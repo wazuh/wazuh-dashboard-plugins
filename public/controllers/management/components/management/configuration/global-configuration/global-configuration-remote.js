@@ -11,11 +11,8 @@ import {
   EuiTitle
 } from "@elastic/eui";
 
-import WzConfigurationSettingsHeader from "../util-components/configuration-settings-header";
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
-import WzViewSelector from "../util-components/view-selector";
-import WzCodeViewer from "../util-components/code-viewer";
-import { getJSON, getXML } from "../utils/wz-fetch";
+import { renderValueOrNoValue, renderValueOrDefault } from '../utils/utils';
 
 const renderAllowedDeniedIPs = (items, label) => {
   if(items){
@@ -38,14 +35,14 @@ class WzConfigurationGlobalConfigurationRemote extends Component{
   constructor(props){
     super(props);
     this.columns = [ 
-      { field: 'connection', name: 'Connection', render: (item) => item || '-' },
-      { field: 'port', name: 'Port', render: (item) => item || '-' },
-      { field: 'protocol', name: 'Protocol', render: (item) => item || 'udp' },
-      { field: 'ipv6', name: 'IPv6', render: (item) => item || '-' },
+      { field: 'connection', name: 'Connection', render: renderValueOrNoValue },
+      { field: 'port', name: 'Port', render: renderValueOrNoValue },
+      { field: 'protocol', name: 'Protocol', render: renderValueOrDefault('udp') },
+      { field: 'ipv6', name: 'IPv6', render: renderValueOrNoValue },
       { field: 'allowed-ips', name: 'Allowed IPs', render: (item) => renderAllowedDeniedIPs(item, 'allowed')},
       { field: 'denied-ips', name: 'Denied Ips', render: (item) => renderAllowedDeniedIPs(item, 'denied')},
-      { field: 'local_ip', name: 'Local IP', render: (item) => item || 'All interfaces' },
-      { field: 'queue_size', name: 'Queue size', render: (item) => item || '16384' }
+      { field: 'local_ip', name: 'Local IP', render: renderValueOrDefault('All interfaces') },
+      { field: 'queue_size', name: 'Queue size', render: renderValueOrDefault('16384') }
     ];
   }
   render(){

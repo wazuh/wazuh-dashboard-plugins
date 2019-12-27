@@ -7,7 +7,7 @@ import {
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
-import { isString } from '../utils/wz-fetch';
+import { isString } from '../utils/utils';
 
 const mainSettings = [
   { key: 'email_to', text: 'Send alerts to this email address'},
@@ -19,6 +19,7 @@ const mainSettings = [
   { key: 'do_not_delay', text: 'Disable delayed email delivery' },
   { key: 'do_not_group', text: 'Disable alerts grouping into the same email' }
 ];
+
 const helpLinks = [
   { text: 'How to configure email alerts', href: 'https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/index.html'},
   { text: 'How to configure authenticated SMTP server', href: 'https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/smtp_authentication.html'},

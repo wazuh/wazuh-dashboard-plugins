@@ -9,8 +9,8 @@ import WzConfigurationPath from '../util-components/configuration-path';
 import WzNoConfig from '../util-components/no-config';
 import TabSelector from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
-import { isString } from '../utils/wz-fetch';
-
+import { isString } from '../utils/utils';
+import helpLinks from './help-links';
 import WzConfigurationCisCatGeneral from './cis-cat-general';
 import WzConfigurationCisCatBenchmarks from './cis-cat-benchmarks';
 
@@ -28,10 +28,10 @@ class WzConfigurationCisCat extends Component{
       <Fragment>
         <WzConfigurationPath title='CIS-CAT' description='Configuration assessment using CIS scanner and SCAP checks' path='CIS-CAT' updateConfigurationSection={this.props.updateConfigurationSection} badge={this.badgeEnabled()}/>
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error={currentConfig['wmodules-wmodules']}/>
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
         )}
         {currentConfig && !this.config && !isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error='not-present'/>
+          <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         <TabSelector>
           <div label='General'>

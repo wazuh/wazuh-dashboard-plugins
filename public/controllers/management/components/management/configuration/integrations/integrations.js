@@ -12,7 +12,7 @@ import { WzConfigurationSettingsHeaderViewer } from '../util-components/configur
 import WzNoConfig from '../util-components/no-config';
 import { WzSettingsViewer } from '../util-components/code-viewer';
 import withWzConfig from '../util-hocs/wz-config';
-import { capitalize } from '../utils/wz-fetch';
+import { capitalize, isString } from '../utils/utils';
 
 const helpLinks = [
   {text: 'How to integrate Wazuh with external APIs', href: 'https://documentation.wazuh.com/current/user-manual/manager/manual-integration.html'},

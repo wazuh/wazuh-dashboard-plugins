@@ -39,7 +39,7 @@ const renderUrlAttr = (item) => {
 
 const columnsAllowAttr = [
   { field: 'replaced_os' , name: 'Replaced OS', render: renderTableField },
-  { field: 'src' , name: 'Source', render: (item) => renderTableField(item.toSting()) },
+  { field: 'src' , name: 'Source', render: (item) => renderTableField(item.toString()) },
 ];
 
 const renderAllowAttr = (item) => {
@@ -68,7 +68,6 @@ const columns = [
 class WzConfigurationVulnerabilitiesProviders extends Component{
   constructor(props){
     super(props);
-    console.log('vul providesr', this.props)
   }
   render(){
     const { config } = this.props;

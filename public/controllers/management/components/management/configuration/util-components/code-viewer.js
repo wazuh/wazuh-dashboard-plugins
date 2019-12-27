@@ -7,7 +7,7 @@ import {
 
 import WzConfigurationSettingsHeader from './configuration-settings-header';
 import WzCodeEditor from './code-editor';
-import { getJSON, getXML } from '../utils/wz-fetch';
+import { getJSON, getXML } from '../utils/utils';
 
 class WzCodeViewer extends Component{
   constructor(props){

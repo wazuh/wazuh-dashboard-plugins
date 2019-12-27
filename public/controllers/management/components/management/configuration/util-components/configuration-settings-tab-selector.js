@@ -15,7 +15,6 @@ class WzConfigurationTabSelector extends Component{
     this.state = {
       view: ''
     };
-    console.log('Entering Tab Selector', this.props)
   }
   changeView(view){
     this.setState({ view });

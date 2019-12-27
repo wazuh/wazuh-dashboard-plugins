@@ -5,9 +5,8 @@ import {
   EuiSpacer
 } from "@elastic/eui";
 
-import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import { isString } from '../utils/wz-fetch';
+import { isString } from '../utils/utils';
 
 const helpLinks = [
   { text: 'How to generate automatic reports', href: 'https://documentation.wazuh.com/current/user-manual/manager/automatic-reports.html'},

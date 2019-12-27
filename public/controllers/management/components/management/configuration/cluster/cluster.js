@@ -11,7 +11,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 
 import withWzConfig from '../util-hocs/wz-config';
-import { isString } from "../utils/wz-fetch";
+import { isString } from "../utils/utils";
 
 const mainSettings = [
   { key: 'disabled', text: 'Cluster status'},

@@ -102,28 +102,28 @@ class WzConfigurationOverview extends Component{
 						name: 'Osquery',
 						description: 'Expose an operating system as a high-performance relational database'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('osquery')
 				},
 				{
 					row: {
 						name: 'Inventory data',
 						description: 'Gather relevant information about system OS, hardware, networking and packages'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('inventory')
 				},
 				{
 					row: {
 						name: 'Active Response',
 						description: 'Active threat addressing by inmmediate response'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('active-response')
 				},
 				{
 					row: {
 						name: 'Commands',
 						description: 'Configuration options of the Command wodle'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('commands')
 				}
 			];
 			this.logDataAnalysisItems = [
@@ -132,21 +132,21 @@ class WzConfigurationOverview extends Component{
 						name: 'Log collection',
 						description: 'Log analysis from text files, Windows events or syslog outputs'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('log-collection')
 				},
 				{
 					row: {
 						name: 'Integrity monitoring',
 						description: 'Identify changes in content, permissions, ownership, and attributes of files'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('integrity-monitoring')
 				},
 				{
 					row: {
 						name: 'Agentless',
 						description: 'Run integrity checks on devices such as routers, firewalls and switches'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('agentless')
 				}
 				
 			];
@@ -156,7 +156,7 @@ class WzConfigurationOverview extends Component{
 						name: 'Amazon S3',
 						description: 'Security events related to Amazon AWS services, collected directly via AWS API'
 					},
-					onClick: () => {}
+					onClick: () => this.updateConfigurationSection('aws-s3')
 				}
 			];
 			this.helpLinks = [
@@ -166,7 +166,6 @@ class WzConfigurationOverview extends Component{
 			];
 		}
 		updateConfigurationSection(section){
-			console.log('Section from Overview Component', section, this.props)
 			this.props.updateConfigurationSection(section);
 		}
     render(){

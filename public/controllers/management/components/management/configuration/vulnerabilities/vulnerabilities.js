@@ -11,7 +11,7 @@ import TabSelector from '../util-components/tab-selector';
 import WzConfigurationPath from '../util-components/configuration-path';
 import WzConfigurationVulnerabilitiesGeneral from './vulnerabilities-general';
 import WzConfigurationVulnerabilitiesProviders from './vulnerabilities-providers';
-import { isString } from '../utils/wz-fetch';
+import { isString } from '../utils/utils';
 
 class WzConfigurationVulnerabilities extends Component{
   constructor(props){

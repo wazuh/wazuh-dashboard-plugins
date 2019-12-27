@@ -13,7 +13,7 @@ import WzConfigurationAlertsLabels from './alerts-labels';
 import WzConfigurationAlertsEmailAlerts from './alerts-email-alerts';
 import WzConfigurationAlertsEmailReports from './alerts-reports';
 import WzConfigurationAlertsSyslogOutput from './alerts-syslog-output';
-import { isString } from '../utils/wz-fetch';
+import { isString } from '../utils/utils';
 
 class WzConfigurationAlerts extends Component{
   constructor(props){

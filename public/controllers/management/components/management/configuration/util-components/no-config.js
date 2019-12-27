@@ -18,7 +18,6 @@ class WzNoConfig extends Component{
   }
   render(){
     const { error, help } = this.props;
-    console.log('wzNoConfig', this.props)
     return (
       <EuiPanel>
         <EuiFlexGroup>

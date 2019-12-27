@@ -13,13 +13,12 @@ const mainSettings = [
   { key: 'disabled', text: 'Vulnerability detector status' },
   { key: 'interval', text: 'Interval between scan executions' },
   { key: 'run_on_start', text: 'Scan on start' },
-  { key: 'ignore_time', text: 'Time to ignore already detected vulerabilities' }
+  { key: 'ignore_time', text: 'Time to ignore already detected vulnerabilities' }
 ];
 
 class WzConfigurationVulnerabilitiesGeneral extends Component{
   constructor(props){
     super(props);
-    console.log('vul general', this.props)
   }
   render(){
     const { config } = this.props;

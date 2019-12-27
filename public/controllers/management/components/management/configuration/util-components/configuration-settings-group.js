@@ -26,7 +26,7 @@ class WzSettingsGroup extends Component{
         <EuiFlexGroup>
           <EuiFlexItem>
             {items.map(item => 
-              <WzConfigurationSetting keyItem={title} description={item.text} value={config[item.key]}/>
+              <WzConfigurationSetting keyItem={title} description={item.text} value={item.render ? item.render(config[item.key]) : config[item.key]}/>
             )}
           </EuiFlexItem>
         </EuiFlexGroup>

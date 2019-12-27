@@ -8,7 +8,7 @@ import {
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
-import { isString } from '../utils/wz-fetch';
+import { isString, renderValueOrAll, renderValueOrNo, renderValueOrDefault } from '../utils/utils';
 
 const helpLinks = [
   { text: 'How to configure the syslog output', href: 'https://documentation.wazuh.com/current/user-manual/manager/manual-syslog-output.html'},
@@ -22,11 +22,11 @@ class WzConfigurationAlertsReports extends Component{
       { field: 'server', name: 'Server' },
       { field: 'port', name: 'Port' },
       { field: 'level', name: 'Level' },
-      { field: 'format', name: 'Format' , render: (item) => item || 'default' },
-      { field: 'use_fqdn', name: 'FQDN' , render: (item) => item || 'no'},
-      { field: 'rule_id', name: 'Rule ID' , render: (item) => item || 'all'},
-      { field: 'group', name: 'Group' , render: (item) => item || 'all'},
-      { field: 'location', name: 'Location' , render: (item) => item || 'all'}
+      { field: 'format', name: 'Format' , render: renderValueOrDefault('default') },
+      { field: 'use_fqdn', name: 'FQDN' , render: renderValueOrNo },
+      { field: 'rule_id', name: 'Rule ID' , render: renderValueOrAll },
+      { field: 'group', name: 'Group' , render: renderValueOrAll },
+      { field: 'location', name: 'Location' , render: renderValueOrAll }
     ];
   }
   render(){

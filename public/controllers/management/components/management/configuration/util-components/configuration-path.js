@@ -24,14 +24,14 @@ class WzConfigurationPath extends Component{
       <Fragment>
         <EuiFlexGroup alignItems='center'>
           <EuiButtonEmpty onClick={() => updateConfigurationSection('')}>Configuration</EuiButtonEmpty>
-          <span> / {path}</span>
+          <span> / {path ? path : title}</span>
         </EuiFlexGroup>
         <EuiSpacer size='s'/>
         <EuiFlexGroup>
           <EuiFlexItem>
             {icon && <EuiIcon size='l' type={icon}/> }
             <EuiTitle style={{display: 'inline-block'}}>
-              <span>{title} {badge !== undefined ? <WzBadge enabled={badge}/> : null}</span>
+              <span>{title} {/*badge !== undefined*/ 'badge' in this.props ? <WzBadge enabled={badge}/> : null}</span>
             </EuiTitle>
             {description && (<EuiText color='subdued'>{description}</EuiText>)}
             <EuiSpacer size='xs'/>
@@ -44,7 +44,8 @@ class WzConfigurationPath extends Component{
 
 WzConfigurationPath.propTypes = {
   title: Proptypes.string.isRequired,
-  path: Proptypes.string.isRequired,
+  description: Proptypes.string,
+  path: Proptypes.string,
   icon: Proptypes.string
 };
 

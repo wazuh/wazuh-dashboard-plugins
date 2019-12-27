@@ -6,10 +6,8 @@ import {
   EuiSpacer
 } from "@elastic/eui";
 
-import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import { WzSettingsViewer } from '../util-components/code-viewer';
-import { isString, hasSize, getJSON, getXML } from '../utils/wz-fetch';
+import { isString, hasSize } from '../utils/utils';
 
 class WzConfigurationAlertsLabels extends Component{
   constructor(props){

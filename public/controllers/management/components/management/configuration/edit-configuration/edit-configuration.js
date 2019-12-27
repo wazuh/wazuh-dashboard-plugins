@@ -32,15 +32,12 @@ class WzEditConfiguration extends Component{
   }
   editorSave(){
     window.alert('Saving');
-    console.log('Saving...', this.state.editorValue);
   }
   editorCancel(){
     window.alert('Canceling');
-    console.log('Canceling...', this.state.editorValue);
   }
   editorRestart(){
     window.alert('Restarting');
-    console.log('Restarting...', this.state.editorValue);
   }
   onEditorChange(editorValue){
     this.setState({ editorValue })
