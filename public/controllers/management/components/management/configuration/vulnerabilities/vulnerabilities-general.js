@@ -10,10 +10,10 @@ import WzConfigurationSettingsGroup from "../util-components/configuration-setti
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'disabled', text: 'Vulnerability detector status' },
-  { key: 'interval', text: 'Interval between scan executions' },
-  { key: 'run_on_start', text: 'Scan on start' },
-  { key: 'ignore_time', text: 'Time to ignore already detected vulnerabilities' }
+  { field: 'disabled', label: 'Vulnerability detector status' },
+  { field: 'interval', label: 'Interval between scan executions' },
+  { field: 'run_on_start', label: 'Scan on start' },
+  { field: 'ignore_time', label: 'Time to ignore already detected vulnerabilities' }
 ];
 
 class WzConfigurationVulnerabilitiesGeneral extends Component{

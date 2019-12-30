@@ -62,7 +62,7 @@ const sections = [
 ];
 
 export default withWzConfig('000', sections, null, ({ error }) => {
-  return (
+  return ( //TODO: remove this and insert inner Component
     <Fragment>
       {error.alerts && <WzNoConfig error={error.alerts}/>}
       {error.notPresent && (

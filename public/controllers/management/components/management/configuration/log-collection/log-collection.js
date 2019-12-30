@@ -16,7 +16,6 @@ class WzConfigurationLogCollection extends Component{
   constructor(props){
     super(props);
   }
-  //TODO: build localfile-logs and localfile-commands? and insert on currentConfig
   render(){
     let { currentConfig } = this.props;
     currentConfig = {

@@ -24,6 +24,9 @@ import WzConfigurationPath from './util-components/configuration-path';
 
 import { connect } from "react-redux";
 
+import { checkDaemons } from './utils/wz-fetch';
+import ToastProvider from './util-providers/toast-provider';
+
 import {
 	EuiPage,
 	EuiPanel
@@ -66,8 +69,8 @@ class WzConfigurationMain extends Component{
 							(<WzConfigurationOverview updateConfigurationSection={this.updateConfigurationSection}/>)
 						}
 					</EuiPanel>
+					<ToastProvider />
 				</EuiPage>
-
 			</WzReduxProvider>
 		)
 	}

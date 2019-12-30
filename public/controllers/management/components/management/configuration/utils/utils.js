@@ -50,3 +50,5 @@ export const renderValueOrNo = renderValueOrDefault('no');
 export const renderValueOrYes = renderValueOrDefault('yes');
 export const renderValueNoThenEnabled = (item) => item === 'no' ? 'enabled' : 'disabled';
 export const renderValueOrAll = (item) => item || 'all';
+
+export const delay = (timeMs) => new Promise((resolve, reject) => setTimeout(resolve, timeMs));

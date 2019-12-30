@@ -12,16 +12,16 @@ import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'name', text: 'Bucket name' },
-  { key: 'type', text: 'Bucket type' },
-  { key: 'aws_account_id', text: 'AWS account ID' },
-  { key: 'aws_account_alias', text: 'AWS account alias' },
-  { key: 'aws_profile', text: 'Profile name with read permissions' },
-  { key: 'iam_role_arn', text: 'IAM ARN role to read bucket logs' },
-  { key: 'path', text: 'Bucket path' },
-  { key: 'only_logs_after', text: 'Parse only logs from this date onwards' },
-  { key: 'remove_from_bucket', text: 'Remove bucket logs after being read' },
-  { key: 'regions', text: 'Limit log parsing to these regions' }
+  { field: 'name', label: 'Bucket name' },
+  { field: 'type', label: 'Bucket type' },
+  { field: 'aws_account_id', label: 'AWS account ID' },
+  { field: 'aws_account_alias', label: 'AWS account alias' },
+  { field: 'aws_profile', label: 'Profile name with read permissions' },
+  { field: 'iam_role_arn', label: 'IAM ARN role to read bucket logs' },
+  { field: 'path', label: 'Bucket path' },
+  { field: 'only_logs_after', label: 'Parse only logs from this date onwards' },
+  { field: 'remove_from_bucket', label: 'Remove bucket logs after being read' },
+  { field: 'regions', label: 'Limit log parsing to these regions' }
 ];
 
 class WzConfigurationAmazonS3Buckets extends Component{

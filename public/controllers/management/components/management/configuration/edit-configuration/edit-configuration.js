@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
-import { connect } from "react-redux";
 
 import {
   EuiButton,
@@ -11,66 +10,139 @@ import {
   EuiLink,
   EuiText,
   EuiTitle,
-  EuiSpacer
+  EuiSpacer,
+  EuiLoadingSpinner
 } from "@elastic/eui";
 
 import WzCodeEditor from '../util-components/code-editor';
 import WzConfigurationPath from '../util-components/configuration-path';
-import { updateConfigurationSection } from '../../../../../../redux/actions/configurationActions';
+import withLoading from '../util-hocs/loading';
 
-class WzEditConfiguration extends Component{
+import { updateConfigurationSection } from '../../../../../../redux/actions/configurationActions';
+import { fetchFile, restartNodeSelected, saveFileManager } from '../utils/wz-fetch';
+import { validateXML } from '../utils/xml';
+
+import { addToast } from '../util-providers/toast-provider';
+
+const WzEditorConfiguration = withLoading(async () => {
+  const xmlFetched = await fetchFile()
+  return { xmlFetched }
+})(class extends Component{
   constructor(props){
     super(props);
     this.state = {
-      editorValue: ''
-    }
-    this.titleComponent = (
-      <EuiText>
-        Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>manager</span>
-      </EuiText>
-    )
+      xml: this.props.xmlFetched,
+      editorValue: this.props.xmlFetched,
+      xmlError: false,
+      restart: false,
+      restarting: false,
+      saving: false
+    };
   }
-  editorSave(){
-    window.alert('Saving');
+  async editorSave(){
+    try{
+      this.setState({ saving: true});
+      await saveFileManager(this.state.editorValue);
+      this.setState( { saving: false });
+      addToast({
+        title: (
+          <Fragment>
+            <EuiIcon type='check'/>&nbsp;
+            <span>Success. Manager configuration has been updated</span>
+          </Fragment>),
+        color: 'success'
+      })
+    }catch(error){
+      console.error(error);
+    }
   }
   editorCancel(){
-    window.alert('Canceling');
+    this.props.updateConfigurationSection('');
   }
-  editorRestart(){
-    window.alert('Restarting');
+  toggleRestart(){
+    this.setState( { restart: !this.state.restart } ); 
   }
-  onEditorChange(editorValue){
-    this.setState({ editorValue })
+  confirmRestart(){
+    this.setState( { restart: !this.state.restart, restarting: true } ); 
+  }
+  onChange(editorValue){
+    const xmlError = validateXML(editorValue);
+    this.setState({ editorValue, xmlError });
+  }
+  async confirmRestart(){
+    try{
+      this.setState( { restarting: true } );
+      await restartNodeSelected();
+      this.setState( { restart: false, restarting: false } );
+    }catch(error){
+      this.setState( { restart: false, restarting: false } );
+    }
   }
   render(){
-    const { editorValue } = this.state;
+    const { editorValue, xml, xmlError, restart, restarting, saving } = this.state;
     return (
       <Fragment>
-        {/* TODO: Missing gear icon */}
-        <WzConfigurationPath title='Manager configuration' path='Edit Configuration' updateConfigurationSection={this.props.updateConfigurationSection}/>
-        <EuiFlexGroup justifyContent="spaceBetween">
+        <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup>
               <EuiFlexItem>
                   <EuiButtonEmpty onClick={() => this.editorCancel()}>Cancel</EuiButtonEmpty>
               </EuiFlexItem>
               <EuiFlexItem>
-                  <EuiButton iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
+                {xmlError ? 
+                  <EuiButton iconType='alert' isDisabled>XML format error</EuiButton>
+                  : <EuiButton isDisabled={saving} iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
+                }
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup justifyContent='flexEnd'>
-              <EuiButton fill iconType='refresh' style={{marginRight: '10px'}} onClick={() => this.editorRestart()}>Restart manager</EuiButton>
+            <EuiFlexGroup justifyContent='flexEnd' style={{marginRight: '10px'}}>
+              {restart && !restarting ? 
+                (<EuiFlexGroup alignItems='center'>
+                  <EuiFlexItem>
+                    <span><strong>manager</strong> will be restarted</span>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty onClick={() => this.toggleRestart()}>Cancel</EuiButtonEmpty>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButton fill iconType='check' onClick={() => this.confirmRestart()}>Confirm</EuiButton>
+                  </EuiFlexItem>
+                </EuiFlexGroup>)
+                  : restarting ? 
+                    <EuiButton fill isDisabled>
+                      <EuiLoadingSpinner size="s"/> Restarting manager
+                    </EuiButton>
+                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart manager</EuiButton>
+              }
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s'/>
-        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onEditorChange(editorValue)} titleComponent={this.titleComponent}/>
+        <EuiText>
+          Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>manager</span>
+          {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
+        </EuiText>
+        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)}/>
+      </Fragment>
+    )
+  }
+})
+class WzEditConfiguration extends Component{
+  constructor(props){
+    super(props);
+  }
+  render(){
+    return (
+      <Fragment>
+        {/* TODO: Missing gear icon */}
+        <WzConfigurationPath title='Manager configuration' path='Edit Configuration' updateConfigurationSection={this.props.updateConfigurationSection}/>
+        <WzEditorConfiguration updateConfigurationSection={this.props.updateConfigurationSection}/>
       </Fragment>
     )
   }
 }
 
-// TODO: Editor, cancel, save and restart manager is hiiden while load/fetch ossec.conf file text
+// TODO: Editor, cancel, save and restart manager is hidden while load/fetch ossec.conf file text
 export default WzEditConfiguration;

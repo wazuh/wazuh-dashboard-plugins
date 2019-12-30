@@ -15,19 +15,19 @@ const helpLinks = [
   { text: 'Syslog output reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syslog-output.html' }
 ];
 
+const columns = [ 
+  { field: 'server', name: 'Server' },
+  { field: 'port', name: 'Port' },
+  { field: 'level', name: 'Level' },
+  { field: 'format', name: 'Format' , render: renderValueOrDefault('default') },
+  { field: 'use_fqdn', name: 'FQDN' , render: renderValueOrNo },
+  { field: 'rule_id', name: 'Rule ID' , render: renderValueOrAll },
+  { field: 'group', name: 'Group' , render: renderValueOrAll },
+  { field: 'location', name: 'Location' , render: renderValueOrAll }
+];
 class WzConfigurationAlertsReports extends Component{
   constructor(props){
     super(props);
-    this.columns = [ 
-      { field: 'server', name: 'Server' },
-      { field: 'port', name: 'Port' },
-      { field: 'level', name: 'Level' },
-      { field: 'format', name: 'Format' , render: renderValueOrDefault('default') },
-      { field: 'use_fqdn', name: 'FQDN' , render: renderValueOrNo },
-      { field: 'rule_id', name: 'Rule ID' , render: renderValueOrAll },
-      { field: 'group', name: 'Group' , render: renderValueOrAll },
-      { field: 'location', name: 'Location' , render: renderValueOrAll }
-    ];
   }
   render(){
     //TODO: 
@@ -61,7 +61,7 @@ class WzConfigurationAlertsReports extends Component{
               ))}
             </ul>
             <EuiBasicTable
-              columns={this.columns}
+              columns={columns}
               items={currentConfig['csyslog-csyslog'].syslog_output}/>
           </WzConfigurationSettingsTabSelector>
         )}

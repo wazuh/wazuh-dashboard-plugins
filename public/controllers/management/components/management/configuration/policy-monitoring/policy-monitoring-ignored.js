@@ -12,11 +12,11 @@ import WzConfigurationSettingsHeader from '../util-components/configuration-sett
 import helpLinks from './help-links.js';
 
 const columnsIgnore = [
-  {field: 'path', name: 'Path'}
+  { field: 'path', name: 'Path' }
 ];
 
 const columnsIgnoreSregex = [
-  {field: 'path', name: 'Sregex'}
+  { field: 'path', name: 'Sregex' }
 ];
 
 class WzConfigurationPolicyMonitoringSystemAudit extends Component{

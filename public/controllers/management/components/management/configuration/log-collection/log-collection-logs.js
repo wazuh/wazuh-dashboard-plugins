@@ -13,10 +13,10 @@ import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'logformat', text: 'Log format', render: renderValueOrNoValue },
-  { key: 'file', text: 'Log location', render: renderValueOrNoValue },
-  { key: 'labels', text: 'Only receive logs occured after start', render: renderValueOrNoValue },
-  { key: 'target', text: 'Redirect output to this socket', render: renderValueOrDefault('agent') },
+  { field: 'logformat', label: 'Log format', render: renderValueOrNoValue },
+  { field: 'file', label: 'Log location', render: renderValueOrNoValue },
+  { field: 'labels', label: 'Only receive logs occured after start', render: renderValueOrNoValue },
+  { field: 'target', label: 'Redirect output to this socket', render: renderValueOrDefault('agent') },
 ];
 
 class WzConfigurationLogCollectionLogs extends Component{

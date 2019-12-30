@@ -15,9 +15,9 @@ import withWzConfig from '../util-hocs/wz-config';
 import { capitalize, isString } from '../utils/utils';
 
 const helpLinks = [
-  {text: 'How to integrate Wazuh with external APIs', href: 'https://documentation.wazuh.com/current/user-manual/manager/manual-integration.html'},
-  {text: 'VirusTotal integration documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html'},
-  {text: 'Integration reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html'}
+  { text: 'How to integrate Wazuh with external APIs', href: 'https://documentation.wazuh.com/current/user-manual/manager/manual-integration.html'},
+  { text: 'VirusTotal integration documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html'},
+  { text: 'Integration reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html'}
 ];
 
 const defaultIntegrations = [
@@ -27,12 +27,12 @@ const defaultIntegrations = [
 ];
 
 const integrationsSettings = [
-  { key: 'hook_url', text: 'Hook URL'},
-  { key: 'level', text: 'Filter alerts by this level or above' },
-  { key: 'rule_id', text: 'Filter alerts by these rule IDs' },
-  { key: 'group', text: 'Filter alerts by these rule groupst' },
-  { key: 'event_location', text: 'Filter alerts by location (agent, IP or file)' },
-  { key: 'alert_format', text: 'Used format to write alerts' }
+  { field: 'hook_url', label: 'Hook URL'},
+  { field: 'level', label: 'Filter alerts by this level or above' },
+  { field: 'rule_id', label: 'Filter alerts by these rule IDs' },
+  { field: 'group', label: 'Filter alerts by these rule groupst' },
+  { field: 'event_location', label: 'Filter alerts by location (agent, IP or file)' },
+  { field: 'alert_format', label: 'Used format to write alerts' }
 ];
 
 class WzConfigurationIntegrations extends Component{

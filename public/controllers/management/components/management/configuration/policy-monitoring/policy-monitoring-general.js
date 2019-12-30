@@ -9,27 +9,27 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import helpLinks from './help-links';
 
 const allSettings = [
-  { key: 'disabled', text: 'Policy monitoring service status'},
-  { key: 'base_directory', text: 'Base directory' },
-  { key: 'scanall', text: 'Scan the entire system' },
-  { key: 'frequency', text: 'Frequency (in seconds) to run the scan' },
-  { key: 'check_dev', text: 'Check /dev path' },
-  { key: 'check_files', text: 'Check files' },
-  { key: 'check_if', text: 'Check network interfaces' },
-  { key: 'check_pids', text: 'Check processes IDs' },
-  { key: 'check_ports', text: 'Check network ports' },
-  { key: 'check_sys', text: 'Check anomalous system objects' },
-  { key: 'check_trojans', text: 'Check trojans' },
-  { key: 'check_unixaudit', text: 'Check UNIX audit' },
-  { key: 'check_winapps', text: 'Check Windows apps' },
-  { key: 'check_winaudit', text: 'Check Windows audit' },
-  { key: 'check_winmalware', text: 'Check Windows malware' },
-  { key: 'skip_nfs', text: 'Skip scan on CIFS/NFS mounts' },
-  { key: 'rootkit_files', text: 'Rootkit files database path' },
-  { key: 'rootkit_trojans', text: 'Rootkit trojans database path' },
-  { key: 'windows_audit', text: 'Rootkit trojans database path' },
-  { key: 'windows_apps', text: 'Rootkit trojans database path' },
-  { key: 'windows_malware', text: 'Rootkit trojans database path' }
+  { field: 'disabled', label: 'Policy monitoring service status'},
+  { field: 'base_directory', label: 'Base directory' },
+  { field: 'scanall', label: 'Scan the entire system' },
+  { field: 'frequency', label: 'Frequency (in seconds) to run the scan' },
+  { field: 'check_dev', label: 'Check /dev path' },
+  { field: 'check_files', label: 'Check files' },
+  { field: 'check_if', label: 'Check network interfaces' },
+  { field: 'check_pids', label: 'Check processes IDs' },
+  { field: 'check_ports', label: 'Check network ports' },
+  { field: 'check_sys', label: 'Check anomalous system objects' },
+  { field: 'check_trojans', label: 'Check trojans' },
+  { field: 'check_unixaudit', label: 'Check UNIX audit' },
+  { field: 'check_winapps', label: 'Check Windows apps' },
+  { field: 'check_winaudit', label: 'Check Windows audit' },
+  { field: 'check_winmalware', label: 'Check Windows malware' },
+  { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
+  { field: 'rootkit_files', label: 'Rootkit files database path' },
+  { field: 'rootkit_trojans', label: 'Rootkit trojans database path' },
+  { field: 'windows_audit', label: 'Rootkit trojans database path' },
+  { field: 'windows_apps', label: 'Rootkit trojans database path' },
+  { field: 'windows_malware', label: 'Rootkit trojans database path' }
 ];
 
 class WzConfigurationPolicyMonitoringGeneral extends Component{

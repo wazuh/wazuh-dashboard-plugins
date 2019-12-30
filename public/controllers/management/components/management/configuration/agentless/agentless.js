@@ -11,11 +11,11 @@ import WzConfigurationListSelector from '../util-components/configuration-settin
 import { isString } from '../utils/utils';
 
 const mainSettings = [
-  { key: 'type', text: 'Agentless monitoring type' },
-  { key: 'frequency', text: 'Interval (in seconds) between checks' },
-  { key: 'host', text: 'Device username and hostname' },
-  { key: 'state', text: 'Device check type' },
-  { key: 'arguments', text: 'Pass these arguments to check' }
+  { field: 'type', label: 'Agentless monitoring type' },
+  { field: 'frequency', label: 'Interval (in seconds) between checks' },
+  { field: 'host', label: 'Device username and hostname' },
+  { field: 'state', label: 'Device check type' },
+  { field: 'arguments', label: 'Pass these arguments to check' }
 ];
 
 const helpLinks = [

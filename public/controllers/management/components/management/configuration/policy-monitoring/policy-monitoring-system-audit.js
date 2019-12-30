@@ -2,18 +2,21 @@ import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
 import {
-  
+  EuiBasicTable
 } from "@elastic/eui";
 
 import WzNoConfig from '../util-components/no-config';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+
+import helpLinks from './help-links';
+
+const columns = [
+  { field: 'path', name: 'Path' }
+];
 
 class WzPolicyMonitoringSystemAudit extends Component{
   constructor(props){
     super(props);
-    this.columns = [
-      {field: 'path', name: 'Path'}
-    ];
-
   }
   render(){
     let { currentConfig } = this.props;
@@ -30,7 +33,7 @@ class WzPolicyMonitoringSystemAudit extends Component{
             helpLinks={helpLinks}>
               <EuiBasicTable 
                 items={currentConfig['syscheck-rootcheck'].rootcheck.system_audit}
-                columns={this.columns}
+                columns={columns}
               />
           </WzConfigurationSettingsTabSelector>
         )}

@@ -14,14 +14,14 @@ import withWzConfig from '../util-hocs/wz-config';
 import { isString } from "../utils/utils";
 
 const mainSettings = [
-  { key: 'disabled', text: 'Cluster status'},
-  { key: 'jsonout_output', text: 'Cluster name' },
-  { key: 'name', text: 'Node name' },
-  { key: 'node_type', text: 'Node type' },
-  { key: 'nodes', text: 'Master node IP address' },
-  { key: 'port', text: 'Port to listen to cluster communications' },
-  { key: 'bind_addr', text: 'IP address to listen to cluster communications' },
-  { key: 'hidden', text: 'Hide cluster information in alerts' }
+  { field: 'disabled', label: 'Cluster status'},
+  { field: 'jsonout_output', label: 'Cluster name' },
+  { field: 'name', label: 'Node name' },
+  { field: 'node_type', label: 'Node type' },
+  { field: 'nodes', label: 'Master node IP address' },
+  { field: 'port', label: 'Port to listen to cluster communications' },
+  { field: 'bind_addr', label: 'IP address to listen to cluster communications' },
+  { field: 'hidden', label: 'Hide cluster information in alerts' }
 ];
 
 const helpLinks = [
@@ -48,12 +48,14 @@ class WzCluster extends Component{
         {/*wazuhNotReadyYet &&*/ (!currentConfig || !currentConfig['com-cluster']) && (
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
-        <WzConfigurationSettingsTabSelector title='Main settings' currentConfig={currentConfig} helpLinks={helpLinks}>
-            <WzConfigurationSettingsGroup
-              config={mainSettingsConfig}
-              items={mainSettings}
-            />
-        </WzConfigurationSettingsTabSelector>
+        {currentConfig['com-cluster'] && !isString(currentConfig['com-cluster']) && (
+          <WzConfigurationSettingsTabSelector title='Main settings' currentConfig={currentConfig} helpLinks={helpLinks}>
+              <WzConfigurationSettingsGroup
+                config={mainSettingsConfig}
+                items={mainSettings}
+              />
+          </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }

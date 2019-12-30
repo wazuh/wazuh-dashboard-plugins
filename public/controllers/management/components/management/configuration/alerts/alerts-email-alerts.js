@@ -10,14 +10,14 @@ import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 
 const mainSettings = [
-  { key: 'email_to', text: 'Send alerts to this email address'},
-  { key: 'level', text: 'Minimum severity level to send the alert by email' },
-  { key: 'group', text: 'Send only alerts that belong to one of these groups' },
-  { key: 'event_location', text: 'Send alerts when they match this event location' },
-  { key: 'format', text: 'Format for email alerts' },
-  { key: 'rule_id', text: 'Send only alerts that belong to one of these rule IDs' },
-  { key: 'do_not_delay', text: 'Disable delayed email delivery' },
-  { key: 'do_not_group', text: 'Disable alerts grouping into the same email' }
+  { field: 'email_to', label: 'Send alerts to this email address'},
+  { field: 'level', label: 'Minimum severity level to send the alert by email' },
+  { field: 'group', label: 'Send only alerts that belong to one of these groups' },
+  { field: 'event_location', label: 'Send alerts when they match this event location' },
+  { field: 'format', label: 'Format for email alerts' },
+  { field: 'rule_id', label: 'Send only alerts that belong to one of these rule IDs' },
+  { field: 'do_not_delay', label: 'Disable delayed email delivery' },
+  { field: 'do_not_group', label: 'Disable alerts grouping into the same email' }
 ];
 
 const helpLinks = [

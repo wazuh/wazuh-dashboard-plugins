@@ -14,25 +14,25 @@ import helpLinks from './help-links';
 const renderOptsIncludes = (key) => (item) => item.includes(key) ? 'yes' : 'no';
 
 const mainSettings = [
-  { key: 'dir', text: 'Selected item' },
-  { key: 'opts', text: 'Enable realtime monitoring', render: renderOptsIncludes('realtime') },
-  { key: 'opts', text: 'Enable auditing (who-data)', render: renderOptsIncludes('check_whodata') },
-  { key: 'opts', text: 'Report file changes', render: renderOptsIncludes('report_changes') },
-  { key: 'opts', text: 'Perform all checksums', render: renderOptsIncludes('check_all') },
-  { key: 'opts', text: 'Check sums (MD5 & SHA1)', render: renderOptsIncludes('check_sum') },
-  { key: 'opts', text: 'Check MD5 sum', render: renderOptsIncludes('check_md5sum') },
-  { key: 'opts', text: 'Check SHA1 sum', render: renderOptsIncludes('check_sha1sum') },
-  { key: 'opts', text: 'Check SHA256 sum', render: renderOptsIncludes('check_sha256sum') },
-  { key: 'opts', text: 'Check files size', render: renderOptsIncludes('check_size') },
-  { key: 'opts', text: 'Check files owner', render: renderOptsIncludes('check_owner') },
-  { key: 'opts', text: 'Check files groups', render: renderOptsIncludes('check_group') },
-  { key: 'opts', text: 'Check files permissions', render: renderOptsIncludes('check_perm') },
-  { key: 'opts', text: 'Check files modification time', render: renderOptsIncludes('check_mtime') },
-  { key: 'opts', text: 'Check files inodes', render: renderOptsIncludes('check_inode') },
-  { key: 'restrict', text: 'Restrict to files containing this string' },
-  { key: 'tags', text: 'Custom tags for alerts' },
-  { key: 'recursion_level', text: 'Recursion level' },
-  { key: 'opts', text: 'Follow symbolic link', render: renderOptsIncludes('follow_symbolic_link') }
+  { field: 'dir', label: 'Selected item' },
+  { field: 'opts', label: 'Enable realtime monitoring', render: renderOptsIncludes('realtime') },
+  { field: 'opts', label: 'Enable auditing (who-data)', render: renderOptsIncludes('check_whodata') },
+  { field: 'opts', label: 'Report file changes', render: renderOptsIncludes('report_changes') },
+  { field: 'opts', label: 'Perform all checksums', render: renderOptsIncludes('check_all') },
+  { field: 'opts', label: 'Check sums (MD5 & SHA1)', render: renderOptsIncludes('check_sum') },
+  { field: 'opts', label: 'Check MD5 sum', render: renderOptsIncludes('check_md5sum') },
+  { field: 'opts', label: 'Check SHA1 sum', render: renderOptsIncludes('check_sha1sum') },
+  { field: 'opts', label: 'Check SHA256 sum', render: renderOptsIncludes('check_sha256sum') },
+  { field: 'opts', label: 'Check files size', render: renderOptsIncludes('check_size') },
+  { field: 'opts', label: 'Check files owner', render: renderOptsIncludes('check_owner') },
+  { field: 'opts', label: 'Check files groups', render: renderOptsIncludes('check_group') },
+  { field: 'opts', label: 'Check files permissions', render: renderOptsIncludes('check_perm') },
+  { field: 'opts', label: 'Check files modification time', render: renderOptsIncludes('check_mtime') },
+  { field: 'opts', label: 'Check files inodes', render: renderOptsIncludes('check_inode') },
+  { field: 'restrict', label: 'Restrict to files containing this string' },
+  { field: 'tags', label: 'Custom tags for alerts' },
+  { field: 'recursion_level', label: 'Recursion level' },
+  { field: 'opts', label: 'Follow symbolic link', render: renderOptsIncludes('follow_symbolic_link') }
 ];
 
 class WzConfigurationIntegrityMonitoringMonitored extends Component{

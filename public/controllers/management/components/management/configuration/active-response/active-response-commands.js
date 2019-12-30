@@ -18,11 +18,11 @@ const helpLinks = [
 ];
 
 const mainSettings = [
-  { key: 'name', text: 'Command name' },
-  { key: 'executable', text: 'Name of executable file' },
-  { key: 'expect', text: 'List of expected fields' },
-  { key: 'extra_args', text: 'Extra arguments' },
-  { key: 'timeout_allowed', text: 'Allow this command to be reverted' }
+  { field: 'name', label: 'Command name' },
+  { field: 'executable', label: 'Name of executable file' },
+  { field: 'expect', label: 'List of expected fields' },
+  { field: 'extra_args', label: 'Extra arguments' },
+  { field: 'timeout_allowed', label: 'Allow this command to be reverted' }
 ];
 
 class WzConfigurationActiveResponseCommands extends Component{

@@ -18,20 +18,22 @@ import WzHelpButtonPopover from './util-components/help-button-popover';
 
 import { updateConfigurationSection } from '../../../../../redux/actions/configurationActions';
 
+const columns = [
+	{
+		field: 'name',
+		name: 'Name'
+	},
+	{
+		field: 'description',
+		name: 'Description'
+	}
+];
+
 class WzConfigurationOverview extends Component{
     constructor(props){
 			super(props);
 
-			this.columns = [
-				{
-					field: 'name',
-					name: 'Name'
-				},
-				{
-					field: 'description',
-					name: 'Description'
-				}
-			];
+			
 			this.mainConfigurationsItems = [
 				{
 					row: {
@@ -198,32 +200,32 @@ class WzConfigurationOverview extends Component{
 						<EuiFlexItem>
 							<WzConfigurationOverviewTable 
 								title="Main configurations"
-								columns={this.columns}
+								columns={columns}
 								items={this.mainConfigurationsItems}
 							/>
 							<WzConfigurationOverviewTable 
 								title="Alerts and output management"
-								columns={this.columns}
+								columns={columns}
 								items={this.alertsOutputManagementItems}
 							/>
 							<WzConfigurationOverviewTable 
 								title="Auditing and policy monitoring"
-								columns={this.columns}
+								columns={columns}
 								items={this.auditingPolicyMonitoringItems}
 							/>
 							<WzConfigurationOverviewTable 
 								title="System threats and incident response"
-								columns={this.columns}
+								columns={columns}
 								items={this.systemThreatsIncidentResponseItems}
 							/>
 							<WzConfigurationOverviewTable 
 								title="Alerts and output management"
-								columns={this.columns}
+								columns={columns}
 								items={this.logDataAnalysisItems}
 							/>
 							<WzConfigurationOverviewTable 
 								title="Cloud security monitoring"
-								columns={this.columns}
+								columns={columns}
 								items={this.cloudSecurityMonitoring}
 							/>
 						</EuiFlexItem>

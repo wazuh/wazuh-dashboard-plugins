@@ -9,9 +9,9 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 
 const mainSettings = [
-  { key: 'log_alert_level', text: 'Minimum severity level to store the alert'},
-  { key: 'email_alert_level', text: 'Minimum severity level to send the alert by email' },
-  { key: 'use_geoip', text: 'Enable GeoIP lookups' }
+  { field: 'log_alert_level', label: 'Minimum severity level to store the alert'},
+  { field: 'email_alert_level', label: 'Minimum severity level to send the alert by email' },
+  { field: 'use_geoip', label: 'Enable GeoIP lookups' }
 ];
 const helpLinks = [
   { text: 'Use cases about alerts generation', href: 'https://documentation.wazuh.com/current/getting-started/use-cases.html' },

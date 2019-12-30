@@ -9,18 +9,20 @@ import {
 import WzNoConfig from '../util-components/no-config';
 import { isString, hasSize } from '../utils/utils';
 
+const columns = [ 
+  { field: 'label_key', name: 'Label key' },
+  { field: 'label_value', name: 'Label value' },
+  { field: 'label_hidden', name: 'Hidden' }
+];
+
+const helpLinks = [
+  {text: 'Labels documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/labels.html'},
+  {text: 'Labels reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html'}
+];
+
 class WzConfigurationAlertsLabels extends Component{
   constructor(props){
     super(props);
-    this.columns = [ 
-      { field: 'label_key', name: 'Label key' },
-      { field: 'label_value', name: 'Label value' },
-      { field: 'label_hidden', name: 'Hidden' }
-    ];
-    this.helpLinks = [
-      {text: 'Labels documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/labels.html'},
-      {text: 'Labels reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html'}
-    ];
   }
   render(){
     const { currentConfig } = this.props;
@@ -32,7 +34,7 @@ class WzConfigurationAlertsLabels extends Component{
         {currentConfig['analysis-labels'] && !isString(currentConfig['analysis-labels']) && !hasSize(currentConfig['analysis-labels'].labels) && (
           <Fragment>
             <EuiSpacer size='s'/>
-            <WzNoConfig error='not-present' help={this.helpLinks}/>
+            <WzNoConfig error='not-present' help={helpLinks}/>
           </Fragment>
         )}
         {/*wazuhNotReadyYet && */ (!currentConfig || !currentConfig['analysis-labels']) && ( /* TODO: wazuhNotReady */
@@ -48,7 +50,7 @@ class WzConfigurationAlertsLabels extends Component{
               items={mainSettings}
             />
             <EuiBasicTable
-              columns={this.columns}
+              columns={columns}
               items={currentConfig['analysis-labels'].labels}/>
           </WzConfigurationSettingsTabSelector>
         )}

@@ -10,18 +10,18 @@ import WzConfigurationSettingsGroup from "../util-components/configuration-setti
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'disabled', text: 'CIS-CAT integration status' },
-  { key: 'timeout', text: 'Timeout (in seconds) for scan executions' },
-  { key: 'java_path', text: 'Path to Java executable directory' },
-  { key: 'ciscat_path', text: 'Path to CIS-CAT executable directory' }
+  { field: 'disabled', label: 'CIS-CAT integration status' },
+  { field: 'timeout', label: 'Timeout (in seconds) for scan executions' },
+  { field: 'java_path', label: 'Path to Java executable directory' },
+  { field: 'ciscat_path', label: 'Path to CIS-CAT executable directory' }
 ];
 
 const schedulingSettings = [
-  { key: 'interval', text: 'Interval between scan executions' },
-  { key: 'scan-on-start', text: 'Scan on start' },
-  { key: 'day', text: 'Day of the month to run scans' },
-  { key: 'wday', text: 'Day of the week to run scans' },
-  { key: 'time', text: 'Time of the day to run scans' }
+  { field: 'interval', label: 'Interval between scan executions' },
+  { field: 'scan-on-start', label: 'Scan on start' },
+  { field: 'day', label: 'Day of the month to run scans' },
+  { field: 'wday', label: 'Day of the week to run scans' },
+  { field: 'time', label: 'Time of the day to run scans' }
 ];
 
 class WzConfigurationCisCatGeneral extends Component{

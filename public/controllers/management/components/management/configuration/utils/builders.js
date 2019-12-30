@@ -16,8 +16,8 @@ export const settingsListBuilder = (items, label) => items.map((item, key) => ({
  * @param {*} items 
  */
 export const settingsBuilder = (items) => items.map((item, key) => ({
-  key: item[0],
-  text: item[1]
+  field: item[0],
+  label: item[1]
 }))
 
 /**

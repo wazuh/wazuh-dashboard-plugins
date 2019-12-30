@@ -10,13 +10,17 @@ import WzConfigurationTabSelector from '../util-components/configuration-setting
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, isArray, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
-import helpLinks from './help-links';
+
+const helpLinks = [
+  { text: 'Using multiple outputs', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs' },
+  { text: 'Socket reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/socket.html' }
+];
 
 const mainSettings = [
-  { key: 'name', text: 'Socket name', render: renderValueOrNoValue  },
-  { key: 'location', text: 'Socket location', render: renderValueOrNoValue },
-  { key: 'mode', text: 'UNIX socket protocol', render: renderValueOrDefault('udp') },
-  { key: 'prefix', text: 'Prefix to place before the message', render: renderValueOrNoValue }
+  { field: 'name', label: 'Socket name', render: renderValueOrNoValue  },
+  { field: 'location', label: 'Socket location', render: renderValueOrNoValue },
+  { field: 'mode', label: 'UNIX socket protocol', render: renderValueOrDefault('udp') },
+  { field: 'prefix', label: 'Prefix to place before the message', render: renderValueOrNoValue }
 ];
 
 class WzConfigurationLogCollectionSockets extends Component{

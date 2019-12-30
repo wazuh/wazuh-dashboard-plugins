@@ -13,18 +13,18 @@ import { renderValueOrDefault, renderValueOrNoValue, renderValueOrYes, renderVal
 import WzSettingsGroup from "../util-components/configuration-settings-group";
 
 const mainSettings = [
-  { key: 'disabled', text: 'Integrity monitoring status', render: renderValueNoThenEnabled },
-  { key: 'frequency', text: 'Interval (in seconds) to run the integrity scan' },
-  { key: 'scan_time', text: 'Time of day to run integrity scans', render: renderValueOrNoValue },
-  { key: 'scan_day', text: 'Day of the week to run integrity scans', render: renderValueOrNoValue },
-  { key: 'auto_ignore', text: 'Ignore files that change too many times', render: renderValueOrNo },
-  { key: 'alert_new_files', text: 'Alert when new files are created', render: renderValueOrNo },
-  { key: 'scan_on_start', text: 'Scan on start' },
-  { key: 'skip_nfs', text: 'Skip scan on CIFS/NFS mounts' },
-  { key: 'remove_old_diff', text: 'Remove old local snapshots', render: renderValueOrYes },
-  { key: 'restart_audit', text: 'Restart the Audit daemon' },
-  { key: 'windows_audit_interval', text: 'Interval (in seconds) to check directories\' SACLs', render: renderValueOrDefault('300') },
-  { key: 'prefilter_cmd', text: 'Command to prevent prelinking', render: renderValueOrNoValue },
+  { field: 'disabled', label: 'Integrity monitoring status', render: renderValueNoThenEnabled },
+  { field: 'frequency', label: 'Interval (in seconds) to run the integrity scan' },
+  { field: 'scan_time', label: 'Time of day to run integrity scans', render: renderValueOrNoValue },
+  { field: 'scan_day', label: 'Day of the week to run integrity scans', render: renderValueOrNoValue },
+  { field: 'auto_ignore', label: 'Ignore files that change too many times', render: renderValueOrNo },
+  { field: 'alert_new_files', label: 'Alert when new files are created', render: renderValueOrNo },
+  { field: 'scan_on_start', label: 'Scan on start' },
+  { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
+  { field: 'remove_old_diff', label: 'Remove old local snapshots', render: renderValueOrYes },
+  { field: 'restart_audit', label: 'Restart the Audit daemon' },
+  { field: 'windows_audit_interval', label: 'Interval (in seconds) to check directories\' SACLs', render: renderValueOrDefault('300') },
+  { field: 'prefilter_cmd', label: 'Command to prevent prelinking', render: renderValueOrNoValue },
 ];
 
 class WzConfigurationIntegrityMonitoringGeneral extends Component{

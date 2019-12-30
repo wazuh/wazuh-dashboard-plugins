@@ -1,4 +1,6 @@
 import { WzRequest } from '../../../../../../react-services/wz-request';
+import { delay } from './utils';
+import { replaceIllegalXML } from './xml';
 
 export const getCurrentConfig = async (agentId = '000', sections, node = false) => {
   try{
@@ -41,7 +43,7 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false) 
         //   false,
         //   true
         // );
-        result[`${component}-${configuration}`] = handleError(error, 'Fetch configuration');
+        result[`${component}-${configuration}`] = await handleError(error, 'Fetch configuration');
       }
     }
     return result;
@@ -84,53 +86,415 @@ export const extractMessage = (error) => {
   return error || 'Unexpected error';
 }
 
-export const handleError = (error, location) => {
+export const handleError = async (error, location) => {
   const message = extractMessage(error);
   const messageIsString = typeof message === 'string';
-
-  if (messageIsString && message.includes('ERROR3099')) {
-    //this.$rootScope.wazuhNotReadyYet = 'Wazuh not ready yet.'; //TODO:
-    //this.$rootScope.$applyAsync();
-    //this.checkDaemonsStatus.makePing();
-    return;
+  try {
+    if (messageIsString && message.includes('ERROR3099')) {
+      //this.$rootScope.wazuhNotReadyYet = 'Wazuh not ready yet.'; //TODO:
+      await makePing();
+      return;
+    }
+  
+    const origin = ((error || {}).config || {}).url || '';
+    const originIsString = typeof origin === 'string' && origin.length;
+  
+    // if (this.wzMisc.getBlankScr()) silent = true;
+  
+    const hasOrigin = messageIsString && originIsString;
+  
+    let text = hasOrigin ? `${message} (${origin})` : message;
+  
+    if (error.extraMessage) text = error.extraMessage;
+    text = location ? location + '. ' + text : text;
+  
+    // // Current date in milliseconds //TODO: toast notification?
+    // const date = new Date().getTime();
+  
+    // // Remove errors older than 2s from the error history
+    // this.history = this.history.filter(item => date - item.date <= 2000);
+  
+    // // Check if the incoming error was already shown in the last two seconds
+    // const recentlyShown = this.history.map(item => item.text).includes(text);
+  
+    // // If the incoming error was not shown in the last two seconds, add it to the history
+    // !recentlyShown && this.history.push({ text, date });
+  
+    // // The error must be shown and the error was not shown in the last two seconds, then show the error
+    // if (!silent && !recentlyShown) {
+    //   if (
+    //     isWarning ||
+    //     (text &&
+    //       typeof text === 'string' &&
+    //       text.toLowerCase().includes('no results'))
+    //   ) {
+    //     toastNotifications.addWarning(text);
+    //   } else {
+    //     toastNotifications.addDanger(text);
+    //   }
+    // }
+    return text;
+  }catch(error){
+    console.error(error);
   }
+}
 
-  const origin = ((error || {}).config || {}).url || '';
-  const originIsString = typeof origin === 'string' && origin.length;
+export const checkDaemons = async () => {
+  try{
+    const response = await WzRequest.apiReq('GET', '/manager/status', {});
+    console.log('checkdaemons', response)
+    const daemons = ((response || {}).data || {}).data || {};
+    console.log('daemons', daemons)
+    const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
-  // if (this.wzMisc.getBlankScr()) silent = true;
+    const execd = daemons['ossec-execd'] === 'running';
+    const modulesd = daemons['wazuh-modulesd'] === 'running';
+    const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
+    const clusterd = isCluster
+        ? daemons['wazuh-clusterd'] === 'running'
+        : true;
 
-  const hasOrigin = messageIsString && originIsString;
+    const isValid = execd && modulesd && wazuhdb && clusterd;
 
-  let text = hasOrigin ? `${message} (${origin})` : message;
+    if( isValid ){
+      return { isValid }
+    }else{
+      throw new Error('Wazuh not ready yet');
+    }
+  }catch(error){
+    return Promise.reject(error);
+  }
+}
 
-  if (error.extraMessage) text = error.extraMessage;
-  text = location ? location + '. ' + text : text;
+export const makePing = async (tries = 10) => {
+   try{
+     let isValid = false;
+     while (tries--) {
+      console.log('makepingbefore')
+      await delay(1200);
+      try{
+        const result = await WzRequest.apiReq('GET', '/ping', {});
+        console.log('makeping', result)
+        isValid = ((result || {}).data || {}).isValid;
+        if (isValid) {
+          // this.$rootScope.wazuhNotReadyYet = false; // TODO: wznotereadyyet
+          break;
+        }
+      }catch(error){
+        console.error(error)
+      }
+    }
+    if(!isValid){
+      throw new Error('Not recovered');
+    }
+    return Promise.resolve('Wazuh is ready')
+   }catch(error){
+    return Promise.reject('Wazuh could not be recovered.')
+   }
+}
 
-  // // Current date in milliseconds //TODO: toast notification?
-  // const date = new Date().getTime();
+export const clusterReq = async () => {
+  try{
+    return WzRequest.apiReq(
+      'GET',
+      '/cluster/status',
+      {}
+    );
+  }catch(error){
+    return Promise.reject(error);
+  }
+}
 
-  // // Remove errors older than 2s from the error history
-  // this.history = this.history.filter(item => date - item.date <= 2000);
+export const fetchFile = async (selectedNode) => {
+  try {
+    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const isCluster =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
 
-  // // Check if the incoming error was already shown in the last two seconds
-  // const recentlyShown = this.history.map(item => item.text).includes(text);
+    const data = await WzRequest.apiReq(
+      'GET',
+      isCluster
+        ? `/cluster/${selectedNode}/files`
+        : `/manager/files`,
+      { path: 'etc/ossec.conf' }
+    );
 
-  // // If the incoming error was not shown in the last two seconds, add it to the history
-  // !recentlyShown && this.history.push({ text, date });
+    let xml = ((data || {}).data || {}).data || false;
 
-  // // The error must be shown and the error was not shown in the last two seconds, then show the error
-  // if (!silent && !recentlyShown) {
-  //   if (
-  //     isWarning ||
-  //     (text &&
-  //       typeof text === 'string' &&
-  //       text.toLowerCase().includes('no results'))
-  //   ) {
-  //     toastNotifications.addWarning(text);
+    if (!xml) {
+      throw new Error('Could not fetch configuration file');
+    }
+
+    xml = xml.replace(/..xml.+\?>/, '');
+    return xml;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+export const restartNodeSelected = async (selectedNode) => {
+  try{
+    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const isCluster =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    isCluster
+      ? await restartNode(selectedNode)
+      : await restartManager();
+    // this.$rootScope.wazuhNotReadyYet = `Restarting ${
+    //   isCluster ? selectedNode : 'manager'
+    // }, please wait. `;
+    return await makePing();
+  }catch(error){
+    console.error('restartNodeSelected',error);
+    return Promise.reject(error);
+  }
+}
+
+/**
+   * Restart manager (single-node API call)
+   */
+export const restartManager = async () => {
+  try {
+    const validationError = await WzRequest.apiReq(
+      'GET',
+      `/manager/configuration/validation`,
+      {}
+    );
+
+    const data = ((validationError || {}).data || {}).data || {};
+    const isOk = data.status === 'OK';
+    if (!isOk && Array.isArray(data.details)) {
+      const str = data.details.join();
+      throw new Error(str);
+    }
+    const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
+    return result;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+/**
+ * Restart cluster
+ */
+export const restartCluster = async () => {
+  try {
+    const validationError = await WzRequest.apiReq(
+      'GET',
+      `/cluster/configuration/validation`,
+      {}
+    );
+
+    const data = ((validationError || {}).data || {}).data || {};
+    const isOk = data.status === 'OK';
+    if (!isOk && Array.isArray(data.details)) {
+      const str = data.details.join();
+      throw new Error(str);
+    }
+    this.performClusterRestart();
+    return { data: { data: 'Restarting cluster' } };
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+/**
+ * Restart a cluster node
+*/
+export const restartNode = async (node) => {
+  try {
+    const validationError = await WzRequest.apiReq(
+      'GET',
+      `/cluster/${node}/configuration/validation`,
+      {}
+    );
+
+    const data = ((validationError || {}).data || {}).data || {};
+    const isOk = data.status === 'OK';
+    if (!isOk && Array.isArray(data.details)) {
+      const str = data.details.join();
+      throw new Error(str);
+    }
+    const result = await WzRequest.apiReq(
+      'PUT',
+      `/cluster/${node}/restart`,
+      {}
+    );
+    return result;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+export const saveConfiguration = async (selectedNode) => {
+  try {
+    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const enabledAndRunning =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    const parameters = enabledAndRunning
+      ? {
+          node: selectedNode,
+          showRestartManager: 'cluster'
+        }
+      : saveFileManager(xml);
+    // this.$scope.$broadcast('saveXmlFile', parameters);
+  } catch (error) {
+    this.fetchedXML = null;
+    this.doingSaving = false;
+    this.errorHandler.handle(error.message || error);
+  }
+}
+
+export const saveFileManager = async (text) => {
+  const xml = replaceIllegalXML(text);
+  try {
+    await WzRequest.apiReq(
+      'POST',
+      `/manager/files?path=etc/ossec.conf&overwrite=true`,
+      { content: xml, origin: 'xmleditor' }
+    );
+    await validateAfterSent(false);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  
+  // const warnMsg =
+  //   'File has been updated, but there are errors in the configuration';
+  // try {
+  //   // const text = $scope.xmlCodeBox.getValue();
+  //   const xml = replaceIllegalXML(text);
+  //   if (params.group) {
+  //     close = false;
+  //     await groupHandler.sendConfiguration(params.group, xml);
+  //     try {
+  //       await validateAfterSent(false);
+  //     } catch (err) {
+  //       params.showRestartManager = 'warn';
+  //     }
+  //     const msg = 'Success. Group has been updated';
+  //     params.showRestartManager
+  //       ? params.showRestartManager !== 'warn'
+  //         ? showRestartMessage(msg, params.showRestartManager)
+  //         : errorHandler.handle(warnMsg, '', true)
+  //       : errorHandler.info(msg);
+  //   } else if (params.rule) {
+  //     close = false;
+  //     await rulesetHandler.sendRuleConfiguration(
+  //       params.rule,
+  //       xml,
+  //       params.isNewFile && !params.isOverwrite
+  //     );
+  //     try {
+  //       await validateAfterSent(false);
+  //     } catch (err) {
+  //       params.showRestartManager = 'warn';
+  //     }
+  //     const msg = 'Success. Rules updated';
+  //     params.showRestartManager
+  //       ? params.showRestartManager !== 'warn'
+  //         ? showRestartMessage(msg, params.showRestartManager)
+  //         : errorHandler.handle(warnMsg, '', true)
+  //       : errorHandler.info(msg);
+  //   } else if (params.decoder) {
+  //     close = false;
+  //     await rulesetHandler.sendDecoderConfiguration(
+  //       params.decoder,
+  //       xml,
+  //       params.isNewFile && !params.isOverwrite
+  //     );
+  //     try {
+  //       await validateAfterSent(false);
+  //     } catch (err) {
+  //       params.showRestartManager = 'warn';
+  //     }
+  //     const msg = 'Success. Decoders has been updated';
+  //     params.showRestartManager
+  //       ? params.showRestartManager !== 'warn'
+  //         ? showRestartMessage(msg, params.showRestartManager)
+  //         : errorHandler.handle(warnMsg, '', true)
+  //       : errorHandler.info(msg);
+  //   } else if (params.node) {
+  //     close = false;
+  //     await configHandler.saveNodeConfiguration(params.node, xml);
+  //     try {
+  //       await validateAfterSent(params.node);
+  //     } catch (err) {
+  //       params.showRestartManager = 'warn';
+  //     }
+  //     const msg = `Success. Node (${params.node}) configuration has been updated`;
+  //     params.showRestartManager
+  //       ? params.showRestartManager !== 'warn'
+  //         ? showRestartMessage(msg, params.node)
+  //         : errorHandler.handle(warnMsg, '', true)
+  //       : errorHandler.info(msg);
+  //   } else if (params.manager) {
+  //     await configHandler.saveManagerConfiguration(xml);
+  //     try {
+  //       await validateAfterSent(false);
+  //     } catch (err) {
+  //       params.showRestartManager = 'warn';
+  //     }
+  //     const msg = 'Success. Manager configuration has been updated';
+  //     params.showRestartManager
+  //       ? params.showRestartManager !== 'warn'
+  //         ? showRestartMessage(msg, params.showRestartManager)
+  //         : errorHandler.handle(warnMsg, '', true)
+  //       : errorHandler.info(msg);
+  //   }
+  //   $scope.savingParam();
+  //   if (close) $scope.closeFn({ reload: true });
+  // } catch (error) {
+  //   $scope.savingParam();
+  //   if ((error || '').includes('Wazuh API error: 1905')) {
+  //     $scope.configError = ['File name already exists'];
+  //     $scope.$emit('showSaveAndOverwrite', {});
   //   } else {
-  //     toastNotifications.addDanger(text);
+  //     errorHandler.handle(error, 'Error');
   //   }
   // }
-  return text;
-}
+  // return;
+};
+
+export const validateAfterSent = async (node = false) => {
+  try {
+    const clusterStatus = await WzRequest.apiReq(
+      'GET',
+      `/cluster/status`,
+      {}
+    );
+
+    const clusterData = ((clusterStatus || {}).data || {}).data || {};
+    const isCluster =
+      clusterData.enabled === 'yes' && clusterData.running === 'yes';
+
+    let validation = false;
+    if (node && isCluster) {
+      validation = await WzRequest.apiReq(
+        'GET',
+        `/cluster/${node}/configuration/validation`,
+        {}
+      );
+    } else {
+      validation = isCluster
+        ? await WzRequest.apiReq(
+            'GET',
+            `/cluster/configuration/validation`,
+            {}
+          )
+        : await WzRequest.apiReq(
+            'GET',
+            `/manager/configuration/validation`,
+            {}
+          );
+    }
+    const data = ((validation || {}).data || {}).data || {};
+    const isOk = data.status === 'OK';
+    if (!isOk && Array.isArray(data.details)) {
+      // $scope.configError = data.details;
+      throw new Error('Validation error');
+    }
+    return true;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};

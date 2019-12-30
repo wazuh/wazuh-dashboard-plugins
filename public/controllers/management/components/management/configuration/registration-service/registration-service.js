@@ -18,20 +18,20 @@ const helpLinks = [
 ];
 
 const mainSettings = [
-  { key: 'disabled', text: 'Service status'},
-  { key: 'port', text: 'Listen to connections at port'},
-  { key: 'use_source_ip', text: 'Use client\'s source IP address'},
-  { key: 'use_password', text: 'Use a password to register agents'},
-  { key: 'purge', text: 'Purge agents list when removing agents'},
-  { key: 'limit_maxagents', text: 'Limit registration to maximum number of agents'},
-  { key: 'force_insert', text: 'Force registration when using an existing IP address'}
+  { field: 'disabled', label: 'Service status'},
+  { field: 'port', label: 'Listen to connections at port'},
+  { field: 'use_source_ip', label: 'Use client\'s source IP address'},
+  { field: 'use_password', label: 'Use a password to register agents'},
+  { field: 'purge', label: 'Purge agents list when removing agents'},
+  { field: 'limit_maxagents', label: 'Limit registration to maximum number of agents'},
+  { field: 'force_insert', label: 'Force registration when using an existing IP address'}
 ];
 const sslSettings = [
-  { key: 'ssl_verify_host', text: 'Verify agents using a CA certificate'},
-  { key: 'ssl_auto_negotiate', text: 'Auto-select the SSL negotiation method'},
-  { key: 'ssl_manager_cert', text: 'Server SSL certificate location'},
-  { key: 'ssl_manager_key', text: 'Server SSL key location'},
-  { key: 'ciphers', text: 'Use the following SSL ciphers'}
+  { field: 'ssl_verify_host', label: 'Verify agents using a CA certificate'},
+  { field: 'ssl_auto_negotiate', label: 'Auto-select the SSL negotiation method'},
+  { field: 'ssl_manager_cert', label: 'Server SSL certificate location'},
+  { field: 'ssl_manager_key', label: 'Server SSL key location'},
+  { field: 'ciphers', label: 'Use the following SSL ciphers'}
 ];
 
 class WzRegistrationService extends Component{

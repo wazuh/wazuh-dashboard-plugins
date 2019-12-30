@@ -25,8 +25,13 @@ class WzSettingsGroup extends Component{
         <EuiSpacer size='s'/>
         <EuiFlexGroup>
           <EuiFlexItem>
-            {items.map(item => 
-              <WzConfigurationSetting keyItem={title} description={item.text} value={item.render ? item.render(config[item.key]) : config[item.key]}/>
+            {items.map((item, key) => {
+              const keyItem = `${title || ''}-${item.label}-${item.value}-${key}`
+              console.log('configurationSetting', keyItem);
+              return (
+                <WzConfigurationSetting keyItem={keyItem} label={item.label} value={item.render ? item.render(config[item.field]) : config[item.field]}/>
+              )
+            }
             )}
           </EuiFlexItem>
         </EuiFlexGroup>

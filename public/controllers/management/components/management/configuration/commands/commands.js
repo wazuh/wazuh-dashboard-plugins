@@ -18,17 +18,17 @@ const helpLinks = [
 ];
 
 const mainSettings = [
-  { key: 'disabled', text: 'Command status' },
-  { key: 'tag', text: 'Command name' },
-  { key: 'command', text: 'Command to execute' },
-  { key: 'interval', text: 'Interval between executions' },
-  { key: 'run_on_start', text: 'Run on start' },
-  { key: 'ignore_output', text: 'Ignore command output' },
-  { key: 'timeout', text: 'Timeout (in seconds) to wait for execution' },
-  { key: 'verify_md5', text: 'Verify MD5 sum' },
-  { key: 'verify_sha1', text: 'Verify SHA1 sum' },
-  { key: 'verify_sha256', text: 'Verify SHA256 sum' },
-  { key: 'skip_verification', text: 'Ignore checksum verification' }
+  { field: 'disabled', label: 'Command status' },
+  { field: 'tag', label: 'Command name' },
+  { field: 'command', label: 'Command to execute' },
+  { field: 'interval', label: 'Interval between executions' },
+  { field: 'run_on_start', label: 'Run on start' },
+  { field: 'ignore_output', label: 'Ignore command output' },
+  { field: 'timeout', label: 'Timeout (in seconds) to wait for execution' },
+  { field: 'verify_md5', label: 'Verify MD5 sum' },
+  { field: 'verify_sha1', label: 'Verify SHA1 sum' },
+  { field: 'verify_sha256', label: 'Verify SHA256 sum' },
+  { field: 'skip_verification', label: 'Ignore checksum verification' }
 ];
 
 class WzConfigurationCommands extends Component{

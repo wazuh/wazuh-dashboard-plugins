@@ -7,27 +7,28 @@ import {
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
-import WzConfigurationSettingsHeader from '../util-components/configuration-settings-tab-selector';
-import WzConfigurationSettingsGroup from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
+import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import helpLinks from './help-links';
 
 const securitySettings = [
-  { key: 'enabled', text: 'Security configuration assessment status'},
-  { key: 'interval', text: 'Interval'},
-  { key: 'scan_on_start', text: 'Scan on start'},
-  { key: 'skip_nfs', text: 'Skip nfs'}
+  { field: 'enabled', label: 'Security configuration assessment status'},
+  { field: 'interval', label: 'Interval'},
+  { field: 'scan_on_start', label: 'Scan on start'},
+  { field: 'skip_nfs', label: 'Skip nfs'}
+];
+
+const columns = [
+  { field: 'policy', name: 'Name' }
 ];
 
 class WzPolicyMonitoringSCA extends Component{
   constructor(props){
     super(props);
-    this.columns = [
-      { field: 'policy', name: 'Name' }
-    ]
   }
   render(){
     let { currentConfig } = this.props;
-    currentConfig = currentConfig['wmodules-wmodules'].wmodules.find(module => module.sca);
+    currentConfig = currentConfig['wmodules-wmodules'].wmodules.find(wmodule => wmodule.sca);
     const securitySettingsConfig = {
       ...currentConfig['sca'],
       enabled: currentConfig['sca'].enabled === 'yes' ? 'enabled' : 'disabled'
@@ -37,7 +38,10 @@ class WzPolicyMonitoringSCA extends Component{
         {!currentConfig['sca'] ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : (
-          <WzConfigurationSettingsTabSelector title='Security configuration assessment status' currentConfig={currentConfig} helpLinks={helpLinks}>
+          <WzConfigurationSettingsTabSelector
+            title='Security configuration assessment status'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
               config={securitySettingsConfig}
               items={securitySettings}
@@ -47,7 +51,7 @@ class WzPolicyMonitoringSCA extends Component{
             />
             <EuiBasicTable
               items={currentConfig['sca'].policies.map(policy => ({ policy }))}
-              columns={this.columns}/>
+              columns={columns}/>
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>

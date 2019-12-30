@@ -14,21 +14,21 @@ class WzConfigurationSetting extends Component{
     super(props);
   }
   render(){
-    const { keyItem, description, value } = this.props;
+    const { keyItem, label, value } = this.props;
     return (
       <Fragment>
         {value ? (
           <Fragment>
-            <EuiFlexGroup key={`${keyItem}-${description}`} alignItems='center'>
+            <EuiFlexGroup key={`${keyItem}-${label}`} alignItems='center'>
               <EuiFlexItem style={{justifySelf: 'flex-end'}}>
                   <EuiTextAlign textAlign='right'>
-                    {description}
+                    {label}
                   </EuiTextAlign>
               </EuiFlexItem>
               <EuiFlexItem grow={2}>
-                {Array.isArray(value) ? value.map(v => (
+                {Array.isArray(value) ? value.map((v,key) => (
                   <ul>
-                    <li><EuiFieldText value={String(v)} readOnly/></li>
+                    <li><EuiFieldText key={`${keyItem}-${label}-${key}`} value={String(v)} readOnly/></li>
                   </ul>
                 ))
                 : (
@@ -45,8 +45,8 @@ class WzConfigurationSetting extends Component{
 }
 
 WzConfigurationSetting.propTypes = {
-  keyItem: PropTypes.string,
-  description: PropTypes.string.isRequired,
+  keyItem: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   // value: PropTypes.string
 }
 

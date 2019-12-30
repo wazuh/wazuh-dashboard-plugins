@@ -13,11 +13,11 @@ import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'logformat', text: 'Log format' },
-  { key: 'command', text: 'Run this command', render: renderValueOrNoValue },
-  { key: 'alias', text: 'Command alias', render: renderValueOrNoValue },
-  { key: 'frequency', text: 'Interval between command executions', render: renderValueOrNoValue },
-  { key: 'target', text: 'Redirect output to this socket', render: renderValueOrDefault('agent') },
+  { field: 'logformat', label: 'Log format' },
+  { field: 'command', label: 'Run this command', render: renderValueOrNoValue },
+  { field: 'alias', label: 'Command alias', render: renderValueOrNoValue },
+  { field: 'frequency', label: 'Interval between command executions', render: renderValueOrNoValue },
+  { field: 'target', label: 'Redirect output to this socket', render: renderValueOrDefault('agent') },
 ];
 
 class WzConfigurationLogCollectionCommands extends Component{

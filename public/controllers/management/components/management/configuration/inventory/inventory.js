@@ -13,19 +13,19 @@ import withWzConfig from "../util-hocs/wz-config";
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 
 const mainSettings = [
-  { key: 'disabled', text: 'Syscollector integration status', render: renderValueNoThenEnabled },
-  { key: 'interval', text: 'Interval between system scans' },
-  { key: 'scan-on-start', text: 'Scan on start' }
+  { field: 'disabled', label: 'Syscollector integration status', render: renderValueNoThenEnabled },
+  { field: 'interval', label: 'Interval between system scans' },
+  { field: 'scan-on-start', label: 'Scan on start' }
 ];
 
 const scanSettings = [
-  { key: 'hardware', text: 'Scan hardware info' },
-  { key: 'processes', text: 'Scan current processes' },
-  { key: 'os', text: 'Scan operating system infoo' },
-  { key: 'packages', text: 'Scan installed packages' },
-  { key: 'network', text: 'Scan network interfaces' },
-  { key: 'ports', text: 'Scan listening network ports' },
-  { key: 'ports_all', text: 'Scan all network ports' }
+  { field: 'hardware', label: 'Scan hardware info' },
+  { field: 'processes', label: 'Scan current processes' },
+  { field: 'os', label: 'Scan operating system infoo' },
+  { field: 'packages', label: 'Scan installed packages' },
+  { field: 'network', label: 'Scan network interfaces' },
+  { field: 'ports', label: 'Scan listening network ports' },
+  { field: 'ports_all', label: 'Scan all network ports' }
 ];
 
 const helpLinks = [

@@ -11,8 +11,8 @@ import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'restart_audit', text: 'Restart audit' },
-  { key: 'startup_healthcheck', text: 'Startup healthcheck' },
+  { field: 'restart_audit', label: 'Restart audit' },
+  { field: 'startup_healthcheck', label: 'Startup healthcheck' },
 ];
 
 const columns = [

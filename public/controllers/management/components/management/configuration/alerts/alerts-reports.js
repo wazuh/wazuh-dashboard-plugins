@@ -14,16 +14,16 @@ const helpLinks = [
 ];
 
 const mainSettings = [
-  { key: 'title', text: 'Report name'},
-  { key: 'mail_to', text: 'Send report to this email addresses' },
-  { key: 'showlogs', text: 'Include logs when creating a report' },
-  { key: 'group', text: 'Filter by this group' },
-  { key: 'category', text: 'Filter by this category' },
-  { key: 'rule', text: 'Filter by this rule ID' },
-  { key: 'level', text: 'Filter by this alert level and above' },
-  { key: 'location', text: 'Filter by this log location' },
-  { key: 'srcip', text: 'Filter by this source IP address' },
-  { key: 'user', text: 'Filter by this user name' }
+  { field: 'title', label: 'Report name'},
+  { field: 'mail_to', label: 'Send report to this email addresses' },
+  { field: 'showlogs', label: 'Include logs when creating a report' },
+  { field: 'group', label: 'Filter by this group' },
+  { field: 'category', label: 'Filter by this category' },
+  { field: 'rule', label: 'Filter by this rule ID' },
+  { field: 'level', label: 'Filter by this alert level and above' },
+  { field: 'location', label: 'Filter by this log location' },
+  { field: 'srcip', label: 'Filter by this source IP address' },
+  { field: 'user', label: 'Filter by this user name' }
 ];
 
 class WzConfigurationAlertsReports extends Component{

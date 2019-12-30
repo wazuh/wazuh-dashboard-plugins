@@ -12,14 +12,14 @@ import WzConfigurationSettingsListSelector from '../util-components/configuratio
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 
 const mainSettings = [
-  { key: 'disabled', text: 'Status of this active response', render: renderValueNoThenEnabled },
-  { key: 'command', text: 'Command to execute' },
-  { key: 'location', text: 'Execute the command on this location' },
-  { key: 'agent_id', text: 'Agent ID on which execute the command' },
-  { key: 'level', text: 'Match to this severity level or above' },
-  { key: 'rules_group', text: 'Match to one of these groups' },
-  { key: 'rules_id', text: 'Match to one of these rule IDs' },
-  { key: 'timeout', text: 'Timeout (in seconds) before reverting' }
+  { field: 'disabled', label: 'Status of this active response', render: renderValueNoThenEnabled },
+  { field: 'command', label: 'Command to execute' },
+  { field: 'location', label: 'Execute the command on this location' },
+  { field: 'agent_id', label: 'Agent ID on which execute the command' },
+  { field: 'level', label: 'Match to this severity level or above' },
+  { field: 'rules_group', label: 'Match to one of these groups' },
+  { field: 'rules_id', label: 'Match to one of these rule IDs' },
+  { field: 'timeout', label: 'Timeout (in seconds) before reverting' }
 ];
 
 const helpLinks = [

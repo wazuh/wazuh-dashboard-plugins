@@ -12,12 +12,12 @@ import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'type', text: 'Service type' },
-  { key: 'aws_profile', text: 'Profile name with read permissions' },
-  { key: 'account_alias', text: 'AWS account alias' },
-  { key: 'iam_role_arn', text: 'IAM ARN role to read bucket logs' },
-  { key: 'only_logs_after', text: 'Parse only logs from this date onwards' },
-  { key: 'regions', text: 'Limit log parsing to these regions' }
+  { field: 'type', label: 'Service type' },
+  { field: 'aws_profile', label: 'Profile name with read permissions' },
+  { field: 'account_alias', label: 'AWS account alias' },
+  { field: 'iam_role_arn', label: 'IAM ARN role to read bucket logs' },
+  { field: 'only_logs_after', label: 'Parse only logs from this date onwards' },
+  { field: 'regions', label: 'Limit log parsing to these regions' }
 ];
 
 class WzConfigurationAmazonS3Services extends Component{

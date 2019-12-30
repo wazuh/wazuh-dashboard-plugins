@@ -14,12 +14,12 @@ import { isString, isArray, renderValueNoThenEnabled } from '../utils/utils';
 import WzConfigurationSettingsHeader from "../util-components/configuration-settings-header";
 
 const mainSettings = [
-  { key: 'disabled', text: 'Osquery integration status', render: renderValueNoThenEnabled },
-  { key: 'run_daemon', text: 'Auto-run the Osquery daemon' },
-  { key: 'bin_path', text: 'Path to the Osquery executable' },
-  { key: 'log_path', text: 'Path to the Osquery results log file' },
-  { key: 'config_path', text: 'Path to the Osquery configuration file' },
-  { key: 'add_labels', text: 'Use defined labels as decorators' }
+  { field: 'disabled', label: 'Osquery integration status', render: renderValueNoThenEnabled },
+  { field: 'run_daemon', label: 'Auto-run the Osquery daemon' },
+  { field: 'bin_path', label: 'Path to the Osquery executable' },
+  { field: 'log_path', label: 'Path to the Osquery results log file' },
+  { field: 'config_path', label: 'Path to the Osquery configuration file' },
+  { field: 'add_labels', label: 'Use defined labels as decorators' }
 ];
 
 const helpLinks = [

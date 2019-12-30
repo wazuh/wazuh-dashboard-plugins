@@ -13,11 +13,11 @@ import { renderValueNoThenEnabled, renderValueOrYes } from '../utils/utils';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { key: 'disabled', text: 'Amazon S3 integration status', render: renderValueNoThenEnabled },
-  { key: 'interval', text: 'Frequency for reading from S3 buckets' },
-  { key: 'run_on_start', text: 'Run on start' },
-  { key: 'remove_from_bucket', text: 'Remove bucket logs after being read', render: renderValueOrYes },
-  { key: 'skip_on_error', text: "Skip logs that can't be processed" }
+  { field: 'disabled', label: 'Amazon S3 integration status', render: renderValueNoThenEnabled },
+  { field: 'interval', label: 'Frequency for reading from S3 buckets' },
+  { field: 'run_on_start', label: 'Run on start' },
+  { field: 'remove_from_bucket', label: 'Remove bucket logs after being read', render: renderValueOrYes },
+  { field: 'skip_on_error', label: "Skip logs that can't be processed" }
 ];
 
 class WzConfigurationAmazonS3General extends Component{

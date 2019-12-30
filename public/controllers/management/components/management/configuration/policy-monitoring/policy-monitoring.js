@@ -6,12 +6,13 @@ import {
 } from "@elastic/eui";
 
 import withWzConfig from '../util-hocs/wz-config';
-import TabSelector from "../util-components/tab-selector";
-import WzConfigurationPolicyMonitoringGeneral from './policy-monitoring-general';
+import WzTabSelector from "../util-components/tab-selector";
 import WzConfigurationPath from "../util-components/configuration-path";
+
+import WzConfigurationPolicyMonitoringGeneral from './policy-monitoring-general';
+import WzConfigurationPolicyMonitoringSystemAudit from './policy-monitoring-system-audit';
 import WzConfigurationPolicyMonitoringIgnored from "./policy-monitoring-ignored";
 import WzConfigurationPolicyMonitoringSCA from "./policy-monitoring-sca";
-
 
 class WzPolicyMonitoring extends Component{
   constructor(props){
@@ -28,11 +29,12 @@ class WzPolicyMonitoring extends Component{
     return (
       <Fragment>
         <WzConfigurationPath title='Policy monitoring' description='Configuration to ensure compliance with security policies, standards and hardening guides' path='Policy monitoring' updateConfigurationSection={this.props.updateConfigurationSection} badge={this.badgeEnabled()}/>
-        <TabSelector>
+        <WzTabSelector>
           <div label='General'>
             <WzConfigurationPolicyMonitoringGeneral {...this.props} />
           </div>
           <div label='System audit'>
+            <WzConfigurationPolicyMonitoringSystemAudit {...this.props} />
           </div>
           <div label='Ignored'>
             <WzConfigurationPolicyMonitoringIgnored {...this.props} />
@@ -40,7 +42,7 @@ class WzPolicyMonitoring extends Component{
           <div label='SCA'>
             <WzConfigurationPolicyMonitoringSCA {...this.props} />
           </div>
-        </TabSelector>
+        </WzTabSelector>
       </Fragment>
       
     )
