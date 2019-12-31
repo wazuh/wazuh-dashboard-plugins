@@ -26,6 +26,7 @@ import { connect } from "react-redux";
 
 import { checkDaemons } from './utils/wz-fetch';
 import ToastProvider from './util-providers/toast-provider';
+import WzToastP from './util-providers/toast-p';
 
 import {
 	EuiPage,
@@ -38,39 +39,77 @@ class WzConfigurationMain extends Component{
 			this.state = {
 				section: ''
 			};
-			this.updateConfigurationSection = this.updateConfigurationSection.bind(this);
 	}
-	updateConfigurationSection(section){
+	updateConfigurationSection = (section) => {
 		this.setState({ section });
 	}
 	render(){
 		const { section } = this.state;
 		return (
 			<WzReduxProvider>
-				<EuiPage>
-					<EuiPanel>
-						{(section === 'global-configuration' && (<WzConfigurationGlobalConfiguration updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'cluster' && (<WzConfigurationCluster updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'registration-service' && (<WzConfigurationRegistrationService updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'alerts' && (<WzConfigurationAlerts updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'integrations' && (<WzConfigurationIntegrations updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'policy-monitoring' && (<WzConfigurationPolicyMonitoring updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'cis-cat' && (<WzConfigurationCisCat updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'vulnerabilities' && (<WzConfigurationVulnerabilities updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'osquery' && (<WzConfigurationOsquery updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'inventory' && (<WzConfigurationInventory updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'active-response' && (<WzConfigurationActiveResponse updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'commands' && (<WzConfigurationCommands updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'log-collection' && (<WzConfigurationLogCollection updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'integrity-monitoring' && (<WzConfigurationIntegrityMonitoring updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'agentless' && (<WzConfigurationIntegrityAgentless updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'aws-s3' && (<WzConfigurationIntegrityAmazonS3 updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(section === 'edit-configuration' && (<WzConfigurationEditConfiguration updateConfigurationSection={this.updateConfigurationSection}/>)) ||
-							(<WzConfigurationOverview updateConfigurationSection={this.updateConfigurationSection}/>)
-						}
-					</EuiPanel>
-					<ToastProvider />
-				</EuiPage>
+				<WzToastP>
+					<EuiPage>
+						<EuiPanel>
+							<WzViewSelector view={section}>
+								<div default>
+									<WzConfigurationOverview updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='global-configuration'>
+									<WzConfigurationGlobalConfiguration updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='cluster'>
+									<WzConfigurationCluster updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='registration-service'>
+									<WzConfigurationRegistrationService updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='alerts'>
+									<WzConfigurationAlerts updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='integrations'>
+									<WzConfigurationIntegrations updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='policy-monitoring'>
+									<WzConfigurationPolicyMonitoring updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='cis-cat'>
+									<WzConfigurationCisCat updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='vulnerabilities'>
+									<WzConfigurationVulnerabilities updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='osquery'>
+									<WzConfigurationOsquery updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='inventory'>
+									<WzConfigurationInventory updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='active-response'>
+									<WzConfigurationActiveResponse updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='commands'>
+									<WzConfigurationCommands updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='log-collection'>
+									<WzConfigurationLogCollection updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='integrity-monitoring'>
+									<WzConfigurationIntegrityMonitoring updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='agentless'>
+									<WzConfigurationIntegrityAgentless updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='aws-s3'>
+									<WzConfigurationIntegrityAmazonS3 updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='edit-configuration'>
+									<WzConfigurationEditConfiguration updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+							</WzViewSelector>
+						</EuiPanel>
+						{/* <ToastProvider /> */}
+					</EuiPage>
+				</WzToastP>
 			</WzReduxProvider>
 		)
 	}

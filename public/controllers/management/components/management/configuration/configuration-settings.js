@@ -1,0 +1,118 @@
+export default [
+  {
+    title: 'Main configurations',
+    description: '',
+    settings: [
+      {
+        name: 'Global Configuration',
+        description: 'Global and remote settings',
+        goto: 'global-configuration'
+      },
+      {
+        name: 'Cluster',
+        description: 'Master node configuration',
+        goto: 'cluster'
+      },
+      {
+        name: 'Registration Service',
+        description: 'Automatic agent registration service',
+        goto: 'registration-service'
+      }
+    ]
+  },
+  {
+    title: 'Alerts and output management',
+    description: '',
+    settings: [
+      {
+        name: 'Alerts',
+        description: 'Settings related to the alerts and their format',
+        goto: 'alerts'
+      },
+      {
+        name: 'Integrations',
+        description: 'Slack, VirusTotal and PagerDuty integrations with external APIs',
+        goto: 'integrations'
+      }
+    ]
+  },
+  {
+    title: 'Auditing and policy monitoring',
+    description: '',
+    settings: [
+      {
+        name: 'Policy monitoring',
+        description: 'Configuration to ensure compliance with security policies, standards and hardening guides',
+        goto: 'policy-monitoring'
+      },
+      {
+        name: 'CIS-CAT',
+        description: 'Configuration assessment using CIS scanner and SCAP checks',
+        goto: 'cis-cat'
+      }
+    ]
+  },
+  {
+    title: 'System threats and incident response',
+    description: '',
+    settings: [
+      {
+        name: 'Vulnerabilities',
+        description: 'Discover what applications are affected by well-known vulnerabilities',
+        goto: 'vulnerabilities'
+      },
+      {
+        name: 'Osquery',
+        description: 'Expose an operating system as a high-performance relational database',
+        goto: 'osquery'
+      },
+      {
+        name: 'Inventory data',
+        description: 'Gather relevant information about system OS, hardware, networking and packages',
+        goto: 'inventory'
+      },
+      {
+        name: 'Active Response',
+        description: 'Active threat addressing by inmmediate response',
+        goto: 'active-response'
+      },
+      {
+        name: 'Commands',
+        description: 'Configuration options of the Command wodle',
+        goto: 'commands'
+      }
+    ]
+  },
+  {
+    title: 'Log data analysis',
+    description: '',
+    settings: [
+      {
+        name: 'Log collection',
+        description: 'Log analysis from text files, Windows events or syslog outputs',
+        goto: 'log-collection'
+      },
+      {
+        name: 'Integrity monitoring',
+        description: 'Identify changes in content, permissions, ownership, and attributes of files',
+        goto: 'integrity-monitoring'
+      },
+      {
+        name: 'Agentless',
+        description: 'Run integrity checks on devices such as routers, firewalls and switches',
+        goto: 'agentless'
+      }
+    ]
+  },
+  {
+    title: 'Cloud security monitoring',
+    description: '',
+    settings: [
+      {
+        name: 'Amazon S3',
+        description: 'Security events related to Amazon AWS services, collected directly via AWS API',
+        goto: 'aws-s3'
+      }
+    ]
+  }
+];

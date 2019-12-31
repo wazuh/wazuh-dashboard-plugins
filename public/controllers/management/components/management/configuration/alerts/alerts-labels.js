@@ -32,16 +32,10 @@ class WzConfigurationAlertsLabels extends Component{
           <WzNoConfig error='not-present'/>
         )}
         {currentConfig['analysis-labels'] && !isString(currentConfig['analysis-labels']) && !hasSize(currentConfig['analysis-labels'].labels) && (
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='not-present' help={helpLinks}/>
-          </Fragment>
+          <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         {/*wazuhNotReadyYet && */ (!currentConfig || !currentConfig['analysis-labels']) && ( /* TODO: wazuhNotReady */
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='Wazuh not ready yet'/>
-          </Fragment>
+          <WzNoConfig error='Wazuh not ready yet'/>
         )}
         {currentConfig['analysis-labels'] && isString(currentConfig['analysis-labels']) && !hasSize(currentConfig['analysis-labels'].labels) && (
           <WzConfigurationSettingsTabSelector title='Defined labels'currentConfig={currentConfig} helpLinks={helpLinks}>

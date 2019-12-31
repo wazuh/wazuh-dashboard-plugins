@@ -38,16 +38,10 @@ class WzConfigurationAlertsReports extends Component{
           <WzNoConfig error={currentConfig['csyslog-csyslog']} help={helpLinks}/>
         )}
         {currentConfig['csyslog-csyslog'] && !isString(currentConfig['csyslog-csyslog']) && (!currentConfig['csyslog-csyslog'].syslog_output || !currentConfig['csyslog-csyslog'].syslog_output.length) && (
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='not-present' help={helpLinks}/>
-          </Fragment>
+          <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         {/*wazuhNotReadyYet && */ (!currentConfig || !currentConfig['csyslog-csyslog']) && ( /* TODO: wazuhNotReady */
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
-          </Fragment>
+          <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig['csyslog-csyslog'] && !isString(currentConfig['csyslog-csyslog']) && currentConfig['csyslog-csyslog'].syslog_output && currentConfig['csyslog-csyslog'].syslog_output.length && (
           <WzConfigurationSettingsTabSelector

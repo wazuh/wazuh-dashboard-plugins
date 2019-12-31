@@ -51,16 +51,10 @@ class WzConfigurationAlertsEmailAlerts extends Component{
           <WzNoConfig error={currentConfig['mail-alerts']} help={helpLinks}/>
         )}
         {currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && (!currentConfig['mail-alerts'].email_alerts || !currentConfig['mail-alerts'].email_alerts.length) && (
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='not-present' help={helpLinks}/>
-          </Fragment>
+          <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         {/*wazuhNotReadyYet && */ (!currentConfig || !currentConfig['mail-alerts']) && ( /* TODO: wazuhNotReady */
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
-          </Fragment>
+          <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {selectedItem && (
           <WzConfigurationSettingsTabSelector

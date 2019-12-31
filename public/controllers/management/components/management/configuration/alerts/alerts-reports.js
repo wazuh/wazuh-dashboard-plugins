@@ -52,16 +52,10 @@ class WzConfigurationAlertsReports extends Component{
           <WzNoConfig error={currentConfig['monitor-reports']} help={helpLinks}/>
         )}
         {currentConfig['monitor-reports'] && !isString(currentConfig['monitor-reports']) && (!currentConfig['monitor-reports'].reports || !currentConfig['monitor-reports'].reports.length) && (
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='not-present' help={helpLinks}/>
-          </Fragment>
+          <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         {/*wazuhNotReadyYet && */ (!currentConfig || !currentConfig['monitor-reports']) && ( /* TODO: wazuhNotReady */
-          <Fragment>
-            <EuiSpacer size='s'/>
-            <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
-          </Fragment>
+          <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {selectedItem && (
           <WzConfigurationSettingsTabSelector

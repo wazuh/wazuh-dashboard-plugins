@@ -5,7 +5,7 @@ import {
   
 } from "@elastic/eui";
 
-import WzConfigurationTabSelector from "../util-components/configuration-settings-tab-selector";
+import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
 import helpLinks from './help-links';
 
@@ -32,7 +32,7 @@ class WzConfigurationCisCatGeneral extends Component{
     const { config } = this.props;
     return (
       <Fragment>
-        <WzConfigurationTabSelector 
+        <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='General settings applied to all benchmarks'
           currentConfig={config}
@@ -47,7 +47,7 @@ class WzConfigurationCisCatGeneral extends Component{
               config={config['cis-cat']}
               items={schedulingSettings}
             />
-        </WzConfigurationTabSelector>
+        </WzConfigurationSettingsTabSelector>
 
       </Fragment>
     )

@@ -6,7 +6,7 @@ import {
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -36,7 +36,7 @@ class WzConfigurationLogCollectionCommands extends Component{
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}
         {currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && currentConfig['logcollector-localfile']['localfile-commands'] && currentConfig['logcollector-localfile']['localfile-commands'].length ? (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Command monitoring'
             description='All output from these commands will be read as one or more log messages depending on whether command or full_command is used.'
             currentConfig={currentConfig}
@@ -45,7 +45,7 @@ class WzConfigurationLogCollectionCommands extends Component{
                 items={items}
                 settings={mainSettings}
               />
-            </WzConfigurationTabSelector>
+            </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     )

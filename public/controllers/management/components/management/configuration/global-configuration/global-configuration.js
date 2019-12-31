@@ -4,7 +4,7 @@ import {
   EuiSpacer
 } from "@elastic/eui";
 
-import TabSelector from '../util-components/tab-selector';
+import WzTabSelector from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
 import WzConfigurationPath from '../util-components/configuration-path';
@@ -27,14 +27,14 @@ class WzConfigurationGlobalConfiguration extends Component{
     return (
       <Fragment>
         <WzConfigurationPath title='Global configuration' description='Global and remote settings' path='Global Configuration' updateConfigurationSection={this.props.updateConfigurationSection}/>
-        <TabSelector container={this.container}>
+        <WzTabSelector container={this.container}>
           <div label="Global">
             <WzConfigurationGlobalConfigurationGlobal {...this.props}/>
           </div>
           <div label="Remote">
             <WzConfigurationGlobalConfigurationRemote {...this.props}/>
           </div>
-        </TabSelector>
+        </WzTabSelector>
       </Fragment>
     )
   }

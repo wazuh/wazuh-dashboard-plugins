@@ -5,7 +5,7 @@ import {
   
 } from "@elastic/eui";
 
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzSettingsGroup from '../util-components/configuration-settings-group';
 
 import { renderValueNoThenEnabled, renderValueOrYes } from '../utils/utils';
@@ -28,7 +28,7 @@ class WzConfigurationAmazonS3General extends Component{
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        <WzConfigurationTabSelector
+        <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='Common settings applied to all Amazon S3 buckets'
           currentConfig={currentConfig}
@@ -38,7 +38,7 @@ class WzConfigurationAmazonS3General extends Component{
             config={currentConfig['aws-s3'].syscheck}
             items={mainSettings}
           />
-        </WzConfigurationTabSelector>
+        </WzConfigurationSettingsTabSelector>
       </Fragment>
     )
   }

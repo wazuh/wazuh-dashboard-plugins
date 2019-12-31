@@ -6,7 +6,7 @@ import {
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -35,7 +35,7 @@ class WzConfigurationLogCollectionLogs extends Component{
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}
         {currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && currentConfig['logcollector-localfile']['localfile-logs'] && currentConfig['logcollector-localfile']['localfile-logs'].length ? (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
           title='Logs files'
           description='List of log files that will be analyzed'
           currentConfig={currentConfig}
@@ -44,7 +44,7 @@ class WzConfigurationLogCollectionLogs extends Component{
               items={items}
               settings={mainSettings}
             />
-          </WzConfigurationTabSelector>
+          </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     )

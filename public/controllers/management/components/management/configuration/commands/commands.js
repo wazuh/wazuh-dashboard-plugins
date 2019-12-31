@@ -7,7 +7,7 @@ import {
 
 import WzConfigurationPath from "../util-components/configuration-path";
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationTabSelector from "../util-components/configuration-settings-tab-selector";
+import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import withWzConfig from "../util-hocs/wz-config";
 import { isString } from '../utils/utils';
@@ -49,7 +49,7 @@ class WzConfigurationCommands extends Component{
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         {currentConfig && this.config && !isString(currentConfig['wmodules-wmodules']) && currentConfig.commands.length ? (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Command definitions'
             description='Find here all the currently defined commands'
             currentConfig={this.config}
@@ -58,7 +58,7 @@ class WzConfigurationCommands extends Component{
                 items={items}
                 settings={mainSettings}
               />
-          </WzConfigurationTabSelector>
+          </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     )

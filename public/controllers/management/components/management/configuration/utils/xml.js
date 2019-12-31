@@ -1,5 +1,10 @@
 const parser = new DOMParser();
 
+/**
+ * Validate XML
+ * @param {string} xml
+ * @returns {string|boolean}
+ */
 export const validateXML = (xml) => {
   const xmlReplaced = replaceIllegalXML(xml).replace(/..xml.+\?>/, '').replace(/\\</gm, '');
   const xmlDoc = parser.parseFromString(
@@ -15,6 +20,11 @@ export const validateXML = (xml) => {
   return false
 }
 
+/**
+ * Replace illegal XML
+ * @param {string} text 
+ * @returns {string}
+ */
 export const replaceIllegalXML = (text) => {
   const oDOM = parser.parseFromString(text, 'text/html');
   const lines = oDOM.documentElement.textContent.split('\n');
@@ -33,6 +43,13 @@ export const replaceIllegalXML = (text) => {
   return text;
 };
 
+/**
+ * Replace string in a XML
+ * @param {string} str 
+ * @param {string} split 
+ * @param {string} newstr 
+ * @returns {string}
+ */
 export const replaceXML = function(str, split, newstr) {
   return str.split(split).join(newstr);
 };

@@ -9,7 +9,7 @@ import WzConfigurationSettingsHeader from './configuration-settings-header';
 import WzViewSelector from './view-selector';
 import { WzSettingsViewer } from './code-viewer';
 
-class WzConfigurationTabSelector extends Component{
+class WzConfigurationSettingsTabSelector extends Component{
   constructor(props){
     super(props);
     this.state = {
@@ -64,4 +64,4 @@ class WzConfigurationTabSelector extends Component{
   }
 }
 
-export default WzConfigurationTabSelector;
+export default WzConfigurationSettingsTabSelector;

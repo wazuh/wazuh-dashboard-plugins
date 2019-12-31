@@ -15,32 +15,27 @@ class WzConfigurationSetting extends Component{
   }
   render(){
     const { keyItem, label, value } = this.props;
-    return (
-      <Fragment>
-        {value ? (
+    return value ? (
           <Fragment>
-            <EuiFlexGroup key={`${keyItem}-${label}`} alignItems='center'>
+            <EuiFlexGroup alignItems='center'>
               <EuiFlexItem style={{justifySelf: 'flex-end'}}>
                   <EuiTextAlign textAlign='right'>
                     {label}
                   </EuiTextAlign>
               </EuiFlexItem>
               <EuiFlexItem grow={2}>
-                {Array.isArray(value) ? value.map((v,key) => (
+                {Array.isArray(value) ? (
                   <ul>
-                    <li><EuiFieldText key={`${keyItem}-${label}-${key}`} value={String(v)} readOnly/></li>
-                  </ul>
-                ))
-                : (
-                  <EuiFieldText value={String(value)} readOnly/>
-                )}
+                    {value.map((v,key) => (
+                      <li key={`${keyItem}-${label}-${key}`}><EuiFieldText value={String(v)} readOnly/></li>
+                    ))}
+                  </ul>)
+                : <EuiFieldText value={String(value)} readOnly/>}
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size='s' />
           </Fragment>
-        ) : null}
-      </Fragment>
-    )
+        ) : null
   }
 }
 

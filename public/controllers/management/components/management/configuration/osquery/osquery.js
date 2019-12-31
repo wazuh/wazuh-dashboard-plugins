@@ -6,7 +6,7 @@ import {
 } from "@elastic/eui";
 
 import WzConfigurationPath from '../util-components/configuration-path';
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import withWzConfig from "../util-hocs/wz-config";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
 import WzNoConfig from "../util-components/no-config";
@@ -51,7 +51,7 @@ class WzConfigurationOsquery extends Component{
         {currentConfig && !this.config.osquery && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        <WzConfigurationTabSelector
+        <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='General Osquery integration settings'
           currentConfig={this.config}
@@ -72,7 +72,7 @@ class WzConfigurationOsquery extends Component{
               />
             </Fragment>
           )}
-        </WzConfigurationTabSelector>
+        </WzConfigurationSettingsTabSelector>
       </Fragment>
     )
   }

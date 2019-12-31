@@ -5,7 +5,7 @@ import {
   
 } from "@elastic/eui";
 
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
@@ -35,7 +35,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        <WzConfigurationTabSelector
+        <WzConfigurationSettingsTabSelector
           title='General'
           description='The settings shown below are applied globally'
           currentConfig={currentConfig}
@@ -45,7 +45,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
             config={currentConfig['syscheck-syscheck'].syscheck}
             items={mainSettings}
           />
-        </WzConfigurationTabSelector>
+        </WzConfigurationSettingsTabSelector>
       </Fragment>
     )
   }

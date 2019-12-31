@@ -2,6 +2,12 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 import { delay } from './utils';
 import { replaceIllegalXML } from './xml';
 
+/**
+ * Get configuration for an agent/manager of request sections
+ * @param {string} [agentId=000] Agent ID 
+ * @param {array} sections Sections
+ * @param {falsy} [node=false] Node 
+ */
 export const getCurrentConfig = async (agentId = '000', sections, node = false) => {
   try{
     if (
@@ -86,6 +92,11 @@ export const extractMessage = (error) => {
   return error || 'Unexpected error';
 }
 
+/**
+ * 
+ * @param {Error|string} error 
+ * @param {*} location 
+ */
 export const handleError = async (error, location) => {
   const message = extractMessage(error);
   const messageIsString = typeof message === 'string';
@@ -139,12 +150,14 @@ export const handleError = async (error, location) => {
   }
 }
 
+/**
+ * Check daemons status
+ * @returns {object|Promise}
+ */
 export const checkDaemons = async () => {
   try{
     const response = await WzRequest.apiReq('GET', '/manager/status', {});
-    console.log('checkdaemons', response)
     const daemons = ((response || {}).data || {}).data || {};
-    console.log('daemons', daemons)
     const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
     const execd = daemons['ossec-execd'] === 'running';
@@ -166,15 +179,18 @@ export const checkDaemons = async () => {
   }
 }
 
+/**
+ * Make ping to Wazuh API
+ * @param {number} [tries=10] Tries
+ * @return {Promise}
+ */
 export const makePing = async (tries = 10) => {
    try{
      let isValid = false;
      while (tries--) {
-      console.log('makepingbefore')
       await delay(1200);
       try{
         const result = await WzRequest.apiReq('GET', '/ping', {});
-        console.log('makeping', result)
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
           // this.$rootScope.wazuhNotReadyYet = false; // TODO: wznotereadyyet
@@ -193,6 +209,10 @@ export const makePing = async (tries = 10) => {
    }
 }
 
+/**
+ * Get Cluster status from Wazuh API
+ * @returns {Promise}
+ */
 export const clusterReq = async () => {
   try{
     return WzRequest.apiReq(
@@ -205,6 +225,10 @@ export const clusterReq = async () => {
   }
 }
 
+/** 
+ * Fetch a config file from cluster node or manager
+ * @return {string} 
+ */
 export const fetchFile = async (selectedNode) => {
   try {
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
@@ -232,6 +256,10 @@ export const fetchFile = async (selectedNode) => {
   }
 }
 
+/**
+ * Restart a node or manager
+ * @param {} selectedNode Cluster Node
+ */
 export const restartNodeSelected = async (selectedNode) => {
   try{
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
@@ -245,14 +273,14 @@ export const restartNodeSelected = async (selectedNode) => {
     // }, please wait. `;
     return await makePing();
   }catch(error){
-    console.error('restartNodeSelected',error);
     return Promise.reject(error);
   }
 }
 
 /**
-   * Restart manager (single-node API call)
-   */
+  * Restart manager (single-node API call)
+  * @returns {object|Promise}
+  */
 export const restartManager = async () => {
   try {
     const validationError = await WzRequest.apiReq(
@@ -276,6 +304,7 @@ export const restartManager = async () => {
 
 /**
  * Restart cluster
+ * @returns {object|Promise}
  */
 export const restartCluster = async () => {
   try {
@@ -300,7 +329,8 @@ export const restartCluster = async () => {
 
 /**
  * Restart a cluster node
-*/
+ * @returns {object|Promise}
+ */
 export const restartNode = async (node) => {
   try {
     const validationError = await WzRequest.apiReq(
@@ -345,6 +375,10 @@ export const saveConfiguration = async (selectedNode) => {
   }
 }
 
+/**
+ * Save text to ossec.conf manager file
+ * @param {string} text Text to save
+ */
 export const saveFileManager = async (text) => {
   const xml = replaceIllegalXML(text);
   try {
@@ -455,6 +489,11 @@ export const saveFileManager = async (text) => {
   // return;
 };
 
+/**
+ * Validate after sent
+ * @param {} node Node
+ * @returns{boolean|Promise}
+ */
 export const validateAfterSent = async (node = false) => {
   try {
     const clusterStatus = await WzRequest.apiReq(

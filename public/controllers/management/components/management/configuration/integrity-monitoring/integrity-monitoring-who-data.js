@@ -5,7 +5,7 @@ import {
   EuiBasicTable
 } from "@elastic/eui";
 
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
@@ -31,7 +31,7 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
           <WzNoConfig error='not-present' help={helpLinks} />
         )}
         {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Who-data audit keys'
             description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
             currentConfig={currentConfig}
@@ -47,7 +47,7 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
               columns={columns}
             />
           )}
-        </WzConfigurationTabSelector>
+        </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
     )

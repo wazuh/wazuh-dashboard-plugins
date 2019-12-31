@@ -1,5 +1,5 @@
 /**
- * 
+ * Build a object for settings list
  * @param {[]} items
  * @param {string} label 
  */
@@ -12,7 +12,7 @@ export const settingsListBuilder = (items, label) => items.map((item, key) => ({
 }));
 
 /**
- * 
+ * Build a object for settings items used in WzConfigurationSettings
  * @param {*} items 
  */
 export const settingsBuilder = (items) => items.map((item, key) => ({
@@ -21,7 +21,7 @@ export const settingsBuilder = (items) => items.map((item, key) => ({
 }))
 
 /**
- * 
+ * Build a object for help links
  * @param {*} items 
  */
 export const helpLinksBuilder = (items) => items.map((item, key) => ({
@@ -30,7 +30,7 @@ export const helpLinksBuilder = (items) => items.map((item, key) => ({
 }))
 
 /**
- * 
+ * Build a object for current configuration with wodle inserted
  * @param {*} currentConfig 
  * @param {array|string} wodles 
  */

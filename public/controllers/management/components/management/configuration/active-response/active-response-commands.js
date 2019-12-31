@@ -8,7 +8,7 @@ import {
 } from "@elastic/eui";
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import { isString } from '../utils/utils';
 
@@ -54,7 +54,7 @@ class WzConfigurationActiveResponseCommands extends Component{
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
         )}
         {currentConfig['analysis-command'] && !isString(currentConfig['analysis-command']) && currentConfig['analysis-command'].command && currentConfig['analysis-command'].command.length ? (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Command definitions'
             description='Find here all the currently defined commands used for Active response'
             currentConfig={currentConfig}
@@ -86,7 +86,7 @@ class WzConfigurationActiveResponseCommands extends Component{
               config={this.config.syscollector}
               items={scanSettings}
             /> */}
-          </WzConfigurationTabSelector>
+          </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     )

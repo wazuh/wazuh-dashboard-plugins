@@ -7,7 +7,7 @@ import {
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import TabSelector from '../util-components/tab-selector';
+import WzTabSelector from '../util-components/tab-selector';
 import WzConfigurationPath from '../util-components/configuration-path';
 import WzConfigurationVulnerabilitiesGeneral from './vulnerabilities-general';
 import WzConfigurationVulnerabilitiesProviders from './vulnerabilities-providers';
@@ -32,14 +32,14 @@ class WzConfigurationVulnerabilities extends Component{
         {currentConfig && !this.config && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present'/>
         )}
-        <TabSelector>
+        <WzTabSelector>
           <div label='General'>
             <WzConfigurationVulnerabilitiesGeneral config={this.config}/>
           </div>
           <div label='Providers'>
             <WzConfigurationVulnerabilitiesProviders config={this.config}/>
           </div>
-        </TabSelector>
+        </WzTabSelector>
       </Fragment>
     )
   }

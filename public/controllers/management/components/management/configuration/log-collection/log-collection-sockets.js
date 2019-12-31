@@ -6,7 +6,7 @@ import {
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, isArray, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -39,7 +39,7 @@ class WzConfigurationLogCollectionSockets extends Component{
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}
         {currentConfig['logcollector-socket'] && !isString(currentConfig['logcollector-socket']) && currentConfig['logcollector-socket'].target && currentConfig['logcollector-socket'].target.length ? (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Output sockets'
             description='Define custom outputs to send log data'
             currentConfig={currentConfig}
@@ -48,7 +48,7 @@ class WzConfigurationLogCollectionSockets extends Component{
                 items={items}
                 settings={mainSettings}
               />
-            </WzConfigurationTabSelector>
+            </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     )

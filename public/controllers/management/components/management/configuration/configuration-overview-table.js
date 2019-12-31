@@ -16,7 +16,7 @@ class WzConfigurationOverviewTable extends Component{
 		super(props);
 	}
 	render(){
-		const { title, items, columns } = this.props;
+		const { title, items, columns, onClick } = this.props;
 		return (
 			<Fragment>
 				<EuiTitle size='s'><h2>{title}</h2></EuiTitle>
@@ -29,11 +29,11 @@ class WzConfigurationOverviewTable extends Component{
 					</EuiTableHeader>
           <EuiTableBody>
 						{items.map((item, key) => (
-							<EuiTableRow key={`${title}-row-${key}`} onClick={() => item.onClick()}>
+							<EuiTableRow key={`${title}-row-${key}`} onClick={() => onClick(item.goto)}>
 								{columns.map(column => column.field)
 									.map(field => (
-										<EuiTableRowCell key={`${item.row[field]}`}>
-											{item.row[field]}
+										<EuiTableRowCell key={`${item[field]}`}>
+											{item[field]}
 										</EuiTableRowCell>
 									))}
 							</EuiTableRow>

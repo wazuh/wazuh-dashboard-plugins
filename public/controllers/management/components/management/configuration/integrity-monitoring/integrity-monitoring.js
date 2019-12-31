@@ -6,7 +6,7 @@ import {
 } from "@elastic/eui";
 
 import WzConfigurationPath from '../util-components/configuration-path';
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import withWzConfig from "../util-hocs/wz-config";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
 import WzNoConfig from "../util-components/no-config";

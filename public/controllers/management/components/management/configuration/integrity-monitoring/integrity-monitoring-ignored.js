@@ -6,7 +6,7 @@ import {
   EuiSpacer
 } from "@elastic/eui";
 
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
 
@@ -31,7 +31,7 @@ class WzConfigurationMonitoringIgnored extends Component{
         ) : null}
         {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && currentConfig['syscheck-syscheck'].syscheck.ignore.length ? (
             <Fragment>
-              <WzConfigurationTabSelector
+              <WzConfigurationSettingsTabSelector
                 title='Ignored files and directories'
                 description='These files and directories are ignored from the integrity scan'
                 currentConfig={currentConfig}
@@ -46,7 +46,7 @@ class WzConfigurationMonitoringIgnored extends Component{
                   items={currentConfig['syscheck-syscheck'].syscheck.ignore_sregex.map(item => ({sregex: item}))}
                   columns={columnsSregex}
                 />
-              </WzConfigurationTabSelector>
+              </WzConfigurationSettingsTabSelector>
             </Fragment>
           ) : null}
       </Fragment>

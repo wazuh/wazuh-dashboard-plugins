@@ -5,7 +5,7 @@ import {
   
 } from "@elastic/eui";
 
-import WzConfigurationTabSelector from "../util-components/configuration-settings-tab-selector";
+import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
 import helpLinks from './help-links';
 
@@ -24,7 +24,7 @@ class WzConfigurationVulnerabilitiesGeneral extends Component{
     const { config } = this.props;
     return (
       <Fragment>
-        <WzConfigurationTabSelector 
+        <WzConfigurationSettingsTabSelector 
           title='Main settings'
           description='General settings applied to the vulnerability detector and its providers'
           currentConfig={config}
@@ -33,7 +33,7 @@ class WzConfigurationVulnerabilitiesGeneral extends Component{
               config={config['vulnerability-detector']}
               items={mainSettings}
             />
-        </WzConfigurationTabSelector>
+        </WzConfigurationSettingsTabSelector>
       </Fragment>
     )
   }

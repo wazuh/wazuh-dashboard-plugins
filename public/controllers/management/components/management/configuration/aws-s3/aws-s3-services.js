@@ -6,7 +6,7 @@ import {
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
@@ -36,7 +36,7 @@ class WzConfigurationAmazonS3Services extends Component{
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].services && (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Services'
             description='Amazon services from where logs are read'
             currentConfig={currentConfig}
@@ -46,7 +46,7 @@ class WzConfigurationAmazonS3Services extends Component{
               items={items}
               settings={mainSettings}
             />
-          </WzConfigurationTabSelector>
+          </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
     )

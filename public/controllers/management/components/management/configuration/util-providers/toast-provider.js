@@ -17,7 +17,7 @@ class WzToastProvider extends Component{
   constructor(props){
     super(props);
     this.state = {
-      toasts : []
+      toasts: []
     }
     addToastHandler = this.addToast.bind(this);
     removeToastHandler = this.removeToast.bind(this);
@@ -42,7 +42,7 @@ class WzToastProvider extends Component{
     return (
       <EuiGlobalToastList
         toasts={this.state.toasts}
-        dismissToast={(t) => this.removeToast(t)}
+        dismissToast={(toast) => this.removeToast(toast)}
         toastLifeTimeMs={5000}
       />
     )

@@ -11,7 +11,8 @@ import {
   EuiText,
   EuiTitle,
   EuiSpacer,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiCallOut
 } from "@elastic/eui";
 
 import WzCodeEditor from '../util-components/code-editor';
@@ -23,11 +24,12 @@ import { fetchFile, restartNodeSelected, saveFileManager } from '../utils/wz-fet
 import { validateXML } from '../utils/xml';
 
 import { addToast } from '../util-providers/toast-provider';
+import { withWzToast } from '../util-providers/toast-p';
 
 const WzEditorConfiguration = withLoading(async () => {
   const xmlFetched = await fetchFile()
   return { xmlFetched }
-})(class extends Component{
+})(withWzToast(class extends Component{
   constructor(props){
     super(props);
     this.state = {
@@ -36,22 +38,23 @@ const WzEditorConfiguration = withLoading(async () => {
       xmlError: false,
       restart: false,
       restarting: false,
-      saving: false
+      saving: false,
+      infoChangesAfterRestart: false
     };
   }
   async editorSave(){
     try{
       this.setState({ saving: true});
       await saveFileManager(this.state.editorValue);
-      this.setState( { saving: false });
-      addToast({
+      this.setState( { saving: false, infoChangesAfterRestart: true });
+      this.props.addToast({
         title: (
           <Fragment>
             <EuiIcon type='check'/>&nbsp;
             <span>Success. Manager configuration has been updated</span>
           </Fragment>),
         color: 'success'
-      })
+      });
     }catch(error){
       console.error(error);
     }
@@ -60,10 +63,7 @@ const WzEditorConfiguration = withLoading(async () => {
     this.props.updateConfigurationSection('');
   }
   toggleRestart(){
-    this.setState( { restart: !this.state.restart } ); 
-  }
-  confirmRestart(){
-    this.setState( { restart: !this.state.restart, restarting: true } ); 
+    this.setState({ restart: !this.state.restart }); 
   }
   onChange(editorValue){
     const xmlError = validateXML(editorValue);
@@ -71,7 +71,7 @@ const WzEditorConfiguration = withLoading(async () => {
   }
   async confirmRestart(){
     try{
-      this.setState( { restarting: true } );
+      this.setState( { restarting: true, infoChangesAfterRestart: false } );
       await restartNodeSelected();
       this.setState( { restart: false, restarting: false } );
     }catch(error){
@@ -79,14 +79,14 @@ const WzEditorConfiguration = withLoading(async () => {
     }
   }
   render(){
-    const { editorValue, xml, xmlError, restart, restarting, saving } = this.state;
+    const { editorValue, xml, xmlError, restart, restarting, saving, infoChangesAfterRestart } = this.state;
     return (
       <Fragment>
         <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup>
               <EuiFlexItem>
-                  <EuiButtonEmpty onClick={() => this.editorCancel()}>Cancel</EuiButtonEmpty>
+                  <EuiButtonEmpty isDisabled={xmlError} onClick={() => this.editorCancel()}>Cancel</EuiButtonEmpty>
               </EuiFlexItem>
               <EuiFlexItem>
                 {xmlError ? 
@@ -124,11 +124,14 @@ const WzEditorConfiguration = withLoading(async () => {
           Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>manager</span>
           {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
         </EuiText>
+        {infoChangesAfterRestart && (
+          <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
+        )}
         <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)}/>
       </Fragment>
     )
   }
-})
+}))
 class WzEditConfiguration extends Component{
   constructor(props){
     super(props);
@@ -144,5 +147,4 @@ class WzEditConfiguration extends Component{
   }
 }
 
-// TODO: Editor, cancel, save and restart manager is hidden while load/fetch ossec.conf file text
 export default WzEditConfiguration;

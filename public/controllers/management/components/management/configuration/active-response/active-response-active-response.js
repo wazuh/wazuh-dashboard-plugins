@@ -6,7 +6,7 @@ import {
 } from "@elastic/eui";
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
@@ -49,7 +49,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
           <WzNoConfig error={currentConfig['com-active-response']} help={helpLinks} />
         )}
         {currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'].length ? (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Active response settings'
             description='Find here all the currently defined Active responses'
             currentConfig={currentConfig['analysis-active_response']['active-response']}
@@ -58,7 +58,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
               items={items}
               settings={mainSettings}
             />
-          </WzConfigurationTabSelector>
+          </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     )

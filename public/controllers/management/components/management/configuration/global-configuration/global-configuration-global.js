@@ -1,20 +1,9 @@
 import React, { Component, Fragment } from "react";
 
 import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiButtonEmpty,
-  EuiTitle,
-  EuiText,
-  EuiTextAlign,
-  EuiSpacer,
-  EuiFieldText
 } from "@elastic/eui";
 
-import { WzConfigurationSettingsHeaderViewer } from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import WzViewSelector from '../util-components/view-selector';
-import { WzSettingsViewer } from '../util-components/code-viewer';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 
 const helpLinks = [
@@ -63,9 +52,13 @@ class WzConfigurationGlobalConfigurationGlobal extends Component{
     const globalSettingsConfig = {
       ...currentConfig['analysis-global'].global
     };
-    // TODO: Missing field for rendering? Juanca?
+    // TODO: Missing field for rendering?
     return (
-      <WzConfigurationSettingsTabSelector title='Main settings' description='Basic alerts and logging settings' currentConfig={currentConfig} helpLinks={helpLinks}>
+      <WzConfigurationSettingsTabSelector
+        title='Main settings'
+        description='Basic alerts and logging settings'
+        currentConfig={currentConfig}
+        helpLinks={helpLinks}>
         <WzConfigurationSettingsGroup
           config={mainSettingsConfig}
           items={mainSettings}

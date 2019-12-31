@@ -5,7 +5,7 @@ import {
   EuiSpacer
 } from "@elastic/eui";
 
-import TabSelector from '../util-components/tab-selector';
+import WzTabSelector from '../util-components/tab-selector';
 import WzConfigurationPath from '../util-components/configuration-path';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationAlertsGeneral from './alerts-general';
@@ -18,20 +18,22 @@ import { isString } from '../utils/utils';
 class WzConfigurationAlerts extends Component{
   constructor(props){
     super(props);
-    this.container = (content) => (
-      <div>
-        <EuiSpacer size='xs'/>
-        <div>
-          {content}
-        </div>
-      </div>
-    );
   }
   render(){
+    const { currentConfig } = this.props;
     return (
       <Fragment>
         <WzConfigurationPath title='Alerts' description='Settings related to the alerts and their format' path='Alerts' updateConfigurationSection={this.props.updateConfigurationSection}/>
-        <TabSelector container={this.container}>
+        {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && (
+          <WzNoConfig error={currentConfig['analysis-alerts']}/>
+        )}
+        {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts && (
+          <WzNoConfig error='not-present'/>
+        )}
+        {/*wazuhNotReadyYet &&*/ (!currentConfig || !currentConfig['analysis-alerts']) && (
+          <WzNoConfig error='Wazuh not ready yet'/>
+        )}
+        <WzTabSelector>
           <div label="General">
             <WzConfigurationAlertsGeneral {...this.props}/>
           </div>
@@ -47,7 +49,7 @@ class WzConfigurationAlerts extends Component{
           <div label='Syslog output'>
             <WzConfigurationAlertsSyslogOutput {...this.props}/>
           </div>
-        </TabSelector>
+        </WzTabSelector>
       </Fragment>
     )
   }
@@ -61,38 +63,4 @@ const sections = [
   {component:'csyslog',configuration:'csyslog'}
 ];
 
-export default withWzConfig('000', sections, null, ({ error }) => {
-  return ( //TODO: remove this and insert inner Component
-    <Fragment>
-      {error.alerts && <WzNoConfig error={error.alerts}/>}
-      {error.notPresent && (
-        <Fragment>
-          <EuiSpacer size='s'/>
-          <WzNoConfig error={error.notPresent}/>}
-        </Fragment>
-      )}
-      {error.wazuhNotReadyYet && (
-        <Fragment>
-          <EuiSpacer size='s'/>
-          <WzNoConfig error={error.wazuhNotReadyYet}/>
-        </Fragment>
-      )}
-    </Fragment>
-  )
-}, (currentConfig) => {
-  let error = false;
-  if(currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts'])){
-    error = error || {};
-    error.alerts = currentConfig['analysis-alerts'];
-  };
-  if(currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts){
-    error = error || {};
-    error.notPresent = 'not-present';
-  };
-  if(/*wazuhNotReadyYet &&*/ (!currentConfig || !currentConfig['analysis-alerts'])){ // TODO: wazuhNotReadyYet
-    error = error || {};
-    error.wazuhNotReadyYet = 'Wazuh not ready yet';
-  };
-  return error
-
-})(WzConfigurationAlerts);
+export default withWzConfig('000', sections)(WzConfigurationAlerts);

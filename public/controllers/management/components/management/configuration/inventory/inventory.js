@@ -7,7 +7,7 @@ import {
 
 import WzConfigurationPath from '../util-components/configuration-path';
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from "../util-hocs/wz-config";
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
@@ -52,7 +52,7 @@ class WzConfigurationInventory extends Component{
         {currentConfig && !this.config.syscollector && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        <WzConfigurationTabSelector
+        <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='General settings applied to all the scans'
           currentConfig={this.config}
@@ -67,7 +67,7 @@ class WzConfigurationInventory extends Component{
             config={this.config.syscollector}
             items={scanSettings}
           />
-        </WzConfigurationTabSelector>
+        </WzConfigurationSettingsTabSelector>
       </Fragment>
     )
   }

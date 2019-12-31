@@ -5,7 +5,7 @@ import {
   
 } from "@elastic/eui";
 
-import WzConfigurationTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import WzNoConfig from '../util-components/no-config';
 import { settingsListBuilder } from '../utils/builders';
@@ -48,7 +48,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component{
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}
         {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories && currentConfig['syscheck-syscheck'].syscheck.directories.length ? (
-          <WzConfigurationTabSelector
+          <WzConfigurationSettingsTabSelector
             title='Monitored directories'
             description='These directories are included on the integrity scan'
             currentConfig={currentConfig}
@@ -57,7 +57,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component{
                 items={items}
                 settings={mainSettings}
               />
-            </WzConfigurationTabSelector>
+            </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
     )
