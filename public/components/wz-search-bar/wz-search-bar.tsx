@@ -16,26 +16,13 @@ import { WzSearchFormatSelector } from './wz-search-format-selector';
 import { WzSearchBadges } from './wz-search-badges';
 import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { QHandler, qSuggests } from './lib/q-handler';
+import { ApiHandler, apiSuggests } from './lib/api-handler';
 
-interface suggestItem {
+export interface suggestItem {
   type: {iconType: string, color: string }
   label: string
   description?: string
-}
-
-interface qSuggests {
-  label: string
-  description: string
-  operators?: string[]
-  values: Function | [] | undefined
-}
-
-interface apiSuggests {
-  label: string
-  description: string
-  values?: string[]
-  multiValue?: boolean
-  range?: boolean
 }
 
 export default class WzSearchBar extends Component {
@@ -52,6 +39,7 @@ export default class WzSearchBar extends Component {
     status: string
     filters: {}
   };
+  suggestHandler: QHandler | ApiHandler;
   props!:{
     qSuggests: qSuggests[]
     apiSuggests: apiSuggests[]
@@ -80,6 +68,11 @@ export default class WzSearchBar extends Component {
       isInvalid: false,
       status: 'unchanged',
       filters: {}
+    }
+    if(this.state.searchFormat === '?Q') {
+      this.suggestHandler = new QHandler(props.qSuggests);
+    } else {
+      this.suggestHandler = new ApiHandler(props.apiSuggests);
     }
   }
 
@@ -111,15 +104,11 @@ export default class WzSearchBar extends Component {
 
 
   buildSuggestFields() {
-    const { searchFormat, inputValue } = this.state;
+    const { inputValue } = this.state;
     const { searchDisable } = this.props;
     const fields:suggestItem[] = [];
     let isSearch = true;
-    if (searchFormat === '?Q') {
-      fields.push(...this.buildSuggestFieldsQ());
-    } else if (searchFormat === 'API') {
-      fields.push(...this.buildSuggestFieldAPI());
-    }
+    fields.push(...this.suggestHandler.buildSuggestFields(inputValue));
 
     if (!searchDisable && inputValue !== '') {
       const suggestSearch = this.buildSuggestFieldsSearch();
@@ -139,26 +128,6 @@ export default class WzSearchBar extends Component {
       };
       return searchSuggestItem;
     }
-  }
-
-  buildSuggestFieldsQ():suggestItem[] {
-    const { qSuggests } = this.props
-    const { field } = this.getLastQuery();
-    const fields:suggestItem[] = qSuggests
-    .filter((item) => this.filterSuggestFields(item, field))
-    .map(this.mapSuggestFields);
-
-    return fields;
-  }
-
-  buildSuggestFieldAPI():suggestItem[] {
-    const { apiSuggests } = this.props;
-    const { inputValue } = this.state;
-    const { 0:field } = inputValue.split(':');
-    const fields:suggestItem[] = apiSuggests
-    .filter((item) => this.filterSuggestFields(item, field))
-    .map(this.mapSuggestFields)
-    return fields;
   }
 
   filterSuggestFields(item:(apiSuggests | qSuggests), field:string='') {
