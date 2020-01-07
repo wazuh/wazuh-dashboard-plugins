@@ -37,6 +37,8 @@ export class QHandler extends BaseHandler {
     this.inputStage = 'fields';
   }
 
+  //#region Build suggests elements
+
   buildSuggestItems(inputValue:string):suggestItem[] {
     if (this.inputStage === 'fields' || inputValue === ''){
       return this.buildSuggestFields(inputValue);
@@ -57,11 +59,16 @@ export class QHandler extends BaseHandler {
     .map(this.mapSuggestFields);
     return fields;
   }
-
+  
+  //#endregion
+  
   getLastQuery(inputValue:string):queryObject {
     const qInterpreter = new QInterpreter(inputValue);
     return qInterpreter.lastQuery();
   }
+  
+
+  //#region Events
 
   onItemClick(item:suggestItem, inputValue:string, currentFilters:object):{
     inputValue:string, filters:object
@@ -92,5 +99,33 @@ export class QHandler extends BaseHandler {
       filters
     }
   }
+
+  onInputChange(inputValue:string, currentFilters:object):{
+    isInvalid: boolean, filters: object
+  } {
+    const filters = {...currentFilters};
+    const { field, value=false } = this.getLastQuery(inputValue);
+    let isInvalid = false;
+
+    if (inputValue.length === 0) {
+      delete filters['q'];
+    }
+
+    if (value !== false) {
+      const fieldExist = this.qSuggests.find(item => item.label === field);
+      if (fieldExist) {
+        this.inputStage = 'values',
+        isInvalid = false;
+      } else {
+        isInvalid = true;
+      }
+    } else {
+      this.inputStage = 'fields';
+      isInvalid = false;
+    }
+    return { isInvalid, filters };
+  }
+
+  //#endregion 
 
 }

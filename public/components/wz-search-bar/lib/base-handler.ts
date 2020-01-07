@@ -11,6 +11,7 @@
  */
 
 import { suggestItem } from '../wz-search-bar';
+import { boolean } from 'joi';
 
 
 export abstract class BaseHandler {
@@ -28,9 +29,13 @@ export abstract class BaseHandler {
     return item.label.includes(field);
   }
 
-  onItemClick(item:suggestItem, inputValue:string, filters:object) {
-    
-  }
+  onItemClick(item:suggestItem, inputValue:string, filters:object):{
+    inputValue:string, filters:object
+  } { return {inputValue, filters}; }
+
+  onInputChange(inputValue:string, currentFilters:object):{
+    isInvalid: boolean, filters: object
+  } { return {isInvalid:true, filters:{}} }
 
   mapSuggestFields(item): suggestItem {
     const suggestItem = {

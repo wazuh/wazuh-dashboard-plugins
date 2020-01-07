@@ -30,21 +30,33 @@ export class ApiHandler extends BaseHandler {
     this.inputStage = 'fields';
   }
 
+  //#region Build suggests elements
+
   buildSuggestItems(inputValue:string):suggestItem[] {
     if (this.inputStage === 'fields' || inputValue === ''){
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'values') {
       return []// this.buildSuggestValues();
     }
+    return this.buildSuggestFields(inputValue);
   }
 
   buildSuggestFields(inputValue:string):suggestItem[] {
-    const { 0:field } = inputValue.split(':');
+    const { field } = this.inputInterpreter(inputValue);
     const fields:suggestItem[] = this.apiSuggest
     .filter((item) => this.filterSuggestFields(item, field))
     .map(this.mapSuggestFields)
     return fields;
   }
+
+  //#endregion
+
+  inputInterpreter(input:string):{field:string, value:boolean|string} {
+    const { 0:field, 1:value=false } = input.split(':');
+    return {field, value}; 
+  }
+
+  //#region Events
 
   onItemClick(item:suggestItem, inputValue, currentFilters:object):{
     inputValue:string, filters:object
@@ -60,4 +72,28 @@ export class ApiHandler extends BaseHandler {
     }
     return {inputValue, filters};
   }
+
+
+  onInputChange(inputValue:string, currentFilters:object):{
+    isInvalid: boolean, filters: object
+  } {
+    const { field, value } = this.inputInterpreter(inputValue);
+    let isInvalid = false;
+    if (value !== false) {
+      const fieldExist = this.apiSuggest.find(item => item.label === field);
+      if (fieldExist) {
+        this.inputStage = 'values';
+        isInvalid = false;
+      } else {
+        isInvalid = true;
+      }
+    } else {
+      isInvalid = false;
+      this.inputStage = 'fields';
+    }
+
+    return {isInvalid, filters:currentFilters};
+  }
+
+  //#endregion
 }

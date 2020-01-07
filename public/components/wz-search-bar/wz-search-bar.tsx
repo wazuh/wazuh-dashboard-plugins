@@ -61,7 +61,7 @@ export default class WzSearchBar extends Component {
     this.state = {
       searchFormat: (props.qSuggests) ? '?Q' : (props.apiSuggests) ? 'API' : null,
       suggestions: [],
-      isProcessing: false,
+      isProcessing: true,
       inputStage: 'fields',
       inputValue: '',
       isSearch: false,
@@ -77,8 +77,8 @@ export default class WzSearchBar extends Component {
   }
 
   componentDidMount() {
-    this.buildSuggestFields();
     const suggestsItems = [...this.suggestHandler.buildSuggestItems('')];
+    this.setState({suggestions: suggestsItems});
   }
 
   isUpdated() {
@@ -90,39 +90,25 @@ export default class WzSearchBar extends Component {
     if (!this.isUpdated()){
       return;
     }
-    const { inputStage, searchFormat, inputValue } = this.state;
-    const suggestsItems = [...this.suggestHandler.buildSuggestItems(inputValue)];
-
-    // if (inputStage === 'fields' || inputValue === ''){
-    //   this.buildSuggestFields();
-    // } else if (inputStage === 'operators' && searchFormat) {
-    //   this.buildSuggestOperators();
-    // } else if (inputStage === 'values' && searchFormat) {
-    //   this.buildSuggestValues();
-    // } else if (inputStage === 'conjuntions' && searchFormat){
-    //   this.buildSuggestConjuntions();
-    // }
-    this.setState({
-      isProcessing: false,
-      suggestsItems,
-    });
-  }
-
-
-  buildSuggestFields() {
-    const { inputValue } = this.state;
     const { searchDisable } = this.props;
-    const fields:suggestItem[] = [];
-    let isSearch = true;
-    fields.push(...this.suggestHandler.buildSuggestFields(inputValue));
+    const { inputValue } = this.state;
+    const suggestsItems = [...this.suggestHandler.buildSuggestItems(inputValue)];
+    const isSearchEnabled = this.suggestHandler.inputStage === 'fields' 
+      && !searchDisable 
+      && inputValue !== '';
 
-    if (!searchDisable && inputValue !== '') {
+    if (isSearchEnabled) {
       const suggestSearch = this.buildSuggestFieldsSearch();
-      suggestSearch && fields.unshift(suggestSearch);
+      suggestSearch && suggestsItems.unshift(suggestSearch);
     }
 
-    this.setState({suggestions: fields, isSearch });
+    this.setState({
+      isProcessing: false,
+      suggestions: suggestsItems,
+    });
   }
+  
+  
 
   buildSuggestFieldsSearch():suggestItem | undefined {
     const { inputValue } = this.state;
@@ -249,18 +235,16 @@ export default class WzSearchBar extends Component {
   }
 
   onInputChange = (value:string) => {
-    const { filters } = this.state;
-    if (value.length === 0) {
-      delete filters['q'];
-      this.props.onInputChange(filters);
-    }
+    const { filters:currentFilters } = this.state;
 
+    const { isInvalid, filters } = this.suggestHandler.onInputChange(value, currentFilters);
+    console.log("Stage:", this.suggestHandler.inputStage)
     this.setState({
       inputValue: value,
       isProcessing: true,
+      isInvalid,
       filters
     });
-    this.inputStageHandler(value);
   }
 
   onChangeSearchFormat = (format) => {console.log(format)}
@@ -303,35 +287,6 @@ export default class WzSearchBar extends Component {
     delete filters[badge.field];
     this.props.onInputChange(filters);
     this.setState({filters});
-  }
-
-  inputStageHandler(inputValue: string) {
-    const qInterpreter = new QInterpreter(inputValue);
-
-    const {field, value=false } = qInterpreter.lastQuery()
-    if(value !== false) {
-      const { qSuggests } = this.props;
-      const result = qSuggests.find((item) => {return item.label === field})
-      if (result) {
-        this.setState({
-          isInvalid: false,
-          inputStage: 'values',
-        });
-      } else {
-        this.setState({
-          isInvalid: true,
-          suggestions: [{
-            type: { iconType: 'alert', color: 'tint2' },
-            label: `The field ${field} no exists`,
-          }]
-        });
-      }
-    } else {
-      this.setState({
-        isInvalid: false,
-        inputStage: 'fields',
-      });
-    }
   }
 
   renderFormatSelector() {
