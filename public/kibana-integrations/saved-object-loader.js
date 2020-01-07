@@ -44,11 +44,11 @@ export class SavedObjectLoader {
     this.savedObjectsClient = savedObjectClient;
   }
 
-    // Fake async function, only to resolve a promise
-    async processFunc() {
-      return;
-    }
-  
+  // Fake async function, only to resolve a promise
+  async processFunc() {
+    return;
+  }
+
   /**
    * Retrieve a saved object by id. Returns a promise that completes when the object finishes
    * initializing.
@@ -140,8 +140,8 @@ export class SavedObjectLoader {
    * @returns {Promise}
    */
   findAll(search = '', size = 100, fields) {
-    return this.savedObjectsClient
-      .find({
+    return this.savedObjectsClient.find(
+      {
         type: this.lowercaseType,
         search: search ? `${search}*` : undefined,
         perPage: size,
@@ -149,8 +149,7 @@ export class SavedObjectLoader {
         searchFields: ['title^3', 'description'],
         defaultSearchOperator: 'AND',
         fields,
-      })
-      .then((resp) => {
+      }).then((resp) => {
         return {
           total: resp.total,
           hits: resp.savedObjects

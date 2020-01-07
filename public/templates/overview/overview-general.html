@@ -20,8 +20,8 @@
 
     <div ng-repeat="row in octrl.visualizations['overview'].rows">
         <div class="euiFlexGroup" ng-style="{'height':row.height + 'px'}">
-            <div ng-repeat="vis in row.vis" class="euiPanel wz-margin-10">
-                <div class="euiFlexItem" ng-class="{'fullscreen': octrl.checkExpandedVis($parent.$index, $index)}">
+            <div ng-repeat="vis in row.vis" class="euiPanel wz-margin-10" flex="vis.width || 100">
+                <div class="euiFlexItem h-100" ng-class="{'fullscreen': octrl.checkExpandedVis($parent.$index, $index)}">
                         <div class="euiFlexGroup" ng-dblclick="octrl.expand($parent.$index, $index)">
                             <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{vis.title}}</span>
                             <span class="cursor-pointer wz-margin-8-no-left" ng-click="octrl.expand($parent.$index, $index)">

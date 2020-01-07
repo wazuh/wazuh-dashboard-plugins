@@ -31,11 +31,11 @@ const app = uiModules.get('app/visualize');
 // Register this service with the saved object registry so it can be
 // edited by the object editor.
 savedObjectManagementRegistry.register({
-  service: 'wzsavedVisualizations',
+  service: 'wzSavedVisualizations',
   title: 'visualizations',
 });
 
-app.service('wzsavedVisualizations', function (SavedVis, Private, kbnUrl, chrome) {
+app.service('wzSavedVisualizations', function (SavedVis, Private, kbnUrl, chrome) {
   const visTypes = visualizations.types;
   const savedObjectClient = Private(SavedObjectsClientProvider);
   const saveVisualizationLoader = new SavedObjectLoader(

@@ -28,7 +28,7 @@ app.directive('kbnVis', function () {
     controller(
       $scope,
       $rootScope,
-      wzsavedVisualizations,
+      wzSavedVisualizations,
       errorHandler,
       rawVisualizations,
       loadedVisualizations,
@@ -111,7 +111,7 @@ app.directive('kbnVis', function () {
               const rawVis = raw.filter(
                 item => item && item.id === $scope.visID
               );
-              visualization = await wzsavedVisualizations.get(
+              visualization = await wzSavedVisualizations.get(
                 $scope.visID,
                 rawVis[0]
               );
