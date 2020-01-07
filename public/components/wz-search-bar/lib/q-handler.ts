@@ -34,6 +34,20 @@ export class QHandler extends BaseHandler {
   constructor(qSuggests) {
     super();
     this.qSuggests = qSuggests;
+    this.inputStage = 'fields';
+  }
+
+  buildSuggestItems(inputValue:string):suggestItem[] {
+    if (this.inputStage === 'fields' || inputValue === ''){
+      return this.buildSuggestFields(inputValue);
+    } else if (this.inputStage === 'operators') {
+      return []// this.buildSuggestOperators();
+    } else if (this.inputStage === 'values') {
+      return []// this.buildSuggestValues();
+    } else if (this.inputStage === 'conjuntions'){
+      return []// this.buildSuggestConjuntions();
+    }
+    return this.buildSuggestFields(inputValue);
   }
 
   buildSuggestFields(inputValue:string):suggestItem[] {
@@ -47,6 +61,36 @@ export class QHandler extends BaseHandler {
   getLastQuery(inputValue:string):queryObject {
     const qInterpreter = new QInterpreter(inputValue);
     return qInterpreter.lastQuery();
+  }
+
+  onItemClick(item:suggestItem, inputValue:string, currentFilters:object):{
+    inputValue:string, filters:object
+  } {
+    const filters = {...currentFilters};
+    const qInterpreter = new QInterpreter(inputValue);
+    switch (item.type.iconType) {
+      case'kqlField':
+        qInterpreter.setlastQuery(item.label);
+        this.inputStage = 'operators';
+        break;
+      case'kqlOperand':
+        qInterpreter.setlastQuery(item.label);
+        this.inputStage = 'values';
+        break;
+      case'kqlValue':
+        qInterpreter.setlastQuery(item.label);
+        filters['q'] = qInterpreter.toString()
+        this.inputStage = 'conjuntions';
+        break;
+      case'kqlSelector':
+        qInterpreter.addNewQuery(item.label);
+        this.inputStage = 'fields';
+        break;
+    }
+    return {
+      inputValue: qInterpreter.toString(),
+      filters
+    }
   }
 
 }

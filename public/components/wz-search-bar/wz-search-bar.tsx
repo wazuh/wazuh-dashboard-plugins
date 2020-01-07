@@ -78,6 +78,7 @@ export default class WzSearchBar extends Component {
 
   componentDidMount() {
     this.buildSuggestFields();
+    const suggestsItems = [...this.suggestHandler.buildSuggestItems('')];
   }
 
   isUpdated() {
@@ -90,16 +91,21 @@ export default class WzSearchBar extends Component {
       return;
     }
     const { inputStage, searchFormat, inputValue } = this.state;
-    if (inputStage === 'fields' || inputValue === ''){
-      this.buildSuggestFields();
-    } else if (inputStage === 'operators' && searchFormat) {
-      this.buildSuggestOperators();
-    } else if (inputStage === 'values' && searchFormat) {
-      this.buildSuggestValues();
-    } else if (inputStage === 'conjuntions' && searchFormat){
-      this.buildSuggestConjuntions();
-    }
-    this.setState({isProcessing: false});
+    const suggestsItems = [...this.suggestHandler.buildSuggestItems(inputValue)];
+
+    // if (inputStage === 'fields' || inputValue === ''){
+    //   this.buildSuggestFields();
+    // } else if (inputStage === 'operators' && searchFormat) {
+    //   this.buildSuggestOperators();
+    // } else if (inputStage === 'values' && searchFormat) {
+    //   this.buildSuggestValues();
+    // } else if (inputStage === 'conjuntions' && searchFormat){
+    //   this.buildSuggestConjuntions();
+    // }
+    this.setState({
+      isProcessing: false,
+      suggestsItems,
+    });
   }
 
 
@@ -277,32 +283,18 @@ export default class WzSearchBar extends Component {
 
   onItemClick(item: suggestItem) {
     const { inputValue, filters } = this.state;
-    const qInterperter = new QInterpreter(inputValue);
-    let inputStage:string = '';
-    if (item.type.iconType === 'kqlField') {
-      qInterperter.setlastQuery(item.label);
-      inputStage = 'operators';
-    } else if (item.type.iconType === 'kqlOperand') {
-      qInterperter.setlastQuery(item.label);
-      inputStage = 'values';
-    } else if (item.type.iconType === 'kqlValue' && item.type.color === 'tint0') {
-      qInterperter.setlastQuery(item.label);
-      filters['q'] = qInterperter.toString()
-      this.props.onInputChange(filters);
-      inputStage = 'conjuntions';
-    } else if (item.type.iconType === 'kqlSelector') {
-      qInterperter.addNewQuery(item.label);
-      inputStage = 'fields';
-    } else if (item.type.iconType === 'search') {
-      filters['search'] = inputValue;
+    const {inputValue:newInputValue, filters:newFilters } = this.suggestHandler.onItemClick(item, inputValue, filters);
+
+    if (JSON.stringify(filters) !== JSON.stringify(newFilters)) {
       this.props.onInputChange(filters);
     }
+
     this.setState({
-      inputValue: qInterperter.toString(),
+      inputValue: newInputValue,
       suggestions: [],
+      filters: newFilters,
+      inputStage: this.suggestHandler.inputStage,
       isProcessing: true,
-      filters,
-      inputStage,
     });
   }
 

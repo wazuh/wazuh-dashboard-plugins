@@ -14,13 +14,22 @@ import { suggestItem } from '../wz-search-bar';
 
 
 export abstract class BaseHandler {
-
+  inputStage?: string;
+  
+  buildSuggestItems(inputValue: string):suggestItem[] {
+    return [];
+  }
+  
   buildSuggestFields(inputValue:string):suggestItem[] {
     return [];
   };
 
   filterSuggestFields(item, field: string = '') {
     return item.label.includes(field);
+  }
+
+  onItemClick(item:suggestItem, inputValue:string, filters:object) {
+    
   }
 
   mapSuggestFields(item): suggestItem {

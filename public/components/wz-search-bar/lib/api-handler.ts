@@ -22,18 +22,42 @@ export interface apiSuggests {
   }
 
 export class ApiHandler extends BaseHandler {
-    apiSuggest: apiSuggests[];
+  apiSuggest: apiSuggests[];
 
-    constructor(apiSuggests) {
-      super()
-      this.apiSuggest = apiSuggests;
-    }
+  constructor(apiSuggests) {
+    super()
+    this.apiSuggest = apiSuggests;
+    this.inputStage = 'fields';
+  }
 
-    buildSuggestFields(inputValue:string):suggestItem[] {
-      const { 0:field } = inputValue.split(':');
-      const fields:suggestItem[] = this.apiSuggest
-      .filter((item) => this.filterSuggestFields(item, field))
-      .map(this.mapSuggestFields)
-      return fields;
+  buildSuggestItems(inputValue:string):suggestItem[] {
+    if (this.inputStage === 'fields' || inputValue === ''){
+      return this.buildSuggestFields(inputValue);
+    } else if (this.inputStage === 'values') {
+      return []// this.buildSuggestValues();
     }
+  }
+
+  buildSuggestFields(inputValue:string):suggestItem[] {
+    const { 0:field } = inputValue.split(':');
+    const fields:suggestItem[] = this.apiSuggest
+    .filter((item) => this.filterSuggestFields(item, field))
+    .map(this.mapSuggestFields)
+    return fields;
+  }
+
+  onItemClick(item:suggestItem, inputValue, currentFilters:object):{
+    inputValue:string, filters:object
+  } {
+    const filters = {...currentFilters};
+    switch (item.type.iconType) {
+      case 'kqlField':
+        this.inputStage = 'values';
+        inputValue = item.label + ':';
+        break;
+      case 'kqlValue':
+        break;
+    }
+    return {inputValue, filters};
+  }
 }
