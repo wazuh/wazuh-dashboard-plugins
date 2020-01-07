@@ -1,12 +1,13 @@
-<div ng-if="octrl.tab === 'general' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" class="md-padding-v">
+<div ng-if="octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" class="md-padding-v">
 
     <div class="wz-no-display">
-        <div ng-repeat="vis in octrl.visualizations['overview'].hide">
-            <kbn-vis id="{{vis}}" vis-id="vis"></kbn-vis>
+        <div ng-repeat="vis in octrl.visualizations['overview'].metrics">
+            <kbn-vis id="{{vis.id}}" vis-id="vis.id"></kbn-vis>
         </div>
     </div>
 
-     <div layout="row" layout-padding>
+    <!-- Metrics of Security Events Dashboard -->
+     <div ng-if="octrl.tab === 'general'" class="md-padding">
         <react-component flex name="AlertsStats" props="{
             items: [
                 { description: 'Total', value: octrl.totalAlerts(), color: 'primary' },
@@ -27,9 +28,9 @@
                                 <react-component name="EuiIcon" props="{type:'expand'}"  />
                             </span>
                         </div>
-                        <md-card-content class="wazuh-column">
+                        <div class="wazuh-column" ng-style="{'height': (row.height - 65) + 'px'}">
                             <kbn-vis id="{{vis.id}}" vis-id="vis.id"></kbn-vis>
-                        </md-card-content>
+                        </div>
                     </div>
                 </div>
             </div>

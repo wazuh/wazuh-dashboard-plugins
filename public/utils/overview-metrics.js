@@ -12,64 +12,64 @@
 
 // Metrics General
 const metricsGeneral = {
-  totalAlerts: '[vis-id="\'Wazuh-App-Overview-General-Metric-alerts\'"]',
-  level12: '[vis-id="\'Wazuh-App-Overview-General-Level-12-alerts\'"]',
+  totalAlerts: '[id="Wazuh-App-Overview-General-Metric-alerts"]',
+  level12: '[id="Wazuh-App-Overview-General-Level-12-alerts"]',
   authFailure:
-    '[vis-id="\'Wazuh-App-Overview-General-Authentication-failure\'"]',
+    '[id="Wazuh-App-Overview-General-Authentication-failure"]',
   authSuccess:
-    '[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"]'
+    '[id="Wazuh-App-Overview-General-Authentication-success"]'
 };
 
 // Metrics Vulnerability Detector
 const metricsVulnerability = {
   vulnCritical:
-    '[vis-id="\'Wazuh-App-Overview-vuls-Metric-Critical-severity\'"]',
-  vulnHigh: '[vis-id="\'Wazuh-App-Overview-vuls-Metric-High-severity\'"]',
-  vulnMedium: '[vis-id="\'Wazuh-App-Overview-vuls-Metric-Medium-severity\'"]',
-  vulnLow: '[vis-id="\'Wazuh-App-Overview-vuls-Metric-Low-severity\'"]'
+    '[id="Wazuh-App-Overview-vuls-Metric-Critical-severity"]',
+  vulnHigh: '[id="Wazuh-App-Overview-vuls-Metric-High-severity"]',
+  vulnMedium: '[id="Wazuh-App-Overview-vuls-Metric-Medium-severity"]',
+  vulnLow: '[id="Wazuh-App-Overview-vuls-Metric-Low-severity"]'
 };
 
 // Metrics Scap
 const metricsScap = {
-  scapLastScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Last-score\'"]',
-  scapHighestScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Highest-score\'"]',
-  scapLowestScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Lowest-score\'"]'
+  scapLastScore: '[id="Wazuh-App-Overview-OSCAP-Last-score"]',
+  scapHighestScore: '[id="Wazuh-App-Overview-OSCAP-Highest-score"]',
+  scapLowestScore: '[id="Wazuh-App-Overview-OSCAP-Lowest-score"]'
 };
 
 // Metrics Mitre
 const metricsMitre = {
-  mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE\'"]'
+  mitreMetrics: '[id="Wazuh-App-Overview-MITRE"]'
 };
 
 // Metrics CIS-CAT
 const metricsCiscat = {
   ciscatScanNotChecked:
-    '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-not-checked\'"]',
-  ciscatScanScore: '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-score\'"]',
-  ciscatScanPass: '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-pass\'"]',
-  ciscatScanFail: '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-fail\'"]',
+    '[id="Wazuh-app-Overview-CISCAT-last-scan-not-checked"]',
+  ciscatScanScore: '[id="Wazuh-app-Overview-CISCAT-last-scan-score"]',
+  ciscatScanPass: '[id="Wazuh-app-Overview-CISCAT-last-scan-pass"]',
+  ciscatScanFail: '[id="Wazuh-app-Overview-CISCAT-last-scan-fail"]',
   ciscatScanTimestamp:
-    '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-timestamp\'"]',
-  ciscatScanError: '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-error\'"]',
+    '[id="Wazuh-app-Overview-CISCAT-last-scan-timestamp"]',
+  ciscatScanError: '[id="Wazuh-app-Overview-CISCAT-last-scan-error"]',
   ciscatScanBenchmark:
-    '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-benchmark\'"]',
+    '[id="Wazuh-app-Overview-CISCAT-last-scan-benchmark"]',
   ciscatScanUnknown:
-    '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-unknown\'"]'
+    '[id="Wazuh-app-Overview-CISCAT-last-scan-unknown"]'
 };
 
 // Metrics Virustotal
 const metricsVirustotal = {
   virusMalicious:
-    '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Malicious\'"]',
+    '[id="Wazuh-App-Overview-Virustotal-Total-Malicious"]',
   virusPositives:
-    '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Positives\'"]',
-  virusTotal: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
+    '[id="Wazuh-App-Overview-Virustotal-Total-Positives"]',
+  virusTotal: '[id="Wazuh-App-Overview-Virustotal-Total"]'
 };
 
 // Metrics OSQuery
 const metricsOsquery = {
   osqueryAgentsReporting:
-    '[vis-id="\'Wazuh-App-Overview-Osquery-Agents-reporting\'"]'
+    '[id="Wazuh-App-Overview-Osquery-Agents-reporting"]'
 };
 
 export default {
