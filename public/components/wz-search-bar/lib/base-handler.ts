@@ -17,7 +17,7 @@ import { boolean } from 'joi';
 export abstract class BaseHandler {
   inputStage?: string;
   
-  buildSuggestItems(inputValue: string):suggestItem[] {
+  async buildSuggestItems(inputValue: string):Promise<suggestItem[]> {
     return [];
   }
   
@@ -25,8 +25,30 @@ export abstract class BaseHandler {
     return [];
   };
 
+  async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
+    return [];
+  }
+
+  buildSuggestValue(value:string|number) {
+    return {
+      type: {iconType: 'kqlValue', color: 'tint0'},
+      label: typeof value !== 'string' ? value.toString(): value,
+    };
+  }
+
   filterSuggestFields(item, field: string = '') {
     return item.label.includes(field);
+  }
+
+  filterSuggestValues(item:number|string, inputValue:string) {
+    if (typeof item === 'number' && !!inputValue) {
+      // @ts-ignore
+      return item == inputValue;
+    } else if (!!inputValue) {
+      // @ts-ignore
+      return item.includes(inputValue);
+    }
+    return true;
   }
 
   onItemClick(item:suggestItem, inputValue:string, filters:object):{

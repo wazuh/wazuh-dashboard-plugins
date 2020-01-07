@@ -16,7 +16,7 @@ import { suggestItem } from '../wz-search-bar';
 export interface apiSuggests {
     label: string
     description: string
-    values?: string[]
+    values?: [] | Function | undefined
     multiValue?: boolean
     range?: boolean
   }
@@ -32,11 +32,11 @@ export class ApiHandler extends BaseHandler {
 
   //#region Build suggests elements
 
-  buildSuggestItems(inputValue:string):suggestItem[] {
+  async buildSuggestItems(inputValue:string):Promise<suggestItem[]> {
     if (this.inputStage === 'fields' || inputValue === ''){
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'values') {
-      return []// this.buildSuggestValues();
+      return await this.buildSuggestValues(inputValue);
     }
     return this.buildSuggestFields(inputValue);
   }
@@ -49,11 +49,39 @@ export class ApiHandler extends BaseHandler {
     return fields;
   }
 
+  async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
+    const { values } = this.getCurrentField(inputValue);
+    
+    const rawSuggestions:string[] = typeof values === 'function'
+      ? await values()
+      : values;
+    const { value } = this.inputInterpreter(inputValue);
+    const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
+    const suggestions:suggestItem[] = [];
+    
+    for (const value of filterSuggestions) {
+      const item:suggestItem = this.buildSuggestValue(value);
+      suggestions.push(item);
+    }
+
+    return suggestions;
+  }
+
   //#endregion
 
   inputInterpreter(input:string):{field:string, value:boolean|string} {
     const { 0:field, 1:value=false } = input.split(':');
     return {field, value}; 
+  }
+
+  getCurrentField(inputValue:string):apiSuggests {
+    const { field } = this.inputInterpreter(inputValue);
+    const currentField = this.apiSuggest.find(item => item.label === field);
+    if (currentField) {
+      return currentField;
+    } else {
+      throw Error('Error when try to get the current suggest element')
+    }
   }
 
   //#region Events

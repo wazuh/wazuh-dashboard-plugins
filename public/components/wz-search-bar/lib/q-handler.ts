@@ -13,6 +13,7 @@
 import { BaseHandler } from './base-handler';
 import { QInterpreter, queryObject } from './q-interpreter';
 import { suggestItem } from '../wz-search-bar';
+import value from '@elastic/eui/dist/eui_theme_*.json';
 
 export interface qSuggests {
   label: string
@@ -39,13 +40,13 @@ export class QHandler extends BaseHandler {
 
   //#region Build suggests elements
 
-  buildSuggestItems(inputValue:string):suggestItem[] {
+  async buildSuggestItems(inputValue:string):Promise<suggestItem[]> {
     if (this.inputStage === 'fields' || inputValue === ''){
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'operators') {
       return []// this.buildSuggestOperators();
     } else if (this.inputStage === 'values') {
-      return []// this.buildSuggestValues();
+      return await this.buildSuggestValues(inputValue);
     } else if (this.inputStage === 'conjuntions'){
       return []// this.buildSuggestConjuntions();
     }
@@ -59,6 +60,23 @@ export class QHandler extends BaseHandler {
     .map(this.mapSuggestFields);
     return fields;
   }
+
+  async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
+    const { values } = this.getCurrentField(inputValue);
+    const rawSuggestions:string[] = typeof values === 'function'
+      ? await values()
+      : values;
+    const { value } = this.getLastQuery(inputValue);
+    const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
+    const suggestions:suggestItem[] = [];
+
+    for (const value of filterSuggestions) {
+      const item:suggestItem = this.buildSuggestValue(value);
+      suggestions.push(item);
+    }
+
+    return suggestions;
+  }
   
   //#endregion
   
@@ -67,6 +85,16 @@ export class QHandler extends BaseHandler {
     return qInterpreter.lastQuery();
   }
   
+  getCurrentField(inputValue:string):qSuggests {
+    const { field } = this.getLastQuery(inputValue);
+    const currentField = this.qSuggests.find(item => item.label === field);
+    if (currentField) {
+      return currentField;
+    } else {
+      throw Error('Error when try to get the current suggest element')
+    }
+  }
+
 
   //#region Events
 

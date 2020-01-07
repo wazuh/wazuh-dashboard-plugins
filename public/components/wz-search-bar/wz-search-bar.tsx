@@ -76,8 +76,8 @@ export default class WzSearchBar extends Component {
     }
   }
 
-  componentDidMount() {
-    const suggestsItems = [...this.suggestHandler.buildSuggestItems('')];
+  async componentDidMount() {
+    const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
     this.setState({suggestions: suggestsItems});
   }
 
@@ -86,13 +86,13 @@ export default class WzSearchBar extends Component {
     return isProcessing && !isInvalid;
   }
 
-  componentDidUpdate() {
+  async componentDidUpdate() {
     if (!this.isUpdated()){
       return;
     }
     const { searchDisable } = this.props;
     const { inputValue } = this.state;
-    const suggestsItems = [...this.suggestHandler.buildSuggestItems(inputValue)];
+    const suggestsItems = [...await this.suggestHandler.buildSuggestItems(inputValue)];
     const isSearchEnabled = this.suggestHandler.inputStage === 'fields' 
       && !searchDisable 
       && inputValue !== '';
@@ -238,7 +238,6 @@ export default class WzSearchBar extends Component {
     const { filters:currentFilters } = this.state;
 
     const { isInvalid, filters } = this.suggestHandler.onInputChange(value, currentFilters);
-    console.log("Stage:", this.suggestHandler.inputStage)
     this.setState({
       inputValue: value,
       isProcessing: true,
