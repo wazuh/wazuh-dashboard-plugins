@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 import WzNoConfig from '../util-components/no-config';
@@ -6,12 +18,14 @@ import {
   EuiSpacer  
 } from "@elastic/eui";
 
-import WzConfigurationPath from '../util-components/configuration-path';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 
 import withWzConfig from '../util-hocs/wz-config';
 import { isString } from "../utils/utils";
+
+import { connect } from "react-redux";
+import { compose } from 'redux';
 
 const mainSettings = [
   { field: 'disabled', label: 'Cluster status'},
@@ -34,18 +48,17 @@ class WzCluster extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, wazuhNotReadyYet } = this.props;
     let mainSettingsConfig = {
       ...currentConfig['com-cluster'],
       disabled: currentConfig['com-cluster'].disabled === 'yes'? 'disabled' : 'enabled'
     };
     return (
       <Fragment>
-        <WzConfigurationPath title='Cluster' description='Master node configuration' path='Cluster' updateConfigurationSection={this.props.updateConfigurationSection}/>
         {currentConfig['com-cluster'] && isString(currentConfig['com-cluster']) && (
           <WzNoConfig error={currentConfig['com-cluster']} help={helpLinks}/>
         )}
-        {/*wazuhNotReadyYet &&*/ (!currentConfig || !currentConfig['com-cluster']) && (
+        {wazuhNotReadyYet && (!currentConfig || !currentConfig['com-cluster']) && (
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig['com-cluster'] && !isString(currentConfig['com-cluster']) && (
@@ -63,4 +76,11 @@ class WzCluster extends Component{
 
 const sections = [{component:'com',configuration:'cluster'}];
 
-export default withWzConfig('000', sections)(WzCluster);
+const mapStateToProps = (state) => ({
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+});
+
+export default compose(
+  withWzConfig(sections),
+  connect(mapStateToProps)
+)(WzCluster);

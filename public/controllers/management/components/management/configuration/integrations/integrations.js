@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -7,7 +19,6 @@ import {
   EuiHorizontalRule
 } from "@elastic/eui";
 
-import WzConfigurationPath from '../util-components/configuration-path';
 import { WzConfigurationSettingsHeaderViewer } from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import { WzSettingsViewer } from '../util-components/code-viewer';
@@ -49,13 +60,14 @@ class WzConfigurationIntegrations extends Component{
     return defaultIntegrations.find(i => i.title && i.title.toLocaleLowerCase() === integration) || { title: capitalize(integration), description: 'Custom integration' };
   }
   render(){
-    // TODO: test
     const { view } = this.state;
     const { currentConfig } = this.props;
-    const integrations = Object.keys(currentConfig['integrator-integration'].integration);
+    const integrations = currentConfig['integrator-integration'] && currentConfig['integrator-integration'].integrations ? Object.keys(currentConfig['integrator-integration'].integration) : false;
     return (
       <Fragment>
-        <WzConfigurationPath title='Integrations' description='Slack, VirusTotal, PagerDuty and custom integrations with external APIs' path='Integrations' updateConfigurationSection={this.props.updateConfigurationSection}/>
+        {currentConfig['integrator-integration'] && isString(currentConfig['integrator-integration']) && (
+          <WzNoConfig error={currentConfig['integrator-integration']} help={helpLinks}/>
+        )}
         {currentConfig['integrator-integration'] && !isString(currentConfig['integrator-integration']) && (
           <WzViewSelector view={view}>
             <div default>
@@ -107,21 +119,4 @@ class WzConfigurationIntegrations extends Component{
 
 const sections = [{component:'integrator',configuration:'integration'}];
 
-export default withWzConfig('000', sections, null, ({ error, updateConfigurationSection }) => {
-  return (
-    <Fragment>
-      <WzConfigurationPath title='Integrations' description='Slack, VirusTotal, PagerDuty and custom integrations with external APIs' path='Integrations' updateConfigurationSection={updateConfigurationSection}/>
-      <WzNoConfig error={error.integrations} help={helpLinks}/>
-    </Fragment>)
-}, (currentConfig) => {
-  let error = false;
-  if(currentConfig['integrator-integration'] && typeof currentConfig['integrator-integration'] === 'string'){
-    error = error || {};
-    error.integrations = currentConfig['integrator-integration'];
-  }
-  if(/*wazuhNotReadyYet &&*/ (!currentConfig || !currentConfig['integrator-integration'])){ // TODO: wazuhNotReadyYet
-    error = error || {};
-    error.wazuhNotReadyYet = 'Wazuh not ready yet'
-  }
-  return error
-})(WzConfigurationIntegrations);
+export default withWzConfig(sections)(WzConfigurationIntegrations);

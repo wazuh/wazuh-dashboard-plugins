@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -7,8 +19,9 @@ import {
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzSettingsGroup from '../util-components/configuration-settings-group';
+import WzNoConfig from '../util-components/no-config';
 
-import { renderValueNoThenEnabled, renderValueOrYes } from '../utils/utils';
+import { renderValueNoThenEnabled, renderValueOrYes, isString } from '../utils/utils';
 
 import helpLinks from './help-links';
 
@@ -28,17 +41,25 @@ class WzConfigurationAmazonS3General extends Component{
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        <WzConfigurationSettingsTabSelector
-          title='Main settings'
-          description='Common settings applied to all Amazon S3 buckets'
-          currentConfig={currentConfig}
-          helpLinks={helpLinks}
-        >
-          <WzSettingsGroup
-            config={currentConfig['aws-s3'].syscheck}
-            items={mainSettings}
-          />
-        </WzConfigurationSettingsTabSelector>
+        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks} />
+        )}
+        {currentConfig && !currentConfig['aws-s3'] && !isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error='not-present' help={helpLinks} />
+        )}
+        {currentConfig && currentConfig['aws-s3'] && (
+          <WzConfigurationSettingsTabSelector
+            title='Main settings'
+            description='Common settings applied to all Amazon S3 buckets'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}
+          >
+            <WzSettingsGroup
+              config={currentConfig['aws-s3'].syscheck}
+              items={mainSettings}
+            />
+          </WzConfigurationSettingsTabSelector>
+          )}
       </Fragment>
     )
   }

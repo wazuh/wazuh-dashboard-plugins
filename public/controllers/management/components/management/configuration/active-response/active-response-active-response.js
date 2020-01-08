@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -7,9 +19,10 @@ import {
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
-import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
+
+import { connect } from 'react-redux';
 
 const mainSettings = [
   { field: 'disabled', label: 'Status of this active response', render: renderValueNoThenEnabled },
@@ -32,7 +45,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, wazuhNotReadyYet } = this.props;
     const items = currentConfig['analysis-active_response']['active-response'].map((item, key) => ({
       button: item.command,
       data: item
@@ -45,7 +58,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
         {currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && !currentConfig['analysis-active_response']['active-response'].length && (
           <WzNoConfig error='not-present' help={helpLinks} />
         )}
-        {/*wazuhNotReadyYet &&*/ (!currentConfig || !currentConfig['analysis-active_response']) && (
+        {wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-active_response']) && (
           <WzNoConfig error={currentConfig['com-active-response']} help={helpLinks} />
         )}
         {currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'].length ? (
@@ -65,4 +78,8 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
   }
 }
 
-export default WzConfigurationActiveResponseActiveResponse;
+const mapStateToProps = (state) => ({
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+});
+
+export default connect(mapStateToProps)(WzConfigurationActiveResponseActiveResponse);

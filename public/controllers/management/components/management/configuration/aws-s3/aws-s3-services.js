@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -10,6 +22,8 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
+
+import { connect } from 'react-redux';
 
 const mainSettings = [
   { field: 'type', label: 'Service type' },
@@ -25,14 +39,14 @@ class WzConfigurationAmazonS3Services extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
-    const items = settingsListBuilder(currentConfig['aws-s3'].services, 'type');
+    const { currentConfig, wazuhNotReadyYet } = this.props;
+    const items = currentConfig['aws-s3'] && currentConfig['aws-s3'].services ? settingsListBuilder(currentConfig['aws-s3'].services, 'type') : {};
     return (
       <Fragment>
-        {urrentConfig && currentConfig['aws-s3'] && !currentConfig['aws-s3'].services && (
+        {currentConfig && !currentConfig['aws-s3'] /*&& !currentConfig['aws-s3'].services*/ && (
           <WzNoConfig error='not-present' help={helpLinks}/>
-          )}
-        {/*wazuhNotReadyYet &&*/ (!currentConfig || !currentConfig['aws-s3']) && ( 
+        )}
+        {wazuhNotReadyYet && (!currentConfig /*|| !currentConfig['aws-s3']*/) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].services && (
@@ -53,4 +67,8 @@ class WzConfigurationAmazonS3Services extends Component{
   }
 }
 
-export default WzConfigurationAmazonS3Services;
+const mapStateToProps = (state) => ({
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+});
+
+export default connect(mapStateToProps)(WzConfigurationAmazonS3Services);

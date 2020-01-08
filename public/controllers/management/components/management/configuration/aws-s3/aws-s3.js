@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -25,39 +37,31 @@ class WzConfigurationAmazonS3 extends Component{
   constructor(props){
     super(props);
   }
+  componentDidMount(){
+    this.props.updateBadge(this.badgeEnabled());
+  }
   badgeEnabled(){
-    return this.props.currentConfig && this.props.currentConfig['aws-s3'] && this.props.currentConfig['aws-s3'].disabled === 'no'
+    return (this.props.currentConfig && this.props.currentConfig['aws-s3'] && this.props.currentConfig['aws-s3'].disabled === 'no') || false;
   }
   render(){
     let { currentConfig } = this.props;
     currentConfig = wodleBuilder(currentConfig, 'aws-s3');
     return (
-      <Fragment>
-        <WzConfigurationPath title='Amazon S3' description='Security events related to Amazon AWS services, collected directly via AWS API' updateConfigurationSection={this.props.updateConfigurationSection} badge={this.badgeEnabled()}/>
-        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks} />
-          )}
-        {currentConfig && !currentConfig['aws-s3'] && !isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error='not-present' help={helpLinks} />
-        )}
-        {currentConfig && currentConfig['aws-s3'] && (
-          <WzTabSelector>
-            <div label='General'>
-              <WzConfigurationAmazonS3General currentConfig={currentConfig}/>
-            </div>
-            <div label='Buckets'>
-              <WzConfigurationAmazonS3Buckets currentConfig={currentConfig}/>
-            </div>
-            <div label='Services'>
-              <WzConfigurationAmazonS3Services currentConfig={currentConfig}/>
-            </div>
-          </WzTabSelector>
-        )}
-      </Fragment>
+      <WzTabSelector>
+        <div label='General'>
+          <WzConfigurationAmazonS3General currentConfig={currentConfig}/>
+        </div>
+        <div label='Buckets'>
+          <WzConfigurationAmazonS3Buckets currentConfig={currentConfig}/>
+        </div>
+        <div label='Services'>
+          <WzConfigurationAmazonS3Services currentConfig={currentConfig}/>
+        </div>
+      </WzTabSelector>
     )
   }
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
-export default withWzConfig('000', sections)(WzConfigurationAmazonS3);
+export default withWzConfig(sections)(WzConfigurationAmazonS3);

@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -7,7 +19,9 @@ import {
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
-import { isString } from '../utils/utils';
+import { isString, isArray } from '../utils/utils';
+
+import { connect } from 'react-redux';
 
 const mainSettings = [
   { field: 'email_to', label: 'Send alerts to this email address'},
@@ -41,10 +55,9 @@ class WzConfigurationAlertsEmailAlerts extends Component{
     this.setState({ view });
   }
   render(){
-    //TODO: 
     const { selectedItemIndex } = this.state;
-    const { currentConfig } = this.props;
-    const selectedItem = Array.isArray(currentConfig['mail-alerts'].email_alerts) && currentConfig['mail-alerts'].email_alerts[selectedItemIndex];
+    const { currentConfig, wazuhNotReadyYet } = this.props;
+    const selectedItem = isArray(currentConfig['mail-alerts'].email_alerts) && currentConfig['mail-alerts'].email_alerts[selectedItemIndex];
     return (
       <Fragment>
         {currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts']) && (
@@ -53,7 +66,7 @@ class WzConfigurationAlertsEmailAlerts extends Component{
         {currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && (!currentConfig['mail-alerts'].email_alerts || !currentConfig['mail-alerts'].email_alerts.length) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {/*wazuhNotReadyYet && */ (!currentConfig || !currentConfig['mail-alerts']) && ( /* TODO: wazuhNotReady */
+        {wazuhNotReadyYet &&  (!currentConfig || !currentConfig['mail-alerts']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {selectedItem && (
@@ -78,4 +91,8 @@ class WzConfigurationAlertsEmailAlerts extends Component{
   }
 }
 
-export default WzConfigurationAlertsEmailAlerts;
+const mapStateToProps = (state) => ({
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+});
+
+export default connect(mapStateToProps)(WzConfigurationAlertsEmailAlerts);

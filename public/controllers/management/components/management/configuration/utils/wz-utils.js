@@ -10,7 +10,12 @@
 * Find more information about this on the LICENSE file.
 */
 
-export default [
-  { text: 'CIS-CAT module documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html' },
-  { text: 'CIS-CAT module reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-ciscat.html' }
-];
+import { UnsupportedComponents } from "../../../../../../utils/components-os-support";
+import WzConfigurationSettings from '../configuration-settings';
+
+export const shouldShowComponent = (component, agent) => {
+  return !(
+    UnsupportedComponents[agent.agentPlatform] ||
+    UnsupportedComponents['other']
+  ).includes(component);
+}

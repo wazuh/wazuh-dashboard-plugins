@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -16,7 +28,7 @@ class WzCodeEditor extends Component{
     super(props);
   }
   render(){
-    const { title, titleComponent, mode, value, onChange, isReadOnly } = this.props;
+    const { title, titleComponent, mode, value, onChange, isReadOnly, height, minusHeight } = this.props;
     return (
       <Fragment>
         {(titleComponent && (
@@ -30,10 +42,11 @@ class WzCodeEditor extends Component{
           mode={mode}
           theme='github'
           width='100%'
+          height={height || `calc(100vh - ${minusHeight || 400}px)`} // Groups section has -250px
           value={value}
           tabSize={2}
-          minLines={15}
-          maxLines={15}
+          // minLines={15}
+          // maxLines={15}
           highlightActiveLine={false}
           onChange={onChange}
           isReadOnly={isReadOnly}
@@ -53,7 +66,9 @@ class WzCodeEditor extends Component{
 WzCodeEditor.propTypes = {
   title: Proptypes.string,
   mode: Proptypes.string,
-  value: Proptypes.string
+  value: Proptypes.string,
+  height: Proptypes.string,
+  minusHeight: Proptypes.number
 };
 
 export default WzCodeEditor;

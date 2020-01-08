@@ -10,9 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
- export const updateConfigurationSection = (section) => {
+export const updateConfigurationSection = (section) => {
   return {
     type: 'UPDATE_CONFIGURATION_SECTION',
     section
+  }
+}
+
+export const updateWazuhNotReadyYet = (wazuhNotReadyYet) => {
+  return {
+    type: 'UPDATE_WAZUH_NOT_READY_YET',
+    wazuhNotReadyYet
   }
 }

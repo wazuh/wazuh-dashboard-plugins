@@ -100,7 +100,7 @@ export class ConfigurationController {
     };
 
     //Adding props to configurationProps
-    this.mctrl.managementProps.configurationProps = {};
+    this.mctrl.managementProps.configurationProps = this.mctrl.managementProps.configurationProps || {};
     this.mctrl.managementProps.configurationProps.switchWodle = this.switchWodle;
     this.mctrl.managementProps.configurationProps.switchConfigTab = this.switchConfigTab;
 

@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
@@ -16,20 +28,20 @@ import {
 } from "@elastic/eui";
 
 import WzCodeEditor from '../util-components/code-editor';
-import WzConfigurationPath from '../util-components/configuration-path';
 import withLoading from '../util-hocs/loading';
 
-import { updateConfigurationSection } from '../../../../../../redux/actions/configurationActions';
 import { fetchFile, restartNodeSelected, saveFileManager } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
 
 import { addToast } from '../util-providers/toast-provider';
 import { withWzToast } from '../util-providers/toast-p';
 
-const WzEditorConfiguration = withLoading(async () => {
-  const xmlFetched = await fetchFile()
-  return { xmlFetched }
-})(withWzToast(class extends Component{
+import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/configurationActions';
+
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+
+class WzEditorConfiguration extends Component{
   constructor(props){
     super(props);
     this.state = {
@@ -72,9 +84,11 @@ const WzEditorConfiguration = withLoading(async () => {
   async confirmRestart(){
     try{
       this.setState( { restarting: true, infoChangesAfterRestart: false } );
-      await restartNodeSelected();
+      await restartNodeSelected(null, this.props.updateWazuhNotReadyYet);
+      this.props.updateWazuhNotReadyYet(false);
       this.setState( { restart: false, restarting: false } );
     }catch(error){
+      updateWazuhNotReadyYet(false);
       this.setState( { restart: false, restarting: false } );
     }
   }
@@ -127,24 +141,26 @@ const WzEditorConfiguration = withLoading(async () => {
         {infoChangesAfterRestart && (
           <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
         )}
-        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)}/>
-      </Fragment>
-    )
-  }
-}))
-class WzEditConfiguration extends Component{
-  constructor(props){
-    super(props);
-  }
-  render(){
-    return (
-      <Fragment>
-        {/* TODO: Missing gear icon */}
-        <WzConfigurationPath title='Manager configuration' path='Edit Configuration' updateConfigurationSection={this.props.updateConfigurationSection}/>
-        <WzEditorConfiguration updateConfigurationSection={this.props.updateConfigurationSection}/>
+        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)} minusHeight={325}/>
       </Fragment>
     )
   }
 }
 
-export default WzEditConfiguration;
+const mapStateToProps = (state) => ({
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value))
+});
+
+
+export default compose(
+  withWzToast,
+  withLoading(async () => {
+    const xmlFetched = await fetchFile()
+    return { xmlFetched }
+  }),
+  connect(mapStateToProps, mapDispatchToProps)
+)(WzEditorConfiguration);

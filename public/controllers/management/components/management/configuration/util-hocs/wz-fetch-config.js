@@ -17,18 +17,31 @@ import {
   
 } from "@elastic/eui";
 
-const withWodle = (wodle) => (WrappedComponent) => {
-  class WithWodle extends Component{
+export default withWzFetchConfig = (sections) => (WrappedComponent) => {
+  return class WzFetchConfigWrapper extends Component{
     constructor(props){
       super(props);
+      this.state = {
+        currentConfig: false
+      }
+    }
+    componendDidMount(){
+      const { agent } = this.props;
+      try{
+        const currentConfig = await getCurrentConfig(agent.id, sections);
+        this.setState({ currentConfig });
+      }catch(error){
+        console.error(error);
+      }
     }
     render(){
       return (
-        <WrappedComponent {...this.props}/>
+        <Fragment>
+          {this.state.currentConfig && <WrappedComponent currentConfig={this.props.currentConfig}/>}
+        </Fragment>
       )
     }
   }
-  return WithWodle
 }
 
-export default Wodle;
+export default WzFetchConfigWrapper;

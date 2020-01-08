@@ -1,14 +1,27 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
 import {
   EuiBasicTable,
-  EuiSpacer
 } from "@elastic/eui";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueOrAll, renderValueOrNo, renderValueOrDefault } from '../utils/utils';
+
+import { connect } from 'react-redux';
 
 const helpLinks = [
   { text: 'How to configure the syslog output', href: 'https://documentation.wazuh.com/current/user-manual/manager/manual-syslog-output.html'},
@@ -30,8 +43,7 @@ class WzConfigurationAlertsReports extends Component{
     super(props);
   }
   render(){
-    //TODO: 
-    const { currentConfig } = this.props;
+    const { currentConfig, wazuhNotReadyYet } = this.props;
     return (
       <Fragment>
         {currentConfig['csyslog-csyslog'] && isString(currentConfig['csyslog-csyslog']) && (
@@ -40,7 +52,7 @@ class WzConfigurationAlertsReports extends Component{
         {currentConfig['csyslog-csyslog'] && !isString(currentConfig['csyslog-csyslog']) && (!currentConfig['csyslog-csyslog'].syslog_output || !currentConfig['csyslog-csyslog'].syslog_output.length) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {/*wazuhNotReadyYet && */ (!currentConfig || !currentConfig['csyslog-csyslog']) && ( /* TODO: wazuhNotReady */
+        {wazuhNotReadyYet && (!currentConfig || !currentConfig['csyslog-csyslog']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig['csyslog-csyslog'] && !isString(currentConfig['csyslog-csyslog']) && currentConfig['csyslog-csyslog'].syslog_output && currentConfig['csyslog-csyslog'].syslog_output.length && (
@@ -64,4 +76,8 @@ class WzConfigurationAlertsReports extends Component{
   }
 }
 
-export default WzConfigurationAlertsReports;
+const mapStateToProps = (state) => ({
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+});
+
+export default connect(mapStateToProps)(WzConfigurationAlertsReports);

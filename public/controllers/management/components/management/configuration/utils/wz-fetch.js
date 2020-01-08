@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { delay } from './utils';
 import { replaceIllegalXML } from './xml';
@@ -8,7 +20,7 @@ import { replaceIllegalXML } from './xml';
  * @param {array} sections Sections
  * @param {falsy} [node=false] Node 
  */
-export const getCurrentConfig = async (agentId = '000', sections, node = false) => {
+export const getCurrentConfig = async (agentId = '000', sections, node = false, updateWazuhNotReadyYet) => {
   try{
     if (
       !agentId ||
@@ -42,14 +54,7 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false) 
         const partialResult = await WzRequest.apiReq('GET', url, {});
         result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
-        //TODO: 
-        // result[`${component}-${configuration}`] = errorHandler.handle(
-        //   error,
-        //   'Fetch configuration',
-        //   false,
-        //   true
-        // );
-        result[`${component}-${configuration}`] = await handleError(error, 'Fetch configuration');
+        result[`${component}-${configuration}`] = await handleError(error, 'Fetch configuration', updateWazuhNotReadyYet);
       }
     }
     return result;
@@ -97,13 +102,13 @@ export const extractMessage = (error) => {
  * @param {Error|string} error 
  * @param {*} location 
  */
-export const handleError = async (error, location) => {
+export const handleError = async (error, location, updateWazuhNotReadyYet) => {
   const message = extractMessage(error);
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
-      //this.$rootScope.wazuhNotReadyYet = 'Wazuh not ready yet.'; //TODO:
-      await makePing();
+      updateWazuhNotReadyYet('Wazuh not ready yet.')
+      await makePing(null, updateWazuhNotReadyYet);
       return;
     }
   
@@ -184,7 +189,7 @@ export const checkDaemons = async () => {
  * @param {number} [tries=10] Tries
  * @return {Promise}
  */
-export const makePing = async (tries = 10) => {
+export const makePing = async (tries = 10, updateWazuhNotReadyYet) => {
    try{
      let isValid = false;
      while (tries--) {
@@ -193,7 +198,7 @@ export const makePing = async (tries = 10) => {
         const result = await WzRequest.apiReq('GET', '/ping', {});
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
-          // this.$rootScope.wazuhNotReadyYet = false; // TODO: wznotereadyyet
+          updateWazuhNotReadyYet(false);
           break;
         }
       }catch(error){
@@ -260,7 +265,7 @@ export const fetchFile = async (selectedNode) => {
  * Restart a node or manager
  * @param {} selectedNode Cluster Node
  */
-export const restartNodeSelected = async (selectedNode) => {
+export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) => {
   try{
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
     const isCluster =
@@ -268,10 +273,10 @@ export const restartNodeSelected = async (selectedNode) => {
     isCluster
       ? await restartNode(selectedNode)
       : await restartManager();
-    // this.$rootScope.wazuhNotReadyYet = `Restarting ${
-    //   isCluster ? selectedNode : 'manager'
-    // }, please wait. `;
-    return await makePing();
+    
+    // Dispatch a Redux action
+    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'manager'}, please wait. `);
+    return await makePing(null, updateWazuhNotReadyYet);
   }catch(error){
     return Promise.reject(error);
   }

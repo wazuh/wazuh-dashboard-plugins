@@ -177,7 +177,15 @@ export class ManagementController {
       switchTab: (section) => this.switchTab(section, true),
       section: "",
       groupsProps: {},
-      // configurationProps: this.mctrl.managementProps.configurationProps
+      configurationProps: {
+        agent: { id: '000', agentPlatform: 'other' }, // TODO: get dynamically the agent?
+        updateWazuhNotReadyYet: (status) => { 
+          console.log('changing status',status)
+          this.$rootScope.wazuhNotReadyYet = status
+          this.$scope.$applyAsync();
+        },
+        wazuhNotReadyYet: () => this.$rootScope.wazuhNotReadyYet
+      }
     }
   }
 

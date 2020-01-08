@@ -1,3 +1,15 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
 import React, { Component } from 'react';
 
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
@@ -22,9 +34,6 @@ import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzViewSelector from './util-components/view-selector';
 import WzConfigurationPath from './util-components/configuration-path';
 
-import { connect } from "react-redux";
-
-import { checkDaemons } from './utils/wz-fetch';
 import ToastProvider from './util-providers/toast-provider';
 import WzToastP from './util-providers/toast-p';
 
@@ -37,73 +46,79 @@ class WzConfigurationMain extends Component{
 	constructor(props){
 			super(props);
 			this.state = {
-				section: ''
+				view: '',
+				viewProps: {},
 			};
 	}
-	updateConfigurationSection = (section) => {
-		this.setState({ section });
+	updateConfigurationSection = (view, title, description, path) => {
+		this.setState({ view, viewProps: {title: title, description, path: path || title} });
+	}
+	updateBadge = (badgeStatus = false) => {
+		this.setState({ viewProps: { ...this.state.viewProps, badge: badgeStatus}})
 	}
 	render(){
-		const { section } = this.state;
+		const { view, viewProps: {title, description, path, badge} } = this.state;
+		const { agent } = this.props.configurationProps;
 		return (
 			<WzReduxProvider>
 				<WzToastP>
 					<EuiPage>
 						<EuiPanel>
-							<WzViewSelector view={section}>
+							{view !== '' && (<WzConfigurationPath title={title} description={description} path={path} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
+							<WzViewSelector view={view}>
 								<div default>
-									<WzConfigurationOverview updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationOverview agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='global-configuration'>
-									<WzConfigurationGlobalConfiguration updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationGlobalConfiguration agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='cluster'>
-									<WzConfigurationCluster updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationCluster agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='registration-service'>
-									<WzConfigurationRegistrationService updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationRegistrationService agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='alerts'>
-									<WzConfigurationAlerts updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationAlerts agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='integrations'>
-									<WzConfigurationIntegrations updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationIntegrations agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='policy-monitoring'>
-									<WzConfigurationPolicyMonitoring updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationPolicyMonitoring agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='cis-cat'>
-									<WzConfigurationCisCat updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationCisCat agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='vulnerabilities'>
-									<WzConfigurationVulnerabilities updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationVulnerabilities agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='osquery'>
-									<WzConfigurationOsquery updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationOsquery agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='inventory'>
-									<WzConfigurationInventory updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationInventory agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='active-response'>
-									<WzConfigurationActiveResponse updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationActiveResponse agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='commands'>
-									<WzConfigurationCommands updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationCommands agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='log-collection'>
-									<WzConfigurationLogCollection updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationLogCollection agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='integrity-monitoring'>
-									<WzConfigurationIntegrityMonitoring updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationIntegrityMonitoring agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='agentless'>
-									<WzConfigurationIntegrityAgentless updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationIntegrityAgentless agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='aws-s3'>
-									<WzConfigurationIntegrityAmazonS3 updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationIntegrityAmazonS3 agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='edit-configuration'>
-									<WzConfigurationEditConfiguration updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationEditConfiguration agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 							</WzViewSelector>
 						</EuiPanel>

@@ -1,3 +1,17 @@
+/*
+* Wazuh app - React component for registering agents.
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
+
+import { shouldShowComponent } from './utils/wz-utils';
+
 export default [
   {
     title: 'Main configurations',
@@ -6,17 +20,44 @@ export default [
       {
         name: 'Global Configuration',
         description: 'Global and remote settings',
-        goto: 'global-configuration'
+        goto: 'global-configuration',
+        when: 'manager'
       },
       {
         name: 'Cluster',
         description: 'Master node configuration',
-        goto: 'cluster'
+        goto: 'cluster',
+        when: 'manager'
       },
       {
         name: 'Registration Service',
         description: 'Automatic agent registration service',
-        goto: 'registration-service'
+        goto: 'registration-service',
+        when: 'manager'
+      },
+      {
+        name: 'Global Configuration',
+        description: 'Logging settings that apply to the agent',
+        goto: 'global-configuration-agent',
+        when: 'agent'
+      },
+      {
+        name: 'Communication',
+        description: 'Settings related to the connection with the manager',
+        goto: 'client',
+        when: 'agent'
+      },
+      {
+        name: 'Anti-flooding settings',
+        description: 'Agent bucket parameters to avoid event flooding',
+        goto: 'client-buffer',
+        when: 'agent'
+      },
+      {
+        name: 'Labels',
+        description: 'User-defined information about the agent included in alerts',
+        goto: 'alerts-agent',
+        when: 'agent'
       }
     ]
   },
@@ -74,12 +115,25 @@ export default [
       {
         name: 'Active Response',
         description: 'Active threat addressing by inmmediate response',
-        goto: 'active-response'
+        goto: 'active-response',
+        when: 'manager'
+      },
+      {
+        name: 'Active response',
+        description: 'Configuration options of the Command wodle',
+        goto: 'active-response',
+        when: 'agent'
       },
       {
         name: 'Commands',
-        description: 'Configuration options of the Command wodle',
+        description: 'Active threat addressing by inmmediate response',
         goto: 'commands'
+      },
+      {
+        name: 'Docker listener',
+        description: 'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
+        goto: 'docker-listener',
+        when: (agent) => shouldShowComponent('docker', agent)
       }
     ]
   },
