@@ -44,7 +44,7 @@ export class TabVisualizations {
       oscap: 11,
       ciscat: 3,
       audit: 6,
-      pci: 5,
+      pci: 6,
       gdpr: 5,
       hipaa: 8,
       nist: 7,

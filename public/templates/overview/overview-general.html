@@ -19,6 +19,13 @@
         }" />
     </div>
 
+    <!-- Cards for PCI Dashboard-->
+    <div ng-if="octrl.tab === 'pci'" class="md-padding">
+        <div ng-if="octrl.pciReqs" class="wz-margin-10">
+            <react-component name='RequirementCard' props="octrl.pciReqs" />
+        </div>
+    </div>
+
     <div ng-repeat="row in octrl.visualizations[octrl.tab].rows">
         <div class="euiFlexGroup" ng-style="{'height':row.height + 'px'}">
             <div ng-repeat="vis in row.vis" class="euiPanel wz-margin-10" flex="{{vis.width || 100}}">

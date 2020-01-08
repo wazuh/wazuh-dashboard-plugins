@@ -176,4 +176,59 @@ export const visualizations = {
       },
     ],
   },
+  pci: {
+    rows: [
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'PCI DSS requirements',
+            id: 'Wazuh-App-Overview-PCI-DSS-requirements',
+            width: 50,
+          },
+          {
+            title: 'Top 10 agents by alerts number',
+            id: 'Wazuh-App-Overview-PCI-DSS-Agents',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
+          },
+        ],
+      },
+      {
+        height: 530,
+        vis: [
+          {
+            title: 'Last alerts',
+            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
+          },
+        ],
+      },
+      {
+        height: 255,
+        vis: [
+          {
+            title: 'Requirements by agent',
+            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-PCI-DSS-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
