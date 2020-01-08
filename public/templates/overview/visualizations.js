@@ -339,4 +339,77 @@ export const visualizations = {
       },
     ],
   },
+  hipaa: {
+    rows: [
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts volume by agent',
+            id: 'Wazuh-App-Overview-HIPAA-Heatmap',
+            width: 50,
+          },
+          {
+            hasRows: true,
+            rows: [
+              {
+                height: 285,
+                vis: [
+                  {
+                    title: 'Most common alerts',
+                    id: 'Wazuh-App-Overview-HIPAA-Tag-cloud',
+                    width: 50,
+                  },
+                  {
+                    title: 'Top 10 requirements',
+                    id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements',
+                    width: 50,
+                  },
+                ],
+              },
+              {
+                height: 285,
+                vis: [
+                  {
+                    title: 'Most active agents',
+                    id: 'Wazuh-App-Overview-HIPAA-Top-10-agents',
+                    width: 50,
+                  },
+                  {
+                    title: 'Stats',
+                    id: 'Wazuh-App-Overview-HIPAA-Metrics',
+                    width: 50,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'Requirements evolution over time',
+            id: 'Wazuh-App-Overview-HIPAA-Top-requirements-over-time',
+            width: 50,
+          },
+          {
+            title: 'Requirements distribution by agent',
+            id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-HIPAA-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };

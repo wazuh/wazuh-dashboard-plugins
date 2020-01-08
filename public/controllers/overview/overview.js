@@ -444,11 +444,11 @@ export class OverviewController {
     return;
   }
 
-  checkExpandedVis(idx1, idx2) {
-    return this.expandedVis === `${idx1}-${idx2}`;
+  checkExpandedVis(id) {
+    return this.expandedVis === id;
   }
 
-  expand(idx1, idx2) {
-    this.expandedVis = this.expandedVis === `${idx1}-${idx2}` ? false : `${idx1}-${idx2}`;
+  expand(id) {
+    this.expandedVis = this.expandedVis === id ? false : id;
   }
 }

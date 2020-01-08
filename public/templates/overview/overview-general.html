@@ -40,24 +40,52 @@
         </div>
     </div>
 
+    <!-- Cards for HIPAA Dashboard-->
+    <div ng-if="octrl.tab === 'hipaa'" class="md-padding">
+        <div ng-if="octrl.hipaaReqs" class="wz-margin-10">
+            <react-component name='RequirementCard' props="octrl.hipaaReqs" />
+        </div>
+    </div>
+
     <div ng-repeat="row in octrl.visualizations[octrl.tab].rows">
         <div class="euiFlexGroup" ng-style="{'height':row.height + 'px'}">
-            <div ng-repeat="vis in row.vis" class="euiPanel wz-margin-10" flex="{{vis.width || 100}}">
-                <div class="euiFlexItem h-100"
-                    ng-class="{'fullscreen': octrl.checkExpandedVis($parent.$index, $index)}">
-                    <div class="euiFlexGroup" ng-dblclick="octrl.expand($parent.$index, $index)">
-                        <span
-                            class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{vis.title}}</span>
-                        <span class="cursor-pointer wz-margin-8-no-left"
-                            ng-click="octrl.expand($parent.$index, $index)">
-                            <react-component name="EuiIcon" props="{type:'expand'}" />
-                        </span>
+            <div ng-repeat="vis in row.vis" ng-class="{'euiPanel wz-margin-10' : !vis.hasRows}"
+                flex="{{vis.width || 100}}">
+                <div class="euiFlexItem h-100" ng-class="{'fullscreen': octrl.checkExpandedVis(vis.id)}">
+                    <div ng-if="vis.hasRows">
+                        <div class="euiFlexGroup" ng-repeat="visRow in vis.rows">
+                            <div class="euiFlexItem h-100" flex="{{visualizeRow.width || 100}}"
+                                ng-repeat="visualizeRow in visRow.vis"
+                                ng-class="{'fullscreen': octrl.checkExpandedVis(visualizeRow.id)}">
+                                <div class="euiPanel wz-margin-10">
+                                    <div class="euiFlexGroup" ng-dblclick="octrl.expand(visualizeRow.id)">
+                                        <span
+                                            class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{visualizeRow.title}}</span>
+                                        <span class="cursor-pointer wz-margin-8-no-left"
+                                            ng-click="octrl.expand(visualizeRow.id)">
+                                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                                        </span>
+                                    </div>
+                                    <div class="wazuh-column" ng-style="{'height': (visRow.height - 65) + 'px'}">
+                                        <kbn-vis id="{{visualizeRow.id}}" vis-id="visualizeRow.id"></kbn-vis>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="wazuh-column" ng-style="{'height': (row.height - 65) + 'px'}"
-                        ng-show="vis.id !== 'Wazuh-App-Overview-General-Agents-status' || (vis.id === 'Wazuh-App-Overview-General-Agents-status' && octrl.wzMonitoringEnabled)">
-                        <kbn-vis id="{{vis.id}}" vis-id="vis.id"></kbn-vis>
+                    <div ng-if="!vis.hasRows">
+                        <div class="euiFlexGroup" ng-dblclick="octrl.expand(vis.id)">
+                            <span
+                                class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{vis.title}}</span>
+                            <span class="cursor-pointer wz-margin-8-no-left" ng-click="octrl.expand(vis.id)">
+                                <react-component name="EuiIcon" props="{type:'expand'}" />
+                            </span>
+                        </div>
+                        <div class="wazuh-column" ng-style="{'height': (row.height - 65) + 'px'}"
+                            ng-show="vis.id !== 'Wazuh-App-Overview-General-Agents-status' || (vis.id === 'Wazuh-App-Overview-General-Agents-status' && octrl.wzMonitoringEnabled)">
+                            <kbn-vis id="{{vis.id}}" vis-id="vis.id"></kbn-vis>
+                        </div>
                     </div>
-
                     <div class="wazuh-column" ng-style="{'height': (row.height - 65) + 'px'}"
                         ng-show="vis.id === 'Wazuh-App-Overview-General-Agents-status' && !octrl.wzMonitoringEnabled">
                         <div layout="row">
