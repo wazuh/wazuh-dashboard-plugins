@@ -19,6 +19,17 @@
         }" />
     </div>
 
+    <div ng-if="octrl.tab === 'vuls'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Critical severity alerts', value: octrl.vulnCritical(), color: 'danger' },
+                { description: 'High severity alerts', value: octrl.vulnHigh(), color: 'primary' },
+                { description: 'Medium severity alerts', value: octrl.vulnMedium(), color: 'secondary' },
+                { description: 'Low severity alerts', value: octrl.vulnLow(), color: 'subdued' }
+            ]            
+        }" />
+    </div>
+
     <!-- Cards for PCI Dashboard-->
     <div ng-if="octrl.tab === 'pci'" class="md-padding">
         <div ng-if="octrl.pciReqs" class="wz-margin-10">

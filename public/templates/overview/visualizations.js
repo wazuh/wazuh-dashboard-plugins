@@ -412,4 +412,59 @@ export const visualizations = {
       },
     ],
   },
+  vuls: {
+    metrics: [
+      { id: 'Wazuh-App-Overview-vuls-Metric-Critical-severity' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-High-severity' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-Medium-severity' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-Low-severity' },
+    ],
+    rows: [
+      {
+        height: 270,
+        vis: [
+          {
+            title: 'Most affected agents',
+            id: 'Wazuh-App-Overview-vuls-Most-affected-agents',
+            width: 30,
+          },
+          { title: 'Alerts severity', id: 'Wazuh-App-Overview-vuls-Alerts-severity', width: 70 },
+        ],
+      },
+      {
+        height: 270,
+        vis: [
+          {
+            title: 'Severity distribution',
+            id: 'Wazuh-App-Overview-vuls-Vulnerability-severity-distribution',
+            width: 25,
+          },
+          {
+            title: 'Commonly affected packages',
+            id: 'Wazuh-App-Overview-vuls-Commonly-affected-packages',
+            width: 25,
+          },
+          {
+            title: 'Most common CVEs',
+            id: 'Wazuh-App-Overview-vuls-Most-common-CVEs',
+            width: 25,
+          },
+          {
+            title: 'Most common CWEs',
+            id: 'Wazuh-App-Overview-vuls-Most-common-CWEs',
+            width: 25,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alert summary',
+            id: 'Wazuh-App-Overview-vuls-Alert-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
