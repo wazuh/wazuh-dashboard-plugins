@@ -41,14 +41,17 @@ export class QHandler extends BaseHandler {
   //#region Build suggests elements
 
   async buildSuggestItems(inputValue:string):Promise<suggestItem[]> {
+    this.isSearch = false;
     if (this.inputStage === 'fields' || inputValue === ''){
+      const qInterpreter = new QInterpreter(inputValue);
+      this.isSearch = qInterpreter.qNumber() <= 1;
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'operators') {
-      return []// this.buildSuggestOperators();
+      return this.buildSuggestOperators(inputValue);
     } else if (this.inputStage === 'values') {
       return await this.buildSuggestValues(inputValue);
     } else if (this.inputStage === 'conjuntions'){
-      return []// this.buildSuggestConjuntions();
+      return this.buildSuggestConjuntions(inputValue);
     }
     return this.buildSuggestFields(inputValue);
   }
@@ -59,6 +62,15 @@ export class QHandler extends BaseHandler {
     .filter((item) => this.filterSuggestFields(item, field))
     .map(this.mapSuggestFields);
     return fields;
+  }
+
+  buildSuggestOperators(inputValue:string):suggestItem[] {
+    const { operators=false } = this.getCurrentField(inputValue);
+    const operatorsAllow = operators
+      ? operators
+      : [...Object.keys(this.operators)];
+    const suggestions:suggestItem[] = operatorsAllow.map(this.CreateSuggestOperator);
+    return suggestions;
   }
 
   async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
@@ -75,6 +87,20 @@ export class QHandler extends BaseHandler {
       suggestions.push(item);
     }
 
+    return suggestions;
+  }
+
+  buildSuggestConjuntions(inputValue:string):suggestItem[] {
+    const suggestions = [
+      {'label':',', 'description':'OR'},
+      {'label':';', 'description':'AND'}
+    ].map((item) => {
+      return {
+        type: { iconType: 'kqlSelector', color: 'tint3' },
+        label: item.label,
+        description: item.description
+      }
+    })
     return suggestions;
   }
   
@@ -95,6 +121,13 @@ export class QHandler extends BaseHandler {
     }
   }
 
+  CreateSuggestOperator = (operator):suggestItem => {
+    return {
+      type: { iconType: 'kqlOperand', color: 'tint1' },
+      label: operator,
+      description: this.operators[operator]
+    }
+  }
 
   //#region Events
 
@@ -114,7 +147,7 @@ export class QHandler extends BaseHandler {
         break;
       case'kqlValue':
         qInterpreter.setlastQuery(item.label);
-        filters['q'] = qInterpreter.toString()
+        filters['q'] = qInterpreter.toString();
         this.inputStage = 'conjuntions';
         break;
       case'kqlSelector':

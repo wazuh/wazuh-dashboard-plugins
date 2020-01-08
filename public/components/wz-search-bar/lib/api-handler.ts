@@ -33,7 +33,9 @@ export class ApiHandler extends BaseHandler {
   //#region Build suggests elements
 
   async buildSuggestItems(inputValue:string):Promise<suggestItem[]> {
+    this.isSearch = false;
     if (this.inputStage === 'fields' || inputValue === ''){
+      this.isSearch = true;
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'values') {
       return await this.buildSuggestValues(inputValue);

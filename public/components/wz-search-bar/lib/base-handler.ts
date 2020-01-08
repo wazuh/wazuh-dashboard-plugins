@@ -11,11 +11,11 @@
  */
 
 import { suggestItem } from '../wz-search-bar';
-import { boolean } from 'joi';
 
 
 export abstract class BaseHandler {
   inputStage?: string;
+  isSearch?: boolean;
   
   async buildSuggestItems(inputValue: string):Promise<suggestItem[]> {
     return [];
