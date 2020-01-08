@@ -14,7 +14,6 @@ import PropTypes, {InferProps} from 'prop-types';
 import { EuiSuggest } from '../eui-suggest';
 import { WzSearchFormatSelector } from './wz-search-format-selector';
 import { WzSearchBadges } from './wz-search-badges';
-import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { QHandler, qSuggests } from './lib/q-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
@@ -37,7 +36,7 @@ export default class WzSearchBar extends Component {
     status: string
     filters: {}
   };
-  suggestHandler: QHandler | ApiHandler;
+  suggestHandler!: QHandler | ApiHandler;
   props!:{
     qSuggests: qSuggests[]
     apiSuggests: apiSuggests[]
@@ -57,15 +56,19 @@ export default class WzSearchBar extends Component {
       status: 'unchanged',
       filters: {}
     }
+  }
 
-    if(this.state.searchFormat === '?Q') {
-      this.suggestHandler = new QHandler(props.qSuggests);
+  selectSuggestHandler(searchFormat):void {
+    if(searchFormat === '?Q') {
+      this.suggestHandler = new QHandler(this.props.qSuggests);
     } else {
-      this.suggestHandler = new ApiHandler(props.apiSuggests);
+      this.suggestHandler = new ApiHandler(this.props.apiSuggests);
     }
+    this.setState({ isProcessing: true, suggestions: [] })
   }
 
   async componentDidMount() {
+    this.selectSuggestHandler(this.state.searchFormat);
     const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
     this.setState({suggestions: suggestsItems});
   }
@@ -155,6 +158,7 @@ export default class WzSearchBar extends Component {
       this.props.onInputChange(newFilters);
     }
   }
+
   //#region Event methods
 
   onInputChange = (value:string) => {
@@ -172,7 +176,10 @@ export default class WzSearchBar extends Component {
     });
   }
 
-  onChangeSearchFormat = (format) => {console.log(format)}
+  onChangeSearchFormat(format) {
+    this.setState({searchFormat: format});
+    this.selectSuggestHandler(format);
+  }
 
   onKeyPress = (e:KeyboardEvent)  => {
     const { isInvalid } = this.state;
@@ -225,7 +232,7 @@ export default class WzSearchBar extends Component {
       return null;
     }
     return (<WzSearchFormatSelector
-      onChange={this.onChangeSearchFormat}
+      onChange={this.onChangeSearchFormat.bind(this)}
       qFilterEnabled={qFilterEnabled}
       apiFilterEnabled={apiFilterEnabled}
     />);
