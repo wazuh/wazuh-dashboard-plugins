@@ -467,4 +467,55 @@ export const visualizations = {
       },
     ],
   },
+  virustotal: {
+    metrics: [
+      { id: 'Wazuh-App-Overview-Virustotal-Total-Malicious' },
+      { id: 'Wazuh-App-Overview-Virustotal-Total-Positives' },
+      { id: 'Wazuh-App-Overview-Virustotal-Total' },
+    ],
+    rows: [
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Unique malicious files per agent',
+            id: 'Wazuh-App-Overview-Virustotal-Malicious-Per-Agent',
+            width: 50,
+          },
+          {
+            title: 'Last scanned files',
+            id: 'Wazuh-App-Overview-Virustotal-Last-Files-Pie',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 550,
+        vis: [
+          {
+            title: 'Top 10 agents with positive scans',
+            id: 'Wazuh-App-Overview-Virustotal-Positives-Heatmap',
+          },
+        ],
+      },
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Malicious files alerts evolution',
+            id: 'Wazuh-App-Overview-Virustotal-Malicious-Evolution',
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Last files',
+            id: 'Wazuh-App-Overview-Virustotal-Files-Table',
+          },
+        ],
+      },
+    ],
+  },
 };
