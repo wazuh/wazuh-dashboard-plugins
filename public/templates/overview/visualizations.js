@@ -231,4 +231,59 @@ export const visualizations = {
       },
     ],
   },
+  gdpr: {
+    rows: [
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'Top 10 agents by alerts number',
+            id: 'Wazuh-App-Overview-GDPR-Agents',
+            width: 30,
+          },
+          {
+            title: 'GDPR requirements',
+            id: 'Wazuh-App-Overview-GDPR-requirements',
+            width: 70,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-GDPR-Requirements-heatmap',
+          },
+        ],
+      },
+      {
+        height: 530,
+        vis: [
+          {
+            title: 'Last alerts',
+            id: 'Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap',
+          },
+        ],
+      },
+      {
+        height: 255,
+        vis: [
+          {
+            title: 'Requirements by agent',
+            id: 'Wazuh-App-Overview-GDPR-Requirements-by-agent',
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-GDPR-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
