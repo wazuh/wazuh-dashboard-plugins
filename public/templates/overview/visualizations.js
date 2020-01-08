@@ -57,4 +57,61 @@ export const visualizations = {
       },
     ],
   },
+  fim: {
+    rows: [
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'Alerts by action over time',
+            id: 'Wazuh-App-Agents-FIM-Alerts-by-action-over-time',
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top 5 agents',
+            id: 'Wazuh-App-Overview-FIM-Top-5-agents-pie',
+            width: 25,
+          },
+          {
+            title: 'Events summary',
+            id: 'Wazuh-App-Overview-FIM-Events-summary',
+            width: 75,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Rule distribution',
+            id: 'Wazuh-App-Overview-FIM-Top-5-rules',
+            width: 33,
+          },
+          {
+            title: 'Actions',
+            id: 'Wazuh-App-Overview-FIM-Common-actions',
+            width: 33,
+          },
+          {
+            title: 'Top 5 users',
+            id: 'Wazuh-App-Overview-FIM-top-agents-user',
+            width: 33,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-FIM-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
