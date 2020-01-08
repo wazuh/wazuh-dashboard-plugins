@@ -286,4 +286,57 @@ export const visualizations = {
       },
     ],
   },
+  nist: {
+    rows: [
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'Most active agents',
+            id: 'Wazuh-App-Overview-NIST-Agents',
+            width: 20,
+          },
+          {
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-NIST-Requirements-over-time',
+            width: 45,
+          },
+          {
+            title: 'Requiments distribution by agent',
+            id: 'Wazuh-App-Overview-NIST-requirements-by-agents',
+            width: 35,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Alerts volume by agent',
+            id: 'Wazuh-App-Overview-NIST-Requirements-Agents-heatmap',
+            width: 45,
+          },
+          {
+            title: 'Stats',
+            id: 'Wazuh-App-Overview-NIST-Metrics',
+            width: 25,
+          },
+          {
+            title: 'Top 10 requirements',
+            id: 'Wazuh-App-Overview-NIST-Top-10-requirements',
+            width: 30,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-NIST-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
