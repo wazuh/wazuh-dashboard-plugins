@@ -1,13 +1,14 @@
-<div ng-if="octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" class="md-padding-v">
+<div ng-if="octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    class="md-padding-v">
 
     <div class="wz-no-display">
-        <div ng-repeat="vis in octrl.visualizations['overview'].metrics">
+        <div ng-repeat="vis in octrl.visualizations[octrl.tab].metrics">
             <kbn-vis id="{{vis.id}}" vis-id="vis.id"></kbn-vis>
         </div>
     </div>
 
     <!-- Metrics of Security Events Dashboard -->
-     <div ng-if="octrl.tab === 'general'" class="md-padding">
+    <div ng-if="octrl.tab === 'general'" class="md-padding">
         <react-component flex name="AlertsStats" props="{
             items: [
                 { description: 'Total', value: octrl.totalAlerts(), color: 'primary' },
@@ -18,21 +19,55 @@
         }" />
     </div>
 
-    <div ng-repeat="row in octrl.visualizations['overview'].rows">
+    <div ng-repeat="row in octrl.visualizations[octrl.tab].rows">
         <div class="euiFlexGroup" ng-style="{'height':row.height + 'px'}">
-            <div ng-repeat="vis in row.vis" class="euiPanel wz-margin-10" flex="vis.width || 100">
-                <div class="euiFlexItem h-100" ng-class="{'fullscreen': octrl.checkExpandedVis($parent.$index, $index)}">
-                        <div class="euiFlexGroup" ng-dblclick="octrl.expand($parent.$index, $index)">
-                            <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{vis.title}}</span>
-                            <span class="cursor-pointer wz-margin-8-no-left" ng-click="octrl.expand($parent.$index, $index)">
-                                <react-component name="EuiIcon" props="{type:'expand'}"  />
-                            </span>
-                        </div>
-                        <div class="wazuh-column" ng-style="{'height': (row.height - 65) + 'px'}">
-                            <kbn-vis id="{{vis.id}}" vis-id="vis.id"></kbn-vis>
+            <div ng-repeat="vis in row.vis" class="euiPanel wz-margin-10" flex="{{vis.width || 100}}">
+                <div class="euiFlexItem h-100"
+                    ng-class="{'fullscreen': octrl.checkExpandedVis($parent.$index, $index)}">
+                    <div class="euiFlexGroup" ng-dblclick="octrl.expand($parent.$index, $index)">
+                        <span
+                            class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{vis.title}}</span>
+                        <span class="cursor-pointer wz-margin-8-no-left"
+                            ng-click="octrl.expand($parent.$index, $index)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </div>
+                    <div class="wazuh-column" ng-style="{'height': (row.height - 65) + 'px'}"
+                        ng-show="vis.id !== 'Wazuh-App-Overview-General-Agents-status' || (vis.id === 'Wazuh-App-Overview-General-Agents-status' && octrl.wzMonitoringEnabled)">
+                        <kbn-vis id="{{vis.id}}" vis-id="vis.id"></kbn-vis>
+                    </div>
+
+                    <div class="wazuh-column" ng-style="{'height': (row.height - 65) + 'px'}"
+                        ng-show="vis.id === 'Wazuh-App-Overview-General-Agents-status' && !octrl.wzMonitoringEnabled">
+                        <div layout="row">
+                            <div flex layout="column">
+                                <div layout="row" class="wz-padding-top-10"></div>
+                                <div layout="row" class="wz-padding-top-10">
+                                    <p flex="50" class="wz-text-bold">Total</p>
+                                    <p class="wz-text-right color-grey wz-text-bold">{{octrl.agentsCountTotal}}</p>
+                                </div>
+                                <div layout="row" class="wz-padding-top-10"></div>
+                                <div layout="row" class="wz-padding-top-10">
+                                    <p flex="50">Active</p>
+                                    <p class="wz-text-right color-grey">{{octrl.agentsCountActive}}</p>
+                                </div>
+                                <div layout="row" class="wz-padding-top-10">
+                                    <p flex="50">Disconnected</p>
+                                    <p class="wz-text-right color-grey">{{octrl.agentsCountDisconnected}}</p>
+                                </div>
+                                <div layout="row" class="wz-padding-top-10">
+                                    <p flex="50">Never connected</p>
+                                    <p class="wz-text-right color-grey">{{octrl.agentsCountNeverConnected}}</p>
+                                </div>
+                                <div layout="row" class="wz-padding-top-10">
+                                    <p flex="50">Agents coverage</p>
+                                    <p class="wz-text-right color-grey">{{(octrl.agentsCoverity | number:2)}}%</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
