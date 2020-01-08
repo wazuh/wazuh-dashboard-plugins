@@ -187,6 +187,14 @@ export class QHandler extends BaseHandler {
     return { isInvalid, filters };
   }
 
+  onKeyPress(inputValue:string, currentFilters:object):{
+    inputValue:string, filters: object
+  } { 
+    const filters = {...currentFilters};
+    filters['q'] = inputValue;
+    return { inputValue, filters }; 
+  }
+
   //#endregion 
 
 }

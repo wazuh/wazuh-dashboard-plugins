@@ -70,31 +70,41 @@ export default class WzSearchBar extends Component {
     this.setState({suggestions: suggestsItems});
   }
 
-  isUpdated() {
-    const { isProcessing, isInvalid } = this.state;
-    return isProcessing && !isInvalid;
-  }
-
   async componentDidUpdate() {
-    if (!this.isUpdated()){
+    const { isProcessing } = this.state;
+    if (!isProcessing){
       return;
     }
+    const { inputValue, isInvalid } = this.state;
     const { searchDisable } = this.props;
-    const { inputValue } = this.state;
-    const suggestsItems = [...await this.suggestHandler.buildSuggestItems(inputValue)];
-    const isSearchEnabled = this.suggestHandler.inputStage === 'fields' 
-      && !searchDisable 
-      && inputValue !== '';
-
-    if (isSearchEnabled) {
-      const suggestSearch = this.buildSuggestFieldsSearch();
-      suggestSearch && suggestsItems.unshift(suggestSearch);
-    }
-
-    this.setState({
-      isProcessing: false,
-      suggestions: suggestsItems,
+    if (isInvalid) {
+      const suggestsItems = [{
+        type: { iconType: 'alert', color: 'tint2' },
+        label: "Error",
+        description: "The field are invalid"
+      }];
+      this.setState({
+        isProcessing: false,
+        suggestions: suggestsItems,
+        status: 'unsaved',
     });
+    } else {
+      const suggestsItems = [...await this.suggestHandler.buildSuggestItems(inputValue)];
+      const isSearchEnabled = this.suggestHandler.inputStage === 'fields' 
+        && !searchDisable 
+        && inputValue !== '';
+  
+      if (isSearchEnabled) {
+        const suggestSearch = this.buildSuggestFieldsSearch();
+        suggestSearch && suggestsItems.unshift(suggestSearch);
+      }
+  
+      this.setState({
+        isProcessing: false,
+        suggestions: suggestsItems,
+        status: 'unchanged',
+      });
+    }
   }
   
   
@@ -133,6 +143,7 @@ export default class WzSearchBar extends Component {
     this.setState({
       inputValue: newInputValue,
       suggestions: [],
+      status: 'loading',
       filters: newFilters,
       isProcessing: true,
     });
@@ -149,11 +160,13 @@ export default class WzSearchBar extends Component {
   onInputChange = (value:string) => {
     const { filters:currentFilters } = this.state;
     const { isInvalid, filters } = this.suggestHandler.onInputChange(value, currentFilters);
-
-    this.updateFilters(filters);
+    if (!isInvalid) {
+      this.updateFilters(filters);
+    }
     this.setState({
       inputValue: value,
       isProcessing: true,
+      status: 'loading',
       isInvalid,
       filters
     });
@@ -163,19 +176,26 @@ export default class WzSearchBar extends Component {
 
   onKeyPress = (e:KeyboardEvent)  => {
     const { isInvalid } = this.state;
-    if(e.key !== 'Enter' && !isInvalid) {
+    if(e.key !== 'Enter' || isInvalid) {
       return;
     }
-    const { inputValue, filters } = this.state;
+    const { inputValue, filters:currentFilters } = this.state;
     const { searchDisable } = this.props;
+    let filters = {};
+    let newInputValue = '';
     if (this.suggestHandler.isSearch && !searchDisable) {
       filters['search'] = inputValue;
-      this.setState({inputValue:'', isProcessing: true});
     } else if(inputValue.length > 0) {
-      filters['q'] = inputValue;
+      const { inputValue:newInput, filters:newFilters } = this.suggestHandler.onKeyPress(inputValue, currentFilters);
+      filters = {...newFilters};
+      newInputValue = newInput;
     }
     this.props.onInputChange(filters);
-    this.setState({filters})
+    this.setState({
+      isProcessing: true,
+      inputValue: newInputValue,
+      filters
+    });
   }
 
   onItemClick(item: suggestItem) {

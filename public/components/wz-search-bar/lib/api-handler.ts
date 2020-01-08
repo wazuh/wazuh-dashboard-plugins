@@ -91,6 +91,7 @@ export class ApiHandler extends BaseHandler {
   onItemClick(item:suggestItem, inputValue, currentFilters:object):{
     inputValue:string, filters:object
   } {
+    const { field } = this.inputInterpreter(inputValue);
     const filters = {...currentFilters};
     switch (item.type.iconType) {
       case 'kqlField':
@@ -98,6 +99,8 @@ export class ApiHandler extends BaseHandler {
         inputValue = item.label + ':';
         break;
       case 'kqlValue':
+        inputValue = '';
+        filters[field] = item.label;
         break;
     }
     return {inputValue, filters};
@@ -123,6 +126,17 @@ export class ApiHandler extends BaseHandler {
     }
 
     return {isInvalid, filters:currentFilters};
+  }
+
+  onKeyPress(inputValue:string, currentFilters:object):{
+    inputValue:string, filters: object
+  } {
+    const filters = {...currentFilters};
+    const { field, value } = this.inputInterpreter(inputValue);
+
+    filters[field] = value;
+
+    return { inputValue: '', filters }; 
   }
 
   //#endregion

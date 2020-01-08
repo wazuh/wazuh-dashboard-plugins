@@ -59,6 +59,10 @@ export abstract class BaseHandler {
     isInvalid: boolean, filters: object
   } { return {isInvalid:true, filters:{}} }
 
+  onKeyPress(inputValue:string, currentFilters:object):{
+    inputValue:string, filters: object
+  } { return {inputValue, filters: {}}; }
+
   mapSuggestFields(item): suggestItem {
     const suggestItem = {
       type: {
