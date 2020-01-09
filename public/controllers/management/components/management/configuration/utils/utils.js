@@ -102,6 +102,7 @@ export const objectWithoutProperties = (obj) => {
  */
 export const renderValueOrDefault = (defaultValue) => (value) => value || defaultValue;
 
+
 /**
  * Return value if isn't falsy or '-'
  * @param {value} value Value to return if it isn't falsy
@@ -125,6 +126,12 @@ export const renderValueOrYes = renderValueOrDefault('yes');
  * @param {value} value Value
  */
 export const renderValueNoThenEnabled = (value) => value === 'no' ? 'enabled' : 'disabled';
+
+/**
+ * Return 'enabled' if value = 'yes', or 'disabled'
+ * @param {value} value Value
+ */
+export const renderValueYesThenEnabled = (value) => value === 'yes' ? 'enabled' : 'disabled';
 
 /**
  * Return value if isn't falsy or 'all'

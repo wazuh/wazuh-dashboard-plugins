@@ -68,12 +68,14 @@ export default [
       {
         name: 'Alerts',
         description: 'Settings related to the alerts and their format',
-        goto: 'alerts'
+        goto: 'alerts',
+        when: 'manager'
       },
       {
         name: 'Integrations',
         description: 'Slack, VirusTotal and PagerDuty integrations with external APIs',
-        goto: 'integrations'
+        goto: 'integrations',
+        when: 'manager'
       }
     ]
   },
@@ -100,7 +102,8 @@ export default [
       {
         name: 'Vulnerabilities',
         description: 'Discover what applications are affected by well-known vulnerabilities',
-        goto: 'vulnerabilities'
+        goto: 'vulnerabilities',
+        when: 'manager'
       },
       {
         name: 'Osquery',
@@ -121,7 +124,7 @@ export default [
       {
         name: 'Active response',
         description: 'Configuration options of the Command wodle',
-        goto: 'active-response',
+        goto: 'active-response-agent',
         when: 'agent'
       },
       {
@@ -154,7 +157,8 @@ export default [
       {
         name: 'Agentless',
         description: 'Run integrity checks on devices such as routers, firewalls and switches',
-        goto: 'agentless'
+        goto: 'agentless',
+        when: 'manager'
       }
     ]
   },
@@ -165,7 +169,8 @@ export default [
       {
         name: 'Amazon S3',
         description: 'Security events related to Amazon AWS services, collected directly via AWS API',
-        goto: 'aws-s3'
+        goto: 'aws-s3',
+        when: 'manager'
       }
     ]
   }

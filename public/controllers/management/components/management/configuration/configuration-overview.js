@@ -27,6 +27,9 @@ import { connect } from 'react-redux';
 
 import WzConfigurationOverviewTable from './configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
+import WzBadge from './util-components/badge';
+
+import WzExportConfiguration from '../../../../agent/components/export-configuration';
 
 import { updateConfigurationSection } from '../../../../../redux/actions/configurationActions';
 
@@ -54,6 +57,7 @@ const helpLinks = [
 class WzConfigurationOverview extends Component{
     constructor(props){
 			super(props);
+			this.settings = this.filterSettings(configurationSettingsGroup);
 		}
 		updateConfigurationSection(section, title, description, path){
 			this.props.updateConfigurationSection(section, title, description, path);
@@ -64,8 +68,13 @@ class WzConfigurationOverview extends Component{
 				(this.props.agent.id === '000' && setting.when && ((isString(setting.when) && setting.when === 'manager') || isFunction(setting.when) && setting.when(this.props.agent))) ||
 				(isFunction(setting.when) && setting.when(this.props.agent)) ||
 				(!setting.when && true)
-			
 			)
+		}
+		filterSettings(groups){
+			return groups.map(group => {
+
+				return { title: group.title, settings: this.filterSettingsIfAgentOrManager(group.settings) }
+			}).filter(group => group.settings.length);
 		}
     render(){
 			return (
@@ -75,7 +84,7 @@ class WzConfigurationOverview extends Component{
 							<EuiFlexGroup>
 								<EuiFlexItem>
 									<EuiTitle>
-										<h2>Configuration</h2>
+										<span>Configuration {this.props.agent.id !== '000' && <WzBadge synchronized={this.props.synchronized}/>}</span>
 									</EuiTitle>
 								</EuiFlexItem>
 							</EuiFlexGroup>
@@ -83,9 +92,13 @@ class WzConfigurationOverview extends Component{
 						<EuiFlexItem grow={false}>
 							<EuiFlexGroup gutterSize="xs">
 								<EuiFlexItem>
-									<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', this.props.agent.id === '000' ? 'Manager configuration' : 'Agent configuration', '', 'Edit configuration')}> 
-										Edit configuration
-									</EuiButtonEmpty>
+									{this.props.agent.id === '000' ? (
+										<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', this.props.agent.id === '000' ? 'Manager configuration' : 'Agent configuration', '', 'Edit configuration')}> 
+											Edit configuration
+										</EuiButtonEmpty>
+									) : this.props.agent.status === 'Active' ? 
+									<WzExportConfiguration agent={this.props.agent} exportConfiguration={''}/> //TODO: export configuration
+									: null}
 								</EuiFlexItem>
 								<EuiFlexItem>
 									<WzHelpButtonPopover links={helpLinks}/>
@@ -95,12 +108,12 @@ class WzConfigurationOverview extends Component{
 					</EuiFlexGroup>
 					<EuiFlexGroup>
 						<EuiFlexItem>
-							{configurationSettingsGroup.map((group, key) => (
+							{this.settings.map((group, key) => (
 								<WzConfigurationOverviewTable 
 									key={`settings-${group.title}`}
 									title={group.title}
 									columns={columns}
-									items={this.filterSettingsIfAgentOrManager(group.settings)}
+									items={group.settings}
 									onClick={this.props.updateConfigurationSection}
 								/>
 							))}

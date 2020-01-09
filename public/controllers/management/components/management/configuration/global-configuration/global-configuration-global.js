@@ -17,6 +17,9 @@ import {
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzNoConfig from "../util-components/no-config";
+
+import { isString } from '../utils/utils';
 
 const helpLinks = [
   { text: 'Global reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/global.html' },
@@ -50,45 +53,69 @@ const preludeZeroMQOutputSettings = [
   { field: 'zeromq_output', label: 'Enable ZeroMQ output'}
 ];
 
+const buildHelpLinks = (agent) => agent.id === '000' ? helpLinks : [helpLinks[1]];
+
 class WzConfigurationGlobalConfigurationGlobal extends Component{
   constructor(props){
     super(props);
+    this.helpLinks = buildHelpLinks(this.props.agent);
   }
   render(){
-    const { currentConfig } = this.props;
-    const mainSettingsConfig = {
+    const { currentConfig, agent, wazuhNotReadyYet } = this.props;
+    const mainSettingsConfig = agent.id === '000' ? {
       ...currentConfig['analysis-global'].global,
       plain: currentConfig['com-logging'].logging.plain,
-      json: currentConfig['com-logging'].logging.json,
+      json: currentConfig['com-logging'].logging.json
+    }: {
+      plain: currentConfig['com-logging'].logging.plain,
+      json: currentConfig['com-logging'].logging.json
     };
-    const globalSettingsConfig = {
+    const globalSettingsConfig = agent.id === '000' ? {
       ...currentConfig['analysis-global'].global
-    };
+    } : {};
     return (
-      <WzConfigurationSettingsTabSelector
-        title='Main settings'
-        description='Basic alerts and logging settings'
-        currentConfig={currentConfig}
-        helpLinks={helpLinks}>
-        <WzConfigurationSettingsGroup
-          config={mainSettingsConfig}
-          items={mainSettings}
-        />
-        <WzConfigurationSettingsGroup
-          title='Email settings'
-          description='Basic email settings (needed for granular email settings)'
-          config={globalSettingsConfig}
-          items={emailSettings}/>
-        <WzConfigurationSettingsGroup
-          title='Other settings'
-          description='Settings not directly related to any specific component'
-          config={globalSettingsConfig}
-          items={otherSettings}/>
-        <WzConfigurationSettingsGroup
-          title='Prelude and ZeroMQ output'
-          config={globalSettingsConfig}
-          items={preludeZeroMQOutputSettings}/>
-      </WzConfigurationSettingsTabSelector>
+      <Fragment>
+        {currentConfig['analysis-global'] && isString(currentConfig['analysis-global']) && (
+          <WzNoConfig error={currentConfig['analysis-global']} help={this.helpLinks} />
+        )}
+        {agent && agent.id !== '000' && currentConfig['com-logging'] && isString(currentConfig['com-logging']) && (
+          <WzNoConfig error={currentConfig['com-global']} help={this.helpLinks} />
+        )}
+        {currentConfig['analysis-global'] && !isString(currentConfig['analysis-global']) && !currentConfig['analysis-global'].global && (
+          <WzNoConfig error='not-present' help={this.helpLinks} />
+        )}
+        {wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-global']) && (
+          <WzNoConfig error='Wazuh not ready yet' help={this.helpLinks} />
+        )}
+        <WzConfigurationSettingsTabSelector
+          title='Main settings'
+          description='Basic alerts and logging settings'
+          currentConfig={currentConfig}
+          helpLinks={this.helpLinks}>
+          <WzConfigurationSettingsGroup
+            config={mainSettingsConfig}
+            items={mainSettings}
+          />
+          {agent.id === '000' && (
+            <Fragment>
+              <WzConfigurationSettingsGroup
+                title='Email settings'
+                description='Basic email settings (needed for granular email settings)'
+                config={globalSettingsConfig}
+                items={emailSettings}/>
+              <WzConfigurationSettingsGroup
+                title='Other settings'
+                description='Settings not directly related to any specific component'
+                config={globalSettingsConfig}
+                items={otherSettings}/>
+              <WzConfigurationSettingsGroup
+                title='Prelude and ZeroMQ output'
+                config={globalSettingsConfig}
+                items={preludeZeroMQOutputSettings}/>
+            </Fragment>
+            )}
+        </WzConfigurationSettingsTabSelector>
+      </Fragment>
     )
   }
 }

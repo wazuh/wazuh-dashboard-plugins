@@ -23,6 +23,8 @@ import WzConfigurationSettingsListSelector from '../util-components/configuratio
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
+import withWzConfig from "../util-hocs/wz-config";
 
 const mainSettings = [
   { field: 'disabled', label: 'Status of this active response', render: renderValueNoThenEnabled },
@@ -46,10 +48,11 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = currentConfig['analysis-active_response']['active-response'].map((item, key) => ({
+    console.log('active response agent?', currentConfig, this.props)
+    const items = !isString(currentConfig['analysis-active_response']) ? currentConfig['analysis-active_response']['active-response'].map((item, key) => ({
       button: item.command,
       data: item
-    }))
+    })) : {}
     return (
       <Fragment>
         {currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response']) && (
@@ -59,11 +62,11 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
           <WzNoConfig error='not-present' help={helpLinks} />
         )}
         {wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-active_response']) && (
-          <WzNoConfig error={currentConfig['com-active-response']} help={helpLinks} />
+          <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
         )}
         {currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'].length ? (
           <WzConfigurationSettingsTabSelector
-            title='Active response settings'
+            title='Active response definitions'
             description='Find here all the currently defined Active responses'
             currentConfig={currentConfig['analysis-active_response']['active-response']}
             helpLinks={helpLinks}>
@@ -83,3 +86,10 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(WzConfigurationActiveResponseActiveResponse);
+
+const sectionsAgent = [{component:'com',configuration:'active-response'}];
+
+export const WzConfigurationActiveResponseActiveResponseAgent = compose(
+  connect(mapStateToProps),
+  withWzConfig(sectionsAgent)
+)(WzConfigurationActiveResponseActiveResponse)

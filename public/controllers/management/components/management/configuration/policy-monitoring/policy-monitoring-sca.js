@@ -22,9 +22,10 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import helpLinks from './help-links';
+import { renderValueYesThenEnabled} from '../utils/utils';
 
 const securitySettings = [
-  { field: 'enabled', label: 'Security configuration assessment status'},
+  { field: 'enabled', label: 'Security configuration assessment status', render: renderValueYesThenEnabled },
   { field: 'interval', label: 'Interval'},
   { field: 'scan_on_start', label: 'Scan on start'},
   { field: 'skip_nfs', label: 'Skip nfs'}
@@ -39,12 +40,8 @@ class WzPolicyMonitoringSCA extends Component{
     super(props);
   }
   render(){
-    let { currentConfig } = this.props;
-    currentConfig = currentConfig['wmodules-wmodules'].wmodules.find(wmodule => wmodule.sca);
-    const securitySettingsConfig = {
-      ...currentConfig['sca'],
-      enabled: currentConfig['sca'].enabled === 'yes' ? 'enabled' : 'disabled'
-    };
+    const { currentConfig } = this.props;
+    currentConfig['sca'] = currentConfig['wmodules-wmodules'].wmodules.find(wmodule => wmodule.sca).sca; 
     return (
       <Fragment>
         {!currentConfig['sca'] ? (
@@ -55,7 +52,7 @@ class WzPolicyMonitoringSCA extends Component{
             currentConfig={currentConfig}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
-              config={securitySettingsConfig}
+              config={currentConfig['sca']}
               items={securitySettings}
             />
             <WzConfigurationSettingsHeader

@@ -14,11 +14,14 @@ import React, { Component } from 'react';
 
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzConfigurationOverview from './configuration-overview';
-import WzConfigurationGlobalConfiguration from './global-configuration/global-configuration';
+import { WzConfigurationGlobalConfigurationManager, WzConfigurationGlobalConfigurationAgent } from './global-configuration/global-configuration';
 import WzConfigurationEditConfiguration from './edit-configuration/edit-configuration';
 import WzConfigurationRegistrationService from './registration-service/registration-service';
 import WzConfigurationCluster from './cluster/cluster';
 import WzConfigurationAlerts from './alerts/alerts';
+import WzConfigurationClient from './client/client';
+import WzConfigurationClientBuffer from './client-buffer/client-buffer';
+import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationIntegrations from './integrations/integrations';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 import WzConfigurationCisCat from './cis-cat/cis-cat';
@@ -26,6 +29,7 @@ import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
 import WzConfigurationOsquery from './osquery/osquery';
 import WzConfigurationInventory from './inventory/inventory';
 import WzConfigurationActiveResponse from './active-response/active-response';
+import WzConfigurationActiveResponseAgent from './active-response/active-response-agent';
 import WzConfigurationCommands from './commands/commands';
 import WzConfigurationLogCollection from './log-collection/log-collection';
 import WzConfigurationIntegrityMonitoring from './integrity-monitoring/integrity-monitoring';
@@ -37,6 +41,7 @@ import WzConfigurationPath from './util-components/configuration-path';
 import ToastProvider from './util-providers/toast-provider';
 import WzToastP from './util-providers/toast-p';
 
+console.log('config-main', WzConfigurationGlobalConfigurationManager, WzConfigurationGlobalConfigurationAgent)
 import {
 	EuiPage,
 	EuiPanel
@@ -58,7 +63,7 @@ class WzConfigurationMain extends Component{
 	}
 	render(){
 		const { view, viewProps: {title, description, path, badge} } = this.state;
-		const { agent } = this.props.configurationProps;
+		const { agent, synchronized } = this.props.configurationProps;
 		return (
 			<WzReduxProvider>
 				<WzToastP>
@@ -67,10 +72,13 @@ class WzConfigurationMain extends Component{
 							{view !== '' && (<WzConfigurationPath title={title} description={description} path={path} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
 							<WzViewSelector view={view}>
 								<div default>
-									<WzConfigurationOverview agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationOverview agent={agent} synchronized={synchronized} updateConfigurationSection={this.updateConfigurationSection}/>{/* TODO: synchronized */}
 								</div>
 								<div view='global-configuration'>
-									<WzConfigurationGlobalConfiguration agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationGlobalConfigurationManager agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='global-configuration-agent'>
+									<WzConfigurationGlobalConfigurationAgent agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='cluster'>
 									<WzConfigurationCluster agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
@@ -80,6 +88,15 @@ class WzConfigurationMain extends Component{
 								</div>
 								<div view='alerts'>
 									<WzConfigurationAlerts agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='client'>
+									<WzConfigurationClient agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='client-buffer'>
+									<WzConfigurationClientBuffer agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='alerts-agent'>
+									<WzConfigurationAlertsLabelsAgent agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='integrations'>
 									<WzConfigurationIntegrations agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
@@ -101,6 +118,9 @@ class WzConfigurationMain extends Component{
 								</div>
 								<div view='active-response'>
 									<WzConfigurationActiveResponse agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='active-response-agent'>
+									<WzConfigurationActiveResponseAgent agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='commands'>
 									<WzConfigurationCommands agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>

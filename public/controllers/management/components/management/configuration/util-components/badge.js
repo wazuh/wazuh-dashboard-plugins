@@ -20,13 +20,21 @@ import {
 class WzBadge extends Component{
   constructor(props){
     super(props);
-    if( typeof this.props.enabled !== undefined ){
+    if( typeof this.props.enabled !== 'undefined' ){
       if(this.props.enabled){
         this.color = 'secondary';
         this.content = 'ENABLED';
       }else{
         this.color = 'danger';
         this.content = 'DISABLED';
+      }
+    }else if(typeof this.props.synchronized !== 'undefined'){
+      if(this.props.synchronized){
+        this.color = 'secondary';
+        this.content = 'SYNCHRONIZED'
+      }else{
+        this.color = 'danger';
+        this.content = 'NOT SYNCHRONIZED'
       }
     }else{
       this.color = this.props.color;

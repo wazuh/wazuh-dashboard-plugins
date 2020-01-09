@@ -22,31 +22,55 @@ import WzConfigurationGlobalConfigurationRemote from './global-configuration-rem
 
 import withWzConfig from '../util-hocs/wz-config';
 
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+
 class WzConfigurationGlobalConfiguration extends Component{
   constructor(props){
     super(props);
+    
   }
   render(){
+    const { currentConfig, agent, wazuhNotReadyYet } = this.props;
     return (
       <Fragment>
-        <WzTabSelector>
-          <div label="Global">
-            <WzConfigurationGlobalConfigurationGlobal {...this.props}/>
-          </div>
-          <div label="Remote">
-            <WzConfigurationGlobalConfigurationRemote {...this.props}/>
-          </div>
-        </WzTabSelector>
+        {(agent && agent.id === '000') ? (
+          <WzTabSelector>
+            <div label="Global">
+              <WzConfigurationGlobalConfigurationGlobal {...this.props}/>
+            </div>
+            <div label="Remote">
+              <WzConfigurationGlobalConfigurationRemote {...this.props}/>
+            </div>
+          </WzTabSelector>
+
+        ) : <WzConfigurationGlobalConfigurationGlobal {...this.props}/>}
       </Fragment>
     )
   }
 }
 
-const sections = [
+const sectionsManager = [
   {component:'analysis',configuration:'global'},
   {component:'mail',configuration:'global'},
   {component:'request',configuration:'remote'},
   {component:'com',configuration:'logging'}
 ];
 
-export default withWzConfig(sections)(WzConfigurationGlobalConfiguration);
+const sectionsAgent = [
+  {component:'com',configuration:'logging'}
+];
+
+const mapStateToProps = (state) => ({
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+});
+
+export const WzConfigurationGlobalConfigurationManager = compose(
+  withWzConfig(sectionsManager),
+  connect(mapStateToProps)
+)(WzConfigurationGlobalConfiguration);
+
+export const WzConfigurationGlobalConfigurationAgent = compose(
+  withWzConfig(sectionsAgent),
+  connect(mapStateToProps)
+)(WzConfigurationGlobalConfiguration);
