@@ -42,6 +42,15 @@
         }" />
     </div>
 
+    <!-- Metrics of Osquery Dashboard -->
+    <div ng-if="octrl.tab === 'osquery'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Agents reporting Osquery events', value: octrl.osqueryAgentsReporting() + ' / ' + octrl.agentsCountTotal, color: 'primary' },
+            ]            
+        }" />
+    </div>
+
     <!-- Cards for PCI Dashboard-->
     <div ng-if="octrl.tab === 'pci'" class="md-padding">
         <div ng-if="octrl.pciReqs" class="wz-margin-10">

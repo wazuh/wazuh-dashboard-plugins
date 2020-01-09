@@ -50,7 +50,7 @@ export class TabVisualizations {
       nist: 7,
       aws: 8,
       virustotal: 5,
-      osquery: 5,
+      osquery: 6,
       sca: 8,
       docker: 5,
       mitre: 6

@@ -518,4 +518,53 @@ export const visualizations = {
       },
     ],
   },
+  osquery: {
+    metrics: [{ id: 'Wazuh-App-Overview-Osquery-Agents-reporting' }],
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top 5 Osquery events added',
+            id: 'Wazuh-App-Overview-Osquery-Top-5-added',
+            width: 25,
+          },
+          {
+            title: 'Top 5 Osquery events removed',
+            id: 'Wazuh-App-Overview-Osquery-Top-5-removed',
+            width: 25,
+          },
+          {
+            title: 'Evolution of Osquery events per pack over time',
+            id: 'Wazuh-App-Agents-Osquery-Evolution',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Most common packs',
+            id: 'Wazuh-App-Overview-Osquery-Most-common-packs',
+            width: 30,
+          },
+          {
+            title: 'Top 5 rules',
+            id: 'Wazuh-App-Overview-Osquery-Top-5-rules',
+            width: 70,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-Osquery-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
