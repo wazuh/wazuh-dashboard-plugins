@@ -21,17 +21,23 @@ wz-menu {
 }
 .wz-menu {
     background-color: #FFF;
-    width: calc(~'100vw - 48px')!important;
     box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
     border-bottom: 1px solid #d3dae6;
     font-size: 14px;
-    position: fixed !important;
+    position: relative !important;
     height: 50px;
 }
 
+.wz-menu-wrapper{
+    width: 100%;
+    position: fixed;
+    padding-left: 48px;
+    left: 0;
+}
+
 @media only screen and (max-width: 767px){
-    .wz-menu {
-        width: 100%;
+    .wz-menu-wrapper{
+        padding-left: 0!important;
     }
   }
 
