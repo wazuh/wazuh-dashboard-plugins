@@ -27,9 +27,10 @@ export class WzSearchBadges extends Component {
   }
 
   buildBadge(title:filter) {
+    const idGenerator = () => {return '_' + Math.random().toString(36).substr(2, 9)};
     return (
       <EuiBadge
-        key={Date.now()}
+        key={idGenerator()}
         iconType="cross"
         iconSide="right"
         iconOnClickAriaLabel="Remove"

@@ -191,6 +191,7 @@ export default class WzSearchBar extends Component {
     let filters = {};
     let newInputValue = '';
     if (this.suggestHandler.isSearch && !searchDisable) {
+      filters = {...currentFilters};
       filters['search'] = inputValue;
     } else if(inputValue.length > 0) {
       const { inputValue:newInput, filters:newFilters } = this.suggestHandler.onKeyPress(inputValue, currentFilters);
