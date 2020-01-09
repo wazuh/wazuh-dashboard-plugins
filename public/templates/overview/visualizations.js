@@ -609,4 +609,71 @@ export const visualizations = {
       },
     ],
   },
+  oscap: {
+    metrics: [
+      { id: 'Wazuh-App-Overview-OSCAP-Last-score' },
+      { id: 'Wazuh-App-Overview-OSCAP-Highest-score' },
+      { id: 'Wazuh-App-Overview-OSCAP-Lowest-score' },
+    ],
+    rows: [
+      {
+        height: 215,
+        vis: [
+          {
+            title: 'Top 5 Agents',
+            id: 'Wazuh-App-Overview-OSCAP-Agents',
+            width: 25,
+          },
+          {
+            title: 'Top 5 Profiles',
+            id: 'Wazuh-App-Overview-OSCAP-Profiles',
+            width: 25,
+          },
+          {
+            title: 'Top 5 Content',
+            id: 'Wazuh-App-Overview-OSCAP-Content',
+            width: 25,
+          },
+          {
+            title: 'Top 5 Severity',
+            id: 'Wazuh-App-Overview-OSCAP-Severity',
+            width: 25,
+          },
+        ],
+      },
+      {
+        height: 240,
+        vis: [
+          {
+            title: 'Top 5 Agents - Severity high',
+            id: 'Wazuh-App-Overview-OSCAP-Top-5-agents-Severity-high',
+          },
+        ],
+      },
+      {
+        height: 320,
+        vis: [
+          {
+            title: 'Top 10 - Alerts',
+            id: 'Wazuh-App-Overview-OSCAP-Top-10-alerts',
+            width: 50,
+          },
+          {
+            title: 'Top 10 - High risk alerts',
+            id: 'Wazuh-App-Overview-OSCAP-Top-10-high-risk-alerts',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-OSCAP-Last-alerts',
+          },
+        ],
+      },
+    ],
+  },
 };

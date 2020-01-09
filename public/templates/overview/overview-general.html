@@ -51,6 +51,17 @@
         }" />
     </div>
 
+    <!-- Metrics of Oscap Dashboard -->
+    <div ng-if="octrl.tab === 'oscap'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+                items: [
+                    { description: 'Last score', value: octrl.scapLastScore(), color: 'accent' },
+                    { description: 'Highest score', value: octrl.virusPositives(), color: 'primary' },
+                    { description: 'Lowest score', value: octrl.virusTotal(), color: 'secondary' },
+                ]            
+            }" />
+    </div>
+
     <!-- Cards for PCI Dashboard-->
     <div ng-if="octrl.tab === 'pci'" class="md-padding">
         <div ng-if="octrl.pciReqs" class="wz-margin-10">
