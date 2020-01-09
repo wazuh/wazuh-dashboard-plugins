@@ -33,6 +33,7 @@ export class AgentsPreviewController {
     apiReq,
     appState,
     $location,
+    $route,
     errorHandler,
     csvReq,
     shareAgent,
@@ -47,6 +48,7 @@ export class AgentsPreviewController {
     this.apiReq = apiReq;
     this.appState = appState;
     this.$location = $location;
+    this.$route = $route;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
     this.shareAgent = shareAgent;
@@ -61,7 +63,7 @@ export class AgentsPreviewController {
   /**
    * On controller loads
    */
-  $onInit() {
+  async $onInit() {
     this.init = true;
     this.api = JSON.parse(this.appState.getCurrentAPI()).id;
     const loc = this.$location.search();
@@ -90,6 +92,17 @@ export class AgentsPreviewController {
       this.submenuNavItem = loc.tab;
     }
 
+    const summaryData = await this.apiReq.request('GET', '/agents/summary', {});
+    this.summary = summaryData.data.data;
+    if (this.summary.Total - 1 === 0) {
+      if (this.addingNewAgent === undefined) {
+        this.addNewAgent(true);
+      }
+      this.hasAgents = false;
+    } else {
+      this.hasAgents = true;
+    }
+
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
       this.$location.search('tab', this.submenuNavItem);
@@ -101,6 +114,8 @@ export class AgentsPreviewController {
 
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
+      hasAgents: this.hasAgents,
+      reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
       getCurrentApiAddress: () => this.getCurrentApiAddress(),
       needsPassword: () => this.needsPassword()
@@ -133,6 +148,7 @@ export class AgentsPreviewController {
         this.$scope.$applyAsync()
       },
       timeService: (date) => this.timeService.offset(date),
+      summary: this.summary
     }
     //Load
     this.load();

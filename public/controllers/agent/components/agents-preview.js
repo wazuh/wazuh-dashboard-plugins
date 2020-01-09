@@ -54,11 +54,10 @@ export class AgentsPreview extends Component {
 
   async getSummary() {
     try {
-      const result = await this.props.tableProps.wzReq('GET', '/agents/summary', {});
-      this.totalAgents = result.data.data.Total - 1;
       const lastAgent = await this.props.tableProps.wzReq('GET', '/agents', { limit: 1, sort: '-dateAdd' });
       this.lastAgent = lastAgent.data.data.items[0];
-      this.summary = result.data.data;
+      this.summary = this.props.tableProps.summary;
+      this.totalAgents = this.summary.Total - 1;
       this.agentsCoverity = this.totalAgents ? (((this.summary['Active'] || 1) - 1) / this.totalAgents) * 100 : 0;
       this.mostActiveAgent = await this.props.tableProps.getMostActive();
       const model = [
