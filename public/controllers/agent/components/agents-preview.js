@@ -138,7 +138,7 @@ export class AgentsPreview extends Component {
                   </EuiFlexGroup>
                 </EuiPanel>
               </EuiFlexItem>
-              {((this.totalAgents > 0 && this.agentsCoverity > 0) &&
+              {((this.totalAgents > 0) &&
                 <EuiFlexItem grow={false} style={{ margin: "12px 0px" }}>
                   <EuiPanel betaBadgeLabel="Coverage" style={{ paddingBottom: 0 }}>
                     <EuiFlexGroup>
