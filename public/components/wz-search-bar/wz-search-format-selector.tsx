@@ -36,6 +36,7 @@ export class WzSearchFormatSelector extends Component {
     onChange: Function
     qFilterEnabled?: boolean
     apiFilterEnabled?: boolean
+    format?: string
   }
 
   qLegend = (
@@ -68,9 +69,11 @@ export class WzSearchFormatSelector extends Component {
     super(props);
     const { qFilterEnabled, apiFilterEnabled } = props;  
     this.toggleButtons = this.initToggleButtons(qFilterEnabled, apiFilterEnabled);
+    console.log(props.format);
+    const toggleIndex = props.format === '?Q' ? 0 : 1;
     this.state = {
       isPopoverOpen: false,
-      toggleIdSelected: this.toggleButtons[0],
+      toggleIdSelected: this.toggleButtons[toggleIndex],
     };
   }
 

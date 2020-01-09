@@ -42,13 +42,20 @@ export default class WzSearchBar extends Component {
     apiSuggests: apiSuggests[]
     onInputChange: Function
     searchDisable?: boolean
+    defaultFormat?: string
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      searchFormat: (props.qSuggests) ? '?Q' : (props.apiSuggests) ? 'API' : null,
+      searchFormat: (props.defaultFormat)
+        ? props.defaultFormat
+        : (props.qSuggests) 
+        ? '?Q' 
+        : (props.apiSuggests) 
+          ? 'API' 
+          : null,
       suggestions: [],
       isProcessing: true,
       inputValue: '',
@@ -227,6 +234,7 @@ export default class WzSearchBar extends Component {
 
   renderFormatSelector() {
     const { qSuggests, apiSuggests } = this.props;
+    const { searchFormat } = this.state;
     const qFilterEnabled = qSuggests ? true : false;
     const apiFilterEnabled = apiSuggests ? true : false;
     if (!qFilterEnabled && !apiFilterEnabled) {
@@ -234,6 +242,7 @@ export default class WzSearchBar extends Component {
     }
     return (<WzSearchFormatSelector
       onChange={this.onChangeSearchFormat.bind(this)}
+      format={searchFormat}
       qFilterEnabled={qFilterEnabled}
       apiFilterEnabled={apiFilterEnabled}
     />);
@@ -246,24 +255,24 @@ export default class WzSearchBar extends Component {
     return (
       <div>
         <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <WzSearchBadges
+              filters={formatedFilter}
+              onChange={this.onDeleteBadge.bind(this)} />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
           <EuiFlexItem>
             <EuiSuggest
               status={status}
               value={inputValue}
               onKeyPress={this.onKeyPress}
               onItemClick={this.onItemClick.bind(this)}
-              append={searchFormatSelector}
+              prepend={searchFormatSelector}
               suggestions={suggestions}
               onInputChange={this.onInputChange}
               isInvalid={isInvalid}
             />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <WzSearchBadges
-              filters={formatedFilter}
-              onChange={this.onDeleteBadge.bind(this)} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
