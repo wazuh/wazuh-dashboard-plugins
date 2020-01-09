@@ -24,6 +24,7 @@ import {
 } from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
 
 export class OverviewController {
   /**
@@ -44,7 +45,6 @@ export class OverviewController {
     $scope,
     $location,
     $rootScope,
-    appState,
     errorHandler,
     apiReq,
     tabVisualizations,
@@ -56,7 +56,6 @@ export class OverviewController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.tabVisualizations = tabVisualizations;
@@ -91,13 +90,12 @@ export class OverviewController {
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
-
     this.$location.search('_a', null);
-    this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
+    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
+    const extensions = AppState.getExtensions(currentApi);
     this.extensions = extensions;
 
     this.wzMonitoringEnabled = false;
@@ -119,11 +117,11 @@ export class OverviewController {
     this.init();
 
     this.welcomeCardsProps = {
-      api: this.appState.getCurrentAPI(),
+      api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
       extensions: this.extensions,
       setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
+        AppState.setExtensions(api, extensions)
     };
 
     this.setTabs();

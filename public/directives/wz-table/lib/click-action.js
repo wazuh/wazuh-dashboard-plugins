@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../../../react-services/app-state";
 
 export function clickAction(
   item,
@@ -19,7 +20,7 @@ export function clickAction(
   $scope,
   appState
 ) {
-  appState.setNavigation({ status: true });
+  AppState.setNavigation({ status: true });
   if (
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/).test(instance.path)

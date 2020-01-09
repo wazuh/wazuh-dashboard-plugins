@@ -12,6 +12,7 @@
 import { TabNames } from '../../utils/tab-names';
 import { configEquivalences } from '../../utils/config-equivalences';
 import { kibana } from '../../../package.json';
+import { AppState } from '../../react-services/app-state';
 
 export class SettingsController {
   /**
@@ -20,7 +21,6 @@ export class SettingsController {
    * @param {*} $window
    * @param {*} $location
    * @param {*} testAPI
-   * @param {*} appState
    * @param {*} genericReq
    * @param {*} errorHandler
    * @param {*} wzMisc
@@ -31,7 +31,6 @@ export class SettingsController {
     $window,
     $location,
     testAPI,
-    appState,
     genericReq,
     errorHandler,
     wzMisc,
@@ -42,7 +41,6 @@ export class SettingsController {
     this.$window = $window;
     this.$location = $location;
     this.testAPI = testAPI;
-    this.appState = appState;
     this.genericReq = genericReq;
     this.errorHandler = errorHandler;
     this.wzMisc = wzMisc;
@@ -157,7 +155,7 @@ export class SettingsController {
    */
   switchTab(tab, setNav = false) {
     if (setNav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     }
     this.tab = tab;
     this.$location.search('tab', this.tab);
@@ -214,9 +212,9 @@ export class SettingsController {
       const { manager, cluster, status } = cluster_info;
 
       // Check the connection before set as default
-      this.appState.setClusterInfo(cluster_info);
+      AppState.setClusterInfo(cluster_info);
       const clusterEnabled = status === 'disabled';
-      this.appState.setCurrentAPI(
+      AppState.setCurrentAPI(
         JSON.stringify({
           name: clusterEnabled ? manager : cluster,
           id: id
@@ -225,7 +223,7 @@ export class SettingsController {
 
       this.$scope.$emit('updateAPI', {});
 
-      const currentApi = this.appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
       this.apiTableProps.currentDefault = this.currentDefault;
       this.$scope.$applyAsync();
@@ -233,9 +231,9 @@ export class SettingsController {
       this.errorHandler.info(`API ${manager} set as default`);
 
       this.getCurrentAPIIndex();
-      if (currentApi && !this.appState.getExtensions(id)) {
+      if (currentApi && !AppState.getExtensions(id)) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        this.appState.setExtensions(id, extensions);
+        AppState.setExtensions(id, extensions);
       }
 
       this.$scope.$applyAsync();
@@ -267,7 +265,7 @@ export class SettingsController {
 
       // Set the addingApi flag based on if there is any API entry
       this.addingApi = !this.apiEntries.length;
-      const currentApi = this.appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
 
       if (currentApi) {
         const { id } = JSON.parse(currentApi);
@@ -282,14 +280,15 @@ export class SettingsController {
         return;
       }
 
-      if (currentApi && !this.appState.getExtensions(this.currentDefault)) {
+      if (currentApi && !AppState.getExtensions(this.currentDefault)) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
         const apiExtensions = extensions || {};
-        this.appState.setExtensions(id, apiExtensions);
+        AppState.setExtensions(id, apiExtensions);
       }
 
       this.$scope.$applyAsync();
     } catch (error) {
+      console.log(error)
       this.errorHandler.handle('Error getting API entries', 'Settings');
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
@@ -401,8 +400,8 @@ export class SettingsController {
 
       this.load = false;
       const config = this.wazuhConfig.getConfig();
-      this.appState.setPatternSelector(config['ip.selector']);
-      const pattern = this.appState.getCurrentPattern();
+      AppState.setPatternSelector(config['ip.selector']);
+      const pattern = AppState.getCurrentPattern();
       this.selectedIndexPattern = pattern || config['pattern'];
 
       if (this.tab === 'logs') {

@@ -12,6 +12,7 @@
 import * as FileSaver from '../../services/file-saver';
 
 import { colors } from './colors';
+import { AppState } from '../../react-services/app-state';
 
 export class DecodersController {
   /**
@@ -28,7 +29,6 @@ export class DecodersController {
     $sce,
     $location,
     errorHandler,
-    appState,
     apiReq,
     csvReq,
     wzTableFilter,
@@ -39,7 +39,6 @@ export class DecodersController {
     this.$sce = $sce;
     this.errorHandler = errorHandler;
     this.$location = $location;
-    this.appState = appState;
     this.apiReq = apiReq;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
@@ -229,7 +228,7 @@ export class DecodersController {
     try {
       const path =
         this.typeFilter === 'parents' ? '/decoders/parents' : '/decoders';
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         path,
         currentApi,
@@ -253,7 +252,7 @@ export class DecodersController {
         this.currentDecoder.file
       );
       this.$location.search('editingFile', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.fetchedXML });
     } catch (error) {
@@ -284,7 +283,7 @@ export class DecodersController {
     }
     this.editingFile = false;
     this.$scope.$applyAsync();
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.$scope.$broadcast('closeEditXmlFile', {});
   }
 
@@ -337,7 +336,7 @@ export class DecodersController {
   };
 
   doSaveConfig() {
-    const clusterInfo = this.appState.getClusterInfo();
+    const clusterInfo = AppState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
     this.doingSaving = true;

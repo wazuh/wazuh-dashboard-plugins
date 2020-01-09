@@ -11,6 +11,7 @@
  */
 import beautifier from '../../utils/json-beautifier';
 import * as FileSaver from '../../services/file-saver';
+import { AppState } from '../../react-services/app-state';
 
 export function GroupsController(
   $scope,
@@ -18,7 +19,6 @@ export function GroupsController(
   apiReq,
   errorHandler,
   csvReq,
-  appState,
   shareAgent,
   groupHandler,
   wzTableFilter,
@@ -44,7 +44,7 @@ export function GroupsController(
   $scope.downloadCsv = async data_path => {
     try {
       errorHandler.info('Your download should begin automatically...', 'CSV');
-      const currentApi = JSON.parse(appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await csvReq.fetch(
         data_path,
         currentApi,
@@ -141,7 +141,7 @@ export function GroupsController(
       $scope.currentGroup = group;
       $location.search('currentGroup', group.name);
       if ($location.search() && $location.search().navigation) {
-        appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         $location.search('navigation', null);
       }
       $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
@@ -291,7 +291,7 @@ export function GroupsController(
     try {
       $scope.fetchedXML = await fetchFile();
       $location.search('editingFile', true);
-      appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
@@ -302,7 +302,7 @@ export function GroupsController(
 
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
-    appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     $scope.groupsTabsProps.selectedTab = 'files';
     $scope.$applyAsync();
@@ -636,7 +636,7 @@ export function GroupsController(
   $scope.$on('openGroupFromList', (ev, parameters) => {
     $scope.editingFile = true;
     $scope.groupsSelectedTab = 'files';
-    appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     $location.search('navigation', true);
     return $scope
       .loadGroup(parameters.group)

@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import chrome from 'ui/chrome';
+import { AppState } from '../react-services/app-state';
 
 export class ApiTester {
   /**
@@ -41,7 +42,7 @@ export class ApiTester {
         headers
       );
 
-      this.appState.setPatternSelector(configuration['ip.selector']);
+      AppState.setPatternSelector(configuration['ip.selector']);
 
       if (result.error) {
         return Promise.reject(result);
@@ -67,10 +68,8 @@ export class ApiTester {
         headers: { 'Content-Type': 'application/json' },
         timeout: timeout || 20000
       };
-
       const url = chrome.addBasePath('/api/check-api');
       const response = await this.$http.post(url, data, headers);
-
       if (response.error) {
         return Promise.reject(response);
       }

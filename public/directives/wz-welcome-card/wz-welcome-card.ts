@@ -13,6 +13,8 @@
 import template from './wz-welcome-card.html';
 // @ts-ignore
 import { uiModules } from 'ui/modules';
+// @ts-ignore
+import { AppState } from '../../react-services/app-state'
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -40,7 +42,7 @@ class WzWelcomeCard {
 
     link(scope, elm, attrs) {
         scope.callSwitchTab = () => {
-            this.appState.setNavigation(true);
+            AppState.setNavigation(true);
             scope.switchTab()
         };
     }

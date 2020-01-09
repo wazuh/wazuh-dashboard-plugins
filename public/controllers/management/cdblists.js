@@ -11,12 +11,12 @@
  */
 import * as FileSaver from '../../services/file-saver';
 import { stringToObj } from '../../utils/cdblist-to-object';
+import { AppState } from '../../react-services/app-state';
 
 export class CdbListsController {
   constructor(
     $scope,
     errorHandler,
-    appState,
     csvReq,
     wzTableFilter,
     $location,
@@ -26,7 +26,6 @@ export class CdbListsController {
   ) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
-    this.appState = appState;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.$location = $location;
@@ -152,7 +151,7 @@ export class CdbListsController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         '/lists',
         currentApi,

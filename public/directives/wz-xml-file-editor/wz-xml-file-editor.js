@@ -15,6 +15,7 @@ import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
+import { AppState } from '../../react-services/app-state';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -33,7 +34,6 @@ app.directive('wzXmlFileEditor', function() {
       $scope,
       $document,
       $location,
-      appState,
       errorHandler,
       groupHandler,
       rulesetHandler,
@@ -421,7 +421,7 @@ app.directive('wzXmlFileEditor', function() {
 
       $scope.$on('$destroy', function() {
         $location.search('editingFile', null);
-        appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
       });
     },
     template

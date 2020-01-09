@@ -49,7 +49,6 @@ app.directive('wzTable', function() {
       errorHandler,
       wzTableFilter,
       $window,
-      appState,
       groupHandler,
       rulesetHandler,
       wazuhConfig,

@@ -20,8 +20,8 @@ export class AppState {
      * @param {id} id 
      */
     static getExtensions(id) {
-        const current = Cookies.get('extensions');
-        return current ? current[id] : false;
+        const current = Cookies.get('extensions') ? JSON.parse(Cookies.get('extensions')) : false;
+        return current ? current[id] : {};
     }
 
     /**
@@ -30,7 +30,7 @@ export class AppState {
      * @param {*} extensions 
      */
     static setExtensions(id, extensions) {
-        const current = Cookies.get('extensions') || {};
+        const current = Cookies.get('extensions') ? JSON.parse(Cookies.get('extensions')) : {};
         current[id] = extensions;
         const exp = new Date();
         exp.setDate(exp.getDate() + 365);
@@ -44,7 +44,7 @@ export class AppState {
      * Cluster setters and getters
      **/
     static getClusterInfo() {
-        return Cookies.get('_clusterInfo');
+        return Cookies.get('_clusterInfo') ? JSON.parse(Cookies.get('_clusterInfo')) : {};
     }
 
     /**
@@ -73,7 +73,8 @@ export class AppState {
      * Get '_createdAt' value   
      */
     static getCreatedAt() {
-        return Cookies.get('_createdAt');
+        const createdAt = Cookies.get('_createdAt') ? Cookies.get('_createdAt') : false;
+        return createdAt;
     }
 
     
@@ -81,7 +82,12 @@ export class AppState {
      * Get 'API' value   
      */
     static getCurrentAPI() {
-        return Cookies.get('API');
+        const currentAPI = Cookies.get('API');// ? Cookies.get('API') : {};
+        if (currentAPI && currentAPI.charAt(0) === '"' && currentAPI.charAt(currentAPI.length -1) === '"')
+        {
+            return currentAPI.substr(1,currentAPI.length -2);
+        }
+        return currentAPI || undefined;
     }
 
     /**
@@ -137,7 +143,13 @@ export class AppState {
      * Get '_currentPattern' value   
      */
     static getCurrentPattern() {
-        return Cookies.get('_currentPattern');
+        const currentPattern = Cookies.get('_currentPattern');
+        if (currentPattern && currentPattern.charAt(0) === '"' && currentPattern.charAt(currentPattern.length -1) === '"')
+        {
+            return currentPattern.substr(1,currentPattern.length -2);
+        }
+        return currentPattern || "";
+       
     }
 
 
@@ -183,17 +195,19 @@ export class AppState {
 
 
     static setNavigation(params) {
-        const navigate2 = Cookies.get('navigate');
-        console.log(navigate2)
-        var navigate = navigate2 ? JSON.parse(navigate2) : {};
-        for (var key in params) {
-            navigate[key] = params[key];
-        }
-        Cookies.set('navigate',navigate);
+            const navigateStr = Cookies.get('navigate');
+            var navigate = navigateStr ? JSON.parse(navigateStr) : {};
+            for (var key in params) {
+                navigate[key] = params[key];
+            }
+            Cookies.set('navigate',navigate);
+
     }
     
     static getNavigation() {
-        return Cookies.get('navigate') || {};
+            const navigateStr = Cookies.get('navigate');
+            const navigateObj = navigateStr ? JSON.parse(navigateStr) : false;
+            return navigateObj;
     }
     /**
      * 

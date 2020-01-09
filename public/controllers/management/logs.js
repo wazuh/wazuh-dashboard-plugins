@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { AppState } from '../../react-services/app-state';
 
 export class LogsController {
   /**
@@ -18,7 +19,6 @@ export class LogsController {
    * @param {*} apiReq
    * @param {*} errorHandler
    * @param {*} csvReq
-   * @param {*} appState
    * @param {*} wzTableFilter
    */
   constructor(
@@ -26,7 +26,6 @@ export class LogsController {
     apiReq,
     errorHandler,
     csvReq,
-    appState,
     wzTableFilter,
     timeService
   ) {
@@ -34,7 +33,6 @@ export class LogsController {
     this.apiReq = apiReq;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
-    this.appState = appState;
     this.wzTableFilter = wzTableFilter;
     this.nodeList = false;
     this.type_log = 'all';
@@ -130,7 +128,7 @@ export class LogsController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const path = this.selectedNode
         ? `/cluster/${this.selectedNode}/logs`
         : '/manager/logs';

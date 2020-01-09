@@ -123,10 +123,30 @@
 #     port: <port>
 #     user: <user>
 #     password: <password> 
+#  - default:
+#     url: http://172.16.1.2
+#     port: 55000
+#     user: pablo
+#     password: pablotorres
 
 hosts:
-  - default:
-     url: http://localhost
+  - asdfasg:
+     url: http://172.16.1.2
+     port: 55000
+     user: pablo
+     password: pablotorresx
+  - rrrrrrrtt:
+     url: http://192.168.0.54
      port: 55000
      user: foo
+     password: bar
+  - cf:
+     url: http://192.168.0.54
+     port: 55000
+     user: fooc
+     password: bar
+  - default2:
+     url: http://192.168.0.54
+     port: 55000
+     user: fooeeeee
      password: bar

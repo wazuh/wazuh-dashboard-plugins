@@ -9,13 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../react-services/app-state";
+
 export class CommonData {
   /**
    * Class constructor
    * @param {*} $rootScope
    * @param {*} $timeout
    * @param {*} genericReq
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} $location
    * @param {*} shareAgent
@@ -25,7 +26,6 @@ export class CommonData {
     $rootScope,
     $timeout,
     genericReq,
-    appState,
     errorHandler,
     $location,
     shareAgent,
@@ -34,7 +34,6 @@ export class CommonData {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = genericReq;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.$location = $location;
     this.shareAgent = shareAgent;
@@ -152,12 +151,12 @@ export class CommonData {
       };
 
       const filters = [];
-      const isCluster = this.appState.getClusterInfo().status == 'enabled';
+      const isCluster = AppState.getClusterInfo().status == 'enabled';
       filters.push(
         filterHandler.managerQuery(
           isCluster
-            ? this.appState.getClusterInfo().cluster
-            : this.appState.getClusterInfo().manager,
+            ? AppState.getClusterInfo().cluster
+            : AppState.getClusterInfo().manager,
           isCluster
         )
       );

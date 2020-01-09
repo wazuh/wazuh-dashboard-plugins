@@ -11,6 +11,7 @@
  */
 import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
+import { AppState } from '../../react-services/app-state';
 
 export function settingsWizard(
   $location,
@@ -44,7 +45,8 @@ export function settingsWizard(
       } else {
         fromWazuhHosts = true;
         wzMisc.setBlankScr(errorHandler.handle(data));
-        appState.removeCurrentAPI();
+
+        AppState.removeCurrentAPI();
       }
 
       if (!fromWazuhHosts) {
@@ -80,7 +82,7 @@ export function settingsWizard(
     const changeCurrentApi = data => {
       let currentApi = false;
       try {
-        currentApi = JSON.parse(appState.getCurrentAPI()).id;
+        currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
         // eslint-disable-next-line
         console.log(`Error parsing JSON (settingsWizards.changeCurrentApi)`);
@@ -93,8 +95,8 @@ export function settingsWizard(
           ? JSON.stringify({ name: clusterInfo.manager, id: currentApi })
           : JSON.stringify({ name: clusterInfo.cluster, id: currentApi });
 
-      appState.setCurrentAPI(str);
-      appState.setClusterInfo(clusterInfo);
+      AppState.setCurrentAPI(str);
+      AppState.setClusterInfo(clusterInfo);
     };
 
     const callCheckStored = () => {
@@ -102,14 +104,14 @@ export function settingsWizard(
       let currentApi = false;
 
       try {
-        currentApi = JSON.parse(appState.getCurrentAPI()).id;
+        currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
         console.log(
           'Error parsing JSON (settingsWizards.callCheckStored 1)',
           error
         );
       }
-      if (currentApi && !appState.getExtensions(currentApi)) {
+      if (currentApi && !AppState.getExtensions(currentApi)) {
         const extensions = {
           audit: config['extensions.audit'],
           pci: config['extensions.pci'],
@@ -123,9 +125,9 @@ export function settingsWizard(
           osquery: config['extensions.osquery'],
           docker: config['extensions.docker']
         };
-        appState.setExtensions(currentApi, extensions);
+        AppState.setExtensions(currentApi, extensions);
       }
-      checkTimestamp(appState, genericReq, $location, wzMisc)
+      checkTimestamp(AppState, genericReq, $location, wzMisc)
         .then(() => testAPI.checkStored(currentApi))
         .then(data => {
           if (data === 3099) {
@@ -137,14 +139,14 @@ export function settingsWizard(
               if (((data || {}).data || {}).idChanged) {
                 let apiRaw = false;
                 try {
-                  apiRaw = JSON.parse(appState.getCurrentAPI());
+                  apiRaw = JSON.parse(AppState.getCurrentAPI());
                 } catch (error) {
                   // eslint-disable-next-line
                   console.log(
                     `Error parsing JSON (settingsWizards.callCheckStored 2)`
                   );
                 }
-                appState.setCurrentAPI(
+                AppState.setCurrentAPI(
                   JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
                 );
               }
@@ -155,7 +157,7 @@ export function settingsWizard(
           }
         })
         .catch(error => {
-          appState.removeCurrentAPI();
+          AppState.removeCurrentAPI();
           setUpCredentials(
             'Wazuh App: Please set up Wazuh API credentials.',
             false
@@ -168,7 +170,7 @@ export function settingsWizard(
       !comeFromWizard && errorHandler.handle(msg, false, true);
       wzMisc.setWizard(true);
       if (redirect) {
-        appState.setCurrentAPI(redirect);
+        AppState.setCurrentAPI(redirect);
       } else if (!$location.path().includes('/settings')) {
         $location.search('_a', null);
         $location.search('tab', 'api');
@@ -192,7 +194,7 @@ export function settingsWizard(
                 name: api.cluster_info.manager,
                 id: id
               });
-              appState.setCurrentAPI(defaultApi);
+              AppState.setCurrentAPI(defaultApi);
               callCheckStored();
               return defaultApi;
             }
@@ -224,7 +226,7 @@ export function settingsWizard(
       deferred.resolve();
     } else {
       // There's no cookie for current API
-      const currentApi = appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
       if (!currentApi) {
         genericReq
           .request('GET', '/hosts/apis')
@@ -265,7 +267,7 @@ export function settingsWizard(
             ) {
               callCheckStored();
             } else {
-              appState.removeCurrentAPI();
+              AppState.removeCurrentAPI();
               if (data.data.length > 0) {
                 // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);

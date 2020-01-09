@@ -12,6 +12,7 @@
 import * as FileSaver from '../../services/file-saver';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
+import { AppState } from '../../react-services/app-state';
 
 export class AgentsPreviewController {
   /**
@@ -29,7 +30,6 @@ export class AgentsPreviewController {
     $scope,
     genericReq,
     apiReq,
-    appState,
     $location,
     errorHandler,
     csvReq,
@@ -43,7 +43,6 @@ export class AgentsPreviewController {
     this.$scope = $scope;
     this.genericReq = genericReq;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.$location = $location;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
@@ -61,7 +60,7 @@ export class AgentsPreviewController {
    */
   $onInit() {
     this.init = true;
-    this.api = JSON.parse(this.appState.getCurrentAPI()).id;
+    this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
       this.commonData.setTimefilter(timefilter.getTime());
@@ -69,8 +68,8 @@ export class AgentsPreviewController {
     }
 
     this.isClusterEnabled =
-      this.appState.getClusterInfo() &&
-      this.appState.getClusterInfo().status === 'enabled';
+      AppState.getClusterInfo() &&
+      AppState.getClusterInfo().status === 'enabled';
 
     this.loading = true;
     this.osPlatforms = [];
@@ -163,12 +162,12 @@ export class AgentsPreviewController {
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
-      const clusterInfo = this.appState.getClusterInfo();
+      const clusterInfo = AppState.getClusterInfo();
       const firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       const secondUrlParam = clusterInfo[firstUrlParam];
 
-      const pattern = this.appState.getCurrentPattern();
+      const pattern = AppState.getCurrentPattern();
 
       const data = await Promise.all([
         this.genericReq.request('GET', '/api/agents-unique/' + this.api, {}),
@@ -241,7 +240,7 @@ export class AgentsPreviewController {
       }
 
       if (agentsTop.data.data === '') {
-        this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
+        this.mostActiveAgent.name = AppState.getClusterInfo().manager;
         this.mostActiveAgent.id = '000';
       } else {
         this.mostActiveAgent.name = agentsTop.data.data;

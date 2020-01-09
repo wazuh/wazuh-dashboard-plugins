@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { AppState } from "../../react-services/app-state";
+
 export class ConfigurationGroupsController {
   /**
    * Constructor
@@ -16,13 +19,11 @@ export class ConfigurationGroupsController {
    * @param {*} $location
    * @param {*} errorHandler
    * @param {*} apiReq
-   * @param {*} appState
    */
-  constructor($scope, $location, errorHandler, apiReq, appState, groupHandler) {
+  constructor($scope, $location, errorHandler, apiReq, groupHandler) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
@@ -60,13 +61,13 @@ export class ConfigurationGroupsController {
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       try {
         this.$scope.fetchedXML = await this.fetchFile();
         this.$location.search('editingFile', true);
-        this.appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -77,7 +78,7 @@ export class ConfigurationGroupsController {
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
       this.$scope.fetchedXML = null;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$broadcast('closeEditXmlFile', {});
       this.$scope.$applyAsync();
     };

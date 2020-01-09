@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { stringToObj } from '../../utils/cdblist-to-object';
+import { AppState } from '../../react-services/app-state';
 export class ConfigurationRulesetController {
   /**
    * Constructor
@@ -24,13 +25,11 @@ export class ConfigurationRulesetController {
     $location,
     errorHandler,
     apiReq,
-    appState,
     rulesetHandler
   ) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
@@ -49,7 +48,7 @@ export class ConfigurationRulesetController {
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       this.$scope.newFile = false;
@@ -63,7 +62,7 @@ export class ConfigurationRulesetController {
                 this.$scope.selectedItem.file
               );
         this.$location.search('editingFile', true);
-        this.appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -77,7 +76,7 @@ export class ConfigurationRulesetController {
       this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
       if (reload) this.$scope.search();
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$applyAsync();
     };
 
@@ -154,7 +153,7 @@ export class ConfigurationRulesetController {
       this.$scope.type = type;
       this.$scope.$applyAsync();
       this.$location.search('editingFile', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     };
 
@@ -200,7 +199,7 @@ export class ConfigurationRulesetController {
     this.$scope.switchRulesetTab('rules');
 
     this.$scope.cancelEditList = () => {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.viewingDetail = false;
       this.$scope.currentList = false;
     };
@@ -215,7 +214,7 @@ export class ConfigurationRulesetController {
         );
         this.$scope.currentList.list = stringToObj(data.data.data);
         this.$location.search('editingFile', true);
-        this.appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         this.$scope.viewingDetail = true;
       } catch (error) {
         this.$scope.currentList.list = [];

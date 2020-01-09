@@ -12,12 +12,12 @@
 import * as FileSaver from '../../services/file-saver';
 
 import { colors } from './colors';
+import { AppState } from '../../react-services/app-state';
 
 export function RulesController(
   $scope,
   $sce,
   errorHandler,
-  appState,
   csvReq,
   wzTableFilter,
   $location,
@@ -231,7 +231,7 @@ export function RulesController(
   $scope.downloadCsv = async () => {
     try {
       errorHandler.info('Your download should begin automatically...', 'CSV');
-      const currentApi = JSON.parse(appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await csvReq.fetch(
         '/rules',
         currentApi,
@@ -287,7 +287,7 @@ export function RulesController(
         $scope.currentRule.file
       );
       $location.search('editingFile', true);
-      appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       $scope.$applyAsync();
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
@@ -321,7 +321,7 @@ export function RulesController(
 
     $scope.editingFile = false;
     $scope.$applyAsync();
-    appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     $scope.$applyAsync();
   };
@@ -393,7 +393,7 @@ export function RulesController(
   };
 
   $scope.doSaveConfig = () => {
-    const clusterInfo = appState.getClusterInfo();
+    const clusterInfo = AppState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
     $scope.doingSaving = true;
