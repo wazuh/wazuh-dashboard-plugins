@@ -756,4 +756,51 @@ export const visualizations = {
       },
     ],
   },
+  audit: {
+    rows: [
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Groups',
+            id: 'Wazuh-App-Overview-Audit-Groups',
+            width: 25,
+          },
+          {
+            title: 'Agents',
+            id: 'Wazuh-App-Overview-Audit-Agents',
+            width: 25,
+          },
+          {
+            title: 'Commands',
+            id: 'Wazuh-App-Overview-Audit-Commands',
+            width: 25,
+          },
+          {
+            title: 'Files',
+            id: 'Wazuh-App-Overview-Audit-Files',
+            width: 25,
+          },
+        ],
+      },
+      {
+        height: 310,
+        vis: [
+          {
+            title: 'Alerts over time',
+            id: 'Wazuh-App-Overview-Audit-Alerts-over-time',
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-Audit-Last-alerts',
+          },
+        ],
+      },
+    ],
+  },
 };
