@@ -38,6 +38,31 @@ export class WzSearchFormatSelector extends Component {
     apiFilterEnabled?: boolean
   }
 
+  qLegend = (
+    <div>
+      <p>
+        The ?Q filter offers a simplified query syntax to get 
+        data of the Wazuh
+      </p>
+      <a href="https://documentation.wazuh.com/current/user-manual/api/queries.html"
+        target="_blank" >
+        ?Q filter documentation
+      </a>
+    </div>
+  );
+  apiLegend = (
+    <div>
+      <p>
+        Use the parameters of the Wazuh API to filter the data output, 
+        check our documentation for more info
+      </p>
+      <a href="https://documentation.wazuh.com/current/user-manual/api/reference.html"
+        target="_blank" >
+        API Reference
+      </a>
+    </div>
+  );
+
 
   constructor(props) {
     super(props);
@@ -138,13 +163,10 @@ export class WzSearchFormatSelector extends Component {
         <EuiPopoverTitle>{toggleIdSelected.label}</EuiPopoverTitle>
           <div style={{ width: '300px' }}>
             <EuiText>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                Donec mattis varius volutpat. In tempus egestas justo at 
-                consectetur. Donec sit amet finibus massa, eget sollicitudin 
-                tortor. Donec sed libero ex. Praesent at lacinia arcu, 
-                eu porta nisl.
-              </p>
+              { (toggleIdSelected.label === '?Q')
+               ? this.qLegend
+               : this.apiLegend
+              }
             </EuiText>
           </div>
           { renderFooter }
