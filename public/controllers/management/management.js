@@ -178,7 +178,10 @@ export class ManagementController {
       section: "",
       groupsProps: {},
       configurationProps: {
-        agent: { id: '000', agentPlatform: 'other' }, // TODO: get dynamically the agent?
+        agent: {
+          id: '000',
+          // agentPlatform: 'linux'
+        }, // TODO: get dynamically the agent?
         updateWazuhNotReadyYet: (status) => { 
           this.$rootScope.wazuhNotReadyYet = status
           this.$scope.$applyAsync();

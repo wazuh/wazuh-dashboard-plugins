@@ -89,6 +89,12 @@ export default [
         goto: 'policy-monitoring'
       },
       {
+        name: 'OpenSCAP',
+        description: 'Configuration assessment and automation of compliance monitoring using SCAP checks',
+        goto: 'open-scap',
+        when: (agent) => shouldShowComponent('docker', agent)
+      },
+      {
         name: 'CIS-CAT',
         description: 'Configuration assessment using CIS scanner and SCAP checks',
         goto: 'cis-cat'

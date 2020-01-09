@@ -24,6 +24,7 @@ import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationIntegrations from './integrations/integrations';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
+import WzConfigurationOpenSCAP from './open-scap/open-scap';
 import WzConfigurationCisCat from './cis-cat/cis-cat';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
 import WzConfigurationOsquery from './osquery/osquery';
@@ -31,6 +32,7 @@ import WzConfigurationInventory from './inventory/inventory';
 import WzConfigurationActiveResponse from './active-response/active-response';
 import WzConfigurationActiveResponseAgent from './active-response/active-response-agent';
 import WzConfigurationCommands from './commands/commands';
+import WzConfigurationDockerListener from './docker-listener/docker-listener';
 import WzConfigurationLogCollection from './log-collection/log-collection';
 import WzConfigurationIntegrityMonitoring from './integrity-monitoring/integrity-monitoring';
 import WzConfigurationIntegrityAgentless from './agentless/agentless';
@@ -41,7 +43,6 @@ import WzConfigurationPath from './util-components/configuration-path';
 import ToastProvider from './util-providers/toast-provider';
 import WzToastP from './util-providers/toast-p';
 
-console.log('config-main', WzConfigurationGlobalConfigurationManager, WzConfigurationGlobalConfigurationAgent)
 import {
 	EuiPage,
 	EuiPanel
@@ -104,6 +105,9 @@ class WzConfigurationMain extends Component{
 								<div view='policy-monitoring'>
 									<WzConfigurationPolicyMonitoring agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
+								<div view='open-scap'>
+									<WzConfigurationOpenSCAP agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
 								<div view='cis-cat'>
 									<WzConfigurationCisCat agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
@@ -124,6 +128,9 @@ class WzConfigurationMain extends Component{
 								</div>
 								<div view='commands'>
 									<WzConfigurationCommands agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+								</div>
+								<div view='docker-listener'>
+									<WzConfigurationDockerListener agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='log-collection'>
 									<WzConfigurationLogCollection agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>

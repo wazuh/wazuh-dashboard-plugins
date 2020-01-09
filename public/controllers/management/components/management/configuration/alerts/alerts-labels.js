@@ -41,7 +41,6 @@ class WzConfigurationAlertsLabels extends Component{
   }
   render(){
     const { currentConfig, agent, wazuhNotReadyYet } = this.props;
-    console.log('labels', this.props)
     return (
       <Fragment>
         {currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && (

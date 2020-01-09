@@ -48,7 +48,6 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    console.log('active response agent?', currentConfig, this.props)
     const items = !isString(currentConfig['analysis-active_response']) ? currentConfig['analysis-active_response']['active-response'].map((item, key) => ({
       button: item.command,
       data: item
