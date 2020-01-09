@@ -13,7 +13,7 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
-import { visualizations } from '../../templates/overview/visualizations';
+import { visualizations } from '../../templates/visualize/visualizations';
 
 import {
   metricsGeneral,

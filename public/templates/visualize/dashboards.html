@@ -110,8 +110,10 @@
         <div class="euiFlexGroup" ng-style="{'height':row.height + 'px'}">
             <div ng-repeat="vis in row.vis" ng-class="{'euiPanel wz-margin-10' : !vis.hasRows}"
                 flex="{{vis.width || 100}}">
-                <div class="euiFlexItem h-100" ng-class="{'fullscreen': octrl.checkExpandedVis(vis.id)}">
-                    <div ng-if="vis.hasRows">
+                <div ng-if="vis.hasRows">
+
+                    <div class="euiFlexItem h-100" ng-class="{'fullscreen': octrl.checkExpandedVis(vis.id)}">
+
                         <div class="euiFlexGroup" ng-repeat="visRow in vis.rows">
                             <div class="euiFlexItem h-100" flex="{{visualizeRow.width || 100}}"
                                 ng-repeat="visualizeRow in visRow.vis"
@@ -132,7 +134,11 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="!vis.hasRows">
+
+                </div>
+                <div ng-if="!vis.hasRows">
+                    <div class="euiFlexItem h-100" ng-class="{'fullscreen': octrl.checkExpandedVis(vis.id)}">
+
                         <div class="euiFlexGroup" ng-dblclick="octrl.expand(vis.id)">
                             <span
                                 class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{vis.title}}</span>
