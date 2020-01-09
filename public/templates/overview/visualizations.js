@@ -567,4 +567,46 @@ export const visualizations = {
       },
     ],
   },
+  docker: {
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top 5 images',
+            id: 'Wazuh-App-Overview-Docker-top-5-images',
+            width: 25,
+          },
+          {
+            title: 'Top 5 events',
+            id: 'Wazuh-App-Overview-Docker-top-5-actions',
+            width: 25,
+          },
+          {
+            title: 'Resources usage over time',
+            id: 'Wazuh-App-Overview-Docker-Types-over-time',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Events occurred evolution',
+            id: 'Wazuh-App-Overview-Docker-Actions-over-time',
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-Docker-Events-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
