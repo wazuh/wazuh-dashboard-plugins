@@ -121,6 +121,7 @@ export function settingsWizard(
           aws: config['extensions.aws'],
           virustotal: config['extensions.virustotal'],
           osquery: config['extensions.osquery'],
+          mitre: config['extensions.mitre'],
           docker: config['extensions.docker']
         };
         appState.setExtensions(currentApi, extensions);

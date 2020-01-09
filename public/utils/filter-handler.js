@@ -164,4 +164,16 @@ export class FilterHandler {
     delete result.query;
     return result;
   }
+
+  mitreQuery() {
+    const result = this.base();
+    result.meta.type = 'exists';
+    result.meta.value = 'exists';
+    result.meta.key = 'rule.mitre.id';
+    result.exists = {
+      field: 'rule.mitre.id'
+    };
+    delete result.query;
+    return result;
+  }
 }

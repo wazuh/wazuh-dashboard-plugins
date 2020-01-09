@@ -6,22 +6,22 @@
     <!-- Node alerts summary card -->
     <div layout="row" layout-align="start stretch" class="height-250 wz-timelions wz-margin-top-16" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
         ng-show="!loading && currentNode && !showConfig">
-        <md-card flex class="wz-md-card">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>
+                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{ currentNode.name }} alerts summary</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-monitoring-Overview-Node'" id="Wazuh-App-Cluster-monitoring-Overview-Node"></kbn-vis>
             </md-card-content>
-        </md-card>
+        </div>
     </div>
     <!-- End node alerts summary card -->
 
     <!-- Node info and files cards section -->
     <div layout="row" style="z-index: 10000" layout-align="start stretch" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck">
         <!-- Node information card -->
-        <md-card flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info">
             <md-card-content>
-                <i class="fa fa-fw fa-info" aria-hidden="true"></i> <span class="wz-headline-title">Node
+                <i class="fa fa-fw fa-info" aria-hidden="true"></i> <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Node
                     information</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
@@ -45,12 +45,12 @@
                     <span class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
                 </div>
             </md-card-content>
-        </md-card>
+        </div>
 
         <!-- Last files sync card -->
-        <md-card flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
             <md-card-content>
-                <i class="fa fa-fw fa-file" aria-hidden="true"></i> <span class="wz-headline-title">Last files
+                <i class="fa fa-fw fa-file" aria-hidden="true"></i> <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Last files
                     integrity synchronization</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
@@ -78,7 +78,7 @@
                     <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra}}</span>
                 </div>
             </md-card-content>
-        </md-card>
+        </div>
     </div>
     <!-- End node info and files cards section -->
 
@@ -86,9 +86,9 @@
     <div layout="row" layout-align="start stretch" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
 
         <!-- Agents sync card -->
-        <md-card flex class="wz-md-card">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> <span class="wz-headline-title">Last agents
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Last agents
                     information synchronization</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
@@ -104,12 +104,12 @@
                     <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.total_agentinfo}}</span>
                 </div>
             </md-card-content>
-        </md-card>
+        </div>
 
         <!-- Groups sync card -->
-        <md-card flex class="wz-md-card">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> <span class="wz-headline-title">Last agents
+                <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Last agents
                     groups synchronization</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
@@ -125,7 +125,7 @@
                     <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.total_agentgroups}}</span>
                 </div>
             </md-card-content>
-        </md-card>
+        </div>
     </div>
     <!-- End ode agents cards section -->
 </div>

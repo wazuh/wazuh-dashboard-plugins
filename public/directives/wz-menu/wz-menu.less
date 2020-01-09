@@ -19,24 +19,36 @@
 wz-menu {
     z-index: 999;
 }
-.wz-menu-content {
-    color: #373a42;
+.wz-menu {
+    color: #006BB4;
     background-color: #FFF;
-    border-bottom: 1px solid #D3DAE6;
-    width: calc(~'100vw - 49px');
+    width: calc(~'100vw - 48px')!important;
     box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+    border-bottom: 1px solid #d3dae6;
+    font-size: 14px;
+    position: fixed !important;
+    height: 50px;
 }
+
 @media only screen and (max-width: 767px){
-    .wz-menu-content {
+    .wz-menu {
         width: 100%;
     }
   }
 
-/* Style to override the font on the toolbar */
-.wz-menu-content {
-    font-size: 14px;
-}
+    md-toolbar .bsTooltip-inner{
+        padding: 8px 3px;
+      }
 
+    md-toolbar .md-button {
+        margin: 0px 8px 0px 0px!important;
+      }
+
+.wz-menu-logo {
+    filter: hue-rotate(30deg) brightness(0.8);
+    margin-top: 4px;
+  }
+  
 .wz-menu-button {
     font-size: 14px !important;
     transition: none !important;
@@ -45,7 +57,8 @@ wz-menu {
     height: 35px;
     padding: 0px 8px;
     border-radius: 4px;
-    margin: 0px 5px;
+    margin-right: 5px;
+    min-width: 45px!important;
 }
 
 .wz-menu-button.md-icon-button {
@@ -63,6 +76,7 @@ wz-menu {
 }
 .wz-menu-button:not([disabled]):hover {
     background-color: #f5f7fa;
+    text-decoration: none;
 }
 
 /* Style for index-pattern selector */

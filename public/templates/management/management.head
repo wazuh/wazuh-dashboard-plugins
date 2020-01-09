@@ -1,4 +1,4 @@
-<div ng-cloak ng-controller="managementController as mctrl" style="padding-top: 16px">
+<div ng-cloak ng-controller="managementController as mctrl">
     <!-- Navigation section -->
     <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab !== 'configuration'" class="sideBarContent">
         <!-- Breadcrumbs -->
