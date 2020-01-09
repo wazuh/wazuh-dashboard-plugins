@@ -676,4 +676,42 @@ export const visualizations = {
       },
     ],
   },
+  ciscat: {
+    metrics: [
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-error' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-fail' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-not-checked' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-pass' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-score' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-timestamp' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown' },
+    ],
+    rows: [
+      {
+        height: 320,
+        vis: [
+          {
+            title: 'Top 5 CIS-CAT groups',
+            id: 'Wazuh-app-Overview-CISCAT-top-5-groups',
+            width: 60,
+          },
+          {
+            title: 'Scan result evolution',
+            id: 'Wazuh-app-Overview-CISCAT-scan-result-evolution',
+            width: 40,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-app-Overview-CISCAT-alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };

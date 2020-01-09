@@ -250,7 +250,7 @@ app.directive('kbnVis', function () {
         loadedVisualizations.addItem(true);
 
         const currentLoaded = loadedVisualizations.getList().length;
-        const deadVis = tabVisualizations.getDeadVis();
+        const deadVis = tab === 'ciscat' ? 0 : tabVisualizations.getDeadVis();
         const totalTabVis = tabVisualizations.getItem(tab) - deadVis;
 
         if (totalTabVis < 1) {

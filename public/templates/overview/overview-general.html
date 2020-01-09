@@ -62,6 +62,22 @@
             }" />
     </div>
 
+    <!-- Metrics of Cis-Cat Dashboard -->
+    <div ng-if="octrl.tab === 'ciscat'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+                items: [
+                    { description: 'Last not checked', value: octrl.ciscatScanNotChecked(), color: 'accent' },
+                    { description: 'Last pass', value: octrl.ciscatScanPass(), color: 'primary' },
+                    { description: 'Last scan score', value: octrl.ciscatScanScore(), color: 'secondary' },
+                    { description: 'Last scan date', value: octrl.ciscatScanTimestamp(), color: 'subdued' },
+                    { description: 'Last errors', value: octrl.ciscatScanError(), color: 'accent' },
+                    { description: 'Last fails', value: octrl.ciscatScanFail(), color: 'primary' },
+                    { description: 'Last unknown', value: octrl.ciscatScanUnknown(), color: 'secondary' },
+                    { description: 'Last scan benchmark', value: octrl.ciscatScanBenchmark(), color: 'subdued' },
+                ]            
+            }" />
+    </div>
+
     <!-- Cards for PCI Dashboard-->
     <div ng-if="octrl.tab === 'pci'" class="md-padding">
         <div ng-if="octrl.pciReqs" class="wz-margin-10">
