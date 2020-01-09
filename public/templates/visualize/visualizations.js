@@ -714,4 +714,46 @@ export const visualizations = {
       },
     ],
   },
+  pm: {
+    rows: [
+      {
+        height: 290,
+        vis: [
+          {
+            title: 'Events over time',
+            id: 'Wazuh-App-Overview-PM-Events-over-time',
+            width: 50,
+          },
+          {
+            title: 'Rule distribution',
+            id: 'Wazuh-App-Overview-PM-Top-5-rules',
+            width: 25,
+          },
+          {
+            title: 'Top 5 agents',
+            id: 'Wazuh-App-Overview-PM-Top-5-agents-pie',
+            width: 25,
+          },
+        ],
+      },
+      {
+        height: 240,
+        vis: [
+          {
+            title: 'Events per control type evolution',
+            id: 'Wazuh-App-Overview-PM-Events-per-agent-evolution',
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-PM-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
 };
