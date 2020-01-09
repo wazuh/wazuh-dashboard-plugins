@@ -43,6 +43,7 @@ export class Tabs extends Component {
         onClick={() => this.onSelectedTabChanged(tab.id)}
         isSelected={tab.id === this.state.selectedTabId}
         key={index}
+        style={{fontWeight:200}}
       >
         {tab.name}
       </EuiTab>
@@ -52,7 +53,7 @@ export class Tabs extends Component {
   render() {
     return (
       <Fragment>
-        <EuiTabs>{this.renderTabs()}</EuiTabs>
+        <EuiTabs display="condensed">{this.renderTabs()}</EuiTabs>
       </Fragment>
     );
   }

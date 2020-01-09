@@ -1,4 +1,4 @@
-<div ng-if="ctrl.tab === 'about' && !ctrl.load" class="sideBarContent">
+<div ng-if="ctrl.tab === 'about' && !ctrl.load">
     <div class="euiPage euiPageBody">
     <!-- App information section -->
     <div ng-if="!ctrl.load">
@@ -48,8 +48,10 @@
                             </div>
                         </div>
                     <div class="euiSpacer euiSpacer--m"></div>
-                <div layout="row" layout-padding class="wz-line-height">
-                    Enjoy your Wazuh experience and please don't hesitate to give us your feedback.
+                <div class="euiText euiText--medium">
+                        <p>
+                                Enjoy your Wazuh experience and please don't hesitate to give us your feedback.
+                    </p>
                 </div>
                 <div class="euiSpacer euiSpacer--l"></div>
                 <div layout="row" class="layout-align-center-center" flex>
