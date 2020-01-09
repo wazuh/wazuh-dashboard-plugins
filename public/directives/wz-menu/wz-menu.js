@@ -108,6 +108,7 @@ class WzMenu {
     };
 
     const calcHeight = () => {
+      console.log("entra")
       let height = false;
       try {
         height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
