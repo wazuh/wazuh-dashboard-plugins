@@ -44,8 +44,13 @@ export class AppState {
      * Cluster setters and getters
      **/
     static getClusterInfo() {
-        const clusterInfo = decodeURI(Cookies.get('_clusterInfo'));
-        return clusterInfo ?  JSON.parse(clusterInfo) : {};
+        try{
+            const clusterInfo = decodeURI(Cookies.get('_clusterInfo'));
+            return clusterInfo ?  JSON.parse(clusterInfo) : {};
+        }catch(err){
+            console.log("Error get cluster info");
+            console.log(err);
+        }
     }
 
     /**
@@ -53,12 +58,17 @@ export class AppState {
      * @param {*} cluster_info 
      */
     static setClusterInfo(cluster_info) {
+        try{
             const encodedClusterInfo = encodeURI(JSON.stringify(cluster_info));
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (cluster_info) {
                 Cookies.set('_clusterInfo', encodedClusterInfo, { expires: exp, path: '/app'  });
             }
+        }catch(err){
+            console.log("Error set cluster info");
+            console.log(err);
+        }
     }
 
     /**
@@ -66,17 +76,28 @@ export class AppState {
      * @param {*} date 
      */
     static setCreatedAt(date) {
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        Cookies.set('_createdAt', date, { expires: exp, path: '/app' });
-    }
+        try{
+            const createdAt = encodeURI(date);
+            const exp = new Date();
+            exp.setDate(exp.getDate() + 365);
+            Cookies.set('_createdAt', createdAt, { expires: exp, path: '/app' });
+        }catch(err){
+            console.log("Error set createdAt date");
+            console.log(err);
+        }
+       }
 
     /**
      * Get '_createdAt' value   
      */
     static getCreatedAt() {
-        const createdAt = Cookies.get('_createdAt') ? Cookies.get('_createdAt') : false;
-        return createdAt;
+        try{
+            const createdAt = decodeURI(Cookies.get('_createdAt'));
+            return createdAt ? Cookies.get('_createdAt') : false;
+        }catch(err){
+            console.log("Error get createdAt date");
+            console.log(err);
+        }
     }
 
 
