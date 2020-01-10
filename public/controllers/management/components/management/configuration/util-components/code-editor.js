@@ -19,8 +19,6 @@ import {
 } from "@elastic/eui";
 
 import 'brace/theme/github';
-import 'brace/mode/javascript';
-import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
 
 class WzCodeEditor extends Component{
@@ -45,8 +43,6 @@ class WzCodeEditor extends Component{
           height={height || `calc(100vh - ${minusHeight || 400}px)`} // Groups section has -250px
           value={value}
           tabSize={2}
-          // minLines={15}
-          // maxLines={15}
           highlightActiveLine={false}
           onChange={onChange}
           isReadOnly={isReadOnly}

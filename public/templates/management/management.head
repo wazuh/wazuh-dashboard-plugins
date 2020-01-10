@@ -8,6 +8,7 @@
         </div>
         <!-- End breadcrumbs -->
     </div>
+    <!-- Break Configuration React Component
     <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab === 'configuration'" class="sideBarContent">
         <div layout-padding class="euiFlexGroup">
             <div layout="row" ng-if="mctrl.currentConfiguration || mctrl.editionTab === 'editconfiguration'"
@@ -27,3 +28,4 @@
             </div>
         </div>
     </div>
+    -->

@@ -44,7 +44,7 @@ class WzManagementMain extends Component {
             {(section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
               (section === 'reporting' && <WzReporting />) || 
-              (section === 'configuration DEV' && <WzConfiguration {...this.props} />) ||
+              (section === 'configuration' && <WzConfiguration {...this.props} />) ||
               (ruleset.includes(section) && <WzRuleset />)}
           </div>
         </EuiFlexItem>

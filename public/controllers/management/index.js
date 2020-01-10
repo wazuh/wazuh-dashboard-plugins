@@ -38,7 +38,7 @@ const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('managementController', ManagementController)
-  .controller('managementConfigurationController', ConfigurationController)
+  // .controller('managementConfigurationController', ConfigurationController)
   .controller('decodersController', DecodersController)
   .controller('groupsPreviewController', GroupsController)
   .controller('managerLogController', LogsController)

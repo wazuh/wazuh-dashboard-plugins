@@ -170,10 +170,10 @@ class WzManagementSideMenu extends Component {
           }),
           this.createItem(this.managementSections.configuration, {
             icon: <EuiIcon type="devToolsApp" />,
-          }),
+          })/*,
           this.createItem({ id: 'configuration DEV', text: 'Configuration Dev' }, { // TODO: delete this item after migrate
             icon: <EuiIcon type="devToolsApp" />,
-          })
+          })*/
         ],
       })
     ];
