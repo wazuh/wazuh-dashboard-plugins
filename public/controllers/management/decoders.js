@@ -338,7 +338,7 @@ export class DecodersController {
   };
 
   doSaveConfig() {
-    const clusterInfo = this.appState.getClusterInfo();
+    const clusterInfo = AppState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
     this.doingSaving = true;

@@ -36,7 +36,7 @@ app.directive('wzListManage', function() {
       appState,
       csvReq
     ) {
-      const clusterInfo = appState.getClusterInfo();
+      const clusterInfo = AppState.getClusterInfo();
 
       /**
        * Pagination variables and functions

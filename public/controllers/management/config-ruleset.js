@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { stringToObj } from '../../utils/cdblist-to-object';
+import { AppState } from '../../react-services/app-state';
+
 export class ConfigurationRulesetController {
   /**
    * Constructor
@@ -49,7 +51,7 @@ export class ConfigurationRulesetController {
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       this.$scope.newFile = false;

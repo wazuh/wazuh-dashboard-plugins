@@ -72,8 +72,8 @@ export class AgentsPreviewController {
     }
 
     this.isClusterEnabled =
-      this.appState.getClusterInfo() &&
-      this.appState.getClusterInfo().status === 'enabled';
+      AppState.getClusterInfo() &&
+      AppState.getClusterInfo().status === 'enabled';
 
     this.loading = true;
     this.osPlatforms = [];
@@ -213,7 +213,7 @@ export class AgentsPreviewController {
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
-      const clusterInfo = this.appState.getClusterInfo();
+      const clusterInfo = AppState.getClusterInfo();
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];

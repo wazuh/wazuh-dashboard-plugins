@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../react-services/app-state";
+
 export class CommonData {
   /**
    * Class constructor
@@ -152,12 +154,12 @@ export class CommonData {
       };
 
       const filters = [];
-      const isCluster = this.appState.getClusterInfo().status == 'enabled';
+      const isCluster = AppState.getClusterInfo().status == 'enabled';
       filters.push(
         filterHandler.managerQuery(
           isCluster
-            ? this.appState.getClusterInfo().cluster
-            : this.appState.getClusterInfo().manager,
+            ? AppState.getClusterInfo().cluster
+            : AppState.getClusterInfo().manager,
           isCluster
         )
       );

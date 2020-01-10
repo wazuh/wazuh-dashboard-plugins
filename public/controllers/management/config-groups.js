@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../../react-services/app-state";
+
 export class ConfigurationGroupsController {
   /**
    * Constructor
@@ -60,7 +62,7 @@ export class ConfigurationGroupsController {
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       try {
