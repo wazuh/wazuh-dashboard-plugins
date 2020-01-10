@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { TabNames } from '../../utils/tab-names';
+import { AppState } from '../../react-services/app-state';
 
 export class ManagementController {
   /**
@@ -184,7 +185,7 @@ export class ManagementController {
    * When controller loads
    */
   $onInit() {
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
 
@@ -381,7 +382,7 @@ export class ManagementController {
   async loadNodeList() {
     try {
       this.loadingNodes = true;
-      const clusterInfo = this.appState.getClusterInfo() || {};
+      const clusterInfo = AppState.getClusterInfo() || {};
       const clusterEnabled = clusterInfo.status === 'enabled';
       if (clusterEnabled) {
         const response = await this.apiReq.request('GET', '/cluster/nodes', {});

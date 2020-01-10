@@ -44,7 +44,8 @@ export class AppState {
      * Cluster setters and getters
      **/
     static getClusterInfo() {
-        return Cookies.get('_clusterInfo') ? JSON.parse(Cookies.get('_clusterInfo')) : {};
+        const clusterInfo = decodeURI(Cookies.get('_clusterInfo'));
+        return clusterInfo ?  JSON.parse(clusterInfo) : {};
     }
 
     /**
@@ -52,11 +53,12 @@ export class AppState {
      * @param {*} cluster_info 
      */
     static setClusterInfo(cluster_info) {
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        if (cluster_info) {
-            Cookies.set('_clusterInfo', cluster_info, { expires: exp, path: '/app' });
-        }
+            const encodedClusterInfo = encodeURI(JSON.stringify(cluster_info));
+            const exp = new Date();
+            exp.setDate(exp.getDate() + 365);
+            if (cluster_info) {
+                Cookies.set('_clusterInfo', encodedClusterInfo, { expires: exp, path: '/app'  });
+            }
     }
 
     /**
@@ -102,7 +104,7 @@ export class AppState {
         const exp = new Date();
         exp.setDate(exp.getDate() + 365);
         if (API) {
-            Cookies.set('API', encodedApi, { expires: exp});
+            Cookies.set('API', encodedApi, { expires: exp, path: '/app' });
         }
     }
 

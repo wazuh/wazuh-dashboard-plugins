@@ -207,7 +207,7 @@ export class SettingsController {
       const { manager, cluster, status } = cluster_info;
 
       // Check the connection before set as default
-      this.appState.setClusterInfo(cluster_info);
+      AppState.setClusterInfo(cluster_info);
       const clusterEnabled = status === 'disabled';
       AppState.setCurrentAPI(
         JSON.stringify({

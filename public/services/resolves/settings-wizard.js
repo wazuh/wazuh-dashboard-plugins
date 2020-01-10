@@ -95,7 +95,7 @@ export function settingsWizard(
           : JSON.stringify({ name: clusterInfo.cluster, id: currentApi });
 
           AppState.setCurrentAPI(str);
-      appState.setClusterInfo(clusterInfo);
+      AppState.setClusterInfo(clusterInfo);
     };
 
     const callCheckStored = () => {

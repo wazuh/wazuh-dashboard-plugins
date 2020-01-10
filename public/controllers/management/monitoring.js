@@ -11,6 +11,7 @@
  */
 import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
 
 export function ClusterController(
   $scope,
@@ -34,7 +35,7 @@ export function ClusterController(
   };
 
   const clusterEnabled =
-    appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled';
+    AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
   $scope.isClusterEnabled = clusterEnabled;
   $scope.isClusterRunning = true;
   $location.search('tabView', 'cluster-monitoring');
@@ -204,7 +205,7 @@ export function ClusterController(
     try {
       filters = [];
       filters.push(
-        filterHandler.managerQuery(appState.getClusterInfo().cluster, true)
+        filterHandler.managerQuery(AppState.getClusterInfo().cluster, true)
       );
       if (node) {
         filters.push(filterHandler.nodeQuery(node));

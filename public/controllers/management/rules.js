@@ -486,7 +486,7 @@ export class RulesController {
    * Emit the event to save the config
    */
   doSaveConfig() {
-    const clusterInfo = this.appState.getClusterInfo();
+    const clusterInfo = AppState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
     this.doingSaving = true;

@@ -1030,7 +1030,7 @@ export class AgentsController {
     if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
       syscollectorFilters.push(
         this.filterHandler.managerQuery(
-          this.appState.getClusterInfo().cluster,
+          AppState.getClusterInfo().cluster,
           true
         )
       );
