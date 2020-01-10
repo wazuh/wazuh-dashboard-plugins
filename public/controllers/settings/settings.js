@@ -11,6 +11,7 @@
  */
 import { TabNames } from '../../utils/tab-names';
 import { kibana } from '../../../package.json';
+import { AppState } from '../../react-services/app-state';
 
 export class SettingsController {
   /**
@@ -208,7 +209,7 @@ export class SettingsController {
       // Check the connection before set as default
       this.appState.setClusterInfo(cluster_info);
       const clusterEnabled = status === 'disabled';
-      this.appState.setCurrentAPI(
+      AppState.setCurrentAPI(
         JSON.stringify({
           name: clusterEnabled ? manager : cluster,
           id: id,
@@ -217,7 +218,7 @@ export class SettingsController {
 
       this.$scope.$emit('updateAPI', {});
 
-      const currentApi = this.appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
       this.apiTableProps.currentDefault = this.currentDefault;
       this.$scope.$applyAsync();
@@ -255,7 +256,7 @@ export class SettingsController {
 
       // Set the addingApi flag based on if there is any API entry
       this.addingApi = !this.apiEntries.length;
-      const currentApi = this.appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
 
       if (currentApi) {
         const { id } = JSON.parse(currentApi);

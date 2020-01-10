@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import chrome from 'ui/chrome';
+import { AppState } from '../react-services/app-state';
 
 export class GenericRequest {
   /**
@@ -49,7 +50,7 @@ export class GenericRequest {
 
       try {
         requestHeaders.headers.id = JSON.parse(
-          this.appState.getCurrentAPI()
+          AppState.getCurrentAPI()
         ).id;
       } catch (error) {
         // Intended

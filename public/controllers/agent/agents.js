@@ -27,6 +27,7 @@ import {
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
 
 export class AgentsController {
   /**
@@ -155,7 +156,7 @@ export class AgentsController {
     this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
     const extensions = this.appState.getExtensions(currentApi);
     this.$scope.extensions = extensions;
 
@@ -958,7 +959,7 @@ export class AgentsController {
       switchTab: tab => this.switchTab(tab),
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
-      api: this.appState.getCurrentAPI(),
+      api: AppState.getCurrentAPI(),
       setExtensions: (api, extensions) => {
         this.appState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;
@@ -1010,7 +1011,7 @@ export class AgentsController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(path, currentApi, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 

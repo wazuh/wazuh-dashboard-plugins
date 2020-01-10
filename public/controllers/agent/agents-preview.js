@@ -14,6 +14,7 @@ import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
 import { clickAction } from '../../directives/wz-table/lib/click-action';
+import { AppState } from '../../react-services/app-state';
 
 export class AgentsPreviewController {
   /**
@@ -63,7 +64,7 @@ export class AgentsPreviewController {
    */
   $onInit() {
     this.init = true;
-    this.api = JSON.parse(this.appState.getCurrentAPI()).id;
+    this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
       this.commonData.setTimefilter(timefilter.getTime());

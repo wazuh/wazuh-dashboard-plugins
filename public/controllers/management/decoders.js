@@ -12,6 +12,7 @@
 import * as FileSaver from '../../services/file-saver';
 
 import { colors } from './colors';
+import { AppState } from '../../react-services/app-state';
 
 export class DecodersController {
   /**
@@ -229,7 +230,7 @@ export class DecodersController {
     try {
       const path =
         this.typeFilter === 'parents' ? '/decoders/parents' : '/decoders';
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         path,
         currentApi,

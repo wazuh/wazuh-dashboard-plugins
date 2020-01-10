@@ -13,6 +13,7 @@
 import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
 import $ from 'jquery';
+import { AppState } from '../../react-services/app-state';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -92,9 +93,9 @@ class WzMenu {
             .currLocation.replace(/\//g, '');
         }
 
-        if (appState.getCurrentAPI()) {
+        if (AppState.getCurrentAPI()) {
           $scope.theresAPI = true;
-          $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+          $scope.currentAPI = JSON.parse(AppState.getCurrentAPI()).name;
         } else {
           $scope.theresAPI = false;
         }
@@ -147,7 +148,7 @@ class WzMenu {
 
     //listeners
     $scope.$on('updateAPI', (evt, params) => {
-      const current = appState.getCurrentAPI();
+      const current = AppState.getCurrentAPI();
       if (current) {
         const parsed = JSON.parse(current);
 
@@ -158,7 +159,7 @@ class WzMenu {
           } else {
             parsed.name = params.cluster_info.manager;
           }
-          appState.setCurrentAPI(JSON.stringify(parsed));
+          AppState.setCurrentAPI(JSON.stringify(parsed));
         }
 
         $scope.theresAPI = true;

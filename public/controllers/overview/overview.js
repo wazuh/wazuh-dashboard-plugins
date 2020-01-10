@@ -25,6 +25,7 @@ import {
 } from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
 
 export class OverviewController {
   /**
@@ -99,7 +100,7 @@ export class OverviewController {
     this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
     const extensions = this.appState.getExtensions(currentApi);
     this.extensions = extensions;
 
@@ -122,7 +123,7 @@ export class OverviewController {
     this.init();
 
     this.welcomeCardsProps = {
-      api: this.appState.getCurrentAPI(),
+      api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
       extensions: this.extensions,
       setExtensions: (api, extensions) =>
