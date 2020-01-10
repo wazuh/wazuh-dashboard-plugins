@@ -127,7 +127,7 @@ export function settingsWizard(
         };
         appState.setExtensions(currentApi, extensions);
       }
-      checkTimestamp(appState, genericReq, $location, wzMisc)
+      checkTimestamp(genericReq, $location, wzMisc)
         .then(() => testAPI.checkStored(currentApi))
         .then(data => {
           if (data === 3099) {
