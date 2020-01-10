@@ -11,6 +11,7 @@
  */
 import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
+import { AppState } from '../../react-services/app-state';
 
 export function settingsWizard(
   $location,
@@ -80,7 +81,7 @@ export function settingsWizard(
     const changeCurrentApi = data => {
       let currentApi = false;
       try {
-        currentApi = JSON.parse(appState.getCurrentAPI()).id;
+        currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
         // eslint-disable-next-line
         console.log(`Error parsing JSON (settingsWizards.changeCurrentApi)`);
@@ -93,7 +94,7 @@ export function settingsWizard(
           ? JSON.stringify({ name: clusterInfo.manager, id: currentApi })
           : JSON.stringify({ name: clusterInfo.cluster, id: currentApi });
 
-      appState.setCurrentAPI(str);
+          AppState.setCurrentAPI(str);
       appState.setClusterInfo(clusterInfo);
     };
 
@@ -102,7 +103,7 @@ export function settingsWizard(
       let currentApi = false;
 
       try {
-        currentApi = JSON.parse(appState.getCurrentAPI()).id;
+        currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
         console.log(
           'Error parsing JSON (settingsWizards.callCheckStored 1)',
@@ -138,14 +139,14 @@ export function settingsWizard(
               if (((data || {}).data || {}).idChanged) {
                 let apiRaw = false;
                 try {
-                  apiRaw = JSON.parse(appState.getCurrentAPI());
+                  apiRaw = JSON.parse(AppState.getCurrentAPI());
                 } catch (error) {
                   // eslint-disable-next-line
                   console.log(
                     `Error parsing JSON (settingsWizards.callCheckStored 2)`
                   );
                 }
-                appState.setCurrentAPI(
+                AppState.setCurrentAPI(
                   JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
                 );
               }
@@ -169,7 +170,8 @@ export function settingsWizard(
       !comeFromWizard && errorHandler.handle(msg, false, true);
       wzMisc.setWizard(true);
       if (redirect) {
-        appState.setCurrentAPI(redirect);
+        AppState.setCurrentAPI(redirect);
+
       } else if (!$location.path().includes('/settings')) {
         $location.search('_a', null);
         $location.search('tab', 'api');
@@ -193,7 +195,7 @@ export function settingsWizard(
                 name: api.cluster_info.manager,
                 id: id
               });
-              appState.setCurrentAPI(defaultApi);
+              AppState.setCurrentAPI(defaultApi);
               callCheckStored();
               return defaultApi;
             }
@@ -225,7 +227,7 @@ export function settingsWizard(
       deferred.resolve();
     } else {
       // There's no cookie for current API
-      const currentApi = appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
       if (!currentApi) {
         genericReq
           .request('GET', '/hosts/apis')

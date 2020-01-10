@@ -12,6 +12,7 @@
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
+import { AppState } from '../../react-services/app-state';
 
 export class HealthCheck {
   /**
@@ -139,13 +140,13 @@ export class HealthCheck {
    */
   async checkApiConnection() {
     try {
-      const currentApi = JSON.parse(this.appState.getCurrentAPI() || '{}');
+      const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (this.checks.api && currentApi && currentApi.id) {
         const data = await this.testAPI.checkStored(currentApi.id);
 
         if (((data || {}).data || {}).idChanged) {
-          const apiRaw = JSON.parse(this.appState.getCurrentAPI());
-          this.appState.setCurrentAPI(
+          const apiRaw = JSON.parse(AppState.getCurrentAPI());
+          AppState.setCurrentAPI(
             JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
           );
         }
