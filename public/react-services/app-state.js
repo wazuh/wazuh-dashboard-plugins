@@ -20,8 +20,15 @@ export class AppState {
      * @param {id} id 
      */
     static getExtensions(id) {
-        const current = Cookies.get('extensions') ? JSON.parse(Cookies.get('extensions')) : false;
-        return current ? current[id] : {};
+        try{
+            const extensions = Cookies.get('extensions') ? decodeURI(Cookies.get('extensions')) : false;
+            const parsedExtensions = extensions ? JSON.parse(extensions) : false;
+            return parsedExtensions ? extensions : {}; 
+        }catch(err){
+            console.log("Error get extensions");
+            console.log(err);
+            throw err;
+        }
     }
 
     /**
@@ -30,12 +37,19 @@ export class AppState {
      * @param {*} extensions 
      */
     static setExtensions(id, extensions) {
-        const current = Cookies.get('extensions') ? JSON.parse(Cookies.get('extensions')) : {};
-        current[id] = extensions;
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        if (extensions) {
-            Cookies.set('extensions', current, { expires: exp, path: '/app'});
+        try{
+            const decodedExtensions = Cookies.get('extensions') ? decodeURI(Cookies.get('extensions')) : false;
+            const current = decodedExtensions ? JSON.parse(decodedExtensions) : {};
+            current[id] = extensions;
+            const exp = new Date();
+            exp.setDate(exp.getDate() + 365);
+            if (extensions) {
+                Cookies.set('extensions', current, { expires: exp, path: '/app'});
+            }
+        }catch(err){
+            console.log("Error set extensions");
+            console.log(err);
+            throw err;
         }
     }
 
@@ -45,11 +59,12 @@ export class AppState {
      **/
     static getClusterInfo() {
         try{
-            const clusterInfo = decodeURI(Cookies.get('_clusterInfo'));
+            const clusterInfo = Cookies.get('_clusterInfo') ? decodeURI(Cookies.get('_clusterInfo')) : false;
             return clusterInfo ?  JSON.parse(clusterInfo) : {};
         }catch(err){
             console.log("Error get cluster info");
             console.log(err);
+            throw err;
         }
     }
 
@@ -68,6 +83,7 @@ export class AppState {
         }catch(err){
             console.log("Error set cluster info");
             console.log(err);
+            throw err;
         }
     }
 
@@ -84,6 +100,7 @@ export class AppState {
         }catch(err){
             console.log("Error set createdAt date");
             console.log(err);
+            throw err;
         }
        }
 
@@ -92,11 +109,12 @@ export class AppState {
      */
     static getCreatedAt() {
         try{
-            const createdAt = decodeURI(Cookies.get('_createdAt'));
-            return createdAt ? Cookies.get('_createdAt') : false;
+            const createdAt = Cookies.get('_createdAt') ? decodeURI(Cookies.get('_createdAt')) : false;
+            return createdAt ? createdAt : false;
         }catch(err){
             console.log("Error get createdAt date");
             console.log(err);
+            throw err;
         }
     }
 
@@ -105,8 +123,14 @@ export class AppState {
      * Get 'API' value   
      */
     static getCurrentAPI() {
-        const currentAPI = Cookies.get('API');
-        return currentAPI ? decodeURI(currentAPI) : '{}';
+        try{
+            const currentAPI = Cookies.get('API');
+            return currentAPI ? decodeURI(currentAPI) : '{}';
+        }catch(err){
+            console.log("Error get current Api");
+            console.log(err);
+            throw err;
+        }
     }
 
     /**
@@ -121,11 +145,17 @@ export class AppState {
      * @param {*} date 
      */
     static setCurrentAPI(API) {
-        const encodedApi = encodeURI(API);
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        if (API) {
-            Cookies.set('API', encodedApi, { expires: exp, path: '/app' });
+        try{
+            const encodedApi = encodeURI(API);
+            const exp = new Date();
+            exp.setDate(exp.getDate() + 365);
+            if (API) {
+                Cookies.set('API', encodedApi, { expires: exp, path: '/app' });
+            }
+        }catch(err){
+            console.log("Error set current API");
+            console.log(err);
+            throw err;
         }
     }
 
