@@ -97,7 +97,7 @@ export class OverviewController {
     this.$rootScope.reportStatus = false;
 
     this.$location.search('_a', null);
-    this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
     const currentApi = JSON.parse(AppState.getCurrentAPI()).id;

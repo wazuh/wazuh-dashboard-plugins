@@ -46,7 +46,7 @@ export class GenericRequest {
       };
       const tmpUrl = chrome.addBasePath(path);
 
-      requestHeaders.headers.pattern = this.appState.getCurrentPattern();
+      requestHeaders.headers.pattern = AppState.getCurrentPattern();
 
       try {
         requestHeaders.headers.id = JSON.parse(

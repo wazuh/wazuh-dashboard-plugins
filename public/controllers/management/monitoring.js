@@ -41,7 +41,7 @@ export function ClusterController(
   $location.search('tabView', 'cluster-monitoring');
   $location.search('tab', 'monitoring');
   $location.search('_a', null);
-  const filterHandler = new FilterHandler(appState.getCurrentPattern());
+  const filterHandler = new FilterHandler(AppState.getCurrentPattern());
   discoverPendingUpdates.removeAll();
   tabVisualizations.removeAll();
   rawVisualizations.removeAll();
@@ -271,7 +271,7 @@ export function ClusterController(
 
       const visData = await genericReq.request(
         'POST',
-        `/elastic/visualizations/cluster-monitoring/${appState.getCurrentPattern()}`,
+        `/elastic/visualizations/cluster-monitoring/${AppState.getCurrentPattern()}`,
         { nodes: nodeList }
       );
 
