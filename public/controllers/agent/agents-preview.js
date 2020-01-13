@@ -218,7 +218,7 @@ export class AgentsPreviewController {
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
 
-      this.pattern = this.appState.getCurrentPattern();
+      this.pattern = AppState.getCurrentPattern();
     } catch (error) {
       this.errorInit = this.errorHandler.handle(error, false, false, true);
     }

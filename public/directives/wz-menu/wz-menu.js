@@ -66,26 +66,26 @@ class WzMenu {
         $scope.showSelector = true;
         let filtered = false;
         // If there is no current pattern, fetch it
-        if (!appState.getCurrentPattern()) {
-          appState.setCurrentPattern(list[0].id);
+        if (!AppState.getCurrentPattern()) {
+          AppState.setCurrentPattern(list[0].id);
         } else {
           // Check if the current pattern cookie is valid
           filtered = list.filter(item =>
-            item.id.includes(appState.getCurrentPattern())
+            item.id.includes(AppState.getCurrentPattern())
           );
-          if (!filtered.length) appState.setCurrentPattern(list[0].id);
+          if (!filtered.length) AppState.setCurrentPattern(list[0].id);
         }
 
         const data = filtered
           ? filtered
-          : await indexPatterns.get(appState.getCurrentPattern());
+          : await indexPatterns.get(AppState.getCurrentPattern());
         $scope.theresPattern = true;
         $scope.currentPattern = data.title;
 
         // Getting the list of index patterns
         if (list) {
           $scope.patternList = list;
-          $scope.currentSelectedPattern = appState.getCurrentPattern();
+          $scope.currentSelectedPattern = AppState.getCurrentPattern();
         }
         if (!$scope.menuNavItem) {
           $scope.menuNavItem = appState
@@ -172,10 +172,10 @@ class WzMenu {
     $scope.$on('updatePattern', () => {
       if (!appState.getPatternSelector()) return;
       indexPatterns
-        .get(appState.getCurrentPattern())
+        .get(AppState.getCurrentPattern())
         .then(() => {
           $scope.theresPattern = true;
-          $scope.currentSelectedPattern = appState.getCurrentPattern();
+          $scope.currentSelectedPattern = AppState.getCurrentPattern();
         })
         .catch(error => {
           errorHandler.handle(error.message || error);

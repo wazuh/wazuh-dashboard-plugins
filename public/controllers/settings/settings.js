@@ -389,7 +389,7 @@ export class SettingsController {
       this.load = false;
       const config = this.wazuhConfig.getConfig();
       this.appState.setPatternSelector(config['ip.selector']);
-      const pattern = this.appState.getCurrentPattern();
+      const pattern = AppState.getCurrentPattern();
       this.selectedIndexPattern = pattern || config['pattern'];
 
       if (this.tab === 'logs') {

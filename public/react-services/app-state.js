@@ -182,10 +182,11 @@ export class AppState {
      * @param {*} date 
      */
     static setCurrentPattern(newPattern) {
+        const encodedPattern = encodeURI(newPattern);
         const exp = new Date();
         exp.setDate(exp.getDate() + 365);
         if (newPattern) {
-            Cookies.set('_currentPattern', newPattern, { expires: exp, path: '/app' });
+            Cookies.set('_currentPattern', encodedPattern, { expires: exp, path: '/app' });
         }
     }
 
@@ -193,13 +194,7 @@ export class AppState {
      * Get '_currentPattern' value   
      */
     static getCurrentPattern() {
-        const currentPattern = Cookies.get('_currentPattern');
-        if (currentPattern && currentPattern.charAt(0) === '"' && currentPattern.charAt(currentPattern.length -1) === '"')
-        {
-            return currentPattern.substr(1,currentPattern.length -2);
-        }
-        return currentPattern || "";
-
+        return Cookies.get('_currentPattern') ? decodeURI(Cookies.get('_currentPattern')) : "";
     }
 
 

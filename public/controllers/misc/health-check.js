@@ -95,7 +95,7 @@ export class HealthCheck {
     try {
       const data = await this.savedObjectsClient.get(
         'index-pattern',
-        this.appState.getCurrentPattern()
+        AppState.getCurrentPattern()
       );
       const patternTitle = data.attributes.title;
 

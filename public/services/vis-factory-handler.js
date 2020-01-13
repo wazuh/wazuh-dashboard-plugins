@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../react-services/app-state";
+
 export class VisFactoryService {
   /**
    * Class Constructor
@@ -75,7 +77,7 @@ export class VisFactoryService {
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/visualizations/overview-${tab}/${this.appState.getCurrentPattern()}`
+        `/elastic/visualizations/overview-${tab}/${AppState.getCurrentPattern()}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange);
@@ -101,7 +103,7 @@ export class VisFactoryService {
         tab !== 'sca'
           ? await this.genericReq.request(
               'GET',
-              `/elastic/visualizations/agents-${tab}/${this.appState.getCurrentPattern()}`
+              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
             )
           : false;
       data && this.rawVisualizations.assignItems(data.data.raw);
