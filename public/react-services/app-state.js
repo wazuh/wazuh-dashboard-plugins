@@ -23,7 +23,7 @@ export class AppState {
         try{
             const extensions = Cookies.get('extensions') ? decodeURI(Cookies.get('extensions')) : false;
             const parsedExtensions = extensions ? JSON.parse(extensions) : false;
-            return parsedExtensions ? extensions : {}; 
+            return parsedExtensions ? parsedExtensions[id] : false; 
         }catch(err){
             console.log("Error get extensions");
             console.log(err);
