@@ -110,7 +110,7 @@ export function settingsWizard(
           error
         );
       }
-      if (currentApi && !appState.getExtensions(currentApi)) {
+      if (currentApi && !AppState.getExtensions(currentApi)) {
         const extensions = {
           audit: config['extensions.audit'],
           pci: config['extensions.pci'],
@@ -125,7 +125,7 @@ export function settingsWizard(
           mitre: config['extensions.mitre'],
           docker: config['extensions.docker']
         };
-        appState.setExtensions(currentApi, extensions);
+        AppState.setExtensions(currentApi, extensions);
       }
       checkTimestamp(genericReq, $location, wzMisc)
         .then(() => testAPI.checkStored(currentApi))

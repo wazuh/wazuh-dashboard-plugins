@@ -101,7 +101,7 @@ export class OverviewController {
     this.visFactoryService.clearAll();
 
     const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
+    const extensions = AppState.getExtensions(currentApi);
     this.extensions = extensions;
 
     this.wzMonitoringEnabled = false;
@@ -127,7 +127,7 @@ export class OverviewController {
       switchTab: tab => this.switchTab(tab),
       extensions: this.extensions,
       setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
+        AppState.setExtensions(api, extensions)
     };
 
     this.setTabs();

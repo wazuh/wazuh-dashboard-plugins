@@ -157,7 +157,7 @@ export class AgentsController {
     this.visFactoryService.clearAll();
 
     const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
+    const extensions = AppState.getExtensions(currentApi);
     this.$scope.extensions = extensions;
 
     // Getting possible target location
@@ -961,7 +961,7 @@ export class AgentsController {
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
       setExtensions: (api, extensions) => {
-        this.appState.setExtensions(api, extensions);
+        AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;
       }
     };

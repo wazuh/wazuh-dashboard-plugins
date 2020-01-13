@@ -226,9 +226,9 @@ export class SettingsController {
       this.errorHandler.info(`API ${manager} set as default`);
 
       this.getCurrentAPIIndex();
-      if (currentApi && !this.appState.getExtensions(id)) {
+      if (currentApi && !AppState.getExtensions(id)) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        this.appState.setExtensions(id, extensions);
+        AppState.setExtensions(id, extensions);
       }
 
       this.$scope.$applyAsync();
@@ -271,10 +271,10 @@ export class SettingsController {
         return;
       }
 
-      if (currentApi && !this.appState.getExtensions(this.currentDefault)) {
+      if (currentApi && !AppState.getExtensions(this.currentDefault)) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
         const apiExtensions = extensions || {};
-        this.appState.setExtensions(id, apiExtensions);
+        AppState.setExtensions(id, apiExtensions);
       }
 
       this.$scope.$applyAsync();
