@@ -35,7 +35,7 @@ class WzMenu {
     errorHandler,
     wazuhConfig
   ) {
-    $scope.showSelector = appState.getPatternSelector();
+    $scope.showSelector = AppState.getPatternSelector();
     $scope.root = $rootScope;
     $scope.settedMenuHeight = false;
 
@@ -57,10 +57,10 @@ class WzMenu {
 
         // Get the configuration to check if pattern selector is enabled
         const config = wazuhConfig.getConfig();
-        appState.setPatternSelector(config['ip.selector']);
+        AppState.setPatternSelector(config['ip.selector']);
 
         // Abort if we have disabled the pattern selector
-        if (!appState.getPatternSelector()) return;
+        if (!AppState.getPatternSelector()) return;
 
         // Show the pattern selector
         $scope.showSelector = true;
@@ -131,7 +131,7 @@ class WzMenu {
     // Function to change the current index pattern on the app
     $scope.changePattern = async selectedPattern => {
       try {
-        if (!appState.getPatternSelector()) return;
+        if (!AppState.getPatternSelector()) return;
         $scope.currentSelectedPattern = await patternHandler.changePattern(
           selectedPattern
         );
@@ -169,7 +169,7 @@ class WzMenu {
     });
 
     $scope.$on('updatePattern', () => {
-      if (!appState.getPatternSelector()) return;
+      if (!AppState.getPatternSelector()) return;
       indexPatterns
         .get(AppState.getCurrentPattern())
         .then(() => {

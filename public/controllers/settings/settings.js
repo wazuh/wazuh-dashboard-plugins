@@ -388,7 +388,7 @@ export class SettingsController {
 
       this.load = false;
       const config = this.wazuhConfig.getConfig();
-      this.appState.setPatternSelector(config['ip.selector']);
+      AppState.setPatternSelector(config['ip.selector']);
       const pattern = AppState.getCurrentPattern();
       this.selectedIndexPattern = pattern || config['pattern'];
 

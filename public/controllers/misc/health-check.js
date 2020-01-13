@@ -219,7 +219,7 @@ export class HealthCheck {
     try {
       const configuration = this.wazuhConfig.getConfig();
 
-      this.appState.setPatternSelector(configuration['ip.selector']);
+      AppState.setPatternSelector(configuration['ip.selector']);
 
       this.checks.pattern = configuration['checks.pattern'];
       this.checks.template = configuration['checks.template'];
