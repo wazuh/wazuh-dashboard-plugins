@@ -17,6 +17,7 @@ import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
+import { AppState } from '../../react-services/app-state';
 
 export class DevToolsController {
   /**
@@ -97,7 +98,7 @@ export class DevToolsController {
     this.apiInputBox.on('change', () => {
       this.groups = this.analyzeGroups();
       const currentState = this.apiInputBox.getValue().toString();
-      this.appState.setCurrentDevTools(currentState);
+      AppState.setCurrentDevTools(currentState);
       const currentGroup = this.calculateWhichGroup();
       if (currentGroup) {
         const hasWidget = this.widgets.filter(
@@ -149,7 +150,7 @@ export class DevToolsController {
   analyzeGroups() {
     try {
       const currentState = this.apiInputBox.getValue().toString();
-      this.appState.setCurrentDevTools(currentState);
+      AppState.setCurrentDevTools(currentState);
 
       const tmpgroups = [];
       const splitted = currentState
@@ -361,13 +362,13 @@ export class DevToolsController {
       }
     });
     this.apiOutputBox.setSize('auto', '100%');
-    const currentState = this.appState.getCurrentDevTools();
+    const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
         'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
         JSON.stringify({ limit: 5 }, null, 2);
 
-      this.appState.setCurrentDevTools(demoStr);
+      AppState.setCurrentDevTools(demoStr);
       this.apiInputBox.getDoc().setValue(demoStr);
     } else {
       this.apiInputBox.getDoc().setValue(currentState);
