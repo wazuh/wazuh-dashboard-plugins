@@ -144,7 +144,6 @@ export class AgentsPreviewController {
           this.shareAgent,
           this.$location,
           this.$scope,
-          this.appState
         );
         this.$scope.$applyAsync()
       },

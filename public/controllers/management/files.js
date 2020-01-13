@@ -219,7 +219,7 @@ export class FilesController {
     this.$scope.cancelSaveAndOverwrite();
     this.$scope.$applyAsync();
     this.$location.search('editingFile', true);
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.$scope.$emit('fetchedFile', { data: this.$scope.fetchedXML });
   }
 

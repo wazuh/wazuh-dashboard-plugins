@@ -88,9 +88,7 @@ class WzMenu {
           $scope.currentSelectedPattern = AppState.getCurrentPattern();
         }
         if (!$scope.menuNavItem) {
-          $scope.menuNavItem = appState
-            .getNavigation()
-            .currLocation.replace(/\//g, '');
+          $scope.menuNavItem = AppState.getNavigation().currLocation.replace(/\//g, '');
         }
 
         if (AppState.getCurrentAPI()) {

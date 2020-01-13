@@ -16,10 +16,8 @@ export function clickAction(
   instance,
   shareAgent,
   $location,
-  $scope,
-  appState
+  $scope
 ) {
-  appState.setNavigation({ status: true });
   if (
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/).test(instance.path)

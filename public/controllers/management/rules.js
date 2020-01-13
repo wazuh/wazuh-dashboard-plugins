@@ -388,7 +388,7 @@ export class RulesController {
         this.currentRule.file
       );
       this.location.search('editingFile', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.scope.$applyAsync();
       this.scope.$broadcast('fetchedFile', { data: this.scope.fetchedXML });
     } catch (error) {
@@ -426,7 +426,7 @@ export class RulesController {
 
     this.editingFile = false;
     this.scope.$applyAsync();
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.scope.$broadcast('closeEditXmlFile', {});
     this.scope.$applyAsync();
   }

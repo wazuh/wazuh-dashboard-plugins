@@ -11,6 +11,7 @@
  */
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { DynamicHeight } from '../../utils/dynamic-height';
+import { AppState } from '../../react-services/app-state';
 
 export class ConfigurationController {
   /**
@@ -123,7 +124,7 @@ export class ConfigurationController {
    * Navigate to woodle
    */
   switchWodle(wodleName, navigate = true) {
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.navigate = navigate;
     this.configWodle = wodleName;
     if (!this.$location.search().configWodle) {
@@ -203,7 +204,7 @@ export class ConfigurationController {
   }
 
   switchConfigTab(configurationTab, sections, navigate = true) {
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.navigate = navigate;
     try {
       this.configSubTab = JSON.stringify({ configurationTab, sections });

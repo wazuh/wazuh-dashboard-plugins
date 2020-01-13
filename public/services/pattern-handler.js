@@ -73,7 +73,7 @@ export class PatternHandler {
         `/elastic/known-fields/${selectedPattern}`,
         {}
       );
-      return this.AppState.getCurrentPattern();
+      return AppState.getCurrentPattern();
     } catch (error) {
       this.errorHandler.handle(error, 'Pattern Handler (changePattern)');
     }
