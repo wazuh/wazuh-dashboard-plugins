@@ -44,7 +44,8 @@ export class AppState {
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (extensions) {
-                Cookies.set('extensions', current, { expires: exp, path: '/app'});
+                const encodedExtensions = encodeURI(JSON.stringify(current));
+                Cookies.set('extensions', encodedExtensions, { expires: exp, path: '/app'});
             }
         }catch(err){
             console.log("Error set extensions");
@@ -164,22 +165,23 @@ export class AppState {
      * Get 'patternSelector' value   
      */
     static getPatternSelector() {
-        return Cookies.get('patternSelector');
+        return Cookies.get('patternSelector') ? decodeURI(Cookies.get('patternSelector')) : false;
     }
 
     /**
      * Set a new value to the 'patternSelector' cookie
-     * @param {*} date 
+     * @param {*} value 
      */
     static setPatternSelector(value) {
-        Cookies.set('patternSelector', value, { path: '/app'});
+        const encodedPattern = encodeURI(value);
+        Cookies.set('patternSelector', encodedPattern, { path: '/app'});
     }
 
 
 
     /**
      * Set a new value to the '_currentPattern' cookie
-     * @param {*} date 
+     * @param {*} newPattern 
      */
     static setCurrentPattern(newPattern) {
         const encodedPattern = encodeURI(newPattern);
@@ -200,7 +202,7 @@ export class AppState {
 
     /**
      * Set a new value to the 'currentDevTools' cookie
-     * @param {*} date 
+     * @param {*} current 
      **/
     static setCurrentDevTools(current) {
         window.localStorage.setItem('currentDevTools', current);
@@ -240,19 +242,21 @@ export class AppState {
 
 
     static setNavigation(params) {
-            const navigateStr = Cookies.get('navigate');
-            var navigate = navigateStr ? JSON.parse(navigateStr) : {};
-            for (var key in params) {
-                navigate[key] = params[key];
-            }
-            Cookies.set('navigate',navigate);
-
+        const decodedNavigation = Cookies.get('navigate') ? decodeURI(Cookies.get('navigate')) : false;
+        var navigate = decodedNavigation ? JSON.parse(decodedNavigation) : {};
+        for (var key in params) {
+            navigate[key] = params[key];
+        }
+        if(navigate){
+            const encodedURI = encodeURI(JSON.stringify(navigate));
+            Cookies.set('navigate', encodedURI);
+        }
     }
 
     static getNavigation() {
-            const navigateStr = Cookies.get('navigate');
-            const navigateObj = navigateStr ? JSON.parse(navigateStr) : false;
-            return navigateObj;
+        const decodedNavigation = Cookies.get('navigate') ? decodeURI(Cookies.get('navigate')) : false;
+        const navigation = decodedNavigation ? JSON.parse(decodedNavigation) : {};
+        return navigation;
     }
     /**
      * 

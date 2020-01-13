@@ -254,7 +254,7 @@ export class DecodersController {
         this.currentDecoder.file
       );
       this.$location.search('editingFile', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.fetchedXML });
     } catch (error) {
@@ -285,7 +285,7 @@ export class DecodersController {
     }
     this.editingFile = false;
     this.$scope.$applyAsync();
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.$scope.$broadcast('closeEditXmlFile', {});
   }
 

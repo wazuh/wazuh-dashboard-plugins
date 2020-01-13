@@ -68,7 +68,7 @@ export class ConfigurationGroupsController {
       try {
         this.$scope.fetchedXML = await this.fetchFile();
         this.$location.search('editingFile', true);
-        this.appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -79,7 +79,7 @@ export class ConfigurationGroupsController {
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
       this.$scope.fetchedXML = null;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$broadcast('closeEditXmlFile', {});
       this.$scope.$applyAsync();
     };

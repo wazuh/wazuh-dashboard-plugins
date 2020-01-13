@@ -991,7 +991,7 @@ export class AgentsController {
    * @param {*} group
    */
   goGroups(agent, group) {
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');

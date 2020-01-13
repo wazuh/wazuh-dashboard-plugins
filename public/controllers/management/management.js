@@ -59,7 +59,7 @@ export class ManagementController {
 
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentGroup', null);
     });
 
@@ -69,32 +69,32 @@ export class ManagementController {
 
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentRule', null);
     });
 
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
       this.currentDecoder = (params || {}).currentDecoder || false;
       this.$location.search('currentDecoder', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     });
 
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentDecoder', null);
     });
 
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
       this.$location.search('currentList', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$applyAsync();
     });
 
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentList', null);
     });
 
@@ -259,7 +259,7 @@ export class ManagementController {
   setConfigTab(tab, nav = false) {
     this.globalConfigTab = tab;
     if (nav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     } else {
       this.editionTab = tab;
     }
@@ -274,7 +274,7 @@ export class ManagementController {
   setCurrentRule(params) {
     this.currentRule = (params || {}).currentRule || false;
     this.$location.search('currentRule', true);
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
   }
 
   /**
@@ -284,7 +284,7 @@ export class ManagementController {
   switchTab(tab, setNav = false) {
     this.editTab = '';
     if (setNav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     } else {
       if (this.$location.search().editSubTab) {
         this.editTab = this.$location.search().editSubTab;
