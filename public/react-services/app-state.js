@@ -126,7 +126,7 @@ export class AppState {
     static getCurrentAPI() {
         try{
             const currentAPI = Cookies.get('API');
-            return currentAPI ? decodeURI(currentAPI) : '{}';
+            return currentAPI ? decodeURI(currentAPI) : false;
         }catch(err){
             console.log("Error get current Api");
             console.log(err);
