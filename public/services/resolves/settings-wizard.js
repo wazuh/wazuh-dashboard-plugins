@@ -45,7 +45,7 @@ export function settingsWizard(
       } else {
         fromWazuhHosts = true;
         wzMisc.setBlankScr(errorHandler.handle(data));
-        appState.removeCurrentAPI();
+        AppState.removeCurrentAPI();
       }
 
       if (!fromWazuhHosts) {
@@ -157,7 +157,7 @@ export function settingsWizard(
           }
         })
         .catch(error => {
-          appState.removeCurrentAPI();
+          AppState.removeCurrentAPI();
           setUpCredentials(
             'Wazuh App: Please set up Wazuh API credentials.',
             false
@@ -268,7 +268,7 @@ export function settingsWizard(
             ) {
               callCheckStored();
             } else {
-              appState.removeCurrentAPI();
+              AppState.removeCurrentAPI();
               if (data.data.length > 0) {
                 // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);
