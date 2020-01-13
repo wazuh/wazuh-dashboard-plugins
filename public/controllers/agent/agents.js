@@ -310,7 +310,7 @@ export class AgentsController {
           sections: sections
         });
         if (!this.$location.search().configSubTab) {
-          this.appState.setSessionStorageItem(
+          AppState.setSessionStorageItem(
             'configSubTab',
             this.$scope.configSubTab
           );
@@ -352,7 +352,7 @@ export class AgentsController {
         const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
           try {
-            const config = this.appState.getSessionStorageItem('configSubTab');
+            const config = AppState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
             this.$scope.switchConfigTab(
               configSubTabObj.configurationTab,
@@ -370,7 +370,7 @@ export class AgentsController {
         }
       } else {
         this.$location.search('configSubTab', null);
-        this.appState.removeSessionStorageItem('configSubTab');
+        AppState.removeSessionStorageItem('configSubTab');
         this.$location.search('configWodle', null);
       }
     };
@@ -410,7 +410,7 @@ export class AgentsController {
     this.$scope.goDiscover = () => this.goDiscover();
 
     this.$scope.$on('$routeChangeStart', () => {
-      return this.appState.removeSessionStorageItem('configSubTab');
+      return AppState.removeSessionStorageItem('configSubTab');
     });
 
     this.$scope.switchGroupEdit = () => {
