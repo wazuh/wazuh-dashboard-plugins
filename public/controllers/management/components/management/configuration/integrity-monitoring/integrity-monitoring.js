@@ -54,20 +54,20 @@ class WzConfigurationIntegrityMonitoring extends Component{
         {currentConfig['syscheck-syscheck'] && !isString(currentConfig['syscheck-syscheck']) && currentConfig['syscheck-syscheck'].syscheck && (
           <WzTabSelector>
             <div label='General'>
-              <WzConfigurationIntegrityMonitoringGeneral currentConfig={currentConfig} />
+              <WzConfigurationIntegrityMonitoringGeneral {...this.props} />
             </div>
             <div label='Monitored'>
-              <WzConfigurationIntegrityMonitoringMonitored currentConfig={currentConfig} />
+              <WzConfigurationIntegrityMonitoringMonitored {...this.props} />
             </div>
             <div label='Ignored'>
-              <WzConfigurationIntegrityMonitoringIgnored currentConfig={currentConfig} />
+              <WzConfigurationIntegrityMonitoringIgnored {...this.props} />
 
             </div>
             <div label='No diff'>
-              <WzConfigurationIntegrityMonitoringNoDiff currentConfig={currentConfig} />
+              <WzConfigurationIntegrityMonitoringNoDiff {...this.props} />
             </div>
             <div label='Who-data'>
-              <WzConfigurationIntegrityMonitoringWhoData currentConfig={currentConfig} />
+              <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
             </div>
           </WzTabSelector>
         )}

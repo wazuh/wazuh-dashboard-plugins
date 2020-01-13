@@ -18,19 +18,19 @@ import {
 } from "@elastic/eui";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
-import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
-import { settingsListBuilder } from '../utils/builders';
-import helpLinks from './help-links';
-import { renderValueOrDefault, renderValueOrNoValue, renderValueOrYes, renderValueOrNo, renderValueNoThenEnabled } from '../utils/utils';
 import WzSettingsGroup from "../util-components/configuration-settings-group";
+
+import { renderValueOrDefault, renderValueOrNoValue, renderValueOrYes, renderValueOrNo, renderValueNoThenEnabled } from '../utils/utils';
+
+import helpLinks from './help-links';
 
 const mainSettings = [
   { field: 'disabled', label: 'Integrity monitoring status', render: renderValueNoThenEnabled },
   { field: 'frequency', label: 'Interval (in seconds) to run the integrity scan' },
   { field: 'scan_time', label: 'Time of day to run integrity scans', render: renderValueOrNoValue },
   { field: 'scan_day', label: 'Day of the week to run integrity scans', render: renderValueOrNoValue },
-  { field: 'auto_ignore', label: 'Ignore files that change too many times', render: renderValueOrNo },
-  { field: 'alert_new_files', label: 'Alert when new files are created', render: renderValueOrNo },
+  { field: 'auto_ignore', label: 'Ignore files that change too many times', render: renderValueOrNo, when: 'manager' },
+  { field: 'alert_new_files', label: 'Alert when new files are created', render: renderValueOrNo, when: 'manager' },
   { field: 'scan_on_start', label: 'Scan on start' },
   { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
   { field: 'remove_old_diff', label: 'Remove old local snapshots', render: renderValueOrYes },
@@ -39,12 +39,14 @@ const mainSettings = [
   { field: 'prefilter_cmd', label: 'Command to prevent prelinking', render: renderValueOrNoValue },
 ];
 
+const mainSettingsFroAgentOrManager = (agent) => agent.id === '000' ? mainSettings : mainSettings.filter(setting => setting.when !== 'manager' )
+
 class WzConfigurationIntegrityMonitoringGeneral extends Component{
   constructor(props){
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, agent } = this.props;
     return (
       <Fragment>
         <WzConfigurationSettingsTabSelector
@@ -55,7 +57,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
         >
           <WzSettingsGroup
             config={currentConfig['syscheck-syscheck'].syscheck}
-            items={mainSettings}
+            items={mainSettingsFroAgentOrManager(agent)}
           />
         </WzConfigurationSettingsTabSelector>
       </Fragment>

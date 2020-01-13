@@ -10,7 +10,7 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzConfigurationOverview from './configuration-overview';
@@ -41,12 +41,16 @@ import WzViewSelector from './util-components/view-selector';
 import WzConfigurationPath from './util-components/configuration-path';
 
 import ToastProvider from './util-providers/toast-provider';
-import WzToastP from './util-providers/toast-p';
+import WzToastProvider from './util-providers/toast-p';
 
 import {
 	EuiPage,
-	EuiPanel
+	EuiPanel,
+	EuiSpacer,
+	EuiButtonEmpty
 } from "@elastic/eui";
+
+import { agentIsSynchronized } from './utils/wz-fetch';
 
 class WzConfigurationMain extends Component{
 	constructor(props){
@@ -54,6 +58,7 @@ class WzConfigurationMain extends Component{
 			this.state = {
 				view: '',
 				viewProps: {},
+				agentSynchronized: undefined
 			};
 	}
 	updateConfigurationSection = (view, title, description, path) => {
@@ -62,18 +67,39 @@ class WzConfigurationMain extends Component{
 	updateBadge = (badgeStatus = false) => {
 		this.setState({ viewProps: { ...this.state.viewProps, badge: badgeStatus}})
 	}
+	async componentDidMount(){
+		// If agent, check if is synchronized or not
+		if(this.props.agent.id !== '000'){
+			try{
+				const agentSynchronized = await agentIsSynchronized(this.props.agent);
+				this.setState({ agentSynchronized });
+			}catch(error){
+				console.log(error);
+			}
+		}
+	}
 	render(){
-		const { view, viewProps: {title, description, path, badge} } = this.state;
-		const { agent, synchronized } = this.props.configurationProps;
+		const { view, viewProps: {title, description, path, badge}, agentSynchronized } = this.state;
+		const { agent, goGroups } = this.props; // goGroups and exportConfiguration is used for Manager and depends of AngularJS
 		return (
 			<WzReduxProvider>
-				<WzToastP>
+				<WzToastProvider>
 					<EuiPage>
 						<EuiPanel>
+							{agent.id !== '000' && agent.group && agent.group.length ? (
+								<Fragment>
+									<span>Groups:</span>
+									{agent.group.map((group, key) => (
+										<EuiButtonEmpty key={`agent-group-${key}`} onClick={() => goGroups(agent, key)}>{group}</EuiButtonEmpty>
+									))}
+									<EuiSpacer size='s'/>
+									<span></span>
+								</Fragment>
+							) : null}
 							{view !== '' && (<WzConfigurationPath title={title} description={description} path={path} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
 							<WzViewSelector view={view}>
 								<div default>
-									<WzConfigurationOverview agent={agent} synchronized={synchronized} updateConfigurationSection={this.updateConfigurationSection}/>{/* TODO: synchronized */}
+									<WzConfigurationOverview agent={agent} agentSynchronized={agentSynchronized} exportConfiguration={this.props.exportConfiguration} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='global-configuration'>
 									<WzConfigurationGlobalConfigurationManager agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
@@ -149,9 +175,8 @@ class WzConfigurationMain extends Component{
 								</div>
 							</WzViewSelector>
 						</EuiPanel>
-						{/* <ToastProvider /> */}
 					</EuiPage>
-				</WzToastP>
+				</WzToastProvider>
 			</WzReduxProvider>
 		)
 	}

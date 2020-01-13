@@ -52,10 +52,11 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, agent } = this.props;
     const items = settingsListBuilder(currentConfig['syscheck-syscheck'].syscheck.directories, 'dir')
     return (
       <Fragment>
+        {/* FIXME: dont show if linux agent ? */}
         {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories && !currentConfig['syscheck-syscheck'].syscheck.directories.length ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}

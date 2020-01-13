@@ -16,35 +16,58 @@ import Proptypes from "prop-types";
 import {
   EuiBadge
 } from "@elastic/eui";
+import { timeHours } from "d3";
 
 class WzBadge extends Component{
   constructor(props){
     super(props);
-    if( typeof this.props.enabled !== 'undefined' ){
-      if(this.props.enabled){
-        this.color = 'secondary';
-        this.content = 'ENABLED';
-      }else{
-        this.color = 'danger';
-        this.content = 'DISABLED';
+    this.state = {};
+    // if(typeof this.props.enabled !== 'undefined' ){
+    //   if(this.props.enabled){
+    //     this.state.color = 'secondary';
+    //     this.state.content = 'ENABLED';
+    //   }else{
+    //     this.state.color = 'danger';
+    //     this.state.content = 'DISABLED';
+    //   }
+    // }else if(typeof this.props.synchronized !== 'undefined'){
+    //   if(this.props.synchronized){
+    //     this.state.color = 'secondary';
+    //     this.state.content = 'SYNCHRONIZED'
+    //   }else{
+    //     this.state.color = 'danger';
+    //     this.state.content = 'NOT SYNCHRONIZED'
+    //   }
+    // }else if(this.props.color && this.props.content){
+    //   this.state.color = this.props.color;
+    //   this.state.content = this.props.content;
+    // }
+  }
+  static getDerivedStateFromProps(nextProps, prevState){
+    if(typeof nextProps === 'object'){
+      if(typeof nextProps.enabled !== 'undefined' ){
+        if(nextProps.enabled){
+          return { color: 'secondary', content: 'ENABLED'};
+        }else{
+          return { color: 'danger', content: 'DISABLED'};
+        }
+      }else if(typeof nextProps.synchronized !== 'undefined'){
+        if(nextProps.synchronized){
+          return { color: 'secondary', content: 'SYNCHRONIZED'};
+        }else{
+          return { color: 'secondary', content: 'NOT SYNCHRONIZED'};
+        }
+      }else if(nextProps.color && nextProps.content){
+        return { color: nextProps.color, content: nextProps.content };
       }
-    }else if(typeof this.props.synchronized !== 'undefined'){
-      if(this.props.synchronized){
-        this.color = 'secondary';
-        this.content = 'SYNCHRONIZED'
-      }else{
-        this.color = 'danger';
-        this.content = 'NOT SYNCHRONIZED'
-      }
-    }else{
-      this.color = this.props.color;
-      this.content = this.props.content;
     }
+    return null
   }
   render(){
-    return (
-      <EuiBadge color={this.color}>{this.content}</EuiBadge>
-    )
+    const { color, content } = this.state;
+    return color && content ? (
+      <EuiBadge color={color}>{content}</EuiBadge>
+    ) : null
   }
 }
 

@@ -34,14 +34,14 @@ class WzConfigurationMonitoringIgnored extends Component{
   constructor(props){
     super(props);
   }
-  render(){ //TODO: agent?
-    const { currentConfig } = this.props;
+  render(){ 
+    const { currentConfig, agent } = this.props;
     return (
       <Fragment>
-        {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && !currentConfig['syscheck-syscheck'].syscheck.ignore.length ? (
+        {((agent || {}).os || {}).platform !== 'windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && !currentConfig['syscheck-syscheck'].syscheck.ignore.length ? (
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
-        {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && currentConfig['syscheck-syscheck'].syscheck.ignore.length ? (
+        {((agent || {}).os || {}).platform !== 'windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && currentConfig['syscheck-syscheck'].syscheck.ignore.length ? (
             <Fragment>
               <WzConfigurationSettingsTabSelector
                 title='Ignored files and directories'

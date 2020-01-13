@@ -29,7 +29,7 @@ import WzConfigurationOverviewTable from './configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
 import WzBadge from './util-components/badge';
 
-import WzExportConfiguration from '../../../../agent/components/export-configuration';
+import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 
 import { updateConfigurationSection } from '../../../../../redux/actions/configurationActions';
 
@@ -72,7 +72,6 @@ class WzConfigurationOverview extends Component{
 		}
 		filterSettings(groups){
 			return groups.map(group => {
-
 				return { title: group.title, settings: this.filterSettingsIfAgentOrManager(group.settings) }
 			}).filter(group => group.settings.length);
 		}
@@ -84,7 +83,7 @@ class WzConfigurationOverview extends Component{
 							<EuiFlexGroup>
 								<EuiFlexItem>
 									<EuiTitle>
-										<span>Configuration {this.props.agent.id !== '000' && <WzBadge synchronized={this.props.synchronized}/>}</span>
+										<span>Configuration {this.props.agent.id !== '000' && <WzBadge synchronized={this.props.agentSynchronized}/>}</span>
 									</EuiTitle>
 								</EuiFlexItem>
 							</EuiFlexGroup>
@@ -93,11 +92,11 @@ class WzConfigurationOverview extends Component{
 							<EuiFlexGroup gutterSize="xs">
 								<EuiFlexItem>
 									{this.props.agent.id === '000' ? (
-										<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', this.props.agent.id === '000' ? 'Manager configuration' : 'Agent configuration', '', 'Edit configuration')}> 
+										<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', this.props.agent.id === '000' ? 'Manager configuration' : 'Agent configuration', '', 'Edit configuration')}>  {/* TODO: delete Agent configuration */}
 											Edit configuration
 										</EuiButtonEmpty>
 									) : this.props.agent.status === 'Active' ? 
-									<WzExportConfiguration agent={this.props.agent} exportConfiguration={''}/> //TODO: export configuration
+									<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/> //TODO: export configuration
 									: null}
 								</EuiFlexItem>
 								<EuiFlexItem>

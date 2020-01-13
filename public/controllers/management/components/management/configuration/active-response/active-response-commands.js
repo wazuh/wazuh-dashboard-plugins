@@ -22,7 +22,9 @@ import {
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
+import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import { isString } from '../utils/utils';
+import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
 
@@ -42,16 +44,11 @@ const mainSettings = [
 class WzConfigurationActiveResponseCommands extends Component{
   constructor(props){
     super(props);
-    this.state = {
-      selectedItem: 0
-    };
-  }
-  selectItem(selectedItem){
-    this.setState({ selectedItem });
   }
   render(){
     const { selectedItem } = this.state;
     const { currentConfig, wazuhNotReadyYet } = this.props;
+    const items = settingsListBuilder(currentConfig['analysis-command'].command, 'name');
     const selectedItemConfig = currentConfig['analysis-command'].command[selectedItem] ? {
       ...currentConfig['analysis-command'].command[selectedItem],
       timeout_allowed: currentConfig['analysis-command'].command[selectedItem].timeout_allowed ? 'yes' : 'no'
@@ -73,33 +70,10 @@ class WzConfigurationActiveResponseCommands extends Component{
             description='Find here all the currently defined commands used for Active response'
             currentConfig={currentConfig}
             helpLinks={helpLinks}>
-              <EuiFlexGroup alignItems='flexStart'>
-                <EuiFlexItem grow={false}>
-                  <ul>
-                    {currentConfig['analysis-command'].command.map((item, key) => (
-                      <li key={`analysis-command-list-${key}`}>
-                        <EuiButtonEmpty style={selectedItem === key ? {textDecoration: 'underline' } : {}} onClick={() => this.selectItem(key)}>{item.name}</EuiButtonEmpty>
-                      </li>
-                    ))}
-                  </ul>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <WzConfigurationSettingsGroup 
-                    config={selectedItemConfig}
-                    items={mainSettings}
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            {/* <WzConfigurationSettingsGroup //TODO: what is this
-              config={this.config.syscollector}
-              items={mainSettings}
-            />
-            <WzConfigurationSettingsGroup
-              title='Scan settings'
-              description='Specific inventory scans to collect'
-              config={this.config.syscollector}
-              items={scanSettings}
-            /> */}
+              <WzConfigurationSettingsListSelector
+                items={items}
+                settings={mainSettings}
+              />
           </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>

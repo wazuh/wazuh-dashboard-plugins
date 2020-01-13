@@ -33,6 +33,7 @@ import WzRuleset from './components/management/ruleset/main-ruleset';
 import WzManagement from './components/management/management-provider';
 import WzManagementMain from './components/management/management-main';
 import { ExportConfiguration } from '../agent/components/export-configuration';
+import WzManagementConfiguration from './components/management/configuration/configuration-main';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -59,4 +60,5 @@ app
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsInGroupTable', AgentsInGroupTable)
   .value('FilesInGroupTable', FilesInGroupTable)
-  .value('UploadFiles', UploadFiles);
+  .value('UploadFiles', UploadFiles)
+  .value('WzManagementConfiguration', WzManagementConfiguration);

@@ -14,7 +14,7 @@ import React, { Component, Fragment } from "react";
 import Proptypes from "prop-types";
 
 import {
-  
+  EuiSpacer
 } from "@elastic/eui";
 
 import WzConfigurationSettingsHeader from './configuration-settings-header';

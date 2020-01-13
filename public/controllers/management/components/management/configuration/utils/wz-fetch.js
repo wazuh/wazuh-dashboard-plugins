@@ -124,7 +124,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;
   
-    // // Current date in milliseconds //TODO: toast notification?
+    // // Current date in milliseconds //TODO: toast notification? AngularJS code
     // const date = new Date().getTime();
   
     // // Remove errors older than 2s from the error history
@@ -325,7 +325,9 @@ export const restartCluster = async () => {
       const str = data.details.join();
       throw new Error(str);
     }
-    this.performClusterRestart();
+    // this.performClusterRestart(); // TODO: convert AngularJS to React
+    await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
+    // this.$rootScope.$broadcast('removeRestarting', {}); TODO: isRestarting: false?
     return { data: { data: 'Restarting cluster' } };
   } catch (error) {
     return Promise.reject(error);
@@ -361,24 +363,72 @@ export const restartNode = async (node) => {
   }
 }
 
-export const saveConfiguration = async (selectedNode) => {
+export const saveConfiguration = async (selectedNode, xml) => {
   try {
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
-    const enabledAndRunning =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    const parameters = enabledAndRunning
-      ? {
-          node: selectedNode,
-          showRestartManager: 'cluster'
-        }
-      : saveFileManager(xml);
-    // this.$scope.$broadcast('saveXmlFile', parameters);
+    const enabledAndRunning = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    if(enabledAndRunning){
+      await saveFileCluster(xml);
+    }else{
+      await saveFileManager(xml);
+    }
   } catch (error) {
-    this.fetchedXML = null;
-    this.doingSaving = false;
-    this.errorHandler.handle(error.message || error);
+    // this.fetchedXML = null; // From AngularJS
+    // this.doingSaving = false;
+    // this.errorHandler.handle(error.message || error);
+    return Promise.error(error.message || error);
   }
 }
+
+/**
+   * Send ossec.conf content for a cluster node
+   * @param {*} node Node name
+   * @param {*} content XML raw content for ossec.conf file
+   */
+export const saveNodeConfiguration = async (node, content) => {
+  try {
+    const result = await WzRequest.apiReq(
+      'POST',
+      `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
+      { content, origin: 'xmleditor' }
+    );
+    return result;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+/**
+ * Save text to ossec.conf cluster file
+ * @param {string} text Text to save
+ */
+export const saveFileCluster = async (text) => {
+  const xml = replaceIllegalXML(text);
+  try {
+    await WzRequest.apiReq(
+      'POST',
+      `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
+      { content: xml, origin: 'xmleditor' }
+    );
+    await validateAfterSent(false);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+// close = false; // TODO: showRestarMessage or errorHandler? when restart a node Cluster
+// await configHandler.saveNodeConfiguration(params.node, xml);
+// try {
+//   await validateAfterSent(params.node);
+// } catch (err) {
+//   params.showRestartManager = 'warn';
+// }
+// const msg = `Success. Node (${params.node}) configuration has been updated`;
+// params.showRestartManager
+//   ? params.showRestartManager !== 'warn'
+//     ? showRestartMessage(msg, params.node)
+//     : errorHandler.handle(warnMsg, '', true)
+//   : errorHandler.info(msg);
 
 /**
  * Save text to ossec.conf manager file
@@ -542,3 +592,12 @@ export const validateAfterSent = async (node = false) => {
     return Promise.reject(error);
   }
 };
+
+export const agentIsSynchronized = async (agent) => {
+  const isSync = await WzRequest.apiReq(
+     'GET',
+    `/agents/${agent.id}/group/is_sync`,
+    {}
+  );
+  return (((isSync || {}).data || {}).data || {}).synced || false;
+}

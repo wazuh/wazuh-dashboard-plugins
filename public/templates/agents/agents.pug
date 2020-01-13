@@ -16,5 +16,9 @@ include ./agents-syscollector.html
 include ./agents-osquery.html
 include ./agents-sca.html
 include ./agents-docker.html
+//- TODO: delete
+<div>{{agent}}</div>
+<react-component ng-if="tab === 'configuration' && agent" name="WzManagementConfiguration" props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"/>
+//- TODO: delete
 include ../management/configuration/agent-configuration.pug
 include ../footer.foot

@@ -27,16 +27,20 @@ import helpLinks from './help-links';
 const mainSettings = [
   { field: 'logformat', label: 'Log format', render: renderValueOrNoValue },
   { field: 'file', label: 'Log location', render: renderValueOrNoValue },
-  { field: 'labels', label: 'Only receive logs occured after start', render: renderValueOrNoValue },
+  { field: 'only-future-events', label: 'Only receive logs occured after start', when: 'agent' },
+  { field: 'reconnect_time', label: 'Time in seconds to try to reconnect with Windows Event Channel when it has fallen', when: 'agent' },
+  { field: 'query', label: 'Filter logs using this XPATH query', render: renderValueOrNoValue, when: 'agent' },
+  { field: 'labels', label: 'Only receive logs occured after start', render: renderValueOrNoValue, when: 'agent' },
   { field: 'target', label: 'Redirect output to this socket', render: renderValueOrDefault('agent') },
 ];
 
+const getMainSettingsAgentOrManager = (agent) => agent && agent.id === '000' ? mainSettings.filter(setting => setting.when !== 'agent') : mainSettings.filter(setting => setting.when === 'agent' ? agent && agent.os && agent.os.platform === 'windows' : true);
 class WzConfigurationLogCollectionLogs extends Component{
   constructor(props){
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, agent } = this.props;
     const items = settingsListBuilder(currentConfig['logcollector-localfile']['localfile-logs'], 'file');
     return (
       <Fragment>
@@ -48,13 +52,13 @@ class WzConfigurationLogCollectionLogs extends Component{
         ) : null}
         {currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && currentConfig['logcollector-localfile']['localfile-logs'] && currentConfig['logcollector-localfile']['localfile-logs'].length ? (
           <WzConfigurationSettingsTabSelector
-          title='Logs files'
-          description='List of log files that will be analyzed'
-          currentConfig={currentConfig}
-          helpLinks={helpLinks}>
+            title='Logs files'
+            description='List of log files that will be analyzed'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}>
             <WzConfigurationListSelector
               items={items}
-              settings={mainSettings}
+              settings={getMainSettingsAgentOrManager(agent)}
             />
           </WzConfigurationSettingsTabSelector>
         ) : null}

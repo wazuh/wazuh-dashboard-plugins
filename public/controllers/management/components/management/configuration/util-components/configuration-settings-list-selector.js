@@ -16,7 +16,9 @@ import Proptypes from "prop-types";
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiSpacer,
+  EuiPanel
 } from "@elastic/eui";
 
 import WzConfigurationSettingsGroup from './configuration-settings-group';
@@ -35,23 +37,30 @@ class WzConfigurationSettingsListSelector extends Component{
     const { selectedItem } = this.state;
     const { items, settings, keyList } = this.props;
     return (
-      <EuiFlexGroup alignItems='flexStart'>
-        <EuiFlexItem grow={false}>
-          <ul>
-            {items.map((item, key) => (
-              <li key={`${keyList}-${key}`}>
-                <EuiButtonEmpty style={selectedItem === key ? {textDecoration: 'underline' } : {}} onClick={() => this.selectItem(key)}>{item.label}</EuiButtonEmpty>
-              </li>
-            ))}
-          </ul>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <WzConfigurationSettingsGroup 
-            config={items[selectedItem].data}
-            items={settings}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      <Fragment>
+        <EuiSpacer size='m'/>
+        <EuiFlexGroup alignItems='flexStart'>
+          <EuiFlexItem grow={false}>
+            <EuiPanel>
+              <ul>
+                {items.map((item, key) => (
+                  <li key={`${keyList}-${key}`}>
+                    <EuiButtonEmpty style={selectedItem === key ? {textDecoration: 'underline' } : {}} onClick={() => this.selectItem(key)}>{item.label}</EuiButtonEmpty>
+                  </li>
+                ))}
+              </ul>
+            </EuiPanel>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiPanel>
+              <WzConfigurationSettingsGroup 
+                config={items[selectedItem].data}
+                items={settings}
+              />
+            </EuiPanel>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </Fragment>
     )
   }
 }

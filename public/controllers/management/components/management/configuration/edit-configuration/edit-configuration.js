@@ -56,7 +56,7 @@ class WzEditorConfiguration extends Component{
   }
   async editorSave(){
     try{
-      this.setState({ saving: true});
+      this.setState({ saving: true });
       await saveFileManager(this.state.editorValue);
       this.setState( { saving: false, infoChangesAfterRestart: true });
       this.props.addToast({
@@ -154,7 +154,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value))
 });
-
 
 export default compose(
   withWzToast,

@@ -19,6 +19,8 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiButtonEmpty,
+  EuiToolTip,
+  EuiButtonIcon,
   EuiSpacer,
   EuiTitle,
   EuiText
@@ -31,18 +33,18 @@ class WzConfigurationPath extends Component{
     super(props);
   }
   render(){
-    const { title, description, icon, path, updateConfigurationSection, badge } = this.props;
+    const { title, description, icon, updateConfigurationSection, badge } = this.props;
     return (
       <Fragment>
         <EuiFlexGroup alignItems='center'>
-          <EuiButtonEmpty onClick={() => updateConfigurationSection('')}>Configuration</EuiButtonEmpty>
-          <span> / {path ? path : title}</span>
-        </EuiFlexGroup>
-        <EuiSpacer size='s'/>
-        <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem grow={false} style={{margin: "0 6px"}}>
+            <EuiToolTip content='Back to configuration' position='right'>
+              <EuiButtonIcon  style={{padding: 0}} iconType='arrowLeft' iconSize='l' onClick={() => updateConfigurationSection('')} aria-label='back to configuration'/>
+            </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem style={{marginLeft: '6px', marginRight: '6px'}}>
             {icon && <EuiIcon size='l' type={icon}/> }
-            <EuiTitle style={{display: 'inline-block'}}>
+            <EuiTitle style={{display: 'inline-block', margin: 0}}>
               <span>{title} {typeof badge === 'boolean' ? <WzBadge enabled={badge}/> : null}</span>
             </EuiTitle>
             {description && (<EuiText color='subdued'>{description}</EuiText>)}
@@ -58,8 +60,9 @@ class WzConfigurationPath extends Component{
 WzConfigurationPath.propTypes = {
   title: Proptypes.string.isRequired,
   description: Proptypes.string,
-  path: Proptypes.string,
-  icon: Proptypes.string
+  icon: Proptypes.string,
+  updateConfigurationSection: Proptypes.func,
+  badge: Proptypes.bool
 };
 
 export default WzConfigurationPath;

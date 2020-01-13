@@ -28,7 +28,7 @@ class WzConfigurationLogCollection extends Component{
     super(props);
   }
   render(){
-    let { currentConfig } = this.props;
+    let { currentConfig, agent } = this.props;
     currentConfig = {
       ...currentConfig,
       'logcollector-localfile' : {
@@ -41,13 +41,13 @@ class WzConfigurationLogCollection extends Component{
       <Fragment>
         <WzTabSelector>
           <div label='Logs'>
-            <WzConfigurationLogCollectionLogs currentConfig={currentConfig} />
+            <WzConfigurationLogCollectionLogs currentConfig={currentConfig} agent={agent}/>
           </div>
           <div label='Commands'>
-            <WzConfigurationLogCollectionCommands currentConfig={currentConfig} />
+            <WzConfigurationLogCollectionCommands currentConfig={currentConfig} agent={agent}/>
           </div>
           <div label='Sockets'>
-          <WzConfigurationLogCollectionSockets currentConfig={currentConfig} />
+          <WzConfigurationLogCollectionSockets currentConfig={currentConfig} agent={agent}/>
           </div>
         </WzTabSelector>
       </Fragment>
