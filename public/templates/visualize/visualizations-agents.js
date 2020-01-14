@@ -472,56 +472,56 @@ export const visualizations = {
   },
   oscap: {
     metrics: [
-      { id: 'Wazuh-App-Overview-OSCAP-Last-score' },
-      { id: 'Wazuh-App-Overview-OSCAP-Highest-score' },
-      { id: 'Wazuh-App-Overview-OSCAP-Lowest-score' },
+      { id: 'Wazuh-App-Agents-OSCAP-Last-score' },
+      { id: 'Wazuh-App-Agents-OSCAP-Higher-score-metric' },
+      { id: 'Wazuh-App-Agents-OSCAP-Lower-score-metric' },
     ],
     rows: [
       {
-        height: 215,
+        height: 230,
         vis: [
           {
-            title: 'Top 5 Agents',
-            id: 'Wazuh-App-Overview-OSCAP-Agents',
+            title: 'Top 5 Scans',
+            id: 'Wazuh-App-Agents-OSCAP-Scans',
             width: 25,
           },
           {
             title: 'Top 5 Profiles',
-            id: 'Wazuh-App-Overview-OSCAP-Profiles',
+            id: 'Wazuh-App-Agents-OSCAP-Profiles',
             width: 25,
           },
           {
             title: 'Top 5 Content',
-            id: 'Wazuh-App-Overview-OSCAP-Content',
+            id: 'Wazuh-App-Agents-OSCAP-Content',
             width: 25,
           },
           {
             title: 'Top 5 Severity',
-            id: 'Wazuh-App-Overview-OSCAP-Severity',
+            id: 'Wazuh-App-Agents-OSCAP-Severity',
             width: 25,
           },
         ],
       },
       {
-        height: 240,
+        height: 230,
         vis: [
           {
-            title: 'Top 5 Agents - Severity high',
-            id: 'Wazuh-App-Overview-OSCAP-Top-5-agents-Severity-high',
+            title: 'Daily scans evolution',
+            id: 'Wazuh-App-Agents-OSCAP-Daily-scans-evolution',
           },
         ],
       },
       {
-        height: 320,
+        height: 250,
         vis: [
           {
-            title: 'Top 10 - Alerts',
-            id: 'Wazuh-App-Overview-OSCAP-Top-10-alerts',
+            title: 'Top 5 - Alerts',
+            id: 'Wazuh-App-Agents-OSCAP-Top-5-Alerts',
             width: 50,
           },
           {
-            title: 'Top 10 - High risk alerts',
-            id: 'Wazuh-App-Overview-OSCAP-Top-10-high-risk-alerts',
+            title: 'Top 5 - High risk alerts',
+            id: 'Wazuh-App-Agents-OSCAP-Top-5-High-risk-alerts',
             width: 50,
           },
         ],
@@ -531,7 +531,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-OSCAP-Last-alerts',
+            id: 'Wazuh-App-Agents-OSCAP-Last-alerts',
           },
         ],
       },
