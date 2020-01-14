@@ -215,22 +215,22 @@ export const visualizations = {
   nist: {
     rows: [
       {
-        height: 400,
+        height: 300,
         vis: [
           {
-            title: 'Most active agents',
-            id: 'Wazuh-App-Overview-NIST-Agents',
-            width: 20,
+            title: 'Stats',
+            id: 'Wazuh-App-Agents-NIST-Stats',
+            width: 25,
           },
           {
-            title: 'Top requirements over time',
-            id: 'Wazuh-App-Overview-NIST-Requirements-over-time',
-            width: 45,
+            title: 'Top 10 requirements',
+            id: 'Wazuh-App-Agents-NIST-top-10-requirements',
+            width: 25,
           },
           {
-            title: 'Requiments distribution by agent',
-            id: 'Wazuh-App-Overview-NIST-requirements-by-agents',
-            width: 35,
+            title: 'Requirements distributed by level',
+            id: 'Wazuh-App-Agents-NIST-Requirement-by-level',
+            width: 50,
           },
         ],
       },
@@ -238,19 +238,8 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: 'Alerts volume by agent',
-            id: 'Wazuh-App-Overview-NIST-Requirements-Agents-heatmap',
-            width: 45,
-          },
-          {
-            title: 'Stats',
-            id: 'Wazuh-App-Overview-NIST-Metrics',
-            width: 25,
-          },
-          {
-            title: 'Top 10 requirements',
-            id: 'Wazuh-App-Overview-NIST-Top-10-requirements',
-            width: 30,
+            title: 'Requirements over time',
+            id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime',
           },
         ],
       },
@@ -259,7 +248,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-NIST-Alerts-summary',
+            id: 'Wazuh-App-Agents-NIST-Last-alerts',
           },
         ],
       },
