@@ -27,6 +27,7 @@ import {
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
 
 export class AgentsController {
   /**
@@ -152,11 +153,11 @@ export class AgentsController {
     this.$rootScope.reportStatus = false;
 
     this.$location.search('_a', null);
-    this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
+    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
+    const extensions = AppState.getExtensions(currentApi);
     this.$scope.extensions = extensions;
 
     // Getting possible target location
@@ -309,7 +310,7 @@ export class AgentsController {
           sections: sections
         });
         if (!this.$location.search().configSubTab) {
-          this.appState.setSessionStorageItem(
+          AppState.setSessionStorageItem(
             'configSubTab',
             this.$scope.configSubTab
           );
@@ -351,7 +352,7 @@ export class AgentsController {
         const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
           try {
-            const config = this.appState.getSessionStorageItem('configSubTab');
+            const config = AppState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
             this.$scope.switchConfigTab(
               configSubTabObj.configurationTab,
@@ -369,7 +370,7 @@ export class AgentsController {
         }
       } else {
         this.$location.search('configSubTab', null);
-        this.appState.removeSessionStorageItem('configSubTab');
+        AppState.removeSessionStorageItem('configSubTab');
         this.$location.search('configWodle', null);
       }
     };
@@ -409,7 +410,7 @@ export class AgentsController {
     this.$scope.goDiscover = () => this.goDiscover();
 
     this.$scope.$on('$routeChangeStart', () => {
-      return this.appState.removeSessionStorageItem('configSubTab');
+      return AppState.removeSessionStorageItem('configSubTab');
     });
 
     this.$scope.switchGroupEdit = () => {
@@ -958,9 +959,9 @@ export class AgentsController {
       switchTab: tab => this.switchTab(tab),
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
-      api: this.appState.getCurrentAPI(),
+      api: AppState.getCurrentAPI(),
       setExtensions: (api, extensions) => {
-        this.appState.setExtensions(api, extensions);
+        AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;
       }
     };
@@ -990,7 +991,7 @@ export class AgentsController {
    * @param {*} group
    */
   goGroups(agent, group) {
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');
@@ -1010,7 +1011,7 @@ export class AgentsController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(path, currentApi, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -1029,7 +1030,7 @@ export class AgentsController {
     if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
       syscollectorFilters.push(
         this.filterHandler.managerQuery(
-          this.appState.getClusterInfo().cluster,
+          AppState.getClusterInfo().cluster,
           true
         )
       );

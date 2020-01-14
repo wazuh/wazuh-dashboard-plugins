@@ -163,7 +163,7 @@ export class AgentsTable extends Component {
     const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : ".";
     const { timeService } = this.props;
     return {
-      "id": agent,
+      "id": agent.id,
       "name": agent.name,
       "ip": agent.ip,
       "status": agent.status,
@@ -176,33 +176,25 @@ export class AgentsTable extends Component {
     }
   }
 
-  welcomePanelButtonRender(agent, field, color = 'primary', size = false) {
-    return (
-      <EuiToolTip content="View the welcome panel for this agent" position="right">
-        <EuiLink
-          onClick={() => this.props.clickAction(agent)}
-          aria-label="View the welcome panel for this agent"
-          color={color}
-        >
-          {(agent[field].lenght > size) ? `${agent[field].substring(0, size)}...` : agent[field]}
-        </EuiLink>
-      </EuiToolTip>
-    )
-  }
-
   actionButtonsRender(agent) {
     return (
       <div>
         <EuiToolTip content="Open Discover panel for this agent" position="left">
           <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'discover')}
+            onClick={() => (ev) => {
+              ev.stopPropagation();
+              this.props.clickAction(agent, 'discover')
+            }}
             iconType="discoverApp"
             aria-label="Open Discover panel for this agent"
           />
         </EuiToolTip>
         <EuiToolTip content="Open configuration for this agent" position="left">
           <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
+            onClick={(ev) => {
+              ev.stopPropagation();
+              this.props.clickAction(agent, 'configuration')
+            }}
             color={'text'}
             iconType="wrench"
             aria-label="Open configuration for this agent"
@@ -300,7 +292,6 @@ export class AgentsTable extends Component {
         name: 'ID',
         sortable: true,
         width: '65px',
-        render: (agent) => this.welcomePanelButtonRender(agent, 'id'),
       },
       {
         field: 'name',
@@ -566,6 +557,16 @@ export class AgentsTable extends Component {
   }
 
   tableRender() {
+
+    const getRowProps = item => {
+      const { id } = item;
+      return {
+        'data-test-subj': `row-${id}`,
+        className: 'customRowClass',
+        onClick: () => this.props.clickAction(item),
+      };
+    };
+
     const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state
     const columns = this.columns();
     const pagination = {
@@ -591,6 +592,7 @@ export class AgentsTable extends Component {
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
+            rowProps={getRowProps}
             noItemsMessage="No agents found"
           />
         </EuiFlexItem>

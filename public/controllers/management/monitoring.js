@@ -11,6 +11,7 @@
  */
 import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
 
 export function ClusterController(
   $scope,
@@ -34,13 +35,13 @@ export function ClusterController(
   };
 
   const clusterEnabled =
-    appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled';
+    AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
   $scope.isClusterEnabled = clusterEnabled;
   $scope.isClusterRunning = true;
   $location.search('tabView', 'cluster-monitoring');
   $location.search('tab', 'monitoring');
   $location.search('_a', null);
-  const filterHandler = new FilterHandler(appState.getCurrentPattern());
+  const filterHandler = new FilterHandler(AppState.getCurrentPattern());
   discoverPendingUpdates.removeAll();
   tabVisualizations.removeAll();
   rawVisualizations.removeAll();
@@ -204,7 +205,7 @@ export function ClusterController(
     try {
       filters = [];
       filters.push(
-        filterHandler.managerQuery(appState.getClusterInfo().cluster, true)
+        filterHandler.managerQuery(AppState.getClusterInfo().cluster, true)
       );
       if (node) {
         filters.push(filterHandler.nodeQuery(node));
@@ -270,7 +271,7 @@ export function ClusterController(
 
       const visData = await genericReq.request(
         'POST',
-        `/elastic/visualizations/cluster-monitoring/${appState.getCurrentPattern()}`,
+        `/elastic/visualizations/cluster-monitoring/${AppState.getCurrentPattern()}`,
         { nodes: nodeList }
       );
 

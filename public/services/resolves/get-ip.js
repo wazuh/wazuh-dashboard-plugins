@@ -12,6 +12,7 @@
 
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { healthCheck } from './health-check';
+import { AppState } from '../../react-services/app-state';
 
 export function getIp(
   indexPatterns,
@@ -40,9 +41,9 @@ export function getIp(
 
       let currentPattern = '';
 
-      if (appState.getCurrentPattern()) {
+      if (AppState.getCurrentPattern()) {
         // There's cookie for the pattern
-        currentPattern = appState.getCurrentPattern();
+        currentPattern = AppState.getCurrentPattern();
       } else {
         const data = await genericReq.request('GET', '/elastic/index-patterns');
 
@@ -53,7 +54,7 @@ export function getIp(
           return;
         }
         currentPattern = data.data.data[0].id;
-        appState.setCurrentPattern(currentPattern);
+        AppState.setCurrentPattern(currentPattern);
       }
 
       const onlyWazuhAlerts = savedObjects.filter(

@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../../react-services/app-state";
 
 export class GroupsController {
   constructor(
@@ -162,7 +163,7 @@ export class GroupsController {
       this.groupsSelectedTab = 'agents';
       this.location.search('currentGroup', group.name);
       if (this.location.search() && this.location.search().navigation) {
-        this.appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         this.location.search('navigation', null);
       }
       this.scope.$emit('setCurrentGroup', { currentGroup: this.currentGroup });

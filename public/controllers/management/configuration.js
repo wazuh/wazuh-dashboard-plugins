@@ -11,6 +11,7 @@
  */
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { DynamicHeight } from '../../utils/dynamic-height';
+import { AppState } from '../../react-services/app-state';
 
 export class ConfigurationController {
   /**
@@ -70,7 +71,7 @@ export class ConfigurationController {
       this.configurationHandler.getIntegration(list, this.$scope);
 
     this.$scope.$on('$routeChangeStart', () =>
-      this.appState.removeSessionStorageItem('configSubTab')
+      AppState.removeSessionStorageItem('configSubTab')
     );
 
     this.$scope.$on('configurationIsReloaded', (event, params) => {
@@ -123,7 +124,7 @@ export class ConfigurationController {
    * Navigate to woodle
    */
   switchWodle(wodleName, navigate = true) {
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.navigate = navigate;
     this.configWodle = wodleName;
     if (!this.$location.search().configWodle) {
@@ -156,7 +157,7 @@ export class ConfigurationController {
       let configSubTab = this.$location.search().configSubTab;
       if (configSubTab) {
         try {
-          const config = this.appState.getSessionStorageItem('configSubTab');
+          const config = AppState.getSessionStorageItem('configSubTab');
           const configSubTabObj = JSON.parse(config);
           if (!configSubTabObj) return;
           this.$scope.$emit('setCurrentConfiguration', {
@@ -181,7 +182,7 @@ export class ConfigurationController {
       }
     } else {
       this.$location.search('configSubTab', null);
-      this.appState.removeSessionStorageItem('configSubTab');
+      AppState.removeSessionStorageItem('configSubTab');
       this.$location.search('configWodle', null);
     }
   }
@@ -192,7 +193,7 @@ export class ConfigurationController {
       this.$scope.mctrl.editionTab = params.globalConfigTab;
       if ((params || {}).reloadConfigSubTab) {
         this.$location.search('configSubTab', null);
-        this.appState.removeSessionStorageItem('configSubTab');
+        AppState.removeSessionStorageItem('configSubTab');
       }
       this.$scope.$emit('removeCurrentConfiguration', {});
     } else {
@@ -203,12 +204,12 @@ export class ConfigurationController {
   }
 
   switchConfigTab(configurationTab, sections, navigate = true) {
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.navigate = navigate;
     try {
       this.configSubTab = JSON.stringify({ configurationTab, sections });
       if (!this.$location.search().configSubTab) {
-        this.appState.setSessionStorageItem('configSubTab', this.configSubTab);
+        AppState.setSessionStorageItem('configSubTab', this.configSubTab);
         this.$scope.$emit('setCurrentConfiguration', {
           currentConfiguration: configurationTab
         });

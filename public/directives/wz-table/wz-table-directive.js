@@ -149,8 +149,7 @@ app.directive('wzTable', function() {
           instance,
           shareAgent,
           $location,
-          $scope,
-          appState
+          $scope
         );
 
       const fetch = async (options = {}) => {
