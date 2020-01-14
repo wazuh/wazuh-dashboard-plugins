@@ -14,9 +14,14 @@ import React, {
   Component,
 } from 'react';
 import { EuiBadge } from '@elastic/eui';
-import { date } from 'joi';
 
 interface filter { field:string, value:string }
+
+export interface Props {
+  filters: filter[]
+  onChange: (badge) => void
+}
+
 export class WzSearchBadges extends Component {
   props!: {
     filters: filter[]
@@ -44,7 +49,8 @@ export class WzSearchBadges extends Component {
     const { filters } = this.props;
     const badges = filters.filter((item) => item.field !== 'q').map((item) => this.buildBadge(item))
     return (
-      <div>
+      <div
+        data-testid="search-badges" >
         {badges}
       </div>
     );
