@@ -119,17 +119,22 @@ export const visualizations = {
   pci: {
     rows: [
       {
-        height: 400,
+        height: 300,
         vis: [
           {
-            title: 'PCI DSS requirements',
-            id: 'Wazuh-App-Overview-PCI-DSS-requirements',
-            width: 50,
+            title: 'Top 5 rule groups',
+            id: 'Wazuh-App-Agents-PCI-Groups',
+            width: 33,
           },
           {
-            title: 'Top 10 agents by alerts number',
-            id: 'Wazuh-App-Overview-PCI-DSS-Agents',
-            width: 50,
+            title: 'Top 5 rules',
+            id: 'Wazuh-App-Agents-PCI-Rule',
+            width: 33,
+          },
+          {
+            title: 'Top 5 PCI DSS requirements',
+            id: 'Wazuh-App-Agents-PCI-Requirement',
+            width: 33,
           },
         ],
       },
@@ -137,26 +142,14 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: 'Top requirements over time',
-            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
+            title: 'PCI Requirements',
+            id: 'Wazuh-App-Agents-PCI-Requirements',
+            width: 70,
           },
-        ],
-      },
-      {
-        height: 530,
-        vis: [
           {
-            title: 'Last alerts',
-            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
-          },
-        ],
-      },
-      {
-        height: 255,
-        vis: [
-          {
-            title: 'Requirements by agent',
-            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
+            title: 'Rule level distribution',
+            id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
+            width: 30,
           },
         ],
       },
@@ -165,7 +158,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-PCI-DSS-Alerts-summary',
+            id: 'Wazuh-App-Agents-PCI-Last-alerts',
           },
         ],
       },
