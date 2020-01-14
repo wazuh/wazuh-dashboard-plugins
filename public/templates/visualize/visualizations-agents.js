@@ -539,14 +539,14 @@ export const visualizations = {
   },
   ciscat: {
     metrics: [
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-error' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-fail' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-not-checked' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-pass' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-score' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-timestamp' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-error' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-fail' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-not-checked' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-pass' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-score' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-timestamp' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark' },
+      { id: 'Wazuh-app-Agents-CISCAT-last-scan-unknown' },
     ],
     rows: [
       {
@@ -554,12 +554,12 @@ export const visualizations = {
         vis: [
           {
             title: 'Top 5 CIS-CAT groups',
-            id: 'Wazuh-app-Overview-CISCAT-top-5-groups',
+            id: 'Wazuh-app-Agents-CISCAT-top-5-groups',
             width: 60,
           },
           {
             title: 'Scan result evolution',
-            id: 'Wazuh-app-Overview-CISCAT-scan-result-evolution',
+            id: 'Wazuh-app-Agents-CISCAT-scan-result-evolution',
             width: 40,
           },
         ],
@@ -569,7 +569,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-app-Overview-CISCAT-alerts-summary',
+            id: 'Wazuh-app-Agents-CISCAT-alerts-summary',
           },
         ],
       },
