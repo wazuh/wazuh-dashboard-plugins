@@ -613,29 +613,30 @@ export const visualizations = {
     ],
   },
   audit: {
+    metrics: [
+      { id: 'Wazuh-App-Agents-Audit-New-files-metric' },
+      { id: 'Wazuh-App-Agents-Audit-Read-files-metric' },
+      { id: 'Wazuh-App-Agents-Audit-Modified-files-metric' },
+      { id: 'Wazuh-App-Agents-Audit-Removed-files-metric' },
+    ],
     rows: [
       {
         height: 250,
         vis: [
           {
             title: 'Groups',
-            id: 'Wazuh-App-Overview-Audit-Groups',
-            width: 25,
-          },
-          {
-            title: 'Agents',
-            id: 'Wazuh-App-Overview-Audit-Agents',
-            width: 25,
+            id: 'Wazuh-App-Agents-Audit-Groups',
+            width: 33,
           },
           {
             title: 'Commands',
-            id: 'Wazuh-App-Overview-Audit-Commands',
-            width: 25,
+            id: 'Wazuh-App-Agents-Audit-Commands',
+            width: 33,
           },
           {
             title: 'Files',
-            id: 'Wazuh-App-Overview-Audit-Files',
-            width: 25,
+            id: 'Wazuh-App-Agents-Audit-Files',
+            width: 33,
           },
         ],
       },
@@ -644,7 +645,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts over time',
-            id: 'Wazuh-App-Overview-Audit-Alerts-over-time',
+            id: 'Wazuh-App-Agents-Audit-Alerts-over-time',
           },
         ],
       },
@@ -653,7 +654,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Audit-Last-alerts',
+            id: 'Wazuh-App-Agents-Audit-Last-alerts',
           },
         ],
       },
