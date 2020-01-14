@@ -257,62 +257,37 @@ export const visualizations = {
   hipaa: {
     rows: [
       {
-        height: 570,
+        height: 300,
         vis: [
           {
-            title: 'Alerts volume by agent',
-            id: 'Wazuh-App-Overview-HIPAA-Heatmap',
+            title: 'Requirements over time',
+            id: 'Wazuh-App-Agents-HIPAA-Requirements-Stacked-Overtime',
             width: 50,
           },
           {
-            hasRows: true,
-            rows: [
-              {
-                height: 285,
-                vis: [
-                  {
-                    title: 'Most common alerts',
-                    id: 'Wazuh-App-Overview-HIPAA-Tag-cloud',
-                    width: 50,
-                  },
-                  {
-                    title: 'Top 10 requirements',
-                    id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements',
-                    width: 50,
-                  },
-                ],
-              },
-              {
-                height: 285,
-                vis: [
-                  {
-                    title: 'Most active agents',
-                    id: 'Wazuh-App-Overview-HIPAA-Top-10-agents',
-                    width: 50,
-                  },
-                  {
-                    title: 'Stats',
-                    id: 'Wazuh-App-Overview-HIPAA-Metrics',
-                    width: 50,
-                  },
-                ],
-              },
-            ],
+            title: 'Top 10 requirements',
+            id: 'Wazuh-App-Agents-HIPAA-top-10',
+            width: 50,
           },
         ],
       },
       {
-        height: 400,
+        height: 300,
         vis: [
           {
-            title: 'Requirements evolution over time',
-            id: 'Wazuh-App-Overview-HIPAA-Top-requirements-over-time',
-            width: 50,
+            title: 'HIPAA requirements',
+            id: 'Wazuh-App-Agents-HIPAA-Burbles',
+            width: 45,
           },
           {
-            title: 'Requirements distribution by agent',
-            id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent',
-            width: 50,
+            title: 'Requirements distribution by level',
+            id: 'Wazuh-App-Agents-HIPAA-Distributed-By-Level',
+            width: 30,
+          },
+          {
+            title: 'Most common alerts',
+            id: 'Wazuh-App-Agents-HIPAA-Most-Common',
+            width: 25,
           },
         ],
       },
@@ -321,7 +296,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-HIPAA-Alerts-summary',
+            id: 'Wazuh-App-Agents-HIPAA-Last-alerts',
           },
         ],
       },
