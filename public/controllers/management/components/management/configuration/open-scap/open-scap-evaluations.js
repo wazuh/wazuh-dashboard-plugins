@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
@@ -60,5 +60,9 @@ class WzConfigurationOpenScapEvaluations extends Component{
     )
   }
 }
+
+WzConfigurationOpenScapEvaluations.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+};
 
 export default WzConfigurationOpenScapEvaluations;

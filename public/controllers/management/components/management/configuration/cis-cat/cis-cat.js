@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from '../util-components/no-config';
 import TabSelector from '../util-components/tab-selector';
@@ -33,6 +29,9 @@ class WzConfigurationCisCat extends Component{
   badgeEnabled(){
     return this.config['cis-cat'].disabled !== 'yes';
   }
+  componentDidMount(){
+    this.props.updateBadge(this.badgeEnabled());
+  }
   render(){
     const { currentConfig } = this.props;
     return (
@@ -45,10 +44,10 @@ class WzConfigurationCisCat extends Component{
         )}
         <TabSelector>
           <div label='General'>
-            <WzConfigurationCisCatGeneral config={this.config}/>
+            <WzConfigurationCisCatGeneral currentConfig={this.config}/>
           </div>
           <div label='Benchmarks'>
-            <WzConfigurationCisCatBenchmarks config={this.config}/>
+            <WzConfigurationCisCatBenchmarks currentConfig={this.config}/>
           </div>
         </TabSelector>
       </Fragment>
@@ -57,5 +56,9 @@ class WzConfigurationCisCat extends Component{
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationCisCat.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationCisCat);

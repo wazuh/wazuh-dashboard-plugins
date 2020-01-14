@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzTabSelector from "../util-components/tab-selector";
@@ -39,7 +35,6 @@ class WzPolicyMonitoring extends Component{
     && this.props.currentConfig['syscheck-rootcheck'].rootcheck.disabled === 'no'
   }
   render(){
-    const { currentConfig } = this.props;
     return (
       <Fragment>
         <WzTabSelector>
@@ -63,5 +58,9 @@ class WzPolicyMonitoring extends Component{
 }
 
 const sections = [{component:'syscheck',configuration:'rootcheck'}, {component:'wmodules',configuration:'wmodules'}]
+
+WzPolicyMonitoring.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzPolicyMonitoring);

@@ -10,28 +10,16 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
-import {
-  
-} from "@elastic/eui";
-
-import WzConfigurationPath from "../util-components/configuration-path";
-import WzNoConfig from "../util-components/no-config";
 import WzTabSelector from "../util-components/tab-selector";
 import withWzConfig from "../util-hocs/wz-config";
-import { isString } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 
 import WzConfigurationAmazonS3General from './aws-s3-general';
 import WzConfigurationAmazonS3Buckets from './aws-s3-buckets';
 import WzConfigurationAmazonS3Services from './aws-s3-services';
-
-const helpLinks = [
-  { text: 'Using Wazuh to monitor AWS', href: 'https://documentation.wazuh.com/current/amazon/index.html' },
-  { text: 'Amazon S3 module reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html' },
-];
 
 class WzConfigurationAmazonS3 extends Component{
   constructor(props){
@@ -63,5 +51,10 @@ class WzConfigurationAmazonS3 extends Component{
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationAmazonS3.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default withWzConfig(sections)(WzConfigurationAmazonS3);

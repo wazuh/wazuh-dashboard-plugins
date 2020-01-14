@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -38,7 +34,7 @@ class WzConfigurationLogCollectionCommands extends Component{
   }
   render(){
     const { currentConfig } = this.props;
-    const items = settingsListBuilder(currentConfig['logcollector-localfile']['localfile-commands'], ['alias','command'])
+    const items = currentConfig['logcollector-localfile'] && currentConfig['logcollector-localfile']['localfile-commands'] ? settingsListBuilder(currentConfig['logcollector-localfile']['localfile-commands'], ['alias','command']) : [];
     return (
       <Fragment>
         {currentConfig['logcollector-localfile'] && isString(currentConfig['logcollector-localfile']) && (
@@ -63,5 +59,9 @@ class WzConfigurationLogCollectionCommands extends Component{
     )
   }
 }
+
+WzConfigurationLogCollectionCommands.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationLogCollectionCommands;

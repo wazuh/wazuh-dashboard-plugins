@@ -11,16 +11,13 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import withWzConfig from "../util-hocs/wz-config";
 import WzNoConfig from "../util-components/no-config";
 import { isString } from '../utils/utils';
 import WzTabSelector from '../util-components/tab-selector';
+import helpLinks from './help-links';
 
 import WzConfigurationIntegrityMonitoringGeneral from './integrity-monitoring-general';
 import WzConfigurationIntegrityMonitoringMonitored from './integrity-monitoring-monitored';
@@ -78,4 +75,7 @@ class WzConfigurationIntegrityMonitoring extends Component{
 
 const sections = [{component:'syscheck',configuration:'syscheck'}];
 
+WzConfigurationIntegrityMonitoring.proptTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 export default withWzConfig(sections)(WzConfigurationIntegrityMonitoring);

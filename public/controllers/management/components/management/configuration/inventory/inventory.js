@@ -11,13 +11,12 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
 } from "@elastic/eui";
 
-import WzConfigurationPath from '../util-components/configuration-path';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -33,7 +32,7 @@ const mainSettings = [
 const scanSettings = [
   { field: 'hardware', label: 'Scan hardware info' },
   { field: 'processes', label: 'Scan current processes' },
-  { field: 'os', label: 'Scan operating system infoo' },
+  { field: 'os', label: 'Scan operating system info' },
   { field: 'packages', label: 'Scan installed packages' },
   { field: 'network', label: 'Scan network interfaces' },
   { field: 'ports', label: 'Scan listening network ports' },
@@ -63,27 +62,33 @@ class WzConfigurationInventory extends Component{
         {currentConfig && !this.config.syscollector && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        <WzConfigurationSettingsTabSelector
-          title='Main settings'
-          description='General settings applied to all the scans'
-          currentConfig={this.config}
-          helpLinks={helpLinks}>
-          <WzConfigurationSettingsGroup
-            config={this.config.syscollector}
-            items={mainSettings}
-          />
-          <WzConfigurationSettingsGroup
-            title='Scan settings'
-            description='Specific inventory scans to collect'
-            config={this.config.syscollector}
-            items={scanSettings}
-          />
-        </WzConfigurationSettingsTabSelector>
+        {currentConfig && this.config && this.config.syscollector && (
+          <WzConfigurationSettingsTabSelector
+            title='Main settings'
+            description='General settings applied to all the scans'
+            currentConfig={this.config}
+            helpLinks={helpLinks}>
+            <WzConfigurationSettingsGroup
+              config={this.config.syscollector}
+              items={mainSettings}
+            />
+            <WzConfigurationSettingsGroup
+              title='Scan settings'
+              description='Specific inventory scans to collect'
+              config={this.config.syscollector}
+              items={scanSettings}
+            />
+          </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationInventory.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationInventory);

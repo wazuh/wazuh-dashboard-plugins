@@ -11,13 +11,14 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 
 import helpLinks from './help-links';
 
@@ -32,21 +33,21 @@ class WzConfigurationCisCatBenchmarks extends Component{
     super(props);
   }
   render(){
-    const { config } = this.props;
+    const { currentConfig } = this.props;
     return (
       <Fragment>
-        {(!config['cis-cat'].content && (
+        {(!currentConfig['cis-cat'].content && (
           <WzNoConfig error='not-present' help={helpLinks}></WzNoConfig>
         )) || (
           <Fragment>
             <WzConfigurationSettingsTabSelector
               title='Benchmarks'
               description='List of CIS-CAT benchmark templates to perform scans'
-              currentConfig={config}
+              currentConfig={currentConfig}
               helpLinks={helpLinks}
             >
             <EuiBasicTable
-              items={config['cis-cat']}
+              items={currentConfig['cis-cat']}
               columns={columns}/>
             </WzConfigurationSettingsTabSelector>
 
@@ -56,5 +57,9 @@ class WzConfigurationCisCatBenchmarks extends Component{
     )
   }
 }
+
+WzConfigurationCisCatBenchmarks.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationCisCatBenchmarks;

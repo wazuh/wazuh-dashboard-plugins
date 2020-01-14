@@ -13,17 +13,11 @@
 import React, { Component, Fragment } from 'react';
 
 import {
-	EuiPage,
-	EuiPanel,
 	EuiTitle,
 	EuiFlexGroup,
 	EuiFlexItem,
-	EuiText,
-	EuiButtonEmpty,
-	EuiPopover
+	EuiButtonEmpty
 } from '@elastic/eui';
-
-import { connect } from 'react-redux';
 
 import WzConfigurationOverviewTable from './configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
@@ -107,7 +101,7 @@ class WzConfigurationOverview extends Component{
 					</EuiFlexGroup>
 					<EuiFlexGroup>
 						<EuiFlexItem>
-							{this.settings.map((group, key) => (
+							{this.settings.map(group => (
 								<WzConfigurationOverviewTable 
 									key={`settings-${group.title}`}
 									title={group.title}

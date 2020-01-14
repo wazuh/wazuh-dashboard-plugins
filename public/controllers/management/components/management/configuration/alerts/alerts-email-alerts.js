@@ -11,12 +11,13 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
-  
+  EuiSpacer,
 } from "@elastic/eui";
 
+import WzConfigurationSetting from '../util-components/configuration-setting';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString, isArray } from '../utils/utils';
@@ -81,8 +82,8 @@ class WzConfigurationAlertsEmailAlerts extends Component{
                 ))}
               </ul>
               <EuiSpacer size='s'/>
-              {mainSettings.map(item => 
-                <WzConfigurationSetting keyItem={'email-alerts'} description={item.text} value={selectedItem[item.key]}/>
+              {mainSettings.map((item,key) => 
+                <WzConfigurationSetting key={`email-alerts-${key}`} keyItem={`email-alerts-${key}`} description={item.text} value={selectedItem[item.key]}/>
               )}
           </WzConfigurationSettingsTabSelector>
         )}
@@ -94,5 +95,10 @@ class WzConfigurationAlertsEmailAlerts extends Component{
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
+
+WzConfigurationAlertsEmailAlerts.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default connect(mapStateToProps)(WzConfigurationAlertsEmailAlerts);

@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiButton,
@@ -19,9 +19,7 @@ import {
   EuiIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLink,
   EuiText,
-  EuiTitle,
   EuiSpacer,
   EuiLoadingSpinner,
   EuiCallOut
@@ -58,17 +56,26 @@ class WzEditorConfiguration extends Component{
     try{
       this.setState({ saving: true });
       await saveFileManager(this.state.editorValue);
-      this.setState( { saving: false, infoChangesAfterRestart: true });
+      this.setState({ saving: false, infoChangesAfterRestart: true });
       this.props.addToast({
         title: (
           <Fragment>
             <EuiIcon type='check'/>&nbsp;
-            <span>Success. Manager configuration has been updated</span>
+        <span>Success. {this.props.node} configuration has been updated</span>
           </Fragment>),
         color: 'success'
       });
     }catch(error){
       console.error(error);
+      this.props.addToast({
+        title: (
+          <Fragment>
+            <EuiIcon type='check'/>&nbsp;
+            <span>Failed</span>
+          </Fragment>),
+        color: 'danger'
+      });
+      this.setState({ saving: false, infoChangesAfterRestart: false });
     }
   }
   editorCancel(){
@@ -83,17 +90,19 @@ class WzEditorConfiguration extends Component{
   }
   async confirmRestart(){
     try{
-      this.setState( { restarting: true, infoChangesAfterRestart: false } );
+      this.setState({ restarting: true, infoChangesAfterRestart: false } );
       await restartNodeSelected(null, this.props.updateWazuhNotReadyYet);
       this.props.updateWazuhNotReadyYet(false);
-      this.setState( { restart: false, restarting: false } );
+      this.setState({ restart: false, restarting: false });
     }catch(error){
-      updateWazuhNotReadyYet(false);
-      this.setState( { restart: false, restarting: false } );
+      console.error('error restarting', error)
+      this.props.updateWazuhNotReadyYet(false);
+      this.setState({ restart: false, restarting: false });
     }
   }
   render(){
-    const { editorValue, xml, xmlError, restart, restarting, saving, infoChangesAfterRestart } = this.state;
+    const { editorValue, xmlError, restart, restarting, saving, infoChangesAfterRestart } = this.state;
+    const { node = 'manager' } = this.props;
     return (
       <Fragment>
         <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
@@ -115,7 +124,7 @@ class WzEditorConfiguration extends Component{
               {restart && !restarting ? 
                 (<EuiFlexGroup alignItems='center'>
                   <EuiFlexItem>
-                    <span><strong>manager</strong> will be restarted</span>
+                    <span><strong>{node}</strong> will be restarted</span>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty onClick={() => this.toggleRestart()}>Cancel</EuiButtonEmpty>
@@ -126,16 +135,16 @@ class WzEditorConfiguration extends Component{
                 </EuiFlexGroup>)
                   : restarting ? 
                     <EuiButton fill isDisabled>
-                      <EuiLoadingSpinner size="s"/> Restarting manager
+                      <EuiLoadingSpinner size="s"/> Restarting {node}
                     </EuiButton>
-                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart manager</EuiButton>
+                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {node}</EuiButton>
               }
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s'/>
         <EuiText>
-          Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>manager</span>
+          Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{node}</span>
           {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
         </EuiText>
         {infoChangesAfterRestart && (
@@ -154,6 +163,11 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value))
 });
+
+WzEditorConfiguration.propTypes = {
+  wazuhNotReadyYet: PropTypes.string,
+  updateWazuhNotReadyYet: PropTypes.func
+};
 
 export default compose(
   withWzToast,

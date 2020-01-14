@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -31,4 +31,4 @@ const withWodle = (wodle) => (WrappedComponent) => {
   return WithWodle
 }
 
-export default Wodle;
+export default withWodle;

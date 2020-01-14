@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -47,10 +47,10 @@ class WzConfigurationAmazonS3Buckets extends Component{
     const items = currentConfig['aws-s3'] && currentConfig['aws-s3'].buckets ? settingsListBuilder(currentConfig['aws-s3'].buckets, 'name') : {};
     return (
       <Fragment>
-        {currentConfig && !currentConfig['aws-s3'] /*&& !currentConfig['aws-s3'].buckets*/ && (
+        {currentConfig && !currentConfig['aws-s3'] && !currentConfig['aws-s3'].buckets && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {wazuhNotReadyYet && (!currentConfig /*|| !currentConfig['aws-s3']*/) && ( 
+        {wazuhNotReadyYet && (!currentConfig || !currentConfig['aws-s3']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].buckets && (
@@ -74,5 +74,11 @@ class WzConfigurationAmazonS3Buckets extends Component{
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
+
+WzConfigurationAmazonS3Buckets.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
+
 
 export default connect(mapStateToProps)(WzConfigurationAmazonS3Buckets);

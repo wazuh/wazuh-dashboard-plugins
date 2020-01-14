@@ -11,17 +11,13 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  EuiTitle,
-  EuiText,
-  EuiHorizontalRule
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import { WzConfigurationSettingsHeaderViewer } from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import { WzSettingsViewer } from '../util-components/code-viewer';
+import WzViewSelector from '../util-components/view-selector';
+import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
 import { capitalize, isString } from '../utils/utils';
 
@@ -69,6 +65,12 @@ class WzConfigurationIntegrations extends Component{
           <WzNoConfig error={currentConfig['integrator-integration']} help={helpLinks}/>
         )}
         {currentConfig['integrator-integration'] && !isString(currentConfig['integrator-integration']) && (
+        //   <WzConfigurationSettingsTabSelector
+        //     title='Main settings'
+        //     description='Basic alerts and logging settings'
+        //     currentConfig={currentConfig}
+        //     helpLinks={helpLinks}>
+        // </WzConfigurationSettingsTabSelector>
           <WzViewSelector view={view}>
             <div default>
               {integrations.map((integrationKey) => {
@@ -118,5 +120,9 @@ class WzConfigurationIntegrations extends Component{
 }
 
 const sections = [{component:'integrator',configuration:'integration'}];
+
+WzConfigurationIntegrations.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationIntegrations);

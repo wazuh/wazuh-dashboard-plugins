@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiCodeEditor,
@@ -60,11 +60,11 @@ class WzCodeEditor extends Component{
 }
 
 WzCodeEditor.propTypes = {
-  title: Proptypes.string,
-  mode: Proptypes.string,
-  value: Proptypes.string,
-  height: Proptypes.string,
-  minusHeight: Proptypes.number
+  title: PropTypes.string,
+  mode: PropTypes.string,
+  value: PropTypes.string,
+  height: PropTypes.string,
+  minusHeight: PropTypes.number
 };
 
 export default WzCodeEditor;

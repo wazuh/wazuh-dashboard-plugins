@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -41,7 +41,7 @@ class WzViewSelector extends Component{
 }
 
 WzViewSelector.propTypes = {
-  children: Proptypes.array
+  children: PropTypes.array
 }
 
 export default WzViewSelector;

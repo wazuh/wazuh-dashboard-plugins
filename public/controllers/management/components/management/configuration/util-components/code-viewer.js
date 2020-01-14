@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -44,10 +44,10 @@ class WzCodeViewer extends Component{
 }
 
 WzCodeViewer.propTypes = {
-  title: Proptypes.string.isRequired,
-  mode: Proptypes.string.isRequired,
-  view: Proptypes.string.isRequired,
-  editorValue: Proptypes.string.isRequired
+  title: PropTypes.string.isRequired,
+  mode: PropTypes.string.isRequired,
+  view: PropTypes.string.isRequired,
+  editorValue: PropTypes.string.isRequired
 };
 
 export default WzCodeViewer;

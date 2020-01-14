@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
@@ -50,5 +46,9 @@ class WzConfigurationVulnerabilitiesGeneral extends Component{
     )
   }
 }
+
+WzConfigurationVulnerabilitiesGeneral.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+};
 
 export default WzConfigurationVulnerabilitiesGeneral;

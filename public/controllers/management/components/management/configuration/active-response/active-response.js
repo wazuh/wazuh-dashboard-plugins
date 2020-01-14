@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzTabSelector from '../util-components/tab-selector';
 import WzConfigurationActiveResponseActiveResponse from './active-response-active-response';
@@ -43,5 +39,9 @@ class WzConfigurationActiveResponse extends Component{
 }
 
 const sections = [{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}];
+
+WzConfigurationActiveResponse.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationActiveResponse);

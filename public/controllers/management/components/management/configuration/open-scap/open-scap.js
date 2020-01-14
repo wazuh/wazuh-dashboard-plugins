@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from "../util-components/no-config";
 import WzTabSelector from '../util-components/tab-selector';
@@ -68,6 +64,10 @@ const mapStateToProps = (state) => ({
 })
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationOpenSCAP.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+};
 
 export default compose(
   connect(mapStateToProps),

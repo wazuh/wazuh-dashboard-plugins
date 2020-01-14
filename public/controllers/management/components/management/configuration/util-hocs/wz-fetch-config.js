@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -25,7 +25,7 @@ export default withWzFetchConfig = (sections) => (WrappedComponent) => {
         currentConfig: false
       }
     }
-    componendDidMount(){
+    async componendDidMount(){
       const { agent } = this.props;
       try{
         const currentConfig = await getCurrentConfig(agent.id, sections);

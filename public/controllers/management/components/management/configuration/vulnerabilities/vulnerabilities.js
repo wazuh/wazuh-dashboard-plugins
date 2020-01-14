@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';

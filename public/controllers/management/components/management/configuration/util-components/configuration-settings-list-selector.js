@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiFlexGroup,
@@ -66,9 +66,9 @@ class WzConfigurationSettingsListSelector extends Component{
 }
 
 WzConfigurationSettingsListSelector.propTypes = {
-  items: Proptypes.array.isRequired,
-  settings: Proptypes.array.isRequired,
-  keyList: Proptypes.string,
+  items: PropTypes.array.isRequired,
+  settings: PropTypes.array.isRequired,
+  keyList: PropTypes.string,
 }
 
 export default WzConfigurationSettingsListSelector;

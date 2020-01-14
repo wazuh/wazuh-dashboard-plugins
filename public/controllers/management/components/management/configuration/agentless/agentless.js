@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import withWzConfig from "../util-hocs/wz-config";
 import WzNoConfig from "../util-components/no-config";
@@ -76,6 +72,11 @@ const sections = [{component:'agentless',configuration:'agentless'}];
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
+
+WzConfigurationAgentless.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default compose(
   withWzConfig(sections),

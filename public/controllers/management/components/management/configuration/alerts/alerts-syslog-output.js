@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable,
@@ -61,11 +61,6 @@ class WzConfigurationAlertsReports extends Component{
             description='Output alerts to a syslog server'
             currentConfig={currentConfig} 
             helpLinks={helpLinks}>
-            <ul>
-              {currentConfig['monitor-reports'].email_alerts.map((item, key) => (
-                <li key={`monitor-reports-${key}`} onClick={() => this.selectItem(key)}></li>
-              ))}
-            </ul>
             <EuiBasicTable
               columns={columns}
               items={currentConfig['csyslog-csyslog'].syslog_output}/>
@@ -79,5 +74,10 @@ class WzConfigurationAlertsReports extends Component{
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
+
+WzConfigurationAlertsReports.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default connect(mapStateToProps)(WzConfigurationAlertsReports);

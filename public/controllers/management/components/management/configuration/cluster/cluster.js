@@ -11,15 +11,11 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-import WzNoConfig from '../util-components/no-config';
-
-import {
-  EuiSpacer  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzNoConfig from '../util-components/no-config';
 
 import withWzConfig from '../util-hocs/wz-config';
 import { isString } from "../utils/utils";
@@ -29,8 +25,8 @@ import { compose } from 'redux';
 
 const mainSettings = [
   { field: 'disabled', label: 'Cluster status'},
-  { field: 'jsonout_output', label: 'Cluster name' },
-  { field: 'name', label: 'Node name' },
+  { field: 'name', label: 'Cluster name' },
+  { field: 'node_name', label: 'Node name' },
   { field: 'node_type', label: 'Node type' },
   { field: 'nodes', label: 'Master node IP address' },
   { field: 'port', label: 'Port to listen to cluster communications' },
@@ -62,7 +58,10 @@ class WzCluster extends Component{
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig['com-cluster'] && !isString(currentConfig['com-cluster']) && (
-          <WzConfigurationSettingsTabSelector title='Main settings' currentConfig={currentConfig} helpLinks={helpLinks}>
+          <WzConfigurationSettingsTabSelector
+            title='Main settings'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}>
               <WzConfigurationSettingsGroup
                 config={mainSettingsConfig}
                 items={mainSettings}
@@ -79,6 +78,11 @@ const sections = [{component:'com',configuration:'cluster'}];
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
+
+WzCluster.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default compose(
   withWzConfig(sections),

@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiButtonEmpty,
@@ -74,8 +74,8 @@ class WzConfigurationSettingsHeader extends Component{
 }
 
 WzConfigurationSettingsHeader.propTypes = {
-  title: Proptypes.string,
-  description: Proptypes.string
+  title: PropTypes.string,
+  description: PropTypes.string
 }
 
 const ButtonLink = ({ onClick, text, view, viewSelected }) => {

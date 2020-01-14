@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzSettingsGroup from "../util-components/configuration-settings-group";
@@ -64,5 +60,10 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
     )
   }
 }
+
+WzConfigurationIntegrityMonitoringGeneral.proptTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  agent: PropTypes.object
+};
 
 export default WzConfigurationIntegrityMonitoringGeneral;

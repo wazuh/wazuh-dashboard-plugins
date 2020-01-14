@@ -11,13 +11,14 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
 } from "@elastic/eui";
 
 import WzNoConfig from '../util-components/no-config';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, hasSize } from '../utils/utils';
 
@@ -53,14 +54,13 @@ class WzConfigurationAlertsLabels extends Component{
           <WzNoConfig error='Wazuh not ready yet'/>
         )}
         {currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels) ? (
-          <WzConfigurationSettingsTabSelector title='Defined labels'currentConfig={currentConfig} helpLinks={helpLinks}>
-            <WzConfigurationSettingsGroup
-              config={mainSettingsConfig}
-              items={mainSettings}
-            />
+          <WzConfigurationSettingsTabSelector
+            title='Defined labels'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}>
             <EuiBasicTable
               columns={columns}
-              items={currentConfig['analysis-labels'].labels}/>
+              items={currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels}/>
           </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
@@ -80,3 +80,13 @@ export const WzConfigurationAlertsLabelsAgent = compose(
   connect(mapStateToProps),
   withWzConfig(sectionsAgent)
 )(WzConfigurationAlertsLabels)
+
+WzConfigurationAlertsLabels.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
+
+WzConfigurationAlertsLabelsAgent.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};

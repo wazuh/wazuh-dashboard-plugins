@@ -11,14 +11,13 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
-import {
-  EuiSpacer
-} from "@elastic/eui";
-
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import WzNoConfig from '../util-components/no-config';
-import { isString, isArray } from '../utils/utils';
+import { isString } from '../utils/utils';
+import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
 
@@ -43,22 +42,10 @@ const mainSettings = [
 class WzConfigurationAlertsReports extends Component{
   constructor(props){
     super(props);
-    this.state = {
-      view: '',
-      selectedItemIndex: 0
-    };
-
-  }
-  selectItem(selectedItem){
-    this.setState({ selectedItem })
-  }
-  changeView(view){
-    this.setState({ view });
   }
   render(){
-    const { selectedItemIndex } = this.state;
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const selectedItem = isArray(currentConfig['monitor-reports'].email_alerts) && currentConfig['mail-alerts'].email_alerts[selectedItemIndex];
+    const items = currentConfig['monitor-reports'].email_alerts ? settingsListBuilder(currentConfig['monitor-reports'].email_alerts, 'file') : {};
     return (
       <Fragment>
         {currentConfig['monitor-reports'] && isString(currentConfig['monitor-reports']) && (
@@ -70,21 +57,16 @@ class WzConfigurationAlertsReports extends Component{
         {wazuhNotReadyYet && (!currentConfig || !currentConfig['monitor-reports']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
-        {selectedItem && (
+        {currentConfig['monitor-reports'] && !isString(currentConfig['monitor-reports']) && currentConfig['monitor-reports'].reports && currentConfig['monitor-reports'].reports.length && (
           <WzConfigurationSettingsTabSelector
             title='Main settings'
             description='Daily reports about alerts'
             currentConfig={currentConfig}
             helpLinks={helpLinks}>
-              <ul>
-                {currentConfig['monitor-reports'].email_alerts.map((item, key) => (
-                  <li key={`monitor-reports-${key}`} onClick={() => this.selectItem(key)}></li>
-                ))}
-              </ul>
-              <EuiSpacer size='s'/>
-              {mainSettings.map((item, key) => 
-                <WzConfigurationSetting key={`monitor-reports-${key}-setting`} keyItem={`monitor-reports-${key}`} description={item.text} value={selectedItem[item.key]}/>
-              )}
+              <WzConfigurationListSelector
+                items={items}
+                settings={mainSettings}
+              />
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
@@ -95,5 +77,10 @@ class WzConfigurationAlertsReports extends Component{
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
+
+WzConfigurationAlertsReports.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default connect(mapStateToProps)(WzConfigurationAlertsReports);

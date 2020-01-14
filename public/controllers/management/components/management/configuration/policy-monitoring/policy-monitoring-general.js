@@ -10,8 +10,8 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 import {
   
@@ -19,9 +19,10 @@ import {
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import helpLinks from './help-links';
+import { renderValueNoThenEnabled } from '../utils/utils';
 
 const allSettings = [
-  { field: 'disabled', label: 'Policy monitoring service status'},
+  { field: 'disabled', label: 'Policy monitoring service status', render: renderValueNoThenEnabled},
   { field: 'base_directory', label: 'Base directory' },
   { field: 'scanall', label: 'Scan the entire system' },
   { field: 'frequency', label: 'Frequency (in seconds) to run the scan' },
@@ -50,23 +51,23 @@ class WzConfigurationPolicyMonitoringGeneral extends Component{
   }
   render(){
     const { currentConfig } = this.props;
-    const allSettingsConfig = {
-      ...currentConfig['syscheck-rootcheck'].rootcheck,
-      disabled: currentConfig['syscheck-rootcheck'].rootcheck.disabled === 'no' ? 'enabled' : 'disabled'
-    };
-
     return (
       <WzConfigurationSettingsTabSelector
         title='All settings'
         description='General settings for the rootcheck daemon'
-        currentConfig={currentConfig} helpLinks={helpLinks}>
+        currentConfig={currentConfig}
+        helpLinks={helpLinks}>
           <WzConfigurationSettingsGroup
-            config={allSettingsConfig}
+            config={currentConfig['syscheck-rootcheck'].rootcheck}
             items={allSettings}
           />
       </WzConfigurationSettingsTabSelector>
     )
   }
 }
+
+WzConfigurationPolicyMonitoringGeneral.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationPolicyMonitoringGeneral;

@@ -11,18 +11,15 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
 import helpLinks from './help-links';
+import { renderValueNoThenEnabled } from '../utils/utils';
 
 const mainSettings = [
-  { field: 'disabled', label: 'CIS-CAT integration status' },
+  { field: 'disabled', label: 'CIS-CAT integration status', render: renderValueNoThenEnabled},
   { field: 'timeout', label: 'Timeout (in seconds) for scan executions' },
   { field: 'java_path', label: 'Path to Java executable directory' },
   { field: 'ciscat_path', label: 'Path to CIS-CAT executable directory' }
@@ -41,22 +38,22 @@ class WzConfigurationCisCatGeneral extends Component{
     super(props);
   }
   render(){
-    const { config } = this.props;
+    const { currentConfig } = this.props;
     return (
       <Fragment>
         <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='General settings applied to all benchmarks'
-          currentConfig={config}
+          currentConfig={currentConfig}
           helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup 
-              config={config['cis-cat']}
+              config={currentConfig['cis-cat']}
               items={mainSettings}
             />
             <WzConfigurationSettingsGroup
               title='Scheduling settings'
               description='Customize CIS-CAT scans scheduling'
-              config={config['cis-cat']}
+              config={currentConfig['cis-cat']}
               items={schedulingSettings}
             />
         </WzConfigurationSettingsTabSelector>
@@ -66,4 +63,7 @@ class WzConfigurationCisCatGeneral extends Component{
   }
 }
 
+WzConfigurationCisCatGeneral.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+}
 export default WzConfigurationCisCatGeneral;

@@ -11,21 +11,18 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
+
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { field: 'logformat', label: 'Log format', render: renderValueOrNoValue },
+  { field: 'logformat', label: 'Log format' },
   { field: 'file', label: 'Log location', render: renderValueOrNoValue },
   { field: 'only-future-events', label: 'Only receive logs occured after start', when: 'agent' },
   { field: 'reconnect_time', label: 'Time in seconds to try to reconnect with Windows Event Channel when it has fallen', when: 'agent' },
@@ -41,7 +38,7 @@ class WzConfigurationLogCollectionLogs extends Component{
   }
   render(){
     const { currentConfig, agent } = this.props;
-    const items = settingsListBuilder(currentConfig['logcollector-localfile']['localfile-logs'], 'file');
+    const items = currentConfig['logcollector-localfile'] && currentConfig['logcollector-localfile']['localfile-logs'] ? settingsListBuilder(currentConfig['logcollector-localfile']['localfile-logs'], 'file') : [];
     return (
       <Fragment>
         {currentConfig['logcollector-localfile'] && isString(currentConfig['logcollector-localfile']) && (
@@ -66,5 +63,9 @@ class WzConfigurationLogCollectionLogs extends Component{
     )
   }
 }
+
+WzConfigurationLogCollectionLogs.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationLogCollectionLogs;

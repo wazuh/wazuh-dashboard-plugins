@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import {
@@ -23,7 +23,8 @@ import {
   EuiButtonIcon,
   EuiSpacer,
   EuiTitle,
-  EuiText
+  EuiText,
+  EuiIcon
 } from "@elastic/eui";
 
 import WzBadge from '../util-components/badge';
@@ -58,11 +59,11 @@ class WzConfigurationPath extends Component{
 }
 
 WzConfigurationPath.propTypes = {
-  title: Proptypes.string.isRequired,
-  description: Proptypes.string,
-  icon: Proptypes.string,
-  updateConfigurationSection: Proptypes.func,
-  badge: Proptypes.bool
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  icon: PropTypes.string,
+  updateConfigurationSection: PropTypes.func,
+  badge: PropTypes.bool
 };
 
 export default WzConfigurationPath;

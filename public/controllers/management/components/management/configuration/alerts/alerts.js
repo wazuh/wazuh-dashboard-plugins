@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  EuiSpacer
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzTabSelector from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
@@ -24,7 +20,6 @@ import WzConfigurationAlertsLabels from './alerts-labels';
 import WzConfigurationAlertsEmailAlerts from './alerts-email-alerts';
 import WzConfigurationAlertsEmailReports from './alerts-reports';
 import WzConfigurationAlertsSyslogOutput from './alerts-syslog-output';
-import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -34,18 +29,8 @@ class WzConfigurationAlerts extends Component{
     super(props);
   }
   render(){
-    const { currentConfig, wazuhNotReadyYet } = this.props;
     return (
       <Fragment>
-        {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && (
-          <WzNoConfig error={currentConfig['analysis-alerts']}/>
-        )}
-        {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts && (
-          <WzNoConfig error='not-present'/>
-        )}
-        {wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-alerts']) && (
-          <WzNoConfig error='Wazuh not ready yet'/>
-        )}
         <WzTabSelector>
           <div label="General">
             <WzConfigurationAlertsGeneral {...this.props}/>
@@ -79,6 +64,11 @@ const sections = [
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
+
+WzConfigurationAlerts.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default compose(
   withWzConfig(sections),

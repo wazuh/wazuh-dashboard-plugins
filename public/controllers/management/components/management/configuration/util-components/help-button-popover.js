@@ -11,7 +11,7 @@
 */
 
 import React, { Component } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiButtonEmpty,
@@ -39,7 +39,7 @@ class WzHelpButtonPopover extends Component{
         isOpen={showHelp}
         closePopover={() => this.toggleShowHelp()}>
           <div style={{ width: '300px' }}>
-            <EuiText color='subdued'>More info about this section</EuiText>
+            <EuiText color='subdued' style={{padding: "0 8px"}}>More info about this section</EuiText>
             {links.map(link => (
               <div key={`show-help-${link.text}`}>
                 <EuiButtonEmpty target='_blank' href={link.href}>{link.text}</EuiButtonEmpty>
@@ -52,7 +52,7 @@ class WzHelpButtonPopover extends Component{
 }
 
 WzHelpButtonPopover.propTypes = {
-  links: Proptypes.array
+  links: PropTypes.array
 };
 
 export default WzHelpButtonPopover;

@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
@@ -44,8 +44,8 @@ const columns = [
   { field: 'address', name: 'Address', render: renderValueOrNoValue },
   { field: 'port', name: 'Port', render: renderValueOrDefault('1514') },
   { field: 'protocol', name: 'Protocol', render: renderValueOrDefault('udp') }
-]
-// import 
+];
+
 class WzConfigurationClient extends Component{
   constructor(props){
     super(props);
@@ -86,5 +86,9 @@ class WzConfigurationClient extends Component{
 }
 
 const sections = [{component:'agent',configuration:'client'}];
+
+WzConfigurationClient.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+};
 
 export default withWzConfig(sections)(WzConfigurationClient);

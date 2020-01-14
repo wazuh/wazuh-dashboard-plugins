@@ -11,16 +11,14 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
 } from "@elastic/eui";
 
-import WzViewSelector from '../util-components/view-selector';
-import { WzJSONViewer, WzXMLViewer } from '../util-components/code-viewer';
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
+import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import helpLinks from './help-links.js';
 
 const columnsIgnore = [
@@ -28,7 +26,7 @@ const columnsIgnore = [
 ];
 
 const columnsIgnoreSregex = [
-  { field: 'path', name: 'Sregex' }
+  { field: 'sreg', name: 'Sregex' }
 ];
 
 class WzConfigurationPolicyMonitoringSystemAudit extends Component{
@@ -37,8 +35,6 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component{
   }
   render(){
     const { currentConfig } = this.props;
-    const itemsIgnore = currentConfig['syscheck-rootcheck'].rootcheck.ignore;
-    const itemsIgnoreSregex = currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex;
     return (
       <Fragment>
         {currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && (!currentConfig['syscheck-rootcheck'].rootcheck.ignore || ( currentConfig['syscheck-rootcheck'].rootcheck.ignore && !currentConfig['syscheck-rootcheck'].rootcheck.ignore.length)) && (
@@ -50,25 +46,29 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component{
             currentConfig={currentConfig}
             helpLinks={helpLinks}>
               {(currentConfig['syscheck-rootcheck'].rootcheck.ignore || {}).length && (
-                  <Fragment>
-                    <EuiBasiTable 
-                      items={itemsIgnore}
-                      columns={columnsIgnore}
-                    />
-                  </Fragment>
-                )}
-                {(currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex || {}).length && (
-                  <Fragment>
-                    <EuiBasiTable 
-                      items={itemsIgnoreSregex}
-                      columns={columnsIgnoreSregex}/>
-                  </Fragment>
-                )}
+                <Fragment>
+                  <EuiBasicTable 
+                    items={currentConfig['syscheck-rootcheck'].rootcheck.ignore}
+                    columns={columnsIgnore}
+                  />
+                </Fragment>
+              )}
+              {(currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex || {}).length && (
+                <Fragment>
+                  <EuiBasicTable 
+                    items={currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex}
+                    columns={columnsIgnoreSregex}/>
+                </Fragment>
+              )}
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
     )
   }
 }
+
+WzConfigurationPolicyMonitoringSystemAudit.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationPolicyMonitoringSystemAudit;

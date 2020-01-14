@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
@@ -41,8 +41,7 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component{
             title='No diff directories'
             description="This files won't have their diff calculated"
             currentConfig={currentConfig}
-            helpLinks={helpLinks}
-          >
+            helpLinks={helpLinks}>
             <EuiBasicTable
               items={currentConfig['syscheck-syscheck'].syscheck.nodiff.map(item => ({path: item}))}
               columns={columnsPath}
@@ -53,5 +52,9 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component{
     )
   }
 }
+
+WzConfigurationIntegrityMonitoringNoDiff.proptTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationIntegrityMonitoringNoDiff;

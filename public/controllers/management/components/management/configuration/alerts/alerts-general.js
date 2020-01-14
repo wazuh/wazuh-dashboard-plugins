@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -19,11 +19,13 @@ import {
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzNoConfig from '../util-components/no-config';
+import { isString, renderValueOrNo } from '../utils/utils';
 
 const mainSettings = [
   { field: 'log_alert_level', label: 'Minimum severity level to store the alert'},
   { field: 'email_alert_level', label: 'Minimum severity level to send the alert by email' },
-  { field: 'use_geoip', label: 'Enable GeoIP lookups' }
+  { field: 'use_geoip', label: 'Enable GeoIP lookups', render: renderValueOrNo }
 ];
 const helpLinks = [
   { text: 'Use cases about alerts generation', href: 'https://documentation.wazuh.com/current/getting-started/use-cases.html' },
@@ -35,25 +37,39 @@ class WzConfigurationAlertsGeneral extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
-    const mainSettingsConfig = {
-      log_alert_level: currentConfig['analysis-alerts'].alerts.log_alert_level,
-      email_alert_level: currentConfig['analysis-alerts'].alerts.email_alert_level,
-      use_geoip: currentConfig['analysis-alerts'].use_geoip || 'no'
-    };
+    const { currentConfig, wazuhNotReadyYet } = this.props;
     return (
-      <WzConfigurationSettingsTabSelector
-        title='Main settings'
-        description='General alert settings'
-        currentConfig={currentConfig}
-        helpLinks={helpLinks}>
-          <WzConfigurationSettingsGroup
-            config={mainSettingsConfig}
-            items={mainSettings}
-          />
-      </WzConfigurationSettingsTabSelector>
+      <Fragment>
+        {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && (
+          <WzNoConfig error={currentConfig['analysis-alerts']}/>
+        )}
+        {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts && (
+          <WzNoConfig error='not-present'/>
+        )}
+        {wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-alerts']) && (
+          <WzNoConfig error='Wazuh not ready yet'/>
+        )}
+        {currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && currentConfig['analysis-alerts'].alerts && (
+          <WzConfigurationSettingsTabSelector
+            title='Main settings'
+            description='General alert settings'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}>
+              <WzConfigurationSettingsGroup
+                config={currentConfig['analysis-alerts'].alerts}
+                items={mainSettings}
+              />
+          </WzConfigurationSettingsTabSelector>
+        )}
+      </Fragment>
     )
   }
 }
+
+WzConfigurationAlertsGeneral.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
+
 
 export default WzConfigurationAlertsGeneral;

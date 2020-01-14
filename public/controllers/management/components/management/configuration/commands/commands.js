@@ -11,17 +11,13 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import withWzConfig from "../util-hocs/wz-config";
-import { isString } from '../utils/utils';
+import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 const helpLinks = [
@@ -29,7 +25,7 @@ const helpLinks = [
 ];
 
 const mainSettings = [
-  { field: 'disabled', label: 'Command status' },
+  { field: 'disabled', label: 'Command status', renderValueNoThenEnabled },
   { field: 'tag', label: 'Command name' },
   { field: 'command', label: 'Command to execute' },
   { field: 'interval', label: 'Interval between executions' },
@@ -76,5 +72,9 @@ class WzConfigurationCommands extends Component{
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationCommands.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationCommands);

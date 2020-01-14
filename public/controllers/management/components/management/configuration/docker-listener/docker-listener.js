@@ -10,16 +10,13 @@
 * Find more information about this on the LICENSE file.
 */
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from "../util-components/no-config";
+import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
+import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
 import { isString, renderValueOrDefault, renderValueNoThenEnabled, renderValueOrYes} from '../utils/utils';
 
-import { connect } from 'react-redux';
 import withWzConfig from "../util-hocs/wz-config";
 
 const helpLinks = [
@@ -57,7 +54,7 @@ class WzConfigurationDockerListener extends Component{
           currentConfig={currentConfig}
           helpLinks={helpLinks}>
           <WzConfigurationSettingsGroup
-            config={mainSettingsConfig}
+            config={currentConfig['docker-listener']}
             items={mainSettings}
           />
         </WzConfigurationSettingsTabSelector>
@@ -68,5 +65,9 @@ class WzConfigurationDockerListener extends Component{
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationDockerListener.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationDockerListener);

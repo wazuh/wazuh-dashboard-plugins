@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -56,5 +56,9 @@ class WzConfigurationLogCollection extends Component{
 }
 
 const sections = [{component:'logcollector',configuration:'localfile'},{component:'logcollector',configuration:'socket'}];
+
+WzConfigurationLogCollection.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationLogCollection);

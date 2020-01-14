@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable,
@@ -30,6 +30,11 @@ const columnsSregex = [
   { field: 'sregex', name: 'Sregex' }
 ];
 
+const columnsAgentWin = [
+  { field: 'entry', name: 'Entry' },
+  { field: 'arch', name: 'Arch' }
+];
+
 class WzConfigurationMonitoringIgnored extends Component{
   constructor(props){
     super(props);
@@ -42,28 +47,56 @@ class WzConfigurationMonitoringIgnored extends Component{
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {((agent || {}).os || {}).platform !== 'windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && currentConfig['syscheck-syscheck'].syscheck.ignore.length ? (
-            <Fragment>
-              <WzConfigurationSettingsTabSelector
-                title='Ignored files and directories'
-                description='These files and directories are ignored from the integrity scan'
-                currentConfig={currentConfig}
-                helpLinks={helpLinks}
-              >
-                <EuiBasicTable
-                  items={currentConfig['syscheck-syscheck'].syscheck.ignore.map(item => ({path: item}))}
-                  columns={columnsPath}
-                />
-                <EuiSpacer size='s'/>
-                <EuiBasicTable
-                  items={currentConfig['syscheck-syscheck'].syscheck.ignore_sregex.map(item => ({sregex: item}))}
-                  columns={columnsSregex}
-                />
-              </WzConfigurationSettingsTabSelector>
-            </Fragment>
-          ) : null}
+          <Fragment>
+            <WzConfigurationSettingsTabSelector
+              title='Ignored files and directories'
+              description='These files and directories are ignored from the integrity scan'
+              currentConfig={currentConfig}
+              helpLinks={helpLinks}
+            >
+              <EuiBasicTable
+                items={currentConfig['syscheck-syscheck'].syscheck.ignore.map(item => ({path: item}))}
+                columns={columnsPath}
+              />
+              <EuiSpacer size='s'/>
+              <EuiBasicTable
+                items={currentConfig['syscheck-syscheck'].syscheck.ignore_sregex.map(item => ({sregex: item}))}
+                columns={columnsSregex}
+              />
+            </WzConfigurationSettingsTabSelector>
+          </Fragment>
+        ) : null}
+        {((agent || {}).os || {}).platform === 'windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.registry && !currentConfig['syscheck-syscheck'].syscheck.registry_ignore && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {((agent || {}).os || {}).platform === 'windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && (currentConfig['syscheck-syscheck'].syscheck.registry || currentConfig['syscheck-syscheck'].syscheck.registry_ignore) && (
+          <WzConfigurationSettingsTabSelector 
+            title='Ignored'
+            description='A list of registry entries that will be ignored'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}>
+            {currentConfig['syscheck-syscheck'].syscheck.registry_ignore && (
+              <EuiBasicTable
+                items={currentConfig['syscheck-syscheck'].syscheck.registry_ignore}
+                columns={columnsAgentWin}
+              />
+            )}
+            {currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex && (
+              <EuiBasicTable
+                items={currentConfig['syscheck-syscheck'].syscheck.ignore_sregex}
+                columns={columnsAgentWin}
+              />
+            )}
+          </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }
 }
+
+WzConfigurationMonitoringIgnored.proptTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  agent: PropTypes.object
+};
 
 export default WzConfigurationMonitoringIgnored;

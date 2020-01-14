@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   
@@ -64,5 +64,10 @@ class WzConfigurationAmazonS3General extends Component{
     )
   }
 }
+
+WzConfigurationAmazonS3General.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
 
 export default WzConfigurationAmazonS3General;

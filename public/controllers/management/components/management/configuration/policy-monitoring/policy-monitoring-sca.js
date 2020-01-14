@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
@@ -67,5 +67,9 @@ class WzPolicyMonitoringSCA extends Component{
     )
   }
 }
+
+WzPolicyMonitoringSCA.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzPolicyMonitoringSCA;

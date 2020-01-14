@@ -11,10 +11,10 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
-  
+  EuiBasicTable
 } from "@elastic/eui";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -47,16 +47,20 @@ const mainSettings = [
   { field: 'opts', label: 'Follow symbolic link', render: renderOptsIncludes('follow_symbolic_link') }
 ];
 
+const columnsAgentWin = [
+  { field: 'entry', name: 'Entry' },
+  { field: 'arch', name: 'Arch' }
+];
+
 class WzConfigurationIntegrityMonitoringMonitored extends Component{
   constructor(props){
     super(props);
   }
   render(){
     const { currentConfig, agent } = this.props;
-    const items = settingsListBuilder(currentConfig['syscheck-syscheck'].syscheck.directories, 'dir')
+    const items = currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories ? settingsListBuilder(currentConfig['syscheck-syscheck'].syscheck.directories, 'dir') : [];
     return (
       <Fragment>
-        {/* FIXME: dont show if linux agent ? */}
         {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories && !currentConfig['syscheck-syscheck'].syscheck.directories.length ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}
@@ -72,9 +76,29 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component{
               />
             </WzConfigurationSettingsTabSelector>
         ) : null}
+        {((agent || {}).os || {}).platform === 'windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.registry && !currentConfig['syscheck-syscheck'].syscheck.registry_ignore && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {((agent || {}).os || {}).platform === 'windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && (currentConfig['syscheck-syscheck'].syscheck.registry || currentConfig['syscheck-syscheck'].syscheck.registry_ignore) && (
+            <WzConfigurationSettingsTabSelector 
+              title='Monitored'
+              description='A list of registry entries that will be monitored'
+              currentConfig={currentConfig}
+              helpLinks={helpLinks}>
+              <EuiBasicTable
+                items={currentConfig['syscheck-syscheck'].syscheck.registry}
+                columns={columnsAgentWin}
+              />
+            </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }
 }
+
+WzConfigurationIntegrityMonitoringMonitored.proptTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  agent: PropTypes.object
+};
 
 export default WzConfigurationIntegrityMonitoringMonitored;

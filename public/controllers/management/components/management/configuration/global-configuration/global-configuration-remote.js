@@ -11,26 +11,22 @@
 */
 
 import React, { Component, Fragment } from "react";
+import PropTypes from 'prop-types';
 
 import {
   EuiBasicTable,
-  EuiButtonEmpty,
-  EuiFlexGroup,
-  EuiFlexItem,
   EuiSpacer,
-  EuiText,
-  EuiTextAlign,
-  EuiTitle
 } from "@elastic/eui";
 
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
-import { renderValueOrNoValue, renderValueOrDefault } from '../utils/utils';
+import WzNoConfig from '../util-components/no-config';
+import { isString, renderValueOrNoValue, renderValueOrDefault } from '../utils/utils';
 
 const renderAllowedDeniedIPs = (items, label) => {
   if(items){
     return (
       <ul>
-        {items.map(item => <li key={`remote-${label}-${key}`}>{item}</li>)}
+        {items.map((item,key) => <li key={`remote-${label}-${key}`}>{item}</li>)}
       </ul>
     )
   }else{
@@ -60,19 +56,32 @@ class WzConfigurationGlobalConfigurationRemote extends Component{
   render(){
     const { currentConfig } = this.props;
     return (
-      <WzConfigurationSettingsTabSelector 
-        title='Remote settings'
-        description='Configuration to listen for events from the agents or a syslog client'
-        currentConfig={currentConfig} helpLinks={helpLinks}>
-          <EuiSpacer size='s'/>
-          <EuiBasicTable
-            columns={this.columns}
-            items={currentConfig['request-remote'].remote}
-          />
-      </WzConfigurationSettingsTabSelector>
+      <Fragment>
+        {currentConfig['request-remote'] && isString(currentConfig['request-remote']) && (
+          <WzNoConfig error={currentConfig['request-remote']} help={helpLinks} />
+          )}
+        {currentConfig['request-remote'] && !isString(currentConfig['request-remote']) && !currentConfig['request-remote'].remote && (
+          <WzNoConfig error='not-present' help={helpLinks} />
+        )}
+        {currentConfig['request-remote'] && currentConfig['request-remote'].remote && (
+          <WzConfigurationSettingsTabSelector 
+            title='Remote settings'
+            description='Configuration to listen for events from the agents or a syslog client'
+            currentConfig={currentConfig} helpLinks={helpLinks}>
+              <EuiSpacer size='s'/>
+              <EuiBasicTable
+                columns={this.columns}
+                items={currentConfig['request-remote'].remote}
+              />
+          </WzConfigurationSettingsTabSelector>
+        )}
+      </Fragment>
     )
   }
 }
 
+WzConfigurationGlobalConfigurationRemote.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+};
 
 export default WzConfigurationGlobalConfigurationRemote;

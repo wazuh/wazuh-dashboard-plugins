@@ -61,8 +61,8 @@ class WzConfigurationMain extends Component{
 				agentSynchronized: undefined
 			};
 	}
-	updateConfigurationSection = (view, title, description, path) => {
-		this.setState({ view, viewProps: {title: title, description, path: path || title} });
+	updateConfigurationSection = (view, title, description) => {
+		this.setState({ view, viewProps: {title: title, description} });
 	}
 	updateBadge = (badgeStatus = false) => {
 		this.setState({ viewProps: { ...this.state.viewProps, badge: badgeStatus}})
@@ -79,7 +79,7 @@ class WzConfigurationMain extends Component{
 		}
 	}
 	render(){
-		const { view, viewProps: {title, description, path, badge}, agentSynchronized } = this.state;
+		const { view, viewProps: {title, description, badge}, agentSynchronized } = this.state;
 		const { agent, goGroups } = this.props; // goGroups and exportConfiguration is used for Manager and depends of AngularJS
 		return (
 			<WzReduxProvider>
@@ -96,7 +96,7 @@ class WzConfigurationMain extends Component{
 									<span></span>
 								</Fragment>
 							) : null}
-							{view !== '' && (<WzConfigurationPath title={title} description={description} path={path} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
+							{view !== '' && (<WzConfigurationPath title={title} description={description} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
 							<WzViewSelector view={view}>
 								<div default>
 									<WzConfigurationOverview agent={agent} agentSynchronized={agentSynchronized} exportConfiguration={this.props.exportConfiguration} updateConfigurationSection={this.updateConfigurationSection}/>
@@ -135,7 +135,7 @@ class WzConfigurationMain extends Component{
 									<WzConfigurationOpenSCAP agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='cis-cat'>
-									<WzConfigurationCisCat agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
+									<WzConfigurationCisCat agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</div>
 								<div view='vulnerabilities'>
 									<WzConfigurationVulnerabilities agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>

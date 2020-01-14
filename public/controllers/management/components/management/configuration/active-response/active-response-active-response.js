@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -48,7 +44,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = !isString(currentConfig['analysis-active_response']) ? currentConfig['analysis-active_response']['active-response'].map((item, key) => ({
+    const items = !isString(currentConfig['analysis-active_response']) ? currentConfig['analysis-active_response']['active-response'].map((item) => ({
       button: item.command,
       data: item
     })) : {}
@@ -80,6 +76,11 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
   }
 }
 
+WzConfigurationActiveResponseActiveResponse.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};
+
 const mapStateToProps = (state) => ({
   wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
 });
@@ -92,3 +93,8 @@ export const WzConfigurationActiveResponseActiveResponseAgent = compose(
   connect(mapStateToProps),
   withWzConfig(sectionsAgent)
 )(WzConfigurationActiveResponseActiveResponse)
+
+WzConfigurationActiveResponseActiveResponseAgent.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.string
+};

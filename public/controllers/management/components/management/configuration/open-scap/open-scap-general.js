@@ -10,12 +10,8 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -50,5 +46,9 @@ class WzConfigurationOpenSCAPGeneral extends Component{
     )
   }
 }
+
+WzConfigurationOpenSCAPGeneral.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+};
 
 export default WzConfigurationOpenSCAPGeneral;

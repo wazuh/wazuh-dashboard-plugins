@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiIcon,
@@ -53,8 +53,8 @@ class WzNoConfig extends Component{
 }
 
 WzNoConfig.propTypes = {
-  error: Proptypes.string.isRequired,
-  links: Proptypes.array
+  error: PropTypes.string.isRequired,
+  links: PropTypes.array
 };
 
 export default WzNoConfig;

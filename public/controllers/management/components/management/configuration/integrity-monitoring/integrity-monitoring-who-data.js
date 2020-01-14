@@ -11,10 +11,12 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
-  EuiBasicTable
+  EuiBasicTable,
+  EuiIcon,
+  EuiLink
 } from "@elastic/eui";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -47,23 +49,33 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
             title='Who-data audit keys'
             description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
             currentConfig={currentConfig}
-            helpLinks={helpLinks}
-          >
-          <WzConfigurationSettingsGroup 
-            config={currentConfig['syscheck-syscheck'].syscheck.whodata}
-            items={mainSettings}
-          />
-          {currentConfig['syscheck-syscheck'].syscheck.whodata.audit_key && (
-            <EuiBasicTable
-              items={currentConfig['syscheck-syscheck'].syscheck.whodata.audit_key.map(item => ({audit_key: item}))}
-              columns={columns}
+            helpLinks={helpLinks}>
+            <WzConfigurationSettingsGroup 
+              config={currentConfig['syscheck-syscheck'].syscheck.whodata}
+              items={mainSettings}
             />
-          )}
-        </WzConfigurationSettingsTabSelector>
+            {currentConfig['syscheck-syscheck'].syscheck.whodata.audit_key && (
+              <EuiBasicTable
+                items={currentConfig['syscheck-syscheck'].syscheck.whodata.audit_key.map(item => ({audit_key: item}))}
+                columns={columns}
+              />
+            )}
+            {!currentConfig['syscheck-syscheck'].syscheck.whodata && (
+              <Fragment>
+                <EuiIcon size='m' type='iInCircle'/>
+                <span> No audit keys were found. Visit the documentation on <EuiLink target='__blank' href='https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html#whodata'>this link</EuiLink> to enable it.</span>
+              </Fragment>
+            )}
+          </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
     )
   }
 }
+
+
+WzConfigurationIntegrityMonitoringWhoData.proptTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationIntegrityMonitoringWhoData;

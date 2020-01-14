@@ -11,11 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
+import PropTypes from "prop-types";
 
 import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -46,7 +42,7 @@ class WzConfigurationLogCollectionSockets extends Component{
       <Fragment>
         {currentConfig['logcollector-socket'] && isString(currentConfig['logcollector-socket']) && (
           <WzNoConfig error={currentConfig['logcollector-socket']} help={helpLinks}/>
-          )}
+        )}
         {currentConfig['logcollector-socket'] && !isString(currentConfig['logcollector-socket']) && !currentConfig['logcollector-socket'].target ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}
@@ -66,5 +62,9 @@ class WzConfigurationLogCollectionSockets extends Component{
     )
   }
 }
+
+WzConfigurationLogCollectionSockets.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default WzConfigurationLogCollectionSockets;

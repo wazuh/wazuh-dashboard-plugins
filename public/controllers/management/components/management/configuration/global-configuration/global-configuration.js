@@ -11,10 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-
-import {
-  EuiSpacer
-} from "@elastic/eui";
+import PropTypes from 'prop-types';
 
 import WzTabSelector from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
@@ -31,7 +28,7 @@ class WzConfigurationGlobalConfiguration extends Component{
     
   }
   render(){
-    const { currentConfig, agent, wazuhNotReadyYet } = this.props;
+    const { agent } = this.props;
     return (
       <Fragment>
         {(agent && agent.id === '000') ? (
@@ -74,3 +71,11 @@ export const WzConfigurationGlobalConfigurationAgent = compose(
   withWzConfig(sectionsAgent),
   connect(mapStateToProps)
 )(WzConfigurationGlobalConfiguration);
+
+WzConfigurationGlobalConfigurationManager.propTypes = {
+  agent: PropTypes.object
+};
+
+WzConfigurationGlobalConfigurationAgent.propTypes = {
+  agent: PropTypes.object
+};

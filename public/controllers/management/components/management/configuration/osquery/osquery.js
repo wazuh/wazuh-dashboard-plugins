@@ -11,7 +11,7 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
@@ -64,33 +64,39 @@ class WzConfigurationOsquery extends Component{
         {currentConfig && !this.config.osquery && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        <WzConfigurationSettingsTabSelector
-          title='Main settings'
-          description='General Osquery integration settings'
-          currentConfig={this.config}
-          helpLinks={helpLinks}>
-          <WzConfigurationSettingsGroup
-            config={this.config.osquery}
-            items={mainSettings}
-          />
-          {this.config.osquery.packs && isArray(this.config.osquery.packs) && this.config.osquery.packs.length && (
-            <Fragment>
-              <WzConfigurationSettingsHeader
-                title='Osquery packs'
-                description='A pack contains multiple queries to quickly retrieve system information'
-              />
-              <EuiBasicTable 
-                items={this.config.osquery.packs}
-                columns={columns}
-              />
-            </Fragment>
-          )}
-        </WzConfigurationSettingsTabSelector>
+        {currentConfig && this.config && this.config.osquery && (
+          <WzConfigurationSettingsTabSelector
+            title='Main settings'
+            description='General Osquery integration settings'
+            currentConfig={this.config}
+            helpLinks={helpLinks}>
+            <WzConfigurationSettingsGroup
+              config={this.config.osquery}
+              items={mainSettings}
+            />
+            {this.config.osquery.packs && isArray(this.config.osquery.packs) && this.config.osquery.packs.length && (
+              <Fragment>
+                <WzConfigurationSettingsHeader
+                  title='Osquery packs'
+                  description='A pack contains multiple queries to quickly retrieve system information'
+                />
+                <EuiBasicTable 
+                  items={this.config.osquery.packs}
+                  columns={columns}
+                />
+              </Fragment>
+            )}
+          </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+
+WzConfigurationOsquery.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
 
 export default withWzConfig(sections)(WzConfigurationOsquery);

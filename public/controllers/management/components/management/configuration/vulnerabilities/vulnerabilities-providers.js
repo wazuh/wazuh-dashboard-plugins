@@ -11,13 +11,14 @@
 */
 
 import React, { Component, Fragment } from "react";
-import Proptypes from "prop-types";
+import PropTypes from "prop-types";
 
 import {
   EuiBasicTable
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";
+import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 
 import helpLinks from './help-links';
 
@@ -57,7 +58,7 @@ const columnsAllowAttr = [
 const renderAllowAttr = (item) => {
   if(item){
     return (
-      <EuiTable 
+      <EuiBasicTable 
         items={item}
         columns={columnsAllowAttr}
       />
@@ -105,5 +106,9 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
     )
   }
 }
+
+WzConfigurationVulnerabilitiesProviders.propTypes = {
+  currentConfig: PropTypes.object.isRequired,
+};
 
 export default WzConfigurationVulnerabilitiesProviders;
