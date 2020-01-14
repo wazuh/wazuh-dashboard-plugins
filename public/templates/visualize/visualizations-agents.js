@@ -435,17 +435,17 @@ export const visualizations = {
         vis: [
           {
             title: 'Top 5 images',
-            id: 'Wazuh-App-Overview-Docker-top-5-images',
+            id: 'Wazuh-App-Agents-Docker-top-5-images',
             width: 25,
           },
           {
             title: 'Top 5 events',
-            id: 'Wazuh-App-Overview-Docker-top-5-actions',
+            id: 'Wazuh-App-Agents-Docker-top-5-actions',
             width: 25,
           },
           {
             title: 'Resources usage over time',
-            id: 'Wazuh-App-Overview-Docker-Types-over-time',
+            id: 'Wazuh-App-Agents-Docker-Types-over-time',
             width: 50,
           },
         ],
@@ -455,7 +455,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Events occurred evolution',
-            id: 'Wazuh-App-Overview-Docker-Actions-over-time',
+            id: 'Wazuh-App-Agents-Docker-Actions-over-time',
           },
         ],
       },
@@ -464,7 +464,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Docker-Events-summary',
+            id: 'Wazuh-App-Agents-Docker-Events-summary',
           },
         ],
       },
