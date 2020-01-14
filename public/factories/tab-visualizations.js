@@ -17,7 +17,7 @@ export class TabVisualizations {
   constructor() {
     this.agents = {
       welcome: 0,
-      general: 7,
+      general: 11,
       fim: 7,
       pm: 4,
       vuls: 10,
