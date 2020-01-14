@@ -304,45 +304,40 @@ export const visualizations = {
   },
   vuls: {
     metrics: [
-      { id: 'Wazuh-App-Overview-vuls-Metric-Critical-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-High-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-Medium-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-Low-severity' },
+      { id: 'Wazuh-App-Agents-vuls-Metric-Critical-severity' },
+      { id: 'Wazuh-App-Agents-vuls-Metric-High-severity' },
+      { id: 'Wazuh-App-Agents-vuls-Metric-Medium-severity' },
+      { id: 'Wazuh-App-Agents-vuls-Metric-Low-severity' },
     ],
     rows: [
       {
-        height: 270,
+        height: 300,
         vis: [
           {
-            title: 'Most affected agents',
-            id: 'Wazuh-App-Overview-vuls-Most-affected-agents',
-            width: 30,
+            title: 'Alerts severity over time',
+            id: 'Wazuh-App-Agents-vuls-Alerts-severity-over-time',
+            width: 50,
           },
-          { title: 'Alerts severity', id: 'Wazuh-App-Overview-vuls-Alerts-severity', width: 70 },
+          { title: 'Most common rules', id: 'Wazuh-App-Agents-vuls-Most-common-rules', width: 50 },
         ],
       },
       {
         height: 270,
         vis: [
           {
+            title: 'Most common CVEs',
+            id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
+            width: 33,
+          },
+          {
             title: 'Severity distribution',
-            id: 'Wazuh-App-Overview-vuls-Vulnerability-severity-distribution',
-            width: 25,
+            id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
+            width: 33,
           },
           {
             title: 'Commonly affected packages',
-            id: 'Wazuh-App-Overview-vuls-Commonly-affected-packages',
-            width: 25,
-          },
-          {
-            title: 'Most common CVEs',
-            id: 'Wazuh-App-Overview-vuls-Most-common-CVEs',
-            width: 25,
-          },
-          {
-            title: 'Most common CWEs',
-            id: 'Wazuh-App-Overview-vuls-Most-common-CWEs',
-            width: 25,
+            id: 'Wazuh-App-Agents-vuls-Commonly-affected-packages',
+            width: 33,
           },
         ],
       },
@@ -351,7 +346,7 @@ export const visualizations = {
         vis: [
           {
             title: 'Alert summary',
-            id: 'Wazuh-App-Overview-vuls-Alert-summary',
+            id: 'Wazuh-App-Agents-vuls-Alert-summary',
           },
         ],
       },
