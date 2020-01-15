@@ -114,6 +114,10 @@ export class OverviewController {
         AppState.setExtensions(api, extensions)
     };
 
+    this.visualizeProps= {
+      selectedTab: this.tab,
+    }
+
     this.setTabs();
 
     this.$scope.$on('$destroy', () => {
@@ -262,6 +266,7 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
+    this.visualizeProps.selectedTab = newTab;
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
