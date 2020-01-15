@@ -427,7 +427,7 @@ export default class WzLogs extends Component {
             <div>
                 {this.state.logsList && (
                     <EuiCodeBlock
-                        fontSize="m"
+                        fontSize="s"
                         paddingSize="m"
                         color="dark"
                         overflowHeight={this.height}>

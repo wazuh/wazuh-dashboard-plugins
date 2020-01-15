@@ -37,13 +37,13 @@ export default class SettingsLogs extends Component {
   }
 
   updateHeight = () => {
-    this.height = window.innerHeight - 275; //eslint-disable-line
+    this.height = window.innerHeight - 325; //eslint-disable-line
     this.forceUpdate();
   }
 
   componentDidMount() {
     this.refresh();
-    this.height = window.innerHeight - 275; //eslint-disable-line
+    this.height = window.innerHeight - 325; //eslint-disable-line
     window.addEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
@@ -107,7 +107,7 @@ export default class SettingsLogs extends Component {
           )}
           {(!this.state.refreshingEntries &&
             <EuiCodeBlock
-              fontSize="m"
+              fontSize="s"
               paddingSize="m"
               color="dark"
               overflowHeight={this.height}>
