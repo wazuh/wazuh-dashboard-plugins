@@ -83,10 +83,16 @@ export const WzConfigurationAlertsLabelsAgent = compose(
 
 WzConfigurationAlertsLabels.propTypes = {
   currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.string
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ])
 };
 
 WzConfigurationAlertsLabelsAgent.propTypes = {
   currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.string
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ])
 };

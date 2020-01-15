@@ -68,7 +68,10 @@ class WzConfigurationAlertsGeneral extends Component{
 
 WzConfigurationAlertsGeneral.propTypes = {
   currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.string
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ])
 };
 
 

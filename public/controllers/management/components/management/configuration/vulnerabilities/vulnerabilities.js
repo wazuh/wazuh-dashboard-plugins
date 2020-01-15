@@ -56,4 +56,8 @@ class WzConfigurationVulnerabilities extends Component{
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
+WzConfigurationVulnerabilities.propTypes = {
+  currentConfig: PropTypes.object.isRequired
+};
+
 export default withWzConfig(sections)(WzConfigurationVulnerabilities);

@@ -54,7 +54,10 @@ const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationAmazonS3.propTypes = {
   currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.string
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ])
 };
 
 export default withWzConfig(sections)(WzConfigurationAmazonS3);

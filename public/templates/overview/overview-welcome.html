@@ -1,7 +1,7 @@
 <div layout="column" layout-align="start stretch" ng-if="octrl.tab === 'welcome'">
 
     <div layout="row" layout-padding>
-        <react-component name="StatsOverview" flex props="{
+        <react-component name="StatsOverview" style="padding-bottom: 0;" flex props="{
                 total: octrl.agentsCountTotal >= 0 ? octrl.agentsCountTotal : '-',
                 active: octrl.agentsCountActive >= 0 ? octrl.agentsCountActive : '-',
                 disconnected: octrl.agentsCountDisconnected >= 0 ? octrl.agentsCountDisconnected : '-',
@@ -9,7 +9,7 @@
     </div>
 
     <div layout="row" layout-padding>
-        <react-component name="WelcomeScreenOverview" props="octrl.welcomeCardsProps" />
+        <react-component name="WelcomeScreenOverview" props="octrl.welcomeCardsProps" style="padding-top: 0;" />
     </div>
 
 </div>

@@ -15,6 +15,7 @@ import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
+import { AppState } from '../../react-services/app-state';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -89,6 +90,7 @@ app.directive('wzXmlFileEditor', function() {
           let xml = replaceIllegalXML(text);
           xml = xml.replace(/..xml.+\?>/, '');
           xml = xml.replace(/\\</gm, '');
+          xml = xml.replace(/<!--[\s\S\n]*?-->/gm, '');
           const xmlDoc = parser.parseFromString(
             `<file>${xml}</file>`,
             'text/xml'
@@ -263,6 +265,17 @@ app.directive('wzXmlFileEditor', function() {
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg);
+            if(params.isNewFile) {
+              $scope.$emit('editFile', {
+                file: {
+                  file: params.rule.file,
+                  path: 'etc/rules',
+                  status: 'enabled',
+                  type: 'rule',
+                },
+                path: 'etc/rules',
+              });
+            }
           } else if (params.decoder) {
             close = false;
             await rulesetHandler.sendDecoderConfiguration(
@@ -281,6 +294,17 @@ app.directive('wzXmlFileEditor', function() {
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg);
+            if(params.isNewFile) {
+              $scope.$emit('editFile', {
+                file: {
+                  file: params.decoder.file,
+                  path: '/decoders/files',
+                  status: 'enabled',
+                  type: 'decoder',
+                },
+                path: '/decoders/files',
+              });
+            }
           } else if (params.node) {
             close = false;
             await configHandler.saveNodeConfiguration(params.node, xml);
@@ -399,7 +423,7 @@ app.directive('wzXmlFileEditor', function() {
 
       $scope.$on('$destroy', function() {
         $location.search('editingFile', null);
-        appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
       });
     },
     template

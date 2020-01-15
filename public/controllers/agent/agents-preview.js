@@ -14,6 +14,7 @@ import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
 import { clickAction } from '../../directives/wz-table/lib/click-action';
+import { AppState } from '../../react-services/app-state';
 
 export class AgentsPreviewController {
   /**
@@ -33,6 +34,7 @@ export class AgentsPreviewController {
     apiReq,
     appState,
     $location,
+    $route,
     errorHandler,
     csvReq,
     shareAgent,
@@ -47,6 +49,7 @@ export class AgentsPreviewController {
     this.apiReq = apiReq;
     this.appState = appState;
     this.$location = $location;
+    this.$route = $route;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
     this.shareAgent = shareAgent;
@@ -61,9 +64,9 @@ export class AgentsPreviewController {
   /**
    * On controller loads
    */
-  $onInit() {
+  async $onInit() {
     this.init = true;
-    this.api = JSON.parse(this.appState.getCurrentAPI()).id;
+    this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
       this.commonData.setTimefilter(timefilter.getTime());
@@ -71,8 +74,8 @@ export class AgentsPreviewController {
     }
 
     this.isClusterEnabled =
-      this.appState.getClusterInfo() &&
-      this.appState.getClusterInfo().status === 'enabled';
+      AppState.getClusterInfo() &&
+      AppState.getClusterInfo().status === 'enabled';
 
     this.loading = true;
     this.osPlatforms = [];
@@ -90,6 +93,17 @@ export class AgentsPreviewController {
       this.submenuNavItem = loc.tab;
     }
 
+    const summaryData = await this.apiReq.request('GET', '/agents/summary', {});
+    this.summary = summaryData.data.data;
+    if (this.summary.Total - 1 === 0) {
+      if (this.addingNewAgent === undefined) {
+        this.addNewAgent(true);
+      }
+      this.hasAgents = false;
+    } else {
+      this.hasAgents = true;
+    }
+
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
       this.$location.search('tab', this.submenuNavItem);
@@ -101,6 +115,8 @@ export class AgentsPreviewController {
 
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
+      hasAgents: this.hasAgents,
+      reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
       getCurrentApiAddress: () => this.getCurrentApiAddress(),
       needsPassword: () => this.needsPassword()
@@ -128,11 +144,11 @@ export class AgentsPreviewController {
           this.shareAgent,
           this.$location,
           this.$scope,
-          this.appState
         );
         this.$scope.$applyAsync()
       },
       timeService: (date) => this.timeService.offset(date),
+      summary: this.summary
     }
     //Load
     this.load();
@@ -212,12 +228,12 @@ export class AgentsPreviewController {
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
-      const clusterInfo = this.appState.getClusterInfo();
+      const clusterInfo = AppState.getClusterInfo();
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
 
-      this.pattern = this.appState.getCurrentPattern();
+      this.pattern = AppState.getCurrentPattern();
     } catch (error) {
       this.errorInit = this.errorHandler.handle(error, false, false, true);
     }

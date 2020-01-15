@@ -108,7 +108,7 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
 }
 
 WzConfigurationVulnerabilitiesProviders.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationVulnerabilitiesProviders;

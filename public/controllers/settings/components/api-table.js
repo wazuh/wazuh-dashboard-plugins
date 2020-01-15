@@ -20,6 +20,7 @@ import {
   EuiToolTip,
   EuiHealth,
   EuiPanel,
+  EuiPage,
   EuiButtonEmpty,
   EuiTitle,
   EuiText,
@@ -183,19 +184,19 @@ export class ApiTable extends Component {
                 </EuiToolTip>
               </span>
             ) : (
-              <span>
-                <EuiHealth color="danger">Offline</EuiHealth>
-                <EuiToolTip position="top" content={item.downReason}>
-                  <EuiButtonIcon
-                    color="primary"
-                    style={{ marginTop: '-12px' }}
-                    iconType="questionInCircle"
-                    aria-label="Info about the error"
-                    onClick={() => this.props.copyToClipBoard(item.downReason)}
-                  />
-                </EuiToolTip>
-              </span>
-            );
+                  <span>
+                    <EuiHealth color="danger">Offline</EuiHealth>
+                    <EuiToolTip position="top" content={item.downReason}>
+                      <EuiButtonIcon
+                        color="primary"
+                        style={{ marginTop: '-12px' }}
+                        iconType="questionInCircle"
+                        aria-label="Info about the error"
+                        onClick={() => this.props.copyToClipBoard(item.downReason)}
+                      />
+                    </EuiToolTip>
+                  </span>
+                );
           } else {
             return (
               <span>
@@ -251,52 +252,54 @@ export class ApiTable extends Component {
     };
 
     return (
-      <EuiPanel paddingSize="l">
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiTitle>
-                  <h2>Wazuh hosts</h2>
-                </EuiTitle>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
-              iconType="plusInCircle"
-              onClick={() => this.props.showAddApi()}
-            >
-              Add new
+      <EuiPage>
+        <EuiPanel paddingSize="l">
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiTitle>
+                    <h2>Wazuh hosts</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                iconType="plusInCircle"
+                onClick={() => this.props.showAddApi()}
+              >
+                Add new
             </EuiButtonEmpty>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
-              iconType="refresh"
-              onClick={async () => await this.refresh()}
-            >
-              Refresh
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                iconType="refresh"
+                onClick={async () => await this.refresh()}
+              >
+                Refresh
             </EuiButtonEmpty>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can see how to set up your Wazuh host, establish as
-              default, and check their connection and status.
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
+                From here you can see how to set up your Wazuh host, establish as
+                default, and check their connection and status.
             </EuiText>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiInMemoryTable
-          itemId="id"
-          items={items}
-          search={search}
-          columns={columns}
-          pagination={true}
-          sorting={true}
-          loading={this.state.refreshingEntries}
-        />
-      </EuiPanel>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiInMemoryTable
+            itemId="id"
+            items={items}
+            search={search}
+            columns={columns}
+            pagination={true}
+            sorting={true}
+            loading={this.state.refreshingEntries}
+          />
+        </EuiPanel>
+      </EuiPage>
     );
   }
 }

@@ -48,7 +48,7 @@ class WzConfigurationVulnerabilitiesGeneral extends Component{
 }
 
 WzConfigurationVulnerabilitiesGeneral.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationVulnerabilitiesGeneral;

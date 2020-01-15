@@ -16,32 +16,11 @@ import PropTypes from "prop-types";
 import {
   EuiBadge
 } from "@elastic/eui";
-import { timeHours } from "d3";
 
 class WzBadge extends Component{
   constructor(props){
     super(props);
     this.state = {};
-    // if(typeof this.props.enabled !== 'undefined' ){
-    //   if(this.props.enabled){
-    //     this.state.color = 'secondary';
-    //     this.state.content = 'ENABLED';
-    //   }else{
-    //     this.state.color = 'danger';
-    //     this.state.content = 'DISABLED';
-    //   }
-    // }else if(typeof this.props.synchronized !== 'undefined'){
-    //   if(this.props.synchronized){
-    //     this.state.color = 'secondary';
-    //     this.state.content = 'SYNCHRONIZED'
-    //   }else{
-    //     this.state.color = 'danger';
-    //     this.state.content = 'NOT SYNCHRONIZED'
-    //   }
-    // }else if(this.props.color && this.props.content){
-    //   this.state.color = this.props.color;
-    //   this.state.content = this.props.content;
-    // }
   }
   static getDerivedStateFromProps(nextProps, prevState){
     if(typeof nextProps === 'object'){

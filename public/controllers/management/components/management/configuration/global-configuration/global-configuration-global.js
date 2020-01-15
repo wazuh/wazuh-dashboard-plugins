@@ -136,7 +136,10 @@ class WzConfigurationGlobalConfigurationGlobal extends Component{
 WzConfigurationGlobalConfigurationGlobal.propTypes = {
   currentConfig: PropTypes.object.isRequired,
   agent: PropTypes.object,
-  wazuhNotReadyYet: PropTypes.string,
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ])
 };
 
 export default WzConfigurationGlobalConfigurationGlobal;

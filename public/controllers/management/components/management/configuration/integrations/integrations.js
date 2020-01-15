@@ -58,6 +58,7 @@ class WzConfigurationIntegrations extends Component{
   render(){
     const { view } = this.state;
     const { currentConfig } = this.props;
+    console.log('currentConfig', )
     const integrations = currentConfig['integrator-integration'] && currentConfig['integrator-integration'].integrations ? Object.keys(currentConfig['integrator-integration'].integration) : false;
     return (
       <Fragment>

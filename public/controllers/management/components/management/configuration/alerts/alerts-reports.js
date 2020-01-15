@@ -80,7 +80,10 @@ const mapStateToProps = (state) => ({
 
 WzConfigurationAlertsReports.propTypes = {
   currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.string
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ])
 };
 
 export default connect(mapStateToProps)(WzConfigurationAlertsReports);
