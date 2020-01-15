@@ -12,6 +12,8 @@
 import './eui-loader';
 import { uiModules } from 'ui/modules';
 import { WzFilterBar } from './wz-filter-bar/wz-filter-bar';
+import { WzMenu } from './wz-menu/wz-menu';
 
 const app = uiModules.get('app/wazuh', []);
 app.value('WzFilterBar', WzFilterBar);
+app.value('WzMenu', WzMenu);

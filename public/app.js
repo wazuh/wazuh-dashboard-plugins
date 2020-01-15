@@ -87,7 +87,7 @@ app.config([
 
 app.run(function($rootScope, $route, $location, appState, $window) {
   chrome
-    .setRootTemplate('<wz-menu></wz-menu><div ng-view class="mainView"></div>')
+    .setRootTemplate('<react-component name="WzMenu" props="" /><div ng-view class="mainView"></div>')
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
   AppState.setNavigation({ status: false });
