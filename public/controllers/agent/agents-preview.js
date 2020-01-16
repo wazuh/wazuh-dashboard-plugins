@@ -15,6 +15,7 @@ import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
 import { clickAction } from '../../directives/wz-table/lib/click-action';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class AgentsPreviewController {
   /**
@@ -40,7 +41,6 @@ export class AgentsPreviewController {
     shareAgent,
     wzTableFilter,
     commonData,
-    wazuhConfig,
     $window,
     timeService
   ) {
@@ -55,7 +55,7 @@ export class AgentsPreviewController {
     this.shareAgent = shareAgent;
     this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
     this.timeService = timeService;

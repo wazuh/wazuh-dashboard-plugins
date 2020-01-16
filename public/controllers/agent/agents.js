@@ -28,6 +28,7 @@ import {
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class AgentsController {
   /**
@@ -61,7 +62,6 @@ export class AgentsController {
     csvReq,
     wzTableFilter,
     groupHandler,
-    wazuhConfig,
     timeService,
     genericReq
   ) {
@@ -79,7 +79,7 @@ export class AgentsController {
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.groupHandler = groupHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.timeService = timeService;
     this.genericReq = genericReq;
 

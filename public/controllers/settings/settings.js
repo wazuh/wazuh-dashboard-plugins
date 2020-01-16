@@ -12,6 +12,7 @@
 import { TabNames } from '../../utils/tab-names';
 import { kibana } from '../../../package.json';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class SettingsController {
   /**
@@ -24,7 +25,6 @@ export class SettingsController {
    * @param {*} genericReq
    * @param {*} errorHandler
    * @param {*} wzMisc
-   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -35,7 +35,6 @@ export class SettingsController {
     genericReq,
     errorHandler,
     wzMisc,
-    wazuhConfig
   ) {
     this.kibanaVersion = (kibana || {}).version || false;
     this.$scope = $scope;
@@ -46,7 +45,7 @@ export class SettingsController {
     this.genericReq = genericReq;
     this.errorHandler = errorHandler;
     this.wzMisc = wzMisc;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
 
     if (this.wzMisc.getWizard()) {
       $window.sessionStorage.removeItem('healthCheck');

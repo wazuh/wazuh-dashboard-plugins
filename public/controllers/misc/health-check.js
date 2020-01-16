@@ -13,6 +13,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class HealthCheck {
   /**
@@ -26,7 +27,6 @@ export class HealthCheck {
    * @param {*} appState
    * @param {*} testAPI
    * @param {*} errorHandler
-   * @param {*} wazuhConfig
    * @param {*} Private
    * @param {*} $window
    */
@@ -40,7 +40,6 @@ export class HealthCheck {
     appState,
     testAPI,
     errorHandler,
-    wazuhConfig,
     Private,
     $window
   ) {
@@ -53,7 +52,7 @@ export class HealthCheck {
     this.appState = appState;
     this.testAPI = testAPI;
     this.errorHandler = errorHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.$window = $window;
     this.results = [];
 

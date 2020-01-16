@@ -14,6 +14,7 @@ import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
 import $ from 'jquery';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -32,9 +33,9 @@ class WzMenu {
     appState,
     patternHandler,
     indexPatterns,
-    errorHandler,
-    wazuhConfig
+    errorHandler
   ) {
+    const wazuhConfig = new WazuhConfig();
     $scope.showSelector = AppState.getPatternSelector();
     $scope.root = $rootScope;
     $scope.settedMenuHeight = false;

@@ -13,6 +13,7 @@ import * as FileSaver from '../../services/file-saver';
 
 import { colors } from './colors';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class DecodersController {
   /**
@@ -33,7 +34,6 @@ export class DecodersController {
     apiReq,
     csvReq,
     wzTableFilter,
-    wazuhConfig,
     rulesetHandler
   ) {
     this.$scope = $scope;
@@ -44,7 +44,7 @@ export class DecodersController {
     this.apiReq = apiReq;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
     this.showingLocalDecoders = false;
   }

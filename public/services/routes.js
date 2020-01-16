@@ -32,6 +32,7 @@ import overviewTemplate from '../templates/overview/overview.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import { WazuhConfig } from '../react-services/wazuh-config';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -71,7 +72,6 @@ function nestedResolve(
   $q,
   genericReq,
   errorHandler,
-  wazuhConfig,
   $rootScope,
   $location,
   $window,
@@ -81,7 +81,7 @@ function nestedResolve(
 ) {
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
-
+  const wazuhConfig = new WazuhConfig();
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
   return getWzConfig($q, genericReq, wazuhConfig).then(() =>
@@ -94,7 +94,6 @@ function nestedResolve(
       genericReq,
       errorHandler,
       wzMisc,
-      wazuhConfig,
       location && location.includes('/health-check')
     )
   );

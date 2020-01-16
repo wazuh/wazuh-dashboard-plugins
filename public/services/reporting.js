@@ -12,6 +12,7 @@
 
 import $ from 'jquery';
 import moment from 'moment';
+import { WazuhConfig } from '../react-services/wazuh-config';
 
 export class ReportingService {
   constructor(
@@ -21,7 +22,6 @@ export class ReportingService {
     visHandlers,
     genericReq,
     errorHandler,
-    wazuhConfig
   ) {
     this.$rootScope = $rootScope;
     this.vis2png = vis2png;
@@ -29,7 +29,7 @@ export class ReportingService {
     this.visHandlers = visHandlers;
     this.genericReq = genericReq;
     this.errorHandler = errorHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
   }
   removeTableVis(visList) {
     const attributes = JSON.parse(visList.attributes.visState);
