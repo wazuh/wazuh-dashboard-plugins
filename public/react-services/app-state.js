@@ -249,7 +249,7 @@ export class AppState {
         }
         if(navigate){
             const encodedURI = encodeURI(JSON.stringify(navigate));
-            Cookies.set('navigate', encodedURI);
+            Cookies.set('navigate', encodedURI, {path: '/app'});
         }
     }
 
