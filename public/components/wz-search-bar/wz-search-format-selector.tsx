@@ -152,10 +152,9 @@ export class WzSearchFormatSelector extends Component {
     const button = (
       <EuiButtonEmpty
         onClick={this.onButtonClick.bind(this)}>
-        {toggleIdSelected.label}
+        {"Help"}
       </EuiButtonEmpty>
     );
-    const renderFooter = this.renderFooter()
     return (
       <EuiPopover 
         id='wzFormatSelector'
@@ -163,16 +162,13 @@ export class WzSearchFormatSelector extends Component {
         button={button}
         isOpen={this.state.isPopoverOpen}
         closePopover={this.closePopover.bind(this)}>
-        <EuiPopoverTitle>{toggleIdSelected.label}</EuiPopoverTitle>
+        <EuiPopoverTitle>{'Help'}</EuiPopoverTitle>
           <div style={{ width: '300px' }}>
             <EuiText>
-              { (toggleIdSelected.label === '?Q')
-               ? this.qLegend
-               : this.apiLegend
+              { this.apiLegend
               }
             </EuiText>
           </div>
-          { renderFooter }
       </EuiPopover>
     );
   }
