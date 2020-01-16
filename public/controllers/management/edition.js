@@ -19,7 +19,6 @@ export class EditionController {
    * @param {*} errorHandler
    * @param {*} apiReq
    * @param {*} appState
-   * @param {*} wazuhConfig
    */
   constructor(
     $scope,

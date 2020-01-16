@@ -18,13 +18,13 @@ import * as FileSaver from '../../services/file-saver';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class DevToolsController {
   /**
    * Constructor
    * @param {*} $scope
    * @param {*} apiReq
-   * @param {*} genericReq
    * @param {*} $window
    * @param {*} appState
    * @param {*} errorHandler
@@ -33,14 +33,13 @@ export class DevToolsController {
   constructor(
     $scope,
     apiReq,
-    genericReq,
     $window,
     appState,
     errorHandler,
     $document
   ) {
     this.apiReq = apiReq;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.$window = $window;
     this.appState = appState;
     this.errorHandler = errorHandler;
