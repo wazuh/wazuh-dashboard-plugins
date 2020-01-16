@@ -44,12 +44,7 @@ export class EuiSuggestInput extends Component {
     this.props.sendValue(e.target.value);
   };
 
-  closePopover = () => {
-    this.setState({
-      isPopoverOpen: false,
-    });
-  };
-
+  
   render() {
     const {
       className,
@@ -107,11 +102,11 @@ export class EuiSuggestInput extends Component {
         <EuiInputPopover
           id="popover"
           input={customInput}
-          onFocus={e => this.setState({isPopoverOpen: true})}
-          isOpen={this.state.isPopoverOpen}
+          onFocus={this.props.onPopoverFocus}
+          isOpen={this.props.isPopoverOpen}
           panelPaddingSize="none"
           fullWidth
-          closePopover={this.closePopover}>
+          closePopover={this.props.onClosePopover}>
           <div>{suggestions}</div>
         </EuiInputPopover>
       </div>
@@ -134,6 +129,9 @@ EuiSuggestInput.propTypes = {
    * List of suggestions to display using 'suggestItem'.
    */
   suggestions: PropTypes.array,
+  isOpen: PropTypes.bool,
+  onClosePopover: PropTypes.func,
+  onPopoverFocus: PropTypes.func
 };
 
 EuiSuggestInput.defaultProps = {

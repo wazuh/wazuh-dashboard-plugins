@@ -35,6 +35,7 @@ export default class WzSearchBar extends Component {
     isInvalid: boolean
     status: string
     filters: {}
+    isPopoverOpen: boolean
   };
   suggestHandler!: QHandler | ApiHandler;
   props!:{
@@ -61,7 +62,8 @@ export default class WzSearchBar extends Component {
       inputValue: '',
       isInvalid: false,
       status: 'unchanged',
-      filters: {}
+      filters: {},
+      isPopoverOpen: false,
     }
   }
 
@@ -163,6 +165,7 @@ export default class WzSearchBar extends Component {
     const { filters } = this.state;
     if (JSON.stringify(filters) !== JSON.stringify(newFilters)) {
       this.props.onInputChange(newFilters);
+      this.setState({isPopoverOpen:false});
     }
   }
 
@@ -228,6 +231,14 @@ export default class WzSearchBar extends Component {
     this.setState({filters});
   }
 
+  onPopoverFocus(event) {
+    this.setState({isPopoverOpen: true});
+  }
+
+  closePopover = () => {
+    this.setState({isPopoverOpen: false});
+  };
+
   //#endregion
 
   //#region Renderer methods
@@ -249,7 +260,7 @@ export default class WzSearchBar extends Component {
   }
 
   render() {
-    const { status, suggestions, inputValue, isInvalid, filters } = this.state;
+    const { status, suggestions, inputValue, isInvalid, filters, isPopoverOpen } = this.state;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     return (
@@ -269,6 +280,9 @@ export default class WzSearchBar extends Component {
               onKeyPress={this.onKeyPress}
               onItemClick={this.onItemClick.bind(this)}
               append={searchFormatSelector}
+              isPopoverOpen={isPopoverOpen}
+              onClosePopover={this.closePopover.bind(this)}
+              onPopoverFocus={this.onPopoverFocus.bind(this)}
               suggestions={suggestions}
               onInputChange={this.onInputChange}
               isInvalid={isInvalid}
