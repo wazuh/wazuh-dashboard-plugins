@@ -29,6 +29,7 @@ import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class AgentsController {
   /**
@@ -62,8 +63,7 @@ export class AgentsController {
     csvReq,
     wzTableFilter,
     groupHandler,
-    timeService,
-    genericReq
+    timeService
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -81,7 +81,7 @@ export class AgentsController {
     this.groupHandler = groupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.timeService = timeService;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;

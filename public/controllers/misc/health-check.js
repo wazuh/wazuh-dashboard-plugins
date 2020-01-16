@@ -14,6 +14,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class HealthCheck {
   /**
@@ -47,7 +48,7 @@ export class HealthCheck {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.$location = $location;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.apiReq = apiReq;
     this.appState = appState;
     this.testAPI = testAPI;

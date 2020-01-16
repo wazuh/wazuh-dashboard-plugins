@@ -13,6 +13,7 @@ import { TabNames } from '../../utils/tab-names';
 import { kibana } from '../../../package.json';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class SettingsController {
   /**
@@ -42,7 +43,7 @@ export class SettingsController {
     this.$location = $location;
     this.testAPI = testAPI;
     this.appState = appState;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.wzMisc = wzMisc;
     this.wazuhConfig = new WazuhConfig();

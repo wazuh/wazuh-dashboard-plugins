@@ -12,6 +12,7 @@
 import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export function ClusterController(
   $scope,
@@ -269,7 +270,7 @@ export function ClusterController(
       nodeList.name = $scope.configuration.name;
       nodeList.master_node = $scope.configuration.node_name;
 
-      const visData = await genericReq.request(
+      const visData = await GenericRequest.request(
         'POST',
         `/elastic/visualizations/cluster-monitoring/${AppState.getCurrentPattern()}`,
         { nodes: nodeList }

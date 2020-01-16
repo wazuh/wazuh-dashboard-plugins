@@ -13,6 +13,7 @@
 import $ from 'jquery';
 import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
+import { GenericRequest } from '../react-services/generic-request';
 
 export class ReportingService {
   constructor(
@@ -27,7 +28,7 @@ export class ReportingService {
     this.vis2png = vis2png;
     this.rawVisualizations = rawVisualizations;
     this.visHandlers = visHandlers;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.wazuhConfig = new WazuhConfig();
   }

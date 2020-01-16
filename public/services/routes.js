@@ -33,6 +33,7 @@ import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
+import { GenericRequest } from '../react-services/generic-request';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -62,7 +63,7 @@ function ip(
     $location,
     Private,
     appState,
-    genericReq,
+    GenericRequest,
     errorHandler,
     wzMisc
   );
@@ -84,14 +85,14 @@ function nestedResolve(
   const wazuhConfig = new WazuhConfig();
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
-  return getWzConfig($q, genericReq, wazuhConfig).then(() =>
+  return getWzConfig($q, GenericRequest, wazuhConfig).then(() =>
     settingsWizard(
       $location,
       $q,
       $window,
       testAPI,
       appState,
-      genericReq,
+      GenericRequest,
       errorHandler,
       wzMisc,
       location && location.includes('/health-check')
@@ -119,9 +120,10 @@ function savedSearch(
   );
 }
 
-function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
+function wzConfig($q, genericReq, $rootScope, $location) {
   assignPreviousLocation($rootScope, $location);
-  return getWzConfig($q, genericReq, wazuhConfig);
+  const wazuhConfig = new WazuhConfig();
+  return getWzConfig($q, GenericRequest, wazuhConfig);
 }
 
 function wzKibana($location, $window, $rootScope) {
