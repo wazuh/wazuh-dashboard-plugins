@@ -175,13 +175,13 @@ export class AgentsPreview extends Component {
                         <EuiFlexGroup>
                           <EuiFlexItem>
                             <EuiStat
-                              className='euiStatLink'
+                              className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
                               title={this.mostActiveAgent.name || '-'}
                               titleSize="s"
                               textAlign="center"
                               description="Most active agent"
                               titleColor="primary"
-                              onClick={() => this.props.tableProps.showAgent(this.mostActiveAgent)}
+                              onClick={() => this.mostActiveAgent.name ? this.props.tableProps.showAgent(this.mostActiveAgent) : ''}
                             />
                           </EuiFlexItem>
                         </EuiFlexGroup>
