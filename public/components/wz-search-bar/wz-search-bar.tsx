@@ -268,7 +268,7 @@ export default class WzSearchBar extends Component {
               value={inputValue}
               onKeyPress={this.onKeyPress}
               onItemClick={this.onItemClick.bind(this)}
-              prepend={searchFormatSelector}
+              append={searchFormatSelector}
               suggestions={suggestions}
               onInputChange={this.onInputChange}
               isInvalid={isInvalid}
