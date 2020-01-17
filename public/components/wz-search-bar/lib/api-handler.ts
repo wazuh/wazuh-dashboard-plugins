@@ -53,11 +53,11 @@ export class ApiHandler extends BaseHandler {
 
   async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
     const { values } = this.getCurrentField(inputValue);
+    const { value } = this.inputInterpreter(inputValue);
     
     const rawSuggestions:string[] = typeof values === 'function'
-      ? await values()
+      ? await values(value)
       : values;
-    const { value } = this.inputInterpreter(inputValue);
     const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
     const suggestions:suggestItem[] = [];
     

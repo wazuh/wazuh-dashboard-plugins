@@ -75,10 +75,10 @@ export class QHandler extends BaseHandler {
 
   async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
     const { values } = this.getCurrentField(inputValue);
-    const rawSuggestions:string[] = typeof values === 'function'
-      ? await values()
-      : values;
     const { value } = this.getLastQuery(inputValue);
+    const rawSuggestions:string[] = typeof values === 'function'
+      ? await values(value)
+      : values;
     const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
     const suggestions:suggestItem[] = [];
 
