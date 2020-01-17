@@ -62,7 +62,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
 }
 
 WzConfigurationIntegrityMonitoringGeneral.proptTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   agent: PropTypes.object
 };
 

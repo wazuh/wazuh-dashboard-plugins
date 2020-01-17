@@ -41,7 +41,7 @@ class WzConfigurationAmazonS3General extends Component{
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks} />
         )}
         {currentConfig && !currentConfig['aws-s3'] && !isString(currentConfig['wmodules-wmodules']) && (
@@ -55,7 +55,7 @@ class WzConfigurationAmazonS3General extends Component{
             helpLinks={helpLinks}
           >
             <WzSettingsGroup
-              config={currentConfig['aws-s3'].syscheck}
+              config={currentConfig['aws-s3']}
               items={mainSettings}
             />
           </WzConfigurationSettingsTabSelector>
@@ -66,7 +66,7 @@ class WzConfigurationAmazonS3General extends Component{
 }
 
 WzConfigurationAmazonS3General.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

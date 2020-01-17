@@ -23,3 +23,24 @@ export const updateWazuhNotReadyYet = (wazuhNotReadyYet) => {
     wazuhNotReadyYet
   }
 }
+
+export const updateClusterNodes = (clusterNodes) => {
+  return {
+    type: 'UPDATE_CONFIGURATION_CLUSTER_NODES',
+    clusterNodes
+  }
+}
+
+export const updateClusterNodeSelected = (clusterNodeSelected) => {
+  return {
+    type: 'UPDATE_CONFIGURATION_CLUSTER_NODE_SELECTED',
+    clusterNodeSelected
+  }
+}
+
+export const updateLoadingStatus = (loadingStatus) => {
+  return {
+    type: 'UPDATE_CONFIGURATION_LOADING_STATUS',
+    loadingStatus
+  }
+}

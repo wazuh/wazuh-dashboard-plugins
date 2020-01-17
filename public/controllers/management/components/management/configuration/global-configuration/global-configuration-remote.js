@@ -81,7 +81,7 @@ class WzConfigurationGlobalConfigurationRemote extends Component{
 }
 
 WzConfigurationGlobalConfigurationRemote.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationGlobalConfigurationRemote;

@@ -41,6 +41,10 @@ class WzConfigurationAgentless extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
+    const items = currentConfig && currentConfig['agentless-agentless'] && currentConfig['agentless-agentless'].agentless ? currentConfig['agentless-agentless'].agentless.map(item => ({
+      label: `${item.type} (${item.state})`,
+      data: item
+    })) : false;
     return (
       <Fragment>
         {currentConfig['agentless-agentless'] && isString(currentConfig['agentless-agentless']) && (
@@ -57,7 +61,7 @@ class WzConfigurationAgentless extends Component{
               helpLinks={helpLinks}
             >
             <WzConfigurationListSelector
-              items={currentConfig['agentless-agentless'].agentless}
+              items={items}
               settings={mainSettings}
             />
           </WzConfigurationSettingsTabSelector>
@@ -74,7 +78,7 @@ const mapStateToProps = (state) => ({
 });
 
 WzConfigurationAgentless.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

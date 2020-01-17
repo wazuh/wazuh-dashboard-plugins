@@ -83,7 +83,7 @@ class WzRegistrationService extends Component{
 }
 
 WzRegistrationService.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig([{component:'auth',configuration:'auth'}])(WzRegistrationService);

@@ -67,7 +67,7 @@ class WzConfigurationPolicyMonitoringGeneral extends Component{
 }
 
 WzConfigurationPolicyMonitoringGeneral.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationPolicyMonitoringGeneral;

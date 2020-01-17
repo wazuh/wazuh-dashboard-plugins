@@ -58,8 +58,7 @@ class WzConfigurationIntegrations extends Component{
   render(){
     const { view } = this.state;
     const { currentConfig } = this.props;
-    console.log('currentConfig', )
-    const integrations = currentConfig['integrator-integration'] && currentConfig['integrator-integration'].integrations ? Object.keys(currentConfig['integrator-integration'].integration) : false;
+    const integrations = currentConfig['integrator-integration'] && currentConfig['integrator-integration'].integration ? currentConfig['integrator-integration'].integration : false;
     return (
       <Fragment>
         {currentConfig['integrator-integration'] && isString(currentConfig['integrator-integration']) && (
@@ -74,8 +73,8 @@ class WzConfigurationIntegrations extends Component{
         // </WzConfigurationSettingsTabSelector>
           <WzViewSelector view={view}>
             <div default>
-              {integrations.map((integrationKey) => {
-                const integration = Object.assign(this.buildIntegration(integration), currentConfig['integrator-integration'].integration[integrationKey]);
+              {integrations && integrations.map((integrationInfo, key) => {
+                const integration = Object.assign(this.buildIntegration(integrationInfo.name), integrationInfo);
                 return (
                   <Fragment key={`integration-${integration.title}`}>
                     <WzConfigurationSettingsGroup
@@ -84,9 +83,9 @@ class WzConfigurationIntegrations extends Component{
                       items={integrationsSettings}
                       config={integration}
                       viewSelected={view}
-                      settings={() => this.changeView('')}
-                      json={() => this.changeView('json')}
-                      xml={() => this.changeView('xml')}
+                      settings={key === 0 ? () => this.changeView('') : undefined}
+                      json={key === 0 ? () => this.changeView('json') : undefined}
+                      xml={key === 0 ? () => this.changeView('xml') : undefined}
                       help={this.helpLinks}/>
                   </Fragment>
                 )
@@ -122,8 +121,8 @@ class WzConfigurationIntegrations extends Component{
 
 const sections = [{component:'integrator',configuration:'integration'}];
 
-WzConfigurationIntegrations.propTypes = {
-  currentConfig: PropTypes.object.isRequired
-};
+// WzConfigurationIntegrations.propTypes = {
+//   currentConfig: PropTypes.object.isRequired
+// };
 
 export default withWzConfig(sections)(WzConfigurationIntegrations);

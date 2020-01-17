@@ -62,7 +62,7 @@ class WzConfigurationOpenScapEvaluations extends Component{
 }
 
 WzConfigurationOpenScapEvaluations.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationOpenScapEvaluations;

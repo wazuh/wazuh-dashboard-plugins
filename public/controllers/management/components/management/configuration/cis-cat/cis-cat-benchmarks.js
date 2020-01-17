@@ -47,7 +47,7 @@ class WzConfigurationCisCatBenchmarks extends Component{
               helpLinks={helpLinks}
             >
             <EuiBasicTable
-              items={currentConfig['cis-cat']}
+              items={currentConfig['cis-cat'].content}
               columns={columns}/>
             </WzConfigurationSettingsTabSelector>
 
@@ -59,7 +59,7 @@ class WzConfigurationCisCatBenchmarks extends Component{
 }
 
 WzConfigurationCisCatBenchmarks.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationCisCatBenchmarks;

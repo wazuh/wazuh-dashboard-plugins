@@ -88,7 +88,7 @@ class WzConfigurationClient extends Component{
 const sections = [{component:'agent',configuration:'client'}];
 
 WzConfigurationClient.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig(sections)(WzConfigurationClient);

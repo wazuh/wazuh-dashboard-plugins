@@ -10,10 +10,12 @@
 * Find more information about this on the LICENSE file.
 */
 
+import React, { Component, Fragment } from 'react';
 import withLoading from './loading';
 import { getCurrentConfig } from '../utils/wz-fetch';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { updateWazuhNotReadyYet, updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
 
 /**
  * 
@@ -35,21 +37,21 @@ import { compose } from 'redux';
 // }, LoadingComponent, ErrorComponent)(WrappedComponent)
 
 
+const mapStateToProps = (state) => ({
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+});
+
 const mapDispatchToProps = (dispatch) => ({
-  updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value))
+  updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value)),
+  updateLoadingStatus: (loadingStatus) => dispatch(updateLoadingStatus(loadingStatus))
 });
 
 const withWzConfig = (sections) => (WrappedComponent) => 
   compose(
-    connect(null, mapDispatchToProps),
+    connect(mapStateToProps, mapDispatchToProps),
     withLoading(async (props) => {
-      const currentConfig = await getCurrentConfig(props.agent.id, sections, props.node, props.updateWazuhNotReadyYet);
-      // if(throwError){
-      //   const error = throwError(currentConfig);
-      //   if(error){
-      //     throw error;
-      //   };
-      // }
+      const currentConfig = await getCurrentConfig(props.agent.id, sections, props.clusterNodeSelected, props.updateWazuhNotReadyYet);
+      props.updateLoadingStatus(false);
       return { ...props, currentConfig };
     })
   )(WrappedComponent)

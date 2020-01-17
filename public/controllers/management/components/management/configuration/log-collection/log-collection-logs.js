@@ -65,7 +65,7 @@ class WzConfigurationLogCollectionLogs extends Component{
 }
 
 WzConfigurationLogCollectionLogs.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationLogCollectionLogs;

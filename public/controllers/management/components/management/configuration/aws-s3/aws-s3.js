@@ -24,26 +24,25 @@ import WzConfigurationAmazonS3Services from './aws-s3-services';
 class WzConfigurationAmazonS3 extends Component{
   constructor(props){
     super(props);
+    this.config = wodleBuilder(this.props.currentConfig, 'aws-s3');
   }
   componentDidMount(){
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return (this.props.currentConfig && this.props.currentConfig['aws-s3'] && this.props.currentConfig['aws-s3'].disabled === 'no') || false;
+    return this.config && this.config['aws-s3'] && this.config['aws-s3'].disabled === 'no' || false;
   }
   render(){
-    let { currentConfig } = this.props;
-    currentConfig = wodleBuilder(currentConfig, 'aws-s3');
     return (
       <WzTabSelector>
         <div label='General'>
-          <WzConfigurationAmazonS3General currentConfig={currentConfig}/>
+          <WzConfigurationAmazonS3General currentConfig={this.config}/>
         </div>
         <div label='Buckets'>
-          <WzConfigurationAmazonS3Buckets currentConfig={currentConfig}/>
+          <WzConfigurationAmazonS3Buckets currentConfig={this.config}/>
         </div>
         <div label='Services'>
-          <WzConfigurationAmazonS3Services currentConfig={currentConfig}/>
+          <WzConfigurationAmazonS3Services currentConfig={this.config}/>
         </div>
       </WzTabSelector>
     )
@@ -53,7 +52,7 @@ class WzConfigurationAmazonS3 extends Component{
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationAmazonS3.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

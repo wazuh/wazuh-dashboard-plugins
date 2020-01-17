@@ -1,4 +1,10 @@
-const initialState = { section: '', wazuhNotReadyYet: false };
+const initialState = {
+  section: '',
+  wazuhNotReadyYet: false,
+  clusterNodes: false,
+  clusterNodeSelected: false,
+  loadingStatus: false
+};
 
 const configurationReducers = (state = initialState, action) => {
   switch(action.type){
@@ -11,7 +17,22 @@ const configurationReducers = (state = initialState, action) => {
       return {
         ...state,
         wazuhNotReadyYet: action.wazuhNotReadyYet
-      } 
+      }
+    case 'UPDATE_CONFIGURATION_CLUSTER_NODES':
+      return {
+        ...state,
+        clusterNodes: action.clusterNodes
+      }
+    case 'UPDATE_CONFIGURATION_CLUSTER_NODE_SELECTED':
+      return {
+        ...state,
+        clusterNodeSelected: action.clusterNodeSelected
+      }
+    case 'UPDATE_CONFIGURATION_LOADING_STATUS':
+      return {
+        ...state,
+        loadingStatus: action.loadingStatus
+      }
     default:
       return state
   }

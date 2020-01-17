@@ -95,7 +95,7 @@ class WzConfigurationMonitoringIgnored extends Component{
 }
 
 WzConfigurationMonitoringIgnored.proptTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   agent: PropTypes.object
 };
 

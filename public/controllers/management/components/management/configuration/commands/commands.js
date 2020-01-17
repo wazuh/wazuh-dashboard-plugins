@@ -41,24 +41,24 @@ const mainSettings = [
 class WzConfigurationCommands extends Component{
   constructor(props){
     super(props);
-    this.config = this.props.currentConfig['wmodules-wmodules'].wmodules.find(item => item['commands']);
+    this.config = this.props.currentConfig['wmodules-wmodules'].wmodules.filter(item => item['command']);
   }
   render(){
     const { currentConfig } = this.props;
-    const items = this.config ? settingsListBuilder(this.config, 'tag') : [];
+    const items = this.config && this.config.length ? settingsListBuilder(this.config.map(item => item.command), 'tag') : false;
     return (
       <Fragment>
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
         )}
-        {currentConfig && !this.config && !isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && !items && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {currentConfig && this.config && !isString(currentConfig['wmodules-wmodules']) && currentConfig.commands.length ? (
+        {currentConfig && items && !isString(currentConfig['wmodules-wmodules']) ? (
           <WzConfigurationSettingsTabSelector
             title='Command definitions'
             description='Find here all the currently defined commands'
-            currentConfig={this.config}
+            currentConfig={currentConfig}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsListSelector
                 items={items}
@@ -74,7 +74,7 @@ class WzConfigurationCommands extends Component{
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationCommands.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig(sections)(WzConfigurationCommands);

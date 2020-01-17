@@ -40,7 +40,7 @@ class WzConfigurationActiveResponseCommands extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = settingsListBuilder(currentConfig['analysis-command'].command, 'name');
+    const items = currentConfig && currentConfig['analysis-command'] && currentConfig['analysis-command'].command ? settingsListBuilder(currentConfig['analysis-command'].command, 'name') : [];
     return (
       <Fragment>
         {currentConfig['analysis-command'] && isString(currentConfig['analysis-command']) && (
@@ -74,7 +74,7 @@ const mapStateToProps = (state) => ({
 });
 
 WzConfigurationActiveResponseCommands.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

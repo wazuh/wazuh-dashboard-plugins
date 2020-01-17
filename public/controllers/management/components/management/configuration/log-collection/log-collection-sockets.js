@@ -64,7 +64,7 @@ class WzConfigurationLogCollectionSockets extends Component{
 }
 
 WzConfigurationLogCollectionSockets.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationLogCollectionSockets;

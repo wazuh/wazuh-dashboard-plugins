@@ -66,7 +66,7 @@ const mapStateToProps = (state) => ({
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationOpenSCAP.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default compose(

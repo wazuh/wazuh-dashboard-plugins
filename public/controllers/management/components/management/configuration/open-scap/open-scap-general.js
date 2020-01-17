@@ -48,7 +48,7 @@ class WzConfigurationOpenSCAPGeneral extends Component{
 }
 
 WzConfigurationOpenSCAPGeneral.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationOpenSCAPGeneral;

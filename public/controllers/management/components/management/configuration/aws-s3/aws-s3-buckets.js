@@ -44,10 +44,10 @@ class WzConfigurationAmazonS3Buckets extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = currentConfig['aws-s3'] && currentConfig['aws-s3'].buckets ? settingsListBuilder(currentConfig['aws-s3'].buckets, 'name') : {};
+    const items = currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].buckets ? settingsListBuilder(currentConfig['aws-s3'].buckets, 'name') : {};
     return (
       <Fragment>
-        {currentConfig && !currentConfig['aws-s3'] && !currentConfig['aws-s3'].buckets && (
+        {currentConfig && currentConfig['aws-s3'] && !currentConfig['aws-s3'].buckets && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         {wazuhNotReadyYet && (!currentConfig || !currentConfig['aws-s3']) && ( 
@@ -76,7 +76,7 @@ const mapStateToProps = (state) => ({
 });
 
 WzConfigurationAmazonS3Buckets.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

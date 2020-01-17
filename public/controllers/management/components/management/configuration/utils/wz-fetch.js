@@ -108,7 +108,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
   try {
     if (messageIsString && message.includes('ERROR3099')) {
       updateWazuhNotReadyYet('Wazuh not ready yet.')
-      await makePing(null, updateWazuhNotReadyYet);
+      await makePing(updateWazuhNotReadyYet);
       return;
     }
   
@@ -168,6 +168,9 @@ export const checkDaemons = async () => {
     const execd = daemons['ossec-execd'] === 'running';
     const modulesd = daemons['wazuh-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
+    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const isCluster =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     const clusterd = isCluster
         ? daemons['wazuh-clusterd'] === 'running'
         : true;
@@ -189,7 +192,7 @@ export const checkDaemons = async () => {
  * @param {number} [tries=10] Tries
  * @return {Promise}
  */
-export const makePing = async (tries = 10, updateWazuhNotReadyYet) => {
+export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
    try{
      let isValid = false;
      while (tries--) {
@@ -239,7 +242,6 @@ export const fetchFile = async (selectedNode) => {
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-
     const data = await WzRequest.apiReq(
       'GET',
       isCluster
@@ -276,7 +278,7 @@ export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) 
     
     // Dispatch a Redux action
     updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'manager'}, please wait. `);
-    return await makePing(null, updateWazuhNotReadyYet);
+    return await makePing(updateWazuhNotReadyYet);
   }catch(error){
     return Promise.reject(error);
   }
@@ -368,7 +370,7 @@ export const saveConfiguration = async (selectedNode, xml) => {
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
     const enabledAndRunning = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     if(enabledAndRunning){
-      await saveFileCluster(xml);
+      await saveFileCluster(xml, selectedNode);
     }else{
       await saveFileManager(xml);
     }
@@ -401,8 +403,9 @@ export const saveNodeConfiguration = async (node, content) => {
 /**
  * Save text to ossec.conf cluster file
  * @param {string} text Text to save
+ * @param {node}
  */
-export const saveFileCluster = async (text) => {
+export const saveFileCluster = async (text, node) => {
   const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq(
@@ -600,4 +603,16 @@ export const agentIsSynchronized = async (agent) => {
     {}
   );
   return (((isSync || {}).data || {}).data || {}).synced || false;
+}
+
+/**
+   * Get cluster nodes
+   */
+export const clusterNodes = async () => {
+  try {
+    const result = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
+    return result;
+  } catch (error) {
+    return Promise.reject(error);
+  }
 }

@@ -50,7 +50,7 @@ export const wodleBuilder = (currentConfig, wodles) => {
   const result = {...currentConfig };
   wodles = typeof wodles === 'string' ? [wodles] : wodles;
   wodles.map(wodle => { 
-    result[wodle] = currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle])
+    result[wodle] = currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle]) ? currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle])[wodle] : undefined
   });
   return result;
 }

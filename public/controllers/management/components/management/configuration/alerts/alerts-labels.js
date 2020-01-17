@@ -26,14 +26,14 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 
 const columns = [ 
-  { field: 'label_key', name: 'Label key' },
-  { field: 'label_value', name: 'Label value' },
-  { field: 'label_hidden', name: 'Hidden' }
+  { field: 'key', name: 'Label key' },
+  { field: 'value', name: 'Label value' },
+  { field: 'hidden', name: 'Hidden' }
 ];
 
 const helpLinks = [
-  {text: 'Labels documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/labels.html'},
-  {text: 'Labels reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html'}
+  { text: 'Labels documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/labels.html'},
+  { text: 'Labels reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html'}
 ];
 
 class WzConfigurationAlertsLabels extends Component{
@@ -82,7 +82,7 @@ export const WzConfigurationAlertsLabelsAgent = compose(
 )(WzConfigurationAlertsLabels)
 
 WzConfigurationAlertsLabels.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string
@@ -90,7 +90,7 @@ WzConfigurationAlertsLabels.propTypes = {
 };
 
 WzConfigurationAlertsLabelsAgent.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

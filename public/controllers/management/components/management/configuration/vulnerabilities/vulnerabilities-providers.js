@@ -14,34 +14,30 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import {
-  EuiBasicTable
+  EuiBasicTable,
+  EuiFlexGroup,
+  EuiFlexItem
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
-
+import { renderValueOrNoValue } from '../utils/utils';
 import helpLinks from './help-links';
 
 const renderTableField = (item) => item || '-';
 
 const renderUrlAttr = (item) => {
-  if(!item){
+  if(item){
     return (
       <Fragment>
         {item.start && (
-          <Fragment>
-            <span><b>Start: </b>{item.start}</span><br></br>
-          </Fragment>
+          <div><b>Start: </b>{item.start}</div>
         )}
-        {item.start && (
-          <Fragment>
-            <span><b>End: </b>{item.start}</span><br></br>
-          </Fragment>
+        {item.end && (
+          <div><b>End: </b>{item.end}</div>
         )}
-        {item.start && (
-          <Fragment>
-            <span><b>Port: </b>{item.start}</span><br></br>
-          </Fragment>
+        {item.port && (
+            <div><b>Port: </b>{item.port}</div>
         )}
       </Fragment>
       
@@ -68,14 +64,14 @@ const renderAllowAttr = (item) => {
 }
 
 const columns = [
-  { field: 'name', name: 'Name' , render: renderTableField },
-  { field: 'version', name: 'Version' , render: renderTableField },
-  { field: 'update_interval', name: 'Update interval' , render: renderTableField },
-  { field: 'update_from_year', name: 'Update from year' , render: renderTableField },
-  { field: 'path', name: 'Path' , render: renderTableField },
-  { field: 'url', name: 'URL' , render: renderTableField },
+  { field: 'name', name: 'Name' , render: renderValueOrNoValue },
+  { field: 'version', name: 'Version' , render: renderValueOrNoValue },
+  { field: 'update_interval', name: 'Update interval' , render: renderValueOrNoValue },
+  { field: 'update_from_year', name: 'Update from year' , render: renderValueOrNoValue },
+  { field: 'path', name: 'Path' , render: renderValueOrNoValue },
+  { field: 'url', name: 'URL' , render: renderValueOrNoValue },
   { field: 'url_attrs', name: 'URL attributes', render: renderUrlAttr },
-  { field: 'allow', name: 'Allow' },
+  { field: 'allow', name: 'Allow', render: renderAllowAttr }
 ];
 
 class WzConfigurationVulnerabilitiesProviders extends Component{
@@ -83,21 +79,32 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
     super(props);
   }
   render(){
-    const { config } = this.props;
+    let { currentConfig } = this.props;
+    //TODO: delete testing 
+    // Testing data to see the render of this properties
+    // if(currentConfig['vulnerability-detector'].providers){
+    //   currentConfig['vulnerability-detector'].providers[0].url_attrs = {
+    //     start: 1, end: 2, port: 1323
+    //   }
+    //   currentConfig['vulnerability-detector'].providers[0].allow = [
+    //     { replaced_os: 'linux', src:'DATA'},
+    //     { replaced_os: 'win10', src:'DATA2'}
+    //   ]
+    // }
     return (
       <Fragment>
-        {(config['vulnerability-detector'] && !config['vulnerability-detector'].providers && (
+        {(currentConfig['vulnerability-detector'] && !currentConfig['vulnerability-detector'].providers && (
           <WzNoConfig error='not-present' help={helpLinks}></WzNoConfig>
         )) || (
           <Fragment>
             <WzConfigurationSettingsTabSelector
               title='Providers'
               description='List of OVAL databases providers to check for vulnerability scans'
-              currentConfig={config}
+              currentConfig={currentConfig}
               helpLinks={helpLinks}
             >
               <EuiBasicTable
-                items={config['vulnerability-detector']}
+                items={currentConfig['vulnerability-detector'].providers}
                 columns={columns}/>
             </WzConfigurationSettingsTabSelector>
           </Fragment>
@@ -108,7 +115,7 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
 }
 
 WzConfigurationVulnerabilitiesProviders.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  config: PropTypes.object.isRequired
 };
 
 export default WzConfigurationVulnerabilitiesProviders;

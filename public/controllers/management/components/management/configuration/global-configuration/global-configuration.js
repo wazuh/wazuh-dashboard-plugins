@@ -25,7 +25,6 @@ import { compose } from 'redux';
 class WzConfigurationGlobalConfiguration extends Component{
   constructor(props){
     super(props);
-    
   }
   render(){
     const { agent } = this.props;
@@ -40,7 +39,6 @@ class WzConfigurationGlobalConfiguration extends Component{
               <WzConfigurationGlobalConfigurationRemote {...this.props}/>
             </div>
           </WzTabSelector>
-
         ) : <WzConfigurationGlobalConfigurationGlobal {...this.props}/>}
       </Fragment>
     )
@@ -59,17 +57,23 @@ const sectionsAgent = [
 ];
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet,
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 
+// export const WzConfigurationGlobalConfigurationManager = compose(
+//   withWzConfig(sectionsManager),
+//   connect(mapStateToProps)
+// )(WzConfigurationGlobalConfiguration);
+
 export const WzConfigurationGlobalConfigurationManager = compose(
-  withWzConfig(sectionsManager),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
+  withWzConfig(sectionsManager)
 )(WzConfigurationGlobalConfiguration);
 
 export const WzConfigurationGlobalConfigurationAgent = compose(
-  withWzConfig(sectionsAgent),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
+  withWzConfig(sectionsAgent)
 )(WzConfigurationGlobalConfiguration);
 
 WzConfigurationGlobalConfigurationManager.propTypes = {

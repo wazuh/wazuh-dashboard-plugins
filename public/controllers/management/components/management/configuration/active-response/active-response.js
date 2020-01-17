@@ -41,7 +41,7 @@ class WzConfigurationActiveResponse extends Component{
 const sections = [{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}];
 
 WzConfigurationActiveResponse.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig(sections)(WzConfigurationActiveResponse);

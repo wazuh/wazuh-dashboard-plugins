@@ -66,7 +66,7 @@ class WzConfigurationClientBuffer extends Component{
 const sections = [{component:'agent',configuration:'buffer'}];
 
 WzConfigurationClientBuffer.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig(sections)(WzConfigurationClientBuffer);

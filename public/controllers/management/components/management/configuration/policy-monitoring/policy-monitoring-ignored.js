@@ -14,7 +14,8 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import {
-  EuiBasicTable
+  EuiBasicTable,
+  EuiSpacer
 } from "@elastic/eui";
 
 import WzNoConfig from '../util-components/no-config';
@@ -48,15 +49,16 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component{
               {(currentConfig['syscheck-rootcheck'].rootcheck.ignore || {}).length && (
                 <Fragment>
                   <EuiBasicTable 
-                    items={currentConfig['syscheck-rootcheck'].rootcheck.ignore}
+                    items={currentConfig['syscheck-rootcheck'].rootcheck.ignore.map(item => ({ path: item}))}
                     columns={columnsIgnore}
                   />
+                  <EuiSpacer size='m'/>
                 </Fragment>
               )}
               {(currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex || {}).length && (
                 <Fragment>
                   <EuiBasicTable 
-                    items={currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex}
+                    items={currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex.map(item => ({ sreg: item}))}
                     columns={columnsIgnoreSregex}/>
                 </Fragment>
               )}
@@ -68,7 +70,7 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component{
 }
 
 WzConfigurationPolicyMonitoringSystemAudit.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzConfigurationPolicyMonitoringSystemAudit;

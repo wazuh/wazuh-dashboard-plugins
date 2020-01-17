@@ -45,7 +45,7 @@ class WzConfigurationAlertsReports extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = currentConfig['monitor-reports'].email_alerts ? settingsListBuilder(currentConfig['monitor-reports'].email_alerts, 'file') : {};
+    const items = currentConfig && currentConfig['monitor-reports'] && currentConfig['monitor-reports'].reports ? settingsListBuilder(currentConfig['monitor-reports'].reports, 'title') : {};
     return (
       <Fragment>
         {currentConfig['monitor-reports'] && isString(currentConfig['monitor-reports']) && (
@@ -79,7 +79,7 @@ const mapStateToProps = (state) => ({
 });
 
 WzConfigurationAlertsReports.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

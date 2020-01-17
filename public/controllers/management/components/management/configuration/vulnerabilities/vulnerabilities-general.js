@@ -29,16 +29,16 @@ class WzConfigurationVulnerabilitiesGeneral extends Component{
     super(props);
   }
   render(){
-    const { config } = this.props;
+    const { currentConfig } = this.props;
     return (
       <Fragment>
         <WzConfigurationSettingsTabSelector 
           title='Main settings'
           description='General settings applied to the vulnerability detector and its providers'
-          currentConfig={config}
+          currentConfig={currentConfig}
           helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup 
-              config={config['vulnerability-detector']}
+              config={currentConfig['vulnerability-detector']}
               items={mainSettings}
             />
         </WzConfigurationSettingsTabSelector>

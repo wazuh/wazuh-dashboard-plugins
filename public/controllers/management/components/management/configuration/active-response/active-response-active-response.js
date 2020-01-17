@@ -17,7 +17,7 @@ import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
-
+import { settingsListBuilder } from '../utils/builders';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import withWzConfig from "../util-hocs/wz-config";
@@ -44,10 +44,16 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
   }
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = !isString(currentConfig['analysis-active_response']) ? currentConfig['analysis-active_response']['active-response'].map((item) => ({
-      button: item.command,
-      data: item
-    })) : {}
+    const items = !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && currentConfig['analysis-active_response']['active-response'].length ? settingsListBuilder(currentConfig['analysis-active_response']['active-response'], 'command') : [];
+    //TODO: remove this what is for example
+    // const items = !isString(currentConfig['analysis-active_response']) ? currentConfig['analysis-active_response']['active-response'].map((item) => ({
+    //   button: item.command,
+    //   data: item
+    // })) : {}
+    // ['active-response'].map((item) => ({
+    //   button: item.command,
+    //   data: item
+    // })) : {}
     return (
       <Fragment>
         {currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response']) && (
@@ -77,8 +83,11 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
 }
 
 WzConfigurationActiveResponseActiveResponse.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.string
+  // currentConfig: PropTypes.object.isRequired,
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ])
 };
 
 const mapStateToProps = (state) => ({
@@ -95,7 +104,7 @@ export const WzConfigurationActiveResponseActiveResponseAgent = compose(
 )(WzConfigurationActiveResponseActiveResponse)
 
 WzConfigurationActiveResponseActiveResponseAgent.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

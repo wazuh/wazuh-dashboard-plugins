@@ -69,7 +69,7 @@ class WzPolicyMonitoringSCA extends Component{
 }
 
 WzPolicyMonitoringSCA.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzPolicyMonitoringSCA;

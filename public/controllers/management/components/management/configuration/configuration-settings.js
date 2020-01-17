@@ -129,13 +129,13 @@ export default [
       },
       {
         name: 'Active response',
-        description: 'Configuration options of the Command wodle',
+        description: 'Active threat addressing by inmmediate response',
         goto: 'active-response-agent',
         when: 'agent'
       },
       {
         name: 'Commands',
-        description: 'Active threat addressing by inmmediate response',
+        description: 'Configuration options of the Command wodle',
         goto: 'commands'
       },
       {

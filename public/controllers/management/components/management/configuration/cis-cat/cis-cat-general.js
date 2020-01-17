@@ -64,6 +64,7 @@ class WzConfigurationCisCatGeneral extends Component{
 }
 
 WzConfigurationCisCatGeneral.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
-}
+  // currentConfig: PropTypes.object.isRequired,
+};
+
 export default WzConfigurationCisCatGeneral;

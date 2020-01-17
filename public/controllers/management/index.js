@@ -33,7 +33,7 @@ import WzRuleset from './components/management/ruleset/main-ruleset';
 import WzManagement from './components/management/management-provider';
 import WzManagementMain from './components/management/management-main';
 import { ExportConfiguration } from '../agent/components/export-configuration';
-import WzManagementConfiguration from './components/management/configuration/configuration-main';
+import WzManagementConfiguration from './components/management/configuration/configuration-switch';
 import WzLogs from './components/management/mg-logs/logs';
 
 const app = uiModules.get('app/wazuh', []);

@@ -44,7 +44,7 @@ class WzPolicyMonitoringSystemAudit extends Component{
             currentConfig={currentConfig}
             helpLinks={helpLinks}>
               <EuiBasicTable 
-                items={currentConfig['syscheck-rootcheck'].rootcheck.system_audit}
+                items={currentConfig['syscheck-rootcheck'].rootcheck.system_audit.map(item => ({path: item}))}
                 columns={columns}
               />
           </WzConfigurationSettingsTabSelector>
@@ -55,7 +55,7 @@ class WzPolicyMonitoringSystemAudit extends Component{
 }
 
 WzPolicyMonitoringSystemAudit.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default WzPolicyMonitoringSystemAudit;

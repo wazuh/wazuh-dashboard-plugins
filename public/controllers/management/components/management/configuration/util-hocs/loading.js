@@ -55,6 +55,7 @@ const withLoading = (load, LoadingComponent, ErrorComponent) => (WrappedComponen
       )
     }
   }
+  WithLoading.displayName = `WithLoading(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`
   return WithLoading
 } 
 

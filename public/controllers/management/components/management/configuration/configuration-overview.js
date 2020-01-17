@@ -29,6 +29,7 @@ import { updateConfigurationSection } from '../../../../../redux/actions/configu
 
 import configurationSettingsGroup from './configuration-settings';
 
+import { connect } from 'react-redux';
 import { isString, isFunction } from './utils/utils';
 
 const columns = [
@@ -51,7 +52,6 @@ const helpLinks = [
 class WzConfigurationOverview extends Component{
     constructor(props){
 			super(props);
-			this.settings = this.filterSettings(configurationSettingsGroup);
 		}
 		updateConfigurationSection(section, title, description, path){
 			this.props.updateConfigurationSection(section, title, description, path);
@@ -70,6 +70,7 @@ class WzConfigurationOverview extends Component{
 			}).filter(group => group.settings.length);
 		}
     render(){
+			const settings = this.filterSettings(configurationSettingsGroup);
 			return (
 				<Fragment>
 					<EuiFlexGroup>
@@ -86,7 +87,7 @@ class WzConfigurationOverview extends Component{
 							<EuiFlexGroup gutterSize="xs">
 								<EuiFlexItem>
 									{this.props.agent.id === '000' ? (
-										<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', this.props.agent.id === '000' ? 'Manager configuration' : 'Agent configuration', '', 'Edit configuration')}>  {/* TODO: delete Agent configuration */}
+										<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>  {/* TODO: delete Agent configuration */}
 											Edit configuration
 										</EuiButtonEmpty>
 									) : this.props.agent.status === 'Active' ? 
@@ -101,7 +102,7 @@ class WzConfigurationOverview extends Component{
 					</EuiFlexGroup>
 					<EuiFlexGroup>
 						<EuiFlexItem>
-							{this.settings.map(group => (
+							{settings.map(group => (
 								<WzConfigurationOverviewTable 
 									key={`settings-${group.title}`}
 									title={group.title}
@@ -117,4 +118,8 @@ class WzConfigurationOverview extends Component{
     }
 }
 
-export default WzConfigurationOverview;
+const mapStateToProps = (state) => ({
+	clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+});
+
+export default connect(mapStateToProps)(WzConfigurationOverview);

@@ -77,7 +77,7 @@ const mapStateToProps = (state) => ({
 const sectionsAgent = [{component:'com',configuration:'active-response'}];
 
 WzConfigurationActiveResponseAgent.propTypes = {
-  currentConfig: PropTypes.object.isRequired,
+  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.string

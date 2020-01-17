@@ -28,12 +28,12 @@ import {
 import WzCodeEditor from '../util-components/code-editor';
 import withLoading from '../util-hocs/loading';
 
-import { fetchFile, restartNodeSelected, saveFileManager } from '../utils/wz-fetch';
+import { fetchFile, restartNodeSelected, saveFileManager, saveFileCluster } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
 
 import { addToast } from '../util-providers/toast-provider';
 import { withWzToast } from '../util-providers/toast-p';
-
+import WzConfigurationPath from '../util-components/configuration-path';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/configurationActions';
 
 import { connect } from 'react-redux';
@@ -55,13 +55,15 @@ class WzEditorConfiguration extends Component{
   async editorSave(){
     try{
       this.setState({ saving: true });
-      await saveFileManager(this.state.editorValue);
+      this.props.clusterNodeSelected ?
+        await saveFileCluster(this.state.editorValue, this.props.clusterNodeSelected)
+        : await saveFileManager(this.state.editorValue);
       this.setState({ saving: false, infoChangesAfterRestart: true });
       this.props.addToast({
         title: (
           <Fragment>
             <EuiIcon type='check'/>&nbsp;
-        <span>Success. {this.props.node} configuration has been updated</span>
+        <span>Success. {this.props.clusterNodeSelected || 'Manager' } configuration has been updated</span>
           </Fragment>),
         color: 'success'
       });
@@ -91,7 +93,7 @@ class WzEditorConfiguration extends Component{
   async confirmRestart(){
     try{
       this.setState({ restarting: true, infoChangesAfterRestart: false } );
-      await restartNodeSelected(null, this.props.updateWazuhNotReadyYet);
+      await restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
       this.props.updateWazuhNotReadyYet(false);
       this.setState({ restart: false, restarting: false });
     }catch(error){
@@ -102,9 +104,10 @@ class WzEditorConfiguration extends Component{
   }
   render(){
     const { editorValue, xmlError, restart, restarting, saving, infoChangesAfterRestart } = this.state;
-    const { node = 'manager' } = this.props;
+    const { clusterNodeSelected = 'manager' } = this.props;
     return (
       <Fragment>
+        {/* <WzConfigurationPath title={`${clusterNodeSelected} configuration`} updateConfigurationSection={this.props.updateConfigurationSection}/> */}
         <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup>
@@ -124,7 +127,7 @@ class WzEditorConfiguration extends Component{
               {restart && !restarting ? 
                 (<EuiFlexGroup alignItems='center'>
                   <EuiFlexItem>
-                    <span><strong>{node}</strong> will be restarted</span>
+                    <span><strong>{clusterNodeSelected}</strong> will be restarted</span>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty onClick={() => this.toggleRestart()}>Cancel</EuiButtonEmpty>
@@ -135,29 +138,31 @@ class WzEditorConfiguration extends Component{
                 </EuiFlexGroup>)
                   : restarting ? 
                     <EuiButton fill isDisabled>
-                      <EuiLoadingSpinner size="s"/> Restarting {node}
+                      <EuiLoadingSpinner size="s"/> Restarting {clusterNodeSelected}
                     </EuiButton>
-                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {node}</EuiButton>
+                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected}</EuiButton>
               }
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s'/>
         <EuiText>
-          Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{node}</span>
+          Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected}</span>
           {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
         </EuiText>
         {infoChangesAfterRestart && (
           <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
         )}
-        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)} minusHeight={325}/>
+        <EuiSpacer size='s'/>
+        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)} minusHeight={clusterNodeSelected ? 360 : 325}/>
       </Fragment>
     )
   }
 }
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet,
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -165,15 +170,18 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 WzEditorConfiguration.propTypes = {
-  wazuhNotReadyYet: PropTypes.string,
+  wazuhNotReadyYet: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string
+  ]),
   updateWazuhNotReadyYet: PropTypes.func
 };
 
 export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
   withWzToast,
-  withLoading(async () => {
-    const xmlFetched = await fetchFile()
+  withLoading(async (props) => {
+    const xmlFetched = await fetchFile(props.clusterNodeSelected)
     return { xmlFetched }
-  }),
-  connect(mapStateToProps, mapDispatchToProps)
+  })
 )(WzEditorConfiguration);

@@ -60,7 +60,7 @@ class WzPolicyMonitoring extends Component{
 const sections = [{component:'syscheck',configuration:'rootcheck'}, {component:'wmodules',configuration:'wmodules'}]
 
 WzPolicyMonitoring.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig(sections)(WzPolicyMonitoring);

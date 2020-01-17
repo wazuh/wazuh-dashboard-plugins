@@ -43,10 +43,10 @@ class WzConfigurationVulnerabilities extends Component{
         )}
         <WzTabSelector>
           <div label='General'>
-            <WzConfigurationVulnerabilitiesGeneral config={this.config}/>
+            <WzConfigurationVulnerabilitiesGeneral currentConfig={this.config}/>
           </div>
           <div label='Providers'>
-            <WzConfigurationVulnerabilitiesProviders config={this.config}/>
+            <WzConfigurationVulnerabilitiesProviders currentConfig={this.config}/>
           </div>
         </WzTabSelector>
       </Fragment>
@@ -57,7 +57,7 @@ class WzConfigurationVulnerabilities extends Component{
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationVulnerabilities.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig(sections)(WzConfigurationVulnerabilities);

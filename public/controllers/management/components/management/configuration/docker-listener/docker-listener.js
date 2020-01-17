@@ -67,7 +67,7 @@ class WzConfigurationDockerListener extends Component{
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationDockerListener.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  // currentConfig: PropTypes.object.isRequired
 };
 
 export default withWzConfig(sections)(WzConfigurationDockerListener);
