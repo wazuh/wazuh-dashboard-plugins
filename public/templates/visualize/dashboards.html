@@ -1,5 +1,5 @@
-<div ng-if="octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
-    class="md-padding-v">
+<div ng-if="octrl.tabView === 'panels' && octrl.tab !== 'welcome'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" class="md-padding-v">
 
     <react-component name="WzVisualize" props="octrl.visualizeProps" />
 

@@ -14,7 +14,13 @@ export class RawVisualizations {
    * Class constructor
    */
   constructor() {
+    if (!!RawVisualizations.instance) {
+      return RawVisualizations.instance;
+    }
     this.list = [];
+
+    RawVisualizations.instance = this;
+    return this;
   }
 
   /**

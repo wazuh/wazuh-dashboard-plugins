@@ -11,9 +11,10 @@
  */
 import React, { Component } from 'react';
 
-import { EuiText } from '@elastic/eui';
-
 import { visualizations } from './visualizations';
+
+import { KibanaVis } from '../kibana-vis/kibana-vis';
+import { EuiFlexGroup, EuiPanel, EuiFlexItem, EuiIcon } from '@elastic/eui';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -21,6 +22,7 @@ export class WzVisualize extends Component {
     this.visualizations = visualizations;
     this.state = {
       selectedTab: this.props.selectedTab,
+      updateVis: this.props.updateVis,
     };
   }
 
@@ -33,6 +35,36 @@ export class WzVisualize extends Component {
 
   render() {
     const { selectedTab } = this.state;
-    return <EuiText grow={false}>{selectedTab}</EuiText>;
+
+    return (
+      <div>
+        {this.props.selectedTab !== 'welcome' &&
+          this.visualizations[selectedTab].rows.map((row, i) => {
+            return (
+              <EuiFlexGroup key={i} style={{ height: row.height + 'px', width: '100%', margin: 0 }}>
+                {row.vis.map((vis, j) => {
+                  return !vis.hasRows ? (
+                    <EuiFlexItem grow={vis.width ? vis.width : 10} key={j}>
+                      <EuiPanel>
+                        <EuiFlexGroup>
+                          <span className="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">
+                            {vis.title}
+                          </span>
+                          <span className="cursor-pointer wz-margin-8-no-left">
+                            <EuiIcon type="expand"></EuiIcon>
+                          </span>
+                        </EuiFlexGroup>
+                        <div style={{ height: '100%' }}>
+                          <KibanaVis visID={vis.id} tab={selectedTab} {...this.props}></KibanaVis>
+                        </div>
+                      </EuiPanel>
+                    </EuiFlexItem>
+                  ) : null;
+                })}
+              </EuiFlexGroup>
+            );
+          })}
+      </div>
+    );
   }
 }
