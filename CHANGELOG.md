@@ -2,6 +2,20 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.11.2 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 572
+
+### Added
+
+- Support for Wazuh v3.11.2
+
+### Changed
+
+- Increased list filesize limit for the CDB-list [#1993](https://github.com/wazuh/wazuh-kibana-app/pull/1993)
+
+### Fixed
+
+- The xml validator now correctly handles the `--` string within comments [#1980](https://github.com/wazuh/wazuh-kibana-app/pull/1980)
+
 
 ## Wazuh v3.11.1 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 581
 
