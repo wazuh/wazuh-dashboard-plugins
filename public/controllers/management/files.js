@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../../react-services/app-state";
 
 export class FilesController {
   constructor(
@@ -89,7 +90,7 @@ export class FilesController {
     };
 
     this.$scope.doSaveConfig = (isNewFile, fileName) => {
-      const clusterInfo = this.appState.getClusterInfo();
+      const clusterInfo = AppState.getClusterInfo();
       const showRestartManager =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       if (isNewFile && !fileName) {
@@ -218,7 +219,7 @@ export class FilesController {
     this.$scope.cancelSaveAndOverwrite();
     this.$scope.$applyAsync();
     this.$location.search('editingFile', true);
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.$scope.$emit('fetchedFile', { data: this.$scope.fetchedXML });
   }
 

@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { TabNames } from '../../utils/tab-names';
+import { AppState } from '../../react-services/app-state';
 
 export class ManagementController {
   /**
@@ -58,7 +59,7 @@ export class ManagementController {
 
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentGroup', null);
     });
 
@@ -68,32 +69,32 @@ export class ManagementController {
 
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentRule', null);
     });
 
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
       this.currentDecoder = (params || {}).currentDecoder || false;
       this.$location.search('currentDecoder', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     });
 
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentDecoder', null);
     });
 
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
       this.$location.search('currentList', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$applyAsync();
     });
 
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentList', null);
     });
 
@@ -184,7 +185,7 @@ export class ManagementController {
    * When controller loads
    */
   $onInit() {
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
 
@@ -258,7 +259,7 @@ export class ManagementController {
   setConfigTab(tab, nav = false) {
     this.globalConfigTab = tab;
     if (nav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     } else {
       this.editionTab = tab;
     }
@@ -273,7 +274,7 @@ export class ManagementController {
   setCurrentRule(params) {
     this.currentRule = (params || {}).currentRule || false;
     this.$location.search('currentRule', true);
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
   }
 
   /**
@@ -283,7 +284,7 @@ export class ManagementController {
   switchTab(tab, setNav = false) {
     this.editTab = '';
     if (setNav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     } else {
       if (this.$location.search().editSubTab) {
         this.editTab = this.$location.search().editSubTab;
@@ -381,7 +382,7 @@ export class ManagementController {
   async loadNodeList() {
     try {
       this.loadingNodes = true;
-      const clusterInfo = this.appState.getClusterInfo() || {};
+      const clusterInfo = AppState.getClusterInfo() || {};
       const clusterEnabled = clusterInfo.status === 'enabled';
       if (clusterEnabled) {
         const response = await this.apiReq.request('GET', '/cluster/nodes', {});

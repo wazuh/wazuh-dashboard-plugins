@@ -1,5 +1,12 @@
 import React from 'react';
-import { EuiToolTip, EuiButtonIcon, EuiLink, EuiButtonEmpty, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import { EuiToolTip,
+  EuiButtonIcon,
+  EuiLink,
+  EuiBetaBadge,
+  EuiButtonEmpty,
+  EuiOverlayMask,
+  EuiConfirmModal
+} from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
 
 
@@ -48,32 +55,8 @@ export default class RulesetColumns {
             width: '10%'
           },
           {
-            field: 'pci',
-            name: 'PCI',
-            align: 'left',
-            sortable: false,
-            width: '10%'
-          },
-          {
-            field: 'gdpr',
-            name: 'GDPR',
-            align: 'left',
-            sortable: false,
-            width: '10%'
-          },
-          {
-            field: 'hipaa',
-            name: 'HIPAA',
-            align: 'left',
-            sortable: false,
-            width: '10%'
-          },
-          {
-            field: 'nist-800-53',
-            name: 'NIST 800-53',
-            align: 'left',
-            sortable: false,
-            width: '10%'
+            name: 'Regulatory compliance',
+            render: this.buildComplianceBadges,
           },
           {
             field: 'level',
@@ -301,5 +284,26 @@ export default class RulesetColumns {
     }
 
     this.buildColumns();
+  }
+
+  buildComplianceBadges(item){
+    const badgeList = [];
+    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53'];
+    const buildBadge = (field) => {
+      return (<EuiBetaBadge 
+        label={field.toUpperCase()} 
+        tooltipContent={item[field].join(', ')} 
+        tooltipPosition="bottom"
+        class="euiBadge euiBadge--hollow eui-displayInlineBlock"
+        style={{margin:"1px 2px"}}
+      />);
+    }
+    for (const field of fields) {
+      if (item[field].length) {
+        badgeList.push(buildBadge(field))
+      }
+    }
+
+    return <div>{badgeList}</div>;
   }
 }
