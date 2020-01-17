@@ -87,6 +87,7 @@ app.directive('wzXmlFileEditor', function() {
           let xml = replaceIllegalXML(text);
           xml = xml.replace(/..xml.+\?>/, '');
           xml = xml.replace(/\\</gm, '');
+          xml = xml.replace(/<!--[\s\S\n]*?-->/gm, '');
           const xmlDoc = parser.parseFromString(
             `<file>${xml}</file>`,
             'text/xml'
