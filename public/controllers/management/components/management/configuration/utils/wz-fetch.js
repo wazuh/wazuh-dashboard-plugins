@@ -50,7 +50,7 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false, 
           : !node && agentId === '000'
           ? `/manager/config/${component}/${configuration}`
           : `/agents/${agentId}/config/${component}/${configuration}`;
-
+        console.log('url', url)
         const partialResult = await WzRequest.apiReq('GET', url, {});
         result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
@@ -272,12 +272,13 @@ export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) 
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    console.log('restarting', selectedNode)
     isCluster
       ? await restartNode(selectedNode)
       : await restartManager();
     
     // Dispatch a Redux action
-    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'manager'}, please wait. `);
+    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'manager'}, please wait.`);
     return await makePing(updateWazuhNotReadyYet);
   }catch(error){
     return Promise.reject(error);
@@ -347,7 +348,7 @@ export const restartNode = async (node) => {
       `/cluster/${node}/configuration/validation`,
       {}
     );
-
+    console.log('restart node validation error', validationError)
     const data = ((validationError || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
@@ -359,6 +360,7 @@ export const restartNode = async (node) => {
       `/cluster/${node}/restart`,
       {}
     );
+    console.log('restart node result', result)
     return result;
   } catch (error) {
     return Promise.reject(error);
@@ -419,20 +421,6 @@ export const saveFileCluster = async (text, node) => {
   }
 }
 
-// close = false; // TODO: showRestarMessage or errorHandler? when restart a node Cluster
-// await configHandler.saveNodeConfiguration(params.node, xml);
-// try {
-//   await validateAfterSent(params.node);
-// } catch (err) {
-//   params.showRestartManager = 'warn';
-// }
-// const msg = `Success. Node (${params.node}) configuration has been updated`;
-// params.showRestartManager
-//   ? params.showRestartManager !== 'warn'
-//     ? showRestartMessage(msg, params.node)
-//     : errorHandler.handle(warnMsg, '', true)
-//   : errorHandler.info(msg);
-
 /**
  * Save text to ossec.conf manager file
  * @param {string} text Text to save
@@ -449,102 +437,6 @@ export const saveFileManager = async (text) => {
   } catch (error) {
     return Promise.reject(error);
   }
-  
-  // const warnMsg =
-  //   'File has been updated, but there are errors in the configuration';
-  // try {
-  //   // const text = $scope.xmlCodeBox.getValue();
-  //   const xml = replaceIllegalXML(text);
-  //   if (params.group) {
-  //     close = false;
-  //     await groupHandler.sendConfiguration(params.group, xml);
-  //     try {
-  //       await validateAfterSent(false);
-  //     } catch (err) {
-  //       params.showRestartManager = 'warn';
-  //     }
-  //     const msg = 'Success. Group has been updated';
-  //     params.showRestartManager
-  //       ? params.showRestartManager !== 'warn'
-  //         ? showRestartMessage(msg, params.showRestartManager)
-  //         : errorHandler.handle(warnMsg, '', true)
-  //       : errorHandler.info(msg);
-  //   } else if (params.rule) {
-  //     close = false;
-  //     await rulesetHandler.sendRuleConfiguration(
-  //       params.rule,
-  //       xml,
-  //       params.isNewFile && !params.isOverwrite
-  //     );
-  //     try {
-  //       await validateAfterSent(false);
-  //     } catch (err) {
-  //       params.showRestartManager = 'warn';
-  //     }
-  //     const msg = 'Success. Rules updated';
-  //     params.showRestartManager
-  //       ? params.showRestartManager !== 'warn'
-  //         ? showRestartMessage(msg, params.showRestartManager)
-  //         : errorHandler.handle(warnMsg, '', true)
-  //       : errorHandler.info(msg);
-  //   } else if (params.decoder) {
-  //     close = false;
-  //     await rulesetHandler.sendDecoderConfiguration(
-  //       params.decoder,
-  //       xml,
-  //       params.isNewFile && !params.isOverwrite
-  //     );
-  //     try {
-  //       await validateAfterSent(false);
-  //     } catch (err) {
-  //       params.showRestartManager = 'warn';
-  //     }
-  //     const msg = 'Success. Decoders has been updated';
-  //     params.showRestartManager
-  //       ? params.showRestartManager !== 'warn'
-  //         ? showRestartMessage(msg, params.showRestartManager)
-  //         : errorHandler.handle(warnMsg, '', true)
-  //       : errorHandler.info(msg);
-  //   } else if (params.node) {
-  //     close = false;
-  //     await configHandler.saveNodeConfiguration(params.node, xml);
-  //     try {
-  //       await validateAfterSent(params.node);
-  //     } catch (err) {
-  //       params.showRestartManager = 'warn';
-  //     }
-  //     const msg = `Success. Node (${params.node}) configuration has been updated`;
-  //     params.showRestartManager
-  //       ? params.showRestartManager !== 'warn'
-  //         ? showRestartMessage(msg, params.node)
-  //         : errorHandler.handle(warnMsg, '', true)
-  //       : errorHandler.info(msg);
-  //   } else if (params.manager) {
-  //     await configHandler.saveManagerConfiguration(xml);
-  //     try {
-  //       await validateAfterSent(false);
-  //     } catch (err) {
-  //       params.showRestartManager = 'warn';
-  //     }
-  //     const msg = 'Success. Manager configuration has been updated';
-  //     params.showRestartManager
-  //       ? params.showRestartManager !== 'warn'
-  //         ? showRestartMessage(msg, params.showRestartManager)
-  //         : errorHandler.handle(warnMsg, '', true)
-  //       : errorHandler.info(msg);
-  //   }
-  //   $scope.savingParam();
-  //   if (close) $scope.closeFn({ reload: true });
-  // } catch (error) {
-  //   $scope.savingParam();
-  //   if ((error || '').includes('Wazuh API error: 1905')) {
-  //     $scope.configError = ['File name already exists'];
-  //     $scope.$emit('showSaveAndOverwrite', {});
-  //   } else {
-  //     errorHandler.handle(error, 'Error');
-  //   }
-  // }
-  // return;
 };
 
 /**

@@ -15,21 +15,22 @@ import PropTypes from "prop-types";
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import WzTabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationVulnerabilitiesGeneral from './vulnerabilities-general';
 import WzConfigurationVulnerabilitiesProviders from './vulnerabilities-providers';
 import { isString } from '../utils/utils';
+import { wodleBuilder } from '../utils/builders';
 
 class WzConfigurationVulnerabilities extends Component{
   constructor(props){
     super(props);
-    this.config = this.props.currentConfig['wmodules-wmodules'].wmodules.find(item => item['vulnerability-detector']);
+    this.wodleConfig = wodleBuilder(this.props.currentConfig,'vulnerability-detector');
   }
   componentDidMount(){
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return this.config['vulnerability-detector'].disabled !== 'yes';
+    return this.wodleConfig && this.wodleConfig['vulnerability-detector'] && this.wodleConfig['vulnerability-detector'].disabled !== 'yes';
   }
   render(){
     const { currentConfig } = this.props;
@@ -38,16 +39,16 @@ class WzConfigurationVulnerabilities extends Component{
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']}/>
         )}
-        {currentConfig && !this.config && !isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && !this.wodleConfig && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present'/>
         )}
         <WzTabSelector>
-          <div label='General'>
-            <WzConfigurationVulnerabilitiesGeneral currentConfig={this.config}/>
-          </div>
-          <div label='Providers'>
-            <WzConfigurationVulnerabilitiesProviders currentConfig={this.config}/>
-          </div>
+          <WzTabSelectorTab label='General'>
+            <WzConfigurationVulnerabilitiesGeneral currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Providers'>
+            <WzConfigurationVulnerabilitiesProviders currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+          </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>
     )

@@ -38,22 +38,22 @@ class WzConfigurationCisCatGeneral extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
         <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='General settings applied to all benchmarks'
-          currentConfig={currentConfig}
+          currentConfig={wodleConfig}
           helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup 
-              config={currentConfig['cis-cat']}
+              config={wodleConfig['cis-cat']}
               items={mainSettings}
             />
             <WzConfigurationSettingsGroup
               title='Scheduling settings'
               description='Customize CIS-CAT scans scheduling'
-              config={currentConfig['cis-cat']}
+              config={wodleConfig['cis-cat']}
               items={schedulingSettings}
             />
         </WzConfigurationSettingsTabSelector>

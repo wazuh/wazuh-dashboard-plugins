@@ -39,21 +39,21 @@ class WzConfigurationAmazonS3Services extends Component{
     super(props);
   }
   render(){
-    const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = currentConfig['aws-s3'] && currentConfig['aws-s3'].services ? settingsListBuilder(currentConfig['aws-s3'].services, 'type') : {};
+    const { currentConfig, wodleConfig, wazuhNotReadyYet } = this.props;
+    const items = wodleConfig['aws-s3'] && wodleConfig['aws-s3'].services ? settingsListBuilder(wodleConfig['aws-s3'].services, 'type') : {};
     return (
       <Fragment>
-        {currentConfig && !currentConfig['aws-s3'] /*&& !currentConfig['aws-s3'].services*/ && (
+        {currentConfig && !wodleConfig['aws-s3'] /*&& !currentConfig['aws-s3'].services*/ && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {wazuhNotReadyYet && (!currentConfig /*|| !currentConfig['aws-s3']*/) && ( 
+        {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
-        {currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].services && (
+        {currentConfig && wodleConfig['aws-s3'] && wodleConfig['aws-s3'].services && (
           <WzConfigurationSettingsTabSelector
             title='Services'
             description='Amazon services from where logs are read'
-            currentConfig={currentConfig}
+            currentConfig={wodleConfig}
             helpLinks={helpLinks}
           >
             <WzConfigurationListSelector

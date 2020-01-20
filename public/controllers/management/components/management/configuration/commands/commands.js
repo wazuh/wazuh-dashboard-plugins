@@ -41,11 +41,11 @@ const mainSettings = [
 class WzConfigurationCommands extends Component{
   constructor(props){
     super(props);
-    this.config = this.props.currentConfig['wmodules-wmodules'].wmodules.filter(item => item['command']);
+    this.wodleConfig = this.props.currentConfig['wmodules-wmodules'].wmodules.filter(item => item['command']);
   }
   render(){
     const { currentConfig } = this.props;
-    const items = this.config && this.config.length ? settingsListBuilder(this.config.map(item => item.command), 'tag') : false;
+    const items = this.wodleConfig && this.wodleConfig.length ? settingsListBuilder(this.wodleConfig.map(item => item.command), 'tag') : false;
     return (
       <Fragment>
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (

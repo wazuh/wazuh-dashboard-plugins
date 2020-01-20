@@ -18,7 +18,7 @@ import {
 } from "@elastic/eui";
 
 import WzConfigurationSettingsHeader from './configuration-settings-header';
-import WzViewSelector from './view-selector';
+import WzViewSelector, { WzViewSelectorSwitch } from './view-selector';
 import { WzSettingsViewer } from './code-viewer';
 
 class WzConfigurationSettingsTabSelector extends Component{
@@ -61,15 +61,15 @@ class WzConfigurationSettingsTabSelector extends Component{
           help={helpLinks}
         />
         <WzViewSelector view={view}>
-          <div default>
+          <WzViewSelectorSwitch default>
             {children}
-          </div>
-          <div view='json'>
+          </WzViewSelectorSwitch>
+          <WzViewSelectorSwitch view='json'>
             <WzSettingsViewer mode='json' value={currentConfig} />
-          </div>
-          <div view='xml'>
+          </WzViewSelectorSwitch>
+          <WzViewSelectorSwitch view='xml'>
             <WzSettingsViewer mode='xml' value={currentConfig} />
-          </div>
+          </WzViewSelectorSwitch>
         </WzViewSelector>
       </Fragment>
     )

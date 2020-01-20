@@ -33,21 +33,21 @@ class WzConfigurationCisCatBenchmarks extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
-        {(!currentConfig['cis-cat'].content && (
+        {(!wodleConfig['cis-cat'].content && (
           <WzNoConfig error='not-present' help={helpLinks}></WzNoConfig>
         )) || (
           <Fragment>
             <WzConfigurationSettingsTabSelector
               title='Benchmarks'
               description='List of CIS-CAT benchmark templates to perform scans'
-              currentConfig={currentConfig}
+              currentConfig={wodleConfig}
               helpLinks={helpLinks}
             >
             <EuiBasicTable
-              items={currentConfig['cis-cat'].content}
+              items={wodleConfig['cis-cat'].content}
               columns={columns}/>
             </WzConfigurationSettingsTabSelector>
 

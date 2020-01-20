@@ -14,7 +14,7 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import withWzConfig from '../util-hocs/wz-config';
-import WzTabSelector from "../util-components/tab-selector";
+import WzTabSelector, { WzTabSelectorTab } from "../util-components/tab-selector";
 
 import WzConfigurationPolicyMonitoringGeneral from './policy-monitoring-general';
 import WzConfigurationPolicyMonitoringSystemAudit from './policy-monitoring-system-audit';
@@ -38,18 +38,18 @@ class WzPolicyMonitoring extends Component{
     return (
       <Fragment>
         <WzTabSelector>
-          <div label='General'>
+          <WzTabSelectorTab label='General'>
             <WzConfigurationPolicyMonitoringGeneral {...this.props} />
-          </div>
-          <div label='System audit'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='System audit'>
             <WzConfigurationPolicyMonitoringSystemAudit {...this.props} />
-          </div>
-          <div label='Ignored'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Ignored'>
             <WzConfigurationPolicyMonitoringIgnored {...this.props} />
-          </div>
-          <div label='SCA'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='SCA'>
             <WzConfigurationPolicyMonitoringSCA {...this.props} />
-          </div>
+          </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>
       

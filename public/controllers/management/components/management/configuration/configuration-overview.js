@@ -22,6 +22,7 @@ import {
 import WzConfigurationOverviewTable from './configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
 import WzBadge from './util-components/badge';
+import WzClusterSelect from './configuration-cluster-selector';
 
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 
@@ -71,6 +72,7 @@ class WzConfigurationOverview extends Component{
 		}
     render(){
 			const settings = this.filterSettings(configurationSettingsGroup);
+			console.log('overview', this.props)
 			return (
 				<Fragment>
 					<EuiFlexGroup>
@@ -87,15 +89,23 @@ class WzConfigurationOverview extends Component{
 							<EuiFlexGroup gutterSize="xs">
 								<EuiFlexItem>
 									{this.props.agent.id === '000' ? (
-										<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>  {/* TODO: delete Agent configuration */}
-											Edit configuration
-										</EuiButtonEmpty>
+										<Fragment>
+											<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>  {/* TODO: delete Agent configuration */}
+												Edit configuration
+											</EuiButtonEmpty>
+										</Fragment>
 									) : this.props.agent.status === 'Active' ? 
 									<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/> //TODO: export configuration
 									: null}
 								</EuiFlexItem>
 								<EuiFlexItem>
 									<WzHelpButtonPopover links={helpLinks}/>
+								</EuiFlexItem>
+								<EuiFlexItem>
+									{this.props.clusterNodes && this.props.clusterNodes.length && this.props.clusterNodeSelected ? (
+											<WzClusterSelect />
+										)
+									: null}
 								</EuiFlexItem>
 							</EuiFlexGroup>
 						</EuiFlexItem>
@@ -119,6 +129,7 @@ class WzConfigurationOverview extends Component{
 }
 
 const mapStateToProps = (state) => ({
+	clusterNodes: state.configurationReducers.clusterNodes,
 	clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 

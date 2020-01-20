@@ -16,7 +16,7 @@ import PropTypes from "prop-types";
 import withWzConfig from "../util-hocs/wz-config";
 import WzNoConfig from "../util-components/no-config";
 import { isString } from '../utils/utils';
-import WzTabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import helpLinks from './help-links';
 
 import WzConfigurationIntegrityMonitoringGeneral from './integrity-monitoring-general';
@@ -50,22 +50,21 @@ class WzConfigurationIntegrityMonitoring extends Component{
         )}
         {currentConfig['syscheck-syscheck'] && !isString(currentConfig['syscheck-syscheck']) && currentConfig['syscheck-syscheck'].syscheck && (
           <WzTabSelector>
-            <div label='General'>
+            <WzTabSelectorTab label='General'>
               <WzConfigurationIntegrityMonitoringGeneral {...this.props} />
-            </div>
-            <div label='Monitored'>
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label='Monitored'>
               <WzConfigurationIntegrityMonitoringMonitored {...this.props} />
-            </div>
-            <div label='Ignored'>
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label='Ignored'>
               <WzConfigurationIntegrityMonitoringIgnored {...this.props} />
-
-            </div>
-            <div label='No diff'>
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label='No diff'>
               <WzConfigurationIntegrityMonitoringNoDiff {...this.props} />
-            </div>
-            <div label='Who-data'>
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label='Who-data'>
               <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
-            </div>
+            </WzTabSelectorTab>
           </WzTabSelector>
         )}
       </Fragment>

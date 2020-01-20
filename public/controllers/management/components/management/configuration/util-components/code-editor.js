@@ -48,9 +48,9 @@ class WzCodeEditor extends Component{
           isReadOnly={isReadOnly}
           setOptions={{
             fontSize: '14px',
-            enableBasicAutocompletion: true,
+            // enableBasicAutocompletion: true,
             enableSnippets: true,
-            enableLiveAutocompletion: true,
+            // enableLiveAutocompletion: true,
           }}
           aria-label='Code Editor'
         />

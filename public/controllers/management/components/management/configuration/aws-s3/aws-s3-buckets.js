@@ -43,21 +43,21 @@ class WzConfigurationAmazonS3Buckets extends Component{
     super(props);
   }
   render(){
-    const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].buckets ? settingsListBuilder(currentConfig['aws-s3'].buckets, 'name') : {};
+    const { currentConfig, wodleConfig, wazuhNotReadyYet } = this.props;
+    const items = wodleConfig && wodleConfig['aws-s3'] && wodleConfig['aws-s3'].buckets ? settingsListBuilder(wodleConfig['aws-s3'].buckets, 'name') : {};
     return (
       <Fragment>
-        {currentConfig && currentConfig['aws-s3'] && !currentConfig['aws-s3'].buckets && (
+        {currentConfig && !wodleConfig['aws-s3'] /*&& !currentConfig['aws-s3'].buckets*/ && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {wazuhNotReadyYet && (!currentConfig || !currentConfig['aws-s3']) && ( 
+        {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
-        {currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].buckets && (
+        {currentConfig && wodleConfig['aws-s3'] && wodleConfig['aws-s3'].buckets && (
           <WzConfigurationSettingsTabSelector
             title='Main settings'
             description='Common settings applied to all Amazon S3 buckets'
-            currentConfig={currentConfig}
+            currentConfig={wodleConfig}
             helpLinks={helpLinks}
           >
             <WzConfigurationListSelector

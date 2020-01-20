@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from 'prop-types';
 
-import WzTabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
 
@@ -28,16 +28,17 @@ class WzConfigurationGlobalConfiguration extends Component{
   }
   render(){
     const { agent } = this.props;
+    console.log('global configuration', this.props)
     return (
       <Fragment>
         {(agent && agent.id === '000') ? (
           <WzTabSelector>
-            <div label="Global">
+            <WzTabSelectorTab label="Global">
               <WzConfigurationGlobalConfigurationGlobal {...this.props}/>
-            </div>
-            <div label="Remote">
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label="Remote">
               <WzConfigurationGlobalConfigurationRemote {...this.props}/>
-            </div>
+            </WzTabSelectorTab>
           </WzTabSelector>
         ) : <WzConfigurationGlobalConfigurationGlobal {...this.props}/>}
       </Fragment>

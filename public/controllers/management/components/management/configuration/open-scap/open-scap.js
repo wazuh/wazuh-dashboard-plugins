@@ -14,7 +14,7 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import WzNoConfig from "../util-components/no-config";
-import WzTabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationOpenSCAPGeneral from './open-scap-general';
 import WzConfigurationOpenSCAPEvaluations from './open-scap-evaluations';
 import { isString } from '../utils/utils';
@@ -44,13 +44,12 @@ class WzConfigurationOpenSCAP extends Component{
         {currentConfig && currentConfig['open-scap'] && (
           <Fragment>
             <WzTabSelector>
-              <div label='General'>
+              <WzTabSelectorTab label='General'>
                 <WzConfigurationOpenSCAPGeneral {...this.props} currentConfig={currentConfig}/>
-              </div>
-              <div label='Evaluations'>
+              </WzTabSelectorTab>
+              <WzTabSelectorTab label='Evaluations'>
                 <WzConfigurationOpenSCAPEvaluations {...this.props} currentConfig={currentConfig}/>
-              </div>
-
+              </WzTabSelectorTab>
             </WzTabSelector>
           </Fragment>
         )}

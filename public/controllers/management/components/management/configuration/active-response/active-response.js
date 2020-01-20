@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
-import WzTabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationActiveResponseActiveResponse from './active-response-active-response';
 import WzConfigurationActiveResponseCommands from './active-response-commands';
 import withWzConfig from "../util-hocs/wz-config";
@@ -26,12 +26,12 @@ class WzConfigurationActiveResponse extends Component{
     return (
       <Fragment>
         <WzTabSelector>
-          <div label='Active response'>
+          <WzTabSelectorTab label='Active response'>
             <WzConfigurationActiveResponseActiveResponse currentConfig={this.props.currentConfig}/>
-          </div>
-          <div label='Commands'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Commands'>
             <WzConfigurationActiveResponseCommands currentConfig={this.props.currentConfig}/>
-          </div>
+          </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>
     )

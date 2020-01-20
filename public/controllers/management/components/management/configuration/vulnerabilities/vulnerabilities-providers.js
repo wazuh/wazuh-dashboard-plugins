@@ -79,7 +79,7 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
     super(props);
   }
   render(){
-    let { currentConfig } = this.props;
+    let { currentConfig, wodleConfig } = this.props;
     //TODO: delete testing 
     // Testing data to see the render of this properties
     // if(currentConfig['vulnerability-detector'].providers){
@@ -93,18 +93,18 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
     // }
     return (
       <Fragment>
-        {(currentConfig['vulnerability-detector'] && !currentConfig['vulnerability-detector'].providers && (
+        {(wodleConfig['vulnerability-detector'] && !wodleConfig['vulnerability-detector'].providers && (
           <WzNoConfig error='not-present' help={helpLinks}></WzNoConfig>
         )) || (
           <Fragment>
             <WzConfigurationSettingsTabSelector
               title='Providers'
               description='List of OVAL databases providers to check for vulnerability scans'
-              currentConfig={currentConfig}
+              currentConfig={wodleConfig}
               helpLinks={helpLinks}
             >
               <EuiBasicTable
-                items={currentConfig['vulnerability-detector'].providers}
+                items={wodleConfig['vulnerability-detector'].providers}
                 columns={columns}/>
             </WzConfigurationSettingsTabSelector>
           </Fragment>
@@ -115,7 +115,7 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
 }
 
 WzConfigurationVulnerabilitiesProviders.propTypes = {
-  config: PropTypes.object.isRequired
+  
 };
 
 export default WzConfigurationVulnerabilitiesProviders;

@@ -28,6 +28,7 @@ import {
 } from "@elastic/eui";
 
 import WzBadge from '../util-components/badge';
+import WzClusterSelect from '../configuration-cluster-selector';
 
 class WzConfigurationPath extends Component{
   constructor(props){
@@ -38,20 +39,30 @@ class WzConfigurationPath extends Component{
     return (
       <Fragment>
         <EuiFlexGroup alignItems='center'>
-          <EuiFlexItem grow={false} style={{margin: "0 6px"}}>
-            <EuiToolTip content='Back to configuration' position='right'>
-              <EuiButtonIcon  style={{padding: 0}} iconType='arrowLeft' iconSize='l' onClick={() => updateConfigurationSection('')} aria-label='back to configuration'/>
-            </EuiToolTip>
+          <EuiFlexItem>
+            <EuiFlexGroup alignItems='center'>
+              <EuiFlexItem grow={false} style={{margin: "0 6px"}}>
+                <EuiToolTip content='Back to configuration' position='right'>
+                  <EuiButtonIcon  style={{padding: 0}} iconType='arrowLeft' iconSize='l' onClick={() => updateConfigurationSection('')} aria-label='back to configuration'/>
+                </EuiToolTip>
+              </EuiFlexItem>
+              <EuiFlexItem style={{marginLeft: '6px', marginRight: '6px'}}>
+                {icon && <EuiIcon size='l' type={icon}/> }
+                <EuiTitle style={{display: 'inline-block', margin: 0}}>
+                  <span>{title} {typeof badge === 'boolean' ? <WzBadge enabled={badge}/> : null}</span>
+                </EuiTitle>
+                {description && (<EuiText color='subdued'>{description}</EuiText>)}
+                <EuiSpacer size='xs'/>
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiFlexItem>
-          <EuiFlexItem style={{marginLeft: '6px', marginRight: '6px'}}>
-            {icon && <EuiIcon size='l' type={icon}/> }
-            <EuiTitle style={{display: 'inline-block', margin: 0}}>
-              <span>{title} {typeof badge === 'boolean' ? <WzBadge enabled={badge}/> : null}</span>
-            </EuiTitle>
-            {description && (<EuiText color='subdued'>{description}</EuiText>)}
-            <EuiSpacer size='xs'/>
-          </EuiFlexItem>
+          {this.props.clusterNodes && this.props.clusterNodes.length && (
+            <EuiFlexItem grow={false}>
+              <div><WzClusterSelect /></div>
+            </EuiFlexItem>
+          )}
         </EuiFlexGroup>
+        
         <EuiSpacer size='s'/>
       </Fragment>
     )
@@ -66,4 +77,8 @@ WzConfigurationPath.propTypes = {
   badge: PropTypes.bool
 };
 
-export default WzConfigurationPath;
+const mapStateToProps = (state) => ({
+  clusterNodes: state.configurationReducers.clusterNodes
+});
+
+export default connect(mapStateToProps)(WzConfigurationPath);

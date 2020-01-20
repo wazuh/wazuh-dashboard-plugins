@@ -21,8 +21,9 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import withWzConfig from "../util-hocs/wz-config";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
 import WzNoConfig from "../util-components/no-config";
-import { isString, isArray, renderValueNoThenEnabled } from '../utils/utils';
 import WzConfigurationSettingsHeader from "../util-components/configuration-settings-header";
+import { isString, isArray, renderValueNoThenEnabled } from '../utils/utils';
+import { wodleBuilder } from '../utils/builders';
 
 const mainSettings = [
   { field: 'disabled', label: 'Osquery integration status', render: renderValueNoThenEnabled },
@@ -46,13 +47,13 @@ const columns = [
 class WzConfigurationOsquery extends Component{
   constructor(props){
     super(props);
-    this.config = this.props.currentConfig['wmodules-wmodules'].wmodules.find(item => item['osquery']);
+    this.wodleConfig = wodleBuilder(this.props.currentConfig, 'osquery');
   }
   componentDidMount(){
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return this.config.osquery.disabled === 'no';
+    return this.wodleConfig && this.wodleConfig.osquery && this.wodleConfig.osquery.disabled === 'no';
   }
   render(){
     const { currentConfig } = this.props;
@@ -61,27 +62,27 @@ class WzConfigurationOsquery extends Component{
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
         )}
-        {currentConfig && !this.config.osquery && !isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && !this.wodleConfig.osquery && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {currentConfig && this.config && this.config.osquery && (
+        {currentConfig && this.wodleConfig && this.wodleConfig.osquery && (
           <WzConfigurationSettingsTabSelector
             title='Main settings'
             description='General Osquery integration settings'
-            currentConfig={this.config}
+            currentConfig={this.wodleConfig}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
-              config={this.config.osquery}
-              items={mainSettings}
+              config={this.wodleConfig.osquery}
+              items={mainSettings}ks
             />
-            {this.config.osquery.packs && isArray(this.config.osquery.packs) && this.config.osquery.packs.length && (
+            {this.wodleConfig.osquery.packs && isArray(this.wodleConfig.osquery.packs) && this.wodleConfig.osquery.packs.length && (
               <Fragment>
                 <WzConfigurationSettingsHeader
                   title='Osquery packs'
                   description='A pack contains multiple queries to quickly retrieve system information'
                 />
                 <EuiBasicTable 
-                  items={this.config.osquery.packs}
+                  items={this.wodleConfig.osquery.packs}
                   columns={columns}
                 />
               </Fragment>

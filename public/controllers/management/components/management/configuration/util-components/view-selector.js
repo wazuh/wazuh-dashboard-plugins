@@ -29,6 +29,26 @@ class WzViewSelector extends Component{
 
 WzViewSelector.propTypes = {
   children: PropTypes.array
-}
+};
 
 export default WzViewSelector;
+
+export class WzViewSelectorSwitch extends Component{
+  constructor(props){
+    super(props);
+  }
+  render(){
+    return (
+      <Fragment>
+        {this.props.children}
+      </Fragment>
+    )
+  }
+}
+
+WzViewSelectorSwitch.propTypes = {
+  view: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.any
+  ])
+};

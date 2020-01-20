@@ -22,6 +22,7 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from "../util-hocs/wz-config";
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import { wodleBuilder } from '../utils/builders';
 
 const mainSettings = [
   { field: 'disabled', label: 'Syscollector integration status', render: renderValueNoThenEnabled },
@@ -47,10 +48,13 @@ const helpLinks = [
 class WzConfigurationInventory extends Component{
   constructor(props){
     super(props);
-    this.config = this.props.currentConfig['wmodules-wmodules'].wmodules.find(item => item['syscollector']);
+    this.wodleConfig = wodleBuilder(this.props.currentConfig, 'syscollector');
+  }
+  componentDidMount(){
+    this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return this.config.syscollector.disabled === 'no';
+    return (this.wodleConfig && this.wodleConfig.syscollector && this.wodleConfig.syscollector.disabled === 'no') || false;
   }
   render(){
     const { currentConfig } = this.props;
@@ -59,23 +63,23 @@ class WzConfigurationInventory extends Component{
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
         )}
-        {currentConfig && !this.config.syscollector && !isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && !this.wodleConfig.syscollector && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {currentConfig && this.config && this.config.syscollector && (
+        {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
           <WzConfigurationSettingsTabSelector
             title='Main settings'
             description='General settings applied to all the scans'
-            currentConfig={this.config}
+            currentConfig={this.wodleConfig}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
-              config={this.config.syscollector}
+              config={this.wodleConfig.syscollector}
               items={mainSettings}
             />
             <WzConfigurationSettingsGroup
               title='Scan settings'
               description='Specific inventory scans to collect'
-              config={this.config.syscollector}
+              config={this.wodleConfig.syscollector}
               items={scanSettings}
             />
           </WzConfigurationSettingsTabSelector>

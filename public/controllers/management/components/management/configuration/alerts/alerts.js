@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
-import WzTabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationAlertsGeneral from './alerts-general';
 import WzConfigurationAlertsLabels from './alerts-labels';
@@ -32,21 +32,21 @@ class WzConfigurationAlerts extends Component{
     return (
       <Fragment>
         <WzTabSelector>
-          <div label="General">
+          <WzTabSelectorTab label="General">
             <WzConfigurationAlertsGeneral {...this.props}/>
-          </div>
-          <div label="Labels">
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label="Labels">
             <WzConfigurationAlertsLabels {...this.props}/>
-          </div>
-          <div label='Email alerts'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Email alerts'>
             <WzConfigurationAlertsEmailAlerts {...this.props}/>
-          </div>
-          <div label='Reports'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Reports'>
             <WzConfigurationAlertsEmailReports {...this.props}/>
-          </div>
-          <div label='Syslog output'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Syslog output'>
             <WzConfigurationAlertsSyslogOutput {...this.props}/>
-          </div>
+          </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>
     )

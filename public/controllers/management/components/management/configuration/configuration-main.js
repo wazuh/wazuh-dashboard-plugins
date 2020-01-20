@@ -14,7 +14,7 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
-import WzConfigurationSwitch from './configuration-overview';
+import WzConfigurationSwitch from './configuration-switch';
 
 import {
   
@@ -23,11 +23,12 @@ import {
 class WzConfigurationMain extends Component{
   constructor(props){
     super(props);
+    console.log('')
   }
   render(){
     return (
       <WzReduxProvider>
-        <WzConfigurationSwitch />
+        <WzConfigurationSwitch {...this.props}/>
       </WzReduxProvider>
     )
   }

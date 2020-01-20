@@ -18,7 +18,7 @@ import {
 } from "@elastic/eui";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
-import WzSettingsGroup from '../util-components/configuration-settings-group';
+import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 
 import { renderValueNoThenEnabled, renderValueOrYes, isString } from '../utils/utils';
@@ -38,24 +38,24 @@ class WzConfigurationAmazonS3General extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
         {currentConfig && currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks} />
         )}
-        {currentConfig && !currentConfig['aws-s3'] && !isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && !wodleConfig['aws-s3'] && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks} />
         )}
-        {currentConfig && currentConfig['aws-s3'] && (
+        {currentConfig && wodleConfig['aws-s3'] && (
           <WzConfigurationSettingsTabSelector
             title='Main settings'
             description='Common settings applied to all Amazon S3 buckets'
-            currentConfig={currentConfig}
+            currentConfig={wodleConfig}
             helpLinks={helpLinks}
           >
-            <WzSettingsGroup
-              config={currentConfig['aws-s3']}
+            <WzConfigurationSettingsGroup
+              config={wodleConfig['aws-s3']}
               items={mainSettings}
             />
           </WzConfigurationSettingsTabSelector>

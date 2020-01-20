@@ -47,7 +47,7 @@ export const helpLinksBuilder = (items) => items.map((item, key) => ({
  * @param {array|string} wodles 
  */
 export const wodleBuilder = (currentConfig, wodles) => {
-  const result = {...currentConfig };
+  const result = {};
   wodles = typeof wodles === 'string' ? [wodles] : wodles;
   wodles.map(wodle => { 
     result[wodle] = currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle]) ? currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle])[wodle] : undefined

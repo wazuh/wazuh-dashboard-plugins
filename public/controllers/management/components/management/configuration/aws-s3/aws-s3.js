@@ -13,7 +13,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import WzTabSelector from "../util-components/tab-selector";
+import WzTabSelector, { WzTabSelectorTab } from "../util-components/tab-selector";
 import withWzConfig from "../util-hocs/wz-config";
 import { wodleBuilder } from '../utils/builders';
 
@@ -24,26 +24,26 @@ import WzConfigurationAmazonS3Services from './aws-s3-services';
 class WzConfigurationAmazonS3 extends Component{
   constructor(props){
     super(props);
-    this.config = wodleBuilder(this.props.currentConfig, 'aws-s3');
+    this.wodleConfig = wodleBuilder(this.props.currentConfig, 'aws-s3');
   }
   componentDidMount(){
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return this.config && this.config['aws-s3'] && this.config['aws-s3'].disabled === 'no' || false;
+    return this.wodleConfig && this.wodleConfig['aws-s3'] && this.wodleConfig['aws-s3'].disabled === 'no' || false;
   }
   render(){
     return (
       <WzTabSelector>
-        <div label='General'>
-          <WzConfigurationAmazonS3General currentConfig={this.config}/>
-        </div>
-        <div label='Buckets'>
-          <WzConfigurationAmazonS3Buckets currentConfig={this.config}/>
-        </div>
-        <div label='Services'>
-          <WzConfigurationAmazonS3Services currentConfig={this.config}/>
-        </div>
+        <WzTabSelectorTab label='General'>
+          <WzConfigurationAmazonS3General currentConfig={this.props.currentConfig} wodleConfig={this.wodleConfig}/>
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Buckets'>
+          <WzConfigurationAmazonS3Buckets currentConfig={this.props.currentConfig} wodleConfig={this.wodleConfig}/>
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Services'>
+          <WzConfigurationAmazonS3Services currentConfig={this.props.currentConfig} wodleConfig={this.wodleConfig}/>
+        </WzTabSelectorTab>
       </WzTabSelector>
     )
   }

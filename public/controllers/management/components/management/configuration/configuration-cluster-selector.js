@@ -29,11 +29,11 @@ class WzConfigurationClusterSelect extends Component{
     this.props.updateClusterNodeSelected(e.target.value);
     if(this.props.view !== ''){
       this.props.updateLoadingStatus(true);
-      setTimeout(() => {this.props.updateLoadingStatus(false);},0) //TODO: ñapa
+      setTimeout(() => {this.props.updateLoadingStatus(false);},0) // trick: This unmount hoc components and mount again it with new cluser node selected
     }
   }
   render(){
-    const options = this.props.clusterNodes.map((clusterNode) => ({ value: clusterNode.name, text: clusterNode.name }))
+    const options = this.props.clusterNodes.map((clusterNode) => ({ value: clusterNode.name, text: `${clusterNode.name} (${clusterNode.type})` }))
     return (
       <EuiSelect
         id="selectConfigurationClusterNode"
@@ -41,12 +41,14 @@ class WzConfigurationClusterSelect extends Component{
         value={this.props.clusterNodeSelected}
         onChange={this.onChange}
         aria-label="Select Configuration Cluster Node"
+        style={{width: this.props.withd || '200px'}}
       />
     )
   }
 }
 
 const mapStateToProps = (state) => ({
+  clusterNodes: state.configurationReducers.clusterNodes,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 

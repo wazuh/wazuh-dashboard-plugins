@@ -16,7 +16,7 @@ import PropTypes from "prop-types";
 import { WzConfigurationSettingsHeaderViewer } from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import { WzSettingsViewer } from '../util-components/code-viewer';
-import WzViewSelector from '../util-components/view-selector';
+import WzViewSelector, { WzViewSelectorSwitch } from '../util-components/view-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
 import { capitalize, isString } from '../utils/utils';
@@ -72,7 +72,7 @@ class WzConfigurationIntegrations extends Component{
         //     helpLinks={helpLinks}>
         // </WzConfigurationSettingsTabSelector>
           <WzViewSelector view={view}>
-            <div default>
+            <WzViewSelectorSwitch default>
               {integrations && integrations.map((integrationInfo, key) => {
                 const integration = Object.assign(this.buildIntegration(integrationInfo.name), integrationInfo);
                 return (
@@ -90,8 +90,8 @@ class WzConfigurationIntegrations extends Component{
                   </Fragment>
                 )
               })}
-            </div>
-            <div view='json'>
+            </WzViewSelectorSwitch>
+            <WzViewSelectorSwitch view='json'>
               <WzConfigurationSettingsHeaderViewer
                 mode='json'
                 view={view}
@@ -100,8 +100,8 @@ class WzConfigurationIntegrations extends Component{
                 xml={() => this.changeView('xml')}
                 help={helpLinks}/>
               <WzSettingsViewer mode='json' value={currentConfig}/>
-            </div>
-            <div view='xml'>
+            </WzViewSelectorSwitch>
+            <WzViewSelectorSwitch view='xml'>
               <WzConfigurationSettingsHeaderViewer
                 mode='xml'
                 view={view}
@@ -110,7 +110,7 @@ class WzConfigurationIntegrations extends Component{
                 xml={() => this.changeView('xml')}
                 help={helpLinks}/>
               <WzSettingsViewer mode='xml' value={currentConfig}/>
-            </div>
+            </WzViewSelectorSwitch>
 
           </WzViewSelector>
         )}

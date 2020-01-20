@@ -17,7 +17,7 @@ import {
   
 } from "@elastic/eui";
 
-import WzTabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationLogCollectionLogs from './log-collection-logs';
 import WzConfigurationLogCollectionCommands from './log-collection-commands';
 import WzConfigurationLogCollectionSockets from './log-collection-sockets';
@@ -40,15 +40,15 @@ class WzConfigurationLogCollection extends Component{
     return (
       <Fragment>
         <WzTabSelector>
-          <div label='Logs'>
+          <WzTabSelectorTab label='Logs'>
             <WzConfigurationLogCollectionLogs currentConfig={currentConfig} agent={agent}/>
-          </div>
-          <div label='Commands'>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Commands'>
             <WzConfigurationLogCollectionCommands currentConfig={currentConfig} agent={agent}/>
-          </div>
-          <div label='Sockets'>
-          <WzConfigurationLogCollectionSockets currentConfig={currentConfig} agent={agent}/>
-          </div>
+          </WzTabSelectorTab>
+          <WzTabSelectorTab label='Sockets'>
+            <WzConfigurationLogCollectionSockets currentConfig={currentConfig} agent={agent}/>
+          </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>
     )
