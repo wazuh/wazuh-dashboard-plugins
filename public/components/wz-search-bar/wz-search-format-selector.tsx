@@ -91,6 +91,8 @@ export class WzSearchFormatSelector extends Component {
           label: '?Q',
         }
       )
+    } else {
+      toggleButtons.push({});
     }
 
     if (apiEnable) {
@@ -100,6 +102,8 @@ export class WzSearchFormatSelector extends Component {
           label: 'API',
         },
       )
+    } else {
+      toggleButtons.push({});
     }
     return toggleButtons;
   }
@@ -149,12 +153,14 @@ export class WzSearchFormatSelector extends Component {
 
   render() {
     const {toggleIdSelected} = this.state;
+    const { apiFilterEnabled, qFilterEnabled } = this.props;
     const button = (
       <EuiButtonEmpty
         onClick={this.onButtonClick.bind(this)}>
         {"Help"}
       </EuiButtonEmpty>
     );
+    const renderFooter = this.renderFooter()
     return (
       <EuiPopover 
         id='wzFormatSelector'
@@ -162,13 +168,16 @@ export class WzSearchFormatSelector extends Component {
         button={button}
         isOpen={this.state.isPopoverOpen}
         closePopover={this.closePopover.bind(this)}>
-        <EuiPopoverTitle>{'Help'}</EuiPopoverTitle>
+        <EuiPopoverTitle>{"Help"}</EuiPopoverTitle>
           <div style={{ width: '300px' }}>
             <EuiText>
-              { this.apiLegend
+              { (toggleIdSelected.label === '?Q')
+               ? this.qLegend
+               : this.apiLegend
               }
             </EuiText>
           </div>
+          { !(qFilterEnabled && apiFilterEnabled) || renderFooter }
       </EuiPopover>
     );
   }
