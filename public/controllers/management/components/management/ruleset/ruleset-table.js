@@ -24,10 +24,7 @@ import { toastNotifications } from 'ui/notify';
 import {
   updateLoadingStatus,
   updateIsProcessing,
-  updatePageIndex,
   updateShowModal,
-  updateSortDirection,
-  updateSortField,
   updateDefaultItems,
 } from '../../../../../redux/actions/rulesetActions';
 
@@ -42,6 +39,7 @@ class WzRulesetTable extends Component {
     this.state = {
       items: [],
       pageSize: 10,
+      pageIndex: 0,
       totalItems: 0,
     };
     this.paths = {
@@ -110,33 +108,33 @@ class WzRulesetTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex } = this.props.state;
-    const { pageSize } = this.state;
+    const { pageSize, pageIndex } = this.state;
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter(),
+      ...this.buildSortFilter(),
     };
 
     return filter;
   }
 
   buildSortFilter() {
-    const {sortDirection, section} = this.props.state;
+    const {sortDirection, sortField} = this.state;
+    const sortFilter = {};
+    if (sortField) {
+      const direction = (sortDirection === 'asc') ? '+' : '-';
+      sortFilter['sort'] = direction+sortField;
+    }
+    console.log("direction",sortDirection);
+    console.log("filter",sortFilter);
 
-    const field = section === 'rules' ? 'id' : 'name';
-    const direction = (sortDirection === 'asc') ? '+' : '-';
-
-    return direction+field;
+    return sortFilter;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-    this.setState({ pageSize });
-    this.props.updatePageIndex(pageIndex);
-    this.props.updateSortDirection(sortDirection);
-    this.props.updateSortField(sortField);
+    this.setState({ pageSize, pageIndex, sortDirection, sortField });
     this.props.updateIsProcessing(true);
   };
 
@@ -145,13 +143,16 @@ class WzRulesetTable extends Component {
     const {
       isLoading,
       section,
-      pageIndex,
       showingFiles,
       error,
+    } = this.props.state;
+    const { items,
+      pageSize,
+      totalItems,
+      pageIndex,
       sortField,
       sortDirection,
-    } = this.props.state;
-    const { items, pageSize, totalItems, } = this.state;
+    } = this.state;
     const rulesetColums = this.rulesetColums.columns;
     const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
     const message = isLoading ? null : 'No results...';
@@ -249,10 +250,7 @@ const mapDispatchToProps = (dispatch) => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)), //TODO: remove this action
     updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),//TODO: Remove to redux
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)), //TODO: Remove to redux
-    updateSortField: sortField => dispatch(updateSortField(sortField)),//TODO: Remove to redux
   };
 };
 
