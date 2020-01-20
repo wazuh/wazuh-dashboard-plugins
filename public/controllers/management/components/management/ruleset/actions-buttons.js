@@ -138,7 +138,7 @@ class WzRulesetActionButtons extends Component {
   async refresh() {
     try {
       this.props.updateIsProcessing(true);
-      this.onRefreshLoading();
+      // this.onRefreshLoading();
 
     } catch (error) {
       return Promise.reject(error);
@@ -149,12 +149,11 @@ class WzRulesetActionButtons extends Component {
     clearInterval(this.refreshTimeoutId);
 
     this.props.updateLoadingStatus(true);
-    this.refreshTimeoutId =  setInterval(() => {
-      if(!this.props.state.isProcessing) {
-        this.props.updateLoadingStatus(false);
-        clearInterval(this.refreshTimeoutId);
-      }
-    }, 100);
+    // this.refreshTimeoutId =  setInterval(() => {
+    //   if(!this.props.state.isProcessing) {
+    //     clearInterval(this.refreshTimeoutId);
+    //   }
+    // }, 100);
   }
 
   render() {

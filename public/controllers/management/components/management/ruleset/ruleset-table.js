@@ -23,14 +23,9 @@ import { toastNotifications } from 'ui/notify';
 
 import {
   updateLoadingStatus,
-  updateFileContent,
-  updateRuleInfo,
-  updateDecoderInfo,
-  updateListContent,
   updateIsProcessing,
   updatePageIndex,
   updateShowModal,
-  updateListItemsForRemove,
   updateSortDirection,
   updateSortField,
   updateDefaultItems,
@@ -64,10 +59,11 @@ class WzRulesetTable extends Component {
 
   async componentDidUpdate(prevProps) {
     const sectionChanged = prevProps.state.section !== this.props.state.section
-   
+
     if ( (this.props.state.isProcessing && this._isMounted) || sectionChanged) {
       this.props.updateLoadingStatus(true);
       this.props.updateIsProcessing(false);
+
       await this.getItems();
     }
   }
@@ -75,16 +71,13 @@ class WzRulesetTable extends Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-  
+
   async getItems() {
     const { section, showingFiles } = this.props.state;
 
     this.setState({
       items : []
     });
-    if(this.props.state.defaultItems.length === 0 && section === 'lists'){
-      await this.setDefaultItems();
-    }
 
     const rawItems = await this.wzReq(
       'GET',
@@ -130,10 +123,10 @@ class WzRulesetTable extends Component {
 
   buildSortFilter() {
     const {sortDirection, section} = this.props.state;
-    
+
     const field = section === 'rules' ? 'id' : 'name';
     const direction = (sortDirection === 'asc') ? '+' : '-';
-    
+
     return direction+field;
   }
 
@@ -174,7 +167,7 @@ class WzRulesetTable extends Component {
         direction: sortDirection,
       },
     }
-    
+
     if (!error) {
       const itemList = this.props.state.itemList;
       return (
@@ -241,7 +234,7 @@ class WzRulesetTable extends Component {
       this.props.updateLoadingStatus(false);
       this.showToast('success', 'Success', 'Deleted correctly', 3000);
     });
-  }; 
+  };
 }
 
 
@@ -253,18 +246,13 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateFileContent: content => dispatch(updateFileContent(content)),
-    updateRuleInfo: info => dispatch(updateRuleInfo(info)),
-    updateDecoderInfo: info => dispatch(updateDecoderInfo(info)),
-    updateListContent: content => dispatch(updateListContent(content)),
-    updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)),
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)), //TODO: remove this action
+    updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),//TODO: Remove to redux
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: sortField => dispatch(updateSortField(sortField)),
+    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)), //TODO: Remove to redux
+    updateSortField: sortField => dispatch(updateSortField(sortField)),//TODO: Remove to redux
   };
 };
 
