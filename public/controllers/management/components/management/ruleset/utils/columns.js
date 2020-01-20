@@ -294,7 +294,7 @@ export default class RulesetColumns {
         label={field.toUpperCase()} 
         tooltipContent={item[field].join(', ')} 
         tooltipPosition="bottom"
-        class="euiBadge euiBadge--hollow eui-displayInlineBlock"
+        className="euiBadge euiBadge--hollow eui-displayInlineBlock"
         style={{margin:"1px 2px"}}
       />);
     }
