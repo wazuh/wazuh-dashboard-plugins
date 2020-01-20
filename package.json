@@ -31,8 +31,6 @@
     "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
     "build": "plugin-helpers build",
     "test": "_mocha test/**/*",
-    "test:jest": "jest",
-    "test:jest:watch": "jest --watch",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js"
   },
   "dependencies": {
