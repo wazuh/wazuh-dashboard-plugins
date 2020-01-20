@@ -22,7 +22,6 @@ import RulesetHandler from './utils/ruleset-handler';
 import { toastNotifications } from 'ui/notify';
 
 import {
-  updateLoadingStatus,
   updateIsProcessing,
   updateShowModal,
   updateDefaultItems,
@@ -41,6 +40,7 @@ class WzRulesetTable extends Component {
       pageSize: 10,
       pageIndex: 0,
       totalItems: 0,
+      isLoading: false,
     };
     this.paths = {
       rules: '/rules',
@@ -59,7 +59,7 @@ class WzRulesetTable extends Component {
     const sectionChanged = prevProps.state.section !== this.props.state.section
 
     if ( (this.props.state.isProcessing && this._isMounted) || sectionChanged) {
-      this.props.updateLoadingStatus(true);
+      this.setState({isLoading:true});
       this.props.updateIsProcessing(false);
 
       await this.getItems();
@@ -87,9 +87,8 @@ class WzRulesetTable extends Component {
     this.setState({
       items,
       totalItems,
-      isProcessing: false,
+      isLoading:false
     });
-    this.props.updateLoadingStatus(false);
   }
 
   async setDefaultItems() {
@@ -125,8 +124,6 @@ class WzRulesetTable extends Component {
       const direction = (sortDirection === 'asc') ? '+' : '-';
       sortFilter['sort'] = direction+sortField;
     }
-    console.log("direction",sortDirection);
-    console.log("filter",sortFilter);
 
     return sortFilter;
   }
@@ -141,7 +138,6 @@ class WzRulesetTable extends Component {
   render() {
     this.rulesetColums = new RulesetColums(this.props);
     const {
-      isLoading,
       section,
       showingFiles,
       error,
@@ -152,6 +148,7 @@ class WzRulesetTable extends Component {
       pageIndex,
       sortField,
       sortDirection,
+      isLoading,
     } = this.state;
     const rulesetColums = this.rulesetColums.columns;
     const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
@@ -225,14 +222,13 @@ class WzRulesetTable extends Component {
   };
 
   async removeItems(items) {
-    this.props.updateLoadingStatus(true);
+    this.setState({ isLoading: true });
     const results = items.map(async (item, i) => {
       await this.rulesetHandler.deleteFile((item.file)? item.file: item.name, item.path);
     });
 
     Promise.all(results).then((completed) => {
       this.props.updateIsProcessing(true);
-      this.props.updateLoadingStatus(false);
       this.showToast('success', 'Success', 'Deleted correctly', 3000);
     });
   };
@@ -247,7 +243,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)), //TODO: remove this action
     updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
