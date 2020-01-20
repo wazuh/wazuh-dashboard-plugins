@@ -44,6 +44,7 @@ app.directive('kbnVis', function () {
       let visHandler = null;
       let renderInProgress = false;
       let deadField = false;
+      let mapClicked = false;
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
           const fromParsed = dateMath.parse(from);
@@ -274,6 +275,16 @@ app.directive('kbnVis', function () {
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';
+
+            if ($scope.visID.includes('AWS-geo')) {
+              const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
+              setTimeout(function () {
+                if (!mapClicked) {
+                  mapClicked = true;
+                  canvas[0].click();
+                }
+              }, 1000);
+            }
           } else if (
             $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
           ) {
