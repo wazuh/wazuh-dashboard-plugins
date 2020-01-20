@@ -12,7 +12,8 @@
 
 
 import Cookies from '../utils/js-cookie';
-
+import store from '../redux/store'
+import {updateAdminMode} from '../redux/actions/groupsActions'
 export class AppState {
 
     /**
@@ -165,7 +166,7 @@ export class AppState {
      * Get 'patternSelector' value   
      */
     static getPatternSelector() {
-        return Cookies.get('patternSelector') ? decodeURI(Cookies.get('patternSelector')) : false;
+        return Cookies.get('patternSelector') ? decodeURI(Cookies.get('patternSelector'))=="true" : false;
     }
 
     /**

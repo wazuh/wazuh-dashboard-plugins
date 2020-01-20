@@ -40,9 +40,9 @@ export class PatternHandler {
       );
 
       if (!patternList.data.data.length) {
-        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         this.$location.search('tab', null);
-        this.$location.path('/blank-screen');
+        if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen'))
+          window.location.href = "/app/wazuh#/settings/";
         return;
       }
 
