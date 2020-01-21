@@ -13,6 +13,7 @@
 const initialState = {
   currentAPI: "",
   showMenu: false,
+  wazuhNotReadyYet: ""
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -27,6 +28,14 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       showMenu: action.showMenu,
+    };
+  }
+
+
+  if (action.type === 'UPDATE_WAZUH_NOT_READY_YET') {
+    return {
+      ...state,
+      wazuhNotReadyYet: action.wazuhNotReadyYet,
     };
   }
 

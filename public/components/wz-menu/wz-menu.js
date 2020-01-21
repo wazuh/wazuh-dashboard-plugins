@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiButtonIcon } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiButton, EuiCallOut, EuiLoadingSpinner } from '@elastic/eui';
 import PropTypes from 'prop-types';
 import './wz-menu.css';
 import { AppState } from '../../react-services/app-state';
@@ -127,7 +127,6 @@ class WzMenu extends Component {
 
   buildPatternSelector(){
     return (
-      <EuiFlexItem grow={false}>
         <span className="small">
           <select className="wz-menu-select" value={this.state.currentSelectedPattern}
               onChange={this.changePattern} aria-label="Index pattern selector">
@@ -140,7 +139,6 @@ class WzMenu extends Component {
                 })}
           </select>
       </span>
-      </EuiFlexItem>
     )
   }
 
@@ -160,7 +158,7 @@ class WzMenu extends Component {
         <WzReduxProvider>
         <div className="wz-menu-wrapper">
           <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
-              <EuiFlexItem grow={false} >
+              <EuiFlexItem >
                 <EuiFlexGroup style={{marginLeft: "10px", marginTop: "-6px"}}>
                         
                 <EuiButtonEmpty
@@ -202,9 +200,7 @@ class WzMenu extends Component {
 
                 </EuiFlexGroup>
               </EuiFlexItem>
-
-              <EuiFlexItem></EuiFlexItem>
-              <EuiFlexItem grow={false} style={{paddingTop: "6px", marginRight: "-4px"}}>
+              <EuiFlexItem grow={false} style={{paddingTop: "6px", marginRight: "-4px", display: "inline"}}>
                 {this.state.currentAPI && 
                 (
                   <span><EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon> {this.state.currentAPI} </span>
@@ -212,18 +208,17 @@ class WzMenu extends Component {
                 }
                 {!this.state.currentAPI && 
                 (
-                  <span>- No API </span>
+                  <span> No API </span>
                 )
                 }
+                 &nbsp; &nbsp;
+                {this.state.showSelector && this.state.theresPattern && this.state.patternList && this.state.patternList.length > 1 &&
+                  (
+                    this.buildPatternSelector()
+                  )
+                  }
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{paddingTop: "6px", marginRight: "-4px"}}>
-                
-              {this.state.showSelector && this.state.theresPattern && this.state.patternList && this.state.patternList.length > 1 &&
-                ( 
-                  this.buildPatternSelector()
-                )
-                }
-              </EuiFlexItem>
+
               <EuiFlexItem grow={false} style={{ marginTop: "6px", marginRight: "1px"}}>
                 <EuiButtonEmpty 
                   className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
@@ -237,6 +232,35 @@ class WzMenu extends Component {
               </EuiFlexItem>
             </EuiFlexGroup>
         </div>
+            {this.props.state.wazuhNotReadyYet && 
+            (<EuiCallOut  title={this.props.state.wazuhNotReadyYet} color="warning" style={{marginTop : "50px", marginBottom : "-50px", marginLeft: "8px", marginRight: "8px"}}>
+              <EuiFlexGroup responsive={false} direction="row" style={{maxHeight: "40px", marginTop: "-45px"}}>
+              
+              <EuiFlexItem>
+              <p></p>              
+              </EuiFlexItem>  
+              {this.props.state.wazuhNotReadyYet.includes("Restarting") && 
+              (
+                <EuiFlexItem grow={false}>
+                <p>     <EuiLoadingSpinner size="l" /> &nbsp; &nbsp;</p>              
+                </EuiFlexItem>  
+              )
+              }
+
+              {this.props.state.wazuhNotReadyYet === "Wazuh could not be recovered." && 
+              (
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty grow={false} onClick={() => location.reload()} className="WzNotReadyButton" >
+                  <span> Reload </span>              
+                  </EuiButtonEmpty>  
+                </EuiFlexItem>  
+
+              )
+              }
+              </EuiFlexGroup>
+            </EuiCallOut>)
+            }
+        
       </WzReduxProvider>
       );
       }else{

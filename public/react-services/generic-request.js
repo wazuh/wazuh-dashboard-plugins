@@ -86,7 +86,9 @@ export class GenericRequest {
       }
       return data;
     }catch(err){
-
+      return (((err || {}).response || {}).data || {}).message || false
+        ? Promise.reject(err.response.data.message)
+        : Promise.reject(err.response.message || err.response || err);
     }
   }
 

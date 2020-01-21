@@ -33,3 +33,14 @@ export const updateShowMenu = showMenu => {
     showMenu: showMenu
   };
 };
+
+/**
+ * Updates WazuhNotReadyYet in the appState store
+ * @param wazuhNotReadyYet
+ */
+export const updateWazuhNotReadyYet = wazuhNotReadyYet => {
+  return {
+    type: 'UPDATE_WAZUH_NOT_READY_YET',
+    wazuhNotReadyYet: wazuhNotReadyYet
+  };
+};
