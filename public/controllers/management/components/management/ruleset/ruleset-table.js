@@ -147,12 +147,18 @@ class WzRulesetTable extends Component {
     this.props.updateIsProcessing(true);
   };
 
-  render() {
+  getColumns() {
     const {
       section,
       showingFiles,
-      error,
     } = this.props.state;
+    const rulesetColums = new RulesetColums(this.props).columns;
+    const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
+    return columns;
+  }
+
+  render() {
+    const { error } = this.props.state;
     const { 
       items,
       pageSize,
@@ -162,8 +168,7 @@ class WzRulesetTable extends Component {
       sortDirection,
       isLoading,
     } = this.state;
-    const rulesetColums = new RulesetColums(this.props).columns;
-    const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
+    const columns = this.getColumns();
     const message = isLoading ? null : 'No results...';
     const pagination = {
       pageIndex: pageIndex,
