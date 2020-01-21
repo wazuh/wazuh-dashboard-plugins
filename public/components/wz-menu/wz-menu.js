@@ -18,9 +18,13 @@ import {WzMisc} from '../../factories/misc';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import chrome from 'ui/chrome';
+import { connect } from 'react-redux';
+import WzReduxProvider from '../../redux/wz-redux-provider';
+import store from '../../redux/store'
 
 
-export class WzMenu extends Component {
+
+class WzMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -33,6 +37,7 @@ export class WzMenu extends Component {
       patternList: [],
       currentSelectedPattern: ""
     };
+    this.store = store;
     this.wazuhConfig = new WazuhConfig();
   }
 
@@ -50,8 +55,13 @@ export class WzMenu extends Component {
 
 
   componentDidUpdate(prevProps) {
+    
     if(!this.state.currentAPI && JSON.parse(AppState.getCurrentAPI()).name || JSON.parse(AppState.getCurrentAPI()).name !== this.state.currentAPI ){
       this.setState( {currentAPI: JSON.parse(AppState.getCurrentAPI()).name })
+    }else{
+      if(this.state.currentAPI && this.props.state.currentAPI && this.state.currentAPI !== this.props.state.currentAPI){
+        this.setState({currentAPI: this.props.state.currentAPI} );
+      }
     }
   }
 
@@ -141,7 +151,6 @@ export class WzMenu extends Component {
   }
 
   render() {
-    this.isHealthCheckExecuted()
 
     if(!this.state.showMenu && this.isHealthCheckExecuted())
       this.load();
@@ -153,6 +162,7 @@ export class WzMenu extends Component {
     
     if(this.state.showMenu){
       return (
+        <WzReduxProvider>
         <div className="wz-menu-wrapper">
           <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
               <EuiFlexItem grow={false} >
@@ -232,11 +242,18 @@ export class WzMenu extends Component {
               </EuiFlexItem>
             </EuiFlexGroup>
         </div>
+      </WzReduxProvider>
       );
       }else{
-        return (<div> no menu </div>)
+        return (<WzReduxProvider><div> </div></WzReduxProvider>)
       }
   }
 }
 
-WzMenu.propTypes = { }
+const mapStateToProps = state => {
+  return {
+    state: state.appStateReducers,
+  };
+};
+
+export default connect(mapStateToProps)(WzMenu);
