@@ -27,14 +27,11 @@ import {
 
 import WzCodeEditor from '../util-components/code-editor';
 import withLoading from '../util-hocs/loading';
+import { withWzToast } from '../util-providers/toast-p';
+import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 
 import { fetchFile, restartNodeSelected, saveFileManager, saveFileCluster } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
-
-import { addToast } from '../util-providers/toast-provider';
-import { withWzToast } from '../util-providers/toast-p';
-import WzConfigurationPath from '../util-components/configuration-path';
-import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/configurationActions';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -94,11 +91,11 @@ class WzEditorConfiguration extends Component{
     try{
       this.setState({ restarting: true, infoChangesAfterRestart: false } );
       await restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
-      this.props.updateWazuhNotReadyYet(false);
+      this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, restarting: false });
     }catch(error){
       console.error('error restarting', error)
-      this.props.updateWazuhNotReadyYet(false);
+      this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, restarting: false });
     }
   }
@@ -161,7 +158,7 @@ class WzEditorConfiguration extends Component{
 }
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet,
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 

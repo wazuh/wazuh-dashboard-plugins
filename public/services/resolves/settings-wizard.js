@@ -12,6 +12,7 @@
 import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export function settingsWizard(
   $location,
@@ -22,10 +23,10 @@ export function settingsWizard(
   genericReq,
   errorHandler,
   wzMisc,
-  wazuhConfig,
   disableErrors = false
 ) {
   try {
+    const wazuhConfig = new WazuhConfig();
     const deferred = $q.defer();
     const checkResponse = data => {
       let fromWazuhHosts = false;
@@ -290,7 +291,7 @@ export function settingsWizard(
           });
       }
     }
-    appState.setWzMenu();
+    AppState.setWzMenu();
     return deferred.promise;
   } catch (error) {
     !disableErrors && errorHandler.handle(error);

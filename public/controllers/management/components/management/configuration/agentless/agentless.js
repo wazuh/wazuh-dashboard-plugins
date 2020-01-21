@@ -74,7 +74,7 @@ class WzConfigurationAgentless extends Component{
 const sections = [{component:'agentless',configuration:'agentless'}];
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 WzConfigurationAgentless.propTypes = {

@@ -17,13 +17,6 @@ export const updateConfigurationSection = (section) => {
   }
 }
 
-export const updateWazuhNotReadyYet = (wazuhNotReadyYet) => {
-  return {
-    type: 'UPDATE_WAZUH_NOT_READY_YET',
-    wazuhNotReadyYet
-  }
-}
-
 export const updateClusterNodes = (clusterNodes) => {
   return {
     type: 'UPDATE_CONFIGURATION_CLUSTER_NODES',

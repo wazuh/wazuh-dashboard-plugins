@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../react-services/app-state";
+import { GenericRequest } from "../react-services/generic-request";
 
 export class VisFactoryService {
   /**
    * Class Constructor
    * @param {*} $rootScope
    * @param {*} appState
-   * @param {*} genericReq
    * @param {*} discoverPendingUpdates
    * @param {*} rawVisualizations
    * @param {*} tabVisualizations
@@ -27,7 +27,6 @@ export class VisFactoryService {
   constructor(
     $rootScope,
     appState,
-    genericReq,
     discoverPendingUpdates,
     rawVisualizations,
     tabVisualizations,
@@ -37,7 +36,7 @@ export class VisFactoryService {
   ) {
     this.$rootScope = $rootScope;
     this.appState = appState;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.discoverPendingUpdates = discoverPendingUpdates;
     this.rawVisualizations = rawVisualizations;
     this.tabVisualizations = tabVisualizations;

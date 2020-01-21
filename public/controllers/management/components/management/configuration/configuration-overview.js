@@ -89,12 +89,12 @@ class WzConfigurationOverview extends Component{
 								<EuiFlexItem>
 									{this.props.agent.id === '000' ? (
 										<Fragment>
-											<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>  {/* TODO: delete Agent configuration */}
+											<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>
 												Edit configuration
 											</EuiButtonEmpty>
 										</Fragment>
 									) : this.props.agent.status === 'Active' ? 
-									<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/> //TODO: export configuration
+									<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/>
 									: null}
 								</EuiFlexItem>
 								<EuiFlexItem>

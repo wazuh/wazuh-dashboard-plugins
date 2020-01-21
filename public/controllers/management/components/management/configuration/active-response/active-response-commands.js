@@ -70,7 +70,7 @@ class WzConfigurationActiveResponseCommands extends Component{
 }
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 WzConfigurationActiveResponseCommands.propTypes = {

@@ -76,7 +76,7 @@ class WzCluster extends Component{
 const sections = [{component:'com',configuration:'cluster'}];
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 WzCluster.propTypes = {

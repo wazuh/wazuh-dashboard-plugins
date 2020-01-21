@@ -91,7 +91,7 @@ WzConfigurationActiveResponseActiveResponse.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 export default connect(mapStateToProps)(WzConfigurationActiveResponseActiveResponse);

@@ -75,7 +75,7 @@ class WzConfigurationAlertsReports extends Component{
 }
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 WzConfigurationAlertsReports.propTypes = {

@@ -57,7 +57,7 @@ const sectionsAgent = [
 ];
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet,
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 

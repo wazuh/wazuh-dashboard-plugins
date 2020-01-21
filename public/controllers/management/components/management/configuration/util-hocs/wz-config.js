@@ -15,7 +15,8 @@ import withLoading from './loading';
 import { getCurrentConfig } from '../utils/wz-fetch';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { updateWazuhNotReadyYet, updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
+import { updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
+import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 
 /**
  * 
@@ -25,17 +26,6 @@ import { updateWazuhNotReadyYet, updateLoadingStatus } from '../../../../../../r
  * @param {React Component} ErrorComponent 
  * @param {function} throwError 
  */
-// const withWzConfig = (agentId, sections, LoadingComponent, ErrorComponent, throwError) => (WrappedComponent) => withLoading(async () => {
-//   const currentConfig = await getCurrentConfig(agentId, sections);
-//   if(throwError){
-//     const error = throwError(currentConfig);
-//     if(error){
-//       throw error;
-//     };
-//   }
-//   return { currentConfig };
-// }, LoadingComponent, ErrorComponent)(WrappedComponent)
-
 
 const mapStateToProps = (state) => ({
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected

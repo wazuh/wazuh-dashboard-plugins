@@ -71,7 +71,7 @@ class WzConfigurationActiveResponseAgent extends Component{
 }
 
 const mapStateToProps = (state) => ({
-  wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 const sectionsAgent = [{component:'com',configuration:'active-response'}];

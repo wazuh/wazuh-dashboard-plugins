@@ -218,7 +218,7 @@ const mapStateToProps = (state) => ({
 	clusterNodes: state.configurationReducers.clusterNodes,
 	clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 	loadingStatus: state.configurationReducers.loadingStatus,
-	wazuhNotReadyYet: state.configurationReducers.wazuhNotReadyYet
+	wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 const mapDispatchToProps = (dispatch) => ({

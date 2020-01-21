@@ -42,7 +42,7 @@ class WzConfigurationLogSettings extends Component{
               <WzConfigurationLogSettingsInternal {...this.props}/>
             </WzTabSelectorTab>
           </WzTabSelector>
-        ) : <div {...this.props}></div>} {/*TODO: remove*/}
+        ) : <div {...this.props}></div>} {/*TODO: when is agent && agent.id !== '000' */}
       </Fragment>
     )
   }

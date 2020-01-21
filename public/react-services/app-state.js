@@ -12,6 +12,9 @@
 
 
 import Cookies from '../utils/js-cookie';
+import store from '../redux/store';
+import { updateCurrentApi, updateShowMenu } from '../redux/actions/appStateActions';
+
 
 export class AppState {
 
@@ -138,6 +141,8 @@ export class AppState {
      * Remove 'API' cookie
      */
     static removeCurrentAPI() {
+        const updateApiMenu = updateCurrentApi(false);
+        store.dispatch(updateApiMenu);
         return Cookies.remove('API');
     }
 
@@ -152,6 +157,10 @@ export class AppState {
             exp.setDate(exp.getDate() + 365);
             if (API) {
                 Cookies.set('API', encodedApi, { expires: exp, path: '/app' });
+                try{
+                    const updateApiMenu = updateCurrentApi(JSON.parse(API).name);
+                    store.dispatch(updateApiMenu);
+                }catch(err){ }
             }
         }catch(err){
             console.log("Error set current API");
@@ -165,7 +174,7 @@ export class AppState {
      * Get 'patternSelector' value   
      */
     static getPatternSelector() {
-        return Cookies.get('patternSelector') ? decodeURI(Cookies.get('patternSelector')) : false;
+        return Cookies.get('patternSelector') ? decodeURI(Cookies.get('patternSelector'))=="true" : false;
     }
 
     /**
@@ -249,7 +258,7 @@ export class AppState {
         }
         if(navigate){
             const encodedURI = encodeURI(JSON.stringify(navigate));
-            Cookies.set('navigate', encodedURI);
+            Cookies.set('navigate', encodedURI, {path: '/app'});
         }
     }
 
@@ -258,11 +267,10 @@ export class AppState {
         const navigation = decodedNavigation ? JSON.parse(decodedNavigation) : {};
         return navigation;
     }
-    /**
-     * 
-    setWzMenu() {
-        this.$rootScope.$emit('loadWazuhMenu', {});
+
+    static setWzMenu() {
+        const showMenu = updateShowMenu(true);
+        store.dispatch(showMenu);
       }
-      */
 
 } 

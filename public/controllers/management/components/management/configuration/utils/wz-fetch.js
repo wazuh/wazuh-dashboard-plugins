@@ -123,7 +123,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
   
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;
-    
+
     return text;
   }catch(error){
     console.error(error);
@@ -176,7 +176,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
         const result = await WzRequest.apiReq('GET', '/ping', {});
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
-          updateWazuhNotReadyYet(false);
+          updateWazuhNotReadyYet('');
           break;
         }
       }catch(error){
