@@ -57,8 +57,17 @@ class WzRulesetTable extends Component {
 
   async componentDidUpdate(prevProps) {
     const sectionChanged = prevProps.state.section !== this.props.state.section
+    const showingFilesChanged = prevProps.state.showingFiles !== this.props.state.showingFiles;
 
     if ( (this.props.state.isProcessing && this._isMounted) || sectionChanged) {
+      if ( sectionChanged || showingFilesChanged ) {
+        this.setState({
+          pageSize: 10,
+          pageIndex: 0,
+          sortDirection: null,
+          sortField: null,
+        })
+      }
       this.setState({isLoading:true});
       this.props.updateIsProcessing(false);
 
@@ -81,9 +90,9 @@ class WzRulesetTable extends Component {
       'GET',
       `${this.paths[section]}${showingFiles ? '/files': ''}`,
       this.buildFilter(),
-    )
+    ).catch((error) => {return {}})
 
-    const { items, totalItems } = ((rawItems || {}).data || {}).data;
+    const { items=[], totalItems=0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
       items,
       totalItems,
@@ -136,13 +145,13 @@ class WzRulesetTable extends Component {
   };
 
   render() {
-    this.rulesetColums = new RulesetColums(this.props);
     const {
       section,
       showingFiles,
       error,
     } = this.props.state;
-    const { items,
+    const { 
+      items,
       pageSize,
       totalItems,
       pageIndex,
@@ -150,7 +159,7 @@ class WzRulesetTable extends Component {
       sortDirection,
       isLoading,
     } = this.state;
-    const rulesetColums = this.rulesetColums.columns;
+    const rulesetColums = new RulesetColums(this.props).columns;
     const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
     const message = isLoading ? null : 'No results...';
     const pagination = {
@@ -159,12 +168,14 @@ class WzRulesetTable extends Component {
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
     };
-    const sorting = {
-      sort: {
-        field: sortField,
-        direction: sortDirection,
-      },
-    }
+    const sorting = !!sortField 
+    ? {
+        sort: {
+          field: sortField,
+          direction: sortDirection,
+        },
+      }
+    : {};
 
     if (!error) {
       const itemList = this.props.state.itemList;
