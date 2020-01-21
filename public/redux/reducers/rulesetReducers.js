@@ -75,7 +75,7 @@ const rulesetReducers = (state = initialState, action) => {
     case 'UPDATE_RULE_INFO':
       return Object.assign({}, state, { ruleInfo: action.info, decoderInfo: false, listInfo: false, error: false });
     case 'UPDATE_RULESET_SECTION':
-      return Object.assign({}, state, { section: action.section, error: false });
+      return Object.assign({}, state, { section: action.section, showingFiles:false, error: false });
     case 'UPDATE_SHOW_MODAL':
       return Object.assign({}, state, { showModal: action.showModal, error: false });
     case 'UPDATE_SORT_DIRECTION':
