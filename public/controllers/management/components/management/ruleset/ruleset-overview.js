@@ -96,11 +96,13 @@ class WzRulesetOverview extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <WzSearchBarFilter 
+          <WzSearchBarFilter
             filters={this.filters[section]} />
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzRulesetTable />
+              <WzRulesetTable
+                  request={`${section}`}
+              />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>
