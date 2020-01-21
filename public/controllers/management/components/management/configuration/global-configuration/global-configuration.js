@@ -28,7 +28,6 @@ class WzConfigurationGlobalConfiguration extends Component{
   }
   render(){
     const { agent } = this.props;
-    console.log('global configuration', this.props)
     return (
       <Fragment>
         {(agent && agent.id === '000') ? (

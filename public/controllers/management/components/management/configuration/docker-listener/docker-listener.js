@@ -18,6 +18,7 @@ import WzConfigurationSettingsGroup from "../util-components/configuration-setti
 import { isString, renderValueOrDefault, renderValueNoThenEnabled, renderValueOrYes} from '../utils/utils';
 
 import withWzConfig from "../util-hocs/wz-config";
+import { wodleBuilder } from "../utils/builders";
 
 const helpLinks = [
   { text: 'Docker listener module reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html' }
@@ -33,6 +34,7 @@ const mainSettings = [
 class WzConfigurationDockerListener extends Component{
   constructor(props){
     super(props);
+    this.wodleConfig = wodleBuilder(this.props.currentConfig, 'docker-listener');
   }
   componentDidMount(){
     this.props.updateBadge(this.props.currentConfig && this.props.currentConfig['docker-listener'] && this.props.currentConfig['docker-listener'].disabled === 'no')
@@ -44,17 +46,17 @@ class WzConfigurationDockerListener extends Component{
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
         )}
-        {currentConfig && !currentConfig['docker-listener'] && !isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && !this.wodleConfig && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {currentConfig && currentConfig['docker-listener'] && (
+        {currentConfig && this.wodleConfig && (
           <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='General Docker listener settings'
-          currentConfig={currentConfig}
+          currentConfig={this.wodleConfig}
           helpLinks={helpLinks}>
           <WzConfigurationSettingsGroup
-            config={currentConfig['docker-listener']}
+            config={this.wodleConfig}
             items={mainSettings}
           />
         </WzConfigurationSettingsTabSelector>

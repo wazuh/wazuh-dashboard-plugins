@@ -50,7 +50,7 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false, 
           : !node && agentId === '000'
           ? `/manager/config/${component}/${configuration}`
           : `/agents/${agentId}/config/${component}/${configuration}`;
-        console.log('url', url)
+
         const partialResult = await WzRequest.apiReq('GET', url, {});
         result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
@@ -123,32 +123,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
   
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;
-  
-    // // Current date in milliseconds //TODO: toast notification? AngularJS code
-    // const date = new Date().getTime();
-  
-    // // Remove errors older than 2s from the error history
-    // this.history = this.history.filter(item => date - item.date <= 2000);
-  
-    // // Check if the incoming error was already shown in the last two seconds
-    // const recentlyShown = this.history.map(item => item.text).includes(text);
-  
-    // // If the incoming error was not shown in the last two seconds, add it to the history
-    // !recentlyShown && this.history.push({ text, date });
-  
-    // // The error must be shown and the error was not shown in the last two seconds, then show the error
-    // if (!silent && !recentlyShown) {
-    //   if (
-    //     isWarning ||
-    //     (text &&
-    //       typeof text === 'string' &&
-    //       text.toLowerCase().includes('no results'))
-    //   ) {
-    //     toastNotifications.addWarning(text);
-    //   } else {
-    //     toastNotifications.addDanger(text);
-    //   }
-    // }
+    
     return text;
   }catch(error){
     console.error(error);
@@ -272,7 +247,6 @@ export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) 
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    console.log('restarting', selectedNode)
     isCluster
       ? await restartNode(selectedNode)
       : await restartManager();
@@ -348,7 +322,7 @@ export const restartNode = async (node) => {
       `/cluster/${node}/configuration/validation`,
       {}
     );
-    console.log('restart node validation error', validationError)
+
     const data = ((validationError || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
@@ -360,7 +334,7 @@ export const restartNode = async (node) => {
       `/cluster/${node}/restart`,
       {}
     );
-    console.log('restart node result', result)
+
     return result;
   } catch (error) {
     return Promise.reject(error);

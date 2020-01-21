@@ -58,12 +58,13 @@ export default [
         description: 'User-defined information about the agent included in alerts',
         goto: 'alerts-agent',
         when: 'agent'
-      },
-      {
-        name: 'Log settings',
-        description: 'Alerts, archives and internal settings',
-        goto: 'log-settings'
       }
+      // ,
+      // { //TODO: Uncomment this to activate Log Settings
+      //   name: 'Log settings',
+      //   description: 'Alerts, archives and internal settings',
+      //   goto: 'log-settings'
+      // }
     ]
   },
   {

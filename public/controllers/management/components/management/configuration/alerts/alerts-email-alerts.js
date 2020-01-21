@@ -59,7 +59,6 @@ class WzConfigurationAlertsEmailAlerts extends Component{
     const { selectedItemIndex } = this.state;
     const { currentConfig, wazuhNotReadyYet } = this.props;
     const selectedItem = isArray(currentConfig['mail-alerts'].email_alerts) && currentConfig['mail-alerts'].email_alerts[selectedItemIndex] || false;
-    console.log('alerts/email alerts', this.props)
     return (
       <Fragment>
         {currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts']) && (

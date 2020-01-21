@@ -28,7 +28,6 @@ class WzConfigurationLogSettings extends Component{
   }
   render(){
     const { agent } = this.props;
-    console.log('log-settings', this.props);
     return (
       <Fragment>
         {(agent && agent.id === '000') ? (

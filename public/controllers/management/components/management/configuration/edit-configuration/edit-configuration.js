@@ -73,7 +73,7 @@ class WzEditorConfiguration extends Component{
         title: (
           <Fragment>
             <EuiIcon type='check'/>&nbsp;
-            <span>Failed</span>
+            <span>Error: saving configuration</span>
           </Fragment>),
         color: 'danger'
       });

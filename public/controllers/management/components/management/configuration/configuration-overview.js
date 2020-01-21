@@ -72,7 +72,6 @@ class WzConfigurationOverview extends Component{
 		}
     render(){
 			const settings = this.filterSettings(configurationSettingsGroup);
-			console.log('overview', this.props)
 			return (
 				<Fragment>
 					<EuiFlexGroup>
