@@ -290,7 +290,10 @@ export default class RulesetColumns {
     const badgeList = [];
     const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53'];
     const buildBadge = (field) => {
+      const idGenerator = () => {return '_' + Math.random().toString(36).substr(2, 9)};
+
       return (<EuiBetaBadge 
+        key={idGenerator()}
         label={field.toUpperCase()} 
         tooltipContent={item[field].join(', ')} 
         tooltipPosition="bottom"
@@ -298,10 +301,13 @@ export default class RulesetColumns {
         style={{margin:"1px 2px"}}
       />);
     }
-    for (const field of fields) {
-      if (item[field].length) {
-        badgeList.push(buildBadge(field))
+    try {
+      for (const field of fields) {
+        if (item[field].length) {
+          badgeList.push(buildBadge(field))
+        }
       }
+    } catch (error) {
     }
 
     return <div>{badgeList}</div>;
