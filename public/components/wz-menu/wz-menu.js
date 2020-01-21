@@ -45,17 +45,15 @@ class WzMenu extends Component {
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.indexPatterns = $injector.get('indexPatterns');
 
-    if(this.isHealthCheckExecuted())
-      this.load();
   }
 
-  isHealthCheckExecuted(){
-    return window.sessionStorage.getItem('healthCheck') == 'executed';
-  }
+ 
 
 
   componentDidUpdate(prevProps) {
-    
+    if(prevProps.state.showMenu !== this.props.state.showMenu  || this.props.state.showMenu === true && this.state.showMenu === false){
+      this.load();
+    }
     if(!this.state.currentAPI && JSON.parse(AppState.getCurrentAPI()).name || JSON.parse(AppState.getCurrentAPI()).name !== this.state.currentAPI ){
       this.setState( {currentAPI: JSON.parse(AppState.getCurrentAPI()).name })
     }else{
@@ -151,9 +149,6 @@ class WzMenu extends Component {
   }
 
   render() {
-
-    if(!this.state.showMenu && this.isHealthCheckExecuted())
-      this.load();
 /*
   isHealthCheckExecuted(){
     if(!this.state.currentMenuTab){

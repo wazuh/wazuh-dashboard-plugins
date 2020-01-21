@@ -21,3 +21,15 @@ export const updateCurrentApi = currentAPI => {
     currentAPI: currentAPI
   };
 };
+
+
+/**
+ * Updates ShowMenu in the appState store
+ * @param showMenu
+ */
+export const updateShowMenu = showMenu => {
+  return {
+    type: 'SHOW_MENU',
+    showMenu: showMenu
+  };
+};

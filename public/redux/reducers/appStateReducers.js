@@ -12,6 +12,7 @@
 
 const initialState = {
   currentAPI: "",
+  showMenu: false,
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -19,6 +20,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentAPI: action.currentAPI,
+    };
+  }
+
+  if (action.type === 'SHOW_MENU') {
+    return {
+      ...state,
+      showMenu: action.showMenu,
     };
   }
 

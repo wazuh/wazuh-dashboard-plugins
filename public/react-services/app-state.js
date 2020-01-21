@@ -13,7 +13,7 @@
 
 import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
-import { updateCurrentApi } from '../redux/actions/appStateActions';
+import { updateCurrentApi, updateShowMenu } from '../redux/actions/appStateActions';
 
 
 export class AppState {
@@ -267,5 +267,10 @@ export class AppState {
         const navigation = decodedNavigation ? JSON.parse(decodedNavigation) : {};
         return navigation;
     }
+
+    static setWzMenu() {
+        const showMenu = updateShowMenu(true);
+        store.dispatch(showMenu);
+      }
 
 } 
