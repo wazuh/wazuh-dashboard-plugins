@@ -97,7 +97,6 @@ export class ErrorHandler {
   handle(error, location, isWarning, silent) {
     const message = this.extractMessage(error);
     const messageIsString = typeof message === 'string';
-console.log(error)
     if (messageIsString && message.includes('ERROR3099')) {
       
       const updateNotReadyYet = updateWazuhNotReadyYet('Wazuh not ready yet.');
