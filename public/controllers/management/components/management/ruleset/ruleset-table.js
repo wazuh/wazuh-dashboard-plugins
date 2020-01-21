@@ -25,6 +25,9 @@ import {
   updateIsProcessing,
   updateShowModal,
   updateDefaultItems,
+  updateListContent,
+  updateFileContent,
+  updateListItemsForRemove,
 } from '../../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -257,6 +260,9 @@ const mapDispatchToProps = (dispatch) => {
     updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateFileContent: fileContent => dispatch(updateFileContent(fileContent)),
+    updateListContent: listInfo => dispatch(updateListContent(listInfo)),
+    updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
   };
 };
 
