@@ -61,10 +61,9 @@ class WzRulesetTable extends Component {
   async componentDidUpdate(prevProps) {
     const sectionChanged = prevProps.state.section !== this.props.state.section
     const showingFilesChanged = prevProps.state.showingFiles !== this.props.state.showingFiles;
-
-    if ( (this.props.state.isProcessing && this._isMounted) || sectionChanged) {
+    if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
       if ( sectionChanged || showingFilesChanged ) {
-        this.setState({
+        await this.setState({
           pageSize: 10,
           pageIndex: 0,
           sortDirection: null,
@@ -73,7 +72,7 @@ class WzRulesetTable extends Component {
       }
       this.setState({isLoading:true});
       this.props.updateIsProcessing(false);
-
+      
       await this.getItems();
     }
   }
@@ -93,7 +92,10 @@ class WzRulesetTable extends Component {
       'GET',
       `${this.paths[section]}${showingFiles ? '/files': ''}`,
       this.buildFilter(),
-    ).catch((error) => {return {}})
+    ).catch((error) => {
+      console.warn(`Error when get the items of ${section}: `, error)
+      return {}
+    })
 
     const { items=[], totalItems=0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
@@ -120,10 +122,12 @@ class WzRulesetTable extends Component {
 
   buildFilter() {
     const { pageSize, pageIndex } = this.state;
+    const { filters } = this.props.state;
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
       ...this.buildSortFilter(),
+      ...filters
     };
 
     return filter;

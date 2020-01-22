@@ -17,9 +17,10 @@ import { connect } from 'react-redux';
 
 // Wazuh components
 import WzRulesetTable from './ruleset-table';
+import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-import WzSearchBarFilter from '../../../../../components/wz-search-bar/wz-search-bar'
+
 
 class WzRulesetOverview extends Component {
   constructor(props) {
@@ -29,34 +30,6 @@ class WzRulesetOverview extends Component {
       decoders: 'Decoders',
       lists: 'CDB lists'
     }
-    this.model = [
-      {
-        label: 'Level',
-        options: [
-          {
-            label: '0',
-            group: 'level'
-          },
-          {
-            label: '1',
-            group: 'level'
-          },
-          {
-            label: '2',
-            group: 'level'
-          }
-        ]
-      },
-    ];
-    this.filters = {
-      rules: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }, { label: 'Level', value: 'level' },
-        { label: 'Group', value: 'group' }, { label: 'PCI control', value: 'pci' }, { label: 'GDPR', value: 'gdpr' }, { label: 'HIPAA', value: 'hipaa' }, { label: 'NIST-800-53', value: 'nist-800-53' }
-      ],
-      decoders: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }
-      ]
-    };
   }
 
 
@@ -96,8 +69,7 @@ class WzRulesetOverview extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <WzSearchBarFilter 
-            filters={this.filters[section]} />
+            <WzRulesetSearchBar />
           <EuiFlexGroup>
             <EuiFlexItem>
               <WzRulesetTable />
