@@ -68,7 +68,7 @@ class WzMenu extends Component {
     try{
         this.setState( {showMenu : true});
 
-        if(!this.state.currentMenuTab &&  AppState.getNavigation().currLocation){
+        if(!this.state.currentMenuTab && AppState.getNavigation().currLocation){
           this.setState( {currentMenuTab : AppState.getNavigation().currLocation.replace(/\//g, '')});
         }
 
@@ -147,6 +147,9 @@ class WzMenu extends Component {
   }
 
   render() {
+    if(AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation.replace(/\//g, '')!== this.state.currentMenuTab){
+      this.setState({currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '')})
+    }
 /*
   isHealthCheckExecuted(){
     if(!this.state.currentMenuTab){

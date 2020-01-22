@@ -143,7 +143,7 @@ export class AppState {
     static removeCurrentAPI() {
         const updateApiMenu = updateCurrentApi(false);
         store.dispatch(updateApiMenu);
-        return Cookies.remove('API');
+        return Cookies.remove('API', { path : '/app' });
     }
 
     /**
@@ -266,6 +266,10 @@ export class AppState {
         const decodedNavigation = Cookies.get('navigate') ? decodeURI(Cookies.get('navigate')) : false;
         const navigation = decodedNavigation ? JSON.parse(decodedNavigation) : {};
         return navigation;
+    }
+
+    static removeNavigation() {
+        return Cookies.remove('navigate', {path: '/app'});
     }
 
     static setWzMenu() {
