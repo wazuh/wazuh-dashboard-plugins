@@ -151,7 +151,7 @@ class WzEditorConfiguration extends Component{
           <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
         )}
         <EuiSpacer size='s'/>
-        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)} minusHeight={clusterNodeSelected ? 360 : 325}/>
+        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)} minusHeight={300}/>
       </Fragment>
     )
   }

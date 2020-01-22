@@ -42,8 +42,8 @@ class WzConfigurationOverviewTable extends Component{
           <EuiTableBody>
 						{items.map((item, key) => (
 							<EuiTableRow key={`${title}-row-${key}`} onClick={() => onClick(item.goto, item.name, item.description)}>
-								{columns.map(column => (
-									<EuiTableRowCell key={`${item[column.field]}`}>
+								{columns.map((column, keyColumn) => (
+									<EuiTableRowCell colSpan={keyColumn === 1 && 2} key={`${item[column.field]}`}>
 										{item[column.field]}
 									</EuiTableRowCell>
 								))}

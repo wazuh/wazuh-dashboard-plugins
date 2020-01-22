@@ -45,15 +45,6 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
   render(){
     const { currentConfig, wazuhNotReadyYet } = this.props;
     const items = !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && currentConfig['analysis-active_response']['active-response'].length ? settingsListBuilder(currentConfig['analysis-active_response']['active-response'], 'command') : [];
-    //TODO: remove this what is for example
-    // const items = !isString(currentConfig['analysis-active_response']) ? currentConfig['analysis-active_response']['active-response'].map((item) => ({
-    //   button: item.command,
-    //   data: item
-    // })) : {}
-    // ['active-response'].map((item) => ({
-    //   button: item.command,
-    //   data: item
-    // })) : {}
     return (
       <Fragment>
         {currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response']) && (

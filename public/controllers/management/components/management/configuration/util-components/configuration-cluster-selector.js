@@ -17,7 +17,7 @@ import {
   EuiSelect
 } from "@elastic/eui";
 
-import { updateClusterNodes, updateClusterNodeSelected, updateLoadingStatus } from '../../../../../redux/actions/configurationActions';
+import { updateClusterNodes, updateClusterNodeSelected, updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
 
 import { connect } from 'react-redux';
 

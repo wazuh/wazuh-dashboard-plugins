@@ -19,10 +19,10 @@ import {
 	EuiButtonEmpty
 } from '@elastic/eui';
 
-import WzConfigurationOverviewTable from './configuration-overview-table';
+import WzConfigurationOverviewTable from './util-components/configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
 import WzBadge from './util-components/badge';
-import WzClusterSelect from './configuration-cluster-selector';
+import WzClusterSelect from './util-components/configuration-cluster-selector';
 
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 

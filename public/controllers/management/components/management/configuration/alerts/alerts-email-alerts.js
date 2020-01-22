@@ -19,8 +19,10 @@ import {
 
 import WzConfigurationSetting from '../util-components/configuration-setting';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString, isArray } from '../utils/utils';
+import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
 
@@ -44,21 +46,10 @@ const helpLinks = [
 class WzConfigurationAlertsEmailAlerts extends Component{
   constructor(props){
     super(props);
-    this.state = {
-      view: '',
-      selectedItemIndex: 0
-    };
-  }
-  selectItem(selectedItem){
-    this.setState({ selectedItem })
-  }
-  changeView(view){
-    this.setState({ view });
   }
   render(){
-    const { selectedItemIndex } = this.state;
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const selectedItem = isArray(currentConfig['mail-alerts'].email_alerts) && currentConfig['mail-alerts'].email_alerts[selectedItemIndex] || false;
+    const items = currentConfig && currentConfig['mail-alerts'] && isArray(currentConfig['mail-alerts'].email_alerts) ? settingsListBuilder(currentConfig['mail-alerts'].email_alerts, 'email_to') : [];
     return (
       <Fragment>
         {currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts']) && (
@@ -70,23 +61,18 @@ class WzConfigurationAlertsEmailAlerts extends Component{
         {wazuhNotReadyYet &&  (!currentConfig || !currentConfig['mail-alerts']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
-        {selectedItem && (
+        {currentConfig['mail-alerts'] && isArray(currentConfig['mail-alerts'].email_alerts) && currentConfig['mail-alerts'].email_alerts.length ? (
           <WzConfigurationSettingsTabSelector
             title='Main settings'
             description='Granular email alert options'
             currentConfig={currentConfig}
             helpLinks={helpLinks}>
-              <ul>
-                {currentConfig['mail-alerts'].email_alerts.map((item, key) => (
-                  <li key={`mail-alerts-${key}`} onClick={() => this.selectItem(key)}></li>
-                ))}
-              </ul>
-              <EuiSpacer size='s'/>
-              {mainSettings.map((item,key) => 
-                <WzConfigurationSetting key={`email-alerts-${key}`} keyItem={`email-alerts-${key}`} description={item.text} value={selectedItem[item.key]}/>
-              )}
+              <WzConfigurationSettingsListSelector
+                items={items}
+                settings={mainSettings}
+              />
           </WzConfigurationSettingsTabSelector>
-        )}
+        ) : null}
       </Fragment>
     )
   }

@@ -40,8 +40,6 @@ import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzConfigurationAzureLogs from './azure-logs/azure-logs';
 import WzViewSelector, { WzViewSelectorSwitch } from './util-components/view-selector';
 import WzConfigurationPath from './util-components/configuration-path';
-import WzClusterSelect from './configuration-cluster-selector';
-import ToastProvider from './util-providers/toast-provider';
 import WzToastProvider from './util-providers/toast-p';
 
 import { clusterNodes } from './utils/wz-fetch';

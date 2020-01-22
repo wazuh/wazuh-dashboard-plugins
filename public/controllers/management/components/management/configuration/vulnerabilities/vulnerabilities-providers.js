@@ -29,7 +29,7 @@ const renderTableField = (item) => item || '-';
 const renderUrlAttr = (item) => {
   if(item){
     return (
-      <Fragment>
+      <div style={{display: 'block'}}>
         {item.start && (
           <div><b>Start: </b>{item.start}</div>
         )}
@@ -37,10 +37,9 @@ const renderUrlAttr = (item) => {
           <div><b>End: </b>{item.end}</div>
         )}
         {item.port && (
-            <div><b>Port: </b>{item.port}</div>
+          <div><b>Port: </b>{item.port}</div>
         )}
-      </Fragment>
-      
+      </div>
       )
   }
   return '-'
@@ -80,17 +79,6 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
   }
   render(){
     let { currentConfig, wodleConfig } = this.props;
-    //TODO: delete testing 
-    // Testing data to see the render of this properties
-    // if(currentConfig['vulnerability-detector'].providers){
-    //   currentConfig['vulnerability-detector'].providers[0].url_attrs = {
-    //     start: 1, end: 2, port: 1323
-    //   }
-    //   currentConfig['vulnerability-detector'].providers[0].allow = [
-    //     { replaced_os: 'linux', src:'DATA'},
-    //     { replaced_os: 'win10', src:'DATA2'}
-    //   ]
-    // }
     return (
       <Fragment>
         {(wodleConfig['vulnerability-detector'] && !wodleConfig['vulnerability-detector'].providers && (

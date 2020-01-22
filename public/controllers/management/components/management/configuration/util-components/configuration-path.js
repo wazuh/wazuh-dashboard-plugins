@@ -15,10 +15,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import {
-  EuiBadge,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButtonEmpty,
   EuiToolTip,
   EuiButtonIcon,
   EuiSpacer,
@@ -28,7 +26,7 @@ import {
 } from "@elastic/eui";
 
 import WzBadge from '../util-components/badge';
-import WzClusterSelect from '../configuration-cluster-selector';
+import WzClusterSelect from './configuration-cluster-selector';
 
 class WzConfigurationPath extends Component{
   constructor(props){
