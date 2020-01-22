@@ -64,7 +64,7 @@ export class UpdateConfigurationFile {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
-      const configuration = getConfiguration() || {};
+      const configuration = getConfiguration(true) || {};
       const adminUndefined = !Object.keys(configuration).includes('admin');
       const adminIsTrue = configuration.admin;
 
