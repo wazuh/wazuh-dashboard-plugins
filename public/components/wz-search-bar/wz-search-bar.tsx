@@ -84,7 +84,20 @@ export default class WzSearchBar extends Component {
     }
   }
 
-  async componentDidUpdate() {
+  updateSuggestOnProps(qSuggestsPrev, apiSuggestsPrev) {
+    const { qSuggests, apiSuggests } = this.props;
+    const qSuggestsChanged = JSON.stringify(qSuggests) !== JSON.stringify(qSuggestsPrev);
+    const apiSuggestsChanged = JSON.stringify(apiSuggests) !== JSON.stringify(apiSuggestsPrev);
+
+    if (qSuggestsChanged || apiSuggestsChanged) {
+      this.selectSuggestHandler(this.state.searchFormat);
+    }
+
+  }
+
+  async componentDidUpdate(prevProps) {
+    this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests);
+
     const { isProcessing } = this.state;
     if (!isProcessing){
       return;
