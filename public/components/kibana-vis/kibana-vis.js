@@ -12,13 +12,11 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery';
-import { uiModules } from 'ui/modules';
 import { getVisualizeLoader } from 'ui/visualize/loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 
 import { DiscoverPendingUpdates } from '../../factories/discover-pending-updates';
-import wzSavedVisualizations from '../../kibana-integrations/saved-visualizations';
 import chrome from 'ui/chrome';
 import { LoadedVisualizations } from '../../factories/loaded-visualizations';
 import { RawVisualizations } from '../../factories/raw-visualizations';
@@ -40,6 +38,7 @@ export class KibanaVis extends Component {
     this.visHandler = null;
     this.renderInProgress = false;
     this.deadField = false;
+    this.mapClicked = false;
 
     this.discoverPendingUpdates = new DiscoverPendingUpdates();
     this.loadedVisualizations = new LoadedVisualizations();
@@ -57,6 +56,7 @@ export class KibanaVis extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.updateVis) {
+      console.log("update : ", nextProps.updateVis)
       this.updateVis();
     }
   }
@@ -66,7 +66,8 @@ export class KibanaVis extends Component {
   }
 
   componentWillUnmount() {
-    console.log('DESTROY!!!');
+    console.log('DESTROY!!!', this.visID);
+    console.log('adf', this.visHandler);
     if (this._isMounted) {
       this._isMounted = false;
       this.updateVis();
@@ -83,8 +84,8 @@ export class KibanaVis extends Component {
     if (this.deadField) {
       return this.renderComplete();
     }
-    // $scope.$applyAsync();
     const rawVis = this.rawVisualizations.getList();
+    console.log("Y AHORA AQUI : ", rawVis)
     if (Array.isArray(rawVis) && rawVis.length) {
       this.myRender(rawVis);
     }
@@ -209,7 +210,7 @@ export class KibanaVis extends Component {
       if (((error || {}).message || '').includes('not locate that index-pattern-field')) {
         if (this.deadField) {
           this.tabVisualizations.addDeadVis();
-          return renderComplete();
+          return this.renderComplete();
         }
         this.deadField = true;
         if (!this.lockFields) {
@@ -225,7 +226,7 @@ export class KibanaVis extends Component {
         }
 
         this.renderInProgress = false;
-        return myRender(raw);
+        return this.myRender(raw);
       } else {
         // errorHandler.handle(error, 'Visualize');
       }
@@ -234,40 +235,23 @@ export class KibanaVis extends Component {
     return;
   };
 
-  // Listen for changes
-  // const updateVisWatcher = $scope.$on('updateVis', () => {
-  //   if (this.deadField) {
-  //     return renderComplete();
-  //   }
-  //   $scope.$applyAsync();
-  //   const rawVis = rawVisualizations.getList();
-  //   if (Array.isArray(rawVis) && rawVis.length) {
-  //     myRender(rawVis);
-  //   }
-  // });
-
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
     try {
       this.visHandler.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
   };
-
-  // $scope.$on('$destroy', () => {
-  //   updateVisWatcher();
-  //   destroyAll();
-  // });
 
   renderComplete = () => {
     const visId = this.visID.toLowerCase();
     this.props.finishUpdateVis();
 
-    // if (!visId.includes(this.props.tab)) {
-    //   this.destroyAll();
-    //   return;
-    // }
+    if (!visId.includes(this.props.tab)) {
+      this.destroyAll();
+      return;
+    }
 
     this.rendered = true;
     this.loadedVisualizations.addItem(true);
@@ -276,12 +260,8 @@ export class KibanaVis extends Component {
     const deadVis = this.props.tab === 'ciscat' ? 0 : this.tabVisualizations.getDeadVis();
     const totalTabVis = this.tabVisualizations.getItem(this.props.tab) - deadVis;
 
-    console.log('Current loaded: ', currentLoaded);
-    console.log('TotalTabVis: ', totalTabVis);
-
     if (totalTabVis < 1) {
       this.props.updateRootScope('resultState', 'none');
-      // $rootScope.resultState = 'none';
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
 
@@ -289,36 +269,34 @@ export class KibanaVis extends Component {
         'loadingStatus',
         `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`
       );
-      // $rootScope.loadingStatus = `Rendering visualizations... ${
-      //   currentCompleted > 100 ? 100 : currentCompleted
-      // } %`;
 
-      // const visTitle = (((visHandler || {}).vis || {})._state || {}).title;
-      // if (visTitle === 'Mitre attack count') {
-      //   $scope.$emit('sendVisDataRows', {
-      //     mitreRows: visHandler.dataLoader['visData'],
-      //   });
-      // }
+      const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
+      if (visTitle === 'Mitre attack count') {
+        //   $scope.$emit('sendVisDataRows', {
+        //     mitreRows: visHandler.dataLoader['visData'],
+        //   });
+      }
       if (currentCompleted >= 100) {
         this.props.updateRootScope('rendered', 'true');
-        // $rootScope.rendered = true;
         this.props.updateRootScope('loadingStatus', 'Fetching data...');
-        // $rootScope.loadingStatus = 'Fetching data...';
+        if (visId.includes('AWS-geo')) {
+          const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
+          setTimeout(() => {
+            if (!this.mapClicked) {
+              this.mapClicked = true;
+              canvas[0].click();
+            }
+          }, 1000);
+        }
       } else if (this.visID !== 'Wazuh-App-Overview-General-Agents-status') {
         this.props.updateRootScope('rendered', 'false');
-        // $rootScope.rendered = false;
       }
     }
-
-    // Forcing a digest cycle
-    // $rootScope.$applyAsync();
   };
 
   render() {
-    return this.visID !== undefined ? (
+    return this.visID && (
       <div id={this.visID} vis-id={this.visID} style={{ height: '100%' }}></div>
-    ) : (
-      <h1>mmm</h1>
-    );
+    )
   }
 }

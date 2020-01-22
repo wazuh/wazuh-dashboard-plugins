@@ -52,7 +52,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [{ title: 'Alerts summary', id: 'Wazuh-App-Overview-General-Alerts-summary' }],
       },
     ],
@@ -104,7 +104,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -221,7 +221,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -276,7 +276,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -329,7 +329,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -351,6 +351,7 @@ export const visualizations = {
           },
           {
             hasRows: true,
+            width: 1,
             rows: [
               {
                 height: 285,
@@ -402,7 +403,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -457,7 +458,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alert summary',
@@ -557,7 +558,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -599,7 +600,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -666,7 +667,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -704,7 +705,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -746,7 +747,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
@@ -793,7 +794,7 @@ export const visualizations = {
         ],
       },
       {
-        height: 570,
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',

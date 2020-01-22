@@ -405,11 +405,7 @@ md-dialog.modalTheme .md-button {
 }
 
 .fullscreen {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  z-index: 9999;
+  z-index: 1000;
   height: calc(~'100vh - 119px');
   width: calc(~'100vw - 128px');
   position: fixed;
@@ -417,7 +413,7 @@ md-dialog.modalTheme .md-button {
   left: 48px;
   right: 20px;
   background-color: white;
-  max-width: 100% !important;
+  max-width: calc(~'100vw - 128px') !important;
   margin: 35px;
   outline: 35px solid rgba(0, 0, 0, 0.2);
 }

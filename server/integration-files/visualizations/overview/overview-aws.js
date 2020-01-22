@@ -33,9 +33,9 @@ export default [
     _source: {
       title: 'Geolocation map',
       visState:
-        '{"title":"Geolocation map","type":"tile_map","params":{"colorSchema":"Green to Red","mapType":"Scaled Circle Markers","isDesaturated":false,"addTooltip":true,"heatClusterSize":1.5,"legendPosition":"bottomright","mapZoom":2,"mapCenter":[0,0],"wms":{"enabled":false,"options":{"format":"image/png","transparent":true}},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"geohash":{"accessor":0,"format":{"id":"string"},"params":{"precision":2,"useGeocentroid":true},"aggType":"geohash_grid"},"geocentroid":{"accessor":2,"format":{"id":"string"},"params":{},"aggType":"geo_centroid"}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"geohash_grid","schema":"segment","params":{"field":"GeoLocation.location","autoPrecision":true,"precision":2,"useGeocentroid":true,"isFilteredByCollar":true,"mapZoom":4,"mapCenter":[0,0]}}]}',
+        '{"title":"Geolocation map","type":"tile_map","params":{"colorSchema":"Green to Red","mapType":"Scaled Circle Markers","isDesaturated":false,"addTooltip":true,"heatClusterSize":1.5,"legendPosition":"bottomright","mapZoom":1,"mapCenter":[0,0],"wms":{"enabled":false,"options":{"format":"image/png","transparent":true}},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"geohash":{"accessor":0,"format":{"id":"string"},"params":{"precision":2,"useGeocentroid":true},"aggType":"geohash_grid"},"geocentroid":{"accessor":2,"format":{"id":"string"},"params":{},"aggType":"geo_centroid"}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"geohash_grid","schema":"segment","params":{"field":"GeoLocation.location","autoPrecision":true,"precision":2,"useGeocentroid":true,"isFilteredByCollar":true,"mapZoom":1,"mapCenter":[0,0]}}]}',
       uiStateJSON:
-        '{"mapZoom":3,"mapCenter":[38.685509760012025,-31.816406250000004]}',
+        '{"mapZoom":1,"mapCenter":[38.685509760012025,-31.816406250000004]}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {

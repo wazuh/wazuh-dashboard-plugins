@@ -68,8 +68,7 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
-    this.showingMitreTable = false
-    this.expandedVis = false;
+    this.showingMitreTable = false;
   }
 
   /**
@@ -114,7 +113,7 @@ export class OverviewController {
         AppState.setExtensions(api, extensions)
     };
 
-    this.visualizeProps= {
+    this.visualizeProps = {
       selectedTab: this.tab,
       updateVis: false,
       finishUpdateVis: () => {
@@ -123,7 +122,9 @@ export class OverviewController {
       },
       updateRootScope: (prop, value) => {
         this.$rootScope[prop] = value;
+        this.$rootScope.$applyAsync();
       },
+      cardReqs: {}
     }
 
     this.setTabs();
@@ -134,7 +135,12 @@ export class OverviewController {
 
     // Listen for changes
     this.$scope.$on('updateVis', () => {
+      console.log("entra normal")
       this.visualizeProps.updateVis = true;
+    });
+    this.$rootScope.$on('updateVis', (ev, params) => {
+      console.log("entra root")
+      this.visualizeProps.updateVis = params ? params.raw : true;
     });
   }
 
@@ -279,6 +285,18 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
+    if (newTab === 'pci') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
+    }
+    if (newTab === 'gdpr') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getGDPR(), reqTitle: 'GDPR Requirement' };
+    }
+    if (newTab === 'hipaa') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getHIPAA(), reqTitle: 'HIPAA Requirement' };
+    }
+    if (newTab === 'nist') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
+    }
     this.visualizeProps.selectedTab = newTab;
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
@@ -294,16 +312,6 @@ export class OverviewController {
 
       if (typeof this.agentsCountTotal === 'undefined') {
         await this.getSummary();
-      }
-
-      if (newTab === 'pci') {
-        const pciTabs = await this.commonData.getPCI();
-        this.pciReqs = { items: pciTabs, reqTitle: 'PCI DSS Requirement' };
-      }
-
-      if (newTab === 'gdpr') {
-        const gdprTabs = await this.commonData.getGDPR();
-        this.gdprReqs = { items: gdprTabs, reqTitle: 'GDPR Requirement' };
       }
 
       if (newTab === 'mitre') {
@@ -322,19 +330,6 @@ export class OverviewController {
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
           attacksCount: this.$scope.attacksCount,
         }
-      }
-
-      if (newTab === 'hipaa') {
-        const hipaaTabs = await this.commonData.getHIPAA();
-        this.hipaaReqs = { items: hipaaTabs, reqTitle: 'HIPAA Requirement' };
-      }
-
-      if (newTab === 'nist') {
-        const nistTabs = await this.commonData.getNIST();
-        this.nistReqs = {
-          items: nistTabs,
-          reqTitle: 'NIST 800-53 Requirement'
-        };
       }
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);
@@ -461,13 +456,5 @@ export class OverviewController {
     }
     this.$scope.$applyAsync();
     return;
-  }
-
-  checkExpandedVis(id) {
-    return this.expandedVis === id;
-  }
-
-  expand(id) {
-    this.expandedVis = this.expandedVis === id ? false : id;
   }
 }

@@ -263,7 +263,7 @@ export class RegisterAgent extends Component {
                           onClick={() => this.props.addNewAgent(false)}
                           iconType="cross"
                         >
-                          close
+                          Close
                       </EuiButtonEmpty>
                       )}
                       {!this.props.hasAgents && (

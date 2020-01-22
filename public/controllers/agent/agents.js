@@ -102,7 +102,6 @@ export class AgentsController {
     this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
 
-    this.$scope.lookingSca = false;
     this.$scope.expandArray = [
       false,
       false,
@@ -358,7 +357,6 @@ export class AgentsController {
     };
 
     this.$scope.switchScaScan = () => {
-      this.$scope.lookingSca = false;
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
@@ -388,6 +386,7 @@ export class AgentsController {
 
     this.$scope.loadScaChecks = policy =>
       (this.$scope.lookingSca = { ...policy, id: policy.policy_id });
+
     this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
 
     this.$scope.confirmAddGroup = group => {
@@ -586,14 +585,12 @@ export class AgentsController {
       }
 
       if (tab === 'sca') {
-        try {
-          this.$scope.loadSca = true;
-          const policies = await this.apiReq.request('GET', `/sca/${this.$scope.agent.id}`, {});
-          this.$scope.policies = (((policies || {}).data || {}).data || {}).items || [];
-        } catch (error) {
-          this.$scope.policies = [];
-        }
-        this.$scope.loadSca = false;
+        //remove to component
+        this.$scope.scaProps = {
+          agent: this.$scope.agent,
+          loadScaChecks: (policy) => this.$scope.loadScaChecks(policy),
+          downloadCsv: (path, name) => this.downloadCsv(path, name)
+        };
       }
 
       if (tab === 'syscollector')
@@ -605,7 +602,7 @@ export class AgentsController {
       } else {
         this.configurationHandler.reset(this.$scope);
       }
-      this.$scope.lookingSca = false;
+
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
 

@@ -82,7 +82,7 @@ export class AgentsPreview extends Component {
         <EuiFlexItem>
           <EuiFlexGroup style={{ 'marginTop': 0 }}>
             <EuiFlexItem>
-              <EuiPanel betaBadgeLabel="Global status" style={{ paddingBottom: 0, height: 158 }}>
+              <EuiPanel betaBadgeLabel="Global status" style={{ paddingBottom: 0, minHeight: 158 }}>
                 {(this.state.loading &&
                   <EuiFlexItem>
                     <EuiLoadingChart style={{ margin: '40px auto' }} size="xl" />
@@ -91,7 +91,7 @@ export class AgentsPreview extends Component {
                 {(!this.state.loading &&
                   <EuiFlexGroup>
                     {(this.totalAgents > 0 &&
-                      <EuiFlexItem>
+                      <EuiFlexItem style={{ alignItems: 'center' }} >
                         <Pie width={250} height={125} data={this.state.data} colors={colors} />
                       </EuiFlexItem>
                     )}
@@ -143,8 +143,8 @@ export class AgentsPreview extends Component {
               <EuiFlexItem grow={false} style={{ margin: "12px 0px" }}>
                 <EuiPanel betaBadgeLabel="Coverage" style={{ paddingBottom: 0 }}>
                   <EuiFlexGroup>
-                    <EuiFlexItem grow={false}>
-                      <ProgressChart width={125} height={125} percent={this.agentsCoverity}></ProgressChart>
+                    <EuiFlexItem grow={false} style={{ alignItems: 'center' }} >
+                      <ProgressChart width={125} height={125} percent={this.agentsCoverity} />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>
@@ -175,19 +175,19 @@ export class AgentsPreview extends Component {
                         <EuiFlexGroup>
                           <EuiFlexItem>
                             <EuiStat
-                              className='euiStatLink'
+                              className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
                               title={this.mostActiveAgent.name || '-'}
                               titleSize="s"
                               textAlign="center"
                               description="Most active agent"
                               titleColor="primary"
-                              onClick={() => this.props.tableProps.showAgent(this.mostActiveAgent)}
+                              onClick={() => this.mostActiveAgent.name ? this.props.tableProps.showAgent(this.mostActiveAgent) : ''}
                             />
                           </EuiFlexItem>
                         </EuiFlexGroup>
                       )}
                     </EuiFlexItem>
-                    <EuiFlexItem>
+                    <EuiFlexItem style={{ alignItems: 'center' }}>
                       <Pie width={250} height={125} data={this.state.platforms} colors={null} />
                     </EuiFlexItem>
                   </EuiFlexGroup>

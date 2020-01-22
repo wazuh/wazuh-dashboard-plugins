@@ -33,6 +33,12 @@ export class RequirementCard extends Component {
     this.expanded = false;
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.items) {
+      this.buildSlider();
+    }
+  }
+
   buildSlider() {
     const items = this.props.items.map((req, index) => {
       const title = `${this.props.reqTitle}: ${req.title}`;
