@@ -120,7 +120,21 @@ class WzRulesetSearchBar extends Component {
       }
     },
   ]
-  rulesFiles = [];
+  rulesFiles = [
+    {
+      label: 'file',
+      description: 'Filters the rules by file name.',
+      values: async (value) => {
+        const filter = {limit:30};
+        if (value){
+          filter['search'] = value;
+        }
+        const wzReq = (...args) => WzRequest.apiReq(...args);
+        const result = await wzReq('GET', '/rules/files', filter);
+        return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
+      },
+    },
+  ];
 
   decodersItems = [
     {
@@ -142,8 +156,8 @@ class WzRulesetSearchBar extends Component {
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/manager/configuration', {
-          section:'decoders',
-          field: 'rule_dir',
+          section:'ruleset',
+          field: 'decoder_dir',
         });
         return ((result || {}).data || {}).data;
       }
@@ -156,17 +170,16 @@ class WzRulesetSearchBar extends Component {
   ]
   decodersFiles = [];
 
-  cdbFiles = []
-
   apiSuggestsItems = {
     items: {
       rules: this.rulesItems,
       decoders: this.decodersItems,
+      list: []
     },
     files: {
       rule: this.rulesFiles,
       decoders: this.decodersFiles,
-      cdb: this.cdbFiles,
+      list: []
     }
   }
 
@@ -174,7 +187,6 @@ class WzRulesetSearchBar extends Component {
     const { section, showingFiles } = this.props.state;
     const type = showingFiles ? 'files' : 'items';
     const apiSuggests = this.apiSuggestsItems[type][section];
-
     return (
     <WzSearchBar
       apiSuggests={apiSuggests}
