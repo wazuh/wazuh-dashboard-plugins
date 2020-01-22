@@ -41,7 +41,7 @@ const mainSettings = [
 class WzConfigurationCommands extends Component{
   constructor(props){
     super(props);
-    this.wodleConfig = this.props.currentConfig['wmodules-wmodules'].wmodules.filter(item => item['command']);
+    this.wodleConfig = this.props.currentConfig && !isString(this.props.currentConfig['wmodules-wmodules']) ? this.props.currentConfig['wmodules-wmodules'].wmodules.filter(item => item['command']) : [];
   }
   render(){
     const { currentConfig } = this.props;

@@ -73,15 +73,15 @@ class WzConfigurationGlobalConfigurationGlobal extends Component{
   }
   render(){
     const { currentConfig, agent, wazuhNotReadyYet } = this.props;
-    const mainSettingsConfig = agent.id === '000' ? {
+    const mainSettingsConfig = agent.id === '000' && currentConfig['analysis-global'] && currentConfig['analysis-global'].global && currentConfig['analysis-global'].logging ? {
       ...currentConfig['analysis-global'].global,
       plain: currentConfig['com-logging'].logging.plain,
       json: currentConfig['com-logging'].logging.json
-    }: {
+    }: currentConfig['com-logging'] && currentConfig['com-logging'].logging ? {
       plain: currentConfig['com-logging'].logging.plain,
       json: currentConfig['com-logging'].logging.json
-    };
-    const globalSettingsConfig = agent.id === '000' ? {
+    } : {};
+    const globalSettingsConfig = agent.id === '000' && currentConfig['analysis-global'] && currentConfig['analysis-global'].global ? {
       ...currentConfig['analysis-global'].global
     } : {};
     return (

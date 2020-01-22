@@ -115,8 +115,6 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
     const origin = ((error || {}).config || {}).url || '';
     const originIsString = typeof origin === 'string' && origin.length;
   
-    // if (this.wzMisc.getBlankScr()) silent = true;
-  
     const hasOrigin = messageIsString && originIsString;
   
     let text = hasOrigin ? `${message} (${origin})` : message;

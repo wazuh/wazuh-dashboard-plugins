@@ -18,7 +18,8 @@ import {
 } from "@elastic/eui";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
-
+import WzNoConfig from '../util-components/no-config';
+import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
 const renderProfile = (item) => (
@@ -43,19 +44,26 @@ class WzConfigurationOpenScapEvaluations extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
-    const openSCAPConfig = {'open-scap' : currentConfig['open-scap']}
+    const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
-        <WzConfigurationSettingsTabSelector
-          title='Evaluations'
-          description='Scans executed according to specific security policies and their profiles'
-          currentConfig={openSCAPConfig}
-          helpLinks={helpLinks}>
-          <EuiBasicTable
-            columns={columns}
-            items={currentConfig['open-scap'].content}/>
-        </WzConfigurationSettingsTabSelector>
+        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
+        )}
+        {currentConfig && wodleConfig['open-scap'] && !wodleConfig['open-scap'].content && !isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {wodleConfig['open-scap'] && wodleConfig['open-scap'].content && (
+          <WzConfigurationSettingsTabSelector
+            title='Evaluations'
+            description='Scans executed according to specific security policies and their profiles'
+            currentConfig={wodleConfig}
+            helpLinks={helpLinks}>
+            <EuiBasicTable
+              columns={columns}
+              items={wodleConfig['open-scap'].content}/>
+          </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }

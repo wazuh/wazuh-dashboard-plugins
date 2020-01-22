@@ -19,7 +19,7 @@ import {
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
-
+import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
 const columns = [
@@ -31,9 +31,12 @@ class WzPolicyMonitoringSystemAudit extends Component{
     super(props);
   }
   render(){
-    let { currentConfig } = this.props;
+    const { currentConfig } = this.props;
     return (
       <Fragment>
+        {currentConfig['syscheck-rootcheck'] && isString(currentConfig['syscheck-rootcheck']) && (
+          <WzNoConfig error={currentConfig['syscheck-rootcheck']} help={helpLinks}/>
+        )}
         {currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && !currentConfig['syscheck-rootcheck'].rootcheck.system_audit && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}

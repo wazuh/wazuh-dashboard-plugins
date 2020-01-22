@@ -45,7 +45,7 @@ class WzConfigurationAlertsLabels extends Component{
     return (
       <Fragment>
         {currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && (
-          <WzNoConfig error={currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']}/>
+          <WzNoConfig error={currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']} help={helpLinks}/>
         )}
         {currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && !hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels) && (
           <WzNoConfig error='not-present' help={helpLinks}/>

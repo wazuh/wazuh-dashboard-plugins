@@ -36,12 +36,6 @@ class WzConfigurationVulnerabilities extends Component{
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error={currentConfig['wmodules-wmodules']}/>
-        )}
-        {currentConfig && !this.wodleConfig && !isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error='not-present'/>
-        )}
         <WzTabSelector>
           <WzTabSelectorTab label='General'>
             <WzConfigurationVulnerabilitiesGeneral currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>

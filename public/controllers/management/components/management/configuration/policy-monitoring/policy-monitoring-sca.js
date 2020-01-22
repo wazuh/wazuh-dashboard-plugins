@@ -23,6 +23,7 @@ import WzConfigurationSettingsHeader from '../util-components/configuration-sett
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import helpLinks from './help-links';
 import { renderValueYesThenEnabled} from '../utils/utils';
+import { wodleBuilder } from "../utils/builders";
 
 const securitySettings = [
   { field: 'enabled', label: 'Security configuration assessment status', render: renderValueYesThenEnabled },
@@ -38,28 +39,27 @@ const columns = [
 class WzPolicyMonitoringSCA extends Component{
   constructor(props){
     super(props);
+    this.wodleConfig = wodleBuilder(this.props.currentConfig, 'sca');
   }
   render(){
-    const { currentConfig } = this.props;
-    currentConfig['sca'] = currentConfig['wmodules-wmodules'].wmodules.find(wmodule => wmodule.sca).sca; 
     return (
       <Fragment>
-        {!currentConfig['sca'] ? (
+        {!this.wodleConfig.sca ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : (
           <WzConfigurationSettingsTabSelector
             title='Security configuration assessment status'
-            currentConfig={currentConfig}
+            currentConfig={this.wodleConfig}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
-              config={currentConfig['sca']}
+              config={this.wodleConfig.sca}
               items={securitySettings}
             />
             <WzConfigurationSettingsHeader
               title='Policies'
             />
             <EuiBasicTable
-              items={currentConfig['sca'].policies.map(policy => ({ policy }))}
+              items={this.wodleConfig.sca.policies.map(policy => ({ policy }))}
               columns={columns}/>
           </WzConfigurationSettingsTabSelector>
         )}

@@ -9,6 +9,7 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { isString } from './utils';
 
 /**
  * Build a object for settings list
@@ -50,7 +51,7 @@ export const wodleBuilder = (currentConfig, wodles) => {
   const result = {};
   wodles = typeof wodles === 'string' ? [wodles] : wodles;
   wodles.map(wodle => { 
-    result[wodle] = currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle]) ? currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle])[wodle] : undefined
+    result[wodle] = currentConfig['wmodules-wmodules'] && !isString(currentConfig['wmodules-wmodules']) && currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle]) ? currentConfig['wmodules-wmodules'].wmodules.find(item => item[wodle])[wodle] : undefined
   });
   return result;
 }

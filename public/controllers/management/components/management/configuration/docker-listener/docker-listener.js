@@ -37,7 +37,10 @@ class WzConfigurationDockerListener extends Component{
     this.wodleConfig = wodleBuilder(this.props.currentConfig, 'docker-listener');
   }
   componentDidMount(){
-    this.props.updateBadge(this.props.currentConfig && this.props.currentConfig['docker-listener'] && this.props.currentConfig['docker-listener'].disabled === 'no')
+    this.props.updateBadge(this.badgeEnabled());
+  }
+  badgeEnabled(){
+    return this.props.currentConfig && this.wodleConfig['docker-listener'] && this.wodleConfig['docker-listener'].disabled === 'no';
   }
   render(){
     const { currentConfig } = this.props;
@@ -46,10 +49,10 @@ class WzConfigurationDockerListener extends Component{
         {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
         )}
-        {currentConfig && !this.wodleConfig && !isString(currentConfig['wmodules-wmodules']) && (
+        {currentConfig && !this.wodleConfig['docker-listener'] && !isString(currentConfig['wmodules-wmodules']) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
         )}
-        {currentConfig && this.wodleConfig && (
+        {currentConfig && this.wodleConfig['docker-listener'] && (
           <WzConfigurationSettingsTabSelector
           title='Main settings'
           description='General Docker listener settings'

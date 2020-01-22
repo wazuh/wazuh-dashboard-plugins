@@ -15,6 +15,8 @@ import PropTypes from "prop-types";
 
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
+import WzNoConfig from '../util-components/no-config';
+import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
 const mainSettings = [
@@ -32,16 +34,24 @@ class WzConfigurationVulnerabilitiesGeneral extends Component{
     const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
-        <WzConfigurationSettingsTabSelector 
-          title='Main settings'
-          description='General settings applied to the vulnerability detector and its providers'
-          currentConfig={wodleConfig}
-          helpLinks={helpLinks}>
-            <WzConfigurationSettingsGroup 
-              config={wodleConfig['vulnerability-detector']}
-              items={mainSettings}
-            />
-        </WzConfigurationSettingsTabSelector>
+        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
+        )}
+        {currentConfig && !wodleConfig['vulnerability-detector'] && !isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {wodleConfig['vulnerability-detector'] && (
+          <WzConfigurationSettingsTabSelector 
+            title='Main settings'
+            description='General settings applied to the vulnerability detector and its providers'
+            currentConfig={wodleConfig}
+            helpLinks={helpLinks}>
+              <WzConfigurationSettingsGroup 
+                config={wodleConfig['vulnerability-detector']}
+                items={mainSettings}
+              />
+          </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }

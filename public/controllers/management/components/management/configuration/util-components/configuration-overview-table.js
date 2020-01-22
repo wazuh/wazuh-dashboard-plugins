@@ -43,7 +43,7 @@ class WzConfigurationOverviewTable extends Component{
 						{items.map((item, key) => (
 							<EuiTableRow key={`${title}-row-${key}`} onClick={() => onClick(item.goto, item.name, item.description)}>
 								{columns.map((column, keyColumn) => (
-									<EuiTableRowCell colSpan={keyColumn === 1 && 2} key={`${item[column.field]}`}>
+									<EuiTableRowCell colSpan={keyColumn === 1 ? 2 : undefined} key={`${item[column.field]}`}>
 										{item[column.field]}
 									</EuiTableRowCell>
 								))}

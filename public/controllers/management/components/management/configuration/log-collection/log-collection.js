@@ -22,6 +22,7 @@ import WzConfigurationLogCollectionLogs from './log-collection-logs';
 import WzConfigurationLogCollectionCommands from './log-collection-commands';
 import WzConfigurationLogCollectionSockets from './log-collection-sockets';
 import withWzConfig from "../util-hocs/wz-config";
+import { isString } from "../utils/utils";
 
 class WzConfigurationLogCollection extends Component{
   constructor(props){
@@ -29,14 +30,14 @@ class WzConfigurationLogCollection extends Component{
   }
   render(){
     let { currentConfig, agent } = this.props;
-    currentConfig = {
+    currentConfig = currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) ? {
       ...currentConfig,
       'logcollector-localfile' : {
         ...currentConfig['logcollector-localfile'],
         'localfile-logs': currentConfig['logcollector-localfile'].localfile.filter(item => item.file),
         'localfile-commands': currentConfig['logcollector-localfile'].localfile.filter(item => item.command)
-      }
-    }
+      } 
+    } : currentConfig;
     return (
       <Fragment>
         <WzTabSelector>

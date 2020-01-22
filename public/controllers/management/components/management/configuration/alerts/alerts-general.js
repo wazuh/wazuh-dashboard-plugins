@@ -41,13 +41,13 @@ class WzConfigurationAlertsGeneral extends Component{
     return (
       <Fragment>
         {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && (
-          <WzNoConfig error={currentConfig['analysis-alerts']}/>
+          <WzNoConfig error={currentConfig['analysis-alerts']} help={helpLinks}/>
         )}
-        {currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts && (
-          <WzNoConfig error='not-present'/>
+        {currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
         )}
         {wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-alerts']) && (
-          <WzNoConfig error='Wazuh not ready yet'/>
+          <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}
         {currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && currentConfig['analysis-alerts'].alerts && (
           <WzConfigurationSettingsTabSelector

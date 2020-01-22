@@ -14,7 +14,7 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import WzNoConfig from '../util-components/no-config';
-import TabSelector from '../util-components/tab-selector';
+import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationCisCatGeneral from './cis-cat-general';
 import WzConfigurationCisCatBenchmarks from './cis-cat-benchmarks';
@@ -28,7 +28,7 @@ class WzConfigurationCisCat extends Component{
     this.wodleConfig = wodleBuilder(this.props.currentConfig, 'cis-cat');
   }
   badgeEnabled(){
-    return this.wodleConfig['cis-cat'].disabled !== 'yes';
+    return this.wodleConfig['cis-cat'] && this.wodleConfig['cis-cat'].disabled !== 'yes';
   }
   componentDidMount(){
     this.props.updateBadge(this.badgeEnabled());
@@ -36,22 +36,14 @@ class WzConfigurationCisCat extends Component{
   render(){
     const { currentConfig } = this.props;
     return (
-      <Fragment>
-        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
-        )}
-        {currentConfig && !this.wodleConfig && !isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error='not-present' help={helpLinks}/>
-        )}
-        <TabSelector>
-          <div label='General'>
-            <WzConfigurationCisCatGeneral currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
-          </div>
-          <div label='Benchmarks'>
-            <WzConfigurationCisCatBenchmarks currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
-          </div>
-        </TabSelector>
-      </Fragment>
+      <WzTabSelector>
+        <WzTabSelectorTab label='General'>
+          <WzConfigurationCisCatGeneral currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Benchmarks'>
+          <WzConfigurationCisCatBenchmarks currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+        </WzTabSelectorTab>
+      </WzTabSelector>
     )
   }
 }

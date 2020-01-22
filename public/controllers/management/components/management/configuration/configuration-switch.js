@@ -72,7 +72,7 @@ class WzConfigurationSwitch extends Component{
 	updateConfigurationSection = (view, title, description) => {
 		this.setState({ view, viewProps: {title: title, description} });
 	}
-	updateBadge = (badgeStatus = false) => {
+	updateBadge = (badgeStatus) => { // default value false?
 		this.setState({ viewProps: { ...this.state.viewProps, badge: badgeStatus}})
 	}
 	async componentDidMount(){

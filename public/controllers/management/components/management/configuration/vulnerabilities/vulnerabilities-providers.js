@@ -21,7 +21,7 @@ import {
 
 import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
-import { renderValueOrNoValue } from '../utils/utils';
+import { isString, renderValueOrNoValue } from '../utils/utils';
 import helpLinks from './help-links';
 
 const renderTableField = (item) => item || '-';
@@ -81,9 +81,13 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
     let { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
-        {(wodleConfig['vulnerability-detector'] && !wodleConfig['vulnerability-detector'].providers && (
-          <WzNoConfig error='not-present' help={helpLinks}></WzNoConfig>
-        )) || (
+        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
+        )}
+        {currentConfig && wodleConfig['vulnerability-detector'] && !wodleConfig['vulnerability-detector'].providers && !isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {wodleConfig['vulnerability-detector'] && wodleConfig['vulnerability-detector'].providers ? (
           <Fragment>
             <WzConfigurationSettingsTabSelector
               title='Providers'
@@ -96,7 +100,7 @@ class WzConfigurationVulnerabilitiesProviders extends Component{
                 columns={columns}/>
             </WzConfigurationSettingsTabSelector>
           </Fragment>
-        )}
+        ) : null}
       </Fragment>
     )
   }

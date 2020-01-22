@@ -10,7 +10,7 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import {
@@ -19,7 +19,8 @@ import {
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import helpLinks from './help-links';
-import { renderValueNoThenEnabled } from '../utils/utils';
+import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import WzNoConfig from "../util-components/no-config";
 
 const allSettings = [
   { field: 'disabled', label: 'Policy monitoring service status', render: renderValueNoThenEnabled},
@@ -52,16 +53,26 @@ class WzConfigurationPolicyMonitoringGeneral extends Component{
   render(){
     const { currentConfig } = this.props;
     return (
-      <WzConfigurationSettingsTabSelector
-        title='All settings'
-        description='General settings for the rootcheck daemon'
-        currentConfig={currentConfig}
-        helpLinks={helpLinks}>
-          <WzConfigurationSettingsGroup
-            config={currentConfig['syscheck-rootcheck'].rootcheck}
-            items={allSettings}
-          />
-      </WzConfigurationSettingsTabSelector>
+      <Fragment>
+        {currentConfig['syscheck-rootcheck'] && isString(currentConfig['syscheck-rootcheck']) && (
+          <WzNoConfig error={currentConfig['syscheck-rootcheck']} help={helpLinks}/>
+        )}
+        {currentConfig['syscheck-rootcheck'] && !isString(currentConfig['syscheck-rootcheck']) && !currentConfig['syscheck-rootcheck'].rootcheck && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {((currentConfig['syscheck-rootcheck'] && !isString(currentConfig['syscheck-rootcheck']) && currentConfig['syscheck-rootcheck'].rootcheck) || currentConfig['sca']) && (
+          <WzConfigurationSettingsTabSelector
+            title='All settings'
+            description='General settings for the rootcheck daemon'
+            currentConfig={currentConfig}
+            helpLinks={helpLinks}>
+              <WzConfigurationSettingsGroup
+                config={currentConfig['syscheck-rootcheck'].rootcheck}
+                items={allSettings}
+              />
+          </WzConfigurationSettingsTabSelector>
+        )}
+      </Fragment>
     )
   }
 }

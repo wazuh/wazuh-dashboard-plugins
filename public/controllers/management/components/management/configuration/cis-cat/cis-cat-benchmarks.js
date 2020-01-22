@@ -19,7 +19,7 @@ import {
 
 import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
-
+import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
 const columns = [
@@ -36,9 +36,13 @@ class WzConfigurationCisCatBenchmarks extends Component{
     const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
-        {(!wodleConfig['cis-cat'].content && (
-          <WzNoConfig error='not-present' help={helpLinks}></WzNoConfig>
-        )) || (
+        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
+        )}
+        {currentConfig && wodleConfig['cis-cat'] && !wodleConfig['cis-cat'].content && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {wodleConfig['cis-cat'] && wodleConfig['cis-cat'].content && (
           <Fragment>
             <WzConfigurationSettingsTabSelector
               title='Benchmarks'

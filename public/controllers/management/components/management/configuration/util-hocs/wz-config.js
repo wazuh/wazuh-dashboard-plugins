@@ -40,9 +40,14 @@ const withWzConfig = (sections) => (WrappedComponent) =>
   compose(
     connect(mapStateToProps, mapDispatchToProps),
     withLoading(async (props) => {
-      const currentConfig = await getCurrentConfig(props.agent.id, sections, props.clusterNodeSelected, props.updateWazuhNotReadyYet);
-      props.updateLoadingStatus(false);
-      return { ...props, currentConfig };
+      try{
+        const currentConfig = await getCurrentConfig(props.agent.id, sections, props.clusterNodeSelected, props.updateWazuhNotReadyYet);
+        props.updateLoadingStatus(false);
+        return { ...props, currentConfig };
+      }catch(error){
+        props.updateLoadingStatus(false);
+        return { ...props, currentConfig : {}, error };
+      }
     })
   )(WrappedComponent)
 

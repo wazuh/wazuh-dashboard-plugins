@@ -55,9 +55,9 @@ class WzConfigurationAlertsEmailAlerts extends Component{
         {currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts']) && (
           <WzNoConfig error={currentConfig['mail-alerts']} help={helpLinks}/>
         )}
-        {currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && (!currentConfig['mail-alerts'].email_alerts || !currentConfig['mail-alerts'].email_alerts.length) && (
+        {currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && (!currentConfig['mail-alerts'].email_alerts || !currentConfig['mail-alerts'].email_alerts.length) ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
-        )}
+        ) : null}
         {wazuhNotReadyYet &&  (!currentConfig || !currentConfig['mail-alerts']) && ( 
           <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
         )}

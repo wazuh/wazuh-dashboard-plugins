@@ -15,8 +15,9 @@ import PropTypes from "prop-types";
 
 import WzConfigurationSettingsTabSelector from "../util-components/configuration-settings-tab-selector";
 import WzConfigurationSettingsGroup from "../util-components/configuration-settings-group";
+import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
-import { renderValueNoThenEnabled } from '../utils/utils';
+import { isString, renderValueNoThenEnabled } from '../utils/utils';
 
 const mainSettings = [
   { field: 'disabled', label: 'CIS-CAT integration status', render: renderValueNoThenEnabled},
@@ -41,23 +42,30 @@ class WzConfigurationCisCatGeneral extends Component{
     const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
-        <WzConfigurationSettingsTabSelector
-          title='Main settings'
-          description='General settings applied to all benchmarks'
-          currentConfig={wodleConfig}
-          helpLinks={helpLinks}>
-            <WzConfigurationSettingsGroup 
-              config={wodleConfig['cis-cat']}
-              items={mainSettings}
-            />
-            <WzConfigurationSettingsGroup
-              title='Scheduling settings'
-              description='Customize CIS-CAT scans scheduling'
-              config={wodleConfig['cis-cat']}
-              items={schedulingSettings}
-            />
-        </WzConfigurationSettingsTabSelector>
-
+        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
+        )}
+        {currentConfig && !wodleConfig['cis-cat'] && !isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {wodleConfig['cis-cat'] && (
+          <WzConfigurationSettingsTabSelector
+            title='Main settings'
+            description='General settings applied to all benchmarks'
+            currentConfig={wodleConfig}
+            helpLinks={helpLinks}>
+              <WzConfigurationSettingsGroup 
+                config={wodleConfig['cis-cat']}
+                items={mainSettings}
+              />
+              <WzConfigurationSettingsGroup
+                title='Scheduling settings'
+                description='Customize CIS-CAT scans scheduling'
+                config={wodleConfig['cis-cat']}
+                items={schedulingSettings}
+              />
+          </WzConfigurationSettingsTabSelector>
+        )}
       </Fragment>
     )
   }

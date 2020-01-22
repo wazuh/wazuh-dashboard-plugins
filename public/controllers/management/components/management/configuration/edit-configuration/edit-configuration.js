@@ -26,6 +26,7 @@ import {
 } from "@elastic/eui";
 
 import WzCodeEditor from '../util-components/code-editor';
+import WzWazuhAPINotReachable from '../util-components/wz-api-not-reachable';
 import withLoading from '../util-hocs/loading';
 import { withWzToast } from '../util-providers/toast-p';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
@@ -60,7 +61,7 @@ class WzEditorConfiguration extends Component{
         title: (
           <Fragment>
             <EuiIcon type='check'/>&nbsp;
-        <span>Success. {this.props.clusterNodeSelected || 'Manager' } configuration has been updated</span>
+            <span>Success. {this.props.clusterNodeSelected || 'Manager' } configuration has been updated</span>
           </Fragment>),
         color: 'success'
       });
@@ -69,7 +70,7 @@ class WzEditorConfiguration extends Component{
       this.props.addToast({
         title: (
           <Fragment>
-            <EuiIcon type='check'/>&nbsp;
+            <EuiIcon type='alert'/>&nbsp;
             <span>Error: saving configuration</span>
           </Fragment>),
         color: 'danger'
@@ -104,54 +105,59 @@ class WzEditorConfiguration extends Component{
     const { clusterNodeSelected = 'manager' } = this.props;
     return (
       <Fragment>
-        {/* <WzConfigurationPath title={`${clusterNodeSelected} configuration`} updateConfigurationSection={this.props.updateConfigurationSection}/> */}
-        <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
-          <EuiFlexItem grow={false}>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                  <EuiButtonEmpty isDisabled={xmlError} onClick={() => this.editorCancel()}>Cancel</EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                {xmlError ? 
-                  <EuiButton iconType='alert' isDisabled>XML format error</EuiButton>
-                  : <EuiButton isDisabled={saving} iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
-                }
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiFlexGroup justifyContent='flexEnd' style={{marginRight: '10px'}}>
-              {restart && !restarting ? 
-                (<EuiFlexGroup alignItems='center'>
+        {this.props.xmlFetched ? (
+          <Fragment>
+            <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
+              <EuiFlexItem grow={false}>
+                <EuiFlexGroup>
                   <EuiFlexItem>
-                    <span><strong>{clusterNodeSelected}</strong> will be restarted</span>
+                      <EuiButtonEmpty isDisabled={xmlError} onClick={() => this.editorCancel()}>Cancel</EuiButtonEmpty>
                   </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiButtonEmpty onClick={() => this.toggleRestart()}>Cancel</EuiButtonEmpty>
+                  <EuiFlexItem>
+                    {xmlError ? 
+                      <EuiButton iconType='alert' isDisabled>XML format error</EuiButton>
+                      : <EuiButton isDisabled={saving} iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
+                    }
                   </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiButton fill iconType='check' onClick={() => this.confirmRestart()}>Confirm</EuiButton>
-                  </EuiFlexItem>
-                </EuiFlexGroup>)
-                  : restarting ? 
-                    <EuiButton fill isDisabled>
-                      <EuiLoadingSpinner size="s"/> Restarting {clusterNodeSelected}
-                    </EuiButton>
-                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected}</EuiButton>
-              }
+                </EuiFlexGroup>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiFlexGroup justifyContent='flexEnd' style={{marginRight: '10px'}}>
+                  {restart && !restarting ? 
+                    (<EuiFlexGroup alignItems='center'>
+                      <EuiFlexItem>
+                        <span><strong>{clusterNodeSelected}</strong> will be restarted</span>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonEmpty onClick={() => this.toggleRestart()}>Cancel</EuiButtonEmpty>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButton fill iconType='check' onClick={() => this.confirmRestart()}>Confirm</EuiButton>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>)
+                      : restarting ? 
+                        <EuiButton fill isDisabled>
+                          <EuiLoadingSpinner size="s"/> Restarting {clusterNodeSelected}
+                        </EuiButton>
+                      : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected}</EuiButton>
+                  }
+                </EuiFlexGroup>
+              </EuiFlexItem>
             </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size='s'/>
-        <EuiText>
-          Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected}</span>
-          {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
-        </EuiText>
-        {infoChangesAfterRestart && (
-          <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
+            <EuiSpacer size='s'/>
+            <EuiText>
+              Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected}</span>
+              {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
+            </EuiText>
+            {infoChangesAfterRestart && (
+              <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
+            )}
+            <EuiSpacer size='s'/>
+            <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)} minusHeight={300}/>
+          </Fragment>
+        ) : (
+          <WzWazuhAPINotReachable error={this.props.errorXMLFetched}/>
         )}
-        <EuiSpacer size='s'/>
-        <WzCodeEditor mode='xml' value={editorValue} onChange={(editorValue) => this.onChange(editorValue)} minusHeight={300}/>
       </Fragment>
     )
   }
@@ -178,7 +184,11 @@ export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withWzToast,
   withLoading(async (props) => {
-    const xmlFetched = await fetchFile(props.clusterNodeSelected)
-    return { xmlFetched }
+    try{
+      const xmlFetched = await fetchFile(props.clusterNodeSelected)
+      return { xmlFetched }
+    }catch(error){
+      return { xmlFetched: null, errorXMLFetched: error }
+    }
   })
 )(WzEditorConfiguration);

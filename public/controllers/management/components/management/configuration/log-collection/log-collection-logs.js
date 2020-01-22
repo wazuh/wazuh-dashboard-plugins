@@ -43,7 +43,7 @@ class WzConfigurationLogCollectionLogs extends Component{
       <Fragment>
         {currentConfig['logcollector-localfile'] && isString(currentConfig['logcollector-localfile']) && (
           <WzNoConfig error={currentConfig['logcollector-localfile']} help={helpLinks}/>
-          )}
+        )}
         {currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && !(currentConfig['logcollector-localfile']['localfile-logs'] || []).length ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}

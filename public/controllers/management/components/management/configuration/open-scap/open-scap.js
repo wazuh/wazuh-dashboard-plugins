@@ -13,47 +13,34 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
-import WzNoConfig from "../util-components/no-config";
 import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationOpenSCAPGeneral from './open-scap-general';
 import WzConfigurationOpenSCAPEvaluations from './open-scap-evaluations';
-import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import withWzConfig from "../util-hocs/wz-config";
+import { wodleBuilder } from "../utils/builders";
 
 class WzConfigurationOpenSCAP extends Component{
   constructor(props){
     super(props);
+    this.wodleConfig = wodleBuilder(this.props.currentConfig, 'open-scap');
   }
   componentDidMount(){
     this.props.updateBadge(this.props.currentConfig && this.props.currentConfig['open-scap'] && this.props.currentConfig['open-scap'].disabled === 'no');
   }
   render(){
     let { currentConfig } = this.props;
-    currentConfig['open-scap'] = currentConfig['wmodules-wmodules'].wmodules.find(item => item['open-scap'])['open-scap'];
     return (
-      <Fragment>
-        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={''}/>
-          )}
-        {currentConfig && !currentConfig['open-scap'] && !isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error='not-present' help={''}/>
-        )}
-        {currentConfig && currentConfig['open-scap'] && (
-          <Fragment>
-            <WzTabSelector>
-              <WzTabSelectorTab label='General'>
-                <WzConfigurationOpenSCAPGeneral {...this.props} currentConfig={currentConfig}/>
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label='Evaluations'>
-                <WzConfigurationOpenSCAPEvaluations {...this.props} currentConfig={currentConfig}/>
-              </WzTabSelectorTab>
-            </WzTabSelector>
-          </Fragment>
-        )}
-      </Fragment>
+      <WzTabSelector>
+        <WzTabSelectorTab label='General'>
+          <WzConfigurationOpenSCAPGeneral {...this.props} currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Evaluations'>
+          <WzConfigurationOpenSCAPEvaluations {...this.props} currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+        </WzTabSelectorTab>
+      </WzTabSelector>
     )
   }
 }

@@ -10,14 +10,14 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-
+import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
-import { renderValueNoThenEnabled } from '../utils/utils';
+import { isString, renderValueNoThenEnabled } from '../utils/utils';
 
 const mainSettings = [
   {field: 'disabled', label: 'OpenSCAP integration status', render: renderValueNoThenEnabled },
@@ -31,18 +31,28 @@ class WzConfigurationOpenSCAPGeneral extends Component{
     super(props);
   }
   render(){
-    const { currentConfig } = this.props;
+    const { currentConfig, wodleConfig } = this.props;
     return (
-      <WzConfigurationSettingsTabSelector
-          title='Main settings'
-          description='These settings apply to all OpenSCAP evaluations'
-          currentConfig={currentConfig}
-          helpLinks={helpLinks}>
-          <WzConfigurationSettingsGroup
-            config={currentConfig['open-scap']}
-            items={mainSettings}
-          />
-        </WzConfigurationSettingsTabSelector>
+      <Fragment>
+        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
+        )}
+        {currentConfig && !wodleConfig['open-scap'] && !isString(currentConfig['wmodules-wmodules']) && (
+          <WzNoConfig error='not-present' help={helpLinks}/>
+        )}
+        {wodleConfig['open-scap'] && (
+          <WzConfigurationSettingsTabSelector
+            title='Main settings'
+            description='These settings apply to all OpenSCAP evaluations'
+            currentConfig={wodleConfig}
+            helpLinks={helpLinks}>
+            <WzConfigurationSettingsGroup
+              config={wodleConfig['open-scap']}
+              items={mainSettings}
+            />
+          </WzConfigurationSettingsTabSelector>
+        )}
+      </Fragment>
     )
   }
 }

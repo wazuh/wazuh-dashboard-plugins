@@ -20,6 +20,7 @@ import {
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import { isString } from '../utils/utils';
 import helpLinks from './help-links.js';
 
 const columnsIgnore = [
@@ -38,9 +39,13 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component{
     const { currentConfig } = this.props;
     return (
       <Fragment>
+        {currentConfig['syscheck-rootcheck'] && isString(currentConfig['syscheck-rootcheck']) && (
+          <WzNoConfig error={currentConfig['syscheck-rootcheck']} help={helpLinks}/>
+        )}
         {currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && (!currentConfig['syscheck-rootcheck'].rootcheck.ignore || ( currentConfig['syscheck-rootcheck'].rootcheck.ignore && !currentConfig['syscheck-rootcheck'].rootcheck.ignore.length)) && (
           <WzNoConfig error='not-present' help={helpLinks}/>
-        ) || (
+        )}
+        {currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && currentConfig['syscheck-rootcheck'].rootcheck.ignore && currentConfig['syscheck-rootcheck'].rootcheck.ignore.length ? (
           <WzConfigurationSettingsTabSelector
             title='Ignored files and directories'
             description='These files and directories are ignored from the rootcheck scan'
@@ -63,7 +68,7 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component{
                 </Fragment>
               )}
           </WzConfigurationSettingsTabSelector>
-        )}
+        ) : null}
       </Fragment>
     )
   }
