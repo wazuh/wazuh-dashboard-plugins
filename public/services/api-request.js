@@ -10,17 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../react-services/app-state";
+import { GenericRequest } from "../react-services/generic-request";
 
 export class ApiRequest {
   /**
    * Class constructor
    * @param {*} $q
-   * @param {*} genericReq
    * @param {*} appState
    */
-  constructor($q, genericReq, appState) {
+  constructor($q, appState) {
     this.$q = $q;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.appState = appState;
   }
 

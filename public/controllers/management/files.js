@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../../react-services/app-state";
+import { WazuhConfig } from "../../react-services/wazuh-config";
 
 export class FilesController {
   constructor(
     $scope,
-    wazuhConfig,
     rulesetHandler,
     errorHandler,
     appState,
     $location
   ) {
     this.$scope = $scope;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
     this.errorHandler = errorHandler;
     this.appState = appState;

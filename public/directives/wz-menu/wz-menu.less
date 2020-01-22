@@ -20,7 +20,9 @@ wz-menu {
     z-index: 999;
 }
 .wz-menu {
+    margin-right: 1px;
     background-color: #FFF;
+    margin-top: 0;
     box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
     border-bottom: 1px solid #d3dae6;
     font-size: 14px;
@@ -28,16 +30,28 @@ wz-menu {
     height: 50px;
 }
 
+.wz-menu a:focus{
+    text-decoration: none;
+}
+
 .wz-menu-wrapper{
     width: 100%;
     position: fixed;
     padding-left: 48px;
+    z-index: 999;
     left: 0;
 }
 
 @media only screen and (max-width: 767px){
+    .wz-menu-select{
+        max-width: 20px !important;
+    }
     .wz-menu-wrapper{
         padding-left: 0!important;
+    }
+
+    .wz-menu-button-title {
+        display: none;
     }
   }
 
@@ -62,7 +76,7 @@ wz-menu {
     height: 38px;
     padding: 0px 8px;
     border-radius: 4px;
-    margin-right: 5px;
+    margin-right: 8px;
     min-width: 45px!important;
     font-weight: 400;
 }

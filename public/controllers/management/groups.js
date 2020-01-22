@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../../react-services/app-state";
+import { WazuhConfig } from "../../react-services/wazuh-config";
 
 export class GroupsController {
   constructor(
@@ -20,7 +21,6 @@ export class GroupsController {
     appState,
     shareAgent,
     groupHandler,
-    wazuhConfig,
     reportingService
   ) {
     this.scope = $scope;
@@ -30,7 +30,7 @@ export class GroupsController {
     this.appState = appState;
     this.shareAgent = shareAgent;
     this.groupHandler = groupHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.reportingService = reportingService;
   }
 
