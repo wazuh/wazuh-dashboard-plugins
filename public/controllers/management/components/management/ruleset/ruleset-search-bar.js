@@ -32,7 +32,7 @@ class WzRulesetSearchBar extends Component {
       label: 'group',
       description: 'Filters the rules by group',
       values: async (value) => {
-        const filter = {limit:30}
+        const filter = {limit:30};
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/groups', filter);
         return (((result || {}).data || {}).data || {}).items;
@@ -46,9 +46,13 @@ class WzRulesetSearchBar extends Component {
     {
       label: 'file',
       description: 'Filters the rules by file name.',
-      values: async () => {
+      values: async (value) => {
+        const filter = {limit:30};
+        if (value){
+          filter['search'] = value;
+        }
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/rules/files', {});
+        const result = await wzReq('GET', '/rules/files', filter);
         return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
       },
     },
@@ -116,17 +120,48 @@ class WzRulesetSearchBar extends Component {
       }
     },
   ]
-  rulesFiles = []
+  rulesFiles = [];
 
-  decodersItems = []
-  decodersFiles = []
+  decodersItems = [
+    {
+      label: 'file',
+      description: 'Filters the decoders by file name.',
+      values: async (value) => {
+        const filter = {limit:30};
+        if (value){
+          filter['search'] = value;
+        }
+        const wzReq = (...args) => WzRequest.apiReq(...args);
+        const result = await wzReq('GET', '/decoders/files', filter);
+        return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
+      },
+    },
+    {
+      label: 'path',
+      description: 'Path of the decoders files.',
+      values: async () => {
+        const wzReq = (...args) => WzRequest.apiReq(...args);
+        const result = await wzReq('GET', '/manager/configuration', {
+          section:'decoders',
+          field: 'rule_dir',
+        });
+        return ((result || {}).data || {}).data;
+      }
+    },
+    {
+      label: 'status',
+      description: 'Filters the decoders by status.',
+      values: ['enabled', 'disabled'],
+    },
+  ]
+  decodersFiles = [];
 
   cdbFiles = []
 
   apiSuggestsItems = {
     items: {
       rules: this.rulesItems,
-      decoders: this.decodersFiles,
+      decoders: this.decodersItems,
     },
     files: {
       rule: this.rulesFiles,
@@ -139,8 +174,8 @@ class WzRulesetSearchBar extends Component {
     const { section, showingFiles } = this.props.state;
     const type = showingFiles ? 'files' : 'items';
     const apiSuggests = this.apiSuggestsItems[type][section];
-    
-    return ( 
+
+    return (
     <WzSearchBar
       apiSuggests={apiSuggests}
       onInputChange={this.props.updateFilters} />
