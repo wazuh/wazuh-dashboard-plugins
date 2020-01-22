@@ -497,7 +497,6 @@ class WzListEditor extends Component {
                         items={this.state.items}
                         columns={columns}
                         pagination={{ pageSizeOptions: [10, 15] }}
-                        loading={isLoading}
                         sorting={true}
                         message={message}
                         search={{ box: { incremental: true } }}
