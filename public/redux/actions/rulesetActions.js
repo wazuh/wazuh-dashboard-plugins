@@ -167,7 +167,7 @@ export const updatePageIndex = (pageIndex) => {
  */
 export const updateFilters = (filters) => {
   return {
-    type: 'UPDATE_FILTERS',
+    type: 'UPDATE_RULE_FILTERS',
     filters: filters
   }
 }
