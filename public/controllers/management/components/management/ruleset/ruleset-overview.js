@@ -72,7 +72,9 @@ class WzRulesetOverview extends Component {
             <WzRulesetSearchBar />
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzRulesetTable />
+              <WzRulesetTable
+                  request={`${section}`}
+              />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>

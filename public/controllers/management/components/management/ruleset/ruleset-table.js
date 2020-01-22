@@ -90,7 +90,7 @@ class WzRulesetTable extends Component {
 
     const rawItems = await this.wzReq(
       'GET',
-      `${this.paths[section]}${showingFiles ? '/files': ''}`,
+      `${this.paths[this.props.request]}${showingFiles ? '/files': ''}`,
       this.buildFilter(),
     ).catch((error) => {
       console.warn(`Error when get the items of ${section}: `, error)
@@ -163,7 +163,7 @@ class WzRulesetTable extends Component {
 
   render() {
     const { error } = this.props.state;
-    const { 
+    const {
       items,
       pageSize,
       totalItems,
@@ -180,7 +180,7 @@ class WzRulesetTable extends Component {
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
     };
-    const sorting = !!sortField 
+    const sorting = !!sortField
     ? {
         sort: {
           field: sortField,
