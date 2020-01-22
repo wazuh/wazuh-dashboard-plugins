@@ -48,15 +48,9 @@ export default class WzSearchBar extends Component {
 
   constructor(props) {
     super(props);
-
+    const searchFormat = this.selectSearchFormat(props);
     this.state = {
-      searchFormat: (props.defaultFormat)
-        ? props.defaultFormat
-        : (props.qSuggests) 
-        ? '?Q' 
-        : (props.apiSuggests) 
-          ? 'API' 
-          : null,
+      searchFormat,
       suggestions: [],
       isProcessing: true,
       inputValue: '',
@@ -65,6 +59,18 @@ export default class WzSearchBar extends Component {
       filters: {},
       isPopoverOpen: false,
     }
+  }
+
+  selectSearchFormat(props) {
+    const searchFormat = (props.defaultFormat)
+    ? props.defaultFormat
+    : (!!props.qSuggests) 
+      ? '?Q' 
+      : (props.apiSuggests) 
+        ? 'API' 
+        : null;
+
+    return searchFormat;
   }
 
   selectSuggestHandler(searchFormat):void {
@@ -90,13 +96,36 @@ export default class WzSearchBar extends Component {
     const apiSuggestsChanged = JSON.stringify(apiSuggests) !== JSON.stringify(apiSuggestsPrev);
 
     if (qSuggestsChanged || apiSuggestsChanged) {
-      this.selectSuggestHandler(this.state.searchFormat);
+      return true;
     }
+    return false;
 
   }
 
+  shouldComponentUpdate(nextProps, nextState){
+    if (this.updateSuggestOnProps(nextProps.qSuggests, nextState.apiSuggests)){
+      return true;
+    }
+    if (nextState.isProcessing) {
+      return true;
+    }
+    if (nextState.isPopoverOpen !== this.state.isPopoverOpen){
+      return true;
+    }
+    if (nextState.status !== this.state.status) {
+      return true;
+    }
+    if (JSON.stringify(nextState.filters) !== JSON.stringify(this.state.filters) ) {
+      return true;
+    }
+    
+    return false;
+  }
+
   async componentDidUpdate(prevProps) {
-    this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests);
+    if (this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests)) {
+      this.selectSuggestHandler(this.state.searchFormat);
+    }
 
     const { isProcessing } = this.state;
     if (!isProcessing){
@@ -129,10 +158,10 @@ export default class WzSearchBar extends Component {
         suggestSearch && suggestsItems.unshift(suggestSearch);
       }
   
-      this.setState({
-        isProcessing: false,
-        suggestions: suggestsItems,
+      await this.setState({
         status: 'unchanged',
+        suggestions: suggestsItems,
+        isProcessing: false,
       });
     }
   }
@@ -254,7 +283,7 @@ export default class WzSearchBar extends Component {
     const { filters } = this.state;
     delete filters[badge.field];
     this.props.onInputChange(filters);
-    this.setState({filters});
+    this.setState({filters, isProcessing: true});
   }
 
   onPopoverFocus(event) {
