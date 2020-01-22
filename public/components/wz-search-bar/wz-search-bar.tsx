@@ -286,7 +286,14 @@ export default class WzSearchBar extends Component {
   }
 
   render() {
-    const { status, suggestions, inputValue, isInvalid, filters, isPopoverOpen } = this.state;
+    const { status,
+      suggestions,
+      inputValue,
+      isInvalid,
+      filters,
+      isPopoverOpen
+    } = this.state;
+    const { placeholder } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     return (
@@ -312,6 +319,7 @@ export default class WzSearchBar extends Component {
               suggestions={suggestions}
               onInputChange={this.onInputChange}
               isInvalid={isInvalid}
+              placeholder={placeholder}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
