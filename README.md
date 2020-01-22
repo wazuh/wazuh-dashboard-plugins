@@ -32,8 +32,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 - Wazuh HIDS 3.11.2
 - Wazuh RESTful API 3.11.2
-- Kibana 7.5.1
-- Elasticsearch 7.5.1
+- Kibana 7.5.2
+- Elasticsearch 7.5.2
 
 ## Installation
 
@@ -42,13 +42,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.1.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.1.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip' kibana
 ```
 
 Restart Kibana
@@ -105,13 +105,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.1_7.5.1.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.1_7.5.2.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.1.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip' kibana
 ```
 
 Restart Kibana
@@ -228,6 +228,7 @@ service kibana restart
 |      6.8.6     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_6.8.6.zip> |
 |      7.3.2     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.3.2.zip> |
 |      7.5.1     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.1.zip> |
+|      7.5.2     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip> |
 
 
 ## Contribute
@@ -237,14 +238,17 @@ If you want to contribute to our project please don't hesitate to send a pull re
 ## Software and libraries used
 
 - https://elastic.co
+- https://elastic.github.io/eui
 - https://material.angularjs.org
 - https://angularjs.org
 - https://nodejs.org
 - https://npmjs.com
+- https://reactjs.org
+- https://redux.js.org
 
 ## Copyright & License
 
-Copyright &copy; 2019 Wazuh, Inc.
+Copyright &copy; 2020 Wazuh, Inc.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
