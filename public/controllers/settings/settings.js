@@ -405,6 +405,7 @@ export class SettingsController {
       }
       this.$scope.$applyAsync();
     } catch (error) {
+      AppState.removeNavigation();
       this.errorHandler.handle('Error when loading Wazuh setup info', 'Settings');
     }
     return;

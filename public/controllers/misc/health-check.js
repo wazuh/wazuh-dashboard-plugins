@@ -204,6 +204,7 @@ export class HealthCheck {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      AppState.removeNavigation();
       if (error && error.data && error.data.code && error.data.code === 3002) {
         return error;
       } else {

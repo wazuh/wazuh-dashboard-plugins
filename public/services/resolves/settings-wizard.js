@@ -204,6 +204,12 @@ export function settingsWizard(
             // Sum errors to check if any API could be selected
             errors++;
             if (errors >= apis.length) {
+              AppState.setNavigation({ status: false });
+              AppState.setNavigation({
+                reloaded: false,
+                discoverPrevious: false,
+                discoverSections: ['/overview/', '/agents', '/wazuh-dev']
+              });
               throw new Error('Could not select any API entry');
             }
           }
