@@ -9,13 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { GenericRequest } from "../react-services/generic-request";
+
 export class CSVRequest {
   /**
    * Constructor
-   * @param {*} genericReq Service to make requests to our server
    */
-  constructor(genericReq) {
-    this.genericReq = genericReq;
+  constructor() {
+    this.genericReq = GenericRequest;
   }
 
   /**

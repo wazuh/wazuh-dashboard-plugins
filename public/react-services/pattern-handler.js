@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Pattern handler service
+ * Wazuh app - Pattern Handler service
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,38 +9,24 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "../react-services/app-state";
+import { GenericRequest } from "./generic-request";
+import { AppState } from "./app-state";
 
 export class PatternHandler {
-  /**
-   * Class constructor
-   * @param {*} $location
-   * @param {*} genericReq
-   * @param {*} appState
-   * @param {*} errorHandler
-   * @param {*} wzMisc
-   */
-  constructor($location, genericReq, appState, errorHandler, wzMisc) {
-    this.$location = $location;
-    this.genericReq = genericReq;
-    this.appState = appState;
-    this.errorHandler = errorHandler;
-    this.wzMisc = wzMisc;
-  }
 
-  /**
+   /**
    * Get the available pattern list
    */
-  async getPatternList() {
+  static async getPatternList() {
     try {
-      const patternList = await this.genericReq.request(
+      const patternList = await GenericRequest.request(
         'GET',
         '/elastic/index-patterns',
         {}
       );
 
       if (!patternList.data.data.length) {
-        this.$location.search('tab', null);
+        //this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen'))
           window.location.href = "/app/wazuh#/settings/";
         return;
@@ -56,27 +42,30 @@ export class PatternHandler {
 
       return patternList.data.data;
     } catch (error) {
-      this.errorHandler.handle(error, 'Pattern Handler (getPatternList)');
+      throw new Error('Error Pattern Handler (getPatternList)')
     }
     return;
   }
+
+
 
   /**
    * Change current pattern for the given pattern
    * @param {String} selectedPattern
    */
-  async changePattern(selectedPattern) {
+  static async changePattern(selectedPattern) {
     try {
       AppState.setCurrentPattern(selectedPattern);
-      await this.genericReq.request(
+      await GenericRequest.request(
         'GET',
         `/elastic/known-fields/${selectedPattern}`,
         {}
       );
       return AppState.getCurrentPattern();
     } catch (error) {
-      this.errorHandler.handle(error, 'Pattern Handler (changePattern)');
+      throw new Error('Error Pattern Handler (changePattern)')
     }
     return;
   }
-}
+
+} 

@@ -14,6 +14,8 @@ import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
 import $ from 'jquery';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { PatternHandler } from '../../react-services/pattern-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -32,9 +34,9 @@ class WzMenu {
     appState,
     patternHandler,
     indexPatterns,
-    errorHandler,
-    wazuhConfig
+    errorHandler
   ) {
+    const wazuhConfig = new WazuhConfig();
     $scope.showSelector = AppState.getPatternSelector();
     $scope.root = $rootScope;
     $scope.settedMenuHeight = false;
@@ -52,7 +54,7 @@ class WzMenu {
      */
     const load = async () => {
       try {
-        const list = await patternHandler.getPatternList();
+        const list = await PatternHandler.getPatternList();
         if (!list) return;
 
         // Get the configuration to check if pattern selector is enabled
@@ -130,7 +132,7 @@ class WzMenu {
     $scope.changePattern = async selectedPattern => {
       try {
         if (!AppState.getPatternSelector()) return;
-        $scope.currentSelectedPattern = await patternHandler.changePattern(
+        $scope.currentSelectedPattern = await PatternHandler.changePattern(
           selectedPattern
         );
         $scope.$applyAsync();
