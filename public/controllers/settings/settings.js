@@ -132,7 +132,7 @@ export class SettingsController {
       },
       selectedTab: this.tab || 'api',
       tabs: [
-        { id: 'api', name: 'API hosts' },
+        { id: 'api', name: 'API' },
         { id: 'configuration', name: 'Configuration' },
         { id: 'logs', name: 'Logs' },
         { id: 'about', name: 'About' }
