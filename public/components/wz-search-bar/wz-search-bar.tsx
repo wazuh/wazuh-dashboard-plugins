@@ -65,10 +65,10 @@ export default class WzSearchBar extends Component {
   selectSearchFormat(props) {
     const searchFormat = (props.defaultFormat)
     ? props.defaultFormat
-    : (!!props.qSuggests) 
-      ? '?Q' 
-      : (props.apiSuggests) 
-        ? 'API' 
+    : (!!props.qSuggests)
+      ? '?Q'
+      : (props.apiSuggests)
+        ? 'API'
         : '';
 
     return searchFormat;
@@ -80,7 +80,7 @@ export default class WzSearchBar extends Component {
     } else {
       this.suggestHandler = new ApiHandler(this.props.apiSuggests);
     }
-    this.setState({ isProcessing: true, suggestions: [] })
+    this.setState({ isProcessing: true, suggestions: [], filters: {} })
   }
 
   async componentDidMount() {
@@ -135,16 +135,16 @@ export default class WzSearchBar extends Component {
       const suggestsItems = !!searchFormat ?
         [...await this.suggestHandler.buildSuggestItems(inputValue)]
         : [];
-      const isSearchEnabled = (this.suggestHandler.inputStage === 'fields' 
-        && !searchDisable 
+      const isSearchEnabled = (this.suggestHandler.inputStage === 'fields'
+        && !searchDisable
         && inputValue !== '')
         || !searchFormat;
-  
+
       if (isSearchEnabled) {
         const suggestSearch = this.buildSuggestFieldsSearch();
         suggestSearch && suggestsItems.unshift(suggestSearch);
       }
-  
+
       await this.setState({
         status: 'unchanged',
         suggestions: suggestsItems,
@@ -152,7 +152,7 @@ export default class WzSearchBar extends Component {
       });
     }
   }
-  
+
   buildSuggestInvalid() {
     const suggestsItems = [{
       type: { iconType: 'alert', color: 'tint2' },
@@ -194,10 +194,10 @@ export default class WzSearchBar extends Component {
 
   makeFilter(item:suggestItem):void {
     const { inputValue, filters } = this.state;
-      
+
     const {inputValue:newInputValue, filters:newFilters } = this.suggestHandler.onItemClick(item, inputValue, filters);
     this.updateFilters(newFilters);
-    
+
     this.setState({
       inputValue: newInputValue,
       suggestions: [],
