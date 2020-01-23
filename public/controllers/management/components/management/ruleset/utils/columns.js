@@ -298,7 +298,7 @@ export default class RulesetColumns {
         tooltipContent={item[field].join(', ')} 
         tooltipPosition="bottom"
         className="euiBadge euiBadge--hollow eui-displayInlineBlock"
-        style={{margin:"1px 2px"}}
+        style={{margin:"1px 2px", borderRadius: "2px"}}
       />);
     }
     try {
