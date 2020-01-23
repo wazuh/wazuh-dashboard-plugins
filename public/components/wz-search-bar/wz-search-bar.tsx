@@ -131,16 +131,7 @@ export default class WzSearchBar extends Component {
     const { inputValue, isInvalid, searchFormat } = this.state;
     const { searchDisable } = this.props;
     if (isInvalid) {
-      const suggestsItems = [{
-        type: { iconType: 'alert', color: 'tint2' },
-        label: "Error",
-        description: "The field are invalid"
-      }];
-      this.setState({
-        isProcessing: false,
-        suggestions: suggestsItems,
-        status: 'unsaved',
-    });
+      this.buildSuggestInvalid();
     } else {
       const suggestsItems = !!searchFormat ?
         [...await this.suggestHandler.buildSuggestItems(inputValue)]
@@ -163,7 +154,18 @@ export default class WzSearchBar extends Component {
     }
   }
   
-  
+  buildSuggestInvalid() {
+    const suggestsItems = [{
+      type: { iconType: 'alert', color: 'tint2' },
+      label: "Error",
+      description: "The field are invalid"
+    }];
+    this.setState({
+      isProcessing: false,
+      suggestions: suggestsItems,
+      status: 'unsaved',
+    });
+  }
 
   buildSuggestFieldsSearch():suggestItem | undefined {
     const { inputValue, searchFormat } = this.state;
