@@ -33,6 +33,9 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by group',
       values: async (value) => {
         const filter = {limit:30};
+        if (value){
+          filter['search'] = value;
+        }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/groups', filter);
         return (((result || {}).data || {}).data || {}).items;

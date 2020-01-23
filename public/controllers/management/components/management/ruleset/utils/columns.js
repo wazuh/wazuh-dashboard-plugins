@@ -1,11 +1,9 @@
 import React from 'react';
-import { EuiToolTip,
+import {
+  EuiToolTip,
   EuiButtonIcon,
   EuiLink,
-  EuiBetaBadge,
-  EuiButtonEmpty,
-  EuiOverlayMask,
-  EuiConfirmModal
+  EuiBadge,
 } from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
 
@@ -263,7 +261,7 @@ export default class RulesetColumns {
                       color="primary"
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}/${item.name}`) === -1)? `Delete ${item.name}`: `The ${item.name} list cannot be deleted`}>
+                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}/${item.name}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
@@ -286,20 +284,26 @@ export default class RulesetColumns {
     this.buildColumns();
   }
 
-  buildComplianceBadges(item){
+  buildComplianceBadges(item) {
     const badgeList = [];
     const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53'];
     const buildBadge = (field) => {
-      const idGenerator = () => {return '_' + Math.random().toString(36).substr(2, 9)};
+      const idGenerator = () => {
+        return '_' + Math.random().toString(36).substr(2, 9)
+      };
 
-      return (<EuiBetaBadge 
-        key={idGenerator()}
-        label={field.toUpperCase()} 
-        tooltipContent={item[field].join(', ')} 
-        tooltipPosition="bottom"
-        className="euiBadge euiBadge--hollow eui-displayInlineBlock"
-        style={{margin:"1px 2px", borderRadius: "2px"}}
-      />);
+      return (
+        <EuiToolTip
+          content={item[field].join(', ')}
+          position="bottom" >
+          <EuiBadge
+            key={idGenerator()}
+            title={false}
+            color="hollow"
+            style={{ margin: "1px 2px" }}
+          >{field.toUpperCase()}</EuiBadge>
+        </EuiToolTip>
+      );
     }
     try {
       for (const field of fields) {

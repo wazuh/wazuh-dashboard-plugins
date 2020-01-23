@@ -328,13 +328,6 @@ export default class WzSearchBar extends Component {
     return (
       <div>
         <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <WzSearchBadges
-              filters={formatedFilter}
-              onChange={this.onDeleteBadge.bind(this)} />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
           <EuiFlexItem>
             <EuiSuggest
               status={status}
@@ -350,6 +343,13 @@ export default class WzSearchBar extends Component {
               isInvalid={isInvalid}
               placeholder={placeholder}
             />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <WzSearchBadges
+              filters={formatedFilter}
+              onChange={this.onDeleteBadge.bind(this)} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>

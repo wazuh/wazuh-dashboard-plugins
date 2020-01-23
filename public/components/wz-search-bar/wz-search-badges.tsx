@@ -46,6 +46,8 @@ export class WzSearchBadges extends Component {
         iconType="cross"
         iconSide="right"
         iconOnClickAriaLabel="Remove"
+        color="hollow"
+        className="globalFilterItem"
         iconOnClick={() => this.props.onChange(title)}>
         {`${title.field}:${title.value}`}
       </EuiBadge>
