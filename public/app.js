@@ -1,6 +1,6 @@
 /*
  * Wazuh app - File for app requirements and set up
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,9 +85,9 @@ app.config([
   }
 ]);
 
-app.run(function($rootScope, $route, $location, appState, $window) {
+app.run(function($rootScope, $route, $location, $window) {
   chrome
-    .setRootTemplate('<wz-menu></wz-menu><div ng-view class="mainView"></div>')
+    .setRootTemplate('<react-component name="WzMenuWrapper" props="" /><div ng-view class="mainView"></div>')
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
   AppState.setNavigation({ status: false });

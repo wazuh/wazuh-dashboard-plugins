@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh register agents
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,7 @@
 
 import template from './wz-register-agents.html';
 import { uiModules } from 'ui/modules';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -26,7 +27,8 @@ class WzRegisterAgents {
       reload: '&'
     };
   }
-  controller($scope, wazuhConfig, errorHandler, apiReq) {
+  controller($scope, errorHandler, apiReq) {
+    const wazuhConfig = new WazuhConfig();
     const configuration = wazuhConfig.getConfig();
     $scope.adminMode = !!(configuration || {}).admin;
     const load = async () => {

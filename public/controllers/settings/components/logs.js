@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the API entries table.
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import { TimeService } from '../../../services/time-service'
 export default class SettingsLogs extends Component {
   constructor(props) {
     super(props);
-
+    this.offset = 340;
     this.state = {
       logs: [],
       refreshingEntries: false
@@ -37,13 +37,13 @@ export default class SettingsLogs extends Component {
   }
 
   updateHeight = () => {
-    this.height = window.innerHeight - 325; //eslint-disable-line
+    this.height = window.innerHeight - this.offset; //eslint-disable-line
     this.forceUpdate();
   }
 
   componentDidMount() {
     this.refresh();
-    this.height = window.innerHeight - 325; //eslint-disable-line
+    this.height = window.innerHeight - this.offset; //eslint-disable-line
     window.addEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 

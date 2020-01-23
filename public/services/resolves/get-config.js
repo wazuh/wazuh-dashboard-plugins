@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Resolve function to parse configuration file
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'extensions.mitre': false,
     'extensions.docker': false,
     timeout: 20000,
-    'wazuh.shards': 1,
-    'wazuh.replicas': 0,
     'ip.selector': true,
     'ip.ignore': [],
     'xpack.rbac.enabled': true,

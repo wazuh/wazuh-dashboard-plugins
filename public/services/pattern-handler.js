@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Pattern handler service
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,9 @@ export class PatternHandler {
       );
 
       if (!patternList.data.data.length) {
-        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         this.$location.search('tab', null);
-        this.$location.path('/blank-screen');
+        if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen'))
+          window.location.href = "/app/wazuh#/settings/";
         return;
       }
 
