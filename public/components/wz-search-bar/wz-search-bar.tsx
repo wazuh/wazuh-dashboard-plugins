@@ -95,7 +95,6 @@ export default class WzSearchBar extends Component {
     const { qSuggests, apiSuggests } = this.props;
     const qSuggestsChanged = JSON.stringify(qSuggests) !== JSON.stringify(qSuggestsPrev);
     const apiSuggestsChanged = JSON.stringify(apiSuggests) !== JSON.stringify(apiSuggestsPrev);
-
     if (qSuggestsChanged || apiSuggestsChanged) {
       return true;
     }
@@ -104,9 +103,6 @@ export default class WzSearchBar extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState){
-    if (this.updateSuggestOnProps(nextProps.qSuggests, nextState.apiSuggests)){
-      return true;
-    }
     if (nextState.isProcessing) {
       return true;
     }
@@ -116,7 +112,9 @@ export default class WzSearchBar extends Component {
     if (nextState.status !== this.state.status) {
       return true;
     }
-    
+    if (this.updateSuggestOnProps(nextProps.qSuggests, nextProps.apiSuggests)){
+      return true;
+    }
     return false;
   }
 
