@@ -59,7 +59,7 @@ class WzConfigurationDockerListener extends Component{
           currentConfig={this.wodleConfig}
           helpLinks={helpLinks}>
           <WzConfigurationSettingsGroup
-            config={this.wodleConfig}
+            config={this.wodleConfig['docker-listener']}
             items={mainSettings}
           />
         </WzConfigurationSettingsTabSelector>
