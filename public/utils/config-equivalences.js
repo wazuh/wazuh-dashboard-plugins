@@ -25,9 +25,6 @@ export const configEquivalences = {
     'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:
     'Defines the maximum time the app will wait for an API response when making requests to it.',
-  'wazuh.shards': 'Define the number of shards to use for the .wazuh index.',
-  'wazuh.replicas':
-    'Define the number of replicas to use for the .wazuh index.',
   'ip.selector':
     'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':

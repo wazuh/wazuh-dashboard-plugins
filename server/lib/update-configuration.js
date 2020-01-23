@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to update the configuration file
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,6 @@ import { getConfiguration } from './get-configuration';
 
 const needRestartFields = [
   'pattern',
-  'wazuh.shards',
-  'wazuh.replicas',
   'wazuh.monitoring.enabled',
   'wazuh.monitoring.frequency',
   'wazuh.monitoring.shards',
