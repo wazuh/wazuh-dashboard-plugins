@@ -139,31 +139,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Creates the .wazuh index with a custom configuration.
-   * @param {*} config
-   */
-  async createWazuhIndex(configuration) {
-    try {
-      if (!configuration)
-        return Promise.reject(
-          new Error('No valid configuration for create .wazuh index')
-        );
-
-      const data = await this.elasticRequest.callWithInternalUser(
-        'indices.create',
-        {
-          index: '.wazuh',
-          body: configuration
-        }
-      );
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Delete .wazuh-version index if exists
    */
   async deleteWazuhVersionIndex() {
@@ -425,43 +400,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Search for the Wazuh API configuration document using its own id (usually it's a timestamp)
-   * @param {*} id Eg: 12396176723
-   */
-  async getWazuhConfigurationById(id) {
-    try {
-      if (!id) return Promise.reject(new Error('No valid document id given'));
-      this.cleanCachedCredentials();
-      if (!this.cachedCredentials[id]) {
-        const data = await this.elasticRequest.callWithInternalUser('get', {
-          index: '.wazuh',
-          type: '_doc',
-          id: id
-        });
-        const object = {
-          user: data._source.api_user,
-          secret: Buffer.from(data._source.api_password, 'base64').toString(
-            'ascii'
-          ),
-          url: data._source.url,
-          port: data._source.api_port,
-          insecure: data._source.insecure,
-          cluster_info: data._source.cluster_info,
-          extensions: data._source.extensions,
-          fetched_at: new Date().getTime()
-        };
-        this.cachedCredentials[id] = { ...object };
-      }
-
-      this.cachedCredentials[id].password = this.cachedCredentials[id].secret;
-
-      return this.cachedCredentials[id];
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Get the Wazuh API entries stored on .wazuh index
    */
   async getWazuhAPIEntries() {
@@ -470,80 +408,6 @@ export class ElasticWrapper {
         index: '.wazuh',
         type: '_doc',
         size: '100'
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Usually used to save a new Wazuh API entry
-   * @param {*} doc
-   * @param {*} req
-   */
-  async createWazuhIndexDocument(req, doc) {
-    try {
-      if (!doc) return Promise.reject(new Error('No valid document given'));
-
-      const data = await this.elasticRequest.callWithRequest(req, 'create', {
-        index: '.wazuh',
-        type: '_doc',
-        id: new Date().getTime(),
-        body: doc,
-        refresh: true
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Updates the a document from the .wazuh index using id and doc content
-   * @param {*} req. Optional parameter to pass an incoming request (X-Pack related)
-   * @param {*} id. Wazuh API entry ID (Elasticsearch ID)
-   * @param {*} doc. The content to be used for updating the document.
-   */
-  async updateWazuhIndexDocument(req, id, doc) {
-    try {
-      if (!id || !doc) throw new Error('No valid parameters given');
-
-      const data = req
-        ? await this.elasticRequest.callWithRequest(req, 'update', {
-            index: '.wazuh',
-            type: '_doc',
-            id: id,
-            body: doc
-          })
-        : await this.elasticRequest.callWithInternalUser('update', {
-            index: '.wazuh',
-            type: '_doc',
-            id: id,
-            body: doc
-          });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Delete a Wazuh API entry using incoming request
-   * @param {*} req
-   */
-  async deleteWazuhAPIEntriesWithRequest(req) {
-    try {
-      if (!req.params || !req.params.id)
-        return Promise.reject(new Error('No API id given'));
-
-      const data = await this.elasticRequest.callWithRequest(req, 'delete', {
-        index: '.wazuh',
-        type: '_doc',
-        id: req.params.id
       });
 
       return data;

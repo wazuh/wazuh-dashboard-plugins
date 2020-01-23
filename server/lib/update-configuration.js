@@ -16,8 +16,6 @@ import { getConfiguration } from './get-configuration';
 
 const needRestartFields = [
   'pattern',
-  'wazuh.shards',
-  'wazuh.replicas',
   'wazuh.monitoring.enabled',
   'wazuh.monitoring.frequency',
   'wazuh.monitoring.shards',
