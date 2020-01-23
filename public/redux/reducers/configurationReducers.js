@@ -1,6 +1,5 @@
 const initialState = {
   section: '',
-  wazuhNotReadyYet: false,
   clusterNodes: false,
   clusterNodeSelected: false,
   loadingStatus: false
@@ -12,11 +11,6 @@ const configurationReducers = (state = initialState, action) => {
       return {
         ...state,
         section: action.section
-      }
-    case 'UPDATE_WAZUH_NOT_READY_YET':
-      return {
-        ...state,
-        wazuhNotReadyYet: action.wazuhNotReadyYet
       }
     case 'UPDATE_CONFIGURATION_CLUSTER_NODES':
       return {

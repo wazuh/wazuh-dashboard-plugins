@@ -57,7 +57,7 @@ class WzWazuhAPINotReachable extends Component{
               <EuiIcon type='alert' style={{marginRight: '4px'}}/>
               <span>Wazuh API not reachable</span>
               <EuiHorizontalRule margin='s'/>
-              <EuiButton onClick={this.onClickRefresh}>Refresh</EuiButton>
+              <EuiButton iconType='refresh' onClick={this.onClickRefresh}>Refresh</EuiButton>
               <EuiSpacer size='s'/>
             </div>
           </EuiFlexItem>
