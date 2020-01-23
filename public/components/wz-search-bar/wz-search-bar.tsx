@@ -115,9 +115,6 @@ export default class WzSearchBar extends Component {
     if (nextState.status !== this.state.status) {
       return true;
     }
-    if (JSON.stringify(nextState.filters) !== JSON.stringify(this.state.filters) ) {
-      return true;
-    }
     
     return false;
   }
