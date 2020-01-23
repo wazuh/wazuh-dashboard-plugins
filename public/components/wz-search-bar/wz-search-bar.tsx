@@ -26,7 +26,7 @@ export interface suggestItem {
 
 export default class WzSearchBar extends Component {
   state: {
-    searchFormat: string | null
+    searchFormat: string
     suggestions: suggestItem[]
     isProcessing: boolean
     inputValue: string
@@ -44,6 +44,7 @@ export default class WzSearchBar extends Component {
     onInputChange: Function
     searchDisable?: boolean
     defaultFormat?: string
+    placeholder?: string
   };
 
   constructor(props) {
@@ -68,7 +69,7 @@ export default class WzSearchBar extends Component {
       ? '?Q' 
       : (props.apiSuggests) 
         ? 'API' 
-        : null;
+        : '';
 
     return searchFormat;
   }
