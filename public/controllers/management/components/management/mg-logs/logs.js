@@ -27,6 +27,7 @@ import 'brace/theme/github';
 export default class WzLogs extends Component {
     constructor(props) {
         super(props);
+        this.offset = 390;
         this.state = {
             isCluster: false,
             selectedDaemon: '',
@@ -49,14 +50,14 @@ export default class WzLogs extends Component {
     }
 
     updateHeight = () => {
-        this.height = window.innerHeight - 400; 
+        this.height = window.innerHeight - this.offset; 
         this.forceUpdate();
     }
 
 
 
     async componentDidMount(){
-        this.height = window.innerHeight - 400; 
+        this.height = window.innerHeight - this.offset; 
         window.addEventListener('resize', this.updateHeight); 
         this.setState({isLoading: true})
 

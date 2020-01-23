@@ -34,7 +34,7 @@ export class WzConfigurationSettings extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() { }
 
   render() {
     return (
@@ -46,7 +46,7 @@ export class WzConfigurationSettings extends Component {
                 <EuiFlexItem>
                   <EuiTitle>
                     <h2>
-                      App current settings
+                      App current settings&nbsp;
                       <EuiToolTip position="right" content="More about configuration file">
                         <EuiButtonIcon
                           iconType="questionInCircle"

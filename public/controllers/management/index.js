@@ -32,14 +32,15 @@ import { UploadFiles } from './components/upload-files';
 import WzRuleset from './components/management/ruleset/main-ruleset';
 import WzManagement from './components/management/management-provider';
 import WzManagementMain from './components/management/management-main';
-import WzLogs from './components/management/mg-logs/logs';
 import { ExportConfiguration } from '../agent/components/export-configuration';
+import WzManagementConfiguration from './components/management/configuration/configuration-main';
+import WzLogs from './components/management/mg-logs/logs';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('managementController', ManagementController)
-  .controller('managementConfigurationController', ConfigurationController)
+  // .controller('managementConfigurationController', ConfigurationController)
   .controller('decodersController', DecodersController)
   .controller('groupsPreviewController', GroupsController)
   .controller('managerLogController', LogsController)
@@ -60,4 +61,6 @@ app
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsInGroupTable', AgentsInGroupTable)
   .value('FilesInGroupTable', FilesInGroupTable)
+  .value('UploadFiles', UploadFiles)
+  .value('WzManagementConfiguration', WzManagementConfiguration)
   .value('WzLogs', WzLogs);
