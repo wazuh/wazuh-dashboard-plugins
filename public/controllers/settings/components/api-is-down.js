@@ -73,6 +73,7 @@ export class ApiIsDown extends Component {
           entries[idx].cluster_info = clusterInfo;
           //Updates the cluster info in the registry
           await this.props.updateClusterInfoInRegistry(id, clusterInfo);
+          this.props.setDefault(entry);
         } catch (error) {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code;
@@ -257,6 +258,7 @@ hosts:
 ApiIsDown.propTypes = {
   apiEntries: PropTypes.array,
   checkManager: PropTypes.func,
+  setDefault: PropTypes.func,
   closeApiIsDown: PropTypes.func,
   updateClusterInfoInRegistry: PropTypes.func,
   getHosts: PropTypes.func,
