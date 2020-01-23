@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Reporting service
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,8 @@
 
 import $ from 'jquery';
 import moment from 'moment';
+import { WazuhConfig } from '../react-services/wazuh-config';
+import { GenericRequest } from '../react-services/generic-request';
 
 export class ReportingService {
   constructor(
@@ -21,15 +23,14 @@ export class ReportingService {
     visHandlers,
     genericReq,
     errorHandler,
-    wazuhConfig
   ) {
     this.$rootScope = $rootScope;
     this.vis2png = vis2png;
     this.rawVisualizations = rawVisualizations;
     this.visHandlers = visHandlers;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
   }
   removeTableVis(visList) {
     const attributes = JSON.parse(visList.attributes.visState);

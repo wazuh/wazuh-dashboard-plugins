@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { error: action.error });
     case 'UPDATE_FILE_CONTENT':
       return Object.assign({}, state, { fileContent: action.content, decoderInfo: false, ruleInfo: false, listInfo: false, error: false });
-    case 'UPDATE_FILTERS':
+    case 'UPDATE_RULE_FILTERS':
       return Object.assign({}, state, { filters: action.filters, error: false });
     case 'UPDATE_IS_PROCESSING':
       return Object.assign({}, state, { isProcessing: action.isProcessing, ruleInfo: false, listInfo: false, error: false });

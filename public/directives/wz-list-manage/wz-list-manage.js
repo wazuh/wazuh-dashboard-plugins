@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh search and filter by tags bar
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@ import * as pagination from '../wz-table/lib/pagination';
 import { checkGap } from '../wz-table/lib/check-gap';
 import * as FileSaver from '../../services/file-saver';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -32,10 +33,10 @@ app.directive('wzListManage', function() {
       errorHandler,
       $filter,
       rulesetHandler,
-      wazuhConfig,
       appState,
       csvReq
     ) {
+      const wazuhConfig = new WazuhConfig();
       const clusterInfo = AppState.getClusterInfo();
 
       /**

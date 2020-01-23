@@ -23,14 +23,14 @@ export default class configurationColumns {
           name: 'Setting',
           align: 'left',
           sortable: true,
-          width: '250px',
+          width: '200px',
         },
         {
           field: 'value',
           name: 'Value',
           align: 'left',
           sortable: true,
-          width: '250px',
+          width: '150px',
           render: (value, item) => {
             if (
               editingKey === item.setting &&

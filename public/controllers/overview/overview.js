@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Overview controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import {
 
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class OverviewController {
   /**
@@ -40,7 +41,6 @@ export class OverviewController {
    * @param {*} commonData
    * @param {*} reportingService
    * @param {*} visFactoryService
-   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -53,7 +53,6 @@ export class OverviewController {
     commonData,
     reportingService,
     visFactoryService,
-    wazuhConfig
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -65,7 +64,7 @@ export class OverviewController {
     this.commonData = commonData;
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.showingMitreTable = false
     this.expandArray = [
       false,

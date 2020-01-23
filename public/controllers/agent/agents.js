@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agents controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ import {
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class AgentsController {
   /**
@@ -61,9 +63,7 @@ export class AgentsController {
     csvReq,
     wzTableFilter,
     groupHandler,
-    wazuhConfig,
-    timeService,
-    genericReq
+    timeService
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -79,9 +79,9 @@ export class AgentsController {
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.groupHandler = groupHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.timeService = timeService;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Custom visualization directive
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ import { uiModules } from 'ui/modules';
 import { getVisualizeLoader } from 'ui/visualize/loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
+import { GenericRequest } from '../react-services/generic-request';
 
 const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
@@ -188,7 +189,7 @@ app.directive('kbnVis', function () {
             if (!lockFields) {
               try {
                 lockFields = true;
-                await genericReq.request(
+                await GenericRequest.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}

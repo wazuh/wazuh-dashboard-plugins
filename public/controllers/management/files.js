@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Ruleset controllers
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../../react-services/app-state";
+import { WazuhConfig } from "../../react-services/wazuh-config";
 
 export class FilesController {
   constructor(
     $scope,
-    wazuhConfig,
     rulesetHandler,
     errorHandler,
     appState,
     $location
   ) {
     this.$scope = $scope;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
     this.errorHandler = errorHandler;
     this.appState = appState;

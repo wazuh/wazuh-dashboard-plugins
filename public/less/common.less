@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Commons stylesheet
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1347,4 +1347,22 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
 
 .hide-close-button{
   display: none;
+}
+
+.WzNotReadyButton{
+  z-index: 9999;
+}
+
+.WzNotReadyButton:focus{
+  background-color: transparent !important;
+}
+
+div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
+  max-height: 350px;
+  overflow: scroll;
+}
+
+.euiSuggestItem .euiSuggestItem__label {
+  flex-basis: 25%;
+  min-width: 25%;
 }

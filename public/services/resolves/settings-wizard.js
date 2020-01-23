@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to execute some checks on most app routes
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,7 @@
 import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export function settingsWizard(
   $location,
@@ -22,10 +23,10 @@ export function settingsWizard(
   genericReq,
   errorHandler,
   wzMisc,
-  wazuhConfig,
   disableErrors = false
 ) {
   try {
+    const wazuhConfig = new WazuhConfig();
     const deferred = $q.defer();
     const checkResponse = data => {
       let fromWazuhHosts = false;
@@ -203,6 +204,12 @@ export function settingsWizard(
             // Sum errors to check if any API could be selected
             errors++;
             if (errors >= apis.length) {
+              AppState.setNavigation({ status: false });
+              AppState.setNavigation({
+                reloaded: false,
+                discoverPrevious: false,
+                discoverSections: ['/overview/', '/agents', '/wazuh-dev']
+              });
               throw new Error('Could not select any API entry');
             }
           }
@@ -290,7 +297,7 @@ export function settingsWizard(
           });
       }
     }
-    appState.setWzMenu();
+    AppState.setWzMenu();
     return deferred.promise;
   } catch (error) {
     !disableErrors && errorHandler.handle(error);

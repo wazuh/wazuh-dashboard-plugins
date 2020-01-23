@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Common data service
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../react-services/app-state";
+import { GenericRequest } from "../react-services/generic-request";
 
 export class CommonData {
   /**
@@ -35,7 +36,7 @@ export class CommonData {
   ) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.appState = appState;
     this.errorHandler = errorHandler;
     this.$location = $location;

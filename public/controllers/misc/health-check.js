@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Health check controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,6 +13,8 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class HealthCheck {
   /**
@@ -26,7 +28,6 @@ export class HealthCheck {
    * @param {*} appState
    * @param {*} testAPI
    * @param {*} errorHandler
-   * @param {*} wazuhConfig
    * @param {*} Private
    * @param {*} $window
    */
@@ -40,7 +41,6 @@ export class HealthCheck {
     appState,
     testAPI,
     errorHandler,
-    wazuhConfig,
     Private,
     $window
   ) {
@@ -48,12 +48,12 @@ export class HealthCheck {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.$location = $location;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.apiReq = apiReq;
     this.appState = appState;
     this.testAPI = testAPI;
     this.errorHandler = errorHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.$window = $window;
     this.results = [];
 
@@ -204,6 +204,7 @@ export class HealthCheck {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      AppState.removeNavigation();
       if (error && error.data && error.data.code && error.data.code === 3002) {
         return error;
       } else {

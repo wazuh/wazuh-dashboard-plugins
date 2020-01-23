@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,6 +11,7 @@
  */
 import { TabNames } from '../../utils/tab-names';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class ManagementController {
   /**
@@ -24,7 +25,6 @@ export class ManagementController {
     $rootScope,
     $location,
     shareAgent,
-    wazuhConfig,
     appState,
     configHandler,
     errorHandler,
@@ -37,7 +37,7 @@ export class ManagementController {
     this.$location = $location;
     this.appState = appState;
     this.shareAgent = shareAgent;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;

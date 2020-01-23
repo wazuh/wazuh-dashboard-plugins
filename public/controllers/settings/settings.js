@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Settings controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,8 @@
 import { TabNames } from '../../utils/tab-names';
 import { kibana } from '../../../package.json';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class SettingsController {
   /**
@@ -24,7 +26,6 @@ export class SettingsController {
    * @param {*} genericReq
    * @param {*} errorHandler
    * @param {*} wzMisc
-   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -35,7 +36,6 @@ export class SettingsController {
     genericReq,
     errorHandler,
     wzMisc,
-    wazuhConfig
   ) {
     this.kibanaVersion = (kibana || {}).version || false;
     this.$scope = $scope;
@@ -43,10 +43,10 @@ export class SettingsController {
     this.$location = $location;
     this.testAPI = testAPI;
     this.appState = appState;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.wzMisc = wzMisc;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
 
     if (this.wzMisc.getWizard()) {
       $window.sessionStorage.removeItem('healthCheck');
@@ -405,6 +405,7 @@ export class SettingsController {
       }
       this.$scope.$applyAsync();
     } catch (error) {
+      AppState.removeNavigation();
       this.errorHandler.handle('Error when loading Wazuh setup info', 'Settings');
     }
     return;

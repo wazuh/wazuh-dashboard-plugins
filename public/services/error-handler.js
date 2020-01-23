@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Error handler service
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { toastNotifications } from 'ui/notify';
+import store from '../redux/store';
+import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 
 export class ErrorHandler {
   /**
@@ -95,8 +97,11 @@ export class ErrorHandler {
   handle(error, location, isWarning, silent) {
     const message = this.extractMessage(error);
     const messageIsString = typeof message === 'string';
-
     if (messageIsString && message.includes('ERROR3099')) {
+      
+      const updateNotReadyYet = updateWazuhNotReadyYet('Wazuh not ready yet.');
+      store.dispatch(updateNotReadyYet);
+
       this.$rootScope.wazuhNotReadyYet = 'Wazuh not ready yet.';
       this.$rootScope.$applyAsync();
       this.checkDaemonsStatus.makePing();

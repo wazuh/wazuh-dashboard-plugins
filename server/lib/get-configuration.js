@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to parse the configuration file
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +14,11 @@ import yml from 'js-yaml';
 import path from 'path';
 let cachedConfiguration = null;
 let lastAssign = new Date().getTime();
-export function getConfiguration() {
+export function getConfiguration(isUpdating=false) {
   try {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
-    if (!cachedConfiguration || dateDiffer >= 10000) {
+    if (!cachedConfiguration || dateDiffer >= 10000 || isUpdating) {
       const customPath = path.join(__dirname, '../../wazuh.yml');
       const raw = fs.readFileSync(customPath, { encoding: 'utf-8' });
       const file = yml.load(raw);

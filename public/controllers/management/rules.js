@@ -1,6 +1,6 @@
 /*
- * @param {Objet} * Wazuh app - Ruleset controllers
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Wazuh app - Ruleset controllers
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,6 +13,7 @@ import * as FileSaver from '../../services/file-saver';
 
 import { colors } from './colors';
 import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 
 export class RulesController {
@@ -26,7 +27,6 @@ export class RulesController {
     * @param {Objet} wzTableFilter
     * @param {Objet} $location
     * @param {Objet} apiReq
-    * @param {Objet} wazuhConfig
     * @param {Objet} rulesetHandler
    */
 
@@ -39,7 +39,6 @@ export class RulesController {
     wzTableFilter,
     $location,
     apiReq,
-    wazuhConfig,
     rulesetHandler
   ) {
     this.scope = $scope;
@@ -50,7 +49,7 @@ export class RulesController {
     this.wzTableFilter = wzTableFilter;
     this.location = $location;
     this.apiReq = apiReq;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
 
     this.overwriteError = false;
