@@ -30,7 +30,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.11.2
+- Wazuh HIDS 3.12.0
 - Wazuh RESTful API 3.11.2
 - Kibana 7.5.2
 - Elasticsearch 7.5.2
@@ -42,13 +42,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip' kibana
 ```
 
 Restart Kibana
@@ -105,13 +105,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.1_7.5.2.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip' kibana
 ```
 
 Restart Kibana

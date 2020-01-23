@@ -17,7 +17,6 @@ import { DecodersController } from './decoders';
 import { LogsController } from './logs';
 import { ManagementController } from './management';
 import { RulesController } from './rules';
-import { StatusController } from './status';
 import { ClusterController } from './monitoring';
 import { CdbListsController } from './cdblists';
 import { ConfigurationRulesetController } from './config-ruleset';
@@ -25,19 +24,27 @@ import { ConfigurationGroupsController } from './config-groups';
 import { EditionController } from './edition';
 import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
-import { ReportingTable } from './components/reporting-table';
+import { WelcomeWrapper } from './components/welcome-wrapper';
+import { AgentsInGroupTable } from './components/agents-groups-table';
+import { FilesInGroupTable } from './components/files-group-table';
+import { GroupsTable } from './components/management/groups/groups-table';
 import { UploadFiles } from './components/upload-files';
+import WzRuleset from './components/management/ruleset/main-ruleset';
+import WzManagement from './components/management/management-provider';
+import WzManagementMain from './components/management/management-main';
+import { ExportConfiguration } from '../agent/components/export-configuration';
+import WzManagementConfiguration from './components/management/configuration/configuration-main';
+import WzLogs from './components/management/mg-logs/logs';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('managementController', ManagementController)
-  .controller('managementConfigurationController', ConfigurationController)
+  // .controller('managementConfigurationController', ConfigurationController)
   .controller('decodersController', DecodersController)
   .controller('groupsPreviewController', GroupsController)
   .controller('managerLogController', LogsController)
   .controller('rulesController', RulesController)
-  .controller('managerStatusController', StatusController)
   .controller('clusterController', ClusterController)
   .controller('cdbListsController', CdbListsController)
   .controller('configurationRulesetController', ConfigurationRulesetController)
@@ -45,5 +52,15 @@ app
   .controller('editionController', EditionController)
   .controller('filesController', FilesController)
   .value('WelcomeScreenManagement', WelcomeScreen)
-  .value('ReportingTable', ReportingTable)
-  .value('UploadFiles', UploadFiles);
+  .value('WelcomeWrapper', WelcomeWrapper)
+  .value('UploadFiles', UploadFiles)
+  .value('WzRuleset', WzRuleset)
+  .value('WzManagement', WzManagement)
+  .value('WzManagementMain', WzManagementMain)
+  .value('GroupsTable', GroupsTable)
+  .value('ExportConfiguration', ExportConfiguration)
+  .value('AgentsInGroupTable', AgentsInGroupTable)
+  .value('FilesInGroupTable', FilesInGroupTable)
+  .value('UploadFiles', UploadFiles)
+  .value('WzManagementConfiguration', WzManagementConfiguration)
+  .value('WzLogs', WzLogs);

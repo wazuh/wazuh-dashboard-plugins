@@ -1,23 +1,5 @@
-<div layout="column" ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'">
+<div layout="column" ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'" class="sideBarContent">
     <div flex layout="column" ng-show="!isClusterEnabled || !isClusterRunning">
-
-        <!-- Cluster disabled breadcrumbs -->
-        <div layout="row" layout-align="start center">
-            <div layout="row" layout-padding>
-                <div>
-                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                    <span> / </span>
-                    <span>{{ mctrl.tabNames[tab] }}</span>
-                </div>
-            </div>
-        </div>
-        <!-- End cluster disabled breadcrumbs -->
-
-        <!-- Status and reports navigation bar -->
-        <div ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
-            <react-component name="Tabs" props="mctrl.managementTabsProps" />
-        </div>
-        <!-- End status and reports navigation bar -->
 
         <!-- Cluster disabled section -->
         <div flex layout="row" layout-align="start start" ng-if="!isClusterEnabled">
@@ -61,27 +43,17 @@
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
         </div>
 
+
         <!-- Navigation section -->
         <div layout="row" layout-align="start center" ng-if="!loading">
             <div layout="row" layout-padding>
-                <div ng-if="!showConfig && !showNodes">
-                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                    <span> / </span>
-                    <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
-                    <span> / </span>
-                    <span>{{ currentAPI }}</span>
-                </div>
                 <div ng-if="showConfig">
-                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                    <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                     <span> / Overview</span>
                 </div>
                 <div ng-if="showNodes && !currentNode">
-                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                    <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
@@ -89,8 +61,6 @@
                     <span>Nodes</span>
                 </div>
                 <div ng-if="currentNode">
-                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                    <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
@@ -102,22 +72,24 @@
             </div>
         </div>
         <!-- End navigation section -->
-
-        <!-- Status and reports navigation bar -->
-        <div ng-if="!loading"  ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
-            <react-component name="Tabs" props="mctrl.managementTabsProps" />
-        </div>
-        <!-- End status and reports navigation bar -->
+       
 
         <!-- Discover search bar section -->
         <kbn-dis ng-show="!loading && (!showNodes || currentNode)" class="wz-margin-top-10 monitoring-discover"></kbn-dis>
         <!-- End Discover search bar section -->
 
         <!-- Loading status section -->
-        <div layout="column" layout-align="center center" class="wz-margin-bottom-40"
-            ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
-            <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-            <div class="percentage">{{loadingStatus}}</div>
-        </div>
+            <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center" ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
+                    <span class="euiLoadingChart euiLoadingChart--large">
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                    </span>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="percentage">{{loadingStatus}}</div>
+                </div>
+            </div>
         <!-- End loading status section -->
     </div>

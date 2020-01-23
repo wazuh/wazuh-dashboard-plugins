@@ -11,10 +11,16 @@ include ./agents-pci.html
 include ./agents-gdpr.html
 include ./agents-hipaa.html
 include ./agents-nist.html
+include ./agents-mitre.html
 include ./agents-virustotal.html
 include ./agents-syscollector.html
 include ./agents-osquery.html
 include ./agents-sca.html
 include ./agents-docker.html
-include ../management/configuration/agent-configuration.pug
+//- TODO: delete
+<div ng-if="tab === 'configuration' && agent" style="margin-top: 10px;">
+  <react-component ng-if="tab === 'configuration' && agent" name="WzManagementConfiguration" props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"/>
+</div>
+//- TODO: delete
+//- include ../management/configuration/agent-configuration.pug
 include ../footer.foot

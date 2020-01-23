@@ -1,7 +1,7 @@
-<div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'api' && !ctrl.load">
+<div ng-if="ctrl.tab === 'api' && !ctrl.load">
 
     <!-- API table section-->
-    <div layout="row" layout-padding ng-if="ctrl.apiEntries.length && !ctrl.addingApi && !ctrl.apiIsDown">
+    <div ng-if="ctrl.apiEntries.length && !ctrl.addingApi && !ctrl.apiIsDown">
         <react-component name="ApiTable" props="ctrl.apiTableProps" />
     </div>
 

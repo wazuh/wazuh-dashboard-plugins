@@ -149,34 +149,34 @@ export class RegisterAgent extends Component {
         this.state.needsPassword
           ? ` WAZUH_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
-      }yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
+        }yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.x86_64.rpm`,
+        }-1.x86_64.rpm`,
       debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
         this.state.wazuhVersion
-      }-1_amd64.deb && sudo WAZUH_MANAGER_IP='${this.state.serverAddress}'${
+        }-1_amd64.deb && sudo WAZUH_MANAGER_IP='${this.state.serverAddress}'${
         this.state.needsPassword
           ? ` WAZUH_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
-      } dpkg -i ./wazuh-agent.deb`,
+        } dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.pkg && sudo launchctl setenv WAZUH_MANAGER_IP '${
+        }-1.pkg && sudo launchctl setenv WAZUH_MANAGER_IP '${
         this.state.serverAddress
-      }'${
+        }'${
         this.state.needsPassword
           ? ` WAZUH_PASSWORD '${this.state.wazuhPassword}'`
           : ' '
-      } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.msi -OutFile wazuh-agent.msi; .\wazuh-agent.msi /q ADDRESS='${
+        }-1.msi -OutFile wazuh-agent.msi; .\wazuh-agent.msi /q ADDRESS='${
         this.state.serverAddress
-      }' AUTHD_SERVER='${this.state.serverAddress}'${
+        }' AUTHD_SERVER='${this.state.serverAddress}'${
         this.state.needsPassword
           ? ` PASSWORD='${this.state.wazuhPassword}' `
           : ' '
-      }`
+        }`
     };
 
     const field = `${this.state.selectedOS}Text`;
@@ -257,13 +257,24 @@ export class RegisterAgent extends Component {
                       </EuiTitle>
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
-                      <EuiButtonEmpty
-                        size="s"
-                        onClick={() => this.props.addNewAgent(false)}
-                        iconType="cross"
-                      >
-                        close
+                      {this.props.hasAgents && (
+                        <EuiButtonEmpty
+                          size="s"
+                          onClick={() => this.props.addNewAgent(false)}
+                          iconType="cross"
+                        >
+                          Close
                       </EuiButtonEmpty>
+                      )}
+                      {!this.props.hasAgents && (
+                        <EuiButtonEmpty
+                          size="s"
+                          onClick={() => this.props.reload()}
+                          iconType="refresh"
+                        >
+                          Refresh
+                      </EuiButtonEmpty>
+                      )}
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer></EuiSpacer>

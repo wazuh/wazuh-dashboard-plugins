@@ -15,6 +15,8 @@ import { uiModules } from 'ui/modules';
 import * as pagination from '../wz-table/lib/pagination';
 import { checkGap } from '../wz-table/lib/check-gap';
 import * as FileSaver from '../../services/file-saver';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -31,11 +33,11 @@ app.directive('wzListManage', function() {
       errorHandler,
       $filter,
       rulesetHandler,
-      wazuhConfig,
       appState,
       csvReq
     ) {
-      const clusterInfo = appState.getClusterInfo();
+      const wazuhConfig = new WazuhConfig();
+      const clusterInfo = AppState.getClusterInfo();
 
       /**
        * Pagination variables and functions
@@ -170,7 +172,7 @@ app.directive('wzListManage', function() {
             'CSV'
           );
           const filters = [{ name: 'path', value: filePath + '/' + fileName }];
-          const currentApi = JSON.parse(appState.getCurrentAPI()).id;
+          const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
           const output = await csvReq.fetch(path, currentApi, filters);
           const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 

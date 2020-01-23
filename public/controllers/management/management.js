@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { TabNames } from '../../utils/tab-names';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class ManagementController {
   /**
@@ -23,7 +25,6 @@ export class ManagementController {
     $rootScope,
     $location,
     shareAgent,
-    wazuhConfig,
     appState,
     configHandler,
     errorHandler,
@@ -36,7 +37,7 @@ export class ManagementController {
     this.$location = $location;
     this.appState = appState;
     this.shareAgent = shareAgent;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;
@@ -58,7 +59,7 @@ export class ManagementController {
 
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentGroup', null);
     });
 
@@ -68,32 +69,32 @@ export class ManagementController {
 
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentRule', null);
     });
 
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
       this.currentDecoder = (params || {}).currentDecoder || false;
       this.$location.search('currentDecoder', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     });
 
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentDecoder', null);
     });
 
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
       this.$location.search('currentList', true);
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$applyAsync();
     });
 
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$location.search('currentList', null);
     });
 
@@ -156,16 +157,6 @@ export class ManagementController {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
     };
 
-    this.rulesetTabsProps = {
-      clickAction: tab => this.setRulesTab(tab),
-      selectedTab: this.rulesetTab || 'rules',
-      tabs: [
-        { id: 'rules', name: 'Rules' },
-        { id: 'decoders', name: 'Decoders' },
-        { id: 'lists', name: 'Lists' }
-      ]
-    };
-
     this.managementTabsProps = {
       clickAction: tab => this.switchTab(tab, true),
       selectedTab: this.tab,
@@ -182,13 +173,30 @@ export class ManagementController {
       close: () => this.openLogtest(),
       showClose: true
     };
+
+    this.managementProps = {
+      switchTab: (section) => this.switchTab(section, true),
+      section: "",
+      groupsProps: {},
+      configurationProps: {
+        agent: {
+          id: '000',
+          // agentPlatform: 'linux'
+        }, // TODO: get dynamically the agent?
+        updateWazuhNotReadyYet: (status) => { 
+          this.$rootScope.wazuhNotReadyYet = status
+          this.$scope.$applyAsync();
+        },
+        wazuhNotReadyYet: () => this.$rootScope.wazuhNotReadyYet
+      }
+    }
   }
 
   /**
    * When controller loads
    */
   $onInit() {
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
 
@@ -262,7 +270,7 @@ export class ManagementController {
   setConfigTab(tab, nav = false) {
     this.globalConfigTab = tab;
     if (nav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     } else {
       this.editionTab = tab;
     }
@@ -277,7 +285,7 @@ export class ManagementController {
   setCurrentRule(params) {
     this.currentRule = (params || {}).currentRule || false;
     this.$location.search('currentRule', true);
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
   }
 
   /**
@@ -287,7 +295,7 @@ export class ManagementController {
   switchTab(tab, setNav = false) {
     this.editTab = '';
     if (setNav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     } else {
       if (this.$location.search().editSubTab) {
         this.editTab = this.$location.search().editSubTab;
@@ -324,6 +332,7 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
+    this.managementProps.section = this.tab === 'ruleset' ? this.rulesetTab : this.tab;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
@@ -384,7 +393,7 @@ export class ManagementController {
   async loadNodeList() {
     try {
       this.loadingNodes = true;
-      const clusterInfo = this.appState.getClusterInfo() || {};
+      const clusterInfo = AppState.getClusterInfo() || {};
       const clusterEnabled = clusterInfo.status === 'enabled';
       if (clusterEnabled) {
         const response = await this.apiReq.request('GET', '/cluster/nodes', {});

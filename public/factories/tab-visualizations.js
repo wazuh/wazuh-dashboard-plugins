@@ -31,7 +31,8 @@ export class TabVisualizations {
       virustotal: 6,
       configuration: 0,
       osquery: 5,
-      docker: 5
+      docker: 5,
+      mitre: 6
     };
 
     this.overview = {
@@ -51,7 +52,8 @@ export class TabVisualizations {
       virustotal: 7,
       osquery: 5,
       sca: 8,
-      docker: 5
+      docker: 5,
+      mitre: 6
     };
 
     this.tabVisualizations = {};

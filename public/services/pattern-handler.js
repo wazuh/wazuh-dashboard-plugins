@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../react-services/app-state";
+
 export class PatternHandler {
   /**
    * Class constructor
@@ -38,18 +40,18 @@ export class PatternHandler {
       );
 
       if (!patternList.data.data.length) {
-        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         this.$location.search('tab', null);
-        this.$location.path('/blank-screen');
+        if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen'))
+          window.location.href = "/app/wazuh#/settings/";
         return;
       }
 
-      if (this.appState.getCurrentPattern()) {
+      if (AppState.getCurrentPattern()) {
         let filtered = patternList.data.data.filter(item =>
-          item.id.includes(this.appState.getCurrentPattern())
+          item.id.includes(AppState.getCurrentPattern())
         );
         if (!filtered.length)
-          this.appState.setCurrentPattern(patternList.data.data[0].id);
+          AppState.setCurrentPattern(patternList.data.data[0].id);
       }
 
       return patternList.data.data;
@@ -65,13 +67,13 @@ export class PatternHandler {
    */
   async changePattern(selectedPattern) {
     try {
-      this.appState.setCurrentPattern(selectedPattern);
+      AppState.setCurrentPattern(selectedPattern);
       await this.genericReq.request(
         'GET',
         `/elastic/known-fields/${selectedPattern}`,
         {}
       );
-      return this.appState.getCurrentPattern();
+      return AppState.getCurrentPattern();
     } catch (error) {
       this.errorHandler.handle(error, 'Pattern Handler (changePattern)');
     }

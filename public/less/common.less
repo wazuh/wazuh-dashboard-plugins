@@ -16,6 +16,10 @@
 
 /* Custom healthcheck and blank screen styles */
 
+.kbnGlobalBannerList{
+  display: none;
+}
+
 .error-notify {
   font-size: 20px;
   color: black;
@@ -68,11 +72,8 @@
 }
 
 .percentage {
-  font-size: 18px;
   text-align: center;
-  position: relative;
-  height: 25px;
-  color: #666666;
+  color: gray;
 }
 
 /* Custom JSON viewer settings */
@@ -161,10 +162,6 @@
 .kuiLocalSearchInput:focus {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #d9d9d9 !important;
-}
-
-.euiFlexGroup .euiFlexGroup:hover {
-  background: #fafcfe;
 }
 
 /* Custom Manager/Status styles */
@@ -449,6 +446,10 @@ md-content.md-default-theme, md-content{
   font-size: 14px !important;
 }
 
+.euiTab.euiTab-isSelected {
+  font-weight: 600!important;
+}
+
 .sca-checksum {
   color: gray;
   font-size: 12px;
@@ -648,10 +649,6 @@ md-switch.md-checked .md-thumb {
 .wz-always-top,
 .kuiLocalSearchAssistedInput__assistance {
   z-index: 9999 !important;
-}
-
-.euiTitle {
-  font-weight: normal !important;
 }
 
 .wzEuiTitle {
@@ -893,7 +890,7 @@ wz-xml-file-editor {
 }
 
 .daemon-label {
-  width: 165px;
+  width: 200px;
   float: left;
   border-radius: 30px;
   margin: 3px;
@@ -1005,12 +1002,11 @@ discover-app-w .container-fluid {
 }
 
 .navBarLogo {
-  width: 110px;
-  margin-top: 4px;
+  width: 125px;
 }
 
 .application{
-  //background: #fafbfd;
+  background: #fafbfd;
 }
 
 .application.tab-health-check wz-menu{
@@ -1061,18 +1057,6 @@ discover-app-w .container-fluid {
   z-index: 1!important;
 }
 
-md-toolbar { 
-  min-height: 0px !important;
-}
-
-.md-toolbar-tools { 
-  position: fixed !important;
-}
-
-md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
-    background-color: transparent!important;
-}
-
 .refresh-report-button {
   padding: 10px;
   text-align: right;
@@ -1100,6 +1084,10 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 .wz-md-card:not(.fullscreen) .sca-vis.table-scrollable .kbnAggTable__paginated{
   height: 150px;
+}
+
+.wz-margin-16 {
+  margin: 16px;
 }
 
 .wz-margin-10 {
@@ -1256,6 +1244,132 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
   overflow: auto !important;
 }
 
+.title-pin:hover {
+  cursor: pointer;
+}
+
+.title-pin:hover:after {
+  padding-left: 5px;
+  font-size: 12px;
+  content: "\f00e";
+  font-family: "FontAwesome";
+  color: #0b6bb4;
+  position: absolute;
+}
+
+.flyout-no-overlap {
+  margin-top: 50px;
+}
+
+.wz-markdown-margin > p {
+  margin-top: 5px;
+}
+
+.AgentsTable__soBadge{
+  font-size: 18px!important;
+  padding-right: 3px;
+}
+.AgentsTable__soBadge--windows{
+  color: lightskyblue;
+}
+
+.AgentsTable__soBadge--darwin{
+  color: gray;
+}
+
+.euiStatLink .euiStat__title{
+  cursor: pointer;
+}
+
+.euiStatLink .euiStat__title:hover {
+  text-decoration: underline;
+}
+
+.subdued-background {
+  background: #d3dae6;
+}
+
+.subdued-color {
+  color: #808184;
+}
+
+.react-code-mirror {
+  height: 73vh;
+  border: solid 1px #d9d9d9;
+}
+
+.react-code-mirror > .CodeMirror.CodeMirror-wrap.cm-s-default{
+  height: 100% !important;
+}
+
+.wz-form-row {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.wz-form-row .euiComboBox {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.wz-form-row .euiFormControlLayout {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.wz-form-row .euiComboBox__inputWrap.euiComboBox__inputWrap-isClearable {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.sideMenuButton .euiButtonEmpty__content{
+  justify-content: left!important;
+}
+
+.sideBarContent{
+  float: right;
+  width: calc(~'100vw - 240px');
+}
+
+.wz-log-viewer{
+  border: solid #8080806b 1px;
+}
+
+.wz-load-extra{
+  color: #257dbd;
+  text-align: center;
+  cursor: pointer;
+}
+
+.wz-load-extra:hover{
+  text-decoration: underline;
+}
+
 .hide-close-button{
   display: none;
+}
+.WzNotReadyButton{
+  z-index: 9999;
+}
+
+.WzNotReadyButton:focus{
+  background-color: transparent !important;
+}
+
+.WzNotReadyButton{
+  z-index: 9999;
+}
+
+.WzNotReadyButton:focus{
+  background-color: transparent !important;
+}
+
+div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
+  max-height: 350px;
+  overflow: scroll;
+}
+
+.euiSuggestItem .euiSuggestItem__label {
+  flex-basis: 25%;
+  min-width: 25%;
 }

@@ -22,6 +22,7 @@ import nist from './overview-nist';
 import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import vuls from './overview-vuls';
+import mitre from './overview-mitre';
 import osquery from './overview-osquery';
 import docker from './overview-docker';
 
@@ -39,6 +40,7 @@ export {
   pm,
   virustotal,
   vuls,
+  mitre,
   osquery,
   docker
 };

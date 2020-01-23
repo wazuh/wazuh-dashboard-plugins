@@ -75,6 +75,11 @@ export const TabDescription = {
     description:
       'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.'
   },
+  mitre: {
+    title: 'MITRE ATT&CK',
+    description:
+      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations'
+  },
   syscollector: {
     title: 'Inventory data',
     description:

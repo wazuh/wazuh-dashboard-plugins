@@ -23,4 +23,4 @@ app
   .value('WelcomeScreenOverview', WelcomeScreen)
   .value('StatsOverview', Stats)
   .value('AlertsStats', AlertsStats)
-  .value('RequirementCard', RequirementCard);
+  .value('RequirementCard', RequirementCard)

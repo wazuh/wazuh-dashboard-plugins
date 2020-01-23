@@ -10,8 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import { TabNames } from '../../utils/tab-names';
-import { configEquivalences } from '../../utils/config-equivalences';
 import { kibana } from '../../../package.json';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class SettingsController {
   /**
@@ -24,7 +26,6 @@ export class SettingsController {
    * @param {*} genericReq
    * @param {*} errorHandler
    * @param {*} wzMisc
-   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -35,7 +36,6 @@ export class SettingsController {
     genericReq,
     errorHandler,
     wzMisc,
-    wazuhConfig
   ) {
     this.kibanaVersion = (kibana || {}).version || false;
     this.$scope = $scope;
@@ -43,10 +43,10 @@ export class SettingsController {
     this.$location = $location;
     this.testAPI = testAPI;
     this.appState = appState;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.wzMisc = wzMisc;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
 
     if (this.wzMisc.getWizard()) {
       $window.sessionStorage.removeItem('healthCheck');
@@ -58,10 +58,7 @@ export class SettingsController {
     this.tab = 'api';
     this.load = true;
     this.loadingLogs = true;
-    this.editingKey = false;
     this.tabNames = TabNames;
-    this.configuration = { ...(wazuhConfig.getConfig() || {}) };
-    this.configurationTypes = [];
     this.indexPatterns = [];
     this.apiEntries = [];
   }
@@ -71,20 +68,13 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      for (const key in this.configuration) {
-        this.configurationTypes[key] = typeof this.configuration[key];
-        if (key.includes('extension') || key.includes('hosts')) {
-          delete this.configuration[key];
-        }
-      }
       // Set component props
       this.setComponentProps();
       // Loading data
       await this.getSettings();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
-      this.apiIsDown =
-        down >= this.apiEntries.length && this.apiEntries.length > 0;
+      this.apiIsDown = down >= this.apiEntries.length && this.apiEntries.length > 0;
 
       const location = this.$location.search();
       if (location && location.tab) {
@@ -111,27 +101,27 @@ export class SettingsController {
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
       testApi: entry => this.testAPI.check(entry),
-      showAddApiWithInitialError: error =>
-        this.showAddApiWithInitialError(error),
+      showAddApiWithInitialError: error => this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
       showApiIsDown: () => this.showApiIsDown(),
-      copyToClipBoard: msg => this.copyToClipBoard(msg)
+      copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
-      closeAddApi: () => this.closeAddApi()
+      closeAddApi: () => this.closeAddApi(),
     };
 
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
+      setDefault: entry => this.setDefault(entry),
       testApi: entry => this.testAPI.check(entry),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
-      copyToClipBoard: msg => this.copyToClipBoard(msg)
+      copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
     this.settingsTabsProps = {
@@ -147,7 +137,14 @@ export class SettingsController {
         { id: 'configuration', name: 'Configuration' },
         { id: 'logs', name: 'Logs' },
         { id: 'about', name: 'About' }
-      ]
+      ],
+      wazuhConfig: this.wazuhConfig,
+    };
+
+    this.settingsLogsProps = {
+      getLogs: async () => {
+        return await this.getAppLogs();
+      },
     };
   }
 
@@ -157,7 +154,7 @@ export class SettingsController {
    */
   switchTab(tab, setNav = false) {
     if (setNav) {
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
     }
     this.tab = tab;
     this.$location.search('tab', this.tab);
@@ -166,9 +163,7 @@ export class SettingsController {
   // Get current API index
   getCurrentAPIIndex() {
     if (this.apiEntries.length) {
-      const idx = this.apiEntries
-        .map(entry => entry.id)
-        .indexOf(this.currentDefault);
+      const idx = this.apiEntries.map(entry => entry.id).indexOf(this.currentDefault);
       this.currentApiEntryIndex = idx;
     }
   }
@@ -193,15 +188,14 @@ export class SettingsController {
           this.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
-          const downReason =
-            ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
         }
       }
       return numError;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Set default API
@@ -214,18 +208,18 @@ export class SettingsController {
       const { manager, cluster, status } = cluster_info;
 
       // Check the connection before set as default
-      this.appState.setClusterInfo(cluster_info);
+      AppState.setClusterInfo(cluster_info);
       const clusterEnabled = status === 'disabled';
-      this.appState.setCurrentAPI(
+      AppState.setCurrentAPI(
         JSON.stringify({
           name: clusterEnabled ? manager : cluster,
-          id: id
+          id: id,
         })
       );
 
       this.$scope.$emit('updateAPI', {});
 
-      const currentApi = this.appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
       this.apiTableProps.currentDefault = this.currentDefault;
       this.$scope.$applyAsync();
@@ -233,9 +227,9 @@ export class SettingsController {
       this.errorHandler.info(`API ${manager} set as default`);
 
       this.getCurrentAPIIndex();
-      if (currentApi && !this.appState.getExtensions(id)) {
+      if (currentApi && !AppState.getExtensions(id)) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        this.appState.setExtensions(id, extensions);
+        AppState.setExtensions(id, extensions);
       }
 
       this.$scope.$applyAsync();
@@ -248,11 +242,7 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      const patternList = await this.genericReq.request(
-        'GET',
-        '/elastic/index-patterns',
-        {}
-      );
+      const patternList = await this.genericReq.request('GET', '/elastic/index-patterns', {});
 
       this.indexPatterns = patternList.data.data;
 
@@ -267,7 +257,7 @@ export class SettingsController {
 
       // Set the addingApi flag based on if there is any API entry
       this.addingApi = !this.apiEntries.length;
-      const currentApi = this.appState.getCurrentAPI();
+      const currentApi = AppState.getCurrentAPI();
 
       if (currentApi) {
         const { id } = JSON.parse(currentApi);
@@ -282,10 +272,10 @@ export class SettingsController {
         return;
       }
 
-      if (currentApi && !this.appState.getExtensions(this.currentDefault)) {
+      if (currentApi && !AppState.getExtensions(this.currentDefault)) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
         const apiExtensions = extensions || {};
-        this.appState.setExtensions(id, apiExtensions);
+        AppState.setExtensions(id, apiExtensions);
       }
 
       this.$scope.$applyAsync();
@@ -294,7 +284,7 @@ export class SettingsController {
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
     await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
-      entries: this.apiEntries
+      entries: this.apiEntries,
     });
     return;
   }
@@ -307,7 +297,7 @@ export class SettingsController {
     try {
       const url = `/hosts/update-hostname/${id}`;
       await this.genericReq.request('PUT', url, {
-        cluster_info: clusterInfo
+        cluster_info: clusterInfo,
       });
     } catch (error) {
       return Promise.reject(error);
@@ -329,7 +319,7 @@ export class SettingsController {
         port: port,
         cluster_info: {},
         insecure: 'true',
-        id: id
+        id: id,
       };
 
       // Test the connection
@@ -370,18 +360,16 @@ export class SettingsController {
    */
   async getAppLogs() {
     try {
-      this.loadingLogs = true;
       const logs = await this.genericReq.request('GET', '/utils/logs', {});
-      this.logs = logs.data.lastLogs.map(item => JSON.parse(item));
-      this.loadingLogs = false;
       this.$scope.$applyAsync();
+      return logs.data.lastLogs.map(item => JSON.parse(item));
     } catch (error) {
-      this.logs = [
+      return [
         {
           date: new Date(),
           level: 'error',
-          message: 'Error when loading Wazuh app logs'
-        }
+          message: 'Error when loading Wazuh app logs',
+        },
       ];
     }
   }
@@ -396,13 +384,13 @@ export class SettingsController {
       this.appInfo = {
         'app-version': response['app-version'],
         installationDate: response['installationDate'],
-        revision: response['revision']
+        revision: response['revision'],
       };
 
       this.load = false;
       const config = this.wazuhConfig.getConfig();
-      this.appState.setPatternSelector(config['ip.selector']);
-      const pattern = this.appState.getCurrentPattern();
+      AppState.setPatternSelector(config['ip.selector']);
+      const pattern = AppState.getCurrentPattern();
       this.selectedIndexPattern = pattern || config['pattern'];
 
       if (this.tab === 'logs') {
@@ -418,10 +406,8 @@ export class SettingsController {
       }
       this.$scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(
-        'Error when loading Wazuh setup info',
-        'Settings'
-      );
+      AppState.removeNavigation();
+      this.errorHandler.handle('Error when loading Wazuh setup info', 'Settings');
     }
     return;
   }
@@ -431,73 +417,6 @@ export class SettingsController {
    */
   refreshLogs() {
     return this.getAppLogs();
-  }
-
-  /**
-   * This get the string equivalence for a given key
-   * @param {String} key
-   */
-  configEquivalence(key) {
-    return configEquivalences[key] || '-';
-  }
-
-  /**
-   * Cancel edition of a configuration entry
-   */
-  cancelEditingKey() {
-    this.editingKey = false;
-    this.editingNewValue = '';
-  }
-
-  /**
-   * Enable edition for a given key
-   * @param {String} key Configuration key
-   */
-  setEditingKey(key, value) {
-    if (typeof value === 'object') {
-      try {
-        value = JSON.stringify(value);
-      } catch (err) {
-        this.errorHandler.handle('Error parsing value', key);
-      }
-    }
-    this.editingKey = key;
-    this.editingNewValue = value;
-  }
-
-  /**
-   * Change value for a given configuration key
-   * @param {String} key Configuration key
-   * @param {String} value New configuration value for key
-   */
-  async editKey(key, value) {
-    try {
-      this.loadingChange = true;
-      const data = await this.genericReq.request(
-        'PUT',
-        '/utils/configuration',
-        { key, value }
-      );
-      const response = data.data.data;
-      if (response) {
-        this.errorHandler.handle(
-          'You must restart Kibana for the changes to take effect',
-          '',
-          true
-        );
-      } else {
-        this.errorHandler.info(
-          'The configuration has been successfully updated'
-        );
-      }
-      this.configuration[key] = value;
-      this.cancelEditingKey();
-      this.loadingChange = false;
-    } catch (error) {
-      this.cancelEditingKey();
-      this.loadingChange = false;
-      this.errorHandler.handle(error);
-    }
   }
 
   /**
@@ -513,23 +432,22 @@ export class SettingsController {
         throw {
           message: 'There were not found any API entry in the wazuh.yml',
           type: 'warning',
-          closedEnabled: false
+          closedEnabled: false,
         };
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
         if (notRecheable >= hosts.length) {
           this.apiIsDown = true;
           throw {
-            message:
-              'Wazuh API not recheable, please review your configuration',
+            message: 'Wazuh API not recheable, please review your configuration',
             type: 'danger',
-            closedEnabled: true
+            closedEnabled: true,
           };
         }
         throw {
           message: `Some of the API entries are not reachable. You can still use the Wazuh APP but please, review your hosts configuration.`,
           type: 'warning',
-          closedEnabled: true
+          closedEnabled: true,
         };
       }
       return;
@@ -608,8 +526,7 @@ export class SettingsController {
       this.apiEntries = await this.getHosts();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
-      this.apiIsDown =
-        down >= this.apiEntries.length && this.apiEntries.length > 0;
+      this.apiIsDown = down >= this.apiEntries.length && this.apiEntries.length > 0;
       this.$scope.$applyAsync();
       return this.apiEntries;
     } catch (error) {

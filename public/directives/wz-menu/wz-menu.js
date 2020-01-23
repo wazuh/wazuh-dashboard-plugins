@@ -13,6 +13,9 @@
 import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
 import $ from 'jquery';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { PatternHandler } from '../../react-services/pattern-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -31,10 +34,10 @@ class WzMenu {
     appState,
     patternHandler,
     indexPatterns,
-    errorHandler,
-    wazuhConfig
+    errorHandler
   ) {
-    $scope.showSelector = appState.getPatternSelector();
+    const wazuhConfig = new WazuhConfig();
+    $scope.showSelector = AppState.getPatternSelector();
     $scope.root = $rootScope;
     $scope.settedMenuHeight = false;
 
@@ -51,50 +54,48 @@ class WzMenu {
      */
     const load = async () => {
       try {
-        const list = await patternHandler.getPatternList();
+        const list = await PatternHandler.getPatternList();
         if (!list) return;
 
         // Get the configuration to check if pattern selector is enabled
         const config = wazuhConfig.getConfig();
-        appState.setPatternSelector(config['ip.selector']);
+        AppState.setPatternSelector(config['ip.selector']);
 
         // Abort if we have disabled the pattern selector
-        if (!appState.getPatternSelector()) return;
+        if (!AppState.getPatternSelector()) return;
 
         // Show the pattern selector
         $scope.showSelector = true;
         let filtered = false;
         // If there is no current pattern, fetch it
-        if (!appState.getCurrentPattern()) {
-          appState.setCurrentPattern(list[0].id);
+        if (!AppState.getCurrentPattern()) {
+          AppState.setCurrentPattern(list[0].id);
         } else {
           // Check if the current pattern cookie is valid
           filtered = list.filter(item =>
-            item.id.includes(appState.getCurrentPattern())
+            item.id.includes(AppState.getCurrentPattern())
           );
-          if (!filtered.length) appState.setCurrentPattern(list[0].id);
+          if (!filtered.length) AppState.setCurrentPattern(list[0].id);
         }
 
         const data = filtered
           ? filtered
-          : await indexPatterns.get(appState.getCurrentPattern());
+          : await indexPatterns.get(AppState.getCurrentPattern());
         $scope.theresPattern = true;
         $scope.currentPattern = data.title;
 
         // Getting the list of index patterns
         if (list) {
           $scope.patternList = list;
-          $scope.currentSelectedPattern = appState.getCurrentPattern();
+          $scope.currentSelectedPattern = AppState.getCurrentPattern();
         }
         if (!$scope.menuNavItem) {
-          $scope.menuNavItem = appState
-            .getNavigation()
-            .currLocation.replace(/\//g, '');
+          $scope.menuNavItem = AppState.getNavigation().currLocation.replace(/\//g, '');
         }
 
-        if (appState.getCurrentAPI()) {
+        if (AppState.getCurrentAPI()) {
           $scope.theresAPI = true;
-          $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+          $scope.currentAPI = JSON.parse(AppState.getCurrentAPI()).name;
         } else {
           $scope.theresAPI = false;
         }
@@ -130,8 +131,8 @@ class WzMenu {
     // Function to change the current index pattern on the app
     $scope.changePattern = async selectedPattern => {
       try {
-        if (!appState.getPatternSelector()) return;
-        $scope.currentSelectedPattern = await patternHandler.changePattern(
+        if (!AppState.getPatternSelector()) return;
+        $scope.currentSelectedPattern = await PatternHandler.changePattern(
           selectedPattern
         );
         $scope.$applyAsync();
@@ -146,7 +147,7 @@ class WzMenu {
 
     //listeners
     $scope.$on('updateAPI', (evt, params) => {
-      const current = appState.getCurrentAPI();
+      const current = AppState.getCurrentAPI();
       if (current) {
         const parsed = JSON.parse(current);
 
@@ -157,7 +158,7 @@ class WzMenu {
           } else {
             parsed.name = params.cluster_info.manager;
           }
-          appState.setCurrentAPI(JSON.stringify(parsed));
+          AppState.setCurrentAPI(JSON.stringify(parsed));
         }
 
         $scope.theresAPI = true;
@@ -168,12 +169,12 @@ class WzMenu {
     });
 
     $scope.$on('updatePattern', () => {
-      if (!appState.getPatternSelector()) return;
+      if (!AppState.getPatternSelector()) return;
       indexPatterns
-        .get(appState.getCurrentPattern())
+        .get(AppState.getCurrentPattern())
         .then(() => {
           $scope.theresPattern = true;
-          $scope.currentSelectedPattern = appState.getCurrentPattern();
+          $scope.currentSelectedPattern = AppState.getCurrentPattern();
         })
         .catch(error => {
           errorHandler.handle(error.message || error);

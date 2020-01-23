@@ -14,6 +14,7 @@ import { uiModules } from 'ui/modules';
 import { getVisualizeLoader } from 'ui/visualize/loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
+import { GenericRequest } from '../react-services/generic-request';
 
 const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
@@ -188,7 +189,7 @@ app.directive('kbnVis', function () {
             if (!lockFields) {
               try {
                 lockFields = true;
-                await genericReq.request(
+                await GenericRequest.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}
@@ -266,6 +267,12 @@ app.directive('kbnVis', function () {
             currentCompleted > 100 ? 100 : currentCompleted
             } %`;
 
+            const visTitle = (((visHandler || {}).vis || {})._state || {}).title
+            if(visTitle === 'Mitre attack count'){
+              $scope.$emit('sendVisDataRows', {
+                "mitreRows" : visHandler.dataLoader["visData"]
+              });
+            }            
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';

@@ -20,5 +20,6 @@ export const defaultExt = {
   aws: false,
   virustotal: false,
   osquery: false,
+  mitre: false,
   docker: false
 };

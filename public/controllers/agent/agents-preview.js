@@ -10,14 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
+import { clickAction } from '../../directives/wz-table/lib/click-action';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class AgentsPreviewController {
   /**
    * Class constructor
    * @param {Object} $scope
-   * @param {Object} genericReq
    * @param {Object} appState
    * @param {Object} $location
    * @param {Object} errorHandler
@@ -27,30 +31,30 @@ export class AgentsPreviewController {
    */
   constructor(
     $scope,
-    genericReq,
     apiReq,
     appState,
     $location,
+    $route,
     errorHandler,
     csvReq,
     shareAgent,
     wzTableFilter,
     commonData,
-    wazuhConfig,
     $window,
     timeService
   ) {
     this.$scope = $scope;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.apiReq = apiReq;
     this.appState = appState;
     this.$location = $location;
+    this.$route = $route;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
     this.shareAgent = shareAgent;
     this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
     this.timeService = timeService;
@@ -59,9 +63,9 @@ export class AgentsPreviewController {
   /**
    * On controller loads
    */
-  $onInit() {
+  async $onInit() {
     this.init = true;
-    this.api = JSON.parse(this.appState.getCurrentAPI()).id;
+    this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
       this.commonData.setTimefilter(timefilter.getTime());
@@ -69,8 +73,8 @@ export class AgentsPreviewController {
     }
 
     this.isClusterEnabled =
-      this.appState.getClusterInfo() &&
-      this.appState.getClusterInfo().status === 'enabled';
+      AppState.getClusterInfo() &&
+      AppState.getClusterInfo().status === 'enabled';
 
     this.loading = true;
     this.osPlatforms = [];
@@ -88,6 +92,17 @@ export class AgentsPreviewController {
       this.submenuNavItem = loc.tab;
     }
 
+    const summaryData = await this.apiReq.request('GET', '/agents/summary', {});
+    this.summary = summaryData.data.data;
+    if (this.summary.Total - 1 === 0) {
+      if (this.addingNewAgent === undefined) {
+        this.addNewAgent(true);
+      }
+      this.hasAgents = false;
+    } else {
+      this.hasAgents = true;
+    }
+
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
       this.$location.search('tab', this.submenuNavItem);
@@ -99,12 +114,41 @@ export class AgentsPreviewController {
 
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
+      hasAgents: this.hasAgents,
+      reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
       getCurrentApiAddress: () => this.getCurrentApiAddress(),
       needsPassword: () => this.needsPassword()
     };
     this.hasAgents = true;
     this.init = false;
+    const instance = new DataFactory(
+      this.apiReq,
+      '/agents',
+      false,
+      false
+    )
+    //Props
+    this.tableAgentsProps = {
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+      addingNewAgent: () => { this.addNewAgent(true); this.$scope.$applyAsync() },
+      downloadCsv: (filters = []) => { this.downloadCsv(filters); this.$scope.$applyAsync() },
+      showAgent: (agent) => { this.showAgent(agent); this.$scope.$applyAsync() },
+      getMostActive: async () => { return await this.getMostActive() },
+      clickAction: (item, openAction = false) => {
+        clickAction(
+          item,
+          openAction,
+          instance,
+          this.shareAgent,
+          this.$location,
+          this.$scope,
+        );
+        this.$scope.$applyAsync()
+      },
+      timeService: (date) => this.timeService.offset(date),
+      summary: this.summary
+    }
     //Load
     this.load();
   }
@@ -131,7 +175,7 @@ export class AgentsPreviewController {
   /**
    * Exports the table in CSV format
    */
-  async downloadCsv() {
+  async downloadCsv(filters) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
@@ -140,7 +184,7 @@ export class AgentsPreviewController {
       const output = await this.csvReq.fetch(
         '/agents',
         this.api,
-        this.wzTableFilter.get()
+        filters
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -153,6 +197,26 @@ export class AgentsPreviewController {
     return;
   }
 
+  async getMostActive() {
+    try {
+      const data = await this.genericReq.request(
+        'GET',
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}`
+      )
+      this.mostActiveAgent.name = data.data.data;
+      const info = await this.genericReq.request(
+        'GET',
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}`
+      );
+      if (info.data.data === '' && this.mostActiveAgent.name !== '') {
+        this.mostActiveAgent.id = '000';
+      } else {
+        this.mostActiveAgent.id = info.data.data;
+      }
+      return this.mostActiveAgent;
+    } catch (error) { }
+  }
+
   /**
    * On controller loads
    */
@@ -163,126 +227,23 @@ export class AgentsPreviewController {
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
-      const clusterInfo = this.appState.getClusterInfo();
-      const firstUrlParam =
+      const clusterInfo = AppState.getClusterInfo();
+      this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-      const secondUrlParam = clusterInfo[firstUrlParam];
+      this.secondUrlParam = clusterInfo[this.firstUrlParam];
 
-      const pattern = this.appState.getCurrentPattern();
-
-      const data = await Promise.all([
-        this.genericReq.request('GET', '/api/agents-unique/' + this.api, {}),
-        this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
-        )
-      ]);
-      const [agentsUnique, agentsTop] = data;
-      const unique = agentsUnique.data.result;
-
-      this.searchBarModel = {
-        name: [],
-        status: ['Active', 'Disconnected', 'Never connected'],
-        group: unique.groups.sort((a, b) => {
-          return a.toString().localeCompare(b.toString());
-        }),
-        version: unique.versions.sort((a, b) => {
-          return a.toString().localeCompare(b.toString(), undefined, {
-            numeric: true,
-            sensitivity: 'base'
-          });
-        }),
-        'os.platform': unique.osPlatforms
-          .map(x => x.platform)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          }),
-        'os.version': unique.osPlatforms
-          .map(x => x.version)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString(), undefined, {
-              numeric: true,
-              sensitivity: 'base'
-            });
-          }),
-        'os.name': unique.osPlatforms
-          .map(x => x.name)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          })
-      };
-
-      if (clusterInfo.status === 'enabled' && unique.nodes) {
-        this.searchBarModel.node_name = unique.nodes;
-      }
-
-      this.searchBarModel['os.name'] = Array.from(
-        new Set(this.searchBarModel['os.name'])
-      );
-      this.searchBarModel['os.version'] = Array.from(
-        new Set(this.searchBarModel['os.version'])
-      );
-      this.searchBarModel['os.platform'] = Array.from(
-        new Set(this.searchBarModel['os.platform'])
-      );
-      this.groups = unique.groups;
-      this.nodes = unique.nodes.map(item => ({ id: item }));
-      this.versions = unique.versions.map(item => ({ id: item }));
-      this.osPlatforms = unique.osPlatforms;
-      this.lastAgent = unique.lastAgent;
-      this.summary = unique.summary;
-      if (!this.lastAgent || !this.lastAgent.id) {
-        if (this.addingNewAgent === undefined) {
-          this.addNewAgent(true);
-        }
-        this.hasAgents = false;
-      } else {
-        this.hasAgents = true;
-      }
-
-      if (agentsTop.data.data === '') {
-        this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
-        this.mostActiveAgent.id = '000';
-      } else {
-        this.mostActiveAgent.name = agentsTop.data.data;
-        const info = await this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
-        );
-        if (info.data.data === '' && this.mostActiveAgent.name !== '') {
-          this.mostActiveAgent.id = '000';
-        } else {
-          this.mostActiveAgent.id = info.data.data;
-        }
-      }
+      this.pattern = AppState.getCurrentPattern();
     } catch (error) {
       this.errorInit = this.errorHandler.handle(error, false, false, true);
     }
     this.loading = false;
     this.$scope.$applyAsync();
+
     return;
   }
 
   addNewAgent(flag) {
     this.addingNewAgent = flag;
-  }
-
-  reloadList() {
-    this.refreshAgentsStats();
-  }
-
-  async refreshAgentsStats() {
-    try {
-      const data = await this.genericReq.request(
-        'GET',
-        '/api/agents-unique/' + this.api,
-        {}
-      );
-      this.summary = ((data.data || {}).result || {}).summary || {};
-    } catch (error) {
-      this.errorHandler.handle('Error refreshing agents stats');
-    }
-    this.$scope.$broadcast('reloadSearchFilterBar', {});
   }
 
   openRegistrationDocs() {

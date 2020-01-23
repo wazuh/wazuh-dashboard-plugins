@@ -115,14 +115,15 @@ export class ExportConfiguration extends Component {
 
   render() {
     const button = (
-      <EuiButton
+      <EuiButtonEmpty
         iconType="importAction"
         iconSide="left"
         size="s"
+        style={{ marginTop: '4px' }}
         onClick={this.exportClick.bind(this)}
       >
-        PDF
-      </EuiButton>
+        Export PDF
+      </EuiButtonEmpty>
     );
     return (
       <EuiPopover

@@ -17,6 +17,7 @@ import ciscat from './agents-ciscat';
 import pci from './agents-pci';
 import gdpr from './agents-gdpr';
 import hipaa from './agents-hipaa';
+import mitre from './agents-mitre';
 import nist from './agents-nist';
 import pm from './agents-pm';
 import virustotal from './agents-virustotal';
@@ -38,5 +39,6 @@ export {
   virustotal,
   vuls,
   osquery,
+  mitre,
   docker
 };

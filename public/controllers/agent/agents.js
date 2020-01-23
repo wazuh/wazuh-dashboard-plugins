@@ -21,11 +21,15 @@ import {
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
-  metricsVirustotal
+  metricsVirustotal,
+  metricsMitre
 } from '../../utils/agents-metrics';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export class AgentsController {
   /**
@@ -58,11 +62,8 @@ export class AgentsController {
     visFactoryService,
     csvReq,
     wzTableFilter,
-    $mdDialog,
     groupHandler,
-    wazuhConfig,
-    timeService,
-    genericReq
+    timeService
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -77,11 +78,10 @@ export class AgentsController {
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
-    this.$mdDialog = $mdDialog;
     this.groupHandler = groupHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.timeService = timeService;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -100,7 +100,6 @@ export class AgentsController {
     this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
 
-    this.$scope.lookingSca = false;
     this.$scope.expandArray = [
       false,
       false,
@@ -131,16 +130,33 @@ export class AgentsController {
       this.commonData.removeTimefilter();
     }
 
+    this.$scope.$on('sendVisDataRows', (ev, param) => {
+      const rows = (param || {}).mitreRows.tables[0].rows
+      this.$scope.attacksCount = {}
+      for(var i in rows){
+        this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
+      }
+
+      
+    this.$scope.mitreCardsSliderProps = {
+      items: this.$scope.mitreIds,
+      attacksCount: this.$scope.attacksCount,
+      reqTitle: "MITRE",
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+      addFilter: (id) => this.addMitrefilter(id)
+      }
+    });
+
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
 
     this.$location.search('_a', null);
-    this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
+    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
+    const extensions = AppState.getExtensions(currentApi);
     this.$scope.extensions = extensions;
 
     // Getting possible target location
@@ -293,7 +309,7 @@ export class AgentsController {
           sections: sections
         });
         if (!this.$location.search().configSubTab) {
-          this.appState.setSessionStorageItem(
+          AppState.setSessionStorageItem(
             'configSubTab',
             this.$scope.configSubTab
           );
@@ -335,7 +351,7 @@ export class AgentsController {
         const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
           try {
-            const config = this.appState.getSessionStorageItem('configSubTab');
+            const config = AppState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
             this.$scope.switchConfigTab(
               configSubTabObj.configurationTab,
@@ -353,7 +369,7 @@ export class AgentsController {
         }
       } else {
         this.$location.search('configSubTab', null);
-        this.appState.removeSessionStorageItem('configSubTab');
+        AppState.removeSessionStorageItem('configSubTab');
         this.$location.search('configWodle', null);
       }
     };
@@ -379,7 +395,6 @@ export class AgentsController {
     };
 
     this.$scope.switchScaScan = () => {
-      this.$scope.lookingSca = false;
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
@@ -393,7 +408,7 @@ export class AgentsController {
     this.$scope.goDiscover = () => this.goDiscover();
 
     this.$scope.$on('$routeChangeStart', () => {
-      return this.appState.removeSessionStorageItem('configSubTab');
+      return AppState.removeSessionStorageItem('configSubTab');
     });
 
     this.$scope.switchGroupEdit = () => {
@@ -411,6 +426,7 @@ export class AgentsController {
 
     this.$scope.loadScaChecks = policy =>
       (this.$scope.lookingSca = { ...policy, id: policy.policy_id });
+
     this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
 
     this.$scope.confirmAddGroup = group => {
@@ -481,7 +497,10 @@ export class AgentsController {
         case 'virustotal':
           this.createMetrics(metricsVirustotal);
           break;
-      }
+        case 'mitre':
+          this.createMetrics(metricsMitre);
+          break;
+    }
     }
   }
 
@@ -586,6 +605,19 @@ export class AgentsController {
         };
       }
 
+      if (tab === 'mitre') {
+        const result = await this.apiReq.request('GET', '/rules/mitre', {});
+        this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
+
+        this.$scope.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds ,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: "MITRE",
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
+        }
+      }
+      
       if (tab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
         this.$scope.hipaaReqs = {
@@ -603,19 +635,12 @@ export class AgentsController {
       }
 
       if (tab === 'sca') {
-        try {
-          this.$scope.loadSca = true;
-          const policies = await this.apiReq.request(
-            'GET',
-            `/sca/${this.$scope.agent.id}`,
-            {}
-          );
-          this.$scope.policies =
-            (((policies || {}).data || {}).data || {}).items || [];
-        } catch (error) {
-          this.$scope.policies = [];
-        }
-        this.$scope.loadSca = false;
+        //remove to component
+        this.$scope.scaProps = {
+          agent: this.$scope.agent,
+          loadScaChecks: (policy) => this.$scope.loadScaChecks(policy),
+          downloadCsv: (path, name) => this.downloadCsv(path, name)
+        };
       }
 
       if (tab === 'syscollector')
@@ -627,7 +652,7 @@ export class AgentsController {
       } else {
         this.configurationHandler.reset(this.$scope);
       }
-      this.$scope.lookingSca = false;
+
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
@@ -698,6 +723,16 @@ export class AgentsController {
     };
 
     this.setTabs();
+  }
+
+
+   /**
+   * Filter by Mitre.ID
+   * @param {*} id 
+   */
+  addMitrefilter(id){
+    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
   }
 
   /**
@@ -916,9 +951,9 @@ export class AgentsController {
       switchTab: tab => this.switchTab(tab),
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
-      api: this.appState.getCurrentAPI(),
+      api: AppState.getCurrentAPI(),
       setExtensions: (api, extensions) => {
-        this.appState.setExtensions(api, extensions);
+        AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;
       }
     };
@@ -948,7 +983,7 @@ export class AgentsController {
    * @param {*} group
    */
   goGroups(agent, group) {
-    this.appState.setNavigation({ status: true });
+    AppState.setNavigation({ status: true });
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');
@@ -968,7 +1003,7 @@ export class AgentsController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(path, currentApi, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -987,7 +1022,7 @@ export class AgentsController {
     if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
       syscollectorFilters.push(
         this.filterHandler.managerQuery(
-          this.appState.getClusterInfo().cluster,
+          AppState.getClusterInfo().cluster,
           true
         )
       );

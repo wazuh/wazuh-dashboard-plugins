@@ -23,6 +23,7 @@ import { searchData, filterData, queryData } from './lib/data';
 import { clickAction } from './lib/click-action';
 import { initTable } from './lib/init';
 import { checkGap } from './lib/check-gap';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -52,10 +53,10 @@ app.directive('wzTable', function() {
       appState,
       groupHandler,
       rulesetHandler,
-      wazuhConfig,
       $sce,
       timeService
     ) {
+      const wazuhConfig = new WazuhConfig();
       $scope.showColumns = false;
       $scope.scapepath = $scope.path.split('/').join('');
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
@@ -149,8 +150,7 @@ app.directive('wzTable', function() {
           instance,
           shareAgent,
           $location,
-          $scope,
-          appState
+          $scope
         );
 
       const fetch = async (options = {}) => {

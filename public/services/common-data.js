@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../react-services/app-state";
+import { GenericRequest } from "../react-services/generic-request";
+
 export class CommonData {
   /**
    * Class constructor
@@ -33,7 +36,7 @@ export class CommonData {
   ) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.appState = appState;
     this.errorHandler = errorHandler;
     this.$location = $location;
@@ -45,14 +48,14 @@ export class CommonData {
     this.overviewTabs = {
       hostMonitoringTabs: ['general', 'fim', 'aws'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
-      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
     };
 
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
-      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker','mitre'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
     };
   }
@@ -152,12 +155,12 @@ export class CommonData {
       };
 
       const filters = [];
-      const isCluster = this.appState.getClusterInfo().status == 'enabled';
+      const isCluster = AppState.getClusterInfo().status == 'enabled';
       filters.push(
         filterHandler.managerQuery(
           isCluster
-            ? this.appState.getClusterInfo().cluster
-            : this.appState.getClusterInfo().manager,
+            ? AppState.getClusterInfo().cluster
+            : AppState.getClusterInfo().manager,
           isCluster
         )
       );
@@ -175,6 +178,9 @@ export class CommonData {
         } else if (tab === 'nist') {
           this.removeDuplicateExists('rule.nist_800_53');
           filters.push(filterHandler.nistQuery());
+        } else if (tab === 'mitre') {
+          this.removeDuplicateExists('rule.mitre.id');
+          filters.push(filterHandler.mitreQuery());
         } else {
           this.removeDuplicateRuleGroups(tabFilters[tab].group);
           filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));

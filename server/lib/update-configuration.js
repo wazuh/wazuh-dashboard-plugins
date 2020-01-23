@@ -16,8 +16,6 @@ import { getConfiguration } from './get-configuration';
 
 const needRestartFields = [
   'pattern',
-  'wazuh.shards',
-  'wazuh.replicas',
   'wazuh.monitoring.enabled',
   'wazuh.monitoring.frequency',
   'wazuh.monitoring.shards',
@@ -64,7 +62,7 @@ export class UpdateConfigurationFile {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
-      const configuration = getConfiguration() || {};
+      const configuration = getConfiguration(true) || {};
       const adminUndefined = !Object.keys(configuration).includes('admin');
       const adminIsTrue = configuration.admin;
 
