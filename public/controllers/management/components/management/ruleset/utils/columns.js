@@ -295,10 +295,10 @@ export default class RulesetColumns {
       return (
         <EuiToolTip
           content={item[field].join(', ')}
+          key={idGenerator()}
           position="bottom" >
           <EuiBadge
-            key={idGenerator()}
-            title={false}
+            title={null}
             color="hollow"
             style={{ margin: "1px 2px" }}
           >{field.toUpperCase()}</EuiBadge>
