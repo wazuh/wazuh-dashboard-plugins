@@ -128,5 +128,5 @@ hosts:
   - default:
      url: http://localhost
      port: 55000
-     user: foo
-     password: bar
+     username: wazuh
+     password: wazuh
