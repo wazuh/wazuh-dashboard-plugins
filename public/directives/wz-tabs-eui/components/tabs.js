@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for section tabs.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ export class Tabs extends Component {
   render() {
     return (
       <Fragment>
-        <EuiTabs display={this.props.condesnsed ? "concensed" : ""}>{this.renderTabs()}</EuiTabs>
+        <EuiTabs display={this.props.condensed ? "condensed" : "default"}>{this.renderTabs()}</EuiTabs>
       </Fragment>
     );
   }

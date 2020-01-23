@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Settings controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ export class SettingsController {
       },
       selectedTab: this.tab || 'api',
       tabs: [
-        { id: 'api', name: 'API hosts' },
+        { id: 'api', name: 'API' },
         { id: 'configuration', name: 'Configuration' },
         { id: 'logs', name: 'Logs' },
         { id: 'about', name: 'About' }

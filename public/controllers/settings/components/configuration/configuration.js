@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component building the configuration component.
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ export class WzConfigurationSettings extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() { }
 
   render() {
     return (
@@ -46,7 +46,7 @@ export class WzConfigurationSettings extends Component {
                 <EuiFlexItem>
                   <EuiTitle>
                     <h2>
-                      App current settings
+                      App current settings&nbsp;
                       <EuiToolTip position="right" content="More about configuration file">
                         <EuiButtonIcon
                           iconType="questionInCircle"

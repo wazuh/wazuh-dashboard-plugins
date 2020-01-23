@@ -1,7 +1,7 @@
 ---
 #
 # Wazuh app - App configuration file
-# Copyright (C) 2015-2019 Wazuh, Inc.
+# Copyright (C) 2015-2020 Wazuh, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,12 +56,6 @@
 # It means milliseconds before we consider a request as failed.
 # Default: 20000
 #timeout: 20000
-#
-# ------------------------------ Advanced indices ------------------------------
-#
-# Configure .wazuh indices shards and replicas.
-#wazuh.shards          : 1
-#wazuh.replicas        : 0
 #
 # --------------------------- Index pattern selector ---------------------------
 #
