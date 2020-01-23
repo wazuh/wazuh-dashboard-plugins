@@ -132,11 +132,6 @@ export class OverviewController {
       this.visFactoryService.clearAll();
     });
 
-    // Listen for changes
-    this.$scope.$on('updateVis', () => {
-      console.log("entra normal")
-      this.visualizeProps.updateVis = true;
-    });
     this.$rootScope.$on('updateVis', (ev, params) => {
       console.log("entra root")
       this.visualizeProps.updateVis = params ? params.raw : true;
@@ -284,6 +279,9 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
+    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist'){
+      this.visualizeProps.cardReqs = {};
+    }
     if (newTab === 'pci') {
       this.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
     }
