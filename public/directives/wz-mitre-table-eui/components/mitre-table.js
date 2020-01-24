@@ -63,8 +63,8 @@ import { EuiPanel,
     await this.getItems();
   }
 
-  async componentDidUpdate() {
-    if (this.state.isProcessing) {
+  async componentDidUpdate(prevProps) {
+    if (this.state.isProcessing || this.props.attacksCount !== prevProps.attacksCount) {
       await this.getItems();
     }
   }

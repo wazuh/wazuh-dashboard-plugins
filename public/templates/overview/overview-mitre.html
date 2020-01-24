@@ -1,9 +1,12 @@
 <div ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'" style="margin-top: 10px;">
 
 
-
+  <!-- MITRE TABLE -->
+  <div layout="row" ng-show="!octrl.showingMitreTable" layout-padding>
+    <react-component flex name="MitreTable" props="octrl.mitreTableProps">
+</div>
     
-    <div layout="row" style="color:#216bb4" layout-align="center stretch" ng-show="resultState !== 'none'">
+    <div layout="row" style="color:#216bb4;" layout-align="center stretch">
         <md-button ng-click="octrl.switchMitreTab()"
             aria-label="Show mitre sliders">
             <div ng-if="!octrl.showingMitreTable">
@@ -15,10 +18,6 @@
         </md-button>
     </div>
     
-    <!-- MITRE TABLE -->
-    <div layout="row" ng-show="!octrl.showingMitreTable || resultState === 'none'" layout-padding>
-        <react-component flex name="MitreTable" props="octrl.mitreTableProps">
-    </div>
     
     <div ng-show="octrl.showingMitreTable && resultState !== 'none' && resultState !== 'loading'" ng-if="mitreIds">
         <!-- Mitre cards slider-->
