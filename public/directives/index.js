@@ -11,8 +11,6 @@
  */
 import './wz-dynamic/wz-dynamic';
 import './wz-enter/wz-enter';
-import './wz-menu/wz-menu';
-import './wz-menu/wz-menu.less';
 import './wz-table';
 import './wz-table-eui';
 import './wz-welcome-card/wz-welcome-card';

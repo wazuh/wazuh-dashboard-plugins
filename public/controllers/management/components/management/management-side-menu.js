@@ -12,7 +12,7 @@
 import React, { Component } from 'react';
 import {
   EuiFlexItem,
-  EuiButtonEmpty,
+  EuiFlexGroup,
   EuiSideNav,
   EuiIcon
 } from '@elastic/eui';
@@ -79,7 +79,8 @@ class WzManagementSideMenu extends Component {
   componentDidMount() {
     // Fetch the data in the first mount
     if (['rules', 'decoders', 'lists'].includes(this.state.selectedItemName)) {
-      this.fetchData(this.managementSections.rules.id);    }
+      this.fetchData(this.managementSections.rules.id);
+    }
     this.props.updateManagementSection(this.state.selectedItemName);
   }
 
@@ -127,7 +128,7 @@ class WzManagementSideMenu extends Component {
         this.props.switchTab(section);
         this.fetchData(section);
       } else {
-        if(section === 'cluster'){
+        if (section === 'cluster') {
           section = 'monitoring';
         }
         this.props.updateManagementSection(section);
@@ -198,25 +199,21 @@ class WzManagementSideMenu extends Component {
     ];
 
     return (
-      <div style={{ position: 'fixed' }} >
-        <EuiFlexItem grow={false}>
-          <EuiButtonEmpty
-            style={{ margin: "0px 6px" }}
-            size="s"
-            onClick={() => this.props.switchTab('welcome')}
-            iconType="arrowLeft"
-            className={'sideMenuButton'}>
-            Management
-        </EuiButtonEmpty>
-        </EuiFlexItem>
-        <EuiSideNav
-          items={sideNavAdmin}
-          style={{ padding: 16 }}
-        />
-        <EuiSideNav
-          items={sideNavStatus}
-          style={{ padding: 16 }}
-        />
+      <div>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <EuiSideNav
+              items={sideNavAdmin}
+              style={{ padding: 16 }}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiSideNav
+              items={sideNavStatus}
+              style={{ padding: 16 }}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </div>
     );
   }
