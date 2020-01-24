@@ -75,7 +75,7 @@ export class ApiInterceptor {
     return axios(options)
       .then(response => {
         if (response.status === 200) {
-          return response.data.data.affected_items[0];
+          return response.data;
         }
         return response.data;
       })
@@ -83,11 +83,10 @@ export class ApiInterceptor {
         if (attempts > 0) {
           if (error.response.status === 401) {
             await this.authenticateApi(idHost);
-            this.request(method, path, payload, idHost, attempts - 1);
+            return this.request(method, path, payload, idHost, attempts - 1);
           }
-        } else {
-          return null;
         }
+        return null;
       });
   }
 }
