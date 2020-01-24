@@ -1,10 +1,10 @@
 <div ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'" style="margin-top: 10px;">
 
 
-  <!-- MITRE TABLE -->
-  <div layout="row" ng-show="!octrl.showingMitreTable" layout-padding>
-    <react-component flex name="MitreTable" props="octrl.mitreTableProps">
-</div>
+    <!-- MITRE TABLE -->
+    <div layout="row" ng-show="!octrl.showingMitreTable" layout-padding>
+        <react-component flex name="MitreTable" props="octrl.mitreTableProps">
+    </div>
     
     <div layout="row" style="color:#216bb4;" layout-align="center stretch">
         <md-button ng-click="octrl.switchMitreTab()"
