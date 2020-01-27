@@ -205,6 +205,12 @@ export class AppState {
      * Get '_currentPattern' value   
      */
     static getCurrentPattern() {
+        const currentPattern = Cookies.get('_currentPattern') ? decodeURI(Cookies.get('_currentPattern')) : "";
+         // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
+        if(currentPattern[0] === '"' && currentPattern[currentPattern.length-1] === '"'){
+            const newPattern = currentPattern.substring(1, currentPattern.length-1);
+            this.setCurrentPattern(newPattern);
+        }
         return Cookies.get('_currentPattern') ? decodeURI(Cookies.get('_currentPattern')) : "";
     }
 
