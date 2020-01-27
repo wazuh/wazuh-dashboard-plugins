@@ -49,7 +49,7 @@ class WzRulesetOverview extends Component {
                 <h2>{this.sectionNames[section]}</h2>
               </EuiTitle>
             </EuiFlexItem>
-            {(section == 'rules' || section === 'decoders') && (
+            {/* {(section == 'rules' || section === 'decoders') && (
               <EuiFlexItem grow={false} style={{ paddingTop: 7 }}>
                 <EuiSwitch
                   label={`Custom ${this.sectionNames[section]}`}
@@ -57,7 +57,7 @@ class WzRulesetOverview extends Component {
                   onChange={this.clickActionFilterBar}
                 />
               </EuiFlexItem>
-            )}
+            )} */}
             <EuiFlexItem>
             </EuiFlexItem>
             <WzRulesetActionButtons />
