@@ -56,7 +56,6 @@ export class KibanaVis extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.updateVis) {
-      console.log("update : ", nextProps.updateVis)
       this.updateVis();
     }
   }
@@ -66,8 +65,6 @@ export class KibanaVis extends Component {
   }
 
   componentWillUnmount() {
-    console.log('DESTROY!!!', this.visID);
-    console.log('adf', this.visHandler);
     if (this._isMounted) {
       this._isMounted = false;
       this.updateVis();
@@ -85,7 +82,6 @@ export class KibanaVis extends Component {
       return this.renderComplete();
     }
     const rawVis = this.rawVisualizations.getList();
-    console.log("Y AHORA AQUI : ", rawVis)
     if (Array.isArray(rawVis) && rawVis.length) {
       this.myRender(rawVis);
     }

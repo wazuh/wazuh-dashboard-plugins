@@ -13,10 +13,34 @@
 export const visualizations = {
   general: {
     metrics: [
-      { id: 'Wazuh-App-Overview-General-Metric-alerts' },
-      { id: 'Wazuh-App-Overview-General-Level-12-alerts' },
-      { id: 'Wazuh-App-Overview-General-Authentication-failure' },
-      { id: 'Wazuh-App-Overview-General-Authentication-success' },
+      {
+        id: 'Wazuh-App-Overview-General-Metric-alerts',
+        description: 'Total',
+        value: 'totalAlerts',
+        color: 'primary',
+        metric: '[id="Wazuh-App-Overview-General-Metric-alerts"]'
+      },
+      {
+        id: 'Wazuh-App-Overview-General-Level-12-alerts',
+        description: 'Level 12 or above alerts',
+        value: 'level12',
+        color: 'accent',
+        metric: '[id="Wazuh-App-Overview-General-Level-12-alerts"]'
+      },
+      {
+        id: 'Wazuh-App-Overview-General-Authentication-failure',
+        description: 'Authentication failure',
+        value: 'authFailure',
+        color: 'danger',
+        metric: '[id="Wazuh-App-Overview-General-Authentication-failure"]'
+      },
+      {
+        id: 'Wazuh-App-Overview-General-Authentication-success',
+        description: 'Authentication success',
+        value: 'authSuccess',
+        color: 'secondary',
+        metric: '[id="Wazuh-App-Overview-General-Authentication-success"]'
+      },
     ],
     rows: [
       {
@@ -415,9 +439,9 @@ export const visualizations = {
   },
   vuls: {
     metrics: [
-      { id: 'Wazuh-App-Overview-vuls-Metric-Critical-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-High-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-Medium-severity' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-Critical-severity', description: 'Total malicious', value: 'virusMalicious', color: 'danger' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-High-severity', description: 'Total positives', value: 'virusPositives', color: 'primary'  },
+      { id: 'Wazuh-App-Overview-vuls-Metric-Medium-severity', description: 'Total', value: 'virusTotal', color: 'secondary' },
       { id: 'Wazuh-App-Overview-vuls-Metric-Low-severity' },
     ],
     rows: [
@@ -470,9 +494,9 @@ export const visualizations = {
   },
   virustotal: {
     metrics: [
-      { id: 'Wazuh-App-Overview-Virustotal-Total-Malicious' },
-      { id: 'Wazuh-App-Overview-Virustotal-Total-Positives' },
-      { id: 'Wazuh-App-Overview-Virustotal-Total' },
+      { id: 'Wazuh-App-Overview-Virustotal-Total-Malicious' , description: 'Total malicious', value: 'virusMalicious', color: 'danger' },
+      { id: 'Wazuh-App-Overview-Virustotal-Total-Positives', description: 'Total positives', value: 'virusPositives', color: 'primary'  },
+      { id: 'Wazuh-App-Overview-Virustotal-Total' , description: 'Total', value: 'virusTotal', color: 'secondary' },
     ],
     rows: [
       {

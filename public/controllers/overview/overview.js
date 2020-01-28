@@ -10,20 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import { FilterHandler } from '../../utils/filter-handler';
-import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { visualizations } from '../../templates/visualize/visualizations';
-
-import {
-  metricsGeneral,
-  metricsVulnerability,
-  metricsScap,
-  metricsCiscat,
-  metricsVirustotal,
-  metricsOsquery,
-  metricsMitre
-} from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
@@ -133,7 +122,6 @@ export class OverviewController {
     });
 
     this.$rootScope.$on('updateVis', (ev, params) => {
-      console.log("entra root")
       this.visualizeProps.updateVis = params ? params.raw : true;
     });
   }
@@ -145,52 +133,6 @@ export class OverviewController {
    */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
-  }
-
-  /**
-   * Create metric for given object
-   * @param {*} metricsObject
-   */
-  createMetrics(metricsObject) {
-    for (const key in metricsObject) {
-      this[key] = () => {
-        const metric = generateMetric(metricsObject[key]);
-        return !!metric ? metric : '-';
-      };
-    }
-  }
-
-  /**
-   * Classify metrics for create the suitable one
-   * @param {*} tab
-   * @param {*} subtab
-   */
-  checkMetrics(tab, subtab) {
-    if (subtab === 'panels') {
-      switch (tab) {
-        case 'general':
-          this.createMetrics(metricsGeneral);
-          break;
-        case 'vuls':
-          this.createMetrics(metricsVulnerability);
-          break;
-        case 'oscap':
-          this.createMetrics(metricsScap);
-          break;
-        case 'ciscat':
-          this.createMetrics(metricsCiscat);
-          break;
-        case 'virustotal':
-          this.createMetrics(metricsVirustotal);
-          break;
-        case 'osquery':
-          this.createMetrics(metricsOsquery);
-          break;
-        case 'mitre':
-          this.createMetrics(metricsMitre);
-          break;
-      }
-    }
   }
 
   /**
@@ -258,8 +200,6 @@ export class OverviewController {
           tab: this.tab
         });
       }
-
-      this.checkMetrics(this.tab, subtab);
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }

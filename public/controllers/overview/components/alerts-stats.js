@@ -21,6 +21,12 @@ export class AlertsStats extends Component {
     this.state = {};
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.items) {
+      console.log(nextProps.items)
+    }
+  }
+
   buildStats() {
     const stats = this.props.items.map(item => {
       const title = typeof item.value !== 'undefined' ? item.value : '-';

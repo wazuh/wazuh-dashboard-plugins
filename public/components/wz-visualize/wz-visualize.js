@@ -12,10 +12,11 @@
 import React, { Component } from 'react';
 
 import { visualizations } from './visualizations';
-
+import { generateMetric } from '../../utils/generate-metric';
 import { KibanaVis } from '../kibana-vis/kibana-vis';
 import { EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card'
+import { AlertsStats } from '../../controllers/overview/components/alerts-stats'
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -25,8 +26,10 @@ export class WzVisualize extends Component {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
       updateVis: this.props.updateVis,
-      cardReqs: {}
+      cardReqs: {},
+      metricItems: this.getMetricItems(this.props.selectedTab)
     };
+    this.metricValues = false;
   }
 
   async componentDidUpdate() {
@@ -46,13 +49,36 @@ export class WzVisualize extends Component {
     }
   }
 
+  getMetric(key) {
+    const obj = this.visualizations[this.state.selectedTab].metrics.find(
+      x => { return x.value === key }
+    );
+    return generateMetric(obj.metric);
+  }
+
+  getMetricItems(tab) {
+    const items = [];
+    this.visualizations[tab].metrics.forEach(
+      x => { items.push({ description: x.description, value: x.value, color: x.color, hasValue: false }) }
+    );
+    return {
+      items
+    }
+  }
+
   expand = (id) => {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   }
 
   render() {
     const { selectedTab, cardReqs } = this.state;
-
+    if (this.state.metricItems) {
+      this.state.metricItems.forEach(x => {
+        const metric = this.getMetric(x.value);
+        x.value = metric || x.value
+        x.hasMetric = metric ? true : false
+      });
+    }
     const renderVisualizations = (vis) => {
       return (
         <EuiFlexItem grow={vis.width || 10} key={vis.id}>
@@ -95,6 +121,85 @@ export class WzVisualize extends Component {
 
     return (
       <EuiFlexItem>
+        {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab].metrics) &&
+          <div className="wz-no-display">
+            {this.visualizations[selectedTab].metrics.map((vis, i) => {
+              return (
+                <div key={i}>
+                  <KibanaVis visID={vis.id} tab={selectedTab} {...this.props}></KibanaVis>
+                </div>
+              )
+            })}
+          </div>
+        }
+
+        {/* Metrics of Dashboard */}
+        {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab].metrics && this.state.metricItems) &&
+          <div className="md-padding">
+            <AlertsStats {...this.state.metricItems} />
+          </div>
+        }
+        {/* 
+    <!-- Metrics of Vulverabilities Dashboard -->
+    <div ng-if="octrl.tab === 'vuls'" class="md-padding">
+        <AlertsStats props="{
+            items: [
+                { description: 'Critical severity alerts', value: octrl.vulnCritical(), color: 'danger' },
+                { description: 'High severity alerts', value: octrl.vulnHigh(), color: 'primary' },
+                { description: 'Medium severity alerts', value: octrl.vulnMedium(), color: 'secondary' },
+                { description: 'Low severity alerts', value: octrl.vulnLow(), color: 'subdued' }
+            ]            
+        }" />
+    </div>
+
+    <!-- Metrics of VirusTotal Dashboard -->
+    <div ng-if="octrl.tab === 'virustotal'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Total malicious', value: octrl.virusMalicious(), color: 'danger' },
+                { description: 'Total positives', value: octrl.virusPositives(), color: 'primary' },
+                { description: 'Total', value: octrl.virusTotal(), color: 'secondary' },
+            ]            
+        }" />
+    </div>
+
+    <!-- Metrics of Osquery Dashboard -->
+    <div ng-if="octrl.tab === 'osquery'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Agents reporting Osquery events', value: octrl.osqueryAgentsReporting() + ' / ' + octrl.agentsCountTotal, color: 'primary' },
+            ]            
+        }" />
+    </div>
+
+    <!-- Metrics of Oscap Dashboard -->
+    <div ng-if="octrl.tab === 'oscap'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+                items: [
+                    { description: 'Last score', value: octrl.scapLastScore(), color: 'accent' },
+                    { description: 'Highest score', value: octrl.virusPositives(), color: 'primary' },
+                    { description: 'Lowest score', value: octrl.virusTotal(), color: 'secondary' },
+                ]            
+            }" />
+    </div>
+
+    <!-- Metrics of Cis-Cat Dashboard -->
+    <div ng-if="octrl.tab === 'ciscat'" class="md-padding">
+        <react-component flex name="AlertsStats" props="{
+                items: [
+                    { description: 'Last not checked', value: octrl.ciscatScanNotChecked(), color: 'accent' },
+                    { description: 'Last pass', value: octrl.ciscatScanPass(), color: 'primary' },
+                    { description: 'Last scan score', value: octrl.ciscatScanScore(), color: 'secondary' },
+                    { description: 'Last scan date', value: octrl.ciscatScanTimestamp(), color: 'subdued' },
+                    { description: 'Last errors', value: octrl.ciscatScanError(), color: 'accent' },
+                    { description: 'Last fails', value: octrl.ciscatScanFail(), color: 'primary' },
+                    { description: 'Last unknown', value: octrl.ciscatScanUnknown(), color: 'secondary' },
+                    { description: 'Last scan benchmark', value: octrl.ciscatScanBenchmark(), color: 'subdued' },
+                ]            
+            }" />
+    </div>
+
+ */}
         {/* Cards for Regulatory Compliance Dashboards */}
         {(cardReqs && cardReqs.items) &&
           <div className="md-padding">

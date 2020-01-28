@@ -13,10 +13,10 @@
 export const visualizations = {
   general: {
     metrics: [
-      { id: 'Wazuh-App-Overview-General-Metric-alerts' },
-      { id: 'Wazuh-App-Overview-General-Level-12-alerts' },
-      { id: 'Wazuh-App-Overview-General-Authentication-failure' },
-      { id: 'Wazuh-App-Overview-General-Authentication-success' },
+      { id: 'Wazuh-App-Overview-General-Metric-alerts', description: 'Total', value: 'totalAlerts', color: 'primary', metric: '[id="Wazuh-App-Overview-General-Metric-alerts"]' },
+      { id: 'Wazuh-App-Overview-General-Level-12-alerts', description: 'Level 12 or above alerts', value: 'level12', color: 'accent', metric: '[id="Wazuh-App-Overview-General-Level-12-alerts"]' },
+      { id: 'Wazuh-App-Overview-General-Authentication-failure', description: 'Authentication failure', value: 'authFailure', color: 'danger', metric: '[id="Wazuh-App-Overview-General-Authentication-failure"]' },
+      { id: 'Wazuh-App-Overview-General-Authentication-success', description: 'Authentication success', value: 'authSuccess', color: 'secondary', metric: '[id="Wazuh-App-Overview-General-Authentication-success"]' },
     ],
     rows: [
       {

@@ -80,7 +80,6 @@ export class VisFactoryService {
         `/elastic/visualizations/overview-${tab}/${currentPattern}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
-      console.log("LLEGA AQUIII : ", this.rawVisualizations.getList())
       this.commonData.assignFilters(filterHandler, tab, localChange);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
       this.$rootScope.$broadcast('updateVis', {raw : this.rawVisualizations.getList()});
