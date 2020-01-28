@@ -13,7 +13,7 @@
     "wazuh",
     "ossec"
   ],
-  "node_build": "8.14.0",
+  "node_build": "10.15.2",
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "repository": {

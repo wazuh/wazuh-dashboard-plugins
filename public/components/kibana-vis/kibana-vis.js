@@ -20,9 +20,10 @@ import { DiscoverPendingUpdates } from '../../factories/discover-pending-updates
 import chrome from 'ui/chrome';
 import { LoadedVisualizations } from '../../factories/loaded-visualizations';
 import { RawVisualizations } from '../../factories/raw-visualizations';
-import { VisHandlers } from '../../factories/vis-handlers'; //public/factories/vis-handlers.js
-import { TabVisualizations } from '../../factories/tab-visualizations'; //public/factories/vis-handlers.js
-
+import { VisHandlers } from '../../factories/vis-handlers';
+import { TabVisualizations } from '../../factories/tab-visualizations';
+import store from '../../redux/store';
+import { updateMetric } from '../../redux/actions/visualizationsActions'
 export class KibanaVis extends Component {
   _isMounted = false;
 
@@ -39,6 +40,7 @@ export class KibanaVis extends Component {
     this.renderInProgress = false;
     this.deadField = false;
     this.mapClicked = false;
+    this.updateMetric = updateMetric;
 
     this.discoverPendingUpdates = new DiscoverPendingUpdates();
     this.loadedVisualizations = new LoadedVisualizations();
@@ -240,7 +242,7 @@ export class KibanaVis extends Component {
     } catch (error) { } // eslint-disable-line
   };
 
-  renderComplete = () => {
+  renderComplete = async () => {
     const visId = this.visID.toLowerCase();
     this.props.finishUpdateVis();
 
@@ -267,6 +269,11 @@ export class KibanaVis extends Component {
       );
 
       const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
+      if (this.props.type === 'metric') {
+        const data = await this.visHandler.fetch();
+        const updateMetric = this.updateMetric({ name: visId, value: data.value.visData.rows['0']['col-0-1'] });
+        store.dispatch(updateMetric)
+      }
       if (visTitle === 'Mitre attack count') {
         //   $scope.$emit('sendVisDataRows', {
         //     mitreRows: visHandler.dataLoader['visData'],

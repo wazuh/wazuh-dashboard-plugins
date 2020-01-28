@@ -12,11 +12,11 @@
 import React, { Component } from 'react';
 
 import { visualizations } from './visualizations';
-import { generateMetric } from '../../utils/generate-metric';
 import { KibanaVis } from '../kibana-vis/kibana-vis';
 import { EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card'
-import { AlertsStats } from '../../controllers/overview/components/alerts-stats'
+import AlertsStats from '../../controllers/overview/components/alerts-stats'
+import WzReduxProvider from '../../redux/wz-redux-provider';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -49,18 +49,13 @@ export class WzVisualize extends Component {
     }
   }
 
-  getMetric(key) {
-    const obj = this.visualizations[this.state.selectedTab].metrics.find(
-      x => { return x.value === key }
-    );
-    return generateMetric(obj.metric);
-  }
-
   getMetricItems(tab) {
     const items = [];
-    this.visualizations[tab].metrics.forEach(
-      x => { items.push({ description: x.description, value: x.value, color: x.color, hasValue: false }) }
-    );
+    if (this.visualizations[tab].metrics) {
+      this.visualizations[tab].metrics.forEach(
+        x => { items.push({ id: x.id, description: x.description, value: x.value, color: x.color, hasValue: false }) }
+      );
+    }
     return {
       items
     }
@@ -72,13 +67,6 @@ export class WzVisualize extends Component {
 
   render() {
     const { selectedTab, cardReqs } = this.state;
-    if (this.state.metricItems) {
-      this.state.metricItems.forEach(x => {
-        const metric = this.getMetric(x.value);
-        x.value = metric || x.value
-        x.hasMetric = metric ? true : false
-      });
-    }
     const renderVisualizations = (vis) => {
       return (
         <EuiFlexItem grow={vis.width || 10} key={vis.id}>
@@ -97,7 +85,7 @@ export class WzVisualize extends Component {
                 />
               </EuiFlexGroup>
               <div style={{ height: '100%' }}>
-                <KibanaVis visID={vis.id} tab={selectedTab} {...this.props}></KibanaVis>
+                <KibanaVis visID={vis.id} tab={selectedTab} type={false} {...this.props}></KibanaVis>
               </div>
             </EuiFlexItem>
           </EuiPanel>
@@ -126,7 +114,7 @@ export class WzVisualize extends Component {
             {this.visualizations[selectedTab].metrics.map((vis, i) => {
               return (
                 <div key={i}>
-                  <KibanaVis visID={vis.id} tab={selectedTab} {...this.props}></KibanaVis>
+                  <KibanaVis visID={vis.id} tab={selectedTab} type={'metric'} {...this.props}></KibanaVis>
                 </div>
               )
             })}
@@ -136,7 +124,9 @@ export class WzVisualize extends Component {
         {/* Metrics of Dashboard */}
         {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab].metrics && this.state.metricItems) &&
           <div className="md-padding">
-            <AlertsStats {...this.state.metricItems} />
+            <WzReduxProvider>
+              <AlertsStats {...this.state.metricItems} tab={selectedTab} />
+            </WzReduxProvider>
           </div>
         }
         {/* 
