@@ -46,13 +46,15 @@ class WzMenu extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    const { name:apiName } = JSON.parse(AppState.getCurrentAPI())
+    const { currentAPI } = this.state;
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
       this.load();
     }
-    if (!this.state.currentAPI && JSON.parse(AppState.getCurrentAPI()).name || JSON.parse(AppState.getCurrentAPI()).name !== this.state.currentAPI) {
-      this.setState({ currentAPI: JSON.parse(AppState.getCurrentAPI()).name })
+    if (!currentAPI && apiName || apiName !== currentAPI) {
+      this.setState({ currentAPI: apiName })
     } else {
-      if (this.state.currentAPI && this.props.state.currentAPI && this.state.currentAPI !== this.props.state.currentAPI) {
+      if (currentAPI && this.props.state.currentAPI && currentAPI !== this.props.state.currentAPI) {
         this.setState({ currentAPI: this.props.state.currentAPI });
       }
     }
@@ -157,7 +159,7 @@ class WzMenu extends Component {
           color="text"
           iconSide="right">
           Management
-      </EuiButtonEmpty>
+        </EuiButtonEmpty>
       </EuiButtonEmpty>);
 
     return (
