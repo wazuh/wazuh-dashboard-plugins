@@ -5,8 +5,9 @@
       "tsconfig.json",
       "wazuh.yml",
       "index.js",
-        "init.js",
+      "init.js",
       "server/**/*",
+      "!server/wazuh-registry.json",
       "public/**/*",
       "util/**/*"
     ]
