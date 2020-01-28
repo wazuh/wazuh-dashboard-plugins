@@ -38,6 +38,8 @@ import {
   OverviewVisualizations
 } from '../integration-files/visualizations';
 
+import { log } from '../logger';
+
 const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export class WazuhReportingCtrl {
