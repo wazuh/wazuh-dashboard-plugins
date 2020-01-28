@@ -10,19 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiButton, EuiCallOut, EuiLoadingSpinner } from '@elastic/eui';
-import PropTypes from 'prop-types';
-import './wz-menu.css';
+import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiPopover } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
-import { WzMisc } from '../../factories/misc';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
-
-
+import WzManagementSideMenu from '../../controllers/management/components/management/management-side-menu';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -35,7 +31,9 @@ class WzMenu extends Component {
       theresPattern: false,
       currentPattern: "",
       patternList: [],
-      currentSelectedPattern: ""
+      currentSelectedPattern: "",
+      isManagementPopoverOpen: false,
+      isVisualizePopoverOpen: false
     };
     this.store = store;
     this.wazuhConfig = new WazuhConfig();
@@ -146,6 +144,22 @@ class WzMenu extends Component {
       this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') })
     }
 
+    const managementButton = (
+      <EuiButtonEmpty
+        className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
+        color="text"
+        onClick={() => this.setMenuItem('manager')}>
+        <EuiIcon type='managementApp' color='primary' size='m' />
+        <EuiButtonEmpty
+          onClick={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
+          iconType="arrowDown"
+          className="wz-menu-button-title "
+          color="text"
+          iconSide="right">
+          Management
+      </EuiButtonEmpty>
+      </EuiButtonEmpty>);
+
     return (
       <WzReduxProvider>
         {this.state.showMenu && (
@@ -154,24 +168,31 @@ class WzMenu extends Component {
               <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
                 <EuiFlexItem >
                   <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }}>
-
                     <EuiButtonEmpty
                       className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
                       color="text"
                       href="#/overview"
                       onClick={() => this.setMenuItem('overview')} >
                       <EuiIcon type='visualizeApp' color='primary' size='m' />
-                      <span className="wz-menu-button-title "> Overview</span>
+                      <EuiButtonEmpty
+                        onClick={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
+                        iconType="arrowDown"
+                        className="wz-menu-button-title "
+                        color="text"
+                        iconSide="right">
+                        Visualize
+                      </EuiButtonEmpty>
                     </EuiButtonEmpty>
 
-                    <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/manager"
-                      onClick={() => this.setMenuItem('manager')}>
-                      <EuiIcon type='managementApp' color='primary' size='m' />
-                      <span className="wz-menu-button-title "> Management </span>
-                    </EuiButtonEmpty>
+                    <EuiPopover
+                      id="popover"
+                      button={managementButton}
+                      isOpen={this.state.isManagementPopoverOpen}
+                      closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
+                      anchorPosition="downLeft"
+                      hasArrow='false'>
+                      <WzManagementSideMenu section={'rules'} {...this.props} />
+                    </EuiPopover>
 
                     <EuiButtonEmpty
                       className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
