@@ -349,12 +349,6 @@ export const saveConfiguration = async (selectedNode, xml) => {
       await saveFileManager(xml);
     }
   } catch (error) {
-<<<<<<< HEAD
-=======
-    // this.fetchedXML = null; // From AngularJS
-    // this.doingSaving = false;
-    // this.errorHandler.handle(error.message || error);
->>>>>>> 0f423fa81ebf44a1f8ae28873ed9a1a7303341f6
     return Promise.error(error.message || error);
   }
 }
@@ -390,11 +384,7 @@ export const saveFileCluster = async (text, node) => {
       `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
       { content: xml, origin: 'xmleditor' }
     );
-<<<<<<< HEAD
     await validateAfterSent(node);
-=======
-    await validateAfterSent(false);
->>>>>>> 0f423fa81ebf44a1f8ae28873ed9a1a7303341f6
   } catch (error) {
     return Promise.reject(error);
   }
@@ -458,10 +448,6 @@ export const validateAfterSent = async (node = false) => {
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
-<<<<<<< HEAD
-=======
-      // $scope.configError = data.details;
->>>>>>> 0f423fa81ebf44a1f8ae28873ed9a1a7303341f6
       throw new Error('Validation error');
     }
     return true;
