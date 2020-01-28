@@ -122,18 +122,16 @@ class WzManagementSideMenu extends Component {
       const managementSections = ['rules', 'decoders', 'lists'];
       if (managementSections.includes(section) && managementSections.includes(fromSection)) {
         this.fetchData(section);
-        this.props.switchTab(section);
       } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
         this.props.updateManagementSection(section);
-        this.props.switchTab(section);
         this.fetchData(section);
       } else {
         if (section === 'cluster') {
           section = 'monitoring';
         }
         this.props.updateManagementSection(section);
-        this.props.switchTab(section);
       }
+      window.location.href = `#/manager/?tab=${section}`;
     }
   };
 
