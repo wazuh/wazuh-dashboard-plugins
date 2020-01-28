@@ -3,6 +3,17 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
+## Wazuh v3.11.3 - Kibana v7.5.2 - Revision 854
+
+### Added
+
+- Support for Wazuh v3.11.3
+
+### Fixed
+
+- Windows Updates table is now displayed in the Inventory Data report [#2028](https://github.com/wazuh/wazuh-kibana-app/pull/2028)
+
+
 ## Wazuh v3.11.2 - Kibana v7.5.2 - Revision 853
 
 ### Added
