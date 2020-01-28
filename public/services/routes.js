@@ -186,7 +186,7 @@ routes
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,
-    resolve: { enableWzMenu, nestedResolve }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,
