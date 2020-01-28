@@ -2,7 +2,26 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.11.2 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 572
+
+## Wazuh v3.11.3 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 854
+
+### Added
+
+- Support for Wazuh v3.11.3
+
+### Fixed
+
+- Windows Updates table is now displayed in the Inventory Data report [#2028](https://github.com/wazuh/wazuh-kibana-app/pull/2028)
+
+
+## Wazuh v3.11.2 - Kibana v7.5.2 - Revision 853
+
+### Added
+
+- Support for Kibana v7.5.2
+
+
+## Wazuh v3.11.2 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 852
 
 ### Added
 
@@ -15,6 +34,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - The xml validator now correctly handles the `--` string within comments [#1980](https://github.com/wazuh/wazuh-kibana-app/pull/1980)
+- The AWS map visualization wasn't been loaded until the user interacts with it [dd31bd7](https://github.com/wazuh/wazuh-kibana-app/commit/dd31bd7a155354bc50fe0af22fca878607c8936a)
 
 
 ## Wazuh v3.11.1 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 581

@@ -38,6 +38,8 @@ import {
   OverviewVisualizations
 } from '../integration-files/visualizations';
 
+import { log } from '../logger';
+
 const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export class WazuhReportingCtrl {
@@ -2303,7 +2305,34 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (error) {
+            log('reporting:report', error.message || error, 'debug');
+          }
+
+          try {
+            log(
+              'reporting:report',
+              `Fetching hotfixes for agent ${agentId}`,
+              'debug'
+            );
+            const hotfixes = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/hotfixes`,
+              {},
+              apiId
+            );
+            if (hotfixes && hotfixes.data && hotfixes.data.items) {
+              tables.push({
+                title: 'Windows updates',
+                columns: ['Update code'],
+                rows: hotfixes.data.items.map(x => {
+                  return [x['hotfix']];
+                })
+              });
+            }
+          } catch (error) {
+            log('reporting:report', error.message || error, 'debug');
+          }
         }
 
         if (!isAgentConfig && !isGroupConfig) {
