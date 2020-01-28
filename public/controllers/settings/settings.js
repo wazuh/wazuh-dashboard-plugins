@@ -115,6 +115,7 @@ export class SettingsController {
 
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
+      setDefault: entry => this.setDefault(entry),
       testApi: entry => this.testAPI.check(entry),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
@@ -132,7 +133,7 @@ export class SettingsController {
       },
       selectedTab: this.tab || 'api',
       tabs: [
-        { id: 'api', name: 'API hosts' },
+        { id: 'api', name: 'API' },
         { id: 'configuration', name: 'Configuration' },
         { id: 'logs', name: 'Logs' },
         { id: 'about', name: 'About' }

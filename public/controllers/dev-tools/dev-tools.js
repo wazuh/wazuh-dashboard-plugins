@@ -19,6 +19,7 @@ import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
+import store from '../../redux/store';
 
 export class DevToolsController {
   /**
@@ -56,6 +57,9 @@ export class DevToolsController {
    * When controller loads
    */
   $onInit() {
+    if(store.getState() && store.getState().appStateReducers && !store.getState().appStateReducers.showMenu){
+      AppState.setWzMenu();
+    }
     $(this.$document[0]).keydown(e => {
       if (!this.multipleKeyPressed.includes(e.which)) {
         this.multipleKeyPressed.push(e.which);
