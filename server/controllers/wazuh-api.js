@@ -252,7 +252,7 @@ export class WazuhApiCtrl {
 
       if (responseIsDown) {
         return ErrorResponse(
-          `ERROR3099 - ${responseManagerInfo.data.message || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${responseManagerInfo.data.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           reply
@@ -314,9 +314,7 @@ export class WazuhApiCtrl {
         }
       }
 
-      const tmpMsg =
-        ((responseManagerInfo || {}).data || {}).message ||
-        'Unexpected error checking the Wazuh API';
+      const tmpMsg =  responseManagerInfo.data.detail || 'Unexpected error checking the Wazuh API';
 
       throw new Error(tmpMsg);
     } catch (error) {
