@@ -18,6 +18,7 @@ import { updateRulesetSection } from '../../../../redux/actions/rulesetActions'
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
+import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main'
 // import { GroupsTable } from './groups/groups-table';
@@ -43,6 +44,7 @@ class WzManagementMain extends Component {
               (section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
               (section === 'reporting' && <WzReporting />) || 
+              (section === 'logs' && <WzLogs />) || 
               (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
               (ruleset.includes(section) && <WzRuleset section={section} />)
             }
