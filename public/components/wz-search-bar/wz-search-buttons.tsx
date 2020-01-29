@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import { EuiButtonGroup } from '@elastic/eui';
+import index from "../../../test/functional/apps/overview";
 
 export interface filterButton {
   label: string
@@ -25,10 +26,10 @@ export class WzSearchButtons extends Component {
     options: filterButton[]
     filters: {}
     onChange: Function
-  }
+  };
   state: {
     toggleIconIdToSelectedMap: {}
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -36,6 +37,16 @@ export class WzSearchButtons extends Component {
       toggleIconIdToSelectedMap: {},
     };
     this.onChange.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const currenttFilters = JSON.stringify(this.props.filters);
+    const nextFilters = JSON.stringify(nextProps.filters);
+    return (currenttFilters !== nextFilters ? false : true);
+  }
+
+  componentDidUpdate() {
+    this.checkFilters();
   }
 
   buildOptions() {
@@ -60,7 +71,7 @@ export class WzSearchButtons extends Component {
       },
     };
 
-    const result = this.changeFilters(optionId, !toggleIconIdToSelectedMap[optionId])
+    const result = this.changeFilters(optionId, !toggleIconIdToSelectedMap[optionId]);
     this.props.onChange(result);
     this.setState({
       toggleIconIdToSelectedMap: newToggleIconIdToSelectedMap,
@@ -74,18 +85,45 @@ export class WzSearchButtons extends Component {
     if(status) {
       return {
         ...filters,
-        [button['field']]: button['value'] 
+        [button['field']]: button['value']
       }
     } else {
       return delete filters[button['field']]
     }
   }
 
+  selectFilter(optionLabel, newStatus) {
+    const { toggleIconIdToSelectedMap } = this.state;
+    const newToggleIconIdToSelectedMap = {
+      ...toggleIconIdToSelectedMap,
+      ...{
+        [optionLabel]: newStatus,
+      },
+    };
+    this.setState({
+      toggleIconIdToSelectedMap: newToggleIconIdToSelectedMap
+    });
+  }
 
+  checkFilters() {
+    const { filters, options } = this.props;
+    const { toggleIconIdToSelectedMap } = this.state;
+
+    if (Object.keys(toggleIconIdToSelectedMap).length === 0 && toggleIconIdToSelectedMap.constructor === Object) {
+      // OBJETO BOTONES VACIO
+      for (const filter of Object.keys(filters)) {
+        for (const option of options) {
+          if (filter === option.field) {
+            this.selectFilter(option.label,true);
+          }
+        }
+      }
+    }
+  }
 
   render() {
     const { toggleIconIdToSelectedMap } = this.state;
-    const options = this.buildOptions()
+    const options = this.buildOptions();
     return (
       <EuiButtonGroup
         legend="Text align"
