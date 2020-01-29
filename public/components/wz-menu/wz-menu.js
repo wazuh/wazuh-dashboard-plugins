@@ -178,7 +178,6 @@ class WzMenu extends Component {
                       <EuiIcon type='visualizeApp' color='primary' size='m' />
                       <EuiButtonEmpty
                         onClick={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
-                        iconType="arrowDown"
                         className="wz-menu-button-title "
                         color="text"
                         iconSide="right">
