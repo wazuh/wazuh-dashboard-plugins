@@ -24,6 +24,7 @@ import { VisHandlers } from '../../factories/vis-handlers';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateMetric } from '../../redux/actions/visualizationsActions'
+import { GenericRequest } from '../../react-services/generic-request';
 export class KibanaVis extends Component {
   _isMounted = false;
 
@@ -41,7 +42,7 @@ export class KibanaVis extends Component {
     this.deadField = false;
     this.mapClicked = false;
     this.updateMetric = updateMetric;
-
+    this.genericReq = GenericRequest;
     this.discoverPendingUpdates = new DiscoverPendingUpdates();
     this.loadedVisualizations = new LoadedVisualizations();
     this.rawVisualizations = new RawVisualizations();
@@ -204,7 +205,6 @@ export class KibanaVis extends Component {
         }
       }
     } catch (error) {
-      console.log('ERRORRRRR ', error);
       if (((error || {}).message || '').includes('not locate that index-pattern-field')) {
         if (this.deadField) {
           this.tabVisualizations.addDeadVis();
@@ -214,11 +214,12 @@ export class KibanaVis extends Component {
         if (!this.lockFields) {
           try {
             this.lockFields = true;
-            await genericReq.request('GET', '/elastic/known-fields/all', {});
+            await this.genericReq.request('GET', '/elastic/known-fields/all', {});
             this.lockFields = false;
           } catch (error) {
             this.lockFields = false;
             console.log(error.message || error);
+            //TODO:Implement errorHandler service as class
             // errorHandler.handle('An error occurred fetching new index pattern fields.');
           }
         }
@@ -226,6 +227,8 @@ export class KibanaVis extends Component {
         this.renderInProgress = false;
         return this.myRender(raw);
       } else {
+        console.log(error.message || error);
+        //TODO:Implement errorHandler service as class
         // errorHandler.handle(error, 'Visualize');
       }
     }
@@ -269,7 +272,7 @@ export class KibanaVis extends Component {
       );
 
       const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
-      if (this.props.type === 'metric') {
+      if (this.props.isMetric) {
         const data = await this.visHandler.fetch();
         const updateMetric = this.updateMetric({ name: visId, value: data.value.visData.rows['0']['col-0-1'] });
         store.dispatch(updateMetric)

@@ -12,7 +12,6 @@
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
-import { visualizations } from '../../templates/visualize/visualizations';
 
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
@@ -47,7 +46,6 @@ export class OverviewController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.visualizations = visualizations;
     this.appState = appState;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;

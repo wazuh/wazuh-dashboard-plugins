@@ -27,7 +27,9 @@ export class WzVisualize extends Component {
       expandedVis: false,
       updateVis: this.props.updateVis,
       cardReqs: {},
-      metricItems: this.getMetricItems(this.props.selectedTab)
+      metricItems: this.props.selectedTab !== 'welcome'
+        ? this.getMetricItems(this.props.selectedTab)
+        : []
     };
     this.metricValues = false;
   }
@@ -36,7 +38,10 @@ export class WzVisualize extends Component {
     const { selectedTab } = this.state;
     if (selectedTab !== this.props.selectedTab) {
       this.setState({
-        selectedTab: this.props.selectedTab
+        selectedTab: this.props.selectedTab,
+        metricItems: this.props.selectedTab !== 'welcome'
+          ? this.getMetricItems(this.props.selectedTab)
+          : []
       });
     }
   }
@@ -53,7 +58,7 @@ export class WzVisualize extends Component {
     const items = [];
     if (this.visualizations[tab].metrics) {
       this.visualizations[tab].metrics.forEach(
-        x => { items.push({ id: x.id, description: x.description, value: x.value, color: x.color, hasValue: false }) }
+        x => { items.push({ id: x.id, description: x.description, color: x.color }) }
       );
     }
     return {
@@ -114,7 +119,7 @@ export class WzVisualize extends Component {
             {this.visualizations[selectedTab].metrics.map((vis, i) => {
               return (
                 <div key={i}>
-                  <KibanaVis visID={vis.id} tab={selectedTab} type={'metric'} {...this.props}></KibanaVis>
+                  <KibanaVis visID={vis.id} tab={selectedTab} isMetric={true} {...this.props}></KibanaVis>
                 </div>
               )
             })}
@@ -123,79 +128,17 @@ export class WzVisualize extends Component {
 
         {/* Metrics of Dashboard */}
         {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab].metrics && this.state.metricItems) &&
-          <div className="md-padding">
+          <div className="md-padding-top-10">
             <WzReduxProvider>
               <AlertsStats {...this.state.metricItems} tab={selectedTab} />
             </WzReduxProvider>
           </div>
         }
-        {/* 
-    <!-- Metrics of Vulverabilities Dashboard -->
-    <div ng-if="octrl.tab === 'vuls'" class="md-padding">
-        <AlertsStats props="{
-            items: [
-                { description: 'Critical severity alerts', value: octrl.vulnCritical(), color: 'danger' },
-                { description: 'High severity alerts', value: octrl.vulnHigh(), color: 'primary' },
-                { description: 'Medium severity alerts', value: octrl.vulnMedium(), color: 'secondary' },
-                { description: 'Low severity alerts', value: octrl.vulnLow(), color: 'subdued' }
-            ]            
-        }" />
-    </div>
 
-    <!-- Metrics of VirusTotal Dashboard -->
-    <div ng-if="octrl.tab === 'virustotal'" class="md-padding">
-        <react-component flex name="AlertsStats" props="{
-            items: [
-                { description: 'Total malicious', value: octrl.virusMalicious(), color: 'danger' },
-                { description: 'Total positives', value: octrl.virusPositives(), color: 'primary' },
-                { description: 'Total', value: octrl.virusTotal(), color: 'secondary' },
-            ]            
-        }" />
-    </div>
-
-    <!-- Metrics of Osquery Dashboard -->
-    <div ng-if="octrl.tab === 'osquery'" class="md-padding">
-        <react-component flex name="AlertsStats" props="{
-            items: [
-                { description: 'Agents reporting Osquery events', value: octrl.osqueryAgentsReporting() + ' / ' + octrl.agentsCountTotal, color: 'primary' },
-            ]            
-        }" />
-    </div>
-
-    <!-- Metrics of Oscap Dashboard -->
-    <div ng-if="octrl.tab === 'oscap'" class="md-padding">
-        <react-component flex name="AlertsStats" props="{
-                items: [
-                    { description: 'Last score', value: octrl.scapLastScore(), color: 'accent' },
-                    { description: 'Highest score', value: octrl.virusPositives(), color: 'primary' },
-                    { description: 'Lowest score', value: octrl.virusTotal(), color: 'secondary' },
-                ]            
-            }" />
-    </div>
-
-    <!-- Metrics of Cis-Cat Dashboard -->
-    <div ng-if="octrl.tab === 'ciscat'" class="md-padding">
-        <react-component flex name="AlertsStats" props="{
-                items: [
-                    { description: 'Last not checked', value: octrl.ciscatScanNotChecked(), color: 'accent' },
-                    { description: 'Last pass', value: octrl.ciscatScanPass(), color: 'primary' },
-                    { description: 'Last scan score', value: octrl.ciscatScanScore(), color: 'secondary' },
-                    { description: 'Last scan date', value: octrl.ciscatScanTimestamp(), color: 'subdued' },
-                    { description: 'Last errors', value: octrl.ciscatScanError(), color: 'accent' },
-                    { description: 'Last fails', value: octrl.ciscatScanFail(), color: 'primary' },
-                    { description: 'Last unknown', value: octrl.ciscatScanUnknown(), color: 'secondary' },
-                    { description: 'Last scan benchmark', value: octrl.ciscatScanBenchmark(), color: 'subdued' },
-                ]            
-            }" />
-    </div>
-
- */}
         {/* Cards for Regulatory Compliance Dashboards */}
         {(cardReqs && cardReqs.items) &&
-          <div className="md-padding">
-            <div className="wz-margin-10">
-              <RequirementCard {...cardReqs} />
-            </div>
+          <div style={{ padding: '10px 12px 8px' }}>
+            <RequirementCard {...cardReqs} />
           </div>
         }
 

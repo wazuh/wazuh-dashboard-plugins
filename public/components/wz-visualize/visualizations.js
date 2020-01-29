@@ -13,10 +13,10 @@
 export const visualizations = {
   general: {
     metrics: [
-      { id: 'Wazuh-App-Overview-General-Metric-alerts', description: 'Total', value: 'totalAlerts', color: 'primary', metric: '[id="Wazuh-App-Overview-General-Metric-alerts"]' },
-      { id: 'Wazuh-App-Overview-General-Level-12-alerts', description: 'Level 12 or above alerts', value: 'level12', color: 'accent', metric: '[id="Wazuh-App-Overview-General-Level-12-alerts"]' },
-      { id: 'Wazuh-App-Overview-General-Authentication-failure', description: 'Authentication failure', value: 'authFailure', color: 'danger', metric: '[id="Wazuh-App-Overview-General-Authentication-failure"]' },
-      { id: 'Wazuh-App-Overview-General-Authentication-success', description: 'Authentication success', value: 'authSuccess', color: 'secondary', metric: '[id="Wazuh-App-Overview-General-Authentication-success"]' },
+      { id: 'Wazuh-App-Overview-General-Metric-alerts', description: 'Total', value: 'totalAlerts', color: 'primary' },
+      { id: 'Wazuh-App-Overview-General-Level-12-alerts', description: 'Level 12 or above alerts', value: 'level12', color: 'accent' },
+      { id: 'Wazuh-App-Overview-General-Authentication-failure', description: 'Authentication failure', value: 'authFailure', color: 'danger' },
+      { id: 'Wazuh-App-Overview-General-Authentication-success', description: 'Authentication success', value: 'authSuccess', color: 'secondary' },
     ],
     rows: [
       {
@@ -415,10 +415,10 @@ export const visualizations = {
   },
   vuls: {
     metrics: [
-      { id: 'Wazuh-App-Overview-vuls-Metric-Critical-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-High-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-Medium-severity' },
-      { id: 'Wazuh-App-Overview-vuls-Metric-Low-severity' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-Critical-severity', description: 'Critical severity alerts', color: 'danger' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-High-severity', description: 'High severity alerts', color: 'primary' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-Medium-severity', description: 'Medium severity alerts', color: 'secondary' },
+      { id: 'Wazuh-App-Overview-vuls-Metric-Low-severity', description: 'Low severity alerts', color: 'subdued' },
     ],
     rows: [
       {
@@ -470,9 +470,9 @@ export const visualizations = {
   },
   virustotal: {
     metrics: [
-      { id: 'Wazuh-App-Overview-Virustotal-Total-Malicious' },
-      { id: 'Wazuh-App-Overview-Virustotal-Total-Positives' },
-      { id: 'Wazuh-App-Overview-Virustotal-Total' },
+      { id: 'Wazuh-App-Overview-Virustotal-Total-Malicious', description: 'Total malicious', color: 'danger' },
+      { id: 'Wazuh-App-Overview-Virustotal-Total-Positives', description: 'Total positives', color: 'primary' },
+      { id: 'Wazuh-App-Overview-Virustotal-Total', description: 'Total', color: 'secondary' },
     ],
     rows: [
       {
@@ -520,7 +520,7 @@ export const visualizations = {
     ],
   },
   osquery: {
-    metrics: [{ id: 'Wazuh-App-Overview-Osquery-Agents-reporting' }],
+    metrics: [{ id: 'Wazuh-App-Overview-Osquery-Agents-reporting', description: 'Agents reporting Osquery events', color: 'primary' }],
     rows: [
       {
         height: 300,
@@ -612,9 +612,9 @@ export const visualizations = {
   },
   oscap: {
     metrics: [
-      { id: 'Wazuh-App-Overview-OSCAP-Last-score' },
-      { id: 'Wazuh-App-Overview-OSCAP-Highest-score' },
-      { id: 'Wazuh-App-Overview-OSCAP-Lowest-score' },
+      { id: 'Wazuh-App-Overview-OSCAP-Last-score', description: 'Last score', color: 'accent' },
+      { id: 'Wazuh-App-Overview-OSCAP-Highest-score', description: 'Highest score', color: 'primary' },
+      { id: 'Wazuh-App-Overview-OSCAP-Lowest-score', description: 'Lowest score', color: 'secondary' },
     ],
     rows: [
       {
@@ -679,14 +679,14 @@ export const visualizations = {
   },
   ciscat: {
     metrics: [
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-error' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-fail' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-not-checked' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-pass' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-score' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-timestamp' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-error', description: 'Last not checked', color: 'accent'  },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-fail', description: 'Last pass', color: 'primary' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-not-checked', description: 'Last scan score', color: 'secondary' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-pass', description: 'Last scan date', color: 'subdued' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-score', description: 'Last errors', color: 'accent' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-timestamp', description: 'Last fails',  color: 'primary' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark', description: 'Last unknown', color: 'secondary' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown', description: 'Last scan benchmark', color: 'subdued' },
     ],
     rows: [
       {

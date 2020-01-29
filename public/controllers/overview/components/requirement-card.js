@@ -149,28 +149,23 @@ export class RequirementCard extends Component {
     if (!this.state.slider.length) this.buildSlider();
     const cards = this.state.slider[this.state.position];
     return (
-      <div>
-        <EuiFlexGroup gutterSize="l" className="requirements-cards">
-          {this.state.sliderLength > 1 && this.state.position > 0 && (
-            <EuiButtonIcon
-              className="wz-margin-left-10"
-              iconType="arrowLeft"
-              aria-label="Previous"
-              onClick={() => this.slideLeft()}
-            />
-          )}
-          {cards}
-          {this.state.sliderLength > 1 &&
-            this.state.position < this.state.sliderLength - 1 && (
-              <EuiButtonIcon
-                className="wz-margin-right-10"
-                iconType="arrowRight"
-                aria-label="Next"
-                onClick={() => this.slideRight()}
-              />
-            )}
-        </EuiFlexGroup>
-      </div>
+      <EuiFlexGroup gutterSize="l" className="requirements-cards">
+        <EuiButtonIcon
+          style={{ margin: '12px 0 12px 12px' }}
+          iconType="arrowLeft"
+          aria-label="Previous"
+          onClick={() => this.slideLeft()}
+          isDisabled={this.state.sliderLength <= 1 || this.state.position === 0}
+        />
+        {cards}
+        <EuiButtonIcon
+          style={{ margin: '12px 10px 12px 0' }}
+          iconType="arrowRight"
+          aria-label="Next"
+          onClick={() => this.slideRight()}
+          isDisabled={this.state.sliderLength <= 1 || this.state.position >= this.state.sliderLength - 1}
+        />
+      </EuiFlexGroup>
     );
   }
 }
