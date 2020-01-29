@@ -35,18 +35,14 @@ export class ApiInterceptor {
       url: `${api.url}:${api.port}/security/user/authenticate`,
     };
 
-    axios(options)
+    return axios(options)
       .then(response => {
         const token = response.data.token;
-        if (response.status === 200) {
-          this.updateRegistry.updateTokenByHost(idHost, token);
-          return token;
-        }
-
-        return null;
+        this.updateRegistry.updateTokenByHost(idHost, token);
+        return response;
       })
       .catch(error => {
-        return null;
+        throw error;
       });
   }
 
@@ -74,19 +70,21 @@ export class ApiInterceptor {
 
     return axios(options)
       .then(response => {
-        if (response.status === 200) {
-          return response.data;
-        }
-        return response.data;
+        return response;
       })
       .catch(async error => {
         if (attempts > 0) {
           if (error.response.status === 401) {
-            await this.authenticateApi(idHost);
-            return this.request(method, path, payload, idHost, attempts - 1);
+            return this.authenticateApi(idHost)
+              .then(response => {
+                return this.request(method, path, payload, idHost, attempts - 1);
+              })
+              .catch(errorAuth => {
+                return errorAuth.response;
+              });
           }
         }
-        return null;
+        return error.response;
       });
   }
 }
