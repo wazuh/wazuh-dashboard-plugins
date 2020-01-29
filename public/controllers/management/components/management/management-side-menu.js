@@ -41,7 +41,8 @@ class WzManagementSideMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedItemName: this.props.section || 'ruleset'
+      // TODO: Fix the selected section
+      selectedItemName: null
     };
 
     this.managementSections = {
@@ -107,32 +108,8 @@ class WzManagementSideMenu extends Component {
     }
   }
 
-  clickMenuItem = name => {
-    const fromSection = this.state.selectedItemName;
-    let section = name;
-    if (this.state.selectedItemName !== section) {
-      this.setState({
-        selectedItemName: section,
-      });
-      this.props.updateSortDirection('asc');
-      this.props.updateSortField(section !== 'rules' ? 'name' : 'id');
-      this.props.cleanFilters();
-      this.props.updateIsProcessing(true);
-      this.props.updatePageIndex(0);
-      const managementSections = ['rules', 'decoders', 'lists'];
-      if (managementSections.includes(section) && managementSections.includes(fromSection)) {
-        this.fetchData(section);
-      } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
-        this.props.updateManagementSection(section);
-        this.fetchData(section);
-      } else {
-        if (section === 'cluster') {
-          section = 'monitoring';
-        }
-        this.props.updateManagementSection(section);
-      }
-      window.location.href = `#/manager/?tab=${section}`;
-    }
+  clickMenuItem = section => {
+    window.location.href = `#/manager/?tab=${section}`;
   };
 
   createItem = (item, data = {}) => {

@@ -7,10 +7,6 @@ import {
   EuiPage,
   EuiText,
   EuiTitle,
-  EuiSwitch,
-  EuiPopover,
-  EuiButton,
-  EuiButtonEmpty
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -49,15 +45,6 @@ class WzRulesetOverview extends Component {
                 <h2>{this.sectionNames[section]}</h2>
               </EuiTitle>
             </EuiFlexItem>
-            {/* {(section == 'rules' || section === 'decoders') && (
-              <EuiFlexItem grow={false} style={{ paddingTop: 7 }}>
-                <EuiSwitch
-                  label={`Custom ${this.sectionNames[section]}`}
-                  checked={false}
-                  onChange={this.clickActionFilterBar}
-                />
-              </EuiFlexItem>
-            )} */}
             <EuiFlexItem>
             </EuiFlexItem>
             <WzRulesetActionButtons />

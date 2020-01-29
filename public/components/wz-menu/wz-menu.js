@@ -193,7 +193,7 @@ class WzMenu extends Component {
                       closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
                       anchorPosition="downLeft"
                       hasArrow='false'>
-                      <WzManagementSideMenu section={'rules'} {...this.props} />
+                      <WzManagementSideMenu {...this.props} />
                     </EuiPopover>
 
                     <EuiButtonEmpty
