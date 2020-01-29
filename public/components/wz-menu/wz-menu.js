@@ -48,6 +48,10 @@ class WzMenu extends Component {
   componentDidUpdate(prevProps) {
     const { name:apiName } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
+    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation.replace(/\//g, '') !== this.state.currentMenuTab) {
+      this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') })
+    }
+
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
       this.load();
     }
@@ -141,25 +145,29 @@ class WzMenu extends Component {
     this.setState({ currentMenuTab: item })
   }
 
+  managementPopoverToggle() {
+    this.setState(state => { 
+      return {isManagementPopoverOpen: !state.isManagementPopoverOpen }
+    });
+  }
+
+  onClickManagementButton() {
+    this.setMenuItem('manager');
+    this.managementPopoverToggle();
+  }
+
+
   render() {
-    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation.replace(/\//g, '') !== this.state.currentMenuTab) {
-      this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') })
-    }
+
 
     const managementButton = (
       <EuiButtonEmpty
         className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
         color="text"
-        onClick={() => this.setMenuItem('manager')}>
-        <EuiIcon type='managementApp' color='primary' size='m' />
-        <EuiButtonEmpty
-          onClick={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
-          iconType="arrowDown"
-          className="wz-menu-button-title "
-          color="text"
-          iconSide="right">
-          Management
-        </EuiButtonEmpty>
+        onClick={this.onClickManagementButton.bind(this)}
+        iconType="arrowDown"
+        iconSide="right">
+        <EuiIcon type='managementApp' color='primary' size='m' /> Management
       </EuiButtonEmpty>);
 
     return (
@@ -175,14 +183,7 @@ class WzMenu extends Component {
                       color="text"
                       href="#/overview"
                       onClick={() => this.setMenuItem('overview')} >
-                      <EuiIcon type='visualizeApp' color='primary' size='m' />
-                      <EuiButtonEmpty
-                        onClick={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
-                        className="wz-menu-button-title "
-                        color="text"
-                        iconSide="right">
-                        Visualize
-                      </EuiButtonEmpty>
+                      <EuiIcon type='visualizeApp' color='primary' size='m' /> Visualize
                     </EuiButtonEmpty>
 
                     <EuiPopover
@@ -190,9 +191,10 @@ class WzMenu extends Component {
                       button={managementButton}
                       isOpen={this.state.isManagementPopoverOpen}
                       closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
-                      anchorPosition="downLeft"
-                      hasArrow='false'>
-                      <WzManagementSideMenu {...this.props} />
+                      anchorPosition="downLeft" >
+                      <WzManagementSideMenu 
+                        managementPopoverToggle={this.managementPopoverToggle.bind(this)} 
+                        {...this.props} />
                     </EuiPopover>
 
                     <EuiButtonEmpty
