@@ -123,5 +123,5 @@ hosts:
      url: http://localhost
      port: 55000
      user: foo
-     username: wazuhw
+     username: wazuh
      password: wazuh
