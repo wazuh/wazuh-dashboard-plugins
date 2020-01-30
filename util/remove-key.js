@@ -11,27 +11,27 @@
  */
 export function cleanKeys(response) {
   // Remove agent key
-  if (response.body.data.internal_key) {
-    response.body.data.internal_key = '********';
+  if (response.data.data.internal_key) {
+    response.data.data.internal_key = '********';
   }
 
   // Remove cluster key (/com/cluster)
-  if (response.body.data.node_type && response.body.data.key) {
-    response.body.data.key = '********';
+  if (response.data.data.node_type && response.data.data.key) {
+    response.data.data.key = '********';
   }
 
   // Remove cluster key (/manager/configuration)
   if (
-    response.body.data.cluster &&
-    response.body.data.cluster.node_type &&
-    response.body.data.cluster.key
+    response.data.data.cluster &&
+    response.data.data.cluster.node_type &&
+    response.data.data.cluster.key
   ) {
-    response.body.data.cluster.key = '********';
+    response.data.data.cluster.key = '********';
   }
 
   // Remove AWS keys
-  if (response.body.data.wmodules) {
-    response.body.data.wmodules.map(item => {
+  if (response.data.data.wmodules) {
+    response.data.data.wmodules.map(item => {
       if (item['aws-s3']) {
         if (item['aws-s3'].buckets) {
           item['aws-s3'].buckets.map(item => {
@@ -50,7 +50,7 @@ export function cleanKeys(response) {
   }
 
   // Remove integrations keys
-  if (response.body.data.integration) {
-    response.body.data.integration.map(item => (item.api_key = '********'));
+  if (response.data.data.integration) {
+    response.data.data.integration.map(item => (item.api_key = '********'));
   }
 }
