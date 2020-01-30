@@ -209,6 +209,11 @@ class WzRulesetActionButtons extends Component {
         Refresh
       </EuiButtonEmpty>
     );
+    
+    const uploadFile = async (files, path) => {
+      await this.uploadFiles(files, path);
+      await this.refresh();
+    };
 
     return (
       <Fragment>
@@ -233,7 +238,7 @@ class WzRulesetActionButtons extends Component {
             <UploadFiles
               msg={section}
               path={`etc/${section}`}
-              upload={async (files, path) => await this.uploadFiles(files, path)} />
+              upload={uploadFile} />
           </EuiFlexItem>
         )}
         <EuiFlexItem grow={false}>
