@@ -167,10 +167,10 @@ export class HealthCheck {
           if (this.checks.setup) {
             const versionData = await this.apiReq.request(
               'GET',
-              '/version',
+              '//',
               {}
             );
-            const apiVersion = versionData.data.data;
+            const apiVersion = versionData.data.api_version;
             const setupData = await this.genericReq.request(
               'GET',
               '/api/setup'
@@ -182,7 +182,7 @@ export class HealthCheck {
               );
               this.errors.push('Error fetching version');
             }
-            const apiSplit = apiVersion.split('v')[1].split('.');
+            const apiSplit = apiVersion.split('.');
             const appSplit = setupData.data.data['app-version'].split('.');
 
             const i = this.results.map(item => item.id).indexOf(1);
