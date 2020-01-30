@@ -54,7 +54,7 @@ export class WzStatisticsOverview extends Component {
       });
       this.setState({
         clusterNodes: nodes,
-        clusterNodeSelected: nodes[0]
+        clusterNodeSelected: nodes[0].value
       });
     } catch (err) {
       this.setState({
@@ -84,7 +84,7 @@ export class WzStatisticsOverview extends Component {
     this.setState({
       isLoading: true,
     });
-    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId, this.state.clusterNodeSelected.value);
+    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId, this.state.clusterNodeSelected);
     this.setState({
       stats: data.data.data,
       isLoading: false
@@ -105,7 +105,7 @@ export class WzStatisticsOverview extends Component {
 
   onSelectNode = e => {
     this.setState({
-      clusterNodeSelected: e.target
+      clusterNodeSelected: e.target.value
     }, () => {
       this.fetchData();
     });
