@@ -21,74 +21,85 @@ export class ApiInterceptor {
   }
 
   async authenticateApi(idHost) {
-    const api = await this.manageHosts.getHostById(idHost);
+    try {
+      const api = await this.manageHosts.getHostById(idHost);
+      const options = {
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+        },
+        auth: {
+          username: api.username,
+          password: api.password,
+        },
+        url: `${api.url}:${api.port}/security/user/authenticate`,
+      };
 
-    const options = {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-      auth: {
-        username: api.username,
-        password: api.password,
-      },
-      url: `${api.url}:${api.port}/security/user/authenticate`,
-    };
-
-    return axios(options)
-      .then(async response => {
-        const token = response.data.token;
-        await this.updateRegistry.updateTokenByHost(idHost, token);
-        return response;
-      })
-      .catch(error => {
-        throw error;
-      });
+      const response = await axios(options);
+      const token = response.data.token;
+      await this.updateRegistry.updateTokenByHost(idHost, token);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async buildOptionsObject(method, path, payload, options) {
-    if(!options.idHost){
+    if (!options.idHost) {
       return {};
     }
-    const idHost = options.idHost
+    const idHost = options.idHost;
     let token = await this.updateRegistry.getTokenById(idHost);
 
     if (token === null) {
-      token = await this.authenticateApi(idHost);
-      await this.updateRegistry.updateTokenByHost(idHost, token);
+      await this.authenticateApi(idHost);
+      token = await this.updateRegistry.getTokenById(idHost);
     }
 
-    return {
-      method: method,
-      headers: {
-        'content-type': options.content_type || 'application/json',
-        Authorization: ' Bearer ' + token,
-      },
-      data: payload,
-      url: path,
-    };
+    if (token !== null) {
+      return {
+        method: method,
+        headers: {
+          'content-type': options.content_type || 'application/json',
+          Authorization: ' Bearer ' + token,
+        },
+        data: payload,
+        url: path,
+      };
+    } else {
+      return null;
+    }
   }
 
   async request(method, path, payload = {}, options, attempts = 3) {
     const optionsObject = await this.buildOptionsObject(method, path, payload, options);
 
-    return axios(optionsObject)
-      .then(response => {
-        return response;
-      })
-      .catch(async error => {
-        if (attempts > 0) {
-          if (error.response.status === 401) {
-            return this.authenticateApi(options.idHost)
-              .then(response => {
+    if (optionsObject !== null) {
+      return axios(optionsObject)
+        .then(response => {
+          return response;
+        })
+        .catch(async error => {
+          if (attempts > 0) {
+            if (error.response.status === 401) {
+              const responseAuth = await this.authenticateApi(options.idHost);
+
+              if (responseAuth.status === 200) {
                 return this.request(method, path, payload, options, attempts - 1);
-              })
-              .catch(errorAuth => {
-                return errorAuth.response;
-              });
+              } else {
+                return responseAuth;
+              }
+            }
           }
-        }
-        return error.response;
-      });
+          return error.response;
+        });
+    } else {
+      return {
+        data: {
+          detail: 'Error to create the options',
+        },
+        status: 500,
+      };
+    }
   }
 }
