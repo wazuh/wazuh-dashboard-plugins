@@ -202,7 +202,8 @@ class WzRulesetSearchBar extends Component {
       apiSuggests={apiSuggests}
       onInputChange={this.props.updateFilters}
       placeholder={"Add filter or search"} 
-      buttonOptions={buttonOptions} />
+      buttonOptions={buttonOptions}
+      noDeleteFiltersOnUpdateSuggests={true} />
     )
   }
 }
