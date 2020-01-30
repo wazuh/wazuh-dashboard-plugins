@@ -12,7 +12,6 @@
 
 import React, { Component } from 'react';
 import { EuiButtonGroup } from '@elastic/eui';
-import index from "../../../test/functional/apps/overview";
 
 export interface filterButton {
   label: string
@@ -28,13 +27,13 @@ export class WzSearchButtons extends Component {
     onChange: Function
   };
   state: {
-    toggleIconIdToSelectedMap: {}
+    IconSelectedMap: {}
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      toggleIconIdToSelectedMap: {},
+      IconSelectedMap: {},
     };
     this.onChange.bind(this);
   }
@@ -42,7 +41,7 @@ export class WzSearchButtons extends Component {
   shouldComponentUpdate(nextProps) {
     const currenttFilters = JSON.stringify(this.props.filters);
     const nextFilters = JSON.stringify(nextProps.filters);
-    return (currenttFilters !== nextFilters ? false : true);
+    return (currenttFilters !== nextFilters);
   }
 
   componentDidUpdate() {
@@ -63,15 +62,15 @@ export class WzSearchButtons extends Component {
   }
 
   onChange(optionId) {
-    const { toggleIconIdToSelectedMap } = this.state;
+    const { IconSelectedMap } = this.state;
     const newToggleIconIdToSelectedMap = {
-      ...toggleIconIdToSelectedMap,
+      ...IconSelectedMap,
       ...{
-        [optionId]: !toggleIconIdToSelectedMap[optionId],
+        [optionId]: !IconSelectedMap[optionId],
       },
     };
 
-    const result = this.changeFilters(optionId, !toggleIconIdToSelectedMap[optionId]);
+    const result = this.changeFilters(optionId, !IconSelectedMap[optionId]);
     this.props.onChange(result);
     this.setState({
       toggleIconIdToSelectedMap: newToggleIconIdToSelectedMap,
@@ -92,37 +91,21 @@ export class WzSearchButtons extends Component {
     }
   }
 
-  selectFilter(optionLabel, newStatus) {
-    const { toggleIconIdToSelectedMap } = this.state;
-    const newToggleIconIdToSelectedMap = {
-      ...toggleIconIdToSelectedMap,
-      ...{
-        [optionLabel]: newStatus,
-      },
-    };
-    this.setState({
-      toggleIconIdToSelectedMap: newToggleIconIdToSelectedMap
-    });
-  }
-
   checkFilters() {
     const { filters, options } = this.props;
-    const { toggleIconIdToSelectedMap } = this.state;
+    const { IconSelectedMap } = this.state;
 
-    if (Object.keys(toggleIconIdToSelectedMap).length === 0 && toggleIconIdToSelectedMap.constructor === Object) {
-      // OBJETO BOTONES VACIO
-      for (const filter of Object.keys(filters)) {
-        for (const option of options) {
-          if (filter === option.field) {
-            this.selectFilter(option.label,true);
-          }
-        }
-      }
+    for (const button of options) {
+      const filterExist = Object.keys(filters).find( 
+        item => item === button.field && filters[item] === button.value
+      );
+
+      IconSelectedMap[button.label] = !!filterExist
     }
   }
 
   render() {
-    const { toggleIconIdToSelectedMap } = this.state;
+    const { IconSelectedMap } = this.state;
     const options = this.buildOptions();
     return (
       <EuiButtonGroup
@@ -130,7 +113,7 @@ export class WzSearchButtons extends Component {
         name="textAlign"
         buttonSize="m"
         options={options}
-        idToSelectedMap={toggleIconIdToSelectedMap}
+        idToSelectedMap={IconSelectedMap}
         type="multi"
         onChange={this.onChange.bind(this)}
       />
