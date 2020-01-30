@@ -24,7 +24,7 @@ const initialState = {
   listInfo: false,
   pageIndex: 0,
   ruleInfo: false,
-  section: 'rules',
+  section: '',
   showingFiles: false,
   showModal: false,
   sortDirection: 'asc',
