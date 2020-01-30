@@ -114,9 +114,11 @@ export class WazuhApiCtrl {
               // Update cluster information in the wazuh-registry.json
               await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
       
-              // Hide Wazuh API password
+              // Hide Wazuh API secret, username, password
               const copied = { ...api };
               copied.secret = '****';
+              copied.username = '****';
+              copied.password = '****';
               
               return {
                 statusCode: 200,
