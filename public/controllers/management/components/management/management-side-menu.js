@@ -130,11 +130,11 @@ class WzManagementSideMenu extends Component {
     const sideNavAdmin = [
       this.createItem(this.managementSections.administration, {
         disabled: true,
-        icon: <EuiIcon type="managementApp" />,
+        icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
           this.createItem(this.managementSections.ruleset, {
             disabled: true,
-            icon: <EuiIcon type="indexRollupApp" />,
+            icon: <EuiIcon type="indexRollupApp" color="primary" />,
             forceOpen: true,
             items: [
               this.createItem(this.managementSections.rules),
@@ -143,14 +143,11 @@ class WzManagementSideMenu extends Component {
             ],
           }),
           this.createItem(this.managementSections.groups, {
-            icon: <EuiIcon type="spacesApp" />,
+            icon: <EuiIcon type="spacesApp" color="primary" />,
           }),
           this.createItem(this.managementSections.configuration, {
-            icon: <EuiIcon type="devToolsApp" />,
-          })/*,
-          this.createItem({ id: 'configuration DEV', text: 'Configuration Dev' }, { // TODO: delete this item after migrate
-            icon: <EuiIcon type="devToolsApp" />,
-          })*/
+            icon: <EuiIcon type="devToolsApp" color="primary" />,
+          })
         ],
       })
     ];
@@ -158,44 +155,42 @@ class WzManagementSideMenu extends Component {
     const sideNavStatus = [
       this.createItem(this.managementSections.statusReports, {
         disabled: true,
-        icon: <EuiIcon type="indexSettings" />,
+        icon: <EuiIcon type="indexSettings" color="primary" />,
         items: [
           this.createItem(this.managementSections.status, {
-            icon: <EuiIcon type="uptimeApp" />,
+            icon: <EuiIcon type="uptimeApp" color="primary" />,
           }),
           this.createItem(this.managementSections.cluster, {
-            icon: <EuiIcon type="packetbeatApp" />,
-          }),
-          this.createItem(this.managementSections.logs, {
-            icon: <EuiIcon type="filebeatApp" />,
-          }),
-          this.createItem(this.managementSections.reporting, {
-            icon: <EuiIcon type="reportingApp" />,
+            icon: <EuiIcon type="packetbeatApp" color="primary" />,
           }),
           this.createItem(this.managementSections.statistics, {
-            icon: <EuiIcon type="visualizeApp" />,
+            icon: <EuiIcon type="visualizeApp" color="primary" />,
+          }),
+          this.createItem(this.managementSections.logs, {
+            icon: <EuiIcon type="filebeatApp" color="primary" />,
+          }),
+          this.createItem(this.managementSections.reporting, {
+            icon: <EuiIcon type="reportingApp" color="primary" />,
           })
         ],
       })
     ];
 
     return (
-      <div>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <EuiSideNav
-              items={sideNavAdmin}
-              style={{ padding: 16 }}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiSideNav
-              items={sideNavStatus}
-              style={{ padding: 16 }}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </div>
+      <EuiFlexGroup>
+        <EuiFlexItem grow={false}>
+          <EuiSideNav
+            items={sideNavAdmin}
+            style={{ padding: '4px 12px' }}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiSideNav
+            items={sideNavStatus}
+            style={{ padding: '4px 12px' }}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
     );
   }
 }
