@@ -28,6 +28,8 @@ import {
   updateListContent,
   updateFileContent,
   updateListItemsForRemove,
+  updateRuleInfo,
+  updateDecoderInfo 
 } from '../../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -192,6 +194,29 @@ class WzRulesetTable extends Component {
 
     if (!error) {
       const itemList = this.props.state.itemList;
+
+      const getRowProps = item => {
+        const { id, name } = item;
+        return {
+          'data-test-subj': `row-${id || name}`,
+          className: 'customRowClass',
+          onClick: async () => {
+            if(this.props.state.section === 'rules'){
+              const result = await this.rulesetHandler.getRuleInformation(item.file, id);
+              this.props.updateRuleInfo(result);
+            } else if (this.props.state.section === 'decoders'){
+              const result = await this.rulesetHandler.getDecoderInformation(item.file, name);
+              this.props.updateDecoderInfo(result);
+            } else{
+              const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+              const file = { name: item.name, content: result, path: item.path };
+              this.props.updateListContent(file);
+            }
+          },
+        };
+      };
+
+
       return (
         <div>
           <EuiBasicTable
@@ -201,6 +226,7 @@ class WzRulesetTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading}
+            rowProps={getRowProps}
             sorting={sorting}
             message={message}
           />
@@ -273,6 +299,8 @@ const mapDispatchToProps = (dispatch) => {
     updateFileContent: fileContent => dispatch(updateFileContent(fileContent)),
     updateListContent: listInfo => dispatch(updateListContent(listInfo)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
+    updateRuleInfo: rule => dispatch(updateRuleInfo(rule)),
+    updateDecoderInfo : rule => dispatch(updateDecoderInfo (rule))
   };
 };
 

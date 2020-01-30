@@ -23,20 +23,7 @@ export default class RulesetColumns {
             name: 'ID',
             align: 'left',
             sortable: true,
-            width: '5%',
-            render: (value, item) => {
-              return (
-                <EuiToolTip position="top" content={`Show rule ID ${value} information`}>
-                  <EuiLink onClick={async () => {
-                    const result = await this.rulesetHandler.getRuleInformation(item.file, value);
-                    this.tableProps.updateRuleInfo(result);
-                  }
-                  }>
-                    {value}
-                  </EuiLink>
-                </EuiToolTip>
-              )
-            }
+            width: '5%'
           },
           {
             field: 'description',
@@ -72,7 +59,8 @@ export default class RulesetColumns {
             render: (value, item) => {
               return (
                 <EuiToolTip position="top" content={`Show ${value} content`}>
-                  <EuiLink onClick={async () => {
+                  <EuiLink onClick={async (ev) => {
+                    ev.stopPropagation();
                     const noLocal = item.path.startsWith('ruleset/');
                     const result = await this.rulesetHandler.getRuleContent(value, noLocal);
                     const file = { name: value, content: result, path: item.path };
@@ -98,20 +86,7 @@ export default class RulesetColumns {
             field: 'name',
             name: 'Name',
             align: 'left',
-            sortable: true,
-            render: (value, item) => {
-              return (
-                <EuiToolTip position="top" content={`Show ${value} decoder information`}>
-                  <EuiLink onClick={async () => {
-                    const result = await this.rulesetHandler.getDecoderInformation(item.file, value);
-                    this.tableProps.updateDecoderInfo(result);
-                  }
-                  }>
-                    {value}
-                  </EuiLink>
-                </EuiToolTip>
-              )
-            }
+            sortable: true
           },
           {
             field: 'details.program_name',
@@ -133,7 +108,8 @@ export default class RulesetColumns {
             render: (value, item) => {
               return (
                 <EuiToolTip position="top" content={`Show ${value} content`}>
-                  <EuiLink onClick={async () => {
+                  <EuiLink onClick={async (ev) => {
+                    ev.stopPropagation();
                     const noLocal = item.path.startsWith('ruleset/');
                     const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
                     const file = { name: value, content: result, path: item.path };
@@ -157,19 +133,6 @@ export default class RulesetColumns {
             name: 'Name',
             align: 'left',
             sortable: true,
-            render: (value, item) => {
-              return (
-                <EuiToolTip position="top" content={`Show ${value} content`}>
-                  <EuiLink onClick={async () => {
-                    const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
-                    const file = { name: item.name, content: result, path: item.path };
-                    this.tableProps.updateListContent(file);
-                  }}>
-                    {value}
-                  </EuiLink>
-                </EuiToolTip>
-              )
-            }
           },
           {
             field: 'path',
@@ -195,7 +158,8 @@ export default class RulesetColumns {
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="eye"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
                         const file = { name: item.file, content: result, path: item.path };
                         this.tableProps.updateFileContent(file);
@@ -207,31 +171,31 @@ export default class RulesetColumns {
               } else {
                 return (
                   <div>
-                    <div>
-                      <EuiToolTip position="top" content={`Edit ${item.file} content`}>
-                        <EuiButtonIcon
-                          aria-label="Edit content"
-                          iconType="pencil"
-                          onClick={async () => {
-                            const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
-                            const file = { name: item.file, content: result, path: item.path };
-                            this.tableProps.updateFileContent(file);
-                          }}
-                          color="primary"
-                        />
-                      </EuiToolTip>
-                      <EuiToolTip position="top" content={`Remove ${item.file} file`}>
-                        <EuiButtonIcon
-                          aria-label="Delete content"
-                          iconType="trash"
-                          onClick={() => {
-                            this.tableProps.updateListItemsForRemove([item]);
-                            this.tableProps.updateShowModal(true);
-                          }}
-                          color="danger"
-                        />
-                      </EuiToolTip>
-                    </div>
+                    <EuiToolTip position="top" content={`Edit ${item.file} content`}>
+                      <EuiButtonIcon
+                        aria-label="Edit content"
+                        iconType="pencil"
+                        onClick={async (ev) => {
+                          ev.stopPropagation();
+                          const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
+                          const file = { name: item.file, content: result, path: item.path };
+                          this.tableProps.updateFileContent(file);
+                        }}
+                        color="primary"
+                      />
+                    </EuiToolTip>
+                    <EuiToolTip position="top" content={`Remove ${item.file} file`}>
+                      <EuiButtonIcon
+                        aria-label="Delete content"
+                        iconType="trash"
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          this.tableProps.updateListItemsForRemove([item]);
+                          this.tableProps.updateShowModal(true);
+                        }}
+                        color="danger"
+                      />
+                    </EuiToolTip>
                   </div>
                 )
               }
