@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiFlexGrid, EuiButtonEmpty, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiStat, EuiSpacer, EuiSelect, EuiProgress, EuiFieldSearch } from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiFlexGrid, EuiButtonEmpty, EuiInMemoryTable, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiStat, EuiSpacer, EuiSelect, EuiProgress, EuiFieldSearch } from '@elastic/eui';
 
 import StatisticsHandler from './utils/statistics-handler'
 import { clusterNodes } from '../configuration/utils/wz-fetch';
@@ -124,6 +124,12 @@ export class WzStatisticsOverview extends Component {
         Refresh
       </EuiButtonEmpty>
     );
+    const search = {
+      box: {
+        incremental: true,
+        schema: true
+      }
+    };
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
@@ -172,7 +178,22 @@ export class WzStatisticsOverview extends Component {
             <div>
               <EuiCallOut title={this.info[this.state.selectedTabId]} iconType="iInCircle" />
               <EuiSpacer size={'m'} />
-              <EuiFieldSearch
+              <EuiInMemoryTable
+                items={Object.entries(this.state.stats)}
+                columns={[
+                  {
+                    field: '0',
+                    name: 'Indicator',
+                  },
+                  {
+                    field: '1',
+                    name: 'Value',
+                  }
+                ]}
+                pagination={true}
+                search={search}
+              />
+              {/* <EuiFieldSearch
                 placeholder="Search values"
                 value={this.state.searchvalue}
                 fullWidth={true}
@@ -191,7 +212,7 @@ export class WzStatisticsOverview extends Component {
                     />
                   </EuiFlexItem>
                 ))}
-              </EuiFlexGrid>
+              </EuiFlexGrid> */}
             </div>
           )}
         </EuiPanel>
