@@ -11,31 +11,90 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiPanel, EuiTitle, EuiPage, EuiText } from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiFlexGrid, EuiButtonEmpty, EuiPanel, EuiTitle, EuiPage, EuiText, EuiTabs, EuiTab, EuiStat, EuiSpacer, EuiProgress, EuiFieldSearch } from '@elastic/eui';
 
-// Wazuh components
-import WzStatisticsActionButtons from './utils/actions-buttons-main';
+import StatisticsHandler from './utils/statistics-handler'
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      selectedTabId: 'remoted',
+      stats: {},
+      isLoading: false,
+      searchvalue: ''
+    };
+    this.statisticsHandler = StatisticsHandler;
+    this.tabs = [
+      {
+        id: 'remoted',
+        name: 'remoted'
+      },
+      {
+        id: 'analysisd',
+        name: 'analysisd'
+      },
+    ];
   }
 
   componentDidMount() {
     this._isMounted = true;
+    this.fetchData();
   }
 
-  componentDidUpdate() {}
+  componentDidUpdate() { }
 
   componentWillUnmount() {
     this._isMounted = false;
   }
 
+  onSelectedTabChanged = id => {
+    this.setState({
+      selectedTabId: id,
+      searchvalue: ''
+    }, () => {
+      this.fetchData();
+    });
+  };
+
+  async fetchData() {
+    this.setState({
+      isLoading: true,
+    });
+    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId);
+    this.setState({
+      stats: data.data.data,
+      isLoading: false
+    });
+  }
+
+  renderTabs() {
+    return this.tabs.map((tab, index) => (
+      <EuiTab
+        onClick={() => this.onSelectedTabChanged(tab.id)}
+        isSelected={tab.id === this.state.selectedTabId}
+        key={index}
+      >
+        {tab.name}
+      </EuiTab>
+    ));
+  }
+
+  onChangeSearchValue = e => {
+    this.setState({
+      searchvalue: e.target.value,
+    });
+  };
+
   render() {
+    const refreshButton = (
+      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.fetchData()}>
+        Refresh
+      </EuiButtonEmpty>
+    );
     return (
-      <EuiPage style={{ background: 'transparent'}}>
+      <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -47,7 +106,7 @@ export class WzStatisticsOverview extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            <WzStatisticsActionButtons />
+            <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -56,6 +115,41 @@ export class WzStatisticsOverview extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiTabs>{
+                this.renderTabs()
+              }</EuiTabs>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size={'m'} />
+          {this.state.isLoading &&
+            <EuiProgress size="xs" color="primary" />
+          }
+          {((Object.entries(this.state.stats) || []).length && !this.state.isLoading) && (
+            <div>
+              <EuiFieldSearch
+                placeholder="Search values"
+                value={this.state.searchvalue}
+                fullWidth={true}
+                onChange={this.onChangeSearchValue}
+                aria-label=""
+              />
+              <EuiSpacer size={'xl'} />
+              <EuiFlexGrid columns={4}>
+                {(Object.entries(this.state.stats) || []).filter(([value]) => value.includes(this.state.searchvalue)).map(([key, value]) => (
+                  <EuiFlexItem key={key}>
+                    <EuiStat
+                      title={value}
+                      titleSize="s"
+                      description={key}
+                      textAlign="center"
+                    />
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGrid>
+            </div>
+          )}
         </EuiPanel>
       </EuiPage>
     );
