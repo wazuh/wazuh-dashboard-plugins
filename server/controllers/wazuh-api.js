@@ -824,7 +824,7 @@ export class WazuhApiCtrl {
             : false;
         response.data = responseBody;
       }
-      const responseError = response.status !== 200;
+      const responseError = response.status !== 200 ? response.status : false;;
 
       if (!responseError && responseBody) {
         //cleanKeys(response);
