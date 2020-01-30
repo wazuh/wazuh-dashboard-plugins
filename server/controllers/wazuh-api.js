@@ -490,7 +490,7 @@ export class WazuhApiCtrl {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
   
-      const isDown = socketErrorCodes.includes(response.data.code || 1);
+      const isDown = socketErrorCodes.includes(response.data.status || 1);
   
       isDown && log('wazuh-api:makeRequest', 'Wazuh API is online but Wazuh is not ready yet');
   
@@ -642,14 +642,14 @@ export class WazuhApiCtrl {
    */
   async checkDaemons(api, path) {
     try {
-      const response = await needle(
+      const response = await this.apiInterceptor.request(
         'GET',
         getPath(api) + '/manager/status',
         {},
-        ApiHelper.buildOptionsObject(api)
+        { idHost: api.id}
       );
 
-      const daemons = ((response || {}).body || {}).data || {};
+      const daemons = ((response || {}).data || {}).data || {};
 
       const isCluster =
         ((api || {}).cluster_info || {}).status === 'enabled' &&
@@ -717,7 +717,6 @@ export class WazuhApiCtrl {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
-
       if (devTools) {
         delete data.devTools;
       }
@@ -766,7 +765,7 @@ export class WazuhApiCtrl {
       }
 
       if (path === '/ping') {
-        try {
+        try { // TODO 
           const check = await this.checkDaemons(api, path);
           return check;
         } catch (error) {
@@ -806,7 +805,7 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const response = await needle(method, fullUrl, data, options);
+      const response = await this.apiInterceptor.request(method, fullUrl, data, options);
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
@@ -817,29 +816,26 @@ export class WazuhApiCtrl {
           reply
         );
       }
-
-      const responseBody = (response || {}).body || {};
-      let responseData = responseBody.data;
-      if (!responseData) {
-        responseData =
-          typeof responseData === 'string' && path.includes('/files') && method === 'GET'
+      const responseBody = (response || {}).data || {};
+      if (!responseBody) {
+        responseBody =
+          typeof responseBody === 'string' && path.includes('/files') && method === 'GET'
             ? ' '
             : false;
-        response.body.data = responseData;
+        response.data = responseBody;
       }
-      const responseError = responseBody.error || false;
+      const responseError = response.status !== 200;
 
-      if (!responseError && responseData) {
-        cleanKeys(response);
-        return response.body;
+      if (!responseError && responseBody) {
+        //cleanKeys(response);
+        return response.data;
       }
 
       if (responseError && devTools) {
-        return response.body;
+        return response.data;
       }
-
-      throw responseError && responseBody.message
-        ? { message: responseBody.message, code: responseError }
+      throw responseError && responseBody.detail
+        ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       log('wazuh-api:makeRequest', error.message || error);
