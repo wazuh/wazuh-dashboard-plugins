@@ -29,7 +29,7 @@ import {
   updateFileContent,
   updateListItemsForRemove,
   updateRuleInfo,
-  updateDecoderInfo 
+  updateDecoderInfo
 } from '../../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -198,7 +198,7 @@ class WzRulesetTable extends Component {
       const getRowProps = item => {
         const { id, name } = item;
         return {
-          'data-test-subj': `row-${id || name}`,
+          'data-test-subj': `ruleRow-${id || name}`,
           className: 'customRowClass',
           onClick: async () => {
             if(this.props.state.section === 'rules'){
