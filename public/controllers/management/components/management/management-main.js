@@ -21,6 +21,7 @@ import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main'
+import WzStatistics from './statistics/statistics-main'
 // import { GroupsTable } from './groups/groups-table';
 // import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
@@ -44,6 +45,7 @@ class WzManagementMain extends Component {
               (section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
               (section === 'reporting' && <WzReporting />) || 
+              (section === 'statistics' && <WzStatistics />) || 
               (section === 'logs' && <WzLogs />) || 
               (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
               (ruleset.includes(section) && <WzRuleset section={section} />)

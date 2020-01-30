@@ -59,6 +59,7 @@ class WzManagementSideMenu extends Component {
       cluster: { id: 'monitoring', text: 'Cluster' },
       logs: { id: 'logs', text: 'Logs' },
       reporting: { id: 'reporting', text: 'Reporting' },
+      statistics: { id: 'statistics', text: 'Statistics' },
     };
 
     this.paths = {
@@ -170,6 +171,9 @@ class WzManagementSideMenu extends Component {
           }),
           this.createItem(this.managementSections.reporting, {
             icon: <EuiIcon type="reportingApp" />,
+          }),
+          this.createItem(this.managementSections.statistics, {
+            icon: <EuiIcon type="visualizeApp" />,
           })
         ],
       })
