@@ -41,7 +41,7 @@ export class WzSearchButtons extends Component {
   shouldComponentUpdate(nextProps) {
     const currenttFilters = JSON.stringify(this.props.filters);
     const nextFilters = JSON.stringify(nextProps.filters);
-    return (currenttFilters !== nextFilters);
+    return (currenttFilters === nextFilters);
   }
 
   componentDidUpdate() {
@@ -73,7 +73,7 @@ export class WzSearchButtons extends Component {
     const result = this.changeFilters(optionId, !IconSelectedMap[optionId]);
     this.props.onChange(result);
     this.setState({
-      toggleIconIdToSelectedMap: newToggleIconIdToSelectedMap,
+      IconSelectedMap: newToggleIconIdToSelectedMap,
     });
   }
 
