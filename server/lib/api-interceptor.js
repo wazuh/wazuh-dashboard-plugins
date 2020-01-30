@@ -46,7 +46,11 @@ export class ApiInterceptor {
       });
   }
 
-  async buildOptionsObject(method, path, payload, idHost) {
+  async buildOptionsObject(method, path, payload, options) {
+    if(!options.idHost){
+      return {};
+    }
+    const idHost = options.idHost
     let token = await this.updateRegistry.getTokenById(idHost);
 
     if (token === null) {
@@ -57,7 +61,7 @@ export class ApiInterceptor {
     return {
       method: method,
       headers: {
-        'content-type': 'application/json',
+        'content-type': options.content_type || 'application/json',
         Authorization: ' Bearer ' + token,
       },
       data: payload,
@@ -65,19 +69,19 @@ export class ApiInterceptor {
     };
   }
 
-  async request(method, path, payload = {}, idHost, attempts = 3) {
-    const options = await this.buildOptionsObject(method, path, payload, idHost);
+  async request(method, path, payload = {}, options, attempts = 3) {
+    const optionsObject = await this.buildOptionsObject(method, path, payload, options);
 
-    return axios(options)
+    return axios(optionsObject)
       .then(response => {
         return response;
       })
       .catch(async error => {
         if (attempts > 0) {
           if (error.response.status === 401) {
-            return this.authenticateApi(idHost)
+            return this.authenticateApi(options.idHost)
               .then(response => {
-                return this.request(method, path, payload, idHost, attempts - 1);
+                return this.request(method, path, payload, options, attempts - 1);
               })
               .catch(errorAuth => {
                 return errorAuth.response;

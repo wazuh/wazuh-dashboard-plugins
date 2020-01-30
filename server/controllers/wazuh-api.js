@@ -67,7 +67,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');
       
       // Fetch needed information about the cluster and the manager itself
-      const responseManagerInfo = await this.apiInterceptor.request('get', `${api.url}:${api.port}/manager/info`, {}, id)
+      const responseManagerInfo = await this.apiInterceptor.request('get', `${api.url}:${api.port}/manager/info`, {}, { idHost : id })
 
       // Look for socket-related errors
       if (this.checkResponseIsDown(responseManagerInfo)) {
@@ -83,15 +83,15 @@ export class WazuhApiCtrl {
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const responseAgents = await this.apiInterceptor.request('get', `${api.url}:${api.port}/agents/000`, {}, id);
+        const responseAgents = await this.apiInterceptor.request('get', `${api.url}:${api.port}/agents/000`, {}, { idHost : id });
 
         if(responseAgents.status === 200){
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          const responseClusterStatus = await this.apiInterceptor.request('get', `${api.url}:${api.port}/cluster/status`, {}, id);
+          const responseClusterStatus = await this.apiInterceptor.request('get', `${api.url}:${api.port}/cluster/status`, {}, { idHost : id });
           if(responseClusterStatus.status === 200){
             if(responseClusterStatus.data.data.enabled === 'yes'){
-              const responseClusterLocalInfo = await this.apiInterceptor.request('get', `${api.url}:${api.port}/cluster/local/info`, {}, id);
+              const responseClusterLocalInfo = await this.apiInterceptor.request('get', `${api.url}:${api.port}/cluster/local/info`, {}, { idHost : id });
               if(responseClusterLocalInfo.status === 200){
                 const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes'
                 api.cluster_info = {
@@ -153,7 +153,7 @@ export class WazuhApiCtrl {
                 const id = Object.keys(api)[0];
                 const host = api[id]; 
                 
-                const response = await this.apiInterceptor('get',`${host.url}:${host.port}/manager/info`, {}, id)
+                const response = await this.apiInterceptor('get',`${host.url}:${host.port}/manager/info`, {}, {idHost : id})
   
                 if (this.checkResponseIsDown(response)) {
                   return ErrorResponse(
@@ -233,12 +233,13 @@ export class WazuhApiCtrl {
         apiAvailable = req.payload;
         apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
       }
+      console.log(req.payload.id)
 
       let responseManagerInfo = await this.apiInterceptor.request(
         'GET',
         `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
         {},
-        req.payload.id
+        { idHost: req.payload.id }
       );
 
       const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
@@ -263,7 +264,7 @@ export class WazuhApiCtrl {
           'GET',
           `${apiAvailable.url}:${apiAvailable.port}/agents/000`,
           {},
-          req.payload.id
+          { idHost: req.payload.id }
         );
 
         if (responseAgents.status === 200) {
@@ -273,7 +274,7 @@ export class WazuhApiCtrl {
             'GET',
             `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
             {},
-            req.payload.id
+            { idHost: req.payload.id }
           );
 
           if (responseCluster.status === 200) {
@@ -284,7 +285,7 @@ export class WazuhApiCtrl {
                 'GET',
                 `${apiAvailable.url}:${apiAvailable.port}/cluster/local/info`,
                 {},
-                req.payload.id
+                { idHost: req.payload.id }
               );
 
               if (responseClusterLocal.status === 200) {
@@ -731,7 +732,8 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const options = ApiHelper.buildOptionsObject(api);
+     const options = {};
+     options["idHost"] = id;
 
       // Set content type application/xml if needed
       if (typeof (data || {}).content === 'string' && (data || {}).origin === 'xmleditor') {
