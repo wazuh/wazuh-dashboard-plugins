@@ -215,10 +215,10 @@ class WzStatusActionButtons extends Component {
 
     return (
       <Fragment>
-        {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
         {adminMode && selectedNode !== null && (
           <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>
         )}
+        {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
         {modal}
       </Fragment>
     );
