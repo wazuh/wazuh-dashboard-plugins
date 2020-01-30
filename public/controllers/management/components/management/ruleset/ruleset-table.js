@@ -198,7 +198,7 @@ class WzRulesetTable extends Component {
       const getRowProps = item => {
         const { id, name } = item;
         return {
-          'data-test-subj': `ruleRow-${id || name}`,
+          'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
           onClick: async () => {
             if(this.props.state.section === 'rules'){
