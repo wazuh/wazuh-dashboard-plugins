@@ -59,10 +59,11 @@ class WzRulesetTable extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    const sectionChanged = prevProps.state.section !== this.props.state.section
+    const sectionChanged = prevProps.state.section !== this.props.state.section;
     const showingFilesChanged = prevProps.state.showingFiles !== this.props.state.showingFiles;
+    const filtersChanged = prevProps.state.filters !== this.props.state.filters;
     if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
-      if ( sectionChanged || showingFilesChanged ) {
+      if ( sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
           pageSize: 10,
           pageIndex: 0,
@@ -72,7 +73,7 @@ class WzRulesetTable extends Component {
       }
       this.setState({isLoading:true});
       this.props.updateIsProcessing(false);
-      
+
       await this.getItems();
     }
   }
@@ -93,9 +94,9 @@ class WzRulesetTable extends Component {
       `${this.paths[this.props.request]}${showingFiles ? '/files': ''}`,
       this.buildFilter(),
     ).catch((error) => {
-      console.warn(`Error when get the items of ${section}: `, error)
+      console.warn(`Error when get the items of ${section}: `, error);
       return {}
-    })
+    });
 
     const { items=[], totalItems=0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
