@@ -47,6 +47,7 @@ export default class WzSearchBar extends Component {
     searchDisable?: boolean
     defaultFormat?: string
     placeholder?: string
+    noDeleteFiltersOnUpdateSuggests?: boolean
   };
 
   constructor(props) {
@@ -77,12 +78,20 @@ export default class WzSearchBar extends Component {
   }
 
   selectSuggestHandler(searchFormat):void {
+    const { noDeleteFiltersOnUpdateSuggests } = this.props;
+    const { filters } = this.state;
     if(searchFormat === '?Q') {
       this.suggestHandler = new QHandler(this.props.qSuggests);
     } else {
       this.suggestHandler = new ApiHandler(this.props.apiSuggests);
     }
-    this.setState({ isProcessing: true, suggestions: [], filters: {} })
+    this.setState({ 
+      isProcessing: true, 
+      suggestions: [], 
+      filters: noDeleteFiltersOnUpdateSuggests
+        ? filters
+        : {} 
+    });
   }
 
   async componentDidMount() {
