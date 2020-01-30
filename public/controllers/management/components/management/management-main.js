@@ -32,11 +32,13 @@ class WzManagementMain extends Component {
     this.state = {};
     this.store = store;
   }
+  componentWillMount() {
+    this.props.updateRulesetSection(this.props.section);
+  }
 
   render() {
     const { section } = this.props;
     const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
-    this.props.updateRulesetSection(section);
     return (
       <EuiFlexGroup>
         <EuiFlexItem style={{marginBottom: 0}}>
@@ -48,7 +50,7 @@ class WzManagementMain extends Component {
               (section === 'statistics' && <WzStatistics />) || 
               (section === 'logs' && <WzLogs />) || 
               (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-              (ruleset.includes(section) && <WzRuleset section={section} />)
+              (ruleset.includes(section) && <WzRuleset />)
             }
           </div>
         </EuiFlexItem>
