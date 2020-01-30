@@ -171,7 +171,6 @@ class WzRulesetSearchBar extends Component {
       values: ['enabled', 'disabled'],
     },
   ]
-  decodersFiles = [];
 
   apiSuggestsItems = {
     items: {
@@ -181,20 +180,29 @@ class WzRulesetSearchBar extends Component {
     },
     files: {
       rule: this.rulesFiles,
-      decoders: this.decodersFiles,
+      decoders: [],
       list: []
     }
   }
+
+  buttonOptions = {
+    rules: [{label: "Custom rules", field:"path", value:"etc/rules"}, ],
+    decoders: [{label: "Custom decoders", field:"path", value:"etc/decoders"}, ],
+    list: []
+  }
+  
 
   render() {
     const { section, showingFiles } = this.props.state;
     const type = showingFiles ? 'files' : 'items';
     const apiSuggests = this.apiSuggestsItems[type][section];
+    const buttonOptions = this.buttonOptions[section];
     return (
     <WzSearchBar
       apiSuggests={apiSuggests}
       onInputChange={this.props.updateFilters}
-      placeholder={"Add filter or search"} />
+      placeholder={"Add filter or search"} 
+      buttonOptions={buttonOptions} />
     )
   }
 }

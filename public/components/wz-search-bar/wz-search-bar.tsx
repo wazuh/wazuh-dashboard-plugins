@@ -17,7 +17,7 @@ import { WzSearchBadges } from './wz-search-badges';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { QHandler, qSuggests } from './lib/q-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
-import { WzSearchButtons } from './wz-search-buttons';
+import { WzSearchButtons, filterButton } from './wz-search-buttons';
 
 export interface suggestItem {
   type: {iconType: string, color: string }
@@ -43,6 +43,7 @@ export default class WzSearchBar extends Component {
     qSuggests: qSuggests[]
     apiSuggests: apiSuggests[]
     onInputChange: Function
+    buttonOptions?: filterButton[]
     searchDisable?: boolean
     defaultFormat?: string
     placeholder?: string
@@ -334,7 +335,7 @@ export default class WzSearchBar extends Component {
       filters,
       isPopoverOpen
     } = this.state;
-    const { placeholder } = this.props;
+    const { placeholder, buttonOptions } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     return (
@@ -358,10 +359,7 @@ export default class WzSearchBar extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <WzSearchButtons
-              options={[
-                {label: "Custom rules", field:"path", value:"etc/rules"},
-                {label: "Disabled rules", field:"status", value:"disabled"},
-              ]}
+              options={buttonOptions || []}
               filters={filters}
               onChange={this.onButtonPress.bind(this)} />
           </EuiFlexItem>
