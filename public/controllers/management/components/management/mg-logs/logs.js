@@ -26,7 +26,7 @@ import { ApiRequest } from  '../../../../../react-services/api-request';
 export default class WzLogs extends Component {
     constructor(props) {
         super(props);
-        this.offset = 390;
+        this.offset = 377;
         this.state = {
             isCluster: false,
             selectedDaemon: '',
@@ -332,7 +332,7 @@ export default class WzLogs extends Component {
             <div>
                 <EuiFlexGroup>
                     <EuiFlexItem >
-                        <EuiTitle size={'l'}>
+                        <EuiTitle size={'m'}>
                         <h2>Logs</h2>
                         </EuiTitle>
                     </EuiFlexItem>

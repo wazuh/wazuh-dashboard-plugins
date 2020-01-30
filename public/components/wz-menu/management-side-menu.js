@@ -29,12 +29,12 @@ import {
   updateSortDirection,
   updateSortField,
   cleanInfo,
-} from '../../../../redux/actions/rulesetActions';
+} from '../../redux/actions/rulesetActions';
 import {
   updateManagementSection,
-} from '../../../../redux/actions/managementActions';
-import checkAdminMode from './ruleset/utils/check-admin-mode';
-import { WzRequest } from '../../../../react-services/wz-request';
+} from '../../redux/actions/managementActions';
+import checkAdminMode from '../../controllers/management/components/management/ruleset/utils/check-admin-mode';
+import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
 class WzManagementSideMenu extends Component {
@@ -177,20 +177,22 @@ class WzManagementSideMenu extends Component {
     ];
 
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem grow={false}>
-          <EuiSideNav
-            items={sideNavAdmin}
-            style={{ padding: '4px 12px' }}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiSideNav
-            items={sideNavStatus}
-            style={{ padding: '4px 12px' }}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      <div className="WzManagementSideMenu">
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <EuiSideNav
+              items={sideNavAdmin}
+              style={{ padding: '4px 12px' }}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiSideNav
+              items={sideNavStatus}
+              style={{ padding: '4px 12px' }}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </div>
     );
   }
 }

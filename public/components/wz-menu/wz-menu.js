@@ -18,7 +18,7 @@ import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
-import WzManagementSideMenu from '../../controllers/management/components/management/management-side-menu';
+import WzManagementSideMenu from './management-side-menu';
 
 class WzMenu extends Component {
   constructor(props) {

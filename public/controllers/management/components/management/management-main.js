@@ -39,7 +39,7 @@ class WzManagementMain extends Component {
     this.props.updateRulesetSection(section);
     return (
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem style={{marginBottom: 0}}>
           <div>
             {
               (section === 'groups' && <WzGroups {...this.props} />) ||
