@@ -36,9 +36,9 @@ export class ApiInterceptor {
     };
 
     return axios(options)
-      .then(response => {
+      .then(async response => {
         const token = response.data.token;
-        this.updateRegistry.updateTokenByHost(idHost, token);
+        await this.updateRegistry.updateTokenByHost(idHost, token);
         return response;
       })
       .catch(error => {
