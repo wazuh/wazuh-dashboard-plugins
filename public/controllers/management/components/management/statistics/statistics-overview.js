@@ -11,9 +11,10 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiFlexGrid, EuiButtonEmpty, EuiPanel, EuiTitle, EuiPage, EuiText, EuiTabs, EuiTab, EuiStat, EuiSpacer, EuiProgress, EuiFieldSearch } from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiFlexGrid, EuiButtonEmpty, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiStat, EuiSpacer, EuiSelect, EuiProgress, EuiFieldSearch } from '@elastic/eui';
 
 import StatisticsHandler from './utils/statistics-handler'
+import { clusterNodes } from '../configuration/utils/wz-fetch';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -23,7 +24,8 @@ export class WzStatisticsOverview extends Component {
       selectedTabId: 'remoted',
       stats: {},
       isLoading: false,
-      searchvalue: ''
+      searchvalue: '',
+      clusterNodeSelected: false
     };
     this.statisticsHandler = StatisticsHandler;
     this.tabs = [
@@ -36,10 +38,30 @@ export class WzStatisticsOverview extends Component {
         name: 'analysisd'
       },
     ];
+
+    this.info = {
+      remoted: 'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
+      analysisd: "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'."
+    };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._isMounted = true;
+    try {
+      const data = await clusterNodes();
+      const nodes = data.data.data.items.map(item => {
+        return { value: item.name, text: item.name }
+      });
+      this.setState({
+        clusterNodes: nodes,
+        clusterNodeSelected: nodes[0]
+      });
+    } catch (err) {
+      this.setState({
+        clusterNodes: [],
+        clusterNodeSelected: false
+      });
+    }
     this.fetchData();
   }
 
@@ -62,7 +84,7 @@ export class WzStatisticsOverview extends Component {
     this.setState({
       isLoading: true,
     });
-    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId);
+    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId, this.state.clusterNodeSelected.value);
     this.setState({
       stats: data.data.data,
       isLoading: false
@@ -80,6 +102,15 @@ export class WzStatisticsOverview extends Component {
       </EuiTab>
     ));
   }
+
+  onSelectNode = e => {
+    this.setState({
+      clusterNodeSelected: e.target
+    }, () => {
+      this.fetchData();
+    });
+  };
+
 
   onChangeSearchValue = e => {
     this.setState({
@@ -107,10 +138,21 @@ export class WzStatisticsOverview extends Component {
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
+            {this.state.clusterNodes && this.state.clusterNodes.length && this.state.clusterNodeSelected && (
+              <EuiFlexItem grow={false} >
+                <EuiSelect
+                  id="selectNode"
+                  options={this.state.clusterNodes}
+                  value={this.state.clusterNodeSelected}
+                  onChange={this.onSelectNode}
+                  aria-label="Select node"
+                />
+              </EuiFlexItem>
+            )}
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
+              <EuiText color="subdued">
                 From here you can see demon statistics.
               </EuiText>
             </EuiFlexItem>
@@ -128,6 +170,8 @@ export class WzStatisticsOverview extends Component {
           }
           {((Object.entries(this.state.stats) || []).length && !this.state.isLoading) && (
             <div>
+              <EuiCallOut title={this.info[this.state.selectedTabId]} iconType="iInCircle" />
+              <EuiSpacer size={'m'} />
               <EuiFieldSearch
                 placeholder="Search values"
                 value={this.state.searchvalue}

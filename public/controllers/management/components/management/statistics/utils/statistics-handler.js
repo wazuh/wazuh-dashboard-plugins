@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Status handler service
+ * Wazuh app - Statistics handler service
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,21 +16,15 @@ export default class StatisticsHandler {
   /**
    * Get statistics of demon
    */
-  static async demonStatistics(demon) {
+  static async demonStatistics(demon, node = false) {
     try {
-      const result = await WzRequest.apiReq('GET', `/manager/stats/${demon}`, {});
-      return result;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
+      let result = null;
+      if (node) {
+        result = await WzRequest.apiReq('GET', `/cluster/${node}/stats/${demon}`, {});
+      } else {
+        result = await WzRequest.apiReq('GET', `/manager/stats/${demon}`, {});
+      }
 
-  /**
-   * Get cluster nodes
-   */
-  static async clusterNodes() {
-    try {
-      const result = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
       return result;
     } catch (error) {
       return Promise.reject(error);
