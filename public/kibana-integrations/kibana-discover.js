@@ -204,6 +204,7 @@ function discoverController(
   $scope.$on('$destroy', () => {
     savedSearch.destroy();
     subscriptions.unsubscribe();
+    filterListener();
   });
 
   const $appStatus = $scope.appStatus = this.appStatus = {
@@ -1145,7 +1146,7 @@ function discoverController(
     }
   };
 
-  $rootScope.$on('wzEventFilters', (evt, parameters) => {
+  const filterListener = $rootScope.$on('wzEventFilters', (evt, parameters) => {
     loadFilters(parameters.filters, parameters.localChange, parameters.tab);
   });
 
