@@ -65,9 +65,14 @@ export class WazuhApiCtrl {
       }
 
       log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');
-      
+
       // Fetch needed information about the cluster and the manager itself
-      const responseManagerInfo = await this.apiInterceptor.request('get', `${api.url}:${api.port}/manager/info`, {}, { idHost : id })
+      const responseManagerInfo = await this.apiInterceptor.request(
+        'get',
+        `${api.url}:${api.port}/manager/info`,
+        {},
+        { idHost: id }
+      );
 
       // Look for socket-related errors
       if (this.checkResponseIsDown(responseManagerInfo)) {
@@ -83,50 +88,66 @@ export class WazuhApiCtrl {
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const responseAgents = await this.apiInterceptor.request('get', `${api.url}:${api.port}/agents/000`, {}, { idHost : id });
+        const responseAgents = await this.apiInterceptor.request(
+          'get',
+          `${api.url}:${api.port}/agents/000`,
+          {},
+          { idHost: id }
+        );
 
-        if(responseAgents.status === 200){
+        if (responseAgents.status === 200) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          const responseClusterStatus = await this.apiInterceptor.request('get', `${api.url}:${api.port}/cluster/status`, {}, { idHost : id });
-          if(responseClusterStatus.status === 200){
-            if(responseClusterStatus.data.data.enabled === 'yes'){
-              const responseClusterLocalInfo = await this.apiInterceptor.request('get', `${api.url}:${api.port}/cluster/local/info`, {}, { idHost : id });
-              if(responseClusterLocalInfo.status === 200){
-                const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes'
+          const responseClusterStatus = await this.apiInterceptor.request(
+            'get',
+            `${api.url}:${api.port}/cluster/status`,
+            {},
+            { idHost: id }
+          );
+          if (responseClusterStatus.status === 200) {
+            if (responseClusterStatus.data.data.enabled === 'yes') {
+              const responseClusterLocalInfo = await this.apiInterceptor.request(
+                'get',
+                `${api.url}:${api.port}/cluster/local/info`,
+                {},
+                { idHost: id }
+              );
+              if (responseClusterLocalInfo.status === 200) {
+                const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
                 api.cluster_info = {
                   status: clusterEnabled ? 'enabled' : 'disabled',
                   manager: managerName,
                   node: responseClusterLocalInfo.data.data.affected_items[0].node,
-                  cluster: clusterEnabled ? responseClusterLocalInfo.data.data.affected_items[0].cluster : 'Disabled'
-                }
+                  cluster: clusterEnabled
+                    ? responseClusterLocalInfo.data.data.affected_items[0].cluster
+                    : 'Disabled',
+                };
               }
-            }else{
+            } else {
               // Cluster mode is not active
               api.cluster_info = {
                 status: 'disabled',
                 manager: managerName,
-                cluster: 'Disabled'
-              }
+                cluster: 'Disabled',
+              };
             }
 
-            if(api.cluster_info){
+            if (api.cluster_info) {
               // Update cluster information in the wazuh-registry.json
               await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
-      
+
               // Hide Wazuh API secret, username, password
               const copied = { ...api };
               copied.secret = '****';
               copied.username = '****';
               copied.password = '****';
-              
+
               return {
                 statusCode: 200,
                 data: copied,
-                idChanged: req.idChanged || null
+                idChanged: req.idChanged || null,
               };
             }
-            
           }
         }
       }
@@ -138,42 +159,46 @@ export class WazuhApiCtrl {
       if (error.code === 'EPROTO') {
         return {
           statusCode: 200,
-          data: { password: '****', apiIsDown: true }
+          data: { password: '****', apiIsDown: true },
         };
       } else if (error.code === 'ECONNREFUSED') {
         return {
           statusCode: 200,
-          data: { password: '****', apiIsDown: true }
+          data: { password: '****', apiIsDown: true },
         };
       } else {
-          try {
-            const apis = await this.manageHosts.getHosts();
-            for (const api of apis) {
-              try {
-                const id = Object.keys(api)[0];
-                const host = api[id]; 
-                
-                const response = await this.apiInterceptor('get',`${host.url}:${host.port}/manager/info`, {}, {idHost : id})
-  
-                if (this.checkResponseIsDown(response)) {
-                  return ErrorResponse(
-                    `ERROR3099 - ${response.data.detail ||
-                      'Wazuh not ready yet'}`,
-                    3099,
-                    500,
-                    reply
-                  );
-                }
-                if(response.status === 200){
-                  req.payload = id;
-                  req.idChanged = id;
-                  return this.checkStoredAPI(req, reply, false);
-                }
-              } catch (error) {} // eslint-disable-line
-            }
-          } catch (error) {
-            return ErrorResponse(error.message || error, 3020, 500, reply);
+        try {
+          const apis = await this.manageHosts.getHosts();
+          for (const api of apis) {
+            try {
+              const id = Object.keys(api)[0];
+              const host = api[id];
+
+              const response = await this.apiInterceptor(
+                'get',
+                `${host.url}:${host.port}/manager/info`,
+                {},
+                { idHost: id }
+              );
+
+              if (this.checkResponseIsDown(response)) {
+                return ErrorResponse(
+                  `ERROR3099 - ${response.data.detail || 'Wazuh not ready yet'}`,
+                  3099,
+                  500,
+                  reply
+                );
+              }
+              if (response.status === 200) {
+                req.payload = id;
+                req.idChanged = id;
+                return this.checkStoredAPI(req, reply, false);
+              }
+            } catch (error) {} // eslint-disable-line
           }
+        } catch (error) {
+          return ErrorResponse(error.message || error, 3020, 500, reply);
+        }
         return ErrorResponse(error.message || error, 3002, 500, reply);
       }
     }
@@ -233,7 +258,6 @@ export class WazuhApiCtrl {
         apiAvailable = req.payload;
         apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
       }
-      console.log(req.payload.id)
 
       let responseManagerInfo = await this.apiInterceptor.request(
         'GET',
@@ -308,8 +332,8 @@ export class WazuhApiCtrl {
         }
       }
 
-      const tmpMsg =  responseManagerInfo.data.detail || 'Unexpected error checking the Wazuh API';
-      
+      const tmpMsg = responseManagerInfo.data.detail || 'Unexpected error checking the Wazuh API';
+
       throw new Error(tmpMsg);
     } catch (error) {
       log('wazuh-api:checkAPI', error.message || error);
@@ -486,17 +510,17 @@ export class WazuhApiCtrl {
   }
 
   checkResponseIsDown(response) {
-    if(response.status !== 200){
+    if (response.status !== 200) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
-  
+
       const isDown = socketErrorCodes.includes(response.data.status || 1);
-  
+
       isDown && log('wazuh-api:makeRequest', 'Wazuh API is online but Wazuh is not ready yet');
-  
+
       return isDown;
     }
-    return false
+    return false;
   }
 
   /**
@@ -646,7 +670,7 @@ export class WazuhApiCtrl {
         'GET',
         getPath(api) + '/manager/status',
         {},
-        { idHost: api.id}
+        { idHost: api.id }
       );
 
       const daemons = ((response || {}).data || {}).data || {};
@@ -731,8 +755,8 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-     const options = {};
-     options["idHost"] = id;
+      const options = {};
+      options['idHost'] = id;
 
       // Set content type application/xml if needed
       if (typeof (data || {}).content === 'string' && (data || {}).origin === 'xmleditor') {
@@ -765,7 +789,8 @@ export class WazuhApiCtrl {
       }
 
       if (path === '/ping') {
-        try { // TODO 
+        try {
+          // TODO
           const check = await this.checkDaemons(api, path);
           return check;
         } catch (error) {
@@ -824,7 +849,7 @@ export class WazuhApiCtrl {
             : false;
         response.data = responseBody;
       }
-      const responseError = response.status !== 200 ? response.status : false;;
+      const responseError = response.status !== 200 ? response.status : false;
 
       if (!responseError && responseBody) {
         //cleanKeys(response);

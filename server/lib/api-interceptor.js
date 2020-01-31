@@ -44,7 +44,7 @@ export class ApiInterceptor {
     }
   }
 
-  async buildOptionsObject(method, path, payload, options) {
+  async buildOptionsObject(method, path, data, options) {
     if (!options.idHost) {
       return {};
     }
@@ -63,7 +63,8 @@ export class ApiInterceptor {
           'content-type': options.content_type || 'application/json',
           Authorization: ' Bearer ' + token,
         },
-        data: payload,
+        data: data.payload || {},
+        params: data.params || {},
         url: path,
       };
     } else {
@@ -71,8 +72,8 @@ export class ApiInterceptor {
     }
   }
 
-  async request(method, path, payload = {}, options, attempts = 3) {
-    const optionsObject = await this.buildOptionsObject(method, path, payload, options);
+  async request(method, path, data, options, attempts = 3) {
+    const optionsObject = await this.buildOptionsObject(method, path, data, options);
 
     if (optionsObject !== null) {
       return axios(optionsObject)
@@ -85,7 +86,7 @@ export class ApiInterceptor {
               const responseAuth = await this.authenticateApi(options.idHost);
 
               if (responseAuth.status === 200) {
-                return this.request(method, path, payload, options, attempts - 1);
+                return this.request(method, path, data, options, attempts - 1);
               } else {
                 return responseAuth;
               }
