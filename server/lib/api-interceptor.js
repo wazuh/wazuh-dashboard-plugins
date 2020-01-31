@@ -63,7 +63,7 @@ export class ApiInterceptor {
           'content-type': options.content_type || 'application/json',
           Authorization: ' Bearer ' + token,
         },
-        data: data.payload || {},
+        data: data.body || {},
         params: data.params || {},
         url: path,
       };
