@@ -105,7 +105,7 @@ class WzRuleInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink 
+              <EuiLink
                 onClick={async (event) => {
                 event.stopPropagation();
                 const noLocal = item.path.startsWith('ruleset/');
@@ -129,7 +129,7 @@ class WzRuleInfo extends Component {
 
   /**
    * Build an object with the compliance info about a rule
-   * @param {Object} ruleInfo 
+   * @param {Object} ruleInfo
    */
   buildCompliance(ruleInfo) {
     const compliance = {};
@@ -153,10 +153,10 @@ class WzRuleInfo extends Component {
 
   /**
    * Render the basic information in a list
-   * @param {Number} id 
-   * @param {Number} level 
-   * @param {String} file 
-   * @param {String} path 
+   * @param {Number} id
+   * @param {Number} level
+   * @param {String} file
+   * @param {String} path
    */
   renderInfo(id, level, file, path) {
     return (
@@ -246,30 +246,35 @@ class WzRuleInfo extends Component {
     const keys = Object.keys(compliance);
     for (let i in Object.keys(keys)) {
       const key = keys[i];
-      listCompliance.push(
-        <Fragment>
-          <li key={key}><b>{this.complianceEquivalences[key]}</b></li>
-        </Fragment>
-      )
-      compliance[key].forEach(element => {
+
+      const values = compliance[key].map((element, index) => {
         const filters = {};
         filters[key] = element;
-        listCompliance.push(
-          <Fragment>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ filters })}>
-              <EuiToolTip position="top" content="Filter by this compliance">
-                <li key={element}>{element}</li>
-              </EuiToolTip>
-            </EuiLink>
-            <EuiSpacer size="s" />
-          </Fragment>
+        return (
+            <span key={element}>
+              <EuiLink onClick={async () => this.setNewFiltersAndBack({ filters })}>
+                <EuiToolTip position="top" content="Filter by this compliance">
+                  <span>{element}</span>
+                </EuiToolTip>
+              </EuiLink>
+              {(index < compliance[key].length-1) && ', '}
+            </span>
         );
       });
+
+      listCompliance.push(
+          <li key={key}>
+            <b>{this.complianceEquivalences[key]}</b>
+            <p>{values}</p>
+            <EuiSpacer size='s' />
+          </li>
+      )
+
     }
     return (
-      <ul>
-        {listCompliance}
-      </ul>
+        <ul>
+          {listCompliance}
+        </ul>
     )
   }
 
@@ -328,7 +333,7 @@ class WzRuleInfo extends Component {
               <EuiFlexItem>
                 <EuiPanel paddingSize="s">
                   <EuiText color="subdued">Information</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
+                  <hr/>
                   <EuiSpacer size="s" />
                   {this.renderInfo(id, level, file, path)}
                 </EuiPanel>
@@ -337,7 +342,7 @@ class WzRuleInfo extends Component {
               <EuiFlexItem>
                 <EuiPanel paddingSize="s">
                   <EuiText color="subdued">Details</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
+                  <hr/>
                   <EuiSpacer size="s" />
                   {this.renderDetails(details)}
                 </EuiPanel>
@@ -346,7 +351,7 @@ class WzRuleInfo extends Component {
               <EuiFlexItem>
                 <EuiPanel paddingSize="s">
                   <EuiText color="subdued">Groups</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
+                  <hr/>
                   <EuiSpacer size="s" />
                   {this.renderGroups(groups)}
                 </EuiPanel>
@@ -356,7 +361,7 @@ class WzRuleInfo extends Component {
                 <EuiFlexItem>
                   <EuiPanel paddingSize="s">
                     <EuiText color="subdued">Compliance</EuiText>
-                    <EuiSpacer size="xs" className="subdued-background" />
+                    <hr/>
                     <EuiSpacer size="s" />
                     {this.renderCompliance(compliance)}
                   </EuiPanel>
