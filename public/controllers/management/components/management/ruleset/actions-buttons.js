@@ -106,7 +106,6 @@ class WzRulesetActionButtons extends Component {
       }
       if (errors) throw results;
       //this.errorHandler.info('Upload successful');
-      console.log('UPLOAD SUCCESS');
       return;
     } catch (error) {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
@@ -138,7 +137,7 @@ class WzRulesetActionButtons extends Component {
   async refresh() {
     try {
       this.props.updateIsProcessing(true);
-      this.onRefreshLoading();
+      // this.onRefreshLoading();
 
     } catch (error) {
       return Promise.reject(error);
@@ -149,12 +148,11 @@ class WzRulesetActionButtons extends Component {
     clearInterval(this.refreshTimeoutId);
 
     this.props.updateLoadingStatus(true);
-    this.refreshTimeoutId =  setInterval(() => {
-      if(!this.props.state.isProcessing) {
-        this.props.updateLoadingStatus(false);
-        clearInterval(this.refreshTimeoutId);
-      }
-    }, 100);
+    // this.refreshTimeoutId =  setInterval(() => {
+    //   if(!this.props.state.isProcessing) {
+    //     clearInterval(this.refreshTimeoutId);
+    //   }
+    // }, 100);
   }
 
   render() {
@@ -210,6 +208,11 @@ class WzRulesetActionButtons extends Component {
         Refresh
       </EuiButtonEmpty>
     );
+    
+    const uploadFile = async (files, path) => {
+      await this.uploadFiles(files, path);
+      await this.refresh();
+    };
 
     return (
       <Fragment>
@@ -234,7 +237,7 @@ class WzRulesetActionButtons extends Component {
             <UploadFiles
               msg={section}
               path={`etc/${section}`}
-              upload={async (files, path) => await this.uploadFiles(files, path)} />
+              upload={uploadFile} />
           </EuiFlexItem>
         )}
         <EuiFlexItem grow={false}>

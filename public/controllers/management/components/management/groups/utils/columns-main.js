@@ -37,21 +37,12 @@ export default class GroupsColums {
             <div>
               {(this.adminMode && (
                 <div>
-                  <EuiToolTip position="top" content={`View ${item.name} details`}>
-                    <EuiButtonIcon
-                      aria-label="View group details"
-                      iconType="eye"
-                      onClick={async () => {
-                        this.tableProps.updateGroupDetail(item);
-                      }}
-                      color="primary"
-                    />
-                  </EuiToolTip>
                   <EuiToolTip position="top" content={'Edit group configuration'}>
                     <EuiButtonIcon
                       aria-label="Edit group configuration"
                       iconType="pencil"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         this.showGroupConfiguration(item.name);
                       }}
                     />
@@ -67,7 +58,8 @@ export default class GroupsColums {
                     <EuiButtonIcon
                       aria-label="Delete content"
                       iconType="trash"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         this.tableProps.updateListItemsForRemove([item]);
                         this.tableProps.updateShowModal(true);
                       }}

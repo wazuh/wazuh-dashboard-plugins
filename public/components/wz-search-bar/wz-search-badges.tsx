@@ -31,6 +31,13 @@ export class WzSearchBadges extends Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.filters.lenght !== this.props.filters.length) {
+      return true;
+    }
+    return false;
+  }
+
   buildBadge(title:filter) {
     const idGenerator = () => {return '_' + Math.random().toString(36).substr(2, 9)};
     return (
@@ -39,6 +46,8 @@ export class WzSearchBadges extends Component {
         iconType="cross"
         iconSide="right"
         iconOnClickAriaLabel="Remove"
+        color="hollow"
+        className="globalFilterItem"
         iconOnClick={() => this.props.onChange(title)}>
         {`${title.field}:${title.value}`}
       </EuiBadge>

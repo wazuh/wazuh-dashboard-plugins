@@ -17,6 +17,7 @@ import { WzSearchBadges } from './wz-search-badges';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { QHandler, qSuggests } from './lib/q-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
+import { WzSearchButtons, filterButton } from './wz-search-buttons';
 
 export interface suggestItem {
   type: {iconType: string, color: string }
@@ -26,7 +27,7 @@ export interface suggestItem {
 
 export default class WzSearchBar extends Component {
   state: {
-    searchFormat: string | null
+    searchFormat: string
     suggestions: suggestItem[]
     isProcessing: boolean
     inputValue: string
@@ -42,21 +43,18 @@ export default class WzSearchBar extends Component {
     qSuggests: qSuggests[]
     apiSuggests: apiSuggests[]
     onInputChange: Function
+    buttonOptions?: filterButton[]
     searchDisable?: boolean
     defaultFormat?: string
+    placeholder?: string
+    noDeleteFiltersOnUpdateSuggests?: boolean
   };
 
   constructor(props) {
     super(props);
-
+    const searchFormat = this.selectSearchFormat(props);
     this.state = {
-      searchFormat: (props.defaultFormat)
-        ? props.defaultFormat
-        : (props.qSuggests) 
-        ? '?Q' 
-        : (props.apiSuggests) 
-          ? 'API' 
-          : null,
+      searchFormat,
       suggestions: [],
       isProcessing: true,
       inputValue: '',
@@ -67,66 +65,125 @@ export default class WzSearchBar extends Component {
     }
   }
 
+  selectSearchFormat(props) {
+    const searchFormat = (props.defaultFormat)
+    ? props.defaultFormat
+    : (!!props.qSuggests)
+      ? '?Q'
+      : (props.apiSuggests)
+        ? 'API'
+        : '';
+
+    return searchFormat;
+  }
+
   selectSuggestHandler(searchFormat):void {
+    const { noDeleteFiltersOnUpdateSuggests } = this.props;
+    const { filters } = this.state;
     if(searchFormat === '?Q') {
       this.suggestHandler = new QHandler(this.props.qSuggests);
     } else {
       this.suggestHandler = new ApiHandler(this.props.apiSuggests);
     }
-    this.setState({ isProcessing: true, suggestions: [] })
+    this.setState({ 
+      isProcessing: true, 
+      suggestions: [], 
+      filters: noDeleteFiltersOnUpdateSuggests
+        ? filters
+        : {} 
+    });
   }
 
   async componentDidMount() {
     this.selectSuggestHandler(this.state.searchFormat);
-    const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
-    this.setState({suggestions: suggestsItems});
+    if(this.state.searchFormat) {
+      const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
+      this.setState({suggestions: suggestsItems});
+    }
   }
 
-  async componentDidUpdate() {
+  updateSuggestOnProps(qSuggestsPrev, apiSuggestsPrev) {
+    const { qSuggests, apiSuggests } = this.props;
+    const qSuggestsChanged = JSON.stringify(qSuggests) !== JSON.stringify(qSuggestsPrev);
+    const apiSuggestsChanged = JSON.stringify(apiSuggests) !== JSON.stringify(apiSuggestsPrev);
+    if (qSuggestsChanged || apiSuggestsChanged) {
+      return true;
+    }
+    return false;
+
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+    if (nextState.isProcessing) {
+      return true;
+    }
+    if (nextState.isPopoverOpen !== this.state.isPopoverOpen){
+      return true;
+    }
+    if (nextState.status !== this.state.status) {
+      return true;
+    }
+    if (this.updateSuggestOnProps(nextProps.qSuggests, nextProps.apiSuggests)){
+      return true;
+    }
+    return false;
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests)) {
+      this.selectSuggestHandler(this.state.searchFormat);
+    }
+
     const { isProcessing } = this.state;
     if (!isProcessing){
       return;
     }
-    const { inputValue, isInvalid } = this.state;
+    const { inputValue, isInvalid, searchFormat } = this.state;
     const { searchDisable } = this.props;
     if (isInvalid) {
-      const suggestsItems = [{
-        type: { iconType: 'alert', color: 'tint2' },
-        label: "Error",
-        description: "The field are invalid"
-      }];
-      this.setState({
-        isProcessing: false,
-        suggestions: suggestsItems,
-        status: 'unsaved',
-    });
+      this.buildSuggestInvalid();
     } else {
-      const suggestsItems = [...await this.suggestHandler.buildSuggestItems(inputValue)];
-      const isSearchEnabled = this.suggestHandler.inputStage === 'fields' 
-        && !searchDisable 
-        && inputValue !== '';
-  
+      const suggestsItems = !!searchFormat ?
+        [...await this.suggestHandler.buildSuggestItems(inputValue)]
+        : [];
+      const isSearchEnabled = (this.suggestHandler.inputStage === 'fields'
+        && !searchDisable
+        && inputValue !== '')
+        || !searchFormat;
+
       if (isSearchEnabled) {
         const suggestSearch = this.buildSuggestFieldsSearch();
         suggestSearch && suggestsItems.unshift(suggestSearch);
       }
-  
-      this.setState({
-        isProcessing: false,
-        suggestions: suggestsItems,
+
+      await this.setState({
         status: 'unchanged',
+        suggestions: suggestsItems,
+        isProcessing: false,
       });
     }
   }
-  
-  
+
+  buildSuggestInvalid() {
+    const suggestsItems = [{
+      type: { iconType: 'alert', color: 'tint2' },
+      label: "Error",
+      description: "The field are invalid"
+    }];
+    this.setState({
+      isProcessing: false,
+      suggestions: suggestsItems,
+      status: 'unsaved',
+    });
+  }
 
   buildSuggestFieldsSearch():suggestItem | undefined {
-    const { inputValue } = this.state;
-    if (this.suggestHandler.isSearch) {
+    const { inputValue, searchFormat } = this.state;
+    if (this.suggestHandler.isSearch || !searchFormat ) {
       const searchSuggestItem: suggestItem = {
         type: { iconType: 'search', color: 'tint8' },
         label: inputValue,
+        description: 'Search'
       };
       return searchSuggestItem;
     }
@@ -148,10 +205,10 @@ export default class WzSearchBar extends Component {
 
   makeFilter(item:suggestItem):void {
     const { inputValue, filters } = this.state;
-      
+
     const {inputValue:newInputValue, filters:newFilters } = this.suggestHandler.onItemClick(item, inputValue, filters);
     this.updateFilters(newFilters);
-    
+
     this.setState({
       inputValue: newInputValue,
       suggestions: [],
@@ -173,6 +230,13 @@ export default class WzSearchBar extends Component {
 
   onInputChange = (value:string) => {
     const { filters:currentFilters } = this.state;
+    if (!this.state.searchFormat) {
+      this.setState({
+        inputValue: value,
+        isProcessing: true,
+      });
+      return;
+    }
     const { isInvalid, filters } = this.suggestHandler.onInputChange(value, currentFilters);
     if (!isInvalid) {
       this.updateFilters(filters);
@@ -192,7 +256,7 @@ export default class WzSearchBar extends Component {
   }
 
   onKeyPress = (e:KeyboardEvent)  => {
-    const { isInvalid } = this.state;
+    const { isInvalid, searchFormat } = this.state;
     if(e.key !== 'Enter' || isInvalid) {
       return;
     }
@@ -200,9 +264,11 @@ export default class WzSearchBar extends Component {
     const { searchDisable } = this.props;
     let filters = {};
     let newInputValue = '';
-    if (this.suggestHandler.isSearch && !searchDisable) {
-      filters = {...currentFilters};
-      filters['search'] = inputValue;
+    if ((this.suggestHandler.isSearch && !searchDisable)|| !searchFormat) {
+      filters = {
+        ...currentFilters,
+        ['search']: inputValue,
+      };
     } else if(inputValue.length > 0) {
       const { inputValue:newInput, filters:newFilters } = this.suggestHandler.onKeyPress(inputValue, currentFilters);
       filters = {...newFilters};
@@ -228,7 +294,7 @@ export default class WzSearchBar extends Component {
     const { filters } = this.state;
     delete filters[badge.field];
     this.props.onInputChange(filters);
-    this.setState({filters});
+    this.setState({filters, isProcessing: true});
   }
 
   onPopoverFocus(event) {
@@ -238,6 +304,17 @@ export default class WzSearchBar extends Component {
   closePopover = () => {
     this.setState({isPopoverOpen: false});
   };
+
+  async onButtonPress(filter) {
+    await this.setState(state => ({
+      isProcessing: true,
+      filters: {
+        ...state['filters'],
+        ...filter
+      },
+    }));
+    this.props.onInputChange(this.state.filters);
+  }
 
   //#endregion
 
@@ -260,18 +337,18 @@ export default class WzSearchBar extends Component {
   }
 
   render() {
-    const { status, suggestions, inputValue, isInvalid, filters, isPopoverOpen } = this.state;
+    const { status,
+      suggestions,
+      inputValue,
+      isInvalid,
+      filters,
+      isPopoverOpen
+    } = this.state;
+    const { placeholder, buttonOptions } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     return (
       <div>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <WzSearchBadges
-              filters={formatedFilter}
-              onChange={this.onDeleteBadge.bind(this)} />
-          </EuiFlexItem>
-        </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiSuggest
@@ -286,7 +363,21 @@ export default class WzSearchBar extends Component {
               suggestions={suggestions}
               onInputChange={this.onInputChange}
               isInvalid={isInvalid}
+              placeholder={placeholder}
             />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <WzSearchButtons
+              options={buttonOptions || []}
+              filters={filters}
+              onChange={this.onButtonPress.bind(this)} />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <WzSearchBadges
+              filters={formatedFilter}
+              onChange={this.onDeleteBadge.bind(this)} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
