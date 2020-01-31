@@ -830,7 +830,7 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const response = await this.apiInterceptor.request(method, fullUrl, data, options);
+      const response = await this.apiInterceptor.request(method, fullUrl, { params: data}, options);
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
