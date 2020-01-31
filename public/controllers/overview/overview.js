@@ -379,20 +379,20 @@ export class OverviewController {
    */
   async getSummary() {
     try {
-      const data = await this.apiReq.request('GET', '/agents/summary', {});
+      const data = await this.apiReq.request('GET', '/agents/summary/status', {});
 
       const result = ((data || {}).data || {}).data || false;
 
       if (result) {
-        const active = result.Active - 1;
-        const total = result.Total - 1;
+        const active = result.active - 1;
+        const total = result.total - 1;
         this.agentsCountActive = active;
-        this.agentsCountDisconnected = result.Disconnected;
-        this.agentsCountNeverConnected = result['Never connected'];
+        this.agentsCountDisconnected = result.disconnected;
+        this.agentsCountNeverConnected = result['never_connected'];
         this.agentsCountTotal = total;
         this.agentsCoverity = total ? (active / total) * 100 : 0;
       } else {
-        throw new Error('Error fetching /agents/summary from Wazuh API');
+        throw new Error('Error fetching /agents/summary/status from Wazuh API');
       }
       return;
     } catch (error) {
