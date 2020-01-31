@@ -250,9 +250,11 @@ class WzMenu extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </div>
+          </div>
+        )}
             {this.props.state.wazuhNotReadyYet &&
               (
-                <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ marginTop: "50px", marginBottom: "-50px", marginLeft: "8px", marginRight: "8px" }}>
+                <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: " 60px 8px -50px 8px", }}>
                   <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
 
                     <EuiFlexItem>
@@ -279,9 +281,8 @@ class WzMenu extends Component {
                     }
                   </EuiFlexGroup>
                 </EuiCallOut>
-              )}
-          </div>
-        )}
+              )
+            }
       </WzReduxProvider>
     );
   }
