@@ -126,7 +126,7 @@ class WzEditorConfiguration extends Component{
                   {restart && !restarting ? 
                     (<EuiFlexGroup alignItems='center'>
                       <EuiFlexItem>
-                        <span><strong>{clusterNodeSelected}</strong> will be restarted</span>
+                        <span><strong>{clusterNodeSelected || 'Manager'}</strong> will be restarted</span>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiButtonEmpty onClick={() => this.toggleRestart()}>Cancel</EuiButtonEmpty>

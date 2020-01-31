@@ -193,7 +193,7 @@ class WzRulesetSearchBar extends Component {
   
 
   render() {
-    const { section, showingFiles } = this.props.state;
+    const { section, showingFiles, filters } = this.props.state;
     const type = showingFiles ? 'files' : 'items';
     const apiSuggests = this.apiSuggestsItems[type][section];
     const buttonOptions = this.buttonOptions[section];
@@ -203,7 +203,8 @@ class WzRulesetSearchBar extends Component {
       onInputChange={this.props.updateFilters}
       placeholder={"Add filter or search"} 
       buttonOptions={buttonOptions}
-      noDeleteFiltersOnUpdateSuggests={true} />
+      noDeleteFiltersOnUpdateSuggests={true}
+      initFilters={filters} />
     )
   }
 }
