@@ -349,16 +349,16 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
-          'get',
-          `${api.url}:${api.port}/rules/pci`,
+        const response = await this.apiInterceptor.request(
+          'GET',
+          getPath(api) + '/rules/requirement/pci',
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: api.id}
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).total_failed_items === 0) {
           let PCIobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof pciRequirementsFile[item] !== 'undefined')
               PCIobject[item] = pciRequirementsFile[item];
           }
@@ -411,46 +411,22 @@ export class WazuhApiCtrl {
         const apiId = req.headers.id;
         const api = await this.manageHosts.getHostById(apiId);
 
-        // Checking for GDPR
-        const version = await needle(
-          'get',
-          `${api.url}:${api.port}/version`,
-          {},
-          ApiHelper.buildOptionsObject(api)
-        );
-
-        const number = version.body.data;
-
-        const major = number.split('v')[1].split('.')[0];
-        const minor = number
-          .split('v')[1]
-          .split('.')[1]
-          .split('.')[0];
-        const patch = number
-          .split('v')[1]
-          .split('.')[1]
-          .split('.')[1];
-
-        if ((major >= 3 && minor < 2) || (major >= 3 && minor >= 2 && patch < 3)) {
-          return {};
-        }
-
         if (!Object.keys(api).length) {
           log('wazuh-api:getGdprRequirement', 'Unexpected error getting host credentials');
           // Can not get credentials from wazuh-hosts
           return ErrorResponse('Unexpected error getting host credentials', 3024, 400, reply);
         }
 
-        const response = await needle(
-          'get',
-          `${api.url}:${api.port}/rules/gdpr`,
+        const response = await this.apiInterceptor.request(
+          'GET',
+          getPath(api) + '/rules/requirement/gdpr',
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: api.id }
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).total_failed_items === 0) {
           let GDPRobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof gdprRequirementsFile[item] !== 'undefined')
               GDPRobject[item] = gdprRequirementsFile[item];
           }
@@ -523,16 +499,16 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
-          'get',
-          `${api.url}:${api.port}/rules/hipaa`,
+        const response = await this.apiInterceptor.request(
+          'GET',
+          getPath(api) + '/rules/requirement/hipaa',
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: api.id}
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).total_failed_items === 0) {
           let HIPAAobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof hipaaRequirementsFile[item] !== 'undefined')
               HIPAAobject[item] = hipaaRequirementsFile[item];
           }
@@ -591,16 +567,16 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
-          'get',
-          `${api.url}:${api.port}/rules/nist-800-53`,
+        const response = await this.apiInterceptor.request(
+          'GET',
+          getPath(api) + '/rules/requirement/nist-800-53',
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: api.id}
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).total_failed_items === 0) {
           let NISTobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof nistRequirementsFile[item] !== 'undefined')
               NISTobject[item] = nistRequirementsFile[item];
           }

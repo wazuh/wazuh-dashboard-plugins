@@ -315,7 +315,7 @@ export const apiRequestList = [
         args: []
       },
       {
-        name: '/agents/summary',
+        name: '/agents/summary/status',
         args: []
       },
       {
