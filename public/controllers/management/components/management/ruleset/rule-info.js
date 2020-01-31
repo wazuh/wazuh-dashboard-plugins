@@ -256,10 +256,10 @@ class WzRuleInfo extends Component {
     const listCompliance = [];
     const keys = Object.keys(compliance);
     for (let i in Object.keys(keys)) {
+      const key = keys[i];
       listCompliance.push(
         <Fragment>
           <li key={key}><b>{this.complianceEquivalences[key]}</b></li>
-          <EuiSpacer size="s" />
         </Fragment>
       )
       compliance[key].forEach(element => {

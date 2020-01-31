@@ -106,7 +106,6 @@ class WzRulesetActionButtons extends Component {
       }
       if (errors) throw results;
       //this.errorHandler.info('Upload successful');
-      console.log('UPLOAD SUCCESS');
       return;
     } catch (error) {
       if (Array.isArray(error) && error.length) return Promise.reject(error);

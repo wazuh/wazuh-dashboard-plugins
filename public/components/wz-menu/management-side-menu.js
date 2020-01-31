@@ -110,7 +110,6 @@ class WzManagementSideMenu extends Component {
   }
 
   clickMenuItem = section => {
-    if (section === this.props.state.section) return;
     this.props.managementPopoverToggle();
     window.location.href = `#/manager/?tab=${section}`;
   };
