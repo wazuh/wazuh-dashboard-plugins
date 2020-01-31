@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiFlexGrid, EuiButtonEmpty, EuiInMemoryTable, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiStat, EuiSpacer, EuiSelect, EuiProgress, EuiFieldSearch } from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, EuiInMemoryTable, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiSpacer, EuiSelect, EuiProgress } from '@elastic/eui';
 
 import StatisticsHandler from './utils/statistics-handler'
 import { clusterNodes } from '../configuration/utils/wz-fetch';
@@ -111,13 +111,6 @@ export class WzStatisticsOverview extends Component {
     });
   };
 
-
-  onChangeSearchValue = e => {
-    this.setState({
-      searchvalue: e.target.value,
-    });
-  };
-
   render() {
     const refreshButton = (
       <EuiButtonEmpty iconType="refresh" onClick={async () => await this.fetchData()}>
@@ -144,7 +137,7 @@ export class WzStatisticsOverview extends Component {
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
-            {this.state.clusterNodes && this.state.clusterNodes.length && this.state.clusterNodeSelected && (
+            {!!(this.state.clusterNodes && this.state.clusterNodes.length && this.state.clusterNodeSelected) && (
               <EuiFlexItem grow={false} >
                 <EuiSelect
                   id="selectNode"
@@ -174,7 +167,7 @@ export class WzStatisticsOverview extends Component {
           {this.state.isLoading &&
             <EuiProgress size="xs" color="primary" />
           }
-          {((Object.entries(this.state.stats) || []).length && !this.state.isLoading) && (
+          {!!((Object.entries(this.state.stats) || []).length && !this.state.isLoading) && (
             <div>
               <EuiCallOut title={this.info[this.state.selectedTabId]} iconType="iInCircle" />
               <EuiSpacer size={'m'} />
@@ -193,26 +186,6 @@ export class WzStatisticsOverview extends Component {
                 pagination={true}
                 search={search}
               />
-              {/* <EuiFieldSearch
-                placeholder="Search values"
-                value={this.state.searchvalue}
-                fullWidth={true}
-                onChange={this.onChangeSearchValue}
-                aria-label=""
-              />
-              <EuiSpacer size={'xl'} />
-              <EuiFlexGrid columns={4}>
-                {(Object.entries(this.state.stats) || []).filter(([value]) => value.includes(this.state.searchvalue)).map(([key, value]) => (
-                  <EuiFlexItem key={key}>
-                    <EuiStat
-                      title={value}
-                      titleSize="s"
-                      description={key}
-                      textAlign="center"
-                    />
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGrid> */}
             </div>
           )}
         </EuiPanel>
