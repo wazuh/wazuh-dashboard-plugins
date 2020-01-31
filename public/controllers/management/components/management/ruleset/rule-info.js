@@ -210,16 +210,13 @@ class WzRuleInfo extends Component {
     */
   renderDetails(details) {
     const detailsToRender = [];
-    Object.keys(details).forEach(key => {
+    Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-        <Fragment>
           <li key={key}><b>{key}:</b>&nbsp;{details[key]}</li>
-          <EuiSpacer size="s" />
-        </Fragment>
       );
     });
     return (
-      <ul>
+      <ul style={{lineHeight:'initial'}}>
         {detailsToRender}
       </ul>
     )
@@ -233,16 +230,15 @@ class WzRuleInfo extends Component {
     const listGroups = [];
     groups.forEach(group => {
       listGroups.push(
-        <Fragment>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
+          <li key={group}>
+        <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
             <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
-              <li key={group}>
+              <span>
                 {group}
-              </li>
+              </span>
             </EuiToolTip>
           </EuiLink>
-          <EuiSpacer size="s" />
-        </Fragment>
+        </li>
       );
     });
     return (
@@ -264,7 +260,6 @@ class WzRuleInfo extends Component {
       listCompliance.push(
         <Fragment>
           <li key={key}><b>{this.complianceEquivalences[key]}</b></li>
-          <EuiSpacer size="s" />
         </Fragment>
       )
       compliance[key].forEach(element => {

@@ -38,9 +38,8 @@ class WzCodeEditor extends Component{
         }
         <EuiCodeEditor
           mode={mode}
-          theme='github'
           width='100%'
-          height={height || `calc(100vh - ${minusHeight || 350}px)`} // Groups section has -250px
+          height={height || `calc(100vh - ${minusHeight || 360}px)`} // Groups section has -250px
           value={value}
           tabSize={2}
           highlightActiveLine={false}
