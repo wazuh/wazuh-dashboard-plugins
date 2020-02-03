@@ -38,7 +38,7 @@ export default class GroupsFilesColumns {
                   iconType="eye"
                   onClick={async () => {
                     const result = await this.groupsHandler.getFileContent(
-                      `/agents/groups/${itemDetail.name}/files/${item.filename}`
+                      `/agents/groups/${itemDetail.name}/files/${item.filename}/xml`
                     );
 
                     const isEditable = item.filename === 'agent.conf';

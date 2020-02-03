@@ -137,7 +137,7 @@ class WzReportingTable extends Component {
 
     Promise.all(results).then(completed => {
       this.props.updateIsProcessing(true);
-      this.showToast('success', 'Success', 'Deleted correctly', 3000);
+      this.showToast('success', 'Success', 'Deleted successfully', 5000);
     });
   }
 }

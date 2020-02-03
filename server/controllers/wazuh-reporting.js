@@ -534,8 +534,8 @@ export class WazuhReportingCtrl {
           apiId
         );
         if (
-          typeof ((agent || {}).data || {}).status === 'string' &&
-          ((agent || {}).data || {}).status !== 'Active'
+          typeof ((((agent || {}).data || {}).affected_items || [])[0] || {}).status === 'string' &&
+          ((((agent || {}).data || {}).affected_items || [])[0] || {}).status !== 'Active'
         ) {
           this.dd.content.push({
             text: `Warning. Agent is ${agent.data.status.toLowerCase()}`,
@@ -1883,7 +1883,7 @@ export class WazuhReportingCtrl {
             try {
               configuration = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}/configuration`,
+                `/agents/groups/${g_id}/configuration`, 
                 {},
                 apiId
               );
