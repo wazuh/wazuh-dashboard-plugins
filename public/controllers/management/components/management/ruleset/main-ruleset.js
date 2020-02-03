@@ -22,20 +22,25 @@ import WzRulesetEditor from './ruleset-editor';
 import WzListEditor from './list-editor';
 
 export default class WzRuleset extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
     this.state = {}; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
     this.store = store;
   }
 
-  UNSAFE_componentWillMount() {
+  componentWillMount() {
+    this._isMount = true
     this.store.subscribe(() => {
       const state = this.store.getState().rulesetReducers;
-      this.setState(state);
+      if (this._isMount){
+        this.setState(state);
+      }
     });
   }
 
   componentWillUnmount() {
+    this._isMount = false;
     // When the component is going to be unmounted the ruleset state is reset
     const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
     if (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile) this.store.dispatch({ type: 'RESET' });

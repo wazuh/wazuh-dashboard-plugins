@@ -1,4 +1,4 @@
-<div layout="column" ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'" class="sideBarContent">
+<div layout="column" ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'">
     <div flex layout="column" ng-show="!isClusterEnabled || !isClusterRunning">
 
         <!-- Cluster disabled section -->

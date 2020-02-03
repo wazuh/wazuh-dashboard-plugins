@@ -127,6 +127,14 @@ class WzGroupsTable extends Component {
         direction: sortDirection,
       },
     };
+    const getRowProps = item => {
+      const { id } = item;
+      return {
+        'data-test-subj': `row-${id}`,
+        className: 'customRowClass',
+        onClick: () => this.props.updateGroupDetail(item),
+      };
+    };
 
     if (!error) {
       const itemList = this.props.state.itemList;
@@ -141,6 +149,7 @@ class WzGroupsTable extends Component {
             loading={isLoading}
             sorting={sorting}
             message={message}
+            rowProps={getRowProps}
             search={{ box: { incremental: true } }}
           />
           {this.props.state.showModal ? (

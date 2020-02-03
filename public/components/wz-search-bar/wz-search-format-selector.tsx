@@ -69,7 +69,6 @@ export class WzSearchFormatSelector extends Component {
     super(props);
     const { qFilterEnabled, apiFilterEnabled } = props;  
     this.toggleButtons = this.initToggleButtons(qFilterEnabled, apiFilterEnabled);
-    console.log(props.format);
     const toggleIndex = props.format === '?Q' ? 0 : 1;
     this.state = {
       isPopoverOpen: false,
@@ -160,7 +159,10 @@ export class WzSearchFormatSelector extends Component {
         {"Help"}
       </EuiButtonEmpty>
     );
-    const renderFooter = this.renderFooter()
+    const renderFooter = (qFilterEnabled && apiFilterEnabled) 
+      ? this.renderFooter()
+      : null;
+    
     return (
       <EuiPopover 
         id='wzFormatSelector'
@@ -177,7 +179,7 @@ export class WzSearchFormatSelector extends Component {
               }
             </EuiText>
           </div>
-          { !(qFilterEnabled && apiFilterEnabled) || renderFooter }
+          { renderFooter }
       </EuiPopover>
     );
   }
