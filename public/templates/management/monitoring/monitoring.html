@@ -1,46 +1,24 @@
-<div layout="column" ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'">
-    <div flex layout="column" ng-show="!isClusterEnabled || !isClusterRunning">
+<div style="padding:16px" ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'">
 
-        <!-- Cluster disabled breadcrumbs -->
-        <div layout="row" layout-align="start center">
-            <div layout="row" layout-padding>
-                <div>
-                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                    <span> / </span>
-                    <span>{{ mctrl.tabNames[tab] }}</span>
+    <!-- Cluster disabled or not running -->
+    <div ng-show="!isClusterEnabled || !isClusterRunning"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <div ng-if="!isClusterEnabled" class="euiFlexItem euiTextAlign euiTextAlign--center">
+            <div class="euiPanel euiPanel--paddingMedium">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
+                    disabled</span>
+                <div class="euiSpacer euiSpacer--m"></div>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>The cluster is disabled. Visit the documentation on <a target="_blank"
+                            href="https://documentation.wazuh.com/current/user-manual/configuring-cluster/index.html">this
+                            link</a> to learn about how to enable it.
+                    </p>
                 </div>
             </div>
         </div>
-        <!-- End cluster disabled breadcrumbs -->
-
-        <!-- Status and reports navigation bar -->
-        <div ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
-            <react-component name="Tabs" props="mctrl.managementTabsProps" />
-        </div>
-        <!-- End status and reports navigation bar -->
-
-        <!-- Cluster disabled section -->
-        <div flex layout="row" layout-align="start start" ng-if="!isClusterEnabled">
-            <md-card flex class="wz-md-card" flex>
-                <md-card-content class="wz-text-center">
-                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
-                        disabled</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="column" class="wz-padding-top-10">
-                        <p>The cluster is disabled. Visit the documentation on <a target="_blank"
-                                href="https://documentation.wazuh.com/current/user-manual/configuring-cluster/index.html">this
-                                link</a> to learn about how to enable it.
-                        </p>
-                    </div>
-                </md-card-content>
-            </md-card>
-        </div>
-        <!-- End cluster disabled section -->
-
-        <!-- Cluster not running section -->
-        <div flex layout="row" layout-align="start start" ng-if="!isClusterRunning">
-            <md-card flex class="wz-md-card" flex>
-                <md-card-content class="wz-text-center">
+        <div ng-if="!isClusterRunning">
+            <div class="euiFlexItem euiTextAlign euiTextAlign--center">
+                <div class="euiPanel euiPanel--paddingMedium">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
                         not running</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -49,14 +27,13 @@
                             The cluster is enabled but it's not running.
                         </p>
                     </div>
-                </md-card-content>
-            </md-card>
+                </div>
+            </div>
         </div>
-        <!-- End cluster not running section -->
     </div>
 
-    <div flex="auto" layout="column" ng-show="isClusterEnabled && isClusterRunning">
-
+    <!-- Cluster enabled -->
+    <div ng-show="isClusterEnabled && isClusterRunning" class="monitoring-discover">
         <div class="md-padding md-padding-top-16" ng-show="loading">
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
         </div>
@@ -104,20 +81,29 @@
         <!-- End navigation section -->
 
         <!-- Status and reports navigation bar -->
-        <div ng-if="!loading"  ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
+        <div ng-if="!loading" ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
             <react-component name="Tabs" props="mctrl.managementTabsProps" />
         </div>
         <!-- End status and reports navigation bar -->
 
         <!-- Discover search bar section -->
-        <kbn-dis ng-show="!loading && (!showNodes || currentNode)" class="wz-margin-top-10 monitoring-discover"></kbn-dis>
+        <kbn-dis class="monitoring-discover" ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
         <!-- End Discover search bar section -->
 
         <!-- Loading status section -->
-        <div layout="column" layout-align="center center" class="wz-margin-bottom-40"
-            ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
-            <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-            <div class="percentage">{{loadingStatus}}</div>
+        <div
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+            <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
+                ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
+                <span class="euiLoadingChart euiLoadingChart--large">
+                    <span class="euiLoadingChart__bar"></span>
+                    <span class="euiLoadingChart__bar"></span>
+                    <span class="euiLoadingChart__bar"></span>
+                    <span class="euiLoadingChart__bar"></span>
+                </span>
+                <div class="euiSpacer euiSpacer--m"></div>
+                <div class="percentage">{{loadingStatus}}</div>
+            </div>
         </div>
         <!-- End loading status section -->
     </div>

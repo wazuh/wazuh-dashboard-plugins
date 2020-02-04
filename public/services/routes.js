@@ -127,10 +127,12 @@ function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
-  // Sets ?_a=(columns:!(_source),filters:!())
-  $location.search('_a', '(columns:!(_source),filters:!())');
-  // Removes ?_g
-  $location.search('_g', null);
+  if ($location.$$path !== "/visualize/create") {
+    // Sets ?_a=(columns:!(_source),filters:!())
+    $location.search('_a', '(columns:!(_source),filters:!())');
+    // Removes ?_g
+    $location.search('_g', null);
+  }
   return goToKibana($location, $window);
 }
 
@@ -172,20 +174,20 @@ routes
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
   .when('/discover/context/:pattern?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,
-    resolve: { enableWzMenu, nestedResolve }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,
@@ -200,3 +202,4 @@ routes
   .otherwise({
     redirectTo: '/overview'
   });
+  
