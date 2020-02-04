@@ -8,11 +8,10 @@ import {
   EuiButtonIcon,
   EuiTitle,
   EuiToolTip,
-  EuiText,
+  EuiBadge,
   EuiSpacer,
   EuiInMemoryTable,
   EuiLink,
-  EuiCallOut
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -63,32 +62,8 @@ class WzRuleInfo extends Component {
         width: '10%'
       },
       {
-        field: 'pci',
-        name: 'PCI',
-        align: 'left',
-        sortable: true,
-        width: '10%'
-      },
-      {
-        field: 'gdpr',
-        name: 'GDPR',
-        align: 'left',
-        sortable: true,
-        width: '10%'
-      },
-      {
-        field: 'hipaa',
-        name: 'HIPAA',
-        align: 'left',
-        sortable: true,
-        width: '10%'
-      },
-      {
-        field: 'nist-800-53',
-        name: 'NIST 800-53',
-        align: 'left',
-        sortable: true,
-        width: '10%'
+        name: 'Compliance',
+        render: this.buildComplianceBadges,
       },
       {
         field: 'level',
@@ -139,6 +114,39 @@ class WzRuleInfo extends Component {
       if (complianceKeys.includes(key) && ruleInfo[key].length) compliance[key] = ruleInfo[key]
     });
     return compliance || {};
+  }
+
+  buildComplianceBadges(item) {
+    const badgeList = [];
+    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53'];
+    const buildBadge = (field) => {
+      const idGenerator = () => {
+        return '_' + Math.random().toString(36).substr(2, 9)
+      };
+
+      return (
+          <EuiToolTip
+              content={item[field].join(', ')}
+              key={idGenerator()}
+              position="bottom" >
+            <EuiBadge
+                title={null}
+                color="hollow"
+                style={{ margin: "1px 2px" }}
+            >{field.toUpperCase()}</EuiBadge>
+          </EuiToolTip>
+      );
+    };
+    try {
+      for (const field of fields) {
+        if (item[field].length) {
+          badgeList.push(buildBadge(field))
+        }
+      }
+    } catch (error) {
+    }
+
+    return <div>{badgeList}</div>;
   }
 
 
