@@ -161,40 +161,36 @@ class WzRuleInfo extends Component {
    */
   renderInfo(id, level, file, path) {
     return (
-      <EuiCallOut
-        title={'Information'}
-      >
-        <EuiSpacer size="s" />
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <b>ID:</b>{id}
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <b>Level:</b>
+        <ul>
+          <li key="id"><b>ID:</b>&nbsp;{id}</li>
+          <EuiSpacer size="s" />
+          <li key="level"><b>Level:</b>
             <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
               <EuiLink onClick={async () => this.setNewFiltersAndBack({ level: level })}>
-                {level}
+                &nbsp;{level}
               </EuiLink>
             </EuiToolTip>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <b>File:</b>
+          </li>
+
+          <EuiSpacer size="s" />
+          <li key="file"><b>File:</b>
             <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
               <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
-                {file}
+                &nbsp;{file}
               </EuiLink>
             </EuiToolTip>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <b>Path:</b>
+          </li>
+          <EuiSpacer size="s" />
+          <li key="path"><b>Path:</b>
             <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
               <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
-                {path}
+                &nbsp;{path}
               </EuiLink>
             </EuiToolTip>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiCallOut>
+          </li>
+
+          <EuiSpacer size="s" />
+        </ul>
     )
   }
 
@@ -206,7 +202,7 @@ class WzRuleInfo extends Component {
     const detailsToRender = [];
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-          <li key={key}><b>{key}:</b>&nbsp;{details[key]}</li>
+          <li key={key}><b>{key}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
       );
     });
     return (
@@ -222,22 +218,25 @@ class WzRuleInfo extends Component {
     */
   renderGroups(groups) {
     const listGroups = [];
-    groups.forEach(group => {
+    groups.forEach((group, index) => {
       listGroups.push(
-          <li key={group}>
-        <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
+        <span key={group}>
+          <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
             <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
               <span>
                 {group}
               </span>
             </EuiToolTip>
           </EuiLink>
-        </li>
+          {(index < groups.length-1) && ', '}
+        </span>
       );
     });
     return (
       <ul>
-        {listGroups}
+        <li>
+          {listGroups}
+        </li>
       </ul>
     )
   }
@@ -332,42 +331,48 @@ class WzRuleInfo extends Component {
               </EuiFlexItem>
             </EuiFlexGroup>
             {/* Cards */}
-              <EuiSpacer size={'s'}/>
+            <EuiSpacer size="m" />
+            <EuiFlexGroup>
               {/* General info */}
               <EuiFlexItem>
+                <EuiPanel paddingSize="l">
+                  <EuiTitle size={'s'}>
+                    <h3>Information</h3>
+                  </EuiTitle>
+                  <EuiSpacer size="s" />
                   {this.renderInfo(id, level, file, path)}
+                  {/* Groups */}
+                  <EuiSpacer size={'s'}/>
+                  <EuiTitle size={'s'}>
+                    <h3>Groups</h3>
+                  </EuiTitle>
+                  <EuiSpacer size="s" />
+                  {this.renderGroups(groups)}
+                </EuiPanel>
               </EuiFlexItem>
-              <EuiSpacer size="l" />
-              <EuiFlexGroup>
-                {/* Details */}
-                <EuiFlexItem>
-                  <EuiPanel paddingSize="s">
-                    <EuiText color="subdued">Details</EuiText>
-                    <EuiSpacer size="s" />
-                    {this.renderDetails(details)}
-                  </EuiPanel>
-                </EuiFlexItem>
-                {/* Groups */}
-                <EuiFlexItem>
-                  <EuiPanel paddingSize="s">
-                    <EuiText color="subdued">Groups</EuiText>
-                    <EuiSpacer size="s" />
-                    {this.renderGroups(groups)}
-                  </EuiPanel>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiSpacer size="l" />
+              {/* Details */}
+              <EuiFlexItem>
+                <EuiPanel paddingSize="l">
+                  <EuiTitle size={'s'}>
+                    <h3>Details</h3>
+                  </EuiTitle>
+                  <EuiSpacer size="s" />
+                  {this.renderDetails(details)}
+                </EuiPanel>
+              </EuiFlexItem>
               {/* Compliance */}
               {Object.keys(compliance).length > 0 && (
                 <EuiFlexItem>
-                  <EuiPanel paddingSize="s">
-                    <EuiText color="subdued">Compliance</EuiText>
+                  <EuiPanel paddingSize="l">
+                    <EuiTitle size={'s'}>
+                      <h3>Compliance</h3>
+                    </EuiTitle>
                     <EuiSpacer size="s" />
                     {this.renderCompliance(compliance)}
                   </EuiPanel>
                 </EuiFlexItem>
               )}
-
+            </EuiFlexGroup>
             {/* Table */}
             <EuiSpacer size="l" />
             <EuiPanel paddingSize="m">
