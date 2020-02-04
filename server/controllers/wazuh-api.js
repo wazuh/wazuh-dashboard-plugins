@@ -373,16 +373,16 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/pci`,
+          `${api.url}:${api.port}/rules/requirement/pci`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let PCIobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof pciRequirementsFile[item] !== 'undefined')
               PCIobject[item] = pciRequirementsFile[item];
           }
@@ -436,24 +436,15 @@ export class WazuhApiCtrl {
         const api = await this.manageHosts.getHostById(apiId);
 
         // Checking for GDPR
-        const version = await needle(
+        const version = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/version`,
+          `${api.url}:${api.port}/`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
+        const number = version.data.api_version;
 
-        const number = version.body.data;
-
-        const major = number.split('v')[1].split('.')[0];
-        const minor = number
-          .split('v')[1]
-          .split('.')[1]
-          .split('.')[0];
-        const patch = number
-          .split('v')[1]
-          .split('.')[1]
-          .split('.')[1];
+        const [major, minor, patch] = number.split('.');
 
         if ((major >= 3 && minor < 2) || (major >= 3 && minor >= 2 && patch < 3)) {
           return {};
@@ -465,16 +456,16 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3024, 400, reply);
         }
 
-        const response = await needle(
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/gdpr`,
+          `${api.url}:${api.port}/rules/requirement/gdpr`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
-
-        if ((((response || {}).body || {}).data || {}).items) {
+        
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let GDPRobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof gdprRequirementsFile[item] !== 'undefined')
               GDPRobject[item] = gdprRequirementsFile[item];
           }
@@ -547,16 +538,16 @@ export class WazuhApiCtrl {
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/hipaa`,
+          `${api.url}:${api.port}/rules/requirement/hipaa`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let HIPAAobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof hipaaRequirementsFile[item] !== 'undefined')
               HIPAAobject[item] = hipaaRequirementsFile[item];
           }
@@ -614,17 +605,16 @@ export class WazuhApiCtrl {
           // Can not get credentials from wazuh-hosts
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
-
-        const response = await needle(
+      
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/nist-800-53`,
+          `${api.url}:${api.port}/rules/requirement/nist-800-53`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
-
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let NISTobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof nistRequirementsFile[item] !== 'undefined')
               NISTobject[item] = nistRequirementsFile[item];
           }
@@ -841,7 +831,7 @@ export class WazuhApiCtrl {
           reply
         );
       }
-      const responseBody = (response || {}).data || {};
+      let responseBody = (response || {}).data || {};
       if (!responseBody) {
         responseBody =
           typeof responseBody === 'string' && path.includes('/files') && method === 'GET'
@@ -1304,25 +1294,23 @@ export class WazuhApiCtrl {
 
       const config = await this.manageHosts.getHostById(api);
 
-      const headers = ApiHelper.buildOptionsObject(config);
-
       const data = await Promise.all([
-        needle('get', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, headers),
-        needle('get', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, headers),
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, {idHost: api}),
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, {idHost: api})
       ]);
 
-      const result = data.map(item => (item.body || {}).data || false);
+      const result = data.map(item => (item.data || {}).data || []);
       const [hardwareResponse, osResponse] = result;
 
       // Fill syscollector object
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' && Object.keys(hardwareResponse).length
-            ? { ...hardwareResponse }
+            ? { ...hardwareResponse.affected_items[0] }
             : false,
         os:
           typeof osResponse === 'object' && Object.keys(osResponse).length
-            ? { ...osResponse }
+            ? { ...osResponse.affected_items[0] }
             : false,
       };
 
