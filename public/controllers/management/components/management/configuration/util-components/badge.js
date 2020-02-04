@@ -34,7 +34,7 @@ class WzBadge extends Component{
         if(nextProps.synchronized){
           return { color: 'secondary', content: 'SYNCHRONIZED'};
         }else{
-          return { color: 'secondary', content: 'NOT SYNCHRONIZED'};
+          return { color: 'danger', content: 'NOT SYNCHRONIZED'};
         }
       }else if(nextProps.color && nextProps.content){
         return { color: nextProps.color, content: nextProps.content };
