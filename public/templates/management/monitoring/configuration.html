@@ -1,58 +1,70 @@
 <!-- Cards for overview monitoring section -->
-<div layout="row" layout-align="start stretch" class="wz-timelions wz-margin-top-0" ng-show="showConfig">
-
-    <!-- Overview visualization card -->
-    <div class="euiPanel euiFlexItem wz-margin-10" class="wz-md-card"
-        ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered,'flex-30': resultState === 'ready' && rendered}">
-        <md-card-content class="wazuh-column">
-            <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Top 5 nodes</span>
-            <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-monitoring-Overview-Node-Pie'"
-                id="Wazuh-App-Cluster-monitoring-Overview-Node-Pie"></kbn-vis>
-            <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered">There are no results for selected time
-                range. Try another one.</span>
-        </md-card-content>
+<div ng-show="showConfig">
+    <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero">
+            <h2 class="euiTitle euiTitle--medium">
+                <md-button class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info" aria-label="Back"
+                    tooltip="Go back" tooltip-placement="bottom" ng-click="goBack()"><i class="fa fa-fw fa-arrow-left"
+                        aria-hidden="true"></i></md-button>
+                Overview
+            </h2>
+        </div>
     </div>
 
-    <!-- Cluster configuration card -->
-    <md-card flex class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
-                    configuration</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
+    <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <!-- Overview visualization card -->
+        <div class="euiPanel euiFlexItem euiFlexItem--flexGrowZero" style="min-width: 500px">
+            <md-card-content class="wazuh-column"
+                ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered}">
+                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Top 5
+                    nodes</span>
+                <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-monitoring-Overview-Node-Pie'"
+                    id="Wazuh-App-Cluster-monitoring-Overview-Node-Pie"></kbn-vis>
+                <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered">There are no results for selected
+                    time
+                    range. Try another one.</span>
+            </md-card-content>
+        </div>
+        <!-- Cluster configuration card -->
+        <div class="euiFlexItem">
+            <div class="euiPanel euiPanel--paddingMedium">
+                <span class="euiTitle euiTitle--small euiCard__title">Configuration</span>
+                <div class="euiSpacer euiSpacer--m"></div>
                 <!-- Configuration options -->
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">Disabled</span>
-                <span class="color-grey">{{configuration.disabled}}</span>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Disabled</span>
+                    <span class="color-grey">{{configuration.disabled}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Hidden</span>
+                    <span class="color-grey">{{configuration.hidden}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Name</span>
+                    <span class="color-grey">{{configuration.name}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Node name</span>
+                    <span class="color-grey">{{configuration.node_name}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Node type</span>
+                    <span class="color-grey">{{configuration.node_type}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Bind address</span>
+                    <span class="color-grey">{{configuration.bind_addr}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">IP</span>
+                    <span class="color-grey">{{configuration.nodes[0] || '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Port</span>
+                    <span class="color-grey">{{configuration.port}}</span>
+                </div>
             </div>
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">Hidden</span>
-                <span class="color-grey">{{configuration.hidden}}</span>
-            </div>
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">Name</span>
-                <span class="color-grey">{{configuration.name}}</span>
-            </div>
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">Node name</span>
-                <span class="color-grey">{{configuration.node_name}}</span>
-            </div>
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">Node type</span>
-                <span class="color-grey">{{configuration.node_type}}</span>
-            </div>
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">Bind address</span>
-                <span class="color-grey">{{configuration.bind_addr}}</span>
-            </div>
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">IP</span>
-                <span class="color-grey">{{configuration.nodes[0] || '-'}}</span>
-            </div>
-            <div layout="row" class="wz-padding-top-10">
-                <span flex="25">Port</span>
-                <span class="color-grey">{{configuration.port}}</span>
-            </div>
-        </md-card-content>
-    </md-card>
+        </div>
+    </div>
 </div>
 <!-- End cards for overview monitoring section -->
