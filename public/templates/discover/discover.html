@@ -5,7 +5,10 @@
     <wz-top-nav
       app-name="'discover'"
       config="topNavMenu"
-      show-search-bar="tabView !== 'cluster-monitoring'"
+      show-search-bar="tabView"
+      show-filter-bar="tabView !== 'cluster-monitoring'"
+      show-query-input="tabView !== 'cluster-monitoring'"
+      show-save-query="tabView !== 'cluster-monitoring'"
       show-date-picker="enableTimeRangeSelector"
       show-save-query="showSaveQuery"
       query="state.query"

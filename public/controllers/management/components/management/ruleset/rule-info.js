@@ -45,19 +45,7 @@ class WzRuleInfo extends Component {
         name: 'ID',
         align: 'left',
         sortable: true,
-        width: '5%',
-        render: value => {
-          return (
-            <EuiToolTip position="top" content={`Show rule ID ${value} information`}>
-              <EuiLink onClick={() => {
-                this.changeBetweenRules(value);
-              }
-              }>
-                {value}
-              </EuiLink>
-            </EuiToolTip>
-          )
-        }
+        width: '5%'
       },
       {
         field: 'description',
@@ -117,13 +105,14 @@ class WzRuleInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async () => {
+              <EuiLink 
+                onClick={async (event) => {
+                event.stopPropagation();
                 const noLocal = item.path.startsWith('ruleset/');
                 const result = await this.rulesetHandler.getRuleContent(value, noLocal);
                 const file = { name: value, content: result, path: item.path };
                 this.props.updateFileContent(file);
-              }
-              }>
+                }} >
                 {value}
               </EuiLink>
             </EuiToolTip>
@@ -210,16 +199,13 @@ class WzRuleInfo extends Component {
     */
   renderDetails(details) {
     const detailsToRender = [];
-    Object.keys(details).forEach(key => {
+    Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-        <Fragment>
           <li key={key}><b>{key}:</b>&nbsp;{details[key]}</li>
-          <EuiSpacer size="s" />
-        </Fragment>
       );
     });
     return (
-      <ul>
+      <ul style={{lineHeight:'initial'}}>
         {detailsToRender}
       </ul>
     )
@@ -233,16 +219,15 @@ class WzRuleInfo extends Component {
     const listGroups = [];
     groups.forEach(group => {
       listGroups.push(
-        <Fragment>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
+          <li key={group}>
+        <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
             <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
-              <li key={group}>
+              <span>
                 {group}
-              </li>
+              </span>
             </EuiToolTip>
           </EuiLink>
-          <EuiSpacer size="s" />
-        </Fragment>
+        </li>
       );
     });
     return (
@@ -264,7 +249,6 @@ class WzRuleInfo extends Component {
       listCompliance.push(
         <Fragment>
           <li key={key}><b>{this.complianceEquivalences[key]}</b></li>
-          <EuiSpacer size="s" />
         </Fragment>
       )
       compliance[key].forEach(element => {
@@ -307,6 +291,13 @@ class WzRuleInfo extends Component {
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
+    const onClickRow = item => {
+      return {
+        onClick: () => {
+          this.changeBetweenRules(item.id);
+        },
+      };
+    };
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -393,6 +384,7 @@ class WzRuleInfo extends Component {
                       <EuiInMemoryTable
                         itemId="id"
                         items={rules}
+                        rowProps={onClickRow}
                         columns={columns}
                         pagination={true}
                         loading={isLoading}

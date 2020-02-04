@@ -53,6 +53,9 @@ export class EuiSuggestInput extends Component {
       tooltipContent,
       suggestions,
       sendValue,
+      onPopoverFocus,
+      isPopoverOpen,
+      onClosePopover,
       ...rest
     } = this.props;
 
@@ -102,11 +105,11 @@ export class EuiSuggestInput extends Component {
         <EuiInputPopover
           id="popover"
           input={customInput}
-          onFocus={this.props.onPopoverFocus}
-          isOpen={this.props.isPopoverOpen}
+          onFocus={onPopoverFocus}
+          isOpen={isPopoverOpen}
           panelPaddingSize="none"
           fullWidth
-          closePopover={this.props.onClosePopover}>
+          closePopover={onClosePopover}>
           <div>{suggestions}</div>
         </EuiInputPopover>
       </div>

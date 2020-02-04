@@ -22,18 +22,14 @@ import RulesetHandler from './utils/ruleset-handler';
 import { toastNotifications } from 'ui/notify';
 
 import {
-  updateLoadingStatus,
-  updateFileContent,
-  updateRuleInfo,
-  updateDecoderInfo,
-  updateListContent,
   updateIsProcessing,
-  updatePageIndex,
   updateShowModal,
-  updateListItemsForRemove,
-  updateSortDirection,
-  updateSortField,
   updateDefaultItems,
+  updateListContent,
+  updateFileContent,
+  updateListItemsForRemove,
+  updateRuleInfo,
+  updateDecoderInfo
 } from '../../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -47,7 +43,9 @@ class WzRulesetTable extends Component {
     this.state = {
       items: [],
       pageSize: 10,
+      pageIndex: 0,
       totalItems: 0,
+      isLoading: false,
     };
     this.paths = {
       rules: '/rules',
@@ -63,11 +61,21 @@ class WzRulesetTable extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    const sectionChanged = prevProps.state.section !== this.props.state.section
-   
-    if ( (this.props.state.isProcessing && this._isMounted) || sectionChanged) {
-      this.props.updateLoadingStatus(true);
+    const sectionChanged = prevProps.state.section !== this.props.state.section;
+    const showingFilesChanged = prevProps.state.showingFiles !== this.props.state.showingFiles;
+    const filtersChanged = prevProps.state.filters !== this.props.state.filters;
+    if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
+      if (sectionChanged || showingFilesChanged || filtersChanged) {
+        await this.setState({
+          pageSize: 10,
+          pageIndex: 0,
+          sortDirection: null,
+          sortField: null,
+        })
+      }
+      this.setState({ isLoading: true });
       this.props.updateIsProcessing(false);
+
       await this.getItems();
     }
   }
@@ -75,30 +83,29 @@ class WzRulesetTable extends Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-  
+
   async getItems() {
     const { section, showingFiles } = this.props.state;
 
     this.setState({
-      items : []
+      items: []
     });
-    if(this.props.state.defaultItems.length === 0 && section === 'lists'){
-      await this.setDefaultItems();
-    }
 
     const rawItems = await this.wzReq(
       'GET',
-      `${this.paths[section]}${showingFiles ? '/files': ''}`,
+      `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
       this.buildFilter(),
-    )
+    ).catch((error) => {
+      console.warn(`Error when get the items of ${section}: `, error);
+      return {}
+    });
 
-    const { items, totalItems } = ((rawItems || {}).data || {}).data;
+    const { items = [], totalItems = 0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
       items,
       totalItems,
-      isProcessing: false,
+      isLoading: false
     });
-    this.props.updateLoadingStatus(false);
   }
 
   async setDefaultItems() {
@@ -106,7 +113,7 @@ class WzRulesetTable extends Component {
       'GET',
       '/manager/configuration',
       {
-        'wait_for_complete' : false,
+        'wait_for_complete': false,
         'section': 'ruleset',
         'field': 'list'
       }
@@ -117,50 +124,58 @@ class WzRulesetTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex } = this.props.state;
-    const { pageSize } = this.state;
+    const { pageSize, pageIndex } = this.state;
+    const { filters } = this.props.state;
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter(),
+      ...this.buildSortFilter(),
+      ...filters
     };
 
     return filter;
   }
 
   buildSortFilter() {
-    const {sortDirection, section} = this.props.state;
-    
-    const field = section === 'rules' ? 'id' : 'name';
-    const direction = (sortDirection === 'asc') ? '+' : '-';
-    
-    return direction+field;
+    const { sortDirection, sortField } = this.state;
+    const sortFilter = {};
+    if (sortField) {
+      const direction = (sortDirection === 'asc') ? '+' : '-';
+      sortFilter['sort'] = direction + sortField;
+    }
+
+    return sortFilter;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-    this.setState({ pageSize });
-    this.props.updatePageIndex(pageIndex);
-    this.props.updateSortDirection(sortDirection);
-    this.props.updateSortField(sortField);
+    this.setState({ pageSize, pageIndex, sortDirection, sortField });
     this.props.updateIsProcessing(true);
   };
 
-  render() {
-    this.rulesetColums = new RulesetColums(this.props);
+  getColumns() {
     const {
-      isLoading,
       section,
-      pageIndex,
       showingFiles,
-      error,
+    } = this.props.state;
+    const rulesetColums = new RulesetColums(this.props).columns;
+    const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
+    return columns;
+  }
+
+  render() {
+    const { error } = this.props.state;
+    const {
+      items,
+      pageSize,
+      totalItems,
+      pageIndex,
       sortField,
       sortDirection,
-    } = this.props.state;
-    const { items, pageSize, totalItems, } = this.state;
-    const rulesetColums = this.rulesetColums.columns;
-    const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
+      isLoading,
+    } = this.state;
+    const columns = this.getColumns();
     const message = isLoading ? null : 'No results...';
     const pagination = {
       pageIndex: pageIndex,
@@ -168,15 +183,41 @@ class WzRulesetTable extends Component {
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
     };
-    const sorting = {
-      sort: {
-        field: sortField,
-        direction: sortDirection,
-      },
-    }
-    
+    const sorting = !!sortField
+      ? {
+        sort: {
+          field: sortField,
+          direction: sortDirection,
+        },
+      }
+      : {};
+
     if (!error) {
       const itemList = this.props.state.itemList;
+
+      const getRowProps = item => {
+        const { id, name } = item;
+        return {
+          'data-test-subj': `row-${id || name}`,
+          className: 'customRowClass',
+          onClick: async () => {
+            const { section } = this.props.state;
+            if (section === 'rules') {
+              const result = await this.rulesetHandler.getRuleInformation(item.file, id);
+              this.props.updateRuleInfo(result);
+            } else if (section === 'decoders') {
+              const result = await this.rulesetHandler.getDecoderInformation(item.file, name);
+              this.props.updateDecoderInfo(result);
+            } else {
+              const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+              const file = { name: item.name, content: result, path: item.path };
+              this.props.updateListContent(file);
+            }
+          },
+        };
+      };
+
+
       return (
         <div>
           <EuiBasicTable
@@ -186,6 +227,7 @@ class WzRulesetTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading}
+            rowProps={!this.props.state.showingFiles && getRowProps}
             sorting={sorting}
             message={message}
           />
@@ -205,9 +247,9 @@ class WzRulesetTable extends Component {
               >
                 <p>Are you sure you want to remove?</p>
                 <div>
-                  {itemList.map(function(item, i) {
+                  {itemList.map(function (item, i) {
                     return (
-                      <li key={i}>{(item.file)? item.file: item.name}</li>
+                      <li key={i}>{(item.file) ? item.file : item.name}</li>
                     );
                   })}
                 </div>
@@ -231,17 +273,16 @@ class WzRulesetTable extends Component {
   };
 
   async removeItems(items) {
-    this.props.updateLoadingStatus(true);
+    this.setState({ isLoading: true });
     const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile((item.file)? item.file: item.name, item.path);
+      await this.rulesetHandler.deleteFile((item.file) ? item.file : item.name, item.path);
     });
 
     Promise.all(results).then((completed) => {
       this.props.updateIsProcessing(true);
-      this.props.updateLoadingStatus(false);
       this.showToast('success', 'Success', 'Deleted correctly', 3000);
     });
-  }; 
+  };
 }
 
 
@@ -253,18 +294,14 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateFileContent: content => dispatch(updateFileContent(content)),
-    updateRuleInfo: info => dispatch(updateRuleInfo(info)),
-    updateDecoderInfo: info => dispatch(updateDecoderInfo(info)),
-    updateListContent: content => dispatch(updateListContent(content)),
-    updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)),
+    updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateFileContent: fileContent => dispatch(updateFileContent(fileContent)),
+    updateListContent: listInfo => dispatch(updateListContent(listInfo)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: sortField => dispatch(updateSortField(sortField)),
+    updateRuleInfo: rule => dispatch(updateRuleInfo(rule)),
+    updateDecoderInfo: rule => dispatch(updateDecoderInfo(rule))
   };
 };
 

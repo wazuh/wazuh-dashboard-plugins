@@ -1,11 +1,19 @@
-<!-- Cards for main monitoring section -->
-<div layout="row" layout-align="start stretch" class="wz-timelions wz-margin-top-0" ng-if="!loading && !showConfig && !showNodes && isClusterEnabled && isClusterRunning">
+<div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+    ng-if="!loading && !showConfig && !showNodes && isClusterEnabled && isClusterRunning">
 
     <!-- Overview card -->
-    <md-card flex class="wz-md-card">
-        <md-card-content>
-            <i class="fa fa-fw fa-pie-chart" aria-hidden="true"></i> <span ng-click="goConfiguration()" class="wz-headline-title wz-text-link cursor-pointer">Overview</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
+    <div class="euiFlexItem">
+        <div class="euiPanel euiPanel--paddingMedium">
+            <span class="euiTitle euiTitle--small euiCard__title">Details&nbsp;
+                <button ng-click="goConfiguration()"
+                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall" type="button"><span
+                        class="euiButtonEmpty__content"><i class="fa fa-fw fa-pie-chart"></i><span
+                            class="euiButtonEmpty__text">View
+                            Overview</span>
+                    </span>
+                </button>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
             <div layout="row" class="wz-padding-top-10">
                 <span flex="25">IP</span>
                 <span class="color-grey">{{configuration.nodes[0] || '-'}}</span>
@@ -18,27 +26,30 @@
                 <span flex="25">Version</span>
                 <span class="color-grey">{{version}}</span>
             </div>
-        </md-card-content>
-    </md-card>
+        </div>
+    </div>
     <!-- End overview card -->
 
     <!-- Info card -->
-    <md-card flex class="wz-md-card">
-        <md-card-content>
-            <i class="fa fa-fw fa-info" aria-hidden="true"></i> <span class="wz-headline-title">Information</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
+    <div class="euiFlexItem">
+        <div class="euiPanel euiPanel--paddingMedium">
+            <span class="euiTitle euiTitle--small euiCard__title">Information</span>
+            <div class="euiSpacer euiSpacer--m"></div>
             <!-- Nodes -->
             <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goNodes()">
-                <span flex="25" class="wz-text-link" tooltip="Click to open the list of nodes" tooltip-placement="left">Nodes</span>
-                <span class="wz-text-link" tooltip="Click to open the list of nodes" tooltip-placement="right">{{nodesCount}}</span>
+                <span flex="25" class="wz-text-link" tooltip="Click to open the list of nodes"
+                    tooltip-placement="left">Nodes</span>
+                <span class="wz-text-link" tooltip="Click to open the list of nodes"
+                    tooltip-placement="right">{{nodesCount}}</span>
             </div>
             <!-- Agents -->
             <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goAgents()">
-                <span flex="25" class="wz-text-link" tooltip="Click to open the list of agents" tooltip-placement="left">Agents</span>
-                <span class="wz-text-link" tooltip="Click to open the list of agents" tooltip-placement="right">{{agentsCount}}</span>
+                <span flex="25" class="wz-text-link" tooltip="Click to open the list of agents"
+                    tooltip-placement="left">Agents</span>
+                <span class="wz-text-link" tooltip="Click to open the list of agents"
+                    tooltip-placement="right">{{agentsCount}}</span>
             </div>
-        </md-card-content>
-    </md-card>
+        </div>
+    </div>
     <!-- End info card -->
 </div>
-<!-- End cards for main monitoring section -->
