@@ -45,19 +45,7 @@ class WzRuleInfo extends Component {
         name: 'ID',
         align: 'left',
         sortable: true,
-        width: '5%',
-        render: value => {
-          return (
-            <EuiToolTip position="top" content={`Show rule ID ${value} information`}>
-              <EuiLink onClick={() => {
-                this.changeBetweenRules(value);
-              }
-              }>
-                {value}
-              </EuiLink>
-            </EuiToolTip>
-          )
-        }
+        width: '5%'
       },
       {
         field: 'description',
@@ -117,13 +105,14 @@ class WzRuleInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async () => {
+              <EuiLink 
+                onClick={async (event) => {
+                event.stopPropagation();
                 const noLocal = item.path.startsWith('ruleset/');
                 const result = await this.rulesetHandler.getRuleContent(value, noLocal);
                 const file = { name: value, content: result, path: item.path };
                 this.props.updateFileContent(file);
-              }
-              }>
+                }} >
                 {value}
               </EuiLink>
             </EuiToolTip>
@@ -302,6 +291,13 @@ class WzRuleInfo extends Component {
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
+    const onClickRow = item => {
+      return {
+        onClick: () => {
+          this.changeBetweenRules(item.id);
+        },
+      };
+    };
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -388,6 +384,7 @@ class WzRuleInfo extends Component {
                       <EuiInMemoryTable
                         itemId="id"
                         items={rules}
+                        rowProps={onClickRow}
                         columns={columns}
                         pagination={true}
                         loading={isLoading}
