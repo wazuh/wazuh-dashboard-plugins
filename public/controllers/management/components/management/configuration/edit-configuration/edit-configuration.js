@@ -146,7 +146,7 @@ class WzEditorConfiguration extends Component{
             </EuiFlexGroup>
             <EuiSpacer size='s'/>
             <EuiText>
-              Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected}</span>
+              Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected || 'Manager'}</span>
               {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
             </EuiText>
             {infoChangesAfterRestart && (
