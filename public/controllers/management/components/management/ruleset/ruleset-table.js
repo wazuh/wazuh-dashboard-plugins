@@ -65,7 +65,7 @@ class WzRulesetTable extends Component {
     const showingFilesChanged = prevProps.state.showingFiles !== this.props.state.showingFiles;
     const filtersChanged = prevProps.state.filters !== this.props.state.filters;
     if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
-      if ( sectionChanged || showingFilesChanged || filtersChanged) {
+      if (sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
           pageSize: 10,
           pageIndex: 0,
@@ -73,7 +73,7 @@ class WzRulesetTable extends Component {
           sortField: null,
         })
       }
-      this.setState({isLoading:true});
+      this.setState({ isLoading: true });
       this.props.updateIsProcessing(false);
 
       await this.getItems();
@@ -88,23 +88,23 @@ class WzRulesetTable extends Component {
     const { section, showingFiles } = this.props.state;
 
     this.setState({
-      items : []
+      items: []
     });
 
     const rawItems = await this.wzReq(
       'GET',
-      `${this.paths[this.props.request]}${showingFiles ? '/files': ''}`,
+      `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
       this.buildFilter(),
     ).catch((error) => {
       console.warn(`Error when get the items of ${section}: `, error);
       return {}
     });
 
-    const { items=[], totalItems=0 } = ((rawItems || {}).data || {}).data || {};
+    const { items = [], totalItems = 0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
       items,
       totalItems,
-      isLoading:false
+      isLoading: false
     });
   }
 
@@ -113,7 +113,7 @@ class WzRulesetTable extends Component {
       'GET',
       '/manager/configuration',
       {
-        'wait_for_complete' : false,
+        'wait_for_complete': false,
         'section': 'ruleset',
         'field': 'list'
       }
@@ -137,11 +137,11 @@ class WzRulesetTable extends Component {
   }
 
   buildSortFilter() {
-    const {sortDirection, sortField} = this.state;
+    const { sortDirection, sortField } = this.state;
     const sortFilter = {};
     if (sortField) {
       const direction = (sortDirection === 'asc') ? '+' : '-';
-      sortFilter['sort'] = direction+sortField;
+      sortFilter['sort'] = direction + sortField;
     }
 
     return sortFilter;
@@ -184,13 +184,13 @@ class WzRulesetTable extends Component {
       pageSizeOptions: [10, 25, 50, 100],
     };
     const sorting = !!sortField
-    ? {
+      ? {
         sort: {
           field: sortField,
           direction: sortDirection,
         },
       }
-    : {};
+      : {};
 
     if (!error) {
       const itemList = this.props.state.itemList;
@@ -201,13 +201,14 @@ class WzRulesetTable extends Component {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
           onClick: async () => {
-            if(this.props.state.section === 'rules'){
+            const { section } = this.props.state;
+            if (section === 'rules') {
               const result = await this.rulesetHandler.getRuleInformation(item.file, id);
               this.props.updateRuleInfo(result);
-            } else if (this.props.state.section === 'decoders'){
+            } else if (section === 'decoders') {
               const result = await this.rulesetHandler.getDecoderInformation(item.file, name);
               this.props.updateDecoderInfo(result);
-            } else{
+            } else {
               const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
               const file = { name: item.name, content: result, path: item.path };
               this.props.updateListContent(file);
@@ -226,7 +227,7 @@ class WzRulesetTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading}
-            rowProps={getRowProps}
+            rowProps={!this.props.state.showingFiles && getRowProps}
             sorting={sorting}
             message={message}
           />
@@ -246,9 +247,9 @@ class WzRulesetTable extends Component {
               >
                 <p>Are you sure you want to remove?</p>
                 <div>
-                  {itemList.map(function(item, i) {
+                  {itemList.map(function (item, i) {
                     return (
-                      <li key={i}>{(item.file)? item.file: item.name}</li>
+                      <li key={i}>{(item.file) ? item.file : item.name}</li>
                     );
                   })}
                 </div>
@@ -274,7 +275,7 @@ class WzRulesetTable extends Component {
   async removeItems(items) {
     this.setState({ isLoading: true });
     const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile((item.file)? item.file: item.name, item.path);
+      await this.rulesetHandler.deleteFile((item.file) ? item.file : item.name, item.path);
     });
 
     Promise.all(results).then((completed) => {
@@ -300,7 +301,7 @@ const mapDispatchToProps = (dispatch) => {
     updateListContent: listInfo => dispatch(updateListContent(listInfo)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
     updateRuleInfo: rule => dispatch(updateRuleInfo(rule)),
-    updateDecoderInfo : rule => dispatch(updateDecoderInfo (rule))
+    updateDecoderInfo: rule => dispatch(updateDecoderInfo(rule))
   };
 };
 
