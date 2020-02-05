@@ -438,7 +438,7 @@ export class WazuhApiCtrl {
         // Checking for GDPR
         const version = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/`,
+          `${api.url}:${api.port}//`,
           {},
           { idHost: apiId }
         );

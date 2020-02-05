@@ -293,8 +293,8 @@ export class AgentsPreviewController {
    */
   async getWazuhVersion() {
     try {
-      const data = await this.apiReq.request('GET', '/', {});
-      const result = ((data || {}).data || {}).data;
+      const data = await this.apiReq.request('GET', '//', {});
+      const result = (data || {}).data || {};
       return result.api_version
     } catch (error) {
       return version;
