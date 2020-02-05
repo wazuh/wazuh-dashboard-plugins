@@ -37,7 +37,8 @@
     "test": "_mocha test/**/*",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
-    "test:browser": "plugin-helpers test:browser"
+    "test:browser": "plugin-helpers test:browser",
+    "test:jest": "node scripts/jest"
   },
   "dependencies": {
     "angular-animate": "1.7.8",
