@@ -210,7 +210,7 @@ class WzDecoderInfo extends Component {
   render() {
     const { decoderInfo, isLoading } = this.props.state;
     const currentDecoder = (this.state && this.state.currentDecoder) ? this.state.currentDecoder : decoderInfo.current;
-    const decoders = decoderInfo.items;
+    const decoders = decoderInfo.affected_items;
     const currentDecoderArr = decoders.filter(r => { return r.name === currentDecoder });
     const currentDecoderInfo = currentDecoderArr[0];
     const { position, details, file, name, path } = currentDecoderInfo;

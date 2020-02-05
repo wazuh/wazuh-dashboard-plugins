@@ -100,10 +100,10 @@ class WzRulesetTable extends Component {
       return {}
     });
 
-    const { items=[], totalItems=0 } = ((rawItems || {}).data || {}).data || {};
+    const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
-      items,
-      totalItems,
+      items: affected_items,
+      totalItems : total_affected_items,
       isLoading:false
     });
   }
@@ -208,7 +208,7 @@ class WzRulesetTable extends Component {
               const result = await this.rulesetHandler.getDecoderInformation(item.file, name);
               this.props.updateDecoderInfo(result);
             } else{
-              const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+              const result = await this.rulesetHandler.getCdbList(`${item.path}`);
               const file = { name: item.name, content: result, path: item.path };
               this.props.updateListContent(file);
             }

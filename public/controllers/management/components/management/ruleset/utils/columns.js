@@ -218,14 +218,14 @@ export default class RulesetColumns {
                       aria-label="Edit content"
                       iconType="pencil"
                       onClick={async () => {
-                        const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+                        const result = await this.rulesetHandler.getCdbList(`${item.path}`);
                         const file = { name: item.name, content: result, path: item.path };
                         this.tableProps.updateListContent(file);
                       }}
                       color="primary"
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}/${item.name}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
+                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
@@ -234,7 +234,7 @@ export default class RulesetColumns {
                         this.tableProps.updateShowModal(true);
                       }}
                       color="danger"
-                      disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
+                      disabled={defaultItems.indexOf(`${item.path}`) !== -1}
                     />
                   </EuiToolTip>
                 </div>

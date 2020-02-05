@@ -361,7 +361,7 @@ export const saveConfiguration = async (selectedNode, xml) => {
 export const saveNodeConfiguration = async (node, content) => {
   try {
     const result = await WzRequest.apiReq(
-      'POST',
+      'PUT',
       `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
       { content, origin: 'xmleditor' }
     );
@@ -380,7 +380,7 @@ export const saveFileCluster = async (text, node) => {
   const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq(
-      'POST',
+      'PUT',
       `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
       { content: xml, origin: 'xmleditor' }
     );
@@ -398,7 +398,7 @@ export const saveFileManager = async (text) => {
   const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq(
-      'POST',
+      'PUT',
       `/manager/files?path=etc/ossec.conf&overwrite=true`,
       { content: xml, origin: 'xmleditor' }
     );
