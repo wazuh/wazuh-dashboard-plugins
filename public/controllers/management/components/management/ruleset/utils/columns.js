@@ -266,6 +266,8 @@ export default class RulesetColumns {
           <EuiBadge
             title={null}
             color="hollow"
+            onClick={(ev) => ev.stopPropagation()}
+            onClickAriaLabel={field.toUpperCase()}
             style={{ margin: "1px 2px" }}
           >{field.toUpperCase()}</EuiBadge>
         </EuiToolTip>

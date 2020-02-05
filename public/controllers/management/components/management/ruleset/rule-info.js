@@ -131,6 +131,8 @@ class WzRuleInfo extends Component {
           position="bottom" >
           <EuiBadge
             title={null}
+            onClick={(ev) => ev.stopPropagation()}
+            onClickAriaLabel={field.toUpperCase()}
             color="hollow"
             style={{ margin: "1px 2px" }}
           >{field.toUpperCase()}</EuiBadge>
