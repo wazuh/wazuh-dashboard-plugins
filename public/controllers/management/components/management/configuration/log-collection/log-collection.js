@@ -11,11 +11,6 @@
 */
 
 import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
-
-import {
-  
-} from "@elastic/eui";
 
 import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationLogCollectionLogs from './log-collection-logs';
