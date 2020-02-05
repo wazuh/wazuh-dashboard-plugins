@@ -108,7 +108,10 @@ app.run(function($rootScope, $route, $location, $window) {
 
   $rootScope.$on('$locationChangeSuccess', () => {
     const navigation = AppState.getNavigation();
-    AppState.setNavigation({ currLocation: $location.path() });
+    const addDiscoverSections = {};
+    if(!navigation.discoverSections)
+      addDiscoverSections["discoverSections"] = ['/overview/', '/agents', '/wazuh-dev']
+    AppState.setNavigation({ currLocation: $location.path(), ...addDiscoverSections});
     if (navigation.currLocation !== navigation.prevLocation) {
       if (navigation.discoverSections.includes(navigation.currLocation)) {
         AppState.setNavigation({ discoverPrevious: navigation.prevLocation });

@@ -55,7 +55,7 @@ export default class RulesetHandler {
   static async getRules(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -67,7 +67,7 @@ export default class RulesetHandler {
   static async getRulesFiles(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/rules/files`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -81,7 +81,7 @@ export default class RulesetHandler {
   static async getLists(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/lists/files`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -93,7 +93,7 @@ export default class RulesetHandler {
   static async getDecoders(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -105,7 +105,7 @@ export default class RulesetHandler {
   static async getDecodersFiles(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders/files`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -119,7 +119,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/rules`, {
         path: 'etc/rules'
       });
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -133,7 +133,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
         path: 'etc/decoders'
       });
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -193,7 +193,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/manager/files`, {
         path: path
       });
-      return ((result || {}).data || {}).data || false;
+      return ((result || {}).data || {}).contents || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -208,7 +208,7 @@ export default class RulesetHandler {
   static async sendRuleConfiguration(rule, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
+        'PUT',
         `/manager/files?path=etc/rules/${rule.file ||
         rule}&overwrite=${overwrite}`,
         { content, origin: 'xmleditor' }
@@ -228,7 +228,7 @@ export default class RulesetHandler {
   static async sendDecoderConfiguration(decoder, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
+        'PUT',
         `/manager/files?path=etc/decoders/${decoder.file ||
         decoder}&overwrite=${overwrite}`,
         { content, origin: 'xmleditor' }
@@ -245,7 +245,7 @@ export default class RulesetHandler {
    * @param {String} path 
    * @param {String} content 
    * @param {Boolean} overwrite 
-   */
+     */
   static async sendCdbList(list, path, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(

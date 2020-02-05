@@ -272,7 +272,7 @@ export class DecodersController {
           {}
         );
         const response =
-          (((decoderReload || {}).data || {}).data || {}).items || [];
+          (((decoderReload || {}).data || {}).data || {}).affected_items || [];
         if (!response.length) {
           this.currentDecoder = null;
           this.closeDetailView(true);
