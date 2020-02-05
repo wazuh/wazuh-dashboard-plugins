@@ -11,26 +11,24 @@
 */
 
 import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
-
-import {
-  EuiSpacer
-} from "@elastic/eui";
 
 import WzConfigurationSettingsHeader from './configuration-settings-header';
 import WzViewSelector, { WzViewSelectorSwitch } from './view-selector';
 import { WzSettingsViewer } from './code-viewer';
 
 class WzConfigurationSettingsTabSelector extends Component{
+
   constructor(props){
     super(props);
     this.state = {
       view: ''
     };
   }
+
   changeView(view){
     this.setState({ view });
   }
+
   getTitleDescription(view){
     const result = {};
     if(view === 'json'){
@@ -45,6 +43,7 @@ class WzConfigurationSettingsTabSelector extends Component{
     }
     return result;
   }
+  
   render(){
     const { view } = this.state;
     const { currentConfig, helpLinks, children } = this.props;

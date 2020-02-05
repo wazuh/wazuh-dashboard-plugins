@@ -46,13 +46,13 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false, 
       }
       try {
         const url = node
-          ? `/cluster/${node}/config/${component}/${configuration}`
+          ? `/cluster/${node}/configuration/${component}/${configuration}`
           : !node && agentId === '000'
-          ? `/manager/config/${component}/${configuration}`
+          ? `/manager/configuration/${component}/${configuration}`
           : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
-        result[`${component}-${configuration}`] = partialResult.data.data;
+        result[`${component}-${configuration}`] = partialResult.data.data.affected_items[0];
       } catch (error) {
         result[`${component}-${configuration}`] = await handleError(error, 'Fetch configuration', updateWazuhNotReadyYet);
       }
@@ -171,7 +171,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
      while (tries--) {
       await delay(1200);
       try{
-        const result = await WzRequest.apiReq('GET', '/ping', {});
+        const result = await WzRequest.apiReq('GET', '/ping', {}); //TODO: ¿API 4.0?
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
           updateWazuhNotReadyYet('');
