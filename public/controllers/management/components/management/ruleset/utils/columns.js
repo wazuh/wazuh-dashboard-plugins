@@ -217,7 +217,8 @@ export default class RulesetColumns {
                     <EuiButtonIcon
                       aria-label="Edit content"
                       iconType="pencil"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
                         const file = { name: item.name, content: result, path: item.path };
                         this.tableProps.updateListContent(file);
@@ -229,7 +230,8 @@ export default class RulesetColumns {
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         this.tableProps.updateListItemsForRemove([item]);
                         this.tableProps.updateShowModal(true);
                       }}
@@ -275,8 +277,7 @@ export default class RulesetColumns {
           badgeList.push(buildBadge(field))
         }
       }
-    } catch (error) {
-    }
+    } catch (error) { }
 
     return <div>{badgeList}</div>;
   }

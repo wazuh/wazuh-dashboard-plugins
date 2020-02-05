@@ -259,6 +259,19 @@ export default class RulesetHandler {
     }
   }
 
+  static async uploadCdbList(list, content, overwrite) {
+    try {
+      const result = await WzRequest.apiReq(
+        'POST',
+        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
+        { content, origin: 'raw' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   /**
    * Delete a file
    * @param {String} file 
