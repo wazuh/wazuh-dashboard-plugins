@@ -98,16 +98,14 @@ export class DataFactory {
       const firstPage = await this.httpClient.request(
         'GET',
         this.path,
-        parameters
+        { params: parameters }
       );
-
       this.items = this.items.filter(item => !!item);
-
       Array.isArray(firstPage.data.data)
         ? this.items.push(...firstPage.data.data)
-        : this.items.push(...firstPage.data.data.items);
+        : this.items.push(...firstPage.data.data.affected_items);
 
-      const totalItems = firstPage.data.data.totalItems;
+      const totalItems = firstPage.data.data.total_affected_items;
 
       const remaining =
         this.items.length === totalItems ? 0 : totalItems - this.items.length;
