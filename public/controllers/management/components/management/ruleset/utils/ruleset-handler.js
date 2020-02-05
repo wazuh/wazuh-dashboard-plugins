@@ -245,12 +245,35 @@ export default class RulesetHandler {
    * @param {String} path 
    * @param {String} content 
    * @param {Boolean} overwrite 
-     */
-  static async sendCdbList(list, path, content, overwrite) {
+   */
+  static async sendCdbList(list, path, content, overwrite,addingNew=false) {
+    try {
+      if(!addingNew){
+        const result = await WzRequest.apiReq(
+          'PUT',
+          `/manager/files?path=${path}/${list}&overwrite=${overwrite}`,
+          { content, origin: 'raw' }
+        );
+        return result;
+      }else{
+        const result = await WzRequest.apiReq(
+          'PUT',
+          `/manager/files?path=${path}&overwrite=${overwrite}`,
+          { content, origin: 'raw' }
+        );
+        return result;
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+
+  static async updateCdbList(list, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
-        `/manager/files?path=${path}/${list}&overwrite=${overwrite}`,
+        'PUT',
+        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
         { content, origin: 'raw' }
       );
       return result;
@@ -265,7 +288,10 @@ export default class RulesetHandler {
    * @param {String} path 
    */
   static async deleteFile(file, path) {
-    const fullPath = `${path}/${file}`;
+    let fullPath = `${path}/${file}`;
+    if(path.startsWith("etc/lists")){
+      fullPath = path;
+    }
     try {
       const result = await WzRequest.apiReq('DELETE', '/manager/files', {
         path: fullPath

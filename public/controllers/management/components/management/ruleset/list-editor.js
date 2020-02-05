@@ -48,7 +48,7 @@ class WzListEditor extends Component {
       editingValue: '',
       newListName: '',
     };
-
+    this.tmpListName = ""
     this.items = {};
 
     this.rulesetHandler = RulesetHandler;
@@ -224,12 +224,16 @@ class WzListEditor extends Component {
         return;
       }
       this.setState({ isSaving: true });
-      await this.rulesetHandler.sendCdbList(name, path, raw, overwrite);
+      if(this.tmpListName){
+        addingNew = false;
+      }
+      await this.rulesetHandler.sendCdbList(name, path, raw, overwrite, addingNew);
       if (!addingNew) {
         const result = await this.rulesetHandler.getCdbList(`${path}/${name}`);
         const file = { name: name, content: result, path: path };
         this.props.updateListContent(file);
         this.showToast('success', 'Success', 'CBD List successfully created', 3000);
+        this.tmpListName = name;
       } else {
         this.showToast('success', 'Success', 'CBD List updated', 3000);
       }
