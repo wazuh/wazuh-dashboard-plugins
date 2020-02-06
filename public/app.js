@@ -70,7 +70,7 @@ const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
 
 app.config([
   '$compileProvider',
-  function($compileProvider) {
+  function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -79,12 +79,12 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function($httpProvider) {
+  function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function($rootScope, $route, $location, appState, $window) {
+app.run(function ($rootScope, $route, $location, appState) {
   chrome
     .setRootTemplate('<wz-menu></wz-menu><div ng-view></div>')
     .setRootController(() => require('./app'));
@@ -122,92 +122,6 @@ app.run(function($rootScope, $route, $location, appState, $window) {
           $location.search('configSubTab', null);
           $location.search('editingFile', null);
           $route.reload();
-          //discover sections
-        } else if (
-          navigation.discoverSections.includes(navigation.currLocation)
-        ) {
-          if (navigation.currLocation === navigation.discoverSections[1]) {
-            $window.history.pushState(
-              {
-                page: chrome.addBasePath(
-                  'wazuh#' + navigation.discoverPrevious + '/'
-                )
-              },
-              '',
-              chrome.addBasePath('wazuh#' + navigation.discoverPrevious + '/')
-            );
-          } else if (
-            navigation.currLocation === navigation.discoverSections[2]
-          ) {
-            if (
-              $location.search().tab &&
-              $location.search().tab !== 'welcome'
-            ) {
-              $window.history.pushState(
-                {
-                  page: chrome.addBasePath(
-                    'wazuh#' + navigation.discoverPrevious
-                  )
-                },
-                '',
-                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-              );
-              $window.history.pushState(
-                {
-                  page: chrome.addBasePath(
-                    'wazuh#' +
-                      navigation.discoverPrevious +
-                      '?agent=' +
-                      $location.search().agent
-                  )
-                },
-                '',
-                chrome.addBasePath(
-                  'wazuh#' +
-                    navigation.discoverPrevious +
-                    '?agent=' +
-                    $location.search().agent
-                )
-              );
-            } else {
-              $window.history.pushState(
-                {
-                  page: chrome.addBasePath(
-                    'wazuh#' + navigation.discoverPrevious
-                  )
-                },
-                '',
-                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-              );
-            }
-          } else if (
-            navigation.currLocation === navigation.discoverSections[0] ||
-            navigation.currLocation === navigation.discoverSections[3]
-          ) {
-            $window.history.pushState(
-              {
-                page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-              },
-              '',
-              chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-            );
-          }
-          $window.history.pushState(
-            { page: chrome.addBasePath('wazuh#' + $location.$$url) },
-            '',
-            chrome.addBasePath('wazuh#' + $location.$$url)
-          );
-        } else if ($location.search().tabView === 'cluster-monitoring') {
-          $window.history.pushState(
-            { page: chrome.addBasePath('wazuh#/manager/') },
-            '',
-            chrome.addBasePath('wazuh#/manager/')
-          );
-          $window.history.pushState(
-            { page: 'wazuh#' + $location.$$url },
-            '',
-            chrome.addBasePath('wazuh#' + $location.$$url)
-          );
         }
       }
     }
