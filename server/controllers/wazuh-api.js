@@ -131,23 +131,30 @@ export class WazuhApiCtrl {
                 cluster: 'Disabled',
               };
             }
+          } else {
+             // Cluster mode is not active
+             api.cluster_info = {
+              status: 'disabled',
+              manager: managerName,
+              cluster: 'Disabled',
+            };
+          }
+          
+          if (api.cluster_info) {
+            // Update cluster information in the wazuh-registry.json
+            await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
 
-            if (api.cluster_info) {
-              // Update cluster information in the wazuh-registry.json
-              await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
+            // Hide Wazuh API secret, username, password
+            const copied = { ...api };
+            copied.secret = '****';
+            copied.username = '****';
+            copied.password = '****';
 
-              // Hide Wazuh API secret, username, password
-              const copied = { ...api };
-              copied.secret = '****';
-              copied.username = '****';
-              copied.password = '****';
-
-              return {
-                statusCode: 200,
-                data: copied,
-                idChanged: req.idChanged || null,
-              };
-            }
+            return {
+              statusCode: 200,
+              data: copied,
+              idChanged: req.idChanged || null,
+            };
           }
         }
       }
@@ -328,6 +335,12 @@ export class WazuhApiCtrl {
                 status: 'disabled',
               };
             }
+          } else { // TODO: ONLY FOR NOW, PROBLEMS WITH API
+            return {
+              manager: managerName,
+              cluster: 'Disabled',
+              status: 'disabled',
+            };
           }
         }
       }
