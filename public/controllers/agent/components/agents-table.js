@@ -16,9 +16,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
+  EuiButton,
   EuiButtonEmpty,
   EuiButtonIcon,
-  EuiLink,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
@@ -28,6 +28,7 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
+import { WzRequest } from '../../../react-services/wz-request'
 
 export class AgentsTable extends Component {
 
@@ -46,6 +47,7 @@ export class AgentsTable extends Component {
       sortDirection: 'asc',
       sortField: 'id',
       totalItems: 0,
+      selectedItems: []
     }
     this.downloadCsv.bind(this);
   }
@@ -200,30 +202,6 @@ export class AgentsTable extends Component {
             aria-label="Open configuration for this agent"
           />
         </EuiToolTip>
-        {/*         <EuiToolTip content="Restart agent" position="left">
-          <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
-            color={'primary'}
-            iconType="refresh"
-            aria-label="Restart agent"
-          />
-        </EuiToolTip> */}
-        {/*         <EuiToolTip content="Upgrade agent" position="left">
-          <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
-            color={'success'}
-            iconType="sortUp"
-            aria-label="Upgrade agent"
-          />
-        </EuiToolTip> */}
-        {/*         <EuiToolTip content="Delete this agent" position="left">
-          <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
-            color={'danger'}
-            iconType="trash"
-            aria-label="Delete this agent"
-          />
-        </EuiToolTip> */}
       </div>
     );
   }
@@ -275,6 +253,7 @@ export class AgentsTable extends Component {
     const filterSearch = { name: 'search', value: search }
     this.props.downloadCsv([filterQ, filterSearch])
   }
+
   formattedButton() {
     return (
       <EuiFlexItem grow={false}>
@@ -284,6 +263,57 @@ export class AgentsTable extends Component {
       </EuiFlexItem>
     );
   }
+
+  /* MULTISELECT TABLE */
+  onSelectionChange = selectedItems => {
+    this.setState({ selectedItems });
+  };
+
+  renderUpgradeButton() {
+    const { selectedItems } = this.state;
+
+    if (selectedItems.length === 0) {
+      return;
+    }
+
+    return (
+      <EuiButton color="danger" iconType="upgrade" onClick={this.onClickUpgrade}>
+        Upgrade {selectedItems.length} Agents
+      </EuiButton>
+    );
+  }
+
+  renderResetButton() {
+    const { selectedItems } = this.state;
+
+    if (selectedItems.length === 0) {
+      return;
+    }
+
+    return (
+      <EuiButton color="danger" iconType="upgrade" onClick={this.onClickReset}>
+        Reset {selectedItems.length} Agents
+      </EuiButton>
+    );
+  }
+
+  onClickUpgrade = () => {
+    const { selectedItems } = this.state;
+    selectedItems.map(item => {
+      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
+    });
+    
+    console.log(response);
+  };
+
+  onClickReset = () => {
+    const { selectedItems } = this.state;
+    selectedItems.map(item => {
+      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/restart`, {});
+    });
+    
+    console.log(response);
+  };
 
   columns() {
     return [
@@ -581,18 +611,29 @@ export class AgentsTable extends Component {
         direction: sortDirection,
       },
     };
-    const isLoading = this.state.isLoading
+    const isLoading = this.state.isLoading;
+
+    const selection = {
+      selectable: agent => agent.name,
+      selectableMessage: selectable =>
+        !selectable ? 'Agent is currently offline' : undefined,
+      onSelectionChange: this.onSelectionChange,
+    };
+
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
             items={agents}
+            itemId='id'
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
             rowProps={getRowProps}
+            isSelectable={true}
+            selection={selection}
             noItemsMessage="No agents found"
           />
         </EuiFlexItem>
@@ -603,12 +644,16 @@ export class AgentsTable extends Component {
   render() {
     const title = this.headRender();
     const filter = this.filterBarRender();
+    const upgradeButton = this.renderUpgradeButton();
+    const resetButton = this.renderResetButton();
     const table = this.tableRender();
 
     return (
       <EuiPanel paddingSize="l">
         {title}
         {filter}
+        {upgradeButton}
+        {resetButton}
         {table}
       </EuiPanel>
     );

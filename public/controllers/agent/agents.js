@@ -406,6 +406,8 @@ export class AgentsController {
     };
 
     this.$scope.goDiscover = () => this.goDiscover();
+    this.$scope.onClickUpgrade = () => this.onClickUpgrade();
+    this.$scope.onClickReset = () => this.onClickReset();
 
     this.$scope.$on('$routeChangeStart', () => {
       return AppState.removeSessionStorageItem('configSubTab');
@@ -792,6 +794,24 @@ export class AgentsController {
     };
     return this.switchTab('general');
   }
+
+  onClickUpgrade() {
+    
+    selectedItems.map(item => {
+      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
+    });
+    
+    console.log(response);
+  };
+
+  onClickReset() {
+    
+    selectedItems.map(item => {
+      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/restart`, {});
+    });
+    
+    console.log(response);
+  };
 
   // Agent data
 
