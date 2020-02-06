@@ -167,7 +167,7 @@ class WzMenu extends Component {
         onClick={this.onClickManagementButton.bind(this)}
         iconType="arrowDown"
         iconSide="right">
-        <EuiIcon type='managementApp' color='primary' size='m' /> Management
+        <EuiIcon type='managementApp' color='primary' size='m' />Management
       </EuiButtonEmpty>);
 
     return (
@@ -183,7 +183,7 @@ class WzMenu extends Component {
                       color="text"
                       href="#/overview"
                       onClick={() => this.setMenuItem('overview')} >
-                      <EuiIcon type='visualizeApp' color='primary' size='m' /> Visualize
+                      <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
                     </EuiButtonEmpty>
 
                     <EuiPopover
@@ -203,7 +203,7 @@ class WzMenu extends Component {
                       href="#/agents-preview"
                       onClick={() => this.setMenuItem('agents-preview')}>
                       <EuiIcon type='watchesApp' color='primary' size='m' />
-                      <span className="wz-menu-button-title "> Agents</span>
+                      <span className="wz-menu-button-title ">Agents</span>
                     </EuiButtonEmpty>
 
                     <EuiButtonEmpty
@@ -212,7 +212,7 @@ class WzMenu extends Component {
                       href="#/wazuh-dev"
                       onClick={() => this.setMenuItem('wazuh-dev')}>
                       <EuiIcon type='console' color='primary' size='m' />
-                      <span className="wz-menu-button-title "> Dev Tools</span>
+                      <span className="wz-menu-button-title ">Dev Tools</span>
                     </EuiButtonEmpty>
 
 

@@ -42,7 +42,7 @@ class WzRulesetTable extends Component {
     this.wzReq = (...args) => WzRequest.apiReq(...args);
     this.state = {
       items: [],
-      pageSize: 10,
+      pageSize: 15,
       pageIndex: 0,
       totalItems: 0,
       isLoading: false,
@@ -181,7 +181,7 @@ class WzRulesetTable extends Component {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100],
+      pageSizeOptions: [10, 15, 25, 50, 100],
     };
     const sorting = !!sortField
       ? {
