@@ -52,7 +52,7 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false, 
           : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
-        result[`${component}-${configuration}`] = partialResult.data.data.affected_items[0];
+        result[`${component}-${configuration}`] = partialResult.data.data.total_affected_items !== 0 ? partialResult.data.data.affected_items[0] : {};
       } catch (error) {
         result[`${component}-${configuration}`] = await handleError(error, 'Fetch configuration', updateWazuhNotReadyYet);
       }
