@@ -29,7 +29,7 @@ import {
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { MitreCardsSlider } from '../directives/wz-mitre-card-slider-eui/components/mitre-cards-slider';
 import { MitreTable } from '../directives/wz-mitre-table-eui/components/mitre-table';
-import { Poc2 } from '../directives/wz-mitre-table-eui/components/poc2';
+import { Poc1, Poc2, Poc3 } from '../directives/wz-mitre-table-eui/components/';
 import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 
@@ -51,7 +51,9 @@ app
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer', EuiSpacer)
   .value('MitreTable', MitreTable)
+  .value('Poc1', Poc1)
   .value('Poc2', Poc2)
+  .value('Poc3', Poc3)
   .value('SyscheckTable', SyscheckTable)
   .value('MitreCardsSlider', MitreCardsSlider)
   .value('SyscheckTable', SyscheckTable)
