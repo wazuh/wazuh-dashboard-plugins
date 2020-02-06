@@ -223,7 +223,7 @@ export const fetchFile = async (selectedNode) => {
       { path: 'etc/ossec.conf' }
     );
 
-    let xml = ((data || {}).data || {}).data || false;
+    let xml = ((data || {}).data || {}).contents || false;
 
     if (!xml) {
       throw new Error('Could not fetch configuration file');
@@ -317,7 +317,7 @@ export const restartNode = async (node) => {
   try {
     const validationError = await WzRequest.apiReq(
       'GET',
-      `/cluster/${node}/configuration/validation`,
+      `/cluster/configuration/validation`,
       {}
     );
 
@@ -329,7 +329,7 @@ export const restartNode = async (node) => {
     }
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/${node}/restart`,
+      `/cluster/restart`,
       {}
     );
 
@@ -429,7 +429,7 @@ export const validateAfterSent = async (node = false) => {
     if (node && isCluster) {
       validation = await WzRequest.apiReq(
         'GET',
-        `/cluster/${node}/configuration/validation`,
+        `/cluster/configuration/validation`,
         {}
       );
     } else {
