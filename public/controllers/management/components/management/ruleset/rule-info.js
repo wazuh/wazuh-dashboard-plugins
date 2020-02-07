@@ -8,10 +8,10 @@ import {
   EuiButtonIcon,
   EuiTitle,
   EuiToolTip,
-  EuiText,
+  EuiBadge,
   EuiSpacer,
   EuiInMemoryTable,
-  EuiLink
+  EuiLink,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -45,19 +45,7 @@ class WzRuleInfo extends Component {
         name: 'ID',
         align: 'left',
         sortable: true,
-        width: '5%',
-        render: value => {
-          return (
-            <EuiToolTip position="top" content={`Show rule ID ${value} information`}>
-              <EuiLink onClick={() => {
-                this.changeBetweenRules(value);
-              }
-              }>
-                {value}
-              </EuiLink>
-            </EuiToolTip>
-          )
-        }
+        width: '5%'
       },
       {
         field: 'description',
@@ -74,32 +62,8 @@ class WzRuleInfo extends Component {
         width: '10%'
       },
       {
-        field: 'pci',
-        name: 'PCI',
-        align: 'left',
-        sortable: true,
-        width: '10%'
-      },
-      {
-        field: 'gdpr',
-        name: 'GDPR',
-        align: 'left',
-        sortable: true,
-        width: '10%'
-      },
-      {
-        field: 'hipaa',
-        name: 'HIPAA',
-        align: 'left',
-        sortable: true,
-        width: '10%'
-      },
-      {
-        field: 'nist-800-53',
-        name: 'NIST 800-53',
-        align: 'left',
-        sortable: true,
-        width: '10%'
+        name: 'Compliance',
+        render: this.buildComplianceBadges,
       },
       {
         field: 'level',
@@ -117,13 +81,14 @@ class WzRuleInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async () => {
-                const noLocal = item.path.startsWith('ruleset/');
-                const result = await this.rulesetHandler.getRuleContent(value, noLocal);
-                const file = { name: value, content: result, path: item.path };
-                this.props.updateFileContent(file);
-              }
-              }>
+              <EuiLink
+                onClick={async (event) => {
+                  event.stopPropagation();
+                  const noLocal = item.path.startsWith('ruleset/');
+                  const result = await this.rulesetHandler.getRuleContent(value, noLocal);
+                  const file = { name: value, content: result, path: item.path };
+                  this.props.updateFileContent(file);
+                }} >
                 {value}
               </EuiLink>
             </EuiToolTip>
@@ -140,7 +105,7 @@ class WzRuleInfo extends Component {
 
   /**
    * Build an object with the compliance info about a rule
-   * @param {Object} ruleInfo 
+   * @param {Object} ruleInfo
    */
   buildCompliance(ruleInfo) {
     const compliance = {};
@@ -149,6 +114,40 @@ class WzRuleInfo extends Component {
       if (complianceKeys.includes(key) && ruleInfo[key].length) compliance[key] = ruleInfo[key]
     });
     return compliance || {};
+  }
+
+  buildComplianceBadges(item) {
+    const badgeList = [];
+    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53'];
+    const buildBadge = (field) => {
+      const idGenerator = () => {
+        return '_' + Math.random().toString(36).substr(2, 9)
+      };
+
+      return (
+        <EuiToolTip
+          content={item[field].join(', ')}
+          key={idGenerator()}
+          position="bottom" >
+          <EuiBadge
+            title={null}
+            onClick={(ev) => ev.stopPropagation()}
+            onClickAriaLabel={field.toUpperCase()}
+            color="hollow"
+            style={{ margin: "1px 2px" }}
+          >{field.toUpperCase()}</EuiBadge>
+        </EuiToolTip>
+      );
+    };
+    try {
+      for (const field of fields) {
+        if (item[field].length) {
+          badgeList.push(buildBadge(field))
+        }
+      }
+    } catch (error) { }
+
+    return <div>{badgeList}</div>;
   }
 
 
@@ -164,10 +163,10 @@ class WzRuleInfo extends Component {
 
   /**
    * Render the basic information in a list
-   * @param {Number} id 
-   * @param {Number} level 
-   * @param {String} file 
-   * @param {String} path 
+   * @param {Number} id
+   * @param {Number} level
+   * @param {String} file
+   * @param {String} path
    */
   renderInfo(id, level, file, path) {
     return (
@@ -212,11 +211,11 @@ class WzRuleInfo extends Component {
     const detailsToRender = [];
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-          <li key={key}><b>{key}:</b>&nbsp;{details[key]}</li>
+        <li key={key}><b>{key}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
       );
     });
     return (
-      <ul style={{lineHeight:'initial'}}>
+      <ul style={{ lineHeight: 'initial' }}>
         {detailsToRender}
       </ul>
     )
@@ -228,22 +227,25 @@ class WzRuleInfo extends Component {
     */
   renderGroups(groups) {
     const listGroups = [];
-    groups.forEach(group => {
+    groups.forEach((group, index) => {
       listGroups.push(
-          <li key={group}>
-        <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
+        <span key={group}>
+          <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
             <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
               <span>
                 {group}
               </span>
             </EuiToolTip>
           </EuiLink>
-        </li>
+          {(index < groups.length - 1) && ', '}
+        </span>
       );
     });
     return (
       <ul>
-        {listGroups}
+        <li>
+          {listGroups}
+        </li>
       </ul>
     )
   }
@@ -257,25 +259,30 @@ class WzRuleInfo extends Component {
     const keys = Object.keys(compliance);
     for (let i in Object.keys(keys)) {
       const key = keys[i];
-      listCompliance.push(
-        <Fragment>
-          <li key={key}><b>{this.complianceEquivalences[key]}</b></li>
-        </Fragment>
-      )
-      compliance[key].forEach(element => {
+
+      const values = compliance[key].map((element, index) => {
         const filters = {};
         filters[key] = element;
-        listCompliance.push(
-          <Fragment>
+        return (
+          <span key={element}>
             <EuiLink onClick={async () => this.setNewFiltersAndBack({ filters })}>
               <EuiToolTip position="top" content="Filter by this compliance">
-                <li key={element}>{element}</li>
+                <span>{element}</span>
               </EuiToolTip>
             </EuiLink>
-            <EuiSpacer size="s" />
-          </Fragment>
+            {(index < compliance[key].length - 1) && ', '}
+          </span>
         );
       });
+
+      listCompliance.push(
+        <li key={key}>
+          <b>{this.complianceEquivalences[key]}</b>
+          <p>{values}</p>
+          <EuiSpacer size='s' />
+        </li>
+      )
+
     }
     return (
       <ul>
@@ -302,6 +309,13 @@ class WzRuleInfo extends Component {
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
+    const onClickRow = item => {
+      return {
+        onClick: () => {
+          this.changeBetweenRules(item.id);
+        },
+      };
+    };
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -325,49 +339,49 @@ class WzRuleInfo extends Component {
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size="m" />
             {/* Cards */}
+            <EuiSpacer size="m" />
             <EuiFlexGroup>
               {/* General info */}
               <EuiFlexItem>
-                <EuiPanel paddingSize="s">
-                  <EuiText color="subdued">Information</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
+                <EuiPanel paddingSize="m">
+                  <EuiTitle size={'s'}>
+                    <h3>Information</h3>
+                  </EuiTitle>
                   <EuiSpacer size="s" />
                   {this.renderInfo(id, level, file, path)}
+                  {/* Groups */}
+                  <EuiSpacer size={'m'} />
+                  <EuiTitle size={'s'}>
+                    <h3>Groups</h3>
+                  </EuiTitle>
+                  <EuiSpacer size="s" />
+                  {this.renderGroups(groups)}
                 </EuiPanel>
               </EuiFlexItem>
               {/* Details */}
               <EuiFlexItem>
-                <EuiPanel paddingSize="s">
-                  <EuiText color="subdued">Details</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
+                <EuiPanel paddingSize="m">
+                  <EuiTitle size={'s'}>
+                    <h3>Details</h3>
+                  </EuiTitle>
                   <EuiSpacer size="s" />
                   {this.renderDetails(details)}
-                </EuiPanel>
-              </EuiFlexItem>
-              {/* Groups */}
-              <EuiFlexItem>
-                <EuiPanel paddingSize="s">
-                  <EuiText color="subdued">Groups</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
-                  <EuiSpacer size="s" />
-                  {this.renderGroups(groups)}
                 </EuiPanel>
               </EuiFlexItem>
               {/* Compliance */}
               {Object.keys(compliance).length > 0 && (
                 <EuiFlexItem>
-                  <EuiPanel paddingSize="s">
-                    <EuiText color="subdued">Compliance</EuiText>
-                    <EuiSpacer size="xs" className="subdued-background" />
+                  <EuiPanel paddingSize="m">
+                    <EuiTitle size={'s'}>
+                      <h3>Compliance</h3>
+                    </EuiTitle>
                     <EuiSpacer size="s" />
                     {this.renderCompliance(compliance)}
                   </EuiPanel>
                 </EuiFlexItem>
               )}
             </EuiFlexGroup>
-
             {/* Table */}
             <EuiSpacer size="l" />
             <EuiPanel paddingSize="m">
@@ -388,6 +402,7 @@ class WzRuleInfo extends Component {
                       <EuiInMemoryTable
                         itemId="id"
                         items={rules}
+                        rowProps={onClickRow}
                         columns={columns}
                         pagination={true}
                         loading={isLoading}

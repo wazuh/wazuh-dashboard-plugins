@@ -98,11 +98,9 @@ export class DataFactory {
       const firstPage = await this.httpClient.request(
         'GET',
         this.path,
-        parameters
+        { params: parameters }
       );
-
       this.items = this.items.filter(item => !!item);
-
       Array.isArray(firstPage.data.data)
         ? this.items.push(...firstPage.data.data)
         : this.items.push(...firstPage.data.data.affected_items);

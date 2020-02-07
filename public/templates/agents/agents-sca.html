@@ -1,6 +1,6 @@
 <div ng-if="tab === 'sca' && tabView === 'panels'" class="margin-top-30">
     <div class="md-margin"
-        ng-if="!load && (((agent || {}).status === 'Never connected') || !agent || !agent.os)">
+        ng-if="!load && (((agent || {}).status === 'never_connected') || !agent || !agent.os)">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
                 <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />

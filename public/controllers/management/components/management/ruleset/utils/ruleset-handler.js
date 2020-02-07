@@ -281,7 +281,7 @@ export default class RulesetHandler {
       return Promise.reject(error);
     }
   }
-
+  
   /**
    * Delete a file
    * @param {String} file 

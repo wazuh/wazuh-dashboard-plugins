@@ -13,7 +13,6 @@ import path from 'path';
 import fs from 'fs';
 import { TabDescription as descriptions } from '../reporting/tab-description';
 import * as TimSort from 'timsort';
-import rawParser from '../reporting/raw-parser';
 import PdfPrinter from 'pdfmake/src/printer';
 import { ErrorResponse } from './error-response';
 import { VulnerabilityRequest } from '../reporting/vulnerability-request';
