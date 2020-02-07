@@ -23,6 +23,7 @@ import {
 } from '@elastic/eui';
 import { EuiPopover } from '@elastic/eui';
 import { AttkPopover } from './attk-popover-poc3';
+import { Func } from 'mocha';
 
 export class Poc3 extends Component {
   state:{
@@ -30,7 +31,9 @@ export class Poc3 extends Component {
   }
 
   props!: {
-    mitreobject: object
+    mitreobject: object,
+    addFilter: Function,
+    addNegativeFilter: Function,
   }
   constructor(props) {
     super(props);
@@ -78,7 +81,12 @@ export class Poc3 extends Component {
       const techniques = mitreobject[tact].techniques
       .map(tecn => {
         return (
-          <AttkPopover attacksCount={tecn.attacks_count} name={tecn.name}/>
+          <AttkPopover 
+            attacksCount={tecn.attacks_count}
+            name={tecn.name}
+            id={tecn.id}
+            addFilter={(id) => this.props.addFilter(id)}
+            addNegativeFilter={(id) => this.props.addNegativeFilter(id)} />
         )
       })
       return techniques;

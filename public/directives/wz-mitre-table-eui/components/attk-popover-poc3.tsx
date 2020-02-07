@@ -13,6 +13,9 @@ export class AttkPopover extends Component {
   props!: {
     name: string
     attacksCount: number
+    id: string
+    addFilter: Function 
+    addNegativeFilter: Function
   }
 
   constructor(props) {
@@ -23,7 +26,13 @@ export class AttkPopover extends Component {
   }
 
   render() {
-    const { attacksCount, name } = this.props;
+    const {
+      attacksCount,
+      name,
+      addFilter,
+      addNegativeFilter,
+      id
+    } = this.props;
     const { isOpen } = this.state;
 
     return (
@@ -42,12 +51,12 @@ export class AttkPopover extends Component {
         closePopover={() => this.setState({isOpen: !isOpen})} >
                     <EuiButtonEmpty 
               iconType='plusInCircle'
-              onClick={() => alert(`This set a filter by ${name}`)} >
+              onClick={() => addFilter(id)} >
                 Filter by this
               </EuiButtonEmpty><br />
             <EuiButtonEmpty 
               iconType='minusInCircle'
-              onClick={() => alert(`This set a negative filter by ${name}`)} >
+              onClick={() => addNegativeFilter(id)} >
                 Exclude result
               </EuiButtonEmpty><br />
             <EuiButtonEmpty 
