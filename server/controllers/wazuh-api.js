@@ -1061,7 +1061,7 @@ export class WazuhApiCtrl {
       const output = await this.apiInterceptor.request(
         'GET',
         `${config.url}:${config.port}/${tmpPath}`,
-        { params },
+        { params: params },
         { idHost: req.payload.id }
       );
 
@@ -1076,10 +1076,10 @@ export class WazuhApiCtrl {
           const tmpData = await this.apiInterceptor.request(
             'GET',
             `${config.url}:${config.port}/${tmpPath}`,
-            { params },
+            { params: params },
             { idHost: req.payload.id }
           );
-              itemsArray.push(...tmpData.data.data.items);
+          itemsArray.push(...tmpData.data.data.affected_items);
         }
       }
 
