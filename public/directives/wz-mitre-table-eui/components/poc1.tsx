@@ -84,7 +84,7 @@ export class Poc1 extends Component {
       )
     )
     return (
-      <EuiPanel>
+      <EuiPanel style={{overflowX: 'auto'}}>
         <EuiSwitch 
           onChange={event => {this.setState(s => {return {showEmp: !s.showEmp}})}}
           checked={showEmp}
