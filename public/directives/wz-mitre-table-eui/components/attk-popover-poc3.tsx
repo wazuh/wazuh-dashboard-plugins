@@ -28,11 +28,11 @@ export class AttkPopover extends Component {
 
     return (
       <EuiPopover
-        className="euiButton euiButton--primary"
-        style={{margin:5, padding: "0px 5px"}}
+        className="euiButton euiButton--text facet-poc3"
+        style={{margin:5, padding: "0px 5px",width:"24.2%"}}
         button={
           <EuiFacetButton 
-          style={{width:"300px"}}
+          style={{width: "100%"}}
           quantity={attacksCount}
           onClick={() => this.setState({isOpen: !isOpen})} >
           {name}

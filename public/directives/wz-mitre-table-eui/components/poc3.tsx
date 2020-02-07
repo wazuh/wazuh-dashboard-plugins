@@ -14,8 +14,9 @@ import React, { Component } from 'react';
 import {
   EuiFacetButton,
   EuiFacetGroup,
-  EuiFlexGroup,
+  EuiFieldSearch,
   EuiFlexGrid,
+  EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
   EuiTitle,
@@ -36,7 +37,6 @@ export class Poc3 extends Component {
     this.state = {
       selectedMap: {}
     };
-    console.log(props)
   }
 
   componentWillMount() {
@@ -72,7 +72,6 @@ export class Poc3 extends Component {
     const { mitreobject } = this.props;
     const { selectedMap } = this.state;
     const selectedTact = Object.keys(selectedMap).filter(tact => selectedMap[tact]);
-    console.log(selectedTact)
 
     const allTechniques = selectedTact
     .map(tact => {
@@ -95,15 +94,21 @@ export class Poc3 extends Component {
 
   render() {
     return (
-      <EuiPanel>
+      <EuiPanel style={{margin:16}}>
         <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem 
+            grow={false}
+            style={{background: '#f4f5f8', margin: '-4px', padding: '16px'}} >
             <EuiTitle><h1>Tactics</h1></EuiTitle>
             {this.renderTactics()}
           </EuiFlexItem>
-          <EuiFlexItem style={{maxHeight:515}}>
-            <EuiTitle><h1>Techniques</h1></EuiTitle>
-            <EuiFlexGrid style={{padding: 20, overflow:'hidden', overflowY: 'scroll'}}>
+          <EuiFlexItem>
+            <EuiTitle ><h1 style={{marginLeft: 20 }}>Techniques</h1></EuiTitle>
+            <div style={{marginLeft: 20, marginTop: 10, marginBottom: 0}}>
+              <EuiFieldSearch
+                fullWidth={true}  /> 
+            </div>
+            <EuiFlexGrid style={{margin: '0px -22px -16px 15px', padding:'16px 0px', overflow:'hidden', overflowY: 'scroll', maxHeight:486}}>
             {this.renderTechniques()}
             </EuiFlexGrid>
           </EuiFlexItem>
