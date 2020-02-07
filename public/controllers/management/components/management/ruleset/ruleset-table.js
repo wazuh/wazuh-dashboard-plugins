@@ -100,19 +100,11 @@ class WzRulesetTable extends Component {
       return {}
     });
 
-<<<<<<< HEAD
     const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
       items: affected_items,
       totalItems : total_affected_items,
       isLoading:false
-=======
-    const { items = [], totalItems = 0 } = ((rawItems || {}).data || {}).data || {};
-    this.setState({
-      items,
-      totalItems,
-      isLoading: false
->>>>>>> 9a269a6f956d4f5deb30d79523917628cbeb4992
     });
   }
 
