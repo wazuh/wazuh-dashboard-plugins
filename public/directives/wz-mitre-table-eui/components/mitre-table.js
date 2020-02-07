@@ -482,6 +482,7 @@ import { EuiPanel,
 
 
    render() {
+     console.log(this.state.currentTechniqueData)
     let flyout;
     if (this.state.isFlyoutVisible) {
       flyout = (

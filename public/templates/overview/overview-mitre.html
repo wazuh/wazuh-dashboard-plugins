@@ -1,33 +1,13 @@
 <div ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'" style="margin-top: 10px;">
 
 
-    <select class="wz-menu-select" ng-model="currentPoc"
-    aria-label="Index pattern selector"
-    placeholder="Index pattern">
-    <option class="wz-menu-select-option"
-        value="0">
-        card slider + tabla
-    </option>
-    <option class="wz-menu-select-option"
-        value="1">
-        arbol de ataques / tacticas
-    </option>
-    <option class="wz-menu-select-option"
-        value="2">
-           seleccion vertical
-    </option>
-    <option class="wz-menu-select-option"
-        value="3">
-           seleccion horizontal
-    </option>
-    </select>
 
     <div ng-if="currentPoc == 1">
         <react-component name="Poc1" props="octrl.mitreObject2">
     </div>
 
     <div ng-if="currentPoc == 2">
-        <react-component name="Poc2" props="octrl.mitreObject">
+        <react-component name="Poc2" props="octrl.mitreObject2">
     </div>
 
     <div ng-if="currentPoc == 3">
@@ -39,7 +19,6 @@
 
 
     <div ng-if="currentPoc == 0">
-        card slider + tabla
     <!-- MITRE TABLE -->
     <div layout="row" ng-show="!octrl.showingMitreTable" layout-padding>
         <react-component flex name="MitreTable" props="octrl.mitreTableProps">
@@ -58,7 +37,7 @@
     </div>
 </div>
     
-    <div ng-show="octrl.showingMitreTable && resultState !== 'none' && resultState !== 'loading' && mitreIds">
+    <div ng-show="(octrl.showingMitreTable || currentPoc != 0) && resultState !== 'none' && resultState !== 'loading' && mitreIds">
         <!-- Mitre cards slider-->
         <div ng-if="currentPoc == 0">
 

@@ -88,6 +88,7 @@ export class OverviewController {
     
   }
 
+
   /**
    * On controller loads
    */
@@ -515,14 +516,16 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 7
         "techniques" : impact,
         attacks_count: 0
       },
-      "Táctica con muchas técnicas" : {
-        "name" : "Táctica con muchas técnicas",
+      "example tactic with a big amount of techniques" : {
+        "name" : "example tactic with a big amount of techniques",
         "techniques" : muchos,
         attacks_count: 0
-      },
+      }
     }
     this.mitreObject2 = {
-      mitreobject: {...this.mitreObject}
+      mitreobject: {...this.mitreObject},
+      addFilter: (id) => this.addMitrefilter(id)
+
     }
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
@@ -707,6 +710,11 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 7
     return false;
   }
 
+  setMitre(i){
+    console.log("ee")
+    this.$scope.currentPoc = i;
+  }
+
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
@@ -737,6 +745,7 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 7
       }
 
       if (newTab === 'mitre') {
+        this.$scope.currentPoc = 0;
         const result = await this.apiReq.request('GET', '/rules/mitre', {});
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
         
@@ -745,6 +754,10 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 7
           attacksCount: this.$scope.attacksCount,
           reqTitle: "MITRE",
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
+        }
+
+        this.mitrePoc2 = {
           addFilter: (id) => this.addMitrefilter(id)
         }
 

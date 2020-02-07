@@ -52,7 +52,13 @@
 
             <!-- Navigation bar -->
             <div ng-if="octrl.overviewTabsProps">
+            <div layout="row">
                 <react-component name="Tabs" props="octrl.overviewTabsProps" />
+                <button role="tab" aria-selected="true" type="button" class="euiTab " ng-click="octrl.setMitre(1)"><span class="euiTab__content">MITRE ATT&amp;CK 2</span></button>
+                <button role="tab" aria-selected="true" type="button" class="euiTab " ng-click="octrl.setMitre(2)"><span class="euiTab__content">MITRE ATT&amp;CK 3</span></button>
+                <button role="tab" aria-selected="true" type="button" class="euiTab " ng-click="octrl.setMitre(3)"><span class="euiTab__content">MITRE ATT&amp;CK 4</span></button>
+            </div>
+                
             </div>
             <!-- End of navigation bar -->
 
@@ -61,7 +67,7 @@
             <!-- End Discover search bar section -->
 
             <!-- This section will not be shown if we are in MITRE tab and viewing the MITRE table -->
-            <div ng-show="octrl.tab !== 'mitre' || (octrl.tab === 'mitre' && octrl.showingMitreTable)" >
+            <div ng-show="octrl.tab !== 'mitre' || (octrl.tab === 'mitre' && octrl.showingMitreTable) || octrl.currentPoc != 0" >
                 <!-- Loading status section -->
                 <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
                     <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center" ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'">
