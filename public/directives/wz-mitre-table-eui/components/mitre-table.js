@@ -88,7 +88,7 @@ import { EuiPanel,
       formattedTactics.map( (key,idx) => {
         
         if(this.props.attacksCount && this.props.attacksCount[key.id]){
-          key["count"] = this.props.attacksCount[key.id];
+          key["count"] = 0;  // this.props.attacksCount[key.id];
         }else{
           key["count"] = 0;
         }
