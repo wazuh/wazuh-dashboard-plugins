@@ -670,9 +670,10 @@ export class WazuhElasticCtrl {
         `Index pattern: ${req.params.pattern}`,
         'debug'
       );
+      console.log(`Index pattern: ${req.params.pattern}`)
       const output =
         ((req || {}).params || {}).pattern === 'all'
-          ? await checkKnownFields(this.wzWrapper, false, false, false, true)
+          ? await checkKnownFields(this.wzWrapper, log, this._server, false, false)
           : await this.wzWrapper.updateIndexPatternKnownFields(
               req.params.pattern
             );

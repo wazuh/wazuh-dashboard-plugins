@@ -325,8 +325,7 @@ import {
       "Collection" ,
       "Command And Control" ,
       "Exfiltriation",
-      "Impact",
-      "example tactic with a big amount of techniques"
+      "Impact"
     ]
 
     const result = orderedArray.map( (item,idx) => {

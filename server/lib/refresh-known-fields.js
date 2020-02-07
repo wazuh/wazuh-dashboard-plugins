@@ -24,12 +24,12 @@ export async function checkKnownFields(
   try {
     const usingCredentials = await wzWrapper.usingCredentials();
     const msg = `Security enabled: ${usingCredentials ? 'yes' : 'no'}`;
-
-    !quiet && log('initialize:checkKnownFields', msg, 'debug');
+    console.log("eee")
+     log('initialize:checkKnownFields', msg, 'debug');
 
     const indexPatternList = await wzWrapper.getAllIndexPatterns();
 
-    !quiet &&
+    
       log(
         'initialize:checkKnownFields',
         `Found ${indexPatternList.hits.total.value} index patterns`,
@@ -60,7 +60,7 @@ export async function checkKnownFields(
         }
       }
     }
-    !quiet &&
+   
       log(
         'initialize:checkKnownFields',
         `Found ${list.length} valid index patterns for Wazuh alerts`,
@@ -74,7 +74,6 @@ export async function checkKnownFields(
     );
 
     if (defaultIndexPattern && defaultExists.length === 0) {
-      !quiet &&
         log(
           'initialize:checkKnownFields',
           `Default index pattern not found, creating it...`,
@@ -87,7 +86,6 @@ export async function checkKnownFields(
         log('initialize:checkKnownFields', error.message || error);
       }
 
-      !quiet &&
         log(
           'initialize:checkKnownFields',
           'Waiting for default index pattern creation to complete...',
@@ -107,7 +105,6 @@ export async function checkKnownFields(
         title: tmplist.hits.hits[0]._source['index-pattern'].title
       });
     } else {
-      !quiet &&
         log(
           'initialize:checkKnownFields',
           `Default index pattern found`,
@@ -122,7 +119,6 @@ export async function checkKnownFields(
       ) {
         continue;
       }
-      !quiet &&
         log(
           'initialize:checkKnownFields',
           `Refreshing known fields for "index-pattern:${item.title}"`,
@@ -134,13 +130,13 @@ export async function checkKnownFields(
       await wzWrapper.updateIndexPatternKnownFields(`${prefix}${item.id}`);
     }
 
-    !quiet && log('initialize', 'App ready to be used.', 'info');
-    !quiet && server.log('info', 'Wazuh app ready to be used.');
+    log('initialize', 'App ready to be used.', 'info');
+     server.log('info', 'Wazuh app ready to be used.');
 
     return;
   } catch (error) {
-    !quiet && log('initialize:checkKnownFields', error.message || error);
-    !quiet &&
+    log('initialize:checkKnownFields', error.message || error);
+   
       server.log(
         'error',
         'Wazuh app had en error importing objects into Elasticsearch.' +
