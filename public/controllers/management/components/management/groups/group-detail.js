@@ -128,7 +128,7 @@ class WzGroupDetail extends Component {
                   <EuiToolTip position="right" content={`Back to groups`}>
                     <EuiButtonIcon
                       aria-label="Back"
-                      color="subdued"
+                      color="primary"
                       iconSize="l"
                       iconType="arrowLeft"
                       onClick={() => this.goBack()}
