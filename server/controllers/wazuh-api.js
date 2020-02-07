@@ -809,7 +809,7 @@ export class WazuhApiCtrl {
 
       if (path === '/ping') {
         try {
-          // TODO
+          // TODO: /ping doesnt work 
           const check = await this.checkDaemons(api, path);
           return check;
         } catch (error) {
