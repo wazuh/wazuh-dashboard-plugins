@@ -38,7 +38,7 @@ export class AttkPopover extends Component {
     return (
       <EuiPopover
         className="euiButton euiButton--text facet-poc3"
-        style={{margin:5, padding: "0px 5px",width:"24.2%"}}
+        style={{margin:5, padding: "0px 5px",width:"23%"}}
         button={
           <EuiFacetButton 
           style={{width: "100%"}}

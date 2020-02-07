@@ -110,7 +110,7 @@ export class Poc3 extends Component {
         <EuiFlexGroup>
           <EuiFlexItem 
             grow={false}
-            style={{background: '#f4f5f8', margin: '-4px', padding: '16px'}} >
+            style={{background: '#f4f5f8', margin: '-4px', padding: '16px', width: '17%', minWidth:250}} >
             <EuiTitle><h1>Tactics</h1></EuiTitle>
             {this.renderTactics()}
           </EuiFlexItem>
