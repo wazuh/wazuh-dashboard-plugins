@@ -520,8 +520,8 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
     }
     this.mitreObject2 = {
       mitreobject: {...this.mitreObject},
-      addFilter: (id) => this.addMitrefilter(id),
-      addNegativeFilter : (id) => this.addNegativeMitrefilter(id)
+      addFilter: (id, field) => this.addMitrefilter(id, field),
+      addNegativeFilter : (id, field) => this.addNegativeMitrefilter(id, field)
     }
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
@@ -862,13 +862,13 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
    * Filter by Mitre.ID
    * @param {*} id 
    */
-  addMitrefilter(id){
-    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+  addMitrefilter(id, field='id'){
+    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.${field}":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
   }
 
-  addNegativeMitrefilter(id){
-    const filter = `{"meta":{"negate":true, "index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+  addNegativeMitrefilter(id, field='id'){
+    const filter = `{"meta":{"negate":true, "index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.${field}":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
   }
 

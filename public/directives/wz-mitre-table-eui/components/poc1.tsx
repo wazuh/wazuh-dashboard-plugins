@@ -28,7 +28,10 @@ export class Poc1 extends Component {
   }
   props!: {
     mitreobject: object
+    addFilter: Function
+    addNegativeFilter: Function
   }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -37,14 +40,19 @@ export class Poc1 extends Component {
     };
   }
 
-  createTecnique(name, attacks_count, style) {
+  createTecnique(name, attacks_count, style, id, field) {
     const { showEmp } = this.state;
+    console.log(field)
     return (
       <AttkPopover
         name={name}
         attacksCount={attacks_count}
         showEmp={showEmp}
-        style={style} />
+        style={style}
+        id={id}
+        field={field}
+        addFilter={(id) => this.props.addFilter(id, field)}
+        addNegativeFilter={(id) => this.props.addNegativeFilter(id, field)} />
     )
   }
 
@@ -52,14 +60,25 @@ export class Poc1 extends Component {
     const { mitreobject } = this.props;
     const { showAtt, showEmp } = this.state;
     const tecniques = (<div style={{display: "flex"}}> {Object.keys(mitreobject)
-    .map(tecn => this.createTecnique(tecn, mitreobject[tecn].attacks_count, { alignItems: 'start', background:'rgb(213, 222, 252)'}))}
+    .map(tecn => this.createTecnique(
+      tecn, 
+      mitreobject[tecn].attacks_count, 
+      { alignItems: 'start', background:'rgb(213, 222, 252)'},
+      tecn,
+      'tactics'))}
     </div>)
     const tactics = Object.keys(mitreobject)
     .map(tecn => (
         <div>
           {mitreobject[tecn].techniques
           .map(tact =>
-            this.createTecnique(tact.name, tact.attacks_count, { alignItems: 'start'})
+            this.createTecnique(
+              tact.name, 
+              tact.attacks_count, 
+              { alignItems: 'start'},
+              tact.id,
+              'id'
+            )
           )}
         </div>
       )
@@ -93,5 +112,4 @@ export class Poc1 extends Component {
       </EuiPanel>
     )
   }
-
 }
