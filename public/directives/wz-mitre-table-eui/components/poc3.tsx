@@ -28,6 +28,7 @@ import { Func } from 'mocha';
 export class Poc3 extends Component {
   state:{
     selectedMap: {}
+    filter: string
   }
 
   props!: {
@@ -38,7 +39,8 @@ export class Poc3 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedMap: {}
+      selectedMap: {},
+      filter: ''
     };
   }
 
@@ -73,7 +75,7 @@ export class Poc3 extends Component {
 
   renderTechniques() {
     const { mitreobject } = this.props;
-    const { selectedMap } = this.state;
+    const { selectedMap, filter } = this.state;
     const selectedTact = Object.keys(selectedMap).filter(tact => selectedMap[tact]);
 
     const allTechniques = selectedTact
@@ -92,7 +94,9 @@ export class Poc3 extends Component {
       return techniques;
     })
     const joinTechniques = [].concat(...allTechniques);
-    const sortTechniques = joinTechniques.sort((a,b) => b.props.attacksCount - a.props.attacksCount)
+    const filterTechniques = joinTechniques.filter(item => item.props.name.toLocaleLowerCase().includes(filter))
+    const sortTechniques = filterTechniques.sort((a,b) => b.props.attacksCount - a.props.attacksCount)
+    
     return (
       <EuiFacetGroup layout="horizontal"> 
         {sortTechniques}
@@ -114,7 +118,8 @@ export class Poc3 extends Component {
             <EuiTitle ><h1 style={{marginLeft: 20 }}>Techniques</h1></EuiTitle>
             <div style={{marginLeft: 20, marginTop: 10, marginBottom: 0}}>
               <EuiFieldSearch
-                fullWidth={true}  /> 
+                fullWidth={true}
+                onChange={(input) => this.setState({filter: input.target.value.toLocaleLowerCase()})}  /> 
             </div>
             <EuiFlexGrid style={{margin: '0px -22px -16px 15px', padding:'16px 0px', overflow:'hidden', overflowY: 'scroll', maxHeight:486}}>
             {this.renderTechniques()}
