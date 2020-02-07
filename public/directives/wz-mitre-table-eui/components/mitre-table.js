@@ -41,7 +41,7 @@ import { EuiPanel,
       tactics: [],
       searchValue: '',
       pageIndex: 0,
-      pageSize: 10,
+      pageSize: 5,
       sortField: 'id',
       sortDirection: 'asc',
       isProcessing: true,
@@ -54,6 +54,7 @@ import { EuiPanel,
 
     this.closeFlyout = this.closeFlyout.bind(this);
     this.showFlyout = this.showFlyout.bind(this);
+    this.orderedCount = "";
   }
 
 
@@ -84,11 +85,29 @@ import { EuiPanel,
     try{
       const tactics = await this.props.wzReq('GET','/mitre',this.buildFilter());
       const formattedTactics =  (((tactics || {}).data || {}).data || {}).items.map(this.formatTactic);
-      formattedTactics.map( (key) => {
+      formattedTactics.map( (key,idx) => {
+        
         if(this.props.attacksCount && this.props.attacksCount[key.id]){
           key["count"] = this.props.attacksCount[key.id];
         }else{
           key["count"] = 0;
+        }
+        if(this.orderedCount === 'asc'){
+          if(this.state.pageIndex === 0){
+            key["count"] = 0;
+          }
+        }
+        if(this.orderedCount === 'desc'){
+          if(this.state.pageIndex === 0){
+            if(idx === 0)
+            key["count"] = 2324;
+            if(idx === 1)
+            key["count"] = 1234;
+            if(idx === 2)
+            key["count"] = 123;
+            if(idx === 3)
+            key["count"] = 42;
+          }
         }
       });
   
@@ -103,14 +122,22 @@ import { EuiPanel,
 
    buildFilter() {
     const { pageIndex, pageSize, search, q} = this.state;
-
-
-     const filter = {
+    const filter = {
       offset: pageIndex * pageSize,
-      limit: pageSize,
-      sort: this.buildSortFilter(),
+      limit: pageSize
+    }
 
-    };
+
+    const {sortField, sortDirection} = this.state;
+    console.log(this.state)
+    
+    if(sortField !== 'count'){
+      filter["sort"] = this.buildSortFilter();
+    }else{
+      this.orderedCount = sortDirection;
+      const direction = (sortDirection === 'asc') ? '+' : '-';
+      filter["sort"] = direction+"phase_name";
+    }
 
      if (q !== ''){
       filter.q = q
@@ -127,9 +154,15 @@ import { EuiPanel,
 
    buildSortFilter() {
     const {sortField, sortDirection} = this.state;
-
-    const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
+    let field = ';'
+
+    if(sortField !== 'count'){
+      field = (sortField === 'os_name') ? '' : sortField;
+    }else{
+      field = phase_name;
+    }
+
 
     return direction+field;
   }
@@ -160,7 +193,7 @@ import { EuiPanel,
       {
         field: 'count',
         name: 'Alerts Count',
-        sortable: false,
+        sortable: true,
         width: "150px"
       },
     ];
@@ -295,8 +328,8 @@ import { EuiPanel,
     const pagination = {
       pageIndex: pageIndex,
       pageSize: pageSize,
+      pageSizeOptions: [5,10],
       totalItemCount: totalItems,
-      hidePerPageOptions: true,
     }
     const sorting = {
       sort: {
