@@ -116,7 +116,7 @@ export class AgentsTable extends Component {
     const rawAgents = await WzRequest.apiReq(
       'GET',
       '/agents',
-      {params: this.buildFilter()}
+      this.buildFilter()
     );
     const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(this.formatAgent.bind(this));
     this.setState({
@@ -430,11 +430,9 @@ export class AgentsTable extends Component {
     const rawOs = await WzRequest.apiReq(
       'GET',
       '/agents/stats/distinct',
-      { 
-        params: {
-          'fields': 'os.name,os.version',
-          'q': 'id!=000'
-        }
+      {
+        'fields': 'os.name,os.version',
+        'q': 'id!=000'
       }
     );
     const itemsOs = (((rawOs || {}).data || {}).data || {}).affected_items;
@@ -458,10 +456,9 @@ export class AgentsTable extends Component {
     const rawOsPlatform = await WzRequest.apiReq(
       'GET',
       '/agents/stats/distinct',
-      { params: {
+      { 
         'fields': 'os.platform',
         'q': 'id!=000'
-        }
       }
     );
     const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {}).affected_items;
@@ -486,10 +483,8 @@ export class AgentsTable extends Component {
       'GET',
       '/agents/stats/distinct',
       { 
-        params : {
-          'fields': 'node_name',
-          'q': 'id!=000;node_name!=unknown'
-        }
+        'fields': 'node_name',
+        'q': 'id!=000;node_name!=unknown'
       }
     );
     const itemsNodes = (((rawNodes || {}).data || {}).data || {}).affected_items;
@@ -513,10 +508,9 @@ export class AgentsTable extends Component {
     const rawVersions = await WzRequest.apiReq(
       'GET',
       '/agents/stats/distinct',
-      { params: {
+      { 
         'fields': 'version',
         'q': 'id!=000'
-        }
       }
     );
     const itemsVersions = (((rawVersions || {}).data || {}).data || {}).affected_items;

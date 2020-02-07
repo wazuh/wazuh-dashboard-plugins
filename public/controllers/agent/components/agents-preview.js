@@ -60,7 +60,7 @@ export class AgentsPreview extends Component {
       ];
       this.setState({ data: model });
       this.agentsCoverity = this.totalAgents ? (((this.summary['active'] || 1) - 1) / this.totalAgents) * 100 : 0;
-      const lastAgent = await WzRequest.apiReq('GET', '/agents', {params: { limit: 1, sort: '-dateAdd', q: 'id!=000' }});
+      const lastAgent = await WzRequest.apiReq('GET', '/agents', { limit: 1, sort: '-dateAdd', q: 'id!=000' });
       this.lastAgent = lastAgent.data.data.affected_items[0];
       this.mostActiveAgent = await this.props.tableProps.getMostActive();
       const osresult = await WzRequest.apiReq('GET', '/agents/summary/os', {});
