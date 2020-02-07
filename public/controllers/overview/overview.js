@@ -233,6 +233,8 @@ const discovery  =  [ {id:"T1134",name:"Access Token Manipulation", attacks_coun
 {id:"T1044",name:"File System Permissions Weakness", attacks_count: 4351},
 {id:"T1038",name:"DLL Search Order Hijacking", attacks_count: 3331},
 {id:"T0402",name:"Hidden Files and Directories", attacks_count: 512},
+{id:"T1038",name:"DLL Search Order Hijacking", attacks_count: 445},
+{id:"T0402",name:"Hidden Files and Directories", attacks_count: 442},
 {id:"T1102",name:"Hardware Additions", attacks_count: 412},
 {id:"T0422",name:"Replication Through Removable Media", attacks_count: 322},
 {id:"T0142",name:"Spearphishing Attachment", attacks_count: 40},
@@ -241,15 +243,17 @@ const discovery  =  [ {id:"T1134",name:"Access Token Manipulation", attacks_coun
 {id:"T0154",name:"Dynamic Data Exchange", attacks_count: 0},
 {id:"T0155",name:"Exploitation for Client Execution", attacks_count: 0},
 {id:"T0156",name:"Graphical User Interface", attacks_count: 0},
+{id:"T0154",name:"Dynamic Data Exchange", attacks_count: 0},
+{id:"T0155",name:"Exploitation for Client Execution", attacks_count: 0},
+{id:"T0156",name:"Graphical User Interface", attacks_count: 0},
+{id:"T0154",name:"Dynamic Data Exchange", attacks_count: 0},
+{id:"T0155",name:"Exploitation for Client Execution", attacks_count: 0},
+{id:"T0156",name:"Graphical User Interface", attacks_count: 0},
 {id:"T1136",name:"Create Account", attacks_count: 0},
 {id:"T1133",name:"External Remote Services", attacks_count: 0},
 {id:"T0402",name:"Hidden Files and Directories", attacks_count: 0},
 ]
 const lateral_movement =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 7232},
-{id:"T1044",name:"File System Permissions Weakness", attacks_count: 4351},
-{id:"T1038",name:"DLL Search Order Hijacking", attacks_count: 3331},
-{id:"T0402",name:"Hidden Files and Directories", attacks_count: 512},
-{id:"T1102",name:"Hardware Additions", attacks_count: 412},
 {id:"T0422",name:"Replication Through Removable Media", attacks_count: 322},
 {id:"T0142",name:"Spearphishing Attachment", attacks_count: 40},
 {id:"T0152",name:"Spearphishing via Service", attacks_count: 0},
@@ -275,7 +279,6 @@ const collection =  [ {id:"T1134",name:"Access Token Manipulation", attacks_coun
 {id:"T0156",name:"Graphical User Interface", attacks_count: 0},
 {id:"T1136",name:"Create Account", attacks_count: 0},
 {id:"T1133",name:"External Remote Services", attacks_count: 0},
-{id:"T0402",name:"Hidden Files and Directories", attacks_count: 0},
 ]
 const command_control =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0},
 {id:"T1044",name:"File System Permissions Weakness", attacks_count: 0},
@@ -292,6 +295,10 @@ const command_control =  [ {id:"T1134",name:"Access Token Manipulation", attacks
 {id:"T1136",name:"Create Account", attacks_count: 0},
 {id:"T1133",name:"External Remote Services", attacks_count: 0},
 {id:"T0402",name:"Hidden Files and Directories", attacks_count: 0},
+{id:"T1133",name:"External Remote Services", attacks_count: 0},
+{id:"T0402",name:"Hidden Files and Directories", attacks_count: 0},
+{id:"T1133",name:"External Remote Services", attacks_count: 0},
+{id:"T0402",name:"Hidden Files and Directories", attacks_count: 0},
 ]
 
 const exfiltriation =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0},
@@ -303,12 +310,6 @@ const exfiltriation =  [ {id:"T1134",name:"Access Token Manipulation", attacks_c
 {id:"T0142",name:"Spearphishing Attachment", attacks_count: 0},
 {id:"T0152",name:"Spearphishing via Service", attacks_count: 0},
 {id:"T0153",name:"Compiled HTML File", attacks_count: 0},
-{id:"T0154",name:"Dynamic Data Exchange", attacks_count: 0},
-{id:"T0155",name:"Exploitation for Client Execution", attacks_count: 0},
-{id:"T0156",name:"Graphical User Interface", attacks_count: 0},
-{id:"T1136",name:"Create Account", attacks_count: 0},
-{id:"T1133",name:"External Remote Services", attacks_count: 0},
-{id:"T0402",name:"Hidden Files and Directories", attacks_count: 0},
 ]
 const impact =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0},
 {id:"T1044",name:"File System Permissions Weakness", attacks_count: 0},
@@ -515,17 +516,12 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
         "name" : "Impact",
         "techniques" : impact,
         attacks_count: 0
-      },
-      "example tactic with a big amount of techniques" : {
-        "name" : "example tactic with a big amount of techniques",
-        "techniques" : muchos,
-        attacks_count: 0
       }
     }
     this.mitreObject2 = {
       mitreobject: {...this.mitreObject},
-      addFilter: (id) => this.addMitrefilter(id)
-
+      addFilter: (id) => this.addMitrefilter(id),
+      addNegativeFilter : (id) => this.addNegativeMitrefilter(id)
     }
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
@@ -868,6 +864,11 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
    */
   addMitrefilter(id){
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
+  }
+
+  addNegativeMitrefilter(id){
+    const filter = `{"meta":{"negate":true, "index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
   }
 

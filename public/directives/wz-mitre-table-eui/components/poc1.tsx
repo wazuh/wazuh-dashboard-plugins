@@ -33,7 +33,7 @@ export class Poc1 extends Component {
     super(props);
     this.state = {
       showAtt: false,
-      showEmp: false,
+      showEmp: true,
     };
   }
 
@@ -51,14 +51,15 @@ export class Poc1 extends Component {
   render() {
     const { mitreobject } = this.props;
     const { showAtt, showEmp } = this.state;
-    const tecniques = Object.keys(mitreobject)
-    .map(tecn => this.createTecnique(tecn, mitreobject[tecn].attacks_count, { alignItems: 'center', background:'#006BB4'}));
+    const tecniques = (<div style={{display: "flex"}}> {Object.keys(mitreobject)
+    .map(tecn => this.createTecnique(tecn, mitreobject[tecn].attacks_count, { alignItems: 'start', background:'rgb(213, 222, 252)'}))}
+    </div>)
     const tactics = Object.keys(mitreobject)
     .map(tecn => (
         <div>
           {mitreobject[tecn].techniques
           .map(tact =>
-            this.createTecnique(tact.name, tact.attacks_count, { alignItems: 'center'})
+            this.createTecnique(tact.name, tact.attacks_count, { alignItems: 'start'})
           )}
         </div>
       )
@@ -71,12 +72,12 @@ export class Poc1 extends Component {
           label='Show tactics without alerts'
           />
         <EuiSpacer size="m" />
-        <EuiFlexGroup style={{fontSize:12}} gutterSize='xs'>
+        <EuiFlexGroup style={{fontSize:11}} gutterSize='xs'>
           {tecniques}
         </EuiFlexGroup>
         {
           showAtt &&
-          <EuiFlexGroup style={{fontSize:12}} gutterSize='xs'>
+          <EuiFlexGroup style={{fontSize:11}} gutterSize='xs'>
           {tactics}
           </EuiFlexGroup>
         }

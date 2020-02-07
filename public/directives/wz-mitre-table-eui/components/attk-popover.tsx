@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
   EuiFacetButton,
   EuiFlexItem,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiToolTip
 } from '@elastic/eui';
 import { EuiPopover } from '@elastic/eui';
 
@@ -28,18 +29,19 @@ export class AttkPopover extends Component {
     const { name, attacksCount, showEmp, style} = this.props;
     const { isOpen } = this.state;
     return (
-      (showEmp || attacksCount > 0) &&
-      <EuiFlexItem style={style} > 
+      (true) &&
+      <EuiFlexItem  > 
         <EuiPopover
           button={
+            <EuiToolTip position="top" content={name}>
             <div>
-              <EuiFacetButton
-                style={{maxWidth: 200}}
+              {( showEmp || attacksCount > 0 ) && (<EuiFacetButton
+                style={{maxWidth: "150px", width: "144px", flexWrap: "wrap", marginLeft: "4px", ...style, border: "1px solid rgba(213, 222, 252, 0.26)"}}
                 onClick={() => this.setState({isOpen: !isOpen})}
                 quantity={attacksCount}>
                   {name}
-              </EuiFacetButton>
-            </div>
+              </EuiFacetButton>)}
+            </div></EuiToolTip>
           }
           isOpen={isOpen}
           closePopover={() => this.setState({isOpen: !isOpen})}

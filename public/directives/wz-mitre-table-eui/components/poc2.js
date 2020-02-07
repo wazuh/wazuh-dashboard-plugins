@@ -355,8 +355,13 @@ import {
 
   }
 
-  getTechniques(){ 
+  openFlyout(item){
+    const tmpTechnique = {...this.state.currentTechniqueData}
+    tmpTechnique.name = item.name
+    this.setState({isFlyoutVisible: true, currentTechniqueData: tmpTechnique});
+  }
 
+  getTechniques(){ 
     const result = this.props.mitreobject[this.state.isShowingTechniques].techniques.map( (item,idx) => {
       if(item.name.toLowerCase().includes(this.state.currentSearch.toLowerCase()) && (!this.state.alerts || item.attacks_count > 0))
       return (
@@ -368,26 +373,25 @@ import {
               isOpen={this.state.isPopoverOpen[idx]}
               closePopover={() => this.closePopover()}
               anchorPosition="rightCenter">
-              
               <EuiListGroup maxWidth={288}>
                 <EuiListGroupItem
                   id="link1"
                   iconType="eye"
                   label="View details"
-                  onClick={() => this.setState({isFlyoutVisible: true})}
+                  onClick={() => this.openFlyout(item)}
                   isActive
                 />
 
                 <EuiListGroupItem
                   id="link2"
                   iconType="pin"
-                  onClick={() => window.alert('Se añadiria esta tecnica como filtro  a la búsqueda')}
+                  onClick={() => this.props.addFilter(item.id)}
                   label="Add filter"
                 />
 
                 <EuiListGroupItem
                   id="link3"
-                  onClick={() => window.alert('Se añadaria esta técnica excluida a la búsqueda')}
+                  onClick={() => this.props.addNegativeFilter(item.id)}
                   iconType="pin"
                   label="Exclude from search"
                 />
