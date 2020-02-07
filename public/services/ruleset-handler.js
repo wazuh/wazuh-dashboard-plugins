@@ -60,7 +60,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request('GET', `/manager/files`, {
         path: _path
       });
-      return ((result || {}).data || {}).data || false;
+      return ((result || {}).data || {}).contents || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -73,7 +73,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request('GET', `/manager/files`, {
         path: _path
       });
-      return ((result || {}).data || {}).data || false;
+      return ((result || {}).data || {}).contents || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -83,7 +83,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request('GET', `/manager/files`, {
         path: path
       });
-      return ((result || {}).data || {}).data || false;
+      return ((result || {}).data || {}).contents || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -91,7 +91,7 @@ export class RulesetHandler {
   async sendRuleConfiguration(rule, content, overwrite) {
     try {
       const result = await this.apiReq.request(
-        'POST',
+        'PUT',
         `/manager/files?path=etc/rules/${rule.file ||
           rule}&overwrite=${!overwrite}`,
         { content, origin: 'xmleditor' }
@@ -104,7 +104,7 @@ export class RulesetHandler {
   async sendDecoderConfiguration(decoder, content, overwrite) {
     try {
       const result = await this.apiReq.request(
-        'POST',
+        'PUT',
         `/manager/files?path=etc/decoders/${decoder.file ||
           decoder}&overwrite=${!overwrite}`,
         { content, origin: 'xmleditor' }
@@ -118,7 +118,7 @@ export class RulesetHandler {
   async sendCdbList(list, content, overwrite) {
     try {
       const result = await this.apiReq.request(
-        'POST',
+        'PUT',
         `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
         { content, origin: 'raw' }
       );

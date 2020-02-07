@@ -164,7 +164,7 @@ app.directive('wzTable', function() {
 
           if (!options.skipFetching) {
             const result = await instance.fetch(options);
-            items = options.realTime ? result.items.slice(0, 10) : result.items;
+            items = options.realTime ? result.affected_items.slice(0, 10) : result.items;
             $scope.time = result.time;
             $scope.totalItems = items.length;
             $scope.items = items;

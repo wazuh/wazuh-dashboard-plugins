@@ -10,7 +10,7 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import {
@@ -25,9 +25,11 @@ import {
 import WzHelpButtonPopover from './help-button-popover';
 
 class WzNoConfig extends Component{
+  
   constructor(props){
     super(props);
   }
+
   render(){
     const { error, help } = this.props;
     return (

@@ -138,7 +138,7 @@ class WzGroupsActionButtons extends Component {
       if (this.state.newGroupName !== '') {
         this.props.updateLoadingStatus(true);
         await this.groupsHandler.saveGroup(this.state.newGroupName);
-        this.showToast('success', 'Success', 'The group has been created correctly', 2000);
+        this.showToast('success', 'Success', 'The group has been created successfully', 2000);
         this.clearGroupName();
 
         this.props.updateIsProcessing(true);
@@ -171,7 +171,7 @@ class WzGroupsActionButtons extends Component {
         2000
       );
     } catch (error) {
-      this.showToast('danger', 'Error', `Error when exporting the CSV file: ${error}`, 2000);
+      this.showToast('danger', 'Error', `Error exporting the CSV file: ${error}`, 2000);
     }
     this.setState({ generatingCsv: false });
   }

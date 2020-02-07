@@ -120,7 +120,7 @@ export class RulesController {
       this.location.search('ruleid', null);
       try {
         const data = await this.apiReq.request('get', `/rules/${incomingRule}`, {});
-        const response = (((data || {}).data || {}).data || {}).items || [];
+        const response = (((data || {}).data || {}).data || {}).affected_items || [];
         if (response.length) {
           const result = response.filter(rule => rule.details.overwrite);
           this.currentRule = result.length ? result[0] : response[0];
@@ -409,7 +409,7 @@ export class RulesController {
           {}
         );
         const response =
-          (((ruleReloaded || {}).data || {}).data || {}).items || [];
+          (((ruleReloaded || {}).data || {}).data || {}).affected_items || [];
         if (response.length) {
           const result = response.filter(rule => rule.details.overwrite);
           this.currentRule = result.length ? result[0] : response[0];

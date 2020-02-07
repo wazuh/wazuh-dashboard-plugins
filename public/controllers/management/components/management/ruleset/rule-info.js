@@ -302,7 +302,7 @@ class WzRuleInfo extends Component {
   render() {
     const { ruleInfo, isLoading } = this.props.state;
     const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : ruleInfo.current;
-    const rules = ruleInfo.items;
+    const rules = ruleInfo.affected_items;
     const currentRuleArr = rules.filter(r => { return r.id === currentRuleId });
     const currentRuleInfo = currentRuleArr[0];
     const { description, details, file, path, level, id, groups } = currentRuleInfo;

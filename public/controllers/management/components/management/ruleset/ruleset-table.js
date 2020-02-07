@@ -100,11 +100,11 @@ class WzRulesetTable extends Component {
       return {}
     });
 
-    const { items = [], totalItems = 0 } = ((rawItems || {}).data || {}).data || {};
+    const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
     this.setState({
-      items,
-      totalItems,
-      isLoading: false
+      items: affected_items,
+      totalItems : total_affected_items,
+      isLoading:false
     });
   }
 
@@ -280,7 +280,7 @@ class WzRulesetTable extends Component {
 
     Promise.all(results).then((completed) => {
       this.props.updateIsProcessing(true);
-      this.showToast('success', 'Success', 'Deleted correctly', 3000);
+      this.showToast('success', 'Success', 'Deleted successfully', 5000);
     });
   };
 }

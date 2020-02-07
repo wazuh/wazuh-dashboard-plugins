@@ -86,19 +86,22 @@ export class DataFactory {
       this.busy = true;
       const start = new Date();
 
+      let parameters= {};
       // If offset is not given, it means we need to start again
       if (!options.offset) this.items = [];
-      const offset = options.offset || 0;
-      const limit = options.limit || 500;
-      const parameters = { limit, offset };
-
-      this.serializeFilters(parameters);
+      if(this.path !== '/cluster/nodes') {
+        const offset = options.offset || 0;
+        const limit = options.limit || 500;
+        const params = { limit, offset };
+        this.serializeFilters(params);
+        parameters = { params: params};
+      }
 
       // Fetch next <limit> items
       const firstPage = await this.httpClient.request(
         'GET',
         this.path,
-        { params: parameters }
+        parameters
       );
       this.items = this.items.filter(item => !!item);
       Array.isArray(firstPage.data.data)
