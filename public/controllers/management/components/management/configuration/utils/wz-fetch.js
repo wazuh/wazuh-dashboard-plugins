@@ -212,7 +212,7 @@ export const clusterReq = async () => {
  */
 export const fetchFile = async (selectedNode) => {
   try {
-    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {}; // TODO: Check, when FIX ISSUE /cluster/status
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     const data = await WzRequest.apiReq(
@@ -268,11 +268,9 @@ export const restartManager = async () => {
       `/manager/configuration/validation`,
       {}
     );
-
-    const data = ((validationError || {}).data || {}).data || {};
-    const isOk = data.status === 'OK';
-    if (!isOk && Array.isArray(data.details)) {
-      const str = data.details.join();
+    const isOk = validationError.status === 'OK';
+    if (!isOk && validationError.detail) {
+      const str = validationError.detail;
       throw new Error(str);
     }
     const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
@@ -294,10 +292,9 @@ export const restartCluster = async () => {
       {}
     );
 
-    const data = ((validationError || {}).data || {}).data || {};
-    const isOk = data.status === 'OK';
-    if (!isOk && Array.isArray(data.details)) {
-      const str = data.details.join();
+    const isOk = validationError.status === 'OK';
+    if (!isOk && validationError.detail) {
+      const str = validationError.detail;
       throw new Error(str);
     }
     // this.performClusterRestart(); // TODO: convert AngularJS to React
@@ -321,10 +318,9 @@ export const restartNode = async (node) => {
       {}
     );
 
-    const data = ((validationError || {}).data || {}).data || {};
-    const isOk = data.status === 'OK';
-    if (!isOk && Array.isArray(data.details)) {
-      const str = data.details.join();
+    const isOk = validationError.status === 200;
+    if (!isOk && validationError.detail) {
+      const str = validationError.detail;
       throw new Error(str);
     }
     const result = await WzRequest.apiReq(
@@ -394,7 +390,7 @@ export const saveFileCluster = async (text, node) => {
  * Save text to ossec.conf manager file
  * @param {string} text Text to save
  */
-export const saveFileManager = async (text) => {
+export const saveFileManager = async (text) => { //TODO: Check when manager
   const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq(
@@ -462,7 +458,7 @@ export const agentIsSynchronized = async (agent) => {
     `/agents/${agent.id}/group/is_sync`,
     {}
   );
-  return (((isSync || {}).data || {}).data || {}).synced || false;
+  return (((isSync || {}).data || {}).affected_items[0] || {}).synced || false;
 }
 
 /**
