@@ -65,7 +65,7 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = new WazuhConfig();
-    this.showingMitreTable = false
+    this.showingMitreTable = false;
     this.expandArray = [
       false,
       false,
@@ -127,6 +127,17 @@ export class OverviewController {
       extensions: this.extensions,
       setExtensions: (api, extensions) =>
         AppState.setExtensions(api, extensions)
+    };
+
+    this.sideNavProps = {
+      switchTab: (newTab, force = false) => this.switchTab(newTab, force),
+      extensions: this.extensions
+    };
+
+    this.addNewExtensionProps = {
+      extensions: this.extensions,
+      setExtensions: (id,extensions) => this.appState.setExtensions(id,extensions),
+      api: this.appState.getCurrentAPI()
     };
 
     this.setTabs();
