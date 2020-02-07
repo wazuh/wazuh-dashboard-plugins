@@ -22,7 +22,6 @@ import {
 } from '@elastic/eui';
 import { EuiPopover } from '@elastic/eui';
 import { AttkPopover } from './attk-popover-poc3';
-import { try } from 'bluebird';
 
 export class Poc3 extends Component {
   state:{
@@ -72,10 +71,11 @@ export class Poc3 extends Component {
   renderTechniques() {
     const { mitreobject } = this.props;
     const { selectedMap } = this.state;
-    const allTechniques = Object.keys(mitreobject)
+    const selectedTact = Object.keys(selectedMap).filter(tact => selectedMap[tact]);
+    console.log(selectedTact)
+
+    const allTechniques = selectedTact
     .map(tact => {
-      const isSelected = selectedMap[tact];
-      if(!isSelected) return null;
       const techniques = mitreobject[tact].techniques
       .map(tecn => {
         return (
@@ -85,11 +85,10 @@ export class Poc3 extends Component {
       return techniques;
     })
     const joinTechniques = [].concat(...allTechniques);
-    console.log(joinTechniques)
-
+    const sortTechniques = joinTechniques.sort((a,b) => b.props.attacksCount - a.props.attacksCount)
     return (
       <EuiFacetGroup layout="horizontal"> 
-        {joinTechniques}
+        {sortTechniques}
       </EuiFacetGroup>
     )
   }
