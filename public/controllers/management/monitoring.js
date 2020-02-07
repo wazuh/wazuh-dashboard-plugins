@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Cluster monitoring controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,6 +11,8 @@
  */
 import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export function ClusterController(
   $scope,
@@ -34,13 +36,13 @@ export function ClusterController(
   };
 
   const clusterEnabled =
-    appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled';
+    AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
   $scope.isClusterEnabled = clusterEnabled;
   $scope.isClusterRunning = true;
   $location.search('tabView', 'cluster-monitoring');
   $location.search('tab', 'monitoring');
   $location.search('_a', null);
-  const filterHandler = new FilterHandler(appState.getCurrentPattern());
+  const filterHandler = new FilterHandler(AppState.getCurrentPattern());
   discoverPendingUpdates.removeAll();
   tabVisualizations.removeAll();
   rawVisualizations.removeAll();
@@ -204,7 +206,7 @@ export function ClusterController(
     try {
       filters = [];
       filters.push(
-        filterHandler.managerQuery(appState.getClusterInfo().cluster, true)
+        filterHandler.managerQuery(AppState.getClusterInfo().cluster, true)
       );
       if (node) {
         filters.push(filterHandler.nodeQuery(node));
@@ -268,9 +270,9 @@ export function ClusterController(
       nodeList.name = $scope.configuration.name;
       nodeList.master_node = $scope.configuration.node_name;
 
-      const visData = await genericReq.request(
+      const visData = await GenericRequest.request(
         'POST',
-        `/elastic/visualizations/cluster-monitoring/${appState.getCurrentPattern()}`,
+        `/elastic/visualizations/cluster-monitoring/${AppState.getCurrentPattern()}`,
         { nodes: nodeList }
       );
 

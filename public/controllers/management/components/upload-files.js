@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the reports table.
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ export class UploadFiles extends Component {
       uploadErrors: false,
       errorPopover: false
     };
-    this.maxSize = 307200; // 300Kb
+    this.maxSize = 5120000; // 5Mb
   }
 
   onChange = files => {
@@ -293,7 +293,7 @@ export class UploadFiles extends Component {
           {this.checkOverSize() > 0 && (
             <Fragment>
               {this.renderWarning(
-                `The max size per file allowd is ${this.maxSize / 1024} Kb`
+                `The max size per file allowed is ${this.maxSize / 1024} Kb`
               )}
             </Fragment>
           )}

@@ -1,0 +1,136 @@
+/*
+ * Wazuh app - Top nav bar stylesheet
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ---------------------- Wazuh top nav bar stylesheet ---------------------- */
+/* -------------------------------------------------------------------------- */
+
+/* Style to the base toolbar */
+/* Style applied to the toolbar-tools container */
+wz-menu {
+    z-index: 999;
+}
+.wz-menu {
+    margin-right: 1px;
+    background-color: #FFF;
+    margin-top: 0;
+    box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+    border-bottom: 1px solid #d3dae6;
+    font-size: 14px;
+    position: relative !important;
+    height: 50px;
+}
+
+.wz-menu a:focus{
+    text-decoration: none;
+}
+
+.wz-menu-wrapper{
+    width: 100%;
+    position: fixed;
+    padding-left: 48px;
+    z-index: 999;
+    left: 0;
+}
+
+@media only screen and (max-width: 767px){
+    .wz-menu-select{
+        max-width: 20px !important;
+    }
+    .wz-menu-wrapper{
+        padding-left: 0!important;
+    }
+
+    .wz-menu-button-title {
+        display: none;
+    }
+  }
+
+    md-toolbar .bsTooltip-inner{
+        padding: 8px 3px;
+      }
+
+    md-toolbar .md-button {
+        margin: 0px 8px 0px 0px!important;
+      }
+
+.wz-menu-logo {
+    filter: hue-rotate(30deg) brightness(0.8);
+    margin-top: 4px;
+  }
+  
+.wz-menu-button {
+    font-size: 14px !important;
+    transition: none !important;
+    min-height: 38px !important;
+    line-height: 38px !important;
+    height: 38px;
+    border-radius: 4px;
+    margin-right: 8px;
+    min-width: 45px!important;
+    font-weight: 400;
+}
+
+.wz-menu-button .euiButtonEmpty__content .euiButtonEmpty__content {
+    padding-right: 0;
+}
+
+.wz-menu-button.md-icon-button {
+    line-height: 24px !important;
+}
+.md-icon-button.md-icon-button-back {
+    border: 1px solid #d9d9d9!important;
+    border-radius: 5px!important;
+    margin-left: 0!important;
+}
+
+/* Style to mark active or when-hover buttons on the toolbar */
+.wz-menu-button.wz-menu-active{
+    background-color: #f5f7fa !important;
+}
+.wz-menu-button:not([disabled]):hover {
+    background-color: #f5f7fa;
+    text-decoration: none;
+}
+
+/* Style for index-pattern selector */
+.wz-menu-select {
+    border: none;
+    cursor: pointer;
+    padding-right: 6px;
+}
+
+.wz-menu-select option {
+    color: #373a42;
+    background-color: #FFF;
+}
+
+/* Style for index-pattern selector options */
+.wz-menu-select-option {
+    color: #373a42;
+    background-color: #FFF;
+}
+
+
+.euiHeader {
+    box-shadow: none !important;
+}
+
+.wz-menu-button .euiIcon--medium {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 6px;
+}
+
+.WzManagementSideMenu span {
+    font-size: 14px!important;
+}

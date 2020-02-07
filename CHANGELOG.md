@@ -3,6 +3,35 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
+## Wazuh v3.11.2 - Kibana v7.5.2 - Revision 853
+
+### Added
+
+- Support for Kibana v7.5.2
+
+
+## Wazuh v3.11.2 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 852
+
+### Added
+
+- Support for Wazuh v3.11.2
+
+### Changed
+
+- Increased list filesize limit for the CDB-list [#1993](https://github.com/wazuh/wazuh-kibana-app/pull/1993)
+
+### Fixed
+
+- The xml validator now correctly handles the `--` string within comments [#1980](https://github.com/wazuh/wazuh-kibana-app/pull/1980)
+- The AWS map visualization wasn't been loaded until the user interacts with it [dd31bd7](https://github.com/wazuh/wazuh-kibana-app/commit/dd31bd7a155354bc50fe0af22fca878607c8936a)
+
+
+## Wazuh v3.11.1 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 581
+
+### Added
+- Support for Wazuh v3.11.1.
+
+
 ## Wazuh v3.11.0 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 580
 
 ### Added
@@ -41,11 +70,40 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Logo source fail after adding server.basePath [#1871](https://github.com/wazuh/wazuh-kibana-app/issues/1871)
 - Fixed the documentation broken links [#1853](https://github.com/wazuh/wazuh-kibana-app/pull/1853)
 
-## Wazuh v3.10.2 - Kibana v7.5.0 - Revision 550
+## Wazuh v3.10.2 - Kibana v7.5.1 - Revision 556
+
+### Added
+
+- Support for Kibana v7.5.1
+
+
+## Wazuh v3.10.2 - Kibana v7.5.0 - Revision 555
 
 ### Added
 
 - Support for Kibana v7.5.0
+
+
+## Wazuh v3.10.2 - Kibana v7.4.2 - Revision 549
+
+### Added
+
+- Support for Kibana v7.4.2
+
+
+## Wazuh v3.10.2 - Kibana v7.4.1 - Revision 548
+
+### Added
+
+- Support for Kibana v7.4.1
+
+
+## Wazuh v3.10.2 - Kibana v7.4.0 - Revision 547
+
+### Added
+
+- Support for Kibana v7.4.0
+- Support for Wazuh v3.10.2.
 
 
 ## Wazuh v3.10.2 - Kibana v7.3.2 - Revision 546

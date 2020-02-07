@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Overview controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ import {
 } from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class OverviewController {
   /**
@@ -39,7 +41,6 @@ export class OverviewController {
    * @param {*} commonData
    * @param {*} reportingService
    * @param {*} visFactoryService
-   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -52,7 +53,6 @@ export class OverviewController {
     commonData,
     reportingService,
     visFactoryService,
-    wazuhConfig
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -64,9 +64,9 @@ export class OverviewController {
     this.commonData = commonData;
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
-    this.wazuhConfig = wazuhConfig;
-    this.showingMitreTable = false;
     this.$scope.currentPoc = 0;
+    this.wazuhConfig = new WazuhConfig();
+    this.showingMitreTable = false
     this.expandArray = [
       false,
       false,
@@ -532,11 +532,11 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
     this.$rootScope.reportStatus = false;
 
     this.$location.search('_a', null);
-    this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
+    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
+    const extensions = AppState.getExtensions(currentApi);
     this.extensions = extensions;
 
     this.wzMonitoringEnabled = false;
@@ -558,11 +558,11 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
     this.init();
 
     this.welcomeCardsProps = {
-      api: this.appState.getCurrentAPI(),
+      api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
       extensions: this.extensions,
       setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
+        AppState.setExtensions(api, extensions)
     };
 
     this.setTabs();

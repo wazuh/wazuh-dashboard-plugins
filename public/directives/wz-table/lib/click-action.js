@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh table directive click wrapper
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,8 @@ export function clickAction(
   instance,
   shareAgent,
   $location,
-  $scope,
-  appState
+  $scope
 ) {
-  appState.setNavigation({ status: true });
   if (
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/).test(instance.path)

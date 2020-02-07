@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Class for Wazuh reporting controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,6 @@ import path from 'path';
 import fs from 'fs';
 import { TabDescription as descriptions } from '../reporting/tab-description';
 import * as TimSort from 'timsort';
-import rawParser from '../reporting/raw-parser';
 import PdfPrinter from 'pdfmake/src/printer';
 import { ErrorResponse } from './error-response';
 import { VulnerabilityRequest } from '../reporting/vulnerability-request';
@@ -2546,6 +2545,31 @@ export class WazuhReportingCtrl {
                     x['proto'],
                     x['broadcast']
                   ];
+                })
+              });
+            }
+          } catch (error) {
+            log('reporting:report', error.message || error, 'debug');
+          }
+
+          try {
+            log(
+              'reporting:report',
+              `Fetching hotfixes for agent ${agentId}`,
+              'debug'
+            );
+            const hotfixes = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/hotfixes`,
+              {},
+              apiId
+            );
+            if (hotfixes && hotfixes.data && hotfixes.data.items) {
+              tables.push({
+                title: 'Windows updates',
+                columns: ['Update code'],
+                rows: hotfixes.data.items.map(x => {
+                  return [x['hotfix']];
                 })
               });
             }

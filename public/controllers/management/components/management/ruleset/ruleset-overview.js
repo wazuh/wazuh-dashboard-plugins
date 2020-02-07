@@ -7,18 +7,15 @@ import {
   EuiPage,
   EuiText,
   EuiTitle,
-  EuiSwitch,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
 // Wazuh components
 import WzRulesetTable from './ruleset-table';
+import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-import WzSearchBar from '../../../../../components/wz-search-bar/wz-search-bar';
-import { updateFilters, updateIsProcessing } from '../../../../../redux/actions/rulesetActions';
-import { WzRequest } from '../../../../../react-services/wz-request';
 
 
 class WzRulesetOverview extends Component {
@@ -49,15 +46,6 @@ class WzRulesetOverview extends Component {
                 <h2>{this.sectionNames[section]}</h2>
               </EuiTitle>
             </EuiFlexItem>
-            {(section == 'rules' || section === 'decoders') && (
-              <EuiFlexItem grow={false} style={{ paddingTop: 7 }}>
-                <EuiSwitch
-                  label={`Custom ${this.sectionNames[section]}`}
-                  checked={false}
-                  onChange={this.clickActionFilterBar}
-                />
-              </EuiFlexItem>
-            )}
             <EuiFlexItem>
             </EuiFlexItem>
             <WzRulesetActionButtons />
@@ -69,63 +57,12 @@ class WzRulesetOverview extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <WzSearchBar
-            qSuggests={[
-              {
-                label: 'status',
-                description: 'Filters the rules by status.',
-                operators: ['=', '!='],
-                values: ['enabled', 'disabled'],
-              },
-              // TODO: Wait to framework team fix this call
-              // {
-              //   label: 'group',
-              //   description: 'Filters the rules by group',
-              //   operators: ['=', '!=', '~'],
-              //   values: async () => {
-              //     const wzReq = (...args) => WzRequest.apiReq(...args);
-              //     const result = await wzReq('GET', '/rules/groups', {});
-              //     return (((result || {}).data || {}).data || {}).items;
-              //   },
-              // },
-              {
-                label: 'level',
-                description: 'Filters the rules by level',
-                operators: ['=', '!=', '<', '>'],
-                values: [...Array(16).keys()],
-              },
-              {
-                label: 'file',
-                description: 'Filters the rules by file name.',
-                operators: ['=', '!='],
-                values: async () => {
-                  const wzReq = (...args) => WzRequest.apiReq(...args);
-                  const result = await wzReq('GET', '/rules/files', {});
-                  return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
-                },
-              },
-              // TODO: Wait to framework team fix this call
-              // {
-              //   label: 'path',
-              //   description: '',
-              //   operators: ['=', '!=', '~'],
-              //   values: async () => {
-              //     const wzReq = (...args) => WzRequest.apiReq(...args);
-              //     const result = await wzReq('GET', '/manager/configuration', {
-              //       section:'ruleset',
-              //       field: 'rule_dir',
-              //     });
-              //     console.log(result.data)
-              //     return ((result || {}).data || {}).data;
-              //   }
-              // },
-
-
-            ]}            
-            onInputChange={(filters) => {this.props.updateFilters(filters); this.props.updateIsProcessing(true)}} />
+            <WzRulesetSearchBar />
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzRulesetTable />
+              <WzRulesetTable
+                  request={`${section}`}
+              />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>

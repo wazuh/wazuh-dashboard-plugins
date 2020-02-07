@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management configuration controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { ConfigurationHandler } from '../../utils/config-handler';
+import store from '../../redux/store';
+import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
 
 export class EditionController {
   /**
@@ -19,7 +21,6 @@ export class EditionController {
    * @param {*} errorHandler
    * @param {*} apiReq
    * @param {*} appState
-   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -116,9 +117,14 @@ export class EditionController {
       isCluster
         ? await this.configHandler.restartNode(selectedNode)
         : await this.configHandler.restartManager();
-      this.$rootScope.wazuhNotReadyYet = `Restarting ${
+      const notReadyMessage = `Restarting ${
         isCluster ? selectedNode : 'manager'
       }, please wait. `;
+
+      const updateNotReadyYet = updateWazuhNotReadyYet(notReadyMessage);
+      store.dispatch(updateNotReadyYet);
+
+      this.$rootScope.wazuhNotReadyYet = notReadyMessage;
       this.checkDaemonsStatus.makePing();
       this.isRestarting = false;
       this.$scope.$applyAsync();

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Ruleset controllers
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,6 +11,8 @@
  */
 import * as FileSaver from '../../services/file-saver';
 import { stringToObj } from '../../utils/cdblist-to-object';
+import { AppState } from '../../react-services/app-state';
+import { WazuhConfig } from '../../react-services/wazuh-config';
 
 export class CdbListsController {
   constructor(
@@ -21,7 +23,6 @@ export class CdbListsController {
     wzTableFilter,
     $location,
     apiReq,
-    wazuhConfig,
     rulesetHandler
   ) {
     this.$scope = $scope;
@@ -31,7 +32,7 @@ export class CdbListsController {
     this.wzTableFilter = wzTableFilter;
     this.$location = $location;
     this.apiReq = apiReq;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
 
     this.appliedFilters = [];
@@ -152,7 +153,7 @@ export class CdbListsController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         '/lists',
         currentApi,

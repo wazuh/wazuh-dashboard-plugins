@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the agents table.
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import {
   EuiToolTip,
   EuiTitle,
   EuiHealth,
-  EuiTextColor
+  EuiSpacer
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
 
@@ -102,15 +102,15 @@ export class AgentsTable extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if (this.state.isProcessing) {
-      const {q, search} = this.state;
-      const {q: prevQ, search: prevSearch} = prevState;
+      const { q, search } = this.state;
+      const { q: prevQ, search: prevSearch } = prevState;
       if (prevQ !== q || prevSearch !== search) {
-        this.setState({pageIndex: 0});
+        this.setState({ pageIndex: 0 });
       }
       await this.getItems();
     }
   }
-  
+
   async getItems() {
     const rawAgents = await this.props.wzReq(
       'GET',
@@ -163,7 +163,7 @@ export class AgentsTable extends Component {
     const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : ".";
     const { timeService } = this.props;
     return {
-      "id": agent,
+      "id": agent.id,
       "name": agent.name,
       "ip": agent.ip,
       "status": agent.status,
@@ -176,33 +176,25 @@ export class AgentsTable extends Component {
     }
   }
 
-  welcomePanelButtonRender(agent, field, color = 'primary', size = false) {
-    return (
-      <EuiToolTip content="View the welcome panel for this agent" position="right">
-        <EuiLink
-          onClick={() => this.props.clickAction(agent)}
-          aria-label="View the welcome panel for this agent"
-          color={color}
-        >
-          {(agent[field].lenght > size) ? `${agent[field].substring(0, size)}...` : agent[field]}
-        </EuiLink>
-      </EuiToolTip>
-    )
-  }
-
   actionButtonsRender(agent) {
     return (
       <div>
         <EuiToolTip content="Open Discover panel for this agent" position="left">
           <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'discover')}
+            onClick={() => (ev) => {
+              ev.stopPropagation();
+              this.props.clickAction(agent, 'discover')
+            }}
             iconType="discoverApp"
             aria-label="Open Discover panel for this agent"
           />
         </EuiToolTip>
         <EuiToolTip content="Open configuration for this agent" position="left">
           <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
+            onClick={(ev) => {
+              ev.stopPropagation();
+              this.props.clickAction(agent, 'configuration')
+            }}
             color={'text'}
             iconType="wrench"
             aria-label="Open configuration for this agent"
@@ -300,7 +292,6 @@ export class AgentsTable extends Component {
         name: 'ID',
         sortable: true,
         width: '65px',
-        render: (agent) => this.welcomePanelButtonRender(agent, 'id'),
       },
       {
         field: 'name',
@@ -394,15 +385,7 @@ export class AgentsTable extends Component {
           </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem style={{ paddingBottom: 10 }}>
-            <EuiTextColor color="subdued">
-              <p>
-                From here you can manage all the monitored host agents reporting to the manager.
-              </p>
-            </EuiTextColor>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <EuiSpacer size="xs" />
       </div>
     );
   }
@@ -574,6 +557,16 @@ export class AgentsTable extends Component {
   }
 
   tableRender() {
+
+    const getRowProps = item => {
+      const { id } = item;
+      return {
+        'data-test-subj': `row-${id}`,
+        className: 'customRowClass',
+        onClick: () => this.props.clickAction(item),
+      };
+    };
+
     const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state
     const columns = this.columns();
     const pagination = {
@@ -599,6 +592,7 @@ export class AgentsTable extends Component {
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
+            rowProps={getRowProps}
             noItemsMessage="No agents found"
           />
         </EuiFlexItem>
@@ -626,6 +620,6 @@ AgentsTable.propTypes = {
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
   clickAction: PropTypes.func,
-  timeService: PropTypes.func,  
+  timeService: PropTypes.func,
   reload: PropTypes.func
 };

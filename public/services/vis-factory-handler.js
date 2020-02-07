@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Vis factory service
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,12 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../react-services/app-state";
+import { GenericRequest } from "../react-services/generic-request";
+
 export class VisFactoryService {
   /**
    * Class Constructor
    * @param {*} $rootScope
    * @param {*} appState
-   * @param {*} genericReq
    * @param {*} discoverPendingUpdates
    * @param {*} rawVisualizations
    * @param {*} tabVisualizations
@@ -25,7 +27,6 @@ export class VisFactoryService {
   constructor(
     $rootScope,
     appState,
-    genericReq,
     discoverPendingUpdates,
     rawVisualizations,
     tabVisualizations,
@@ -35,7 +36,7 @@ export class VisFactoryService {
   ) {
     this.$rootScope = $rootScope;
     this.appState = appState;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.discoverPendingUpdates = discoverPendingUpdates;
     this.rawVisualizations = rawVisualizations;
     this.tabVisualizations = tabVisualizations;
@@ -75,7 +76,7 @@ export class VisFactoryService {
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/visualizations/overview-${tab}/${this.appState.getCurrentPattern()}`
+        `/elastic/visualizations/overview-${tab}/${AppState.getCurrentPattern()}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange);
@@ -101,7 +102,7 @@ export class VisFactoryService {
         tab !== 'sca'
           ? await this.genericReq.request(
               'GET',
-              `/elastic/visualizations/agents-${tab}/${this.appState.getCurrentPattern()}`
+              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
             )
           : false;
       data && this.rawVisualizations.assignItems(data.data.raw);

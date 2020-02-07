@@ -1,6 +1,6 @@
 /*
  * Wazuh app - File for app requirements and set up
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,7 @@ import './services';
 import './controllers';
 import './factories';
 import './directives';
+import { AppState } from './react-services/app-state';
 
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
@@ -84,33 +85,33 @@ app.config([
   }
 ]);
 
-app.run(function($rootScope, $route, $location, appState, $window) {
+app.run(function($rootScope, $route, $location, $window) {
   chrome
-    .setRootTemplate('<wz-menu></wz-menu><div ng-view class="mainView"></div>')
+    .setRootTemplate('<react-component name="WzMenuWrapper" props="" /><div ng-view class="mainView"></div>')
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
-  appState.setNavigation({ status: false });
-  appState.setNavigation({
+  AppState.setNavigation({ status: false });
+  AppState.setNavigation({
     reloaded: false,
     discoverPrevious: false,
     discoverSections: ['/overview/', '/agents', '/wazuh-dev']
   });
 
   $rootScope.$on('$routeChangeSuccess', () => {
-    appState.setNavigation({ prevLocation: $location.path() });
-    if (!appState.getNavigation().reloaded) {
-      appState.setNavigation({ status: true });
+    AppState.setNavigation({ prevLocation: $location.path() });
+    if (!AppState.getNavigation().reloaded) {
+      AppState.setNavigation({ status: true });
     } else {
-      appState.setNavigation({ reloaded: false });
+      AppState.setNavigation({ reloaded: false });
     }
   });
 
   $rootScope.$on('$locationChangeSuccess', () => {
-    const navigation = appState.getNavigation();
-    appState.setNavigation({ currLocation: $location.path() });
+    const navigation = AppState.getNavigation();
+    AppState.setNavigation({ currLocation: $location.path() });
     if (navigation.currLocation !== navigation.prevLocation) {
       if (navigation.discoverSections.includes(navigation.currLocation)) {
-        appState.setNavigation({ discoverPrevious: navigation.prevLocation });
+        AppState.setNavigation({ discoverPrevious: navigation.prevLocation });
       }
     } else {
       if (!navigation.status && navigation.prevLocation) {
@@ -118,7 +119,7 @@ app.run(function($rootScope, $route, $location, appState, $window) {
           !navigation.discoverSections.includes(navigation.currLocation) &&
           $location.search().tabView !== 'cluster-monitoring'
         ) {
-          appState.setNavigation({ reloaded: true });
+          AppState.setNavigation({ reloaded: true });
           $location.search('configSubTab', null);
           $location.search('editingFile', null);
           $route.reload();
@@ -211,7 +212,7 @@ app.run(function($rootScope, $route, $location, appState, $window) {
         }
       }
     }
-    appState.setNavigation({ status: false });
+    AppState.setNavigation({ status: false });
   });
 });
 

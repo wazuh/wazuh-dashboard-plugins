@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load the Settings React components.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,11 @@ const app = uiModules.get('app/wazuh', []);
 import { ApiTable } from './components/api-table';
 import { AddApi } from './components/add-api';
 import { ApiIsDown } from './components/api-is-down';
-import WzSettingsSideMenu from './components/settings-side-menu';
-import WzConfigurationSettings from './components/configuration/configuration';
+import { WzConfigurationSettings } from './components/configuration/configuration';
 import SettingsLogs from './components/logs';
 
 app
   .controller('settingsController', SettingsController)
-  .value('WzSettingsSideMenu', WzSettingsSideMenu)
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsLogs', SettingsLogs)
   .value('ApiTable', ApiTable)

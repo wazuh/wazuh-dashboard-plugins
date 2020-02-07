@@ -1,6 +1,6 @@
 /*
  * Wazuh app - File for routes definition
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ import overviewTemplate from '../templates/overview/overview.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import { WazuhConfig } from '../react-services/wazuh-config';
+import { GenericRequest } from '../react-services/generic-request';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -61,7 +63,7 @@ function ip(
     $location,
     Private,
     appState,
-    genericReq,
+    GenericRequest,
     errorHandler,
     wzMisc
   );
@@ -71,7 +73,6 @@ function nestedResolve(
   $q,
   genericReq,
   errorHandler,
-  wazuhConfig,
   $rootScope,
   $location,
   $window,
@@ -81,20 +82,19 @@ function nestedResolve(
 ) {
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
-
+  const wazuhConfig = new WazuhConfig();
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
-  return getWzConfig($q, genericReq, wazuhConfig).then(() =>
+  return getWzConfig($q, GenericRequest, wazuhConfig).then(() =>
     settingsWizard(
       $location,
       $q,
       $window,
       testAPI,
       appState,
-      genericReq,
+      GenericRequest,
       errorHandler,
       wzMisc,
-      wazuhConfig,
       location && location.includes('/health-check')
     )
   );
@@ -120,9 +120,10 @@ function savedSearch(
   );
 }
 
-function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
+function wzConfig($q, genericReq, $rootScope, $location) {
   assignPreviousLocation($rootScope, $location);
-  return getWzConfig($q, genericReq, wazuhConfig);
+  const wazuhConfig = new WazuhConfig();
+  return getWzConfig($q, GenericRequest, wazuhConfig);
 }
 
 function wzKibana($location, $window, $rootScope) {
@@ -185,7 +186,7 @@ routes
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,
-    resolve: { enableWzMenu, nestedResolve }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,

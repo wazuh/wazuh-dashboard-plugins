@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management groups controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../../react-services/app-state";
+import { WazuhConfig } from "../../react-services/wazuh-config";
 
 export class GroupsController {
   constructor(
@@ -19,7 +21,6 @@ export class GroupsController {
     appState,
     shareAgent,
     groupHandler,
-    wazuhConfig,
     reportingService
   ) {
     this.scope = $scope;
@@ -29,7 +30,7 @@ export class GroupsController {
     this.appState = appState;
     this.shareAgent = shareAgent;
     this.groupHandler = groupHandler;
-    this.wazuhConfig = wazuhConfig;
+    this.wazuhConfig = new WazuhConfig();
     this.reportingService = reportingService;
   }
 
@@ -162,7 +163,7 @@ export class GroupsController {
       this.groupsSelectedTab = 'agents';
       this.location.search('currentGroup', group.name);
       if (this.location.search() && this.location.search().navigation) {
-        this.appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         this.location.search('navigation', null);
       }
       this.scope.$emit('setCurrentGroup', { currentGroup: this.currentGroup });

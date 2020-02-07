@@ -1,6 +1,6 @@
 /*
  * Wazuh app - API request service
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,6 +11,7 @@
  */
 import axios from 'axios';
 import chrome from 'ui/chrome';
+import { AppState } from './app-state';
 
 export class WzRequest {
     /**
@@ -55,7 +56,7 @@ export class WzRequest {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
       }
-      const id = this.getCookie('API').id;
+      const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const data = await this.genericReq('POST', '/api/request', requestData);
       return Promise.resolve(data);
@@ -76,7 +77,7 @@ export class WzRequest {
       if (!path || !filters) {
         throw new Error('Missing parameters');
       }
-      const id = this.getCookie('API').id;
+      const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { path, id, filters };
       const data = await this.genericReq('POST', '/api/csv', requestData);
       return Promise.resolve(data);
@@ -84,30 +85,6 @@ export class WzRequest {
       return ((error || {}).data || {}).message || false
         ? Promise.reject(error.data.message)
         : Promise.reject(error.message || error);
-    }
-  }
-
-  /**
-   * Gets the value from a cookie
-   * @param {String} cookieName
-   */
-  static getCookie(cookieName) {
-    try {
-      const value = "; " + document.cookie;
-      const parts = value.split("; " + cookieName + "=");
-      const cookie = parts.length === 2 ? parts.pop().split(';').shift() : false;
-      if (cookie && decodeURIComponent(cookie)) {
-        const decode = decodeURIComponent(cookie);
-        try {
-          return JSON.parse(JSON.parse(decode));
-        } catch (error) {
-          return decode;
-        }
-      } else {
-        throw `Cannot get ${cookieName}`;
-      }
-    } catch (error) {
-      throw new Error(error);
     }
   }
 }

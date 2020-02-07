@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh XML file editor
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@ import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
+import { AppState } from '../../react-services/app-state';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -89,6 +90,7 @@ app.directive('wzXmlFileEditor', function() {
           let xml = replaceIllegalXML(text);
           xml = xml.replace(/..xml.+\?>/, '');
           xml = xml.replace(/\\</gm, '');
+          xml = xml.replace(/<!--[\s\S\n]*?-->/gm, '');
           const xmlDoc = parser.parseFromString(
             `<file>${xml}</file>`,
             'text/xml'
@@ -421,7 +423,7 @@ app.directive('wzXmlFileEditor', function() {
 
       $scope.$on('$destroy', function() {
         $location.search('editingFile', null);
-        appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
       });
     },
     template

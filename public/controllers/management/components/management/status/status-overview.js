@@ -1,7 +1,7 @@
 /*
  * Wazuh app - React component for building the status view
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ export class WzStatusOverview extends Component {
     const { isLoading, listDaemons, stats, nodeInfo, agentInfo } = this.props.state;
 
     return (
-      <EuiPage style={{ background: 'transparent', paddingLeft: 0 }}>
+      <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
           <EuiFlexGroup>
             <EuiFlexItem>

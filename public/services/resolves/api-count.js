@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to fetch API entries
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,17 @@
  * @param {*} genericReq Wazuh module for doing generic requests to our backend.
  * @param {*} $location Angular.js library for URL and paths manipulation.
  */
-export function apiCount($q, genericReq, $location, appState) {
+import { AppState } from "../../react-services/app-state";
+
+export function apiCount($q, genericReq, $location) {
   const deferred = $q.defer();
   genericReq
     .request('GET', '/hosts/apis')
     .then(async data => {
       if (!data || !data.data || !data.data.length)
         throw new Error('No API entries found');
-      if (!appState.getCurrentAPI()) {
-        await tryToSetDefault(data.data, appState);
+      if (!AppState.getCurrentAPI()) {
+        await tryToSetDefault(data.data, AppState);
       }
       deferred.resolve();
     })
@@ -40,12 +42,12 @@ export function apiCount($q, genericReq, $location, appState) {
 }
 
 // Iterates the API entries in order to set one as default
-function tryToSetDefault(apis, appState) {
+function tryToSetDefault(apis, AppState) {
   try {
     for (let idx in apis) {
       const api = apis[idx];
       try {
-        appState.setCurrentAPI(
+        AppState.setCurrentAPI(
           JSON.stringify({
             name: api.cluster_info.manager,
             id: api.id

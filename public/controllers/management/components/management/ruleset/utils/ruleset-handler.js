@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Ruleset handler service
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -251,6 +251,19 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq(
         'POST',
         `/manager/files?path=${path}/${list}&overwrite=${overwrite}`,
+        { content, origin: 'raw' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  static async uploadCdbList(list, content, overwrite) {
+    try {
+      const result = await WzRequest.apiReq(
+        'POST',
+        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
         { content, origin: 'raw' }
       );
       return result;

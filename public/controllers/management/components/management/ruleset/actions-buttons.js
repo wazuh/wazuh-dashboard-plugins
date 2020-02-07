@@ -1,6 +1,6 @@
 /*
 * Wazuh app - React component for registering agents.
-* Copyright (C) 2015-2019 Wazuh, Inc.
+* Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ class WzRulesetActionButtons extends Component {
       } else if (path === 'etc/decoders') {
         upload = this.rulesetHandler.sendDecoderConfiguration;
       } else {
-        upload = this.rulesetHandler.sendCdbList;
+        upload = this.rulesetHandler.uploadCdbList;
       }
       for (let idx in files) {
         const { file, content } = files[idx];
@@ -106,7 +106,6 @@ class WzRulesetActionButtons extends Component {
       }
       if (errors) throw results;
       //this.errorHandler.info('Upload successful');
-      console.log('UPLOAD SUCCESS');
       return;
     } catch (error) {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
@@ -138,7 +137,7 @@ class WzRulesetActionButtons extends Component {
   async refresh() {
     try {
       this.props.updateIsProcessing(true);
-      this.onRefreshLoading();
+      // this.onRefreshLoading();
 
     } catch (error) {
       return Promise.reject(error);
@@ -149,12 +148,11 @@ class WzRulesetActionButtons extends Component {
     clearInterval(this.refreshTimeoutId);
 
     this.props.updateLoadingStatus(true);
-    this.refreshTimeoutId =  setInterval(() => {
-      if(!this.props.state.isProcessing) {
-        this.props.updateLoadingStatus(false);
-        clearInterval(this.refreshTimeoutId);
-      }
-    }, 100);
+    // this.refreshTimeoutId =  setInterval(() => {
+    //   if(!this.props.state.isProcessing) {
+    //     clearInterval(this.refreshTimeoutId);
+    //   }
+    // }, 100);
   }
 
   render() {
@@ -210,6 +208,11 @@ class WzRulesetActionButtons extends Component {
         Refresh
       </EuiButtonEmpty>
     );
+    
+    const uploadFile = async (files, path) => {
+      await this.uploadFiles(files, path);
+      await this.refresh();
+    };
 
     return (
       <Fragment>
@@ -234,7 +237,7 @@ class WzRulesetActionButtons extends Component {
             <UploadFiles
               msg={section}
               path={`etc/${section}`}
-              upload={async (files, path) => await this.uploadFiles(files, path)} />
+              upload={uploadFile} />
           </EuiFlexItem>
         )}
         <EuiFlexItem grow={false}>

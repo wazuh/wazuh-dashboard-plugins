@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { 
     EuiFlexGroup,
     EuiFlexItem,
-    EuiFlexGrid,
     EuiSelect,
     EuiSwitch,
     EuiSpacer,
@@ -19,14 +18,15 @@ import {
     EuiIcon,
     EuiLoadingSpinner
 } from '@elastic/eui';
-import PropTypes from 'prop-types';
 import 'brace/mode/less';
 import 'brace/theme/github';
+import { ApiRequest } from  '../../../../../react-services/api-request';
 
 
 export default class WzLogs extends Component {
     constructor(props) {
         super(props);
+        this.offset = 377;
         this.state = {
             isCluster: false,
             selectedDaemon: '',
@@ -49,14 +49,14 @@ export default class WzLogs extends Component {
     }
 
     updateHeight = () => {
-        this.height = window.innerHeight - 400; 
+        this.height = window.innerHeight - this.offset; 
         this.forceUpdate();
     }
 
 
 
     async componentDidMount(){
-        this.height = window.innerHeight - 400; 
+        this.height = window.innerHeight - this.offset; 
         window.addEventListener('resize', this.updateHeight); 
         this.setState({isLoading: true})
 
@@ -92,7 +92,7 @@ export default class WzLogs extends Component {
     async initDaemonsList(logsPath){
         try{
             const path = logsPath + "/summary";
-            const data = await this.props.wzReq(
+            const data = await ApiRequest.request(
                 'GET',
                 path,
                 {}
@@ -100,7 +100,9 @@ export default class WzLogs extends Component {
             const formattedData = ((data || {}).data || {}).data || {}
             const daemonsList = [ ...['all'], ...Object.keys(formattedData)]
             this.setState({daemonsList})
-        }catch(err){ } // eslint-disable-line
+        }catch(err){
+            throw new Error("Error obtaining daemons list.");
+        } // eslint-disable-line
     }
 
 
@@ -138,7 +140,7 @@ export default class WzLogs extends Component {
         let totalItems = 0;
         if(this.state.selectedNode){
             try{
-                const tmpResult = await this.props.wzReq(
+                const tmpResult = await ApiRequest.request(
                     'GET',
                     logsPath,
                     this.buildFilters(customOffset)
@@ -148,10 +150,11 @@ export default class WzLogs extends Component {
                 result = this.parseLogsToText(resultItems) || "";
             } catch(err){
                 result = "";
+                throw new Error("Error obtaining logs.");
             }
         }else{
             try{
-                const tmpResult = await this.props.wzReq(
+                const tmpResult = await ApiRequest.request(
                     'GET',
                     logsPath,
                     this.buildFilters(customOffset)
@@ -161,6 +164,7 @@ export default class WzLogs extends Component {
                 result = this.parseLogsToText(resultItems) || "";
             }catch(err) {
                 result = "";
+                throw new Error("Error obtaining logs");
             }
         }   
         this.setState({totalItems})
@@ -177,7 +181,7 @@ export default class WzLogs extends Component {
      */
     async getLogsPath() {
         try{
-            const clusterStatus = await this.props.wzReq(
+            const clusterStatus = await ApiRequest.request(
             'GET',
             '/cluster/status',
             {}
@@ -189,7 +193,7 @@ export default class WzLogs extends Component {
             if (clusterEnabled) {
                 let nodeList = "";
                 let selectedNode = "";
-                const nodeListTmp = await this.props.wzReq('GET', '/cluster/nodes', {});
+                const nodeListTmp = await ApiRequest.request('GET', '/cluster/nodes', {});
                 if (Array.isArray((((nodeListTmp || {}).data || {}).data || {}).items)) {
                     nodeList = nodeListTmp.data.data.items
                     .map(item => item.name)
@@ -200,7 +204,9 @@ export default class WzLogs extends Component {
                 }
                 return {nodeList, logsPath: `/cluster/${selectedNode}/logs`,selectedNode: selectedNode}
             }
-        }catch(error){ } // eslint-disable-line
+        }catch(error){ 
+            throw new Error("Error obtaining logs path.");
+        }
         
         return {nodeList:"", logsPath: '/manager/logs',selectedNode: ""};
     }
@@ -224,13 +230,19 @@ export default class WzLogs extends Component {
         ];  
     }
 
-    getNodesList(){
+    getnodeList(){
         try{
-            const nodesList = this.state.nodeList.map(item => {
-                return { value: item, text: item}
-            })
-            return nodesList
-        }catch(err){ }  // eslint-disable-line
+            if(this.state.nodeList && Array.isArray(this.state.nodeList)){
+                const nodeList = this.state.nodeList.map(item => {
+                    return { value: item, text: item}
+                })
+                return nodeList
+            }else{
+                return false;
+            }
+        }catch(err){
+            throw new Error("Error obtaining list of nodes.");
+        }
     }
 
 
@@ -314,13 +326,13 @@ export default class WzLogs extends Component {
     header(){
         const daemonsOptions = this.getDaemonsOptions();
         const logLevelOptions = this.getLogLevelOptions();
-        const nodeList = this.getNodesList();
+        const nodeList = this.getnodeList();
 
         return(
             <div>
                 <EuiFlexGroup>
                     <EuiFlexItem >
-                        <EuiTitle size={'l'}>
+                        <EuiTitle size={'m'}>
                         <h2>Logs</h2>
                         </EuiTitle>
                     </EuiFlexItem>
@@ -334,8 +346,8 @@ export default class WzLogs extends Component {
                     </EuiTextColor>
                 </EuiFlexItem>
                 </EuiFlexGroup>
-                <EuiFlexGrid>
-                    <EuiFlexItem style={this.ITEM_STYLE}>
+                <EuiFlexGroup>
+                    <EuiFlexItem grow={false} >
                         <EuiSelect
                             id="filterDaemon"
                             options={daemonsOptions}
@@ -344,7 +356,7 @@ export default class WzLogs extends Component {
                             aria-label="Filter by daemon"
                         />
                     </EuiFlexItem>
-                    <EuiFlexItem style={this.ITEM_STYLE}>
+                    <EuiFlexItem grow={false} >
                         <EuiSelect
                             id="filterLogLevel"
                             options={logLevelOptions}
@@ -354,7 +366,7 @@ export default class WzLogs extends Component {
                         />
                     </EuiFlexItem>
                     {this.state.selectedNode &&
-                        (<EuiFlexItem style={this.ITEM_STYLE}>
+                        (<EuiFlexItem grow={false} >
                             <EuiSelect
                                 id="selectNode"
                                 options={nodeList}
@@ -364,14 +376,14 @@ export default class WzLogs extends Component {
                             />
                         </EuiFlexItem>)
                     }
-                    <EuiFlexItem style={{...this.ITEM_STYLE, paddingTop: "10px"}}>
+                    <EuiFlexItem grow={false} style={{ paddingTop: "10px"}}>
                         <EuiSwitch
                             label="Descending sort"
                             checked={this.state.descendingSort}
                             onChange={this.onSortSwitchChange}
                         />
                     </EuiFlexItem>
-                </EuiFlexGrid>
+                </EuiFlexGroup>
                 <EuiSpacer></EuiSpacer>
                 <EuiFlexGroup>
                     <EuiFlexItem>
@@ -427,7 +439,7 @@ export default class WzLogs extends Component {
             <div>
                 {this.state.logsList && (
                     <EuiCodeBlock
-                        fontSize="m"
+                        fontSize="s"
                         paddingSize="m"
                         color="dark"
                         overflowHeight={this.height}>
@@ -477,7 +489,3 @@ export default class WzLogs extends Component {
         )
     }
 }
-
-WzLogs.propTypes = {
-    wzReq: PropTypes.func
-};

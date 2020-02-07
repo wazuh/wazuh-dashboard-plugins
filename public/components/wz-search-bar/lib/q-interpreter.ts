@@ -1,6 +1,6 @@
 /*
- * Wazuh app - React component for show search and filter in the rules,decoder and CDB lists.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Wazuh app - React component for show search and filter
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

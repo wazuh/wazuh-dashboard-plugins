@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ const initialState = {
   listInfo: false,
   pageIndex: 0,
   ruleInfo: false,
-  section: 'rules',
+  section: '',
   showingFiles: false,
   showModal: false,
   sortDirection: 'asc',
@@ -57,7 +57,7 @@ const rulesetReducers = (state = initialState, action) => {
     case 'UPDATE_FILE_CONTENT':
       return Object.assign({}, state, { fileContent: action.content, decoderInfo: false, ruleInfo: false, listInfo: false, error: false });
     case 'UPDATE_RULE_FILTERS':
-      return Object.assign({}, state, { filters: action.filters, error: false });
+      return Object.assign({}, state, { filters: action.filters, isProcessing: true, error: false });
     case 'UPDATE_IS_PROCESSING':
       return Object.assign({}, state, { isProcessing: action.isProcessing, ruleInfo: false, listInfo: false, error: false });
     case 'UPDATE_ITEMS':
@@ -75,7 +75,7 @@ const rulesetReducers = (state = initialState, action) => {
     case 'UPDATE_RULE_INFO':
       return Object.assign({}, state, { ruleInfo: action.info, decoderInfo: false, listInfo: false, error: false });
     case 'UPDATE_RULESET_SECTION':
-      return Object.assign({}, state, { section: action.section, error: false });
+      return Object.assign({}, state, { section: action.section, showingFiles:false, error: false });
     case 'UPDATE_SHOW_MODAL':
       return Object.assign({}, state, { showModal: action.showModal, error: false });
     case 'UPDATE_SORT_DIRECTION':

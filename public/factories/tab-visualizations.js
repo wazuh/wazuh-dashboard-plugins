@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Factory to store visualization tabs
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ export class TabVisualizations {
       pm: 4,
       vuls: 10,
       oscap: 13,
-      ciscat: 9,
+      ciscat: 3,
       audit: 9,
       gdpr: 6,
       pci: 6,
@@ -42,7 +42,7 @@ export class TabVisualizations {
       pm: 5,
       vuls: 10,
       oscap: 11,
-      ciscat: 9,
+      ciscat: 3,
       audit: 6,
       pci: 5,
       gdpr: 5,

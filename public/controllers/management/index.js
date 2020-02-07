@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Load all the Management controllers and related React components.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,14 +32,14 @@ import { UploadFiles } from './components/upload-files';
 import WzRuleset from './components/management/ruleset/main-ruleset';
 import WzManagement from './components/management/management-provider';
 import WzManagementMain from './components/management/management-main';
-import WzLogs from './components/management/mg-logs/logs';
 import { ExportConfiguration } from '../agent/components/export-configuration';
+import WzManagementConfiguration from './components/management/configuration/configuration-main';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('managementController', ManagementController)
-  .controller('managementConfigurationController', ConfigurationController)
+  // .controller('managementConfigurationController', ConfigurationController)
   .controller('decodersController', DecodersController)
   .controller('groupsPreviewController', GroupsController)
   .controller('managerLogController', LogsController)
@@ -60,4 +60,5 @@ app
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsInGroupTable', AgentsInGroupTable)
   .value('FilesInGroupTable', FilesInGroupTable)
-  .value('WzLogs', WzLogs);
+  .value('UploadFiles', UploadFiles)
+  .value('WzManagementConfiguration', WzManagementConfiguration);

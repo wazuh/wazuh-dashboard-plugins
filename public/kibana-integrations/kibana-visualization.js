@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Custom visualization directive
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ import { uiModules } from 'ui/modules';
 import { getVisualizeLoader } from 'ui/visualize/loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
+import { GenericRequest } from '../react-services/generic-request';
 
 const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
@@ -44,6 +45,7 @@ app.directive('kbnVis', function () {
       let visHandler = null;
       let renderInProgress = false;
       let deadField = false;
+      let mapClicked = false;
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
           const fromParsed = dateMath.parse(from);
@@ -187,7 +189,7 @@ app.directive('kbnVis', function () {
             if (!lockFields) {
               try {
                 lockFields = true;
-                await genericReq.request(
+                await GenericRequest.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}
@@ -251,7 +253,7 @@ app.directive('kbnVis', function () {
         loadedVisualizations.addItem(true);
 
         const currentLoaded = loadedVisualizations.getList().length;
-        const deadVis = tabVisualizations.getDeadVis();
+        const deadVis = tab === 'ciscat' ? 0 : tabVisualizations.getDeadVis();
         const totalTabVis = tabVisualizations.getItem(tab) - deadVis;
 
         if (totalTabVis < 1) {
@@ -280,6 +282,16 @@ app.directive('kbnVis', function () {
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';
+
+            if ($scope.visID.includes('AWS-geo')) {
+              const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
+              setTimeout(function () {
+                if (!mapClicked) {
+                  mapClicked = true;
+                  canvas[0].click();
+                }
+              }, 1000);
+            }
           } else if (
             $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
           ) {

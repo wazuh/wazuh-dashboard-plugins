@@ -1,6 +1,6 @@
 /*
- * Wazuh app - React component for show search and filter in the rules,decoder and CDB lists.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Wazuh app - React component for show search and filter
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,16 +36,43 @@ export class WzSearchFormatSelector extends Component {
     onChange: Function
     qFilterEnabled?: boolean
     apiFilterEnabled?: boolean
+    format?: string
   }
+
+  qLegend = (
+    <div>
+      <p>
+        The ?Q filter offers a simplified query syntax to get 
+        data of the Wazuh
+      </p>
+      <a href="https://documentation.wazuh.com/current/user-manual/api/queries.html"
+        target="_blank" >
+        ?Q filter documentation
+      </a>
+    </div>
+  );
+  apiLegend = (
+    <div>
+      <p>
+        Use the parameters of the Wazuh API to filter the data output, 
+        check our documentation for more info
+      </p>
+      <a href="https://documentation.wazuh.com/current/user-manual/api/reference.html"
+        target="_blank" >
+        API Reference
+      </a>
+    </div>
+  );
 
 
   constructor(props) {
     super(props);
     const { qFilterEnabled, apiFilterEnabled } = props;  
     this.toggleButtons = this.initToggleButtons(qFilterEnabled, apiFilterEnabled);
+    const toggleIndex = props.format === '?Q' ? 0 : 1;
     this.state = {
       isPopoverOpen: false,
-      toggleIdSelected: this.toggleButtons[0],
+      toggleIdSelected: this.toggleButtons[toggleIndex],
     };
   }
 
@@ -63,6 +90,8 @@ export class WzSearchFormatSelector extends Component {
           label: '?Q',
         }
       )
+    } else {
+      toggleButtons.push({});
     }
 
     if (apiEnable) {
@@ -72,6 +101,8 @@ export class WzSearchFormatSelector extends Component {
           label: 'API',
         },
       )
+    } else {
+      toggleButtons.push({});
     }
     return toggleButtons;
   }
@@ -121,13 +152,17 @@ export class WzSearchFormatSelector extends Component {
 
   render() {
     const {toggleIdSelected} = this.state;
+    const { apiFilterEnabled, qFilterEnabled } = this.props;
     const button = (
       <EuiButtonEmpty
         onClick={this.onButtonClick.bind(this)}>
-        {toggleIdSelected.label}
+        {"Help"}
       </EuiButtonEmpty>
     );
-    const renderFooter = this.renderFooter()
+    const renderFooter = (qFilterEnabled && apiFilterEnabled) 
+      ? this.renderFooter()
+      : null;
+    
     return (
       <EuiPopover 
         id='wzFormatSelector'
@@ -135,16 +170,13 @@ export class WzSearchFormatSelector extends Component {
         button={button}
         isOpen={this.state.isPopoverOpen}
         closePopover={this.closePopover.bind(this)}>
-        <EuiPopoverTitle>{toggleIdSelected.label}</EuiPopoverTitle>
+        <EuiPopoverTitle>{"Help"}</EuiPopoverTitle>
           <div style={{ width: '300px' }}>
             <EuiText>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                Donec mattis varius volutpat. In tempus egestas justo at 
-                consectetur. Donec sit amet finibus massa, eget sollicitudin 
-                tortor. Donec sed libero ex. Praesent at lacinia arcu, 
-                eu porta nisl.
-              </p>
+              { (toggleIdSelected.label === '?Q')
+               ? this.qLegend
+               : this.apiLegend
+              }
             </EuiText>
           </div>
           { renderFooter }

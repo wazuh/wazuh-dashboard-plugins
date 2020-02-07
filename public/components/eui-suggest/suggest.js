@@ -74,6 +74,9 @@ EuiSuggest.propTypes = {
    */
   onItemClick: PropTypes.func,
   onInputChange: PropTypes.func,
+  isOpen: PropTypes.bool,
+  onClosePopover: PropTypes.func,
+  onPopoverFocus: PropTypes.func
 };
 
 EuiSuggestInput.defaultProps = {

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for groups main table.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -127,6 +127,14 @@ class WzGroupsTable extends Component {
         direction: sortDirection,
       },
     };
+    const getRowProps = item => {
+      const { id } = item;
+      return {
+        'data-test-subj': `row-${id}`,
+        className: 'customRowClass',
+        onClick: () => this.props.updateGroupDetail(item),
+      };
+    };
 
     if (!error) {
       const itemList = this.props.state.itemList;
@@ -141,6 +149,7 @@ class WzGroupsTable extends Component {
             loading={isLoading}
             sorting={sorting}
             message={message}
+            rowProps={getRowProps}
             search={{ box: { incremental: true } }}
           />
           {this.props.state.showModal ? (

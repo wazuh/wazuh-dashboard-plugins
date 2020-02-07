@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to check cookie consistence
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,12 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export async function checkTimestamp(appState, genericReq, $location, wzMisc) {
+import { AppState } from "../../react-services/app-state";
+
+export async function checkTimestamp(genericReq, $location, wzMisc) {
   try {
     const data = await genericReq.request('GET', '/api/timestamp');
-    const current = appState.getCreatedAt();
+    const current = AppState.getCreatedAt();
     if (data && data.data) {
-      if (!current) appState.setCreatedAt(data.data.lastRestart);
+      if (!current) AppState.setCreatedAt(data.data.lastRestart);
       wzMisc.setLastRestart(data.data.lastRestart);
     } else {
       wzMisc.setBlankScr('Your wazuh-registry is empty or corrupt.');

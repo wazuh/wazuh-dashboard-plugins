@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management edit groups configuration controller
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { AppState } from "../../react-services/app-state";
+
 export class ConfigurationGroupsController {
   /**
    * Constructor
@@ -60,13 +62,13 @@ export class ConfigurationGroupsController {
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
-    this.clusterInfo = this.appState.getClusterInfo();
+    this.clusterInfo = AppState.getClusterInfo();
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       try {
         this.$scope.fetchedXML = await this.fetchFile();
         this.$location.search('editingFile', true);
-        this.appState.setNavigation({ status: true });
+        AppState.setNavigation({ status: true });
         this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -77,7 +79,7 @@ export class ConfigurationGroupsController {
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
       this.$scope.fetchedXML = null;
-      this.appState.setNavigation({ status: true });
+      AppState.setNavigation({ status: true });
       this.$scope.$broadcast('closeEditXmlFile', {});
       this.$scope.$applyAsync();
     };

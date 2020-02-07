@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Commons stylesheet
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -447,6 +447,10 @@ md-content.md-default-theme, md-content{
 .wazuhNavDiscover .euiTab,
 .wazuhNavDiscover .euiText {
   font-size: 14px !important;
+}
+
+.euiTab.euiTab-isSelected {
+  font-weight: 600!important;
 }
 
 .sca-checksum {
@@ -1061,8 +1065,8 @@ discover-app-w .container-fluid {
   text-align: right;
 }
 
-.monitoring-discover form{
-  display: none;
+.monitoring-discover{
+  margin: -12px -6px 26px -6px;
 }
 
 .euiBadge, .euiBadge__childButton{
@@ -1325,11 +1329,6 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
   justify-content: left!important;
 }
 
-.sideBarContent{
-  float: right;
-  width: calc(~'100vw - 240px');
-}
-
 .wz-log-viewer{
   border: solid #8080806b 1px;
 }
@@ -1350,4 +1349,30 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
 
 .mitre-title .euiTitle--small {
   color: #1a1c21 !important;
+}
+
+.WzNotReadyButton{
+  z-index: 9999;
+}
+
+.WzNotReadyButton:focus{
+  background-color: transparent !important;
+}
+
+.WzNotReadyButton{
+  z-index: 9999;
+}
+
+.WzNotReadyButton:focus{
+  background-color: transparent !important;
+}
+
+div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
+  max-height: 350px;
+  overflow-y: scroll;
+}
+
+.euiSuggestItem .euiSuggestItem__label {
+  flex-basis: 25%;
+  min-width: 25%;
 }

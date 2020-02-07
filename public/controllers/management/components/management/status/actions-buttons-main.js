@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component of actions buttons for status.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -215,10 +215,10 @@ class WzStatusActionButtons extends Component {
 
     return (
       <Fragment>
-        {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
         {adminMode && selectedNode !== null && (
           <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>
         )}
+        {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
         {modal}
       </Fragment>
     );
