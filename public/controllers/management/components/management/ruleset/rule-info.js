@@ -100,7 +100,8 @@ class WzRuleInfo extends Component {
 
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
-    this.props.cleanInfo();
+    //if (!this.props.state.fileContent)
+      //this.props.cleanInfo();
   }
 
   /**

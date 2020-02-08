@@ -80,6 +80,7 @@ export default class WzRuleset extends Component {
 
   render() {
     const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
+    console.log(this.state)
 
     return (
       <WzReduxProvider>
