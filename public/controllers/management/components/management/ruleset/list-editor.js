@@ -102,7 +102,6 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
-                <EuiText color="subdued">{'Are you sure?'}</EuiText>
                 <EuiToolTip position="top" content={'Yes'}>
                   <EuiButtonIcon
                     aria-label="Confirm value"
@@ -256,8 +255,7 @@ class WzListEditor extends Component {
 
   closePopover = () => {
     this.setState({
-      isPopoverOpen: false,
-      addingKey: 'key',
+      isPopoverOpen: false
     });
   };
 
@@ -291,7 +289,11 @@ class WzListEditor extends Component {
   addItem() {
     const { addingKey, addingValue } = this.state;
     if (!addingKey || Object.keys(this.items).includes(addingKey)) {
-      console.log('Key empty or already exists');
+      this.showToast('danger', 'Error', (
+        <Fragment>
+          <strong>{addingKey}</strong> key already exists
+        </Fragment>
+      ), 3000);
       return;
     }
     this.items[addingKey] = addingValue;
@@ -340,7 +342,7 @@ class WzListEditor extends Component {
               <EuiToolTip position="right" content={'Back to lists'}>
                 <EuiButtonIcon
                   aria-label="Back"
-                  color="subdued"
+                  color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
                   onClick={() => this.props.cleanInfo()}
@@ -368,12 +370,13 @@ class WzListEditor extends Component {
    * @param {String} name
    * @param {String} path
    */
-  renderAddAndSave(name, path, newList = false) {
+  renderAddAndSave(name, path, newList = false, items = []) {
     const addButton = <EuiButtonEmpty onClick={() => this.openPopover()}>Add</EuiButtonEmpty>;
 
     const saveButton = (
       <EuiButton
         fill
+        isDisabled={items.length === 0}
         iconType="save"
         isLoading={this.state.isSaving}
         onClick={async () => this.saveList(name, path, newList)}
@@ -383,7 +386,7 @@ class WzListEditor extends Component {
     );
 
     const addItemButton = (
-      <EuiButton fill onClick={() => this.addItem()}>
+      <EuiButton isDisabled={!this.state.addingKey || !this.state.addingValue} fill onClick={() => this.addItem()}>
         Add
       </EuiButton>
     );
@@ -442,7 +445,7 @@ class WzListEditor extends Component {
               <EuiToolTip position="right" content={'Back to lists'}>
                 <EuiButtonIcon
                   aria-label="Back"
-                  color="subdued"
+                  color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
                   onClick={() => this.props.cleanInfo()}
@@ -485,7 +488,7 @@ class WzListEditor extends Component {
                 {/* Pop over to add new key and value */}
                 {adminMode &&
                   !this.state.editing &&
-                  this.renderAddAndSave(listName, path, !addingNew)}
+                  this.renderAddAndSave(listName, path, !addingNew, this.state.items)}
               </EuiFlexGroup>
               {/* CDB list table */}
               <EuiFlexGroup>

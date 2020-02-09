@@ -149,7 +149,7 @@ class WzGroupsEditor extends Component {
                       <EuiToolTip position="right" content={`Back to groups`}>
                         <EuiButtonIcon
                           aria-label="Back"
-                          color="subdued"
+                          color="primary"
                           iconSize="l"
                           iconType="arrowLeft"
                           onClick={() => this.props.cleanFileContent()}
@@ -166,11 +166,11 @@ class WzGroupsEditor extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
-                    <EuiFlexItem>
+                    <EuiFlexItem className="codeEditorWrapper">
                       {(isEditable && (
                         <EuiCodeEditor
                           width="100%"
-                          height="calc(100vh - 250px)"
+                          height="calc(100vh - 225px)"
                           value={content}
                           onChange={newContent => this.setState({ content: newContent })}
                           mode="xml"
@@ -179,15 +179,15 @@ class WzGroupsEditor extends Component {
                           aria-label="Code Editor"
                         ></EuiCodeEditor>
                       )) || (
-                        <EuiCodeBlock
-                          language="xml"
-                          fontSize="m"
-                          paddingSize="m"
-                          overflowHeight={this.height}
-                        >
-                          >{content}
-                        </EuiCodeBlock>
-                      )}
+                          <EuiCodeBlock
+                            language="xml"
+                            fontSize="m"
+                            paddingSize="m"
+                            overflowHeight={this.height}
+                          >
+                            {content}
+                          </EuiCodeBlock>
+                        )}
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlexItem>
