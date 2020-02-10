@@ -1542,13 +1542,13 @@ export class WazuhReportingCtrl {
           this.dd.content.push({ text: 'Hardware information', style: 'h2' });
           this.dd.content.push('\n');
           const ulcustom = [];
-          if (hardware.data.cpu && hardware.data.cpu.cores)
-            ulcustom.push(hardware.data.cpu.cores + ' cores ');
-          if (hardware.data.cpu && hardware.data.cpu.name)
-            ulcustom.push(hardware.data.cpu.name);
-          if (hardware.data.ram && hardware.data.ram.total)
+          if (hardware.data.affected_items[0].cpu && hardware.data.affected_items[0].cpu.cores)
+            ulcustom.push(hardware.data.affected_items[0].cpu.cores + ' cores ');
+          if (hardware.data.affected_items[0].cpu && hardware.data.affected_items[0].cpu.name)
+            ulcustom.push(hardware.data.affected_items[0].cpu.name);
+          if (hardware.data.affected_items[0].ram && hardware.data.affected_items[0].ram.total)
             ulcustom.push(
-              Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
+              Number(hardware.data.affected_items[0].ram.total / 1024 / 1024).toFixed(2) +
               'GB RAM'
             );
           ulcustom &&
