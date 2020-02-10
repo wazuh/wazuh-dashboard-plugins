@@ -699,7 +699,8 @@ export class WazuhReportingCtrl {
           {},
           apiId
         );
-        for (let item of ((agents || {}).data || {}).items || []) {
+
+        for (let item of ((agents || {}).data || {}).affected_items || []) {
           const str = Array(6).fill('-');
           if ((item || {}).id) str[0] = item.id;
           if ((item || {}).name) str[1] = item.name;
@@ -2090,7 +2091,7 @@ export class WazuhReportingCtrl {
             await this.renderHeader(
               tab,
               g_id,
-              (((agentsInGroup || []).data || []).items || []).map(x => x.id),
+              (((agentsInGroup || []).data || []).affected_items || []).map(x => x.id),
               apiId
             );
           }
