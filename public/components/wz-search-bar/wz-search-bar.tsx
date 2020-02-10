@@ -127,7 +127,7 @@ export default class WzSearchBar extends Component {
     if (this.updateSuggestOnProps(nextProps.qSuggests, nextProps.apiSuggests)){
       return true;
     }
-    return false;
+    return true; // if false, it dont't update search field in Search bar in CDB lists section
   }
 
   async componentDidUpdate(prevProps) {
