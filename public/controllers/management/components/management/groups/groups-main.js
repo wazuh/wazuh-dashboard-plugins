@@ -45,10 +45,10 @@ class WzGroups extends Component {
   //   });
   // }
 
-  // componentWillUnmount() {
-  //   // When the component is going to be unmounted the groups state is reset
-  //   this.props.resetGroup();
-  // }
+  componentWillUnmount() {
+    // When the component is going to be unmounted the groups state is reset
+    this.props.resetGroup();
+  }
 
   render() {
     const { itemDetail, showAddAgents, fileContent } = this.props.state;
