@@ -93,7 +93,8 @@ class WzConfigurationSwitch extends Component{
 				// Set cluster node selected in Redux Store
 				this.props.updateClusterNodeSelected(nodes.data.data.items.find(node => node.type === 'master').name);
 			}catch(error){
-				console.error(error);
+				// Do nothing isn't a clustser
+				// console.error(error);
 			}
 		}
 	}

@@ -248,9 +248,9 @@ export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) 
     isCluster
       ? await restartNode(selectedNode)
       : await restartManager();
-    
+    console.log('clusterStatus', clusterStatus)
     // Dispatch a Redux action
-    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'manager'}, please wait.`);
+    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`);
     return await makePing(updateWazuhNotReadyYet);
   }catch(error){
     return Promise.reject(error);

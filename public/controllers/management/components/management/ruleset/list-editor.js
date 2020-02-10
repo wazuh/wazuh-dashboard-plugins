@@ -386,7 +386,7 @@ class WzListEditor extends Component {
     );
 
     const addItemButton = (
-      <EuiButton isDisabled={!this.state.addingKey || !this.state.addingValue} fill onClick={() => this.addItem()}>
+      <EuiButton isDisabled={!this.state.addingKey} fill onClick={() => this.addItem()}>
         Add
       </EuiButton>
     );
