@@ -1464,13 +1464,13 @@ export class WazuhReportingCtrl {
         );
 
         if (lastScan && lastScan.data) {
-          if (lastScan.data.start && lastScan.data.end) {
+          if (lastScan.data.affected_items[0].start && lastScan.data.affected_items[0].end) {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`
             });
-          } else if (lastScan.data.start) {
+          } else if (lastScan.data.affected_items[0].start) {
             this.dd.content.push({
-              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`
+              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.affected_items[0].start}).`
             });
           } else {
             this.dd.content.push({
