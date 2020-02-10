@@ -726,9 +726,9 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (agent && agent.data) {
+            if (agent && agent.data.affected_items[0]) {
               data = {};
-              Object.assign(data, agent.data);
+              Object.assign(data, agent.data.affected_items[0]);
             }
           } catch (error) {
             log(
@@ -816,10 +816,10 @@ export class WazuhReportingCtrl {
       const agents = await this.apiRequest.makeGenericRequest(
         'GET',
         '/agents',
-        { limit: 1 },
+        { params: {limit: 1 }},
         apiId
       );
-      const totalAgents = agents.data.totalItems;
+      const totalAgents = agents.data.total_affected_items;
 
       if (section === 'overview' && tab === 'vuls') {
         log(

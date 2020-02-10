@@ -927,7 +927,7 @@ export class WazuhApiCtrl {
       const response = await this.apiInterceptor.request(
         'GET',
         fullUrl,
-        {},
+        data,
         { idHost: id }
       );
 
