@@ -32,7 +32,11 @@ export class TabVisualizations {
       configuration: 0,
       osquery: 5,
       docker: 5,
-      mitre: 6
+      mitre: 6,
+      'mitre-1': 1,
+      'mitre-2': 1,
+      'mitre-3': 1,
+      'mitre-4': 1,
     };
 
     this.overview = {
@@ -53,7 +57,11 @@ export class TabVisualizations {
       osquery: 5,
       sca: 8,
       docker: 5,
-      mitre: 6
+      mitre: 6,
+      'mitre-1': 1,
+      'mitre-2': 1,
+      'mitre-3': 1,
+      'mitre-4': 1,
     };
 
     this.tabVisualizations = {};

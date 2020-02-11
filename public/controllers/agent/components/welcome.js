@@ -175,7 +175,11 @@ export class WelcomeScreen extends Component {
                     'virustotal',
                     'osquery',
                     'docker',
-                    'mitre'
+                    'mitre',
+                    'mitre-1',
+                    'mitre-2',
+                    'mitre-3',
+                    'mitre-4',
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -215,7 +219,15 @@ export class WelcomeScreen extends Component {
                 {this.props.extensions.docker &&
                   this.buildTabCard('docker', 'spacesApp')}
                 {this.props.extensions.mitre &&
-                  this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
+                  this.buildTabCard('mitre', 'spacesApp')} {/* TODO: Change "spacesApp" icon*/}
+                {this.props.extensions.mitre &&
+                  this.buildTabCard('mitre-1', 'spacesApp')} {/* TODO: Change "spacesApp" icon*/}
+                {this.props.extensions.mitre &&
+                  this.buildTabCard('mitre-2', 'spacesApp')} {/* TODO: Change "spacesApp" icon*/}
+                {this.props.extensions.mitre &&
+                  this.buildTabCard('mitre-3', 'spacesApp')} {/* TODO: Change "spacesApp" icon*/}
+                {this.props.extensions.mitre &&
+                  this.buildTabCard('mitre-4', 'spacesApp')} {/* TODO: Change "spacesApp" icon*/}
               </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>

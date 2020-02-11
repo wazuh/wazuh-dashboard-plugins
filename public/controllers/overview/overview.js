@@ -21,7 +21,11 @@ import {
   metricsCiscat,
   metricsVirustotal,
   metricsOsquery,
-  metricsMitre
+  metricsMitre,
+  metricsMitre_1,
+  metricsMitre_2,
+  metricsMitre_3,
+  metricsMitre_4,
 } from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
@@ -64,9 +68,9 @@ export class OverviewController {
     this.commonData = commonData;
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
-    this.$scope.currentPoc = 0;
+    this.$scope.currentPoc = 3;
     this.wazuhConfig = new WazuhConfig();
-    this.showingMitreTable = false
+    this.showingMitreTable = true
     this.expandArray = [
       false,
       false,
@@ -619,6 +623,18 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
         case 'mitre':
           this.createMetrics(metricsMitre);
           break;
+        case 'mitre-1':
+          this.createMetrics(metricsMitre_1);
+          break;
+        case 'mitre-2':
+          this.createMetrics(metricsMitre_2);
+          break;
+        case 'mitre-3':
+          this.createMetrics(metricsMitre_3);
+          break;
+        case 'mitre-4':
+          this.createMetrics(metricsMitre_4);
+          break;
       }
     }
   }
@@ -627,7 +643,7 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
    * Show/hide MITRE table
    */
   switchMitreTab() {
-    this.showingMitreTable = !this.showingMitreTable
+    this.showingMitreTable = true
   }
 
   /**
@@ -636,7 +652,6 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
   setTabs() {
     this.overviewTabsProps = false;
     this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
-
     if (!this.currentPanel) return;
 
     const tabs = this.commonData.getTabsFromCurrentPanel(
@@ -707,14 +722,13 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
   }
 
   setMitre(i){
-    console.log("ee")
-    this.$scope.currentPoc = i;
+    this.$scope.currentPoc = 3;
   }
 
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
-    this.showingMitreTable = false;
+    this.showingMitreTable = true;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.falseAllExpand();
@@ -740,8 +754,8 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
         this.gdprReqs = { items: gdprTabs, reqTitle: 'GDPR Requirement' };
       }
 
-      if (newTab === 'mitre') {
-        this.$scope.currentPoc = 0;
+      if (['mitre', 'mitre-1', 'mitre-2', 'mitre-3', 'mitre-4'].includes(newTab) ) {
+        this.$scope.currentPoc = 3;
         const result = await this.apiReq.request('GET', '/rules/mitre', {});
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
         
@@ -879,14 +893,14 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
-
+      
       this.$scope.$on('sendVisDataRows', (ev, param) => {
         const rows = (param || {}).mitreRows.tables[0].rows
         this.$scope.attacksCount = {}
         for(var i in rows){
           this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
         }
-
+        
         this.mitreTableProps = {
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
           attacksCount: this.$scope.attacksCount,
@@ -897,9 +911,9 @@ const muchos =  [ {id:"T1134",name:"Access Token Manipulation", attacks_count: 0
           reqTitle: "MITRE",
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
           addFilter: (id) => this.addMitrefilter(id)
-          }
-        });
-
+        }
+      });
+      
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }

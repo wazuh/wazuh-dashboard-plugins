@@ -579,8 +579,7 @@ export class WazuhElasticCtrl {
         : 'agents';
 
       const tabSplit = req.params.tab.split('-');
-      const tabSufix = tabSplit[1];
-
+      const tabSufix = tabSplit.slice(1).join('_');
       const file =
         tabPrefix === 'overview'
           ? OverviewVisualizations[tabSufix]

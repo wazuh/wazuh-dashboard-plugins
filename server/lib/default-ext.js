@@ -21,5 +21,9 @@ export const defaultExt = {
   virustotal: false,
   osquery: false,
   mitre: false,
+  'mitre-1': false,
+  'mitre-2': false,
+  'mitre-3': false,
+  'mitre-4': false,
   docker: false
 };

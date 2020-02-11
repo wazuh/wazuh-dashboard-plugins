@@ -48,14 +48,14 @@ export class CommonData {
     this.overviewTabs = {
       hostMonitoringTabs: ['general', 'fim', 'aws'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
-      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre', 'mitre-1', 'mitre-2', 'mitre-3', 'mitre-4', ],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
     };
 
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
-      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker','mitre'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker','mitre', 'mitre-1', 'mitre-2', 'mitre-3', 'mitre-4', ],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
     };
   }
@@ -178,7 +178,7 @@ export class CommonData {
         } else if (tab === 'nist') {
           this.removeDuplicateExists('rule.nist_800_53');
           filters.push(filterHandler.nistQuery());
-        } else if (tab === 'mitre') {
+        } else if (['mitre', 'mitre-1', 'mitre-2', 'mitre-3', 'mitre-4'].includes(tab)) {
           this.removeDuplicateExists('rule.mitre.id');
           filters.push(filterHandler.mitreQuery());
         } else {

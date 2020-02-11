@@ -23,6 +23,10 @@ import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import vuls from './overview-vuls';
 import mitre from './overview-mitre';
+import mitre_1 from './overview-mitre-1';
+import mitre_2 from './overview-mitre-2';
+import mitre_3 from './overview-mitre-3';
+import mitre_4 from './overview-mitre-4';
 import osquery from './overview-osquery';
 import docker from './overview-docker';
 
@@ -41,6 +45,10 @@ export {
   virustotal,
   vuls,
   mitre,
+  mitre_1,
+  mitre_2,
+  mitre_3,
+  mitre_4,
   osquery,
   docker
 };

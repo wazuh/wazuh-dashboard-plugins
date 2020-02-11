@@ -40,6 +40,22 @@ const metricsScap = {
 const metricsMitre = {
   mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE\'"]'
 };
+// Metrics Mitre
+const metricsMitre_1 = {
+  mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE-1\'"]'
+};
+// Metrics Mitre
+const metricsMitre_2 = {
+  mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE-2\'"]'
+};
+// Metrics Mitre
+const metricsMitre_3 = {
+  mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE-3\'"]'
+};
+// Metrics Mitre
+const metricsMitre_4 = {
+  mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE-4\'"]'
+};
 
 // Metrics CIS-CAT
 const metricsCiscat = {
@@ -79,5 +95,9 @@ export default {
   metricsCiscat,
   metricsVirustotal,
   metricsOsquery,
-  metricsMitre
+  metricsMitre,
+  metricsMitre_1,
+  metricsMitre_2,
+  metricsMitre_3,
+  metricsMitre_4,
 };

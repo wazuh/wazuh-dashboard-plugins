@@ -80,6 +80,26 @@ export const TabDescription = {
     description:
       'Security events from the knowledge base of adversary tactics and techniques based on real-world observations'
   },
+  'mitre-1': {
+    title: 'MITRE ATT&CK PoC 1',
+    description:
+      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations'
+  },
+  'mitre-2': {
+    title: 'MITRE ATT&CK PoC 2',
+    description:
+      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations'
+  },
+  'mitre-3': {
+    title: 'MITRE ATT&CK PoC 3',
+    description:
+      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations'
+  },
+  'mitre-4': {
+    title: 'MITRE ATT&CK PoC 4',
+    description:
+      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations'
+  },
   syscollector: {
     title: 'Inventory data',
     description:
