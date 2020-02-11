@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { 
     EuiFlexGroup,
     EuiFlexItem,
@@ -438,21 +438,22 @@ export default class WzLogs extends Component {
         return(
             <div>
                 {this.state.logsList && (
-                    <EuiCodeBlock
-                        fontSize="s"
-                        paddingSize="m"
-                        color="dark"
-                        overflowHeight={this.height}>
-                        {this.state.logsList}
-                        &nbsp;
+                    <Fragment>
+                        <EuiCodeBlock
+                            fontSize="s"
+                            paddingSize="m"
+                            color="dark"
+                            overflowHeight={this.height}>
+                            {this.state.logsList}
+                        </EuiCodeBlock>
+                        <EuiSpacer size='m'/>
                         {(this.state.offset+100 < this.state.totalItems && !this.state.loadingLogs) && (<p className="wz-load-extra" onClick={() => this.loadExtraLogs()}> <EuiIcon type="refresh" /> 
-                        &nbsp; Click here to load more logs.</p> ) 
-                        ||
-                        (this.state.loadingLogs) &&
-                        (<p className="wz-load-extra"> <EuiLoadingSpinner size="m" />&nbsp; Loading...</p> ) 
-
+                            &nbsp; Click here to load more logs.</p> ) 
+                            ||
+                            (this.state.loadingLogs) &&
+                            (<p className="wz-load-extra"> <EuiLoadingSpinner size="m" />&nbsp; Loading...</p> ) 
                         }
-                    </EuiCodeBlock>
+                    </Fragment>
                     )
                     ||
                     (<EuiCallOut
