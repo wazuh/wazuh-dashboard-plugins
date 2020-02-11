@@ -534,10 +534,10 @@ export class WazuhReportingCtrl {
         );
         if (
           typeof ((((agent || {}).data || {}).affected_items || [])[0] || {}).status === 'string' &&
-          ((((agent || {}).data || {}).affected_items || [])[0] || {}).status !== 'Active'
+          ((((agent || {}).data || {}).affected_items || [])[0] || {}).status !== 'active'
         ) {
           this.dd.content.push({
-            text: `Warning. Agent is ${agent.data.status.toLowerCase()}`,
+            text: `Warning. Agent is ${agent.data.affected_items[0].status.toLowerCase()}`,
             style: 'standard'
           });
           this.dd.content.push('\n');
