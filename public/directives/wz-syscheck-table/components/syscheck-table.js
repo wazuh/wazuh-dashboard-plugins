@@ -82,10 +82,10 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 
    async getItems(){
     const files = await this.props.wzReq('GET',`/syscheck/${this.props.agentId}`,this.buildFilter());
-    const formattedFiles =  (((files || {}).data || {}).data || {}).items.map(this.formatFile);
+    const formattedFiles =  (((files || {}).data || {}).data || {}).affected_items.map(this.formatFile);
     this.setState({
       monitoredFiles: formattedFiles,
-      totalItems: (((files || {}).data || {}).data || {}).totalItems - 1,
+      totalItems: (((files || {}).data || {}).data || {}).total_affected_items - 1,
       isProcessing: false,
     });
   }
