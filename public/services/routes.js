@@ -164,6 +164,10 @@ routes
     template: managementTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
   })
+  .when('/manager/:tab?', {
+    template: managementTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
+  })
   .when('/overview/', {
     template: overviewTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
