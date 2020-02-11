@@ -1068,7 +1068,7 @@ export class AgentsController {
       }
       await this.apiReq.request('PUT', `/syscheck`, {
         params: {
-          list_agents: [this.$scope.agent.id]
+          list_agents: this.$scope.agent.id
         }
       });
       this.errorHandler.info(
