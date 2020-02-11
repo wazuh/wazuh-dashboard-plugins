@@ -187,21 +187,21 @@ export class Monitoring {
       );
 
       const clusterName =
-        (((isCluster || {}).data || {}).data || {}).enabled === 'yes'
-          ? await this.apiInterceptor.request('GET', `${getPath(api)}/cluster/local/info`, {},  { idHost: api.id})
-          : false;
-
+      (((isCluster || {}).data || {}).data || {}).enabled === 'yes'
+      ? await this.apiInterceptor.request('GET', `${getPath(api)}/cluster/local/info`, {},  { idHost: api.id})
+      : false;
+      
       api.clusterName =
-        (((clusterName || {}).data   || {}).data || {}).cluster || false;
+        (((clusterName || {}).data   || {}).data || {}).affected_items[0].cluster || false;
 
-      if (!response.error && ((response.data || {}).data || {}).affected_items) {
+      if (response.status === 200 && ((response.data || {}).data || {}).affected_items) {
         log(
           'monitoring:checkAndSaveStatus',
           `Calling checkStatus for API: ${api.url}:${api.port}`,
           'debug'
         );
-        await this.checkStatus(api, response.data.data.affected_items);
-      } else if ((response || {}).error) {
+        await this.checkStatus(api, response.data.data.total_affected_items);
+      } else if (response.status !== 200) {
         const msg = ((response || {}).data || {}).message || false;
         const extraLog =
           msg ||

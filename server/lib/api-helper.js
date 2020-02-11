@@ -30,7 +30,7 @@ export async function fetchAllAgents(api, maxSize, payload, options) {
     let agents = [];
     // Prevents infinite loop if offset gets higher than maxSize
     while (agents.length < maxSize && payload.offset < maxSize) {
-      const response = await this.apiInterceptor(
+      const response = await this.apiInterceptor.request(
         'GET',
         `${getPath(api)}/agents`,
         {params: payload},
