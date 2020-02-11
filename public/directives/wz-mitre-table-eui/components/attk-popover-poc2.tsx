@@ -14,6 +14,7 @@ import {
   EuiFlyoutBody,
   EuiStat,
   EuiPanel,
+  EuiAvatar,
   EuiButton,
   EuiLoadingContent,
   EuiLink,
@@ -330,7 +331,8 @@ export class AttkPopover extends Component {
       );
     }
     const { isOpen } = this.state;
-
+    console.log(this.props.badge)
+    console.log("asdjhasd")
     return (
       <Fragment>
       <EuiPopover
@@ -338,10 +340,10 @@ export class AttkPopover extends Component {
         style={{margin:5, padding: "0px 5px",width:"23%"}}
         button={
           <EuiFacetButton 
-          icon={<EuiBetaBadge
+          icon={!this.props.badge.length ? (<EuiBetaBadge
             label={id}
             title={id}
-          />}
+          />) : (<EuiAvatar size="m" name={this.props.badge} />)}
           style={{width: "100%"}}
           quantity={attacksCount}
           onClick={() => this.setState({isOpen: !isOpen})} >
