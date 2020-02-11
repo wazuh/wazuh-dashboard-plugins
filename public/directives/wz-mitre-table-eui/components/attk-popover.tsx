@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import {
@@ -32,14 +32,11 @@ export class AttkPopover extends Component {
   props!: {
     name: string
     attacksCount: number
-    showEmp: boolean
-    style: object
     id: string
-    field: string
     addFilter: Function 
     addNegativeFilter: Function
   }
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -48,6 +45,7 @@ export class AttkPopover extends Component {
       isFlyoutVisible: false,
     }
   }
+
 
   getFlyoutHeader(){
     const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`;
@@ -84,7 +82,8 @@ export class AttkPopover extends Component {
     }
    }
 
-   componentDidMount(){
+
+  componentDidMount(){
     this.setState({currentTechniqueData: {created: "2017/05/31 23:30:18",
     dataSources: "Packet capture,Process use of network,Process monitoring,Network protocol analysis",
     description: `Credential dumping is the process of obtaining account login and password information, normally in the form of a hash or a clear text password, from the operating system and software. Credentials can then be used to perform Lateral Movement and access restricted information.
@@ -305,16 +304,14 @@ export class AttkPopover extends Component {
     this.setState({ isFlyoutVisible: false });
   }
 
+
   render() {
     const {
-      name,
       attacksCount,
-      showEmp,
-      style,
-      id,
-      field,
+      name,
       addFilter,
-      addNegativeFilter
+      addNegativeFilter,
+      id
     } = this.props;
     let flyout;
     if (this.state.isFlyoutVisible) {
@@ -330,34 +327,31 @@ export class AttkPopover extends Component {
         </EuiFlyout>
       );
     }
-
     const { isOpen } = this.state;
+
     return (
-      <div>
-      <EuiFlexItem  > 
-        <EuiPopover
-          button={
-            <EuiToolTip position="top" content={name}>
-            <div>
-              {( showEmp || attacksCount > 0 ) && (<EuiFacetButton
-                style={{maxWidth: "150px", width: "144px", flexWrap: "wrap", marginLeft: "4px", ...style, border: "1px solid rgba(213, 222, 252, 0.26)"}}
-                onClick={() => this.setState({isOpen: !isOpen})}
-                quantity={attacksCount}>
-                  {name}
-              </EuiFacetButton>)}
-            </div></EuiToolTip>
-          }
-          isOpen={isOpen}
-          closePopover={() => this.setState({isOpen: !isOpen})}
-          >
-            <EuiButtonEmpty 
+      <Fragment>
+      <EuiPopover
+        className="euiButton euiButton--text facet-poc3"
+        style={{margin:5, padding: "0px 5px",width:"23%"}}
+        button={
+          <EuiFacetButton 
+          style={{width: "100%"}}
+          quantity={attacksCount}
+          onClick={() => this.setState({isOpen: !isOpen})} >
+          {name}
+          </EuiFacetButton>
+        } 
+        isOpen={isOpen}
+        closePopover={() => this.setState({isOpen: !isOpen})} >
+                    <EuiButtonEmpty 
               iconType='plusInCircle'
-              onClick={() => addFilter(id, field)} >
+              onClick={() => addFilter(id)} >
                 Filter by this
               </EuiButtonEmpty><br />
             <EuiButtonEmpty 
               iconType='minusInCircle'
-              onClick={() => addNegativeFilter(id, field)} >
+              onClick={() => addNegativeFilter(id)} >
                 Exclude result
               </EuiButtonEmpty><br />
             <EuiButtonEmpty 
@@ -365,11 +359,9 @@ export class AttkPopover extends Component {
               onClick={() => this.openFlyout(name)} >
                 Info
               </EuiButtonEmpty><br />
-        </EuiPopover>
-      </EuiFlexItem>
+      </EuiPopover>
       {flyout}
-      </div>
-    )
+      </Fragment>
+      )
   }
-
 }
