@@ -102,7 +102,6 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
-                <EuiText color="subdued">{'Are you sure?'}</EuiText>
                 <EuiToolTip position="top" content={'Yes'}>
                   <EuiButtonIcon
                     aria-label="Confirm value"
@@ -344,7 +343,7 @@ class WzListEditor extends Component {
               <EuiToolTip position="right" content={'Back to lists'}>
                 <EuiButtonIcon
                   aria-label="Back"
-                  color="subdued"
+                  color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
                   onClick={() => this.props.cleanInfo()}
@@ -446,7 +445,7 @@ class WzListEditor extends Component {
               <EuiToolTip position="right" content={'Back to lists'}>
                 <EuiButtonIcon
                   aria-label="Back"
-                  color="subdued"
+                  color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
                   onClick={() => this.props.cleanInfo()}

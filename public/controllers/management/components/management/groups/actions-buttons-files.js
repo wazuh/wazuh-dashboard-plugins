@@ -253,7 +253,7 @@ class WzGroupsActionButtonsFiles extends Component {
     const groupConfigurationButton = (
       <EuiButtonEmpty
         iconSide="left"
-        iconType="folderClosed"
+        iconType="documentEdit"
         onClick={() => this.showGroupConfiguration()}
       >
         Edit group configuration

@@ -190,7 +190,7 @@ class WzGroupsActionButtonsAgents extends Component {
     const manageAgentsButton = (
       <EuiButtonEmpty
         iconSide="left"
-        iconType="folderClosed"
+        iconType="folderOpen"
         onClick={() => this.showManageAgents()}
       >
         Manage agents

@@ -120,7 +120,7 @@
 
 hosts:
   - default:
-     url: http://localhost
+     url: https://localhost
      port: 55000
      user: foo
      username: wazuh
