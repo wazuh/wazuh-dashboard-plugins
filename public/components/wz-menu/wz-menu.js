@@ -19,6 +19,7 @@ import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
+import WzVisualizePopover from './wz-visualize-popover';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -151,12 +152,22 @@ class WzMenu extends Component {
     });
   }
 
+  visualizePopoverToggle() {
+    this.setState(state => { 
+      return {isVisualizePopoverOpen: !state.isVisualizePopoverOpen }
+    });
+  }
+
   onClickManagementButton() {
     this.setMenuItem('manager');
     this.managementPopoverToggle();
   }
 
 
+  onClickVisualizeButton() {
+    this.setMenuItem('overview');
+    this.visualizePopoverToggle();
+  }
   render() {
 
 
@@ -170,6 +181,16 @@ class WzMenu extends Component {
         <EuiIcon type='managementApp' color='primary' size='m' />Management
       </EuiButtonEmpty>);
 
+    const visualizeButton = (
+      <EuiButtonEmpty
+        className={"wz-menu-button " + (this.state.currentMenuTab === "overview" ? "wz-menu-active" : "")}
+        color="text"
+        onClick={this.onClickVisualizeButton.bind(this)}
+        iconType="arrowDown"
+        iconSide="right">
+        <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
+      </EuiButtonEmpty>);
+      
     return (
       <WzReduxProvider>
         {this.state.showMenu && (
@@ -177,15 +198,28 @@ class WzMenu extends Component {
             <div className="wz-menu-wrapper">
               <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
                 <EuiFlexItem >
-                  <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }}>
+                  <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }} className="visualize-popover">
                     <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/overview"
-                      onClick={() => this.setMenuItem('overview')} >
-                      <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
-                    </EuiButtonEmpty>
-
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/overview"
+                        onClick={() => this.setMenuItem('overview')} >
+                        <EuiIcon type='visualizeApp' color='primary' size='m' />Overview
+                      </EuiButtonEmpty>
+                      <EuiPopover
+                          className="visualize-popover"
+                          id="popoverVisualize"
+                          button={visualizeButton}
+                          panelClassName="visualize-popover"
+                          isOpen={this.state.isVisualizePopoverOpen}
+                          closePopover={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
+                          anchorPosition="downCenter" >
+                          <WzVisualizePopover
+                            visualizePopoverToggle={this.visualizePopoverToggle.bind(this)}
+                            {...this.props} />
+                            
+                        </EuiPopover>
+                          
                     <EuiPopover
                       id="popover"
                       button={managementButton}

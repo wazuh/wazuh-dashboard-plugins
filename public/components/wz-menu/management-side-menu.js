@@ -159,12 +159,16 @@ class WzManagementSideMenu extends Component {
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiSideNav
+              isOpenOnMobile={true}
+              mobileTitle="Administration"
               items={sideNavAdmin}
               style={{ padding: '4px 12px' }}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiSideNav
+              isOpenOnMobile={true}
+              mobileTitle="Status and reports"
               items={sideNavStatus}
               style={{ padding: '4px 12px' }}
             />
