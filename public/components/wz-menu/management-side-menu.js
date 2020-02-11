@@ -16,7 +16,6 @@ import {
   EuiSideNav,
   EuiIcon
 } from '@elastic/eui';
-import chrome from 'ui/chrome';
 import {
   updateRulesetSection,
   updateLoadingStatus,
@@ -78,14 +77,12 @@ class WzManagementSideMenu extends Component {
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     // Fetch the data in the first mount
     if (['rules', 'decoders', 'lists'].includes(this.state.selectedItemName)) {
       this.fetchData(this.managementSections.rules.id);
     }
     this.props.updateManagementSection(this.state.selectedItemName);
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.$route = $injector.get('$route');
   }
 
   /**
@@ -113,8 +110,7 @@ class WzManagementSideMenu extends Component {
 
   clickMenuItem = section => {
     this.props.managementPopoverToggle();
-    window.location.href = `#/manager/?tab=${section}`;
-    this.$route.reload();
+    window.location.href = `#/manager/${section}?tab=${section}`;
   };
 
   createItem = (item, data = {}) => {
