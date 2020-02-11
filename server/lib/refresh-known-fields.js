@@ -24,7 +24,6 @@ export async function checkKnownFields(
   try {
     const usingCredentials = await wzWrapper.usingCredentials();
     const msg = `Security enabled: ${usingCredentials ? 'yes' : 'no'}`;
-    console.log("eee")
      log('initialize:checkKnownFields', msg, 'debug');
 
     const indexPatternList = await wzWrapper.getAllIndexPatterns();
