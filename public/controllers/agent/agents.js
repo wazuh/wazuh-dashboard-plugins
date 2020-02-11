@@ -579,7 +579,8 @@ export class AgentsController {
         const agentInfo = await this.apiReq.request(
           'GET',
           `/agents/${this.$scope.agent.id}`,
-          { params: {
+          { 
+            params: {
               select: 'status'
             }
           }

@@ -458,7 +458,7 @@ export const agentIsSynchronized = async (agent) => {
     `/agents/${agent.id}/group/is_sync`,
     {}
   );
-  return (((isSync || {}).data || {}).affected_items[0] || {}).synced || false;
+  return (((((isSync || {}).data || {}).data || {}).affected_items || [])[0] || {}).synced || false;
 }
 
 /**
