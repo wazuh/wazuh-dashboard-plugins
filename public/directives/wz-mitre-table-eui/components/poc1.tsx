@@ -18,6 +18,7 @@ import {
   EuiFlexGrid,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiBetaBadge,
   EuiPanel,
   EuiTitle,
 } from '@elastic/eui';
@@ -115,13 +116,19 @@ export class Poc1 extends Component {
             {this.renderTactics()}
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiTitle ><h1 style={{marginLeft: 20 }}>Techniques</h1></EuiTitle>
-            <div style={{marginLeft: 20, marginTop: 10, marginBottom: 0}}>
-              <EuiFieldSearch
-                fullWidth={true}
-                onChange={(input) => this.setState({filter: input.target.value.toLocaleLowerCase()})}  /> 
-            </div>
-            <EuiFlexGrid style={{margin: '0px -22px -16px 15px', padding:'16px 0px', overflow:'hidden', overflowY: 'scroll', maxHeight:486}}>
+            <EuiFlexGroup style={{maxHeight: 75}}>
+              <EuiFlexItem grow={false}>
+                <EuiTitle ><h1 style={{marginLeft: 20 }}>Techniques</h1></EuiTitle>                
+              </EuiFlexItem>
+              <EuiFlexItem style={{marginLeft: 0}}>
+                <div>
+                  <EuiFieldSearch
+                    fullWidth={true}
+                    onChange={(input) => this.setState({filter: input.target.value.toLocaleLowerCase()})}  /> 
+                </div>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGrid style={{margin: '0px -22px -16px 15px', overflow:'hidden', overflowY: 'scroll', maxHeight:486}}>
             {this.renderTechniques()}
             </EuiFlexGrid>
           </EuiFlexItem>
