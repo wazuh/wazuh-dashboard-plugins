@@ -99,10 +99,10 @@ export class GroupsController {
       if (this.globalAgent) {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
-        const data = await this.apiReq.request('GET', '/agents/groups/', {
+        const data = await this.apiReq.request('GET', '/agents/groups', {
           limit: 1000,
         });
-        const filtered = data.data.data.items.filter(group => group.name === globalGroup);
+        const filtered = data.data.data.affected_items.filter(group => group.name === globalGroup);
         if (Array.isArray(filtered) && filtered.length) {
           // Load that our group
           this.loadGroup(filtered[0]);
@@ -114,10 +114,10 @@ export class GroupsController {
 
         this.shareAgent.deleteAgent();
       } else {
-        const loadedGroups = await this.apiReq.request('GET', '/agents/groups/', {
+        const loadedGroups = await this.apiReq.request('GET', '/agents/groups', {
           limit: 1000,
         });
-        this.buildGroupsTableProps(loadedGroups.data.data.items);
+        this.buildGroupsTableProps(loadedGroups.data.data.affected_items);
         const configuration = this.wazuhConfig.getConfig();
         this.adminMode = !!(configuration || {}).admin;
         this.load = false;
@@ -154,7 +154,7 @@ export class GroupsController {
       const count = await this.apiReq.request('GET', `/agents/groups/${group.name}/files`, {
         limit: 1,
       });
-      this.totalFiles = count.data.data.totalItems;
+      this.totalFiles = count.data.data.total_affected_items;
       this.fileViewer = false;
       this.currentGroup = group;
       // Set the name to the react tables
@@ -199,8 +199,8 @@ export class GroupsController {
         `/agents/groups/${this.currentGroup.name}`,
         params
       );
-      this.totalSelectedAgents = result.data.data.totalItems;
-      const mapped = result.data.data.items.map(item => {
+      this.totalSelectedAgents = result.data.data.total_affected_items;
+      const mapped = result.data.data.affected_items.map(item => {
         return { key: item.id, value: item.name };
       });
       this.firstSelectedList = mapped;
@@ -236,11 +236,11 @@ export class GroupsController {
         this.availableAgents.offset = 0;
       }
 
-      const req = await this.apiReq.request('GET', '/agents/', params);
+      const req = await this.apiReq.request('GET', '/agents', params);
 
-      this.totalAgents = req.data.data.totalItems;
+      this.totalAgents = req.data.data.total_affected_items;
 
-      const mapped = req.data.data.items
+      const mapped = req.data.data.affected_items
         .filter(item => {
           return (
             this.selectedAgents.data.filter(selected => {
@@ -363,22 +363,22 @@ export class GroupsController {
       this.multipleSelectorLoading = true;
       if (itemsToSave.addedIds.length) {
         const addResponse = await this.apiReq.request(
-          'POST',
+          'PUT',
           `/agents/group/${this.currentGroup.name}`,
-          { ids: itemsToSave.addedIds }
+          { list_agents: itemsToSave.addedIds }
         );
-        if (addResponse.data.data.failed_ids) {
-          failedIds.push(...addResponse.data.data.failed_ids);
+        if (addResponse.data.data.total_failed_items) {
+          failedIds.push(...addResponse.data.data.failed_items);
         }
       }
       if (itemsToSave.deletedIds.length) {
         const deleteResponse = await this.apiReq.request(
           'DELETE',
           `/agents/group/${this.currentGroup.name}`,
-          { ids: itemsToSave.deletedIds.toString() }
+          { list_agents: itemsToSave.deletedIds.toString() }
         );
-        if (deleteResponse.data.data.failed_ids) {
-          failedIds.push(...deleteResponse.data.data.failed_ids);
+        if (deleteResponse.data.data.total_failed_items) {
+          failedIds.push(...deleteResponse.data.data.failed_items);
         }
       }
 

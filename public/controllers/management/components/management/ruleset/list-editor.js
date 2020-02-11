@@ -48,7 +48,7 @@ class WzListEditor extends Component {
       editingValue: '',
       newListName: '',
     };
-
+    this.tmpListName = ""
     this.items = {};
 
     this.rulesetHandler = RulesetHandler;
@@ -102,7 +102,6 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
-                <EuiText color="subdued">{'Are you sure?'}</EuiText>
                 <EuiToolTip position="top" content={'Yes'}>
                   <EuiButtonIcon
                     aria-label="Confirm value"
@@ -224,12 +223,16 @@ class WzListEditor extends Component {
         return;
       }
       this.setState({ isSaving: true });
-      await this.rulesetHandler.sendCdbList(name, path, raw, overwrite);
+      if(this.tmpListName){
+        addingNew = false;
+      }
+      await this.rulesetHandler.sendCdbList(name, path, raw, overwrite, addingNew);
       if (!addingNew) {
         const result = await this.rulesetHandler.getCdbList(`${path}/${name}`);
         const file = { name: name, content: result, path: path };
         this.props.updateListContent(file);
         this.showToast('success', 'Success', 'CBD List successfully created', 3000);
+        this.tmpListName = name;
       } else {
         this.showToast('success', 'Success', 'CBD List updated', 3000);
       }
@@ -340,7 +343,7 @@ class WzListEditor extends Component {
               <EuiToolTip position="right" content={'Back to lists'}>
                 <EuiButtonIcon
                   aria-label="Back"
-                  color="subdued"
+                  color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
                   onClick={() => this.props.cleanInfo()}
@@ -442,7 +445,7 @@ class WzListEditor extends Component {
               <EuiToolTip position="right" content={'Back to lists'}>
                 <EuiButtonIcon
                   aria-label="Back"
-                  color="subdued"
+                  color="primary"
                   iconSize="l"
                   iconType="arrowLeft"
                   onClick={() => this.props.cleanInfo()}

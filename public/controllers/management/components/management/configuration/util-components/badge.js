@@ -10,8 +10,7 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { Component } from "react";
 
 import {
   EuiBadge
@@ -34,7 +33,7 @@ class WzBadge extends Component{
         if(nextProps.synchronized){
           return { color: 'secondary', content: 'SYNCHRONIZED'};
         }else{
-          return { color: 'secondary', content: 'NOT SYNCHRONIZED'};
+          return { color: 'danger', content: 'NOT SYNCHRONIZED'};
         }
       }else if(nextProps.color && nextProps.content){
         return { color: nextProps.color, content: nextProps.content };

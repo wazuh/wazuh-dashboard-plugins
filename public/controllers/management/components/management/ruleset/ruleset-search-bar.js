@@ -38,7 +38,7 @@ class WzRulesetSearchBar extends Component {
         }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/groups', filter);
-        return (((result || {}).data || {}).data || {}).items;
+        return (((result || {}).data || {}).data || {}).affected_items;
       },
     },
     {
@@ -56,7 +56,7 @@ class WzRulesetSearchBar extends Component {
         }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/files', filter);
-        return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
+        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.file});
       },
     },
     {
@@ -79,7 +79,7 @@ class WzRulesetSearchBar extends Component {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/hipaa', {});
         console.log(result.data)
-        return (((result || {}).data || {}).data || {}).items;
+        return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
     {
@@ -89,7 +89,7 @@ class WzRulesetSearchBar extends Component {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/gdpr', {});
         console.log(result.data)
-        return (((result || {}).data || {}).data || {}).items;
+        return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
     {
@@ -99,7 +99,7 @@ class WzRulesetSearchBar extends Component {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/nist-800-53', {});
         console.log(result.data)
-        return (((result || {}).data || {}).data || {}).items;
+        return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
     {
@@ -109,7 +109,7 @@ class WzRulesetSearchBar extends Component {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/gpg13', {});
         console.log(result.data)
-        return (((result || {}).data || {}).data || {}).items;
+        return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
     {
@@ -119,7 +119,7 @@ class WzRulesetSearchBar extends Component {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/pci', {});
         console.log(result.data)
-        return (((result || {}).data || {}).data || {}).items;
+        return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
   ]
@@ -134,7 +134,7 @@ class WzRulesetSearchBar extends Component {
         }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/files', filter);
-        return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
+        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.file});
       },
     },
   ];
@@ -150,7 +150,7 @@ class WzRulesetSearchBar extends Component {
         }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/decoders/files', filter);
-        return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
+        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.file});
       },
     },
     {
@@ -193,7 +193,7 @@ class WzRulesetSearchBar extends Component {
   
 
   render() {
-    const { section, showingFiles } = this.props.state;
+    const { section, showingFiles, filters } = this.props.state;
     const type = showingFiles ? 'files' : 'items';
     const apiSuggests = this.apiSuggestsItems[type][section];
     const buttonOptions = this.buttonOptions[section];
@@ -203,7 +203,8 @@ class WzRulesetSearchBar extends Component {
       onInputChange={this.props.updateFilters}
       placeholder={"Add filter or search"} 
       buttonOptions={buttonOptions}
-      noDeleteFiltersOnUpdateSuggests={true} />
+      noDeleteFiltersOnUpdateSuggests={true}
+      initFilters={filters} />
     )
   }
 }

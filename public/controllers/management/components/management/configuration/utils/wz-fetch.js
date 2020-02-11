@@ -46,13 +46,13 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false, 
       }
       try {
         const url = node
-          ? `/cluster/${node}/config/${component}/${configuration}`
+          ? `/cluster/${node}/configuration/${component}/${configuration}`
           : !node && agentId === '000'
-          ? `/manager/config/${component}/${configuration}`
+          ? `/manager/configuration/${component}/${configuration}`
           : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
-        result[`${component}-${configuration}`] = partialResult.data.data;
+        result[`${component}-${configuration}`] = partialResult.data.data.total_affected_items !== 0 ? partialResult.data.data.affected_items[0] : {};
       } catch (error) {
         result[`${component}-${configuration}`] = await handleError(error, 'Fetch configuration', updateWazuhNotReadyYet);
       }
@@ -171,7 +171,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
      while (tries--) {
       await delay(1200);
       try{
-        const result = await WzRequest.apiReq('GET', '/ping', {});
+        const result = await WzRequest.apiReq('GET', '/ping', {}); //TODO: ¿API 4.0?
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
           updateWazuhNotReadyYet('');
@@ -212,7 +212,7 @@ export const clusterReq = async () => {
  */
 export const fetchFile = async (selectedNode) => {
   try {
-    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {}; // TODO: Check, when FIX ISSUE /cluster/status
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     const data = await WzRequest.apiReq(
@@ -223,7 +223,7 @@ export const fetchFile = async (selectedNode) => {
       { path: 'etc/ossec.conf' }
     );
 
-    let xml = ((data || {}).data || {}).data || false;
+    let xml = ((data || {}).data || {}).contents || false;
 
     if (!xml) {
       throw new Error('Could not fetch configuration file');
@@ -268,11 +268,9 @@ export const restartManager = async () => {
       `/manager/configuration/validation`,
       {}
     );
-
-    const data = ((validationError || {}).data || {}).data || {};
-    const isOk = data.status === 'OK';
-    if (!isOk && Array.isArray(data.details)) {
-      const str = data.details.join();
+    const isOk = validationError.status === 'OK';
+    if (!isOk && validationError.detail) {
+      const str = validationError.detail;
       throw new Error(str);
     }
     const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
@@ -294,10 +292,9 @@ export const restartCluster = async () => {
       {}
     );
 
-    const data = ((validationError || {}).data || {}).data || {};
-    const isOk = data.status === 'OK';
-    if (!isOk && Array.isArray(data.details)) {
-      const str = data.details.join();
+    const isOk = validationError.status === 'OK';
+    if (!isOk && validationError.detail) {
+      const str = validationError.detail;
       throw new Error(str);
     }
     // this.performClusterRestart(); // TODO: convert AngularJS to React
@@ -317,19 +314,18 @@ export const restartNode = async (node) => {
   try {
     const validationError = await WzRequest.apiReq(
       'GET',
-      `/cluster/${node}/configuration/validation`,
+      `/cluster/configuration/validation`,
       {}
     );
 
-    const data = ((validationError || {}).data || {}).data || {};
-    const isOk = data.status === 'OK';
-    if (!isOk && Array.isArray(data.details)) {
-      const str = data.details.join();
+    const isOk = validationError.status === 200;
+    if (!isOk && validationError.detail) {
+      const str = validationError.detail;
       throw new Error(str);
     }
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/${node}/restart`,
+      `/cluster/restart`,
       {}
     );
 
@@ -361,7 +357,7 @@ export const saveConfiguration = async (selectedNode, xml) => {
 export const saveNodeConfiguration = async (node, content) => {
   try {
     const result = await WzRequest.apiReq(
-      'POST',
+      'PUT',
       `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
       { content, origin: 'xmleditor' }
     );
@@ -380,7 +376,7 @@ export const saveFileCluster = async (text, node) => {
   const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq(
-      'POST',
+      'PUT',
       `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
       { content: xml, origin: 'xmleditor' }
     );
@@ -394,11 +390,11 @@ export const saveFileCluster = async (text, node) => {
  * Save text to ossec.conf manager file
  * @param {string} text Text to save
  */
-export const saveFileManager = async (text) => {
+export const saveFileManager = async (text) => { //TODO: Check when manager
   const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq(
-      'POST',
+      'PUT',
       `/manager/files?path=etc/ossec.conf&overwrite=true`,
       { content: xml, origin: 'xmleditor' }
     );
@@ -429,7 +425,7 @@ export const validateAfterSent = async (node = false) => {
     if (node && isCluster) {
       validation = await WzRequest.apiReq(
         'GET',
-        `/cluster/${node}/configuration/validation`,
+        `/cluster/configuration/validation`,
         {}
       );
     } else {
@@ -462,7 +458,7 @@ export const agentIsSynchronized = async (agent) => {
     `/agents/${agent.id}/group/is_sync`,
     {}
   );
-  return (((isSync || {}).data || {}).data || {}).synced || false;
+  return (((((isSync || {}).data || {}).data || {}).affected_items || [])[0] || {}).synced || false;
 }
 
 /**

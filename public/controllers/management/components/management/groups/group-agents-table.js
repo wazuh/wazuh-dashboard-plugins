@@ -67,11 +67,11 @@ class WzGroupAgentsTable extends Component {
         this.props.state.itemDetail.name,
         this.buildFilter()
       );
-      const { items, totalItems } = ((rawItems || {}).data || {}).data;
+      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
       this.setState({
-        items,
-        totalItems,
+        items: affected_items,
+        totalItems : total_affected_items,
         isProcessing: false,
       });
       this.props.updateIsProcessing(false);
@@ -190,7 +190,7 @@ class WzGroupAgentsTable extends Component {
       completed => {
         this.props.updateIsProcessing(true);
         this.props.updateLoadingStatus(false);
-        this.showToast('success', 'Success', 'Deleted correctly', 3000);
+        this.showToast('success', 'Success', 'Deleted successfully', 3000);
       },
       error => {
         this.props.updateIsProcessing(true);

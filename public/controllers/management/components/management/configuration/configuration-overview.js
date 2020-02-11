@@ -93,7 +93,7 @@ class WzConfigurationOverview extends Component{
 												Edit configuration
 											</EuiButtonEmpty>
 										</Fragment>
-									) : this.props.agent.status === 'Active' ? 
+									) : this.props.agent.status === 'active' ? 
 									<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/>
 									: null}
 								</EuiFlexItem>

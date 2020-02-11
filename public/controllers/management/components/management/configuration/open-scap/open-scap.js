@@ -11,7 +11,6 @@
 */
 
 import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
 
 import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import WzConfigurationOpenSCAPGeneral from './open-scap-general';

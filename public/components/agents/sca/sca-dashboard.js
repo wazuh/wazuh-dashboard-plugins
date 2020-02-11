@@ -136,8 +136,8 @@ export class ScaDashboard extends Component {
     try {
       this.setState({ loading: true });
       this.lookingPolicy = false;
-      const policies = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}`, {});
-      this.policies = (((policies || {}).data || {}).data || {}).items || [];
+      const policies = await WzRequest.apiReq('GET', `/sca/${this.state.agent.id}`, {});
+      this.policies = (((policies || {}).data || {}).data || {}).affected_items || [];
       const models = [];
       for (let i = 0; i < this.policies.length; i++) {
         models.push({
@@ -164,7 +164,7 @@ export class ScaDashboard extends Component {
     this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       const checks = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}/checks/${policy.policy_id}`, {});
-      this.checks = (((checks || {}).data || {}).data || {}).items || [];
+      this.checks = (((checks || {}).data || {}).data || {}).affected_items || [];
     }
     this.setState({ lookingPolicy: policy, loadingPolicy: false });
   }

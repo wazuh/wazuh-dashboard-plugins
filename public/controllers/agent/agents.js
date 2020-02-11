@@ -200,12 +200,12 @@ export class AgentsController {
     this.$scope.switchTab = (tab, force = false) => this.switchTab(tab, force);
 
     this.$scope.getAgentStatusClass = agentStatus =>
-      agentStatus === 'Active' ? 'teal' : 'red';
+      agentStatus === 'active' ? 'teal' : 'red';
 
     this.$scope.formatAgentStatus = agentStatus => {
-      return ['Active', 'Disconnected'].includes(agentStatus)
+      return ['active', 'disconnected'].includes(agentStatus)
         ? agentStatus
-        : 'Never connected';
+        : 'never connected';
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
@@ -259,12 +259,12 @@ export class AgentsController {
         const result = ((data || {}).data || {}).data || false;
         const failed =
           result &&
-          Array.isArray(result.failed_ids) &&
-          result.failed_ids.length;
+          Array.isArray(result.failed_items) &&
+          result.failed_items.length;
         if (failed) {
-          throw new Error(result.failed_ids[0].error.message);
+          throw new Error(result.failed_items[0].detail);
         } else if (result) {
-          this.errorHandler.info(result.msg);
+          this.errorHandler.info(result.message);
         } else {
           throw new Error('Unexpected error upgrading agent');
         }
@@ -436,9 +436,9 @@ export class AgentsController {
           this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
         )
         .then(agent => {
-          this.$scope.agent.group = agent.data.data.group;
+          this.$scope.agent.group = agent.data.data.affected_items[0].group;
           this.$scope.groups = this.$scope.groups.filter(
-            item => !agent.data.data.group.includes(item)
+            item => !agent.data.data.affected_items[0].group.includes(item)
           );
           this.$scope.addingGroupToAgent = false;
           this.$scope.editGroup = false;
@@ -579,10 +579,14 @@ export class AgentsController {
         const agentInfo = await this.apiReq.request(
           'GET',
           `/agents/${this.$scope.agent.id}`,
-          { select: 'status' }
+          { 
+            params: {
+              select: 'status'
+            }
+          }
         );
         this.$scope.agent.status =
-          (((agentInfo || {}).data || {}).data || {}).status ||
+          (((((agentInfo || {}).data || {}).data || {}).affected_items || [])[0] || {}).status ||
           this.$scope.agent.status;
       } catch (error) {} // eslint-disable-line
     }
@@ -606,7 +610,7 @@ export class AgentsController {
       }
 
       if (tab === 'mitre') {
-        const result = await this.apiReq.request('GET', '/rules/mitre', {});
+        const result = await this.apiReq.request('GET', '/rules/mitre', {}); //TODO: adapt to API 4.0 when Core merges Mitre.
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
 
         this.$scope.mitreCardsSliderProps = {
@@ -821,7 +825,7 @@ export class AgentsController {
       {}
     );
     this.$scope.isSynchronized =
-      (((isSync || {}).data || {}).data || {}).synced || false;
+      (((((isSync || {}).data || {}).data || {}).affected_items || [])[0] || {}).synced || false;
     this.$scope.$applyAsync();
   }
 
@@ -835,7 +839,6 @@ export class AgentsController {
         'GET',
         `/api/syscollector/${id}`
       );
-
       this.$scope.syscollector = (syscollectorData || {}).data || {};
 
       return;
@@ -861,8 +864,7 @@ export class AgentsController {
 
       const data = await this.apiReq.request('GET', `/agents/${id}`, {});
 
-      const agentInfo = ((data || {}).data || {}).data || false;
-
+      const agentInfo = ((((data || {}).data || {}).data || {}).affected_items || [])[0] || false;
       // Agent
       this.$scope.agent = agentInfo;
       if (agentInfo && this.$scope.agent.os) {
@@ -888,7 +890,7 @@ export class AgentsController {
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});
-      this.$scope.groups = groups.data.data.items
+      this.$scope.groups = groups.data.data.affected_items
         .map(item => item.name)
         .filter(
           item =>
@@ -1039,7 +1041,7 @@ export class AgentsController {
 
   async launchRootcheckScan() {
     try {
-      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      const isActive = ((this.$scope.agent || {}).status || '') === 'active';
       if (!isActive) {
         throw new Error('Agent is not active');
       }
@@ -1060,11 +1062,15 @@ export class AgentsController {
 
   async launchSyscheckScan() {
     try {
-      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      const isActive = ((this.$scope.agent || {}).status || '') === 'active';
       if (!isActive) {
         throw new Error('Agent is not active');
       }
-      await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
+      await this.apiReq.request('PUT', `/syscheck`, {
+        params: {
+          list_agents: this.$scope.agent.id
+        }
+      });
       this.errorHandler.info(
         `FIM scan launched successfully on agent ${this.$scope.agent.id}`,
         ''

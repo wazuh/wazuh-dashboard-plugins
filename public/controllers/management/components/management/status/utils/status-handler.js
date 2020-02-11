@@ -18,7 +18,7 @@ export default class StatusHandler {
    */
   static async agentsSummary() {
     try {
-      const result = await WzRequest.apiReq('GET', `/agents/summary`, {});
+      const result = await WzRequest.apiReq('GET', `/agents/summary/status`, {});
       return result;
     } catch (error) {
       return Promise.reject(error);

@@ -91,10 +91,9 @@ export class AgentsPreviewController {
     if (loc && loc.tab) {
       this.submenuNavItem = loc.tab;
     }
-
-    const summaryData = await this.apiReq.request('GET', '/agents/summary', {});
+    const summaryData = await this.apiReq.request('GET', '/agents/summary/status', {});
     this.summary = summaryData.data.data;
-    if (this.summary.Total - 1 === 0) {
+    if (this.summary.total - 1 === 0) {
       if (this.addingNewAgent === undefined) {
         this.addNewAgent(true);
       }
@@ -294,9 +293,9 @@ export class AgentsPreviewController {
    */
   async getWazuhVersion() {
     try {
-      const data = await this.apiReq.request('GET', '/version', {});
-      const result = ((data || {}).data || {}).data;
-      return result ? result.substr(1) : version;
+      const data = await this.apiReq.request('GET', '//', {});
+      const result = (data || {}).data || {};
+      return result.api_version
     } catch (error) {
       return version;
     }

@@ -13,10 +13,6 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
-import {
-  
-} from "@elastic/eui";
-
 import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';

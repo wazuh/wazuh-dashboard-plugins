@@ -140,7 +140,7 @@ class WzGroupsActionButtonsFiles extends Component {
   async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
     const result = await this.groupsHandler.getFileContent(
-      `/agents/groups/${itemDetail.name}/files/agent.conf`
+      `/agents/groups/${itemDetail.name}/files/agent.conf/xml`
     );
 
     const data = this.autoFormat(result);
@@ -200,7 +200,7 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast('success', 'Success', 'The group has been created correctly', 2000);
+      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -232,7 +232,7 @@ class WzGroupsActionButtonsFiles extends Component {
         2000
       );
     } catch (error) {
-      this.showToast('danger', 'Error', `Error when exporting the CSV file: ${error}`, 2000);
+      this.showToast('danger', 'Error', `Error exporting the CSV file: ${error}`, 2000);
     }
     this.setState({ generatingCsv: false });
   }
@@ -253,7 +253,7 @@ class WzGroupsActionButtonsFiles extends Component {
     const groupConfigurationButton = (
       <EuiButtonEmpty
         iconSide="left"
-        iconType="folderClosed"
+        iconType="documentEdit"
         onClick={() => this.showGroupConfiguration()}
       >
         Edit group configuration

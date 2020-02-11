@@ -28,6 +28,7 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
+import { WzRequest } from '../../../react-services/wz-request';
 
 export class AgentsTable extends Component {
 
@@ -112,16 +113,15 @@ export class AgentsTable extends Component {
   }
 
   async getItems() {
-    const rawAgents = await this.props.wzReq(
+    const rawAgents = await WzRequest.apiReq(
       'GET',
       '/agents',
-      this.buildFilter()
+      { params: this.buildFilter()}
     );
-
-    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent.bind(this));
+    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(this.formatAgent.bind(this));
     this.setState({
       agents: formatedAgents,
-      totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
+      totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
       isProcessing: false,
       isLoading: false,
     });
@@ -251,20 +251,24 @@ export class AgentsTable extends Component {
 
   }
 
+  parseAgentStatus(status){
+    return status === 'never_connected' ? 'never connected' : status
+  }
+
   addHealthStatusRender(status) {
     const color = (status) => {
       if (status.toLowerCase() === 'active') {
         return 'success';
       } else if (status.toLowerCase() === 'disconnected') {
         return 'danger';
-      } else if (status.toLowerCase() === 'never connected') {
+      } else if (status.toLowerCase() === 'never_connected') {
         return 'subdued';
       }
     };
 
     return (
       <EuiHealth color={color(status)}>
-        {status}
+        {this.parseAgentStatus(status)}
       </EuiHealth>
     );
   }
@@ -342,7 +346,7 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
-        render: this.addHealthStatusRender,
+        render: this.addHealthStatusRender.bind(this),
       },
       {
         align: 'right',
@@ -411,8 +415,8 @@ export class AgentsTable extends Component {
   }
 
   async filterBarModelGroups() {
-    const rawGroups = await this.props.wzReq('GET', '/agents/groups', {});
-    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
+    const rawGroups = await WzRequest.apiReq('GET', '/agents/groups', {});
+    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).affected_items;
     const groups = itemsGroups
       .filter((item) => { return item.count > 0; })
       .map((item) => { return { label: item.name, group: 'group' } });
@@ -423,15 +427,17 @@ export class AgentsTable extends Component {
   }
 
   async filterBarModelOs() {
-    const rawOs = await this.props.wzReq(
+    const rawOs = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        'fields': 'os.name,os.version',
-        'q': 'id!=000'
+      '/agents/stats/distinct',
+      { 
+        params: {
+          'fields': 'os.name,os.version',
+          'q': 'id!=000'
+        }
       }
     );
-    const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
+    const itemsOs = (((rawOs || {}).data || {}).data || {}).affected_items;
     const os = itemsOs
       .filter((item) => { return Object.keys(item).includes('os') })
       .map((item) => {
@@ -449,15 +455,17 @@ export class AgentsTable extends Component {
   }
 
   async filterBarModelOsPlatform() {
-    const rawOsPlatform = await this.props.wzReq(
+    const rawOsPlatform = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        'fields': 'os.platform',
-        'q': 'id!=000'
+      '/agents/stats/distinct',
+      { 
+        params: {
+          'fields': 'os.platform',
+          'q': 'id!=000'
+        }
       }
     );
-    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {}).items;
+    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {}).affected_items;
     const osPlatform = itemsOsPlatform
       .filter((item) => { return Object.keys(item).includes('os') })
       .map((item) => {
@@ -475,15 +483,17 @@ export class AgentsTable extends Component {
   }
 
   async filterBarModelNodes() {
-    const rawNodes = await this.props.wzReq(
+    const rawNodes = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        'fields': 'node_name',
-        'q': 'id!=000;node_name!=unknown'
+      '/agents/stats/distinct',
+      { 
+        params: {
+          'fields': 'node_name',
+          'q': 'id!=000;node_name!=unknown'
+        }
       }
     );
-    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
+    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).affected_items;
     const nodes = itemsNodes
       .filter((item) => { return Object.keys(item).includes('node_name') })
       .map((item) => {
@@ -501,15 +511,17 @@ export class AgentsTable extends Component {
   }
 
   async filterBarModelWazuhVersion() {
-    const rawVersions = await this.props.wzReq(
+    const rawVersions = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        'fields': 'version',
-        'q': 'id!=000'
+      '/agents/stats/distinct',
+      { 
+        params: {
+          'fields': 'version',
+          'q': 'id!=000'
+        }
       }
     );
-    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
+    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).affected_items;
     const versions = itemsVersions
       .filter((item) => { return Object.keys(item).includes('version') })
       .map((item) => {

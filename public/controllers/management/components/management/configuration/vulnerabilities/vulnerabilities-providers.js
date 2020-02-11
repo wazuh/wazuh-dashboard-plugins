@@ -11,12 +11,9 @@
 */
 
 import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
 
 import {
   EuiBasicTable,
-  EuiFlexGroup,
-  EuiFlexItem
 } from "@elastic/eui";
 
 import WzNoConfig from "../util-components/no-config";

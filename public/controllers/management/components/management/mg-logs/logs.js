@@ -97,8 +97,12 @@ export default class WzLogs extends Component {
                 path,
                 {}
             );
-            const formattedData = ((data || {}).data || {}).data || {}
-            const daemonsList = [ ...['all'], ...Object.keys(formattedData)]
+            const formattedData = (((data || {}).data || {}).data || {}).affected_items || [];
+            const formattedDataObj = formattedData.map( (item,idx) => {
+                return  Object.keys(item); 
+            });
+
+            const daemonsList = [ 'all', ...formattedDataObj ];
             this.setState({daemonsList})
         }catch(err){
             throw new Error("Error obtaining daemons list.");
@@ -145,8 +149,8 @@ export default class WzLogs extends Component {
                     logsPath,
                     this.buildFilters(customOffset)
                 )
-                const resultItems = (((tmpResult || {}).data).data || {}).items;
-                totalItems = (((tmpResult || {}).data).data || {}).totalItems;
+                const resultItems = (((tmpResult || {}).data).data || {}).affected_items;
+                totalItems = (((tmpResult || {}).data).data || {}).total_affected_items;
                 result = this.parseLogsToText(resultItems) || "";
             } catch(err){
                 result = "";
@@ -159,8 +163,8 @@ export default class WzLogs extends Component {
                     logsPath,
                     this.buildFilters(customOffset)
                 )
-                const resultItems = (((tmpResult || {}).data).data || {}).items
-                totalItems = (((tmpResult || {}).data).data || {}).totalItems;
+                const resultItems = (((tmpResult || {}).data).data || {}).affected_items
+                totalItems = (((tmpResult || {}).data).data || {}).total_affected_items;
                 result = this.parseLogsToText(resultItems) || "";
             }catch(err) {
                 result = "";
@@ -194,11 +198,11 @@ export default class WzLogs extends Component {
                 let nodeList = "";
                 let selectedNode = "";
                 const nodeListTmp = await ApiRequest.request('GET', '/cluster/nodes', {});
-                if (Array.isArray((((nodeListTmp || {}).data || {}).data || {}).items)) {
-                    nodeList = nodeListTmp.data.data.items
+                if (Array.isArray((((nodeListTmp || {}).data || {}).data || {}).affected_items)) {
+                    nodeList = nodeListTmp.data.data.affected_items
                     .map(item => item.name)
                     .reverse();
-                    selectedNode = nodeListTmp.data.data.items.filter(
+                    selectedNode = nodeListTmp.data.data.affected_items.filter(
                     item => item.type === 'master'
                     )[0].name;
                 }
@@ -222,11 +226,12 @@ export default class WzLogs extends Component {
     getLogLevelOptions(){
         return [
             { value: 'all', text: 'All log levels' },
-            { value: 'INFO', text: 'Info' },
-            { value: 'ERROR', text: 'Error' },
-            { value: 'WARNING', text: 'Warning' },
-            { value: 'CRITICAL', text: 'Critical' },
-            { value: 'DEBUG', text: 'Debug' },
+            { value: 'info', text: 'Info' },
+            { value: 'error', text: 'Error' },
+            { value: 'warning', text: 'Warning' },
+            { value: 'critical', text: 'Critical' },
+            { value: 'debug', text: 'Debug' },
+            { value: 'debug2', text: 'Debug 2' }
         ];  
     }
 

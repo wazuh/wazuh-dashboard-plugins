@@ -38,19 +38,7 @@ class WzDecoderInfo extends Component {
         field: 'name',
         name: 'Name',
         align: 'left',
-        sortable: true,
-        render: value => {
-          return (
-            <EuiToolTip position="top" content={`Show ${value} decoder information`}>
-              <EuiLink onClick={() => {
-                this.changeBetweenDecoders(value);
-              }
-              }>
-                {value}
-              </EuiLink>
-            </EuiToolTip>
-          )
-        }
+        sortable: true
       },
       {
         field: 'details.program_name',
@@ -92,12 +80,6 @@ class WzDecoderInfo extends Component {
     ];
   }
 
-
-  componentWillUnmount() {
-    // When the component is going to be unmounted its info is clear
-    this.props.cleanInfo();
-  }
-  
   /**
    * Clean the existing filters and sets the new ones and back to the previous section
    */
@@ -210,12 +192,19 @@ class WzDecoderInfo extends Component {
   render() {
     const { decoderInfo, isLoading } = this.props.state;
     const currentDecoder = (this.state && this.state.currentDecoder) ? this.state.currentDecoder : decoderInfo.current;
-    const decoders = decoderInfo.items;
+    const decoders = decoderInfo.affected_items;
     const currentDecoderArr = decoders.filter(r => { return r.name === currentDecoder });
     const currentDecoderInfo = currentDecoderArr[0];
     const { position, details, file, name, path } = currentDecoderInfo;
     const columns = this.columns;
 
+    const onClickRow = item => {
+      return {
+        onClick: () => {
+          this.changeBetweenDecoders(item.name);
+        },
+      };
+    };
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -244,18 +233,20 @@ class WzDecoderInfo extends Component {
             <EuiFlexGroup>
               {/* General info */}
               <EuiFlexItem>
-                <EuiPanel paddingSize="s">
-                  <EuiText color="subdued">Information</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
+                <EuiPanel paddingSize="m">
+                  <EuiTitle size={'s'}>
+                    <h3>Information</h3>
+                  </EuiTitle>
                   <EuiSpacer size="s" />
                   {this.renderInfo(position, file, path)}
                 </EuiPanel>
               </EuiFlexItem>
               {/* Details */}
               <EuiFlexItem>
-                <EuiPanel paddingSize="s">
-                  <EuiText color="subdued">Details</EuiText>
-                  <EuiSpacer size="xs" className="subdued-background" />
+                <EuiPanel paddingSize="m">
+                  <EuiTitle size={'s'}>
+                    <h3>Details</h3>
+                  </EuiTitle>
                   <EuiSpacer size="s" />
                   {this.renderDetails(details)}
                 </EuiPanel>
@@ -283,6 +274,7 @@ class WzDecoderInfo extends Component {
                         itemId="id"
                         items={decoders}
                         columns={columns}
+                        rowProps={onClickRow}
                         pagination={true}
                         loading={isLoading}
                         sorting={true}

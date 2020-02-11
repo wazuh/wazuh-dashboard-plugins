@@ -47,6 +47,7 @@ export default class WzSearchBar extends Component {
     searchDisable?: boolean
     defaultFormat?: string
     placeholder?: string
+    initFilters?: {}
     noDeleteFiltersOnUpdateSuggests?: boolean
   };
 
@@ -60,7 +61,7 @@ export default class WzSearchBar extends Component {
       inputValue: '',
       isInvalid: false,
       status: 'unchanged',
-      filters: {},
+      filters: props.initFilters || {},
       isPopoverOpen: false,
     }
   }

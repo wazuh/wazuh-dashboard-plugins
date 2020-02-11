@@ -217,7 +217,8 @@ export default class RulesetColumns {
                     <EuiButtonIcon
                       aria-label="Edit content"
                       iconType="pencil"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
                         const file = { name: item.name, content: result, path: item.path };
                         this.tableProps.updateListContent(file);
@@ -225,16 +226,17 @@ export default class RulesetColumns {
                       color="primary"
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}/${item.name}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
+                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         this.tableProps.updateListItemsForRemove([item]);
                         this.tableProps.updateShowModal(true);
                       }}
                       color="danger"
-                      disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
+                      disabled={defaultItems.indexOf(`${item.path}`) !== -1}
                     />
                   </EuiToolTip>
                 </div>
@@ -264,6 +266,8 @@ export default class RulesetColumns {
           <EuiBadge
             title={null}
             color="hollow"
+            onClick={(ev) => ev.stopPropagation()}
+            onClickAriaLabel={field.toUpperCase()}
             style={{ margin: "1px 2px" }}
           >{field.toUpperCase()}</EuiBadge>
         </EuiToolTip>
@@ -275,8 +279,7 @@ export default class RulesetColumns {
           badgeList.push(buildBadge(field))
         }
       }
-    } catch (error) {
-    }
+    } catch (error) { }
 
     return <div>{badgeList}</div>;
   }

@@ -126,7 +126,7 @@ class WzEditorConfiguration extends Component{
                   {restart && !restarting ? 
                     (<EuiFlexGroup alignItems='center'>
                       <EuiFlexItem>
-                        <span><strong>{clusterNodeSelected}</strong> will be restarted</span>
+                        <span><strong>{clusterNodeSelected || 'Manager'}</strong> will be restarted</span>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiButtonEmpty onClick={() => this.toggleRestart()}>Cancel</EuiButtonEmpty>
@@ -144,9 +144,9 @@ class WzEditorConfiguration extends Component{
                 </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size='s'/>
+            <EuiSpacer size='m'/>
             <EuiText>
-              Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected}</span>
+              Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected || 'Manager'}</span>
               {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
             </EuiText>
             {infoChangesAfterRestart && (

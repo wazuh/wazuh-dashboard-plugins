@@ -37,10 +37,10 @@ export class ConfigurationGroupsController {
     try {
       const data = await this.apiReq.request(
         'GET',
-        `/agents/groups/${this.$scope.selectedItem.name}/files/agent.conf`,
-        { format: 'xml' }
+        `/agents/groups/${this.$scope.selectedItem.name}/files/agent.conf/xml`,
+        { }
       );
-      const xml = ((data || {}).data || {}).data || false;
+      const xml = data;
 
       if (!xml) {
         throw new Error('Could not fetch agent.conf file');
