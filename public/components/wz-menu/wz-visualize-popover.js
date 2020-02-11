@@ -42,41 +42,49 @@ class WzVisualizePopover extends Component {
     this.noResults = 0;
 
     this.visualizeSections = [
-      {"subsections" : [
-        { name: "Security Events", id: "general",icon:"securityApp"},
-        { name: "Integrity Monitoring", id: "fim",icon:"securityApp"},
-        { name : "Amazon AWS", id: "aws",icon:"logoAWS"},
-      ], name: "Security Information Management",
-        icon: "dashboardApp"},
-      {"subsections" : [
-        { name: "Policy monitoring", id:"pm",icon:"securityApp"},
-        { name: "System auditing", id: "audit",icon:"securityApp"},
-        { name : "OpenSCAP", id: "oscap",icon:"securityApp"},
-        { name : "CIS-CAT", id: "ciscat",icon:"securityApp"},
-      ], name: "Auditing and Policy Monitoring",
-         icon: "advancedSettingsApp"},
-      {"subsections" : [
-        { name: "Vulnerabilities", id:"vuls",icon:"securityApp"},
-        { name: "VirusTotal", id: "virustotal",icon:"securityApp"},
-        { name : "Osquery", id:"osquery",icon:"logoOsquery"},
-        { name : "Docker listener", id: "docker",icon:"securityApp"},
-        { name : "MITRE ATT&CK", id:"mitre",icon:"securityApp"},
-      ], name: "Threat detection and response",
-         icon: "securityApp"},
-      {"subsections" : [
-        { name: "PCI DSS", id: "pci",icon:"securityApp"},
-        { name: "GDPR", id: "gdpr",icon:"securityApp"},
-        { name : "HIPAA", id: "hipaa",icon:"securityApp"},
-        { name : "NIST 800-53", id: "nist",icon:"securityApp"},
-      ], name: "Regulatory Compliance",
-        icon: "visTagCloud"},
+      {
+        "subsections": [
+          { name: "Security Events", id: "general", icon: "securityApp" },
+          { name: "Integrity Monitoring", id: "fim", icon: "securityApp" },
+          { name: "Amazon AWS", id: "aws", icon: "logoAWS" },
+        ], name: "Security Information Management",
+        icon: "dashboardApp"
+      },
+      {
+        "subsections": [
+          { name: "Policy monitoring", id: "pm", icon: "securityApp" },
+          { name: "System auditing", id: "audit", icon: "securityApp" },
+          { name: "OpenSCAP", id: "oscap", icon: "securityApp" },
+          { name: "CIS-CAT", id: "ciscat", icon: "securityApp" },
+        ], name: "Auditing and Policy Monitoring",
+        icon: "advancedSettingsApp"
+      },
+      {
+        "subsections": [
+          { name: "Vulnerabilities", id: "vuls", icon: "securityApp" },
+          { name: "VirusTotal", id: "virustotal", icon: "securityApp" },
+          { name: "Osquery", id: "osquery", icon: "logoOsquery" },
+          { name: "Docker listener", id: "docker", icon: "securityApp" },
+          { name: "MITRE ATT&CK", id: "mitre", icon: "securityApp" },
+        ], name: "Threat detection and response",
+        icon: "securityApp"
+      },
+      {
+        "subsections": [
+          { name: "PCI DSS", id: "pci", icon: "securityApp" },
+          { name: "GDPR", id: "gdpr", icon: "securityApp" },
+          { name: "HIPAA", id: "hipaa", icon: "securityApp" },
+          { name: "NIST 800-53", id: "nist", icon: "securityApp" },
+        ], name: "Regulatory Compliance",
+        icon: "visTagCloud"
+      },
     ];
 
     this.wzReq = WzRequest;
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    
+
   }
 
   componentDidMount() {
@@ -89,7 +97,7 @@ class WzVisualizePopover extends Component {
  */
   async fetchData(newSection) {
     try {
-      
+
     } catch (error) {
     }
   }
@@ -100,12 +108,12 @@ class WzVisualizePopover extends Component {
   };
 
 
-  
+
   selectItem = name => {
     console.log(name)
   };
 
- 
+
 
   createItem = (name, data = {}) => {
     return {
@@ -123,37 +131,37 @@ class WzVisualizePopover extends Component {
     });
   };
 
-  
+
 
   onItemClick(item) {
     console.log(item)
     alert(`Item [${item.label}] was clicked`);
   }
 
-  getSections(id){
+  getSections(id) {
     const currentSection = this.visualizeSections[id];
-    
+
     let failedCounter = 0;
-    
-    const subsections = currentSection.subsections.filter(item => this.state.searchValue === "" ||  (this.state.searchValue && TabDescription[item.id].description.toLowerCase().includes(this.state.searchValue.toLowerCase())) || (this.state.searchValue && item.name.toLowerCase().includes(this.state.searchValue.toLowerCase()))).map(item=> {
+
+    const subsections = currentSection.subsections.filter(item => this.state.searchValue === "" || (this.state.searchValue && TabDescription[item.id].description.toLowerCase().includes(this.state.searchValue.toLowerCase())) || (this.state.searchValue && item.name.toLowerCase().includes(this.state.searchValue.toLowerCase()))).map(item => {
       return (this.createItem(item.name))
     })
 
-    if(failedCounter === subsections.length){
+    if (failedCounter === subsections.length) {
       this.noResults += 1;
       return;
     }
 
 
-    const sideNav = [ this.createItem(currentSection.name, {
-      icon: <EuiIcon type={currentSection.icon} />,
+    const sideNav = [this.createItem(currentSection.name, {
+      icon: <EuiIcon type={currentSection.icon} color="primary" />,
       items: subsections
-      })
+    })
     ]
-    
+
     return (
       <EuiFlexItem grow={false}>
-        <EuiSideNav 
+        <EuiSideNav
           mobileTitle={currentSection.name}
           isOpenOnMobile={true}
           items={sideNav}
@@ -161,7 +169,7 @@ class WzVisualizePopover extends Component {
         />
       </EuiFlexItem>
     )
-    
+
   }
 
   onSearchFieldChange = e => {
@@ -169,21 +177,21 @@ class WzVisualizePopover extends Component {
       searchValue: e.target.value,
     });
   };
-  
+
   createSuggestItem = (item) => {
     return {
       label: item.name,
       description: TabDescription[item.id].description,
-      type: { iconType: item.icon, color: 'tint8' },
+      type: { iconType: item.icon, color: 'primary' },
     };
   };
 
-  getSuggestedItems(){
+  getSuggestedItems() {
     let subsections = [];
 
-    for(var i=0; i<4;i++){
+    for (var i = 0; i < 4; i++) {
       const currentSection = this.visualizeSections[i];
-      subsections = subsections.concat(currentSection.subsections.filter(item => this.state.suggestValue === "" ||  (this.state.suggestValue && TabDescription[item.id].description.toLowerCase().includes(this.state.suggestValue.toLowerCase())) || (this.state.suggestValue && item.name.toLowerCase().includes(this.state.suggestValue.toLowerCase()))).map(item=> {
+      subsections = subsections.concat(currentSection.subsections.filter(item => this.state.suggestValue === "" || (this.state.suggestValue && TabDescription[item.id].description.toLowerCase().includes(this.state.suggestValue.toLowerCase())) || (this.state.suggestValue && item.name.toLowerCase().includes(this.state.suggestValue.toLowerCase()))).map(item => {
         return (this.createSuggestItem(item))
       }));
     }
@@ -191,28 +199,29 @@ class WzVisualizePopover extends Component {
     return subsections;
   }
 
-  getFavoriteItems(){
-    const result = this.state.favoriteItems.map( (item,id) => {
+  getFavoriteItems() {
+    const result = this.state.favoriteItems.map((item, id) => {
       return (<EuiListGroupItem
-      id={id}
-      iconType="securityApp"
-      label={item}
-      onClick={() => window.alert('Button clicked')}
-      extraAction={{
-        color: 'subdued',
-        onClick: () => this.removeFavorite(item),
-        iconType:  'starFilled',
-        iconSize: 's',
-        'aria-label': 'Favorite link1',
-      }}
-    />)
+        key={id}
+        id={id}
+        iconType="securityApp"
+        label={item}
+        onClick={() => window.alert('Button clicked')}
+        extraAction={{
+          color: 'subdued',
+          onClick: () => this.removeFavorite(item),
+          iconType: 'starFilled',
+          iconSize: 's',
+          'aria-label': 'Favorite link1',
+        }}
+      />)
 
     })
 
     return result;
   }
 
-  addFavorite(item){
+  addFavorite(item) {
     console.log("jeje")
     console.log(this.props)
     this.props.setFavorite(item);
@@ -225,11 +234,11 @@ class WzVisualizePopover extends Component {
     this.setState({favoriteItems:tmp});*/
   }
 
-  removeFavorite(item){
+  removeFavorite(item) {
     var tmp = this.state.favoriteItems
-    tmp.splice( tmp.indexOf(item), 1 );
+    tmp.splice(tmp.indexOf(item), 1);
 
-    this.setState({favoriteItems:tmp});
+    this.setState({ favoriteItems: tmp });
   }
 
   render() {
@@ -270,84 +279,83 @@ class WzVisualizePopover extends Component {
     return (
       <div className="WzManagementSideMenu">
         <EuiFlexGroup>
-<EuiFlexItem style={{marginTop: 15}}>
+          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
+            <EuiTitle style={{ padding: '0px 16px 6px 16px' }}>
+              <h2>History</h2>
+            </EuiTitle>
+            <EuiListGroup maxWidth={288}>
+              <EuiListGroupItem
+                id="link1"
+                iconType="logoAWS"
+                label="Amazon AWS"
+                onClick={() => window.alert('Button clicked')}
+                extraAction={{
+                  color: 'subdued',
+                  onClick: () => this.addFavorite('Amazon AWS'),
+                  iconType: 'starEmpty',
+                  iconSize: 's',
+                  'aria-label': 'Favorite link1',
+                }}
+              />
 
-<EuiTitle>
-      <h2>History</h2>
-    </EuiTitle>
-    <EuiListGroup maxWidth={288}>
-          <EuiListGroupItem
-            id="link1"
-            iconType="logoAWS"
-            label="Amazon AWS"
-            onClick={() => window.alert('Button clicked')}
-            extraAction={{
-              color: 'subdued',
-              onClick: () => this.addFavorite('Amazon AWS'),
-              iconType:  'starEmpty',
-              iconSize: 's',
-              'aria-label': 'Favorite link1',
-            }}
-          />
+              <EuiListGroupItem
+                id="link2"
+                iconType="securityApp"
+                onClick={() => window.alert('Button clicked')}
+                label="CIS-CAT"
+                extraAction={{
+                  color: 'subdued',
+                  onClick: () => this.addFavorite('CIS-CAT'),
+                  iconType: 'starEmpty',
+                  iconSize: 's',
+                  'aria-label': 'Favorite link2',
+                }}
+              />
 
-          <EuiListGroupItem
-            id="link2"
-            iconType="securityApp"
-            onClick={() => window.alert('Button clicked')}
-            label="CIS-CAT"
-            extraAction={{
-              color: 'subdued',
-              onClick: () => this.addFavorite('CIS-CAT'),
-              iconType: 'starEmpty',
-              iconSize: 's',
-              'aria-label': 'Favorite link2',
-            }}
-          />
+              <EuiListGroupItem
+                id="link3"
+                onClick={() => window.alert('Button clicked')}
+                iconType="securityApp"
+                label="Security Events"
+                extraAction={{
+                  color: 'subdued',
+                  onClick: () => this.addFavorite('Security Events'),
+                  iconType: 'starEmpty',
+                  iconSize: 's',
+                  'aria-label': 'Favorite link3',
+                }}
+              />
 
-          <EuiListGroupItem
-            id="link3"
-            onClick={() => window.alert('Button clicked')}
-            iconType="securityApp"
-            label="Security Events"
-            extraAction={{
-              color: 'subdued',
-              onClick: () => this.addFavorite('Security Events'),
-              iconType: 'starEmpty',
-              iconSize: 's',
-              'aria-label': 'Favorite link3',
-            }}
-          />
+              <EuiListGroupItem
+                id="link4"
+                iconType="logoOsquery"
+                label="Osquery"
+                extraAction={{
+                  color: 'subdued',
+                  onClick: () => this.addFavorite('Osquery'),
+                  iconType: 'starEmpty',
+                  iconSize: 's',
+                  'aria-label': 'Favorite link4',
+                }}
+              />
+              <EuiListGroupItem
+                id="link5"
+                iconType="securityApp"
+                label="Integrity Monitoring"
+                extraAction={{
+                  color: 'subdued',
+                  onClick: () => this.addFavorite('Integrity Monitoring'),
+                  iconType: 'starEmpty',
+                  iconSize: 's',
+                  'aria-label': 'Favorite link4',
+                }}
+              />
+            </EuiListGroup>
 
-<EuiListGroupItem
-            id="link4"
-            iconType="logoOsquery"
-            label="Osquery"
-            extraAction={{
-              color: 'subdued',
-              onClick: () => this.addFavorite('Osquery'),
-              iconType: 'starEmpty',
-              iconSize: 's',
-              'aria-label': 'Favorite link4',
-            }}
-          />
-          <EuiListGroupItem
-            id="link5"
-            iconType="securityApp"
-            label="Integrity Monitoring"
-            extraAction={{
-              color: 'subdued',
-              onClick: () => this.addFavorite('Integrity Monitoring'),
-              iconType: 'starEmpty',
-              iconSize: 's',
-              'aria-label': 'Favorite link4',
-            }}
-          />
-        </EuiListGroup>
+          </EuiFlexItem>
 
-</EuiFlexItem>
-
-<EuiFlexItem>
-{/*
+          <EuiFlexItem>
+            {/*
       <EuiFlexGroup  style={{marginBottom: 10}}>
         <EuiFlexItem>
         <EuiFieldSearch
@@ -361,51 +369,51 @@ class WzVisualizePopover extends Component {
           </EuiFlexItem>
       </EuiFlexGroup>
       */}
-      <EuiFlexGroup>
-        <EuiFlexItem style={{marginTop: 10,marginBottom:20}} >
-          
-          <EuiSuggest
-          status={this.state.status}
-          onInputChange={this.getInputValue}
-          onItemClick={this.onItemClick}
-          className="test"
-          tooltipContent="jasjk"
-          placeholder="Filter extensions"
-          suggestions={this.getSuggestedItems()}
-        />
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <div style={{ marginBottom: 8, marginRight: 16 }}>
+                  <EuiSuggest
+                    status={this.state.status}
+                    onInputChange={this.getInputValue}
+                    onItemClick={this.onItemClick}
+                    className="test"
+                    tooltipContent="jasjk"
+                    placeholder="Filter extensions"
+                    suggestions={this.getSuggestedItems()}
+                  />
+                </div>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup style={{ paddingTop: 8, paddingBottom: 8 }}>
+              {this.getSections(0)}
+              {this.getSections(1)}
+            </EuiFlexGroup>
+            <EuiFlexGroup style={{ paddingTop: 8, paddingBottom: 8 }}>
+              {this.getSections(2)}
+              {this.getSections(3)}
+              <EuiFlexItem>
+                {this.noResults === 4 && (<div>No results</div>)}
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiFlexGroup>
-          {this.getSections(0)}
-          {this.getSections(1)}
-      </EuiFlexGroup>
-
-        <EuiFlexGroup>
-          {this.getSections(2)}
-          {this.getSections(3)}
-        <EuiFlexItem>
-          {this.noResults === 4 && (<div>No results</div>)}
-        </EuiFlexItem>
-        </EuiFlexGroup>
-</EuiFlexItem>
 
 
-{this.state.favoriteItems.length > 0 && (
-<EuiFlexItem style={{marginTop: 15}}>
+          {this.state.favoriteItems.length > 0 && (
+            <EuiFlexItem style={{ marginTop: 15 }}>
 
-<EuiTitle>
-      <h2>Pinned dashboards</h2>
-    </EuiTitle>
-    <EuiListGroup maxWidth={288}>
-          {this.getFavoriteItems()}
-        </EuiListGroup>
+              <EuiTitle>
+                <h2>Pinned dashboards</h2>
+              </EuiTitle>
+              <EuiListGroup maxWidth={288}>
+                {this.getFavoriteItems()}
+              </EuiListGroup>
 
-</EuiFlexItem>
+            </EuiFlexItem>
 
-)}
+          )}
 
         </EuiFlexGroup>
-        
+
 
       </div>
     );

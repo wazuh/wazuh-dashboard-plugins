@@ -28,7 +28,8 @@ import healthCheckTemplate from '../templates/health-check/health-check.html';
 import agentsTemplate from '../templates/agents/agents.pug';
 import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
 import managementTemplate from '../templates/management/management.pug';
-import overviewTemplate from '../templates/overview/overview.pug';
+import visualizeTemplate from '../templates/overview/overview.pug';
+import overviewTemplate from '../templates/welcomeOverview/overview.html';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
@@ -166,6 +167,10 @@ routes
   })
   .when('/overview/', {
     template: overviewTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
+  .when('/visualize/', {
+    template: visualizeTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/settings', {
