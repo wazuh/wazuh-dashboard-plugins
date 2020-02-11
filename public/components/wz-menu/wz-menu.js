@@ -34,7 +34,8 @@ class WzMenu extends Component {
       patternList: [],
       currentSelectedPattern: "",
       isManagementPopoverOpen: false,
-      isVisualizePopoverOpen: false
+      isVisualizePopoverOpen: false,
+      favoriteItems: []
     };
     this.store = store;
     this.wazuhConfig = new WazuhConfig();
@@ -168,6 +169,31 @@ class WzMenu extends Component {
     this.setMenuItem('overview');
     this.visualizePopoverToggle();
   }
+  setFavorite(item){
+    console.log("jajaj" + item)
+    var tmp = this.state.favoriteItems;
+    tmp.push(item);
+    console.log(tmp)
+    this.setState({favoriteItems: tmp})
+  }
+
+  getFavoriteButtons(){
+    const result = this.state.favoriteItems.map( (item,idx) => {
+      const type = item === "Amazon AWS" ? 'logoAWS' :  item === "Osquery" ? "logoOsquery" : "securityApp"
+      return (
+      <EuiButtonEmpty
+        className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
+        color="text"
+        href="#/wazuh-dev"
+        onClick={() => this.setMenuItem('wazuh-dev')}>
+        <EuiIcon type={type} color='primary' size='m' />
+        <span style={{display: "none"}}>Dev Tools</span>
+      </EuiButtonEmpty>
+    )
+  })
+  return result;
+}
+
   render() {
 
 
@@ -213,13 +239,14 @@ class WzMenu extends Component {
                           panelClassName="visualize-popover"
                           isOpen={this.state.isVisualizePopoverOpen}
                           closePopover={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
-                          anchorPosition="downCenter" >
+                          anchorPosition="downLeft" >
                           <WzVisualizePopover
                             visualizePopoverToggle={this.visualizePopoverToggle.bind(this)}
+                            setFavorite={(item) => this.setFavorite(item)}
                             {...this.props} />
                             
                         </EuiPopover>
-                          
+
                     <EuiPopover
                       id="popover"
                       button={managementButton}
@@ -249,6 +276,9 @@ class WzMenu extends Component {
                       <span className="wz-menu-button-title ">Dev Tools</span>
                     </EuiButtonEmpty>
 
+                    {this.state.favoriteItems.length > 0 &&
+                    this.getFavoriteButtons()
+                    }
 
                   </EuiFlexGroup>
                 </EuiFlexItem>

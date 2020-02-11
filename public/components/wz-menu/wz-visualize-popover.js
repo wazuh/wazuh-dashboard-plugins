@@ -14,6 +14,9 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiSideNav,
+  EuiTitle,
+  EuiListGroup,
+  EuiListGroupItem,
   EuiFieldSearch,
   EuiSuggest,
   EuiIcon
@@ -33,7 +36,8 @@ class WzVisualizePopover extends Component {
       searchValue: "",
       status: 'unchanged',
       suggestValue: '',
-      selectedItemName: null
+      selectedItemName: null,
+      favoriteItems: []
     };
     this.noResults = 0;
 
@@ -187,6 +191,47 @@ class WzVisualizePopover extends Component {
     return subsections;
   }
 
+  getFavoriteItems(){
+    const result = this.state.favoriteItems.map( (item,id) => {
+      return (<EuiListGroupItem
+      id={id}
+      iconType="securityApp"
+      label={item}
+      onClick={() => window.alert('Button clicked')}
+      extraAction={{
+        color: 'subdued',
+        onClick: () => this.removeFavorite(item),
+        iconType:  'starFilled',
+        iconSize: 's',
+        'aria-label': 'Favorite link1',
+      }}
+    />)
+
+    })
+
+    return result;
+  }
+
+  addFavorite(item){
+    console.log("jeje")
+    console.log(this.props)
+    this.props.setFavorite(item);
+
+    /*
+    console.log("aqui")
+    var tmp = this.state.favoriteItems
+    tmp.push(item)
+    console.log(tmp)
+    this.setState({favoriteItems:tmp});*/
+  }
+
+  removeFavorite(item){
+    var tmp = this.state.favoriteItems
+    tmp.splice( tmp.indexOf(item), 1 );
+
+    this.setState({favoriteItems:tmp});
+  }
+
   render() {
     this.noResults = 0;
     const sampleItems = [
@@ -224,6 +269,85 @@ class WzVisualizePopover extends Component {
 
     return (
       <div className="WzManagementSideMenu">
+        <EuiFlexGroup>
+<EuiFlexItem style={{marginTop: 15}}>
+
+<EuiTitle>
+      <h2>History</h2>
+    </EuiTitle>
+    <EuiListGroup maxWidth={288}>
+          <EuiListGroupItem
+            id="link1"
+            iconType="logoAWS"
+            label="Amazon AWS"
+            onClick={() => window.alert('Button clicked')}
+            extraAction={{
+              color: 'subdued',
+              onClick: () => this.addFavorite('Amazon AWS'),
+              iconType:  'starEmpty',
+              iconSize: 's',
+              'aria-label': 'Favorite link1',
+            }}
+          />
+
+          <EuiListGroupItem
+            id="link2"
+            iconType="securityApp"
+            onClick={() => window.alert('Button clicked')}
+            label="CIS-CAT"
+            extraAction={{
+              color: 'subdued',
+              onClick: () => this.addFavorite('CIS-CAT'),
+              iconType: 'starEmpty',
+              iconSize: 's',
+              'aria-label': 'Favorite link2',
+            }}
+          />
+
+          <EuiListGroupItem
+            id="link3"
+            onClick={() => window.alert('Button clicked')}
+            iconType="securityApp"
+            label="Security Events"
+            extraAction={{
+              color: 'subdued',
+              onClick: () => this.addFavorite('Security Events'),
+              iconType: 'starEmpty',
+              iconSize: 's',
+              'aria-label': 'Favorite link3',
+            }}
+          />
+
+<EuiListGroupItem
+            id="link4"
+            iconType="logoOsquery"
+            label="Osquery"
+            extraAction={{
+              color: 'subdued',
+              onClick: () => this.addFavorite('Osquery'),
+              iconType: 'starEmpty',
+              iconSize: 's',
+              'aria-label': 'Favorite link4',
+            }}
+          />
+          <EuiListGroupItem
+            id="link5"
+            iconType="securityApp"
+            label="Integrity Monitoring"
+            extraAction={{
+              color: 'subdued',
+              onClick: () => this.addFavorite('Integrity Monitoring'),
+              iconType: 'starEmpty',
+              iconSize: 's',
+              'aria-label': 'Favorite link4',
+            }}
+          />
+        </EuiListGroup>
+
+</EuiFlexItem>
+
+<EuiFlexItem>
+{/*
       <EuiFlexGroup  style={{marginBottom: 10}}>
         <EuiFlexItem>
         <EuiFieldSearch
@@ -235,9 +359,10 @@ class WzVisualizePopover extends Component {
             aria-label="Filter extensions..."
           />
           </EuiFlexItem>
-      </EuiFlexGroup>{/*
+      </EuiFlexGroup>
+      */}
       <EuiFlexGroup>
-        <EuiFlexItem >
+        <EuiFlexItem style={{marginTop: 10,marginBottom:20}} >
           
           <EuiSuggest
           status={this.state.status}
@@ -250,7 +375,6 @@ class WzVisualizePopover extends Component {
         />
           </EuiFlexItem>
       </EuiFlexGroup>
-      */}
       <EuiFlexGroup>
           {this.getSections(0)}
           {this.getSections(1)}
@@ -259,10 +383,29 @@ class WzVisualizePopover extends Component {
         <EuiFlexGroup>
           {this.getSections(2)}
           {this.getSections(3)}
-        <EuiFlexItem style={{marginTop: 20}}>
+        <EuiFlexItem>
           {this.noResults === 4 && (<div>No results</div>)}
         </EuiFlexItem>
         </EuiFlexGroup>
+</EuiFlexItem>
+
+
+{this.state.favoriteItems.length > 0 && (
+<EuiFlexItem style={{marginTop: 15}}>
+
+<EuiTitle>
+      <h2>Pinned dashboards</h2>
+    </EuiTitle>
+    <EuiListGroup maxWidth={288}>
+          {this.getFavoriteItems()}
+        </EuiListGroup>
+
+</EuiFlexItem>
+
+)}
+
+        </EuiFlexGroup>
+        
 
       </div>
     );
