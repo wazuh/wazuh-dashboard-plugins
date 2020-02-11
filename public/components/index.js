@@ -12,7 +12,7 @@
 import './eui-loader';
 import { uiModules } from 'ui/modules';
 import { WzFilterBar } from './wz-filter-bar/wz-filter-bar';
-import { WzVisualize } from './wz-visualize/wz-visualize';
+import { WzVisualize } from './visualize/wz-visualize';
 import { WzMenuWrapper } from '../components/wz-menu/wz-menu-wrapper';
 import { ScaDashboard } from './agents/sca/sca-dashboard';
 

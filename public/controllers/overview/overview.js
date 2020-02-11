@@ -99,6 +99,19 @@ export class OverviewController {
         AppState.setExtensions(api, extensions)
     };
 
+    this.visualizeTopMenuProps = {
+      switchDiscover: tab => {
+        this.switchSubtab(tab);
+      },
+      tab: this.tab,
+      subtab: this.subtab,
+      setAgent: id => {
+        this.isAgent = id;
+        this.$rootScope.$emit('testAGENT', {
+        });
+      },
+    };
+
     this.visualizeProps = {
       selectedTab: this.tab,
       updateVis: false,
@@ -112,8 +125,6 @@ export class OverviewController {
       },
       cardReqs: {}
     }
-
-    this.setTabs();
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -138,35 +149,6 @@ export class OverviewController {
    */
   switchMitreTab() {
     this.showingMitreTable = !this.showingMitreTable
-  }
-
-  /**
-   * Build the current section tabs
-   */
-  setTabs() {
-    this.overviewTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
-
-    if (!this.currentPanel) return;
-
-    const tabs = this.commonData.getTabsFromCurrentPanel(
-      this.currentPanel,
-      this.extensions,
-      this.tabNames
-    );
-
-    this.overviewTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab:
-        this.tab ||
-        (this.currentPanel && this.currentPanel.length
-          ? this.currentPanel[0]
-          : ''),
-      tabs
-    };
-    this.$scope.$applyAsync();
   }
 
   // Switch subtab
@@ -201,6 +183,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
+    this.visualizeTopMenuProps.subtab = subtab;
     this.$scope.$applyAsync();
     return;
   }
@@ -233,6 +216,7 @@ export class OverviewController {
       this.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
     }
     this.visualizeProps.selectedTab = newTab;
+    this.visualizeTopMenuProps.tab = newTab;
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -295,7 +279,6 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    this.setTabs();
     this.$scope.$applyAsync();
     return;
   }
