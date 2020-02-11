@@ -135,7 +135,10 @@ export class Poc4 extends Component {
               <EuiFlexItem>
                 <EuiTitle><h1>Tactics</h1></EuiTitle>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{marginTop:'25px'}}>
+              <EuiFlexItem grow={false} style={{marginTop:'25px', marginRight:4}}>{ allSelected
+                  ? 'Unselect All'
+                  : 'Select all' }</EuiFlexItem>
+              <EuiFlexItem grow={false} style={{marginTop:'25px', marginLeft:0}}>
                 <EuiCheckbox
                   style={{ alignSelf: 'flex-end' }}
                   id='selectTactics'
