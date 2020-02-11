@@ -580,7 +580,9 @@ export class AgentsController {
           'GET',
           `/agents/${this.$scope.agent.id}`,
           { 
-            select: 'status'
+            params: {
+              select: 'status'
+            }
           }
         );
         this.$scope.agent.status =
