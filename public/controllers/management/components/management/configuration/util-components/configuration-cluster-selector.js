@@ -10,14 +10,14 @@
 * Find more information about this on the LICENSE file.
 */
 
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import {
   EuiSelect
 } from "@elastic/eui";
 
-import { updateClusterNodes, updateClusterNodeSelected, updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
+import { updateClusterNodeSelected, updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
 
 import { connect } from 'react-redux';
 
@@ -41,7 +41,7 @@ class WzConfigurationClusterSelect extends Component{
         value={this.props.clusterNodeSelected}
         onChange={this.onChange}
         aria-label="Select Configuration Cluster Node"
-        style={{width: this.props.withd || '200px'}}
+        fullWidth={true}
       />
     )
   }

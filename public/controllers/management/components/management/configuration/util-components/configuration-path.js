@@ -57,7 +57,7 @@ class WzConfigurationPath extends Component{
           {children ? (<Fragment>{children}</Fragment>) : null}
           {this.props.clusterNodes && this.props.clusterNodes.length && (
             <EuiFlexItem grow={false}>
-              <div><WzClusterSelect /></div>
+              <WzClusterSelect />
             </EuiFlexItem>
           )}
         </EuiFlexGroup>

@@ -97,7 +97,7 @@ class WzConfigurationOverview extends Component{
 									<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/>
 									: null}
 								</EuiFlexItem>
-								<EuiFlexItem>
+								<EuiFlexItem grow={false}>
 									<WzHelpButtonPopover links={helpLinks}/>
 								</EuiFlexItem>
 								<EuiFlexItem>

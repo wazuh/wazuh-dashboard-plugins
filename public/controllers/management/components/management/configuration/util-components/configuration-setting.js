@@ -24,14 +24,30 @@ import {
 class WzConfigurationSetting extends Component{
   constructor(props){
     super(props);
+    this.state = {
+      labelAlignment: 'right'
+    }
+    this.limitResize = 760;
+    this.resize = this.resize.bind(this);
+  }
+  componentDidMount() {
+    window.addEventListener("resize", this.resize);
+    this.resize();
+  }
+  componentWillUnmount(){
+    window.removeEventListener("resize", this.resize);
+  }
+  resize() {
+    this.setState({labelAlignment: window.innerWidth > 760 ? 'right' : undefined});
   }
   render(){
+    const { labelAlignment } = this.state;
     const { keyItem, label, value } = this.props;
     return value ? (
       <Fragment>
         <EuiFlexGroup alignItems='center'>
           <EuiFlexItem style={{justifySelf: 'flex-end'}}>
-              <EuiTextAlign textAlign='right'>
+              <EuiTextAlign textAlign={labelAlignment}>
                 {label}
               </EuiTextAlign>
           </EuiFlexItem>
