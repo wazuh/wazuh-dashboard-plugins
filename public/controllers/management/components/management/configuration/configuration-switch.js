@@ -39,6 +39,7 @@ import WzConfigurationIntegrityAgentless from './agentless/agentless';
 import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzConfigurationAzureLogs from './azure-logs/azure-logs';
 import WzViewSelector, { WzViewSelectorSwitch } from './util-components/view-selector';
+import WzLoading from './util-components/loading';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzToastProvider from './util-providers/toast-p';
 
@@ -82,19 +83,20 @@ class WzConfigurationSwitch extends Component{
 				const agentSynchronized = await agentIsSynchronized(this.props.agent);
 				this.setState({ agentSynchronized });
 			}catch(error){
-				console.log(error);
+				// do nothing
 			}
 		}else{
 			try{
-				// Try if is a cluster
+				// try if it is a cluster
 				const nodes = await clusterNodes();
-				// Set cluster nodes in Redux Store
+				// set cluster nodes in Redux Store
 				this.props.updateClusterNodes(nodes.data.data.items);
-				// Set cluster node selected in Redux Store
+				// set cluster node selected in Redux Store
 				this.props.updateClusterNodeSelected(nodes.data.data.items.find(node => node.type === 'master').name);
 			}catch(error){
-				// Do nothing isn't a clustser
-				// console.error(error);
+				// do nothing if it isn't a cluster
+				this.props.updateClusterNodes(false);
+				this.props.updateClusterNodeSelected(false);
 			}
 		}
 	}
@@ -114,9 +116,12 @@ class WzConfigurationSwitch extends Component{
 								<EuiSpacer size='s'/>
 							</Fragment>
 						) : null}
-						{view !== '' && (<WzConfigurationPath title={title} description={description} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
+						{view !== '' && view !== 'edit-configuration' && (<WzConfigurationPath title={title} description={description} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
 						{view === '' && (
 							<WzConfigurationOverview agent={agent} agentSynchronized={agentSynchronized} exportConfiguration={this.props.exportConfiguration} updateConfigurationSection={this.updateConfigurationSection}/>
+						)}
+						{view === 'edit-configuration' && (
+							<WzConfigurationEditConfiguration clusterNodeSelected={this.props.clusterNodeSelected} agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
 						)}
 						{!loadingStatus ? (
 							<WzViewSelector view={view}>
@@ -195,16 +200,9 @@ class WzConfigurationSwitch extends Component{
 								<WzViewSelectorSwitch view='azure-logs'>
 									<WzConfigurationAzureLogs clusterNodeSelected={this.props.clusterNodeSelected} agent={agent} updateBadge={this.updateBadge} updateConfigurationSection={this.updateConfigurationSection}/>
 								</WzViewSelectorSwitch>
-								<WzViewSelectorSwitch view='edit-configuration'>
-									<WzConfigurationEditConfiguration clusterNodeSelected={this.props.clusterNodeSelected} agent={agent} updateConfigurationSection={this.updateConfigurationSection}/>
-								</WzViewSelectorSwitch>
 							</WzViewSelector>
 						) : (
-							<Fragment>
-								<EuiSpacer size='m'/>
-								<EuiProgress size="xs" color="primary"/>
-								<EuiSpacer size='m'/>
-							</Fragment>
+							<WzLoading />
 						)}
 					</EuiPanel>
 				</EuiPage>

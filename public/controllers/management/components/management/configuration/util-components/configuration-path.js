@@ -33,7 +33,7 @@ class WzConfigurationPath extends Component{
     super(props);
   }
   render(){
-    const { title, description, icon, updateConfigurationSection, badge } = this.props;
+    const { title, description, icon, updateConfigurationSection, badge, children } = this.props;
     return (
       <Fragment>
         <EuiFlexGroup alignItems='center'>
@@ -54,13 +54,13 @@ class WzConfigurationPath extends Component{
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
+          {children ? (<Fragment>{children}</Fragment>) : null}
           {this.props.clusterNodes && this.props.clusterNodes.length && (
             <EuiFlexItem grow={false}>
               <div><WzClusterSelect /></div>
             </EuiFlexItem>
           )}
         </EuiFlexGroup>
-        
         <EuiSpacer size='s'/>
       </Fragment>
     )

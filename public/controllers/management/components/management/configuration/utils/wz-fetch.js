@@ -243,13 +243,14 @@ export const fetchFile = async (selectedNode) => {
 export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) => {
   try{
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     isCluster
       ? await restartNode(selectedNode)
       : await restartManager();
     // Dispatch a Redux action
-    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`);
+    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`); //FIXME: if it enable/disable cluster, this will show Manager instead node name
     return await makePing(updateWazuhNotReadyYet);
   }catch(error){
     return Promise.reject(error);

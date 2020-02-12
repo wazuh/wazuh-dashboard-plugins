@@ -34,7 +34,7 @@ export class WzStatusAgentInfo extends Component {
     const { agentInfo } = this.props.state;
     const status = agentInfo.status;
     let operatingSystem = false;
-    if (status !== 'Never connected') {
+    if (status !== 'Never connected' && agentInfo.os) {
       operatingSystem = agentInfo.os.name
         ? agentInfo.os.name + agentInfo.os.version
         : agentInfo.os.uname
@@ -91,7 +91,7 @@ export class WzStatusAgentInfo extends Component {
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>Operating system</EuiFlexItem>
-              <EuiFlexItem style={greyStyle}>{operatingSystem}</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>{operatingSystem || '-'}</EuiFlexItem>
             </EuiFlexGroup>
           </div>
         )}
