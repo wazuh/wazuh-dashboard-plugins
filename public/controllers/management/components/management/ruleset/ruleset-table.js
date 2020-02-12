@@ -94,7 +94,7 @@ class WzRulesetTable extends Component {
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
-      this.buildFilter(),
+      { params: this.buildFilter() },
     ).catch((error) => {
       console.warn(`Error when get the items of ${section}: `, error);
       return {}
