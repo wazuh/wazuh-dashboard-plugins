@@ -63,7 +63,7 @@ class WzGroupsTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
+      const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
       const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
       this.setState({

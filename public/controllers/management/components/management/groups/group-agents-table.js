@@ -65,7 +65,7 @@ class WzGroupAgentsTable extends Component {
     try {
       const rawItems = await this.groupsHandler.agentsGroup(
         this.props.state.itemDetail.name,
-        this.buildFilter()
+        { params: this.buildFilter() }
       );
       const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 

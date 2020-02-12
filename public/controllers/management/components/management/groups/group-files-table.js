@@ -63,7 +63,7 @@ class WzGroupFilesTable extends Component {
     try {
       const rawItems = await this.groupsHandler.filesGroup(
         this.props.state.itemDetail.name,
-        this.buildFilter()
+        { params: this.buildFilter() }
       );
       const { items, totalItems } = ((rawItems || {}).data || {}).data;
 

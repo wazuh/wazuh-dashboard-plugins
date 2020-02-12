@@ -116,7 +116,7 @@ export class AgentsTable extends Component {
     const rawAgents = await WzRequest.apiReq(
       'GET',
       '/agents',
-      { params: this.buildFilter()}
+      { params: this.buildFilter() }
     );
     const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(this.formatAgent.bind(this));
     this.setState({
