@@ -365,7 +365,7 @@ export class GroupsController {
         const addResponse = await this.apiReq.request(
           'PUT',
           `/agents/group/${this.currentGroup.name}`,
-          { list_agents: itemsToSave.addedIds }
+          {params: { list_agents: itemsToSave.addedIds.toString()  }}
         );
         if (addResponse.data.data.total_failed_items) {
           failedIds.push(...addResponse.data.data.failed_items);
@@ -375,7 +375,7 @@ export class GroupsController {
         const deleteResponse = await this.apiReq.request(
           'DELETE',
           `/agents/group/${this.currentGroup.name}`,
-          { list_agents: itemsToSave.deletedIds.toString() }
+          { params: { list_agents: itemsToSave.deletedIds.toString() } }
         );
         if (deleteResponse.data.data.total_failed_items) {
           failedIds.push(...deleteResponse.data.data.failed_items);

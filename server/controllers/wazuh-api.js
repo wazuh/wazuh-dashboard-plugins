@@ -832,13 +832,6 @@ export class WazuhApiCtrl {
         }
       }
 
-      // DELETE must use URL query but we accept objects in Dev Tools
-      if (method === 'DELETE' && dataProperties.length) {
-        const query = querystring.stringify(data);
-        fullUrl += fullUrl.includes('?') ? `&${query}` : `?${query}`;
-        data = {};
-      }
-
       const response = await this.apiInterceptor.request(method, fullUrl, data, options);
 
       const responseIsDown = this.checkResponseIsDown(response);
