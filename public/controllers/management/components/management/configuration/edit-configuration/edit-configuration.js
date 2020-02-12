@@ -218,6 +218,7 @@ export default compose(
 const mapStateToPropsEditor = (state) => ({
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
   clusterNodes: state.configurationReducers.clusterNodes,
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 const WzEditorConfiguration = compose(
@@ -238,7 +239,9 @@ const WzEditorConfiguration = compose(
     this.props.onDidMount(this.props.xmlFetched);
   }
   render(){
-    const { clusterNodes, clusterNodeSelected, xmlError, infoChangesAfterRestart, editorValue, onChange, restart, restarting, toggleRestart, confirmRestart} = this.props;
+    const { clusterNodes, clusterNodeSelected, xmlError, infoChangesAfterRestart, editorValue,
+          onChange, restart, restarting, toggleRestart, confirmRestart, wazuhNotReadyYet
+    } = this.props;
     return (
       <Fragment>
         {!this.props.errorXMLFetched ? (
@@ -251,7 +254,7 @@ const WzEditorConfiguration = compose(
               <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
             )}
             <EuiSpacer size='s'/>
-            <WzCodeEditor mode='xml' value={editorValue} onChange={(value) => onChange(value)} minusHeight={restarting || infoChangesAfterRestart ? 320 : 250}/>
+            <WzCodeEditor mode='xml' value={editorValue} onChange={(value) => onChange(value)} minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 250}/>
             {restart && !restarting && (
               <EuiOverlayMask>
                 <EuiConfirmModal
