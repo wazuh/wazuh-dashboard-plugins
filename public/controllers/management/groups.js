@@ -228,7 +228,7 @@ export class GroupsController {
       const params = {
         limit: 500,
         offset: !searchTerm ? this.availableAgents.offset : 0,
-        select: ['id', 'name'],
+        select: ['id', 'name'].toString(),
       };
 
       if (searchTerm) {
@@ -236,7 +236,7 @@ export class GroupsController {
         this.availableAgents.offset = 0;
       }
 
-      const req = await this.apiReq.request('GET', '/agents', params);
+      const req = await this.apiReq.request('GET', '/agents', { params: params});
 
       this.totalAgents = req.data.data.total_affected_items;
 
