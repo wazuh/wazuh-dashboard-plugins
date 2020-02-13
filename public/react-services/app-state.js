@@ -216,6 +216,14 @@ export class AppState {
 
 
     /**
+     * Remove '_currentPattern' value   
+     */
+    static removeCurrentPattern() {
+        return Cookies.remove('_currentPattern', { path : '/app' });
+    }
+
+
+    /**
      * Set a new value to the 'currentDevTools' cookie
      * @param {*} current 
      **/
