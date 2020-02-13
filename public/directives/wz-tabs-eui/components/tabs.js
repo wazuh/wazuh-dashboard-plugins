@@ -37,6 +37,20 @@ export class Tabs extends Component {
     this.props.clickAction(id);
   };
 
+  componentWillReceiveProps(nextProps) {
+    // You don't have to do this check first, but it can help prevent an unneeded render
+    if (nextProps.selectedTab !== this.state.selectedTab) {
+      this.tabs = [];
+      nextProps.tabs.forEach(tab => {
+        this.tabs.push({
+          id: tab.id,
+          name: tab.name
+        });
+      });
+      this.setState({ selectedTabId: nextProps.selectedTab });
+    }
+  }
+
   renderTabs() {
     return this.tabs.map((tab, index) => (
       <EuiTab

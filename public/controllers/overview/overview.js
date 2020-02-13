@@ -24,6 +24,9 @@ import {
   metricsMitre
 } from '../../utils/overview-metrics';
 
+import {
+  switchTab,
+} from '../../redux/actions/visualizeActions';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -134,6 +137,12 @@ export class OverviewController {
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
+
+    this.$rootScope.$on('switchVisualizeTab', (evt,params) => {
+      this.switchTab(params.tab,true);
+      this.setTabs();
+    });
+    
   }
 
   /**
@@ -206,13 +215,14 @@ export class OverviewController {
     this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
 
     if (!this.currentPanel) return;
-
+ 
+    const updateCurrentTab = switchTab(this.tab);
+    store.dispatch(updateCurrentTab);
     const tabs = this.commonData.getTabsFromCurrentPanel(
       this.currentPanel,
       this.extensions,
       this.tabNames
     );
-
     this.overviewTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);

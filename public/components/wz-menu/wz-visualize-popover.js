@@ -23,6 +23,7 @@ import {
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../server/reporting/tab-description';
+import chrome from 'ui/chrome';
 
 
 import {
@@ -90,14 +91,20 @@ class WzVisualizePopover extends Component {
 
   }
 
-  componentDidMount() {
-
+  async componentDidMount() {
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.rootScope = $injector.get('$rootScope');
+    
   }
 
 
   selectItem = id => {
-    window.location.href = `#/visualize/`;
+    this.props.visualizePopoverToggle();
+    window.location.href = `#/visualize/?tabView=panels&tab=${id}`;
     this.props.switchTab(id);
+    this.rootScope.$emit('switchVisualizeTab', {
+      tab: id
+    });
   };
 
 
@@ -106,7 +113,7 @@ class WzVisualizePopover extends Component {
     return {
       id: name,
       name,
-      isSelected: false,
+      isSelected: this.props.currentTab === id,
       onClick: () => this.selectItem(id),
     };
   };
@@ -120,7 +127,6 @@ class WzVisualizePopover extends Component {
 
 
   onItemClick(item) {
-    console.log(item)
     alert(`Item [${item.label}] was clicked`);
   }
 
@@ -195,7 +201,7 @@ class WzVisualizePopover extends Component {
         id={id}
         iconType="securityApp"
         label={item}
-        onClick={() => window.alert('Button clicked')}
+        onClick={() => this.selectItem(id)}
         extraAction={{
           color: 'subdued',
           onClick: () => this.removeFavorite(item),
@@ -211,16 +217,7 @@ class WzVisualizePopover extends Component {
   }
 
   addFavorite(item) {
-    console.log("jeje")
-    console.log(this.props)
     this.props.setFavorite(item);
-
-    /*
-    console.log("aqui")
-    var tmp = this.state.favoriteItems
-    tmp.push(item)
-    console.log(tmp)
-    this.setState({favoriteItems:tmp});*/
   }
 
   removeFavorite(item) {
@@ -277,7 +274,7 @@ class WzVisualizePopover extends Component {
                 id="link1"
                 iconType="logoAWS"
                 label="Amazon AWS"
-                onClick={() => window.alert('Button clicked')}
+                onClick={() => this.selectItem('aws')}
                 extraAction={{
                   color: 'subdued',
                   onClick: () => this.addFavorite('Amazon AWS'),
@@ -290,7 +287,7 @@ class WzVisualizePopover extends Component {
               <EuiListGroupItem
                 id="link2"
                 iconType="securityApp"
-                onClick={() => window.alert('Button clicked')}
+                onClick={() => this.selectItem('ciscat')}
                 label="CIS-CAT"
                 extraAction={{
                   color: 'subdued',
@@ -303,7 +300,7 @@ class WzVisualizePopover extends Component {
 
               <EuiListGroupItem
                 id="link3"
-                onClick={() => window.alert('Button clicked')}
+                onClick={() => this.selectItem('general')}
                 iconType="securityApp"
                 label="Security Events"
                 extraAction={{
@@ -317,6 +314,7 @@ class WzVisualizePopover extends Component {
 
               <EuiListGroupItem
                 id="link4"
+                onClick={() => this.selectItem('osquery')}
                 iconType="logoOsquery"
                 label="Osquery"
                 extraAction={{
@@ -330,6 +328,7 @@ class WzVisualizePopover extends Component {
               <EuiListGroupItem
                 id="link5"
                 iconType="securityApp"
+                onClick={() => this.selectItem('fim')}
                 label="Integrity Monitoring"
                 extraAction={{
                   color: 'subdued',

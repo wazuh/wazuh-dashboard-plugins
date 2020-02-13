@@ -16,7 +16,6 @@
  * @param tab
  */
 export const switchTab = tab => {
-  console.log("akkki")
   return {
     type: 'SWITCH_VISUALIZE_TAB',
     currentTab: tab

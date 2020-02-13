@@ -16,7 +16,6 @@ const initialState = {
 
 const visualizeReducers = (state = initialState, action) => {
   if (action.type === 'SWITCH_VISUALIZE_TAB') {
-    console.log("aqui")
     return {
       ...state,
       currentTab: action.currentTab,

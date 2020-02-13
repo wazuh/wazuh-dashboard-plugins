@@ -171,10 +171,8 @@ class WzMenu extends Component {
     this.visualizePopoverToggle();
   }
   setFavorite(item) {
-    console.log("jajaj" + item)
     var tmp = this.state.favoriteItems;
     tmp.push(item);
-    console.log(tmp)
     this.setState({ favoriteItems: tmp })
   }
 
@@ -217,7 +215,6 @@ class WzMenu extends Component {
         iconSide="right">
         <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
       </EuiButtonEmpty>);
-
     return (
       <WzReduxProvider>
         {this.state.showMenu && (
@@ -363,6 +360,7 @@ class WzMenu extends Component {
 const mapStateToProps = state => {
   return {
     state: state.appStateReducers,
+    currentTab: state.visualizeReducers.currentTab,
   };
 };
 

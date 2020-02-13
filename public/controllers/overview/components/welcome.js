@@ -43,12 +43,6 @@ class WelcomeScreen extends Component {
     };
   }
 
-
-  componentDidMount(){
-    console.log("mountx")
-    console.log(store.getState())
-    this.props.switchTab(store.getState().visualizeReducers.currentTab)
-  }
   onButtonClick(btn) {
     this.setState({
       [btn]: !this.state[btn]
@@ -124,9 +118,6 @@ class WelcomeScreen extends Component {
   }
 
   render() {
-    console.log("ja")
-    console.log(this.props)
-    console.log(store.getState())
     return (
       <EuiPage style={{ padding: 0 }}>
         <EuiFlexGroup>

@@ -41,10 +41,6 @@ export class WelcomeScreen extends Component {
     };
   }
 
-  componentDidMount(){
-    console.log("mountx");
-  }
-
   onButtonClick(btn) {
     this.setState({
       [btn]: !this.state[btn],
