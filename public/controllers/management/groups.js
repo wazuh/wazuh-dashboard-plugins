@@ -358,6 +358,7 @@ export class GroupsController {
 
   async saveAddAgents() {
     const itemsToSave = this.getItemsToSave();
+    const affectedIds = [];
     const failedIds = [];
     try {
       this.multipleSelectorLoading = true;
@@ -370,6 +371,9 @@ export class GroupsController {
         if (addResponse.data.data.total_failed_items) {
           failedIds.push(...addResponse.data.data.failed_items);
         }
+        if (addResponse.data.data.total_affected_items) {
+          affectedIds.push(...addResponse.data.data.affected_items);
+        }
       }
       if (itemsToSave.deletedIds.length) {
         const deleteResponse = await this.apiReq.request(
@@ -380,16 +384,23 @@ export class GroupsController {
         if (deleteResponse.data.data.total_failed_items) {
           failedIds.push(...deleteResponse.data.data.failed_items);
         }
+        if (deleteResponse.data.data.total_affected_items) {
+          affectedIds.push(...deleteResponse.data.data.affected_items);
+        }
       }
 
       if (failedIds.length) {
         const failedErrors = failedIds.map(item => ({
-          id: (item || {}).id,
+          id: ((item || {}).error || {}).code,
           message: ((item || {}).error || {}).message,
         }));
+
+        const arrayIds = failedIds.map(item => (item.id));
+
         this.failedErrors = this.groupBy(failedErrors, 'message') || false;
-        this.errorHandler.info(
-          `Group has been updated but an error has occurred with ${failedIds.length} agents`,
+        this.errorHandler.handle(
+          `Group has been updated but an error has occurred with ${arrayIds[0].length === 1 ? '1 agent' : arrayIds[0].length + ' agents'}: 
+          ${arrayIds.toString()}`,
           '',
           true
         );
