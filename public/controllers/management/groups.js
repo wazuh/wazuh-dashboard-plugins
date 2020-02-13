@@ -99,8 +99,9 @@ export class GroupsController {
       if (this.globalAgent) {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
-        const data = await this.apiReq.request('GET', '/agents/groups', {
-          limit: 1000,
+        const data = await this.apiReq.request('GET', 
+        '/agents/groups', 
+        { params: { limit: 1000 },
         });
         const filtered = data.data.data.affected_items.filter(group => group.name === globalGroup);
         if (Array.isArray(filtered) && filtered.length) {
@@ -114,9 +115,10 @@ export class GroupsController {
 
         this.shareAgent.deleteAgent();
       } else {
-        const loadedGroups = await this.apiReq.request('GET', '/agents/groups', {
-          limit: 1000,
-        });
+        const loadedGroups = await this.apiReq.request('GET', 
+        '/agents/groups', 
+        { params: { limit: 1000 } } 
+        );
         this.buildGroupsTableProps(loadedGroups.data.data.affected_items);
         const configuration = this.wazuhConfig.getConfig();
         this.adminMode = !!(configuration || {}).admin;
@@ -151,9 +153,10 @@ export class GroupsController {
     try {
       this.groupsSelectedTab = 'agents';
       this.lookingGroup = true;
-      const count = await this.apiReq.request('GET', `/agents/groups/${group.name}/files`, {
-        limit: 1,
-      });
+      const count = await this.apiReq.request('GET', 
+      `/agents/groups/${group.name}/files`, 
+      { params: { limit: 1 }}
+      );
       this.totalFiles = count.data.data.total_affected_items;
       this.fileViewer = false;
       this.currentGroup = group;
@@ -189,7 +192,7 @@ export class GroupsController {
     try {
       let params = {
         offset: !searchTerm ? this.selectedAgents.offset : 0,
-        select: ['id', 'name'],
+        select: ['id', 'name'].toString(),
       };
       if (searchTerm) {
         params.search = searchTerm;
@@ -197,7 +200,7 @@ export class GroupsController {
       const result = await this.apiReq.request(
         'GET',
         `/agents/groups/${this.currentGroup.name}`,
-        params
+        { params: params },
       );
       this.totalSelectedAgents = result.data.data.total_affected_items;
       const mapped = result.data.data.affected_items.map(item => {
@@ -236,7 +239,7 @@ export class GroupsController {
         this.availableAgents.offset = 0;
       }
 
-      const req = await this.apiReq.request('GET', '/agents', { params: params});
+      const req = await this.apiReq.request('GET', '/agents', { params: params });
 
       this.totalAgents = req.data.data.total_affected_items;
 
@@ -366,7 +369,7 @@ export class GroupsController {
         const addResponse = await this.apiReq.request(
           'PUT',
           `/agents/group/${this.currentGroup.name}`,
-          {params: { list_agents: itemsToSave.addedIds.toString()  }}
+          { params: { list_agents: itemsToSave.addedIds.toString() }}
         );
         if (addResponse.data.data.total_failed_items) {
           failedIds.push(...addResponse.data.data.failed_items);
