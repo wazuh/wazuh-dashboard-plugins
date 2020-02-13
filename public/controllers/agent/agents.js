@@ -30,6 +30,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { WzRequest } from '../../react-services/wz-request';
 
 export class AgentsController {
   /**
@@ -796,21 +797,21 @@ export class AgentsController {
   }
 
   onClickUpgrade() {
-    
-    selectedItems.map(item => {
-      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
-    });
-    
-    console.log(response);
+    try {
+      const response = WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/upgrade`, {});
+      console.log(response); 
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   onClickReset() {
-    
-    selectedItems.map(item => {
-      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/restart`, {});
-    });
-    
-    console.log(response);
+    try {
+      const response = WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/restart`, {});
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Agent data

@@ -25,9 +25,11 @@ import {
   EuiToolTip,
   EuiTitle,
   EuiHealth,
-  EuiSpacer
+  EuiSpacer,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
+import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request'
 
 export class AgentsTable extends Component {
@@ -47,9 +49,18 @@ export class AgentsTable extends Component {
       sortDirection: 'asc',
       sortField: 'id',
       totalItems: 0,
-      selectedItems: []
+      selectedItems: [],
     }
     this.downloadCsv.bind(this);
+  }
+
+  async componentWillMount() {
+    const managerVersion = await WzRequest.apiReq(
+      'GET',
+      '/version',
+      {}
+    );
+    this.setState({ managerVersion: managerVersion.data.data });
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -100,6 +111,7 @@ export class AgentsTable extends Component {
       isLoading: true,
     });
     await this.props.reload();
+    this.checkAgentsUpdating();
   }
 
   async componentDidUpdate(prevProps, prevState) {
@@ -183,9 +195,9 @@ export class AgentsTable extends Component {
       <div>
         <EuiToolTip content="Open Discover panel for this agent" position="left">
           <EuiButtonIcon
-            onClick={() => (ev) => {
+            onClick={(ev) => {
               ev.stopPropagation();
-              this.props.clickAction(agent, 'discover')
+              this.props.clickAction(agent, 'discover');
             }}
             iconType="discoverApp"
             aria-label="Open Discover panel for this agent"
@@ -229,6 +241,28 @@ export class AgentsTable extends Component {
 
   }
 
+  addIconUpgrade(agent, item) {
+    let spinner = '';
+    
+    if (item.upgrading === true) {
+      spinner = (
+        <EuiToolTip content="This agent is being updated." position="right">
+          <EuiLoadingSpinner size="s" />
+        </EuiToolTip>
+      )
+    }
+
+    return (
+      <div>
+        <span className="euiTableCellContent__text euiTableCellContent--truncateText">
+          {agent}
+        </span>
+        &nbsp;&nbsp;
+        {spinner}
+      </div>
+    )
+  }
+
   addHealthStatusRender(status) {
     const color = (status) => {
       if (status.toLowerCase() === 'active') {
@@ -264,21 +298,39 @@ export class AgentsTable extends Component {
     );
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
   /* MULTISELECT TABLE */
   onSelectionChange = selectedItems => {
+    const { managerVersion } = this.state;
+
+    selectedItems.forEach(item => {
+      if (managerVersion > item.version) {
+        item.outdated = true;
+      }
+    });
     this.setState({ selectedItems });
   };
 
   renderUpgradeButton() {
     const { selectedItems } = this.state;
 
-    if (selectedItems.length === 0) {
+    if (selectedItems.length === 0 ||
+      (selectedItems.length > 0 && selectedItems.filter(item => item.outdated).length === 0) || 
+      (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0)) {
       return;
     }
 
     return (
-      <EuiButton color="danger" iconType="upgrade" onClick={this.onClickUpgrade}>
-        Upgrade {selectedItems.length} Agents
+      <EuiButton style={{ margin: 6 }} color="secondary" iconType="sortUp" onClick={this.onClickUpgrade}>
+        Upgrade {selectedItems.filter(item => item.outdated).length} Agents
       </EuiButton>
     );
   }
@@ -291,28 +343,76 @@ export class AgentsTable extends Component {
     }
 
     return (
-      <EuiButton color="danger" iconType="upgrade" onClick={this.onClickReset}>
-        Reset {selectedItems.length} Agents
+      <EuiButton style={{ margin: 6 }} color="primary" iconType="refresh" onClick={this.onClickRestart}>
+        Restart {selectedItems.length} Agents
       </EuiButton>
     );
   }
 
-  onClickUpgrade = () => {
-    const { selectedItems } = this.state;
-    selectedItems.map(item => {
-      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
+  setUpgradingState(agentID) {
+    const { agents } = this.state;
+    agents.forEach(element => {
+      element.id === agentID ? element.upgrading = true : false;
     });
+    this.setState({ agents });
+  }
+
+  checkAgentsUpdating() {
+    const { agents, managerVersion } = this.state;
+    let flag = false;
     
-    console.log(response);
+    if (localStorage.getItem('upgradeAgents') !== null) {
+      const upgradingAgents = JSON.parse(localStorage.getItem('upgradeAgents')).map(element => element.itemId);
+      agents.map(agent => {
+        upgradingAgents.map(upgradingAgent => {
+          if (agent.id === upgradingAgent && agent.version === managerVersion) {
+            agent.upgrading = false;
+            flag = true;
+          }
+        });
+      });
+      flag === true ? this.showToast('success', 'Agents Upgrades', '', 5000) : this.showToast('warning', 'Error Upgrading agents', '', 5000);
+      this.setState({ agents });
+    }
+  }
+
+  onClickUpgrade = () => {
+    localStorage.removeItem('upgradeAgents');
+    const { selectedItems } = this.state;
+    let upgradeStorage = [];
+    
+    for (let item of selectedItems.filter(item => item.outdated)) {
+      try {
+        WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
+        upgradeStorage = [
+          ...upgradeStorage,
+          {
+            'itemId': item.id,
+            'lastTimeUpgrade': new Date()
+          }
+        ];
+        localStorage.setItem('upgradeAgents', JSON.stringify(upgradeStorage));
+        this.setUpgradingState(item.id);
+        this.showToast('success', 'Upgrading Agents', '', 5000);
+        this.checkAgentsUpdating();
+        setTimeout(() => {
+          this.reloadAgents();
+        }, 120000);
+      } catch (error) {
+        this.showToast('danger', 'Error Upgrading Agents', error, 5000); 
+      }
+    }
   };
 
-  onClickReset = () => {
+  onClickRestart = () => {
     const { selectedItems } = this.state;
-    selectedItems.map(item => {
-      const response = WzRequest.apiReq('PUT', `/agents/${item.id}/restart`, {});
-    });
-    
-    console.log(response);
+    const agentsId = selectedItems.map(item => item.id);
+    try {
+      WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...agentsId] });
+      this.showToast('success', 'All agents have been restarted.', '', 5000);
+    } catch (error) {
+      this.showToast('warning', 'Error restarting agents', error, 5000);
+    }
   };
 
   columns() {
@@ -354,6 +454,7 @@ export class AgentsTable extends Component {
         width: '100px',
         truncateText: true,
         sortable: true,
+        render: (agent, item) => this.addIconUpgrade(agent, item),
       },
       {
         field: 'dateAdd',
@@ -375,7 +476,7 @@ export class AgentsTable extends Component {
         render: this.addHealthStatusRender,
       },
       {
-        align: 'right',
+        align: 'left',
         width: '100px',
         field: 'actions',
         name: 'Actions',
@@ -593,6 +694,12 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
+        onClick: () => {}
+      };
+    };
+
+    const getCellProps = item => {
+      return {
         onClick: () => this.props.clickAction(item),
       };
     };
@@ -614,9 +721,7 @@ export class AgentsTable extends Component {
     const isLoading = this.state.isLoading;
 
     const selection = {
-      selectable: agent => agent.name,
-      selectableMessage: selectable =>
-        !selectable ? 'Agent is currently offline' : undefined,
+      selectable: agent => agent.status === 'Active',
       onSelectionChange: this.onSelectionChange,
     };
 
@@ -632,6 +737,7 @@ export class AgentsTable extends Component {
             sorting={sorting}
             loading={isLoading}
             rowProps={getRowProps}
+            cellProps={getCellProps}
             isSelectable={true}
             selection={selection}
             noItemsMessage="No agents found"
