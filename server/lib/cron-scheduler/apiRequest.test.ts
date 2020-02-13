@@ -15,11 +15,9 @@ describe('ApiRequest', () => {
       status: 'disabled',
     },
   }
-  beforeEach(() => {
-  })
-
   afterEach(() => {
-  })
+    jest.resetAllMocks();
+  });
 
   test('should return the object with the data of the request ', async () => {
     const mockResponse = {
@@ -54,19 +52,24 @@ describe('ApiRequest', () => {
     const apiRequest = new ApiRequest('/versio', apiExample1);
     const response = await apiRequest.getData();
 
-    expect(response).toEqual(mockResponse.data);
+    expect(response).toEqual(mockResponse.response.data);
   })
+
+  test('should ', async () => {
+    const apiRequest = new ApiRequest('/version', apiExample1);
+    const response = await apiRequest.makeRequest();
+  });
   
-  test('should throw an error when the api user are invalid', () => {
-    expect(true).toBe(false);
-  })
+  // test('should throw an error when the api user are invalid', () => {
+  //   expect(true).toBe(false);
+  // })
   
-  test('should throw an error when the port api are invalid', () => {
-    expect(true).toBe(false);
-  })
+  // test('should throw an error when the port api are invalid', () => {
+  //   expect(true).toBe(false);
+  // })
   
-  test('should throw an error when the url api are invalid', () => {
-    expect(true).toBe(false);
-  })
+  // test('should throw an error when the url api are invalid', () => {
+  //   expect(true).toBe(false);
+  // })
 
 })
