@@ -25,6 +25,9 @@ import {
 import { TabDescription } from '../../../server/reporting/tab-description';
 
 
+import {
+  switchTab,
+} from '../../redux/actions/visualizeActions';
 import checkAdminMode from '../../controllers/management/components/management/ruleset/utils/check-admin-mode';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
@@ -91,37 +94,20 @@ class WzVisualizePopover extends Component {
 
   }
 
-  /**
- * Fetch the data for a section: rules, decoders, lists...
- * @param {String} newSection
- */
-  async fetchData(newSection) {
-    try {
 
-    } catch (error) {
-    }
-  }
-
-  clickMenuItem = section => {
-    this.props.managementPopoverToggle();
-    window.location.href = `#/manager/?tab=${section}`;
+  selectItem = id => {
+    window.location.href = `#/visualize/`;
+    this.props.switchTab(id);
   };
 
 
 
-  selectItem = name => {
-    console.log(name)
-  };
-
-
-
-  createItem = (name, data = {}) => {
+  createItem = (name, id) => {
     return {
-      ...data,
       id: name,
       name,
       isSelected: false,
-      onClick: () => this.selectItem(name),
+      onClick: () => this.selectItem(id),
     };
   };
 
@@ -144,7 +130,7 @@ class WzVisualizePopover extends Component {
     let failedCounter = 0;
 
     const subsections = currentSection.subsections.filter(item => this.state.searchValue === "" || (this.state.searchValue && TabDescription[item.id].description.toLowerCase().includes(this.state.searchValue.toLowerCase())) || (this.state.searchValue && item.name.toLowerCase().includes(this.state.searchValue.toLowerCase()))).map(item => {
-      return (this.createItem(item.name))
+      return (this.createItem(item.name,item.id))
     })
 
     if (failedCounter === subsections.length) {
@@ -153,10 +139,13 @@ class WzVisualizePopover extends Component {
     }
 
 
-    const sideNav = [this.createItem(currentSection.name, {
+    const sideNav = [{
+      name: currentSection.name,
+      id:0,
       icon: <EuiIcon type={currentSection.icon} color="primary" />,
       items: subsections
-    })
+    }
+    
     ]
 
     return (
@@ -420,11 +409,10 @@ class WzVisualizePopover extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    state: state.rulesetReducers
-  };
+    switchTab: tab => dispatch(switchTab(tab))
+  }
 };
 
-
-export default connect(mapStateToProps, null)(WzVisualizePopover);
+export default connect(null, mapDispatchToProps)(WzVisualizePopover);

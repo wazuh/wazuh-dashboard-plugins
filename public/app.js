@@ -122,7 +122,7 @@ app.run(function($rootScope, $route, $location, $window) {
           AppState.setNavigation({ reloaded: true });
           $location.search('configSubTab', null);
           $location.search('editingFile', null);
-          $route.reload();
+  //        $route.reload();
           //discover sections
         } else if (
           navigation.discoverSections.includes(navigation.currLocation)

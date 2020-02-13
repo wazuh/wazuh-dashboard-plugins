@@ -28,10 +28,12 @@ import {
   EuiCallOut,
   EuiPage
 } from '@elastic/eui';
+import store from '../../../redux/store';
+import { connect } from 'react-redux';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
 
-export class WelcomeScreen extends Component {
+class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
     this.strtools = new StringsTools();
@@ -41,6 +43,12 @@ export class WelcomeScreen extends Component {
     };
   }
 
+
+  componentDidMount(){
+    console.log("mountx")
+    console.log(store.getState())
+    this.props.switchTab(store.getState().visualizeReducers.currentTab)
+  }
   onButtonClick(btn) {
     this.setState({
       [btn]: !this.state[btn]
@@ -116,6 +124,9 @@ export class WelcomeScreen extends Component {
   }
 
   render() {
+    console.log("ja")
+    console.log(this.props)
+    console.log(store.getState())
     return (
       <EuiPage style={{ padding: 0 }}>
         <EuiFlexGroup>
@@ -254,3 +265,9 @@ WelcomeScreen.propTypes = {
   setExtensions: PropTypes.func,
   api: PropTypes.string
 };
+
+const mapStateToProps = (state) => ({
+	currentTab: state.visualizeReducers.currentTab
+});
+
+export default connect(mapStateToProps, null)(WelcomeScreen);
