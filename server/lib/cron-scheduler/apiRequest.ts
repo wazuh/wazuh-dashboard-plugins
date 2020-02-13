@@ -26,7 +26,7 @@ export class ApiRequest {
     this.params = params;
   }
 
-  private async makeRequest():AxiosResponse {
+  private async makeRequest():Promise<AxiosResponse> {
     const {url, port, user, password} = this.api;
     
     const requestConfig: AxiosRequestConfig = {
@@ -51,7 +51,6 @@ export class ApiRequest {
         log('apiRequest', `Wrong Wazuh API credentials used`);
         throw error.response;
       }
-      console.log(error.response.data)
       return error.response.data;
     }
   }
