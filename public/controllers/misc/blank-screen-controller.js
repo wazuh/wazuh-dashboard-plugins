@@ -22,6 +22,7 @@ export class BlankScreenController {
     this.$location = $location;
     this.errorHandler = errorHandler;
     this.wzMisc = wzMisc;
+    this.showErrorPage = false;
   }
 
   /**
@@ -35,9 +36,13 @@ export class BlankScreenController {
         parsed = this.errorHandler.handle(catchedError, '', false, true);
       } catch (error) {} // eslint-disable-line
       this.errorToShow = parsed || catchedError;
-      this.wzMisc.setBlankScr(false);
       this.$scope.$applyAsync();
+      this.wzMisc.setBlankScr(false);
+    }else{
+      this.goOverview();
+      return;
     }
+    this.showErrorPage = true;
   }
 
   /**
