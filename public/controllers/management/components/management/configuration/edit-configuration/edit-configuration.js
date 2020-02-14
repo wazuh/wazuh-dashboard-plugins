@@ -139,7 +139,7 @@ class WzEditConfiguration extends Component{
     return (
       <Fragment>
         <WzConfigurationPath title={`${clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`} updateConfigurationSection={this.props.updateConfigurationSection}>
-          <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
+          <EuiFlexGroup gutterSize='s' justifyContent='flexEnd' style={!clusterNodeSelected ? {marginRight: '7px'}: {}}>
             <EuiFlexItem grow={false}>
                 <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>Refresh</EuiButtonEmpty>
             </EuiFlexItem>
@@ -254,7 +254,7 @@ const WzEditorConfiguration = compose(
               <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
             )}
             <EuiSpacer size='s'/>
-            <WzCodeEditor mode='xml' value={editorValue} onChange={(value) => onChange(value)} minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 250}/>
+            <WzCodeEditor mode='xml' value={editorValue} onChange={(value) => onChange(value)} minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 325 : 255}/>
             {restart && !restarting && (
               <EuiOverlayMask>
                 <EuiConfirmModal

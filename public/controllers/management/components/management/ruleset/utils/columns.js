@@ -6,7 +6,7 @@ import {
   EuiBadge,
 } from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
-
+import exportCsv from '../../../../../../react-services/wz-csv';
 
 export default class RulesetColumns {
 
@@ -236,6 +236,18 @@ export default class RulesetColumns {
                         this.tableProps.updateShowModal(true);
                       }}
                       color="danger"
+                      disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
+                    />
+                  </EuiToolTip>
+                  <EuiToolTip position="top" content={`Export ${item.name}`}>
+                    <EuiButtonIcon
+                      aria-label="Export list"
+                      iconType="exportAction"
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
+                        await exportCsv(`/lists?path=${item.path}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.path}/${item.name}`}], item.name)
+                      }}
+                      color="primary"
                       disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
                     />
                   </EuiToolTip>

@@ -54,7 +54,7 @@ class WzConfigurationInventory extends Component{
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return (this.wodleConfig && this.wodleConfig.syscollector && this.wodleConfig.syscollector.disabled === 'no') || false;
+    return this.wodleConfig && this.wodleConfig.syscollector && this.wodleConfig.syscollector.disabled === 'no';
   }
   render(){
     const { currentConfig } = this.props;
