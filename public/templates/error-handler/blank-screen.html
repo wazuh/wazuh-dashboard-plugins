@@ -1,4 +1,5 @@
 <div flex="auto" layout="column" ng-controller="blankScreenController as ctrl" layout-align="center center">
+    <div ng-if="ctrl.showErrorPage">
     <div class="wz-text-center">
         <img class="loading-logo-fail" aria-hidden="true" wz-src="/plugins/wazuh/img/icon_fail.svg" />
     </div>
@@ -22,5 +23,6 @@
                 </md-button>
             </p>
         </div>
+    </div>
     </div>
 </div>

@@ -13,6 +13,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
+import { PatternHandler } from '../../react-services/pattern-handler'
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 
@@ -106,8 +107,13 @@ export class HealthCheck {
           `/elastic/index-patterns/${patternTitle}`
         );
         if (!patternData.data.status) {
-          this.errors.push('The selected index-pattern is not present.');
-          this.results[i].status = 'Error';
+          const patternList = await PatternHandler.getPatternList();
+          if(patternList.length){
+            return this.checkPatterns();
+          }else{
+            this.errors.push('The selected index-pattern is not present.');
+            this.results[i].status = 'Error';
+          }
         } else {
           this.processedChecks++;
           this.results[i].status = 'Ready';
