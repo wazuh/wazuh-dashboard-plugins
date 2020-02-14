@@ -38,10 +38,10 @@ export class WzRequest {
         throw new Error(data.error);
       }
       return Promise.resolve(data);
-    } catch (error) {
-      return (((error || {}).response || {}).data || {}).message || false
-        ? Promise.reject(error.response.data.message)
-        : Promise.reject(error.response.message || error.response || error);
+    } catch(err){
+      return ((err || {}).message) || false
+      ? Promise.reject(err.message)
+      : Promise.reject(err || 'Server did not respond');
     }
   }
 
