@@ -39,7 +39,6 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
   }
   render(){
     const { currentConfig } = this.props;
-    console.log('who-data', this.props)
     return (
       <Fragment>
         {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.whodata && (
