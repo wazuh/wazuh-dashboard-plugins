@@ -110,7 +110,7 @@ describe('SchedulerJob', () => {
     expect(schedulerJob.job).toEqual(testJob);
   });
 
-  it('should get API object when no especified the `apis` paramenter on the job object', async () => {
+  it('should get API object when no specified the `apis` parameter on the job object', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(oneApi)
     const apis: IApi[] = await schedulerJob.getApiObjects();
 
@@ -119,7 +119,7 @@ describe('SchedulerJob', () => {
     expect(apis).toEqual(oneApi);
   });
 
-  it('should get all API object when no especified the `apis` paramenter on the job object', async () => {
+  it('should get all API objects when no specified the `apis` parameter on the job object', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(twoApi)
     const apis: IApi[] = await schedulerJob.getApiObjects();
 
@@ -128,16 +128,7 @@ describe('SchedulerJob', () => {
     expect(apis).toEqual(twoApi);
   });
 
-  it('should get all API object when no especified the `apis` paramenter on the job object', async () => {
-    WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(twoApi)
-    const apis: IApi[] = await schedulerJob.getApiObjects();
-
-    expect(apis).not.toBeUndefined();
-    expect(apis).not.toBeFalsy();
-    expect(apis).toEqual(twoApi);
-  });
-
-  it('should get one of two API object when especified the id in `apis` paramenter on the job object', async () => {
+  it('should get one of two API object when specified the id in `apis` parameter on the job object', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(twoApi)
     schedulerJob.job = {...testJob, apis: ['internal']}
     const apis: IApi[] = await schedulerJob.getApiObjects();
@@ -148,7 +139,7 @@ describe('SchedulerJob', () => {
     expect(apis).toEqual(filteredTwoApi);
   });
 
-  it('should get one of three API object when especified the id in `apis` paramenter on the job object', async () => {
+  it('should get two of three API object when specified the id in `apis` parameter on the job object', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(threeApi)
     const selectedApis = ['internal', 'external'];
     schedulerJob.job = {...testJob, apis: selectedApis}
@@ -160,13 +151,13 @@ describe('SchedulerJob', () => {
     expect(apis).toEqual(filteredThreeApi);
   });
 
-  it('should throw and exception when no get apis', async () => {
+  it('should throw an exception when no get APIs', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue([])
     await expect(schedulerJob.getApiObjects()).rejects.toThrow();
     await expect(schedulerJob.getApiObjects()).rejects.toThrowError(/10001/);
   });
 
-  it('should throw and exception when filter by no exist api', async () => {
+  it('should throw an exception when no match API', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(threeApi)
     schedulerJob.job = {...testJob, apis: ['unkown']}
     await expect(schedulerJob.getApiObjects()).rejects.toThrow();
