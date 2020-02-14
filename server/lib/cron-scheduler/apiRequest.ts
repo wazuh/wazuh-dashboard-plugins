@@ -42,7 +42,7 @@ export class ApiRequest {
     return response;
   }
 
-  public async getData() {
+  public async getData():Promise<object> {
     try {
       const response = await this.makeRequest();
       return response.data;

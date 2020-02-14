@@ -1,4 +1,4 @@
-export interface job {
+export interface IJob {
   status: boolean
   method: 'GET' | 'POST' | 'PUT' | 'DELETE'
   request: string
@@ -9,14 +9,32 @@ export interface job {
   apis?: string[]
 }
 
-export const jobs: job[] = [
+export const jobs: IJob[] = [
+  {
+    status: true,
+    method: "GET",
+    request: '/version',
+    params: {},
+    interval: '* * * * * *',
+    index: 'version',
+    creation: 'w',
+  },
+  {
+    status: true,
+    method: "GET",
+    request: '/manager/status',
+    params: {},
+    interval: '* * * * * *',
+    index: 'manager-stats',
+    creation: 'w',
+  },
   {
     status: true,
     method: "GET",
     request: '/manager/stats/remoted?pretty',
     params: {},
-    interval: '0 */2 * * * *',
-    index: 'managet-stats',
+    interval: '* * * * * *',
+    index: 'manager-stats',
     creation: 'w',
   },
 ]
