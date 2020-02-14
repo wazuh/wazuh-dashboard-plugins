@@ -67,7 +67,7 @@ class WzRulesetTable extends Component {
     if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
-          pageSize: 10,
+          pageSize: this.state.pageSize,
           pageIndex: 0,
           sortDirection: null,
           sortField: null,
