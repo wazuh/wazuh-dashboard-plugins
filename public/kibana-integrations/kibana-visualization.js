@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Custom visualization directive
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,14 +11,14 @@
  */
 import $ from 'jquery';
 import { uiModules } from 'ui/modules';
-import { getVisualizeLoader } from 'ui/visualize/loader';
+import { getVisualizeLoader } from './loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
 
-app.directive('kbnVis', function () {
+app.directive('kbnVis', function() {
   return {
     restrict: 'E',
     scope: {
@@ -44,7 +44,6 @@ app.directive('kbnVis', function () {
       let visHandler = null;
       let renderInProgress = false;
       let deadField = false;
-      let mapClicked = false;
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
           const fromParsed = dateMath.parse(from);
@@ -161,16 +160,8 @@ app.directive('kbnVis', function () {
                 timeRange:
                   isAgentStatus && timeFilterSeconds < 900
                     ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                    : timefilter.getTime(),
-                filters: isAgentStatus ? [] : discoverList[1] || []
+                    : timefilter.getTime()
               });
-
-              if (!isAgentStatus) {
-                visHandler.update({
-                  query: discoverList[0]
-
-                });
-              }
               setSearchSource(discoverList);
             }
           }
@@ -228,10 +219,10 @@ app.directive('kbnVis', function () {
       const destroyAll = () => {
         try {
           visualization.destroy();
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
         try {
           visHandler.destroy();
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       };
 
       $scope.$on('$destroy', () => {
@@ -252,7 +243,7 @@ app.directive('kbnVis', function () {
         loadedVisualizations.addItem(true);
 
         const currentLoaded = loadedVisualizations.getList().length;
-        const deadVis = tab === 'ciscat' ? 0 : tabVisualizations.getDeadVis();
+        const deadVis = tabVisualizations.getDeadVis();
         const totalTabVis = tabVisualizations.getItem(tab) - deadVis;
 
         if (totalTabVis < 1) {
@@ -264,21 +255,11 @@ app.directive('kbnVis', function () {
 
           $rootScope.loadingStatus = `Rendering visualizations... ${
             currentCompleted > 100 ? 100 : currentCompleted
-            } %`;
+          } %`;
 
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';
-
-            if ($scope.visID.includes('AWS-geo')) {
-              const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
-              setTimeout(function () {
-                if (!mapClicked) {
-                  mapClicked = true;
-                  canvas[0].click();
-                }
-              }, 1000);
-            }
           } else if (
             $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
           ) {
