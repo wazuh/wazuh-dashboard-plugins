@@ -1,14 +1,16 @@
-import { job } from './predefined-jobs';
+import { IJob } from './predefined-jobs';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts'
-import { IApi } from './index';
+import { IApi, ApiRequest, SaveDocument } from './index';
 
 export class SchedulerJob {
-  job: job;
+  job: IJob;
   wazuhHosts: WazuhHostsCtrl;
+  saveDocument: SaveDocument;
 
-  constructor(newJob: job) {
+  constructor(newJob: IJob, server) {
     this.job = newJob;
     this.wazuhHosts = new WazuhHostsCtrl();
+    this.saveDocument = new SaveDocument(server);
   }
 
   private async getApiObjects() {
@@ -23,7 +25,14 @@ export class SchedulerJob {
     return hosts;
   }
 
-  private async saveResponse() {}
-
-  public async run() {}
+  public async run() {
+    const hosts = await this.getApiObjects();
+    const data:object[] = [];
+    for (const host of hosts) {
+      const apiRequest = new ApiRequest(this.job.request, host, this.job.params);
+      const response = await apiRequest.getData()
+      data.push(response);
+    }
+    this.saveDocument.save(data, this.job.index)
+  }
 }
