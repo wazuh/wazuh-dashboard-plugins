@@ -98,7 +98,9 @@ class WzConfigurationOverview extends Component{
 									: null}
 								</EuiFlexItem>
 								<EuiFlexItem grow={false}>
-									<WzHelpButtonPopover links={helpLinks}/>
+									<EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
+										<WzHelpButtonPopover links={helpLinks}/>
+									</EuiFlexGroup>
 								</EuiFlexItem>
 								<EuiFlexItem>
 									{this.props.clusterNodes && this.props.clusterNodes.length && this.props.clusterNodeSelected ? (

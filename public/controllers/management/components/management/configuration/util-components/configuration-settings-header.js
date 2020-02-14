@@ -46,7 +46,7 @@ class WzConfigurationSettingsHeader extends Component{
             {description && <EuiText color='subdued'>{description}</EuiText>}
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup alignItems='center' gutterSize='none'>
+            <EuiFlexGroup alignItems='center' gutterSize='none' justifyContent='flexEnd'>
               { settings && (
                 <Fragment>
                   <span>
@@ -75,7 +75,7 @@ class WzConfigurationSettingsHeader extends Component{
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='xs'/>
-        {title && <EuiHorizontalRule margin='none'/>}
+        {title && <EuiHorizontalRule margin='none' style={{ margin: 0 }}/>}
       </Fragment>
     )
   }

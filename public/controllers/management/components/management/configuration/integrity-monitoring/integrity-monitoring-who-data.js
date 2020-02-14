@@ -39,12 +39,13 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
   }
   render(){
     const { currentConfig } = this.props;
+    console.log('who-data', this.props)
     return (
       <Fragment>
-        {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.ignore && (
+        {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.whodata && (
           <WzNoConfig error='not-present' help={helpLinks} />
         )}
-        {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && (
+        {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.whodata && (
           <WzConfigurationSettingsTabSelector
             title='Who-data audit keys'
             description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
@@ -60,12 +61,7 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
                 columns={columns}
               />
             )}
-            {!currentConfig['syscheck-syscheck'].syscheck.whodata && (
-              <Fragment>
-                <EuiIcon size='m' type='iInCircle'/>
-                <span> No audit keys were found. Visit the documentation on <EuiLink target='__blank' href='https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html#whodata'>this link</EuiLink> to enable it.</span>
-              </Fragment>
-            )}
+
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>

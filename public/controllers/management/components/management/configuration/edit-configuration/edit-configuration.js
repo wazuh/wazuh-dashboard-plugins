@@ -139,7 +139,7 @@ class WzEditConfiguration extends Component{
     return (
       <Fragment>
         <WzConfigurationPath title={`${clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`} updateConfigurationSection={this.props.updateConfigurationSection}>
-          <Fragment>
+          <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
             <EuiFlexItem grow={false}>
                 <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>Refresh</EuiButtonEmpty>
             </EuiFlexItem>
@@ -156,7 +156,7 @@ class WzEditConfiguration extends Component{
                   </EuiButton>
                 : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected || 'Manager'}</EuiButton>}
             </EuiFlexItem>
-          </Fragment>
+          </EuiFlexGroup>
         </WzConfigurationPath>
         {!loadingStatus && (
           <Fragment>
