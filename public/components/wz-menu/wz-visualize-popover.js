@@ -48,6 +48,7 @@ class WzVisualizePopover extends Component {
     this.visualizeSections = [
       {
         "subsections": [
+          { name: "Open extensions directory", id: "extensionsDirectory", icon: "securityApp" },
           { name: "Security Events", id: "general", icon: "securityApp" },
           { name: "Integrity Monitoring", id: "fim", icon: "securityApp" },
           { name: "Amazon AWS", id: "aws", icon: "logoAWS" },
@@ -135,7 +136,7 @@ class WzVisualizePopover extends Component {
 
     let failedCounter = 0;
 
-    const subsections = currentSection.subsections.filter(item => this.state.searchValue === "" || (this.state.searchValue && TabDescription[item.id].description.toLowerCase().includes(this.state.searchValue.toLowerCase())) || (this.state.searchValue && item.name.toLowerCase().includes(this.state.searchValue.toLowerCase()))).map(item => {
+    const subsections = currentSection.subsections.filter(item => this.state.searchValue === "" || (item.id !== 'extensionsDirectory' && this.state.searchValue && TabDescription[item.id].description.toLowerCase().includes(this.state.searchValue.toLowerCase())) || (this.state.searchValue && item.name.toLowerCase().includes(this.state.searchValue.toLowerCase()))).map(item => {
       return (this.createItem(item.name,item.id))
     })
 
@@ -176,7 +177,7 @@ class WzVisualizePopover extends Component {
   createSuggestItem = (item) => {
     return {
       label: item.name,
-      description: TabDescription[item.id].description,
+      description: item.id !== 'extensionsDirectory' ? TabDescription[item.id].description : "",
       type: { iconType: item.icon, color: 'primary' },
     };
   };

@@ -37,6 +37,7 @@ export class TabVisualizations {
 
     this.overview = {
       welcome: 0,
+      extensionsDirectory: 0,
       general: 6,
       fim: 6,
       pm: 5,

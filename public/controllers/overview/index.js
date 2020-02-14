@@ -15,6 +15,8 @@ import { WelcomeVisualizeWrapper } from './components/welcome-visualize-wrapper'
 import { Stats } from './components/stats';
 import { AlertsStats } from './components/alerts-stats';
 import { RequirementCard } from './components/requirement-card';
+import { AddNewExtension } from './components/extensions-directory';
+
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -24,3 +26,4 @@ app
   .value('StatsOverview', Stats)
   .value('AlertsStats', AlertsStats)
   .value('RequirementCard', RequirementCard)
+  .value('AddNewExtension', AddNewExtension)

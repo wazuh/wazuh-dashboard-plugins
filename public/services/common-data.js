@@ -165,7 +165,7 @@ export class CommonData {
         )
       );
 
-      if (tab !== 'general') {
+      if (tab !== 'general' && tab !== 'extensionsDirectory') {
         if (tab === 'pci') {
           this.removeDuplicateExists('rule.pci_dss');
           filters.push(filterHandler.pciQuery());

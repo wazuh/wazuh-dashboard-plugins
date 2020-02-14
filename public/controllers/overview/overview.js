@@ -27,6 +27,7 @@ import {
 import {
   switchTab,
 } from '../../redux/actions/visualizeActions';
+import store from '../../redux/store'
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -132,6 +133,9 @@ export class OverviewController {
         AppState.setExtensions(api, extensions)
     };
 
+    this.addNewExtensionProps = {
+      extensions: this.extensions
+    };
     this.setTabs();
 
     this.$scope.$on('$destroy', () => {
