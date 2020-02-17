@@ -359,7 +359,6 @@ export class AgentsTable extends Component {
 
   checkAgentsUpdating() {
     const { agents, managerVersion } = this.state;
-    let flag = false;
     
     if (localStorage.getItem('upgradeAgents') !== null) {
       const upgradingAgents = JSON.parse(localStorage.getItem('upgradeAgents')).map(element => element.itemId);
@@ -367,11 +366,9 @@ export class AgentsTable extends Component {
         upgradingAgents.map(upgradingAgent => {
           if (agent.id === upgradingAgent && agent.version === managerVersion) {
             agent.upgrading = false;
-            flag = true;
           }
         });
       });
-      flag === true ? this.showToast('success', 'Agents Upgrades', '', 5000) : this.showToast('warning', 'Error Upgrading agents', '', 5000);
       this.setState({ agents });
     }
   }
