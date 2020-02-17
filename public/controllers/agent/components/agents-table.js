@@ -394,19 +394,20 @@ export class AgentsTable extends Component {
         this.checkAgentsUpdating();
         setTimeout(() => {
           this.reloadAgents();
-        }, 120000);
+        }, 900000);
       } catch (error) {
-        this.showToast('danger', 'Error Upgrading Agents', error, 5000); 
+        this.showToast('danger', 'Error Upgrading Agents.', error, 5000); 
       }
     }
   };
 
   onClickRestart = () => {
+    localStorage.removeItem('upgradeAgents');
     const { selectedItems } = this.state;
     const agentsId = selectedItems.map(item => item.id);
     try {
       WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...agentsId] });
-      this.showToast('success', 'All agents have been restarted.', '', 5000);
+      this.showToast('success', 'Restarting agents.', '', 5000);
     } catch (error) {
       this.showToast('warning', 'Error restarting agents', error, 5000);
     }
