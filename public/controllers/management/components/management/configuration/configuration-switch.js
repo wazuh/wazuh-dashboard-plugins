@@ -98,7 +98,6 @@ class WzConfigurationSwitch extends Component{
 			try{
 				// try if it is a cluster
 				const nodes = await clusterNodes();
-				console.log('data')
 				// set cluster nodes in Redux Store
 				this.props.updateClusterNodes(nodes.data.data.items);
 				// set cluster node selected in Redux Store
