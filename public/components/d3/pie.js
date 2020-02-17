@@ -27,10 +27,12 @@ export class Pie extends Component {
 
         const width = this.props.width;
         const height = this.props.height;
+        const noLegend = this.props.noLegend;
+        const customStyle= this.props.customStyle;
         const data = createPie(this.props.data);
         const colors = this.props.colors || ['#6eadc1','#57c17b','#6f87d8','#663db8','#bc52bc','#9e3533','#daa05d'];
         return (
-            <svg width={width} height={height}>
+            <svg style={customStyle} width={width} height={height}>
                 <g transform={`translate(${(width / 4) - 6} ${height / 2})`}>
                     {data.map((d, i) => (
                         <Slice key={i}
@@ -43,6 +45,7 @@ export class Pie extends Component {
                             fill={colors[i]} />
                     ))}
                 </g>
+                {!noLegend && (
                 <g transform={`translate(${width / 2} 0)`}>
                     {data.map((d, i) => (
                         <g key={i} className="legend" transform={`translate(0 ${15 * (i + 1)})`}>
@@ -50,7 +53,7 @@ export class Pie extends Component {
                             <text x="15" y="10" style={{ fontSize: 12 }}>{d.data.label}</text>
                         </g>
                     ))}
-                </g>
+                </g>)}
             </svg>
         );
     }
