@@ -42,6 +42,7 @@ import WzViewSelector, { WzViewSelectorSwitch } from './util-components/view-sel
 import WzLoading from './util-components/loading';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzToastProvider from './util-providers/toast-p';
+import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 
 import { clusterNodes, checkAdminMode } from './utils/wz-fetch';
 import { updateClusterNodes, updateClusterNodeSelected, updateAdminMode } from '../../../../../redux/actions/configurationActions';
@@ -52,7 +53,7 @@ import {
 	EuiPanel,
 	EuiSpacer,
 	EuiButtonEmpty,
-	EuiProgress
+	EuiFlexItem
 } from "@elastic/eui";
 
 import { agentIsSynchronized } from './utils/wz-fetch';
@@ -97,6 +98,7 @@ class WzConfigurationSwitch extends Component{
 			try{
 				// try if it is a cluster
 				const nodes = await clusterNodes();
+				console.log('data')
 				// set cluster nodes in Redux Store
 				this.props.updateClusterNodes(nodes.data.data.items);
 				// set cluster node selected in Redux Store
@@ -124,7 +126,15 @@ class WzConfigurationSwitch extends Component{
 								<EuiSpacer size='s'/>
 							</Fragment>
 						) : null}
-						{view !== '' && view !== 'edit-configuration' && (<WzConfigurationPath title={title} description={description} updateConfigurationSection={this.updateConfigurationSection} badge={badge}/>)}
+						{view !== '' && view !== 'edit-configuration' && (
+							<WzConfigurationPath title={title} description={description} updateConfigurationSection={this.updateConfigurationSection} badge={badge}>
+								{agent.id === '000' && (
+									<EuiFlexItem grow={false}>
+										<WzRefreshClusterInfoButton/>
+									</EuiFlexItem>
+								)}
+							</WzConfigurationPath>
+						)}
 						{view === '' && (
 							<WzConfigurationOverview agent={agent} agentSynchronized={agentSynchronized} exportConfiguration={this.props.exportConfiguration} updateConfigurationSection={this.updateConfigurationSection}/>
 						)}

@@ -50,7 +50,7 @@ export class WzStatisticsOverview extends Component {
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.items.map(item => {
-        return { value: item.name, text: item.name }
+        return { value: item.name, text: `${item.name} (${item.type})` }
       });
       this.setState({
         clusterNodes: nodes,

@@ -196,8 +196,6 @@ export default class WzLogs extends Component {
                 const nodeListTmp = await ApiRequest.request('GET', '/cluster/nodes', {});
                 if (Array.isArray((((nodeListTmp || {}).data || {}).data || {}).items)) {
                     nodeList = nodeListTmp.data.data.items
-                    .map(item => item.name)
-                    .reverse();
                     selectedNode = nodeListTmp.data.data.items.filter(
                     item => item.type === 'master'
                     )[0].name;
@@ -234,7 +232,7 @@ export default class WzLogs extends Component {
         try{
             if(this.state.nodeList && Array.isArray(this.state.nodeList)){
                 const nodeList = this.state.nodeList.map(item => {
-                    return { value: item, text: item}
+                    return { value: item.name, text: `${item.name} (${item.type})`}
                 })
                 return nodeList
             }else{
