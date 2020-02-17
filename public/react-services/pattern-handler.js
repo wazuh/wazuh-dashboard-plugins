@@ -40,7 +40,7 @@ export class PatternHandler {
 
       if (AppState.getCurrentPattern()) {
         let filtered = patternList.data.data.filter(item =>
-          item.id.includes(AppState.getCurrentPattern())
+          item.id === AppState.getCurrentPattern()
         );
         if (!filtered.length)
           AppState.setCurrentPattern(patternList.data.data[0].id);

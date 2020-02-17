@@ -14,7 +14,7 @@ import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
 import { RegisterAgent } from './components/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
-import { WelcomeScreen } from './components/welcome';
+import { WelcomeScreen } from './components/agents-welcome';
 import { Stats } from './components/stats';
 import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
