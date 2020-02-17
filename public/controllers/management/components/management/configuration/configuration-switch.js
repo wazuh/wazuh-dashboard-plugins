@@ -43,8 +43,8 @@ import WzLoading from './util-components/loading';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzToastProvider from './util-providers/toast-p';
 
-import { clusterNodes } from './utils/wz-fetch';
-import { updateClusterNodes, updateClusterNodeSelected } from '../../../../../redux/actions/configurationActions';
+import { clusterNodes, checkAdminMode } from './utils/wz-fetch';
+import { updateClusterNodes, updateClusterNodeSelected, updateAdminMode } from '../../../../../redux/actions/configurationActions';
 import { connect } from 'react-redux';
 
 import {
@@ -77,6 +77,14 @@ class WzConfigurationSwitch extends Component{
 		this.setState({ viewProps: { ...this.state.viewProps, badge: badgeStatus}})
 	}
 	async componentDidMount(){
+		// Check admin mode
+		try{
+			const adminMode = await checkAdminMode();
+			this.props.updateAdminMode(adminMode);
+		}catch(error){
+			this.props.updateAdminMode(false);
+			// do nothing
+		}
 		// If agent, check if is synchronized or not
 		if(this.props.agent.id !== '000'){
 			try{
@@ -220,7 +228,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
 	updateClusterNodes: (clusterNodes) => dispatch(updateClusterNodes(clusterNodes)),
-	updateClusterNodeSelected: (clusterNodeSelected) => dispatch(updateClusterNodeSelected(clusterNodeSelected))
+	updateClusterNodeSelected: (clusterNodeSelected) => dispatch(updateClusterNodeSelected(clusterNodeSelected)),
+	updateAdminMode: (adminMode) => dispatch(updateAdminMode(adminMode))
 });
 
 

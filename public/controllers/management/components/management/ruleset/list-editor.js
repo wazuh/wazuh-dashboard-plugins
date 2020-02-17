@@ -35,6 +35,8 @@ import RulesetHandler from './utils/ruleset-handler';
 
 import { toastNotifications } from 'ui/notify';
 
+import exportCsv from '../../../../../react-services/wz-csv';
+
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -395,7 +397,7 @@ class WzListEditor extends Component {
 
     return (
       <Fragment>
-        <EuiFlexItem style={{ textAlign: 'rigth' }} grow={false}>
+        <EuiFlexItem grow={false}>
           <EuiPopover
             id="addKeyValuePopover"
             ownFocus
@@ -482,13 +484,24 @@ class WzListEditor extends Component {
             <EuiFlexItem>
               {/* File name and back button when watching or editing a CDB list */}
               <EuiFlexGroup>
-                {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
-                <EuiFlexItem />
-                {/* This flex item is for separating between title and save button */}
-                {/* Pop over to add new key and value */}
-                {adminMode &&
-                  !this.state.editing &&
-                  this.renderAddAndSave(listName, path, !addingNew, this.state.items)}
+              {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
+              <EuiFlexItem />
+              {/* This flex item is for separating between title and save button */}
+              {/* Pop over to add new key and value */}
+              {!addingNew && (
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty
+                    iconType="exportAction"
+                    onClick={async () => await exportCsv(`/lists?path=${path}/${name}`, [{_isCDBList: true, name: 'path', value: `${path}/${name}`}], name)}
+                  >
+                    Export formatted
+                  </EuiButtonEmpty>
+                </EuiFlexItem>)
+              }
+              {adminMode &&
+                !this.state.editing &&
+                this.renderAddAndSave(listName, path, !addingNew, this.state.items)
+              }
               </EuiFlexGroup>
               {/* CDB list table */}
               <EuiFlexGroup>

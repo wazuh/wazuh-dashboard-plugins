@@ -87,7 +87,7 @@ class WzConfigurationOverview extends Component{
 						<EuiFlexItem grow={false}>
 							<EuiFlexGroup gutterSize="xs">
 								<EuiFlexItem>
-									{this.props.agent.id === '000' ? (
+									{this.props.agent.id === '000' && this.props.adminMode ? (
 										<Fragment>
 											<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>
 												Edit configuration
@@ -131,7 +131,8 @@ class WzConfigurationOverview extends Component{
 
 const mapStateToProps = (state) => ({
 	clusterNodes: state.configurationReducers.clusterNodes,
-	clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+	clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
+	adminMode: state.configurationReducers.adminMode
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);

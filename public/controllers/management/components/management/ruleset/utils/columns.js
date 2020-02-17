@@ -139,6 +139,23 @@ export default class RulesetColumns {
             name: 'Path',
             align: 'left',
             sortable: true
+          },
+          {
+            name: 'Actions',
+            align: 'left',
+            render: (item) => (
+              <EuiToolTip position="top" content={`Export ${item.name}`}>
+                <EuiButtonIcon
+                  aria-label="Export list"
+                  iconType="exportAction"
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    await exportCsv(`/lists?path=${item.path}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.path}/${item.name}`}], item.name)
+                  }}
+                  color="primary"
+                />
+              </EuiToolTip>
+            )
           }
         ],
         files: [
@@ -205,7 +222,7 @@ export default class RulesetColumns {
       }
       // If the admin mode is enabled the action column in CDB lists is shown
       if (this.adminMode) {
-        this.columns.lists.push(
+        this.columns.lists[2] =
           {
             name: 'Actions',
             align: 'left',
@@ -248,14 +265,12 @@ export default class RulesetColumns {
                         await exportCsv(`/lists?path=${item.path}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.path}/${item.name}`}], item.name)
                       }}
                       color="primary"
-                      disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
                     />
                   </EuiToolTip>
                 </div>
               )
             }
           }
-        );
       }
     }
 
