@@ -18,11 +18,17 @@ export class SchedulerJob {
     const hosts:IApi[] = await this.wazuhHosts.getHostsEntries(false, false, false);
     if (hosts.length <= 0) { throw new Error('10001'); }
     if(apis){
-      const filteredHosts = hosts.filter(host => apis.includes(host.id));
-      if (filteredHosts.length <= 0) { throw new Error('10002'); }
-      return filteredHosts;
+      return this.filterHosts(hosts, apis);
     }
     return hosts;
+  }
+
+  private filterHosts(hosts: IApi[], apis: string[]) {
+    const filteredHosts = hosts.filter(host => apis.includes(host.id));
+    if (filteredHosts.length <= 0) {
+      throw new Error('10002');
+    }
+    return filteredHosts;
   }
 
   public async run() {
