@@ -7,6 +7,8 @@ export const configEquivalences = {
   'checks.api': 'Enable or disable the API health check when opening the app.',
   'checks.setup':
     'Enable or disable the setup health check when opening the app.',
+  'checks.fields':
+    'Enable or disable the known fields health check when opening the app.',
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
   'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
