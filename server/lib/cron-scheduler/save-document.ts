@@ -15,7 +15,6 @@ export class SaveDocument {
     this.elasticClient = server.plugins.elasticsearch.getCluster('data').clusterClient.client;
     this.callWithRequest = server.plugins.elasticsearch.getCluster('data').callWithRequest;
     this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
-    this.save([{foo:`bar-${Date.now()}`},], 'test-monitoring')
   }
 
   async checkIndex(index):Promise<boolean> {
@@ -28,15 +27,27 @@ export class SaveDocument {
     if(!indexExists) { 
       await this.elasticClient.indices.create({index});
     }
-
-    const createDocumentObject: BulkIndexDocumentsParams = {
-      index,
-      type: '_doc',
-      body: doc.flatMap(item => [{ index: { _index: index } }, item])
-    }
+    const createDocumentObject = this.createDocument(doc, index);
+    console.log(createDocumentObject);
     await this.elasticClient.bulk(
       createDocumentObject
     );
+  }
+
+  private createDocument (doc, index): BulkIndexDocumentsParams {
+    const createDocumentObject: BulkIndexDocumentsParams = {
+      index,
+      type: '_doc',
+      body: doc.flatMap(item => [{ 
+        index: { _index: index } },
+        {
+          ...(typeof item.data === 'object')
+          ? item.data
+          : {data: item.data},
+          timestamp: new Date(Date.now()).toISOString()}
+      ])
+    };
+    return createDocumentObject;
   }
 
     
