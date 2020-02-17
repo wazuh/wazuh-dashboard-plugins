@@ -87,7 +87,7 @@ app.config([
 
 app.run(function ($rootScope, $route, $location) {
   chrome
-    .setRootTemplate('<react-component name="WzMenuWrapper" props="" /><div ng-view class="mainView"></div>')
+  .setRootTemplate('<react-component name="WzMenuWrapper" props="" /><div ng-view class="mainView"></div>')
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
   AppState.setNavigation({ status: false });
@@ -120,6 +120,9 @@ app.run(function ($rootScope, $route, $location) {
           $location.search().tabView !== 'cluster-monitoring'
         ) {
           AppState.setNavigation({ reloaded: true });
+          $location.search('configSubTab', null);
+          $location.search('editingFile', null);
+          $route.reload();
         }
       }
     }
