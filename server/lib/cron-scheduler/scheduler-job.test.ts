@@ -1,7 +1,13 @@
 //@ts-nocheck
-import { job, SchedulerJob, IApi } from './index';
+import {
+  job,
+  SchedulerJob,
+  IApi,
+  SaveDocument
+} from './index';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 jest.mock('../../controllers/wazuh-hosts');
+jest.mock('./save-document')
 
 describe('SchedulerJob', () => {
   const oneApi = [ { 
