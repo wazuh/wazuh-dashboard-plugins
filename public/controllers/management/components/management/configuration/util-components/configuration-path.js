@@ -40,7 +40,7 @@ class WzConfigurationPath extends Component{
         <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
             <EuiFlexGroup alignItems='center'>
-              <span grow={false} style={{margin: "0 6px"}}>
+              <span style={{margin: "0 6px"}}>
                 <EuiToolTip content='Back to configuration' position='right'>
                   <EuiButtonIcon  style={{padding: 0}} iconType='arrowLeft' iconSize='l' onClick={() => updateConfigurationSection('')} aria-label='back to configuration'/>
                 </EuiToolTip>

@@ -84,7 +84,6 @@ class WzConfigurationSwitch extends Component{
 			this.props.updateAdminMode(adminMode);
 		}catch(error){
 			this.props.updateAdminMode(false);
-			// do nothing
 		}
 		// If agent, check if is synchronized or not
 		if(this.props.agent.id !== '000'){

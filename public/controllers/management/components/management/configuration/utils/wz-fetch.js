@@ -178,7 +178,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
           break;
         }
       }catch(error){
-        console.error(error)
+        console.error(error);
       }
     }
     if(!isValid){
