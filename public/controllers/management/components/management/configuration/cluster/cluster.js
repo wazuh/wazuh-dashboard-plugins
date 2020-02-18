@@ -61,6 +61,7 @@ class WzCluster extends Component{
           <WzConfigurationSettingsTabSelector
             title='Main settings'
             currentConfig={currentConfig}
+            minusHeight={280}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsGroup
                 config={mainSettingsConfig}

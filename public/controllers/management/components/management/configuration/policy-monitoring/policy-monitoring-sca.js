@@ -50,6 +50,7 @@ class WzPolicyMonitoringSCA extends Component{
           <WzConfigurationSettingsTabSelector
             title='Security configuration assessment status'
             currentConfig={this.wodleConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
               config={this.wodleConfig.sca}

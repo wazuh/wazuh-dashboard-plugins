@@ -49,6 +49,7 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
             title='Who-data audit keys'
             description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup 
               config={currentConfig['syscheck-syscheck'].syscheck.whodata}

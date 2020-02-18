@@ -52,6 +52,7 @@ class WzConfigurationMonitoringIgnored extends Component{
               title='Ignored files and directories'
               description='These files and directories are ignored from the integrity scan'
               currentConfig={currentConfig}
+              minusHeight={this.props.agent.id === '000' ? 340 : 410}
               helpLinks={helpLinks}
             >
               <EuiBasicTable
@@ -74,6 +75,7 @@ class WzConfigurationMonitoringIgnored extends Component{
             title='Ignored'
             description='A list of registry entries that will be ignored'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
             {currentConfig['syscheck-syscheck'].syscheck.registry_ignore && (
               <EuiBasicTable

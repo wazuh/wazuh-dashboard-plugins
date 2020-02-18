@@ -45,6 +45,7 @@ class WzConfigurationVulnerabilitiesGeneral extends Component{
             title='Main settings'
             description='General settings applied to the vulnerability detector and its providers'
             currentConfig={wodleConfig}
+            minusHeight={340}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsGroup 
                 config={wodleConfig['vulnerability-detector']}

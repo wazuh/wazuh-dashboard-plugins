@@ -45,6 +45,7 @@ class WzPolicyMonitoringSystemAudit extends Component{
             title='UNIX audit files'
             description='Specified paths to audit definition files for Unix-like systems'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
               <EuiBasicTable 
                 items={currentConfig['syscheck-rootcheck'].rootcheck.system_audit.map(item => ({path: item}))}
