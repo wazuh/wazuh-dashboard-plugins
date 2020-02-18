@@ -2,7 +2,8 @@ import {
   Client,
   BulkIndexDocumentsParams,
 } from 'elasticsearch';
-import { date } from 'joi';
+import { getConfiguration } from '../get-configuration';
+
 
 export class SaveDocument {
   server: object;
@@ -22,13 +23,13 @@ export class SaveDocument {
     return exists
   }
 
-  async save(doc:object[], index) {
+  async save(doc:object[], indexName) {
+    const index = this.addIndexPrefix(indexName)
     const indexExists = this.checkIndex(index);
     if(!indexExists) { 
       await this.elasticClient.indices.create({index});
     }
     const createDocumentObject = this.createDocument(doc, index);
-    console.log(createDocumentObject);
     await this.elasticClient.bulk(
       createDocumentObject
     );
@@ -50,5 +51,10 @@ export class SaveDocument {
     return createDocumentObject;
   }
 
+  private addIndexPrefix(index): string {
+    const configFile = getConfiguration();
+    const prefix = configFile['cron.prefix'] || 'wazuh';
+    return `${prefix}-${index}`;
+  }
     
 }

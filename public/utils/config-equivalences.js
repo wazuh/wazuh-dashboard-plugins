@@ -46,5 +46,7 @@ export const configEquivalences = {
   admin:
     'Enable or disable administrator requests to the Wazuh API when using the app.',
   'logs.level':
-    'Set the app logging level, allowed values are info and debug. Default is info.'
+    'Set the app logging level, allowed values are info and debug. Default is info.',
+  'cron.prefix':
+    'Define the index prefix of predefined jobs'
 };

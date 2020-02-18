@@ -40,6 +40,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'wazuh.monitoring.replicas': 0,
     'wazuh.monitoring.creation': 'd',
     'wazuh.monitoring.pattern': 'wazuh-monitoring-3.x-*',
+    'cron.prefix': 'wazuh',
     admin: true,
     'logs.level': 'info'
   };
