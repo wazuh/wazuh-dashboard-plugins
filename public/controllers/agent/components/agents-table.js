@@ -376,6 +376,7 @@ export class AgentsTable extends Component {
   onClickUpgrade = () => {
     localStorage.removeItem('upgradeAgents');
     const { selectedItems } = this.state;
+    let feedbackFlag = false;
     let upgradeStorage = [];
     
     for (let item of selectedItems.filter(item => item.outdated)) {
@@ -390,15 +391,16 @@ export class AgentsTable extends Component {
         ];
         localStorage.setItem('upgradeAgents', JSON.stringify(upgradeStorage));
         this.setUpgradingState(item.id);
-        this.showToast('success', 'Upgrading Agents', '', 5000);
+        feedbackFlag = true;
         this.checkAgentsUpdating();
         setTimeout(() => {
           this.reloadAgents();
-        }, 900000);
+        }, 120000); /* 900000); */
       } catch (error) {
         this.showToast('danger', 'Error Upgrading Agents.', error, 5000); 
       }
     }
+    feedbackFlag === true ? this.showToast('success', 'Upgrading Agents', '', 5000) : false;
   };
 
   onClickRestart = () => {
