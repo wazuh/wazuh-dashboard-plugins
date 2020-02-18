@@ -395,7 +395,7 @@ export class AgentsTable extends Component {
         this.checkAgentsUpdating();
         setTimeout(() => {
           this.reloadAgents();
-        }, 120000); /* 900000); */
+        }, 900000);
       } catch (error) {
         this.showToast('danger', 'Error Upgrading Agents.', error, 5000); 
       }
