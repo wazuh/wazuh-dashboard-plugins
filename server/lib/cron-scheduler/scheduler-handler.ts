@@ -10,13 +10,14 @@ export class SchedulerHandler {
     new SaveDocument(server)
   }
 
-  async run() {
+  run() {
     for (const job of jobs) {
       const schedulerJob:SchedulerJob = new SchedulerJob(job, this.server);
       this.schedulerJobs.push(schedulerJob);
+      schedulerJob.run()
       const task = cron.schedule(
         job.interval,
-        async () => await schedulerJob.run(),
+        () => schedulerJob.run(),
       )
     }
   }
