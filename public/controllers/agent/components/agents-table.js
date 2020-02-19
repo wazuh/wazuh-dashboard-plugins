@@ -26,7 +26,8 @@ import {
   EuiTitle,
   EuiHealth,
   EuiSpacer,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiCallOut,
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
 import { toastNotifications } from 'ui/notify';
@@ -50,6 +51,7 @@ export class AgentsTable extends Component {
       sortField: 'id',
       totalItems: 0,
       selectedItems: [],
+      allSelected: false
     }
     this.downloadCsv.bind(this);
   }
@@ -60,7 +62,15 @@ export class AgentsTable extends Component {
       '/version',
       {}
     );
-    this.setState({ managerVersion: managerVersion.data.data });
+    const totalAgent = await WzRequest.apiReq(
+      'GET',
+      '/agents',
+      {}
+    );
+    this.setState({ 
+      managerVersion: managerVersion.data.data,
+      totalAgent: totalAgent.data.data.totalItems
+    });
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -308,11 +318,11 @@ export class AgentsTable extends Component {
   };
 
   /* MULTISELECT TABLE */
-  onSelectionChange = selectedItems => {
+  onSelectionChange = (selectedItems) => {
     const { managerVersion } = this.state;
-
+  
     selectedItems.forEach(item => {
-      if (managerVersion > item.version) {
+      if (managerVersion > item.version && item.version !== '.') {
         item.outdated = true;
       }
     });
@@ -320,33 +330,65 @@ export class AgentsTable extends Component {
   };
 
   renderUpgradeButton() {
-    const { selectedItems } = this.state;
-
+    const { selectedItems, allSelected } = this.state;
+    
     if (selectedItems.length === 0 ||
       (selectedItems.length > 0 && selectedItems.filter(item => item.outdated).length === 0) || 
-      (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0)) {
+      (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0) ) {
       return;
     }
 
     return (
-      <EuiButton style={{ margin: 6 }} color="secondary" iconType="sortUp" onClick={this.onClickUpgrade}>
-        Upgrade {selectedItems.filter(item => item.outdated).length} Agents
+      <EuiButton style={{ margin: 6 }} color="secondary" iconType="sortUp" onClick={
+        allSelected === true ? this.upgradeAllAgents : this.onClickUpgrade
+      }>
+        Upgrade {allSelected === true ? 'All' : selectedItems.filter(item => item.outdated).length} Agents
       </EuiButton>
     );
   }
 
-  renderResetButton() {
-    const { selectedItems } = this.state;
-
-    if (selectedItems.length === 0) {
+  renderRestartButton() {
+    const { selectedItems, allSelected } = this.state;
+    
+    if (selectedItems.length === 0 || selectedItems.filter(item => item.status === 'Active').length === 0) {
       return;
     }
 
     return (
-      <EuiButton style={{ margin: 6 }} color="primary" iconType="refresh" onClick={this.onClickRestart}>
-        Restart {selectedItems.length} Agents
+      <EuiButton style={{ margin: 6 }} color="primary" iconType="refresh" onClick={
+        allSelected === true ? this.restartAllAgents : this.onClickRestart
+      }>
+        Restart {allSelected === true ? 'All' : selectedItems.filter(item => item.status === 'Active').length} Agents
       </EuiButton>
     );
+  }
+
+  callOutRender() {
+    const { selectedItems, agents, pageSize, totalAgent, allSelected} = this.state;
+  
+    if (selectedItems.length === 0) {
+      return;
+    } else if (selectedItems.length === agents.length || selectedItems.length === pageSize) {
+      return (
+        <div>
+          <EuiSpacer size="s" />
+          <EuiCallOut
+            size="s"
+            title={`All ${selectedItems.length} agents on this page are selected.`}
+          >
+             <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiButton onClick={() => {
+                  this.setState(prevState => ({allSelected: !prevState.allSelected}))
+                }}>
+                  {allSelected === true ? `Clear ${totalAgent - 1} agents selected.` : `Select all ${totalAgent - 1} agents.`}
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiCallOut>
+        </div>
+      )
+    }
   }
 
   setUpgradingState(agentID) {
@@ -414,6 +456,14 @@ export class AgentsTable extends Component {
       this.showToast('warning', 'Error restarting agents', error, 5000);
     }
   };
+
+  restartAllAgents = () => {
+    this.showToast('success', 'Restarting all agents.', '', 5000);
+  }
+
+  upgradeAllAgents = () => {
+    this.showToast('success', 'Upgrading all agents.', '', 5000);
+  }
 
   columns() {
     return [
@@ -493,9 +543,6 @@ export class AgentsTable extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle>
-                  <h2>Agents</h2>
-                </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -504,11 +551,6 @@ export class AgentsTable extends Component {
               Deploy new agent
           </EuiButtonEmpty>
           </EuiFlexItem>
-          {/* TODO:           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="brush" onClick={() => this.props.addingNewAgent()}>
-              Purgue agents
-          </EuiButtonEmpty>
-          </EuiFlexItem> */}
           {formattedButton}
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty iconType="refresh" onClick={() => this.reloadAgents()}>
@@ -721,7 +763,7 @@ export class AgentsTable extends Component {
     const isLoading = this.state.isLoading;
 
     const selection = {
-      selectable: agent => agent.status === 'Active',
+      /* selectable: agent => agent.status === 'Active', */
       onSelectionChange: this.onSelectionChange,
     };
 
@@ -751,15 +793,17 @@ export class AgentsTable extends Component {
     const title = this.headRender();
     const filter = this.filterBarRender();
     const upgradeButton = this.renderUpgradeButton();
-    const resetButton = this.renderResetButton();
+    const restartButton = this.renderRestartButton();
     const table = this.tableRender();
+    const callOut = this.callOutRender();
 
     return (
       <EuiPanel paddingSize="l">
         {title}
         {filter}
         {upgradeButton}
-        {resetButton}
+        {restartButton}
+        {callOut}
         {table}
       </EuiPanel>
     );
