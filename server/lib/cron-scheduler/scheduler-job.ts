@@ -50,18 +50,23 @@ export class SchedulerJob {
       const response = await apiRequest.getData()
       data.push({...response, apiName:host.id});
     }else {
-        const fieldName  = this.getParamName(request.request);
-        const paramList = await this.getParamList(fieldName, host);
-        for (const param of paramList) {
-          const paramRequest = request.request.replace(/\{.+\}/, param);
-          const apiRequest = new ApiRequest(paramRequest, host, params);
-          const response = await apiRequest.getData()
-          response.data['apiName'] = host.id;
-          response.data[fieldName] = param;
-          data.push(response)
-        }
+      await this.getResponsesForIRequest(host, data);
     }
     return data;
+  }
+
+  private async getResponsesForIRequest(host: any,  data: object[]) {
+    const { request, params } = this.job;
+    const fieldName = this.getParamName(request.request);
+    const paramList = await this.getParamList(fieldName, host);
+    for (const param of paramList) {
+      const paramRequest = request.request.replace(/\{.+\}/, param);
+      const apiRequest = new ApiRequest(paramRequest, host, params);
+      const response = await apiRequest.getData();
+      response.data['apiName'] = host.id;
+      response.data[fieldName] = param;
+      data.push(response);
+    }
   }
 
   private getParamName(request): string {
