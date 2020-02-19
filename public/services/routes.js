@@ -32,6 +32,7 @@ import overviewTemplate from '../templates/overview/overview.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import { npStart } from 'ui/new_platform';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -42,7 +43,6 @@ const assignPreviousLocation = ($rootScope, $location) => {
 };
 
 function ip(
-  indexPatterns,
   $q,
   $rootScope,
   $window,
@@ -55,7 +55,7 @@ function ip(
 ) {
   assignPreviousLocation($rootScope, $location);
   return getIp(
-    indexPatterns,
+    npStart.plugins.data.indexPatterns,
     $q,
     $window,
     $location,

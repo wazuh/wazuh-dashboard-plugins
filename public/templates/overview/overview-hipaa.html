@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'hipaa' && octrl.tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+    ng-class="{'no-opacity': resultState === 'none' || !rendered}" layout-align="start">
 
     <div ng-if="octrl.hipaaReqs" class="wz-margin-10">
         <react-component name='RequirementCard' props="octrl.hipaaReqs" />

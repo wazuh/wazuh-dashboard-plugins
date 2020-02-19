@@ -11,11 +11,14 @@
  */
 import $ from 'jquery';
 import { uiModules } from 'ui/modules';
-import { getVisualizeLoader } from 'ui/visualize/loader';
+import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy'
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
+import { npStart } from 'ui/new_platform';
+import { createSavedVisLoader } from './saved_visualizations';
 
-const app = uiModules.get('app/wazuh', []);
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+const app = getAngularModule('app/wazuh');
 let lockFields = false;
 
 app.directive('kbnVis', function () {
@@ -28,7 +31,6 @@ app.directive('kbnVis', function () {
     controller(
       $scope,
       $rootScope,
-      wzsavedVisualizations,
       errorHandler,
       rawVisualizations,
       loadedVisualizations,
@@ -37,14 +39,20 @@ app.directive('kbnVis', function () {
       visHandlers,
       genericReq
     ) {
-      let implicitFilter = '';
-      let rawFilters = [];
       let rendered = false;
       let visualization = null;
       let visHandler = null;
       let renderInProgress = false;
       let deadField = false;
       let mapClicked = false;
+      const services = {
+        savedObjectsClient: npStart.core.savedObjects.client,
+        indexPatterns: npStart.plugins.data.indexPatterns,
+        chrome: npStart.core.chrome,
+        overlays: npStart.core.overlays,
+      };
+      const savedObjectLoaderVisualize = createSavedVisLoader(services);
+
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
           const fromParsed = dateMath.parse(from);
@@ -58,22 +66,8 @@ app.directive('kbnVis', function () {
 
       const setSearchSource = discoverList => {
         try {
-          const isAgentStatus =
-            $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
           const isCluster = $scope.visID.includes('Cluster');
-          if (!isAgentStatus && !isCluster) {
-            visualization.searchSource
-              .setField('query', {
-                language: discoverList[0].language || 'lucene',
-                query: implicitFilter
-              })
-              .setField(
-                'filter',
-                discoverList.length > 1
-                  ? [...discoverList[1], ...rawFilters]
-                  : rawFilters
-              );
-          } else if (!isAgentStatus) {
+          if (isCluster) {
             // Checks for cluster.name or cluster.node filter existence
             const monitoringFilter = discoverList[1].filter(
               item =>
@@ -96,13 +90,16 @@ app.directive('kbnVis', function () {
 
       const myRender = async raw => {
         try {
-          if (!loader) {
-            loader = await getVisualizeLoader();
+          const discoverList = discoverPendingUpdates.getList();
+          const isAgentStatus = $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
+          const timeFilterSeconds = calculateTimeFilterSeconds(
+            timefilter.getTime()
+          );
+
+          if (!factory) {
+            factory = embeddables.getEmbeddableFactory('visualization');
           }
 
-          const discoverList = discoverPendingUpdates.getList();
-          const isAgentStatus =
-            $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
           if (raw && discoverList.length) {
             // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -112,7 +109,7 @@ app.directive('kbnVis', function () {
               const rawVis = raw.filter(
                 item => item && item.id === $scope.visID
               );
-              visualization = await wzsavedVisualizations.get(
+              visualization = await savedObjectLoaderVisualize.get(
                 $scope.visID,
                 rawVis[0]
               );
@@ -122,55 +119,32 @@ app.directive('kbnVis', function () {
               // Visualization doesn't need "hits"
               visualization.searchSource.setField('size', 0);
 
-              rawFilters = visualization.searchSource.getField('filter');
-
-              // Other case, use the pending one, if it is empty, it won't matter
-              implicitFilter = discoverList ? discoverList[0].query : '';
+              visHandler = await factory.createFromObject(
+                visualization,
+                {
+                  timeRange:
+                    isAgentStatus && timeFilterSeconds < 900
+                      ? { from: 'now-15m', to: 'now', mode: 'quick' }
+                      : timefilter.getTime(),
+                  filters: isAgentStatus ? [] : discoverList[1] || [],
+                  query: !isAgentStatus ? discoverList[0] : {}
+                }
+              );
+              visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]).then(renderComplete);
+              visHandlers.addItem(visHandler);
 
               setSearchSource(discoverList);
-
-              visHandler = loader.embedVisualizationWithSavedObject(
-                $(`[vis-id="'${$scope.visID}'"]`)[0],
-                visualization,
-                {}
-              );
-
-              const timeFilterSeconds = calculateTimeFilterSeconds(
-                timefilter.getTime()
-              );
-
-              visHandler.update({
-                timeRange:
-                  isAgentStatus && timeFilterSeconds < 900
-                    ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                    : timefilter.getTime()
-              });
-              visHandlers.addItem(visHandler);
-              visHandler.addRenderCompleteListener(renderComplete);
             } else if (rendered && !deadField) {
               // There's a visualization object -> just update its filters
-
-              // Use the pending one, if it is empty, it won't matter
-              implicitFilter = discoverList ? discoverList[0].query : '';
-
-              const timeFilterSeconds = calculateTimeFilterSeconds(
-                timefilter.getTime()
-              );
-
-              visHandler.update({
+              $rootScope.rendered = true;
+              visHandler.updateInput({
                 timeRange:
                   isAgentStatus && timeFilterSeconds < 900
                     ? { from: 'now-15m', to: 'now', mode: 'quick' }
                     : timefilter.getTime(),
-                filters: isAgentStatus ? [] : discoverList[1] || []
+                filters: isAgentStatus ? [] : discoverList[1] || [],
+                query: !isAgentStatus ? discoverList[0] : {}
               });
-
-              if (!isAgentStatus) {
-                visHandler.update({
-                  query: discoverList[0]
-
-                });
-              }
               setSearchSource(discoverList);
             }
           }
@@ -209,7 +183,6 @@ app.directive('kbnVis', function () {
             errorHandler.handle(error, 'Visualize');
           }
         }
-
         return;
       };
 
@@ -291,7 +264,7 @@ app.directive('kbnVis', function () {
       };
 
       // Initializing the visualization
-      let loader = null;
+      let factory = null;
     }
   };
 });

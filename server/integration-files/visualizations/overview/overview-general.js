@@ -243,7 +243,7 @@ export default [
       title: 'Top 5 rule groups',
       visState:
         '{"title":"Top 5 rule groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":false}}',
+      uiStateJSON: '{"vis":{"legendOpen":true}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {

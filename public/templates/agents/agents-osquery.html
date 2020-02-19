@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="tab === 'osquery' && tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+    ng-class="{'no-opacity': resultState === 'none' || !rendered}" layout-align="start">
     <div layout="row" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">

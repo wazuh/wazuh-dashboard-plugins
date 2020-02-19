@@ -3,7 +3,7 @@
 
     <!-- Overview visualization card -->
     <md-card class="wz-md-card"
-        ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered,'flex-30': resultState === 'ready' && rendered}">
+        ng-class="{'no-opacity-overview-monitoring': resultState === 'none' || !rendered,'flex-30': resultState === 'ready' && rendered}">
         <md-card-content class="wazuh-column">
             <span class="wz-headline-title">Top 5 nodes</span>
             <md-divider class="wz-margin-top-10"></md-divider>
