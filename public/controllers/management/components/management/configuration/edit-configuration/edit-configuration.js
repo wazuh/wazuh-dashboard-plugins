@@ -106,7 +106,18 @@ class WzEditConfiguration extends Component{
       await restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, restarting: false });
-      this.checkIfClusterOrManager();
+      await this.checkIfClusterOrManager();
+      if(this.props.clusterNodes){
+        this.props.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type='iInCircle'/>&nbsp;
+              <span>Info. Nodes can take some time to restart, refresh if they disappear of node selector</span>
+            </Fragment>),
+          color: 'success',
+          toastLifeTimeMs: 10000
+        })
+      }
     }catch(error){
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, restarting: false });
@@ -139,24 +150,26 @@ class WzEditConfiguration extends Component{
     return (
       <Fragment>
         <WzConfigurationPath title={`${clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`} updateConfigurationSection={this.props.updateConfigurationSection}>
-          <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
-            <EuiFlexItem grow={false}>
-                <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>Refresh</EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              {xmlError ? 
-                <EuiButton iconType='alert' isDisabled>XML format error</EuiButton>
-                : <EuiButton isDisabled={saving} iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
-              }
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              {restarting ? 
-                  <EuiButton fill isDisabled>
-                    <EuiLoadingSpinner size="s"/> Restarting {clusterNodeSelected || 'Manager'}
-                  </EuiButton>
-                : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected || 'Manager'}</EuiButton>}
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
+              <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>Refresh</EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {xmlError ? 
+                  <EuiButton iconType='alert' isDisabled>XML format error</EuiButton>
+                  : <EuiButton isDisabled={saving} iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
+                }
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {restarting ? 
+                    <EuiButton fill isDisabled>
+                      <EuiLoadingSpinner size="s"/> Restarting {clusterNodeSelected || 'Manager'}
+                    </EuiButton>
+                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected || 'Manager'}</EuiButton>}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
         </WzConfigurationPath>
         {!loadingStatus && (
           <Fragment>
@@ -242,12 +255,13 @@ const WzEditorConfiguration = compose(
     const { clusterNodes, clusterNodeSelected, xmlError, infoChangesAfterRestart, editorValue,
           onChange, restart, restarting, toggleRestart, confirmRestart, wazuhNotReadyYet
     } = this.props;
+    const existsClusterCurrentNodeSelected = this.props.clusterNodes && this.props.clusterNodes.find(node => node.name === this.props.clusterNodeSelected);
     return (
       <Fragment>
         {!this.props.errorXMLFetched ? (
           <Fragment>
             <EuiText>
-              Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{clusterNodeSelected || 'Manager'}{clusterNodeSelected && clusterNodes ? ' (' + clusterNodes.find(node => node.name === clusterNodeSelected).type + ')' : ''}</span>
+              Edit <span style={{fontWeight: 'bold'}}>ossec.conf</span> of <span style={{fontWeight: 'bold'}}>{existsClusterCurrentNodeSelected && clusterNodeSelected || 'Manager'}{existsClusterCurrentNodeSelected && clusterNodeSelected && clusterNodes ? ' (' + clusterNodes.find(node => node.name === clusterNodeSelected).type + ')' : ''}</span>
               {xmlError && <span style={{ color: 'red'}}> {xmlError}</span>}
             </EuiText>
             {infoChangesAfterRestart && (
