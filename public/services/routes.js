@@ -34,6 +34,7 @@ import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
+import { npStart } from 'ui/new_platform';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -44,20 +45,18 @@ const assignPreviousLocation = ($rootScope, $location) => {
 };
 
 function ip(
-  indexPatterns,
   $q,
   $rootScope,
   $window,
   $location,
   Private,
   appState,
-  genericReq,
   errorHandler,
   wzMisc
 ) {
   assignPreviousLocation($rootScope, $location);
   return getIp(
-    indexPatterns,
+    npStart.plugins.data.indexPatterns,
     $q,
     $window,
     $location,
@@ -71,7 +70,6 @@ function ip(
 
 function nestedResolve(
   $q,
-  genericReq,
   errorHandler,
   $rootScope,
   $location,
@@ -120,7 +118,7 @@ function savedSearch(
   );
 }
 
-function wzConfig($q, genericReq, $rootScope, $location) {
+function wzConfig($q, $rootScope, $location) {
   assignPreviousLocation($rootScope, $location);
   const wazuhConfig = new WazuhConfig();
   return getWzConfig($q, GenericRequest, wazuhConfig);
