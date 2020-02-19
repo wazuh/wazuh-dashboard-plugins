@@ -14,7 +14,6 @@ export class SchedulerHandler {
     for (const job of jobs) {
       const schedulerJob:SchedulerJob = new SchedulerJob(job, this.server);
       this.schedulerJobs.push(schedulerJob);
-      schedulerJob.run()
       const task = cron.schedule(
         job.interval,
         () => schedulerJob.run(),
