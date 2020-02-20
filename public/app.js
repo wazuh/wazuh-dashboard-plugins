@@ -85,49 +85,11 @@ app.config([
   }
 ]);
 
-app.run(function ($rootScope, $route, $location) {
+app.run(function () {
   chrome
   .setRootTemplate('<react-component name="WzMenuWrapper" props="" /><div ng-view class="mainView"></div>')
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
-  AppState.setNavigation({ status: false });
-  AppState.setNavigation({
-    reloaded: false,
-    discoverPrevious: false,
-    discoverSections: ['/overview/', '/agents', '/wazuh-dev']
-  });
-
-  $rootScope.$on('$routeChangeSuccess', () => {
-    AppState.setNavigation({ prevLocation: $location.path() });
-    if (!AppState.getNavigation().reloaded) {
-      AppState.setNavigation({ status: true });
-    } else {
-      AppState.setNavigation({ reloaded: false });
-    }
-  });
-
-  $rootScope.$on('$locationChangeSuccess', () => {
-    const navigation = AppState.getNavigation();
-    AppState.setNavigation({ currLocation: $location.path() });
-    if (navigation.currLocation !== navigation.prevLocation) {
-      if (navigation.discoverSections.includes(navigation.currLocation)) {
-        AppState.setNavigation({ discoverPrevious: navigation.prevLocation });
-      }
-    } else {
-      if (!navigation.status && navigation.prevLocation) {
-        if (
-          !navigation.discoverSections.includes(navigation.currLocation) &&
-          $location.search().tabView !== 'cluster-monitoring'
-        ) {
-          AppState.setNavigation({ reloaded: true });
-          $location.search('configSubTab', null);
-          $location.search('editingFile', null);
-          $route.reload();
-        }
-      }
-    }
-    AppState.setNavigation({ status: false });
-  });
 });
 
 // Added due to Kibana 6.3.0. Do not modify.
