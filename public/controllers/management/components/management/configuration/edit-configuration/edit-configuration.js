@@ -112,7 +112,7 @@ class WzEditConfiguration extends Component{
           title: (
             <Fragment>
               <EuiIcon type='iInCircle'/>&nbsp;
-              <span>Nodes can take some time to restart, refresh if they disappear of node selector</span>
+              <span>Nodes could take some time to restart, it may be necessary to perform a refresh to see them all.</span>
             </Fragment>),
           color: 'success',
           toastLifeTimeMs: 10000
