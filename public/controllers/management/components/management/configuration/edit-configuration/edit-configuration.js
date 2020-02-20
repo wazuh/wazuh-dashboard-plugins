@@ -151,24 +151,20 @@ class WzEditConfiguration extends Component{
       <Fragment>
         <WzConfigurationPath title={`${clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`} updateConfigurationSection={this.props.updateConfigurationSection}>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
-              <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>Refresh</EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {xmlError ? 
-                  <EuiButton iconType='alert' isDisabled>XML format error</EuiButton>
-                  : <EuiButton isDisabled={saving} iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
-                }
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {restarting ? 
-                    <EuiButton fill isDisabled>
-                      <EuiLoadingSpinner size="s"/> Restarting {clusterNodeSelected || 'Manager'}
-                    </EuiButton>
-                  : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected || 'Manager'}</EuiButton>}
-              </EuiFlexItem>
-            </EuiFlexGroup>
+              <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>Refresh</EuiButtonEmpty>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            {xmlError ? 
+              <EuiButton iconType='alert' isDisabled>XML format error</EuiButton>
+              : <EuiButton isDisabled={saving} iconType='save' onClick={() => this.editorSave()}>Save</EuiButton>
+            }
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            {restarting ? 
+                <EuiButton fill isDisabled>
+                  <EuiLoadingSpinner size="s"/> Restarting {clusterNodeSelected || 'Manager'}
+                </EuiButton>
+              : <EuiButton fill iconType='refresh' onClick={() => this.toggleRestart()}>Restart {clusterNodeSelected || 'Manager'}</EuiButton>}
           </EuiFlexItem>
         </WzConfigurationPath>
         {!loadingStatus && (

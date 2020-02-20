@@ -23,7 +23,7 @@ import WzConfigurationOverviewTable from './util-components/configuration-overvi
 import WzHelpButtonPopover from './util-components/help-button-popover';
 import WzBadge from './util-components/badge';
 import WzClusterSelect from './util-components/configuration-cluster-selector';
-
+import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 
 import { updateConfigurationSection } from '../../../../../redux/actions/configurationActions';
@@ -72,58 +72,61 @@ class WzConfigurationOverview extends Component{
 		}
     render(){
 			const settings = this.filterSettings(configurationSettingsGroup);
+			const { loadingStatus } = this.props;
 			return (
 				<Fragment>
 					<EuiFlexGroup>
 						<EuiFlexItem>
-							<EuiFlexGroup>
-								<EuiFlexItem>
-									<EuiTitle>
-										<span>Configuration {this.props.agent.id !== '000' && <WzBadge synchronized={this.props.agentSynchronized}/>}</span>
-									</EuiTitle>
-								</EuiFlexItem>
-							</EuiFlexGroup>
+							<EuiTitle>
+								<span>Configuration {this.props.agent.id !== '000' && <WzBadge synchronized={this.props.agentSynchronized}/>}</span>
+							</EuiTitle>
 						</EuiFlexItem>
 						<EuiFlexItem grow={false}>
-							<EuiFlexGroup gutterSize="xs">
-								<EuiFlexItem>
-									{this.props.agent.id === '000' && this.props.adminMode ? (
-										<Fragment>
-											<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>
-												Edit configuration
-											</EuiButtonEmpty>
-										</Fragment>
-									) : this.props.agent.status === 'Active' ? 
-									<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/>
-									: null}
-								</EuiFlexItem>
+							<EuiFlexGroup gutterSize="none">
+								{this.props.agent.id === '000' && (
+									<EuiFlexItem grow={false}>
+										<WzRefreshClusterInfoButton/>
+									</EuiFlexItem>
+								)}
+								{this.props.agent.id === '000' && this.props.adminMode ? (
+									<EuiFlexItem>
+										<EuiButtonEmpty iconSide="left" iconType="pencil" onClick={() => this.updateConfigurationSection('edit-configuration', `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager' } configuration`, '', 'Edit configuration')}>
+											Edit configuration
+										</EuiButtonEmpty>
+									</EuiFlexItem>
+								) : this.props.agent.status === 'Active' ? (
+									<EuiFlexItem>
+										<ExportConfiguration agent={this.props.agent} type='agent' exportConfiguration={(enabledComponents) => {this.props.exportConfiguration(enabledComponents)}}/>
+									</EuiFlexItem>
+								)
+								: null}
 								<EuiFlexItem grow={false}>
-									<EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
 										<WzHelpButtonPopover links={helpLinks}/>
-									</EuiFlexGroup>
 								</EuiFlexItem>
-								<EuiFlexItem>
-									{this.props.clusterNodes && this.props.clusterNodes.length && this.props.clusterNodeSelected ? (
-											<WzClusterSelect />
-										)
-									: null}
-								</EuiFlexItem>
+								{this.props.clusterNodes && this.props.clusterNodes.length && this.props.clusterNodeSelected ? (
+									<EuiFlexItem>
+										<WzClusterSelect />
+									</EuiFlexItem>
+									)
+								: null}
 							</EuiFlexGroup>
 						</EuiFlexItem>
 					</EuiFlexGroup>
-					<EuiFlexGroup>
-						<EuiFlexItem>
-							{settings.map(group => (
-								<WzConfigurationOverviewTable 
-									key={`settings-${group.title}`}
-									title={group.title}
-									columns={columns}
-									items={group.settings}
-									onClick={this.props.updateConfigurationSection}
-								/>
-							))}
-						</EuiFlexItem>
-					</EuiFlexGroup>
+					{!loadingStatus && (
+						<EuiFlexGroup>
+							<EuiFlexItem>
+								{settings.map(group => (
+									<WzConfigurationOverviewTable 
+										key={`settings-${group.title}`}
+										title={group.title}
+										columns={columns}
+										items={group.settings}
+										onClick={this.props.updateConfigurationSection}
+									/>
+								))}
+							</EuiFlexItem>
+						</EuiFlexGroup>
+					)}
 				</Fragment>
 			)
     }
@@ -132,7 +135,8 @@ class WzConfigurationOverview extends Component{
 const mapStateToProps = (state) => ({
 	clusterNodes: state.configurationReducers.clusterNodes,
 	clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-	adminMode: state.configurationReducers.adminMode
+	adminMode: state.configurationReducers.adminMode,
+	loadingStatus: state.configurationReducers.loadingStatus
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);
