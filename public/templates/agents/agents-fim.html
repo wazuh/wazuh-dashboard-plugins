@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels'" ng-show="!showSyscheckFiles"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+    ng-class="{'no-opacity': resultState === 'none' || !rendered}" layout-align="start">
     <div layout="row">
         <span flex></span>
         <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i

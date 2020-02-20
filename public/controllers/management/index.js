@@ -23,7 +23,7 @@ import { ConfigurationRulesetController } from './config-ruleset';
 import { ConfigurationGroupsController } from './config-groups';
 import { EditionController } from './edition';
 import { FilesController } from './files';
-import { WelcomeScreen } from './components/welcome';
+import { WelcomeScreen } from './components/management-welcome';
 import { WelcomeWrapper } from './components/welcome-wrapper';
 import { AgentsInGroupTable } from './components/agents-groups-table';
 import { FilesInGroupTable } from './components/files-group-table';

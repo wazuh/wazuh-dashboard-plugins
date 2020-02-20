@@ -60,7 +60,7 @@ export class VisHandlers {
     for (let i = 0; i < tables.length; i++) {
       const columns = [];
       const title = tables[i].vis._state.title || tables[i].dataLoader.previousVisState.title || 'Table';
-      const item = await tables[i].fetch();
+      const item = await tables[i].handler.dataHandler.getData();
       for (const table of item.value.visData.tables) {
         columns.push(...table.columns.map(t => t.name));
       }
@@ -75,13 +75,13 @@ export class VisHandlers {
     }
 
     if (this.list && this.list.length) {
-      const visualization = this.list[0].vis;
+      const visualization = this.list[0];
 
       // Parse current time range
-      const { from, to } = visualization.filters.timeRange;
-      const { query } = visualization.searchSource._fields.query;
+      const { from, to } = visualization.input.timeRange;
+      const { query } = visualization.input.query;
       // Parse applied filters for the first visualization
-      const filters = visualization.searchSource._fields.filter;
+      const filters = visualization.input.filters;
 
       Object.assign(appliedFilters, {
         filters,
