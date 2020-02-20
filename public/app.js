@@ -68,7 +68,6 @@ import './services';
 import './controllers';
 import './factories';
 import './directives';
-import { AppState } from './react-services/app-state';
 
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
