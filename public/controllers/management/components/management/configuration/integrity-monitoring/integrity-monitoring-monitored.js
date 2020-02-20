@@ -69,6 +69,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component{
             title='Monitored directories'
             description='These directories are included on the integrity scan'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
               <WzConfigurationListSelector
                 items={items}
@@ -84,6 +85,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component{
               title='Monitored'
               description='A list of registry entries that will be monitored'
               currentConfig={currentConfig}
+              minusHeight={this.props.agent.id === '000' ? 340 : 410}
               helpLinks={helpLinks}>
               <EuiBasicTable
                 items={currentConfig['syscheck-syscheck'].syscheck.registry}

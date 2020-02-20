@@ -58,6 +58,7 @@ class WzConfigurationActiveResponseAgent extends Component{
             title='Active response settings'
             description='Find here all the Active response settings for this agent'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 280 : 350}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
               config={currentConfig['com-active-response']['active-response']}

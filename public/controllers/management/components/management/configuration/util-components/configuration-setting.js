@@ -24,18 +24,34 @@ import {
 class WzConfigurationSetting extends Component{
   constructor(props){
     super(props);
+    this.state = {
+      isMobile: false
+    }
+    this.limitResize = 760;
+    this.resize = this.resize.bind(this);
+  }
+  componentDidMount() {
+    window.addEventListener("resize", this.resize);
+    this.resize();
+  }
+  componentWillUnmount(){
+    window.removeEventListener("resize", this.resize);
+  }
+  resize() {
+    this.setState({isMobile: window.innerWidth < this.limitResize });
   }
   render(){
+    const { isMobile } = this.state;
     const { keyItem, label, value } = this.props;
     return value ? (
       <Fragment>
-        <EuiFlexGroup alignItems='center'>
-          <EuiFlexItem style={{justifySelf: 'flex-end'}}>
-              <EuiTextAlign textAlign='right'>
+        <div style={{display: 'flex' , alignItems:'center', flexDirection: isMobile ? 'column' : 'row'}}>
+          <div style={isMobile ? { margin: '1em', width: '100%' } : {justifySelf: 'flex-end', margin: '1em', width: '35%'}}>
+              <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
                 {label}
               </EuiTextAlign>
-          </EuiFlexItem>
-          <EuiFlexItem grow={2}>
+          </div>
+          <div style={isMobile ? { width: '100%' } : { width: '65%' }}>
             {Array.isArray(value) ? (
               <ul>
                 {value.map((v,key) => (
@@ -43,8 +59,8 @@ class WzConfigurationSetting extends Component{
                 ))}
               </ul>)
             : <EuiFieldText value={String(value)} readOnly/>}
-          </EuiFlexItem>
-        </EuiFlexGroup>
+          </div>
+        </div>
         <EuiSpacer size='s' />
       </Fragment>
     ) : null
