@@ -82,7 +82,7 @@ class WzConfigurationOverview extends Component{
 							</EuiTitle>
 						</EuiFlexItem>
 						<EuiFlexItem grow={false}>
-							<EuiFlexGroup gutterSize="none">
+							<EuiFlexGroup gutterSize="s">
 								{this.props.agent.id === '000' && (
 									<EuiFlexItem grow={false}>
 										<WzRefreshClusterInfoButton/>

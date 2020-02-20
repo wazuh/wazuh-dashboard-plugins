@@ -37,7 +37,7 @@ class WzConfigurationPath extends Component{
     return (
       <Fragment>
         <EuiSpacer size='s'/>
-        <EuiFlexGroup alignItems='center' gutterSize='s'>
+        <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
             <EuiFlexGroup alignItems='center'>
               <span style={{margin: "0 6px"}}>
