@@ -227,7 +227,7 @@ class WzRulesetTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading}
-            rowProps={!this.props.state.showingFiles && getRowProps}
+            rowProps={(!this.props.state.showingFiles && getRowProps) || undefined}
             sorting={sorting}
             message={message}
           />

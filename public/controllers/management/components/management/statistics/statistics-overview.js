@@ -152,7 +152,7 @@ export class WzStatisticsOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued">
-                From here you can see demon statistics.
+                From here you can see daemon statistics.
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

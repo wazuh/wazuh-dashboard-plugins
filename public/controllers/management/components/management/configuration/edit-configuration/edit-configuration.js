@@ -67,7 +67,7 @@ class WzEditConfiguration extends Component{
         title: (
           <Fragment>
             <EuiIcon type='check'/>&nbsp;
-            <span>Success. {this.props.clusterNodeSelected || 'Manager' } configuration has been updated</span>
+            <span><b>{this.props.clusterNodeSelected || 'Manager' }</b> configuration has been updated</span>
           </Fragment>),
         color: 'success'
       });
@@ -76,7 +76,7 @@ class WzEditConfiguration extends Component{
         title: (
           <Fragment>
             <EuiIcon type='alert'/>&nbsp;
-            <span>Error: saving configuration</span>
+            <span>Error saving configuration</span>
           </Fragment>),
         color: 'danger',
         text: typeof error === 'string' ? error : error.message
@@ -112,7 +112,7 @@ class WzEditConfiguration extends Component{
           title: (
             <Fragment>
               <EuiIcon type='iInCircle'/>&nbsp;
-              <span>Info. Nodes can take some time to restart, refresh if they disappear of node selector</span>
+              <span>Nodes can take some time to restart, refresh if they disappear of node selector</span>
             </Fragment>),
           color: 'success',
           toastLifeTimeMs: 10000

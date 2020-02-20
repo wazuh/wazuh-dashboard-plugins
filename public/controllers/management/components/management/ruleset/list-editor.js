@@ -319,6 +319,7 @@ class WzListEditor extends Component {
       items: itemsArr,
       editing: false,
       editingValue: '',
+      generatingCsv: false
     });
   }
 
@@ -492,7 +493,17 @@ class WzListEditor extends Component {
                 <EuiFlexItem grow={false}>
                   <EuiButtonEmpty
                     iconType="exportAction"
-                    onClick={async () => await exportCsv(`/lists?path=${path}/${name}`, [{_isCDBList: true, name: 'path', value: `${path}/${name}`}], name)}
+                    isDisabled={this.state.generatingCsv}
+                    isLoading={this.state.generatingCsv}
+                    onClick={async () => {
+                      try{
+                        this.setState({ generatingCsv: true});
+                        await exportCsv(`/lists?path=${path}/${name}`, [{_isCDBList: true, name: 'path', value: `${path}/${name}`}], name);
+                        this.setState({ generatingCsv: false});
+                      }catch(error){
+                        this.setState({ generatingCsv: false});
+                      }
+                    }}
                   >
                     Export formatted
                   </EuiButtonEmpty>

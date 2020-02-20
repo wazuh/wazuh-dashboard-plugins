@@ -44,7 +44,7 @@ class WzRulesetEditor extends Component {
     this.codeEditorOptions = {
       fontSize: '14px',
       displayIndentGuides: false,
-      useWrapMode: true,   // wrap text to view
+      wrap: true,   // wrap text to view
       indentedSoftWrap: false, 
       behavioursEnabled: false,
       animatedScroll: true,
