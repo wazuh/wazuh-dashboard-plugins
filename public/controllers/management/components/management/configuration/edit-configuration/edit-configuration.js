@@ -114,8 +114,7 @@ class WzEditConfiguration extends Component{
               <EuiIcon type='iInCircle'/>&nbsp;
               <span>Nodes could take some time to restart, it may be necessary to perform a refresh to see them all.</span>
             </Fragment>),
-          color: 'success',
-          toastLifeTimeMs: 10000
+          color: 'success'
         })
       }
     }catch(error){
