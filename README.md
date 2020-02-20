@@ -39,16 +39,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 Install the app
 
-- With sudo:
-
 ```
 sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.6.0.zip
-```
-
-- Without sudo:
-
-```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.6.0.zip' kibana
 ```
 
 Restart Kibana
@@ -67,6 +59,8 @@ service kibana restart
 
 ## Upgrade
 
+Note: For updates from Wazuh 3.11.x to 3.11.y (regardless of the version of the Elastic Stack) it is recommended to make a backup of the Wazuh app configuration file in order not to lose the modified parameters or the configured APIs.
+
 Stop Kibana
 
 - Systemd:
@@ -79,6 +73,12 @@ systemctl stop kibana
 
 ```
 service kibana stop
+```
+
+Make a backup of the configuration file.
+
+```
+cp /usr/share/kibana/plugins/wazuh/wazuh.yml /tmp/wazuh-backup.yml
 ```
 
 Remove the app using kibana-plugin tool
@@ -102,16 +102,21 @@ chown -R kibana:kibana /usr/share/kibana/plugins
 
 Install the app
 
-- With sudo:
-
 ```
 sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.6.0.zip
 ```
 
-- Without sudo:
+Restore the configuration file backup.
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.6.0.zip' kibana
+sudo cp /tmp/wazuh-backup.yml /usr/share/kibana/plugins/wazuh/wazuh.yml
+```
+
+Update configuration file permissions.
+
+```
+sudo chown kibana:kibana /usr/share/kibana/plugins/wazuh/wazuh.yml
+sudo chmod 600 /usr/share/kibana/plugins/wazuh/wazuh.yml
 ```
 
 Restart Kibana
