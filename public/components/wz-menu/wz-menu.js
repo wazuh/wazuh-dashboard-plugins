@@ -19,6 +19,7 @@ import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
+import { npStart } from 'ui/new_platform'
 
 class WzMenu extends Component {
   constructor(props) {
@@ -37,19 +38,14 @@ class WzMenu extends Component {
     };
     this.store = store;
     this.wazuhConfig = new WazuhConfig();
-  }
-
-  async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.indexPatterns = $injector.get('indexPatterns');
-
+    this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
   componentDidUpdate(prevProps) {
     const { name:apiName } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
-    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation.replace(/\//g, '') !== this.state.currentMenuTab) {
-      this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') })
+    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation || "".replace(/\//g, '') !== this.state.currentMenuTab) {
+      this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') })
     }
 
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
@@ -69,7 +65,7 @@ class WzMenu extends Component {
       this.setState({ showMenu: true });
 
       if (!this.state.currentMenuTab && AppState.getNavigation().currLocation) {
-        this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') });
+        this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') });
       }
 
       const list = await PatternHandler.getPatternList();
