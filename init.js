@@ -19,13 +19,14 @@ import { WazuhHostsRoutes } from './server/routes/wazuh-hosts';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
 import { IndexPatternCronJob } from './server/index-pattern-cron-job';
+import { SchedulerHandler } from './server/lib/cron-scheduler'
 import { log } from './server/logger';
 import { Queue } from './server/jobs/queue';
 
 export function initApp(server) {
   const monitoringInstance = new Monitoring(server);
   const indexPatternCronJobInstance = new IndexPatternCronJob(server);
-
+  const schedulerHandler = new SchedulerHandler(server);
   log('init:initApp', `Waiting for Kibana migration jobs`, 'debug');
   server.kibanaMigrator
     .runMigrations()
@@ -39,6 +40,7 @@ export function initApp(server) {
       WazuhElasticRouter(server);
       monitoringInstance.run();
       indexPatternCronJobInstance.run();
+      schedulerHandler.run();
       Queue.launchCronJob();
       WazuhApiRoutes(server);
       WazuhHostsRoutes(server);
