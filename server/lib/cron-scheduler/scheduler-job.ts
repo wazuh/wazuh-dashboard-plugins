@@ -20,7 +20,7 @@ export class SchedulerJob {
       const response = await this.getResponses(host);
       data.push(...response);
     }
-    this.saveDocument.save(data, this.job.index)
+    await this.saveDocument.save(data, this.job.index)
   }
 
   private async getApiObjects() {

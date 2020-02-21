@@ -3,17 +3,17 @@ import {
   BulkIndexDocumentsParams,
 } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
+import { log } from '../../logger.js'
 
 
 export class SaveDocument {
   server: object;
-  elasticClient: Client
   callWithRequest: Function
   callWithInternalUser: Function
+  logPath = 'Scheduler task | save document';
 
   constructor(server) {
     this.server = server;
-    this.elasticClient = server.plugins.elasticsearch.getCluster('data').clusterClient.client;
     this.callWithRequest = server.plugins.elasticsearch.getCluster('data').callWithRequest;
     this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
   }
@@ -21,15 +21,18 @@ export class SaveDocument {
 
 
   private async checkIndexAndCreateIfNotExists(index) {
-    const exists = await this.elasticClient.indices.exists({index});
-    if(!exists) { 
-      await this.elasticClient.indices.create({index});
+    const exists = await this.callWithInternalUser('indices.exists',{index});
+    log(this.logPath, `Index '${index}' exists? ${exists}`, 'debug');
+    if(!exists) {
+      const response = await this.callWithInternalUser('indices.create', {index});
+      log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
     }
   }
 
   private async checkIndexPatternAndCreateIfNotExists(index) {
     const KIBANA_INDEX = this.getKibanaIndex();
-    const result = await this.elasticClient.search({
+    log(this.logPath, `Internal index of kibana: ${KIBANA_INDEX}`, 'debug');
+    const result = await this.callWithInternalUser('search', {
       index: KIBANA_INDEX,
       type: '_doc',
       body: {
@@ -46,7 +49,7 @@ export class SaveDocument {
   }
 
   private async createIndexPattern(KIBANA_INDEX: any, index: any) {
-    await this.elasticClient.create({
+    const response = await this.callWithInternalUser('create', {
       index: KIBANA_INDEX,
       type: '_doc',
       'id': `index-pattern:${index}*`,
@@ -58,6 +61,11 @@ export class SaveDocument {
         }
       }
     });
+    log(
+      this.logPath, 
+      `The indexPattern no exist, response of createIndexPattern: ${JSON.stringify(response)}`, 
+      'debug'
+    );
   }
 
   private getKibanaIndex() {
@@ -72,9 +80,7 @@ export class SaveDocument {
     const index = this.addIndexPrefix(indexName)
     await this.checkIndexAndCreateIfNotExists(index);
     const createDocumentObject = this.createDocument(doc, index);
-    await this.elasticClient.bulk(
-      createDocumentObject
-    );
+    await this.callWithInternalUser('bulk', createDocumentObject);
     await this.checkIndexPatternAndCreateIfNotExists(index);
   }
 
@@ -91,6 +97,7 @@ export class SaveDocument {
           timestamp: new Date(Date.now()).toISOString()}
       ])
     };
+    log(this.logPath, `Document object: ${JSON.stringify(createDocumentObject)}`, 'debug');
     return createDocumentObject;
   }
 
