@@ -24,10 +24,11 @@ import 'uiExports/devTools';
 import 'uiExports/docViews';
 import 'uiExports/embeddableFactories';
 import 'uiExports/autocompleteProviders';
+import 'uiExports/interpreter';
+import 'angular-sanitize';
 
 // Require CSS
 import './less/loader';
-import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 
 // EUI React components wrapper
@@ -58,16 +59,18 @@ import 'angular-cookies/angular-cookies';
 
 import 'ui/autoload/all';
 
-// Wazuh
+// Set up Wazuh app
+import './setup';
+
+//App imports
 import './kibana-integrations';
 import './services';
 import './controllers';
 import './factories';
 import './directives';
-import { AppState } from './react-services/app-state';
 
-// Set up Wazuh app
-const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+const app = getAngularModule('app/wazuh');
 
 app.config([
   '$compileProvider',
@@ -92,24 +95,4 @@ app.run(function () {
   changeWazuhNavLogo();
 });
 
-// Added due to Kibana 6.3.0. Do not modify.
-uiModules.get('kibana').provider('dashboardConfig', () => {
-  let hideWriteControls = false;
 
-  return {
-    /**
-     * Part of the exposed plugin API - do not remove without careful consideration.
-     * @type {boolean}
-     */
-    turnHideWriteControlsOn() {
-      hideWriteControls = true;
-    },
-    $get() {
-      return {
-        getHideWriteControls() {
-          return hideWriteControls;
-        }
-      };
-    }
-  };
-});

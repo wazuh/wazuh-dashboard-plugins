@@ -12,17 +12,11 @@
 // Manage leaving the app to another Kibana tab
 export function goToKibana($location, $window) {
   const url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
-
+  const lastSubUrl = $window.sessionStorage.getItem(`lastSubUrl:${url}`) || '';
   if (
-    $window.sessionStorage
-      .getItem(`lastSubUrl:${url}`)
-      .includes('/wazuh#/visualize') ||
-    $window.sessionStorage
-      .getItem(`lastSubUrl:${url}`)
-      .includes('/wazuh#/doc') ||
-    $window.sessionStorage
-      .getItem(`lastSubUrl:${url}`)
-      .includes('/wazuh#/context')
+    lastSubUrl.includes('/wazuh#/visualize') ||
+    lastSubUrl.includes('/wazuh#/doc') ||
+    lastSubUrl.includes('/wazuh#/context')
   ) {
     $window.sessionStorage.setItem(`lastSubUrl:${url}`, url);
   }

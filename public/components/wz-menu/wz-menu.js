@@ -19,6 +19,7 @@ import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
+import { npStart } from 'ui/new_platform'
 
 class WzMenu extends Component {
   constructor(props) {
@@ -37,19 +38,14 @@ class WzMenu extends Component {
     };
     this.store = store;
     this.wazuhConfig = new WazuhConfig();
-  }
-
-  async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.indexPatterns = $injector.get('indexPatterns');
-
+    this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
   componentDidUpdate(prevProps) {
-    const { name:apiName } = JSON.parse(AppState.getCurrentAPI())
+    const { name: apiName } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
-    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation.replace(/\//g, '') !== this.state.currentMenuTab) {
-      this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') })
+    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation || "".replace(/\//g, '') !== this.state.currentMenuTab) {
+      this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') })
     }
 
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
@@ -69,7 +65,7 @@ class WzMenu extends Component {
       this.setState({ showMenu: true });
 
       if (!this.state.currentMenuTab && AppState.getNavigation().currLocation) {
-        this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') });
+        this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') });
       }
 
       const list = await PatternHandler.getPatternList();
@@ -146,8 +142,8 @@ class WzMenu extends Component {
   }
 
   managementPopoverToggle() {
-    this.setState(state => { 
-      return {isManagementPopoverOpen: !state.isManagementPopoverOpen }
+    this.setState(state => {
+      return { isManagementPopoverOpen: !state.isManagementPopoverOpen }
     });
   }
 
@@ -172,117 +168,119 @@ class WzMenu extends Component {
 
     return (
       <WzReduxProvider>
-        {this.state.showMenu && (
-          <div>
-            <div className="wz-menu-wrapper">
-              <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
-                <EuiFlexItem >
-                  <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }}>
-                    <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/overview"
-                      onClick={() => this.setMenuItem('overview')} >
-                      <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
+        <div>
+          {this.state.showMenu && (
+            <div>
+              <div className="wz-menu-wrapper">
+                <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
+                  <EuiFlexItem >
+                    <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }}>
+                      <EuiButtonEmpty
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/overview"
+                        onClick={() => this.setMenuItem('overview')} >
+                        <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
                     </EuiButtonEmpty>
 
-                    <EuiPopover
-                      id="popover"
-                      button={managementButton}
-                      isOpen={this.state.isManagementPopoverOpen}
-                      closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
-                      anchorPosition="downLeft" >
-                      <WzManagementSideMenu 
-                        managementPopoverToggle={this.managementPopoverToggle.bind(this)} 
-                        {...this.props} />
-                    </EuiPopover>
+                      <EuiPopover
+                        id="popover"
+                        button={managementButton}
+                        isOpen={this.state.isManagementPopoverOpen}
+                        closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
+                        anchorPosition="downLeft" >
+                        <WzManagementSideMenu
+                          managementPopoverToggle={this.managementPopoverToggle.bind(this)}
+                          {...this.props} />
+                      </EuiPopover>
 
-                    <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/agents-preview"
-                      onClick={() => this.setMenuItem('agents-preview')}>
-                      <EuiIcon type='watchesApp' color='primary' size='m' />
-                      <span className="wz-menu-button-title ">Agents</span>
-                    </EuiButtonEmpty>
+                      <EuiButtonEmpty
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/agents-preview"
+                        onClick={() => this.setMenuItem('agents-preview')}>
+                        <EuiIcon type='watchesApp' color='primary' size='m' />
+                        <span className="wz-menu-button-title ">Agents</span>
+                      </EuiButtonEmpty>
 
-                    <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/wazuh-dev"
-                      onClick={() => this.setMenuItem('wazuh-dev')}>
-                      <EuiIcon type='console' color='primary' size='m' />
-                      <span className="wz-menu-button-title ">Dev Tools</span>
-                    </EuiButtonEmpty>
+                      <EuiButtonEmpty
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/wazuh-dev"
+                        onClick={() => this.setMenuItem('wazuh-dev')}>
+                        <EuiIcon type='console' color='primary' size='m' />
+                        <span className="wz-menu-button-title ">Dev Tools</span>
+                      </EuiButtonEmpty>
 
 
-                  </EuiFlexGroup>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false} style={{ paddingTop: "6px", marginRight: "-4px", display: "inline" }}>
-                  {this.state.currentAPI &&
-                    (
-                      <span><EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon> {this.state.currentAPI} </span>
-                    )
-                  }
-                  {!this.state.currentAPI &&
-                    (
-                      <span> No API </span>
-                    )
-                  }
-                  &nbsp; &nbsp;
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false} style={{ paddingTop: "6px", marginRight: "-4px", display: "inline" }}>
+                    {this.state.currentAPI &&
+                      (
+                        <span><EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon> {this.state.currentAPI} </span>
+                      )
+                    }
+                    {!this.state.currentAPI &&
+                      (
+                        <span> No API </span>
+                      )
+                    }
+                    &nbsp; &nbsp;
                 {this.state.showSelector && this.state.theresPattern && this.state.patternList && this.state.patternList.length > 1 &&
+                      (
+                        this.buildPatternSelector()
+                      )
+                    }
+                  </EuiFlexItem>
+
+                  <EuiFlexItem grow={false} style={{ marginTop: "6px", marginRight: "1px" }}>
+                    <EuiButtonEmpty
+                      className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
+                      href="#/settings"
+                      color="text"
+                      aria-label="Settings"
+                      onClick={() => this.setMenuItem('settings')}>
+                      <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
+                      <span> </span>
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </div>
+            </div>
+          )}
+          {this.props.state.wazuhNotReadyYet &&
+            (
+              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: " 60px 8px -50px 8px", }}>
+                <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
+
+                  <EuiFlexItem>
+                    <p></p>
+                  </EuiFlexItem>
+                  {this.props.state.wazuhNotReadyYet.includes("Restarting") &&
                     (
-                      this.buildPatternSelector()
+                      <EuiFlexItem grow={false}>
+                        <p>
+                          <EuiLoadingSpinner size="l" /> &nbsp; &nbsp;
+                        </p>
+                      </EuiFlexItem>
                     )
                   }
-                </EuiFlexItem>
+                  {this.props.state.wazuhNotReadyYet === "Wazuh could not be recovered." &&
+                    (
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonEmpty grow={false} onClick={() => location.reload()} className="WzNotReadyButton" >
+                          <span> Reload </span>
+                        </EuiButtonEmpty>
+                      </EuiFlexItem>
 
-                <EuiFlexItem grow={false} style={{ marginTop: "6px", marginRight: "1px" }}>
-                  <EuiButtonEmpty
-                    className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
-                    href="#/settings"
-                    color="text"
-                    aria-label="Settings"
-                    onClick={() => this.setMenuItem('settings')}>
-                    <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
-                    <span> </span>
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </div>
-          </div>
-        )}
-            {this.props.state.wazuhNotReadyYet &&
-              (
-                <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: " 60px 8px -50px 8px", }}>
-                  <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
-
-                    <EuiFlexItem>
-                      <p></p>
-                    </EuiFlexItem>
-                    {this.props.state.wazuhNotReadyYet.includes("Restarting") &&
-                      (
-                        <EuiFlexItem grow={false}>
-                          <p>
-                            <EuiLoadingSpinner size="l" /> &nbsp; &nbsp;
-                        </p>
-                        </EuiFlexItem>
-                      )
-                    }
-                    {this.props.state.wazuhNotReadyYet === "Wazuh could not be recovered." &&
-                      (
-                        <EuiFlexItem grow={false}>
-                          <EuiButtonEmpty grow={false} onClick={() => location.reload()} className="WzNotReadyButton" >
-                            <span> Reload </span>
-                          </EuiButtonEmpty>
-                        </EuiFlexItem>
-
-                      )
-                    }
-                  </EuiFlexGroup>
-                </EuiCallOut>
-              )
-            }
+                    )
+                  }
+                </EuiFlexGroup>
+              </EuiCallOut>
+            )
+          }
+        </div>
       </WzReduxProvider>
     );
   }
