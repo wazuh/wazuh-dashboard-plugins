@@ -25,49 +25,49 @@ export const jobs: IJob[] = [
     method: "GET",
     request: '/manager/stats/remoted?pretty',
     params: {},
-    interval: '* * * * * *',
+    interval: '0 0 * * * *',
     index: 'manager-stats-remoted',
     creation: 'w',
   },
-  // {
-  //   status: true,
-  //   method: "GET",
-  //   request: '/manager/stats/analysisd?pretty',
-  //   params: {},
-  //   interval: '* * * * * *',
-  //   index: 'manager-stats-analysisd',
-  //   creation: 'w',
-  // },
-  // {
-  //   status: true,
-  //   method: "GET",
-  //   request: {
-  //     request: '/cluster/{nodeName}/stats/remoted?pretty',
-  //     params: {
-  //       nodeName: {
-  //         request: '/cluster/nodes?select=name'
-  //       }
-  //     }
-  //   },
-  //   params: {},
-  //   interval: '* * * * * *',
-  //   index: 'cluster-stats-remoted',
-  //   creation: 'w',
-  // },
-  // {
-  //   status: true,
-  //   method: "GET",
-  //   request: {
-  //     request: '/cluster/{nodeName}/stats/analysisd?pretty',
-  //     params: {
-  //       nodeName: {
-  //         request: '/cluster/nodes?select=name'
-  //       }
-  //     }
-  //   },
-  //   params: {},
-  //   interval: '* * * * * *',
-  //   index: 'cluster-stats-analysisd',
-  //   creation: 'w',
-  // },
+  {
+    status: true,
+    method: "GET",
+    request: '/manager/stats/analysisd?pretty',
+    params: {},
+    interval: '0 0 * * * *',
+    index: 'manager-stats-analysisd',
+    creation: 'w',
+  },
+  {
+    status: true,
+    method: "GET",
+    request: {
+      request: '/cluster/{nodeName}/stats/remoted?pretty',
+      params: {
+        nodeName: {
+          request: '/cluster/nodes?select=name'
+        }
+      }
+    },
+    params: {},
+    interval: '0 0 * * * *',
+    index: 'cluster-stats-remoted',
+    creation: 'w',
+  },
+  {
+    status: true,
+    method: "GET",
+    request: {
+      request: '/cluster/{nodeName}/stats/analysisd?pretty',
+      params: {
+        nodeName: {
+          request: '/cluster/nodes?select=name'
+        }
+      }
+    },
+    params: {},
+    interval: '0 0 * * * *',
+    index: 'cluster-stats-analysisd',
+    creation: 'w',
+  },
 ]
