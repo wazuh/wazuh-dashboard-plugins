@@ -13,6 +13,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
+import { PatternHandler } from '../../react-services/pattern-handler'
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 
@@ -106,8 +107,13 @@ export class HealthCheck {
           `/elastic/index-patterns/${patternTitle}`
         );
         if (!patternData.data.status) {
-          this.errors.push('The selected index-pattern is not present.');
-          this.results[i].status = 'Error';
+          const patternList = await PatternHandler.getPatternList();
+          if(patternList.length){
+            return this.checkPatterns();
+          }else{
+            this.errors.push('The selected index-pattern is not present.');
+            this.results[i].status = 'Error';
+          }
         } else {
           this.processedChecks++;
           this.results[i].status = 'Ready';
@@ -226,6 +232,7 @@ export class HealthCheck {
       this.checks.template = configuration['checks.template'];
       this.checks.api = configuration['checks.api'];
       this.checks.setup = configuration['checks.setup'];
+      this.checks.fields = configuration['checks.fields'];
 
       this.results.push(
         {
@@ -251,7 +258,7 @@ export class HealthCheck {
         {
           id: 4,
           description: 'Check index pattern known fields',
-          status: 'Checking...'
+          status: this.checks.fields ? 'Checking...' : 'disabled'
         }
       );
 
@@ -263,12 +270,14 @@ export class HealthCheck {
 
       this.checksDone = true;
 
-      try {
-        await this.genericReq.request('GET', '/elastic/known-fields/all', {});
-        this.results[this.results.length - 1].status = 'Ready';
-      } catch (error) {
-        this.results[this.results.length - 1].status = 'Error';
-        this.handleError(error);
+      if(this.checks.fields){
+        try {
+          await this.genericReq.request('GET', '/elastic/known-fields/all', {});
+          this.results[this.results.length - 1].status = 'Ready';
+        } catch (error) {
+          this.results[this.results.length - 1].status = 'Error';
+          this.handleError(error);
+        }
       }
 
       if (!this.errors || !this.errors.length) {

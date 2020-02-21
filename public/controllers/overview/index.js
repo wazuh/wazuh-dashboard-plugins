@@ -12,6 +12,7 @@
 import { uiModules } from 'ui/modules';
 import { OverviewController } from './overview';
 import { WelcomeVisualizeWrapper } from './components/welcome-visualize-wrapper';
+import { WelcomeScreen } from './components/overview-welcome';
 import { Stats } from './components/stats';
 import { AlertsStats } from './components/alerts-stats';
 import { RequirementCard } from './components/requirement-card';

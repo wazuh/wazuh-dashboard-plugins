@@ -31,24 +31,17 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 ## Requisites
 
 - Wazuh HIDS 3.12.0
-- Wazuh RESTful API 3.11.2
-- Kibana 7.5.2
-- Elasticsearch 7.5.2
+- Wazuh RESTful API 3.12.0
+- Kibana 7.6.0
+- Elasticsearch 7.6.0
 
 ## Installation
 
 Install the app
 
-- With sudo:
-
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip
-```
-
-- Without sudo:
-
-```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip' kibana
+cd /usr/share/kibana
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.0.zip
 ```
 
 Restart Kibana
@@ -67,6 +60,8 @@ service kibana restart
 
 ## Upgrade
 
+Note: For updates from Wazuh 3.11.x to 3.11.y (regardless of the version of the Elastic Stack) it is recommended to make a backup of the Wazuh app configuration file in order not to lose the modified parameters or the configured APIs.
+
 Stop Kibana
 
 - Systemd:
@@ -79,6 +74,12 @@ systemctl stop kibana
 
 ```
 service kibana stop
+```
+
+Make a backup of the configuration file.
+
+```
+cp /usr/share/kibana/plugins/wazuh/wazuh.yml /tmp/wazuh-backup.yml
 ```
 
 Remove the app using kibana-plugin tool
@@ -102,16 +103,22 @@ chown -R kibana:kibana /usr/share/kibana/plugins
 
 Install the app
 
-- With sudo:
+```
+cd /usr/share/kibana
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.0.zip
+```
+
+Restore the configuration file backup.
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip
+sudo cp /tmp/wazuh-backup.yml /usr/share/kibana/plugins/wazuh/wazuh.yml
 ```
 
-- Without sudo:
+Update configuration file permissions.
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.5.2.zip' kibana
+sudo chown kibana:kibana /usr/share/kibana/plugins/wazuh/wazuh.yml
+sudo chmod 600 /usr/share/kibana/plugins/wazuh/wazuh.yml
 ```
 
 Restart Kibana
@@ -130,7 +137,7 @@ service kibana restart
  
 ## Older packages 
  
-| Kibana version | Wazuh app version | Package                                                                                                |
+| Kibana version | Wazuh app version | Package                                                         |
 | :------------: | :---------------: | :-------------------------------------------------------------- |
 |      6.0.0     |       3.0.0       | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.0.zip>  |
 |      6.0.1     |       3.0.0       | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.1.zip>  |
@@ -229,6 +236,11 @@ service kibana restart
 |      7.3.2     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.3.2.zip> |
 |      7.5.1     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.1.zip> |
 |      7.5.2     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.2.zip> |
+|      6.8.6     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_6.8.6.zip> |
+|      7.3.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.3.2.zip> |
+|      7.4.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.4.2.zip> |
+|      7.5.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.5.2.zip> |
+|      7.6.0     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.6.0.zip> |
 
 
 ## Contribute

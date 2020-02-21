@@ -103,6 +103,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component{
             title='Main settings'
             description='Basic alerts and logging settings'
             currentConfig={currentConfig}
+            minusHeight={agent.id === '000' ? 340 : 350}
             helpLinks={this.helpLinks}>
             <WzConfigurationSettingsGroup
               config={mainSettingsConfig}

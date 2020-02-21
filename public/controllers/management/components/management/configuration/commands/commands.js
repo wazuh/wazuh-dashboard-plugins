@@ -59,6 +59,7 @@ class WzConfigurationCommands extends Component{
             title='Command definitions'
             description='Find here all the currently defined commands'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 280 : 350}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsListSelector
                 items={items}
