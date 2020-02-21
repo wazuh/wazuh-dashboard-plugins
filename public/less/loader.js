@@ -22,7 +22,6 @@ import './media-queries.less';
 import './typography.less';
 import './ui_framework.css';
 import './jquery-ui.css';
-import './eui_theme_light.css';
 
 import chrome from 'ui/chrome';
 const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
@@ -32,9 +31,5 @@ if (IS_DARK_THEME) {
   newSS.rel = 'stylesheet';
   newSS.href = '../plugins/wazuh/less/dark_theme/wz_theme_dark.css';
   document.getElementsByTagName('head')[0].appendChild(newSS);
-  let newSS2 = document.createElement('link');
-  newSS2.rel = 'stylesheet';
-  newSS2.href = '../plugins/wazuh/less/dark_theme/eui_theme_dark.css';
-  document.getElementsByTagName('head')[0].appendChild(newSS2);
 }
 /* eslint-enable no-undef */
