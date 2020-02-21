@@ -1,6 +1,7 @@
 
 import Axios, { AxiosRequestConfig, AxiosResponse }from 'axios';
 import { log } from '../../logger';
+import { Agent } from 'https';
 
 export interface IApi {
   id: string
@@ -36,6 +37,7 @@ export class ApiRequest {
       params: this.params,
       headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
       auth: {username: user, password: password},
+      httpsAgent: new Agent({rejectUnauthorized: false})
     }
     
     const response = await Axios(requestConfig);
