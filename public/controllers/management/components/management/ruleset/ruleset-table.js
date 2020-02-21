@@ -67,7 +67,7 @@ class WzRulesetTable extends Component {
     if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
-          pageSize: 10,
+          pageSize: this.state.pageSize,
           pageIndex: 0,
           sortDirection: null,
           sortField: null,
@@ -227,7 +227,7 @@ class WzRulesetTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading}
-            rowProps={!this.props.state.showingFiles && getRowProps}
+            rowProps={(!this.props.state.showingFiles && getRowProps) || undefined}
             sorting={sorting}
             message={message}
           />
@@ -245,7 +245,7 @@ class WzRulesetTable extends Component {
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
               >
-                <p>Are you sure you want to remove?</p>
+                <p>This items will be removed</p>
                 <div>
                   {itemList.map(function (item, i) {
                     return (
@@ -280,7 +280,7 @@ class WzRulesetTable extends Component {
 
     Promise.all(results).then((completed) => {
       this.props.updateIsProcessing(true);
-      this.showToast('success', 'Success', 'Deleted correctly', 3000);
+      this.showToast('success', 'Success', 'Deleted successfully', 3000);
     });
   };
 }

@@ -51,6 +51,7 @@ class WzConfigurationClientBuffer extends Component{
             title='Main settings'
             description='These settings determine the event processing rate for the agent'
             currentConfig={currentConfig}
+            minusHeight={350}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsGroup
                 config={currentConfig['agent-buffer'].buffer}

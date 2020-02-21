@@ -20,7 +20,6 @@ import WzRuleInfo from './rule-info';
 import WzDecoderInfo from './decoder-info';
 import WzRulesetEditor from './ruleset-editor';
 import WzListEditor from './list-editor';
-import { EuiTabs, EuiTab } from '@elastic/eui';
 
 export default class WzRuleset extends Component {
   _isMount = false;
@@ -28,21 +27,6 @@ export default class WzRuleset extends Component {
     super(props);
     this.state = {}; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
     this.store = store;
-
-    this.tabs = [
-      {
-        id: 'rules',
-        name: 'Rules'
-      },
-      {
-        id: 'decoders',
-        name: 'Decoders'
-      },
-      {
-        id: 'lists',
-        name: 'CDB Lists'
-      }
-    ];
   }
 
   UNSAFE_componentWillMount() {
@@ -63,29 +47,11 @@ export default class WzRuleset extends Component {
     if (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile) this.store.dispatch({ type: 'RESET' });
   }
 
-
-  renderTabs() {
-    return this.tabs.map((tab, index) => (
-      <EuiTab
-        onClick={() => {
-          window.location.href = `#/manager/?tab=${tab.id}`;
-        }}
-        isSelected={tab.id === this.state.selectedTabId}
-        key={index}
-      >
-        {tab.name}
-      </EuiTab>
-    ));
-  }
-
   render() {
     const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
 
     return (
       <WzReduxProvider>
-        <EuiTabs style={{ margin: '8px 16px 0 16px' }}>{
-          this.renderTabs()
-        }</EuiTabs>
         {
           ruleInfo && (<WzRuleInfo />)
           || decoderInfo && (<WzDecoderInfo />)

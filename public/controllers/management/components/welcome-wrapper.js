@@ -13,7 +13,7 @@
  * DELETE THIS WRAPPER WHEN WELCOME SCREEN WAS NOT BE CALLED FROM ANGULARJS
  */
 import React, { Component } from 'react';
-import WelcomeScreen from './welcome'
+import WelcomeScreen from './management-welcome'
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 
 export class WelcomeWrapper extends Component {
