@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiPopover } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
@@ -168,7 +168,7 @@ class WzMenu extends Component {
 
     return (
       <WzReduxProvider>
-        <div>
+        <Fragment>
           {this.state.showMenu && (
             <div>
               <div className="wz-menu-wrapper">
@@ -251,7 +251,7 @@ class WzMenu extends Component {
           )}
           {this.props.state.wazuhNotReadyYet &&
             (
-              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: " 60px 8px -50px 8px", }}>
+              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: "60px 8px -50px 8px", }}>
                 <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
 
                   <EuiFlexItem>
@@ -280,7 +280,7 @@ class WzMenu extends Component {
               </EuiCallOut>
             )
           }
-        </div>
+        </Fragment>
       </WzReduxProvider>
     );
   }
