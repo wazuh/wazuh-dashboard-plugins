@@ -13,9 +13,11 @@ import './eui-loader';
 import { uiModules } from 'ui/modules';
 import { WzFilterBar } from './wz-filter-bar/wz-filter-bar';
 import { WzMenuWrapper } from '../components/wz-menu/wz-menu-wrapper';
+import { WzBlankScreen } from '../components/wz-blank-screen/wz-blank-screen';
 import { ScaDashboard } from './agents/sca/sca-dashboard';
 
 const app = uiModules.get('app/wazuh', []);
 app.value('WzFilterBar', WzFilterBar);
 app.value('WzMenuWrapper', WzMenuWrapper);
 app.value('ScaDashboard', ScaDashboard);
+app.value('WzBlankScreen', WzBlankScreen);
