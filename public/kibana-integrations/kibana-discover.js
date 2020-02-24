@@ -179,7 +179,7 @@ function discoverController(
     savedSearch.destroy();
     subscriptions.unsubscribe();
     filterStateManager.destroy();
-    if (filterLfilterListener) filterListener();
+    if (filterListener) filterListener();
     implicitFilters = null;
   });
 
