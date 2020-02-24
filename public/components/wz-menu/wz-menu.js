@@ -41,11 +41,37 @@ class WzMenu extends Component {
     this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
+  getCurrentTab(){
+    const currentWindowLocation = window.location.hash;
+    if(currentWindowLocation.match(/#\/overview/)){
+      return 'overview';
+    }
+    if(currentWindowLocation.match(/#\/manager/)){
+      return 'manager';
+    }
+    if(currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/) ){
+      return 'agents-preview';
+    }
+    if(currentWindowLocation.match(/#\/settings/)){
+      return 'settings';
+    }
+    if(currentWindowLocation.match(/#\/wazuh-dev/)){
+      return 'wazuh-dev';
+    }
+    if(currentWindowLocation.match(/#\/health-check/)){
+      return 'health-check';
+    }
+    return "";
+
+  }
+
+
   componentDidUpdate(prevProps) {
     const { name: apiName } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
-    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation || "".replace(/\//g, '') !== this.state.currentMenuTab) {
-      this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') })
+    const currentTab = this.getCurrentTab();
+    if (currentTab !== this.state.currentMenuTab) {
+      this.setState({ currentMenuTab: currentTab })
     }
 
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
@@ -64,8 +90,10 @@ class WzMenu extends Component {
     try {
       this.setState({ showMenu: true });
 
-      if (!this.state.currentMenuTab && AppState.getNavigation().currLocation) {
-        this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') });
+
+      const currentTab = this.getCurrentTab();
+      if (currentTab !== this.state.currentMenuTab) {
+        this.setState({ currentMenuTab: currentTab })
       }
 
       const list = await PatternHandler.getPatternList();
