@@ -43,7 +43,7 @@ export class Pie extends Component {
                             fill={colors[i]} />
                     ))}
                 </g>
-                <g transform={`translate(${width / 2} 0)`}>
+                <g transform={`translate(${width / 1.75} 0)`}>
                     {data.map((d, i) => (
                         <g key={i} className="legend" transform={`translate(0 ${15 * (i + 1)})`}>
                             <rect width="10" height="10" fill={colors[i]} stroke={colors[i]}></rect>
