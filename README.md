@@ -30,8 +30,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.11.3
-- Wazuh RESTful API 3.11.3
+- Wazuh HIDS 3.11.4
+- Wazuh RESTful API 3.11.4
 - Kibana 6.8.6
 - Elasticsearch 6.8.6
 
@@ -42,13 +42,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_6.8.6.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_6.8.6.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_6.8.6.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_6.8.6.zip' kibana
 ```
 
 Restart Kibana
@@ -105,13 +105,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_6.8.6.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_6.8.6.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_6.8.6.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_6.8.6.zip' kibana
 ```
 
 Restart Kibana
@@ -230,7 +230,12 @@ service kibana restart
 |      7.5.1     |       3.11.2      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.2_7.5.1.zip> |
 |      6.8.6     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_6.8.6.zip> |
 |      7.3.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.3.2.zip> |
+|      7.4.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.4.2.zip> |
 |      7.5.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.5.2.zip> |
+|      7.6.0     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.6.0.zip> |
+|      6.8.6     |       3.11.4      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_6.8.6.zip> |
+|      7.4.2     |       3.11.4      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.4.2.zip> |
+|      7.6.0     |       3.11.4      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip> |
 
 ## Contribute
 
