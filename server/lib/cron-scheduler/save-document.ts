@@ -10,7 +10,7 @@ export class SaveDocument {
   server: object;
   callWithRequest: Function
   callWithInternalUser: Function
-  logPath = 'Scheduler task | save document';
+  logPath = 'cron-scheduler|SaveDocument';
 
   constructor(server) {
     this.server = server;
@@ -18,7 +18,14 @@ export class SaveDocument {
     this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
   }
 
-
+  async save(doc:object[], indexName) {
+    const index = this.addIndexPrefix(indexName)
+    await this.checkIndexAndCreateIfNotExists(index);
+    const createDocumentObject = this.createDocument(doc, index);
+    const response = await this.callWithInternalUser('bulk', createDocumentObject);
+    log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
+    await this.checkIndexPatternAndCreateIfNotExists(index);
+  }
 
   private async checkIndexAndCreateIfNotExists(index) {
     const exists = await this.callWithInternalUser('indices.exists',{index});
@@ -74,14 +81,6 @@ export class SaveDocument {
       .kibana || {})
       .options || {})
       .index || '.kibana';
-  }
-
-  async save(doc:object[], indexName) {
-    const index = this.addIndexPrefix(indexName)
-    await this.checkIndexAndCreateIfNotExists(index);
-    const createDocumentObject = this.createDocument(doc, index);
-    await this.callWithInternalUser('bulk', createDocumentObject);
-    await this.checkIndexPatternAndCreateIfNotExists(index);
   }
 
   private createDocument (doc, index): BulkIndexDocumentsParams {
