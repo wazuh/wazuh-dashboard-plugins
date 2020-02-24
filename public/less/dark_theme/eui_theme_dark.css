@@ -546,6 +546,9 @@ html {
         -ms-flex-align: center;
             align-items: center;
     overflow: hidden; }
+    .euiBadge .euiBadge__childButton span {
+      font-size: 12px!important;
+    }
   .euiBadge .euiBadge__childButton {
     max-width: 100%;
     /* 1 */
@@ -1878,9 +1881,12 @@ html {
       -ms-flex-positive: 1;
           flex-grow: 1;
   /* 1 */ }
-  .euiCard__content .euiCard__title {
+  .euiCard__content .euiCard__title button {
+    zoom: 0.9;
+    }
+  .euiCard__content .euiCard__title, .euiCard__content .euiCard__title button {
     color: #dfe5ef;
-    font-size: 18px;
+    font-size: 18px!important;
     font-size: 1.125rem;
     line-height: 1.5rem;
     display: block;
@@ -11111,7 +11117,6 @@ html {
   line-height: 1.5;
   line-height: 1.5rem;
   font-weight: 700;
-  font-weight: 500;
   border-top: none; }
   .euiTableFooterCell .euiTableHeaderButton,
   .euiTableHeaderCell .euiTableHeaderButton {

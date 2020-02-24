@@ -112,7 +112,7 @@ class WzMenu {
       try {
         height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
       } catch (error) {} // eslint-disable-line
-      const barHeight = (height || 51) + 1;
+      const barHeight = (height || 51) + 2;
       $scope.settedMenuHeight = true;
       $('.md-toolbar-tools, md-toolbar')
         .css('height', barHeight, 'important')
