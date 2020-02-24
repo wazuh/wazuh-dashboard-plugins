@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiPopover } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
@@ -41,11 +41,37 @@ class WzMenu extends Component {
     this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
+  getCurrentTab(){
+    const currentWindowLocation = window.location.hash;
+    if(currentWindowLocation.match(/#\/overview/)){
+      return 'overview';
+    }
+    if(currentWindowLocation.match(/#\/manager/)){
+      return 'manager';
+    }
+    if(currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/) ){
+      return 'agents-preview';
+    }
+    if(currentWindowLocation.match(/#\/settings/)){
+      return 'settings';
+    }
+    if(currentWindowLocation.match(/#\/wazuh-dev/)){
+      return 'wazuh-dev';
+    }
+    if(currentWindowLocation.match(/#\/health-check/)){
+      return 'health-check';
+    }
+    return "";
+
+  }
+
+
   componentDidUpdate(prevProps) {
     const { name: apiName } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
-    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation || "".replace(/\//g, '') !== this.state.currentMenuTab) {
-      this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') })
+    const currentTab = this.getCurrentTab();
+    if (currentTab !== this.state.currentMenuTab) {
+      this.setState({ currentMenuTab: currentTab })
     }
 
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
@@ -64,8 +90,10 @@ class WzMenu extends Component {
     try {
       this.setState({ showMenu: true });
 
-      if (!this.state.currentMenuTab && AppState.getNavigation().currLocation) {
-        this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') });
+
+      const currentTab = this.getCurrentTab();
+      if (currentTab !== this.state.currentMenuTab) {
+        this.setState({ currentMenuTab: currentTab })
       }
 
       const list = await PatternHandler.getPatternList();
@@ -168,7 +196,7 @@ class WzMenu extends Component {
 
     return (
       <WzReduxProvider>
-        <div>
+        <Fragment>
           {this.state.showMenu && (
             <div>
               <div className="wz-menu-wrapper">
@@ -251,7 +279,7 @@ class WzMenu extends Component {
           )}
           {this.props.state.wazuhNotReadyYet &&
             (
-              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: " 60px 8px -50px 8px", }}>
+              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: "60px 8px -50px 8px", }}>
                 <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
 
                   <EuiFlexItem>
@@ -280,7 +308,7 @@ class WzMenu extends Component {
               </EuiCallOut>
             )
           }
-        </div>
+        </Fragment>
       </WzReduxProvider>
     );
   }
