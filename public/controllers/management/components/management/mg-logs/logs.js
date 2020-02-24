@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { 
+import {
     EuiFlexGroup,
     EuiFlexItem,
     EuiSelect,
@@ -20,7 +20,7 @@ import {
 } from '@elastic/eui';
 import 'brace/mode/less';
 import 'brace/theme/github';
-import { ApiRequest } from  '../../../../../react-services/api-request';
+import { ApiRequest } from '../../../../../react-services/api-request';
 
 
 export default class WzLogs extends Component {
@@ -33,34 +33,34 @@ export default class WzLogs extends Component {
             logLevelSelect: '',
             descendingSort: false,
             searchBarValue: '',
-            appliedSearch: '', 
+            appliedSearch: '',
             logsList: '',
             isLoading: false,
-            offset:0,
+            offset: 0,
             selectedNode: '',
-            logsPath:'', 
-            nodeList:[],
+            logsPath: '',
+            nodeList: [],
             totalItems: 0,
-            daemonsList:[],
+            daemonsList: [],
             loadingLogs: false,
-            realTime: false 
+            realTime: false
         };
         this.ITEM_STYLE = { width: '300px' };
     }
 
     updateHeight = () => {
-        this.height = window.innerHeight - this.offset; 
+        this.height = window.innerHeight - this.offset;
         this.forceUpdate();
     }
 
 
 
-    async componentDidMount(){
-        this.height = window.innerHeight - this.offset; 
-        window.addEventListener('resize', this.updateHeight); 
-        this.setState({isLoading: true})
+    async componentDidMount() {
+        this.height = window.innerHeight - this.offset;
+        window.addEventListener('resize', this.updateHeight);
+        this.setState({ isLoading: true })
 
-        const {nodeList, logsPath, selectedNode} = await this.getLogsPath()
+        const { nodeList, logsPath, selectedNode } = await this.getLogsPath()
         await this.initDaemonsList(logsPath)
 
         this.setState({
@@ -69,8 +69,8 @@ export default class WzLogs extends Component {
             logLevelSelect: 'all',
             realTime: false,
             descendingSort: false,
-            offset:0,
-            totalItems:0,
+            offset: 0,
+            totalItems: 0,
             logsPath,
             loadingLogs: false,
             nodeList
@@ -89,8 +89,8 @@ export default class WzLogs extends Component {
     }
 
 
-    async initDaemonsList(logsPath){
-        try{
+    async initDaemonsList(logsPath) {
+        try {
             const path = logsPath + "/summary";
             const data = await ApiRequest.request(
                 'GET',
@@ -98,35 +98,35 @@ export default class WzLogs extends Component {
                 {}
             );
             const formattedData = ((data || {}).data || {}).data || {}
-            const daemonsList = [ ...['all'], ...Object.keys(formattedData)]
-            this.setState({daemonsList})
-        }catch(err){
+            const daemonsList = [...['all'], ...Object.keys(formattedData)]
+            this.setState({ daemonsList })
+        } catch (err) {
             throw new Error("Error obtaining daemons list.");
         } // eslint-disable-line
     }
 
 
 
-    parseLogsToText(logs){
-        let result= "";
+    parseLogsToText(logs) {
+        let result = "";
         logs.forEach(item => {
             result += item.timestamp + " " + item.tag + " " + (item.level).toUpperCase() + " " + item.description + "\n";
         })
         return result;
     }
 
-    buildFilters(customOffset=0){
-        let result = {limit:100}
-        if(customOffset){
-            result["offset"] =  customOffset;
+    buildFilters(customOffset = 0) {
+        let result = { limit: 100 }
+        if (customOffset) {
+            result["offset"] = customOffset;
         }
-        if(this.state.logLevelSelect !== 'all')
-            result["type_log"] =  this.state.logLevelSelect;
-        if(this.state.selectedDaemon !== 'all')
+        if (this.state.logLevelSelect !== 'all')
+            result["type_log"] = this.state.logLevelSelect;
+        if (this.state.selectedDaemon !== 'all')
             result["category"] = this.state.selectedDaemon;
-        if(this.state.appliedSearch)
+        if (this.state.appliedSearch)
             result["search"] = this.state.appliedSearch;
-        if(this.state.descendingSort)
+        if (this.state.descendingSort)
             result["sort"] = "+timestamp";
         else
             result["sort"] = "-timestamp";
@@ -134,12 +134,12 @@ export default class WzLogs extends Component {
         return result;
     }
 
-    async getFullLogs(customOffset=0){
-        const {logsPath} = this.state
+    async getFullLogs(customOffset = 0) {
+        const { logsPath } = this.state
         let result = "";
         let totalItems = 0;
-        if(this.state.selectedNode){
-            try{
+        if (this.state.selectedNode) {
+            try {
                 const tmpResult = await ApiRequest.request(
                     'GET',
                     logsPath,
@@ -148,12 +148,12 @@ export default class WzLogs extends Component {
                 const resultItems = (((tmpResult || {}).data).data || {}).items;
                 totalItems = (((tmpResult || {}).data).data || {}).totalItems;
                 result = this.parseLogsToText(resultItems) || "";
-            } catch(err){
+            } catch (err) {
                 result = "";
                 throw new Error("Error obtaining logs.");
             }
-        }else{
-            try{
+        } else {
+            try {
                 const tmpResult = await ApiRequest.request(
                     'GET',
                     logsPath,
@@ -162,33 +162,33 @@ export default class WzLogs extends Component {
                 const resultItems = (((tmpResult || {}).data).data || {}).items
                 totalItems = (((tmpResult || {}).data).data || {}).totalItems;
                 result = this.parseLogsToText(resultItems) || "";
-            }catch(err) {
+            } catch (err) {
                 result = "";
                 throw new Error("Error obtaining logs");
             }
-        }   
-        this.setState({totalItems})
+        }
+        this.setState({ totalItems })
         return result;
     }
 
-    async setFullLogs(){
+    async setFullLogs() {
         const result = await this.getFullLogs();
-        this.setState({logsList: result, offset: 0})
+        this.setState({ logsList: result, offset: 0 })
     }
 
     /**
      * Returns an object with the path to request Wazuh logs, the list of nodes and the current selected node.
      */
     async getLogsPath() {
-        try{
+        try {
             const clusterStatus = await ApiRequest.request(
-            'GET',
-            '/cluster/status',
-            {}
+                'GET',
+                '/cluster/status',
+                {}
             );
             const clusterEnabled =
-            (((clusterStatus || {}).data || {}).data || {}).running === 'yes' &&
-            (((clusterStatus || {}).data || {}).data || {}).enabled === 'yes';
+                (((clusterStatus || {}).data || {}).data || {}).running === 'yes' &&
+                (((clusterStatus || {}).data || {}).data || {}).enabled === 'yes';
 
             if (clusterEnabled) {
                 let nodeList = "";
@@ -197,27 +197,27 @@ export default class WzLogs extends Component {
                 if (Array.isArray((((nodeListTmp || {}).data || {}).data || {}).items)) {
                     nodeList = nodeListTmp.data.data.items
                     selectedNode = nodeListTmp.data.data.items.filter(
-                    item => item.type === 'master'
+                        item => item.type === 'master'
                     )[0].name;
                 }
-                return {nodeList, logsPath: `/cluster/${selectedNode}/logs`,selectedNode: selectedNode}
+                return { nodeList, logsPath: `/cluster/${selectedNode}/logs`, selectedNode: selectedNode }
             }
-        }catch(error){ 
+        } catch (error) {
             throw new Error("Error obtaining logs path.");
         }
-        
-        return {nodeList:"", logsPath: '/manager/logs',selectedNode: ""};
+
+        return { nodeList: "", logsPath: '/manager/logs', selectedNode: "" };
     }
-  
-    getDaemonsOptions(){
+
+    getDaemonsOptions() {
         const daemonsList = this.state.daemonsList.length > 0 ? this.state.daemonsList.map(item => {
-            return { value: item, text: item === 'all' ? 'All daemons' : item}
-        }) : [{value:'all', text:'All daemons'}] ;
+            return { value: item, text: item === 'all' ? 'All daemons' : item }
+        }) : [{ value: 'all', text: 'All daemons' }];
 
         return daemonsList;
     }
 
-    getLogLevelOptions(){
+    getLogLevelOptions() {
         return [
             { value: 'all', text: 'All log levels' },
             { value: 'INFO', text: 'Info' },
@@ -225,20 +225,20 @@ export default class WzLogs extends Component {
             { value: 'WARNING', text: 'Warning' },
             { value: 'CRITICAL', text: 'Critical' },
             { value: 'DEBUG', text: 'Debug' },
-        ];  
+        ];
     }
 
-    getnodeList(){
-        try{
-            if(this.state.nodeList && Array.isArray(this.state.nodeList)){
+    getnodeList() {
+        try {
+            if (this.state.nodeList && Array.isArray(this.state.nodeList)) {
                 const nodeList = this.state.nodeList.map(item => {
-                    return { value: item.name, text: `${item.name} (${item.type})`}
+                    return { value: item.name, text: `${item.name} (${item.type})` }
                 })
                 return nodeList
-            }else{
+            } else {
                 return false;
             }
-        }catch(err){
+        } catch (err) {
             throw new Error("Error obtaining list of nodes.");
         }
     }
@@ -260,7 +260,7 @@ export default class WzLogs extends Component {
             },
             this.setFullLogs
         );
-        
+
     };
 
     onSortSwitchChange = e => {
@@ -277,9 +277,9 @@ export default class WzLogs extends Component {
             selectedNode: e.target.value,
             logsPath: `/cluster/${e.target.value}/logs`
         },
-        this.setFullLogs
+            this.setFullLogs
         );
-        
+
     };
 
     onSearchBarChange = e => {
@@ -300,49 +300,49 @@ export default class WzLogs extends Component {
     };
 
 
-    makeSearch(){
+    makeSearch() {
         this.setState(
-            {appliedSearch: this.state.searchBarValue},
-            this.setFullLogs    
+            { appliedSearch: this.state.searchBarValue },
+            this.setFullLogs
         )
     }
 
-    setRealTimeInterval(){
-        if(this.state.realTime)
-            this.realTimeInterval = setInterval(() => this.setFullLogs() , 5000);
+    setRealTimeInterval() {
+        if (this.state.realTime)
+            this.realTimeInterval = setInterval(() => this.setFullLogs(), 5000);
         else
             clearInterval(this.realTimeInterval);
     }
 
-    switchRealTime(){
-        
-        this.setState({ realTime: !this.state.realTime},
+    switchRealTime() {
+
+        this.setState({ realTime: !this.state.realTime },
             this.setRealTimeInterval)
     }
 
 
-    header(){
+    header() {
         const daemonsOptions = this.getDaemonsOptions();
         const logLevelOptions = this.getLogLevelOptions();
         const nodeList = this.getnodeList();
 
-        return(
+        return (
             <div>
                 <EuiFlexGroup>
                     <EuiFlexItem >
                         <EuiTitle size={'m'}>
-                        <h2>Logs</h2>
+                            <h2>Logs</h2>
                         </EuiTitle>
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiFlexGroup>
-                <EuiFlexItem style={{ paddingBottom: 10 }}>
-                    <EuiTextColor color="subdued">
-                    <p>
-                        List and filter Wazuh logs.
+                    <EuiFlexItem>
+                        <EuiTextColor color="subdued">
+                            <p>
+                                List and filter Wazuh logs.
                     </p>
-                    </EuiTextColor>
-                </EuiFlexItem>
+                        </EuiTextColor>
+                    </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiFlexGroup>
                     <EuiFlexItem grow={false} >
@@ -374,7 +374,7 @@ export default class WzLogs extends Component {
                             />
                         </EuiFlexItem>)
                     }
-                    <EuiFlexItem grow={false} style={{ paddingTop: "10px"}}>
+                    <EuiFlexItem grow={false} style={{ paddingTop: "10px" }}>
                         <EuiSwitch
                             label="Descending sort"
                             checked={this.state.descendingSort}
@@ -382,7 +382,7 @@ export default class WzLogs extends Component {
                         />
                     </EuiFlexItem>
                 </EuiFlexGroup>
-                <EuiSpacer></EuiSpacer>
+                <EuiSpacer size={'s'}></EuiSpacer>
                 <EuiFlexGroup>
                     <EuiFlexItem>
                         <EuiFieldSearch fullWidth={true}
@@ -405,7 +405,7 @@ export default class WzLogs extends Component {
                                 iconType="play">
                                 Play realtime
                             </EuiButton>)
-                        ||
+                            ||
                             (<EuiButton
                                 onClick={() => this.switchRealTime()}
                                 color="danger"
@@ -419,8 +419,8 @@ export default class WzLogs extends Component {
         )
     }
 
-    async loadExtraLogs(){
-        this.setState({loadingLogs : true});
+    async loadExtraLogs() {
+        this.setState({ loadingLogs: true });
         const customOffset = this.state.offset + 100;
         const result = await this.getFullLogs(customOffset);
         this.setState({
@@ -431,9 +431,9 @@ export default class WzLogs extends Component {
     }
 
 
-    logsTable(){
+    logsTable() {
 
-        return(
+        return (
             <div>
                 {this.state.logsList && (
                     <Fragment>
@@ -444,22 +444,22 @@ export default class WzLogs extends Component {
                             overflowHeight={this.height}>
                             {this.state.logsList}
                         </EuiCodeBlock>
-                        <EuiSpacer size='m'/>
-                        {(this.state.offset+100 < this.state.totalItems && !this.state.loadingLogs) && (<p className="wz-load-extra" onClick={() => this.loadExtraLogs()}> <EuiIcon type="refresh" /> 
-                            &nbsp; Click here to load more logs.</p> ) 
+                        <EuiSpacer size='m' />
+                        {(this.state.offset + 100 < this.state.totalItems && !this.state.loadingLogs) && (<p className="wz-load-extra" onClick={() => this.loadExtraLogs()}> <EuiIcon type="refresh" />
+                            &nbsp; Click here to load more logs.</p>)
                             ||
                             (this.state.loadingLogs) &&
-                            (<p className="wz-load-extra"> <EuiLoadingSpinner size="m" />&nbsp; Loading...</p> ) 
+                            (<p className="wz-load-extra"> <EuiLoadingSpinner size="m" />&nbsp; Loading...</p>)
                         }
                     </Fragment>
-                    )
+                )
                     ||
                     (<EuiCallOut
-                        color="warning" 
+                        color="warning"
                         title="No results match your search criteria."
                         iconType="alert">
-                      </EuiCallOut>)
-                    }
+                    </EuiCallOut>)
+                }
             </div>
         )
     }
@@ -471,14 +471,14 @@ export default class WzLogs extends Component {
                 <EuiPageBody>
                     <EuiPanel>
                         {this.header()}
-                        <EuiSpacer></EuiSpacer>
+                        <EuiSpacer size={"m"}></EuiSpacer>
                         {!this.state.isLoading &&
                             (this.logsTable())
                             ||
                             (<EuiFlexGroup alignItems="center" justifyContent="center">
                                 <EuiFlexItem>
                                     <EuiSpacer></EuiSpacer>
-                                    <EuiProgress size="xs" color="primary"/>
+                                    <EuiProgress size="xs" color="primary" />
                                 </EuiFlexItem>
                             </EuiFlexGroup>)
                         }
