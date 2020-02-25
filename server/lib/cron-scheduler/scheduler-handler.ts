@@ -11,11 +11,11 @@ export class SchedulerHandler {
   }
 
   run() {
-    for (const job of jobs) {
+    for (const job of Object.keys(jobs)) {
       const schedulerJob:SchedulerJob = new SchedulerJob(job, this.server);
       this.schedulerJobs.push(schedulerJob);
       const task = cron.schedule(
-        job.interval,
+        jobs[job].interval,
         () => schedulerJob.run(),
       )
     }

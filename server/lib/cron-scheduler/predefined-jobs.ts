@@ -19,8 +19,8 @@ export interface IRequest {
   }
 }
 
-export const jobs: IJob[] = [
-  {
+export const jobs: {[key:string]: IJob} = {
+  'manager-stats-remoted': {
     status: true,
     method: "GET",
     request: '/manager/stats/remoted?pretty',
@@ -29,7 +29,7 @@ export const jobs: IJob[] = [
     index: 'manager-stats-remoted',
     creation: 'w',
   },
-  {
+  'manager-stats-analysisd': {
     status: true,
     method: "GET",
     request: '/manager/stats/analysisd?pretty',
@@ -38,7 +38,7 @@ export const jobs: IJob[] = [
     index: 'manager-stats-analysisd',
     creation: 'w',
   },
-  {
+  'cluster-stats-remoted': {
     status: true,
     method: "GET",
     request: {
@@ -54,7 +54,7 @@ export const jobs: IJob[] = [
     index: 'cluster-stats-remoted',
     creation: 'w',
   },
-  {
+  'cluster-stats-cluster': {
     status: true,
     method: "GET",
     request: {
@@ -70,4 +70,4 @@ export const jobs: IJob[] = [
     index: 'cluster-stats-analysisd',
     creation: 'w',
   },
-]
+}
