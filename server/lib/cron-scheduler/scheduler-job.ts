@@ -1,20 +1,21 @@
-import { IJob } from './predefined-jobs';
+import { jobs } from './predefined-jobs';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import { IApi, ApiRequest, SaveDocument } from './index';
 
 export class SchedulerJob {
-  job: IJob;
+  jobName: string;
   wazuhHosts: WazuhHostsCtrl;
   saveDocument: SaveDocument;
 
-  constructor(newJob: IJob, server) {
-    this.job = newJob;
+  constructor(jobName: string, server) {
+    this.jobName = jobName;
     this.wazuhHosts = new WazuhHostsCtrl();
     this.saveDocument = new SaveDocument(server);
   }
 
   public async run() {
-    const { index, creation} = this.job;
+    const { index, creation, status } = jobs[this.jobName];
+    if ( !status ) { return; }
     const hosts = await this.getApiObjects();
     const data:object[] = [];
     for (const host of hosts) {
@@ -25,7 +26,7 @@ export class SchedulerJob {
   }
 
   private async getApiObjects() {
-    const { apis } = this.job;
+    const { apis } = jobs[this.jobName];
     const hosts:IApi[] = await this.wazuhHosts.getHostsEntries(false, false, false);
     if (hosts.length <= 0) { throw new Error('10001'); }
     if(apis){
@@ -43,7 +44,7 @@ export class SchedulerJob {
   }
 
   private async getResponses(host): Promise<object[]> {
-    const { request, params } = this.job;
+    const { request, params } = jobs[this.jobName];
     const data:object[] = [];
 
     if (typeof request === 'string') {
@@ -57,7 +58,7 @@ export class SchedulerJob {
   }
 
   private async getResponsesForIRequest(host: any,  data: object[]) {
-    const { request, params } = this.job;
+    const { request, params } = jobs[this.jobName];
     const fieldName = this.getParamName(request.request);
     const paramList = await this.getParamList(fieldName, host);
     for (const param of paramList) {
@@ -80,7 +81,7 @@ export class SchedulerJob {
   }
 
   private async getParamList(fieldName, host) {
-    const { request } = this.job;
+    const { request } = jobs[this.jobName];
     // @ts-ignore
     const apiRequest = new ApiRequest(request.params[fieldName].request, host)
     const response = await apiRequest.getData();
