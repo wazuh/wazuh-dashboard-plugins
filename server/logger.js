@@ -37,7 +37,7 @@ const initLogger = () => {
       new winston.transports.File({
         filename: path.join(
           __dirname,
-          '../../../optimize/wazuh-logs/wazuhapp.log'
+          '../../../optimize/wazuh/logs/wazuhapp.log'
         )
       })
     ]
@@ -54,7 +54,7 @@ const initLogger = () => {
       new winston.transports.File({
         filename: path.join(
           __dirname,
-          '../../../optimize/wazuh-logs/wazuhapp-plain.log'
+          '../../../optimize/wazuh/logs/wazuhapp-plain.log'
         )
       })
     ]
@@ -65,12 +65,16 @@ const initLogger = () => {
 };
 
 /**
- * Checks if wazuh-logs exists. If it doesn't exist, it will be created.
+ * Checks if wazuh/logs exists. If it doesn't exist, it will be created.
  */
 const initDirectory = async () => {
   try {
-    if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh-logs'))) {
-      fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh-logs'));
+
+    if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh'))) {
+      fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh'));
+    }
+    if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh/logs'))) {
+      fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh/logs'));
     }
     if (
       typeof wazuhlogger === 'undefined' ||
@@ -109,18 +113,18 @@ const checkFiles = () => {
   if (allowed) {
     if (
       getFilesizeInMegaBytes(
-        path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log')
+        path.join(__dirname, '../../../optimize/wazuh/logs/wazuhapp.log')
       ) >= 100
     ) {
       fs.renameSync(
-        path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log'),
+        path.join(__dirname, '../../../optimize/wazuh/logs/wazuhapp.log'),
         path.join(
           __dirname,
-          `../../../optimize/wazuh-logs/wazuhapp.${new Date().getTime()}.log`
+          `../../../optimize/wazuh/logs/wazuhapp.${new Date().getTime()}.log`
         )
       );
       fs.writeFileSync(
-        path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log'),
+        path.join(__dirname, '../../../optimize/wazuh/logs/wazuhapp.log'),
         JSON.stringify({
           date: new Date(),
           level: 'info',
@@ -131,14 +135,14 @@ const checkFiles = () => {
     }
     if (
       getFilesizeInMegaBytes(
-        path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp-plain.log')
+        path.join(__dirname, '../../../optimize/wazuh/logs/wazuhapp-plain.log')
       ) >= 100
     ) {
       fs.renameSync(
-        path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp-plain.log'),
+        path.join(__dirname, '../../../optimize/wazuh/logs/wazuhapp-plain.log'),
         path.join(
           __dirname,
-          `../../../optimize/wazuh-logs/wazuhapp-plain.${new Date().getTime()}.log`
+          `../../../optimize/wazuh/logs/wazuhapp-plain.${new Date().getTime()}.log`
         )
       );
     }

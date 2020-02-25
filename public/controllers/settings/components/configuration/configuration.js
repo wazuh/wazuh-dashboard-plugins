@@ -65,7 +65,7 @@ export class WzConfigurationSettings extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                Configuration file located at /usr/share/kibana/plugins/wazuh/wazuh.yml
+                Configuration file located at /usr/share/kibana/optimize/wazuh/config/wazuh.yml
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

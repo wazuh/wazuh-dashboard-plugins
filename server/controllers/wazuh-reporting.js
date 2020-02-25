@@ -39,7 +39,7 @@ import {
 
 import { log } from '../logger';
 
-const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
+const REPORTING_PATH = '../../../../optimize/wazuh/downloads/reports';
 
 export class WazuhReportingCtrl {
   /**
@@ -1810,8 +1810,14 @@ export class WazuhReportingCtrl {
       // Init
       this.printer = new PdfPrinter(this.fonts);
       this.dd.content = [];
-      if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
-        fs.mkdirSync(path.join(__dirname, REPORTING_PATH));
+      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh'))) {
+        fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh'));
+      }
+      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh/downloads'))) {
+        fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh/downloads'));
+      }
+      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh/downloads/reports'))) {
+        fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh/downloads/reports'));
       }
 
       if (req.payload && req.payload.array) {

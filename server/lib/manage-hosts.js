@@ -14,12 +14,14 @@ import yml from 'js-yaml';
 import path from 'path';
 import { log } from '../logger';
 import { UpdateRegistry } from './update-registry';
+import { initialWazuhConfig } from './initial-wazuh-config'
 
 export class ManageHosts {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../wazuh.yml');
+    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml');
     this.updateRegistry = new UpdateRegistry();
+    this.initialConfig = initialWazuhConfig;
   }
 
   /**
@@ -64,6 +66,15 @@ export class ManageHosts {
     try {
       this.checkBusy();
       this.busy = true;
+      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh'))) {
+        fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh'));
+      }
+      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh/config'))) {
+        fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh/config'));
+      }
+      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml'))) {
+        await fs.writeFileSync(this.file, this.initialConfig, 'utf8');
+      }
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
       const content = yml.load(raw);
