@@ -179,6 +179,7 @@ export class KibanaVis extends Component {
             query: !isAgentStatus ? discoverList[0] : {}
           });
           this.setSearchSource(discoverList);
+          this.props.finishUpdateVis();
         }
       }
     } catch (error) {
