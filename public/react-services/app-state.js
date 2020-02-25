@@ -128,7 +128,7 @@ export class AppState {
      */
     static getCurrentAPI() {
         try{
-            const currentAPI = Cookies.get('API');
+            const currentAPI = Cookies.get('_currentApi');
             return currentAPI ? decodeURI(currentAPI) : false;
         }catch(err){
             console.log("Error get current Api");
@@ -143,7 +143,7 @@ export class AppState {
     static removeCurrentAPI() {
         const updateApiMenu = updateCurrentApi(false);
         store.dispatch(updateApiMenu);
-        return Cookies.remove('API', { path : window.location.pathname });
+        return Cookies.remove('_currentApi', { path : window.location.pathname });
     }
 
     /**
@@ -156,7 +156,7 @@ export class AppState {
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (API) {
-                Cookies.set('API', encodedApi, { expires: exp, path: window.location.pathname });
+                Cookies.set('_currentApi', encodedApi, { expires: exp, path: window.location.pathname });
                 try{
                     const updateApiMenu = updateCurrentApi(JSON.parse(API).name);
                     store.dispatch(updateApiMenu);
