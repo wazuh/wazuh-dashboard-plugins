@@ -1139,10 +1139,12 @@ export class WazuhApiCtrl {
         params,
         cred
       );
-
+      
+      const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
+      
       const totalItems = (((output || {}).body || {}).data || {}).totalItems;
 
-      if (totalItems) {
+      if (totalItems && !isList) {
         params.offset = 0;
         itemsArray.push(...output.body.data.items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
@@ -1159,9 +1161,8 @@ export class WazuhApiCtrl {
 
       if (totalItems) {
         const { path, filters } = req.payload;
-        const isList = path.includes('/lists') && filters && filters.length;
         const isArrayOfLists =
-          path.includes('/lists') && (!filters || !filters.length);
+          path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
         const isFiles = path.endsWith('/files');
@@ -1209,9 +1210,8 @@ export class WazuhApiCtrl {
 
         if (isList) {
           fields = ['key', 'value'];
-          itemsArray = itemsArray[0];
+          itemsArray = output.body.data.items[0];
         }
-
         fields = fields.map(item => ({ value: item, default: '-' }));
 
         const json2csvParser = new Parser({ fields });

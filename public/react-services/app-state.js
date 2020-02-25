@@ -48,7 +48,7 @@ export class AppState {
             exp.setDate(exp.getDate() + 365);
             if (extensions) {
                 const encodedExtensions = encodeURI(JSON.stringify(current));
-                Cookies.set('extensions', encodedExtensions, { expires: exp, path: '/app'});
+                Cookies.set('extensions', encodedExtensions, { expires: exp, path: window.location.pathname});
             }
         }catch(err){
             console.log("Error set extensions");
@@ -82,7 +82,7 @@ export class AppState {
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (cluster_info) {
-                Cookies.set('_clusterInfo', encodedClusterInfo, { expires: exp, path: '/app'  });
+                Cookies.set('_clusterInfo', encodedClusterInfo, { expires: exp, path: window.location.pathname  });
             }
         }catch(err){
             console.log("Error set cluster info");
@@ -100,7 +100,7 @@ export class AppState {
             const createdAt = encodeURI(date);
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
-            Cookies.set('_createdAt', createdAt, { expires: exp, path: '/app' });
+            Cookies.set('_createdAt', createdAt, { expires: exp, path: window.location.pathname });
         }catch(err){
             console.log("Error set createdAt date");
             console.log(err);
@@ -143,7 +143,7 @@ export class AppState {
     static removeCurrentAPI() {
         const updateApiMenu = updateCurrentApi(false);
         store.dispatch(updateApiMenu);
-        return Cookies.remove('API', { path : '/app' });
+        return Cookies.remove('API', { path : window.location.pathname });
     }
 
     /**
@@ -156,7 +156,7 @@ export class AppState {
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (API) {
-                Cookies.set('API', encodedApi, { expires: exp, path: '/app' });
+                Cookies.set('API', encodedApi, { expires: exp, path: window.location.pathname });
                 try{
                     const updateApiMenu = updateCurrentApi(JSON.parse(API).name);
                     store.dispatch(updateApiMenu);
@@ -183,7 +183,7 @@ export class AppState {
      */
     static setPatternSelector(value) {
         const encodedPattern = encodeURI(value);
-        Cookies.set('patternSelector', encodedPattern, { path: '/app'});
+        Cookies.set('patternSelector', encodedPattern, { path: window.location.pathname});
     }
 
 
@@ -197,7 +197,7 @@ export class AppState {
         const exp = new Date();
         exp.setDate(exp.getDate() + 365);
         if (newPattern) {
-            Cookies.set('_currentPattern', encodedPattern, { expires: exp, path: '/app' });
+            Cookies.set('_currentPattern', encodedPattern, { expires: exp, path: window.location.pathname });
         }
     }
 
@@ -212,6 +212,14 @@ export class AppState {
             this.setCurrentPattern(newPattern);
         }
         return Cookies.get('_currentPattern') ? decodeURI(Cookies.get('_currentPattern')) : "";
+    }
+
+
+    /**
+     * Remove '_currentPattern' value   
+     */
+    static removeCurrentPattern() {
+        return Cookies.remove('_currentPattern', { path : window.location.pathname });
     }
 
 
@@ -264,7 +272,7 @@ export class AppState {
         }
         if(navigate){
             const encodedURI = encodeURI(JSON.stringify(navigate));
-            Cookies.set('navigate', encodedURI, {path: '/app'});
+            Cookies.set('navigate', encodedURI, {path: window.location.pathname});
         }
     }
 
@@ -275,7 +283,7 @@ export class AppState {
     }
 
     static removeNavigation() {
-        return Cookies.remove('navigate', {path: '/app'});
+        return Cookies.remove('navigate', {path: window.location.pathname});
     }
 
     static setWzMenu() {

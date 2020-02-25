@@ -30,7 +30,7 @@ class WzConfigurationAmazonS3 extends Component{
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return this.wodleConfig && this.wodleConfig['aws-s3'] && this.wodleConfig['aws-s3'].disabled === 'no' || false;
+    return this.wodleConfig && this.wodleConfig['aws-s3'] && this.wodleConfig['aws-s3'].disabled === 'no';
   }
   render(){
     return (

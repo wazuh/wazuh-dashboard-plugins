@@ -3,10 +3,10 @@
         <react-component name="RegisterAgent" props="actrl.registerAgentsProps" />
     </div>
     <div ng-show="!actrl.addingNewAgent">
-        <div layout="column" class="euiPage" ng-controller="overviewController as octrl">
-            <div layout="row" layout-align="start center">
+        <div layout="column" ng-controller="overviewController as octrl">
+            <div class="euiPage" style="padding: 12px 8px 0!important">
                 <div ng-if="octrl.tab !== 'welcome'" style="padding: 0!important" class="euiText euiText--small">
-                    <h2 class="euiTitle euiTitle--medium">
+                    <h2 class="euiTitle euiTitle--medium" style="padding-top:6px">
                         <span
                             class="euiTextColor euiTextColor--default">{{ octrl.TabDescription[octrl.tab].title }}</span>
                         <span class="euiTextColor" style="color:#006BB4"

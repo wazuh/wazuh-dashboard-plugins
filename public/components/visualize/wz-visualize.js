@@ -12,7 +12,7 @@
 import React, { Component } from 'react';
 
 import { visualizations } from './visualizations';
-import { KibanaVis } from '../kibana-vis/kibana-vis';
+import { KibanaVis } from '../../kibana-integrations/kibana-vis';
 import { EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card'
 import AlertsStats from '../../controllers/overview/components/alerts-stats'

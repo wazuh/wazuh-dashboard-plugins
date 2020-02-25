@@ -142,7 +142,7 @@ class WzStatusActionButtons extends Component {
     for (const node of listNodes) {
       options.push({
         value: node.name,
-        text: node.name,
+        text: `${node.name} (${node.type})`,
       });
     }
     return options;

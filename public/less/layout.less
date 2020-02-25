@@ -30,6 +30,11 @@ html {
 #kibana-body{
   min-height: calc(~'100vh - 1px') !important;
 }
+
+:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput):not(.euiTextArea) {
+  -webkit-animation: none!important;
+}
+
 /* Margins */
 
 .wz-margin-right-8 {
@@ -412,8 +417,8 @@ md-dialog.modalTheme .md-button {
   top: 49px;
   left: 48px;
   right: 20px;
+  max-width: 100% !important;
   background-color: white;
-  max-width: calc(~'100vw - 128px') !important;
   margin: 35px;
   outline: 35px solid rgba(0, 0, 0, 0.2);
 }

@@ -16,7 +16,6 @@ import {
   EuiSideNav,
   EuiIcon
 } from '@elastic/eui';
-
 import {
   updateRulesetSection,
   updateLoadingStatus,
@@ -111,7 +110,7 @@ class WzManagementSideMenu extends Component {
 
   clickMenuItem = section => {
     this.props.managementPopoverToggle();
-    window.location.href = `#/manager/?tab=${section}`;
+    window.location.href = `#/manager/${section}?tab=${section}`;
   };
 
   createItem = (item, data = {}) => {

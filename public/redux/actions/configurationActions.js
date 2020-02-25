@@ -37,3 +37,10 @@ export const updateLoadingStatus = (loadingStatus) => {
     loadingStatus
   }
 }
+
+export const updateAdminMode = (adminMode) => {
+  return {
+    type: 'UPDATE_CONFIGURATION_ADMIN_MODE',
+    adminMode
+  }
+}

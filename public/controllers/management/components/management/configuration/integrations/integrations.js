@@ -86,7 +86,7 @@ class WzConfigurationIntegrations extends Component{
                       settings={key === 0 ? () => this.changeView('') : undefined}
                       json={key === 0 ? () => this.changeView('json') : undefined}
                       xml={key === 0 ? () => this.changeView('xml') : undefined}
-                      help={this.helpLinks}/>
+                      help={key === 0 ? helpLinks : undefined}/>
                   </Fragment>
                 )
               })}
@@ -99,7 +99,7 @@ class WzConfigurationIntegrations extends Component{
                 json={() => this.changeView('json')}
                 xml={() => this.changeView('xml')}
                 help={helpLinks}/>
-              <WzSettingsViewer mode='json' value={currentConfig}/>
+              <WzSettingsViewer mode='json' value={currentConfig} minusHeight={280}/>
             </WzViewSelectorSwitch>
             <WzViewSelectorSwitch view='xml'>
               <WzConfigurationSettingsHeaderViewer
@@ -109,7 +109,7 @@ class WzConfigurationIntegrations extends Component{
                 json={() => this.changeView('json')}
                 xml={() => this.changeView('xml')}
                 help={helpLinks}/>
-              <WzSettingsViewer mode='xml' value={currentConfig}/>
+              <WzSettingsViewer mode='xml' value={currentConfig} minusHeight={280}/>
             </WzViewSelectorSwitch>
 
           </WzViewSelector>
