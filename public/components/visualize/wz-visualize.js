@@ -12,7 +12,7 @@
 import React, { Component } from 'react';
 
 import { visualizations } from './visualizations';
-import { KibanaVis } from '../../kibana-integrations/kibana-vis';
+import KibanaVis from '../../kibana-integrations/kibana-vis';
 import { EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card'
 import AlertsStats from '../../controllers/overview/components/alerts-stats'
@@ -25,7 +25,6 @@ export class WzVisualize extends Component {
     this.state = {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
-      updateVis: this.props.updateVis,
       cardReqs: {},
       metricItems: this.props.selectedTab !== 'welcome'
         ? this.getMetricItems(this.props.selectedTab)
@@ -90,7 +89,9 @@ export class WzVisualize extends Component {
                 />
               </EuiFlexGroup>
               <div style={{ height: '100%' }}>
-                <KibanaVis visID={vis.id} tab={selectedTab} type={false} {...this.props}></KibanaVis>
+                <WzReduxProvider>
+                  <KibanaVis visID={vis.id} tab={selectedTab} {...this.props}></KibanaVis>
+                </WzReduxProvider>
               </div>
             </EuiFlexItem>
           </EuiPanel>
@@ -119,7 +120,9 @@ export class WzVisualize extends Component {
             {this.visualizations[selectedTab].metrics.map((vis, i) => {
               return (
                 <div key={i}>
-                  <KibanaVis visID={vis.id} tab={selectedTab} isMetric={true} {...this.props}></KibanaVis>
+                  <WzReduxProvider>
+                    <KibanaVis visID={vis.id} tab={selectedTab} isMetric={true} {...this.props}></KibanaVis>
+                  </WzReduxProvider>
                 </div>
               )
             })}

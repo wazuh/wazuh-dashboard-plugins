@@ -14,7 +14,6 @@ import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoad
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'

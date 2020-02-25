@@ -21,6 +21,12 @@ const visualizationsReducers = (state = initialState, action) => {
       ...metric,
     };
   }
+  if (action.type === 'UPDATE_VIS') {
+    return {
+      ...state,
+      shouldUpdate: action.update.update
+    };
+  }
   return state;
 };
 

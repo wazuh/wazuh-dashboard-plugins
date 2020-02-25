@@ -114,11 +114,6 @@ export class OverviewController {
 
     this.visualizeProps = {
       selectedTab: this.tab,
-      updateVis: false,
-      finishUpdateVis: () => {
-        this.visualizeProps.updateVis = false;
-        this.updateVis = false;
-      },
       updateRootScope: (prop, value) => {
         this.$rootScope[prop] = value;
         this.$rootScope.$applyAsync();
@@ -128,10 +123,6 @@ export class OverviewController {
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
-    });
-
-    this.$rootScope.$on('updateVis', (ev, params) => {
-      this.visualizeProps.updateVis = params ? params.raw : true;
     });
   }
 

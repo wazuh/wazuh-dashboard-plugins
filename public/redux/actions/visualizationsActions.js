@@ -16,3 +16,10 @@ export const updateMetric = metric => {
     metric
   };
 };
+
+export const updateVis = update => {
+  return {
+    type: 'UPDATE_VIS',
+    update
+  };
+};

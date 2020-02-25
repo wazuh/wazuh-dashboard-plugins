@@ -117,7 +117,7 @@ export class VisualizeTopMenu extends Component {
               </EuiKeyPadMenuItem>
             }
             <EuiKeyPadMenuItem
-              label={this.state.subtab === 'discover' ? 'Dashboard' : 'Overview'}
+              label={this.state.subtab === 'discover' ? 'Dashboard' : 'Discover'}
               onClick={() => this.props.switchDiscover(this.state.subtab === 'discover' ? 'panels' : 'discover')}>
               <EuiIcon
                 type={this.state.subtab === 'discover' ? 'visualizeApp' : 'discoverApp'}

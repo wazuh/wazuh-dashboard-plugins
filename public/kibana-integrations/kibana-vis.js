@@ -16,7 +16,7 @@ import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/leg
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { DiscoverPendingUpdates } from '../factories/discover-pending-updates';
-import chrome from 'ui/chrome';
+import { connect } from 'react-redux';
 import { LoadedVisualizations } from '../factories/loaded-visualizations';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
@@ -27,13 +27,11 @@ import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
 
-export class KibanaVis extends Component {
+class KibanaVis extends Component {
   _isMounted = false;
 
   constructor(props) {
     super(props);
-    this.state = {};
-
     this.lockFields = false;
     this.implicitFilter = '';
     this.rawFilters = [];
@@ -63,12 +61,6 @@ export class KibanaVis extends Component {
     this.tab = this.props.tab;
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.updateVis) {
-      this.updateVis();
-    }
-  }
-
   componentDidMount() {
     this._isMounted = true;
   }
@@ -81,6 +73,15 @@ export class KibanaVis extends Component {
     }
   }
 
+  /*   shouldComponentUpdate() {
+      return this.props.state.shouldUpdate;
+    } */
+
+  componentDidUpdate() {
+    this.updateVis();
+    //store.dispatch(this.updateVis({ update: false }));
+  }
+
   updateVis() {
     if (this.deadField) {
       return this.renderComplete();
@@ -91,7 +92,12 @@ export class KibanaVis extends Component {
     }
   }
 
-  calculateTimeFilterSeconds = ({ from, to }) => {
+  async callUpdateMetric() {
+    const data = await this.visHandler.handler.dataHandler.getData();
+    store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
+  }
+
+  calculateTimeFilterSeconds = () => {
     try {
       const fromParsed = dateMath.parse(from);
       const toParsed = dateMath.parse(to);
@@ -164,7 +170,6 @@ export class KibanaVis extends Component {
           );
           this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(this.renderComplete);
           this.visHandlers.addItem(this.visHandler);
-
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
@@ -178,8 +183,10 @@ export class KibanaVis extends Component {
             filters: isAgentStatus ? [] : discoverList[1] || [],
             query: !isAgentStatus ? discoverList[0] : {}
           });
+          if (this.props.isMetric) {
+            //this.callUpdateMetric();
+          }
           this.setSearchSource(discoverList);
-          this.props.finishUpdateVis();
         }
       }
     } catch (error) {
@@ -225,7 +232,6 @@ export class KibanaVis extends Component {
 
   renderComplete = async () => {
     const visId = this.visID.toLowerCase();
-    this.props.finishUpdateVis();
 
     if (!visId.includes(this.props.tab)) {
       this.destroyAll();
@@ -250,15 +256,13 @@ export class KibanaVis extends Component {
       );
 
       const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
-      if (this.props.isMetric) {
-        const data = await this.visHandler.handler.dataHandler.getData();
-        const updateMetric = this.updateMetric({ name: visId, value: data.value.visData.rows['0']['col-0-1'] });
-        store.dispatch(updateMetric)
-      }
       if (visTitle === 'Mitre attack count') {
         //   $scope.$emit('sendVisDataRows', {
         //     mitreRows: visHandler.dataLoader['visData'],
         //   });
+      }
+      if (this.props.isMetric) {
+        //this.callUpdateMetric();
       }
       if (currentCompleted >= 100) {
         this.props.updateRootScope('rendered', 'true');
@@ -284,3 +288,14 @@ export class KibanaVis extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  if (state.visualizationsReducers.shouldUpdate) {
+    return {
+      state: state.visualizationsReducers
+    };
+  }
+};
+
+export default connect(mapStateToProps, null)(KibanaVis);
+
