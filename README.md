@@ -40,7 +40,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 Install the app
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip
+cd /usr/share/kibana/
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip
 ```
 
 Restart Kibana
@@ -84,7 +85,8 @@ cp /usr/share/kibana/plugins/wazuh/wazuh.yml /tmp/wazuh-backup.yml
 Remove the app using kibana-plugin tool
 
 ```
-/usr/share/kibana/bin/kibana-plugin remove wazuh
+cd /usr/share/kibana/
+bin/kibana-plugin remove wazuh
 ```
 
 Remove generated bundles
@@ -103,7 +105,8 @@ chown -R kibana:kibana /usr/share/kibana/plugins
 Install the app
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip
+cd /usr/share/kibana/
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip
 ```
 
 Restore the configuration file backup.
