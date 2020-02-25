@@ -14,13 +14,14 @@ export class SchedulerJob {
   }
 
   public async run() {
+    const { index, creation} = this.job;
     const hosts = await this.getApiObjects();
     const data:object[] = [];
     for (const host of hosts) {
       const response = await this.getResponses(host);
       data.push(...response);
     }
-    await this.saveDocument.save(data, this.job.index)
+    await this.saveDocument.save(data, index, creation);
   }
 
   private async getApiObjects() {

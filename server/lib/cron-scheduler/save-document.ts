@@ -1,9 +1,9 @@
 import {
-  Client,
   BulkIndexDocumentsParams,
 } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
-import { log } from '../../logger.js'
+import { log } from '../../logger.js';
+import { indexDate } from '../index-date.js';
 
 
 export class SaveDocument {
@@ -18,10 +18,11 @@ export class SaveDocument {
     this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
   }
 
-  async save(doc:object[], indexName) {
-    const index = this.addIndexPrefix(indexName)
-    await this.checkIndexAndCreateIfNotExists(index);
-    const createDocumentObject = this.createDocument(doc, index);
+  async save(doc:object[], indexName, creation) {
+    const index = this.addIndexPrefix(indexName);
+    const indexCreation = `${index}-${indexDate(creation)}`;
+    await this.checkIndexAndCreateIfNotExists(indexCreation);
+    const createDocumentObject = this.createDocument(doc, indexCreation);
     const response = await this.callWithInternalUser('bulk', createDocumentObject);
     log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
     await this.checkIndexPatternAndCreateIfNotExists(index);
@@ -31,7 +32,19 @@ export class SaveDocument {
     const exists = await this.callWithInternalUser('indices.exists',{index});
     log(this.logPath, `Index '${index}' exists? ${exists}`, 'debug');
     if(!exists) {
-      const response = await this.callWithInternalUser('indices.create', {index});
+      const response = await this.callWithInternalUser('indices.create', 
+      {
+        index, 
+        body: {
+          settings: {
+            index: { 
+              number_of_shards: 2,
+              number_of_replicas: 0
+            }
+          }
+        }
+      });
+
       log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
     }
   }
@@ -77,6 +90,7 @@ export class SaveDocument {
 
   private getKibanaIndex() {
     return ((((this.server || {})
+    // @ts-ignore
       .registrations || {})
       .kibana || {})
       .options || {})
