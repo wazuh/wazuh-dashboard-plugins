@@ -28,6 +28,7 @@ import {
   EuiIcon
 } from '@elastic/eui';
 import { ExtensionDetails } from './extension-details';
+import WzExtensionGuide from './extension-guide';
 
 export class AddNewExtension extends Component {
   constructor(props) {
@@ -309,7 +310,8 @@ export class AddNewExtension extends Component {
     return (
       <div>
         {(!this.state.isShowingExtension && this.showCards())}
-        {(this.state.isShowingExtension && this.showExtensionDetails())}
+        {/* {(this.state.isShowingExtension && this.showExtensionDetails())} */}
+        {(this.state.isShowingExtension && <WzExtensionGuide closeGuide={this.closeExtensionDetails} guide={'syscheck'}/>)}
       </div>
     );
   }
