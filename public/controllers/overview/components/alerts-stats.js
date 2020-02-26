@@ -28,7 +28,7 @@ class AlertsStats extends Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.state) {
       nextProps.items.forEach(x => {
-        x.value = nextProps.state[x.id.toLowerCase()] || '-'
+        x.value = nextProps.state[x.id] || '-'
       });
     }
     this.setState({
