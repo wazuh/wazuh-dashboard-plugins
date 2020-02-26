@@ -100,7 +100,7 @@ app.directive('kbnVis', function () {
           const filters = isAgentStatus ? [] : discoverList[1] || [];
           const query = !isAgentStatus ? discoverList[0] : {};
 
-          const vizInput = {
+          const visInput = {
             timeRange,
             filters,
             query,
@@ -131,7 +131,7 @@ app.directive('kbnVis', function () {
 
               visHandler = await factory.createFromObject(
                 visualization,
-                vizInput
+                visInput
               );
               visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]).then(renderComplete);
               visHandlers.addItem(visHandler);
@@ -140,7 +140,7 @@ app.directive('kbnVis', function () {
             } else if (rendered && !deadField) {
               // There's a visualization object -> just update its filters
               $rootScope.rendered = true;
-              visHandler.updateInput(vizInput);
+              visHandler.updateInput(visInput);
               setSearchSource(discoverList);
             }
           }
