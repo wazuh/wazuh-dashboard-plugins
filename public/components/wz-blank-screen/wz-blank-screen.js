@@ -10,43 +10,42 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { EuiEmptyPrompt, EuiButton, EuiHorizontalRule } from '@elastic/eui';
+import { EuiPage, EuiPageContent, EuiEmptyPrompt, EuiButton, EuiHorizontalRule } from '@elastic/eui';
 
 
 export class WzBlankScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-   
-    };
+    this.state = {};
   }
 
   render() {
-  
     return (
-     <Fragment>
-      <EuiEmptyPrompt
-          iconType="alert"
-          title={<h2>{this.props.errorToShow || 'Something went wrong'}</h2>}
-          body={
-            <Fragment>
-              <EuiHorizontalRule margin='s'/>
-              <p>
-                <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html</a>
-                 <br/>
-                <a href="https://documentation.wazuh.com/current/installation-guide/">https://documentation.wazuh.com/current/installation-guide/</a> 
-              </p>
-              <EuiHorizontalRule margin='s'/>
-              <p> </p>
-            </Fragment>
-          }
-          actions={
-            <EuiButton onClick={this.props.goToOverview} color="primary" fill>
-              Refresh
+      <EuiPage>
+        <EuiPageContent horizontalPosition="center">
+          <EuiEmptyPrompt
+            iconType="alert"
+            title={<h2>{this.props.errorToShow || 'Something went wrong'}</h2>}
+            body={
+              <Fragment>
+                <EuiHorizontalRule margin='s' />
+                <p>
+                  <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html</a>
+                  <br />
+                  <a href="https://documentation.wazuh.com/current/installation-guide/">https://documentation.wazuh.com/current/installation-guide/</a>
+                </p>
+                <EuiHorizontalRule margin='s' />
+                <p> </p>
+              </Fragment>
+            }
+            actions={
+              <EuiButton onClick={this.props.goToOverview} color="primary" fill>
+                Refresh
             </EuiButton>
-          }
-        />
-     </Fragment>
+            }
+          />
+        </EuiPageContent>
+      </EuiPage>
     );
   }
 }
