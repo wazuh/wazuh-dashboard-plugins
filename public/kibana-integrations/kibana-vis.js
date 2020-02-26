@@ -73,13 +73,10 @@ class KibanaVis extends Component {
     }
   }
 
-  /*   shouldComponentUpdate() {
-      return this.props.state.shouldUpdate;
-    } */
-
   componentDidUpdate() {
-    this.updateVis();
-    //store.dispatch(this.updateVis({ update: false }));
+    if(this.props.state.shouldUpdate){
+      this.updateVis();
+    }
   }
 
   updateVis() {
@@ -94,7 +91,8 @@ class KibanaVis extends Component {
 
   async callUpdateMetric() {
     const data = await this.visHandler.handler.dataHandler.getData();
-    store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
+    if(this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
+      store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
   }
 
   calculateTimeFilterSeconds = () => {
@@ -184,7 +182,7 @@ class KibanaVis extends Component {
             query: !isAgentStatus ? discoverList[0] : {}
           });
           if (this.props.isMetric) {
-            //this.callUpdateMetric();
+            this.callUpdateMetric();
           }
           this.setSearchSource(discoverList);
         }
@@ -262,7 +260,7 @@ class KibanaVis extends Component {
         //   });
       }
       if (this.props.isMetric) {
-        //this.callUpdateMetric();
+        this.callUpdateMetric();
       }
       if (currentCompleted >= 100) {
         this.props.updateRootScope('rendered', 'true');
@@ -290,11 +288,9 @@ class KibanaVis extends Component {
 }
 
 const mapStateToProps = state => {
-  if (state.visualizationsReducers.shouldUpdate) {
     return {
       state: state.visualizationsReducers
     };
-  }
 };
 
 export default connect(mapStateToProps, null)(KibanaVis);
