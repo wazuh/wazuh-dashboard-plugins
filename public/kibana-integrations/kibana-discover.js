@@ -72,6 +72,7 @@ import { FilterStateManager } from 'plugins/data';
 import { buildServices } from 'plugins/kibana/discover/build_services';
 import { npStart } from 'ui/new_platform';
 import { pluginInstance } from 'plugins/kibana/discover/index';
+import { WazuhConfig } from '../react-services/wazuh-config';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -129,6 +130,7 @@ function discoverController(
     timefilter,
     toastNotifications,
   } = getServices();
+  const wazuhConfig = new WazuhConfig();
   //////
   const responseHandler = vislibSeriesResponseHandlerProvider().handler;
   const filterStateManager = new FilterStateManager(globalState, getAppState, filterManager);
@@ -434,13 +436,37 @@ function discoverController(
         subscribeWithScope($scope, filterManager.getUpdates$(), {
           next: () => {
             $scope.filters = filterManager.filters;
+            // Wazuh. Hides the alerts of the '000' agent if it is in the configuration
+            const buildFilters = () => {
+              const { hideManager } = wazuhConfig.getConfig();
+              if (hideManager){
+                return [{
+                  "meta": {
+                    "alias":null,
+                    "disabled":false,
+                    "key":"agent.id",
+                    "negate":true,
+                    "params":{"query":"000"},
+                    "type":"phrase",
+                    "index":"wazuh-alerts-3.x-*"
+                  },
+                  "query":{"match_phrase":{"agent.id":"000"}},
+                  "$state": {"store":"appState"}
+                }];
+              }
+              return [];
+            }
+          
             $scope.updateDataSource().then(function () {
               ///////////////////////////////  WAZUH   ///////////////////////////////////
               if (!filtersAreReady()) return;
               discoverPendingUpdates.removeAll();
               discoverPendingUpdates.addItem(
                 $state.query,
-                $scope.filters
+                [
+                  ...$scope.filters,
+                  ...buildFilters() // Hide '000' agent
+                ]
               );
               if ($location.search().tab != 'configuration') {
                 loadedVisualizations.removeAll();

@@ -47,6 +47,8 @@ export const configEquivalences = {
     'Default index pattern to use on the app for Wazuh monitoring.',
   admin:
     'Enable or disable administrator requests to the Wazuh API when using the app.',
+  hideManager:
+    'Hide the alerts of the manager from all visualizations and discover',
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.'
 };
