@@ -105,8 +105,9 @@ export default [
                               "index": "wazuh-alerts",
                               "type": "phrases",
                               "key": "rule.groups",
-                              "value": "authentication_failed, authentication_failures",
+                              "value": "win_authentication_failed, authentication_failed, authentication_failures",
                               "params": [
+                                "win_authentication_failed",
                                 "authentication_failed",
                                 "authentication_failures"
                               ],
@@ -117,6 +118,11 @@ export default [
                             "query": {
                               "bool": {
                                 "should": [
+                                  {
+                                    "match_phrase": {
+                                      "rule.groups": "win_authentication_failed"
+                                    }
+                                  },
                                   {
                                     "match_phrase": {
                                       "rule.groups": "authentication_failed"
