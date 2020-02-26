@@ -99,18 +99,7 @@ export class OverviewController {
         AppState.setExtensions(api, extensions)
     };
 
-    this.visualizeTopMenuProps = {
-      switchDiscover: tab => {
-        this.switchSubtab(tab);
-      },
-      tab: this.tab,
-      subtab: this.subtab,
-      setAgent: id => {
-        this.isAgent = id;
-        this.$rootScope.$emit('testAGENT', {
-        });
-      },
-    };
+    this.setTabs();
 
     this.visualizeProps = {
       selectedTab: this.tab,
@@ -136,10 +125,39 @@ export class OverviewController {
   }
 
   /**
-   * Show/hide MITRE table
-   */
+ * Show/hide MITRE table
+ */
   switchMitreTab() {
     this.showingMitreTable = !this.showingMitreTable
+  }
+
+  /**
+   * Build the current section tabs
+   */
+  setTabs() {
+    this.overviewTabsProps = false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
+
+    if (!this.currentPanel) return;
+
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.extensions,
+      this.tabNames
+    );
+
+    this.overviewTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+      },
+      selectedTab:
+        this.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
+      tabs
+    };
+    this.$scope.$applyAsync();
   }
 
   // Switch subtab
@@ -174,7 +192,6 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    this.visualizeTopMenuProps.subtab = subtab;
     this.$scope.$applyAsync();
     return;
   }
@@ -191,7 +208,7 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
-    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist'){
+    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist') {
       this.visualizeProps.cardReqs = {};
     }
     if (newTab === 'pci') {
@@ -207,7 +224,6 @@ export class OverviewController {
       this.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
     }
     this.visualizeProps.selectedTab = newTab;
-    this.visualizeTopMenuProps.tab = newTab;
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -270,6 +286,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
+    this.setTabs();
     this.$scope.$applyAsync();
     return;
   }
@@ -324,9 +341,9 @@ export class OverviewController {
   }
 
   /**
-   * Filter by Mitre.ID
-   * @param {*} id 
-   */
+ * Filter by Mitre.ID
+ * @param {*} id 
+ */
   addMitrefilter(id) {
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
