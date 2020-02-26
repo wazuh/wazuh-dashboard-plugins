@@ -136,6 +136,17 @@ class KibanaVis extends Component {
       const timeFilterSeconds = this.calculateTimeFilterSeconds(
         timefilter.getTime()
       );
+      const timeRange = isAgentStatus && timeFilterSeconds < 900
+        ? { from: 'now-15m', to: 'now', mode: 'quick' }
+        : timefilter.getTime();
+      const filters = isAgentStatus ? [] : discoverList[1] || [];
+      const query = !isAgentStatus ? discoverList[0] : {};
+
+      const visInput = {
+        timeRange,
+        filters,
+        query,
+      }
 
       if (!this.factory) {
         this.factory = embeddables.getEmbeddableFactory('visualization');
@@ -157,14 +168,7 @@ class KibanaVis extends Component {
 
           this.visHandler = await this.factory.createFromObject(
             this.visualization,
-            {
-              timeRange:
-                isAgentStatus && timeFilterSeconds < 900
-                  ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                  : timefilter.getTime(),
-              filters: isAgentStatus ? [] : discoverList[1] || [],
-              query: !isAgentStatus ? discoverList[0] : {}
-            }
+            visInput
           );
           this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
             this.visHandler.handler.data$.subscribe(this.renderComplete);
@@ -175,14 +179,7 @@ class KibanaVis extends Component {
           // There's a visualization object -> just update its filters
           this.rendered = true;
           this.props.updateRootScope('rendered', 'true');
-          this.visHandler.updateInput({
-            timeRange:
-              isAgentStatus && timeFilterSeconds < 900
-                ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                : timefilter.getTime(),
-            filters: isAgentStatus ? [] : discoverList[1] || [],
-            query: !isAgentStatus ? discoverList[0] : {}
-          });
+          this.visHandler.updateInput(visInput);
           this.setSearchSource(discoverList);
         }
       }
