@@ -103,8 +103,8 @@
 #admin: true
 #
 # ---------------------------- Hide manager alerts ------------------------------
-# Hide the alerts of the manager from all visualizations and discover
-#hideManager: true
+# Hide the alerts of the manager in all dashboards and discover
+#hideManagerAlerts: false
 #
 # ------------------------------- App logging level -----------------------------
 # Set the logging level for the Wazuh App log files.

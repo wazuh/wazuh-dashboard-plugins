@@ -42,7 +42,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'wazuh.monitoring.creation': 'd',
     'wazuh.monitoring.pattern': 'wazuh-monitoring-3.x-*',
     admin: true,
-    'hideManager': true,
+    'hideManagerAlerts': false,
     'logs.level': 'info'
   };
 

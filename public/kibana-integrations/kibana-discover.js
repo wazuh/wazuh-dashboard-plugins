@@ -438,8 +438,8 @@ function discoverController(
             $scope.filters = filterManager.filters;
             // Wazuh. Hides the alerts of the '000' agent if it is in the configuration
             const buildFilters = () => {
-              const { hideManager } = wazuhConfig.getConfig();
-              if (hideManager){
+              const { hideManagerAlerts } = wazuhConfig.getConfig();
+              if (hideManagerAlerts){
                 return [{
                   "meta": {
                     "alias":null,
