@@ -74,7 +74,7 @@ class KibanaVis extends Component {
   }
 
   componentDidUpdate() {
-    if(this.props.state.shouldUpdate){
+    if (this.props.state.shouldUpdate) {
       this.updateVis();
     }
   }
@@ -91,7 +91,7 @@ class KibanaVis extends Component {
 
   async callUpdateMetric() {
     const data = await this.visHandler.handler.dataHandler.getData();
-    if(this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
+    if (this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
       store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
   }
 
@@ -166,7 +166,9 @@ class KibanaVis extends Component {
               query: !isAgentStatus ? discoverList[0] : {}
             }
           );
-          this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(this.renderComplete);
+          this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
+            this.visHandler.handler.data$.subscribe(this.renderComplete);
+          });
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
@@ -181,9 +183,6 @@ class KibanaVis extends Component {
             filters: isAgentStatus ? [] : discoverList[1] || [],
             query: !isAgentStatus ? discoverList[0] : {}
           });
-          if (this.props.isMetric) {
-            this.callUpdateMetric();
-          }
           this.setSearchSource(discoverList);
         }
       }
@@ -288,9 +287,9 @@ class KibanaVis extends Component {
 }
 
 const mapStateToProps = state => {
-    return {
-      state: state.visualizationsReducers
-    };
+  return {
+    state: state.visualizationsReducers
+  };
 };
 
 export default connect(mapStateToProps, null)(KibanaVis);
