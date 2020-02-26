@@ -48,7 +48,7 @@ export const configEquivalences = {
   admin:
     'Enable or disable administrator requests to the Wazuh API when using the app.',
   hideManager:
-    'Hide the alerts of the manager from all visualizations and discover',
+    'Hide the alerts of the manager in all dashboards and discover',
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.'
 };
