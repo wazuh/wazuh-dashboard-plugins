@@ -170,7 +170,15 @@ export class AgentsController {
       this.$scope.tabView = this.commonData.checkTabViewLocation();
       this.$scope.tab = this.commonData.checkTabLocation();
     }
-
+    this.$scope.visualizeProps = {
+      selectedTab: this.$scope.tab,
+      isAgent: true,
+      updateRootScope: (prop, value) => {
+        this.$rootScope[prop] = value;
+        this.$rootScope.$applyAsync();
+      },
+      cardReqs: {}
+    }
     this.tabHistory = [];
     if (!this.ignoredTabs.includes(this.$scope.tab)) this.tabHistory.push(this.$scope.tab);
 
@@ -537,22 +545,23 @@ export class AgentsController {
       } catch (error) {} // eslint-disable-line
     }
 
+    this.$scope.visualizeProps = {
+      selectedTab: tab,
+      isAgent: true,
+      updateRootScope: (prop, value) => {
+        this.$rootScope[prop] = value;
+        this.$rootScope.$applyAsync();
+      },
+      cardReqs: {}
+    }
     try {
       this.$scope.showSyscheckFiles = false;
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
-        const pciTabs = await this.commonData.getPCI();
-        this.$scope.pciReqs = {
-          items: pciTabs,
-          reqTitle: 'PCI DSS Requirement',
-        };
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
       }
       if (tab === 'gdpr') {
-        const gdprTabs = await this.commonData.getGDPR();
-        this.$scope.gdprReqs = {
-          items: gdprTabs,
-          reqTitle: 'GDPR Requirement',
-        };
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getGDPR(), reqTitle: 'GDPR Requirement' };
       }
 
       if (tab === 'mitre') {
@@ -569,19 +578,11 @@ export class AgentsController {
       }
 
       if (tab === 'hipaa') {
-        const hipaaTabs = await this.commonData.getHIPAA();
-        this.$scope.hipaaReqs = {
-          items: hipaaTabs,
-          reqTitle: 'HIPAA Requirement',
-        };
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getHIPAA(), reqTitle: 'HIPAA Requirement' };
       }
 
       if (tab === 'nist') {
-        const nistTabs = await this.commonData.getNIST();
-        this.$scope.nistReqs = {
-          items: nistTabs,
-          reqTitle: 'NIST 800-53 Requirement',
-        };
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
       }
 
       if (tab === 'sca') {

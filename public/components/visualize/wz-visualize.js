@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for Visualize.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,7 @@
 import React, { Component } from 'react';
 
 import { visualizations } from './visualizations';
+import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
 import { EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card'
@@ -21,7 +22,7 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 export class WzVisualize extends Component {
   constructor(props) {
     super(props);
-    this.visualizations = visualizations;
+    this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
     this.state = {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
@@ -55,7 +56,7 @@ export class WzVisualize extends Component {
 
   getMetricItems(tab) {
     const items = [];
-    if (this.visualizations[tab].metrics) {
+    if (this.visualizations && this.visualizations[tab] && this.visualizations[tab].metrics) {
       this.visualizations[tab].metrics.forEach(
         x => { items.push({ id: x.id, description: x.description, color: x.color }) }
       );
@@ -115,7 +116,7 @@ export class WzVisualize extends Component {
 
     return (
       <EuiFlexItem>
-        {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab].metrics) &&
+        {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab] && this.visualizations[selectedTab].metrics) &&
           <div className="wz-no-display">
             {this.visualizations[selectedTab].metrics.map((vis, i) => {
               return (
@@ -130,7 +131,7 @@ export class WzVisualize extends Component {
         }
 
         {/* Metrics of Dashboard */}
-        {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab].metrics && this.state.metricItems) &&
+        {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab] && this.visualizations[selectedTab].metrics && this.state.metricItems) &&
           <div className="md-padding-top-10">
             <WzReduxProvider>
               <AlertsStats {...this.state.metricItems} tab={selectedTab} />
@@ -145,7 +146,7 @@ export class WzVisualize extends Component {
           </div>
         }
 
-        {selectedTab && selectedTab !== 'welcome' &&
+        {selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab] &&
           this.visualizations[selectedTab].rows.map((row, i) => {
             return (
               <EuiFlexGroup key={i} style={{ height: row.height + 'px', margin: 0 }}>
