@@ -6,6 +6,7 @@ export interface IJob {
   interval: string
   index: string
   creation: 'h' | 'd' | 'w' | 'm'
+  mapping?: string
   apis?: string[]
 }
 
@@ -26,7 +27,8 @@ export const jobs: {[key:string]: IJob} = {
     request: '/manager/stats/remoted?pretty',
     params: {},
     interval: '0 0 * * * *',
-    index: 'manager-stats-remoted',
+    mapping: '{"remoted": ${data}, "cluster": "false"}',
+    index: 'statistic',
     creation: 'w',
   },
   'manager-stats-analysisd': {
@@ -35,7 +37,8 @@ export const jobs: {[key:string]: IJob} = {
     request: '/manager/stats/analysisd?pretty',
     params: {},
     interval: '0 0 * * * *',
-    index: 'manager-stats-analysisd',
+    mapping: '{"analysisd": ${data}, "cluster": "false"}',
+    index: 'statistic',
     creation: 'w',
   },
   'cluster-stats-remoted': {
@@ -51,10 +54,11 @@ export const jobs: {[key:string]: IJob} = {
     },
     params: {},
     interval: '0 0 * * * *',
-    index: 'cluster-stats-remoted',
+    mapping: '{"remoted": ${data}, "cluster": "true"}',
+    index: 'statistic',
     creation: 'w',
   },
-  'cluster-stats-cluster': {
+  'cluster-stats-analysisd': {
     status: true,
     method: "GET",
     request: {
@@ -67,7 +71,8 @@ export const jobs: {[key:string]: IJob} = {
     },
     params: {},
     interval: '0 0 * * * *',
-    index: 'cluster-stats-analysisd',
+    mapping: '{"analysisd": ${data}, "cluster": "true"}',
+    index: 'statistic',
     creation: 'w',
   },
 }

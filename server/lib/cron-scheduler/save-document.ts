@@ -18,11 +18,11 @@ export class SaveDocument {
     this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
   }
 
-  async save(doc:object[], indexName, creation) {
+  async save(doc:object[], indexName, creation, mapping) {
     const index = this.addIndexPrefix(indexName);
     const indexCreation = `${index}-${indexDate(creation)}`;
     await this.checkIndexAndCreateIfNotExists(indexCreation);
-    const createDocumentObject = this.createDocument(doc, indexCreation);
+    const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
     const response = await this.callWithInternalUser('bulk', createDocumentObject);
     log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
     await this.checkIndexPatternAndCreateIfNotExists(index);
@@ -97,21 +97,42 @@ export class SaveDocument {
       .index || '.kibana';
   }
 
-  private createDocument (doc, index): BulkIndexDocumentsParams {
+  private createDocument (doc, index, mapping:string): BulkIndexDocumentsParams {
     const createDocumentObject: BulkIndexDocumentsParams = {
       index,
       type: '_doc',
       body: doc.flatMap(item => [{ 
         index: { _index: index } },
         {
-          ...(typeof item.data === 'object')
-          ? item.data
-          : {data: item.data},
-          timestamp: new Date(Date.now()).toISOString()}
+          ...this.buildData(item, mapping),
+          timestamp: new Date(Date.now()).toISOString()
+        }
       ])
     };
     log(this.logPath, `Document object: ${JSON.stringify(createDocumentObject)}`, 'debug');
     return createDocumentObject;
+  }
+
+  buildData(item, mapping)
+  {
+    const getValue = (key: string, item) => {
+      const keys = key.split('.');
+      if (keys.length === 1) {
+        return JSON.stringify(item[key]);
+      }
+      return getValue(keys.slice(1).join('.'), item[keys[0]])
+    }
+    if (mapping) {
+      const data = mapping.replace(
+        /\${([a-z|A-Z|0-9|\.\-\_]+)}/gi,
+        (...key) => getValue(key[1], item)
+      )
+      return JSON.parse(data);
+    }
+    if (typeof item.data === 'object'){
+      return item.data;
+    }
+    return {data: item.data};
   }
 
   private addIndexPrefix(index): string {

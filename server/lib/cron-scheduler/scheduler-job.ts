@@ -14,7 +14,7 @@ export class SchedulerJob {
   }
 
   public async run() {
-    const { index, creation, status } = jobs[this.jobName];
+    const { index, creation, status, mapping } = jobs[this.jobName];
     if ( !status ) { return; }
     const hosts = await this.getApiObjects();
     const data:object[] = [];
@@ -22,7 +22,7 @@ export class SchedulerJob {
       const response = await this.getResponses(host);
       data.push(...response);
     }
-    await this.saveDocument.save(data, index, creation);
+    await this.saveDocument.save(data, index, creation, mapping);
   }
 
   private async getApiObjects() {
