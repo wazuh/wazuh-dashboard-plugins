@@ -20,7 +20,7 @@ export class ClusterTimelions extends Component {
   render() {
     return (
       <WzReduxProvider>
-        <EuiFlexGroup>
+        <EuiFlexGroup style={{ height: '450px' }}>
           <EuiFlexItem key={'Wazuh-App-Cluster-monitoring-Overview-Manager'}>
             <EuiPanel paddingSize="none">
               <EuiFlexItem className={this.state.expandedVis === 'Wazuh-App-Cluster-monitoring-Overview-Manager' ? 'fullscreen h-100' : 'h-100'}>
@@ -36,7 +36,7 @@ export class ClusterTimelions extends Component {
                     aria-label="Expand"
                   />
                 </EuiFlexGroup>
-                <div style={{ height: '400px' }}>
+                <div style={{ height: '100%' }}>
                   <WzReduxProvider>
                     <KibanaVis visID={'Wazuh-App-Cluster-monitoring-Overview-Manager'} tab={'monitoring'} updateRootScope={this.updateRootScope}></KibanaVis>
                   </WzReduxProvider>
@@ -59,7 +59,7 @@ export class ClusterTimelions extends Component {
                     aria-label="Expand"
                   />
                 </EuiFlexGroup>
-                <div style={{ height: '400px' }}>
+                <div style={{ height: '100%' }}>
                   <WzReduxProvider>
                     <KibanaVis visID={'Wazuh-App-Cluster-monitoring-Overview'} tab={'monitoring'} updateRootScope={this.updateRootScope}></KibanaVis>
                   </WzReduxProvider>
