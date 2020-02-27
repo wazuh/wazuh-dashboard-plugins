@@ -89,9 +89,15 @@ class KibanaVis extends Component {
   }
 
   async callUpdateMetric() {
-    const data = await this.visHandler.handler.dataHandler.getData();
-    if (this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
-      store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
+    try{
+      if(this.visHandler){
+        const data = await this.visHandler.handler.dataHandler.getData();
+        if (this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
+          store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
+      }
+    }catch (error){  
+      console.log(error)
+    }
   }
 
   calculateTimeFilterSeconds =  ({ from, to }) => {
