@@ -94,7 +94,7 @@ class KibanaVis extends Component {
       store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
   }
 
-  calculateTimeFilterSeconds = () => {
+  calculateTimeFilterSeconds =  ({ from, to }) => {
     try {
       const fromParsed = dateMath.parse(from);
       const toParsed = dateMath.parse(to);
