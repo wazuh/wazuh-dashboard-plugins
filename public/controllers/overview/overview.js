@@ -10,19 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { FilterHandler } from '../../utils/filter-handler';
-import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
-
-import {
-  metricsGeneral,
-  metricsVulnerability,
-  metricsScap,
-  metricsCiscat,
-  metricsVirustotal,
-  metricsOsquery,
-  metricsMitre
-} from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
@@ -65,26 +54,7 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = new WazuhConfig();
-    this.showingMitreTable = false
-    this.expandArray = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ];
-    
+    this.showingMitreTable = false;
   }
 
   /**
@@ -131,6 +101,15 @@ export class OverviewController {
 
     this.setTabs();
 
+    this.visualizeProps = {
+      selectedTab: this.tab,
+      updateRootScope: (prop, value) => {
+        this.$rootScope[prop] = value;
+        this.$rootScope.$applyAsync();
+      },
+      cardReqs: {}
+    }
+
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
@@ -146,54 +125,8 @@ export class OverviewController {
   }
 
   /**
-   * Create metric for given object
-   * @param {*} metricsObject
-   */
-  createMetrics(metricsObject) {
-    for (const key in metricsObject) {
-      this[key] = () => {
-        const metric = generateMetric(metricsObject[key]);
-        return !!metric ? metric : '-';
-      };
-    }
-  }
-
-  /**
-   * Classify metrics for create the suitable one
-   * @param {*} tab
-   * @param {*} subtab
-   */
-  checkMetrics(tab, subtab) {
-    if (subtab === 'panels') {
-      switch (tab) {
-        case 'general':
-          this.createMetrics(metricsGeneral);
-          break;
-        case 'vuls':
-          this.createMetrics(metricsVulnerability);
-          break;
-        case 'oscap':
-          this.createMetrics(metricsScap);
-          break;
-        case 'ciscat':
-          this.createMetrics(metricsCiscat);
-          break;
-        case 'virustotal':
-          this.createMetrics(metricsVirustotal);
-          break;
-        case 'osquery':
-          this.createMetrics(metricsOsquery);
-          break;
-        case 'mitre':
-          this.createMetrics(metricsMitre);
-          break;
-      }
-    }
-  }
-
-  /**
-   * Show/hide MITRE table
-   */
+ * Show/hide MITRE table
+ */
   switchMitreTab() {
     this.showingMitreTable = !this.showingMitreTable
   }
@@ -256,8 +189,6 @@ export class OverviewController {
           tab: this.tab
         });
       }
-
-      this.checkMetrics(this.tab, subtab);
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
@@ -277,10 +208,26 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
+    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist') {
+      this.visualizeProps.cardReqs = {};
+    }
+    if (newTab === 'pci') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
+    }
+    if (newTab === 'gdpr') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getGDPR(), reqTitle: 'GDPR Requirement' };
+    }
+    if (newTab === 'hipaa') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getHIPAA(), reqTitle: 'HIPAA Requirement' };
+    }
+    if (newTab === 'nist') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
+    }
+    this.visualizeProps.selectedTab = newTab;
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
-    this.falseAllExpand();
+    this.expandedVis = false;
     try {
       if (newTab === 'welcome') {
         this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
@@ -293,22 +240,12 @@ export class OverviewController {
         await this.getSummary();
       }
 
-      if (newTab === 'pci') {
-        const pciTabs = await this.commonData.getPCI();
-        this.pciReqs = { items: pciTabs, reqTitle: 'PCI DSS Requirement' };
-      }
-
-      if (newTab === 'gdpr') {
-        const gdprTabs = await this.commonData.getGDPR();
-        this.gdprReqs = { items: gdprTabs, reqTitle: 'GDPR Requirement' };
-      }
-
       if (newTab === 'mitre') {
         const result = await this.apiReq.request('GET', '/rules/mitre', {});
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
-        
+
         this.mitreCardsSliderProps = {
-          items: this.$scope.mitreIds ,
+          items: this.$scope.mitreIds,
           attacksCount: this.$scope.attacksCount,
           reqTitle: "MITRE",
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
@@ -319,19 +256,6 @@ export class OverviewController {
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
           attacksCount: this.$scope.attacksCount,
         }
-      }
-
-      if (newTab === 'hipaa') {
-        const hipaaTabs = await this.commonData.getHIPAA();
-        this.hipaaReqs = { items: hipaaTabs, reqTitle: 'HIPAA Requirement' };
-      }
-
-      if (newTab === 'nist') {
-        const nistTabs = await this.commonData.getNIST();
-        this.nistReqs = {
-          items: nistTabs,
-          reqTitle: 'NIST 800-53 Requirement'
-        };
       }
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);
@@ -417,12 +341,12 @@ export class OverviewController {
   }
 
   /**
-   * Filter by Mitre.ID
-   * @param {*} id 
-   */
-  addMitrefilter(id){
+ * Filter by Mitre.ID
+ * @param {*} id 
+ */
+  addMitrefilter(id) {
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
-    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
+    this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }
 
   /**
@@ -436,7 +360,7 @@ export class OverviewController {
       this.$scope.$on('sendVisDataRows', (ev, param) => {
         const rows = (param || {}).mitreRows.tables[0].rows
         this.$scope.attacksCount = {}
-        for(var i in rows){
+        for (var i in rows) {
           this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
         }
 
@@ -450,40 +374,13 @@ export class OverviewController {
           reqTitle: "MITRE",
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
           addFilter: (id) => this.addMitrefilter(id)
-          }
-        });
+        }
+      });
 
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
     this.$scope.$applyAsync();
     return;
-  }
-
-  falseAllExpand() {
-    this.expandArray = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ];
-  }
-
-  expand(i) {
-    const oldValue = this.expandArray[i];
-    this.falseAllExpand();
-    this.expandArray[i] = !oldValue;
   }
 }

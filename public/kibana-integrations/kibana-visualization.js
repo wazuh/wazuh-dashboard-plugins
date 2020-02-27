@@ -10,10 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import $ from 'jquery';
+import { uiModules } from 'ui/modules';
 import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy'
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
-import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
 
@@ -36,7 +36,8 @@ app.directive('kbnVis', function () {
       loadedVisualizations,
       tabVisualizations,
       discoverPendingUpdates,
-      visHandlers
+      visHandlers,
+      genericReq
     ) {
       let rendered = false;
       let visualization = null;
@@ -133,7 +134,7 @@ app.directive('kbnVis', function () {
                 visualization,
                 visInput
               );
-              visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]).then(renderComplete);
+              visHandler.render($(`[id='${$scope.visID}']`)[0]).then(renderComplete);
               visHandlers.addItem(visHandler);
 
               setSearchSource(discoverList);
@@ -158,7 +159,7 @@ app.directive('kbnVis', function () {
             if (!lockFields) {
               try {
                 lockFields = true;
-                await GenericRequest.request(
+                await genericReq.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}
@@ -235,12 +236,6 @@ app.directive('kbnVis', function () {
             currentCompleted > 100 ? 100 : currentCompleted
             } %`;
 
-            const visTitle = (((visHandler || {}).vis || {})._state || {}).title
-            if(visTitle === 'Mitre attack count'){
-              $scope.$emit('sendVisDataRows', {
-                "mitreRows" : visHandler.dataLoader["visData"]
-              });
-            }            
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';

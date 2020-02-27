@@ -74,14 +74,15 @@ export class VisFactoryService {
    */
   async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
     try {
+      const currentPattern = AppState.getCurrentPattern();
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/visualizations/overview-${tab}/${AppState.getCurrentPattern()}`
+        `/elastic/visualizations/overview-${tab}/${currentPattern}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
-      this.$rootScope.$broadcast('updateVis');
+      this.$rootScope.$broadcast('updateVis', {raw : this.rawVisualizations.getList()});
       return;
     } catch (error) {
       return Promise.reject(error);
@@ -101,9 +102,9 @@ export class VisFactoryService {
       const data =
         tab !== 'sca'
           ? await this.genericReq.request(
-              'GET',
-              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
-            )
+            'GET',
+            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
+          )
           : false;
       data && this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange, id);
