@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-// Redux
-import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
