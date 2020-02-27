@@ -10,20 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import { FilterHandler } from '../../utils/filter-handler';
-import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../utils/components-os-support';
-import {
-  metricsGeneral,
-  metricsAudit,
-  metricsVulnerability,
-  metricsScap,
-  metricsCiscat,
-  metricsVirustotal,
-  metricsMitre,
-} from '../../utils/agents-metrics';
 import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
@@ -421,51 +411,6 @@ export class AgentsController {
     this.$scope.expand = i => this.expand(i);
     this.setTabs();
   }
-  /**
-   * Create metric for given object
-   * @param {*} metricsObject
-   */
-  createMetrics(metricsObject) {
-    for (let key in metricsObject) {
-      this.$scope[key] = () => {
-        const metric = generateMetric(metricsObject[key]);
-        return !!metric ? metric : '-';
-      };
-    }
-  }
-
-  /**
-   * Classify metrics for create the suitable one
-   * @param {*} tab
-   * @param {*} subtab
-   */
-  checkMetrics(tab, subtab) {
-    if (subtab === 'panels') {
-      switch (tab) {
-        case 'general':
-          this.createMetrics(metricsGeneral);
-          break;
-        case 'audit':
-          this.createMetrics(metricsAudit);
-          break;
-        case 'vuls':
-          this.createMetrics(metricsVulnerability);
-          break;
-        case 'oscap':
-          this.createMetrics(metricsScap);
-          break;
-        case 'ciscat':
-          this.createMetrics(metricsCiscat);
-          break;
-        case 'virustotal':
-          this.createMetrics(metricsVirustotal);
-          break;
-        case 'mitre':
-          this.createMetrics(metricsMitre);
-          break;
-      }
-    }
-  }
 
   // Switch subtab
   async switchSubtab(
@@ -507,9 +452,6 @@ export class AgentsController {
           tab: this.$scope.tab,
         });
       }
-
-      this.checkMetrics(this.$scope.tab, subtab);
-
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
