@@ -6,6 +6,12 @@ import { log } from '../../logger.js';
 import { indexDate } from '../index-date.js';
 
 
+export interface IIndexConfiguration {
+  name: string
+  creation: 'h' | 'd' | 'w' | 'm'
+  mapping?: string
+}
+
 export class SaveDocument {
   server: object;
   callWithRequest: Function
@@ -18,8 +24,9 @@ export class SaveDocument {
     this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
   }
 
-  async save(doc:object[], indexName, creation, mapping) {
-    const index = this.addIndexPrefix(indexName);
+  async save(doc:object[], indexConfig:IIndexConfiguration) {
+    const { name, creation, mapping } = indexConfig;
+    const index = this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
     await this.checkIndexAndCreateIfNotExists(indexCreation);
     const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
