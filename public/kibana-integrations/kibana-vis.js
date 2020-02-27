@@ -12,7 +12,7 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery';
-import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy'
+import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { DiscoverPendingUpdates } from '../factories/discover-pending-updates';
@@ -22,10 +22,11 @@ import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
 import { TabVisualizations } from '../factories/tab-visualizations';
 import store from '../redux/store';
-import { updateMetric } from '../redux/actions/visualizationsActions'
+import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
+import { toastNotifications } from 'ui/notify';
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -60,6 +61,15 @@ class KibanaVis extends Component {
     this.tab = this.props.tab;
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
   componentDidMount() {
     this._isMounted = true;
   }
@@ -89,18 +99,20 @@ class KibanaVis extends Component {
   }
 
   async callUpdateMetric() {
-    try{
-      if(this.visHandler){
+    try {
+      if (this.visHandler) {
         const data = await this.visHandler.handler.dataHandler.getData();
         if (this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
-          store.dispatch(this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] }))
+          store.dispatch(
+            this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] })
+          );
       }
-    }catch (error){  
-      console.log(error)
+    } catch (error) {
+      this.showToast('danger', 'Error', error, 4000);
     }
   }
 
-  calculateTimeFilterSeconds =  ({ from, to }) => {
+  calculateTimeFilterSeconds = ({ from, to }) => {
     try {
       const fromParsed = dateMath.parse(from);
       const toParsed = dateMath.parse(to);
@@ -130,7 +142,7 @@ class KibanaVis extends Component {
         }
       }
     } catch (error) {
-      // errorHandler.handle(error, 'Visualize - setSearchSource');
+      this.showToast('danger', 'Error', error, 4000);
     }
   };
 
@@ -138,12 +150,11 @@ class KibanaVis extends Component {
     try {
       const discoverList = this.discoverPendingUpdates.getList();
       const isAgentStatus = this.visID === 'Wazuh-App-Overview-General-Agents-status';
-      const timeFilterSeconds = this.calculateTimeFilterSeconds(
-        timefilter.getTime()
-      );
-      const timeRange = isAgentStatus && timeFilterSeconds < 900
-        ? { from: 'now-15m', to: 'now', mode: 'quick' }
-        : timefilter.getTime();
+      const timeFilterSeconds = this.calculateTimeFilterSeconds(timefilter.getTime());
+      const timeRange =
+        isAgentStatus && timeFilterSeconds < 900
+          ? { from: 'now-15m', to: 'now', mode: 'quick' }
+          : timefilter.getTime();
       const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
 
@@ -151,7 +162,7 @@ class KibanaVis extends Component {
         timeRange,
         filters,
         query,
-      }
+      };
 
       if (!this.factory) {
         this.factory = embeddables.getEmbeddableFactory('visualization');
@@ -171,10 +182,7 @@ class KibanaVis extends Component {
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
 
-          this.visHandler = await this.factory.createFromObject(
-            this.visualization,
-            visInput
-          );
+          this.visHandler = await this.factory.createFromObject(this.visualization, visInput);
           this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
             this.visHandler.handler.data$.subscribe(this.renderComplete);
           });
@@ -202,18 +210,19 @@ class KibanaVis extends Component {
             this.lockFields = false;
           } catch (error) {
             this.lockFields = false;
-            console.log(error.message || error);
-            //TODO:Implement errorHandler service as class
-            // errorHandler.handle('An error occurred fetching new index pattern fields.');
+            this.showToast(
+              'danger',
+              'An error occurred fetching new index pattern fields',
+              error,
+              2000
+            );
           }
         }
 
         this.renderInProgress = false;
         return this.myRender(raw);
       } else {
-        console.log(error.message || error);
-        //TODO:Implement errorHandler service as class
-        // errorHandler.handle(error, 'Visualize');
+        this.showToast('danger', 'Visualize error', error, 2000);
       }
     }
 
@@ -223,10 +232,10 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
     try {
       this.visHandler.destroy();
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
   };
 
   renderComplete = async () => {
@@ -282,17 +291,14 @@ class KibanaVis extends Component {
   };
 
   render() {
-    return this.visID && (
-      <div id={this.visID} vis-id={this.visID} style={{ height: '100%' }}></div>
-    )
+    return this.visID && <div id={this.visID} vis-id={this.visID} style={{ height: '100%' }}></div>;
   }
 }
 
 const mapStateToProps = state => {
   return {
-    state: state.visualizationsReducers
+    state: state.visualizationsReducers,
   };
 };
 
 export default connect(mapStateToProps, null)(KibanaVis);
-
