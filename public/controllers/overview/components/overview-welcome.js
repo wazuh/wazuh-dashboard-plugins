@@ -184,7 +184,7 @@ export class WelcomeScreen extends Component {
                     {this.props.extensions.osquery &&
                       this.buildTabCard('osquery', 'searchProfilerApp')}
                     {this.props.extensions.docker &&
-                      this.buildTabCard('docker', 'spacesApp')}
+                      this.buildTabCard('docker', 'logoDocker')}
                     {this.props.extensions.mitre &&
                       this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
                   </EuiFlexGrid>

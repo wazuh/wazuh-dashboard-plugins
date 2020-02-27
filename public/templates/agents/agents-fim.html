@@ -11,109 +11,11 @@
                 class="fa fa-fw fa-database"></i>
             Show files</md-button>
     </div>
-    <!-- View: Panels -->
-    <div layout="row" class="height-300">
-
-        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
-            <md-card-actions layout="row" layout-align="end center" class="" ng-dblclick="expand(0)">
-                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Most active users</span>
-                <span flex></span>
-                <span class="cursor-pointer wz-margin-8-no-left" ng-click="expand(0)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-FIM-Users" vis-id="'Wazuh-App-Agents-FIM-Users'">
-            </md-card-content>
-        </div>
-        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
-            <md-card-actions layout="row" layout-align="end center" class="" ng-dblclick="expand(1)">
-                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Actions</span>
-                <span flex></span>
-                <span class="cursor-pointer wz-margin-8-no-left" ng-click="expand(1)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-FIM-Actions" vis-id="'Wazuh-App-Agents-FIM-Actions'">
-            </md-card-content>
-        </div>
-
-        <div class="euiPanel euiFlexItem wz-margin-10" flex="40" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-            <md-card-actions layout="row" layout-align="end center" class="" ng-dblclick="expand(2)">
-                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Events</span>
-                <span flex></span>
-                <span class="cursor-pointer wz-margin-8-no-left" ng-click="expand(2)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-FIM-Events" vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
-            </md-card-content>
-        </div>
-
-    </div>
-
-    <div layout="row" class="height-230">
-        <div class="euiPanel euiFlexItem wz-margin-10" flex="33" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
-            <md-card-actions layout="row" layout-align="end center" class="" ng-dblclick="expand(3)">
-                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Files added</span>
-                <span flex></span>
-                <span class="cursor-pointer wz-margin-8-no-left" ng-click="expand(3)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-FIM-Files-added" vis-id="'Wazuh-App-Agents-FIM-Files-added'"></kbn-vis>
-            </md-card-content>
-        </div>
-        <div class="euiPanel euiFlexItem wz-margin-10" flex="33" class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
-            <md-card-actions layout="row" layout-align="end center" class="" ng-dblclick="expand(4)">
-                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Files modified</span>
-                <span flex></span>
-                <span class="cursor-pointer wz-margin-8-no-left" ng-click="expand(4)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-FIM-Files-modified" vis-id="'Wazuh-App-Agents-FIM-Files-modified'">
-                </kbn-vis>
-            </md-card-content>
-        </div>
-        <div class="euiPanel euiFlexItem wz-margin-10" flex="33" class="wz-md-card" ng-class="{'fullscreen': expandArray[5]}">
-            <md-card-actions layout="row" layout-align="end center" class="" ng-dblclick="expand(5)">
-                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Files deleted</span>
-                <span flex></span>
-                <span class="cursor-pointer wz-margin-8-no-left" ng-click="expand(5)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-FIM-Files-deleted" vis-id="'Wazuh-App-Agents-FIM-Files-deleted'">
-                </kbn-vis>
-            </md-card-content>
-        </div>
-    </div>
-
-    <div layout="row" layout-align="space-between stretch" class="height-570">
-        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card" ng-class="{'fullscreen': expandArray[6]}">
-            <md-card-actions layout="row" layout-align="end center" class="" ng-dblclick="expand(6)">
-                <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Alerts summary</span>
-                <span flex></span>
-                <span class="cursor-pointer wz-margin-8-no-left" ng-click="expand(6)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Alerts-summary'"></kbn-vis>
-            </md-card-content>
-        </div>
-    </div>
 </md-content>
 
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels' && showSyscheckFiles"
     layout-align="start">
-    <div layout="row" class="wz-padding-bottom-14 wz-padding-top-14">
+    <div layout="row" class="wz-padding-bottom-14 wz-padding-top-14" style="margin-top: 32px">
         <span flex></span>
         <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i
                 class="fa fa-fw fa-play"></i>

@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as FileSaver from '../../services/file-saver';
 
 export class LogsController {
   /**

@@ -112,7 +112,6 @@ class WzConfigurationOverview extends Component{
 							</EuiFlexGroup>
 						</EuiFlexItem>
 					</EuiFlexGroup>
-					{!loadingStatus && (
 						<EuiFlexGroup>
 							<EuiFlexItem>
 								{settings.map(group => (
@@ -126,7 +125,6 @@ class WzConfigurationOverview extends Component{
 								))}
 							</EuiFlexItem>
 						</EuiFlexGroup>
-					)}
 				</Fragment>
 			)
     }

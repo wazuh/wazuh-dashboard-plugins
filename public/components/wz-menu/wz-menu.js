@@ -9,17 +9,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiPopover } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
 import { npStart } from 'ui/new_platform'
+import { toastNotifications } from 'ui/notify';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -41,11 +41,46 @@ class WzMenu extends Component {
     this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
+  getCurrentTab(){
+    const currentWindowLocation = window.location.hash;
+    if(currentWindowLocation.match(/#\/overview/)){
+      return 'overview';
+    }
+    if(currentWindowLocation.match(/#\/manager/)){
+      return 'manager';
+    }
+    if(currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/) ){
+      return 'agents-preview';
+    }
+    if(currentWindowLocation.match(/#\/settings/)){
+      return 'settings';
+    }
+    if(currentWindowLocation.match(/#\/wazuh-dev/)){
+      return 'wazuh-dev';
+    }
+    if(currentWindowLocation.match(/#\/health-check/)){
+      return 'health-check';
+    }
+    return "";
+
+  }
+
+
   componentDidUpdate(prevProps) {
     const { name: apiName } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
-    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation || "".replace(/\//g, '') !== this.state.currentMenuTab) {
-      this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') })
+    const currentTab = this.getCurrentTab();
+    if (currentTab !== this.state.currentMenuTab) {
+      this.setState({ currentMenuTab: currentTab })
     }
 
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
@@ -64,8 +99,10 @@ class WzMenu extends Component {
     try {
       this.setState({ showMenu: true });
 
-      if (!this.state.currentMenuTab && AppState.getNavigation().currLocation) {
-        this.setState({ currentMenuTab: AppState.getNavigation().currLocation || "".replace(/\//g, '') });
+
+      const currentTab = this.getCurrentTab();
+      if (currentTab !== this.state.currentMenuTab) {
+        this.setState({ currentMenuTab: currentTab })
       }
 
       const list = await PatternHandler.getPatternList();
@@ -103,8 +140,7 @@ class WzMenu extends Component {
         this.setState({ patternList: list, currentSelectedPattern: AppState.getCurrentPattern() })
       }
     } catch (error) {
-      //TODO handle error
-      console.log(error)
+      this.showToast('danger', 'Error', error, 4000);
     }
   }
 
@@ -114,9 +150,8 @@ class WzMenu extends Component {
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
       location.reload();
-    } catch (err) {
-      //TODO handle error
-      console.log(err)
+    } catch (error) {
+      this.showToast('danger', 'Error', error, 4000);
     }
   }
 
@@ -168,7 +203,7 @@ class WzMenu extends Component {
 
     return (
       <WzReduxProvider>
-        <div>
+        <Fragment>
           {this.state.showMenu && (
             <div>
               <div className="wz-menu-wrapper">
@@ -251,7 +286,7 @@ class WzMenu extends Component {
           )}
           {this.props.state.wazuhNotReadyYet &&
             (
-              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: " 60px 8px -50px 8px", }}>
+              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: "60px 8px -50px 8px", }}>
                 <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
 
                   <EuiFlexItem>
@@ -280,7 +315,7 @@ class WzMenu extends Component {
               </EuiCallOut>
             )
           }
-        </div>
+        </Fragment>
       </WzReduxProvider>
     );
   }
