@@ -14,10 +14,12 @@ import React, { Component } from 'react';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
-import { EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon } from '@elastic/eui';
+import { EuiPage, EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon, EuiDescriptionList } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card'
 import AlertsStats from '../../controllers/overview/components/alerts-stats'
 import WzReduxProvider from '../../redux/wz-redux-provider';
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { WzRequest } from '../../react-services/wz-request';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -32,6 +34,47 @@ export class WzVisualize extends Component {
         : []
     };
     this.metricValues = false;
+    this.wzReq = WzRequest;
+    const wazuhConfig = new WazuhConfig();
+    const configuration = wazuhConfig.getConfig();
+    this.monitoringEnabled = !!(configuration || {})['wazuh.monitoring.enabled'];
+  }
+
+  async componentDidMount() {
+    const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
+    const result = ((data || {}).data || {}).data || false;
+
+    if (result) {
+      const active = result.Active - 1;
+      const total = result.Total - 1;
+      this.agentsCountActive = active;
+      this.agentsCountDisconnected = result.Disconnected;
+      this.agentsCountNeverConnected = result['Never connected'];
+      this.agentsCountTotal = total;
+      this.agentsCoverity = total ? (active / total) * 100 : 0;
+    }
+    this.agentsStatus = [
+      {
+        title: 'Total',
+        description: this.agentsCountTotal,
+      },
+      {
+        title: 'Active',
+        description: this.agentsCountActive,
+      },
+      {
+        title: 'Disconnected',
+        description: this.agentsCountDisconnected,
+      },
+      {
+        title: 'Never Connected',
+        description: this.agentsCountNeverConnected,
+      },
+      {
+        title: 'Agents coverage',
+        description: this.agentsCoverity + '%',
+      },
+    ];
   }
 
   async componentDidUpdate() {
@@ -90,9 +133,20 @@ export class WzVisualize extends Component {
                 />
               </EuiFlexGroup>
               <div style={{ height: '100%' }}>
-                <WzReduxProvider>
-                  <KibanaVis visID={vis.id} tab={selectedTab} {...this.props}></KibanaVis>
-                </WzReduxProvider>
+                {(vis.id !== 'Wazuh-App-Overview-General-Agents-status' || (vis.id === 'Wazuh-App-Overview-General-Agents-status' && this.monitoringEnabled)) &&
+                  <WzReduxProvider>
+                    <KibanaVis visID={vis.id} tab={selectedTab} {...this.props}></KibanaVis>
+                  </WzReduxProvider>
+                }
+                {(vis.id === 'Wazuh-App-Overview-General-Agents-status' && !this.monitoringEnabled) &&
+                  <EuiPage style={{ background: 'transparent' }}>
+                    <EuiDescriptionList
+                      type="column"
+                      listItems={this.agentsStatus}
+                      style={{ maxWidth: '400px' }}
+                    />
+                  </EuiPage>
+                }
               </div>
             </EuiFlexItem>
           </EuiPanel>
