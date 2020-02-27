@@ -117,9 +117,9 @@ export class WzVisualize extends Component {
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = (vis) => {
       return (
-        <EuiFlexItem grow={vis.width || 10} key={vis.id}>
-          <EuiPanel paddingSize="none">
-            <EuiFlexItem className={this.state.expandedVis === vis.id ? 'fullscreen h-100' : 'h-100'}>
+        <EuiFlexItem grow={parseInt((vis.width || 10)/10)} key={vis.id}  style={{maxWidth: vis.width + "%", margin: 0, padding: 12}}>
+          <EuiPanel paddingSize="none" className={this.state.expandedVis === vis.id ? 'fullscreen h-100' : 'h-100'}>
+            <EuiFlexItem className="h-100" >
               <EuiFlexGroup style={{ padding: '12px 12px 0px' }} className="embPanel__header">
                 <h2 className="embPanel__title wz-headline-title">
                   {vis.title}
@@ -155,10 +155,10 @@ export class WzVisualize extends Component {
 
     const renderVisualizationRow = (rows, width, idx) => {
       return (
-        <EuiFlexItem grow={width || 10} key={idx}>
+        <EuiFlexItem grow={(width || 10)/10} key={idx} style={{maxWidth: width + "%", margin: 0, padding: 12}}>
           {rows.map((visRow, j) => {
             return (
-              <EuiFlexGroup key={j} style={{ height: visRow.height + 'px' }}>
+              <EuiFlexGroup key={j} style={{ height: visRow.height + 'px', marginBottom: visRow.noMargin ? "" : "4px" }}>
                 {visRow.vis.map((visualizeRow) => {
                   return (renderVisualizations(visualizeRow))
                 })}
@@ -203,7 +203,7 @@ export class WzVisualize extends Component {
         {selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab] &&
           this.visualizations[selectedTab].rows.map((row, i) => {
             return (
-              <EuiFlexGroup key={i} style={{ height: row.height + 'px', margin: 0 }}>
+              <EuiFlexGroup key={i} style={{ height: row.height + 'px', margin: 0, maxWidth: "100%"}}>
                 {row.vis.map((vis, n) => {
                   return !vis.hasRows ? (
                     renderVisualizations(vis)
