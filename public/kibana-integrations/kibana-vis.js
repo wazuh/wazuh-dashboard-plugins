@@ -57,7 +57,6 @@ class KibanaVis extends Component {
     this.savedObjectLoaderVisualize = createSavedVisLoader(services);
     this.factory = null;
     this.visID = this.props.visID;
-    this.height = this.props.height;
     this.tab = this.props.tab;
   }
 

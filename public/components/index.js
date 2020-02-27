@@ -16,6 +16,7 @@ import { WzVisualize } from './visualize/wz-visualize';
 import { WzMenuWrapper } from '../components/wz-menu/wz-menu-wrapper';
 import { WzBlankScreen } from '../components/wz-blank-screen/wz-blank-screen';
 import { ClusterDisabled } from '../components/management/cluster/cluster-disabled';
+import { ClusterTimelions } from '../components/management/cluster/cluster-timelions';
 import { ScaDashboard } from './agents/sca/sca-dashboard';
 
 const app = uiModules.get('app/wazuh', []);
@@ -25,3 +26,4 @@ app.value('WzMenuWrapper', WzMenuWrapper);
 app.value('ScaDashboard', ScaDashboard);
 app.value('WzBlankScreen', WzBlankScreen);
 app.value('ClusterDisabled', ClusterDisabled);
+app.value('ClusterTimelions', ClusterTimelions);
