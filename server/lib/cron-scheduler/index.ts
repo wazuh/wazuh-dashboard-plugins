@@ -6,4 +6,4 @@ export { SchedulerJob } from './scheduler-job';
 
 export { ApiRequest, IApi } from './apiRequest';
 
-export { SaveDocument } from './save-document';
+export { SaveDocument, IIndexConfiguration } from './save-document';
