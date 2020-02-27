@@ -286,9 +286,9 @@ export class AppState {
         return Cookies.remove('navigate', {path: window.location.pathname});
     }
 
-    static setWzMenu() {
-        const showMenu = updateShowMenu(true);
+    static setWzMenu(isVisible=true) {
+        const showMenu = updateShowMenu(isVisible);
         store.dispatch(showMenu);
-      }
+    }
 
 } 

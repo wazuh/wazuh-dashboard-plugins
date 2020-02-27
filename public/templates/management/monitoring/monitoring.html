@@ -1,40 +1,13 @@
-<div style="padding:16px" ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'">
+<div ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'" style="padding: 16px">
 
     <!-- Cluster disabled or not running -->
-    <div ng-show="!isClusterEnabled || !isClusterRunning"
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
-        <div ng-if="!isClusterEnabled" class="euiFlexItem euiTextAlign euiTextAlign--center">
-            <div class="euiPanel euiPanel--paddingMedium">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
-                    disabled</span>
-                <div class="euiSpacer euiSpacer--m"></div>
-                <div layout="column" class="wz-padding-top-10">
-                    <p>The cluster is disabled. Visit the documentation on <a target="_blank"
-                            href="https://documentation.wazuh.com/current/user-manual/configuring-cluster/index.html">this
-                            link</a> to learn about how to enable it.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div ng-if="!isClusterRunning">
-            <div class="euiFlexItem euiTextAlign euiTextAlign--center">
-                <div class="euiPanel euiPanel--paddingMedium">
-                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
-                        not running</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="column" class="wz-padding-top-10">
-                        <p>
-                            The cluster is enabled but it's not running.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div ng-if="!isClusterEnabled || !isClusterRunning">
+        <react-component name="ClusterDisabled" props="{enabled: isClusterEnabled, running: isClusterRunning}" />
     </div>
 
     <!-- Cluster enabled -->
-    <div ng-show="isClusterEnabled && isClusterRunning" class="monitoring-discover">
-        <div ng-show="loading" style="padding:16px">
+    <div ng-show="isClusterEnabled && isClusterRunning" class="monitoring-discover" >
+        <div ng-show="loading" style="padding: 16px">
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
         </div>
 
@@ -43,7 +16,7 @@
         <!-- End Discover search bar section -->
 
         <!-- Loading status section -->
-        <div
+        <div 
             class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
             <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
                 ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
