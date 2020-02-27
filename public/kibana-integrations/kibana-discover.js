@@ -19,6 +19,8 @@
 
 import discoverTemplate from '../templates/discover/discover.html';
 import { uiModules } from 'ui/modules';
+import store from '../redux/store';
+import { updateVis } from '../redux/actions/visualizationsActions';
 
 uiModules.get('app/wazuh', []).directive('kbnDis', [
   function () {
@@ -713,9 +715,8 @@ function discoverController(
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     if ($location.search().tab != 'configuration') {
       loadedVisualizations.removeAll();
-      //$rootScope.rendered = false;
-      //$rootScope.loadingStatus = 'Fetching data...';
       $rootScope.$broadcast('updateVis');
+      store.dispatch(updateVis({ update: true }));
       // Forcing a digest cycle
       $rootScope.$applyAsync();
     }
@@ -794,6 +795,7 @@ function discoverController(
 
     //Wazuh update the visualizations
     $rootScope.$broadcast('updateVis');
+    store.dispatch(updateVis({ update: true }));
   });
 
   $scope.setSortOrder = function setSortOrder(sortPair) {
@@ -1109,6 +1111,12 @@ function discoverController(
 
   const filterListener = $rootScope.$on('wzEventFilters', (evt, parameters) => {
     loadFilters(parameters.filters, parameters.localChange, parameters.tab);
+  });
+
+  $rootScope.$on('testAGENT', (evt, parameters) => {
+    $scope.updateQueryAndFetch({
+      query: $state.query
+    });
   });
 
   $scope.tabView = $location.search().tabView || 'panels';
