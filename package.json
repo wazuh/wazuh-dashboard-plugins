@@ -1,6 +1,6 @@
 {
   "name": "wazuh",
-  "version": "3.11.4",
+  "version": "3.12.0",
   "revision": "0590",
   "code": "0590-0",
   "kibana": {
@@ -13,7 +13,7 @@
     "wazuh",
     "ossec"
   ],
-  "node_build": "10.15.2",
+  "node_build": "8.14.0",
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "repository": {
