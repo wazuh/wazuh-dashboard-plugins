@@ -78,8 +78,8 @@ class WzReportingTable extends Component {
 
     const sorting = {
       sort: {
-        field: 'name',
-        direction: 'asc',
+        field: 'date',
+        direction: 'desc',
       },
     };
 

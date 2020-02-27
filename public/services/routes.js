@@ -25,10 +25,10 @@ import {
 
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
-import agentsTemplate from '../templates/agents/agents.pug';
+import agentsTemplate from '../templates/agents/dashboards.pug';
 import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
 import managementTemplate from '../templates/management/management.pug';
-import overviewTemplate from '../templates/overview/overview.pug';
+import overviewTemplate from '../templates/visualize/dashboards.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';

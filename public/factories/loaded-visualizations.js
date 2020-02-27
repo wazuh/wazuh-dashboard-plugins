@@ -15,7 +15,13 @@ export class LoadedVisualizations {
    * Class constructor
    */
   constructor() {
+    if (!!LoadedVisualizations.instance) {
+      return LoadedVisualizations.instance;
+    }
     this.list = [];
+
+    LoadedVisualizations.instance = this;
+    return this;
   }
 
   /**

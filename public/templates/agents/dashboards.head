@@ -135,7 +135,7 @@
             Show files</md-button>
     </div>
 
-    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+    <div layout="row" class="wz-margin-right-8 wz-margin-left-8" style="margin-top: 32px;"
         ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
         ng-show="resultState === 'none' && tabView === 'panels'">
         <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />

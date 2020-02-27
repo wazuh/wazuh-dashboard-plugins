@@ -11,18 +11,33 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import { visualizations } from '../../../components/visualize/visualizations';
 import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import { connect } from 'react-redux';
 
-export class AlertsStats extends Component {
+class AlertsStats extends Component {
   constructor(props) {
     super(props);
+    this.visualizations = visualizations;
+    this.state = {
+      items: []
+    };
+  }
 
-    this.state = {};
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.state) {
+      nextProps.items.forEach(x => {
+        x.value = nextProps.state[x.id] || '-'
+      });
+    }
+    this.setState({
+      items: nextProps.items
+    });
   }
 
   buildStats() {
-    const stats = this.props.items.map(item => {
+    const stats = (this.state.items || []).map(item => {
       const title = typeof item.value !== 'undefined' ? item.value : '-';
       return (
         <EuiFlexItem key={`${item.description}${title}`}>
@@ -52,6 +67,16 @@ export class AlertsStats extends Component {
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    state: state.visualizationsReducers,
+  };
+};
+
+
+export default connect(mapStateToProps)(AlertsStats);
+
 AlertsStats.propTypes = {
-  items: PropTypes.array
+  items: PropTypes.array,
+  tab: PropTypes.string
 };
