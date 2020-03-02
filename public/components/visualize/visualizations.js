@@ -13,10 +13,10 @@
 export const visualizations = {
   general: {
     metrics: [
-      { id: 'Wazuh-App-Overview-General-Metric-alerts', description: 'Total', value: 'totalAlerts', color: 'primary' },
-      { id: 'Wazuh-App-Overview-General-Level-12-alerts', description: 'Level 12 or above alerts', value: 'level12', color: 'accent' },
-      { id: 'Wazuh-App-Overview-General-Authentication-failure', description: 'Authentication failure', value: 'authFailure', color: 'danger' },
-      { id: 'Wazuh-App-Overview-General-Authentication-success', description: 'Authentication success', value: 'authSuccess', color: 'secondary' },
+      { id: 'Wazuh-App-Overview-General-Metric-alerts', description: 'Total', color: 'primary' },
+      { id: 'Wazuh-App-Overview-General-Level-12-alerts', description: 'Level 12 or above alerts', color: 'accent' },
+      { id: 'Wazuh-App-Overview-General-Authentication-failure', description: 'Authentication failure', color: 'danger' },
+      { id: 'Wazuh-App-Overview-General-Authentication-success', description: 'Authentication success', color: 'secondary' },
     ],
     rows: [
       {
@@ -147,12 +147,12 @@ export const visualizations = {
           {
             title: 'Events by source over time',
             id: 'Wazuh-App-Overview-AWS-Events-by-source',
-            width: 5,
+            width: 50,
           },
           {
             title: 'Events by S3 bucket over time',
             id: 'Wazuh-App-Overview-AWS-Events-by-s3-bucket',
-            width: 5,
+            width: 50,
           },
         ],
       },
@@ -439,22 +439,22 @@ export const visualizations = {
           {
             title: 'Severity distribution',
             id: 'Wazuh-App-Overview-vuls-Vulnerability-severity-distribution',
-            width: 33,
+            width: 25,
           },
           {
             title: 'Commonly affected packages',
             id: 'Wazuh-App-Overview-vuls-Commonly-affected-packages',
-            width: 33,
+            width: 25,
           },
           {
             title: 'Most common CVEs',
             id: 'Wazuh-App-Overview-vuls-Most-common-CVEs',
-            width: 33,
+            width: 25,
           },
           {
             title: 'Most common CWEs',
             id: 'Wazuh-App-Overview-vuls-Most-common-CWEs',
-            width: 34,
+            width: 25,
           },
         ],
       },
