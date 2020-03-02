@@ -248,7 +248,7 @@ const WzEditorConfiguration = compose(
   }
   render(){
     const { clusterNodes, clusterNodeSelected, xmlError, infoChangesAfterRestart, editorValue,
-          onChange, restart, restarting, toggleRestart, confirmRestart, wazuhNotReadyYet
+          onChange, wazuhNotReadyYet
     } = this.props;
     const existsClusterCurrentNodeSelected = this.props.clusterNodes && this.props.clusterNodes.find(node => node.name === this.props.clusterNodeSelected);
     return (
@@ -264,18 +264,6 @@ const WzEditorConfiguration = compose(
             )}
             <EuiSpacer size='s'/>
             <WzCodeEditor mode='xml' value={editorValue} onChange={(value) => onChange(value)} minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 325 : 255}/>
-            {restart && !restarting && (
-              <EuiOverlayMask>
-                <EuiConfirmModal
-                  title={`${clusterNodeSelected || 'Manager'} will be restarted`}
-                  onCancel={() => toggleRestart()}
-                  onConfirm={() => confirmRestart()}
-                  cancelButtonText="Cancel"
-                  confirmButtonText="Confirm"
-                  defaultFocusedButton="cancel"
-                ></EuiConfirmModal>
-              </EuiOverlayMask>
-            )}
           </Fragment>
         ) : (
           <WzWazuhAPINotReachable error={this.props.errorXMLFetched}/>

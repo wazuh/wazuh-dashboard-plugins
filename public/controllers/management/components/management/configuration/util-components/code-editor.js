@@ -42,6 +42,7 @@ class WzCodeEditor extends Component {
             width='100%'
             height={height || `calc(100vh - ${minusHeight || 360}px)`} // Groups section has -250px
             value={value}
+            wrapEnabled
             tabSize={2}
             highlightActiveLine={false}
             onChange={onChange}
