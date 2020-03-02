@@ -50,6 +50,7 @@ class WzConfigurationAmazonS3Services extends Component{
             title='Services'
             description='Amazon services from where logs are read'
             currentConfig={wodleConfig}
+            minusHeight={340}
             helpLinks={helpLinks}
           >
             <WzConfigurationListSelector

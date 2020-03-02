@@ -27,10 +27,10 @@ class WzConfigurationActiveResponse extends Component{
       <Fragment>
         <WzTabSelector>
           <WzTabSelectorTab label='Active response'>
-            <WzConfigurationActiveResponseActiveResponse currentConfig={this.props.currentConfig}/>
+            <WzConfigurationActiveResponseActiveResponse {...this.props}/>
           </WzTabSelectorTab>
           <WzTabSelectorTab label='Commands'>
-            <WzConfigurationActiveResponseCommands currentConfig={this.props.currentConfig}/>
+            <WzConfigurationActiveResponseCommands {...this.props}/>
           </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>

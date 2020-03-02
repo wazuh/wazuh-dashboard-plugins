@@ -54,7 +54,7 @@ export class WzSettingsViewer extends Component{
   }
   render(){
     return (
-      <WzCodeEditor mode={this.props.mode} value={(this.props.mode === 'json' ? getJSON : getXML)(this.props.value)} isReadOnly/>
+      <WzCodeEditor mode={this.props.mode} value={(this.props.mode === 'json' ? getJSON : getXML)(this.props.value)} isReadOnly minusHeight={this.props.minusHeight}/>
     )
   }
 }

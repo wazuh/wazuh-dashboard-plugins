@@ -178,7 +178,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
           break;
         }
       }catch(error){
-        console.error(error)
+        console.error(error);
       }
     }
     if(!isValid){
@@ -243,14 +243,14 @@ export const fetchFile = async (selectedNode) => {
 export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) => {
   try{
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     isCluster
       ? await restartNode(selectedNode)
       : await restartManager();
-    
     // Dispatch a Redux action
-    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'manager'}, please wait.`);
+    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`); //FIXME: if it enable/disable cluster, this will show Manager instead node name
     return await makePing(updateWazuhNotReadyYet);
   }catch(error){
     return Promise.reject(error);
@@ -470,5 +470,20 @@ export const clusterNodes = async () => {
     return result;
   } catch (error) {
     return Promise.reject(error);
+  }
+}
+
+/**
+  * Check de admin mode and return true or false(if admin mode is not set in the wazuh.yml the default value is true)
+  */
+export const checkAdminMode = async () => {
+  try {
+    let admin = true;
+    const result = await WzRequest.genericReq('GET', '/utils/configuration', {});
+    const data = (((result || {}).data) || {}).data || {};
+    if (Object.keys(data).includes('admin')) admin = data.admin;
+    return admin;
+  } catch (error) {
+    return Promise.error(error);
   }
 }

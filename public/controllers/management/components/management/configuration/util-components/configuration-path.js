@@ -33,34 +33,35 @@ class WzConfigurationPath extends Component{
     super(props);
   }
   render(){
-    const { title, description, icon, updateConfigurationSection, badge } = this.props;
+    const { title, description, icon, updateConfigurationSection, badge, children } = this.props;
     return (
       <Fragment>
+        <EuiSpacer size='s'/>
         <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
             <EuiFlexGroup alignItems='center'>
-              <EuiFlexItem grow={false} style={{margin: "0 6px"}}>
+              <span style={{margin: "0 6px"}}>
                 <EuiToolTip content='Back to configuration' position='right'>
                   <EuiButtonIcon  style={{padding: 0}} iconType='arrowLeft' iconSize='l' onClick={() => updateConfigurationSection('')} aria-label='back to configuration'/>
                 </EuiToolTip>
-              </EuiFlexItem>
-              <EuiFlexItem style={{marginLeft: '6px', marginRight: '6px'}}>
+              </span>
+              <span style={{marginLeft: '6px', marginRight: '6px'}}>
                 {icon && <EuiIcon size='l' type={icon}/> }
                 <EuiTitle style={{display: 'inline-block', margin: 0}}>
                   <span>{title} {typeof badge === 'boolean' ? <WzBadge enabled={badge}/> : null}</span>
                 </EuiTitle>
                 {description && (<EuiText color='subdued'>{description}</EuiText>)}
                 <EuiSpacer size='xs'/>
-              </EuiFlexItem>
+              </span>
             </EuiFlexGroup>
           </EuiFlexItem>
+          {children ? (<Fragment>{children}</Fragment>) : null}
           {this.props.clusterNodes && this.props.clusterNodes.length && (
             <EuiFlexItem grow={false}>
-              <div><WzClusterSelect /></div>
+              <WzClusterSelect />
             </EuiFlexItem>
           )}
         </EuiFlexGroup>
-        
         <EuiSpacer size='s'/>
       </Fragment>
     )

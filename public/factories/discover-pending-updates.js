@@ -15,7 +15,13 @@ export class DiscoverPendingUpdates {
    * Class constructor
    */
   constructor() {
+    if (!!DiscoverPendingUpdates.instance) {
+      return DiscoverPendingUpdates.instance;
+    }
     this.pendingUpdates = [];
+
+    DiscoverPendingUpdates.instance = this;
+    return this;
   }
 
   /**

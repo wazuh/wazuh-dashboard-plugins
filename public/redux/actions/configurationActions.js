@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,5 +35,12 @@ export const updateLoadingStatus = (loadingStatus) => {
   return {
     type: 'UPDATE_CONFIGURATION_LOADING_STATUS',
     loadingStatus
+  }
+}
+
+export const updateAdminMode = (adminMode) => {
+  return {
+    type: 'UPDATE_CONFIGURATION_ADMIN_MODE',
+    adminMode
   }
 }

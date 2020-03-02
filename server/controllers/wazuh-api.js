@@ -216,7 +216,7 @@ export class WazuhApiCtrl {
    * @param {Object} payload API params
    */
   validateCheckApiParams(payload) {
-    // if (!('username' in payload)) {  //FIXME: why is this commented?
+    // if (!('username' in payload)) {  //TODO: why is this commented?
     //   return 'Missing param: API USERNAME';
     // }
 
@@ -1057,11 +1057,12 @@ export class WazuhApiCtrl {
         { params: params },
         { idHost: req.payload.id }
       );
-
-
+      
+      const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
+      
       const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
 
-      if (totalItems) {
+      if (totalItems && !isList) {
         params.offset = 0;
         itemsArray.push(...output.data.data.affected_items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
@@ -1078,8 +1079,8 @@ export class WazuhApiCtrl {
 
       if (totalItems) {
         const { path, filters } = req.payload;
-        const isList = path.includes('/lists') && filters && filters.length;
-        const isArrayOfLists = path.includes('/lists') && (!filters || !filters.length);
+        const isArrayOfLists =
+          path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
         const isFiles = path.endsWith('/files');
@@ -1125,9 +1126,8 @@ export class WazuhApiCtrl {
 
         if (isList) {
           fields = ['key', 'value'];
-          itemsArray = itemsArray[0];
+          itemsArray = output.body.data.items[0];
         }
-
         fields = fields.map(item => ({ value: item, default: '-' }));
 
         const json2csvParser = new Parser({ fields });

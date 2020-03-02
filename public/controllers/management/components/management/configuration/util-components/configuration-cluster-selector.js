@@ -16,7 +16,7 @@ import {
   EuiSelect
 } from "@elastic/eui";
 
-import { updateClusterNodes, updateClusterNodeSelected, updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
+import { updateClusterNodeSelected, updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
 
 import { connect } from 'react-redux';
 
@@ -26,9 +26,12 @@ class WzConfigurationClusterSelect extends Component{
   }
   onChange = (e) => {
     this.props.updateClusterNodeSelected(e.target.value);
-    if(this.props.view !== ''){
-      this.props.updateLoadingStatus(true);
-      setTimeout(() => {this.props.updateLoadingStatus(false);},0) // trick: This unmount hoc components and mount again it with new cluser node selected
+    this.props.updateLoadingStatus(true);
+    this.timer = setTimeout(() => {this.props.updateLoadingStatus(false);},0) // trick: This unmounts hoc components and mount again it with new cluser node selected
+  }
+  componentWillUnmount(){
+    if(this.timer){
+      clearTimeout(this.timer);
     }
   }
   render(){
@@ -40,7 +43,7 @@ class WzConfigurationClusterSelect extends Component{
         value={this.props.clusterNodeSelected}
         onChange={this.onChange}
         aria-label="Select Configuration Cluster Node"
-        style={{width: this.props.withd || '200px'}}
+        fullWidth={true}
       />
     )
   }

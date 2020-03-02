@@ -175,6 +175,7 @@ class WzGroupsEditor extends Component {
                           onChange={newContent => this.setState({ content: newContent })}
                           mode="xml"
                           isReadOnly={!adminMode}
+                          wrapEnabled
                           setOptions={this.codeEditorOptions}
                           aria-label="Code Editor"
                         ></EuiCodeEditor>

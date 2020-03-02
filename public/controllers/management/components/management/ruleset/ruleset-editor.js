@@ -44,7 +44,6 @@ class WzRulesetEditor extends Component {
     this.codeEditorOptions = {
       fontSize: '14px',
       displayIndentGuides: false,
-      useWrapMode: true,   // wrap text to view
       indentedSoftWrap: false, 
       behavioursEnabled: false,
       animatedScroll: true,
@@ -223,6 +222,7 @@ class WzRulesetEditor extends Component {
                         onChange={newContent => this.setState({content: newContent})}
                         mode="xml"
                         isReadOnly={!isEditable}
+                        wrapEnabled
                         setOptions={this.codeEditorOptions}
                         aria-label="Code Editor"
                       ></EuiCodeEditor>

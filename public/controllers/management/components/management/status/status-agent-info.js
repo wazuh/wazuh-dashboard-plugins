@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle, EuiIcon } from '@elastic/eui';
+import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
@@ -33,8 +33,8 @@ export class WzStatusAgentInfo extends Component {
   render() {
     const { agentInfo } = this.props.state;
     const status = agentInfo.status;
-    let operatingSystem = '-';
-    if (status !== 'never_connected') {
+    let operatingSystem = false;
+    if (status !== 'never_connected' && agentInfo.os) {
       operatingSystem = agentInfo.os.name
         ? agentInfo.os.name + agentInfo.os.version
         : agentInfo.os.uname
@@ -79,7 +79,7 @@ export class WzStatusAgentInfo extends Component {
           <EuiFlexItem>Date add</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.dateAdd}</EuiFlexItem>
         </EuiFlexGroup>
-        {status !== 'Never connected' && (
+        {status !== 'never_connected' && (
           <div>
             <EuiFlexGroup>
               <EuiFlexItem>Version</EuiFlexItem>
@@ -91,7 +91,7 @@ export class WzStatusAgentInfo extends Component {
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>Operating system</EuiFlexItem>
-              <EuiFlexItem style={greyStyle}>{operatingSystem}</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>{operatingSystem || '-'}</EuiFlexItem>
             </EuiFlexGroup>
           </div>
         )}

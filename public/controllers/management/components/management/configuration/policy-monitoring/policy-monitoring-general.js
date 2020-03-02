@@ -61,6 +61,7 @@ class WzConfigurationPolicyMonitoringGeneral extends Component{
             title='All settings'
             description='General settings for the rootcheck daemon'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsGroup
                 config={currentConfig['syscheck-rootcheck'].rootcheck}

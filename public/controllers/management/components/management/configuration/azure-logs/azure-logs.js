@@ -71,6 +71,7 @@ class WzConfigurationAzure extends Component{
             title='Main settings'
             description='Common settings applied to all Amazon S3 buckets'
             currentConfig={this.wodleConfig}
+            minusHeight={280}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsGroup

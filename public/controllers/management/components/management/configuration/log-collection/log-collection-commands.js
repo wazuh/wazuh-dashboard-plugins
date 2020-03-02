@@ -33,13 +33,13 @@ class WzConfigurationLogCollectionCommands extends Component{
   }
   render(){
     const { currentConfig } = this.props;
-    const items = currentConfig['logcollector-localfile'] && currentConfig['logcollector-localfile']['localfile-commands'] ? settingsListBuilder(currentConfig['logcollector-localfile']['localfile-commands'], ['alias','command']) : [];
+    const items = currentConfig['logcollector-localfile'] && currentConfig['logcollector-localfile']['localfile-commands'] ? settingsListBuilder(currentConfig['logcollector-localfile']['localfile-commands'], ['file', 'alias','command',(item) => `${item.logformat}${item.targetStr ? ` - ${item.targetStr}` : ''}`]) : [];
     return (
       <Fragment>
         {currentConfig['logcollector-localfile'] && isString(currentConfig['logcollector-localfile']) && (
           <WzNoConfig error={currentConfig['logcollector-localfile']} help={helpLinks}/>
         )}
-        {currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && !(currentConfig['logcollector-localfile']['localfile'] || []).length ? (
+        {currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && !(currentConfig['logcollector-localfile']['localfile-commands'] || []).length ? (
           <WzNoConfig error='not-present' help={helpLinks}/>
         ) : null}
         {currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && currentConfig['logcollector-localfile']['localfile-commands'] && currentConfig['logcollector-localfile']['localfile-commands'].length ? (
@@ -47,6 +47,7 @@ class WzConfigurationLogCollectionCommands extends Component{
             title='Command monitoring'
             description='All output from these commands will be read as one or more log messages depending on whether command or full_command is used.'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
               <WzConfigurationListSelector
                 items={items}

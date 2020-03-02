@@ -79,58 +79,18 @@ export class AgentsPreview extends Component {
       <EuiPage>
         <EuiFlexItem>
           <EuiFlexGroup style={{ 'marginTop': 0 }}>
-            <EuiFlexItem>
-              <EuiPanel betaBadgeLabel="Global status" style={{ paddingBottom: 0, minHeight: 158 }}>
+            <EuiFlexItem grow={false}>
+              <EuiPanel betaBadgeLabel="Status" style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}>
                 {(this.state.loading &&
                   <EuiFlexItem>
-                    <EuiLoadingChart style={{ margin: '40px auto' }} size="xl" />
+                    <EuiLoadingChart style={{ margin: '45px auto' }} size="xl" />
                   </EuiFlexItem>
                 )}
                 {(!this.state.loading &&
                   <EuiFlexGroup>
                     {(this.totalAgents > 0 &&
                       <EuiFlexItem style={{ alignItems: 'center' }} >
-                        <Pie width={250} height={125} data={this.state.data} colors={colors} />
-                      </EuiFlexItem>
-                    )}
-                    {(this.summary &&
-                      <EuiFlexItem style={{ padding: '10px 0px' }}>
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiStat
-                              title={this.totalAgents}
-                              textAlign="center"
-                              description="Total agents"
-                              titleColor="primary"
-                            />
-                          </EuiFlexItem>
-                          <EuiFlexItem>
-                            <EuiStat
-                              title={this.state.data[0].value}
-                              textAlign="center"
-                              description="Active"
-                              titleColor="secondary"
-                            />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiStat
-                              title={this.state.data[1].value}
-                              textAlign="center"
-                              description="Disconnected"
-                              titleColor="danger"
-                            />
-                          </EuiFlexItem>
-                          <EuiFlexItem>
-                            <EuiStat
-                              title={this.state.data[2].value}
-                              textAlign="center"
-                              description="Never connected"
-                              titleColor="subdued"
-                            />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
+                        <Pie width={300} height={150} data={this.state.data} colors={colors} />
                       </EuiFlexItem>
                     )}
                   </EuiFlexGroup>
@@ -138,56 +98,85 @@ export class AgentsPreview extends Component {
               </EuiPanel>
             </EuiFlexItem>
             {((this.totalAgents > 0 && !this.state.loading) &&
-              <EuiFlexItem grow={false} style={{ margin: "12px 0px" }}>
-                <EuiPanel betaBadgeLabel="Coverage" style={{ paddingBottom: 0 }}>
-                  <EuiFlexGroup>
-                    <EuiFlexItem grow={false} style={{ alignItems: 'center' }} >
-                      <ProgressChart width={125} height={125} percent={this.agentsCoverity} />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
-              </EuiFlexItem>
-            )}
-            {((this.totalAgents > 0 && !this.state.loading) &&
-              <EuiFlexItem>
-                <EuiPanel betaBadgeLabel="Stats" style={{ paddingBottom: 0 }}>
-                  <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiPanel betaBadgeLabel="Details" style={{ paddingBottom: 0 }}>
+                  <EuiFlexGroup style={{ minWidth: 500 }}>
+                    <EuiFlexItem></EuiFlexItem>
                     <EuiFlexItem>
-                      {(this.lastAgent &&
+                      {(this.summary &&
+                        <EuiFlexItem style={{ padding: '12px 0px' }}>
+                          <EuiFlexGroup>
+                            <EuiFlexItem>
+                              <EuiStat
+                                title={this.state.data[0].value}
+                                titleSize={'s'}
+                                description="Active"
+                                titleColor="secondary"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                              <EuiStat
+                                title={this.state.data[1].value}
+                                titleSize={'s'}
+                                description="Disconnected"
+                                titleColor="danger"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                              <EuiStat
+                                title={this.state.data[2].value}
+                                titleSize={'s'}
+                                description="Never connected"
+                                titleColor="subdued"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem>
+                              <EuiStat
+                                title={`${this.agentsCoverity}%`}
+                                titleSize={'s'}
+                                description="Agents coverage"
+                                titleColor="primary"
+                                style={{ whiteSpace: 'nowrap' }}
+                              />
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+                        </EuiFlexItem>
+                      )}
+                      <EuiFlexItem>
                         <EuiFlexGroup style={{ marginTop: 0 }}>
-                          <EuiFlexItem>
-                            <EuiStat
-                              className='euiStatLink'
-                              title={this.lastAgent.name}
-                              titleSize="s"
-                              textAlign="center"
-                              description="Last registered agent"
-                              titleColor="primary"
-                              style={{ paddingBottom: 12 }}
-                              onClick={() => this.props.tableProps.showAgent(this.lastAgent)}
-                            />
-                          </EuiFlexItem>
+                          {(this.lastAgent &&
+                            <EuiFlexItem>
+                              <EuiStat
+                                className='euiStatLink'
+                                title={this.lastAgent.name}
+                                titleSize="s"
+                                description="Last registered agent"
+                                titleColor="primary"
+                                style={{ paddingBottom: 12, whiteSpace: 'nowrap' }}
+                                onClick={() => this.props.tableProps.showAgent(this.lastAgent)}
+                              />
+                            </EuiFlexItem>
+                          )}
+                          {(this.mostActiveAgent &&
+                            <EuiFlexItem>
+                              <EuiStat
+                                className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
+                                title={this.mostActiveAgent.name || '-'}
+                                style={{ whiteSpace: 'nowrap' }}
+                                titleSize="s"
+                                description="Most active agent"
+                                titleColor="primary"
+                                onClick={() => this.mostActiveAgent.name ? this.props.tableProps.showAgent(this.mostActiveAgent) : ''}
+                              />
+                            </EuiFlexItem>
+                          )}
                         </EuiFlexGroup>
-                      )}
-                      {(this.mostActiveAgent &&
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiStat
-                              className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
-                              title={this.mostActiveAgent.name || '-'}
-                              titleSize="s"
-                              textAlign="center"
-                              description="Most active agent"
-                              titleColor="primary"
-                              onClick={() => this.mostActiveAgent.name ? this.props.tableProps.showAgent(this.mostActiveAgent) : ''}
-                            />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      )}
+                      </EuiFlexItem>
                     </EuiFlexItem>
-                    <EuiFlexItem style={{ alignItems: 'center' }}>
-                      <Pie width={250} height={125} data={this.state.platforms} colors={null} />
-                    </EuiFlexItem>
+                    <EuiFlexItem></EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>
               </EuiFlexItem>

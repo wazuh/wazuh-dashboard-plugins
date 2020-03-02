@@ -10,20 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import { FilterHandler } from '../../utils/filter-handler';
-import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../utils/components-os-support';
-import {
-  metricsGeneral,
-  metricsAudit,
-  metricsVulnerability,
-  metricsScap,
-  metricsCiscat,
-  metricsVirustotal,
-  metricsMitre
-} from '../../utils/agents-metrics';
+import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
@@ -72,6 +63,7 @@ export class AgentsController {
     this.apiReq = apiReq;
     this.errorHandler = errorHandler;
     this.tabVisualizations = tabVisualizations;
+    this.$scope.visualizations = visualizations;
     this.shareAgent = shareAgent;
     this.commonData = commonData;
     this.reportingService = reportingService;
@@ -116,7 +108,7 @@ export class AgentsController {
       false,
       false,
       false,
-      false
+      false,
     ];
   }
 
@@ -131,20 +123,19 @@ export class AgentsController {
     }
 
     this.$scope.$on('sendVisDataRows', (ev, param) => {
-      const rows = (param || {}).mitreRows.tables[0].rows
-      this.$scope.attacksCount = {}
-      for(var i in rows){
-        this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
+      const rows = (param || {}).mitreRows.tables[0].rows;
+      this.$scope.attacksCount = {};
+      for (var i in rows) {
+        this.$scope.attacksCount[rows[i]['col-0-2']] = rows[i]['col-1-1'];
       }
 
-      
-    this.$scope.mitreCardsSliderProps = {
-      items: this.$scope.mitreIds,
-      attacksCount: this.$scope.attacksCount,
-      reqTitle: "MITRE",
-      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-      addFilter: (id) => this.addMitrefilter(id)
-      }
+      this.$scope.mitreCardsSliderProps = {
+        items: this.$scope.mitreIds,
+        attacksCount: this.$scope.attacksCount,
+        reqTitle: 'MITRE',
+        wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+        addFilter: id => this.addMitrefilter(id),
+      };
     });
 
     this.$scope.TabDescription = TabDescription;
@@ -169,10 +160,17 @@ export class AgentsController {
       this.$scope.tabView = this.commonData.checkTabViewLocation();
       this.$scope.tab = this.commonData.checkTabLocation();
     }
-
+    this.$scope.visualizeProps = {
+      selectedTab: this.$scope.tab,
+      isAgent: true,
+      updateRootScope: (prop, value) => {
+        this.$rootScope[prop] = value;
+        this.$rootScope.$applyAsync();
+      },
+      cardReqs: {}
+    }
     this.tabHistory = [];
-    if (!this.ignoredTabs.includes(this.$scope.tab))
-      this.tabHistory.push(this.$scope.tab);
+    if (!this.ignoredTabs.includes(this.$scope.tab)) this.tabHistory.push(this.$scope.tab);
 
     // Tab names
     this.$scope.tabNames = TabNames;
@@ -184,8 +182,7 @@ export class AgentsController {
      * @param {Object} item
      * @param {Array<Object>} array
      */
-    this.$scope.inArray = (item, array) =>
-      item && Array.isArray(array) && array.includes(item);
+    this.$scope.inArray = (item, array) => item && Array.isArray(array) && array.includes(item);
 
     this.$scope.switchSubtab = async (
       subtab,
@@ -226,8 +223,7 @@ export class AgentsController {
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
-    this.$scope.shouldShowComponent = component =>
-      this.shouldShowComponent(component);
+    this.$scope.shouldShowComponent = component => this.shouldShowComponent(component);
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -241,21 +237,13 @@ export class AgentsController {
     };
 
     this.$scope.exportConfiguration = enabledComponents => {
-      this.reportingService.startConfigReport(
-        this.$scope.agent,
-        'agentConfig',
-        enabledComponents
-      );
+      this.reportingService.startConfigReport(this.$scope.agent, 'agentConfig', enabledComponents);
     };
 
     this.$scope.restartAgent = async agent => {
       this.$scope.restartingAgent = true;
       try {
-        const data = await this.apiReq.request(
-          'PUT',
-          `/agents/${agent.id}/restart`,
-          {}
-        );
+        const data = await this.apiReq.request('PUT', `/agents/${agent.id}/restart`, {});
         const result = ((data || {}).data || {}).data || false;
         const failed =
           result &&
@@ -283,36 +271,24 @@ export class AgentsController {
     try {
       this.$scope.getAgent();
     } catch (e) {
-      this.errorHandler.handle(
-        'Unexpected exception loading controller',
-        'Agents'
-      );
+      this.errorHandler.handle('Unexpected exception loading controller', 'Agents');
     }
 
     // Config on demand
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
     this.$scope.isString = item => typeof item === 'string';
-    this.$scope.hasSize = obj =>
-      obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.offsetTimestamp = (text, time) =>
-      this.offsetTimestamp(text, time);
-    this.$scope.switchConfigTab = (
-      configurationTab,
-      sections,
-      navigate = true
-    ) => {
+    this.$scope.hasSize = obj => obj && typeof obj === 'object' && Object.keys(obj).length;
+    this.$scope.offsetTimestamp = (text, time) => this.offsetTimestamp(text, time);
+    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
       this.$scope.navigate = navigate;
       try {
         this.$scope.configSubTab = JSON.stringify({
           configurationTab: configurationTab,
-          sections: sections
+          sections: sections,
         });
         if (!this.$location.search().configSubTab) {
-          AppState.setSessionStorageItem(
-            'configSubTab',
-            this.$scope.configSubTab
-          );
+          AppState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
@@ -332,21 +308,14 @@ export class AgentsController {
       if (!this.$location.search().configWodle) {
         this.$location.search('configWodle', this.$scope.configWodle);
       }
-      this.configurationHandler.switchWodle(
-        wodleName,
-        this.$scope,
-        this.$scope.agent.id
-      );
+      this.configurationHandler.switchWodle(wodleName, this.$scope, this.$scope.agent.id);
     };
 
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       // Check if configuration is synced
       this.checkSync();
       this.$scope.navigate = navigate;
-      this.configurationHandler.switchConfigurationTab(
-        configurationTab,
-        this.$scope
-      );
+      this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
       if (!this.$scope.navigate) {
         const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
@@ -374,10 +343,7 @@ export class AgentsController {
       }
     };
     this.$scope.switchConfigurationSubTab = configurationSubTab => {
-      this.configurationHandler.switchConfigurationSubTab(
-        configurationSubTab,
-        this.$scope
-      );
+      this.configurationHandler.switchConfigurationSubTab(configurationSubTab, this.$scope);
       if (configurationSubTab === 'pm-sca') {
         this.$scope.currentConfig.sca = this.configurationHandler.parseWodle(
           this.$scope.currentConfig,
@@ -399,7 +365,7 @@ export class AgentsController {
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView,
-          tab: this.$scope.tab
+          tab: this.$scope.tab,
         });
       }
       this.$scope.$applyAsync();
@@ -417,9 +383,7 @@ export class AgentsController {
     };
 
     this.$scope.showConfirmAddGroup = group => {
-      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent
-        ? false
-        : group;
+      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent ? false : group;
     };
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
@@ -432,9 +396,7 @@ export class AgentsController {
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
         .addAgentToGroup(group, this.$scope.agent.id)
-        .then(() =>
-          this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
-        )
+        .then(() => this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {}))
         .then(agent => {
           this.$scope.agent.group = agent.data.data.affected_items[0].group;
           this.$scope.groups = this.$scope.groups.filter(
@@ -448,60 +410,12 @@ export class AgentsController {
         .catch(error => {
           this.$scope.editGroup = false;
           this.$scope.addingGroupToAgent = false;
-          this.errorHandler.handle(
-            error.message || error,
-            'Error adding group to agent'
-          );
+          this.errorHandler.handle(error.message || error, 'Error adding group to agent');
         });
     };
 
     this.$scope.expand = i => this.expand(i);
     this.setTabs();
-  }
-  /**
-   * Create metric for given object
-   * @param {*} metricsObject
-   */
-  createMetrics(metricsObject) {
-    for (let key in metricsObject) {
-      this.$scope[key] = () => {
-        const metric = generateMetric(metricsObject[key]);
-        return !!metric ? metric : '-';
-      };
-    }
-  }
-
-  /**
-   * Classify metrics for create the suitable one
-   * @param {*} tab
-   * @param {*} subtab
-   */
-  checkMetrics(tab, subtab) {
-    if (subtab === 'panels') {
-      switch (tab) {
-        case 'general':
-          this.createMetrics(metricsGeneral);
-          break;
-        case 'audit':
-          this.createMetrics(metricsAudit);
-          break;
-        case 'vuls':
-          this.createMetrics(metricsVulnerability);
-          break;
-        case 'oscap':
-          this.createMetrics(metricsScap);
-          break;
-        case 'ciscat':
-          this.createMetrics(metricsCiscat);
-          break;
-        case 'virustotal':
-          this.createMetrics(metricsVirustotal);
-          break;
-        case 'mitre':
-          this.createMetrics(metricsMitre);
-          break;
-    }
-    }
   }
 
   // Switch subtab
@@ -517,8 +431,7 @@ export class AgentsController {
       this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear(onlyAgent);
       this.$location.search('tabView', subtab);
-      const localChange =
-        subtab === 'panels' && this.$scope.tabView === 'discover' && sameTab;
+      const localChange = subtab === 'panels' && this.$scope.tabView === 'discover' && sameTab;
       this.$scope.tabView = subtab;
 
       if (
@@ -529,8 +442,7 @@ export class AgentsController {
             subtab === 'discover')) &&
         !this.ignoredTabs.includes(this.$scope.tab)
       ) {
-        const condition =
-          !this.changeAgent && (localChange || preserveDiscover);
+        const condition = !this.changeAgent && (localChange || preserveDiscover);
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.$scope.tab,
@@ -543,12 +455,9 @@ export class AgentsController {
       } else {
         this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView,
-          tab: this.$scope.tab
+          tab: this.$scope.tab,
         });
       }
-
-      this.checkMetrics(this.$scope.tab, subtab);
-
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
@@ -591,22 +500,23 @@ export class AgentsController {
       } catch (error) {} // eslint-disable-line
     }
 
+    this.$scope.visualizeProps = {
+      selectedTab: tab,
+      isAgent: true,
+      updateRootScope: (prop, value) => {
+        this.$rootScope[prop] = value;
+        this.$rootScope.$applyAsync();
+      },
+      cardReqs: {}
+    }
     try {
       this.$scope.showSyscheckFiles = false;
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
-        const pciTabs = await this.commonData.getPCI();
-        this.$scope.pciReqs = {
-          items: pciTabs,
-          reqTitle: 'PCI DSS Requirement'
-        };
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
       }
       if (tab === 'gdpr') {
-        const gdprTabs = await this.commonData.getGDPR();
-        this.$scope.gdprReqs = {
-          items: gdprTabs,
-          reqTitle: 'GDPR Requirement'
-        };
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getGDPR(), reqTitle: 'GDPR Requirement' };
       }
 
       if (tab === 'mitre') {
@@ -614,28 +524,20 @@ export class AgentsController {
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
 
         this.$scope.mitreCardsSliderProps = {
-          items: this.$scope.mitreIds ,
+          items: this.$scope.mitreIds,
           attacksCount: this.$scope.attacksCount,
-          reqTitle: "MITRE",
+          reqTitle: 'MITRE',
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-          addFilter: (id) => this.addMitrefilter(id)
-        }
-      }
-      
-      if (tab === 'hipaa') {
-        const hipaaTabs = await this.commonData.getHIPAA();
-        this.$scope.hipaaReqs = {
-          items: hipaaTabs,
-          reqTitle: 'HIPAA Requirement'
+          addFilter: id => this.addMitrefilter(id),
         };
       }
 
+      if (tab === 'hipaa') {
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getHIPAA(), reqTitle: 'HIPAA Requirement' };
+      }
+
       if (tab === 'nist') {
-        const nistTabs = await this.commonData.getNIST();
-        this.$scope.nistReqs = {
-          items: nistTabs,
-          reqTitle: 'NIST 800-53 Requirement'
-        };
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
       }
 
       if (tab === 'sca') {
@@ -658,8 +560,7 @@ export class AgentsController {
       }
 
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
-      if (this.tabHistory.length > 2)
-        this.tabHistory = this.tabHistory.slice(-2);
+      if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
 
       if (this.$scope.tab === tab && !force) {
         this.$scope.$applyAsync();
@@ -670,9 +571,7 @@ export class AgentsController {
       const sameTab = this.$scope.tab === tab;
       this.$location.search('tab', tab);
       const preserveDiscover =
-        this.tabHistory.length === 2 &&
-        this.tabHistory[0] === this.tabHistory[1] &&
-        !force;
+        this.tabHistory.length === 2 && this.tabHistory[0] === this.tabHistory[1] && !force;
       this.$scope.tab = tab;
 
       const targetSubTab =
@@ -681,13 +580,7 @@ export class AgentsController {
           : 'panels';
 
       if (!this.ignoredTabs.includes(this.$scope.tab)) {
-        this.$scope.switchSubtab(
-          targetSubTab,
-          true,
-          onlyAgent,
-          sameTab,
-          preserveDiscover
-        );
+        this.$scope.switchSubtab(targetSubTab, true, onlyAgent, sameTab, preserveDiscover);
       }
 
       this.shareAgent.deleteTargetLocation();
@@ -711,32 +604,28 @@ export class AgentsController {
 
         cleanTabs.push({
           id: x.id,
-          name: x.name
+          name: x.name,
         });
       });
       this.$scope.configurationTabsProps = {
         clickAction: tab => {
           this.$scope.switchConfigurationSubTab(tab);
         },
-        selectedTab:
-          this.$scope.configurationSubTab || (tabs && tabs.length)
-            ? tabs[0].id
-            : '',
-        tabs: cleanTabs
+        selectedTab: this.$scope.configurationSubTab || (tabs && tabs.length) ? tabs[0].id : '',
+        tabs: cleanTabs,
       };
     };
 
     this.setTabs();
   }
 
-
-   /**
+  /**
    * Filter by Mitre.ID
-   * @param {*} id 
+   * @param {*} id
    */
-  addMitrefilter(id){
+  addMitrefilter(id) {
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
-    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
+    this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }
 
   /**
@@ -745,10 +634,7 @@ export class AgentsController {
   setTabs() {
     this.$scope.agentsTabsProps = false;
     if (this.$scope.agent) {
-      this.currentPanel = this.commonData.getCurrentPanel(
-        this.$scope.tab,
-        true
-      );
+      this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
 
       if (!this.currentPanel) return;
 
@@ -770,7 +656,7 @@ export class AgentsController {
 
         cleanTabs.push({
           id: x.id,
-          name: x.name
+          name: x.name,
         });
       });
 
@@ -780,10 +666,8 @@ export class AgentsController {
         },
         selectedTab:
           this.$scope.tab ||
-          (this.currentPanel && this.currentPanel.length
-            ? this.currentPanel[0]
-            : ''),
-        tabs: cleanTabs
+          (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
+        tabs: cleanTabs,
       };
       this.$scope.$applyAsync();
     }
@@ -792,7 +676,7 @@ export class AgentsController {
   goDiscover() {
     this.targetLocation = {
       tab: 'general',
-      subTab: 'discover'
+      subTab: 'discover',
     };
     return this.switchTab('general');
   }
@@ -868,34 +752,25 @@ export class AgentsController {
       // Agent
       this.$scope.agent = agentInfo;
       if (agentInfo && this.$scope.agent.os) {
-        this.$scope.agentOS =
-          this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
+        this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
-        this.$scope.agent.agentPlatform = isLinux
-          ? 'linux'
-          : this.$scope.agent.os.platform;
+        this.$scope.agent.agentPlatform = isLinux ? 'linux' : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
         this.$scope.agent.agentPlatform = false;
       }
 
-
-
       this.$scope.syscheckTableProps = {
         wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-        agentId: this.$scope.agent.id
-      }
-    
+        agentId: this.$scope.agent.id,
+      };
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});
       this.$scope.groups = groups.data.data.affected_items
         .map(item => item.name)
-        .filter(
-          item =>
-            this.$scope.agent.group && !this.$scope.agent.group.includes(item)
-        );
+        .filter(item => this.$scope.agent.group && !this.$scope.agent.group.includes(item));
 
       this.loadWelcomeCardsProps();
       this.$scope.load = false;
@@ -908,11 +783,7 @@ export class AgentsController {
         }
       }
       this.errorHandler.handle(error, 'Agents');
-      if (
-        error &&
-        typeof error === 'string' &&
-        error.includes('Agent does not exist')
-      ) {
+      if (error && typeof error === 'string' && error.includes('Agent does not exist')) {
         this.$location.search('agent', null);
         this.$location.path('/agents-preview');
       }
@@ -925,8 +796,7 @@ export class AgentsController {
 
   shouldShowComponent(component) {
     return !(
-      UnsupportedComponents[this.$scope.agent.agentPlatform] ||
-      UnsupportedComponents['other']
+      UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']
     ).includes(component);
   }
 
@@ -935,8 +805,7 @@ export class AgentsController {
     for (const extension in extensions) {
       if (
         !(
-          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
-          UnsupportedComponents['other']
+          UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']
         ).includes(extension)
       ) {
         result[extension] = extensions[extension];
@@ -957,7 +826,7 @@ export class AgentsController {
       setExtensions: (api, extensions) => {
         AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;
-      }
+      },
     };
   }
 
@@ -1001,10 +870,7 @@ export class AgentsController {
    */
   async downloadCsv(path, fileName, filters = []) {
     try {
-      this.errorHandler.info(
-        'Your download should begin automatically...',
-        'CSV'
-      );
+      this.errorHandler.info('Your download should begin automatically...', 'CSV');
       const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(path, currentApi, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
@@ -1023,14 +889,9 @@ export class AgentsController {
     const syscollectorFilters = [];
     if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
       syscollectorFilters.push(
-        this.filterHandler.managerQuery(
-          AppState.getClusterInfo().cluster,
-          true
-        )
+        this.filterHandler.managerQuery(AppState.getClusterInfo().cluster, true)
       );
-      syscollectorFilters.push(
-        this.filterHandler.agentQuery(this.$scope.agent.id)
-      );
+      syscollectorFilters.push(this.filterHandler.agentQuery(this.$scope.agent.id));
     }
     this.reportingService.startVis2Png(
       this.$scope.tab,
@@ -1045,11 +906,7 @@ export class AgentsController {
       if (!isActive) {
         throw new Error('Agent is not active');
       }
-      await this.apiReq.request(
-        'PUT',
-        `/rootcheck/${this.$scope.agent.id}`,
-        {}
-      );
+      await this.apiReq.request('PUT', `/rootcheck/${this.$scope.agent.id}`, {});
       this.errorHandler.info(
         `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`,
         ''
@@ -1098,7 +955,7 @@ export class AgentsController {
       false,
       false,
       false,
-      false
+      false,
     ];
   }
 

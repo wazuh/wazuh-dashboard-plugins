@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-// Redux
-import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
@@ -25,33 +23,21 @@ import { connect } from 'react-redux';
 class WzGroups extends Component {
   constructor(props) {
     super(props);
-    this.state = {}; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
-    this.store = store;
+    this.state = {};
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.groupsProps.closeAddingAgents && this.state.showAddAgents) {
-      this.setState({
-        closeAddingAgents: true,
-      });
+    if (nextProps.groupsProps.closeAddingAgents && this.props.state.showAddAgents) {
       this.props.updateShowAddAgents(false);
     }
   }
-
-  UNSAFE_componentWillMount() {
-    this.store.subscribe(() => {
-      const state = this.store.getState().groupsReducers;
-      this.setState(state);
-    });
-  }
-
   componentWillUnmount() {
     // When the component is going to be unmounted the groups state is reset
     this.props.resetGroup();
   }
 
   render() {
-    const { itemDetail, showAddAgents, fileContent } = this.state;
+    const { itemDetail, showAddAgents, fileContent } = this.props.state;
 
     return (
       <WzReduxProvider>

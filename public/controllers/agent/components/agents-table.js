@@ -18,7 +18,6 @@ import {
   EuiBasicTable,
   EuiButtonEmpty,
   EuiButtonIcon,
-  EuiLink,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
@@ -366,8 +365,8 @@ export class AgentsTable extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle>
-                  <h2>Agents</h2>
+                <EuiTitle size={"s"} style={{ padding: '6px 0px' }}>
+                  <h2>{this.state.totalItems} Total Agents</h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -377,11 +376,6 @@ export class AgentsTable extends Component {
               Deploy new agent
           </EuiButtonEmpty>
           </EuiFlexItem>
-          {/* TODO:           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="brush" onClick={() => this.props.addingNewAgent()}>
-              Purgue agents
-          </EuiButtonEmpty>
-          </EuiFlexItem> */}
           {formattedButton}
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty iconType="refresh" onClick={() => this.reloadAgents()}>
@@ -618,7 +612,7 @@ export class AgentsTable extends Component {
     const table = this.tableRender();
 
     return (
-      <EuiPanel paddingSize="l">
+      <EuiPanel paddingSize="m">
         {title}
         {filter}
         {table}

@@ -35,6 +35,8 @@ import RulesetHandler from './utils/ruleset-handler';
 
 import { toastNotifications } from 'ui/notify';
 
+import exportCsv from '../../../../../react-services/wz-csv';
+
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -259,8 +261,7 @@ class WzListEditor extends Component {
 
   closePopover = () => {
     this.setState({
-      isPopoverOpen: false,
-      addingKey: 'key',
+      isPopoverOpen: false
     });
   };
 
@@ -294,7 +295,11 @@ class WzListEditor extends Component {
   addItem() {
     const { addingKey, addingValue } = this.state;
     if (!addingKey || Object.keys(this.items).includes(addingKey)) {
-      console.log('Key empty or already exists');
+      this.showToast('danger', 'Error', (
+        <Fragment>
+          <strong>{addingKey}</strong> key already exists
+        </Fragment>
+      ), 3000);
       return;
     }
     this.items[addingKey] = addingValue;
@@ -318,6 +323,7 @@ class WzListEditor extends Component {
       items: itemsArr,
       editing: false,
       editingValue: '',
+      generatingCsv: false
     });
   }
 
@@ -371,12 +377,13 @@ class WzListEditor extends Component {
    * @param {String} name
    * @param {String} path
    */
-  renderAddAndSave(name, path, newList = false) {
+  renderAddAndSave(name, path, newList = false, items = []) {
     const addButton = <EuiButtonEmpty onClick={() => this.openPopover()}>Add</EuiButtonEmpty>;
 
     const saveButton = (
       <EuiButton
         fill
+        isDisabled={items.length === 0}
         iconType="save"
         isLoading={this.state.isSaving}
         onClick={async () => this.saveList(name, path, newList)}
@@ -386,7 +393,7 @@ class WzListEditor extends Component {
     );
 
     const addItemButton = (
-      <EuiButton fill onClick={() => this.addItem()}>
+      <EuiButton isDisabled={!this.state.addingKey} fill onClick={() => this.addItem()}>
         Add
       </EuiButton>
     );
@@ -395,7 +402,7 @@ class WzListEditor extends Component {
 
     return (
       <Fragment>
-        <EuiFlexItem style={{ textAlign: 'rigth' }} grow={false}>
+        <EuiFlexItem grow={false}>
           <EuiPopover
             id="addKeyValuePopover"
             ownFocus
@@ -482,13 +489,34 @@ class WzListEditor extends Component {
             <EuiFlexItem>
               {/* File name and back button when watching or editing a CDB list */}
               <EuiFlexGroup>
-                {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
-                <EuiFlexItem />
-                {/* This flex item is for separating between title and save button */}
-                {/* Pop over to add new key and value */}
-                {adminMode &&
-                  !this.state.editing &&
-                  this.renderAddAndSave(listName, path, !addingNew)}
+              {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
+              <EuiFlexItem />
+              {/* This flex item is for separating between title and save button */}
+              {/* Pop over to add new key and value */}
+              {!addingNew && (
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty
+                    iconType="exportAction"
+                    isDisabled={this.state.generatingCsv}
+                    isLoading={this.state.generatingCsv}
+                    onClick={async () => {
+                      try{
+                        this.setState({ generatingCsv: true});
+                        await exportCsv(`/lists?path=${path}/${name}`, [{_isCDBList: true, name: 'path', value: `${path}/${name}`}], name);
+                        this.setState({ generatingCsv: false});
+                      }catch(error){
+                        this.setState({ generatingCsv: false});
+                      }
+                    }}
+                  >
+                    Export formatted
+                  </EuiButtonEmpty>
+                </EuiFlexItem>)
+              }
+              {adminMode &&
+                !this.state.editing &&
+                this.renderAddAndSave(listName, path, !addingNew, this.state.items)
+              }
               </EuiFlexGroup>
               {/* CDB list table */}
               <EuiFlexGroup>

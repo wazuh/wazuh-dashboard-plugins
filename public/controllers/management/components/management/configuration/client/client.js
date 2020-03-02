@@ -61,6 +61,7 @@ class WzConfigurationClient extends Component{
             title='Main settings'
             description='Basic manager-agent communication settings'
             currentConfig={currentConfig}
+            minusHeight={350}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsGroup
                 config={currentConfig['agent-client'].client}

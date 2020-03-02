@@ -46,8 +46,9 @@ class WzConfigurationSettingsTabSelector extends Component{
   
   render(){
     const { view } = this.state;
-    const { currentConfig, helpLinks, children } = this.props;
+    const { currentConfig, helpLinks, children, minusHeight } = this.props;
     const { title, description } = this.getTitleDescription(view);
+    const codeViewerMinusHeight = minusHeight !== undefined ? minusHeight : 280;
     return (
       <Fragment>
         <WzConfigurationSettingsHeader
@@ -64,10 +65,10 @@ class WzConfigurationSettingsTabSelector extends Component{
             {children}
           </WzViewSelectorSwitch>
           <WzViewSelectorSwitch view='json'>
-            <WzSettingsViewer mode='json' value={currentConfig} />
+            <WzSettingsViewer mode='json' value={currentConfig} minusHeight={codeViewerMinusHeight}/>
           </WzViewSelectorSwitch>
           <WzViewSelectorSwitch view='xml'>
-            <WzSettingsViewer mode='xml' value={currentConfig} />
+            <WzSettingsViewer mode='xml' value={currentConfig} minusHeight={codeViewerMinusHeight}/>
           </WzViewSelectorSwitch>
         </WzViewSelector>
       </Fragment>

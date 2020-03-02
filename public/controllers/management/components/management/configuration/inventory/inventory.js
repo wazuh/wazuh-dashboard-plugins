@@ -49,7 +49,7 @@ class WzConfigurationInventory extends Component{
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled(){
-    return (this.wodleConfig && this.wodleConfig.syscollector && this.wodleConfig.syscollector.disabled === 'no') || false;
+    return this.wodleConfig && this.wodleConfig.syscollector && this.wodleConfig.syscollector.disabled === 'no';
   }
   render(){
     const { currentConfig } = this.props;
@@ -66,6 +66,7 @@ class WzConfigurationInventory extends Component{
             title='Main settings'
             description='General settings applied to all the scans'
             currentConfig={this.wodleConfig}
+            minusHeight={this.props.agent.id === '000' ? 280 : 350}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup
               config={this.wodleConfig.syscollector}

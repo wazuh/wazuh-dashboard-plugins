@@ -67,7 +67,7 @@ class WzRulesetTable extends Component {
     if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
-          pageSize: 10,
+          pageSize: this.state.pageSize,
           pageIndex: 0,
           sortDirection: null,
           sortField: null,
@@ -227,7 +227,7 @@ class WzRulesetTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading}
-            rowProps={!this.props.state.showingFiles && getRowProps}
+            rowProps={(!this.props.state.showingFiles && getRowProps) || undefined}
             sorting={sorting}
             message={message}
           />

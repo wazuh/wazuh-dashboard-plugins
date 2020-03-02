@@ -12,7 +12,6 @@
 
 import React, { Component, Fragment } from "react";
 
-import WzNoConfig from '../util-components/no-config';
 import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationCisCatGeneral from './cis-cat-general';
@@ -31,14 +30,13 @@ class WzConfigurationCisCat extends Component{
     this.props.updateBadge(this.badgeEnabled());
   }
   render(){
-    const { currentConfig } = this.props;
     return (
       <WzTabSelector>
         <WzTabSelectorTab label='General'>
-          <WzConfigurationCisCatGeneral currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+          <WzConfigurationCisCatGeneral {...this.props} wodleConfig={this.wodleConfig}/>
         </WzTabSelectorTab>
         <WzTabSelectorTab label='Benchmarks'>
-          <WzConfigurationCisCatBenchmarks currentConfig={currentConfig} wodleConfig={this.wodleConfig}/>
+          <WzConfigurationCisCatBenchmarks {...this.props} wodleConfig={this.wodleConfig}/>
         </WzTabSelectorTab>
       </WzTabSelector>
     )
