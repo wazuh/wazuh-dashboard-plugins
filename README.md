@@ -85,7 +85,8 @@ cp /usr/share/kibana/plugins/wazuh/wazuh.yml /tmp/wazuh-backup.yml
 Remove the app using kibana-plugin tool
 
 ```
-/usr/share/kibana/bin/kibana-plugin remove wazuh
+cd /usr/share/kibana/
+bin/kibana-plugin remove wazuh
 ```
 
 Remove generated bundles
@@ -135,7 +136,7 @@ systemctl restart kibana
 service kibana restart 
 ``` 
  
-## Older packages 
+## Wazuh - Kibana compatibility matrix
  
 | Kibana version | Wazuh app version | Package                                                         |
 | :------------: | :---------------: | :-------------------------------------------------------------- |
@@ -241,6 +242,9 @@ service kibana restart
 |      7.4.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.4.2.zip> |
 |      7.5.2     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.5.2.zip> |
 |      7.6.0     |       3.11.3      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.3_7.6.0.zip> |
+|      6.8.6     |       3.11.4      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_6.8.6.zip> |
+|      7.4.2     |       3.11.4      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.4.2.zip> |
+|      7.6.0     |       3.11.4      | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip> |
 
 
 ## Contribute
