@@ -102,13 +102,13 @@ class KibanaVis extends Component {
     try {
       if (this.visHandler) {
         const data = await this.visHandler.handler.dataHandler.getData();
-        if (this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
+        if (data && data.value && data.value.visData && data.value.visData.rows && this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
           store.dispatch(
             this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] })
           );
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      this.showToast('danger', 'Error', error.message || error, 4000);
     }
   }
 
@@ -142,7 +142,7 @@ class KibanaVis extends Component {
         }
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      this.showToast('danger', 'Error', error.message || error, 4000);
     }
   };
 
@@ -213,8 +213,8 @@ class KibanaVis extends Component {
             this.showToast(
               'danger',
               'An error occurred fetching new index pattern fields',
-              error,
-              2000
+              error.message || error,
+              4000
             );
           }
         }
@@ -222,7 +222,6 @@ class KibanaVis extends Component {
         this.renderInProgress = false;
         return this.myRender(raw);
       } else {
-        this.showToast('danger', 'Visualize error', error, 2000);
       }
     }
 
