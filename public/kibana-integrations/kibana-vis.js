@@ -252,15 +252,12 @@ class KibanaVis extends Component {
     const deadVis = this.props.tab === 'ciscat' ? 0 : this.tabVisualizations.getDeadVis();
     const totalTabVis = this.tabVisualizations.getItem(this.props.tab) - deadVis;
 
+    this.props.updateRootScope('loadingStatus', 'Fetching data...');
+    
     if (totalTabVis < 1) {
       this.props.updateRootScope('resultState', 'none');
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
-
-      this.props.updateRootScope(
-        'loadingStatus',
-        `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`
-      );
 
       const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
       if (visTitle === 'Mitre attack count') {
@@ -273,7 +270,6 @@ class KibanaVis extends Component {
       }
       if (currentCompleted >= 100) {
         this.props.updateRootScope('rendered', 'true');
-        this.props.updateRootScope('loadingStatus', 'Fetching data...');
         if (visId.includes('AWS-geo')) {
           const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
           setTimeout(() => {
