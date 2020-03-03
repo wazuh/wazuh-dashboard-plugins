@@ -10,30 +10,28 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+// Redux
+import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
-
 import WzGroupDetail from './group-detail';
 import WzGroupEditor from './groups-editor';
 import {
   updateGroupDetail,
 } from '../../../../../redux/actions/groupsActions';
-
 import { updateShowAddAgents, resetGroup } from '../../../../../redux/actions/groupsActions';
 import { connect } from 'react-redux';
-
 class WzGroups extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
-
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.groupsProps.closeAddingAgents && this.props.state.showAddAgents) {
       this.props.updateShowAddAgents(false);
     }
-  if (nextProps.groupsProps.selectedGroup && nextProps.groupsProps.selectedGroup !== this.props.groupsProps.selectedGroup) {
+    if (nextProps.groupsProps.selectedGroup && nextProps.groupsProps.selectedGroup !== this.props.groupsProps.selectedGroup) {
       store.dispatch(updateGroupDetail(nextProps.groupsProps.selectedGroup))
     }
   }
@@ -41,16 +39,13 @@ class WzGroups extends Component {
     // When the component is going to be unmounted the groups state is reset
     this.props.resetGroup();
   }
-
-  componentDidUpdate(){
-    if(this.props.groupsProps.selectedGroup){
+  componentDidUpdate() {
+    if (this.props.groupsProps.selectedGroup) {
       this.props.groupsProps.updateProps();
     }
   }
-
   render() {
     const { itemDetail, showAddAgents, fileContent } = this.props.state;
-
     return (
       <WzReduxProvider>
         {!showAddAgents &&
@@ -60,18 +55,15 @@ class WzGroups extends Component {
     );
   }
 }
-
 const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
-
 const mapDispatchToProps = dispatch => {
   return {
     resetGroup: () => dispatch(resetGroup()),
     updateShowAddAgents: showAddAgents => dispatch(updateShowAddAgents(showAddAgents)),
   };
 };
-
 export default connect(mapStateToProps, mapDispatchToProps)(WzGroups);
