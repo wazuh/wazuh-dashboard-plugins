@@ -39,9 +39,6 @@ export class GroupsController {
       this.mctrl = this.scope.mctrl;
       this.addingGroup = false;
       this.load = false;
-      // Store a boolean variable to check if come from agents
-      this.globalAgent = this.shareAgent.getAgent();
-
       await this.loadGroups();
 
       // Listeners
@@ -75,11 +72,6 @@ export class GroupsController {
         type: 'group',
       };
 
-      this.agentsInGroupTableProps = {
-        addAgents: () => this.addMultipleAgents(true),
-        exportConfigurationProps: this.exportConfigurationProps,
-      };
-
       this.filesInGroupTableProps = {
         exportConfigurationProps: this.exportConfigurationProps,
       };
@@ -96,6 +88,8 @@ export class GroupsController {
   async loadGroups() {
     try {
       // If come from agents
+      // Store a boolean variable to check if come from agents
+      this.globalAgent = this.shareAgent.getAgent();
       if (this.globalAgent) {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
@@ -105,9 +99,7 @@ export class GroupsController {
         const filtered = data.data.data.items.filter(group => group.name === globalGroup);
         if (Array.isArray(filtered) && filtered.length) {
           // Load that our group
-          this.loadGroup(filtered[0]);
-          this.lookingGroup = true;
-          this.addingAgents = false;
+          this.buildGroupsTableProps(data.data.data.items, {group: filtered[0]});
         } else {
           throw Error(`Group ${globalGroup} not found`);
         }
@@ -143,39 +135,6 @@ export class GroupsController {
     this.scope.$applyAsync();
   }
 
-  /**
-   * This load the group information to a given agent
-   * @param {String} group
-   */
-  async loadGroup(group) {
-    try {
-      this.groupsSelectedTab = 'agents';
-      this.lookingGroup = true;
-      const count = await this.apiReq.request('GET', `/agents/groups/${group.name}/files`, {
-        limit: 1,
-      });
-      this.totalFiles = count.data.data.totalItems;
-      this.fileViewer = false;
-      this.currentGroup = group;
-      // Set the name to the react tables
-      this.agentsInGroupTableProps.group = this.currentGroup;
-      this.filesInGroupTableProps.group = this.currentGroup;
-      this.groupsSelectedTab = 'agents';
-      this.location.search('currentGroup', group.name);
-      if (this.location.search() && this.location.search().navigation) {
-        AppState.setNavigation({ status: true });
-        this.location.search('navigation', null);
-      }
-      this.scope.$emit('setCurrentGroup', { currentGroup: this.currentGroup });
-      this.fileViewer = false;
-      this.load = false;
-      this.globalAgent = false;
-      this.scope.$applyAsync();
-    } catch (error) {
-      this.errorHandler.handle(error, 'Groups');
-    }
-    return;
-  }
 
   /**
    *
@@ -424,7 +383,8 @@ export class GroupsController {
     this.addingGroup = !this.addingGroup;
   }
 
-  buildGroupsTableProps(items) {
+  buildGroupsTableProps(items,params={}) {
+    this.redirectGroup = params.group || false;
     this.groupsTableProps = {
       items,
       closeAddingAgents: false,
@@ -439,9 +399,13 @@ export class GroupsController {
       currentGroup: group => {
         this.currentGroup = group;
       },
+      updateProps: () => {
+        this.loadGroups();
+      },
       showAgent: agent => {
         this.showAgent(agent);
       },
+      selectedGroup: this.redirectGroup
     };
     this.mctrl.managementProps.groupsProps = this.groupsTableProps;
   }

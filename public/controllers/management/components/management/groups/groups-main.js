@@ -16,6 +16,9 @@ import WzGroupsOverview from './groups-overview';
 
 import WzGroupDetail from './group-detail';
 import WzGroupEditor from './groups-editor';
+import {
+  updateGroupDetail,
+} from '../../../../../redux/actions/groupsActions';
 
 import { updateShowAddAgents, resetGroup } from '../../../../../redux/actions/groupsActions';
 import { connect } from 'react-redux';
@@ -30,10 +33,19 @@ class WzGroups extends Component {
     if (nextProps.groupsProps.closeAddingAgents && this.props.state.showAddAgents) {
       this.props.updateShowAddAgents(false);
     }
+  if (nextProps.groupsProps.selectedGroup && nextProps.groupsProps.selectedGroup !== this.props.groupsProps.selectedGroup) {
+      store.dispatch(updateGroupDetail(nextProps.groupsProps.selectedGroup))
+    }
   }
   componentWillUnmount() {
     // When the component is going to be unmounted the groups state is reset
     this.props.resetGroup();
+  }
+
+  componentDidUpdate(){
+    if(this.props.groupsProps.selectedGroup){
+      this.props.groupsProps.updateProps();
+    }
   }
 
   render() {
