@@ -24,7 +24,7 @@ const visualizationsReducers = (state = initialState, action) => {
   if (action.type === 'UPDATE_VIS') {
     return {
       ...state,
-      shouldUpdate: action.update.update
+      shouldUpdate: action.update
     };
   }
   return state;

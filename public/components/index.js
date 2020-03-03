@@ -18,6 +18,7 @@ import { WzBlankScreen } from '../components/wz-blank-screen/wz-blank-screen';
 import { ClusterDisabled } from '../components/management/cluster/cluster-disabled';
 import { ClusterTimelions } from '../components/management/cluster/cluster-timelions';
 import { ScaDashboard } from './agents/sca/sca-dashboard';
+import WzStatistics from '../controllers/management/components/management/statistics/statistics-main'
 
 const app = uiModules.get('app/wazuh', []);
 app.value('WzFilterBar', WzFilterBar);
@@ -27,3 +28,4 @@ app.value('ScaDashboard', ScaDashboard);
 app.value('WzBlankScreen', WzBlankScreen);
 app.value('ClusterDisabled', ClusterDisabled);
 app.value('ClusterTimelions', ClusterTimelions);
+app.value('WzStatistics', WzStatistics);

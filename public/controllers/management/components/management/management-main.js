@@ -47,7 +47,7 @@ class WzManagementMain extends Component {
               (section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
               (section === 'reporting' && <WzReporting />) || 
-              (section === 'statistics' && <WzStatistics />) || 
+              // (section === 'statistics' && <WzStatistics />) || TODO: Delete this after PR
               (section === 'logs' && <WzLogs />) || 
               (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
               (ruleset.includes(section) && <WzRuleset />)

@@ -11,10 +11,28 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, EuiInMemoryTable, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiSpacer, EuiSelect, EuiProgress } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiButtonEmpty,
+  EuiPanel,
+  EuiTitle,
+  EuiPage,
+  EuiText,
+  EuiTabs,
+  EuiTab,
+  EuiSpacer,
+  EuiSelect,
+} from '@elastic/eui';
+import { connect } from 'react-redux';
+import { updateVis } from '../../../../../redux/actions/visualizationsActions'
 
+import  KibanaVis  from '../../../../../kibana-integrations/kibana-vis';
 import StatisticsHandler from './utils/statistics-handler'
 import { clusterNodes } from '../configuration/utils/wz-fetch';
+import { GenericRequest } from '../../../../../react-services/generic-request';
+import { RawVisualizations } from '../../../../../factories/raw-visualizations';
+import { DiscoverPendingUpdates } from '../../../../../factories/discover-pending-updates';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -25,7 +43,8 @@ export class WzStatisticsOverview extends Component {
       stats: {},
       isLoading: false,
       searchvalue: '',
-      clusterNodeSelected: false
+      clusterNodeSelected: false,
+      isSaveObjectReady: false,
     };
     this.statisticsHandler = StatisticsHandler;
     this.tabs = [
@@ -38,6 +57,8 @@ export class WzStatisticsOverview extends Component {
         name: 'analysisd'
       },
     ];
+    this.rawVisualizations = new RawVisualizations();
+    this.discoverPendingUpdates = new DiscoverPendingUpdates();
 
     this.info = {
       remoted: 'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
@@ -45,6 +66,17 @@ export class WzStatisticsOverview extends Component {
     };
   }
 
+  async componentWillMount() {
+    this.discoverPendingUpdates.addItem({query: "", language: "lucene"}, [{"meta":{"removable":false,"index":"wazuh-alerts-3.x-*","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"cluster.name","params":{"query":"wazuh"}},"query":{"match":{"cluster.name":{"query":"wazuh","type":"phrase"}}},"$state":{"store":"appState"}}] )
+    const visData = await GenericRequest.request(
+      'POST',
+      `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
+      {nodes: { items: [], name: 'node01' } }
+    );
+
+    await this.rawVisualizations.assignItems(visData.data.raw);
+  }
+  
   async componentDidMount() {
     this._isMounted = true;
     try {
@@ -64,8 +96,6 @@ export class WzStatisticsOverview extends Component {
     }
     this.fetchData();
   }
-
-  componentDidUpdate() { }
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -164,34 +194,23 @@ export class WzStatisticsOverview extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size={'m'} />
-          {this.state.isLoading &&
-            <EuiProgress size="xs" color="primary" />
-          }
-          {!!((Object.entries(this.state.stats) || []).length && !this.state.isLoading) && (
-            <div>
-              <EuiCallOut title={this.info[this.state.selectedTabId]} iconType="iInCircle" />
-              <EuiSpacer size={'m'} />
-              <EuiInMemoryTable
-                items={Object.entries(this.state.stats)}
-                columns={[
-                  {
-                    field: '0',
-                    name: 'Indicator',
-                  },
-                  {
-                    field: '1',
-                    name: 'Value',
-                  }
-                ]}
-                pagination={true}
-                search={search}
-              />
-            </div>
-          )}
+          <EuiFlexGroup style={{ minHeight: 450 }}>
+            <EuiFlexItem>
+              <KibanaVis visID={'Wazuh-App-Cluster-monitoring-Overview-Manager'} tab={'monitoring'} updateRootScope={()=>{}} ></KibanaVis>
+            </EuiFlexItem>
+
+          </EuiFlexGroup>
+
         </EuiPanel>
       </EuiPage>
     );
   }
 }
 
-export default WzStatisticsOverview;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateVis: update => dispatch(updateVis(update)),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(WzStatisticsOverview);

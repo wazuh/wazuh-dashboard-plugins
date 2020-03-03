@@ -18,6 +18,7 @@ import { LogsController } from './logs';
 import { ManagementController } from './management';
 import { RulesController } from './rules';
 import { ClusterController } from './monitoring';
+import { StatisticsController } from './statistics';
 import { CdbListsController } from './cdblists';
 import { ConfigurationRulesetController } from './config-ruleset';
 import { ConfigurationGroupsController } from './config-groups';
@@ -50,6 +51,7 @@ app
   .controller('configurationGroupsController', ConfigurationGroupsController)
   .controller('editionController', EditionController)
   .controller('filesController', FilesController)
+  .controller('statisticsController', StatisticsController)
   .value('WelcomeScreenManagement', WelcomeScreen)
   .value('WelcomeWrapper', WelcomeWrapper)
   .value('UploadFiles', UploadFiles)

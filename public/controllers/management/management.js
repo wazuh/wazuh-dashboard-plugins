@@ -47,7 +47,7 @@ export class ManagementController {
     this.globalConfigTab = 'overview';
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
-    this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
+    this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring', 'statistics'];
     this.currentGroup = false;
     this.logtestOpened = false;
     this.uploadOpened = false;
@@ -164,7 +164,8 @@ export class ManagementController {
         { id: 'status', name: 'Status' },
         { id: 'logs', name: 'Logs' },
         { id: 'monitoring', name: 'Cluster' },
-        { id: 'reporting', name: 'Reporting' }
+        { id: 'reporting', name: 'Reporting' },
+        { id: 'statistics', name: 'Statistics' },
       ]
     };
 
