@@ -136,7 +136,7 @@ systemctl restart kibana
 service kibana restart 
 ``` 
  
-## Wazuh - Kibana compatibility matrix
+## Older packages 
  
 | Kibana version | Wazuh app version | Package                                                         |
 | :------------: | :---------------: | :-------------------------------------------------------------- |
