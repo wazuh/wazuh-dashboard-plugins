@@ -271,4 +271,3 @@ AgentsInGroupTable.propTypes = {
   goToAgent: PropTypes.func,
   exportConfigurationProps: PropTypes.object
 };
-
