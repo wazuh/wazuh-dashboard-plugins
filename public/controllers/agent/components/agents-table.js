@@ -26,12 +26,15 @@ import {
   EuiTitle,
   EuiHealth,
   EuiSpacer,
-  EuiLoadingSpinner,
   EuiCallOut,
+  EuiOverlayMask,
+  EuiConfirmModal
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
+import { CheckUpgrade } from './checkUpgrade';
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request'
+import { timeout } from 'd3';
 
 export class AgentsTable extends Component {
 
@@ -51,25 +54,24 @@ export class AgentsTable extends Component {
       sortField: 'id',
       totalItems: 0,
       selectedItems: [],
-      allSelected: false
+      allSelected: false,
+      purgeModal: false
     }
     this.downloadCsv.bind(this);
   }
 
   async componentWillMount() {
-    const managerVersion = await WzRequest.apiReq(
-      'GET',
-      '/version',
-      {}
-    );
-    const totalAgent = await WzRequest.apiReq(
-      'GET',
-      '/agents',
-      {}
-    );
-    this.setState({
+    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+    const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
+    const outdatedAgents = await WzRequest.apiReq('GET', '/agents/outdated', {});
+    const agentActive = await WzRequest.apiReq('GET', '/agents', {"q":"status=active"});
+
+    
+    this.setState({ 
       managerVersion: managerVersion.data.data,
-      totalAgent: totalAgent.data.data.totalItems
+      outdatedAgents: outdatedAgents.data.data.totalItems,
+      agentActive: agentActive.data.data.totalItems,
+      avaibleAgents: totalAgent.data.data.items
     });
   }
 
@@ -121,7 +123,6 @@ export class AgentsTable extends Component {
       isLoading: true,
     });
     await this.props.reload();
-    this.checkAgentsUpdating();
   }
 
   async componentDidUpdate(prevProps, prevState) {
@@ -196,7 +197,8 @@ export class AgentsTable extends Component {
       "version": agentVersion,
       "dateAdd": timeService(agent.dateAdd),
       "lastKeepAlive": lastKeepAlive(agent.lastKeepAlive, timeService),
-      "actions": agent
+      "actions": agent,
+      "upgrading": false
     }
   }
 
@@ -251,28 +253,6 @@ export class AgentsTable extends Component {
 
   }
 
-  addIconUpgrade(agent, item) {
-    let spinner = '';
-
-    if (item.upgrading === true) {
-      spinner = (
-        <EuiToolTip content="This agent is being updated." position="right">
-          <EuiLoadingSpinner size="s" />
-        </EuiToolTip>
-      )
-    }
-
-    return (
-      <div>
-        <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-          {agent}
-        </span>
-        &nbsp;&nbsp;
-        {spinner}
-      </div>
-    )
-  }
-
   addHealthStatusRender(status) {
     const color = (status) => {
       if (status.toLowerCase() === 'active') {
@@ -288,6 +268,25 @@ export class AgentsTable extends Component {
       <EuiHealth color={color(status)}>
         {status}
       </EuiHealth>
+    );
+  }
+
+  reloadAgent = () => {
+    this.setState({
+      isProcessing: true,
+      isLoading: true,
+    });
+    this.props.reload();
+  }
+
+  addUpgradeStatus(version, agent) {
+    const { managerVersion } = this.state;
+    return (
+      <CheckUpgrade {...agent} 
+      managerVersion={managerVersion} 
+      changeStatusUpdate={this.changeUpgradingState} 
+      reloadAgent={this.reloadAgent}
+      />
     );
   }
 
@@ -319,53 +318,137 @@ export class AgentsTable extends Component {
 
   /* MULTISELECT TABLE */
   onSelectionChange = (selectedItems) => {
-    const { managerVersion } = this.state;
-
+    const { managerVersion, pageSize } = this.state;
+  
     selectedItems.forEach(item => {
       if (managerVersion > item.version && item.version !== '.') {
         item.outdated = true;
       }
     });
+
+    selectedItems.length !== pageSize ? this.setState({allSelected: false}) : false ;
+
     this.setState({ selectedItems });
   };
 
   renderUpgradeButton() {
-    const { selectedItems, allSelected } = this.state;
-
+    const { selectedItems } = this.state;
+    
     if (selectedItems.length === 0 ||
-      (selectedItems.length > 0 && selectedItems.filter(item => item.outdated).length === 0) ||
-      (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0)) {
+      (selectedItems.length > 0 && selectedItems.filter(item => item.outdated).length === 0) || 
+      (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0) ||
+      (selectedItems.length > 0 && selectedItems.filter(item => item.status === 'Active').length === 0)) {
+      return;
+    }
+  
+    return ( 
+      <EuiFlexItem grow={false}>
+        <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgrade}>
+          Upgrade {selectedItems.filter(item => item.outdated).length} Agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderUpgradeButtonAll() {
+    const { selectedItems, outdatedAgents } = this.state;
+  
+    if (selectedItems.length === 0 || (selectedItems.length > 0 && outdatedAgents === 0)) {
       return;
     }
 
     return (
-      <EuiButton style={{ margin: 6 }} color="secondary" iconType="sortUp" onClick={
-        allSelected === true ? this.upgradeAllAgents : this.onClickUpgrade
-      }>
-        Upgrade {allSelected === true ? 'All' : selectedItems.filter(item => item.outdated).length} Agents
-      </EuiButton>
+      <EuiFlexItem grow={false}>
+        <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgradeAll}>
+          Upgrade All Agents
+        </EuiButton>
+      </EuiFlexItem>
     );
   }
 
   renderRestartButton() {
-    const { selectedItems, allSelected } = this.state;
-
+    const { selectedItems } = this.state;
+    
     if (selectedItems.length === 0 || selectedItems.filter(item => item.status === 'Active').length === 0) {
       return;
     }
 
     return (
-      <EuiButton style={{ margin: 6 }} color="primary" iconType="refresh" onClick={
-        allSelected === true ? this.restartAllAgents : this.onClickRestart
-      }>
-        Restart {allSelected === true ? 'All' : selectedItems.filter(item => item.status === 'Active').length} Agents
-      </EuiButton>
+      <EuiFlexItem grow={false}>
+        <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestart}>
+          Restart {selectedItems.filter(item => item.status === 'Active').length} Agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderRestartButtonAll() {
+    const { selectedItems, agentActive } = this.state;
+    
+    if (selectedItems.length === 0 || agentActive === 0) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestartAll}>
+          Restart All Agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderRestartButtonAll() {
+    const { selectedItems, agentActive } = this.state;
+    
+    if (selectedItems.length === 0 || agentActive === 0) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestartAll}>
+          Restart All Agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderPurgeButton() {
+    const { selectedItems } = this.state;
+    
+    if (selectedItems.length === 0) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton iconType="trash" color="danger" onClick={() => {this.setState({purgeModal: true})}}>
+          Purge {selectedItems.length} Agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderPurgeButtonAll() {
+    const { selectedItems } = this.state;
+    
+    if (selectedItems.length === 0) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton iconType="trash" color="danger" onClick={() => {this.setState({purgeModal: true})}}>
+          Purge All Agents
+        </EuiButton>
+      </EuiFlexItem>
     );
   }
 
   callOutRender() {
-    const { selectedItems, agents, pageSize, totalAgent, allSelected } = this.state;
-
+    const { selectedItems, agents, pageSize, allSelected, totalItems} = this.state;
+  
     if (selectedItems.length === 0) {
       return;
     } else if (selectedItems.length === agents.length || selectedItems.length === pageSize) {
@@ -376,12 +459,12 @@ export class AgentsTable extends Component {
             size="s"
             title={`All ${selectedItems.length} agents on this page are selected.`}
           >
-            <EuiFlexGroup>
+             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiButton onClick={() => {
-                  this.setState(prevState => ({ allSelected: !prevState.allSelected }))
+                  this.setState(prevState => ({allSelected: !prevState.allSelected}))
                 }}>
-                  {allSelected === true ? `Clear ${totalAgent - 1} agents selected.` : `Select all ${totalAgent - 1} agents.`}
+                  {allSelected ? `Clear ${totalItems} agents selected.` : `Select all ${totalItems} agents.`}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -399,71 +482,147 @@ export class AgentsTable extends Component {
     this.setState({ agents });
   }
 
-  checkAgentsUpdating() {
-    const { agents, managerVersion } = this.state;
-
-    if (localStorage.getItem('upgradeAgents') !== null) {
-      const upgradingAgents = JSON.parse(localStorage.getItem('upgradeAgents')).map(element => element.itemId);
-      agents.map(agent => {
-        upgradingAgents.map(upgradingAgent => {
-          if (agent.id === upgradingAgent && agent.version === managerVersion) {
-            agent.upgrading = false;
-          }
-        });
-      });
-      this.setState({ agents });
-    }
+  changeUpgradingState = (agentID) => {
+    const { agents } = this.state;
+    agents.forEach(element => {
+      (element.id === agentID && element.upgrading === true) ? element.upgrading = false : false;
+    });
+    this.setState(() => ({agents}));
   }
 
   onClickUpgrade = () => {
-    localStorage.removeItem('upgradeAgents');
     const { selectedItems } = this.state;
-    let feedbackFlag = false;
     let upgradeStorage = [];
 
     for (let item of selectedItems.filter(item => item.outdated)) {
-      try {
-        WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
-        upgradeStorage = [
+      /* this.setUpgradingState(item.id); */
+ 			WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1').then(value => {
+        /* upgradeStorage = [
           ...upgradeStorage,
           {
             'itemId': item.id,
             'lastTimeUpgrade': new Date()
           }
         ];
-        localStorage.setItem('upgradeAgents', JSON.stringify(upgradeStorage));
-        this.setUpgradingState(item.id);
-        feedbackFlag = true;
-        this.checkAgentsUpdating();
-        setTimeout(() => {
-          this.reloadAgents();
-        }, 900000);
-      } catch (error) {
-        this.showToast('danger', 'Error Upgrading Agents.', error, 5000);
-      }
+        localStorage.setItem('upgradeAgents', JSON.stringify(upgradeStorage)); */
+			})
+			.catch(error => {
+        console.log(error);
+        error !== 'Wazuh API error: 3021 - Timeout executing API request' ? 
+        this.showToast('danger', 'Error upgrading all agents.', error, 5000) :
+        false;
+			});
     }
-    feedbackFlag === true ? this.showToast('success', 'Upgrading Agents', '', 5000) : false;
-  };
+    this.showToast('success', 'Upgrading Agents', '', 5000)
+  }
+
+  onClickUpgradeAll = () => {
+    const { avaibleAgents, managerVersion } = this.state;
+
+    avaibleAgents.forEach(agent => {
+      if (agent.id !== '000' && agent.version !== ('Wazuh ' + managerVersion) && agent.status === 'Active') {
+        WzRequest.apiReq('PUT', `/agents/${agent.id}/upgrade`, '1').then(() => {
+          /* upgradeStorage = [
+          ...upgradeStorage,
+          {
+            'itemId': item.id,
+            'lastTimeUpgrade': new Date()
+          }
+        ];
+        localStorage.setItem('upgradeAgents', JSON.stringify(upgradeStorage)); */
+        })
+        .catch(error => {
+          console.log(error);
+          error !== 'Wazuh API error: 3021 - Timeout executing API request' ? 
+          this.showToast('danger', 'Error upgrading all agents.', error, 5000) :
+          false;
+        })
+      }
+    });
+    this.showToast('success', 'Upgrading Agents', '', 5000);
+  }
 
   onClickRestart = () => {
-    localStorage.removeItem('upgradeAgents');
     const { selectedItems } = this.state;
     const agentsId = selectedItems.map(item => item.id);
-    try {
-      WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...agentsId] });
-      this.showToast('success', 'Restarting agents.', '', 5000);
-    } catch (error) {
-      this.showToast('warning', 'Error restarting agents', error, 5000);
-    }
+
+    WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...agentsId] }).then(value => {
+      value.status === 200 ?
+        this.showToast('success', 'Restarting agents.', '', 5000) :
+        this.showToast('warning', 'Error restarting agents', '', 5000);
+    })
+    .catch(error => {
+      this.showToast('danger', 'Error restarting agents', error, 5000);
+    })
+    .then(() => {
+      this.reloadAgents();
+    });
   };
 
-  restartAllAgents = () => {
-    this.showToast('success', 'Restarting all agents.', '', 5000);
+  onClickRestartAll = () => {
+    const { avaibleAgents } = this.state;
+    let idAvaibleAgents = [];
+    avaibleAgents.forEach(agent => {
+      if (agent.id !== '000' && agent.status === 'Active') {
+        idAvaibleAgents.push(agent.id);
+      }
+    });
+
+    WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...idAvaibleAgents] }).then((value) => {
+        value.status === 200 ? 
+          this.showToast('success', 'Restarting all agents.', '', 5000) : 
+          this.showToast('warning', 'Error restarting all agents.', '', 5000);
+      }
+    )
+    .catch(error => {
+      this.showToast('danger', 'Error restarting all agents.', error, 5000);
+    })
+    .finally(() => {
+      this.reloadAgents();
+    });
   }
 
-  upgradeAllAgents = () => {
-    this.showToast('success', 'Upgrading all agents.', '', 5000);
+  onClickPurge = () => {
+    const { selectedItems } = this.state;
+    let showToastPurge = false;
+    const auxAgents = selectedItems.map(agent => {return agent.id !== '000' ? agent.id : null}).filter(agent => agent !== null);
+
+    WzRequest.apiReq('DELETE', `/agents`, {"purge": true, "ids": auxAgents, "older_than": "1s"}).then((value) => {
+      value.status === 200 ? 
+        showToastPurge = true : 
+        this.showToast('warning', `Failed to purge some agents`, '', 5000);
+    })
+    .catch(error => {
+      this.showToast('danger', `Failed to purge some agents`, error, 5000);
+    })
+    .finally(() => {
+      this.reloadAgents();
+    });
+
+    this.setState({purgeModal: false});
+    showToastPurge ? this.showToast('success', `Agents purged successfully`, '', 5000) : false;
   }
+
+  onClickPurgeAll = () => {
+    const { avaibleAgents } = this.state;
+    let showToastPurge = false;
+    const auxAgents = avaibleAgents.map(agent => {return agent.id !== '000' ? agent.id : null}).filter(agent => agent !== null);
+    
+    WzRequest.apiReq('DELETE', `/agents`, {"purge": true, "ids": auxAgents, "older_than": "1s"}).then((value) => {
+      value.status === 200 ? 
+        showToastPurge = true : 
+        this.showToast('warning', `Failed to purge some agents`, '', 5000);
+    })
+    .catch(error => {
+      this.showToast('danger', `Failed to purge some agents`, error, 5000);
+    })
+    .finally(() => {
+      this.reloadAgents();
+    });
+
+    this.setState({purgeModal: false});
+    showToastPurge ? this.showToast('success', `All agents purged successfully`, '', 5000) : false;
+  };
 
   columns() {
     return [
@@ -504,7 +663,7 @@ export class AgentsTable extends Component {
         width: '100px',
         truncateText: true,
         sortable: true,
-        render: (agent, item) => this.addIconUpgrade(agent, item),
+        /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
       },
       {
         field: 'dateAdd',
@@ -543,9 +702,6 @@ export class AgentsTable extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle size={"s"} style={{ padding: '6px 0px' }}>
-                  <h2>{this.state.totalItems} Total Agents</h2>
-                </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -739,7 +895,7 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => { }
+        onClick: () => {}
       };
     };
 
@@ -766,7 +922,7 @@ export class AgentsTable extends Component {
     const isLoading = this.state.isLoading;
 
     const selection = {
-      /* selectable: agent => agent.status === 'Active', */
+      selectable: agent => agent.id,
       onSelectionChange: this.onSelectionChange,
     };
 
@@ -793,21 +949,48 @@ export class AgentsTable extends Component {
   }
 
   render() {
+    const { allSelected, purgeModal, selectedItems } = this.state;
     const title = this.headRender();
     const filter = this.filterBarRender();
     const upgradeButton = this.renderUpgradeButton();
     const restartButton = this.renderRestartButton();
+    const purgeButton = this.renderPurgeButton();
+    const upgradeButtonAll = this.renderUpgradeButtonAll();
+    const restartButtonAll = this.renderRestartButtonAll();
+    const purgeButtonAll = this.renderPurgeButtonAll();
     const table = this.tableRender();
     const callOut = this.callOutRender();
+    let renderPurgeModal;
+
+    if (purgeModal) {
+      renderPurgeModal = (
+        <EuiOverlayMask>
+          <EuiConfirmModal
+            title={allSelected ? 'Purge all agents.' : `Purge ${selectedItems.length} agents.`}
+            onCancel={() => {this.setState({purgeModal: false })}}
+            onConfirm={allSelected ? this.onClickPurgeAll : this.onClickPurge}
+            cancelButtonText="No, don't do it"
+            confirmButtonText="Yes, purge agents"
+            defaultFocusedButton="confirm"
+            buttonColor="danger">
+            <p>Are you sure you want to do this?</p>
+          </EuiConfirmModal>
+        </EuiOverlayMask>
+      );
+    }
 
     return (
-      <EuiPanel paddingSize="m">
+      <EuiPanel paddingSize="l">
         {title}
         {filter}
-        {upgradeButton}
-        {restartButton}
+        <EuiFlexGroup>
+          {allSelected ? upgradeButtonAll : upgradeButton}
+          {allSelected ? restartButtonAll : restartButton}
+          {allSelected ? purgeButtonAll : purgeButton}
+        </EuiFlexGroup>
         {callOut}
         {table}
+        {renderPurgeModal}
       </EuiPanel>
     );
   }
