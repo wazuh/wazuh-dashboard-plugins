@@ -1,3 +1,5 @@
+import { AppState } from "../../react-services/app-state";
+
 /*
  * Wazuh app - Blank screen controller
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -22,12 +24,14 @@ export class BlankScreenController {
     this.$location = $location;
     this.errorHandler = errorHandler;
     this.wzMisc = wzMisc;
+    this.showErrorPage = false;
   }
 
   /**
    * When controller loads
    */
   $onInit() {
+    AppState.setWzMenu();
     const catchedError = this.wzMisc.getBlankScr();
     if (catchedError) {
       let parsed = null;
@@ -35,9 +39,18 @@ export class BlankScreenController {
         parsed = this.errorHandler.handle(catchedError, '', false, true);
       } catch (error) {} // eslint-disable-line
       this.errorToShow = parsed || catchedError;
-      this.wzMisc.setBlankScr(false);
       this.$scope.$applyAsync();
+      this.wzMisc.setBlankScr(false);
+    }else{
+      this.goOverview();
+      return;
     }
+    this.$scope.blankScreenProps = {
+      errorToShow: this.errorToShow,
+      goToOverview: () => this.goOverview()
+    }
+    this.showErrorPage = true;
+    AppState.setWzMenu(false);
   }
 
   /**

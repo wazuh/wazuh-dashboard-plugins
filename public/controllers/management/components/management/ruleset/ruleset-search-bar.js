@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,6 @@ class WzRulesetSearchBar extends Component {
           section:'ruleset',
           field: 'rule_dir',
         });
-        console.log(result.data)
         return ((result || {}).data || {}).data;
       }
     },
@@ -78,7 +77,6 @@ class WzRulesetSearchBar extends Component {
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/hipaa', {});
-        console.log(result.data)
         return (((result || {}).data || {}).data || {}).items;
       }
     },
@@ -88,7 +86,6 @@ class WzRulesetSearchBar extends Component {
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/gdpr', {});
-        console.log(result.data)
         return (((result || {}).data || {}).data || {}).items;
       }
     },
@@ -98,7 +95,6 @@ class WzRulesetSearchBar extends Component {
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/nist-800-53', {});
-        console.log(result.data)
         return (((result || {}).data || {}).data || {}).items;
       }
     },
@@ -108,7 +104,6 @@ class WzRulesetSearchBar extends Component {
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/gpg13', {});
-        console.log(result.data)
         return (((result || {}).data || {}).data || {}).items;
       }
     },
@@ -118,7 +113,6 @@ class WzRulesetSearchBar extends Component {
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/pci', {});
-        console.log(result.data)
         return (((result || {}).data || {}).data || {}).items;
       }
     },

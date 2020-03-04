@@ -43,9 +43,13 @@ class WzRulesetEditor extends Component {
     super(props);
     this.codeEditorOptions = {
       fontSize: '14px',
+      displayIndentGuides: false,
+      indentedSoftWrap: false, 
+      behavioursEnabled: false,
+      animatedScroll: true,
       enableBasicAutocompletion: true,
       enableSnippets: true,
-      enableLiveAutocompletion: true
+      enableLiveAutocompletion: false
     }
     this.rulesetHandler = RulesetHandler;
     const { fileContent, addingRulesetFile } = this.props.state;
@@ -167,7 +171,7 @@ class WzRulesetEditor extends Component {
                       <EuiToolTip position="right" content={`Back to ${section}`}>
                         <EuiButtonIcon
                           aria-label="Back"
-                          color="subdued"
+                          color="primary"
                           iconSize="l"
                           iconType="arrowLeft"
                           onClick={() => this.props.cleanInfo()} />
@@ -189,7 +193,7 @@ class WzRulesetEditor extends Component {
                         <EuiToolTip position="right" content={`Back to ${section}`}>
                           <EuiButtonIcon
                             aria-label="Back"
-                            color="subdued"
+                            color="primary"
                             iconSize="l"
                             iconType="arrowLeft"
                             onClick={() => this.props.cleanInfo()} />
@@ -210,14 +214,15 @@ class WzRulesetEditor extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
-                    <EuiFlexItem>
+                    <EuiFlexItem className="codeEditorWrapper">
                       <EuiCodeEditor
                         width="100%"
-                        height="calc(100vh - 250px)"
+                        height="calc(100vh - 225px)"
                         value={content}
                         onChange={newContent => this.setState({content: newContent})}
                         mode="xml"
                         isReadOnly={!isEditable}
+                        wrapEnabled
                         setOptions={this.codeEditorOptions}
                         aria-label="Code Editor"
                       ></EuiCodeEditor>

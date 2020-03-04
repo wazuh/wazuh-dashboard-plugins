@@ -16,7 +16,6 @@ import {
   EuiSideNav,
   EuiIcon
 } from '@elastic/eui';
-
 import {
   updateRulesetSection,
   updateLoadingStatus,
@@ -111,7 +110,7 @@ class WzManagementSideMenu extends Component {
 
   clickMenuItem = section => {
     this.props.managementPopoverToggle();
-    window.location.href = `#/manager/?tab=${section}`;
+    window.location.href = `#/manager/${section}?tab=${section}`;
   };
 
   createItem = (item, data = {}) => {
@@ -131,22 +130,11 @@ class WzManagementSideMenu extends Component {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
-          this.createItem(this.managementSections.ruleset, {
-            disabled: true,
-            icon: <EuiIcon type="indexRollupApp" color="primary" />,
-            forceOpen: true,
-            items: [
-              this.createItem(this.managementSections.rules),
-              this.createItem(this.managementSections.decoders),
-              this.createItem(this.managementSections.lists),
-            ],
-          }),
-          this.createItem(this.managementSections.groups, {
-            icon: <EuiIcon type="spacesApp" color="primary" />,
-          }),
-          this.createItem(this.managementSections.configuration, {
-            icon: <EuiIcon type="devToolsApp" color="primary" />,
-          })
+          this.createItem(this.managementSections.rules),
+          this.createItem(this.managementSections.decoders),
+          this.createItem(this.managementSections.lists),
+          this.createItem(this.managementSections.groups),
+          this.createItem(this.managementSections.configuration)
         ],
       })
     ];
@@ -154,23 +142,13 @@ class WzManagementSideMenu extends Component {
     const sideNavStatus = [
       this.createItem(this.managementSections.statusReports, {
         disabled: true,
-        icon: <EuiIcon type="indexSettings" color="primary" />,
+        icon: <EuiIcon type="reportingApp" color="primary" />,
         items: [
-          this.createItem(this.managementSections.status, {
-            icon: <EuiIcon type="uptimeApp" color="primary" />,
-          }),
-          this.createItem(this.managementSections.cluster, {
-            icon: <EuiIcon type="packetbeatApp" color="primary" />,
-          }),
-          this.createItem(this.managementSections.statistics, {
-            icon: <EuiIcon type="visualizeApp" color="primary" />,
-          }),
-          this.createItem(this.managementSections.logs, {
-            icon: <EuiIcon type="filebeatApp" color="primary" />,
-          }),
-          this.createItem(this.managementSections.reporting, {
-            icon: <EuiIcon type="reportingApp" color="primary" />,
-          })
+          this.createItem(this.managementSections.status),
+          this.createItem(this.managementSections.cluster),
+          this.createItem(this.managementSections.statistics),
+          this.createItem(this.managementSections.logs),
+          this.createItem(this.managementSections.reporting)
         ],
       })
     ];

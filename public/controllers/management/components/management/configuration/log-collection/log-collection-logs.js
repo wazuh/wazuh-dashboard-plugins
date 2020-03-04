@@ -52,6 +52,7 @@ class WzConfigurationLogCollectionLogs extends Component{
             title='Logs files'
             description='List of log files that will be analyzed'
             currentConfig={currentConfig}
+            minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
             <WzConfigurationListSelector
               items={items}

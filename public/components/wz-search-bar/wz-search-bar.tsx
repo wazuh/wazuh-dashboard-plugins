@@ -127,7 +127,7 @@ export default class WzSearchBar extends Component {
     if (this.updateSuggestOnProps(nextProps.qSuggests, nextProps.apiSuggests)){
       return true;
     }
-    return false;
+    return true; // if false, it dont't update search field in Search bar in CDB lists section, maybe it would have to remove the function because always returns true (ReactComponent.shouldComponentUpdate returns true by default too)
   }
 
   async componentDidUpdate(prevProps) {
@@ -235,6 +235,7 @@ export default class WzSearchBar extends Component {
       this.setState({
         inputValue: value,
         isProcessing: true,
+        isPopoverOpen: true
       });
       return;
     }
@@ -247,6 +248,7 @@ export default class WzSearchBar extends Component {
       isProcessing: true,
       status: 'loading',
       isInvalid,
+      isPopoverOpen: true,
       filters
     });
   }
@@ -279,7 +281,8 @@ export default class WzSearchBar extends Component {
     this.setState({
       isProcessing: true,
       inputValue: newInputValue,
-      filters
+      filters,
+      isPopoverOpen: false
     });
   }
 

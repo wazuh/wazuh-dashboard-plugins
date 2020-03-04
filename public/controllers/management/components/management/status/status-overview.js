@@ -114,7 +114,7 @@ export class WzStatusOverview extends Component {
 
     if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes') {
       const nodes = await this.statusHandler.clusterNodes();
-      const listNodes = nodes.data.data.items.reverse();
+      const listNodes = nodes.data.data.items;
       this.props.updateListNodes(listNodes);
       const masterNode = nodes.data.data.items.filter(item => item.type === 'master')[0];
       this.props.updateSelectedNode(masterNode.name);

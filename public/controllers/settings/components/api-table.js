@@ -284,7 +284,7 @@ export class ApiTable extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                From here you can manage and configure the API entries the plugin will use. You can also check their connection and status.
+                From here you can manage and configure the API entries. You can also check their connection and status.
             </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

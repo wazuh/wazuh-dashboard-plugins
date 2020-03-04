@@ -67,7 +67,7 @@ export class AgentsTable extends Component {
       '/agents',
       {}
     );
-    this.setState({ 
+    this.setState({
       managerVersion: managerVersion.data.data,
       totalAgent: totalAgent.data.data.totalItems
     });
@@ -253,7 +253,7 @@ export class AgentsTable extends Component {
 
   addIconUpgrade(agent, item) {
     let spinner = '';
-    
+
     if (item.upgrading === true) {
       spinner = (
         <EuiToolTip content="This agent is being updated." position="right">
@@ -320,7 +320,7 @@ export class AgentsTable extends Component {
   /* MULTISELECT TABLE */
   onSelectionChange = (selectedItems) => {
     const { managerVersion } = this.state;
-  
+
     selectedItems.forEach(item => {
       if (managerVersion > item.version && item.version !== '.') {
         item.outdated = true;
@@ -331,10 +331,10 @@ export class AgentsTable extends Component {
 
   renderUpgradeButton() {
     const { selectedItems, allSelected } = this.state;
-    
+
     if (selectedItems.length === 0 ||
-      (selectedItems.length > 0 && selectedItems.filter(item => item.outdated).length === 0) || 
-      (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0) ) {
+      (selectedItems.length > 0 && selectedItems.filter(item => item.outdated).length === 0) ||
+      (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0)) {
       return;
     }
 
@@ -349,7 +349,7 @@ export class AgentsTable extends Component {
 
   renderRestartButton() {
     const { selectedItems, allSelected } = this.state;
-    
+
     if (selectedItems.length === 0 || selectedItems.filter(item => item.status === 'Active').length === 0) {
       return;
     }
@@ -364,8 +364,8 @@ export class AgentsTable extends Component {
   }
 
   callOutRender() {
-    const { selectedItems, agents, pageSize, totalAgent, allSelected} = this.state;
-  
+    const { selectedItems, agents, pageSize, totalAgent, allSelected } = this.state;
+
     if (selectedItems.length === 0) {
       return;
     } else if (selectedItems.length === agents.length || selectedItems.length === pageSize) {
@@ -376,10 +376,10 @@ export class AgentsTable extends Component {
             size="s"
             title={`All ${selectedItems.length} agents on this page are selected.`}
           >
-             <EuiFlexGroup>
+            <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiButton onClick={() => {
-                  this.setState(prevState => ({allSelected: !prevState.allSelected}))
+                  this.setState(prevState => ({ allSelected: !prevState.allSelected }))
                 }}>
                   {allSelected === true ? `Clear ${totalAgent - 1} agents selected.` : `Select all ${totalAgent - 1} agents.`}
                 </EuiButton>
@@ -401,7 +401,7 @@ export class AgentsTable extends Component {
 
   checkAgentsUpdating() {
     const { agents, managerVersion } = this.state;
-    
+
     if (localStorage.getItem('upgradeAgents') !== null) {
       const upgradingAgents = JSON.parse(localStorage.getItem('upgradeAgents')).map(element => element.itemId);
       agents.map(agent => {
@@ -420,7 +420,7 @@ export class AgentsTable extends Component {
     const { selectedItems } = this.state;
     let feedbackFlag = false;
     let upgradeStorage = [];
-    
+
     for (let item of selectedItems.filter(item => item.outdated)) {
       try {
         WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
@@ -439,7 +439,7 @@ export class AgentsTable extends Component {
           this.reloadAgents();
         }, 900000);
       } catch (error) {
-        this.showToast('danger', 'Error Upgrading Agents.', error, 5000); 
+        this.showToast('danger', 'Error Upgrading Agents.', error, 5000);
       }
     }
     feedbackFlag === true ? this.showToast('success', 'Upgrading Agents', '', 5000) : false;
@@ -543,6 +543,9 @@ export class AgentsTable extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
+                <EuiTitle size={"s"} style={{ padding: '6px 0px' }}>
+                  <h2>{this.state.totalItems} Total Agents</h2>
+                </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -736,7 +739,7 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => {}
+        onClick: () => { }
       };
     };
 
@@ -798,7 +801,7 @@ export class AgentsTable extends Component {
     const callOut = this.callOutRender();
 
     return (
-      <EuiPanel paddingSize="l">
+      <EuiPanel paddingSize="m">
         {title}
         {filter}
         {upgradeButton}

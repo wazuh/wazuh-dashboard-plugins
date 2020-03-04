@@ -200,7 +200,7 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast('success', 'Success', 'The group has been created correctly', 2000);
+      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -224,7 +224,7 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(`/agents/groups/${this.props.state.itemDetail.name}`, filters, 'Groups');
+      await this.exportCsv(`/agents/groups/${this.props.state.itemDetail.name}/files`, filters, 'Groups');
       this.showToast(
         'success',
         'Success',
@@ -253,7 +253,7 @@ class WzGroupsActionButtonsFiles extends Component {
     const groupConfigurationButton = (
       <EuiButtonEmpty
         iconSide="left"
-        iconType="folderClosed"
+        iconType="documentEdit"
         onClick={() => this.showGroupConfiguration()}
       >
         Edit group configuration

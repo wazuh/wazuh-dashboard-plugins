@@ -59,7 +59,8 @@ class WzRulesetActionButtons extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(`/${section}`, filters, section);
+      const mapFilters = Object.keys(filters).map(key => ({name: key, value: filters[key]})); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
+      await this.exportCsv(`/${section}`, mapFilters, section);
     } catch (error) {
       console.error('Error exporting as CSV ', error);
     }
@@ -81,7 +82,7 @@ class WzRulesetActionButtons extends Component {
       } else if (path === 'etc/decoders') {
         upload = this.rulesetHandler.sendDecoderConfiguration;
       } else {
-        upload = this.rulesetHandler.sendCdbList;
+        upload = this.rulesetHandler.uploadCdbList;
       }
       for (let idx in files) {
         const { file, content } = files[idx];

@@ -49,6 +49,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
           title='General'
           description='The settings shown below are applied globally'
           currentConfig={currentConfig}
+          minusHeight={this.props.agent.id === '000' ? 340 : 410}
           helpLinks={helpLinks}
         >
           <WzSettingsGroup

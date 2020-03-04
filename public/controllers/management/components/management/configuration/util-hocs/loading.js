@@ -13,21 +13,10 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 
-import {
-  EuiProgress,
-  EuiSpacer
-} from "@elastic/eui";
-
-const Loading = () => (
-  <Fragment>
-    <EuiSpacer size='m'/>
-    <EuiProgress size="xs" color="primary"/>
-    <EuiSpacer size='m'/>
-  </Fragment>
-);
+import WzLoading from '../util-components/loading';
 
 const withLoading = (load, LoadingComponent, ErrorComponent) => (WrappedComponent) => {
-  LoadingComponent = LoadingComponent || Loading;
+  LoadingComponent = LoadingComponent || WzLoading;
   class WithLoading extends Component{
     constructor(props){
       super(props);

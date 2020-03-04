@@ -25,15 +25,16 @@ import {
 
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
-import agentsTemplate from '../templates/agents/agents.pug';
+import agentsTemplate from '../templates/agents/dashboards.pug';
 import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
 import managementTemplate from '../templates/management/management.pug';
-import overviewTemplate from '../templates/overview/overview.pug';
+import overviewTemplate from '../templates/visualize/dashboards.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
+import { npStart } from 'ui/new_platform';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -44,20 +45,18 @@ const assignPreviousLocation = ($rootScope, $location) => {
 };
 
 function ip(
-  indexPatterns,
   $q,
   $rootScope,
   $window,
   $location,
   Private,
   appState,
-  genericReq,
   errorHandler,
   wzMisc
 ) {
   assignPreviousLocation($rootScope, $location);
   return getIp(
-    indexPatterns,
+    npStart.plugins.data.indexPatterns,
     $q,
     $window,
     $location,
@@ -71,7 +70,6 @@ function ip(
 
 function nestedResolve(
   $q,
-  genericReq,
   errorHandler,
   $rootScope,
   $location,
@@ -120,7 +118,7 @@ function savedSearch(
   );
 }
 
-function wzConfig($q, genericReq, $rootScope, $location) {
+function wzConfig($q, $rootScope, $location) {
   assignPreviousLocation($rootScope, $location);
   const wazuhConfig = new WazuhConfig();
   return getWzConfig($q, GenericRequest, wazuhConfig);
@@ -164,6 +162,10 @@ routes
     template: managementTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
   })
+  .when('/manager/:tab?', {
+    template: managementTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
+  })
   .when('/overview/', {
     template: overviewTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
@@ -176,11 +178,11 @@ routes
     redirectTo: function() {},
     resolve: { wzConfig, wzKibana }
   })
-  .when('/context/:pattern?/:type?/:id?', {
+  .when('/discover/context/:pattern?/:type?/:id?', {
     redirectTo: function() {},
     resolve: { wzKibana }
   })
-  .when('/doc/:pattern?/:index?/:type?/:id?', {
+  .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
     redirectTo: function() {},
     resolve: { wzKibana }
   })

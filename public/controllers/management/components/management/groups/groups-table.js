@@ -194,7 +194,7 @@ class WzGroupsTable extends Component {
       completed => {
         this.props.updateIsProcessing(true);
         this.props.updateLoadingStatus(false);
-        this.showToast('success', 'Success', 'Deleted correctly', 3000);
+        this.showToast('success', 'Success', 'Deleted successfully', 3000);
       },
       error => {
         this.props.updateIsProcessing(true);

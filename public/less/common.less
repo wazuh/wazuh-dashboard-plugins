@@ -458,14 +458,15 @@ md-content.md-default-theme, md-content{
 }
 
 kbn-vis,
-visualize,
-visualization {
+.visualize,
+.visualization {
   display: flex;
   flex: 1 1 100%;
+  height: 100%;
 }
 
-kbn-vis visualize,
-kbn-vis visualization,
+kbn-vis .visualize,
+kbn-vis .visualization,
 kbn-vis .vis-container,
 kbn-vis .visChart__container {
   overflow: hidden !important;
@@ -992,10 +993,6 @@ wz-xml-file-editor {
   white-space: nowrap;
 }
 
-discover-app-w .container-fluid {
-  background: #fff;
-}
-
 .registerAgent{
   min-height: calc(~'100vh - 100px');
   background: #fafbfd;
@@ -1031,26 +1028,20 @@ discover-app-w .container-fluid {
 }
 
 .health-check-loader{
-  height: 150px;
-  width: 150px;
+  height: 120px;
+  width: 120px;
   margin: 0 auto;
-  position: relative;
-  border: 2px solid transparent;
-  border-top: 2px solid #00A9E5;
-  border-radius: 100%;
-  display: block;
-  animation: rotation .75s .5s infinite linear;
-  animation-play-state: running;
 }
 
 .health-check-logo{
-    width: 110px;
-    height: 110px;
+    width: 60px;
+    height: 60px;
     float: left;
     margin: 0 auto;
-    margin-top: -130px;
+    margin-top: -90px;
     margin-bottom: 50px;
     z-index: 1;
+    filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
 }
 
 .CodeMirror-gutters {
@@ -1367,4 +1358,16 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
 .euiSuggestItem .euiSuggestItem__label {
   flex-basis: 25%;
   min-width: 25%;
+}
+
+.codeEditorWrapper{
+  border: 1px solid #e9edf3;
+}
+
+.codeEditorWrapper .ace-tm .ace_gutter{
+  border: none !important;
+}
+
+.codeEditorWrapper .ace-tm .ace_print-margin{
+  visibility: hidden!important;
 }

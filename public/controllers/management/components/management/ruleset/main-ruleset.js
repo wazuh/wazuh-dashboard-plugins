@@ -29,12 +29,13 @@ export default class WzRuleset extends Component {
     this.store = store;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this._isMount = true
     this.store.subscribe(() => {
       const state = this.store.getState().rulesetReducers;
-      if (this._isMount){
+      if (this._isMount) {
         this.setState(state);
+        this.setState({ selectedTabId: state.section });
       }
     });
   }
@@ -45,7 +46,6 @@ export default class WzRuleset extends Component {
     const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
     if (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile) this.store.dispatch({ type: 'RESET' });
   }
-
 
   render() {
     const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;

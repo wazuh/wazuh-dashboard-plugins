@@ -61,11 +61,6 @@ const mapStateToProps = (state) => ({
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 
-// export const WzConfigurationGlobalConfigurationManager = compose(
-//   withWzConfig(sectionsManager),
-//   connect(mapStateToProps)
-// )(WzConfigurationGlobalConfiguration);
-
 export const WzConfigurationGlobalConfigurationManager = compose(
   connect(mapStateToProps),
   withWzConfig(sectionsManager)

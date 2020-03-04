@@ -26,6 +26,10 @@ import {
 
 import WzHelpButtonPopover from './help-button-popover';
 
+const Separator = () => (
+  <span style={{margin: '0 4px'}}>·</span>
+);
+
 class WzConfigurationSettingsHeader extends Component{
   constructor(props){
     super(props);
@@ -42,32 +46,36 @@ class WzConfigurationSettingsHeader extends Component{
             {description && <EuiText color='subdued'>{description}</EuiText>}
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup alignItems='center' gutterSize='none'>
+            <EuiFlexGroup alignItems='center' gutterSize='none' justifyContent='flexEnd'>
               { settings && (
                 <Fragment>
-                  <ButtonLink viewSelected={viewSelected} view='' text='SETTINGS' onClick={settings}/>
-                  <EuiFlexItem>
-                    <span style={{margin: '0 4px'}}>·</span>
-                  </EuiFlexItem>
+                  <span>
+                    <ButtonLink viewSelected={viewSelected} view='' text='SETTINGS' onClick={settings}/>
+                  </span>
+                  <Separator />
                 </Fragment>
               )}
               { json && xml && (
                 <Fragment>
-                  <ButtonLink viewSelected={viewSelected} view='json' text='JSON' onClick={json}/>
-                  <EuiFlexItem>
-                    <span style={{margin: '0 4px'}}>·</span>
-                  </EuiFlexItem>
-                  <ButtonLink viewSelected={viewSelected} view='xml' text='XML' onClick={xml}/>
+                  <span>
+                    <ButtonLink viewSelected={viewSelected} view='json' text='JSON' onClick={json}/>
+                  </span>
+                  <Separator />
+                  <span>
+                    <ButtonLink viewSelected={viewSelected} view='xml' text='XML' onClick={xml}/>
+                  </span>
                 </Fragment>
               )}
               { help && (
-                <WzHelpButtonPopover links={help} />
+                <span>
+                  <WzHelpButtonPopover links={help} />
+                </span>
               )}
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='xs'/>
-        {title && <EuiHorizontalRule margin='none'/>}
+        {title && <EuiHorizontalRule margin='none' style={{ margin: 0 }}/>}
       </Fragment>
     )
   }

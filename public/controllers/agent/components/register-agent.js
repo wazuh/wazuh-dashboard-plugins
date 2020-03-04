@@ -170,7 +170,7 @@ export class RegisterAgent extends Component {
         } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
         this.state.wazuhVersion
-        }-1.msi -OutFile wazuh-agent.msi; .\wazuh-agent.msi /q ADDRESS='${
+        }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ADDRESS='${
         this.state.serverAddress
         }' AUTHD_SERVER='${this.state.serverAddress}'${
         this.state.needsPassword

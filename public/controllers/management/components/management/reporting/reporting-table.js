@@ -19,8 +19,7 @@ import { toastNotifications } from 'ui/notify';
 import {
   updateIsProcessing,
   updateShowModal,
-  updateListItemsForRemove,
-  cleanInfo,
+  updateListItemsForRemove
 } from '../../../../../redux/actions/reportingActions';
 
 import ReportingColums from './utils/columns-main';
@@ -50,7 +49,6 @@ class WzReportingTable extends Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-    this.props.cleanInfo();
   }
 
   /**
@@ -80,8 +78,8 @@ class WzReportingTable extends Component {
 
     const sorting = {
       sort: {
-        field: 'name',
-        direction: 'asc',
+        field: 'date',
+        direction: 'desc',
       },
     };
 
@@ -137,7 +135,7 @@ class WzReportingTable extends Component {
 
     Promise.all(results).then(completed => {
       this.props.updateIsProcessing(true);
-      this.showToast('success', 'Success', 'Deleted correctly', 3000);
+      this.showToast('success', 'Success', 'Deleted successfully', 3000);
     });
   }
 }
@@ -153,7 +151,6 @@ const mapDispatchToProps = dispatch => {
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
-    cleanInfo: () => dispatch(cleanInfo()),
   };
 };
 

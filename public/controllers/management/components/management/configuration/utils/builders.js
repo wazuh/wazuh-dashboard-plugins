@@ -20,7 +20,8 @@ export const settingsListBuilder = (items, label) => items.map((item, key) => ({
   data: item,
   label: Array.isArray(label) ? label.reduce((sum, tag) => {
     if(sum){ return sum }
-    return item[tag] || sum
+    return typeof tag === 'string' && item[tag] ? item[tag] : 
+      typeof tag === 'function' ? tag(item) : sum
   }, '') : item[label]
 }));
 

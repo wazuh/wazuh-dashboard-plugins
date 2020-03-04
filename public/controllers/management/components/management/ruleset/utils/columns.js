@@ -6,7 +6,7 @@ import {
   EuiBadge,
 } from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
-
+import exportCsv from '../../../../../../react-services/wz-csv';
 
 export default class RulesetColumns {
 
@@ -139,6 +139,23 @@ export default class RulesetColumns {
             name: 'Path',
             align: 'left',
             sortable: true
+          },
+          {
+            name: 'Actions',
+            align: 'left',
+            render: (item) => (
+              <EuiToolTip position="top" content={`Export ${item.name}`}>
+                <EuiButtonIcon
+                  aria-label="Export list"
+                  iconType="exportAction"
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    await exportCsv(`/lists?path=${item.path}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.path}/${item.name}`}], item.name)
+                  }}
+                  color="primary"
+                />
+              </EuiToolTip>
+            )
           }
         ],
         files: [
@@ -205,7 +222,7 @@ export default class RulesetColumns {
       }
       // If the admin mode is enabled the action column in CDB lists is shown
       if (this.adminMode) {
-        this.columns.lists.push(
+        this.columns.lists[2] =
           {
             name: 'Actions',
             align: 'left',
@@ -217,7 +234,8 @@ export default class RulesetColumns {
                     <EuiButtonIcon
                       aria-label="Edit content"
                       iconType="pencil"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
                         const file = { name: item.name, content: result, path: item.path };
                         this.tableProps.updateListContent(file);
@@ -229,7 +247,8 @@ export default class RulesetColumns {
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
-                      onClick={async () => {
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
                         this.tableProps.updateListItemsForRemove([item]);
                         this.tableProps.updateShowModal(true);
                       }}
@@ -237,11 +256,21 @@ export default class RulesetColumns {
                       disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
                     />
                   </EuiToolTip>
+                  <EuiToolTip position="top" content={`Export ${item.name}`}>
+                    <EuiButtonIcon
+                      aria-label="Export list"
+                      iconType="exportAction"
+                      onClick={async (ev) => {
+                        ev.stopPropagation();
+                        await exportCsv(`/lists?path=${item.path}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.path}/${item.name}`}], item.name)
+                      }}
+                      color="primary"
+                    />
+                  </EuiToolTip>
                 </div>
               )
             }
           }
-        );
       }
     }
 
@@ -264,6 +293,8 @@ export default class RulesetColumns {
           <EuiBadge
             title={null}
             color="hollow"
+            onClick={(ev) => ev.stopPropagation()}
+            onClickAriaLabel={field.toUpperCase()}
             style={{ margin: "1px 2px" }}
           >{field.toUpperCase()}</EuiBadge>
         </EuiToolTip>
@@ -275,8 +306,7 @@ export default class RulesetColumns {
           badgeList.push(buildBadge(field))
         }
       }
-    } catch (error) {
-    }
+    } catch (error) { }
 
     return <div>{badgeList}</div>;
   }

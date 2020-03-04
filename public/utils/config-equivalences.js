@@ -7,6 +7,8 @@ export const configEquivalences = {
   'checks.api': 'Enable or disable the API health check when opening the app.',
   'checks.setup':
     'Enable or disable the setup health check when opening the app.',
+  'checks.fields':
+    'Enable or disable the known fields health check when opening the app.',
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
   'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
@@ -45,6 +47,8 @@ export const configEquivalences = {
     'Default index pattern to use on the app for Wazuh monitoring.',
   admin:
     'Enable or disable administrator requests to the Wazuh API when using the app.',
+  hideManagerAlerts:
+    'Hide the alerts of the manager in all dashboards and discover',
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.'
 };

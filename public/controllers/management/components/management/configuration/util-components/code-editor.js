@@ -21,38 +21,40 @@ import {
 import 'brace/theme/github';
 import 'brace/ext/language_tools';
 
-class WzCodeEditor extends Component{
-  constructor(props){
+class WzCodeEditor extends Component {
+  constructor(props) {
     super(props);
   }
-  render(){
+  render() {
     const { title, titleComponent, mode, value, onChange, isReadOnly, height, minusHeight } = this.props;
     return (
       <Fragment>
         {(titleComponent && (
           <Fragment>
             {titleComponent}
-            <EuiSpacer size='s'/>
+            <EuiSpacer size='s' />
           </Fragment>)
-          ) || (title && <div>{title}</div>)
+        ) || (title && <div>{title}</div>)
         }
-        <EuiCodeEditor
-          mode={mode}
-          width='100%'
-          height={height || `calc(100vh - ${minusHeight || 360}px)`} // Groups section has -250px
-          value={value}
-          tabSize={2}
-          highlightActiveLine={false}
-          onChange={onChange}
-          isReadOnly={isReadOnly}
-          setOptions={{
-            fontSize: '14px',
-            // enableBasicAutocompletion: true,
-            enableSnippets: true,
-            // enableLiveAutocompletion: true,
-          }}
-          aria-label='Code Editor'
-        />
+        <div className="codeEditorWrapper">
+          <EuiCodeEditor
+            mode={mode}
+            width='100%'
+            height={height || `calc(100vh - ${minusHeight || 360}px)`} // Groups section has -250px
+            value={value}
+            wrapEnabled
+            tabSize={2}
+            highlightActiveLine={false}
+            onChange={onChange}
+            isReadOnly={isReadOnly}
+            setOptions={{
+              fontSize: '14px',
+              // enableBasicAutocompletion: true,
+              enableSnippets: true,
+              // enableLiveAutocompletion: true,
+            }}
+            aria-label='Code Editor'
+          /></div>
       </Fragment>
     )
   }

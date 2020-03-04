@@ -72,19 +72,21 @@ export class TestConfiguration extends Component {
                 <EuiSpacer size="m" />
               </div>
             )}
-            <EuiCodeEditor
-              theme="XML"
-              width="100%"
-              value={this.state.configuration}
-              height="720px"
-              onChange={this.onChange}
-              setOptions={{
-                fontSize: '14px',
-                enableBasicAutocompletion: true,
-                enableSnippets: true,
-                enableLiveAutocompletion: true
-              }}
-            ></EuiCodeEditor>
+            <div className="codeEditorWrapper">
+              <EuiCodeEditor
+                theme="XML"
+                width="100%"
+                value={this.state.configuration}
+                height="720px"
+                onChange={this.onChange}
+                setOptions={{
+                  fontSize: '14px',
+                  enableBasicAutocompletion: true,
+                  enableSnippets: true,
+                  enableLiveAutocompletion: true
+                }}
+              ></EuiCodeEditor>
+            </div>
           </EuiPanel>
           <EuiSpacer size="m" />
           <EuiFlexGroup justifyContent="spaceBetween">
