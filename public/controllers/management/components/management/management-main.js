@@ -32,7 +32,7 @@ class WzManagementMain extends Component {
     this.state = {};
     this.store = store;
   }
-  componentWillMount() {
+  componentDidMount() {
     this.props.updateRulesetSection(this.props.section);
   }
 
@@ -47,7 +47,6 @@ class WzManagementMain extends Component {
               (section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
               (section === 'reporting' && <WzReporting />) || 
-              // (section === 'statistics' && <WzStatistics />) || TODO: Delete this after PR
               (section === 'logs' && <WzLogs />) || 
               (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
               (ruleset.includes(section) && <WzRuleset />)

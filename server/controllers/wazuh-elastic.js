@@ -532,6 +532,8 @@ export class WazuhElasticCtrl {
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
             query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
+          } else {
+            query = visState.params.expression;
           }
 
           visState.params.expression = query;

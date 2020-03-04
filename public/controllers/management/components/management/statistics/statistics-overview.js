@@ -65,9 +65,19 @@ export class WzStatisticsOverview extends Component {
       analysisd: "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'."
     };
   }
-
-  async componentWillMount() {
-    this.discoverPendingUpdates.addItem({query: "", language: "lucene"}, [{"meta":{"removable":false,"index":"wazuh-alerts-3.x-*","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"cluster.name","params":{"query":"wazuh"}},"query":{"match":{"cluster.name":{"query":"wazuh","type":"phrase"}}},"$state":{"store":"appState"}}] )
+  
+  async componentDidMount() {
+    this._isMounted = true;
+    this.discoverPendingUpdates.addItem(
+      {query: "", language: "lucene"},
+      [
+        {
+          "meta":{"removable":false,"index":"wazuh-statistics*","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"cluster","params":{"query":"false"}},
+          "query":{"match":{"cluster":{"query":"false","type":"phrase"}}},
+          "$state":{"store":"appState"}
+        }
+      ]
+    )
     const visData = await GenericRequest.request(
       'POST',
       `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
@@ -75,10 +85,6 @@ export class WzStatisticsOverview extends Component {
     );
 
     await this.rawVisualizations.assignItems(visData.data.raw);
-  }
-  
-  async componentDidMount() {
-    this._isMounted = true;
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.items.map(item => {
@@ -94,7 +100,6 @@ export class WzStatisticsOverview extends Component {
         clusterNodeSelected: false
       });
     }
-    this.fetchData();
   }
 
   componentWillUnmount() {
@@ -105,21 +110,8 @@ export class WzStatisticsOverview extends Component {
     this.setState({
       selectedTabId: id,
       searchvalue: ''
-    }, () => {
-      this.fetchData();
     });
   };
-
-  async fetchData() {
-    this.setState({
-      isLoading: true,
-    });
-    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId, this.state.clusterNodeSelected);
-    this.setState({
-      stats: data.data.data,
-      isLoading: false
-    });
-  }
 
   renderTabs() {
     return this.tabs.map((tab, index) => (
@@ -136,23 +128,10 @@ export class WzStatisticsOverview extends Component {
   onSelectNode = e => {
     this.setState({
       clusterNodeSelected: e.target.value
-    }, () => {
-      this.fetchData();
     });
   };
 
   render() {
-    const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.fetchData()}>
-        Refresh
-      </EuiButtonEmpty>
-    );
-    const search = {
-      box: {
-        incremental: true,
-        schema: true
-      }
-    };
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
@@ -160,13 +139,10 @@ export class WzStatisticsOverview extends Component {
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Statistics</h2>
-                  </EuiTitle>
+                  <EuiTitle size="l"><p>Statistics</p></EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
             {!!(this.state.clusterNodes && this.state.clusterNodes.length && this.state.clusterNodeSelected) && (
               <EuiFlexItem grow={false} >
                 <EuiSelect
@@ -194,11 +170,25 @@ export class WzStatisticsOverview extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size={'m'} />
-          <EuiFlexGroup style={{ minHeight: 450 }}>
+          <EuiFlexGroup style={{ minHeight: 250 }}>
             <EuiFlexItem>
-              <KibanaVis visID={'Wazuh-App-Cluster-monitoring-Overview-Manager'} tab={'monitoring'} updateRootScope={()=>{}} ></KibanaVis>
+              <EuiTitle size="s"><p>Received Bytes</p></EuiTitle>
+              <KibanaVis visID={'Wazuh-App-Statistics-remoted-Recv-bytes'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
             </EuiFlexItem>
-
+            <EuiFlexItem>
+              <EuiTitle size="s"><p>Event count</p></EuiTitle>
+              <KibanaVis visID={'Wazuh-App-Statistics-remoted-event-count'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiFlexGroup style={{ minHeight: 250 }}>
+            <EuiFlexItem>
+              <EuiTitle size="s"><p>Message stats</p></EuiTitle>
+              <KibanaVis visID={'Wazuh-App-Statistics-remoted-messages'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiTitle size="s"><p>TCP Sessions</p></EuiTitle>
+              <KibanaVis visID={'Wazuh-App-Statistics-remoted-tcp-sessions'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
+            </EuiFlexItem>
           </EuiFlexGroup>
 
         </EuiPanel>
