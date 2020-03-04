@@ -12,9 +12,8 @@
 import { uiModules } from 'ui/modules';
 import { OverviewController } from './overview';
 import { WelcomeVisualizeWrapper } from './components/welcome-visualize-wrapper';
-import { WelcomeScreen } from './components/overview-welcome';
 import { Stats } from './components/stats';
-import { AlertsStats } from './components/alerts-stats';
+import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';
 import { AddNewExtension } from './components/extensions-directory';
 
@@ -25,6 +24,7 @@ app
   .controller('overviewController', OverviewController)
   .value('WelcomeVisualizeWrapper', WelcomeVisualizeWrapper)
   .value('StatsOverview', Stats)
-  .value('AlertsStats', AlertsStats)
   .value('RequirementCard', RequirementCard)
   .value('AddNewExtension', AddNewExtension)
+  .value('SelectAgent', SelectAgent)
+  .value('RequirementCard', RequirementCard);

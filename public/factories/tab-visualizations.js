@@ -17,7 +17,7 @@ export class TabVisualizations {
   constructor() {
     this.agents = {
       welcome: 0,
-      general: 7,
+      general: 11,
       fim: 7,
       pm: 4,
       vuls: 10,
@@ -32,35 +32,42 @@ export class TabVisualizations {
       configuration: 0,
       osquery: 5,
       docker: 5,
-      mitre: 6
+      mitre: 6,
     };
 
     this.overview = {
       welcome: 0,
       extensionsDirectory: 0,
       general: 6,
-      fim: 6,
+      fim: 7,
       pm: 5,
-      vuls: 10,
-      oscap: 11,
+      vuls: 7,
+      oscap: 8,
       ciscat: 3,
       audit: 6,
-      pci: 5,
+      pci: 6,
       gdpr: 5,
       hipaa: 8,
       nist: 7,
       aws: 8,
-      virustotal: 7,
-      osquery: 5,
+      virustotal: 5,
+      osquery: 6,
       sca: 8,
       docker: 5,
-      mitre: 6
+      mitre: 6,
     };
+
+    if (!!TabVisualizations.instance) {
+      return TabVisualizations.instance;
+    }
 
     this.tabVisualizations = {};
     this.currentTab = '';
 
     this.deadVisualizations = 0;
+
+    TabVisualizations.instance = this;
+    return this;
   }
 
   /**
@@ -95,8 +102,7 @@ export class TabVisualizations {
     if (typeof tabs === 'object') {
       this.tabVisualizations = tabs;
     } else if (typeof tabs === 'string') {
-      this.tabVisualizations =
-        tabs === 'overview' ? this.overview : this.agents;
+      this.tabVisualizations = tabs === 'overview' ? this.overview : this.agents;
     }
   }
 
