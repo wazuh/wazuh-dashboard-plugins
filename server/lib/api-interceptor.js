@@ -15,7 +15,8 @@ import { ManageHosts } from './manage-hosts';
 import { UpdateRegistry } from './update-registry';
 
 export class ApiInterceptor {
-  constructor() {
+  constructor(server) {
+    this.server = server;
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
   }
@@ -72,7 +73,7 @@ export class ApiInterceptor {
     }
   }
 
-  async request(method, path, data, options, attempts = 3) {
+  async request(method, path, data, options, req = null, attempts = 3) {
     const optionsObject = await this.buildOptionsObject(method, path, data, options);
 
     if (optionsObject !== null) {
@@ -86,7 +87,7 @@ export class ApiInterceptor {
               const responseAuth = await this.authenticateApi(options.idHost);
 
               if (responseAuth.status === 200) {
-                return this.request(method, path, data, options, attempts - 1);
+                return this.request(method, path, data, options, attempts - 1, req);
               } else {
                 return responseAuth;
               }

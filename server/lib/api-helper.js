@@ -26,7 +26,7 @@ export function buildOptionsObject(api) {
 
 export async function fetchAllAgents(api, maxSize, payload, options) {
   try {
-    this.apiInterceptor = new ApiInterceptor();
+    this.apiInterceptor = new ApiInterceptor(null);
     let agents = [];
     // Prevents infinite loop if offset gets higher than maxSize
     while (agents.length < maxSize && payload.offset < maxSize) {

@@ -44,7 +44,7 @@ export class WazuhApiCtrl {
     this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
-    this.apiInterceptor = new ApiInterceptor();
+    this.apiInterceptor = new ApiInterceptor(server);
   }
 
   /**
@@ -71,7 +71,8 @@ export class WazuhApiCtrl {
         'get',
         `${api.url}:${api.port}/manager/info`,
         {},
-        { idHost: id }
+        { idHost: id },
+        req
       );
 
       // Look for socket-related errors
@@ -92,7 +93,8 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/agents/000`,
           {},
-          { idHost: id }
+          { idHost: id },
+          req
         );
 
         if (responseAgents.status === 200) {
@@ -102,7 +104,8 @@ export class WazuhApiCtrl {
             'get',
             `${api.url}:${api.port}/cluster/status`,
             {},
-            { idHost: id }
+            { idHost: id },
+            req
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
@@ -110,7 +113,8 @@ export class WazuhApiCtrl {
                 'get',
                 `${api.url}:${api.port}/cluster/local/info`,
                 {},
-                { idHost: id }
+                { idHost: id },
+                req
               );
               if (responseClusterLocalInfo.status === 200) {
                 const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
@@ -270,7 +274,8 @@ export class WazuhApiCtrl {
         'GET',
         `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
         {},
-        { idHost: req.payload.id }
+        { idHost: req.payload.id },
+        req
       );
 
       const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
@@ -295,7 +300,8 @@ export class WazuhApiCtrl {
           'GET',
           `${apiAvailable.url}:${apiAvailable.port}/agents/000`,
           {},
-          { idHost: req.payload.id }
+          { idHost: req.payload.id },
+          req
         );
 
         if (responseAgents.status === 200) {
@@ -316,7 +322,8 @@ export class WazuhApiCtrl {
                 'GET',
                 `${apiAvailable.url}:${apiAvailable.port}/cluster/local/info`,
                 {},
-                { idHost: req.payload.id }
+                { idHost: req.payload.id },
+                req
               );
 
               if (responseClusterLocal.status === 200) {
@@ -390,7 +397,8 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/rules/requirement/pci`,
           {},
-          { idHost: apiId }
+          { idHost: apiId },
+          req
         );
 
         if ((((response || {}).data || {}).data || {}).affected_items) {
@@ -453,7 +461,8 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}//`,
           {},
-          { idHost: apiId }
+          { idHost: apiId },
+          req
         );
         const number = version.data.api_version;
 
@@ -473,7 +482,8 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/rules/requirement/gdpr`,
           {},
-          { idHost: apiId }
+          { idHost: apiId },
+          req
         );
         
         if ((((response || {}).data || {}).data || {}).affected_items) {
@@ -555,7 +565,8 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/rules/requirement/hipaa`,
           {},
-          { idHost: apiId }
+          { idHost: apiId },
+          req
         );
 
         if ((((response || {}).data || {}).data || {}).affected_items) {
@@ -623,7 +634,8 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/rules/requirement/nist-800-53`,
           {},
-          { idHost: apiId }
+          { idHost: apiId },
+          req
         );
         if ((((response || {}).data || {}).data || {}).affected_items) {
           let NISTobject = {};
@@ -673,7 +685,8 @@ export class WazuhApiCtrl {
         'GET',
         getPath(api) + '/manager/status',
         {},
-        { idHost: api.id }
+        { idHost: api.id },
+        req
       );
 
       const daemons = ((response || {}).data || {}).data || {};
@@ -1055,7 +1068,8 @@ export class WazuhApiCtrl {
         'GET',
         `${config.url}:${config.port}/${tmpPath}`,
         { params: params },
-        { idHost: req.payload.id }
+        { idHost: req.payload.id },
+        req
       );
       
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
@@ -1071,7 +1085,8 @@ export class WazuhApiCtrl {
             'GET',
             `${config.url}:${config.port}/${tmpPath}`,
             { params: params },
-            { idHost: req.payload.id }
+            { idHost: req.payload.id },
+            req
           );
           itemsArray.push(...tmpData.data.data.affected_items);
         }
@@ -1316,8 +1331,8 @@ export class WazuhApiCtrl {
       const config = await this.manageHosts.getHostById(api);
 
       const data = await Promise.all([
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, {idHost: api}),
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, {idHost: api})
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, {idHost: api}, req),
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, {idHost: api}, req)
       ]);
 
       const result = data.map(item => (item.data || {}).data || []);

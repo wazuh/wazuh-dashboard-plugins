@@ -42,7 +42,7 @@ export class Monitoring {
     this.wazuhHosts = new WazuhHostsCtrl();
     this.agentsArray = [];
     this.quiet = quiet;
-    this.apiInterceptor = new ApiInterceptor();
+    this.apiInterceptor = new ApiInterceptor(server);
     this.initVariables();
   }
 
