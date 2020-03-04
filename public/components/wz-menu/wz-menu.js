@@ -9,17 +9,18 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiPopover } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
 import WzVisualizePopover from './wz-visualize-popover';
+import { npStart } from 'ui/new_platform'
+import { toastNotifications } from 'ui/notify';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -40,19 +41,49 @@ class WzMenu extends Component {
     };
     this.store = store;
     this.wazuhConfig = new WazuhConfig();
+    this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
-  async componentDidMount() {
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.indexPatterns = $injector.get('indexPatterns');
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
+  getCurrentTab() {
+    const currentWindowLocation = window.location.hash;
+    if (currentWindowLocation.match(/#\/overview/)) {
+      return 'overview';
+    }
+    if (currentWindowLocation.match(/#\/manager/)) {
+      return 'manager';
+    }
+    if (currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/)) {
+      return 'agents-preview';
+    }
+    if (currentWindowLocation.match(/#\/settings/)) {
+      return 'settings';
+    }
+    if (currentWindowLocation.match(/#\/wazuh-dev/)) {
+      return 'wazuh-dev';
+    }
+    if (currentWindowLocation.match(/#\/health-check/)) {
+      return 'health-check';
+    }
+    return "";
 
   }
+
 
   componentDidUpdate(prevProps) {
     const { name: apiName } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
-    if (AppState.getNavigation() && AppState.getNavigation().currLocation && AppState.getNavigation().currLocation.replace(/\//g, '') !== this.state.currentMenuTab) {
-      this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') })
+    const currentTab = this.getCurrentTab();
+    if (currentTab !== this.state.currentMenuTab) {
+      this.setState({ currentMenuTab: currentTab })
     }
 
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
@@ -71,8 +102,9 @@ class WzMenu extends Component {
     try {
       this.setState({ showMenu: true });
 
-      if (!this.state.currentMenuTab && AppState.getNavigation().currLocation) {
-        this.setState({ currentMenuTab: AppState.getNavigation().currLocation.replace(/\//g, '') });
+      const currentTab = this.getCurrentTab();
+      if (currentTab !== this.state.currentMenuTab) {
+        this.setState({ currentMenuTab: currentTab })
       }
 
       const list = await PatternHandler.getPatternList();
@@ -110,8 +142,7 @@ class WzMenu extends Component {
         this.setState({ patternList: list, currentSelectedPattern: AppState.getCurrentPattern() })
       }
     } catch (error) {
-      //TODO handle error
-      console.log(error)
+      this.showToast('danger', 'Error', error, 4000);
     }
   }
 
@@ -121,9 +152,8 @@ class WzMenu extends Component {
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
       location.reload();
-    } catch (err) {
-      //TODO handle error
-      console.log(err)
+    } catch (error) {
+      this.showToast('danger', 'Error', error, 4000);
     }
   }
 
@@ -194,8 +224,6 @@ class WzMenu extends Component {
   }
 
   render() {
-
-
     const managementButton = (
       <EuiButtonEmpty
         className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
@@ -214,144 +242,146 @@ class WzMenu extends Component {
         iconType="arrowDown"
         iconSide="right">
         <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
-      </EuiButtonEmpty>);
+  </EuiButtonEmpty>);
     return (
       <WzReduxProvider>
-        {this.state.showMenu && (
-          <div>
-            <div className="wz-menu-wrapper">
-              <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
-                <EuiFlexItem >
-                  <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }} className="visualize-popover">
-                    <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/overview"
-                      onClick={() => this.setMenuItem('overview')} >
-                      <EuiIcon type='metricbeatApp' color='primary' size='m' />Overview
-                      </EuiButtonEmpty>
+        <Fragment>
+          {this.state.showMenu && (
+            <div>
+              <div className="wz-menu-wrapper">
+                <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
+                  <EuiFlexItem >
+                    <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }} className="visualize-popover">
+                      <EuiButtonEmpty
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/overview"
+                        onClick={() => this.setMenuItem('overview')} >
+                        <EuiIcon type='metricbeatApp' color='primary' size='m' />Overview
+                    </EuiButtonEmpty>
 
-                    <EuiPopover
-                      className="visualize-popover"
-                      id="popoverVisualize"
-                      button={visualizeButton}
-                      panelClassName={this.state.expandedVisualize && 'visualize-popover full-screen' || 'visualize-popover'}
-                      isOpen={this.state.isVisualizePopoverOpen}
-                      closePopover={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
-                      anchorPosition="downLeft" >
-                      <div>
-                        <button
-                          className="expandIcon"
-                          onClick={() => this.setState({ expandedVisualize: !this.state.expandedVisualize })}>
-                          <EuiIcon type='expand' color='primary'/>
-                        </button>
-                        <WzVisualizePopover
-                          visualizePopoverToggle={this.visualizePopoverToggle.bind(this)}
-                          setFavorite={(item) => this.setFavorite(item)}
+                      <EuiPopover
+                        className="visualize-popover"
+                        id="popoverVisualize"
+                        button={visualizeButton}
+                        panelClassName={this.state.expandedVisualize && 'visualize-popover full-screen' || 'visualize-popover'}
+                        isOpen={this.state.isVisualizePopoverOpen}
+                        closePopover={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
+                        anchorPosition="downLeft" >
+                        <div>
+                          <button
+                            className="expandIcon"
+                            onClick={() => this.setState({ expandedVisualize: !this.state.expandedVisualize })}>
+                            <EuiIcon type='expand' color='primary' />
+                          </button>
+                          <WzVisualizePopover
+                            visualizePopoverToggle={this.visualizePopoverToggle.bind(this)}
+                            setFavorite={(item) => this.setFavorite(item)}
+                            {...this.props} />
+                        </div>
+                      </EuiPopover>
+
+                      <EuiPopover
+                        id="popover"
+                        button={managementButton}
+                        isOpen={this.state.isManagementPopoverOpen}
+                        closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
+                        anchorPosition="downLeft" >
+                        <WzManagementSideMenu
+                          managementPopoverToggle={this.managementPopoverToggle.bind(this)}
                           {...this.props} />
-                      </div>
-                    </EuiPopover>
+                      </EuiPopover>
 
-                    <EuiPopover
-                      id="popover"
-                      button={managementButton}
-                      isOpen={this.state.isManagementPopoverOpen}
-                      closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
-                      anchorPosition="downLeft" >
-                      <WzManagementSideMenu
-                        managementPopoverToggle={this.managementPopoverToggle.bind(this)}
-                        {...this.props} />
-                    </EuiPopover>
-
-                    <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/agents-preview"
-                      onClick={() => this.setMenuItem('agents-preview')}>
-                      <EuiIcon type='watchesApp' color='primary' size='m' />
-                      <span className="wz-menu-button-title ">Agents</span>
-                    </EuiButtonEmpty>
-
-                    <EuiButtonEmpty
-                      className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
-                      color="text"
-                      href="#/wazuh-dev"
-                      onClick={() => this.setMenuItem('wazuh-dev')}>
-                      <EuiIcon type='console' color='primary' size='m' />
-                      <span className="wz-menu-button-title ">Dev Tools</span>
-                    </EuiButtonEmpty>
-
-                    {this.state.favoriteItems.length > 0 &&
-                      this.getFavoriteButtons()
-                    }
-
-                  </EuiFlexGroup>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false} style={{ paddingTop: "6px", marginRight: "-4px", display: "inline" }}>
-                  {this.state.currentAPI &&
-                    (
-                      <span><EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon> {this.state.currentAPI} </span>
-                    )
-                  }
-                  {!this.state.currentAPI &&
-                    (
-                      <span> No API </span>
-                    )
-                  }
-                  &nbsp; &nbsp;
-                {this.state.showSelector && this.state.theresPattern && this.state.patternList && this.state.patternList.length > 1 &&
-                    (
-                      this.buildPatternSelector()
-                    )
-                  }
-                </EuiFlexItem>
-
-                <EuiFlexItem grow={false} style={{ marginTop: "6px", marginRight: "1px" }}>
-                  <EuiButtonEmpty
-                    className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
-                    href="#/settings"
-                    color="text"
-                    aria-label="Settings"
-                    onClick={() => this.setMenuItem('settings')}>
-                    <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
-                    <span> </span>
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </div>
-          </div>
-        )}
-        {this.props.state.wazuhNotReadyYet &&
-          (
-            <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: " 60px 8px -50px 8px", }}>
-              <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
-
-                <EuiFlexItem>
-                  <p></p>
-                </EuiFlexItem>
-                {this.props.state.wazuhNotReadyYet.includes("Restarting") &&
-                  (
-                    <EuiFlexItem grow={false}>
-                      <p>
-                        <EuiLoadingSpinner size="l" /> &nbsp; &nbsp;
-                        </p>
-                    </EuiFlexItem>
-                  )
-                }
-                {this.props.state.wazuhNotReadyYet === "Wazuh could not be recovered." &&
-                  (
-                    <EuiFlexItem grow={false}>
-                      <EuiButtonEmpty grow={false} onClick={() => location.reload()} className="WzNotReadyButton" >
-                        <span> Reload </span>
+                      <EuiButtonEmpty
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/agents-preview"
+                        onClick={() => this.setMenuItem('agents-preview')}>
+                        <EuiIcon type='watchesApp' color='primary' size='m' />
+                        <span className="wz-menu-button-title ">Agents</span>
                       </EuiButtonEmpty>
-                    </EuiFlexItem>
 
-                  )
-                }
-              </EuiFlexGroup>
-            </EuiCallOut>
-          )
-        }
+                      <EuiButtonEmpty
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/wazuh-dev"
+                        onClick={() => this.setMenuItem('wazuh-dev')}>
+                        <EuiIcon type='console' color='primary' size='m' />
+                        <span className="wz-menu-button-title ">Dev Tools</span>
+                      </EuiButtonEmpty>
+
+                      {this.state.favoriteItems.length > 0 &&
+                        this.getFavoriteButtons()
+                      }
+
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false} style={{ paddingTop: "6px", marginRight: "-4px", display: "inline" }}>
+                    {this.state.currentAPI &&
+                      (
+                        <span><EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon> {this.state.currentAPI} </span>
+                      )
+                    }
+                    {!this.state.currentAPI &&
+                      (
+                        <span> No API </span>
+                      )
+                    }
+                    &nbsp; &nbsp;
+                {this.state.showSelector && this.state.theresPattern && this.state.patternList && this.state.patternList.length > 1 &&
+                      (
+                        this.buildPatternSelector()
+                      )
+                    }
+                  </EuiFlexItem>
+
+                  <EuiFlexItem grow={false} style={{ marginTop: "6px", marginRight: "1px" }}>
+                    <EuiButtonEmpty
+                      className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
+                      href="#/settings"
+                      color="text"
+                      aria-label="Settings"
+                      onClick={() => this.setMenuItem('settings')}>
+                      <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
+                      <span> </span>
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </div>
+            </div>
+          )}
+          {this.props.state.wazuhNotReadyYet &&
+            (
+              <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: "60px 8px -50px 8px", }}>
+                <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
+
+                  <EuiFlexItem>
+                    <p></p>
+                  </EuiFlexItem>
+                  {this.props.state.wazuhNotReadyYet.includes("Restarting") &&
+                    (
+                      <EuiFlexItem grow={false}>
+                        <p>
+                          <EuiLoadingSpinner size="l" /> &nbsp; &nbsp;
+                        </p>
+                      </EuiFlexItem>
+                    )
+                  }
+                  {this.props.state.wazuhNotReadyYet === "Wazuh could not be recovered." &&
+                    (
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonEmpty grow={false} onClick={() => location.reload()} className="WzNotReadyButton" >
+                          <span> Reload </span>
+                        </EuiButtonEmpty>
+                      </EuiFlexItem>
+
+                    )
+                  }
+                </EuiFlexGroup>
+              </EuiCallOut>
+            )
+          }
+        </Fragment>
       </WzReduxProvider>
     );
   }

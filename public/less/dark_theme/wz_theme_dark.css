@@ -6,6 +6,10 @@ html {
   background-color: #1a1b20!important;
 }
 
+.application{
+  background: #1a1b20;
+}
+
 #kibana-body {
   background-color: #1a1b20!important;
 }
@@ -105,9 +109,6 @@ md-content {
   color: white!important;
 }
 
-discover-app-w .container-fluid {
-  background-color: #1D1E24;
-}
 
 .euiBreadcrumbs--truncate
   .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
@@ -141,6 +142,7 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
 
 .wz-menu {
   background-color: #1a1b20;
+  border-bottom: 1px solid #343741;
   color: white;
 }
 
@@ -333,9 +335,6 @@ md-divider.md-default-theme, md-divider {
   text-decoration: underline !important;
 }
 
-discover-app-w > main.container-fluid {
-  background: #1a1b20 !important;
-}
 
 .wz-menu-select {
   filter: invert(0) !important; 
