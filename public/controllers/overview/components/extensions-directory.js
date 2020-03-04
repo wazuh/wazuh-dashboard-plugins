@@ -28,6 +28,7 @@ import {
   EuiIcon
 } from '@elastic/eui';
 import { ExtensionDetails } from './extension-details';
+import { SampleData } from './sample-data';
 
 export class AddNewExtension extends Component {
   constructor(props) {
@@ -233,6 +234,13 @@ export class AddNewExtension extends Component {
                 {this.getExtensions('regulatory')}
               </EuiFlexGrid>
           </Fragment>
+        ),
+      },
+      {
+        id: 'data',
+        name: 'Sample Data',
+        content: (
+          <SampleData />
         ),
       },
     ]
