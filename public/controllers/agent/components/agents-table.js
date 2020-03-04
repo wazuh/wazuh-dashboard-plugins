@@ -69,7 +69,6 @@ export class AgentsTable extends Component {
     
     this.setState({ 
       managerVersion: managerVersion.data.data,
-      totalAgent: totalAgent.data.data.totalItems,
       outdatedAgents: outdatedAgents.data.data.totalItems,
       agentActive: agentActive.data.data.totalItems,
       avaibleAgents: totalAgent.data.data.items
@@ -448,7 +447,7 @@ export class AgentsTable extends Component {
   }
 
   callOutRender() {
-    const { selectedItems, agents, pageSize, totalAgent, allSelected} = this.state;
+    const { selectedItems, agents, pageSize, allSelected, totalItems} = this.state;
   
     if (selectedItems.length === 0) {
       return;
@@ -465,7 +464,7 @@ export class AgentsTable extends Component {
                 <EuiButton onClick={() => {
                   this.setState(prevState => ({allSelected: !prevState.allSelected}))
                 }}>
-                  {allSelected ? `Clear ${totalAgent - 1} agents selected.` : `Select all ${totalAgent - 1} agents.`}
+                  {allSelected ? `Clear ${totalItems} agents selected.` : `Select all ${totalItems} agents.`}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -608,7 +607,7 @@ export class AgentsTable extends Component {
     const { avaibleAgents } = this.state;
     let showToastPurge = false;
     const auxAgents = avaibleAgents.map(agent => {return agent.id !== '000' ? agent.id : null}).filter(agent => agent !== null);
-
+    
     WzRequest.apiReq('DELETE', `/agents`, {"purge": true, "ids": auxAgents, "older_than": "1s"}).then((value) => {
       value.status === 200 ? 
         showToastPurge = true : 
