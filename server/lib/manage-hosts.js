@@ -16,10 +16,12 @@ import { log } from '../logger';
 import { UpdateRegistry } from './update-registry';
 import { initialWazuhConfig } from './initial-wazuh-config'
 
+const BASE_LOGS_PATH = '../../../../optimize/wazuh';
+
 export class ManageHosts {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml');
+    this.file = path.join(__dirname, `${BASE_LOGS_PATH}/config/wazuh.yml`);
     this.updateRegistry = new UpdateRegistry();
     this.initialConfig = initialWazuhConfig;
   }
@@ -66,11 +68,11 @@ export class ManageHosts {
     try {
       this.checkBusy();
       this.busy = true;
-      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh'))) {
-        fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh'));
+      if (!fs.existsSync(path.join(__dirname, BASE_LOGS_PATH))) {
+        fs.mkdirSync(path.join(__dirname, BASE_LOGS_PATH));
       }
-      if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh/config'))) {
-        fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh/config'));
+      if (!fs.existsSync(path.join(__dirname, `${BASE_LOGS_PATH}/config`))) {
+        fs.mkdirSync(path.join(__dirname, `${BASE_LOGS_PATH}/config`));
       }
       if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml'))) {
         await fs.writeFileSync(this.file, this.initialConfig, 'utf8');
