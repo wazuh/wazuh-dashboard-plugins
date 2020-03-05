@@ -60,7 +60,7 @@ service kibana restart
 
 ## Upgrade
 
-Note: For updates from Wazuh 3.11.x to 3.11.y (regardless of the version of the Elastic Stack) it is recommended to make a backup of the Wazuh app configuration file in order not to lose the modified parameters or the configured APIs.
+Note: For updates from Wazuh 3.11.x to 3.12.y (regardless of the version of the Elastic Stack) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
 
 Stop Kibana
 
@@ -76,10 +76,11 @@ systemctl stop kibana
 service kibana stop
 ```
 
-Make a backup of the configuration file.
+Copy the wazuh.yml to its new location. (Only needed for upgrades from 3.11.x to 3.12.y)
 
 ```
-cp /usr/share/kibana/plugins/wazuh/wazuh.yml /tmp/wazuh-backup.yml
+mkdir -p /usr/share/kibana/optimize/wazuh/config
+cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 ```
 
 Remove the app using kibana-plugin tool
@@ -109,19 +110,6 @@ cd /usr/share/kibana
 sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.0.zip
 ```
 
-Restore the configuration file backup.
-
-```
-sudo cp /tmp/wazuh-backup.yml /usr/share/kibana/plugins/wazuh/wazuh.yml
-```
-
-Update configuration file permissions.
-
-```
-sudo chown kibana:kibana /usr/share/kibana/plugins/wazuh/wazuh.yml
-sudo chmod 600 /usr/share/kibana/plugins/wazuh/wazuh.yml
-```
-
 Restart Kibana
 
 - Systemd:
@@ -134,7 +122,8 @@ systemctl restart kibana
  
 ``` 
 service kibana restart 
-``` 
+```
+
  
 ## Wazuh - Kibana compatibility matrix
  
