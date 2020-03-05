@@ -1113,7 +1113,21 @@ function discoverController(
     loadFilters(parameters.filters, parameters.localChange, parameters.tab);
   });
 
-  $rootScope.$on('testAGENT', (evt, parameters) => {
+  $rootScope.$on('selectAgent', (evt, parameters) => {
+    const filter = {
+      "meta": {
+        "alias":null,
+        "disabled":false,
+        "key":"agent.id",
+        "negate":false,
+        "params":{"query":parameters.id},
+        "type":"phrase",
+        "index":"wazuh-alerts-3.x-*"
+      },
+      "query":{"match_phrase":{"agent.id":parameters.id}},
+      "$state": {"store":"appState"}
+    };
+    filterManager.addFilters(filter);
     $scope.updateQueryAndFetch({
       query: $state.query
     });

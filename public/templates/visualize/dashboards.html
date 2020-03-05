@@ -26,7 +26,7 @@
             <kbn-dis ng-show="octrl.tab !== 'welcome'" style="padding-bottom: 16px;margin-top: -8px;"></kbn-dis>
             <!-- End Discover search bar section -->
 
-            <div class="euiPanel euiPanel--paddingMedium euiPanel--hasBetaBadge"  ng-if="octrl.isAgent" style="margin-bottom: 36px;"><span
+            <div class="euiPanel euiPanel--paddingMedium euiPanel--hasBetaBadge"  ng-if="octrl.isAgent && octrl.tabView === 'panels'" style="margin-bottom: 36px;"><span
                     class="euiPanel__betaBadgeWrapper"><span class="euiBetaBadge euiPanel__betaBadge"
                         title="ip-10-0-0-246.us-west-1.compute.internal">DESKTOP-GDPBOU6</span></span>
                 <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
@@ -143,6 +143,6 @@
             </div>
             <!-- No results section -->
 
-            <div ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
+            <div ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" ng-show="octrl.tabView === 'panels'" >
                 <react-component name="WzVisualize" props="octrl.visualizeProps" />
             </div>

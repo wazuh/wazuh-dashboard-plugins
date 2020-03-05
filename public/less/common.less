@@ -1371,3 +1371,15 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
 .codeEditorWrapper .ace-tm .ace_print-margin{
   visibility: hidden!important;
 }
+
+.agent-selection-table-loading:before{
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 2px;
+    background-color: #006BB4;
+    -webkit-animation: euiBasicTableLoading 1000ms linear;
+    animation: euiBasicTableLoading 1000ms linear;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite
+}

@@ -107,7 +107,8 @@ export class OverviewController {
       subtab: this.subtab,
       setAgent: id => {
         this.isAgent = id;
-        this.$rootScope.$emit('testAGENT', {
+        this.$rootScope.$emit('selectAgent', {
+          id: id
         });
       },
     };

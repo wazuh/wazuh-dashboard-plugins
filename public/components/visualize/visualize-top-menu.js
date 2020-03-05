@@ -11,10 +11,35 @@
  */
 import React, { Component } from 'react';
 
-import { EuiFlexItem, EuiKeyPadMenu, EuiKeyPadMenuItem, EuiIcon, EuiOverlayMask, EuiModal, EuiModalHeader, EuiModalHeaderTitle, EuiModalBody } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiKeyPadMenu,
+  EuiKeyPadMenuItem,
+  EuiIcon,
+  EuiOverlayMask,
+  EuiModal,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
+  EuiModalBody,
+  EuiTable,
+  EuiTableBody,
+  EuiTableFooter,
+  EuiTableFooterCell,
+  EuiTableHeader,
+  EuiSwitch,
+  EuiTableHeaderCell,
+  EuiTableHeaderCellCheckbox,
+  EuiTablePagination,
+  EuiTableRow,
+  EuiModalFooter,
+  EuiTableRowCell,
+  EuiTableRowCellCheckbox,
+  EuiTableSortMobile,
+  EuiTableHeaderMobile,
+} from '@elastic/eui';
 import './visualize-top-menu.less';
 import WzReduxProvider from '../../redux/wz-redux-provider';
-
+import { AgentSelectionTable } from './visualize-agent-selection-table';
 export class VisualizeTopMenu extends Component {
   constructor(props) {
     super(props);
@@ -23,22 +48,19 @@ export class VisualizeTopMenu extends Component {
       subtab: this.props.subtab || '',
       isAgentModalVisible: false,
     };
-
   }
 
-  async componentDidUpdate() {
-
-  }
+  async componentDidUpdate() {}
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.tab) {
       this.setState({
-        tab: nextProps.tab
+        tab: nextProps.tab,
       });
     }
     if (nextProps.subtab) {
       this.setState({
-        subtab: nextProps.subtab
+        subtab: nextProps.subtab,
       });
     }
   }
@@ -52,22 +74,23 @@ export class VisualizeTopMenu extends Component {
   }
 
   render() {
-
     let modal;
 
     if (this.state.isAgentModalVisible) {
       modal = (
         <EuiOverlayMask>
-          <EuiModal onClose={() => this.closeAgentModal()} initialFocus="[name=popswitch]">
+          <EuiModal
+            maxWidth="800px"
+            onClose={() => this.closeAgentModal()}
+            initialFocus="[name=popswitch]"
+          >
             <EuiModalHeader>
               <EuiModalHeaderTitle>Select an agent</EuiModalHeaderTitle>
             </EuiModalHeader>
-            <EuiModalBody><div>
-              <button onClick={() => {
-                this.setState({ isAgent: '001' });
-                this.props.setAgent('001');
-                this.closeAgentModal()
-              }}>agent</button></div></EuiModalBody>
+
+            <EuiModalBody>
+              <AgentSelectionTable></AgentSelectionTable>
+            </EuiModalBody>
           </EuiModal>
         </EuiOverlayMask>
       );
@@ -76,23 +99,19 @@ export class VisualizeTopMenu extends Component {
       <div>
         <EuiFlexItem>
           <EuiKeyPadMenu className="VisualizeTopMenu">
-
-            {!this.state.isAgent &&
-              <EuiKeyPadMenuItem
-                label="Agent"
-                onClick={() => this.showAgentModal()}
-              >
+            {!this.state.isAgent && (
+              <EuiKeyPadMenuItem label="Agent" onClick={() => this.showAgentModal()}>
                 <EuiIcon type="watchesApp" color="primary" size="m" />
               </EuiKeyPadMenuItem>
-            }
-            {this.state.isAgent &&
+            )}
+            {this.state.isAgent && (
               <div className="TopMenuAgent">
                 <EuiKeyPadMenuItem
                   label="Change Agent"
                   onClick={() => this.showAgentModal()}
                   betaBadgeLabel="Change"
                   betaBadgeTooltipContent={`Change Agent ${this.state.isAgent}`}
-                  betaBadgeIconType='merge'
+                  betaBadgeIconType="merge"
                 >
                   <EuiIcon type="watchesApp" color="primary" size="m" />
                 </EuiKeyPadMenuItem>
@@ -104,25 +123,28 @@ export class VisualizeTopMenu extends Component {
                   }}
                   betaBadgeLabel="Remove"
                   betaBadgeTooltipContent={`Remove Agent ${this.state.isAgent}`}
-                  betaBadgeIconType='cross'
+                  betaBadgeIconType="cross"
                 >
                   <EuiIcon type="watchesApp" color="primary" size="m" />
                 </EuiKeyPadMenuItem>
-
               </div>
-            }
-            {this.state.subtab === 'panels' &&
+            )}
+            {this.state.subtab === 'panels' && (
               <EuiKeyPadMenuItem isDisabled label="Report">
                 <EuiIcon type="reportingApp" color="primary" size="m" />
               </EuiKeyPadMenuItem>
-            }
+            )}
             <EuiKeyPadMenuItem
               label={this.state.subtab === 'discover' ? 'Dashboard' : 'Discover'}
-              onClick={() => this.props.switchDiscover(this.state.subtab === 'discover' ? 'panels' : 'discover')}>
+              onClick={() =>
+                this.props.switchDiscover(this.state.subtab === 'discover' ? 'panels' : 'discover')
+              }
+            >
               <EuiIcon
                 type={this.state.subtab === 'discover' ? 'visualizeApp' : 'discoverApp'}
                 color="primary"
-                size="m" />
+                size="m"
+              />
             </EuiKeyPadMenuItem>
           </EuiKeyPadMenu>
         </EuiFlexItem>
