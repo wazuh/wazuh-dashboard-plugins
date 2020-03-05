@@ -34,7 +34,7 @@ import { GenericRequest } from '../../../../../react-services/generic-request';
 import { RawVisualizations } from '../../../../../factories/raw-visualizations';
 import { DiscoverPendingUpdates } from '../../../../../factories/discover-pending-updates';
 
-export class WzStatisticsOverview extends Component {
+class WzStatisticsOverview extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
@@ -68,6 +68,12 @@ export class WzStatisticsOverview extends Component {
   
   async componentDidMount() {
     this._isMounted = true;
+    GenericRequest.request(
+      'POST',
+      `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
+      {nodes: { items: [], name: 'node01' } })
+      .then(visData => this.rawVisualizations.assignItems(visData.data.raw));
+
     this.discoverPendingUpdates.addItem(
       {query: "", language: "lucene"},
       [
@@ -77,14 +83,8 @@ export class WzStatisticsOverview extends Component {
           "$state":{"store":"appState"}
         }
       ]
-    )
-    const visData = await GenericRequest.request(
-      'POST',
-      `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
-      {nodes: { items: [], name: 'node01' } }
     );
 
-    await this.rawVisualizations.assignItems(visData.data.raw);
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.items.map(item => {
@@ -170,6 +170,12 @@ export class WzStatisticsOverview extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size={'m'} />
+          <EuiFlexGroup style={{ minHeight: 250 }}>
+            <EuiFlexItem>
+              <EuiTitle size="s"><p>Queue</p></EuiTitle>
+              <KibanaVis visID={'Wazuh-App-Statistics-remoted-queue-size'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
+            </EuiFlexItem>
+          </EuiFlexGroup>
           <EuiFlexGroup style={{ minHeight: 250 }}>
             <EuiFlexItem>
               <EuiTitle size="s"><p>Received Bytes</p></EuiTitle>

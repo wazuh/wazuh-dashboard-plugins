@@ -92,6 +92,22 @@ export default [
     }
   },
   {
+    _id: 'Wazuh-App-Statistics-remoted-queue-size',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics remoted queue size',
+      visState:
+        '{"title":"Wazuh App Statistics remoted queue size","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.total_queue_size).fit(mode=average).label(total_queue_size),.es(timefield=timestamp,metric=avg:remoted.queue_size).fit(mode=average).label(queue_size)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  {
     _id: 'Wazuh-App-Statistics-remoted-event-count',
     _type: 'visualization',
     _source: {
