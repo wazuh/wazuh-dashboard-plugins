@@ -24,7 +24,7 @@ export class AppState {
      */
     static getExtensions(id) {
         try{
-            const extensions = Cookies.get('extensions') ? decodeURI(Cookies.get('extensions')) : false;
+            const extensions = Cookies.get('currentExtensions') ? decodeURI(Cookies.get('currentExtensions')) : false;
             const parsedExtensions = extensions ? JSON.parse(extensions) : false;
             return parsedExtensions ? parsedExtensions[id] : false; 
         }catch(err){
@@ -35,20 +35,20 @@ export class AppState {
     }
 
     /**
-     *  Sets a new value for the cookie 'extensions' object
+     *  Sets a new value for the cookie 'currentExtensions' object
      * @param {*} id 
      * @param {*} extensions 
      */
     static setExtensions(id, extensions) {
         try{
-            const decodedExtensions = Cookies.get('extensions') ? decodeURI(Cookies.get('extensions')) : false;
+            const decodedExtensions = Cookies.get('currentExtensions') ? decodeURI(Cookies.get('currentExtensions')) : false;
             const current = decodedExtensions ? JSON.parse(decodedExtensions) : {};
             current[id] = extensions;
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (extensions) {
                 const encodedExtensions = encodeURI(JSON.stringify(current));
-                Cookies.set('extensions', encodedExtensions, { expires: exp, path: window.location.pathname});
+                Cookies.set('currentExtensions', encodedExtensions, { expires: exp, path: window.location.pathname});
             }
         }catch(err){
             console.log("Error set extensions");
@@ -286,9 +286,9 @@ export class AppState {
         return Cookies.remove('navigate', {path: window.location.pathname});
     }
 
-    static setWzMenu() {
-        const showMenu = updateShowMenu(true);
+    static setWzMenu(isVisible=true) {
+        const showMenu = updateShowMenu(isVisible);
         store.dispatch(showMenu);
-      }
+    }
 
 } 

@@ -103,3 +103,7 @@
                 </div>
             </div>
             <!-- No results section -->
+            
+            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels'">
+                <react-component name="WzVisualize" props="octrl.visualizeProps" />
+            </div>

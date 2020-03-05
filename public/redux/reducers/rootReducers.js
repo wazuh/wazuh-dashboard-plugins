@@ -18,6 +18,7 @@ import reportingReducers from './reportingReducers';
 import managementReducers from './managementReducers';
 import configurationReducers from './configurationReducers';
 import appStateReducers from './appStateReducers';
+import visualizationsReducers from './visualizationsReducers';
 
 export default combineReducers({
   rulesetReducers,
@@ -26,5 +27,6 @@ export default combineReducers({
   reportingReducers,
   managementReducers,
   configurationReducers,
-  appStateReducers
+  appStateReducers,
+  visualizationsReducers
 });

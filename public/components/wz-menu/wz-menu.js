@@ -14,12 +14,12 @@ import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoad
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import chrome from 'ui/chrome';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
 import { npStart } from 'ui/new_platform'
+import { toastNotifications } from 'ui/notify';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -41,24 +41,33 @@ class WzMenu extends Component {
     this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
-  getCurrentTab(){
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
+  getCurrentTab() {
     const currentWindowLocation = window.location.hash;
-    if(currentWindowLocation.match(/#\/overview/)){
+    if (currentWindowLocation.match(/#\/overview/)) {
       return 'overview';
     }
-    if(currentWindowLocation.match(/#\/manager/)){
+    if (currentWindowLocation.match(/#\/manager/)) {
       return 'manager';
     }
-    if(currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/) ){
+    if (currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/)) {
       return 'agents-preview';
     }
-    if(currentWindowLocation.match(/#\/settings/)){
+    if (currentWindowLocation.match(/#\/settings/)) {
       return 'settings';
     }
-    if(currentWindowLocation.match(/#\/wazuh-dev/)){
+    if (currentWindowLocation.match(/#\/wazuh-dev/)) {
       return 'wazuh-dev';
     }
-    if(currentWindowLocation.match(/#\/health-check/)){
+    if (currentWindowLocation.match(/#\/health-check/)) {
       return 'health-check';
     }
     return "";
@@ -89,7 +98,6 @@ class WzMenu extends Component {
   async load() {
     try {
       this.setState({ showMenu: true });
-
 
       const currentTab = this.getCurrentTab();
       if (currentTab !== this.state.currentMenuTab) {
@@ -131,8 +139,7 @@ class WzMenu extends Component {
         this.setState({ patternList: list, currentSelectedPattern: AppState.getCurrentPattern() })
       }
     } catch (error) {
-      //TODO handle error
-      console.log(error)
+      this.showToast('danger', 'Error', error, 4000);
     }
   }
 
@@ -142,9 +149,8 @@ class WzMenu extends Component {
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
       location.reload();
-    } catch (err) {
-      //TODO handle error
-      console.log(err)
+    } catch (error) {
+      this.showToast('danger', 'Error', error, 4000);
     }
   }
 
@@ -180,10 +186,7 @@ class WzMenu extends Component {
     this.managementPopoverToggle();
   }
 
-
   render() {
-
-
     const managementButton = (
       <EuiButtonEmpty
         className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}

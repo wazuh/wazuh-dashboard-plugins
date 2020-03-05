@@ -114,6 +114,10 @@
 # ------------------------------- App privileges --------------------------------
 #admin: true
 #
+# ---------------------------- Hide manager alerts ------------------------------
+# Hide the alerts of the manager in all dashboards and discover
+#hideManagerAlerts: false
+#
 # ------------------------------- App logging level -----------------------------
 # Set the logging level for the Wazuh App log files.
 # Default value: info

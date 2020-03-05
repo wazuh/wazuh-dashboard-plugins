@@ -17,7 +17,13 @@ export class VisHandlers {
    * Class constructor
    */
   constructor() {
+    if (!!VisHandlers.instance) {
+      return VisHandlers.instance;
+    }
     this.list = [];
+
+    VisHandlers.instance = this;
+    return this;
   }
 
   /**
@@ -47,10 +53,10 @@ export class VisHandlers {
         filters: syscollector,
         time: {
           from: 'now-1d/d',
-          to: 'now'
+          to: 'now',
         },
         searchBar: false,
-        tables: []
+        tables: [],
       });
       return appliedFilters;
     }
@@ -67,10 +73,12 @@ export class VisHandlers {
 
       tables[i] = !!(((((item || {}).value || {}).visData || {}).tables || [])[0] || {}).rows
         ? {
-          rows: item.value.visData.tables[0].rows.map(x => { return Object.values(x) }),
-          title,
-          columns
-        }
+            rows: item.value.visData.tables[0].rows.map(x => {
+              return Object.values(x);
+            }),
+            title,
+            columns,
+          }
         : false;
     }
 
@@ -87,13 +95,13 @@ export class VisHandlers {
         filters,
         time: {
           from: dateMath.parse(from),
-          to: dateMath.parse(to)
+          to: dateMath.parse(to),
         },
         searchBar: query,
-        tables
+        tables,
       });
     }
-    
+
     return appliedFilters;
   }
 
@@ -106,8 +114,7 @@ export class VisHandlers {
         item &&
         item.vis &&
         item.vis.title !== 'Agents status' &&
-        ((item.dataLoader || {}).previousVisState || {}).title !==
-        'Agents status' &&
+        ((item.dataLoader || {}).previousVisState || {}).title !== 'Agents status' &&
         item.vis.searchSource &&
         item.vis.searchSource.rawResponse &&
         item.vis.searchSource.rawResponse.hits &&
