@@ -3,7 +3,6 @@
       "package.json",
       "LICENSE",
       "tsconfig.json",
-      "wazuh.yml",
       "index.js",
         "init.js",
       "server/**/*",
