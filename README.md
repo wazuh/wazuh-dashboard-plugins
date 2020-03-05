@@ -87,7 +87,7 @@ Remove the app using kibana-plugin tool
 
 ```
 cd /usr/share/kibana/
-bin/kibana-plugin remove wazuh
+sudo -u kibana bin/kibana-plugin remove wazuh
 ```
 
 Remove generated bundles
