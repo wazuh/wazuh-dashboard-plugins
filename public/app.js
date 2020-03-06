@@ -29,7 +29,8 @@ import 'angular-sanitize';
 
 // Require CSS
 import './less/loader';
-import chrome from 'ui/chrome';
+// Require lib to dashboards PDFs
+require ('./utils/dom-to-image.js');
 
 // EUI React components wrapper
 import './components';
@@ -58,6 +59,7 @@ import 'angular-material/angular-material';
 import 'angular-cookies/angular-cookies';
 
 import 'ui/autoload/all';
+import chrome from 'ui/chrome';
 
 // Set up Wazuh app
 import './setup';

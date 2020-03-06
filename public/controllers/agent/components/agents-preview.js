@@ -101,7 +101,7 @@ export class AgentsPreview extends Component {
               <EuiFlexItem grow={false}>
                 <EuiPanel betaBadgeLabel="Details" style={{ paddingBottom: 0 }}>
                   <EuiFlexGroup style={{ minWidth: 500 }}>
-                    <EuiFlexItem></EuiFlexItem>
+                    <EuiFlexItem grow={false}></EuiFlexItem>
                     <EuiFlexItem>
                       {(this.summary &&
                         <EuiFlexItem style={{ padding: '12px 0px' }}>
@@ -135,10 +135,10 @@ export class AgentsPreview extends Component {
                             </EuiFlexItem>
                             <EuiFlexItem>
                               <EuiStat
-                                title={`${this.agentsCoverity}%`}
+                                title={`${this.agentsCoverity.toFixed(2)}%`}
                                 titleSize={'s'}
                                 description="Agents coverage"
-                                titleColor="primary"
+                                titleColor="text"
                                 style={{ whiteSpace: 'nowrap' }}
                               />
                             </EuiFlexItem>
@@ -176,7 +176,7 @@ export class AgentsPreview extends Component {
                         </EuiFlexGroup>
                       </EuiFlexItem>
                     </EuiFlexItem>
-                    <EuiFlexItem></EuiFlexItem>
+                    <EuiFlexItem grow={false}></EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>
               </EuiFlexItem>

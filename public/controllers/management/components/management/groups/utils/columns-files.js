@@ -43,9 +43,8 @@ export default class GroupsFilesColumns {
 
                     const isEditable = item.filename === 'agent.conf';
                     const data = !isEditable
-                      ? beautifier.prettyPrint(result)
+                      ? typeof result === 'object' ? JSON.stringify(result, null, 2) : result.toString()
                       : this.autoFormat(result);
-
                     const file = {
                       name: item.filename,
                       content: data,
