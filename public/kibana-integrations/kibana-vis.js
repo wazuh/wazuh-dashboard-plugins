@@ -72,6 +72,7 @@ class KibanaVis extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this.updateVis();
   }
 
   componentWillUnmount() {
@@ -79,8 +80,8 @@ class KibanaVis extends Component {
       this._isMounted = false;
       this.updateVis();
       this.destroyAll();
-    }
   }
+}
 
   componentDidUpdate() {
     if (this.props.state.shouldUpdate) {
@@ -257,7 +258,7 @@ class KibanaVis extends Component {
       this.props.updateRootScope('resultState', 'none');
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
-
+      
       this.props.updateRootScope(
         'loadingStatus',
         `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`

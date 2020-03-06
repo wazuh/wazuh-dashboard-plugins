@@ -28,7 +28,6 @@ import { connect } from 'react-redux';
 import { updateVis } from '../../../../../redux/actions/visualizationsActions'
 
 import  KibanaVis  from '../../../../../kibana-integrations/kibana-vis';
-import StatisticsHandler from './utils/statistics-handler'
 import { clusterNodes } from '../configuration/utils/wz-fetch';
 import { GenericRequest } from '../../../../../react-services/generic-request';
 import { RawVisualizations } from '../../../../../factories/raw-visualizations';
@@ -36,44 +35,29 @@ import { DiscoverPendingUpdates } from '../../../../../factories/discover-pendin
 
 class WzStatisticsOverview extends Component {
   _isMounted = false;
+  info = {
+    remoted: `Remoted statistics are cumulative, this means that the
+     information shown is since the data exists.`,
+    analysisd: `Analysisd statistics refer to the data stored from the
+     period indicated in the variable 'analysisd.state_interval'.`
+  };
+  tabs = ['remoted', 'analysisd'].map(item => {return {id: item, name: item}})
+
   constructor(props) {
     super(props);
     this.state = {
       selectedTabId: 'remoted',
       stats: {},
-      isLoading: false,
       searchvalue: '',
       clusterNodeSelected: false,
-      isSaveObjectReady: false,
     };
-    this.statisticsHandler = StatisticsHandler;
-    this.tabs = [
-      {
-        id: 'remoted',
-        name: 'remoted'
-      },
-      {
-        id: 'analysisd',
-        name: 'analysisd'
-      },
-    ];
     this.rawVisualizations = new RawVisualizations();
     this.discoverPendingUpdates = new DiscoverPendingUpdates();
-
-    this.info = {
-      remoted: 'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
-      analysisd: "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'."
-    };
   }
-  
+
   async componentDidMount() {
     this._isMounted = true;
-    GenericRequest.request(
-      'POST',
-      `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
-      {nodes: { items: [], name: 'node01' } })
-      .then(visData => this.rawVisualizations.assignItems(visData.data.raw));
-
+    
     this.discoverPendingUpdates.addItem(
       {query: "", language: "lucene"},
       [
@@ -84,7 +68,11 @@ class WzStatisticsOverview extends Component {
         }
       ]
     );
-
+    GenericRequest.request(
+      'POST',
+      `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
+      {nodes: { items: [], name: 'node01' } })
+      .then(visData => this.rawVisualizations.assignItems(visData.data.raw));
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.items.map(item => {
@@ -100,7 +88,7 @@ class WzStatisticsOverview extends Component {
         clusterNodeSelected: false
       });
     }
-  }
+    }
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -109,7 +97,7 @@ class WzStatisticsOverview extends Component {
   onSelectedTabChanged = id => {
     this.setState({
       selectedTabId: id,
-      searchvalue: ''
+      searchvalue: '',
     });
   };
 
@@ -131,7 +119,42 @@ class WzStatisticsOverview extends Component {
     });
   };
 
+  renderVisualization(visID, title) {
+    return (
+      <EuiFlexItem>
+        <EuiTitle size="s"><p>{title}</p></EuiTitle>
+        <KibanaVis 
+          visID={visID} 
+          tab={'statistics'} 
+          updateRootScope={() => {}} >
+        </KibanaVis>
+      </EuiFlexItem>
+    );
+  }
+
+  renderRemotedVisualizations() {
+    return (<div>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-queue-size', 'Queue')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+          {this.renderVisualization('Wazuh-App-Statistics-remoted-Recv-bytes', 'Received Bytes')}
+          {this.renderVisualization('Wazuh-App-Statistics-remoted-event-count', 'Event count')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+          {this.renderVisualization('Wazuh-App-Statistics-remoted-messages' , 'Message stats')}
+          {this.renderVisualization('Wazuh-App-Statistics-remoted-tcp-sessions', 'TCP Sessions')}
+      </EuiFlexGroup>
+    </div>
+    );
+  }
+
+  renderAnalisysdVisualizations() {
+
+  }
+
   render() {
+    const { clusterNodes, clusterNodeSelected, selectedTabId } = this.state;
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
@@ -143,12 +166,12 @@ class WzStatisticsOverview extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            {!!(this.state.clusterNodes && this.state.clusterNodes.length && this.state.clusterNodeSelected) && (
+            {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
               <EuiFlexItem grow={false} >
                 <EuiSelect
                   id="selectNode"
-                  options={this.state.clusterNodes}
-                  value={this.state.clusterNodeSelected}
+                  options={clusterNodes}
+                  value={clusterNodeSelected}
                   onChange={this.onSelectNode}
                   aria-label="Select node"
                 />
@@ -170,33 +193,8 @@ class WzStatisticsOverview extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size={'m'} />
-          <EuiFlexGroup style={{ minHeight: 250 }}>
-            <EuiFlexItem>
-              <EuiTitle size="s"><p>Queue</p></EuiTitle>
-              <KibanaVis visID={'Wazuh-App-Statistics-remoted-queue-size'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup style={{ minHeight: 250 }}>
-            <EuiFlexItem>
-              <EuiTitle size="s"><p>Received Bytes</p></EuiTitle>
-              <KibanaVis visID={'Wazuh-App-Statistics-remoted-Recv-bytes'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiTitle size="s"><p>Event count</p></EuiTitle>
-              <KibanaVis visID={'Wazuh-App-Statistics-remoted-event-count'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup style={{ minHeight: 250 }}>
-            <EuiFlexItem>
-              <EuiTitle size="s"><p>Message stats</p></EuiTitle>
-              <KibanaVis visID={'Wazuh-App-Statistics-remoted-messages'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiTitle size="s"><p>TCP Sessions</p></EuiTitle>
-              <KibanaVis visID={'Wazuh-App-Statistics-remoted-tcp-sessions'} tab={'statistics'} updateRootScope={()=>{}} ></KibanaVis>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-
+          { selectedTabId === 'remoted' && this.renderRemotedVisualizations() }
+          { selectedTabId === 'analysisd' && this.renderAnalisysdVisualizations() }
         </EuiPanel>
       </EuiPage>
     );

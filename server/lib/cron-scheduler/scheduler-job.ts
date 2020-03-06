@@ -14,15 +14,19 @@ export class SchedulerJob {
   }
 
   public async run() {
-    const { index, status } = jobs[this.jobName];
-    if ( !status ) { return; }
-    const hosts = await this.getApiObjects();
-    const data:object[] = [];
-    for (const host of hosts) {
-      const response = await this.getResponses(host);
-      data.push(...response);
+    try {
+      const { index, status } = jobs[this.jobName];
+      if ( !status ) { return; }
+      const hosts = await this.getApiObjects();
+      const data:object[] = [];
+      for (const host of hosts) {
+        const response = await this.getResponses(host);
+        data.push(...response);
+      }
+      await this.saveDocument.save(data, index);
+    } catch (error) {
+      console.log(error);
     }
-    await this.saveDocument.save(data, index);
   }
 
   private async getApiObjects() {

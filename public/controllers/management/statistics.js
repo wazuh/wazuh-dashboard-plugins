@@ -35,13 +35,4 @@ export function StatisticsController(
     $scope.IsClusterRunning = true;
     $scope.tabView = 'statistics';
 
-    const load = async () => {
-      visHandlers.removeAll();
-      discoverPendingUpdates.removeAll();
-      rawVisualizations.removeAll();
-      loadedVisualizations.removeAll();
-
-
-
-    }
 }
