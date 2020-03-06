@@ -137,7 +137,7 @@ export class AddApi extends Component {
     const editConfigChildren = (
       <div>
         <EuiText>
-          Modify <EuiCode>kibana/plugins/wazuh/wazuh.yml</EuiCode> to set the
+          Modify <EuiCode>/usr/share/kibana/optimize/wazuh/config/wazuh.yml</EuiCode> to set the
           connection information.
         </EuiText>
         <EuiSpacer />

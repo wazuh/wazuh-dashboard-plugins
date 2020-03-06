@@ -50,24 +50,24 @@ class WzMenu extends Component {
     });
   };
 
-  getCurrentTab(){
+  getCurrentTab() {
     const currentWindowLocation = window.location.hash;
-    if(currentWindowLocation.match(/#\/overview/)){
+    if (currentWindowLocation.match(/#\/overview/)) {
       return 'overview';
     }
-    if(currentWindowLocation.match(/#\/manager/)){
+    if (currentWindowLocation.match(/#\/manager/)) {
       return 'manager';
     }
-    if(currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/) ){
+    if (currentWindowLocation.match(/#\/agents-preview/) || currentWindowLocation.match(/#\/agents/)) {
       return 'agents-preview';
     }
-    if(currentWindowLocation.match(/#\/settings/)){
+    if (currentWindowLocation.match(/#\/settings/)) {
       return 'settings';
     }
-    if(currentWindowLocation.match(/#\/wazuh-dev/)){
+    if (currentWindowLocation.match(/#\/wazuh-dev/)) {
       return 'wazuh-dev';
     }
-    if(currentWindowLocation.match(/#\/health-check/)){
+    if (currentWindowLocation.match(/#\/health-check/)) {
       return 'health-check';
     }
     return "";
@@ -98,7 +98,6 @@ class WzMenu extends Component {
   async load() {
     try {
       this.setState({ showMenu: true });
-
 
       const currentTab = this.getCurrentTab();
       if (currentTab !== this.state.currentMenuTab) {
@@ -187,10 +186,7 @@ class WzMenu extends Component {
     this.managementPopoverToggle();
   }
 
-
   render() {
-
-
     const managementButton = (
       <EuiButtonEmpty
         className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
