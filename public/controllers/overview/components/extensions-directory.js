@@ -25,7 +25,10 @@ import {
   EuiSpacer,
   EuiFlexGrid,
   EuiCard,
-  EuiIcon
+  EuiIcon,
+  EuiButtonEmpty,
+  EuiButton,
+  EuiSwitch
 } from '@elastic/eui';
 import { ExtensionDetails } from './extension-details';
 import WzExtensionGuide from './extension-guide';
@@ -49,13 +52,13 @@ export class AddNewExtension extends Component {
           description: TabDescription.aws.description,
           icon: 'logoAWSMono'
         },
-        gcp: {
-          enabled: props.extensions.gcp,
-          title: "Google Cloud Platform",
-          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
-          description: "GCP description - GCP description - GCP description - GCP description ",
-          icon: 'logoGCPMono'
-        },
+        // gcp: {
+        //   enabled: props.extensions.gcp,
+        //   title: "Google Cloud Platform",
+        //   url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
+        //   description: "GCP description - GCP description - GCP description - GCP description ",
+        //   icon: 'logoGCPMono'
+        // },
       },
       auditing: {
         audit: {
@@ -100,7 +103,7 @@ export class AddNewExtension extends Component {
           title: TabDescription.docker.title,
           url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.docker.description,
-          icon: "securityApp"
+          icon: "logoDocker"
         },
         /*
         mitre: {
@@ -161,13 +164,55 @@ export class AddNewExtension extends Component {
       const currentExtension = extensions[key];
       return(
         <EuiFlexItem key={index}>
-          <EuiCard
+          {/* <EuiCard
             layout="horizontal"
             icon={(<EuiIcon size="xl" type={currentExtension.icon} />) }
             title={currentExtension.title}
             description={currentExtension.description}
-            onClick={() => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) }
+            onClick={ !['pci','gdpr','hipaa','nist'].includes(key) ?
+              () => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) 
+              : undefined
+            }
+          /> */}
+          <EuiCard
+            icon={<EuiIcon size="xl" type={currentExtension.icon}  />}
+            title={currentExtension.title}
+            description={currentExtension.description}
+            footer={
+              <div>
+                <EuiButton aria-label="Go to guide" onCLick={!['pci','gdpr','hipaa','nist'].includes(key) ?
+                  () => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) 
+                  : undefined}>
+                    Configure
+                </EuiButton>
+                <EuiSpacer size="m" />
+                <EuiSwitch
+                  label={currentExtension.enabled ? 'Show' : 'Hide'}
+                  checked={currentExtension.enabled}
+                  onChange={this.onChange}
+                />
+              </div>
+            }
           />
+          {/* <EuiCard
+            icon={<EuiIcon size="xl" type={currentExtension.icon} />}
+            title={currentExtension.title}
+            description={currentExtension.description}
+            footer={ !['pci','gdpr','hipaa','nist'].includes(key) ? (
+              <EuiButtonEmpty
+                iconType="iInCircle"
+                size="xs"
+                onClick={() => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true})}
+                aria-label="See more details about Sketch">
+                Interactive guide
+              </EuiButtonEmpty>
+            ) : undefined
+            }
+            selectable={{
+              onClick: () => console.log(''),
+              isSelected: currentExtension.enabled,
+            }}
+          /> */}
         </EuiFlexItem>
       )
     });
@@ -261,7 +306,7 @@ export class AddNewExtension extends Component {
 
   showCards(){
     return (
-      <EuiPage restrictWidth="1100px" style={{ background: 'transparent' }}>
+      <EuiPage style={{ background: 'transparent' }}>
         <EuiPageBody>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -309,9 +354,15 @@ export class AddNewExtension extends Component {
 
     return (
       <div>
-        {(!this.state.isShowingExtension && this.showCards())}
+        {this.state.isShowingExtension ? (
+          <WzExtensionGuide
+            currentExtensionData={this.state.currentExtensionData}
+            closeGuide={this.closeExtensionDetails}
+            guideId={this.state.currentExtensionId}
+            agent={{os: 'windows', type: 'manager'}}
+          />
+        ) : this.showCards()}
         {/* {(this.state.isShowingExtension && this.showExtensionDetails())} */}
-        {(this.state.isShowingExtension && <WzExtensionGuide closeGuide={this.closeExtensionDetails} guide={'syscheck'}/>)}
       </div>
     );
   }
