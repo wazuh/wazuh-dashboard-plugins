@@ -32,7 +32,7 @@ class WzManagementMain extends Component {
     this.state = {};
     this.store = store;
   }
-  componentDidMount() {
+  componentWillMount() {
     this.props.updateRulesetSection(this.props.section);
   }
 
