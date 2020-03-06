@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 import {
   EuiFlexItem,
@@ -38,7 +39,6 @@ import {
   EuiTableHeaderMobile,
 } from '@elastic/eui';
 import './visualize-top-menu.less';
-import WzReduxProvider from '../../redux/wz-redux-provider';
 import { AgentSelectionTable } from './visualize-agent-selection-table';
 export class VisualizeTopMenu extends Component {
   constructor(props) {
@@ -50,7 +50,60 @@ export class VisualizeTopMenu extends Component {
     };
   }
 
-  async componentDidUpdate() {}
+  onFilterUpdate() {
+    console.log('filters were updated', this.state.filterManager.filters);
+    if (this.state.oldFilters) {
+      // if oldFilters length is less than current filters, it means some filters have been added
+      if (this.state.oldFilters.length < this.state.filterManager.filters.length) {
+        // get the filters that have been added
+        const addedFilters = this.state.filterManager.filters.filter(item => {
+          return !this.state.oldFilters.some(oldItem => {
+            return JSON.stringify(oldItem.query) === JSON.stringify(item.query);
+          });
+        });
+        console.log(addedFilters)
+      }
+
+      // if oldFilters length is higher than current filters, it means some filters have been removed
+      if (this.state.oldFilters.length > this.state.filterManager.filters.length) {
+        // get the filters that have been removed
+        const removedFilters = this.state.oldFilters.filter(item => {
+          return !this.state.filterManager.filters.some(oldItem => {
+            return JSON.stringify(oldItem.query) === JSON.stringify(item.query);
+          });
+        });
+        console.log(removedFilters)
+      }
+
+      //if oldFilters length is the same as the current filters length, updated a filter?
+    }
+    this.setState({ oldFilters: this.state.filterManager.filters });
+  }
+
+  removeAgentsFilter() {
+    this.props.buildOverview();
+    const currentAppliedFilters = this.state.filterManager.filters;
+    const agentFilters = currentAppliedFilters.filter(x => {
+      return x.meta.key === 'agent.id';
+    });
+    agentFilters.map(x => {
+      this.state.filterManager.removeFilter(x);
+    });
+  }
+
+  componentDidMount() {
+    const { filterManager } = getServices();
+    const filterUpdateSubscriber = filterManager.updated$.subscribe(x => {
+      this.onFilterUpdate();
+    });
+
+    this.setState({ filterUpdateSubscriber, filterManager: filterManager });
+  }
+
+  componentWillUnmount() {
+    this.state.filterUpdateSubscriber.unsubscribe();
+    console.log('filters unsuscribed');
+  }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.tab) {
@@ -73,6 +126,14 @@ export class VisualizeTopMenu extends Component {
     this.setState({ isAgentModalVisible: true });
   }
 
+  updateAgentSearch(agentsIdList) {
+    this.closeAgentModal();
+    if (agentsIdList) {
+      this.props.setAgent(agentsIdList);
+      this.setState({ isAgent: true });
+    }
+  }
+
   render() {
     let modal;
 
@@ -89,7 +150,9 @@ export class VisualizeTopMenu extends Component {
             </EuiModalHeader>
 
             <EuiModalBody>
-              <AgentSelectionTable></AgentSelectionTable>
+              <AgentSelectionTable
+                updateAgentSearch={agentsIdList => this.updateAgentSearch(agentsIdList)}
+              ></AgentSelectionTable>
             </EuiModalBody>
           </EuiModal>
         </EuiOverlayMask>
@@ -118,8 +181,9 @@ export class VisualizeTopMenu extends Component {
                 <EuiKeyPadMenuItem
                   label="Remove Agent"
                   onClick={() => {
-                    this.setState({ isAgent: false });
+                    this.removeAgentsFilter();
                     this.props.setAgent(false);
+                    this.setState({ isAgent: false });
                   }}
                   betaBadgeLabel="Remove"
                   betaBadgeTooltipContent={`Remove Agent ${this.state.isAgent}`}

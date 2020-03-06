@@ -19,7 +19,10 @@ import { RequirementCard } from '../../controllers/overview/components/requireme
 import AlertsStats from '../../controllers/overview/components/alerts-stats'
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import store from '../../redux/store';
+import { updateVis } from '../../redux/actions/visualizationsActions';
 import { WzRequest } from '../../react-services/wz-request';
+import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -114,6 +117,11 @@ export class WzVisualize extends Component {
   }
 
   render() {
+    //VisFactoryHandler.test();
+    this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
+    //store.dispatch(updateVis({ update: true }));
+    console.log("update")
+    console.log(this.visualizations)
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = (vis) => {
       return (

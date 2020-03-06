@@ -82,7 +82,7 @@ export class VisFactoryService {
       this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
-      this.$rootScope.$broadcast('updateVis', {raw : this.rawVisualizations.getList()});
+      this.$rootScope.$broadcast('updateVis');
       return;
     } catch (error) {
       return Promise.reject(error);

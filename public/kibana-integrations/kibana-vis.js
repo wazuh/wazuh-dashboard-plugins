@@ -75,6 +75,7 @@ class KibanaVis extends Component {
   }
 
   componentWillUnmount() {
+    console.log("destruido", this.visID)
     if (this._isMounted) {
       this._isMounted = false;
       this.updateVis();
@@ -83,6 +84,7 @@ class KibanaVis extends Component {
   }
 
   componentDidUpdate() {
+    this.visID = this.props.visID;
     if (this.props.state.shouldUpdate) {
       this.updateVis();
     }
@@ -167,7 +169,6 @@ class KibanaVis extends Component {
       if (!this.factory) {
         this.factory = embeddables.getEmbeddableFactory('visualization');
       }
-
       if (raw && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -197,6 +198,7 @@ class KibanaVis extends Component {
         }
       }
     } catch (error) {
+      console.log(error)
       if (((error || {}).message || '').includes('not locate that index-pattern-field')) {
         if (this.deadField) {
           this.tabVisualizations.addDeadVis();

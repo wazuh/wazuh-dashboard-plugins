@@ -16,6 +16,7 @@ import { TabDescription } from '../../../server/reporting/tab-description';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { VisFactoryHandler } from '../../react-services/vis-factory-handler'
 
 export class OverviewController {
   /**
@@ -29,7 +30,6 @@ export class OverviewController {
    * @param {*} tabVisualizations
    * @param {*} commonData
    * @param {*} reportingService
-   * @param {*} visFactoryService
    */
   constructor(
     $scope,
@@ -41,7 +41,6 @@ export class OverviewController {
     tabVisualizations,
     commonData,
     reportingService,
-    visFactoryService,
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -52,7 +51,7 @@ export class OverviewController {
     this.tabVisualizations = tabVisualizations;
     this.commonData = commonData;
     this.reportingService = reportingService;
-    this.visFactoryService = visFactoryService;
+    this.visFactoryService = VisFactoryHandler;
     this.wazuhConfig = new WazuhConfig();
     this.showingMitreTable = false;
   }
@@ -105,16 +104,26 @@ export class OverviewController {
       },
       tab: this.tab,
       subtab: this.subtab,
-      setAgent: id => {
-        this.isAgent = id;
-        this.$rootScope.$emit('selectAgent', {
-          id: id
-        });
+      buildOverview: async () => {
+        await this.updateSelectedAgents(false);
+      },
+      buildAgent: async () => {
+        await this.visFactoryService.buildAgentsVisualizations(
+          this.filterHandler,
+          this.tab,
+          null,
+          true,
+          1
+        );
+      },
+      setAgent: async agentList => {
+        this.updateSelectedAgents(agentList)
       },
     };
 
     this.visualizeProps = {
       selectedTab: this.tab,
+      isAgent: this.isAgent,
       updateRootScope: (prop, value) => {
         this.$rootScope[prop] = value;
         this.$rootScope.$applyAsync();
@@ -125,6 +134,40 @@ export class OverviewController {
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
+  }
+
+  async updateSelectedAgents(agentList){
+    console.log("update selected agents")
+    if(agentList && agentList.length){
+      await this.visFactoryService.buildAgentsVisualizations(
+        this.filterHandler,
+        this.tab,
+        null,
+        true,
+        agentList
+      );
+      this.isAgent = agentList[0];
+      if(agentList.length === 1){
+        this.$rootScope.$emit('selectAgent', {
+          id: agentList[0]
+        }); 
+      }else if(agentList.length > 1){
+        this.$rootScope.$emit('selectMultipleAgent', {
+          agentsList: agentList
+        });
+      }
+    }else{
+      await this.visFactoryService.buildOverviewVisualizations(
+        this.filterHandler,
+        this.tab,
+        null, //not needed
+        true
+      );
+    }
+    this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
+
+    this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
+    
   }
 
   /**
@@ -160,12 +203,13 @@ export class OverviewController {
       this.tabView = subtab;
 
       if (subtab === 'panels' && this.tab !== 'welcome') {
-        await this.visFactoryService.buildOverviewVisualizations(
-          this.filterHandler,
-          this.tab,
-          subtab,
-          localChange || preserveDiscover
-        );
+         await this.visFactoryService.buildOverviewVisualizations(
+           this.filterHandler,
+           this.tab,
+           subtab,
+           localChange || preserveDiscover
+         );
+          this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {
         this.$scope.$emit('changeTabView', {
           tabView: this.tabView,

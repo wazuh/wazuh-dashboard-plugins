@@ -45,7 +45,8 @@ export class AgentSelectionTable extends Component {
       itemsPerPage: 10,
       pageIndex: 0,
       totalItems: 0,
-      sortDirection: 'desc',
+      isLoading: false,
+      sortDirection: 'asc',
       sortField: 'id',
       currentSearch: '',
     };
@@ -132,23 +133,28 @@ export class AgentSelectionTable extends Component {
   }
 
   async getItems() {
-    const rawData = await this.wzReq('GET', '/agents', this.buildFilter());
-    const data = (((rawData || {}).data || {}).data || {}).items;
-
-    const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
-    const formattedData = data.map((item, id) => {
-      return {
-        id: item.id,
-        name: item.name,
-        version: item.version || '-',
-        os: (item.os || {}).name || '-',
-        status: item.status,
-        group: item.group || '-',
-      };
-    });
-    this.items = formattedData;
-
-    this.setState({ totalItems });
+    try{
+      this.setState({isLoading: true});
+      const rawData = await this.wzReq('GET', '/agents', this.buildFilter());
+      const data = (((rawData || {}).data || {}).data || {}).items;
+  
+      const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
+      const formattedData = data.map((item, id) => {
+        return {
+          id: item.id,
+          name: item.name,
+          version: item.version || '-',
+          os: (item.os || {}).name || '-',
+          status: item.status,
+          group: item.group || '-',
+        };
+      });
+      this.items = formattedData;
+  
+      this.setState({ totalItems, isLoading: false });
+    }catch(err){
+      this.setState({ isLoading: false });
+    }
   }
 
   addHealthStatusRender(status) {
@@ -488,7 +494,7 @@ export class AgentSelectionTable extends Component {
     if (this.areAnyRowsSelected() > 0 && this.items.length) {
       optionalActionButtons = (
         <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => console.log(this.getSelectedItems())} color="primary">
+          <EuiButton onClick={() => this.props.updateAgentSearch(this.getSelectedItems())} color="primary">
       Filter by {this.getSelectedCount() <= 3 && (`selected agents: ${this.getSelectedItems()}`) || ("selected agents (" + this.getSelectedCount() +")")}
           </EuiButton>
         </EuiFlexItem>
