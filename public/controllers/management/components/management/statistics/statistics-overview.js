@@ -150,7 +150,41 @@ class WzStatisticsOverview extends Component {
   }
 
   renderAnalisysdVisualizations() {
-
+    return (<div>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-alerts-queue', 'Alerts Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-alerts-written', 'Alerts Queue')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-events-queue', 'Events Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-events-received', 'Events Received')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-firewall-queue', 'Firewall Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-firewall-written', 'Firewall Written')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-hostinfo-queue', 'Hostinfo Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-hostinfo-event-decoded', 'Hostinfo events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-rootcheck-queue', 'Rootcheck Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-rootcheck-event-decoded', 'Rootcheck events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-sca-queue', 'Sca Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-sca-event-decoded', 'Sca events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-syscheck-queue', 'Syscheck Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-syscheck-event-decoded', 'Syscheck events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-winevt-queue', 'Winevt Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-winevt-event-decoded', 'Winevt events decoded')}
+      </EuiFlexGroup>
+    </div>
+    );
   }
 
   render() {
