@@ -60,7 +60,7 @@ service kibana restart
 
 ## Upgrade
 
-Note: For updates from Wazuh 3.11.x to 3.12.y (regardless of the version of the Elastic Stack) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
+Note: In Wazuh 3.12.0 (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
 
 Stop Kibana
 
@@ -110,17 +110,11 @@ cd /usr/share/kibana/
 sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.1.zip
 ```
 
-Restore the configuration file backup.
-
-```
-sudo cp /tmp/wazuh-backup.yml /usr/share/kibana/plugins/wazuh/wazuh.yml
-```
-
 Update configuration file permissions.
 
 ```
-sudo chown kibana:kibana /usr/share/kibana/plugins/wazuh/wazuh.yml
-sudo chmod 600 /usr/share/kibana/plugins/wazuh/wazuh.yml
+sudo chown kibana:kibana /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+sudo chmod 600 /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 ```
 
 Restart Kibana
