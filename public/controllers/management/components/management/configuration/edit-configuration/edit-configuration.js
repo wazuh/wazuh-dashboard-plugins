@@ -76,11 +76,11 @@ class WzEditConfiguration extends Component{
         title: (
           <Fragment>
             <EuiIcon type='alert'/>&nbsp;
-            <span>Error saving configuration</span>
+            <span>File ossec.conf saved, but there were found several error while validating the configuration.</span>
           </Fragment>),
-        color: 'danger',
-        text: typeof error === 'string' ? error : error.message
-      });
+        color: 'warning',
+        text: error.details
+      })
       this.setState({ saving: false, infoChangesAfterRestart: false });
     }
   }
