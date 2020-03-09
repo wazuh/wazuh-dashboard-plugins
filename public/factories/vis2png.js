@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import domtoimage from 'dom-to-image';
+import domtoimage from '../utils/dom-to-image';
 
 export class Vis2PNG {
   /**
@@ -38,13 +38,14 @@ export class Vis2PNG {
           const tmpNode = this.htmlObject[currentValue];
           try {
             const tmpResult = await domtoimage.toPng(tmpNode[0]);
+            if (tmpResult === 'data:,') return;
             this.rawArray.push({
               element: tmpResult,
               width: tmpNode.width(),
               height: tmpNode.height(),
               id: currentValue
             });
-          } catch (error) {} // eslint-disable-line
+          } catch (error) { } // eslint-disable-line
           currentCompleted++;
           this.$rootScope.reportStatus = `Generating report...${Math.round(
             (currentCompleted / len) * 100

@@ -59,40 +59,48 @@
                 </div>
                 <!-- End of navigation bar -->
 
-                <!-- Discover search bar section -->
-                <kbn-dis ng-show="octrl.tab !== 'welcome'" style="padding-bottom: 16px;"></kbn-dis>
-                <!-- End Discover search bar section -->
+            <!-- Discover search bar section -->
+            <kbn-dis ng-show="octrl.tab !== 'welcome'"></kbn-dis>
+            <!-- End Discover search bar section -->
 
-                <!-- Loading status section -->
-                <div
-                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
-                        ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'">
-                        <span class="euiLoadingChart euiLoadingChart--large">
-                            <span class="euiLoadingChart__bar"></span>
-                            <span class="euiLoadingChart__bar"></span>
-                            <span class="euiLoadingChart__bar"></span>
-                            <span class="euiLoadingChart__bar"></span>
-                        </span>
-                        <div class="euiSpacer euiSpacer--m"></div>
-                        <div class="percentage">{{loadingStatus}}</div>
-                    </div>
+            <!-- Loading status section -->
+            <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'"
+                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+                    <span class="euiLoadingChart euiLoadingChart--large">
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                    </span>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="percentage">{{loadingStatus}}</div>
                 </div>
+            </div>
 
-                <!-- End loading status section -->
+            <!-- End loading status section -->
 
-                <!-- Report status section -->
-                <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome'"
-                    ng-show="reportBusy && reportStatus">
-                    <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+            <!-- Report status section -->
+            <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
+                ng-if="reportBusy && reportStatus">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+                    <span class="euiLoadingChart euiLoadingChart--large">
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                    </span>
+                    <div class="euiSpacer euiSpacer--m"></div>
                     <div class="percentage">{{reportStatus}}</div>
+                    <div class="euiSpacer euiSpacer--l"></div>
                 </div>
-                <!-- End report status section -->
+            </div>
+            <!-- End report status section -->
 
-                <!-- No results section -->
-                <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
-                    ng-if="octrl.tab !== 'welcome'" ng-show="resultState === 'none' && octrl.tabView === 'panels'">
-                    <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+            <!-- No results section -->
+            <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+                ng-if="octrl.tab !== 'welcome'" ng-show="resultState === 'none' && octrl.tabView === 'panels'">
+                <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
                     one.'}" />
                 </div>
 

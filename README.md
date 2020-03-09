@@ -32,8 +32,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 - Wazuh HIDS 3.12.0
 - Wazuh RESTful API 3.12.0
-- Kibana 7.6.0
-- Elasticsearch 7.6.0
+- Kibana 7.6.1
+- Elasticsearch 7.6.1
 
 ## Installation
 
@@ -41,7 +41,7 @@ Install the app
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.0.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.1.zip
 ```
 
 Restart Kibana
@@ -60,7 +60,7 @@ service kibana restart
 
 ## Upgrade
 
-Note: For updates from Wazuh 3.11.x to 3.11.y (regardless of the version of the Elastic Stack) it is recommended to make a backup of the Wazuh app configuration file in order not to lose the modified parameters or the configured APIs.
+Note: For updates from Wazuh 3.11.x to 3.12.y (regardless of the version of the Elastic Stack) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
 
 Stop Kibana
 
@@ -76,17 +76,18 @@ systemctl stop kibana
 service kibana stop
 ```
 
-Make a backup of the configuration file.
+Copy the wazuh.yml to its new location. (Only needed for upgrades from 3.11.x to 3.12.y)
 
 ```
-cp /usr/share/kibana/plugins/wazuh/wazuh.yml /tmp/wazuh-backup.yml
+mkdir -p /usr/share/kibana/optimize/wazuh/config
+cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 ```
 
 Remove the app using kibana-plugin tool
 
 ```
 cd /usr/share/kibana/
-bin/kibana-plugin remove wazuh
+sudo -u kibana bin/kibana-plugin remove wazuh
 ```
 
 Remove generated bundles
@@ -105,8 +106,8 @@ chown -R kibana:kibana /usr/share/kibana/plugins
 Install the app
 
 ```
-cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.0.zip
+cd /usr/share/kibana/
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.1.zip
 ```
 
 Restore the configuration file backup.
@@ -134,12 +135,14 @@ systemctl restart kibana
  
 ``` 
 service kibana restart 
-``` 
+```
+
  
 ## Wazuh - Kibana compatibility matrix
  
 | Wazuh app version | Kibana version | Package                                                         |
 | :---------------: | :------------: | :-------------------------------------------------------------- |
+|       3.11.4      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.1.zip> |
 |       3.11.4      |      7.6.0     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip> |
 |       3.11.4      |      7.4.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.4.2.zip> |
 |       3.11.4      |      6.8.6     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_6.8.6.zip> |
