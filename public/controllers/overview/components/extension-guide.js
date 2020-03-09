@@ -227,8 +227,8 @@ class WzExtensionGuide extends Component {
       value: this.buildConfigurationElementValue(element),
       toggleable: this.buildConfigurationElementToggleable(element),
       enabled: this.buildConfigurationElementEnabled(element),
-      compressible: (element.attributes || element.options) ? true : false,
-      compressed: (element.attributes || element.options) ? false : undefined,
+      collapsible: (element.attributes || element.options) ? true : false,
+      collapsed: (element.attributes || element.options) ? false : undefined,
       elements: !params.ignore_repeatable && element.repeatable ? (element.repeatable_insert_first ? [this.buildConfigurationElement({...element, ...element.repeatable_insert_first_properties }, {ignore_repeatable: true})] : []) : undefined,
       show_options: element.show_options || false,
       options: element.options && element.options.filter((option) => this.filterElementByAgent(option)).map(option => ({ 
@@ -326,7 +326,7 @@ class WzExtensionGuide extends Component {
         {!guideOption.elements ? (
           <EuiPanel>
             {this.renderOptionSetting(guideOption, keyID, options)}
-            {guideOption.enabled && guideOption.attributes && guideOption.attributes.length && ((guideOption.compressible && !guideOption.compressed) || !guideOption.compressible)? (
+            {guideOption.enabled && guideOption.attributes && guideOption.attributes.length && ((guideOption.collapsible && !guideOption.collapsed) || !guideOption.collapsible)? (
               <Fragment>
                 {guideOption.type && (<EuiSpacer size='m' />)}
                 <EuiToolTip
@@ -356,7 +356,7 @@ class WzExtensionGuide extends Component {
                 )}
               </Fragment>
             ) : null}
-            {guideOption.enabled && guideOption.options && guideOption.options.length && ((guideOption.compressible && !guideOption.compressed) || !guideOption.compressible)? (
+            {guideOption.enabled && guideOption.options && guideOption.options.length && ((guideOption.collapsible && !guideOption.collapsed) || !guideOption.collapsible)? (
               <Fragment>
                 {guideOption.show_attributes && (<EuiSpacer size='m' />)}
                 <EuiToolTip
@@ -499,7 +499,7 @@ class WzExtensionGuide extends Component {
               </EuiToolTip>
             </span>
           )}
-          {guideOption.enabled && guideOption.compressible && (
+          {guideOption.enabled && guideOption.collapsible && (
             <Fragment>
               <EuiToolTip
                 position='top'
@@ -510,8 +510,8 @@ class WzExtensionGuide extends Component {
                 isEmpty
                 isIconOnly
                 size='s'
-                iconType={guideOption.compressed ? 'eye' : 'eyeClosed'}
-                onChange={() => this.setElementProp(keyID, 'compressed', !guideOption.compressed)}
+                iconType={guideOption.collapsed ? 'eye' : 'eyeClosed'}
+                onChange={() => this.setElementProp(keyID, 'collapsed', !guideOption.collapsed)}
               />
             </EuiToolTip>
             </Fragment>
@@ -528,8 +528,8 @@ class WzExtensionGuide extends Component {
             checked={guideOption.enabled}
             onChange={() => {
               this.setElementProp(keyID, 'enabled', !guideOption.enabled)
-              if(guideOption.compressible){
-                this.setElementProp(keyID, 'compressed', false)
+              if(guideOption.collapsible){
+                this.setElementProp(keyID, 'collapsed', false)
               }
             }}
           />
@@ -540,7 +540,7 @@ class WzExtensionGuide extends Component {
             <EuiText color='subdued'>{guideOption.description}</EuiText>
           </Fragment>
         )}
-        {((guideOption.compressible && !guideOption.compressed) || !guideOption.compressible) && (
+        {((guideOption.collapsible && !guideOption.collapsed) || !guideOption.collapsible) && (
           <Fragment>
             <div>
               {guideOption.enabled && (<EuiSpacer size='s' />)}
