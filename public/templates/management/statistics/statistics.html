@@ -1,5 +1,5 @@
 <div ng-controller="statisticsController" ng-if="mctrl.tab === 'statistics'" style="padding: 16px">
-    <kbn-dis ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
+    <kbn-dis class="kbnDis-no-padding" ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
     
     <react-component name="WzStatistics" props="{}" />
 </div>

@@ -27,7 +27,7 @@ import {
 import { connect } from 'react-redux';
 import { updateVis } from '../../../../../redux/actions/visualizationsActions'
 
-import  KibanaVis  from '../../../../../kibana-integrations/kibana-vis';
+import KibanaVis from '../../../../../kibana-integrations/kibana-vis';
 import { clusterNodes } from '../configuration/utils/wz-fetch';
 import { GenericRequest } from '../../../../../react-services/generic-request';
 import { RawVisualizations } from '../../../../../factories/raw-visualizations';
@@ -41,7 +41,7 @@ class WzStatisticsOverview extends Component {
     analysisd: `Analysisd statistics refer to the data stored from the
      period indicated in the variable 'analysisd.state_interval'.`
   };
-  tabs = ['remoted', 'analysisd'].map(item => {return {id: item, name: item}})
+  tabs = ['remoted', 'analysisd'].map(item => { return { id: item, name: item } })
 
   constructor(props) {
     super(props);
@@ -57,21 +57,21 @@ class WzStatisticsOverview extends Component {
 
   async componentDidMount() {
     this._isMounted = true;
-    
+
     this.discoverPendingUpdates.addItem(
-      {query: "", language: "lucene"},
+      { query: "", language: "lucene" },
       [
         {
-          "meta":{"removable":false,"index":"wazuh-statistics*","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"cluster","params":{"query":"false"}},
-          "query":{"match":{"cluster":{"query":"false","type":"phrase"}}},
-          "$state":{"store":"appState"}
+          "meta": { "removable": false, "index": "wazuh-statistics*", "negate": false, "disabled": false, "alias": null, "type": "phrase", "key": "cluster", "params": { "query": "false" } },
+          "query": { "match": { "cluster": { "query": "false", "type": "phrase" } } },
+          "$state": { "store": "appState" }
         }
       ]
     );
     GenericRequest.request(
       'POST',
       `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
-      {nodes: { items: [], name: 'node01' } })
+      { nodes: { items: [], name: 'node01' } })
       .then(visData => this.rawVisualizations.assignItems(visData.data.raw));
     try {
       const data = await clusterNodes();
@@ -88,7 +88,7 @@ class WzStatisticsOverview extends Component {
         clusterNodeSelected: false
       });
     }
-    }
+  }
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -123,10 +123,10 @@ class WzStatisticsOverview extends Component {
     return (
       <EuiFlexItem>
         <EuiTitle size="s"><p>{title}</p></EuiTitle>
-        <KibanaVis 
-          visID={visID} 
-          tab={'statistics'} 
-          updateRootScope={() => {}} >
+        <KibanaVis
+          visID={visID}
+          tab={'statistics'}
+          updateRootScope={() => { }} >
         </KibanaVis>
       </EuiFlexItem>
     );
@@ -138,12 +138,12 @@ class WzStatisticsOverview extends Component {
         {this.renderVisualization('Wazuh-App-Statistics-remoted-queue-size', 'Queue')}
       </EuiFlexGroup>
       <EuiFlexGroup style={{ minHeight: 250 }}>
-          {this.renderVisualization('Wazuh-App-Statistics-remoted-Recv-bytes', 'Received Bytes')}
-          {this.renderVisualization('Wazuh-App-Statistics-remoted-event-count', 'Event count')}
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-Recv-bytes', 'Received Bytes')}
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-event-count', 'Event count')}
       </EuiFlexGroup>
       <EuiFlexGroup style={{ minHeight: 250 }}>
-          {this.renderVisualization('Wazuh-App-Statistics-remoted-messages' , 'Message stats')}
-          {this.renderVisualization('Wazuh-App-Statistics-remoted-tcp-sessions', 'TCP Sessions')}
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-messages', 'Message stats')}
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-tcp-sessions', 'TCP Sessions')}
       </EuiFlexGroup>
     </div>
     );
@@ -190,47 +190,45 @@ class WzStatisticsOverview extends Component {
   render() {
     const { clusterNodes, clusterNodeSelected, selectedTabId } = this.state;
     return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle size="l"><p>Statistics</p></EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-            {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
-              <EuiFlexItem grow={false} >
-                <EuiSelect
-                  id="selectNode"
-                  options={clusterNodes}
-                  value={clusterNodeSelected}
-                  onChange={this.onSelectNode}
-                  aria-label="Select node"
-                />
+      <EuiPanel>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle size="l"><p>Statistics</p></EuiTitle>
               </EuiFlexItem>
-            )}
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color="subdued">
-                From here you can see daemon statistics.
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
+            <EuiFlexItem grow={false} >
+              <EuiSelect
+                id="selectNode"
+                options={clusterNodes}
+                value={clusterNodeSelected}
+                onChange={this.onSelectNode}
+                aria-label="Select node"
+              />
+            </EuiFlexItem>
+          )}
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiText color="subdued">
+              From here you can see daemon statistics.
               </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiTabs>{
-                this.renderTabs()
-              }</EuiTabs>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size={'m'} />
-          { selectedTabId === 'remoted' && this.renderRemotedVisualizations() }
-          { selectedTabId === 'analysisd' && this.renderAnalisysdVisualizations() }
-        </EuiPanel>
-      </EuiPage>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiTabs>{
+              this.renderTabs()
+            }</EuiTabs>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size={'m'} />
+        {selectedTabId === 'remoted' && this.renderRemotedVisualizations()}
+        {selectedTabId === 'analysisd' && this.renderAnalisysdVisualizations()}
+      </EuiPanel>
     );
   }
 }
