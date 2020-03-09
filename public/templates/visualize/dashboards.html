@@ -27,10 +27,9 @@
             <!-- End Discover search bar section -->
             
             <!-- Loading status section -->
-            <div
+            <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'"
                 class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
-                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
-                    ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
                     <span class="euiLoadingChart euiLoadingChart--large">
                         <span class="euiLoadingChart__bar"></span>
                         <span class="euiLoadingChart__bar"></span>
@@ -44,10 +43,19 @@
             <!-- End loading status section -->
 
             <!-- Report status section -->
-            <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome'"
-                ng-show="reportBusy && reportStatus">
-                <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-                <div class="percentage">{{reportStatus}}</div>
+            <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
+                ng-if="reportBusy && reportStatus">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+                    <span class="euiLoadingChart euiLoadingChart--large">
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                    </span>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="percentage">{{reportStatus}}</div>
+                    <div class="euiSpacer euiSpacer--l"></div>
+                </div>
             </div>
             <!-- End report status section -->
 
@@ -81,6 +89,6 @@
             </div>
             <!-- No results section -->
 
-            <div ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" ng-show="octrl.tabView === 'panels'" >
+            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels'">
                 <react-component name="WzVisualize" props="octrl.visualizeProps" />
             </div>

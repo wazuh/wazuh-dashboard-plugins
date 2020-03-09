@@ -80,9 +80,6 @@ export class OverviewController {
     this.tabView = this.commonData.checkTabViewLocation();
     this.tab = this.commonData.checkTabLocation();
 
-    this.tabHistory = [];
-    if (this.tab !== 'welcome') this.tabHistory.push(this.tab);
-
     // This object represents the number of visualizations per tab; used to show a progress bar
     this.tabVisualizations.assign('overview');
 
@@ -188,34 +185,27 @@ export class OverviewController {
 
   // Switch subtab
   async switchSubtab(
-    subtab,
-    force = false,
-    sameTab = true,
-    preserveDiscover = false
+    subtab
   ) {
     try {
-      if (this.tabView === subtab && !force) return;
       this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear();
       this.$location.search('tabView', subtab);
-      const localChange =
-        subtab === 'panels' && this.tabView === 'discover' && sameTab;
-      this.tabView = subtab;
 
       if (subtab === 'panels' && this.tab !== 'welcome') {
          await this.visFactoryService.buildOverviewVisualizations(
            this.filterHandler,
            this.tab,
-           subtab,
-           localChange || preserveDiscover
+           subtab
          );
           this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {
         this.$scope.$emit('changeTabView', {
-          tabView: this.tabView,
+          tabView: subtab,
           tab: this.tab
         });
       }
+      this.tabView = subtab;
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
@@ -287,31 +277,15 @@ export class OverviewController {
         }
       }
 
-      if (newTab !== 'welcome') this.tabHistory.push(newTab);
-
-      if (this.tabHistory.length > 2)
-        this.tabHistory = this.tabHistory.slice(-2);
-
       if (this.tab === newTab && !force) return;
-
-      const sameTab =
-        ((this.tab === newTab && this.tabHistory.length < 2) ||
-          (this.tabHistory.length === 2 &&
-            this.tabHistory[0] === this.tabHistory[1])) &&
-        force !== 'nav';
 
       // Restore force value if we come from md-nav action
       if (force === 'nav') force = false;
 
       this.$location.search('tab', newTab);
-
-      const preserveDiscover =
-        this.tabHistory.length === 2 &&
-        this.tabHistory[0] === this.tabHistory[1];
-
       this.tab = newTab;
 
-      await this.switchSubtab('panels', true, sameTab, preserveDiscover);
+      await this.switchSubtab('panels', true);
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }

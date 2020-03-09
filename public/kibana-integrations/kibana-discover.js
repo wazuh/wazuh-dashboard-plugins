@@ -183,7 +183,8 @@ function discoverController(
     savedSearch.destroy();
     subscriptions.unsubscribe();
     filterStateManager.destroy();
-    filterListener();
+    if (filterListener) filterListener();
+    if (tabListener) tabListener();
     implicitFilters = null;
   });
 
@@ -441,24 +442,24 @@ function discoverController(
             // Wazuh. Hides the alerts of the '000' agent if it is in the configuration
             const buildFilters = () => {
               const { hideManagerAlerts } = wazuhConfig.getConfig();
-              if (hideManagerAlerts){
+              if (hideManagerAlerts) {
                 return [{
                   "meta": {
-                    "alias":null,
-                    "disabled":false,
-                    "key":"agent.id",
-                    "negate":true,
-                    "params":{"query":"000"},
-                    "type":"phrase",
-                    "index":"wazuh-alerts-3.x-*"
+                    "alias": null,
+                    "disabled": false,
+                    "key": "agent.id",
+                    "negate": true,
+                    "params": { "query": "000" },
+                    "type": "phrase",
+                    "index": "wazuh-alerts-3.x-*"
                   },
-                  "query":{"match_phrase":{"agent.id":"000"}},
-                  "$state": {"store":"appState"}
+                  "query": { "match_phrase": { "agent.id": "000" } },
+                  "$state": { "store": "appState" }
                 }];
               }
               return [];
             }
-          
+
             $scope.updateDataSource().then(function () {
               ///////////////////////////////  WAZUH   ///////////////////////////////////
               if (!filtersAreReady()) return;
@@ -646,7 +647,13 @@ function discoverController(
     if (!filtersAreReady()) return;
 
     timefilter.setTime(dateRange);
-    if (query && typeof query === 'object') $state.query = query;
+    if (query && typeof query === 'object') {
+      /// Wazuh 7.6.1
+      if ($scope.tabView !== 'discover')
+        query.update_Id = new Date().getTime().toString();
+      ///
+      $state.query = query;
+    }
     // Update query from search bar
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, filterManager.filters);
@@ -1045,7 +1052,6 @@ function discoverController(
     return;
   }
 
-  //addHelpMenuToAppChrome(chrome);
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1088,7 +1094,7 @@ function discoverController(
     $scope.$applyAsync();
   }
 
-  const loadFilters = async (wzCurrentFilters, localChange, tab) => {
+  const loadFilters = async (wzCurrentFilters, tab) => {
     const appState = getAppState();
     if (!appState || !globalState) {
       $timeout(100).then(() => {
@@ -1097,7 +1103,6 @@ function discoverController(
     } else {
       implicitFilters = [];
       wzCurrentFilters.forEach(x => implicitFilters.push({ ...x }));
-      $state.filters = localChange ? $state.filters : [];
       const globalFilters = globalState.filters;
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
@@ -1110,7 +1115,7 @@ function discoverController(
   };
 
   const filterListener = $rootScope.$on('wzEventFilters', (evt, parameters) => {
-    loadFilters(parameters.filters, parameters.localChange, parameters.tab);
+    loadFilters(parameters.filters, parameters.tab);
   });
 
   $rootScope.$on('selectAgent', (evt, parameters) => {
@@ -1160,12 +1165,12 @@ function discoverController(
   });
 
   $scope.tabView = $location.search().tabView || 'panels';
-  $rootScope.$on('changeTabView', async (evt, parameters) => {
+  const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;
-
+    delete (($state || {}).query || {}).update_Id;
     evt.stopPropagation();
     if ($scope.tabView === 'discover') {
       $scope.rows = false;

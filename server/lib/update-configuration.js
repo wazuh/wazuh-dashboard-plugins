@@ -27,7 +27,7 @@ const needRestartFields = [
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../wazuh.yml');
+    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml');
   }
 
   /**

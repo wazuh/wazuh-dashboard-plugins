@@ -70,9 +70,8 @@ export class VisFactoryService {
    * @param {*} filterHandler
    * @param {*} tab
    * @param {*} subtab
-   * @param {*} localChange
    */
-  async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
+  async buildOverviewVisualizations(filterHandler, tab, subtab) {
     try {
       const currentPattern = AppState.getCurrentPattern();
       const data = await this.genericReq.request(
@@ -80,7 +79,7 @@ export class VisFactoryService {
         `/elastic/visualizations/overview-${tab}/${currentPattern}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
-      this.commonData.assignFilters(filterHandler, tab, localChange);
+      this.commonData.assignFilters(filterHandler, tab);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
       this.$rootScope.$broadcast('updateVis');
       return;
