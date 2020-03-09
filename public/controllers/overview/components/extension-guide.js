@@ -510,7 +510,7 @@ class WzExtensionGuide extends Component {
                 isEmpty
                 isIconOnly
                 size='s'
-                iconType={guideOption.compressed ? 'eyeClosed' : 'eye'}
+                iconType={guideOption.compressed ? 'eye' : 'eyeClosed'}
                 onChange={() => this.setElementProp(keyID, 'compressed', !guideOption.compressed)}
               />
             </EuiToolTip>
