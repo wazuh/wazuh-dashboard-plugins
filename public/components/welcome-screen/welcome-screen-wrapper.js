@@ -12,13 +12,22 @@
 import React, { Component } from 'react';
 import { WelcomeScreen } from './welcome-screen';
 import WzReduxProvider from '../../redux/wz-redux-provider';
-
+import chrome from 'ui/chrome';
 
 export class WelcomeScreenWrapper extends Component {
   constructor(props) {
     super(props);
     this.state = {
     };
+  }
+
+  async componentDidMount(){
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.location = $injector.get('$location');
+    this.scope = $injector.get('$rootScope');
+    this.location.search("tab", "welcome");
+    this.location.search("tabView", "welcome");
+    this.scope.tabView = 'welcome';
   }
 
   render() {

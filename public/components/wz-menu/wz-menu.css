@@ -136,9 +136,15 @@ wz-menu {
 }
 
 .visualize-popover.full-screen{
-    width: calc(100vw - 65px);
-    height: calc(100vh - 115px);
-    left: 56px!important;
+    width: calc(100vw - 48px);
+    height: calc(100vh - 97px);
+    left: 48px!important;
+    box-shadow: none!important;
+    top: 105px!important;
+    border-radius: 0;
+    border: 1px solid #d3dae6;
+    transition: none;
+    position: fixed;
 }
 
 .visualize-popover .expandIcon{
