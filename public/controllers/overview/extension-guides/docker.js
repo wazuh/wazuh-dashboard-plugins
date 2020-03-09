@@ -25,7 +25,7 @@ export default {
       elements: [
         {
           name: 'disabled',
-          description: `Disable the Docker wodle.`,
+          description: `Disables the Docker wodle.`,
           type: 'switch',
           required: true
         },

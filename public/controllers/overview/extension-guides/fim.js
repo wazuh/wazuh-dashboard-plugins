@@ -1,10 +1,21 @@
+/*
+* Wazuh app - Vulnerabilities extension guide
+* Copyright (C) 2015-2020 Wazuh, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* Find more information about this on the LICENSE file.
+*/
 export default {
-  id: 'audit',
+  id: 'fim',
   xml_tag: 'syscheck',
-  name: 'File integrity monitoring',
+  name: 'Integrity monitoring',
   description: 'Configuration options for file integrity monitoring.',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html',
-  icon: 'monitoringApp',
+  icon: 'filebeatApp',
   avaliable_for_manager: true,
   avaliable_for_agent: true,
   steps: [
@@ -26,9 +37,8 @@ export default {
           repeatable_insert_first_properties: {
             removable: false
           },
-          placeholder: '/etc,/usr/bin,/usr/sbin,/bin,/sbin',
+          placeholder: 'Any directory comma separated',
           default_value: '/etc,/usr/bin,/usr/sbin,/bin,/sbin',
-          validate_error_message: 'Any directory comma separated',
           attributes: [
             {
               name: 'realtime',
@@ -137,7 +147,6 @@ export default {
               Any directory or file name (but not a path) is allowed`,
               type: 'input',
               placeholder: 'sregex',
-              default_value: true,
               validate_error_message: 'Any directory or file name (but not a path) is allowed'
             },
             {
@@ -389,6 +398,7 @@ export default {
           type: 'input-number',
           values: { min: 1, max: 9999 },
           default_value: 300,
+          placeholer: 'Time in seconds',
           validate_error_message: 'Any number from 1 to 9999',
           agent_os: 'windows'
         },

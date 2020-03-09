@@ -122,7 +122,7 @@ class WzExtensionGuide extends Component {
       case 'switch':
         return defaultValue || false;
       case 'select':
-        return defaultValue || option.values[0].value;
+        return defaultValue !== undefined ? defaultValue : option.values[0].value;
       default:
         return undefined;
     }
@@ -145,18 +145,16 @@ class WzExtensionGuide extends Component {
   }
   resetGuideWithNotification = () => {
     this.resetGuide(true);
+    this.addToast({
+      title: 'The guide was restarted',
+      color: 'success'
+    });
   }
-  resetGuide(notify){
+  resetGuide(){
     this.setState({
       steps: this.buildInitialSteps(this.guide.steps),
       resetModalVisible: false
     });
-    if(notify){
-      this.addToast({
-        title: 'The guide was restarted',
-        color: 'success'
-      });
-    }
   }
   addToast({color, title, text, time = 3000}){
     toastNotifications.add({title, text, toastLifeTimeMs: time, color})
@@ -229,6 +227,8 @@ class WzExtensionGuide extends Component {
       value: this.buildConfigurationElementValue(element),
       toggleable: this.buildConfigurationElementToggleable(element),
       enabled: this.buildConfigurationElementEnabled(element),
+      compressible: (element.attributes || element.options) ? true : false,
+      compressed: (element.attributes || element.options) ? false : undefined,
       elements: !params.ignore_repeatable && element.repeatable ? (element.repeatable_insert_first ? [this.buildConfigurationElement({...element, ...element.repeatable_insert_first_properties }, {ignore_repeatable: true})] : []) : undefined,
       show_options: element.show_options || false,
       options: element.options && element.options.filter((option) => this.filterElementByAgent(option)).map(option => ({ 
@@ -236,7 +236,8 @@ class WzExtensionGuide extends Component {
         value: this.buildConfigurationElementValue(option),
         toggleable: this.buildConfigurationElementToggleable(option),
         enabled: this.buildConfigurationElementEnabled(option),
-        elements: option.repeatable ? (option.repeatable_insert_first ? [this.buildConfigurationElement({...option, ...option.repeatable_insert_first_properties}, {ignore_repeatable: true})] : []) : undefined
+        elements: option.repeatable ? (option.repeatable_insert_first ? [this.buildConfigurationElement({...option, ...option.repeatable_insert_first_properties}, {ignore_repeatable: true})] : []) : undefined,
+        attributes: option.attributes && option.attributes.length ? option.attributes.map((optionAtribute) => this.buildConfigurationElement(optionAtribute)) : undefined
       })) || undefined,
       show_attributes: element.show_attributes || false,
       attributes: element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).map(attribute => ({ 
@@ -308,11 +309,6 @@ class WzExtensionGuide extends Component {
                   isCopyable>
                   {xmlConfig}
                 </EuiCodeBlock>
-                <EuiCodeBlock
-                  language="js"
-                  color="dark">
-                  {JSON.stringify(this.transformStateToJSON())}
-                </EuiCodeBlock>
               </Fragment>
             ) : (
                 <EuiText color='danger'>There is an error in the configuration, please check fields that have errors.
@@ -324,23 +320,29 @@ class WzExtensionGuide extends Component {
       }
     ]
   }
-  renderOption(guideOption, keyID) {
+  renderOption(guideOption, keyID, options) {
     return (
       <Fragment>
         {!guideOption.elements ? (
           <EuiPanel>
-            {this.renderOptionSetting(guideOption, keyID)}
-            {guideOption.enabled && guideOption.attributes && guideOption.attributes.length ? (
+            {this.renderOptionSetting(guideOption, keyID, options)}
+            {guideOption.enabled && guideOption.attributes && guideOption.attributes.length && ((guideOption.compressible && !guideOption.compressed) || !guideOption.compressible)? (
               <Fragment>
-                <EuiButtonToggle
-                  label='Attributes'
-                  color={this.checkInvalidElements(guideOption.attributes) ? 'danger' : 'primary'}
-                  fill={guideOption.show_attributes}
-                  iconType={!guideOption.show_attributes ? 'eye' : 'eyeClosed'}
-                  onChange={() => this.setElementProp(keyID, 'show_attributes', !guideOption.show_attributes)}
-                  style={{marginRight: '4px'}}
-                />
-                {guideOption.show_attributes && (
+                {guideOption.type && (<EuiSpacer size='m' />)}
+                <EuiToolTip
+                  position='top'
+                  content='Show / hide attributes'
+                >
+                  <EuiButtonToggle
+                    label='Attributes'
+                    color={this.checkInvalidElements(guideOption.attributes) ? 'danger' : 'primary'}
+                    fill={guideOption.show_attributes}
+                    iconType={!guideOption.show_attributes ? 'eye' : 'eyeClosed'}
+                    onChange={() => this.setElementProp(keyID, 'show_attributes', !guideOption.show_attributes)}
+                    style={{marginRight: '4px'}}
+                  />
+                </EuiToolTip>
+                {guideOption.show_attributes && guideOption.attributes && guideOption.attributes.length && (
                   <Fragment>
                     <EuiSpacer size='m' />
                     <EuiFlexGrid columns={2} style={{ marginLeft: '8px' }}>
@@ -354,49 +356,61 @@ class WzExtensionGuide extends Component {
                 )}
               </Fragment>
             ) : null}
-            {guideOption.enabled && guideOption.options && guideOption.options.length ? (
+            {guideOption.enabled && guideOption.options && guideOption.options.length && ((guideOption.compressible && !guideOption.compressed) || !guideOption.compressible)? (
               <Fragment>
-                <EuiButtonToggle
-                  label='Options'
-                  color={this.checkInvalidElements(guideOption.options) ? 'danger' : 'primary'}
-                  fill={guideOption.show_options}
-                  iconType={!guideOption.show_options ? 'eye' : 'eyeClosed'}
-                  onChange={() => this.setElementProp(keyID, 'show_options', !guideOption.show_options)}
-                  style={{marginRight: '4px'}}
-                />
-                {guideOption.show_options && (
+                {guideOption.show_attributes && (<EuiSpacer size='m' />)}
+                <EuiToolTip
+                  position='top'
+                  content='Show / hide options'
+                >
+                  <EuiButtonToggle
+                    label='Options'
+                    color={this.checkInvalidElements(guideOption.options) ? 'danger' : 'primary'}
+                    fill={guideOption.show_options}
+                    iconType={!guideOption.show_options ? 'eye' : 'eyeClosed'}
+                    onChange={() => this.setElementProp(keyID, 'show_options', !guideOption.show_options)}
+                    style={{marginRight: '4px'}}
+                  />
+                </EuiToolTip>
+                {guideOption.show_options && guideOption.options && guideOption.options.length && (
                   <Fragment>
                     <EuiSpacer size='m' />
-                      {guideOption.options.map((guideSubOption, key) => {
-                        return !guideSubOption.elements ? (
-                        <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
-                          <EuiFlexGroup>
-                            <EuiFlexItem key={`extension-guide-${guideOption.name}-${guideSubOption.name}`}>
-                              {this.renderOptionSetting(guideSubOption, [...keyID, 'options', key], { ignore_description: true })}
-                              <EuiSpacer size='s'/>
-                            </EuiFlexItem>
-                          </EuiFlexGroup>
-                        </Fragment>
-                      ) : (
-                        <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
-                          {guideSubOption.elements.map((guideSubOptionElement, keyGuideSubOptionElement) => (
-                            <Fragment key={`extension-guide-${guideOption.name}-${guideSubOption.name}-${keyGuideSubOptionElement}`}>
-                              <EuiFlexGroup>
-                                <EuiFlexItem>
-                                  {this.renderOption(guideSubOptionElement, [...keyID,'options', key,'elements',keyGuideSubOptionElement])}
-                                </EuiFlexItem>
-                              </EuiFlexGroup>
-                              <EuiSpacer size='s'/>
-                            </Fragment>
-                          ))}
-                          <EuiFlexGroup justifyContent='center'>
-                            <EuiFlexItem grow={false}>
-                              <EuiButtonEmpty iconType='plusInCircle' onClick={() => this.addElementToStep([...keyID,'options', key,'elements'], guideSubOption, {ignore_repeatable: true})}>Add {guideSubOption.name}</EuiButtonEmpty>
-                            </EuiFlexItem>
-                          </EuiFlexGroup>
-                        </Fragment>
-                      )
-                      })}
+                    {guideOption.options.map((guideSubOption, key) => {
+                      return !guideSubOption.elements ? (
+                      <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
+                        <EuiFlexGroup>
+                          <EuiFlexItem key={`extension-guide-${guideOption.name}-${guideSubOption.name}`}>
+                            {/* {this.renderOptionSetting(guideSubOption, [...keyID, 'options', key], { ignore_description: true })} */}
+                            {this.renderOption(guideSubOption, [...keyID, 'options', key])}
+                            <EuiSpacer size='s'/>
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                      </Fragment>
+                    ) : (
+                      <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
+                        {guideSubOption.elements.map((guideSubOptionElement, keyGuideSubOptionElement) => (
+                          <Fragment key={`extension-guide-${guideOption.name}-${guideSubOption.name}-${keyGuideSubOptionElement}`}>
+                            <EuiFlexGroup>
+                              <EuiFlexItem>
+                                {this.renderOption(guideSubOptionElement, [...keyID,'options', key,'elements',keyGuideSubOptionElement])}
+                              </EuiFlexItem>
+                            </EuiFlexGroup>
+                            <EuiSpacer size='s'/>
+                          </Fragment>
+                        ))}
+                        <EuiFlexGroup justifyContent='center'>
+                          <EuiFlexItem grow={false}>
+                          <EuiToolTip
+                            position='top'
+                            content={guideSubOption.description}
+                          >
+                            <EuiButtonEmpty iconType='plusInCircle' onClick={() => this.addElementToStep([...keyID,'options', key,'elements'], guideSubOption, {ignore_repeatable: true})}>Add {guideSubOption.name}</EuiButtonEmpty>
+                          </EuiToolTip>
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
+                      </Fragment>
+                    )
+                    })}
                   </Fragment>
                 )}
               </Fragment>
@@ -408,7 +422,7 @@ class WzExtensionGuide extends Component {
               <Fragment key={`extension-guide-${guideSubOption.name}-${key}`}>
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    {this.renderOption(guideSubOption, [...keyID, 'elements', key], { ignore_description: true })}
+                    {this.renderOption(guideSubOption, [...keyID, 'elements', key])}
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size='s'/>
@@ -416,7 +430,12 @@ class WzExtensionGuide extends Component {
             ))}
             <EuiFlexGroup justifyContent='center'>
               <EuiFlexItem grow={false}>
+              <EuiToolTip
+                position='top'
+                content={guideOption.description}
+              >
                 <EuiButtonEmpty iconType='plusInCircle' onClick={() => this.addElementToStep([...keyID,'elements'], guideOption, {ignore_repeatable: true})}>Add {guideOption.name}</EuiButtonEmpty>
+              </EuiToolTip>
               </EuiFlexItem>
             </EuiFlexGroup>
           </Fragment>
@@ -431,7 +450,7 @@ class WzExtensionGuide extends Component {
         <EuiText color={guideOption.enabled ? 'default' : 'subdued'} style={{ display: 'inline' }} size='m'>
           <span>{guideOption.name}</span>
           {guideOption.description && options.ignore_description && (
-            <span style={{margin: '0 4px'}}>
+            <span style={{margin: '0 0 0 6px'}}>
               <EuiToolTip
                 position='top'
                 content={guideOption.description}
@@ -441,7 +460,7 @@ class WzExtensionGuide extends Component {
            </span>
           )}
           {guideOption.info && (
-            <span style={{margin: '0 2px'}}>
+            <span style={{margin: '0 0 0 6px'}}>
               <EuiToolTip
                 position='top'
                 content={guideOption.info}
@@ -451,7 +470,7 @@ class WzExtensionGuide extends Component {
             </span>
           )}
           {guideOption.warning && (
-            <span style={{margin: '0 2px'}}>
+            <span style={{margin: '0 0 0 6px'}}>
               <EuiToolTip
                 position='top'
                 content={guideOption.warning}
@@ -470,7 +489,33 @@ class WzExtensionGuide extends Component {
               </EuiToolTip>
             </span>
           )}
-          {guideOption.removable && <EuiButtonEmpty color='danger' iconType='minusInCircle' onClick={() => this.removeElementOfStep(keyID)}></EuiButtonEmpty>}
+          {guideOption.removable && (
+            <span style={{margin: '0 0 0 6px'}}>
+              <EuiToolTip
+                position='top'
+                content='Remove this option'
+              >
+                <EuiButtonIcon color='danger' iconType='minusInCircle' onClick={() => this.removeElementOfStep(keyID)}/>
+              </EuiToolTip>
+            </span>
+          )}
+          {guideOption.enabled && guideOption.compressible && (
+            <Fragment>
+              <EuiToolTip
+                position='top'
+                content='Show / hide option'
+              >
+              <EuiButtonToggle
+                color={this.checkInvalidElements([guideOption]) ? 'danger' : 'primary'}
+                isEmpty
+                isIconOnly
+                size='s'
+                iconType={guideOption.compressed ? 'eyeClosed' : 'eye'}
+                onChange={() => this.setElementProp(keyID, 'compressed', !guideOption.compressed)}
+              />
+            </EuiToolTip>
+            </Fragment>
+          )}
         </EuiText>
       </Fragment>)
     return (
@@ -481,7 +526,12 @@ class WzExtensionGuide extends Component {
             label={checkboxLabel}
             style={{ display: 'inline' }}
             checked={guideOption.enabled}
-            onChange={() => this.setElementProp(keyID, 'enabled', !guideOption.enabled)}
+            onChange={() => {
+              this.setElementProp(keyID, 'enabled', !guideOption.enabled)
+              if(guideOption.compressible){
+                this.setElementProp(keyID, 'compressed', false)
+              }
+            }}
           />
         ) : checkboxLabel}
         {!options.ignore_description && guideOption.description && (
@@ -490,26 +540,29 @@ class WzExtensionGuide extends Component {
             <EuiText color='subdued'>{guideOption.description}</EuiText>
           </Fragment>
         )}
-        <div>
-          <EuiSpacer size='s' />
-          {typeof guideOption.enabled === 'boolean' ?
-            (guideOption.enabled ? this.renderOptionType(guideOption, keyID) : null)
-            : this.renderOptionType(guideOption, keyID)
-          }
-        </div>
-        <EuiSpacer size='m' />
+        {((guideOption.compressible && !guideOption.compressed) || !guideOption.compressible) && (
+          <Fragment>
+            <div>
+              {guideOption.enabled && (<EuiSpacer size='s' />)}
+              {typeof guideOption.enabled === 'boolean' ?
+                (guideOption.enabled ? this.renderOptionType(guideOption, keyID) : null)
+                : this.renderOptionType(guideOption, keyID)
+              }
+            </div>
+            {/* {typeof guideOption.enabled === 'boolean' && (<EuiSpacer size='m' />)} */}
+          </Fragment>
+        )}
       </Fragment>
     )
   }
   checkInvalidElements(elements) {
-    // console.log('checkInvalidElements', elements)
     return elements.reduce((accum, element) => {
       return accum
         || !element.repeatable && !element.elements && this.checkInvalidElement(element)
         || element.repeatable && !element.elements && this.checkInvalidElement(element)
         || element.elements && element.elements.length && this.checkInvalidElements(element.elements)
-        || !element.elements && element.attributes && element.attributes.length && this.checkInvalidElements(element.attributes)
-        || !element.elements && element.options && element.options.length && this.checkInvalidElements(element.options)
+        || !element.elements && element.enabled && element.attributes && element.attributes.length && this.checkInvalidElements(element.attributes)
+        || !element.elements && element.enabled && element.options && element.options.length && this.checkInvalidElements(element.options)
     }, false)
   }
   checkInvalidElement(element) {
@@ -650,7 +703,22 @@ class WzExtensionGuide extends Component {
                     </EuiLink>
                   )}
                 </EuiText>
+                {/* <EuiSpacer size='s' />
+                <EuiSwitch
+                  label={this.props.extensionEnabled ? 'Show extension' : 'Hide extension'}
+                  checked={this.props.extensionEnabled !== undefined ? this.props.extensionEnabled : false}
+                  onChange={(e) => this.props.onChangeToggleExtensionVisibility(this.props.guideId,e.target.checked)}
+                /> */}
                 <EuiSpacer size='m' />
+                {guide.callout_warning && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCallOut title='Warning' color="warning" iconType="alert">
+                        <p>{guide.callout_warning}</p>
+                      </EuiCallOut>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -681,13 +749,6 @@ class WzExtensionGuide extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiPanel style={{width: '92vw'}}>
-              {guide.callout_warning && (<EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiCallOut title='Warning' color="warning" iconType="alert">
-                    <p>{guide.callout_warning}</p>
-                  </EuiCallOut>
-                </EuiFlexItem>
-              </EuiFlexGroup>)}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
@@ -722,7 +783,6 @@ class WzExtensionGuide extends Component {
                     </Fragment>
                   )}
                   <EuiSteps headingElement="h2" steps={this.renderSteps()} />
-                  <Dev state={this.state} this={this} props={this.props} />
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiPanel>
@@ -754,35 +814,7 @@ WzExtensionGuide.propTypes = {
     icon: PropTypes.string
   }),
   closeGuide: PropTypes.func,
-  guideId: PropTypes.string,
-  agent: PropTypes.shape({
-    os: PropTypes.oneOf(['linux','windows', undefined]),
-    type: PropTypes.oneOf(['agent', 'manager', undefined])
-  })
+  guideId: PropTypes.string
 }
-
-const DevButtons = (...buttons) => (props) => (
-  <Fragment>
-    {buttons.map(button => 
-      <button key={`dev-${button.label}`}onClick={() => button.onClick(props)}>{button.label}</button>
-    )}
-    {props.children}
-  </Fragment>
-)
-
-const Dev = DevButtons(
-  {
-    label: 'State',
-    onClick: (props) => console.log(props.state)
-  },
-  {
-    label: 'transform',
-    onClick: (props) => console.log(props.this.transformStateToJSON())
-  },
-  {
-    label: 'Props',
-    onClick: (props) => console.log(props.props)
-  },
-)
 
 export default WzExtensionGuide;

@@ -30,8 +30,8 @@ import {
   EuiButton,
   EuiSwitch
 } from '@elastic/eui';
-import { ExtensionDetails } from './extension-details';
 import WzExtensionGuide from './extension-guide';
+import { AppState } from '../../../react-services/app-state';
 
 export class AddNewExtension extends Component {
   constructor(props) {
@@ -59,6 +59,13 @@ export class AddNewExtension extends Component {
         //   description: "GCP description - GCP description - GCP description - GCP description ",
         //   icon: 'logoGCPMono'
         // },
+        fim: {
+          enabled: props.extensions.fim,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
+          title: "Integrity monitoring",
+          description: TabDescription.fim.description,
+          icon: 'filebeatApp'
+        }
       },
       auditing: {
         audit: {
@@ -84,6 +91,13 @@ export class AddNewExtension extends Component {
         },
       },
       threat: {
+        vuls:  {
+          enabled: props.extensions.virustotal,
+          title: TabDescription.vuls.title,
+          url: TabDescription.vuls.url,
+          description: TabDescription.vuls.description,
+          icon: "securityApp"
+        },
         virustotal:  {
           enabled: props.extensions.virustotal,
           title: TabDescription.virustotal.title,
@@ -146,11 +160,31 @@ export class AddNewExtension extends Component {
       }
     }
   }
-
+  // Get extension enabled from ookie
+  // componentDidMount(){
+  //   const apiID = JSON.parse(this.props.api).id
+  //   const extensions = AppState.getExtensions(apiID);
+  //   this.setState(extensions);
+  // }
+  // Change ookie extension enabled
+  // onChangeToggleExtensionVisibility = (extensionID, value) => {
+  //   // used for change extension visibility in currentExtensions cookie
+  //   try{
+  //     const apiID = JSON.parse(this.props.api).id
+  //     const extensions = AppState.getExtensions(apiID);
+  //     const newValue = {
+  //       ...extensions,
+  //       [extensionID]: value
+  //     }
+  //     AppState.setExtensions(apiID, newValue);
+  //     this.setState({
+  //       [extensionID]: value
+  //     });
+  //   }catch(error){}
+  // }
   getIcon(extension){
     return (<EuiIcon size="xl" type={this.extensionsGroups[extension]} />)
   }
-
   getExtensions(group) {
     
     let extensions = []
@@ -164,7 +198,7 @@ export class AddNewExtension extends Component {
       const currentExtension = extensions[key];
       return(
         <EuiFlexItem key={index}>
-          {/* <EuiCard
+          <EuiCard
             layout="horizontal"
             icon={(<EuiIcon size="xl" type={currentExtension.icon} />) }
             title={currentExtension.title}
@@ -173,27 +207,31 @@ export class AddNewExtension extends Component {
               () => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) 
               : undefined
             }
-          /> */}
-          <EuiCard
+          />
+          {/* <EuiCard
             icon={<EuiIcon size="xl" type={currentExtension.icon}  />}
             title={currentExtension.title}
             description={currentExtension.description}
             footer={
               <div>
-                <EuiButton aria-label="Go to guide" onCLick={!['pci','gdpr','hipaa','nist'].includes(key) ?
-                  () => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) 
-                  : undefined}>
-                    Configure
-                </EuiButton>
+                {!['pci','gdpr','hipaa','nist'].includes(key) && (
+                  <EuiButton
+                    aria-label="Go to guide"
+                    onClick={
+                    () => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) 
+                    }>
+                      Configure
+                  </EuiButton>
+                )}
                 <EuiSpacer size="m" />
                 <EuiSwitch
-                  label={currentExtension.enabled ? 'Show' : 'Hide'}
-                  checked={currentExtension.enabled}
-                  onChange={this.onChange}
+                  label={this.state[key] ? 'Show extension' : 'Hide extension'}
+                  checked={this.state[key] !== undefined ? this.state[key] : false}
+                  onChange={(e) => this.onChangeToggleExtensionVisibility(key,e.target.checked)}
                 />
               </div>
             }
-          />
+          /> */}
           {/* <EuiCard
             icon={<EuiIcon size="xl" type={currentExtension.icon} />}
             title={currentExtension.title}
@@ -337,18 +375,6 @@ export class AddNewExtension extends Component {
     )
   }
 
-  showExtensionDetails(){
-    return(
-      <ExtensionDetails
-        currentExtension={this.state.currentExtensionData}
-        currentExtensionId={this.state.currentExtensionId}
-        allExtensions={this.props.extensions}
-        closeExtensionDetails={this.closeExtensionDetails}
-        setExtensions={this.props.setExtensions}
-        api={this.props.api}></ExtensionDetails>
-    )
-  }
-
   render() {
 
 
@@ -359,10 +385,10 @@ export class AddNewExtension extends Component {
             currentExtensionData={this.state.currentExtensionData}
             closeGuide={this.closeExtensionDetails}
             guideId={this.state.currentExtensionId}
-            agent={{os: 'windows', type: 'manager'}}
+            // onChangeToggleExtensionVisibility={this.onChangeToggleExtensionVisibility}
+            // extensionEnabled={this.state[this.state.currentExtensionId]}
           />
         ) : this.showCards()}
-        {/* {(this.state.isShowingExtension && this.showExtensionDetails())} */}
       </div>
     );
   }
