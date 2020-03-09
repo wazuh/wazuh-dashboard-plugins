@@ -647,7 +647,13 @@ function discoverController(
     if (!filtersAreReady()) return;
 
     timefilter.setTime(dateRange);
-    if (query && typeof query === 'object') $state.query = query;
+    if (query && typeof query === 'object') {
+      /// Wazuh 7.6.1
+      if ($scope.tabView !== 'discover')
+        query.update_Id = new Date().getTime().toString();
+      ///
+      $state.query = query;
+    }
     // Update query from search bar
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, filterManager.filters);
@@ -1124,6 +1130,7 @@ function discoverController(
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;
+    delete (($state || {}).query || {}).update_Id;
     evt.stopPropagation();
     if ($scope.tabView === 'discover') {
       $scope.rows = false;

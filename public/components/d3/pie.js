@@ -33,7 +33,7 @@ export class Pie extends Component {
         const colors = this.props.colors || ['#6eadc1', '#57c17b', '#6f87d8', '#663db8', '#bc52bc', '#9e3533', '#daa05d'];
         return (
             <svg style={customStyle} width={width} height={height}>
-                <g transform={`translate(${(width / 4) - 6} ${height / 2})`}>
+                <g transform={`translate(${noLegend ? width / 2 : (width / 4) - 6} ${height / 2})`}>
                     {data.map((d, i) => (
                         <Slice key={i}
                             innerRadius={33}

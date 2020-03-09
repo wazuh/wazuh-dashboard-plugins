@@ -30,8 +30,10 @@ import {
   EuiButton,
   EuiSwitch
 } from '@elastic/eui';
+
 import WzExtensionGuide from './extension-guide';
 import { AppState } from '../../../react-services/app-state';
+import { SampleData } from './sample-data';
 
 export class AddNewExtension extends Component {
   constructor(props) {
@@ -317,6 +319,13 @@ export class AddNewExtension extends Component {
                 {this.getExtensions('regulatory')}
               </EuiFlexGrid>
           </Fragment>
+        ),
+      },
+      {
+        id: 'data',
+        name: 'Sample Data',
+        content: (
+          <SampleData />
         ),
       },
     ]

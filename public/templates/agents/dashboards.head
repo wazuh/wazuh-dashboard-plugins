@@ -99,26 +99,36 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-                <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
-                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center" ng-show="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector' && tabView === 'panels' && !rendered && resultState !== 'none'">
-                    <span class="euiLoadingChart euiLoadingChart--large">
-                        <span class="euiLoadingChart__bar"></span>
-                        <span class="euiLoadingChart__bar"></span>
-                        <span class="euiLoadingChart__bar"></span>
-                        <span class="euiLoadingChart__bar"></span>
-                    </span>
-                    <div class="euiSpacer euiSpacer--m"></div>
-                    <div class="percentage">{{loadingStatus}}</div>
-                </div>
-            </div>
+    <div ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector' && tabView === 'panels' && !rendered && resultState !== 'none'"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{loadingStatus}}</div>
+        </div>
+    </div>
 
     <!-- End loading status section -->
 
     <!-- Report status section -->
-    <div layout="column" layout-align="center center" class="wz-margin-top-8"
-        ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
-        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-        <div class="percentage">{{reportStatus}}</div>
+    <div ng-if="reportBusy && reportStatus"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{reportStatus}}</div>
+            <div class="euiSpacer euiSpacer--l"></div>
+        </div>
     </div>
     <!-- End report status section -->
 
@@ -135,10 +145,11 @@
             Show files</md-button>
     </div>
 
-    <div layout="row" class="wz-margin-right-8 wz-margin-left-8" style="margin-top: 32px;"
+    <div layout="row" class="wz-margin-right-8 wz-margin-left-8" style="margin-top: 16px;"
         ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
         ng-show="resultState === 'none' && tabView === 'panels'">
-        <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />
+        <react-component flex name="EuiCallOut"
+            props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />
     </div>
     <!-- No results section -->
 
