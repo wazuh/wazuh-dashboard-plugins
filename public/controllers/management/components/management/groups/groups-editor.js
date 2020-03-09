@@ -181,7 +181,7 @@ class WzGroupsEditor extends Component {
                         ></EuiCodeEditor>
                       )) || (
                           <EuiCodeBlock
-                            language="xml"
+                            language="json"
                             fontSize="m"
                             paddingSize="m"
                             overflowHeight={this.height}

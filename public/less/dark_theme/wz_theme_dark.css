@@ -109,9 +109,6 @@ md-content {
   color: white!important;
 }
 
-discover-app-w .container-fluid {
-  background-color: #1D1E24;
-}
 
 .euiBreadcrumbs--truncate
   .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
@@ -338,9 +335,6 @@ md-divider.md-default-theme, md-divider {
   text-decoration: underline !important;
 }
 
-discover-app-w > main.container-fluid {
-  background: #1a1b20 !important;
-}
 
 .wz-menu-select {
   filter: invert(0) !important; 

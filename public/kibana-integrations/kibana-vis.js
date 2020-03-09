@@ -102,13 +102,13 @@ class KibanaVis extends Component {
     try {
       if (this.visHandler) {
         const data = await this.visHandler.handler.dataHandler.getData();
-        if (this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
+        if (data && data.value && data.value.visData && data.value.visData.rows && this.props.state[this.visID] !== data.value.visData.rows['0']['col-0-1'])
           store.dispatch(
             this.updateMetric({ name: this.visID, value: data.value.visData.rows['0']['col-0-1'] })
           );
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      this.showToast('danger', 'Error', error.message || error, 4000);
     }
   }
 
@@ -142,7 +142,7 @@ class KibanaVis extends Component {
         }
       }
     } catch (error) {
-      this.showToast('danger', 'Error', error, 4000);
+      this.showToast('danger', 'Error', error.message || error, 4000);
     }
   };
 
@@ -213,8 +213,8 @@ class KibanaVis extends Component {
             this.showToast(
               'danger',
               'An error occurred fetching new index pattern fields',
-              error,
-              2000
+              error.message || error,
+              4000
             );
           }
         }
@@ -222,7 +222,6 @@ class KibanaVis extends Component {
         this.renderInProgress = false;
         return this.myRender(raw);
       } else {
-        this.showToast('danger', 'Visualize error', error, 2000);
       }
     }
 
@@ -253,15 +252,12 @@ class KibanaVis extends Component {
     const deadVis = this.props.tab === 'ciscat' ? 0 : this.tabVisualizations.getDeadVis();
     const totalTabVis = this.tabVisualizations.getItem(this.props.tab) - deadVis;
 
+    this.props.updateRootScope('loadingStatus', 'Fetching data...');
+    
     if (totalTabVis < 1) {
       this.props.updateRootScope('resultState', 'none');
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
-
-      this.props.updateRootScope(
-        'loadingStatus',
-        `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`
-      );
 
       const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
       if (visTitle === 'Mitre attack count') {
@@ -274,7 +270,6 @@ class KibanaVis extends Component {
       }
       if (currentCompleted >= 100) {
         this.props.updateRootScope('rendered', 'true');
-        this.props.updateRootScope('loadingStatus', 'Fetching data...');
         if (visId.includes('AWS-geo')) {
           const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
           setTimeout(() => {

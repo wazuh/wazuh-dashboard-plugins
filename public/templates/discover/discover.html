@@ -31,7 +31,7 @@
   
     <main ng-show="tabView !== 'cluster-monitoring'" class="container-fluid">
         <div ng-show="tabView === 'discover'" class="row">
-          <div ng-if="tabView === 'discover'" class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">    
+          <div ng-show="tabView === 'discover'" class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">    
             <div class="dscFieldChooser">
             <disc-field-chooser
               columns="state.columns"

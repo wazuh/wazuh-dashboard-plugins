@@ -98,7 +98,7 @@ export default class SettingsLogs extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                Log file located at /usr/share/kibana/optimize/wazuh-logs/wazuhapp.log
+                Log file located at /usr/share/kibana/optimize/wazuh/logs/wazuhapp.log
             </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
