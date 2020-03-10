@@ -25,7 +25,7 @@ export default {
       elements: [
         {
           name: 'disabled',
-          description: `Disables the Docker wodle.`,
+          description: 'Disables the Docker wodle.',
           type: 'switch',
           required: true
         },
@@ -45,7 +45,7 @@ export default {
           type: 'input-number',
           required: true,
           placeholder: 'Number of attempts to execute the wodle.',
-          values: {min: 1},
+          values: { min: 1 },
           default_value: 5,
           validate_error_message: 'Number of attempts to execute the wodle.'
         },

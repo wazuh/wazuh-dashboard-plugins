@@ -1,5 +1,5 @@
 /*
-* Wazuh app - Amazon Web Services extension guide
+* Wazuh app - Amazon Web Services interactive extension guide
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -31,13 +31,13 @@ export default {
         },
         {
           name: 'interval',
-          description: `Frequency for reading from the S3 bucket.`,
+          description: 'Frequency for reading from the S3 bucket.',
           type: 'input',
           required: true,
           placeholder: 'Positive number with suffix character indicating a time unit',
           default_value: '10m',
           validate_error_message: 'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days). e.g. 10m',
-          validate_regex: /^[1-9]\d*[s|m|h|d|w|M]$/
+          validate_regex: /^[1-9]\d*[s|m|h|d]$/
         },
         {
           name: 'run_on_start',
@@ -73,8 +73,7 @@ export default {
       elements: [
         {
           name: 'bucket',
-          description: `Defines a bucket to process. Must have its attribute type defined. (Supports multiple instances of this option).`,
-          info: 'Different configurations as macie has custom type.',
+          description: 'Defines a bucket to process. Must have its attribute type defined. (Supports multiple instances of this option).',
           removable: true,
           required: true,
           repeatable: true,
@@ -88,6 +87,7 @@ export default {
             {
               name: 'type',
               description: 'Specifies type of bucket. Is an attribute of the bucket tag.',
+              info: 'Different configurations as macie has custom type.',
               type: 'select',
               required: true,
               values: [
@@ -107,8 +107,7 @@ export default {
               description: 'Name of the S3 bucket from where logs are read.',
               type: 'input',
               required: true,
-              placeholder: 'Name of the S3 bucket',
-              validate_error_message: 'Any valid bucket name'
+              placeholder: 'Name of the S3 bucket'
             },
             {
               name: 'aws_account_id',
@@ -121,6 +120,18 @@ export default {
               description: 'A user-friendly name for the AWS account.',
               type: 'input',
               placeholder: 'A user-friendly name for the AWS account'
+            },
+            {
+              name: 'access_key',
+              description: 'The access key ID for the IAM user with the permission to read logs from the bucket.',
+              type: 'input',
+              placeholder: 'Any alphanumerical key.'
+            },
+            {
+              name: 'secret_key',
+              description: 'The secret key created for the IAM user with the permission to read logs from the bucket.',
+              type: 'input',
+              placeholder: 'Any alphanumerical key.'
             },
             {
               name: 'aws_profile',

@@ -16,6 +16,7 @@ export default {
   description: 'Configuration options of the osquery wodle.',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html',
   icon: 'securityApp',
+  callout_warning: 'Osquery is not installed by default. It is an open source software that you have to obtain for using this module.',
   avaliable_for_manager: true,
   avaliable_for_agent: true,
   steps: [
@@ -25,19 +26,22 @@ export default {
       elements: [
         {
           name: 'disabled',
-          description: `Disable the osquery wodle.`,
+          description: 'Disable the osquery wodle.',
           type: 'switch',
           required: true
         },
         {
           name: 'run_daemon',
-          description: `Makes the module run osqueryd as a subprocess or lets the module monitor the results log without running Osquery.`,
-          type: 'switch'
+          description: 'Makes the module run osqueryd as a subprocess or lets the module monitor the results log without running Osquery.',
+          type: 'switch',
+          required: true,
+          default_value: true
         },
         {
           name: 'bin_path',
           description: `Full path to the folder that contains the osqueryd executable.`,
           type: 'input',
+          required: true,
           placeholder: 'Any valid path.',
           default_value_linux: '',
           default_value_windows: 'C:\\Program Files\\osquery\\osqueryd'
@@ -46,6 +50,7 @@ export default {
           name: 'log_path',
           description: 'Full path to the results log written by Osquery.',
           type: 'input',
+          required: true,
           placeholder: 'Any valid path.',
           default_value: '',
           default_value_linux: '/var/log/osquery/osqueryd.results.log',
@@ -56,6 +61,7 @@ export default {
           name: 'config_path',
           description: 'Path to the Osquery configuration file. This path can be relative to the folder where the Wazuh agent is running.',
           type: 'input',
+          required: true,
           placeholder: 'Path to the Osquery configuration file',
           default_value_linux: '/etc/osquery/osquery.conf',
           default_value_windows: 'C:\\Program Files\\osquery\\osquery.conf'
@@ -64,6 +70,7 @@ export default {
           name: 'add_labels',
           description: 'Add the agent labels defined as decorators.',
           type: 'switch',
+          required: true,
           default_value: true
         }
       ]
@@ -82,11 +89,13 @@ export default {
           repeatable: true,
           required: true,
           validate_error_message: 'Path to pack configuration file',
+          show_attributes: true,
           attributes: [
             {
               name: 'name',
               description: 'Name for this pack',
               type: 'input',
+              required: true,
               placeholder: 'Name for this pack',
               default_value: '',
               validate_error_message: 'Name for this pack'

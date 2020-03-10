@@ -1,5 +1,5 @@
 /*
-* Wazuh app - Vulnerabilities extension guide
+* Wazuh app - Vulnerabilities interactive extension guide
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -26,9 +26,9 @@ export default {
         {
           name: 'directories',
           description: `Use this option to add or remove directories to be monitored. The directories must be comma separated.
-      All files and subdirectories within the noted directories will also be monitored.              
-      Drive letters without directories are not valid. At a minimum the ‘.’ should be included (D:\\.).
-      This is to be set on the system to be monitored (or in the agent.conf, if appropriate).`,
+          All files and subdirectories within the noted directories will also be monitored.              
+          Drive letters without directories are not valid. At a minimum the ‘.’ should be included (D:\\.).
+          This is to be set on the system to be monitored (or in the agent.conf, if appropriate).`,
           type: 'input',
           required: true,
           removable: true,
@@ -55,13 +55,13 @@ export default {
             },
             {
               name: 'report_changes',
-              description: `Report file changes. This is limited to text files at this time.`,
+              description: 'Report file changes. This is limited to text files at this time.',
               type: 'switch',
               default_value: false
             },
             {
               name: 'check_all',
-              description: `All attributes with the prefix check_ will be activated.`,
+              description: 'All attributes with the prefix check_ will be activated.',
               type: 'switch',
               default_value: true
             },
@@ -74,25 +74,25 @@ export default {
             },
             {
               name: 'check_sha1sum',
-              description: `Check only the SHA-1 hash of the files.`,
+              description: 'Check only the SHA-1 hash of the files.',
               type: 'switch',
               default_value: false
             },
             {
               name: 'check_md5sum',
-              description: `Check only the MD5 hash of the files.`,
+              description: 'Check only the MD5 hash of the files.',
               type: 'switch',
               default_value: false
             },
             {
               name: 'check_sha256sum',
-              description: `Check only the SHA-256 hash of the files.`,
+              description: 'Check only the SHA-256 hash of the files.',
               type: 'switch',
               default_value: false
             },
             {
               name: 'check_size',
-              description: `Check the size of the files.`,
+              description: 'Check the size of the files.',
               type: 'switch',
               default_value: false
             },
@@ -129,7 +129,7 @@ export default {
             },
             {
               name: 'check_mtime',
-              description: `Check the modification time of a file.`,
+              description: 'Check the modification time of a file.',
               type: 'switch',
               default_value: false
             },
@@ -147,20 +147,22 @@ export default {
               Any directory or file name (but not a path) is allowed`,
               type: 'input',
               placeholder: 'sregex',
+              default_value: 'sregex',
+              field_read_only: true,
               validate_error_message: 'Any directory or file name (but not a path) is allowed'
             },
             {
               name: 'tags',
-              description: `Add tags to alerts for monitored directories.`,
+              description: 'Add tags to alerts for monitored directories.',
               type: 'input',
               placeholder: 'Tags list separated by commas'
             },
             {
               name: 'recursion_level',
-              description: `Limits the maximum level of recursion allowed.`,
+              description: 'Limits the maximum level of recursion allowed.',
               type: 'input-number',
-              default_value: 0,
-              values: {min: 0, max: 320},
+              default_value: '',
+              values: { min: 0, max: 320 },
               placeholder: 'Any integer between 0 and 320',
               validate_error_message: 'Any integer between 0 and 320'
             },
@@ -182,19 +184,21 @@ export default {
       elements: [
         {
           name: 'ignore',
-          description: `List of files or directories to be ignored (one entry per line). Multiple lines may be entered to include multiple files or directories. These files and directories are still checked, but the results are ignored.`,
+          description: 'List of files or directories to be ignored (one entry per line). Multiple lines may be entered to include multiple files or directories. These files and directories are still checked, but the results are ignored.',
           type: 'input',
           removable: true,
           required: true,
           repeatable: true,
-          placeholder: '/etc/mtab',
+          placeholder: 'Files or directories to be ignored',
           validate_error_message: 'Any directory or file name.',
           attributes: [
             {
               name: 'type',
               description: 'This is a simple regex pattern to filter out files so alerts are not generated.',
               type: 'input',
-              placeholder: 'sregex'
+              placeholder: 'sregex',
+              default_value: 'sregex',
+              field_read_only: true
             }
           ]
         }
@@ -206,19 +210,21 @@ export default {
       elements: [
         {
           name: 'nodiff',
-          description: `List of files to not compute the diff (one entry per line). It could be used for sensitive files like a private key, credentials stored in a file or database configuration, avoiding data leaking by sending the file content changes through alerts.`,
+          description: 'List of files to not compute the diff (one entry per line). It could be used for sensitive files like a private key, credentials stored in a file or database configuration, avoiding data leaking by sending the file content changes through alerts.',
           type: 'input',
-          placeholder: '/etc/ssl/private.key',
+          placeholder: 'List of files to not compute the diff',
           required: true,
           removable: true,
           repeatable: true,
-          validate_error_message: 'Any file name.',
+          validate_error_message: 'Any file name. e.g. /etc/ssl/private.key',
           attributes: [
             {
               name: 'type',
               description: 'This is a simple regex pattern to filter out files so alerts are not generated.',
               type: 'input',
-              placeholder: 'sregex'
+              placeholder: 'sregex',
+              default_value: 'sregex',
+              field_only_read: true
             }
           ]
         }
@@ -258,7 +264,7 @@ export default {
           description: `Use this option to monitor specified Windows registry entries (one entry per line). Multiple lines may be entered to include multiple registry entries.`,
           info: 'New entries will not trigger alerts, only changes to existing entries.',
           type: 'input',
-          placeholder: 'HKEY_LOCAL_MACHINE\\Software',
+          placeholder: 'Windows registry entry',
           default_value: 'HKEY_LOCAL_MACHINE\\Software',
           required: true,
           repeatable: true,
@@ -317,10 +323,10 @@ export default {
       elements: [
         {
           name: 'frequency',
-          description: `Frequency that the syscheck will be run (in seconds).`,
+          description: 'Frequency that the syscheck will be run (in seconds).',
           type: 'input-number',
           default_value: 43200,
-          values: {min: 1},
+          values: { min: 1 },
           placeholder: 'A positive number, time in seconds.',
           validate_error_message: `A positive number, time in seconds.`
         },
@@ -330,7 +336,8 @@ export default {
           info: 'This may delay the initialization of real-time scans.',
           type: 'input',
           placeholder: '9pm or 8:30',
-          validate_error_message: `Time of day`,
+          validate_error_message: 'Time of day represented as 9pm or 8:30',
+          validate_regex: /^(((0?[1-9]|1[012])(:[0-5][0-9])?am)|(((0?[0-9])|(1[0-9])|(2[0-4]))(:[0-5][0-9])?pm))|(((0?[0-9])|(1[012])|(2[0-4])):([0-5][0-9]))$/,
           warning: 'This may delay the initialization of real-time scans.'
         },
         {
@@ -343,7 +350,7 @@ export default {
               name: 'frequency',
               description: 'Number of times the alert can be repeated in the’timeframe’ time interval.',
               type: 'input-number',
-              values: {min: 1, max: 99},
+              values: { min: 1, max: 99 },
               default_value: 10,
               validate_error_message: 'Any number between 1 and 99.'
             },
@@ -351,7 +358,7 @@ export default {
               name: 'timeframe',
               description: 'Time interval in which the number of alerts generated by a file accumulates.',
               type: 'input-number',
-              values: {min: 1, max: 43200},
+              values: { min: 1, max: 43200 },
               default_value: 3600,
               validate_error_message: 'Any number between 1 and 43200.'
             }
@@ -359,14 +366,14 @@ export default {
         },
         {
           name: 'alert_new_files',
-          description: `Specifies if syscheck should alert when new files are created.`,
+          description: 'Specifies if syscheck should alert when new files are created.',
           info: 'It is valid on: server and local.',
           type: 'switch',
           default_value: true
         },
         {
           name: 'scan_on_start',
-          description: `Specifies if syscheck scans immediately when started.`,
+          description: 'Specifies if syscheck scans immediately when started.',
           type: 'switch',
           default_value: true
         },

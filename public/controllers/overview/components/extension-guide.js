@@ -52,7 +52,7 @@ const js2xmlOptionsParser = {
   format: {
     doubleQuotes: true
   }
-}
+};
 
 const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
 
@@ -296,11 +296,11 @@ class WzExtensionGuide extends Component {
             {!invalidConfiguration ? (
               <Fragment>
                 {this.state.agentTypeSelected === 'manager' ? (
-                  <EuiText>When you finish of configure the extension, copy xml configuration, go to Configuration Editor, paste it and save.</EuiText>
+                  <EuiText>When you finish of configure the extension, copy xml configuration, go to Configuration Editor, paste it and save. The below section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
                   ) : this.state.agentOSSelected === 'linux' ? (
-                    <EuiText>When you finish of configure the extension, copy xml configuration, go to <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> in Linux agent, paste it, save and restart the agent.</EuiText>
+                    <EuiText>When you finish of configure the extension, copy xml configuration, go to <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> in Linux agent, paste it, save and restart the agent. The below section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
                   ) : (
-                    <EuiText>When you finish of configure the extension, copy xml configuration, go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, paste it, save and restart the agent.</EuiText>
+                    <EuiText>When you finish of configure the extension, copy xml configuration, go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, paste it, save and restart the agent. The below section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
                   )}
                 <EuiSpacer size='s' />
                 <EuiCodeBlock
@@ -578,6 +578,7 @@ class WzExtensionGuide extends Component {
         || (element.values && (element.values.min !== undefined && element.values.max !== undefined && element.value < element.values.min || element.value > element.values.max))
         || (element.values && (element.values.min !== undefined && element.values.max === undefined && element.value < element.values.min))
         || (element.values && (element.values.min === undefined && element.values.max !== undefined && element.value > element.values.max))
+        || (element.value === '')
       }
       default:
         return undefined;

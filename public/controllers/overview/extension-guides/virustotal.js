@@ -24,7 +24,7 @@ export default {
       elements: [
         {
           name: 'name',
-          description: `This indicates the service to integrate with.`,
+          description: 'This indicates the service to integrate with.',
           type: 'input',
           required: true,
           default_value: 'virustotal',
@@ -85,7 +85,7 @@ export default {
           name: 'max_log',
           description: 'The maximum length of an alert snippet that will be sent to the Integrator. Longer strings will be truncated with ...',
           type: 'input-number',
-          values: {min: 165, max: 1024},
+          values: { min: 165, max: 1024 },
           default_value: 165,
           placeholder: 'Any integer from 165 to 1024 inclusive.',
           validate_error_message: 'Any integer from 165 to 1024 inclusive.'

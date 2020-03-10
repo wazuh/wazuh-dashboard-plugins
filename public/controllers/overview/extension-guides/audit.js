@@ -1,5 +1,5 @@
 /*
-* Wazuh app - System auditing extension guide
+* Wazuh app - System auditing interactive extension guide
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -34,10 +34,10 @@ export default {
         },
         {
           name: 'location',
-          description: `Option to get the location of a log or a group of logs.`,
+          description: 'Option to get the location of a log or a group of logs. strftime format strings may be used for log file names.',
           type: 'input',
           required: true,
-          placeholder: '/var/log/audit/audit.log',
+          placeholder: 'Log or group of logs location',
           default_value: '/var/log/audit/audit.log',
           field_read_only: true
         },

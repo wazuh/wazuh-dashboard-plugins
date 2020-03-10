@@ -31,17 +31,17 @@ export default {
         },
         {
           name: 'timeout',
-          description: `Timeout for each evaluation in seconds`,
+          description: 'Timeout for each evaluation in seconds',
           type: 'input-number',
           required: true,
           placeholder: 'A positive number (seconds)',
-          values: {min: 1},
+          values: { min: 1 },
           default_value: 1800,
           validate_error_message: 'A positive number (seconds)'
         },
         {
           name: 'interval',
-          description: `Interval between OpenSCAP executions.`,
+          description: 'Interval between OpenSCAP executions.',
           type: 'input',
           required: true,
           placeholder: 'Positive number with suffix character indicating a time unit',
@@ -140,10 +140,6 @@ export default {
               type: 'input',
               placeholder: 'Select profile.',
               repeatable: true,
-              repeatable_insert_first: true,
-              repeatable_insert_first_properties: {
-                removable: false
-              },
               removable: true,
               required: true
             }

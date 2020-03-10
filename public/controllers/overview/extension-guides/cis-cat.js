@@ -1,5 +1,5 @@
 /*
-* Wazuh app - CIS-CAT interactive extension guide
+* Wazuh app - CIS-CAT interactive interactive extension guide
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -26,17 +26,17 @@ export default {
       elements: [
         {
           name: 'disabled',
-          description: `Disables the CIS-CAT wodle.`,
+          description: 'Disables the CIS-CAT wodle.',
           type: 'switch',
           required: true
         },
         {
           name: 'timeout',
-          description: `Timeout for each evaluation. In case the execution takes longer that the specified timeout, it stops.`,
+          description: 'Timeout for each evaluation. In case the execution takes longer that the specified timeout, it stops.',
           type: 'input-number',
           required: true,
           placeholder: 'A positive number (seconds)',
-          values: {min: 1},
+          values: { min: 1 },
           default_value: 1800,
           validate_error_message: 'A positive number (seconds)'
         },
@@ -45,7 +45,6 @@ export default {
           description: `Define where Java is located. If this parameter is not set, the wodle will search for the Java location in the default environment variable $PATH.`,
           warning: 'For this field, it can be set a full path or a relative path. Whether you specify a relative path, it concatenates to the Wazuh installation path. ciscat_path has the same behavior.',
           type: 'input',
-          required: true,
           placeholder: 'Any valid path.',
           default_value: '$PATH'
         },
@@ -136,7 +135,7 @@ export default {
           type: 'input',
           placeholder: 'Time of day [hh:mm]',
           validate_error_message: 'Time of day [hh:mm]',
-          validate_regex: /^\d{2}:\d{2}$/
+          validate_regex: /^(((0[0-9])|(1[0-9])|(2[0-4])):[0-5][0-9])$/
         }
       ]
     },
@@ -164,7 +163,7 @@ export default {
             },
             {
               name: 'path',
-              description: `Use the specified policy file.`,
+              description: 'Use the specified policy file.',
               info: 'The path attribute can be filled in with the whole path where the benchmark files are located, or with a relative path to the CIS-CAT tool location.',
               type: 'input',
               placeholder: 'Path where the benchmark files are located',
@@ -175,7 +174,7 @@ export default {
               description: `Timeout for the evaluation (in seconds).
               Use of this attribute overwrites the generic timeout.`,
               type: 'input-number',
-              values: {min: 1},
+              values: { min: 1 },
               default_value: 1800,
               validate_error_message: 'A positive number (seconds)'
             }
