@@ -84,8 +84,6 @@ export class SelectAgent extends Component {
   async getItems() {
     const rawAgents = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
 
-    console.log(rawAgents);
-
     const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(
       this.formatAgent.bind(this)
     );

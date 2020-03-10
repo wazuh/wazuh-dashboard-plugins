@@ -12,6 +12,7 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery';
+import _ from 'lodash';
 import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
@@ -75,7 +76,6 @@ class KibanaVis extends Component {
   }
 
   componentWillUnmount() {
-    console.log("destruido", this.visID)
     if (this._isMounted) {
       this._isMounted = false;
       this.updateVis();
@@ -83,7 +83,8 @@ class KibanaVis extends Component {
     }
   }
 
-  componentDidUpdate() {
+
+  componentDidUpdate(prevProps) {
     this.visID = this.props.visID;
     if (this.props.state.shouldUpdate) {
       this.updateVis();
@@ -150,6 +151,11 @@ class KibanaVis extends Component {
 
   myRender = async raw => {
     try {
+     /* const isFound = raw.filter(item => item && item.id === this.visID);
+      if(!isFound.length){
+        this.rendered = true;
+        this.destroyAll();
+      }*/
       const discoverList = this.discoverPendingUpdates.getList();
       const isAgentStatus = this.visID === 'Wazuh-App-Overview-General-Agents-status';
       const timeFilterSeconds = this.calculateTimeFilterSeconds(timefilter.getTime());
@@ -165,7 +171,6 @@ class KibanaVis extends Component {
         filters,
         query,
       };
-
       if (!this.factory) {
         this.factory = embeddables.getEmbeddableFactory('visualization');
       }

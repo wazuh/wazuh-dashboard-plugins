@@ -16,7 +16,9 @@ import { TabDescription } from '../../../server/reporting/tab-description';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { VisFactoryHandler } from '../../react-services/vis-factory-handler'
+import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
+import { RawVisualizations } from '../../factories/raw-visualizations';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 export class OverviewController {
   /**
@@ -54,12 +56,16 @@ export class OverviewController {
     this.visFactoryService = VisFactoryHandler;
     this.wazuhConfig = new WazuhConfig();
     this.showingMitreTable = false;
+    this.rawVisualizations = new RawVisualizations();
   }
 
   /**
    * On controller loads
    */
   $onInit() {
+    const { filterManager } = getServices();
+    this.filterManager = filterManager;
+    this.rawVisualizations.setType("");
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -101,18 +107,6 @@ export class OverviewController {
       },
       tab: this.tab,
       subtab: this.subtab,
-      buildOverview: async () => {
-        await this.updateSelectedAgents(false);
-      },
-      buildAgent: async () => {
-        await this.visFactoryService.buildAgentsVisualizations(
-          this.filterHandler,
-          this.tab,
-          null,
-          true,
-          1
-        );
-      },
       setAgent: async agentList => {
         this.updateSelectedAgents(agentList)
       },
@@ -134,37 +128,32 @@ export class OverviewController {
   }
 
   async updateSelectedAgents(agentList){
-    console.log("update selected agents")
-    if(agentList && agentList.length){
+    this.isAgent = agentList ? agentList[0] : false;
+    this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
+
+    if(agentList && agentList.length && this.rawVisualizations.getType() !== 'agents'){
       await this.visFactoryService.buildAgentsVisualizations(
         this.filterHandler,
         this.tab,
         null,
         true,
         agentList
-      );
-      this.isAgent = agentList[0];
-      if(agentList.length === 1){
-        this.$rootScope.$emit('selectAgent', {
-          id: agentList[0]
-        }); 
-      }else if(agentList.length > 1){
-        this.$rootScope.$emit('selectMultipleAgent', {
-          agentsList: agentList
-        });
-      }
-    }else{
+      ); 
+      this.$rootScope.resultState = "Fetching dashboard data...";
+      this.$rootScope.rendered = false;
+    }else if(!agentList && this.rawVisualizations.getType() !== 'general'){
       await this.visFactoryService.buildOverviewVisualizations(
         this.filterHandler,
         this.tab,
         null, //not needed
         true
       );
+      this.$rootScope.resultState = "Fetching dashboard data...";
+      this.$rootScope.rendered = false;
     }
+    this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
     this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
 
-    this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
-    
   }
 
   /**

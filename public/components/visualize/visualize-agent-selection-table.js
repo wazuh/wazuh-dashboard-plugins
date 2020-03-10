@@ -129,6 +129,7 @@ export class AgentSelectionTable extends Component {
   };
 
   async componentDidMount() {
+    this.setState({itemIdToSelectedMap: this.props.selectedAgents});
     await this.getItems();
   }
 
@@ -479,6 +480,11 @@ export class AgentSelectionTable extends Component {
     return this.getSelectedItems().length;
   }
 
+  newSearch(){
+    this.props.removeAgentsFilter();
+    this.props.updateAgentSearch(this.getSelectedItems());
+  }
+
   render() {
     const pagination = {
       pageIndex: this.state.pageIndex,
@@ -494,7 +500,7 @@ export class AgentSelectionTable extends Component {
     if (this.areAnyRowsSelected() > 0 && this.items.length) {
       optionalActionButtons = (
         <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => this.props.updateAgentSearch(this.getSelectedItems())} color="primary">
+          <EuiButton onClick={() => this.newSearch()} color="primary">
       Filter by {this.getSelectedCount() <= 3 && (`selected agents: ${this.getSelectedItems()}`) || ("selected agents (" + this.getSelectedCount() +")")}
           </EuiButton>
         </EuiFlexItem>

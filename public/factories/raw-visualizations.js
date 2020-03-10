@@ -18,6 +18,7 @@ export class RawVisualizations {
       return RawVisualizations.instance;
     }
     this.list = [];
+    this.type = "";
 
     RawVisualizations.instance = this;
     return this;
@@ -43,6 +44,20 @@ export class RawVisualizations {
    */
   getList() {
     return this.list;
+  }
+
+   /**
+   * Set type
+   */
+  setType(type) {
+    this.type = type;
+  }
+
+  /**
+   * Get type
+   */
+  getType() {
+    return this.type;
   }
 
   /**

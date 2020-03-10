@@ -10,7 +10,7 @@
                         <span
                             class="euiTextColor euiTextColor--default">{{ octrl.TabDescription[octrl.tab].title }}</span>
                         <span class="euiTextColor" style="color:#006BB4"
-                            ng-if="octrl.isAgent"><em>{{' of DESKTOP-GDPBOU6' }}</em></span>
+                            ng-if="octrl.isAgent && isAgentText"><em>{{isAgentText}}</em></span>
                     </h2>
                     <p class="euiTextColor euiTextColor--subdued">
                         {{octrl.TabDescription[octrl.tab].description}}
@@ -27,7 +27,7 @@
             <!-- End Discover search bar section -->
             
             <!-- Loading status section -->
-            <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'"
+            <div ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none' || resultState === 'Fetching dashboard data...'"
                 class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
                 <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
                     <span class="euiLoadingChart euiLoadingChart--large">
@@ -89,6 +89,6 @@
             </div>
             <!-- No results section -->
 
-            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels'">
+            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels' && resultState !== 'Fetching dashboard data...'">
                 <react-component name="WzVisualize" props="octrl.visualizeProps" />
             </div>

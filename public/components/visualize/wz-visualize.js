@@ -117,11 +117,7 @@ export class WzVisualize extends Component {
   }
 
   render() {
-    //VisFactoryHandler.test();
     this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
-    //store.dispatch(updateVis({ update: true }));
-    console.log("update")
-    console.log(this.visualizations)
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = (vis) => {
       return (

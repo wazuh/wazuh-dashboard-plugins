@@ -1118,51 +1118,6 @@ function discoverController(
     loadFilters(parameters.filters, parameters.tab);
   });
 
-  $rootScope.$on('selectAgent', (evt, parameters) => {
-    console.log("aqui348024789")
-    const filter = {
-      "meta": {
-        "alias":null,
-        "disabled":false,
-        "key":"agent.id",
-        "negate":false,
-        "params":{"query":parameters.id},
-        "type":"phrase",
-        "index":"wazuh-alerts-3.x-*"
-      },
-      "query":{"match_phrase":{"agent.id":parameters.id}},
-      "$state": {"store":"appState"}
-    };
-    filterManager.addFilters(filter);
-    $scope.updateQueryAndFetch({
-      query: $state.query
-    });
-  });
-
-  const multipleAgentListener = $rootScope.$on('selectMultipleAgent', (evt, parameters) => {
-    console.log("aqui23")
-    const agentsListString = parameters.agentsList.map(item => {return item.toString()})
-    const agentsListFormatted = parameters.agentsList.map(item => {return { "match_phrase": {"agent.id": item.toString()}}})
-    const filter = {
-      "meta": {
-        "alias":null,
-        "disabled":false,
-        "key":"agent.id",
-        "negate":false,
-        "params": agentsListString,
-        "value":parameters.agentsList.toString(),
-        "type":"phrases",
-        "index":"wazuh-alerts-3.x-*"
-      },
-      "query":{"bool":{"minimum_should_match": 1, "should": agentsListFormatted}},
-      "$state": {"store":"appState"}
-    };
-    console.log(filter)
-    filterManager.addFilters(filter);
-    $scope.updateQueryAndFetch({
-      query: $state.query
-    });
-  });
 
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {

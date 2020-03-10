@@ -15,15 +15,13 @@ import { VisHandlers } from '../factories/vis-handlers';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { LoadedVisualizations } from '../factories/loaded-visualizations';
 import { TabVisualizations } from '../factories/tab-visualizations';
-import { AppState } from "./app-state";
-import { GenericRequest } from "./generic-request"; 
+import { AppState } from './app-state';
+import { GenericRequest } from './generic-request';
 import chrome from 'ui/chrome';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
 
-
 export class VisFactoryHandler {
-
   /**
    * Remove visualizations data
    * @param {Boolean} onlyAgent
@@ -50,8 +48,6 @@ export class VisFactoryHandler {
     tabVisualizations.removeAll();
   }
 
-
-
   /**
    * Build the overview section visualizations
    * @param {*} filterHandler
@@ -61,27 +57,26 @@ export class VisFactoryHandler {
    */
   static async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
     const rawVisualizations = new RawVisualizations();
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    const commonData = $injector.get('commonData');
-    console.log("raw1", rawVisualizations)
-
-    try {
-      const currentPattern = AppState.getCurrentPattern();
-      const data = await GenericRequest.request(
-        'GET',
-        `/elastic/visualizations/overview-${tab}/${currentPattern}`
-      );
-      rawVisualizations.assignItems(data.data.raw);
-      console.log("raw2", rawVisualizations)
-      commonData.assignFilters(filterHandler, tab, localChange);
-      store.dispatch(updateVis({ update: true, raw : rawVisualizations.getList() }));
-
-      return;
-    } catch (error) {
-      return Promise.reject(error);
+    if(rawVisualizations.getType() !== 'general'){
+      rawVisualizations.setType('general');
+      const $injector = await chrome.dangerouslyGetActiveInjector();
+      const commonData = $injector.get('commonData');
+  
+      try {
+        const currentPattern = AppState.getCurrentPattern();
+        const data = await GenericRequest.request(
+          'GET',
+          `/elastic/visualizations/overview-${tab}/${currentPattern}`
+        );
+        rawVisualizations.assignItems(data.data.raw);
+        commonData.assignFilters(filterHandler, tab, localChange);
+        store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
+        return;
+      } catch (error) {
+        return Promise.reject(error);
+      }
     }
   }
-
 
   /**
    * Build the agents section visualizations
@@ -93,25 +88,26 @@ export class VisFactoryHandler {
    */
   static async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
     const rawVisualizations = new RawVisualizations();
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    const commonData = $injector.get('commonData');
-    console.log("raw1", rawVisualizations)
+    if (rawVisualizations.getType() !== 'agents') {
+      rawVisualizations.setType('agents');
+      const $injector = await chrome.dangerouslyGetActiveInjector();
+      const commonData = $injector.get('commonData');
 
-    try {
-      const data =
-        tab !== 'sca'
-          ? await GenericRequest.request(
-            'GET',
-            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
-          )
-          : false;
-      data && rawVisualizations.assignItems(data.data.raw);
-      console.log("raw2", rawVisualizations)
-      commonData.assignFilters(filterHandler, tab, localChange);
-      store.dispatch(updateVis({ update: true }));
-      return;
-    } catch (error) {
-      return Promise.reject(error);
+      try {
+        const data =
+          tab !== 'sca'
+            ? await GenericRequest.request(
+                'GET',
+                `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
+              )
+            : false;
+        data && rawVisualizations.assignItems(data.data.raw);
+        commonData.assignFilters(filterHandler, tab, localChange);
+        store.dispatch(updateVis({ update: true }));
+        return;
+      } catch (error) {
+        return Promise.reject(error);
+      }
     }
   }
 }
