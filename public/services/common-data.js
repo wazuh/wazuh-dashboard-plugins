@@ -133,7 +133,7 @@ export class CommonData {
    * @param {*} localChange
    * @param {*} agent
    */
-  af(filterHandler, tab, localChange, agent) {
+  af(filterHandler, tab, agent) {
     try {
       const tabFilters = {
         general: { group: '' },
@@ -187,10 +187,10 @@ export class CommonData {
         }
       }
       if (agent) filters.push(filterHandler.agentQuery(agent));
-      this.$rootScope.$emit('wzEventFilters', { filters, localChange, tab });
+      this.$rootScope.$emit('wzEventFilters', { filters, tab });
       if (!this.$rootScope.$$listenerCount['wzEventFilters']) {
         this.$timeout(100).then(() =>
-          this.af(filterHandler, tab, localChange, (agent = false))
+          this.af(filterHandler, tab, (agent = false))
         );
       }
     } catch (error) {
@@ -274,11 +274,10 @@ export class CommonData {
    * Assign given filter
    * @param {Object} filterHandler
    * @param {Object} tab
-   * @param {Object} localChange
    * @param {Object} agent
    */
-  assignFilters(filterHandler, tab, localChange, agent) {
-    return this.af(filterHandler, tab, localChange, agent);
+  assignFilters(filterHandler, tab, agent) {
+    return this.af(filterHandler, tab, agent);
   }
 
   /**

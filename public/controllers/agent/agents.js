@@ -187,10 +187,8 @@ export class AgentsController {
     this.$scope.switchSubtab = async (
       subtab,
       force = false,
-      onlyAgent = false,
-      sameTab = true,
-      preserveDiscover = false
-    ) => this.switchSubtab(subtab, force, onlyAgent, sameTab, preserveDiscover);
+      onlyAgent = false
+    ) => this.switchSubtab(subtab, force, onlyAgent);
 
     this.changeAgent = false;
 
@@ -416,18 +414,13 @@ export class AgentsController {
   async switchSubtab(
     subtab,
     force = false,
-    onlyAgent = false,
-    sameTab = true,
-    preserveDiscover = false
+    onlyAgent = false
   ) {
     try {
       if (this.$scope.tabView === subtab && !force) return;
       this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear(onlyAgent);
       this.$location.search('tabView', subtab);
-      const localChange = subtab === 'panels' && this.$scope.tabView === 'discover' && sameTab;
-      this.$scope.tabView = subtab;
-
       if (
         (subtab === 'panels' ||
           (this.targetLocation &&
@@ -436,22 +429,22 @@ export class AgentsController {
             subtab === 'discover')) &&
         !this.ignoredTabs.includes(this.$scope.tab)
       ) {
-        const condition = !this.changeAgent && (localChange || preserveDiscover);
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.$scope.tab,
           subtab,
-          condition,
-          this.$scope.agent.id
+          this.$scope.agent.id,
+          this.$scope.tabView === 'discover'
         );
 
         this.changeAgent = false;
       } else {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView,
+          tabView: subtab,
           tab: this.$scope.tab,
         });
       }
+      this.$scope.tabView = subtab;
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
@@ -484,7 +477,7 @@ export class AgentsController {
         });
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status || this.$scope.agent.status;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
 
     this.$scope.visualizeProps = {
@@ -539,7 +532,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {

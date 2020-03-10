@@ -55,7 +55,7 @@ export class VisFactoryHandler {
    * @param {*} subtab
    * @param {*} localChange
    */
-  static async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
+  static async buildOverviewVisualizations(filterHandler, tab, subtab, fromDiscover = false) {
     const rawVisualizations = new RawVisualizations();
     if(rawVisualizations.getType() !== 'general'){
       rawVisualizations.setType('general');
@@ -69,7 +69,8 @@ export class VisFactoryHandler {
           `/elastic/visualizations/overview-${tab}/${currentPattern}`
         );
         rawVisualizations.assignItems(data.data.raw);
-        commonData.assignFilters(filterHandler, tab, localChange);
+        if(!fromDiscover)
+          commonData.assignFilters(filterHandler, tab);
         store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
         return;
       } catch (error) {
@@ -86,7 +87,7 @@ export class VisFactoryHandler {
    * @param {*} localChange
    * @param {*} id
    */
-  static async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
+  static async buildAgentsVisualizations(filterHandler, tab, subtab, id, fromDiscover = false){
     const rawVisualizations = new RawVisualizations();
     if (rawVisualizations.getType() !== 'agents') {
       rawVisualizations.setType('agents');
@@ -102,7 +103,8 @@ export class VisFactoryHandler {
               )
             : false;
         data && rawVisualizations.assignItems(data.data.raw);
-        commonData.assignFilters(filterHandler, tab, localChange);
+        if(!fromDiscover)
+          commonData.assignFilters(filterHandler, tab);
         store.dispatch(updateVis({ update: true }));
         return;
       } catch (error) {

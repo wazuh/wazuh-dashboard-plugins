@@ -179,6 +179,7 @@ export class AgentSelectionTable extends Component {
   buildFilter() {
     const { itemsPerPage, pageIndex } = this.state;
     const filter = {
+      q: "id!=000",
       offset: pageIndex * itemsPerPage,
       limit: pageIndex * itemsPerPage + itemsPerPage,
       ...this.buildSortFilter(),

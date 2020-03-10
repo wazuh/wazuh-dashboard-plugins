@@ -137,8 +137,8 @@ export class OverviewController {
         this.filterHandler,
         this.tab,
         null,
-        true,
-        agentList
+        agentList,
+        this.tabView === 'discover'
       ); 
     }else if(!agentList && this.rawVisualizations.getType() !== 'general'){
       this.$rootScope.resultState = "Fetching dashboard data...";
@@ -146,7 +146,7 @@ export class OverviewController {
         this.filterHandler,
         this.tab,
         null, //not needed
-        true
+        this.tabView === 'discover'
       );
     }
     this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
@@ -183,7 +183,8 @@ export class OverviewController {
          await this.visFactoryService.buildOverviewVisualizations(
            this.filterHandler,
            this.tab,
-           subtab
+           subtab,
+           this.tabView === 'discover'
          );
           this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {

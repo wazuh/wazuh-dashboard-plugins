@@ -238,10 +238,14 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) {
+      console.log("destroy all err", error)
+    } // eslint-disable-line
     try {
       this.visHandler.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) {
+      console.log("destroy viss err", error)
+    } // eslint-disable-line
   };
 
   renderComplete = async () => {
