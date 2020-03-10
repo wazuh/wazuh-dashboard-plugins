@@ -304,7 +304,7 @@ class WzExtensionGuide extends Component {
                 <EuiSpacer size='s'/>
                 {this.state.agentTypeSelected === 'manager' ? (
                   <Fragment>
-                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to Management {'>'} Configuration {'>'} Edit Configuration, paste configuration, save and restart manager or node.</EuiText>
+                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to Management {'>'} Configuration {'>'} Edit configuration, paste configuration, save and restart manager or node.</EuiText>
                   </Fragment>
                   ) : this.state.agentOSSelected === 'linux' ? (
                     <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> in Linux agent and include above configuration and restart the agent.</EuiText>
