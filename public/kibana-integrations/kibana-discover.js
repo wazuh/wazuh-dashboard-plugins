@@ -1151,7 +1151,7 @@ function discoverController(
       let filters = filterManager.filters;
       filters = Array.isArray(filters)
         ? filters.filter(
-          item => (((item || {}).$state || {}).store || '') === 'appState'
+          item => ['appState', 'globalState'].includes(((item || {}).$state || {}).store || '')
         )
         : [];
       if (!filters || !filters.length) return false;
