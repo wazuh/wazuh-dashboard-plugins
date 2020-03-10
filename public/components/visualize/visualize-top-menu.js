@@ -223,7 +223,7 @@ export class VisualizeTopMenu extends Component {
   updateAgentSearch(agentsIdList) {
     //this.closeAgentModal();
     if (agentsIdList) {
-      this.props.setAgent(agentsIdList);
+      //this.props.setAgent(agentsIdList);
       this.setState({ isAgent: agentsIdList });
     }
   }
@@ -303,7 +303,7 @@ export class VisualizeTopMenu extends Component {
       );
     }
     return (
-      <div>
+      <div style={{marginBottom: 8}}>
         <EuiFlexItem>
           <EuiKeyPadMenu className="VisualizeTopMenu">
             {!this.state.isAgent && (

@@ -132,6 +132,7 @@ export class OverviewController {
     this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
 
     if(agentList && agentList.length && this.rawVisualizations.getType() !== 'agents'){
+      this.$rootScope.resultState = "Fetching dashboard data...";
       await this.visFactoryService.buildAgentsVisualizations(
         this.filterHandler,
         this.tab,
@@ -139,17 +140,14 @@ export class OverviewController {
         true,
         agentList
       ); 
-      this.$rootScope.resultState = "Fetching dashboard data...";
-      this.$rootScope.rendered = false;
     }else if(!agentList && this.rawVisualizations.getType() !== 'general'){
+      this.$rootScope.resultState = "Fetching dashboard data...";
       await this.visFactoryService.buildOverviewVisualizations(
         this.filterHandler,
         this.tab,
         null, //not needed
         true
       );
-      this.$rootScope.resultState = "Fetching dashboard data...";
-      this.$rootScope.rendered = false;
     }
     this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
     this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
