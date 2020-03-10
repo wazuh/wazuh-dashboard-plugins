@@ -304,12 +304,12 @@ class WzExtensionGuide extends Component {
                 <EuiSpacer size='s'/>
                 {this.state.agentTypeSelected === 'manager' ? (
                   <Fragment>
-                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to Management {'>'} Configuration {'>'} Edit configuration, paste configuration, save and restart manager or node.</EuiText>
+                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>Management</EuiCode> {'>'} <EuiCode>Configuration</EuiCode> {'>'} <EuiCode>Edit configuration</EuiCode>, paste configuration, save and restart manager or node.</EuiText>
                   </Fragment>
                   ) : this.state.agentOSSelected === 'linux' ? (
-                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> in Linux agent and include above configuration and restart the agent.</EuiText>
+                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>/var/ossec/etc</EuiCode> in Linux agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
                     ) : (
-                      <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent and include above configuration and restart the agent.</EuiText>
+                      <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
                 )}
                 <EuiSpacer size='s' />
                 <EuiText>The above section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
