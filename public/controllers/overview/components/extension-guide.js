@@ -295,25 +295,28 @@ class WzExtensionGuide extends Component {
           <Fragment>
             {!invalidConfiguration ? (
               <Fragment>
-                {this.state.agentTypeSelected === 'manager' ? (
-                  <EuiText>When you finish of configure the extension, copy xml configuration, go to Configuration Editor, paste it and save. The below section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
-                  ) : this.state.agentOSSelected === 'linux' ? (
-                    <EuiText>When you finish of configure the extension, copy xml configuration, go to <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> in Linux agent, paste it, save and restart the agent. The below section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
-                  ) : (
-                    <EuiText>When you finish of configure the extension, copy xml configuration, go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, paste it, save and restart the agent. The below section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
-                  )}
-                <EuiSpacer size='s' />
                 <EuiCodeBlock
                   language="xml"
                   color="dark"
                   isCopyable>
                   {xmlConfig}
                 </EuiCodeBlock>
+                <EuiSpacer size='s'/>
+                {this.state.agentTypeSelected === 'manager' ? (
+                  <Fragment>
+                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to Management {'>'} Configuration {'>'} Edit Configuration, paste configuration, save and restart manager or node.</EuiText>
+                  </Fragment>
+                  ) : this.state.agentOSSelected === 'linux' ? (
+                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> in Linux agent and include above configuration and restart the agent.</EuiText>
+                    ) : (
+                      <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent and include above configuration and restart the agent.</EuiText>
+                )}
+                <EuiSpacer size='s' />
+                <EuiText>The above section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
               </Fragment>
-            ) : (
-                <EuiText color='danger'>There is an error in the configuration, please check fields that have errors.
-                </EuiText>
-              )}
+              ) : (
+                <EuiText color='danger'>There is an error in the configuration, please check fields that have errors.</EuiText>
+            )}
           </Fragment>
         ),
         status: invalidConfiguration ? 'danger' : 'complete'
@@ -745,7 +748,6 @@ class WzExtensionGuide extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
         )}
-        
         <EuiSpacer size='l' />
         <EuiFlexGroup>
           <EuiFlexItem>
