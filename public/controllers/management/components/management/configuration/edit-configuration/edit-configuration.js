@@ -72,15 +72,27 @@ class WzEditConfiguration extends Component{
         color: 'success'
       });
     }catch(error){
-      this.props.addToast({
-        title: (
-          <Fragment>
-            <EuiIcon type='alert'/>&nbsp;
-            <span>Error saving configuration</span>
-          </Fragment>),
-        color: 'danger',
-        text: typeof error === 'string' ? error : error.message
-      });
+      if(error.details) {
+        this.props.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type='alert'/>&nbsp;
+              <span>File ossec.conf saved, but there were found several error while validating the configuration.</span>
+            </Fragment>),
+          color: 'warning',
+          text: error.details
+        });
+      } else {
+        this.props.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type='alert'/>&nbsp;
+              <span>Error saving configuration</span>
+            </Fragment>),
+          color: 'danger',
+          text: typeof error === 'string' ? error : error.message
+        });
+      }
       this.setState({ saving: false, infoChangesAfterRestart: false });
     }
   }
