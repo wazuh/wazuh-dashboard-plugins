@@ -2044,7 +2044,7 @@ export class WazuhReportingCtrl {
                         columns.forEach(y => {
                           if (y !== '') {
                             y = y !== "check_whodata" ? y : 'whodata';
-                            row.push(x[y] ? 'yes' : 'no');
+                            row.push(x[y] ? x[y] : 'no');
                           }
                         });
                         row.push(x.recursion_level);

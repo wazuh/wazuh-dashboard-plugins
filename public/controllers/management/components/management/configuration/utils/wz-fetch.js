@@ -448,7 +448,7 @@ export const validateAfterSent = async (node = false) => {
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
-      throw new Error('Validation error');
+      throw data;
     }
     return true;
   } catch (error) {
