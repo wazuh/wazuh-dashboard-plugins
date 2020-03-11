@@ -32,7 +32,6 @@ import overviewTemplate from '../templates/overview/overview.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
-import { npStart } from 'ui/new_platform';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -55,7 +54,7 @@ function ip(
 ) {
   assignPreviousLocation($rootScope, $location);
   return getIp(
-    npStart.plugins.data.indexPatterns,
+    indexPatterns,
     $q,
     $window,
     $location,
@@ -177,11 +176,11 @@ routes
     redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
-  .when('/discover/context/:pattern?/:type?/:id?', {
+  .when('/context/:pattern?/:type?/:id?', {
     redirectTo: function () { },
     resolve: { wzKibana }
   })
-  .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
+  .when('/doc/:pattern?/:index?/:type?/:id?', {
     redirectTo: function () { },
     resolve: { wzKibana }
   })
