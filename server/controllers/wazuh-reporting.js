@@ -2663,6 +2663,13 @@ export class WazuhReportingCtrl {
   async getReports(req, reply) {
     try {
       log('reporting:report', `Fetching created reports`, 'info');
+
+      if (!fs.existsSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh`))) {
+        fs.mkdirSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh`));
+      }
+      if (!fs.existsSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh/downloads`))) {
+        fs.mkdirSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh/downloads`));
+      }
       if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
         fs.mkdirSync(path.join(__dirname, REPORTING_PATH));
       }
