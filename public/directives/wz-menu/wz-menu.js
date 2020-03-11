@@ -89,7 +89,7 @@ class WzMenu {
         if (!$scope.menuNavItem) {
           $scope.menuNavItem = appState
             .getNavigation()
-            .currLocation.replace(/\//g, '');
+            .currLocation || ''.replace(/\//g, '');
         }
 
         if (appState.getCurrentAPI()) {

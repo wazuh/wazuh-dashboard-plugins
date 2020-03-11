@@ -18,7 +18,7 @@ export class Tabs extends Component {
     super(props);
 
     this.tabs = [];
-    this.props.tabs.forEach(tab => {
+    this.props.tabs || [].forEach(tab => {
       this.tabs.push({
         id: tab.id,
         name: tab.name
