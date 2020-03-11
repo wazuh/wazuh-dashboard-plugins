@@ -4,8 +4,8 @@
 import { uiModules } from 'ui/modules';
 import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html';
 
-uiModules.get('app/wazuh', []).directive('kbnDis', [
-  function () {
+uiModules.get('app/wazuh', ['kibana/courier']).directive('kbnDis', [
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -82,8 +82,6 @@ import { getUnhashableStatesProvider } from 'ui/state_management/state_hashing';
 //import { Inspector } from 'ui/inspector';
 import { RequestAdapter } from 'ui/inspector/adapters';
 import {
-  angular,
-  buildVislibDimensions,
   getRequestInspectorStats,
   getResponseInspectorStats
 } from 'ui/courier/utils/courier_inspector_utils';
@@ -99,11 +97,11 @@ const app = uiModules.get('apps/discover', [
   'app/wazuh'
 ]);
 
-app.directive('discoverAppW', function () {
+app.directive('discoverAppW', function() {
   return {
     restrict: 'E',
     controllerAs: 'discoverApp',
-    controller: discoverController,
+    controller: discoverController
   };
 });
 
@@ -125,6 +123,8 @@ function discoverController(
   // Wazuh requirements from here
   $rootScope,
   $location,
+  getAppState,
+  globalState,
   loadedVisualizations,
   discoverPendingUpdates
 ) {
@@ -144,7 +144,7 @@ function discoverController(
     ShareContextMenuExtensionsRegistryProvider
   );
   const inspectorAdapters = {
-    requests: new RequestAdapter(),
+    requests: new RequestAdapter()
   };
 
   $scope.getDocLink = getDocLink;
@@ -163,7 +163,7 @@ function discoverController(
   $scope.$on('$destroy', savedSearch.destroy);
 
   const $appStatus = ($scope.appStatus = this.appStatus = {
-    dirty: !savedSearch.id,
+    dirty: !savedSearch.id
   });
 
   // WAZUH MODIFIED
@@ -216,18 +216,18 @@ function discoverController(
   );
 
   if (savedSearch.id && savedSearch.title) {
-    chrome.setBreadcrumbs([
+    chrome.breadcrumbs.set([
       {
         text: discoverBreadcrumbsTitle,
-        href: '#/discover',
+        href: '#/discover'
       },
-      { text: savedSearch.title },
+      { text: savedSearch.title }
     ]);
   } else {
-    chrome.setBreadcrumbs([
+    chrome.breadcrumbs.set([
       {
-        text: discoverBreadcrumbsTitle,
-      },
+        text: discoverBreadcrumbsTitle
+      }
     ]);
   }
 
@@ -260,17 +260,19 @@ function discoverController(
       const fieldCounts = await getFieldCounts();
       return {
         searchFields: null,
-        selectFields: _.keys(fieldCounts).sort(),
+        selectFields: _.keys(fieldCounts).sort()
       };
     }
 
     const timeFieldName = $scope.indexPattern.timeFieldName;
     const hideTimeColumn = config.get('doc_table:hideTimeColumn');
     const fields =
-      timeFieldName && !hideTimeColumn ? [timeFieldName, ...selectedFields] : selectedFields;
+      timeFieldName && !hideTimeColumn
+        ? [timeFieldName, ...selectedFields]
+        : selectedFields;
     return {
       searchFields: fields,
-      selectFields: fields,
+      selectFields: fields
     };
   };
 
@@ -279,7 +281,7 @@ function discoverController(
 
     const { searchFields, selectFields } = await getSharingDataFields();
     searchSource.setField('fields', searchFields);
-    searchSource.setField('sort', getSortForSearchSource($state.sort, $scope.indexPattern));
+    searchSource.setField('sort', getSort($state.sort, $scope.indexPattern));
     searchSource.setField('highlight', null);
     searchSource.setField('highlightAll', null);
     searchSource.setField('aggs', null);
@@ -289,14 +291,14 @@ function discoverController(
     return {
       searchRequest: {
         index: searchSource.getField('index').title,
-        body,
+        body
       },
       fields: selectFields,
       metaFields: $scope.indexPattern.metaFields,
       conflictedTypesFields: $scope.indexPattern.fields
         .filter(f => f.type === 'conflict')
         .map(f => f.name),
-      indexPatternId: searchSource.getField('index').id,
+      indexPatternId: searchSource.getField('index').id
     };
   };
 
@@ -316,7 +318,9 @@ function discoverController(
         config.get('discover:sort:defaultOrder')
       ),
       columns:
-        savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
+        savedSearch.columns.length > 0
+          ? savedSearch.columns
+          : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
       interval: 'auto',
       filters: _.cloneDeep($scope.searchSource.getOwnField('filter'))
@@ -345,16 +349,18 @@ function discoverController(
     });
   };
 
-  $scope.$watchCollection('state.columns', function () {
+  $scope.$watchCollection('state.columns', function() {
     $state.save();
   });
 
   $scope.opts = {
     // number of records to fetch, then paginate through
     sampleSize: config.get('discover:sampleSize'),
-    timefield: isDefaultTypeIndexPattern($scope.indexPattern) && $scope.indexPattern.timeFieldName,
+    timefield:
+      isDefaultTypeIndexPattern($scope.indexPattern) &&
+      $scope.indexPattern.timeFieldName,
     savedSearch: savedSearch,
-    indexPatternList: $route.current.locals.ip.list,
+    indexPatternList: $route.current.locals.ip.list
   };
 
   const init = _.once(function() {
@@ -371,7 +377,7 @@ function discoverController(
         $rootScope.$broadcast('updateVis');
       });
 
-      $scope.$watchCollection('state.sort', function (sort) {
+      $scope.$watchCollection('state.sort', function(sort) {
         if (!sort) return;
 
         // get the current sort from {key: val} to ["key", "val"];
@@ -415,7 +421,7 @@ function discoverController(
       });
 
       // update data source when hitting forward/back and the query changes
-      $scope.$listen($state, 'fetch_with_changes', function (diff) {
+      $scope.$listen($state, 'fetch_with_changes', function(diff) {
         if (diff.indexOf('query') >= 0) $scope.fetch();
       });
 
@@ -435,11 +441,11 @@ function discoverController(
         $scope.fetch();
       });
 
-      $scope.$watch('vis.aggs', function () {
+      $scope.$watch('vis.aggs', function() {
         // no timefield, no vis, nothing to update
         if (!$scope.opts.timefield) return;
 
-        const buckets = $scope.vis.getAggConfig().bySchemaGroup('buckets');
+        const buckets = $scope.vis.getAggConfig().bySchemaGroup.buckets;
 
         if (buckets && buckets.length === 1) {
           $scope.bucketInterval = buckets[0].buckets.getInterval();
@@ -458,7 +464,7 @@ function discoverController(
           const status = {
             LOADING: 'loading', // initial data load
             READY: 'ready', // results came back
-            NO_RESULTS: 'none', // no results came back
+            NO_RESULTS: 'none' // no results came back
           };
 
           function pick(rows, oldRows, fetchStatus) {
@@ -477,10 +483,10 @@ function discoverController(
             else return status.NO_RESULTS;
           }
 
-          return function () {
+          return function() {
             const current = {
               rows: $scope.rows,
-              fetchStatus: $scope.fetchStatus,
+              fetchStatus: $scope.fetchStatus
             };
 
             $scope.resultState = pick(
@@ -547,7 +553,7 @@ function discoverController(
     $scope
       .updateDataSource()
       .then(setupVisualization)
-      .then(function () {
+      .then(function() {
         $state.save();
         return courier.fetch();
       })
@@ -761,7 +767,8 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     if ($location.search().tab != 'configuration') {
       loadedVisualizations.removeAll();
-      $rootScope.$broadcast('updateVis');
+      $rootScope.rendered = false;
+      $rootScope.loadingStatus = 'Fetching data...';
       // Forcing a digest cycle
       $rootScope.$applyAsync();
     }
@@ -771,15 +778,15 @@ function discoverController(
 
     $scope.timeRange = {
       from: dateMath.parse(timefilter.getTime().from),
-      to: dateMath.parse(timefilter.getTime().to, { roundUp: true }),
+      to: dateMath.parse(timefilter.getTime().to, { roundUp: true })
     };
   };
 
-  $scope.resetQuery = function () {
+  $scope.resetQuery = function() {
     kbnUrl.change('/discover/{{id}}', { id: $route.current.params.id });
   };
 
-  $scope.newQuery = function () {
+  $scope.newQuery = function() {
     kbnUrl.change('/discover');
   };
 
@@ -788,10 +795,7 @@ function discoverController(
       .setField('size', $scope.opts.sampleSize)
       .setField('sort', getSort($state.sort, $scope.indexPattern))
       .setField('query', !$state.query ? null : $state.query)
-      .setField('filter', filterManager.filters);
-
-    //Wazuh update the visualizations
-    $rootScope.$broadcast('updateVis');
+      .setField('filter', queryFilter.getFilters());
   });
 
   $scope.setSortOrder = function setSortOrder(columnName, direction) {
@@ -799,11 +803,10 @@ function discoverController(
   };
 
   // TODO: On array fields, negating does not negate the combination, rather all terms
-  $scope.filterQuery = function (field, values, operation) {
+  $scope.filterQuery = function(field, values, operation) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
     //$scope.indexPattern.popularizeField(field, 1);
-    const newFilters = generateFilters(
-      filterManager,
+    filterActions.addFilter(
       field,
       values,
       operation,
@@ -811,7 +814,6 @@ function discoverController(
       $scope.state,
       filterManager
     );
-    return filterManager.addFilters(newFilters);
   };
 
   $scope.addColumn = function addColumn(columnName) {
@@ -830,18 +832,18 @@ function discoverController(
     columnActions.moveColumn($scope.state.columns, columnName, newIndex);
   };
 
-  $scope.scrollToTop = function () {
+  $scope.scrollToTop = function() {
     $window.scrollTo(0, 0);
   };
 
-  $scope.scrollToBottom = function () {
+  $scope.scrollToBottom = function() {
     // delay scrolling to after the rows have been rendered
     $timeout(() => {
       $element.find('#discoverBottomMarker').focus();
     }, 0);
   };
 
-  $scope.showAllRows = function () {
+  $scope.showAllRows = function() {
     $scope.minimumVisibleRows = $scope.hits;
   };
 
@@ -852,7 +854,7 @@ function discoverController(
     const visStateAggs = [
       {
         type: 'count',
-        schema: 'metric',
+        schema: 'metric'
       },
       {
         type: 'date_histogram',
@@ -860,9 +862,9 @@ function discoverController(
         params: {
           field: $scope.opts.timefield,
           interval: $state.interval,
-          timeRange: timefilter.getTime(),
-        },
-      },
+          timeRange: timefilter.getTime()
+        }
+      }
     ];
 
     // we have a vis, just modify the aggs
@@ -880,10 +882,10 @@ function discoverController(
         title: savedSearch.title,
         params: {
           addLegend: false,
-          addTimeMarker: true,
+          addTimeMarker: true
         },
-        aggs: visStateAggs,
-      },
+        aggs: visStateAggs
+      }
     };
 
     $scope.vis = new Vis(
@@ -927,7 +929,7 @@ function discoverController(
     const {
       loaded: loadedIndexPattern,
       stateVal,
-      stateValFound,
+      stateValFound
     } = $route.current.locals.ip;
 
     const ownIndexPattern = $scope.searchSource.getOwnField('index');
@@ -942,8 +944,8 @@ function discoverController(
         {
           defaultMessage: '{stateVal} is not a configured index pattern ID',
           values: {
-            stateVal: `"${stateVal}"`,
-          },
+            stateVal: `"${stateVal}"`
+          }
         }
       );
 
@@ -1063,25 +1065,9 @@ function discoverController(
     wzEventFiltersListener();
     changeTabViewListener();
   });
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  /**
- * Wazuh - aux function for checking filters status
- */
-  const filtersAreReady = () => {
-    const currentUrlPath = $location.path();
-    if (currentUrlPath) {
-      let filters = filterManager.filters;
-      filters = Array.isArray(filters)
-        ? filters.filter(
-          item => ['appState', 'globalState'].includes(((item || {}).$state || {}).store || '')
-        )
-        : [];
-      if (!filters || !filters.length) return false;
-    }
-    return true;
-  };
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   init();
 }

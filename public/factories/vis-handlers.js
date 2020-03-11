@@ -39,7 +39,7 @@ export class VisHandlers {
    * Get all applied filters
    * @param {*} syscollector
    */
-  async getAppliedFilters(syscollector) {
+  getAppliedFilters(syscollector) {
     const appliedFilters = {};
 
     if (syscollector) {
@@ -74,13 +74,13 @@ export class VisHandlers {
       });
 
     if (this.list && this.list.length) {
-      const visualization = this.list[0];
+      const visualization = this.list[0].vis;
+      // Parse applied filters for the first visualization
+      const filters = visualization.API.queryFilter.getFilters();
 
       // Parse current time range
-      const { from, to } = visualization.input.timeRange;
-      const { query } = visualization.input.query;
-      // Parse applied filters for the first visualization
-      const filters = visualization.input.filters;
+      const { from, to } = visualization.API.timeFilter.getTime();
+      const { query } = visualization.searchSource._fields.query;
 
       Object.assign(appliedFilters, {
         filters,
@@ -92,7 +92,7 @@ export class VisHandlers {
         tables
       });
     }
-    
+
     return appliedFilters;
   }
 
@@ -106,7 +106,7 @@ export class VisHandlers {
         item.vis &&
         item.vis.title !== 'Agents status' &&
         ((item.dataLoader || {}).previousVisState || {}).title !==
-        'Agents status' &&
+          'Agents status' &&
         item.vis.searchSource &&
         item.vis.searchSource.rawResponse &&
         item.vis.searchSource.rawResponse.hits &&
