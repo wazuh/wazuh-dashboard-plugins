@@ -4,7 +4,7 @@
         tooltip="Go back" tooltip-placement="right" style="margin: 0px 0 -10px 0px;left: 8px;" ng-click="goNodes()"><i
             class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
     <!-- Node alerts summary card -->
-    <div layout="row" layout-align="start stretch" class="height-250 wz-timelions wz-margin-top-16" ng-class="{'no-opacity': resultState === 'none' || !rendered}"
+    <div layout="row" layout-align="start stretch" class="height-250 wz-timelions wz-margin-top-16" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
         ng-show="!loading && currentNode && !showConfig">
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">

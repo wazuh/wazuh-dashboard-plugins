@@ -1,6 +1,6 @@
 <!-- No results section -->
 <div layout="row" class="wz-margin-right-8 wz-margin-left-8 wz-margin-bottom-45 wz-margin-top-17"
-    ng-show="resultState === 'none' && !loading && !showConfig && !showNodes">
+    ng-show="resultState !== 'ready' && !loading && !showConfig && !showNodes">
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
             <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
@@ -12,7 +12,7 @@
 
 <!-- Monitoring Timelion visualizations section -->
 <div layout="row" layout-align="start stretch" class="height-400"
-    ng-class="{'no-opacity': resultState === 'none' || !rendered}"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
     ng-show="!loading && !showConfig && !showNodes && rendered">
     <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
         <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">

@@ -181,7 +181,7 @@ export class CommonData {
         }
       }
       if (agent) filters.push(filterHandler.agentQuery(agent));
-      this.$rootScope.$emit('wzEventFilters', { filters, localChange, tab });
+      this.$rootScope.$emit('wzEventFilters', { filters, localChange });
       if (!this.$rootScope.$$listenerCount['wzEventFilters']) {
         this.$timeout(100).then(() =>
           this.af(filterHandler, tab, localChange, (agent = false))

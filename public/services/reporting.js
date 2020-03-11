@@ -31,10 +31,6 @@ export class ReportingService {
     this.errorHandler = errorHandler;
     this.wazuhConfig = wazuhConfig;
   }
-  removeTableVis(visList) {
-    const attributes = JSON.parse(visList.attributes.visState);
-    return attributes.type !== 'table';
-  }
 
   removeAgentStatusVis(idArray) {
     const monitoringEnabled = this.wazuhConfig.getConfig()[
@@ -61,16 +57,13 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const rawVisualizations = this.rawVisualizations.getList()
-        .filter(this.removeTableVis);
-
       let idArray = [];
       if (tab === 'general') {
         idArray = this.removeAgentStatusVis(
-          rawVisualizations.map(item => item.id)
+          this.rawVisualizations.getList().map(item => item.id)
         );
       } else {
-        idArray = rawVisualizations.map(item => item.id);
+        idArray = this.rawVisualizations.getList().map(item => item.id);
       }
 
       for (const item of idArray) {
@@ -78,7 +71,7 @@ export class ReportingService {
         this.vis2png.assignHTMLItem(item, tmpHTMLElement);
       }
 
-      const appliedFilters = await this.visHandlers.getAppliedFilters(
+      const appliedFilters = this.visHandlers.getAppliedFilters(
         syscollectorFilters
       );
 
@@ -129,8 +122,8 @@ export class ReportingService {
 
       const docType =
         type === 'agentConfig'
-        ? `wazuh-agent-${obj.id}`
-        : `wazuh-group-${obj.name}`;
+          ? `wazuh-agent-${obj.id}`
+          : `wazuh-group-${obj.name}`;
 
       const name = `${docType}-configuration-${(Date.now() / 1000) | 0}.pdf`;
       const browserTimezone = moment.tz.guess(true);
@@ -139,9 +132,7 @@ export class ReportingService {
         array: [],
         name,
         filters: [
-          type === 'agentConfig'
-          ? { agent: obj.id }
-          : { group: obj.name }
+          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
         ],
         time: '',
         searchBar: '',

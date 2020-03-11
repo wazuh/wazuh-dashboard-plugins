@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab === 'vuls' && tabView === 'panels'" ng-class="{'no-opacity': resultState === 'none' || !rendered}"
+<md-content flex layout="column" ng-if="tab === 'vuls' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
     layout-align="start">
 
     <div layout="row" layout-padding>
