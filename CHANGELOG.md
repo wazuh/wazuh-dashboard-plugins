@@ -18,7 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Dicover time range selector is now displayed on Cluster section. [08901df](https://github.com/wazuh/wazuh-kibana-app/commit/08901dfcbe509f17e4fab26877c8b7dae8a66bff)
+- Discover time range selector is now displayed on the Cluster section. [08901df](https://github.com/wazuh/wazuh-kibana-app/commit/08901dfcbe509f17e4fab26877c8b7dae8a66bff)
 - Added the win_auth_failure rule group to Authentication failure metrics. [#2099](https://github.com/wazuh/wazuh-kibana-app/pull/2099)
 - Negative values in Syscheck attributes now have their correct value in reports. [7c3e84e](https://github.com/wazuh/wazuh-kibana-app/commit/7c3e84ec8f00760b4f650cfc00a885d868123f99)
 
