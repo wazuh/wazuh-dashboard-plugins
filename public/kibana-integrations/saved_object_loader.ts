@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import { StringUtils } from 'ui/utils/string_utils';
+import { SavedObject } from 'ui/saved_objects/types';
+import { ChromeStart, SavedObjectsClientContract, SavedObjectsFindOptions } from 'kibana/public';
+import { StringUtils } from 'ui/saved_objects/helpers/string_utils';
 
 /**
  * The SavedObjectLoader class provides some convenience functions
@@ -28,21 +29,27 @@ import { StringUtils } from 'ui/utils/string_utils';
  * to avoid pulling in extra functionality which isn't used.
  */
 export class SavedObjectLoader {
-  constructor(SavedObjectClass, kbnUrl, chrome, savedObjectClient) {
+  private readonly Class: (id: string) => SavedObject;
+  public type: string;
+  public lowercaseType: string;
+  public loaderProperties: Record<string, string>;
+
+  constructor(
+    SavedObjectClass: any,
+    private readonly savedObjectsClient: SavedObjectsClientContract,
+    private readonly chrome: ChromeStart
+  ) {
     this.type = SavedObjectClass.type;
     this.Class = SavedObjectClass;
     this.lowercaseType = this.type.toLowerCase();
-    this.kbnUrl = kbnUrl;
-    this.chrome = chrome;
 
     this.loaderProperties = {
       name: `${this.lowercaseType}s`,
       noun: StringUtils.upperFirst(this.type),
       nouns: `${this.lowercaseType}s`
     };
-
-    this.savedObjectsClient = savedObjectClient;
   }
+
 
   // Fake async function, only to resolve a promise
   async processFunc() {
@@ -55,7 +62,7 @@ export class SavedObjectLoader {
    * @param id
    * @returns {Promise<SavedObject>}
    */
-  get(id, raw) {
+  get(id: string, raw: any) {
     const instance = new this.Class(id);
 
     instance.init = _.once(() => {
@@ -89,23 +96,32 @@ export class SavedObjectLoader {
     return object;
   }
 
-  urlFor(id) {
-    return this.kbnUrl.eval(`#/${this.lowercaseType}/{{id}}`, { id: id });
+  urlFor(id: string) {
+    return `#/${this.lowercaseType}/${encodeURIComponent(id)}`;
   }
 
-  delete(ids) {
-    ids = !Array.isArray(ids) ? [ids] : ids;
+  async delete(ids: string | string[]) {
+    const idsUsed = !Array.isArray(ids) ? [ids] : ids;
 
-    const deletions = ids.map(id => {
+    const deletions = idsUsed.map(id => {
+      // @ts-ignore
       const savedObject = new this.Class(id);
       return savedObject.delete();
     });
+    await Promise.all(deletions);
 
-    return Promise.all(deletions).then(() => {
-      if (this.chrome) {
-        this.chrome.untrackNavLinksForDeletedSavedObjects(ids);
-      }
-    });
+    const coreNavLinks = this.chrome.navLinks;
+    /**
+     * Modify last url for deleted saved objects to avoid loading pages with "Could not locate..."
+     */
+    coreNavLinks
+      .getAll()
+      .filter(
+        link =>
+          link.linkToLastSubUrl &&
+          idsUsed.find(deletedId => link.url && link.url.includes(deletedId)) !== undefined
+      )
+      .forEach(link => coreNavLinks.update(link.id, { url: link.baseUrl }));
   }
 
   /**
@@ -115,7 +131,7 @@ export class SavedObjectLoader {
    * @param id
    * @returns {source} The modified source object, with an id and url field.
    */
-  mapHitSource(source, id) {
+  mapHitSource(source: Record<string, unknown>, id: string) {
     source.id = id;
     source.url = this.urlFor(id);
     return source;
@@ -127,7 +143,7 @@ export class SavedObjectLoader {
    * @param hit
    * @returns {hit.attributes} The modified hit.attributes object, with an id and url field.
    */
-  mapSavedObjectApiHits(hit) {
+  mapSavedObjectApiHits(hit: { attributes: Record<string, unknown>; id: string }) {
     return this.mapHitSource(hit.attributes, hit.id);
   }
 
@@ -135,11 +151,12 @@ export class SavedObjectLoader {
    * TODO: Rather than use a hardcoded limit, implement pagination. See
    * https://github.com/elastic/kibana/issues/8044 for reference.
    *
-   * @param searchString
+   * @param search
    * @param size
+   * @param fields
    * @returns {Promise}
    */
-  findAll(search = '', size = 100, fields) {
+  findAll(search: string = '', size: number = 100, fields?: string[]) {
     return this.savedObjectsClient
       .find({
         type: this.lowercaseType,
@@ -148,23 +165,21 @@ export class SavedObjectLoader {
         page: 1,
         searchFields: ['title^3', 'description'],
         defaultSearchOperator: 'AND',
-        fields
-      })
+        fields,
+      } as SavedObjectsFindOptions)
       .then(resp => {
         return {
           total: resp.total,
-          hits: resp.savedObjects.map(savedObject =>
-            this.mapSavedObjectApiHits(savedObject)
-          )
+          hits: resp.savedObjects.map(savedObject => this.mapSavedObjectApiHits(savedObject)),
         };
       });
   }
 
-  find(search = '', size = 100) {
+  find(search: string = '', size: number = 100) {
     return this.findAll(search, size).then(resp => {
       return {
         total: resp.total,
-        hits: resp.hits.filter(savedObject => !savedObject.error)
+        hits: resp.hits.filter(savedObject => !savedObject.error),
       };
     });
   }

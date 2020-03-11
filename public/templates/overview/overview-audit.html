@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'audit' && octrl.tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="space-around">
+    ng-class="{'no-opacity': resultState === 'none' || !rendered}" layout-align="space-around">
 
     <div layout="row" layout-align="center stretch" class="height-250">
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">

@@ -5,7 +5,10 @@
     <wz-top-nav
       app-name="'discover'"
       config="topNavMenu"
-      show-search-bar="tabView !== 'cluster-monitoring'"
+      show-search-bar="tabView"
+      show-filter-bar="tabView !== 'cluster-monitoring'"
+      show-query-input="tabView !== 'cluster-monitoring'"
+      show-save-query="tabView !== 'cluster-monitoring'"
       show-date-picker="enableTimeRangeSelector"
       show-save-query="showSaveQuery"
       query="state.query"
@@ -24,14 +27,13 @@
       on-saved-query-updated="onSavedQueryUpdated"
       on-clear-saved-query="onClearSavedQuery"
     >
-    </wz-top-nav>    
+    </wz-top-nav>
   
     <main ng-show="tabView !== 'cluster-monitoring'" class="container-fluid">
         <div ng-show="tabView === 'discover'" class="row">
           <div ng-if="tabView === 'discover'" class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">    
             <div class="dscFieldChooser">
-              <disc-field-chooser
-              class="dscFieldChooser"
+            <disc-field-chooser
               columns="state.columns"
               hits="rows"
               field-counts="fieldCounts"
@@ -231,4 +233,4 @@
         </div>
       </div>
     </main>
-  </discover-app-w>  
+  </discover-app-w>

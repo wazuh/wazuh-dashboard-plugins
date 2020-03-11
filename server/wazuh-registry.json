@@ -1,1 +1,0 @@
-{"name":"Wazuh App","app-version":"3.11.0","revision":"0590","installationDate":"2020-01-28T05:23:14.577Z","lastRestart":"2020-01-28T05:23:14.577Z","hosts":{"default":{"cluster_info":{"status":"disabled","manager":"master","node":"node02","cluster":"Disabled"}}}}

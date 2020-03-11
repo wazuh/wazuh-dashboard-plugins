@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
-  "version": "3.11.4",
-  "revision": "0575",
-  "code": "0575-0",
+  "version": "3.12.0",
+  "revision": "0576",
+  "code": "0576-0",
   "kibana": {
     "version": "7.4.2"
   },
@@ -25,13 +25,19 @@
   },
   "homepage": "https://www.wazuh.com/",
   "scripts": {
+    "preinstall": "node ../../preinstall_check",
     "pretty": "prettier --single-quote \"{,!(node_modules)/**/}*.js\" --write",
     "tslint": "tslint -c .tslint.yml server/**/*.ts server/**/*.tsx public/**/*.ts public/**/*.tsx",
     "lint": "eslint . --ext .js -c .eslintrc.json --color",
+    "kbn": "node ../../scripts/kbn",
+    "es": "node ../../scripts/es",
+    "start": "plugin-helpers start",
     "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
     "build": "plugin-helpers build",
     "test": "_mocha test/**/*",
-    "test:ui:runner": "node ../../scripts/functional_test_runner.js"
+    "test:ui:runner": "node ../../scripts/functional_test_runner.js",
+    "test:server": "plugin-helpers test:server",
+    "test:browser": "plugin-helpers test:browser"
   },
   "dependencies": {
     "angular-animate": "1.7.8",
@@ -39,7 +45,6 @@
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
     "babel-polyfill": "^6.13.0",
-    "dom-to-image": "^2.6.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
@@ -53,7 +58,7 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
+    "@elastic/plugin-helpers": "^7.1.8",
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",
     "eslint": "^5.10.0",

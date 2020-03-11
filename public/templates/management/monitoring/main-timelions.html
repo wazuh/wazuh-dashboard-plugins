@@ -12,7 +12,7 @@
 
 <!-- Monitoring Timelion visualizations section -->
 <div layout="row" layout-align="start stretch" class="height-400"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    ng-class="{'no-opacity': resultState === 'none' || !rendered}"
     ng-show="!loading && !showConfig && !showNodes && rendered">
     <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
         <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">

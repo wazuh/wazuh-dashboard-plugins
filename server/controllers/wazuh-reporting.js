@@ -40,7 +40,8 @@ import {
 
 import { log } from '../logger';
 
-const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
+const BASE_OPTIMIZE_PATH = '../../../../optimize';
+const REPORTING_PATH = `${BASE_OPTIMIZE_PATH}/wazuh/downloads/reports`;
 
 export class WazuhReportingCtrl {
   /**
@@ -139,7 +140,7 @@ export class WazuhReportingCtrl {
         return {
           columns: [
             {
-              text: 'Copyright © 2019 Wazuh, Inc.',
+              text: 'Copyright © 2020 Wazuh, Inc.',
               color: '#1EA5C8',
               margin: [40, 40, 0, 0]
             },
@@ -1811,6 +1812,12 @@ export class WazuhReportingCtrl {
       // Init
       this.printer = new PdfPrinter(this.fonts);
       this.dd.content = [];
+      if (!fs.existsSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh`))) {
+        fs.mkdirSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh`));
+      }
+      if (!fs.existsSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh/downloads`))) {
+        fs.mkdirSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh/downloads`));
+      }
       if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
         fs.mkdirSync(path.join(__dirname, REPORTING_PATH));
       }
@@ -2038,7 +2045,7 @@ export class WazuhReportingCtrl {
                         columns.forEach(y => {
                           if (y !== '') {
                             y = y !== "check_whodata" ? y : 'whodata';
-                            row.push(x[y] ? 'yes' : 'no');
+                            row.push(x[y] ? x[y] : 'no');
                           }
                         });
                         row.push(x.recursion_level);

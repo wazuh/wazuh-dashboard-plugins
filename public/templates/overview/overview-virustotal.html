@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'virustotal' && octrl.tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+    ng-class="{'no-opacity': resultState === 'none' || !rendered}" layout-align="start">
 
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">

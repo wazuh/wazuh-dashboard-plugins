@@ -24,11 +24,13 @@ import 'uiExports/devTools';
 import 'uiExports/docViews';
 import 'uiExports/embeddableFactories';
 import 'uiExports/autocompleteProviders';
+import 'uiExports/interpreter';
+import 'angular-sanitize';
 
 // Require CSS
 import './less/loader';
-import { uiModules } from 'ui/modules';
-import chrome from 'ui/chrome';
+// Require lib to dashboards PDFs
+require ('./utils/dom-to-image.js');
 
 // EUI React components wrapper
 import './components';
@@ -57,16 +59,20 @@ import 'angular-material/angular-material';
 import 'angular-cookies/angular-cookies';
 
 import 'ui/autoload/all';
+import chrome from 'ui/chrome';
 
-// Wazuh
+// Set up Wazuh app
+import './setup';
+
+//App imports
 import './kibana-integrations';
 import './services';
 import './controllers';
 import './factories';
 import './directives';
 
-// Set up Wazuh app
-const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+const app = getAngularModule('app/wazuh');
 
 app.config([
   '$compileProvider',
@@ -84,69 +90,11 @@ app.config([
   }
 ]);
 
-app.run(function ($rootScope, $route, $location, appState) {
+app.run(function () {
   chrome
     .setRootTemplate('<wz-menu></wz-menu><div ng-view></div>')
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
-  appState.setNavigation({ status: false });
-  appState.setNavigation({
-    reloaded: false,
-    discoverPrevious: false,
-    discoverSections: ['/overview/', '/agents', '/wazuh-dev']
-  });
-
-  $rootScope.$on('$routeChangeSuccess', () => {
-    appState.setNavigation({ prevLocation: $location.path() });
-    if (!appState.getNavigation().reloaded) {
-      appState.setNavigation({ status: true });
-    } else {
-      appState.setNavigation({ reloaded: false });
-    }
-  });
-
-  $rootScope.$on('$locationChangeSuccess', () => {
-    const navigation = appState.getNavigation();
-    appState.setNavigation({ currLocation: $location.path() });
-    if (navigation.currLocation !== navigation.prevLocation) {
-      if (navigation.discoverSections.includes(navigation.currLocation)) {
-        appState.setNavigation({ discoverPrevious: navigation.prevLocation });
-      }
-    } else {
-      if (!navigation.status && navigation.prevLocation) {
-        if (
-          !navigation.discoverSections.includes(navigation.currLocation) &&
-          $location.search().tabView !== 'cluster-monitoring'
-        ) {
-          appState.setNavigation({ reloaded: true });
-          $location.search('configSubTab', null);
-          $location.search('editingFile', null);
-          $route.reload();
-        }
-      }
-    }
-    appState.setNavigation({ status: false });
-  });
 });
 
-// Added due to Kibana 6.3.0. Do not modify.
-uiModules.get('kibana').provider('dashboardConfig', () => {
-  let hideWriteControls = false;
 
-  return {
-    /**
-     * Part of the exposed plugin API - do not remove without careful consideration.
-     * @type {boolean}
-     */
-    turnHideWriteControlsOn() {
-      hideWriteControls = true;
-    },
-    $get() {
-      return {
-        getHideWriteControls() {
-          return hideWriteControls;
-        }
-      };
-    }
-  };
-});

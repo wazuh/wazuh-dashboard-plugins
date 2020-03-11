@@ -20,13 +20,11 @@
 import 'ngreact';
 import { wrapInI18nContext } from 'ui/i18n';
 import { uiModules } from 'ui/modules';
-import { TopNavMenu } from './search-bar/top_nav_menu';
-import { Storage } from 'ui/storage';
-import chrome from 'ui/chrome';
+import { npStart } from 'ui/new_platform';
 
 const module = uiModules.get('kibana');
 
-module.directive('wzTopNav', () => {
+export function createTopNavDirective() {
   return {
     restrict: 'E',
     template: '',
@@ -52,10 +50,6 @@ module.directive('wzTopNav', () => {
       elem.append(child);
 
       const linkFn = ($scope, _, $attr) => {
-        $scope.store = localStorage;
-        $scope.uiSettings = chrome.getUiSettingsClient();
-        $scope.savedObjectsClient = chrome.getSavedObjectsClient();
-
         // Watch config changes
         $scope.$watch(
           () => {
@@ -83,23 +77,20 @@ module.directive('wzTopNav', () => {
       };
 
       return linkFn;
-    }
+    },
   };
-});
+}
 
-module.directive('wzTopNavHelper', reactDirective => {
+module.directive('wzTopNav', createTopNavDirective);
+
+export const createTopNavHelper = ({ TopNavMenu }) => reactDirective => {
   return reactDirective(wrapInI18nContext(TopNavMenu), [
-    ['name', { watchDepth: 'reference' }],
     ['config', { watchDepth: 'value' }],
     ['disabledButtons', { watchDepth: 'reference' }],
 
     ['query', { watchDepth: 'reference' }],
     ['savedQuery', { watchDepth: 'reference' }],
-    ['store', { watchDepth: 'reference' }],
-    ['uiSettings', { watchDepth: 'reference' }],
-    ['savedObjectsClient', { watchDepth: 'reference' }],
     ['intl', { watchDepth: 'reference' }],
-    ['store', { watchDepth: 'reference' }],
 
     ['onQuerySubmit', { watchDepth: 'reference' }],
     ['onFiltersUpdated', { watchDepth: 'reference' }],
@@ -127,6 +118,8 @@ module.directive('wzTopNavHelper', reactDirective => {
     'isRefreshPaused',
     'refreshInterval',
     'disableAutoFocus',
-    'showAutoRefreshOnly'
+    'showAutoRefreshOnly',
   ]);
-});
+};
+
+module.directive('wzTopNavHelper', createTopNavHelper(npStart.plugins.navigation.ui));

@@ -223,7 +223,7 @@ hosts:
           <div>
             <EuiText>
               Review the settings in the{' '}
-              <EuiCode>kibana/plugins/wazuh/wazuh.yml</EuiCode> file.
+              <EuiCode>/usr/share/kibana/optimize/wazuh/config/wazuh.yml</EuiCode> file.
             </EuiText>
             <EuiSpacer />
             <EuiCodeBlock language="yaml">{apiExample}</EuiCodeBlock>

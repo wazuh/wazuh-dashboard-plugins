@@ -32,6 +32,7 @@ import overviewTemplate from '../templates/overview/overview.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import { npStart } from 'ui/new_platform';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -42,7 +43,6 @@ const assignPreviousLocation = ($rootScope, $location) => {
 };
 
 function ip(
-  indexPatterns,
   $q,
   $rootScope,
   $window,
@@ -55,7 +55,7 @@ function ip(
 ) {
   assignPreviousLocation($rootScope, $location);
   return getIp(
-    indexPatterns,
+    npStart.plugins.data.indexPatterns,
     $q,
     $window,
     $location,
@@ -127,10 +127,12 @@ function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
-  // Sets ?_a=(columns:!(_source),filters:!())
-  $location.search('_a', '(columns:!(_source),filters:!())');
-  // Removes ?_g
-  $location.search('_g', null);
+  if ($location.$$path !== "/visualize/create") {
+    // Sets ?_a=(columns:!(_source),filters:!())
+    $location.search('_a', '(columns:!(_source),filters:!())');
+    // Removes ?_g
+    $location.search('_g', null);
+  }
   return goToKibana($location, $window);
 }
 
@@ -172,20 +174,20 @@ routes
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
-  .when('/context/:pattern?/:type?/:id?', {
-    redirectTo: function() {},
+  .when('/discover/context/:pattern?/:type?/:id?', {
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
-  .when('/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function() {},
+  .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,
-    resolve: { enableWzMenu, nestedResolve }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,
@@ -200,3 +202,4 @@ routes
   .otherwise({
     redirectTo: '/overview'
   });
+  
