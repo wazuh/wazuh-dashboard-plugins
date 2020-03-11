@@ -42,7 +42,6 @@
   "dependencies": {
     "angular-animate": "1.7.8",
     "angular-chart.js": "1.1.1",
-    "d3": "^5.12.0",
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
     "babel-polyfill": "^6.13.0",
