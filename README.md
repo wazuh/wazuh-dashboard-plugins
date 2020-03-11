@@ -31,7 +31,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 ## Requisites
 
 - Wazuh HIDS 3.12.0
-- Wazuh RESTful API 3.12.
+- Wazuh RESTful API 3.12.0
 - Kibana 7.4.2
 - Elasticsearch 7.4.2
 
@@ -255,13 +255,10 @@ If you want to contribute to our project please don't hesitate to send a pull re
 ## Software and libraries used
 
 - https://elastic.co
-- https://elastic.github.io/eui
 - https://material.angularjs.org
 - https://angularjs.org
 - https://nodejs.org
 - https://npmjs.com
-- https://reactjs.org
-- https://redux.js.org
 
 ## Copyright & License
 

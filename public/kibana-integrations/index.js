@@ -11,5 +11,5 @@
  */
 import './kibana-visualization';
 import './kibana-discover';
-import './saved_visualizations';
+import './saved-visualizations';
 import './wz-top-nav';

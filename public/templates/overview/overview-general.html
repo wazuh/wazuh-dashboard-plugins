@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'general' && octrl.tabView === 'panels'" layout-align="start"
-ng-class="{'no-opacity': resultState === 'none' || !rendered}">
+ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
 
     <div layout="row" layout-padding>
         <react-component flex name="AlertsStats" props="{
