@@ -8,6 +8,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh v3.12.0
+- Added a new setting to hide manager alerts from dashboards. [#2102](https://github.com/wazuh/wazuh-kibana-app/pull/2102)
+- Added suport for PCI 11.2.1 and 11.2.3 rules. [#2062](https://github.com/wazuh/wazuh-kibana-app/pull/2062)
+
+### Changed
+
+- Restructuring of the optimize/wazuh directory. Now the Wazuh configuration file (wazuh.yml) is placed on /usr/share/kibana/optimize/wazuh/config. [#2116](https://github.com/wazuh/wazuh-kibana-app/pull/2116)
+- Improve performance of Dasboards reports generation. [1802344](https://github.com/wazuh/wazuh-kibana-app/commit/18023447c6279d385df84d7f4a5663ed2167fdb5)
+
+### Fixed
+
+- Dicover time range selector is now displayed on Cluster section. [08901df](https://github.com/wazuh/wazuh-kibana-app/commit/08901dfcbe509f17e4fab26877c8b7dae8a66bff)
+- Added the win_auth_failure rule group to Authentication failure metrics. [#2099](https://github.com/wazuh/wazuh-kibana-app/pull/2099)
+- Negative values in Syscheck attributes now have their correct value in reports. [7c3e84e](https://github.com/wazuh/wazuh-kibana-app/commit/7c3e84ec8f00760b4f650cfc00a885d868123f99)
 
 
 ## Wazuh v3.11.4 - Kibana v7.6.1 - Revision 858
