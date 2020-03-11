@@ -42,6 +42,7 @@ const assignPreviousLocation = ($rootScope, $location) => {
 };
 
 function ip(
+  indexPatterns,
   $q,
   $rootScope,
   $window,
