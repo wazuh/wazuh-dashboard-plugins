@@ -12,7 +12,6 @@
 
 import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
-
 const app = uiModules.get('app/wazuh', []);
 
 class WzMenu {
@@ -29,10 +28,10 @@ class WzMenu {
     $window,
     appState,
     patternHandler,
-    indexPatterns,
     errorHandler,
     wazuhConfig
   ) {
+    const indexPatterns = npStart.plugins.data.indexPatterns;
     $scope.showSelector = appState.getPatternSelector();
     $scope.root = $rootScope;
 
@@ -89,7 +88,7 @@ class WzMenu {
         if (!$scope.menuNavItem) {
           $scope.menuNavItem = appState
             .getNavigation()
-            .currLocation.replace(/\//g, '');
+            .currLocation || "".replace(/\//g, '');
         }
 
         if (appState.getCurrentAPI()) {

@@ -284,7 +284,6 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
                   aria-label="Filter monitored files..."
                 />
         </EuiFlexGroup>
-
       </div>
     );
   }
@@ -392,7 +391,6 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
           name: "Field",
           align: "left",
           width: "120px",
-
         },
         {
           field: 'value',
@@ -420,7 +418,6 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
      return (
       <EuiFlexGroup>
         <EuiFlexItem>
-
          </EuiFlexItem>
       </EuiFlexGroup>
     );

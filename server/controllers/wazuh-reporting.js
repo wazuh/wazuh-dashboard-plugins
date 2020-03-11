@@ -40,7 +40,8 @@ import {
 
 import { log } from '../logger';
 
-const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
+const BASE_OPTIMIZE_PATH = '../../../../optimize';
+const REPORTING_PATH = `${BASE_OPTIMIZE_PATH}/wazuh/downloads/reports`;
 
 export class WazuhReportingCtrl {
   /**
@@ -139,7 +140,7 @@ export class WazuhReportingCtrl {
         return {
           columns: [
             {
-              text: 'Copyright © 2019 Wazuh, Inc.',
+              text: 'Copyright © 2020 Wazuh, Inc.',
               color: '#1EA5C8',
               margin: [40, 40, 0, 0]
             },
@@ -185,11 +186,7 @@ export class WazuhReportingCtrl {
     log('reporting:renderTables', `isVis: ${isVis}`, 'debug');
     for (const table of tables) {
       let rowsparsed = [];
-      if (isVis) {
-        rowsparsed = rawParser(table.rawResponse, table.columns);
-      } else {
-        rowsparsed = table.rows;
-      }
+      rowsparsed = table.rows;
       if (Array.isArray(rowsparsed) && rowsparsed.length) {
         const rows =
           rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
@@ -204,8 +201,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-            ? -1
-            : 0;
+              ? -1
+              : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -360,9 +357,9 @@ export class WazuhReportingCtrl {
     const seconds = date.getSeconds();
     const str = `${year}-${month < 10 ? '0' + month : month}-${
       day < 10 ? '0' + day : day
-    }T${hours < 10 ? '0' + hours : hours}:${
+      }T${hours < 10 ? '0' + hours : hours}:${
       minutes < 10 ? '0' + minutes : minutes
-    }:${seconds < 10 ? '0' + seconds : seconds}`;
+      }:${seconds < 10 ? '0' + seconds : seconds}`;
     log('reporting:formatDate', `str: ${str}`, 'debug');
     return str;
   }
@@ -463,19 +460,15 @@ export class WazuhReportingCtrl {
 
     const len = filters.length;
     for (let i = 0; i < len; i++) {
-      const filter = filters[i];
-
-      str +=
-        i === len - 1
-          ? (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value
-          : (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value +
-            ' AND ';
+      const { negate, key, value, params, type } = filters[i].meta;
+      str += `${negate ? 'NOT ' : ''}`;
+      str += `${key}: `;
+      str += `${type === 'range' 
+        ? `${params.gte}-${params.lt}` 
+        : !!value 
+          ? value 
+          : (params || {}).query}`;
+      str += `${i === len - 1 ? '' : ' AND ' }`;
     }
 
     if (searchBar) {
@@ -596,7 +589,7 @@ export class WazuhReportingCtrl {
     log(
       'reporting:checkTitle',
       `Item ID ${item.id}, from ${
-        isAgents ? 'agents' : 'overview'
+      isAgents ? 'agents' : 'overview'
       } and tab ${tab}`,
       'info'
     );
@@ -1558,7 +1551,7 @@ export class WazuhReportingCtrl {
           if (hardware.data.ram && hardware.data.ram.total)
             ulcustom.push(
               Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-                'GB RAM'
+              'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1743,8 +1736,8 @@ export class WazuhReportingCtrl {
           plainData[key] =
             Array.isArray(data[key]) && typeof data[key][0] !== 'object'
               ? data[key].map(x => {
-                  return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
-                })
+                return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
+              })
               : data[key];
         } else if (
           Array.isArray(data[key]) &&
@@ -1764,7 +1757,7 @@ export class WazuhReportingCtrl {
       title: (section.options || {}).hideHeader
         ? ''
         : (section.tabs || [])[tab] ||
-          (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
+        (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
       columns: ['', ''],
       type: 'config',
       rows: this.getConfigRows(plainData, (section.labels || [])[0])
@@ -1782,10 +1775,10 @@ export class WazuhReportingCtrl {
             typeof x[key] !== 'object'
               ? x[key]
               : Array.isArray(x[key])
-              ? x[key].map(x => {
+                ? x[key].map(x => {
                   return x + '\n';
                 })
-              : JSON.stringify(x[key])
+                : JSON.stringify(x[key])
           );
         }
         while (row.length < columns.length) {
@@ -1820,6 +1813,12 @@ export class WazuhReportingCtrl {
       // Init
       this.printer = new PdfPrinter(this.fonts);
       this.dd.content = [];
+      if (!fs.existsSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh`))) {
+        fs.mkdirSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh`));
+      }
+      if (!fs.existsSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh/downloads`))) {
+        fs.mkdirSync(path.join(__dirname, `${BASE_OPTIMIZE_PATH}/wazuh/downloads`));
+      }
       if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
         fs.mkdirSync(path.join(__dirname, REPORTING_PATH));
       }
@@ -1977,10 +1976,10 @@ export class WazuhReportingCtrl {
                               typeof x[key] !== 'object'
                                 ? x[key]
                                 : Array.isArray(x[key])
-                                ? x[key].map(x => {
+                                  ? x[key].map(x => {
                                     return x + '\n';
                                   })
-                                : JSON.stringify(x[key])
+                                  : JSON.stringify(x[key])
                             );
                           });
                           return row;
@@ -2047,7 +2046,7 @@ export class WazuhReportingCtrl {
                         columns.forEach(y => {
                           if (y !== '') {
                             y = y !== "check_whodata" ? y : 'whodata';
-                            row.push(x[y] ? 'yes' : 'no');
+                            row.push(x[y] ? x[y] : 'no');
                           }
                         });
                         row.push(x.recursion_level);
@@ -2166,7 +2165,7 @@ export class WazuhReportingCtrl {
                       data &&
                       data.data &&
                       Object.keys(data.data[Object.keys(data.data)[0]]).length >
-                        0
+                      0
                     ) {
                       if (!titleOfSection) {
                         this.dd.content.push({
@@ -2218,10 +2217,10 @@ export class WazuhReportingCtrl {
                                     typeof x[key] !== 'object'
                                       ? x[key]
                                       : Array.isArray(x[key])
-                                      ? x[key].map(x => {
+                                        ? x[key].map(x => {
                                           return x + '\n';
                                         })
-                                      : JSON.stringify(x[key])
+                                        : JSON.stringify(x[key])
                                   );
                                 });
                                 return row;
@@ -2403,22 +2402,22 @@ export class WazuhReportingCtrl {
                   agentOs === 'windows'
                     ? ['Name', 'Architecture', 'Version', 'Vendor']
                     : [
-                        'Name',
-                        'Architecture',
-                        'Version',
-                        'Vendor',
-                        'Description'
-                      ],
+                      'Name',
+                      'Architecture',
+                      'Version',
+                      'Vendor',
+                      'Description'
+                    ],
                 rows: packages.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
-                        x['name'],
-                        x['architecture'],
-                        x['version'],
-                        x['vendor'],
-                        x['description']
-                      ];
+                      x['name'],
+                      x['architecture'],
+                      x['version'],
+                      x['vendor'],
+                      x['description']
+                    ];
                 })
               });
             }
@@ -2448,11 +2447,11 @@ export class WazuhReportingCtrl {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
-                        x['name'],
-                        x['euser'],
-                        x['nice'],
-                        ProcessEquivalence[x.state]
-                      ];
+                      x['name'],
+                      x['euser'],
+                      x['nice'],
+                      ProcessEquivalence[x.state]
+                    ];
                 })
               });
             }
@@ -2482,18 +2481,18 @@ export class WazuhReportingCtrl {
                 rows: ports.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [
-                        x['local']['ip'],
-                        x['local']['port'],
-                        x['process'],
-                        x['state'],
-                        x['protocol']
-                      ]
+                      x['local']['ip'],
+                      x['local']['port'],
+                      x['process'],
+                      x['state'],
+                      x['protocol']
+                    ]
                     : [
-                        x['local']['ip'],
-                        x['local']['port'],
-                        x['state'],
-                        x['protocol']
-                      ];
+                      x['local']['ip'],
+                      x['local']['port'],
+                      x['state'],
+                      x['protocol']
+                    ];
                 })
               });
             }

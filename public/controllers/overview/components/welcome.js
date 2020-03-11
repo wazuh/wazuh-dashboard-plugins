@@ -126,7 +126,7 @@ export class WelcomeScreen extends Component {
               </EuiFlexGroup>
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('general', 'dashboardApp')}
-                {this.buildTabCard('fim', 'loggingApp')}
+                {this.buildTabCard('fim', 'filebeatApp')}
                 {this.props.extensions.aws &&
                   this.buildTabCard('aws', 'logoAWSMono')}
               </EuiFlexGrid>

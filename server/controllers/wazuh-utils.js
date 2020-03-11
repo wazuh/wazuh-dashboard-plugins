@@ -72,8 +72,8 @@ export class WazuhUtilsCtrl {
   async getAppLogs(req, reply) {
     try {
       const lastLogs = await simpleTail(
-        path.join(__dirname, '../../../../optimize/wazuh-logs/wazuhapp.log'),
-        20
+        path.join(__dirname, '../../../../optimize/wazuh/logs/wazuhapp.log'),
+        50
       );
       return lastLogs && Array.isArray(lastLogs)
         ? {
