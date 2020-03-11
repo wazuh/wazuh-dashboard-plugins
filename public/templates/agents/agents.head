@@ -116,7 +116,7 @@
 
     <!-- No results section -->
     <div layout="row"
-        ng-if="!showSyscheckFiles && !showScaScan && tab === 'fim' && resultState !== 'ready' && tabView === 'panels'">
+        ng-if="!showSyscheckFiles && !showScaScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'">
         <span flex></span>
         <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i
                 class="fa fa-fw fa-play"></i> Run
@@ -129,7 +129,7 @@
 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
         ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
-        ng-show="resultState !== 'ready' && tabView === 'panels'">
+        ng-show="resultState === 'none' && tabView === 'panels'">
         <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />
     </div>
     <!-- No results section -->
