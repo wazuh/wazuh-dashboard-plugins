@@ -142,7 +142,7 @@
 
 hosts:
   - default:
-     url: http://localhost
+     url: https://localhost
      port: 55000
      user: foo
      password: bar
