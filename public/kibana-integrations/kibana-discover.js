@@ -72,7 +72,6 @@ import { FilterStateManager } from 'plugins/data';
 import { buildServices } from 'plugins/kibana/discover/build_services';
 import { npStart } from 'ui/new_platform';
 import { pluginInstance } from 'plugins/kibana/discover/index';
-import { WazuhConfig } from '../factories/wazuh-config';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -116,7 +115,8 @@ function discoverController(
   $rootScope,
   $location,
   loadedVisualizations,
-  discoverPendingUpdates
+  discoverPendingUpdates,
+  wazuhConfig
 ) {
   //WAZUH
   (async () => {
@@ -130,7 +130,6 @@ function discoverController(
     timefilter,
     toastNotifications,
   } = getServices();
-  const wazuhConfig = new WazuhConfig();
   //////
   const responseHandler = vislibSeriesResponseHandlerProvider().handler;
   const filterStateManager = new FilterStateManager(globalState, getAppState, filterManager);
