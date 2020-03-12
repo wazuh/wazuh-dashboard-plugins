@@ -451,6 +451,26 @@ function discoverController(
     );
   };
 
+  const buildFilters = () => {
+    const { hideManagerAlerts } = wazuhConfig.getConfig();
+    if (hideManagerAlerts) {
+      return [{
+        "meta": {
+          "alias": null,
+          "disabled": false,
+          "key": "agent.id",
+          "negate": true,
+          "params": { "query": "000" },
+          "type": "phrase",
+          "index": "wazuh-alerts-3.x-*"
+        },
+        "query": { "match_phrase": { "agent.id": "000" } },
+        "$state": { "store": "appState" }
+      }];
+    }
+    return [];
+  }
+
   const init = _.once(function () {
     stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
     stateMonitor.onChange(status => {
@@ -502,25 +522,6 @@ function discoverController(
       subscriptions.add(
         subscribeWithScope($scope, queryFilter.getUpdates$(), {
           next: () => {
-            const buildFilters = () => {
-              const { hideManagerAlerts } = wazuhConfig.getConfig();
-              if (hideManagerAlerts) {
-                return [{
-                  "meta": {
-                    "alias": null,
-                    "disabled": false,
-                    "key": "agent.id",
-                    "negate": true,
-                    "params": { "query": "000" },
-                    "type": "phrase",
-                    "index": "wazuh-alerts-3.x-*"
-                  },
-                  "query": { "match_phrase": { "agent.id": "000" } },
-                  "$state": { "store": "appState" }
-                }];
-              }
-              return [];
-            }
             $scope
               .updateDataSource()
               .then(function () {
@@ -725,7 +726,11 @@ function discoverController(
 
     // Update query from search bar
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
+    discoverPendingUpdates.addItem($state.query,
+      [
+        ...queryFilter.getFilters(),
+        ...buildFilters() // Hide '000' agent
+      ]);
     $rootScope.$broadcast('updateVis');
     timefilter.setTime(dateRange);
     if (query && typeof query === 'object') $state.query = query;
