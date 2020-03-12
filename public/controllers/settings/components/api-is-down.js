@@ -107,7 +107,7 @@ export class ApiIsDown extends Component {
     const apiExample = `# Example Wazuh API configuration
 hosts:
     - production:
-        url: http://172.16.1.2
+        url: https://172.16.1.2
         port: 55000
         user: foo
         password: bar
@@ -223,7 +223,7 @@ hosts:
           <div>
             <EuiText>
               Review the settings in the{' '}
-              <EuiCode>kibana/plugins/wazuh/wazuh.yml</EuiCode> file.
+              <EuiCode>/usr/share/kibana/optimize/wazuh/config/wazuh.yml</EuiCode> file.
             </EuiText>
             <EuiSpacer />
             <EuiCodeBlock language="yaml">{apiExample}</EuiCodeBlock>

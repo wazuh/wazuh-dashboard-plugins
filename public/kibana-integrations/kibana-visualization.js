@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import $ from 'jquery';
-import { uiModules } from 'ui/modules';
 import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy'
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
@@ -95,6 +94,17 @@ app.directive('kbnVis', function () {
           const timeFilterSeconds = calculateTimeFilterSeconds(
             timefilter.getTime()
           );
+          const timeRange = isAgentStatus && timeFilterSeconds < 900
+            ? { from: 'now-15m', to: 'now', mode: 'quick' }
+            : timefilter.getTime();
+          const filters = isAgentStatus ? [] : discoverList[1] || [];
+          const query = !isAgentStatus ? discoverList[0] : {};
+
+          const visInput = {
+            timeRange,
+            filters,
+            query,
+          }
 
           if (!factory) {
             factory = embeddables.getEmbeddableFactory('visualization');
@@ -121,14 +131,7 @@ app.directive('kbnVis', function () {
 
               visHandler = await factory.createFromObject(
                 visualization,
-                {
-                  timeRange:
-                    isAgentStatus && timeFilterSeconds < 900
-                      ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                      : timefilter.getTime(),
-                  filters: isAgentStatus ? [] : discoverList[1] || [],
-                  query: !isAgentStatus ? discoverList[0] : {}
-                }
+                visInput
               );
               visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]).then(renderComplete);
               visHandlers.addItem(visHandler);
@@ -137,14 +140,7 @@ app.directive('kbnVis', function () {
             } else if (rendered && !deadField) {
               // There's a visualization object -> just update its filters
               $rootScope.rendered = true;
-              visHandler.updateInput({
-                timeRange:
-                  isAgentStatus && timeFilterSeconds < 900
-                    ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                    : timefilter.getTime(),
-                filters: isAgentStatus ? [] : discoverList[1] || [],
-                query: !isAgentStatus ? discoverList[0] : {}
-              });
+              visHandler.updateInput(visInput);
               setSearchSource(discoverList);
             }
           }
@@ -238,7 +234,7 @@ app.directive('kbnVis', function () {
           $rootScope.loadingStatus = `Rendering visualizations... ${
             currentCompleted > 100 ? 100 : currentCompleted
             } %`;
-
+         
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';

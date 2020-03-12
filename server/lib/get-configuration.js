@@ -14,12 +14,12 @@ import yml from 'js-yaml';
 import path from 'path';
 let cachedConfiguration = null;
 let lastAssign = new Date().getTime();
-export function getConfiguration() {
+export function getConfiguration(isUpdating = false) {
   try {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
-    if (!cachedConfiguration || dateDiffer >= 10000) {
-      const customPath = path.join(__dirname, '../../wazuh.yml');
+    if (!cachedConfiguration || dateDiffer >= 10000 || isUpdating) {
+      const customPath = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml');
       const raw = fs.readFileSync(customPath, { encoding: 'utf-8' });
       const file = yml.load(raw);
       cachedConfiguration = { ...file };
