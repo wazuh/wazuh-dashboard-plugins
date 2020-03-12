@@ -385,6 +385,26 @@ function discoverController(
     );
   };
 
+  const buildFilters = () => {
+    const { hideManagerAlerts } = wazuhConfig.getConfig();
+    if (hideManagerAlerts) {
+      return [{
+        "meta": {
+          "alias": null,
+          "disabled": false,
+          "key": "agent.id",
+          "negate": true,
+          "params": { "query": "000" },
+          "type": "phrase",
+          "index": "wazuh-alerts-3.x-*"
+        },
+        "query": { "match_phrase": { "agent.id": "000" } },
+        "$state": { "store": "appState" }
+      }];
+    }
+    return [];
+  }
+
   const init = _.once(function () {
     stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
     stateMonitor.onChange(status => {
@@ -437,26 +457,6 @@ function discoverController(
           next: () => {
             $scope.filters = filterManager.filters;
             // Wazuh. Hides the alerts of the '000' agent if it is in the configuration
-            const buildFilters = () => {
-              const { hideManagerAlerts } = wazuhConfig.getConfig();
-              if (hideManagerAlerts) {
-                return [{
-                  "meta": {
-                    "alias": null,
-                    "disabled": false,
-                    "key": "agent.id",
-                    "negate": true,
-                    "params": { "query": "000" },
-                    "type": "phrase",
-                    "index": "wazuh-alerts-3.x-*"
-                  },
-                  "query": { "match_phrase": { "agent.id": "000" } },
-                  "$state": { "store": "appState" }
-                }];
-              }
-              return [];
-            }
-
             $scope.updateDataSource().then(function () {
               ///////////////////////////////  WAZUH   ///////////////////////////////////
               if (!filtersAreReady()) return;
@@ -653,7 +653,12 @@ function discoverController(
     }
     // Update query from search bar
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query, filterManager.filters);
+    discoverPendingUpdates.addItem($state.query,
+      [
+        ...filterManager.filters,
+        ...buildFilters() // Hide '000' agent
+      ]
+    );
     $scope.fetch();
   };
 
