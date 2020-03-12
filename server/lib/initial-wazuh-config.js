@@ -43,7 +43,7 @@
 #checks.template: true
 #checks.api     : true
 #checks.setup   : true
-#checks.fields   : true
+#checks.fields  : true
 #
 # --------------------------------- Extensions ---------------------------------
 #
