@@ -364,6 +364,26 @@ function discoverController(
     indexPatternList: $route.current.locals.ip.list
   };
 
+  const buildFilters = () => {
+    const { hideManagerAlerts } = wazuhConfig.getConfig();
+    if (hideManagerAlerts) {
+      return [{
+        "meta": {
+          "alias": null,
+          "disabled": false,
+          "key": "agent.id",
+          "negate": true,
+          "params": { "query": "000" },
+          "type": "phrase",
+          "index": "wazuh-alerts-3.x-*"
+        },
+        "query": { "match_phrase": { "agent.id": "000" } },
+        "$state": { "store": "appState" }
+      }];
+    }
+    return [];
+  }
+
   const init = _.once(function () {
     stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
     stateMonitor.onChange(status => {
@@ -392,25 +412,6 @@ function discoverController(
 
       // update data source when filters update
       $scope.$listen(queryFilter, 'update', function () {
-        const buildFilters = () => {
-          const { hideManagerAlerts } = wazuhConfig.getConfig();
-          if (hideManagerAlerts) {
-            return [{
-              "meta": {
-                "alias": null,
-                "disabled": false,
-                "key": "agent.id",
-                "negate": true,
-                "params": { "query": "000" },
-                "type": "phrase",
-                "index": "wazuh-alerts-3.x-*"
-              },
-              "query": { "match_phrase": { "agent.id": "000" } },
-              "$state": { "store": "appState" }
-            }];
-          }
-          return [];
-        }
         return $scope
           .updateDataSource()
           .then(function () {
@@ -591,7 +592,11 @@ function discoverController(
     if (!filtersAreReady()) return;
 
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
+    discoverPendingUpdates.addItem($state.query,
+      [
+        ...queryFilter.getFilters(),
+        ...buildFilters() // Hide '000' agent
+      ]);
     $rootScope.$broadcast('updateVis');
     $rootScope.$broadcast('fetch');
     ////////////////////////////////////////////////////////////////////////////
