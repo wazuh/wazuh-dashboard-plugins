@@ -24,12 +24,13 @@ const needRestartFields = [
   'wazuh.monitoring.replicas',
   'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern',
-  'logs.level'
+  'logs.level',
+  'hideManagerAlerts'
 ];
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../wazuh.yml');
+    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml');
   }
 
   /**
@@ -64,7 +65,7 @@ export class UpdateConfigurationFile {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
-      const configuration = getConfiguration() || {};
+      const configuration = getConfiguration(true) || {};
       const adminUndefined = !Object.keys(configuration).includes('admin');
       const adminIsTrue = configuration.admin;
 

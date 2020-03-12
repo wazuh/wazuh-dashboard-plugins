@@ -87,9 +87,9 @@ class WzMenu {
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
         if (!$scope.menuNavItem) {
-          $scope.menuNavItem = appState
+          $scope.menuNavItem = (appState
             .getNavigation()
-            .currLocation.replace(/\//g, '');
+            .currLocation || '').replace(/\//g, '');
         }
 
         if (appState.getCurrentAPI()) {
@@ -111,7 +111,7 @@ class WzMenu {
       let height = false;
       try {
         height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
       const barHeight = (height || 51) + 2;
       $scope.settedMenuHeight = true;
       $('.md-toolbar-tools, md-toolbar')
@@ -119,7 +119,7 @@ class WzMenu {
         .css('max-height', barHeight, 'important');
     };
 
-    $($window).on('resize', function() {
+    $($window).on('resize', function () {
       calcHeight();
     });
 

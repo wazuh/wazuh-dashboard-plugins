@@ -27,6 +27,8 @@ import 'uiExports/autocompleteProviders';
 
 // Require CSS
 import './less/loader';
+// Require lib to dashboards PDFs
+require ('./utils/dom-to-image.js');
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 
@@ -84,49 +86,11 @@ app.config([
   }
 ]);
 
-app.run(function ($rootScope, $route, $location, appState) {
+app.run(function () {
   chrome
     .setRootTemplate('<wz-menu></wz-menu><div ng-view></div>')
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
-  appState.setNavigation({ status: false });
-  appState.setNavigation({
-    reloaded: false,
-    discoverPrevious: false,
-    discoverSections: ['/overview/', '/agents', '/wazuh-dev']
-  });
-
-  $rootScope.$on('$routeChangeSuccess', () => {
-    appState.setNavigation({ prevLocation: $location.path() });
-    if (!appState.getNavigation().reloaded) {
-      appState.setNavigation({ status: true });
-    } else {
-      appState.setNavigation({ reloaded: false });
-    }
-  });
-
-  $rootScope.$on('$locationChangeSuccess', () => {
-    const navigation = appState.getNavigation();
-    appState.setNavigation({ currLocation: $location.path() });
-    if (navigation.currLocation !== navigation.prevLocation) {
-      if (navigation.discoverSections.includes(navigation.currLocation)) {
-        appState.setNavigation({ discoverPrevious: navigation.prevLocation });
-      }
-    } else {
-      if (!navigation.status && navigation.prevLocation) {
-        if (
-          !navigation.discoverSections.includes(navigation.currLocation) &&
-          $location.search().tabView !== 'cluster-monitoring'
-        ) {
-          appState.setNavigation({ reloaded: true });
-          $location.search('configSubTab', null);
-          $location.search('editingFile', null);
-          $route.reload();
-        }
-      }
-    }
-    appState.setNavigation({ status: false });
-  });
 });
 
 // Added due to Kibana 6.3.0. Do not modify.

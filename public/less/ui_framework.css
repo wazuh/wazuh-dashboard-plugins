@@ -166,7 +166,7 @@
    *    at least make them look like they're not focused.
    */
   .kuiButton {
-    display: inline-block;
+    display: inline-block!important;
     /* 1 */
     -webkit-appearance: none;
        -moz-appearance: none;
