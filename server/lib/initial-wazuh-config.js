@@ -1,4 +1,16 @@
----
+/*
+ * Wazuh app - Initial basic configuration file
+ * Copyright (C) 2015-2019 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+ export const initialWazuhConfig = `---
 #
 # Wazuh app - App configuration file
 # Copyright (C) 2015-2019 Wazuh, Inc.
@@ -31,6 +43,7 @@
 #checks.template: true
 #checks.api     : true
 #checks.setup   : true
+#checks.fields  : true
 #
 # --------------------------------- Extensions ---------------------------------
 #
@@ -108,6 +121,10 @@
 # ------------------------------- App privileges --------------------------------
 #admin: true
 #
+# ---------------------------- Hide manager alerts ------------------------------
+# Hide the alerts of the manager in all dashboards and discover
+#hideManagerAlerts: false
+#
 # ------------------------------- App logging level -----------------------------
 # Set the logging level for the Wazuh App log files.
 # Default value: info
@@ -126,7 +143,9 @@
 
 hosts:
   - default:
-     url: http://localhost
+     url: https://localhost
      port: 55000
      user: foo
      password: bar
+
+`

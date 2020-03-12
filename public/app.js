@@ -27,6 +27,8 @@ import 'uiExports/autocompleteProviders';
 
 // Require CSS
 import './less/loader';
+// Require lib to dashboards PDFs
+require ('./utils/dom-to-image.js');
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 
@@ -81,134 +83,11 @@ app.config([
   }
 ]);
 
-app.run(function($rootScope, $route, $location, appState, $window) {
+app.run(function() {
   chrome
     .setRootTemplate('<wz-menu></wz-menu><div ng-view></div>')
-    .setRootController(() => require('./app'));
-  appState.setNavigation({ status: false });
-  appState.setNavigation({
-    reloaded: false,
-    discoverPrevious: false,
-    discoverSections: ['/overview/', '/agents', '/wazuh-dev']
-  });
-
-  $rootScope.$on('$routeChangeSuccess', () => {
-    appState.setNavigation({ prevLocation: $location.path() });
-    if (!appState.getNavigation().reloaded) {
-      appState.setNavigation({ status: true });
-    } else {
-      appState.setNavigation({ reloaded: false });
-    }
-  });
-
-  $rootScope.$on('$locationChangeSuccess', () => {
-    const navigation = appState.getNavigation();
-    appState.setNavigation({ currLocation: $location.path() });
-    if (navigation.currLocation !== navigation.prevLocation) {
-      if (navigation.discoverSections.includes(navigation.currLocation)) {
-        appState.setNavigation({ discoverPrevious: navigation.prevLocation });
-      }
-    } else {
-      if (!navigation.status && navigation.prevLocation) {
-        if (
-          !navigation.discoverSections.includes(navigation.currLocation) &&
-          $location.search().tabView !== 'cluster-monitoring'
-        ) {
-          appState.setNavigation({ reloaded: true });
-          $location.search('configSubTab', null);
-          $location.search('editingFile', null);
-          $route.reload();
-          //discover sections
-        } else if (
-          navigation.discoverSections.includes(navigation.currLocation)
-        ) {
-          if (navigation.currLocation === navigation.discoverSections[1]) {
-            $window.history.pushState(
-              {
-                page: chrome.addBasePath(
-                  'wazuh#' + navigation.discoverPrevious + '/'
-                )
-              },
-              '',
-              chrome.addBasePath('wazuh#' + navigation.discoverPrevious + '/')
-            );
-          } else if (
-            navigation.currLocation === navigation.discoverSections[2]
-          ) {
-            if (
-              $location.search().tab &&
-              $location.search().tab !== 'welcome'
-            ) {
-              $window.history.pushState(
-                {
-                  page: chrome.addBasePath(
-                    'wazuh#' + navigation.discoverPrevious
-                  )
-                },
-                '',
-                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-              );
-              $window.history.pushState(
-                {
-                  page: chrome.addBasePath(
-                    'wazuh#' +
-                      navigation.discoverPrevious +
-                      '?agent=' +
-                      $location.search().agent
-                  )
-                },
-                '',
-                chrome.addBasePath(
-                  'wazuh#' +
-                    navigation.discoverPrevious +
-                    '?agent=' +
-                    $location.search().agent
-                )
-              );
-            } else {
-              $window.history.pushState(
-                {
-                  page: chrome.addBasePath(
-                    'wazuh#' + navigation.discoverPrevious
-                  )
-                },
-                '',
-                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-              );
-            }
-          } else if (
-            navigation.currLocation === navigation.discoverSections[0] ||
-            navigation.currLocation === navigation.discoverSections[3]
-          ) {
-            $window.history.pushState(
-              {
-                page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-              },
-              '',
-              chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
-            );
-          }
-          $window.history.pushState(
-            { page: chrome.addBasePath('wazuh#' + $location.$$url) },
-            '',
-            chrome.addBasePath('wazuh#' + $location.$$url)
-          );
-        } else if ($location.search().tabView === 'cluster-monitoring') {
-          $window.history.pushState(
-            { page: chrome.addBasePath('wazuh#/manager/') },
-            '',
-            chrome.addBasePath('wazuh#/manager/')
-          );
-          $window.history.pushState(
-            { page: 'wazuh#' + $location.$$url },
-            '',
-            chrome.addBasePath('wazuh#' + $location.$$url)
-          );
-        }
-      }
-    }
-    appState.setNavigation({ status: false });
-  });
+    .setRootController(() => require('./app'))
+  
 });
 
 // Added due to Kibana 6.3.0. Do not modify.

@@ -127,10 +127,12 @@ function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
-  // Sets ?_a=(columns:!(_source),filters:!())
-  $location.search('_a', '(columns:!(_source),filters:!())');
-  // Removes ?_g
-  $location.search('_g', null);
+  if ($location.$$path !== "/visualize/create") {
+    // Sets ?_a=(columns:!(_source),filters:!())
+    $location.search('_a', '(columns:!(_source),filters:!())');
+    // Removes ?_g
+    $location.search('_g', null);
+  }
   return goToKibana($location, $window);
 }
 
@@ -185,7 +187,7 @@ routes
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,
-    resolve: { enableWzMenu, nestedResolve }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,

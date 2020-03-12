@@ -2,19 +2,55 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.11.4 - Kibana v6.8.7, v7.4.2, v7.6.1 - Revision 485
+## Wazuh v3.12.0 - Kibana v6.8.7, v7.4.2, v7.6.1 - Revision 490
 
 ### Added
 
-- Support for Kibana v6.8.7
+- Support for Wazuh v3.12.0
+- Added a new setting to hide manager alerts from dashboards. [#2102](https://github.com/wazuh/wazuh-kibana-app/pull/2102)
+- Added a new setting to enable/disable the known fields health check [#2037](https://github.com/wazuh/wazuh-kibana-app/pull/2037)
+- Added suport for PCI 11.2.1 and 11.2.3 rules. [#2062](https://github.com/wazuh/wazuh-kibana-app/pull/2062)
 
-## Wazuh v3.11.4 - Kibana v6.8.6, v7.4.2, v7.6.0 - Revision 484
+### Changed
+
+- Restructuring of the optimize/wazuh directory. Now the Wazuh configuration file (wazuh.yml) is placed on /usr/share/kibana/optimize/wazuh/config. [#2116](https://github.com/wazuh/wazuh-kibana-app/pull/2116)
+- Improve performance of Dasboards reports generation. [1802344](https://github.com/wazuh/wazuh-kibana-app/commit/18023447c6279d385df84d7f4a5663ed2167fdb5)
+
+### Fixed
+
+- Discover time range selector is now displayed on the Cluster section. [08901df](https://github.com/wazuh/wazuh-kibana-app/commit/08901dfcbe509f17e4fab26877c8b7dae8a66bff)
+- Added the win_auth_failure rule group to Authentication failure metrics. [#2099](https://github.com/wazuh/wazuh-kibana-app/pull/2099)
+- Negative values in Syscheck attributes now have their correct value in reports. [7c3e84e](https://github.com/wazuh/wazuh-kibana-app/commit/7c3e84ec8f00760b4f650cfc00a885d868123f99)
+
+
+## Wazuh v3.11.4 - Kibana v7.6.1 - Revision 858
+
+### Added
+
+- Support for Kibana v7.6.1
+
+
+## Wazuh v3.11.4 - Kibana v6.8.6, v7.4.2, v7.6.0 - Revision 857
 
 ### Added
 
 - Support for Wazuh v3.11.4
 
-## Wazuh v3.11.3 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 483
+
+## Wazuh v3.11.3 - Kibana v7.6.0 - Revision 856
+
+### Added
+
+- Support for Kibana v7.6.0
+
+
+## Wazuh v3.11.3 - Kibana v7.4.2 - Revision 855
+
+### Added
+
+- Support for Kibana v7.4.2
+
+## Wazuh v3.11.3 - Kibana v7.5.2 - Revision 854
 
 ### Added
 
@@ -25,7 +61,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Windows Updates table is now displayed in the Inventory Data report [#2028](https://github.com/wazuh/wazuh-kibana-app/pull/2028)
 
 
-## Wazuh v3.11.2 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 481
+## Wazuh v3.11.2 - Kibana v7.5.2 - Revision 853
+
+### Added
+
+- Support for Kibana v7.5.2
+
+
+## Wazuh v3.11.2 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 852
 
 ### Added
 
@@ -38,6 +81,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - The xml validator now correctly handles the `--` string within comments [#1980](https://github.com/wazuh/wazuh-kibana-app/pull/1980)
+- The AWS map visualization wasn't been loaded until the user interacts with it [dd31bd7](https://github.com/wazuh/wazuh-kibana-app/commit/dd31bd7a155354bc50fe0af22fca878607c8936a)
 
 
 ## Wazuh v3.11.1 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 581
