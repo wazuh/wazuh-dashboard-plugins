@@ -122,7 +122,7 @@
 #admin: true
 #
 # ---------------------------- Hide manager alerts ------------------------------
-# Hide the alerts of the manager in all dashboards and discover
+# Hide the manager's alerts in the dashboard visualizations
 #hideManagerAlerts: false
 #
 # ------------------------------- App logging level -----------------------------
