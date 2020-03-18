@@ -46,18 +46,18 @@
                                     <select
                                         ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
                                         ng-disabled="ctrl.loadingChange"
-                                        class="wz-menu-select wz-input-text wz-width-100"
+                                        class="wz-width-100"
                                         ng-model="ctrl.editingNewValue" ng-options="o as o for o in [true, false]"
                                         style="color:black"></select>
                                     <select ng-if="ctrl.editingKey === key && key === 'wazuh.monitoring.creation'"
                                         ng-disabled="ctrl.loadingChange"
-                                        class="wz-menu-select wz-input-text wz-width-100"
+                                        class="wz-width-100"
                                         ng-model="ctrl.editingNewValue"
                                         ng-options="key as value for (key , value) in  {'h': 'hourly', 'd': 'daily', 'w': 'weekly', 'm': 'monthly'}"
                                         style="color:black"></select>
                                     <select ng-if="ctrl.editingKey === key && key === 'logs.level'"
                                         ng-disabled="ctrl.loadingChange"
-                                        class="wz-menu-select wz-input-text wz-width-100"
+                                        class="wz-width-100"
                                         ng-model="ctrl.editingNewValue"
                                         ng-options="key as value for (key , value) in  {'info': 'info', 'debug': 'debug'}"
                                         style="color:black"></select>
