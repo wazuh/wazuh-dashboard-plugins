@@ -11,7 +11,8 @@
         <md-button class="wz-menu-button" ng-href="#/manager" ng-click="setMenuNavItem('manager')"
             ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab"
             data-test-subj="wzMenuManagement">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'managementApp'}" /> Management
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'managementApp'}" />
+            Management
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents-preview')"
@@ -31,19 +32,33 @@
 
         <!-- API/Index pattern section -->
         <!-- Case 1a - There's API -->
-        <span ng-show="theresAPI" class="small" tooltip="Selected API" tooltip-placement="left">
-            <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span
-                ng-if="showSelector && patternList.length > 1">&nbsp;&ndash;&nbsp;</span>
+        <span ng-show="theresAPI" class="small">
+            <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true" tooltip="Selected API"
+                tooltip-placement="bottom"></i>
+            <span ng-if="!showAPISelector || (showAPISelector && APIList && APIList.length < 2)">
+                {{currentAPI}}
+            </span>
+            <!-- There's API and there's more than one -->
+            <span ng-if="showAPISelector && currentSelectedAPI" ng-show="APIList && APIList.length > 1" class="small">
+                <select class="wz-menu-select" ng-model="currentSelectedAPI" ng-options='api.id for api in APIList'
+                    ng-change="changeAPI(currentSelectedAPI)">
+                </select>
+            </span>
+            <span ng-if="showAPISelector && !currentSelectedAPI">
+                <i class="fa fa-spin fa-spinner" aria-hidden="true"></i>
+            </span>
+            <span ng-if="showSelector && patternList.length > 1">&nbsp;&nbsp;</span>
         </span>
 
         <!-- Case 1b - There's no API -->
-        <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="left">
-            No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+        <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="bottom">
+            No API<span ng-if="showSelector">&nbsp;&nbsp;&nbsp;&nbsp;</span>
         </span>
 
         <!-- There's pattern and there's more than one -->
-        <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="small"
-            tooltip="Selected index pattern" tooltip-placement="left">
+        <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="small">
+            <react-component name="EuiIcon" props="{type:'ip'}" tooltip="Selected index pattern"
+                tooltip-placement="bottom" />
             <select class="wz-menu-select" ng-model="currentSelectedPattern"
                 ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector"
                 placeholder="Index pattern">
