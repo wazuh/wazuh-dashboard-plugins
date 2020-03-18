@@ -203,7 +203,7 @@ export class SettingsController {
         }
       }
       return numError;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Set default API
@@ -483,9 +483,15 @@ export class SettingsController {
         { key, value }
       );
       const response = data.data.data;
-      if (response) {
+      if (response.needRestart) {
         this.errorHandler.handle(
           'You must restart Kibana for the changes to take effect',
+          '',
+          true
+        );
+      } else if (response.needWait) {
+        this.errorHandler.handle(
+          'The configuration has been successfully updated, but it may take a few seconds for the change to take effect',
           '',
           true
         );
