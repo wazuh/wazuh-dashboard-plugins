@@ -65,6 +65,8 @@ class WzMenu {
           if (result.data) {
             $scope.APIList = result.data;
             $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === JSON.parse(appState.getCurrentAPI()).id);
+          } else {
+            $scope.APIList = [];
           }
         }
 

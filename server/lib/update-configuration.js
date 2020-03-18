@@ -24,8 +24,11 @@ const needRestartFields = [
   'wazuh.monitoring.replicas',
   'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern',
-  'logs.level',
-  'hideManagerAlerts'
+  'logs.level'
+];
+const needWaitFields = [
+  'hideManagerAlerts',
+  'api.selector'
 ];
 export class UpdateConfigurationFile {
   constructor() {
@@ -80,7 +83,7 @@ export class UpdateConfigurationFile {
         'Updating configuration',
         'debug'
       );
-      return { needRestart: needRestartFields.includes(key), needWait: key === 'api.selector' };
+      return { needRestart: needRestartFields.includes(key), needWait: needWaitFields.includes(key) };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;
