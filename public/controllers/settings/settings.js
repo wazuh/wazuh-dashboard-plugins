@@ -27,6 +27,7 @@ export class SettingsController {
    * @param {*} wazuhConfig
    */
   constructor(
+    $rootScope,
     $scope,
     $window,
     $location,
@@ -38,6 +39,7 @@ export class SettingsController {
     wazuhConfig
   ) {
     this.kibanaVersion = (kibana || {}).version || false;
+    this.$rootScope = $rootScope;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
@@ -227,10 +229,10 @@ export class SettingsController {
 
       const currentApi = this.appState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
-      this.apiTableProps.currentDefault = this.currentDefault;
+      (this.apiTableProps || {}).currentDefault = this.currentDefault;
       this.$scope.$applyAsync();
 
-      this.errorHandler.info(`API ${manager} set as default`);
+      this.errorHandler.info(`API ${id} set as default`);
 
       this.getCurrentAPIIndex();
       if (currentApi && !this.appState.getExtensions(id)) {
@@ -241,6 +243,7 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return this.currentDefault;
     } catch (error) {
+      this.$rootScope.$emit('currentAPIsetted', {});
       this.errorHandler.handle(error);
     }
   }
@@ -402,6 +405,7 @@ export class SettingsController {
       this.load = false;
       const config = this.wazuhConfig.getConfig();
       this.appState.setPatternSelector(config['ip.selector']);
+      this.appState.setAPISelector(config['api.selector']);
       const pattern = this.appState.getCurrentPattern();
       this.selectedIndexPattern = pattern || config['pattern'];
 
@@ -545,7 +549,7 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      this.apiEntries = (this.apiTableProps || {}).apiEntries = (this.apiIsDownProps || {}).apiEntries = hosts;
       if (!hosts.length) {
         this.apiIsDown = false;
         this.addingApi = true;

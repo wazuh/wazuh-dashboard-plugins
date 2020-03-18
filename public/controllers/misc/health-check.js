@@ -219,7 +219,7 @@ export class HealthCheck {
       const configuration = this.wazuhConfig.getConfig();
 
       this.appState.setPatternSelector(configuration['ip.selector']);
-
+      this.appState.setAPISelector(configuration['api.selector']);
       this.checks.pattern = configuration['checks.pattern'];
       this.checks.template = configuration['checks.template'];
       this.checks.api = configuration['checks.api'];

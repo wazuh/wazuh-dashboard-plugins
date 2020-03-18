@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
- export const initialWazuhConfig = `---
+export const initialWazuhConfig = `---
 #
 # Wazuh app - App configuration file
 # Copyright (C) 2015-2019 Wazuh, Inc.
@@ -75,6 +75,13 @@
 # Configure .wazuh indices shards and replicas.
 #wazuh.shards          : 1
 #wazuh.replicas        : 0
+#
+# -------------------------------- API selector --------------------------------
+#
+# Defines if the user is allowed to change the selected
+# API directly from the Wazuh app top menu.
+# Default: false
+#api.selector: false
 #
 # --------------------------- Index pattern selector ---------------------------
 #

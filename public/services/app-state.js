@@ -78,6 +78,7 @@ export class AppState {
     exp.setDate(exp.getDate() + 365);
     if (API) {
       this.$cookies.putObject('API', API, { expires: exp });
+      this.$rootScope.$emit('currentAPIsetted', {});
     }
   }
 
@@ -88,6 +89,15 @@ export class AppState {
 
   setPatternSelector(value) {
     this.$cookies.putObject('patternSelector', value);
+  }
+
+  //API setters and getters
+  getAPISelector() {
+    return this.$cookies.getObject('APISelector');
+  }
+
+  setAPISelector(value) {
+    this.$cookies.putObject('APISelector', value);
   }
 
   setCurrentPattern(newPattern) {
