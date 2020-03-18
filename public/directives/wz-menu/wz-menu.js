@@ -57,6 +57,7 @@ class WzMenu {
     const load = async () => {
       try {
         const config = wazuhConfig.getConfig();
+        $scope.APIList = [];
         $scope.showAPISelector = config['api.selector'];
         appState.setAPISelector($scope.showAPISelector);
 
@@ -64,9 +65,7 @@ class WzMenu {
           const result = await genericReq.request('GET', '/hosts/apis', {});
           if (result.data) {
             $scope.APIList = result.data;
-            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === JSON.parse(appState.getCurrentAPI()).id);
-          } else {
-            $scope.APIList = [];
+            $scope.currentSelectedAPI = ($scope.APIList || []).find(x => x.id === JSON.parse(appState.getCurrentAPI()).id);
           }
         }
 
@@ -148,7 +147,7 @@ class WzMenu {
     $scope.root.$on('currentAPIsetted', () => {
       const api = JSON.parse(appState.getCurrentAPI());
       $scope.currentAPI = api.name;
-      $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+      $scope.currentSelectedAPI = ($scope.APIList || []).find(x => x.id === api.id);
       $scope.$applyAsync();
     });
 
@@ -217,7 +216,7 @@ class WzMenu {
         if (!settings.apiEntries.length || settings.apiEntries.length !== $scope.APIList.length) {
           await settings.getHosts();
         }
-        await settings.setDefault($scope.APIList.find(x => x.id === api.id));
+        await settings.setDefault(($scope.APIList || []).find(x => x.id === api.id));
         $route.reload();
       }
     }
