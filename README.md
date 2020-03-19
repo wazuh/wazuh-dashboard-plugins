@@ -44,6 +44,13 @@ cd /usr/share/kibana
 sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.1.zip
 ```
 
+It is recommended to increase the heap size of Kibana to ensure the plugin installation:
+```
+cat >> /etc/default/kibana << EOF
+NODE_OPTIONS="--max_old_space_size=2048"
+EOF
+```
+
 Restart Kibana
 
 - Systemd:
@@ -115,6 +122,13 @@ Update configuration file permissions.
 ```
 sudo chown kibana:kibana /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 sudo chmod 600 /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+```
+
+It is recommended to increase the heap size of Kibana to ensure the plugin installation:
+```
+cat >> /etc/default/kibana << EOF
+NODE_OPTIONS="--max_old_space_size=2048"
+EOF
 ```
 
 Restart Kibana

@@ -70,12 +70,6 @@ export const initialWazuhConfig = `---
 # Default: 20000
 #timeout: 20000
 #
-# ------------------------------ Advanced indices ------------------------------
-#
-# Configure .wazuh indices shards and replicas.
-#wazuh.shards          : 1
-#wazuh.replicas        : 0
-#
 # -------------------------------- API selector --------------------------------
 #
 # Defines if the user is allowed to change the selected
