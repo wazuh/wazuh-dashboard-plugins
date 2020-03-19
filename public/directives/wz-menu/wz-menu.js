@@ -219,8 +219,6 @@ class WzMenu {
         });
     });
 
-
-
     // Set default API
     $scope.changeAPI = async (api) => {
       if (appState.getCurrentAPI()) {
