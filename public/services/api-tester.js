@@ -42,6 +42,7 @@ export class ApiTester {
       );
 
       this.appState.setPatternSelector(configuration['ip.selector']);
+      this.appState.setAPISelector(configuration['api.selector']);
 
       if (result.error) {
         return Promise.reject(result);

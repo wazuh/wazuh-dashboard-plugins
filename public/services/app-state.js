@@ -79,7 +79,9 @@ export class AppState {
     if (API) {
       this.$cookies.putObject('API', API, { expires: exp });
       this.$rootScope.currentAPI = JSON.parse(API).name;
+      this.$rootScope.currentAPIid = JSON.parse(API).id;
       this.$rootScope.theresAPI = true;
+      this.$rootScope.$emit('currentAPIsetted', {});
       this.$rootScope.$applyAsync();
     }
   }
@@ -91,6 +93,15 @@ export class AppState {
 
   setPatternSelector(value) {
     this.$cookies.putObject('patternSelector', value);
+  }
+
+  //API setters and getters
+  getAPISelector() {
+    return this.$cookies.getObject('APISelector');
+  }
+
+  setAPISelector(value) {
+    this.$cookies.putObject('APISelector', value);
   }
 
   setCurrentPattern(newPattern) {
