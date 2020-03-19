@@ -147,12 +147,16 @@ class WzMenu {
       const api = JSON.parse(appState.getCurrentAPI());
       $scope.currentAPI = api.name;
       if ($scope.APIList && $scope.APIList.length) {
-        $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+        if ($scope.updateFromEvent) {
+          $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+          $scope.updateFromEvent = false;
+        }
       }
       $scope.$applyAsync();
     }
 
     $scope.root.$on('currentAPIsetted', () => {
+      $scope.updateFromEvent = true;
       setCurrentApi();
     });
 
@@ -223,7 +227,8 @@ class WzMenu {
             await settings.getHosts();
           }
           await settings.setDefault($scope.APIList.find(x => x.id === api.id));
-          $route.reload();
+          if (!location.href.includes('/wazuh-dev'))
+            $route.reload();
         }
       }
     }
