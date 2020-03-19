@@ -9,6 +9,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh v3.12.0
 - Added a new setting to hide manager alerts from dashboards. [#2102](https://github.com/wazuh/wazuh-kibana-app/pull/2102)
+- Added a new setting to be able to change API from the top menu. [#2143](https://github.com/wazuh/wazuh-kibana-app/issues/2143)
 - Added a new setting to enable/disable the known fields health check [#2037](https://github.com/wazuh/wazuh-kibana-app/pull/2037)
 - Added suport for PCI 11.2.1 and 11.2.3 rules. [#2062](https://github.com/wazuh/wazuh-kibana-app/pull/2062)
 

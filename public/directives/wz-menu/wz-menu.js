@@ -63,6 +63,9 @@ class WzMenu {
         if ($scope.showAPISelector) {
           const result = await genericReq.request('GET', '/hosts/apis', {});
           if (result.data) {
+            if ($scope.APIList && $scope.APIList.length && result.data.length !== $scope.APIList.length) {
+              location.reload();
+            }
             $scope.APIList = result.data;
             $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === JSON.parse(appState.getCurrentAPI()).id);
           }
@@ -144,15 +147,17 @@ class WzMenu {
     });
 
     const setCurrentApi = () => {
-      const api = JSON.parse(appState.getCurrentAPI());
-      $scope.currentAPI = api.name;
-      if ($scope.APIList && $scope.APIList.length) {
-        if ($scope.updateFromEvent) {
-          $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
-          $scope.updateFromEvent = false;
+      if (appState.getCurrentAPI()) {
+        const api = JSON.parse(appState.getCurrentAPI());
+        $scope.currentAPI = api.name;
+        if ($scope.APIList && $scope.APIList.length) {
+          if ($scope.updateFromEvent) {
+            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+            $scope.updateFromEvent = false;
+          }
         }
+        $scope.$applyAsync();
       }
-      $scope.$applyAsync();
     }
 
     $scope.root.$on('currentAPIsetted', () => {
