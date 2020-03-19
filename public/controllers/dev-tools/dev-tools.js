@@ -526,7 +526,7 @@ export class DevToolsController {
           });
           const currentPlayButton = $('#play_button').offset();
           $('#play_button').offset({
-            top: cords.top + 10,
+            top: cords.top,
             left: currentPlayButton.left
           });
         }

@@ -90,6 +90,15 @@ export class AppState {
     this.$cookies.putObject('patternSelector', value);
   }
 
+  //API setters and getters
+  getAPISelector() {
+    return this.$cookies.getObject('APISelector');
+  }
+
+  setAPISelector(value) {
+    this.$cookies.putObject('APISelector', value);
+  }
+
   setCurrentPattern(newPattern) {
     const exp = new Date();
     exp.setDate(exp.getDate() + 365);
