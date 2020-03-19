@@ -29,12 +29,17 @@ class WzMenu {
     $rootScope,
     $window,
     appState,
+    genericReq,
     patternHandler,
     indexPatterns,
     errorHandler,
-    wazuhConfig
+    wazuhConfig,
+    $controller,
+    $route
   ) {
+    const settings = $controller('settingsController', { $scope });
     $scope.showSelector = appState.getPatternSelector();
+    $scope.showAPISelector = appState.getAPISelector();
     $scope.root = $rootScope;
     $scope.settedMenuHeight = false;
 
@@ -51,11 +56,25 @@ class WzMenu {
      */
     const load = async () => {
       try {
+        const config = wazuhConfig.getConfig();
+        $scope.showAPISelector = config['api.selector'];
+        appState.setAPISelector($scope.showAPISelector);
+
+        if ($scope.showAPISelector) {
+          const result = await genericReq.request('GET', '/hosts/apis', {});
+          if (result.data) {
+            if ($scope.APIList && $scope.APIList.length && result.data.length !== $scope.APIList.length) {
+              location.reload();
+            }
+            $scope.APIList = result.data;
+            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === JSON.parse(appState.getCurrentAPI()).id);
+          }
+        }
+
         const list = await patternHandler.getPatternList();
         if (!list) return;
 
         // Get the configuration to check if pattern selector is enabled
-        const config = wazuhConfig.getConfig();
         appState.setPatternSelector(config['ip.selector']);
 
         // Abort if we have disabled the pattern selector
@@ -127,6 +146,25 @@ class WzMenu {
       load();
     });
 
+    const setCurrentApi = () => {
+      if (appState.getCurrentAPI()) {
+        const api = JSON.parse(appState.getCurrentAPI());
+        $scope.currentAPI = api.name;
+        if ($scope.APIList && $scope.APIList.length) {
+          if ($scope.updateFromEvent) {
+            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+            $scope.updateFromEvent = false;
+          }
+        }
+        $scope.$applyAsync();
+      }
+    }
+
+    $scope.root.$on('currentAPIsetted', () => {
+      $scope.updateFromEvent = true;
+      setCurrentApi();
+    });
+
     // Function to change the current index pattern on the app
     $scope.changePattern = async selectedPattern => {
       try {
@@ -135,7 +173,7 @@ class WzMenu {
           selectedPattern
         );
         $scope.$applyAsync();
-        $window.location.reload();
+        $route.reload();
         return;
       } catch (error) {
         errorHandler.handle(error.message || error);
@@ -180,7 +218,24 @@ class WzMenu {
           $scope.theresPattern = false;
         });
     });
+
+    // Set default API
+    $scope.changeAPI = async (api) => {
+      if (appState.getCurrentAPI()) {
+        const current = JSON.parse(appState.getCurrentAPI());
+        if (api && current.id !== api.id) {
+          $scope.currentSelectedAPI = false;
+          $scope.$applyAsync();
+          if (!settings.apiEntries.length || settings.apiEntries.length !== $scope.APIList.length) {
+            await settings.getHosts();
+          }
+          await settings.setDefault($scope.APIList.find(x => x.id === api.id));
+          if (!location.href.includes('/wazuh-dev'))
+            $route.reload();
+        }
+      }
+    }
+    setInterval(function () { setCurrentApi() }, 1000);
   }
 }
-
 app.directive('wzMenu', () => new WzMenu());
