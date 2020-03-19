@@ -143,13 +143,17 @@ class WzMenu {
       load();
     });
 
-    $scope.root.$on('currentAPIsetted', () => {
+    const setCurrentApi = () => {
       const api = JSON.parse(appState.getCurrentAPI());
       $scope.currentAPI = api.name;
       if ($scope.APIList && $scope.APIList.length) {
         $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
       }
       $scope.$applyAsync();
+    }
+
+    $scope.root.$on('currentAPIsetted', () => {
+      setCurrentApi();
     });
 
     // Function to change the current index pattern on the app
@@ -223,7 +227,7 @@ class WzMenu {
         }
       }
     }
+    setInterval(function () { setCurrentApi() }, 1000);
   }
 }
-
 app.directive('wzMenu', () => new WzMenu());
