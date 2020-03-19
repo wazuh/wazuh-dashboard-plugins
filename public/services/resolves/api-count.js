@@ -78,7 +78,6 @@ function tryToSetDefault(apis, appState, $http) {
           break;
         }
       } catch (error) {
-        console.log("jasdjks")
         //Do nothing in order to follow the flow of the for
       }
     }
