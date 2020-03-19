@@ -63,6 +63,9 @@ class WzMenu {
         if ($scope.showAPISelector) {
           const result = await genericReq.request('GET', '/hosts/apis', {});
           if (result.data) {
+            if ($scope.APIList && $scope.APIList.length && result.data.length !== $scope.APIList.length) {
+              location.reload();
+            }
             $scope.APIList = result.data;
             $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === JSON.parse(appState.getCurrentAPI()).id);
           }
@@ -143,11 +146,23 @@ class WzMenu {
       load();
     });
 
+    const setCurrentApi = () => {
+      if (appState.getCurrentAPI()) {
+        const api = JSON.parse(appState.getCurrentAPI());
+        $scope.currentAPI = api.name;
+        if ($scope.APIList && $scope.APIList.length) {
+          if ($scope.updateFromEvent) {
+            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+            $scope.updateFromEvent = false;
+          }
+        }
+        $scope.$applyAsync();
+      }
+    }
+
     $scope.root.$on('currentAPIsetted', () => {
-      const api = JSON.parse(appState.getCurrentAPI());
-      $scope.currentAPI = api.name;
-      $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
-      $scope.$applyAsync();
+      $scope.updateFromEvent = true;
+      setCurrentApi();
     });
 
     // Function to change the current index pattern on the app
@@ -204,22 +219,23 @@ class WzMenu {
         });
     });
 
-
-
     // Set default API
     $scope.changeAPI = async (api) => {
-      const current = JSON.parse(appState.getCurrentAPI());
-      if (api && current.id !== api.id) {
-        $scope.currentSelectedAPI = false;
-        $scope.$applyAsync();
-        if (!settings.apiEntries.length || settings.apiEntries.length !== $scope.APIList.length) {
-          await settings.getHosts();
+      if (appState.getCurrentAPI()) {
+        const current = JSON.parse(appState.getCurrentAPI());
+        if (api && current.id !== api.id) {
+          $scope.currentSelectedAPI = false;
+          $scope.$applyAsync();
+          if (!settings.apiEntries.length || settings.apiEntries.length !== $scope.APIList.length) {
+            await settings.getHosts();
+          }
+          await settings.setDefault($scope.APIList.find(x => x.id === api.id));
+          if (!location.href.includes('/wazuh-dev'))
+            $route.reload();
         }
-        await settings.setDefault($scope.APIList.find(x => x.id === api.id));
-        $route.reload();
       }
     }
+    setInterval(function () { setCurrentApi() }, 1000);
   }
 }
-
 app.directive('wzMenu', () => new WzMenu());

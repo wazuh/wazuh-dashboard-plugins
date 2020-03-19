@@ -1,98 +1,98 @@
 <md-toolbar ng-hide="root.hideWzMenu || !settedMenuHeight">
-    <!-- Main toolbar content -->
-    <div class="md-toolbar-tools wz-menu-content">
-        <!-- Main Wazuh app navigation buttons -->
-        <md-button class="wz-menu-button" ng-href="#/overview" ng-click="setMenuNavItem('overview')"
-            ng-class="{'wz-menu-active': menuNavItem === 'overview' || menuNavItem === 'health-check' }"
-            aria-label="Overview tab" data-test-subj="wzMenuOverview">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'visualizeApp'}" /> Overview
-        </md-button>
-
-        <md-button class="wz-menu-button" ng-href="#/manager" ng-click="setMenuNavItem('manager')"
-            ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab"
-            data-test-subj="wzMenuManagement">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'managementApp'}" />
-            Management
-        </md-button>
-
-        <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents-preview')"
-            ng-class="{'wz-menu-active': menuNavItem === 'agents-preview' || menuNavItem === 'agents' }"
-            aria-label="Agents tab" data-test-subj="wzMenuAgents">
-            <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
-        </md-button>
-
-        <md-button class="wz-menu-button" ng-href="#/wazuh-dev" ng-click="setMenuNavItem('wazuh-dev')"
-            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab"
-            data-test-subj="wzMenuDevTools">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'console'}" /> Dev tools
-        </md-button>
-
-        <!-- Fill up the space between left and right area -->
-        <span flex></span>
-
-        <!-- API/Index pattern section -->
-        <!-- Case 1a - There's API -->
-        <span ng-show="theresAPI" class="small">
-            <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true" tooltip="Selected API"
-                tooltip-placement="bottom"></i>
-            <span ng-if="!showAPISelector || (showAPISelector && APIList && APIList.length < 2)">
-                {{currentAPI}}
+        <!-- Main toolbar content -->
+        <div class="md-toolbar-tools wz-menu-content">
+            <!-- Main Wazuh app navigation buttons -->
+            <md-button class="wz-menu-button" ng-href="#/overview" ng-click="setMenuNavItem('overview')"
+                ng-class="{'wz-menu-active': menuNavItem === 'overview' || menuNavItem === 'health-check' }"
+                aria-label="Overview tab" data-test-subj="wzMenuOverview">
+                <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'visualizeApp'}" /> Overview
+            </md-button>
+    
+            <md-button class="wz-menu-button" ng-href="#/manager" ng-click="setMenuNavItem('manager')"
+                ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab"
+                data-test-subj="wzMenuManagement">
+                <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'managementApp'}" />
+                Management
+            </md-button>
+    
+            <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents-preview')"
+                ng-class="{'wz-menu-active': menuNavItem === 'agents-preview' || menuNavItem === 'agents' }"
+                aria-label="Agents tab" data-test-subj="wzMenuAgents">
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
+            </md-button>
+    
+            <md-button class="wz-menu-button" ng-href="#/wazuh-dev" ng-click="setMenuNavItem('wazuh-dev')"
+                ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab"
+                data-test-subj="wzMenuDevTools">
+                <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'console'}" /> Dev tools
+            </md-button>
+    
+            <!-- Fill up the space between left and right area -->
+            <span flex></span>
+    
+            <!-- API/Index pattern section -->
+            <!-- Case 1a - There's API -->
+            <span ng-show="theresAPI" class="small">
+                <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true" tooltip="Selected API"
+                    tooltip-placement="bottom"></i>
+                <span ng-if="!showAPISelector || (showAPISelector && APIList && APIList.length < 2)">
+                    {{currentAPI}}
+                </span>
+                <!-- There's API and there's more than one -->
+                <span ng-if="showAPISelector && currentSelectedAPI" ng-show="APIList && APIList.length > 1" class="small">
+                    <select class="wz-menu-select" ng-model="currentSelectedAPI" ng-options='api.id for api in APIList'
+                        ng-change="changeAPI(currentSelectedAPI)">
+                    </select>
+                </span>
+                <span ng-if="showAPISelector && !currentSelectedAPI">
+                    <i class="fa fa-spin fa-spinner" aria-hidden="true"></i>
+                </span>
+                <span ng-if="showSelector && patternList.length > 1">&nbsp;&nbsp;</span>
             </span>
-            <!-- There's API and there's more than one -->
-            <span ng-if="showAPISelector && currentSelectedAPI" ng-show="APIList && APIList.length > 1" class="small">
-                <select class="wz-menu-select" ng-model="currentSelectedAPI" ng-options='api.id for api in APIList'
-                    ng-change="changeAPI(currentSelectedAPI)">
+    
+            <!-- Case 1b - There's no API -->
+            <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="bottom">
+                No API<span ng-if="showSelector">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </span>
+    
+            <!-- There's pattern and there's more than one -->
+            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="small">
+                <react-component name="EuiIcon" props="{type:'ip'}" tooltip="Selected index pattern"
+                    tooltip-placement="bottom" />
+                <select class="wz-menu-select" ng-model="currentSelectedPattern"
+                    ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector"
+                    placeholder="Index pattern">
+                    <option class="wz-menu-select-option" ng-repeat="pattern in patternList | orderObjectBy:'title'"
+                        value="{{pattern.id}}">
+                        {{pattern.title}}
+                    </option>
                 </select>
             </span>
-            <span ng-if="showAPISelector && !currentSelectedAPI">
-                <i class="fa fa-spin fa-spinner" aria-hidden="true"></i>
-            </span>
-            <span ng-if="showSelector && patternList.length > 1">&nbsp;&nbsp;</span>
-        </span>
-
-        <!-- Case 1b - There's no API -->
-        <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="bottom">
-            No API<span ng-if="showSelector">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        </span>
-
-        <!-- There's pattern and there's more than one -->
-        <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="small">
-            <react-component name="EuiIcon" props="{type:'ip'}" tooltip="Selected index pattern"
-                tooltip-placement="bottom" />
-            <select class="wz-menu-select" ng-model="currentSelectedPattern"
-                ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector"
-                placeholder="Index pattern">
-                <option class="wz-menu-select-option" ng-repeat="pattern in patternList | orderObjectBy:'title'"
-                    value="{{pattern.id}}">
-                    {{pattern.title}}
-                </option>
-            </select>
-        </span>
-
-        <!-- Settings tab button -->
-        <md-button class="wz-menu-button md-icon-button" ng-href="#/settings" ng-click="setMenuNavItem('settings')"
-            ng-class="{'wz-menu-active': menuNavItem === 'settings' }" aria-label="Settings tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'gear'}" />
-        </md-button>
-
-    </div>
-
-</md-toolbar>
-
-<div layout="row" ng-if="wazuhNotReadyYet">
-    <div flex class="euiCallOut euiCallOut--warning">
-        <div class="euiCallOutHeader">
-            <span class="euiCallOutHeader__title">
-                <react-component name="EuiIcon" props="{type:'help'}" />
-                {{wazuhNotReadyYet}}</span>
-            <span flex></span>
-            <react-component
-                ng-if="wazuhNotReadyYet === 'Wazuh not ready yet.' || wazuhNotReadyYet.includes('Restarting')"
-                name="EuiLoadingSpinner" props="{size:'m'}" />
-            <button ng-if="wazuhNotReadyYet === 'Wazuh could not be recovered.'" class="kuiButton kuiButton--secondary"
-                ng-click="refresh()">
-                Refresh
-            </button>
+    
+            <!-- Settings tab button -->
+            <md-button class="wz-menu-button md-icon-button" ng-href="#/settings" ng-click="setMenuNavItem('settings')"
+                ng-class="{'wz-menu-active': menuNavItem === 'settings' }" aria-label="Settings tab">
+                <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'gear'}" />
+            </md-button>
+    
+        </div>
+    
+    </md-toolbar>
+    
+    <div layout="row" ng-if="wazuhNotReadyYet">
+        <div flex class="euiCallOut euiCallOut--warning">
+            <div class="euiCallOutHeader">
+                <span class="euiCallOutHeader__title">
+                    <react-component name="EuiIcon" props="{type:'help'}" />
+                    {{wazuhNotReadyYet}}</span>
+                <span flex></span>
+                <react-component
+                    ng-if="wazuhNotReadyYet === 'Wazuh not ready yet.' || wazuhNotReadyYet.includes('Restarting')"
+                    name="EuiLoadingSpinner" props="{size:'m'}" />
+                <button ng-if="wazuhNotReadyYet === 'Wazuh could not be recovered.'" class="kuiButton kuiButton--secondary"
+                    ng-click="refresh()">
+                    Refresh
+                </button>
+            </div>
         </div>
     </div>
-</div>

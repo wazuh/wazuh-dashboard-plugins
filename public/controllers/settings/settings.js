@@ -224,7 +224,7 @@ export class SettingsController {
           id: id
         })
       );
-
+      this.$rootScope.$emit('currentAPIsetted', {});
       this.$scope.$emit('updateAPI', {});
 
       const currentApi = this.appState.getCurrentAPI();
@@ -341,7 +341,7 @@ export class SettingsController {
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry
       await this.updateClusterInfoInRegistry(id, cluster_info);
-      this.$scope.$emit('updateAPI', { cluster_info });
+      //this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
       this.apiEntries[index].status = 'online';
       this.wzMisc.setApiIsDown(false);
