@@ -224,7 +224,7 @@ export class SettingsController {
           id: id
         })
       );
-
+      this.$rootScope.$emit('currentAPIsetted', {});
       this.$scope.$emit('updateAPI', {});
 
       const currentApi = this.appState.getCurrentAPI();

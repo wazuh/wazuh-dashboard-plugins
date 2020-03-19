@@ -146,7 +146,9 @@ class WzMenu {
     $scope.root.$on('currentAPIsetted', () => {
       const api = JSON.parse(appState.getCurrentAPI());
       $scope.currentAPI = api.name;
-      $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+      if ($scope.APIList && $scope.APIList.length) {
+        $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+      }
       $scope.$applyAsync();
     });
 
@@ -208,15 +210,17 @@ class WzMenu {
 
     // Set default API
     $scope.changeAPI = async (api) => {
-      const current = JSON.parse(appState.getCurrentAPI());
-      if (api && current.id !== api.id) {
-        $scope.currentSelectedAPI = false;
-        $scope.$applyAsync();
-        if (!settings.apiEntries.length || settings.apiEntries.length !== $scope.APIList.length) {
-          await settings.getHosts();
+      if (appState.getCurrentAPI()) {
+        const current = JSON.parse(appState.getCurrentAPI());
+        if (api && current.id !== api.id) {
+          $scope.currentSelectedAPI = false;
+          $scope.$applyAsync();
+          if (!settings.apiEntries.length || settings.apiEntries.length !== $scope.APIList.length) {
+            await settings.getHosts();
+          }
+          await settings.setDefault($scope.APIList.find(x => x.id === api.id));
+          $route.reload();
         }
-        await settings.setDefault($scope.APIList.find(x => x.id === api.id));
-        $route.reload();
       }
     }
   }
