@@ -31,8 +31,6 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'extensions.osquery': false,
     'extensions.docker': false,
     timeout: 20000,
-    'wazuh.shards': 1,
-    'wazuh.replicas': 0,
     'api.selector': false,
     'ip.selector': true,
     'ip.ignore': [],
