@@ -18,7 +18,9 @@
  * @param {*} genericReq Wazuh module for doing generic requests to our backend.
  * @param {*} $location Angular.js library for URL and paths manipulation.
  */
-export function apiCount($q, genericReq, $location, appState) {
+import chrome from 'ui/chrome';
+
+export function apiCount($q, genericReq, $location, appState, $http) {
   const deferred = $q.defer();
   genericReq
     .request('GET', '/hosts/apis')
@@ -26,7 +28,7 @@ export function apiCount($q, genericReq, $location, appState) {
       if (!data || !data.data || !data.data.length)
         throw new Error('No API entries found');
       if (!appState.getCurrentAPI()) {
-        await tryToSetDefault(data.data, appState);
+        await tryToSetDefault(data.data, appState, $http);
       }
       deferred.resolve();
     })
@@ -39,20 +41,44 @@ export function apiCount($q, genericReq, $location, appState) {
   return deferred.promise;
 }
 
+async function check(data, $http) {
+  try {
+
+    const headers = {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 20000
+    };
+
+    const url = chrome.addBasePath('/api/check-api');
+    const response = await $http.post(url, data, headers);
+
+    if (response.error) {
+      return Promise.reject(response);
+    }
+
+    return response;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
 // Iterates the API entries in order to set one as default
-function tryToSetDefault(apis, appState) {
+function tryToSetDefault(apis, appState, $http) {
   try {
     for (let idx in apis) {
       const api = apis[idx];
       try {
-        appState.setCurrentAPI(
-          JSON.stringify({
-            name: api.cluster_info.manager,
-            id: api.id
-          })
-        );
-        break;
+        if(check(api, $http)){
+          appState.setCurrentAPI(
+            JSON.stringify({
+              name: api.cluster_info.manager,
+              id: api.id
+            })
+          );
+          break;
+        }
       } catch (error) {
+        console.log("jasdjks")
         //Do nothing in order to follow the flow of the for
       }
     }
