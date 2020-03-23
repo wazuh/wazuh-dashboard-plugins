@@ -599,7 +599,6 @@ function discoverController(
   $scope.opts.fetch = $scope.fetch = function () {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-    $scope.hideCloseButtons();
     // ignore requests to fetch before the app inits
     if (!init.complete) return;
 
@@ -694,7 +693,6 @@ function discoverController(
     });
 
     $scope.fetchStatus = fetchStatuses.COMPLETE;
-    $scope.activeNoImplicitsFilters();
   }
 
   let inspectorRequest;
@@ -1056,23 +1054,13 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  $scope.hideCloseButtons = () => {
+  const hideCloseImplicitsFilters = () => {
     const closeButtons = $(`.globalFilterItem .euiBadge__iconButton`);
+    const optionsButtons = $(`.globalFilterItem .euiBadge__childButton`);
     for (let i = 0; i < closeButtons.length; i++) {
       $(closeButtons[i]).addClass('hide-close-button');
+      $(optionsButtons[i]).off("click");
     };
-    $scope.$applyAsync();
-  };
-
-  $rootScope.$watch('rendered', () => {
-    if (!$rootScope.rendered) {
-      $scope.hideCloseButtons();
-    } else {
-      $scope.activeNoImplicitsFilters();
-    }
-  });
-
-  $scope.activeNoImplicitsFilters = () => {
     if (!implicitFilters) return;
     const filters = $(`.globalFilterItem .euiBadge__childButton`);
     for (let i = 0; i < filters.length; i++) {
@@ -1086,9 +1074,12 @@ function discoverController(
           found = true;
         }
       });
-      const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
       if (!found) {
+        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
         $(closeButton).removeClass('hide-close-button');
+      } else {
+        const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
+        $(optionsButton).on("click", (ev) => { ev.stopPropagation(); });
       }
     }
     $scope.$applyAsync();
@@ -1107,10 +1098,9 @@ function discoverController(
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
       }
-
+      
       filterManager.addFilters([...wzCurrentFilters, ...globalFilters || []]);
       $scope.filters = filterManager.filters;
-      $scope.hideCloseButtons();
     }
   };
 
@@ -1127,6 +1117,7 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
+    hideCloseImplicitsFilters();
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;

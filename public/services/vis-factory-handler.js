@@ -71,7 +71,7 @@ export class VisFactoryService {
    * @param {*} tab
    * @param {*} subtab
    */
-  async buildOverviewVisualizations(filterHandler, tab, subtab) {
+  async buildOverviewVisualizations(filterHandler, tab, subtab, fromDiscover = false) {
     try {
       const currentPattern = AppState.getCurrentPattern();
       const data = await this.genericReq.request(
@@ -79,9 +79,10 @@ export class VisFactoryService {
         `/elastic/visualizations/overview-${tab}/${currentPattern}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
-      this.commonData.assignFilters(filterHandler, tab);
+      if (!fromDiscover)
+        this.commonData.assignFilters(filterHandler, tab);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
-      this.$rootScope.$broadcast('updateVis', {raw : this.rawVisualizations.getList()});
+      this.$rootScope.$broadcast('updateVis', { raw: this.rawVisualizations.getList() });
       return;
     } catch (error) {
       return Promise.reject(error);
@@ -96,7 +97,7 @@ export class VisFactoryService {
    * @param {*} localChange
    * @param {*} id
    */
-  async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
+  async buildAgentsVisualizations(filterHandler, tab, subtab, id, fromDiscover = false) {
     try {
       const data =
         tab !== 'sca'
@@ -106,7 +107,8 @@ export class VisFactoryService {
           )
           : false;
       data && this.rawVisualizations.assignItems(data.data.raw);
-      this.commonData.assignFilters(filterHandler, tab, localChange, id);
+      if (!fromDiscover)
+        this.commonData.assignFilters(filterHandler, tab, id);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
       this.$rootScope.$broadcast('updateVis');
       return;

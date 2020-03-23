@@ -170,7 +170,8 @@ export class OverviewController {
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
           this.tab,
-          subtab
+          subtab,
+          this.tabView === 'discover'
         );
       } else {
         this.$scope.$emit('changeTabView', {
