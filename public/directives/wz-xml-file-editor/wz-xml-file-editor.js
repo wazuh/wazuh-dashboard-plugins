@@ -88,6 +88,7 @@ app.directive('wzXmlFileEditor', function() {
           const text = $scope.xmlCodeBox.getValue();
           let xml = replaceIllegalXML(text);
           xml = xml.replace(/..xml.+\?>/, '');
+          xml = xml.replace(/\\</, '\ <');
           xml = xml.replace(/\\</gm, '');
           xml = xml.replace(/<!--[\s\S\n]*?-->/gm, '');
           const xmlDoc = parser.parseFromString(
