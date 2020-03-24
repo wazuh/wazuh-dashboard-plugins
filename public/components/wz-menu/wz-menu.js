@@ -277,7 +277,7 @@ class WzMenu extends Component {
   buildApiSelector() {
     return (
       <span  className="small">
-        <EuiToolTip position="bottom" content="Selected index pattern"> 
+        <EuiToolTip position="bottom" content="Selected API"> 
           <EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon>
         </EuiToolTip>
         <select onMouseEnter={async() => this.loadApiList()} className="wz-menu-select" value={this.state.currentAPI}
@@ -393,7 +393,7 @@ class WzMenu extends Component {
                       color="text"
                       aria-label="Settings"
                       onClick={() => this.setMenuItem('settings')}>
-                      <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
+                      <EuiIcon type='advancedSettingsApp' color='primary' size='m' style={{ marginRight: 0 }} />
                       <span> </span>
                     </EuiButtonEmpty>
                   </EuiFlexItem>

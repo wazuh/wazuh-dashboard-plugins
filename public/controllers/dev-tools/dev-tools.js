@@ -501,7 +501,7 @@ export class DevToolsController {
       if (!$('#play_button').is(':visible')) $('#play_button').show();
       const currentPlayButton = $('#play_button').offset();
       $('#play_button').offset({
-        top: cords.top,
+        top: cords.top + 2,
         left: currentPlayButton.left
       });
       if (firstTime) this.highlightGroup(desiredGroup[0]);
@@ -530,7 +530,7 @@ export class DevToolsController {
           });
           const currentPlayButton = $('#play_button').offset();
           $('#play_button').offset({
-            top: cords.top + 10,
+            top: cords.top + 2,
             left: currentPlayButton.left
           });
         }
