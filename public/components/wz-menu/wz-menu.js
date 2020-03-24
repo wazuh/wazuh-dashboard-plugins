@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiPopover } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiToolTip } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -20,6 +20,9 @@ import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
 import { npStart } from 'ui/new_platform'
 import { toastNotifications } from 'ui/notify';
+import { GenericRequest } from '../../react-services/generic-request';
+import chrome from 'ui/chrome';
+import axios from 'axios';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -28,6 +31,7 @@ class WzMenu extends Component {
       showMenu: false,
       currentMenuTab: "",
       currentAPI: "",
+      APIlist: [],
       showSelector: false,
       theresPattern: false,
       currentPattern: "",
@@ -37,6 +41,7 @@ class WzMenu extends Component {
       isVisualizePopoverOpen: false
     };
     this.store = store;
+    this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
     this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
@@ -74,9 +79,18 @@ class WzMenu extends Component {
 
   }
 
+  loadApiList = async () => {
+    const result = await this.genericReq.request('GET', '/hosts/apis', {});
+    const APIlist = ((result || {}).data || []);
+    if(APIlist.length) this.setState({APIlist});
+  }
 
-  componentDidUpdate(prevProps) {
-    const { name: apiName } = JSON.parse(AppState.getCurrentAPI())
+
+  async componentDidUpdate(prevProps) {
+    if(this.state.APIlist && !this.state.APIlist.length){
+      this.loadApiList();
+    }
+    const { id: apiId } = JSON.parse(AppState.getCurrentAPI())
     const { currentAPI } = this.state;
     const currentTab = this.getCurrentTab();
     if (currentTab !== this.state.currentMenuTab) {
@@ -86,8 +100,8 @@ class WzMenu extends Component {
     if (prevProps.state.showMenu !== this.props.state.showMenu || this.props.state.showMenu === true && this.state.showMenu === false) {
       this.load();
     }
-    if (!currentAPI && apiName || apiName !== currentAPI) {
-      this.setState({ currentAPI: apiName })
+    if (!currentAPI && apiId || apiId !== currentAPI) {
+      this.setState({ currentAPI: apiId })
     } else {
       if (currentAPI && this.props.state.currentAPI && currentAPI !== this.props.state.currentAPI) {
         this.setState({ currentAPI: this.props.state.currentAPI });
@@ -154,9 +168,98 @@ class WzMenu extends Component {
     }
   }
 
+  /** Given an API id, the method check if the API is active */
+  checkAPI = async (apiId) => {
+    try{
+      const { timeout } = this.wazuhConfig.getConfig();
+
+
+      const apiData = this.state.APIlist.filter( item => {
+        return item.id === apiId
+      })
+      const url = chrome.addBasePath('/api/check-api');
+      
+      const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana'  },
+        url: url,
+        data: apiData[0],
+        timeout: timeout || 20000
+      };
+      
+      const response = await axios(options); 
+
+      if (response.error) {
+        return Promise.reject(response);
+      }
+
+      return response;
+    } catch (err) {
+      if(err.response){
+        const response = (err.response.data || {}).message || err.message;
+        return Promise.reject(response)
+      }else{
+        return ((err || {}).message) || false
+        ? Promise.reject(err.message)
+        : Promise.reject(err || 'Server did not respond');
+      }
+    }
+  }
+
+
+  /**
+   * @param {String} id
+   * @param {Object} clusterInfo
+   * Updates the wazuh registry of an specific api id
+   */
+  updateClusterInfoInRegistry = async (id, clusterInfo) => {
+    try {
+      const url = `/hosts/update-hostname/${id}`;
+      await this.genericReq.request('PUT', url, {
+        cluster_info: clusterInfo,
+      });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+
+
+  changeAPI = async(event) => {
+    try {
+      const apiId = event.target.value;
+      const response = await this.checkAPI(apiId);
+      const clusterInfo = response.data || {};
+      const apiData = this.state.APIlist.filter( item => {
+        return item.id === apiId
+      });
+
+      if(!apiData[0].cluster_info){ //if apis have been modified we have to refresh the wazuhregistry
+        this.updateClusterInfoInRegistry(apiId, clusterInfo);
+        apiData[0].cluster_info = clusterInfo;
+      }
+
+      AppState.setCurrentAPI(
+        JSON.stringify(
+          {name: apiData[0].cluster_info.manager, id: apiId}
+      ));
+      if(this.state.currentMenuTab !== 'wazuh-dev'){
+        const $injector = await chrome.dangerouslyGetActiveInjector();
+        const tmpRouter = $injector.get('$route');
+        tmpRouter.reload();
+      }
+    } catch (error) {
+      this.showToast('danger', 'Error', error, 4000);
+    }
+  }
+
+
   buildPatternSelector() {
     return (
       <span className="small">
+        <EuiToolTip position="bottom" content="Selected index pattern">
+          <EuiIcon type='ip' color="primary" size='m'></EuiIcon>
+        </EuiToolTip>
         <select className="wz-menu-select" value={this.state.currentSelectedPattern}
           onChange={this.changePattern} aria-label="Index pattern selector">
 
@@ -164,6 +267,26 @@ class WzMenu extends Component {
             return (
               <option className="wz-menu-select-option" key={idx} value={item.id}>
                 {item.title}
+              </option>)
+          })}
+        </select>
+      </span>
+    )
+  }
+
+  buildApiSelector() {
+    return (
+      <span  className="small">
+        <EuiToolTip position="bottom" content="Selected index pattern"> 
+          <EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon>
+        </EuiToolTip>
+        <select onMouseEnter={async() => this.loadApiList()} className="wz-menu-select" value={this.state.currentAPI}
+          onChange={this.changeAPI} aria-label="API selector">
+
+          {this.state.APIlist.map((item, idx) => {
+            return (
+              <option className="wz-menu-select-option" key={idx} value={item.id}>
+                {item.id}
               </option>)
           })}
         </select>
@@ -211,19 +334,17 @@ class WzMenu extends Component {
                         color="text"
                         href="#/overview"
                         onClick={() => this.setMenuItem('overview')} >
-                        <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
+                        <EuiIcon type='visualizeApp' color='primary' size='m' />Overview
                     </EuiButtonEmpty>
 
-                      <EuiPopover
-                        id="popover"
-                        button={managementButton}
-                        isOpen={this.state.isManagementPopoverOpen}
-                        closePopover={() => this.setState({ isManagementPopoverOpen: !this.state.isManagementPopoverOpen })}
-                        anchorPosition="downLeft" >
-                        <WzManagementSideMenu
-                          managementPopoverToggle={this.managementPopoverToggle.bind(this)}
-                          {...this.props} />
-                      </EuiPopover>
+                                
+                  <EuiButtonEmpty
+                    className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
+                    color="text"
+                    href="#/manager"
+                    onClick={() => this.setMenuItem('manager')}>
+                    <EuiIcon type='managementApp' color='primary' size='m' />Management
+                  </EuiButtonEmpty>
 
                       <EuiButtonEmpty
                         className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
@@ -247,9 +368,9 @@ class WzMenu extends Component {
                     </EuiFlexGroup>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false} style={{ paddingTop: "6px", marginRight: "-4px", display: "inline" }}>
-                    {this.state.currentAPI &&
+                    {this.state.currentAPI && this.state.APIlist && this.state.APIlist.length > 1 &&
                       (
-                        <span><EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon> {this.state.currentAPI} </span>
+                        this.buildApiSelector()
                       )
                     }
                     {!this.state.currentAPI &&
