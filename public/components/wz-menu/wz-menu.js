@@ -393,7 +393,7 @@ class WzMenu extends Component {
                       color="text"
                       aria-label="Settings"
                       onClick={() => this.setMenuItem('settings')}>
-                      <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
+                      <EuiIcon type='advancedSettingsApp' color='primary' size='m' style={{ marginRight: 0 }} />
                       <span> </span>
                     </EuiButtonEmpty>
                   </EuiFlexItem>

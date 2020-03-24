@@ -73,7 +73,7 @@ class WzRulesetSearchBar extends Component {
     },
     {
       label: 'hipaa',
-      description: 'Filters the rules by HIPAA',
+      description: 'Filters the rules by HIPAA requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/hipaa', {});
@@ -82,7 +82,7 @@ class WzRulesetSearchBar extends Component {
     },
     {
       label: 'gdpr',
-      description: 'Filters the rules by HIPAA',
+      description: 'Filters the rules by GDPR requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/gdpr', {});
@@ -91,7 +91,7 @@ class WzRulesetSearchBar extends Component {
     },
     {
       label: 'nist-800-53',
-      description: 'Filters the rules by HIPAA',
+      description: 'Filters the rules by NIST requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/nist-800-53', {});
@@ -100,7 +100,7 @@ class WzRulesetSearchBar extends Component {
     },
     {
       label: 'gpg13',
-      description: 'Filters the rules by HIPAA',
+      description: 'Filters the rules by GPG requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/gpg13', {});
@@ -109,7 +109,7 @@ class WzRulesetSearchBar extends Component {
     },
     {
       label: 'pci',
-      description: 'Filters the rules by HIPAA',
+      description: 'Filters the rules by PCI requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/pci', {});

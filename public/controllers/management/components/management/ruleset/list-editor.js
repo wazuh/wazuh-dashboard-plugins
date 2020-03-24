@@ -118,7 +118,7 @@ class WzListEditor extends Component {
                   <EuiButtonIcon
                     aria-label="Cancel edition"
                     iconType="cross"
-                    onClick={() => this.setState({ editing: false }) }
+                    onClick={() => this.setState({ editing: false })}
                     color="danger"
                   />
                 </EuiToolTip>
@@ -141,7 +141,7 @@ class WzListEditor extends Component {
                   <EuiButtonIcon
                     aria-label="Show content"
                     iconType="trash"
-                    onClick={() => this.deleteItem(item.key) }
+                    onClick={() => this.deleteItem(item.key)}
                     color="danger"
                   />
                 </EuiToolTip>
@@ -249,13 +249,13 @@ class WzListEditor extends Component {
     });
   };
 
-  openPopover = () => {
+  openAddEntry = () => {
     this.setState({
       isPopoverOpen: true,
     });
   };
 
-  closePopover = () => {
+  closeAddEntry = () => {
     this.setState({
       isPopoverOpen: false
     });
@@ -357,7 +357,8 @@ class WzListEditor extends Component {
         </EuiFlexItem>
         <EuiFlexItem style={{ marginLeft: '-5px !important' }}>
           <EuiFieldText
-            style={{ marginLeft: '-18px' }}
+            fullWidth={true}
+            style={{ marginLeft: '-18px', width: 'calc(100% - 28px)' }}
             placeholder="New CDB list name"
             value={this.state.newListName}
             onChange={this.onNewListNameChange}
@@ -374,8 +375,6 @@ class WzListEditor extends Component {
    * @param {String} path
    */
   renderAddAndSave(name, path, newList = false, items = []) {
-    const addButton = <EuiButtonEmpty onClick={() => this.openPopover()}>Add</EuiButtonEmpty>;
-
     const saveButton = (
       <EuiButton
         fill
@@ -388,50 +387,64 @@ class WzListEditor extends Component {
       </EuiButton>
     );
 
-    const addItemButton = (
-      <EuiButton isDisabled={!this.state.addingKey} fill onClick={() => this.addItem()}>
-        Add
-      </EuiButton>
-    );
-
-    const closeButton = <EuiButtonEmpty onClick={() => this.closePopover()}>Close</EuiButtonEmpty>;
-
     return (
       <Fragment>
-        <EuiFlexItem grow={false}>
-          <EuiPopover
-            id="addKeyValuePopover"
-            ownFocus
-            button={addButton}
-            isOpen={this.state.isPopoverOpen}
-            anchorPosition="leftCenter"
-            closePopover={() => this.closePopover()}
-          >
-            <EuiFieldText
-              placeholder="key"
-              value={this.state.addingKey}
-              onChange={this.onChangeKey}
-              aria-label="Use aria labels when no actual label is in use"
-            />
-            <EuiSpacer size="s" />
-            <EuiFieldText
-              placeholder="value"
-              value={this.state.addingValue}
-              onChange={this.onChangeValue}
-              aria-label="Use aria labels when no actual label is in use"
-            />
-            <div style={{ textAlign: 'center' }}>
-              <EuiSpacer size="m" />
-              {addItemButton}
-              <EuiSpacer size="s" />
-              {closeButton}
-            </div>
-          </EuiPopover>
-        </EuiFlexItem>
+        {(!this.state.isPopoverOpen &&
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              iconType="plusInCircle" onClick={() => this.openAddEntry()}>Add new entry</EuiButtonEmpty>
+          </EuiFlexItem>
+        )}
         {/* Save button */}
         <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
       </Fragment>
     );
+  }
+
+  renderAdd() {
+    const { addingKey, addingValue } = this.state;
+
+    return (
+      <Fragment>
+        {(this.state.isPopoverOpen &&
+          <div>
+            <EuiSpacer size="l" />
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFieldText
+                  fullWidth={true}
+                  placeholder="Key"
+                  value={addingKey}
+                  onChange={this.onChangeKey}
+                  aria-label="Use aria labels when no actual label is in use"
+                />
+              </EuiFlexItem>
+
+              <EuiFlexItem>
+                <EuiFieldText
+                  fullWidth={true}
+                  placeholder="Value"
+                  value={addingValue}
+                  onChange={this.onChangeValue}
+                  aria-label="Use aria labels when no actual label is in use"
+                />
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiFlexGroup>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty
+                      iconType="plusInCircle" isDisabled={!addingKey} fill onClick={() => this.addItem()}>Add</EuiButtonEmpty>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty onClick={() => this.closeAddEntry()}>Close</EuiButtonEmpty>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </div>
+        )}
+      </Fragment>
+    )
   }
 
   /**
@@ -485,36 +498,37 @@ class WzListEditor extends Component {
             <EuiFlexItem>
               {/* File name and back button when watching or editing a CDB list */}
               <EuiFlexGroup>
-              {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
-              <EuiFlexItem />
-              {/* This flex item is for separating between title and save button */}
-              {/* Pop over to add new key and value */}
-              {!addingNew && (
-                <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty
-                    iconType="exportAction"
-                    isDisabled={this.state.generatingCsv}
-                    isLoading={this.state.generatingCsv}
-                    onClick={async () => {
-                      try{
-                        this.setState({ generatingCsv: true});
-                        await exportCsv(`/lists?path=${path}/${name}`, [{_isCDBList: true, name: 'path', value: `${path}/${name}`}], name);
-                        this.setState({ generatingCsv: false});
-                      }catch(error){
-                        this.setState({ generatingCsv: false});
-                      }
-                    }}
-                  >
-                    Export formatted
+                {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
+                <EuiFlexItem />
+                {/* This flex item is for separating between title and save button */}
+                {/* Pop over to add new key and value */}
+                {!addingNew && (
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty
+                      iconType="exportAction"
+                      isDisabled={this.state.generatingCsv}
+                      isLoading={this.state.generatingCsv}
+                      onClick={async () => {
+                        try {
+                          this.setState({ generatingCsv: true });
+                          await exportCsv(`/lists?path=${path}/${name}`, [{ _isCDBList: true, name: 'path', value: `${path}/${name}` }], name);
+                          this.setState({ generatingCsv: false });
+                        } catch (error) {
+                          this.setState({ generatingCsv: false });
+                        }
+                      }}
+                    >
+                      Export formatted
                   </EuiButtonEmpty>
-                </EuiFlexItem>)
-              }
-              {adminMode &&
-                !this.state.editing &&
-                this.renderAddAndSave(listName, path, !addingNew, this.state.items)
-              }
+                  </EuiFlexItem>)
+                }
+                {adminMode &&
+                  !this.state.editing &&
+                  this.renderAddAndSave(listName, path, !addingNew, this.state.items)
+                }
               </EuiFlexGroup>
               {/* CDB list table */}
+              {this.renderAdd()}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
