@@ -34,9 +34,8 @@ export class Pie extends Component {
                 <g transform={`translate(${(width / 4) - 6} ${height / 2})`}>
                     {data.map((d, i) => (
                         <Slice key={i}
-                            innerRadius={33}
-                            outerRadius={54}
-                            cornerRadius={3}
+                            innerRadius={42}
+                            outerRadius={57}
                             padAngle={0.025}
                             value={d}
                             label={d.id}
@@ -86,28 +85,47 @@ class Slice extends React.Component {
             .style("z-index", -1)
             .style("opacity", 0);
     }
+    
+    lightenDarkenColor(col, amt) {
+        let usePound = false;
+        if (col[0] == "#") {
+            col = col.slice(1);
+            usePound = true;
+        }
+        const num = parseInt(col,16);
+        let r = (num >> 16) + amt;
+        if (r > 255) r = 255;
+        else if  (r < 0) r = 0;
+        let b = ((num >> 8) & 0x00FF) + amt;
+        if (b > 255) b = 255;
+        else if  (b < 0) b = 0;
+        let g = (num & 0x0000FF) + amt;
+        if (g > 255) g = 255;
+        else if (g < 0) g = 0;
+        return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+    }
 
     render() {
         let { value, label, fill, innerRadius = 0, outerRadius, cornerRadius, padAngle, ...props } = this.props;
         if (this.state.isHovered) {
-            innerRadius *= 1.05;
-            fill = fill + 'ee';
+            fill = this.lightenDarkenColor(fill, 50);
         }
+        const newValue = {...value, endAngle: value.endAngle - 0.01 }
         let arc = d3.arc()
             .innerRadius(innerRadius)
             .outerRadius(outerRadius)
             .cornerRadius(cornerRadius)
-            .padAngle(padAngle);
+            .padAngle(0.01);
 
         let div = d3.select(".tooltip-donut");
-        const html = `${value.data.value} ${value.data.label}`;
+        const html = `${newValue.data.value} ${newValue.data.label}`;
 
         return (
             <g onMouseOver={() => this.onMouseOver(div)}
                 onMouseOut={() => this.onMouseOut(div)} onMouseMove={(ev) => this.onMouseMove(div, html, ev)}
                 {...props}>
-                <path d={arc(value)} fill={fill} />
-                <text transform={`translate(${arc.centroid(value)})`}
+                <path d={arc(newValue)} fill={fill} />
+                <text transform={`translate(${arc.centroid(newValue)})`}
                     dy=".35em"
                     className="label">
                     {label}

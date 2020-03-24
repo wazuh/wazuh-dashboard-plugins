@@ -184,7 +184,7 @@ export class AgentsPreview extends Component {
               </EuiFlexItem>
             )}
           </EuiFlexGroup>
-          <EuiSpacer size="m" />
+          <EuiSpacer size="l" />
           <div>
             <AgentsTable
               wzReq={this.props.tableProps.wzReq}
