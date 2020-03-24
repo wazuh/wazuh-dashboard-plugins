@@ -537,7 +537,7 @@ export class AgentsTable extends Component {
 
     return (
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ marginRight: 0 }}>
           <WzFilterBar
             model={model}
             clickAction={this.onQueryChange}
@@ -567,13 +567,13 @@ export class AgentsTable extends Component {
     const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state
     const columns = this.columns();
     const pagination = totalItems > 15
-    ? {
+      ? {
         pageIndex: pageIndex,
         pageSize: pageSize,
         totalItemCount: totalItems,
         pageSizeOptions: [15, 25, 50, 100],
       }
-    : false;
+      : false;
     const sorting = {
       sort: {
         field: sortField,
@@ -605,14 +605,14 @@ export class AgentsTable extends Component {
     const table = this.tableRender();
 
     return (
-    <div>
-      {filter}
-      <EuiSpacer size="l"/>
-      <EuiPanel paddingSize="m">
-        {title}
-        {table}
-      </EuiPanel>
-    </div>
+      <div>
+        {filter}
+        <EuiSpacer size="m" />
+        <EuiPanel paddingSize="m">
+          {title}
+          {table}
+        </EuiPanel>
+      </div>
     );
   }
 }
