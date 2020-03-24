@@ -208,7 +208,6 @@ class WzListEditor extends Component {
    * @param {String} path
    */
   async saveList(name, path, addingNew = false) {
-    console.log(this.state);
     try {
       if (!name) {
         this.showToast('warning', 'Invalid name', 'Please insert a valid name', 3000);
