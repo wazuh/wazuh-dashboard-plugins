@@ -208,7 +208,7 @@ export class UpdateRegistry {
     try {
       if (!id) throw new Error('API id is missing');
       const hosts = await this.getHosts();
-      return hosts[id].token || null;
+      return hosts[id] ? hosts[id].token || null : null;
     } catch (error) {
       log('update-registry:getTokenById', error.message || error);
       return Promise.reject(error);
