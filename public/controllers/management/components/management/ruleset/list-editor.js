@@ -208,6 +208,7 @@ class WzListEditor extends Component {
    * @param {String} path
    */
   async saveList(name, path, addingNew = false) {
+    console.log(this.state);
     try {
       if (!name) {
         this.showToast('warning', 'Invalid name', 'Please insert a valid name', 3000);
@@ -398,7 +399,7 @@ class WzListEditor extends Component {
 
     return (
       <Fragment>
-        <EuiFlexItem grow={false}>
+      {/*<EuiFlexItem grow={false}>
           <EuiPopover
             id="addKeyValuePopover"
             ownFocus
@@ -427,11 +428,47 @@ class WzListEditor extends Component {
               {closeButton}
             </div>
           </EuiPopover>
-        </EuiFlexItem>
+        </EuiFlexItem> */}
         {/* Save button */}
         <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
       </Fragment>
     );
+  }
+
+  renderAdd() {
+    const { addingKey, addingValue } = this.state;
+
+    return(
+      <Fragment>
+        <EuiSpacer size="l" />
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFieldText
+              fullWidth={true}
+              placeholder="Key"
+              value={addingKey}
+              onChange={this.onChangeKey}
+              aria-label="Use aria labels when no actual label is in use"
+            />
+          </EuiFlexItem>
+          
+          <EuiFlexItem>
+            <EuiFieldText
+            fullWidth={true}
+              placeholder="Value"
+              value={addingValue}
+              onChange={this.onChangeValue}
+              aria-label="Use aria labels when no actual label is in use"
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton isDisabled={!addingKey} fill onClick={() => this.addItem()}>
+              Add
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </Fragment>
+    )
   }
 
   /**
@@ -515,6 +552,7 @@ class WzListEditor extends Component {
               }
               </EuiFlexGroup>
               {/* CDB list table */}
+              {this.renderAdd()}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
