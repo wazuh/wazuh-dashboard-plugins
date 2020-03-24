@@ -376,11 +376,6 @@ export class AgentsTable extends Component {
           </EuiButtonEmpty>
           </EuiFlexItem>
           {formattedButton}
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="refresh" onClick={() => this.reloadAgents()}>
-              Refresh
-          </EuiButtonEmpty>
-          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="xs" />
       </div>
