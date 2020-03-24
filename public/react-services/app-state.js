@@ -158,7 +158,7 @@ export class AppState {
             if (API) {
                 Cookies.set('currentApi', encodedApi, { expires: exp, path: window.location.pathname });
                 try{
-                    const updateApiMenu = updateCurrentApi(JSON.parse(API).name);
+                    const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
                     store.dispatch(updateApiMenu);
                 }catch(err){ }
             }
