@@ -334,7 +334,7 @@ class WzMenu extends Component {
                         color="text"
                         href="#/overview"
                         onClick={() => this.setMenuItem('overview')} >
-                        <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
+                        <EuiIcon type='visualizeApp' color='primary' size='m' />Overview
                     </EuiButtonEmpty>
 
                                 
