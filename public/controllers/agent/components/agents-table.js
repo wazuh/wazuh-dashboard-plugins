@@ -16,6 +16,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
+  EuiButton,
   EuiButtonEmpty,
   EuiButtonIcon,
   EuiFlexGroup,
@@ -38,7 +39,7 @@ export class AgentsTable extends Component {
       isLoading: false,
       isProcessing: true,
       pageIndex: 0,
-      pageSize: 10,
+      pageSize: 15,
       q: '',
       search: '',
       selectedOptions: selectedOptions || [],
@@ -375,11 +376,6 @@ export class AgentsTable extends Component {
           </EuiButtonEmpty>
           </EuiFlexItem>
           {formattedButton}
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="refresh" onClick={() => this.reloadAgents()}>
-              Refresh
-          </EuiButtonEmpty>
-          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="xs" />
       </div>
@@ -541,12 +537,17 @@ export class AgentsTable extends Component {
 
     return (
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ marginRight: 0 }}>
           <WzFilterBar
             model={model}
             clickAction={this.onQueryChange}
             selectedOptions={selectedOptions}
           />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton iconType="refresh" fill={true} onClick={() => this.reloadAgents()}>
+            Refresh
+          </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -565,12 +566,14 @@ export class AgentsTable extends Component {
 
     const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state
     const columns = this.columns();
-    const pagination = {
-      pageIndex: pageIndex,
-      pageSize: pageSize,
-      totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100],
-    }
+    const pagination = totalItems > 15
+      ? {
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        totalItemCount: totalItems,
+        pageSizeOptions: [15, 25, 50, 100],
+      }
+      : false;
     const sorting = {
       sort: {
         field: sortField,
@@ -602,11 +605,14 @@ export class AgentsTable extends Component {
     const table = this.tableRender();
 
     return (
-      <EuiPanel paddingSize="m">
-        {title}
+      <div>
         {filter}
-        {table}
-      </EuiPanel>
+        <EuiSpacer size="m" />
+        <EuiPanel paddingSize="m">
+          {title}
+          {table}
+        </EuiPanel>
+      </div>
     );
   }
 }
