@@ -1,6 +1,6 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
     <!-- Navigation section -->
-    <div layout="row" layout-align="start center" ng-if="agent">
+    <div layout="row" layout-align="start center" ng-if="agent && !showSyscheckFiles">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
@@ -87,7 +87,7 @@
     <!-- End navigation section -->
 
     <!-- Navigation bar -->
-    <div ng-if="agentsTabsProps" ng-show="tab !== 'welcome'">
+    <div ng-if="agentsTabsProps && !showSyscheckFiles"" ng-show="tab !== 'welcome'">
         <react-component name="Tabs" props="agentsTabsProps" />
     </div>
     <!-- End of navigation bar -->

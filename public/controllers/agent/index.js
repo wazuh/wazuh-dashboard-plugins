@@ -18,6 +18,7 @@ import { WelcomeScreen } from './components/agents-welcome';
 import { Stats } from './components/stats';
 import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
+import { MainFim } from '../../components/agents/fim';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -29,4 +30,5 @@ app
   .value('WelcomeScreenAgent', WelcomeScreen)
   .value('AgentsPreview', AgentsPreview)
   .value('AgentsTable', AgentsTable)
-  .value('StatsAgent', Stats);
+  .value('StatsAgent', Stats)
+  .value('MainFim', MainFim);
