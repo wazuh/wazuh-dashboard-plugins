@@ -352,6 +352,11 @@ export class AgentsController {
       this.$scope.$applyAsync();
     };
 
+    this.$scope.switchNewFim = () => {
+      this.$scope.showNewFim = !this.$scope.showNewFim;
+      this.$scope.$applyAsync();
+    };
+
     this.$scope.switchScaScan = () => {
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {

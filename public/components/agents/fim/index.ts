@@ -10,10 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { MainFim } from './main-fim';
-
+export { MainFim } from './main';
 export { States} from './states';
-
 export { Events } from './events';
-
 export { Settings } from './settings';

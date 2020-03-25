@@ -17,7 +17,7 @@ import {
   EuiButton,
   EuiHealth,
   EuiPanel,
-  EuiSpacer,
+  EuiPage,
   EuiTab,
   EuiTabs,
   EuiTitle,
@@ -29,6 +29,7 @@ import {
   Events,
   Settings
 } from './index';
+import '../../../less/components/module.less';
 
 export class MainFim extends Component {
   state: {
@@ -36,8 +37,8 @@ export class MainFim extends Component {
   };
 
   tabs = [
-    { id: 'states', name: i18n.translate('wazuh.fim.states', {defaultMessage: 'States'}) },
-    { id: 'events', name: i18n.translate('wazuh.fim.events', {defaultMessage: 'Events'}) },
+    { id: 'states', name: i18n.translate('wazuh.fim.states', { defaultMessage: 'States' }) },
+    { id: 'events', name: i18n.translate('wazuh.fim.events', { defaultMessage: 'Events' }) },
   ]
 
   constructor(props) {
@@ -51,9 +52,9 @@ export class MainFim extends Component {
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiTitle size="m">
+          <EuiTitle size="s">
             <EuiHealth color="success">
-              <h1>Agent</h1>
+              <h1>Agent - <b>Integrity monitoring</b></h1>
             </EuiHealth>
           </EuiTitle>
         </EuiFlexItem>
@@ -90,8 +91,8 @@ export class MainFim extends Component {
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false}>
-        <EuiButton iconType="wrench" ></EuiButton>
+      <EuiFlexItem grow={false} style={{marginLeft: 0}}>
+        <EuiButton iconType="wrench" style={{minWidth: 50}}>Configuration</EuiButton>
       </EuiFlexItem>
     );
   }
@@ -109,26 +110,24 @@ export class MainFim extends Component {
     const dashboardButton = this.renderDashboardButton();
     const settingsButton = this.renderSettingsButton();
     return (
-      <div>
-        <div style={{
-          backgroundColor:'white',
-          boxShadow: '0 2px 2px -1px rgba(152, 162, 179, 0.3)', 
-          borderBottom: '1px solid #D3DAE6',
-          padding: 16
-          }}>
-          {title}
-          <EuiFlexGroup>
-            {tabs}
-            {dashboardButton}
-            {settingsButton}
-          </EuiFlexGroup>
+      <div className='wz-module'>
+        <div className='wz-module-header-wrapper'>
+          <div className='wz-module-header'>
+            {title}
+            <EuiFlexGroup>
+              {tabs}
+              {dashboardButton}
+              {settingsButton}
+            </EuiFlexGroup>
+          </div>
         </div>
-        <EuiSpacer size="l" />
-        <EuiPanel style={{ margin: 12 }}>
-          {selectView === 'states' && <States {...this.props} />}
-          {selectView === 'events' && <Events {...this.props} />}
-          {selectView === 'settings' && <Settings {...this.props} />}
-        </EuiPanel>
+        <EuiPage className='wz-module-body'>
+          <EuiPanel>
+            {selectView === 'states' && <States {...this.props} />}
+            {selectView === 'events' && <Events {...this.props} />}
+            {selectView === 'settings' && <Settings {...this.props} />}
+          </EuiPanel>
+        </EuiPage>
       </div>
     );
   }
