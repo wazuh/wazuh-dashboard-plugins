@@ -1,0 +1,47 @@
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-synchronization'">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Synchronization</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">Database synchronization options</span>
+                </div>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+            <wz-config-item
+                label="Status"
+                value="currentConfig['syscheck-syscheck'].syscheck.synchronization.enabled === 'yes' ? 'enabled' : 'disabled'">
+            </wz-config-item>
+            <wz-config-item
+                label="Maximum interval (in seconds)"
+                value="currentConfig['syscheck-syscheck'].syscheck.synchronization.max_interval">
+            </wz-config-item>
+            <wz-config-item
+                label="Interval (in seconds)"
+                value="currentConfig['syscheck-syscheck'].syscheck.synchronization.interval">
+            </wz-config-item>
+            <wz-config-item
+                label="Response timeout (in seconds)"
+                value="currentConfig['syscheck-syscheck'].syscheck.synchronization.response_timeout">
+            </wz-config-item>
+            <wz-config-item
+                label="Queue size"
+                value="currentConfig['syscheck-syscheck'].syscheck.synchronization.queue_size">
+            </wz-config-item>
+            <wz-config-item
+                label="Maximum eps"
+                value="currentConfig['syscheck-syscheck'].syscheck.synchronization.max_eps">
+            </wz-config-item>
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End general card -->
