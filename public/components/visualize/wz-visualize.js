@@ -43,29 +43,29 @@ export class WzVisualize extends Component {
   async componentDidMount() {
     this.agentsStatus = false;
     if (!this.monitoringEnabled) {
-      const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
+      const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
       const result = ((data || {}).data || {}).data || false;
       if (result) {
         this.agentsStatus = [
           {
             title: 'Total',
-            description: result.Total - 1,
+            description: result.total - 1,
           },
           {
             title: 'Active',
-            description: result.Active - 1,
+            description: result.active - 1,
           },
           {
             title: 'Disconnected',
-            description: result.Disconnected,
+            description: result.disconnected,
           },
           {
             title: 'Never Connected',
-            description: result['Never connected'],
+            description: result['never_connected'],
           },
           {
             title: 'Agents coverage',
-            description: ((result.Total - 1) ? ((result.Active - 1) / (result.Total - 1)) * 100 : 0) + '%',
+            description: ((result.total - 1) ? ((result.active - 1) / (result.total - 1)) * 100 : 0) + '%',
           },
         ];
       }
