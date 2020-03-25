@@ -11,7 +11,7 @@
  */
 import { GenericRequest } from "./generic-request";
 import { AppState } from "./app-state";
-import chrome from 'ui/chrome';
+import { WzMisc } from "../factories/misc";
 
 export class PatternHandler {
 
@@ -29,8 +29,7 @@ export class PatternHandler {
       if (!patternList.data.data.length) {
         AppState.removeCurrentPattern();
 
-        const $injector = await chrome.dangerouslyGetActiveInjector();
-        this.wzMisc = $injector.get('wzMisc');
+        this.wzMisc = new WzMisc();
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen')){
           window.location.href = "/app/wazuh#/blank-screen/";

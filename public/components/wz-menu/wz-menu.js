@@ -21,8 +21,8 @@ import WzManagementSideMenu from './management-side-menu';
 import { npStart } from 'ui/new_platform'
 import { toastNotifications } from 'ui/notify';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiCheck } from '../../react-services/wz-api-check';
 import chrome from 'ui/chrome';
-import axios from 'axios';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -168,44 +168,6 @@ class WzMenu extends Component {
     }
   }
 
-  /** Given an API id, the method check if the API is active */
-  checkAPI = async (apiId) => {
-    try{
-      const { timeout } = this.wazuhConfig.getConfig();
-
-
-      const apiData = this.state.APIlist.filter( item => {
-        return item.id === apiId
-      })
-      const url = chrome.addBasePath('/api/check-api');
-      
-      const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana'  },
-        url: url,
-        data: apiData[0],
-        timeout: timeout || 20000
-      };
-      
-      const response = await axios(options); 
-
-      if (response.error) {
-        return Promise.reject(response);
-      }
-
-      return response;
-    } catch (err) {
-      if(err.response){
-        const response = (err.response.data || {}).message || err.message;
-        return Promise.reject(response)
-      }else{
-        return ((err || {}).message) || false
-        ? Promise.reject(err.message)
-        : Promise.reject(err || 'Server did not respond');
-      }
-    }
-  }
-
 
   /**
    * @param {String} id
@@ -228,7 +190,10 @@ class WzMenu extends Component {
   changeAPI = async(event) => {
     try {
       const apiId = event.target.value;
-      const response = await this.checkAPI(apiId);
+      const apiEntry = this.state.APIlist.filter( item => {
+        return item.id === apiId
+      });
+      const response = await ApiCheck.checkApi(apiEntry[0]);
       const clusterInfo = response.data || {};
       const apiData = this.state.APIlist.filter( item => {
         return item.id === apiId

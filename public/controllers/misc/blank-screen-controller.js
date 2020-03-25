@@ -1,4 +1,5 @@
 import { AppState } from "../../react-services/app-state";
+import { WzMisc } from '../../factories/misc';
 
 /*
  * Wazuh app - Blank screen controller
@@ -17,13 +18,12 @@ export class BlankScreenController {
    * @param {*} $scope
    * @param {*} $location
    * @param {*} errorHandler
-   * @param {*} wzMisc
    */
-  constructor($scope, $location, errorHandler, wzMisc) {
+  constructor($scope, $location, errorHandler) {
     this.$scope = $scope;
     this.$location = $location;
     this.errorHandler = errorHandler;
-    this.wzMisc = wzMisc;
+    this.wzMisc = new WzMisc();
     this.showErrorPage = false;
   }
 

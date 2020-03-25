@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../react-services/app-state";
+import { WzMisc } from "../factories/misc";
 
 export class PatternHandler {
   /**
@@ -20,12 +21,12 @@ export class PatternHandler {
    * @param {*} errorHandler
    * @param {*} wzMisc
    */
-  constructor($location, genericReq, appState, errorHandler, wzMisc) {
+  constructor($location, genericReq, appState, errorHandler) {
     this.$location = $location;
     this.genericReq = genericReq;
     this.appState = appState;
     this.errorHandler = errorHandler;
-    this.wzMisc = wzMisc;
+    this.wzMisc = new WzMisc();
   }
 
   /**
