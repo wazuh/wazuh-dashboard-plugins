@@ -12,13 +12,14 @@
 import { toastNotifications } from 'ui/notify';
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
+import { WzMisc } from '../factories/misc';
 
 export class ErrorHandler {
   /**
    * Constructor
    */
-  constructor(wzMisc, $rootScope, checkDaemonsStatus) {
-    this.wzMisc = wzMisc;
+  constructor($rootScope, checkDaemonsStatus) {
+    this.wzMisc = new WzMisc();
     this.$rootScope = $rootScope;
     this.checkDaemonsStatus = checkDaemonsStatus;
     this.history = [];

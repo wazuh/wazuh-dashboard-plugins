@@ -13,6 +13,7 @@ import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiCheck } from '../../react-services/wz-api-check';
 
 export function settingsWizard(
   $location,
@@ -129,7 +130,7 @@ export function settingsWizard(
         AppState.setExtensions(currentApi, extensions);
       }
       checkTimestamp(genericReq, $location, wzMisc)
-        .then(() => testAPI.checkStored(currentApi))
+        .then(() => ApiCheck.checkStored(currentApi))
         .then(data => {
           if (data === 3099) {
             deferred.resolve();
@@ -189,7 +190,7 @@ export function settingsWizard(
           const api = apis[idx];
           const id = api.id;
           try {
-            const clus = await testAPI.check(api);
+            const clus = await ApiCheck.checkApi(api);
             api.cluster_info = clus.data;
             if (api && api.cluster_info && api.cluster_info.manager) {
               const defaultApi = JSON.stringify({
