@@ -93,10 +93,9 @@ class WzMenu {
         }
 
         if (appState.getCurrentAPI()) {
-          $scope.theresAPI = true;
-          $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+          $rootScope.theresAPI = true;
         } else {
-          $scope.theresAPI = false;
+          $rootScope.theresAPI = false;
         }
         calcHeight();
         $scope.$applyAsync();
@@ -160,10 +159,9 @@ class WzMenu {
           appState.setCurrentAPI(JSON.stringify(parsed));
         }
 
-        $scope.theresAPI = true;
-        $scope.currentAPI = parsed.name;
+        $rootScope.theresAPI = true;
       } else {
-        $scope.theresAPI = false;
+        $rootScope.theresAPI = false;
       }
     });
 

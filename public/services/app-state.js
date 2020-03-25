@@ -78,6 +78,9 @@ export class AppState {
     exp.setDate(exp.getDate() + 365);
     if (API) {
       this.$cookies.putObject('API', API, { expires: exp });
+      this.$rootScope.currentAPI = JSON.parse(API).name;
+      this.$rootScope.theresAPI = true;
+      this.$rootScope.$applyAsync();
     }
   }
 
