@@ -35,6 +35,8 @@ import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
+import { WzMisc } from '../factories/misc';
+import { ApiCheck } from '../react-services/wz-api-check';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -51,9 +53,9 @@ function ip(
   $location,
   Private,
   appState,
-  errorHandler,
-  wzMisc
+  errorHandler
 ) {
+  const wzMisc = new WzMisc();
   assignPreviousLocation($rootScope, $location);
   return getIp(
     npStart.plugins.data.indexPatterns,
@@ -74,10 +76,9 @@ function nestedResolve(
   $rootScope,
   $location,
   $window,
-  testAPI,
-  appState,
-  wzMisc
+  appState
 ) {
+  const wzMisc = new WzMisc();
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
   const wazuhConfig = new WazuhConfig();
@@ -88,7 +89,7 @@ function nestedResolve(
       $location,
       $q,
       $window,
-      testAPI,
+      ApiCheck,
       appState,
       GenericRequest,
       errorHandler,

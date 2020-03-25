@@ -16,6 +16,7 @@ import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler'
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiCheck } from '../../react-services/wz-api-check';
 
 export class HealthCheck {
   /**
@@ -27,7 +28,6 @@ export class HealthCheck {
    * @param {*} genericReq
    * @param {*} apiReq
    * @param {*} appState
-   * @param {*} testAPI
    * @param {*} errorHandler
    * @param {*} Private
    * @param {*} $window
@@ -40,7 +40,6 @@ export class HealthCheck {
     genericReq,
     apiReq,
     appState,
-    testAPI,
     errorHandler,
     Private,
     $window
@@ -52,7 +51,6 @@ export class HealthCheck {
     this.genericReq = GenericRequest;
     this.apiReq = apiReq;
     this.appState = appState;
-    this.testAPI = testAPI;
     this.errorHandler = errorHandler;
     this.wazuhConfig = new WazuhConfig();
     this.$window = $window;
@@ -148,7 +146,7 @@ export class HealthCheck {
     try {
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (this.checks.api && currentApi && currentApi.id) {
-        const data = await this.testAPI.checkStored(currentApi.id);
+        const data = await ApiCheck.checkStored(currentApi.id);
 
         if (((data || {}).data || {}).idChanged) {
           const apiRaw = JSON.parse(AppState.getCurrentAPI());

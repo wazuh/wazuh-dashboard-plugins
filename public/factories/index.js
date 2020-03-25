@@ -16,7 +16,6 @@ import { DiscoverPendingUpdates } from './discover-pending-updates';
 import { VisHandlers } from './vis-handlers';
 import { Vis2PNG } from './vis2png';
 import { ShareAgent } from './share-agent';
-import { WzMisc } from './misc';
 import { WazuhConfig } from './wazuh-config';
 import { uiModules } from 'ui/modules';
 
@@ -30,5 +29,4 @@ app
   .service('visHandlers', VisHandlers)
   .service('vis2png', Vis2PNG)
   .service('shareAgent', ShareAgent)
-  .service('wzMisc', WzMisc)
   .service('wazuhConfig', WazuhConfig);
