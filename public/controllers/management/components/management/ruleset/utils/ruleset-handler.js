@@ -191,7 +191,9 @@ export default class RulesetHandler {
   static async getFileContent(path) {
     try {
       const result = await WzRequest.apiReq('GET', `/manager/files`, {
-        path: path
+        params: {
+          path: path
+        }
       });
       return ((result || {}).data || {}).contents || false;
     } catch (error) {
