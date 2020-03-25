@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show configuration of integrity monitoring - general tab.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,9 @@ const mainSettings = [
   { field: 'restart_audit', label: 'Restart the Audit daemon' },
   { field: 'windows_audit_interval', label: 'Interval (in seconds) to check directories\' SACLs', render: renderValueOrDefault('300') },
   { field: 'prefilter_cmd', label: 'Command to prevent prelinking', render: renderValueOrNoValue },
+  { field: 'max_eps', label: 'Maximum eps' },
+  { field: 'process_priority', label: 'Process priority' },
+  { field: 'database', label: 'Database' }
 ];
 
 const mainSettingsFroAgentOrManager = (agent) => agent.id === '000' ? mainSettings : mainSettings.filter(setting => setting.when !== 'manager' )
@@ -48,7 +51,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
         <WzConfigurationSettingsTabSelector
           title='General'
           description='The settings shown below are applied globally'
-          currentConfig={currentConfig}
+          currentConfig={currentConfig['syscheck-syscheck']}
           minusHeight={this.props.agent.id === '000' ? 340 : 410}
           helpLinks={helpLinks}
         >
