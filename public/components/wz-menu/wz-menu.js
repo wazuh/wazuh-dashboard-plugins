@@ -23,6 +23,7 @@ import { toastNotifications } from 'ui/notify';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import chrome from 'ui/chrome';
+import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumbWrapper';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -82,12 +83,12 @@ class WzMenu extends Component {
   loadApiList = async () => {
     const result = await this.genericReq.request('GET', '/hosts/apis', {});
     const APIlist = ((result || {}).data || []);
-    if(APIlist.length) this.setState({APIlist});
+    if (APIlist.length) this.setState({ APIlist });
   }
 
 
   async componentDidUpdate(prevProps) {
-    if(this.state.APIlist && !this.state.APIlist.length){
+    if (this.state.APIlist && !this.state.APIlist.length) {
       this.loadApiList();
     }
     const { id: apiId } = JSON.parse(AppState.getCurrentAPI())
@@ -187,28 +188,28 @@ class WzMenu extends Component {
 
 
 
-  changeAPI = async(event) => {
+  changeAPI = async (event) => {
     try {
       const apiId = event.target.value;
-      const apiEntry = this.state.APIlist.filter( item => {
+      const apiEntry = this.state.APIlist.filter(item => {
         return item.id === apiId
       });
       const response = await ApiCheck.checkApi(apiEntry[0]);
       const clusterInfo = response.data || {};
-      const apiData = this.state.APIlist.filter( item => {
+      const apiData = this.state.APIlist.filter(item => {
         return item.id === apiId
       });
 
-      if(!apiData[0].cluster_info){ //if apis have been modified we have to refresh the wazuhregistry
+      if (!apiData[0].cluster_info) { //if apis have been modified we have to refresh the wazuhregistry
         this.updateClusterInfoInRegistry(apiId, clusterInfo);
         apiData[0].cluster_info = clusterInfo;
       }
 
       AppState.setCurrentAPI(
         JSON.stringify(
-          {name: apiData[0].cluster_info.manager, id: apiId}
-      ));
-      if(this.state.currentMenuTab !== 'wazuh-dev'){
+          { name: apiData[0].cluster_info.manager, id: apiId }
+        ));
+      if (this.state.currentMenuTab !== 'wazuh-dev') {
         const $injector = await chrome.dangerouslyGetActiveInjector();
         const tmpRouter = $injector.get('$route');
         tmpRouter.reload();
@@ -241,11 +242,11 @@ class WzMenu extends Component {
 
   buildApiSelector() {
     return (
-      <span  className="small">
-        <EuiToolTip position="bottom" content="Selected API"> 
+      <span className="small">
+        <EuiToolTip position="bottom" content="Selected API">
           <EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon>
         </EuiToolTip>
-        <select onMouseEnter={async() => this.loadApiList()} className="wz-menu-select" value={this.state.currentAPI}
+        <select onMouseEnter={async () => this.loadApiList()} className="wz-menu-select" value={this.state.currentAPI}
           onChange={this.changeAPI} aria-label="API selector">
 
           {this.state.APIlist.map((item, idx) => {
@@ -288,6 +289,7 @@ class WzMenu extends Component {
     return (
       <WzReduxProvider>
         <Fragment>
+          <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
           {this.state.showMenu && (
             <div>
               <div className="wz-menu-wrapper">
@@ -302,13 +304,13 @@ class WzMenu extends Component {
                         <EuiIcon type='visualizeApp' color='primary' size='m' />Overview
                     </EuiButtonEmpty>
 
-                                
-                  <EuiButtonEmpty
-                    className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
-                    color="text"
-                    href="#/manager"
-                    onClick={() => this.setMenuItem('manager')}>
-                    <EuiIcon type='managementApp' color='primary' size='m' />Management
+
+                      <EuiButtonEmpty
+                        className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
+                        color="text"
+                        href="#/manager"
+                        onClick={() => this.setMenuItem('manager')}>
+                        <EuiIcon type='managementApp' color='primary' size='m' />Management
                   </EuiButtonEmpty>
 
                       <EuiButtonEmpty
