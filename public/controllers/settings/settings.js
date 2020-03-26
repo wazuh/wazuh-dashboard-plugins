@@ -23,7 +23,6 @@ export class SettingsController {
    * @param {*} $scope
    * @param {*} $window
    * @param {*} $location
-   * @param {*} genericReq
    * @param {*} errorHandler
    */
   constructor(

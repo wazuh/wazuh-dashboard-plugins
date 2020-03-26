@@ -11,18 +11,18 @@
  */
 import { AppState } from "../react-services/app-state";
 import { WzMisc } from "../factories/misc";
+import { GenericRequest } from "../react-services/generic-request";
 
 export class PatternHandler {
   /**
    * Class constructor
    * @param {*} $location
-   * @param {*} genericReq
    * @param {*} errorHandler
    * @param {*} wzMisc
    */
-  constructor($location, genericReq, errorHandler) {
+  constructor($location, errorHandler) {
     this.$location = $location;
-    this.genericReq = genericReq;
+    this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.wzMisc = new WzMisc();
   }

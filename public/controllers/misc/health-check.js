@@ -25,7 +25,6 @@ export class HealthCheck {
    * @param {*} $rootScope
    * @param {*} $timeout
    * @param {*} $location
-   * @param {*} genericReq
    * @param {*} apiReq
    * @param {*} errorHandler
    * @param {*} Private
