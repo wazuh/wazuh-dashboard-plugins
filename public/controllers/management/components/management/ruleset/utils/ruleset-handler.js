@@ -233,7 +233,7 @@ export default class RulesetHandler {
         'PUT',
         `/manager/files?path=etc/decoders/${decoder.file ||
         decoder}&overwrite=${overwrite}`,
-        { content, origin: 'xmleditor' }
+        { body: content }
       );
       return result;
     } catch (error) {
