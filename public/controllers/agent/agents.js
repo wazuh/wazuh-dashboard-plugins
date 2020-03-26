@@ -73,7 +73,7 @@ export class AgentsController {
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
-    this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
+    this.configurationHandler = new ConfigurationHandler(this.apiReq, errorHandler);
     this.$scope.currentConfig = null;
     this.$scope.configurationTab = '';
     this.$scope.configurationSubTab = '';
