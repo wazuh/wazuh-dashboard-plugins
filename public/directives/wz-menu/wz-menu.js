@@ -232,7 +232,6 @@ class WzMenu {
         }
       }
     }
-    setInterval(function () { setCurrentApi() }, 1000);
   }
 }
 
