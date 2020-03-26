@@ -114,6 +114,11 @@ export class QInterpreter {
     this.queryObjects.push(newQuery);
   }
 
+  cleanQuery() {
+    this.query = '';
+    this.queryObjects = [];
+  }
+
   toString():string { 
     let query = '';
     for (const qObject of this.queryObjects) {
