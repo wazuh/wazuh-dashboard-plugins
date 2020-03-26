@@ -213,7 +213,7 @@ export default class RulesetHandler {
         'PUT',
         `/manager/files?path=etc/rules/${rule.file ||
         rule}&overwrite=${overwrite}`,
-        { content, origin: 'xmleditor' }
+        { body: content }
       );
       return result;
     } catch (error) {
