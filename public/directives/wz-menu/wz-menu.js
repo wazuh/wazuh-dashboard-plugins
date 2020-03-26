@@ -67,7 +67,7 @@ class WzMenu {
               location.reload();
             }
             $scope.APIList = result.data;
-            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === JSON.parse(appState.getCurrentAPI()).id);
+            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === $rootScope.currentAPIid);
           }
         }
 
@@ -112,10 +112,9 @@ class WzMenu {
         }
 
         if (appState.getCurrentAPI()) {
-          $scope.theresAPI = true;
-          $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+          $rootScope.theresAPI = true;
         } else {
-          $scope.theresAPI = false;
+          $rootScope.theresAPI = false;
         }
         calcHeight();
         $scope.$applyAsync();
@@ -148,11 +147,10 @@ class WzMenu {
 
     const setCurrentApi = () => {
       if (appState.getCurrentAPI()) {
-        const api = JSON.parse(appState.getCurrentAPI());
-        $scope.currentAPI = api.name;
+        const apiId = $rootScope.currentAPIid ;
         if ($scope.APIList && $scope.APIList.length) {
           if ($scope.updateFromEvent) {
-            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === api.id);
+            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === apiId);
             $scope.updateFromEvent = false;
           }
         }
@@ -198,10 +196,9 @@ class WzMenu {
           appState.setCurrentAPI(JSON.stringify(parsed));
         }
 
-        $scope.theresAPI = true;
-        $scope.currentAPI = parsed.name;
+        $rootScope.theresAPI = true;
       } else {
-        $scope.theresAPI = false;
+        $rootScope.theresAPI = false;
       }
     });
 
@@ -235,7 +232,6 @@ class WzMenu {
         }
       }
     }
-    setInterval(function () { setCurrentApi() }, 1000);
   }
 }
 app.directive('wzMenu', () => new WzMenu());
