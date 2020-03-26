@@ -33,9 +33,9 @@ const mainSettings = [
   { field: 'restart_audit', label: 'Restart the Audit daemon' },
   { field: 'windows_audit_interval', label: 'Interval (in seconds) to check directories\' SACLs', render: renderValueOrDefault('300') },
   { field: 'prefilter_cmd', label: 'Command to prevent prelinking', render: renderValueOrNoValue },
-  { field: 'max_eps', label: 'Maximum eps' },
+  { field: 'max_eps', label: 'Maximum event reporting throughput' },
   { field: 'process_priority', label: 'Process priority' },
-  { field: 'database', label: 'Database' }
+  { field: 'database', label: 'Database type' }
 ];
 
 const mainSettingsFroAgentOrManager = (agent) => agent.id === '000' ? mainSettings : mainSettings.filter(setting => setting.when !== 'manager' )
