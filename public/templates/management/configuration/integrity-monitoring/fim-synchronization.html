@@ -4,7 +4,7 @@
             <div>
                 <span class="font-size-16">Synchronization</span>
                 <div class="wz-margin-top-10">
-                    <span class="md-subheader small">Database synchronization options</span>
+                    <span class="md-subheader small">Database synchronization settings</span>
                 </div>
             </div>
             <span flex></span>
@@ -17,15 +17,15 @@
         <!-- Configuration block -->
         <div class="wz-padding-top-10">
             <wz-config-item
-                label="Status"
+                label="Synchronization status"
                 value="currentConfig['syscheck-syscheck'].syscheck.synchronization.enabled === 'yes' ? 'enabled' : 'disabled'">
             </wz-config-item>
             <wz-config-item
-                label="Maximum interval (in seconds)"
+                label="Maximum interval (in seconds) between every sync"
                 value="currentConfig['syscheck-syscheck'].syscheck.synchronization.max_interval">
             </wz-config-item>
             <wz-config-item
-                label="Interval (in seconds)"
+                label="Interval (in seconds) between every sync"
                 value="currentConfig['syscheck-syscheck'].syscheck.synchronization.interval">
             </wz-config-item>
             <wz-config-item
@@ -33,11 +33,11 @@
                 value="currentConfig['syscheck-syscheck'].syscheck.synchronization.response_timeout">
             </wz-config-item>
             <wz-config-item
-                label="Queue size"
+                label="Queue size of the manager responses"
                 value="currentConfig['syscheck-syscheck'].syscheck.synchronization.queue_size">
             </wz-config-item>
             <wz-config-item
-                label="Maximum eps"
+                label="Maximum message throughput"
                 value="currentConfig['syscheck-syscheck'].syscheck.synchronization.max_eps">
             </wz-config-item>
         </div>
