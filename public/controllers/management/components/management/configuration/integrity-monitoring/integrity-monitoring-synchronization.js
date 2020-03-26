@@ -17,11 +17,13 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
+import { renderValueYesThenEnabled } from '../utils/utils';
 
 const mainSettings = [
-  { field: 'enabled', label: 'Enabled' },
-  { field: 'max_interval', label: 'Maximum interval' },
-  { field: 'response_timeout', label: 'Response timeout' },
+  { field: 'enabled', label: 'Database synchronization status', render: renderValueYesThenEnabled },
+  { field: 'max_interval', label: 'Maximum interval (in seconds)' },
+  { field: 'interval', label: 'Interval (in seconds)'},
+  { field: 'response_timeout', label: 'Response timeout (in seconds)' },
   { field: 'queue_size', label: 'Queue size' },
   { field: 'max_eps', label: 'Maximum eps' }
 ];
@@ -37,7 +39,7 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component{
         {currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.synchronization ? (
           <WzConfigurationSettingsTabSelector
           title='Syncronization'
-          description='Synchronization description'
+          description='Database synchronization settings'
           currentConfig={currentConfig['syscheck-syscheck']}
           minusHeight={this.props.agent.id === '000' ? 340 : 410}
           helpLinks={helpLinks}
