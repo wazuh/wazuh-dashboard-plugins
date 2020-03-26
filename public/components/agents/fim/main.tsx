@@ -57,11 +57,11 @@ export class MainFim extends Component {
       },
       {
         text: 'Agents',
-        href: '/app/wazuh#/agents',
+        href: "#/agents-preview"
       },
       {
         text: 'ip-10-0-0-246.us-west-1.compute.internal (001)',
-        href: '/app/wazuh#/agents?agent=001',
+        href: '#/agents?agent=001',
         truncate: true,
       },
       {
