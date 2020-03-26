@@ -30,6 +30,8 @@ import {
   Settings
 } from './index';
 import '../../../less/components/module.less';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../redux/store';
 
 export class MainFim extends Component {
   state: {
@@ -46,6 +48,31 @@ export class MainFim extends Component {
     this.state = {
       selectView: 'states',
     };
+  }
+
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      {
+        text: '',
+      },
+      {
+        text: 'Agents',
+        href: '/app/wazuh#/agents',
+      },
+      {
+        text: 'ip-10-0-0-246.us-west-1.compute.internal (001)',
+        href: '/app/wazuh#/agents?agent=001',
+        truncate: true,
+      },
+      {
+        text: 'Integrity monitoring',
+      },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
+  componentDidMount() {
+    this.setGlobalBreadcrumb();
   }
 
   renderTitle() {
@@ -91,8 +118,8 @@ export class MainFim extends Component {
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false} style={{marginLeft: 0}}>
-        <EuiButton iconType="wrench" style={{minWidth: 50}}>Configuration</EuiButton>
+      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
+        <EuiButton iconType="wrench">Configuration</EuiButton>
       </EuiFlexItem>
     );
   }
