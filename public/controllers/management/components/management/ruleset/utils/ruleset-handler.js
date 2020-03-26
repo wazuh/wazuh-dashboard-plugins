@@ -295,8 +295,11 @@ export default class RulesetHandler {
       fullPath = path;
     }
     try {
-      const result = await WzRequest.apiReq('DELETE', '/manager/files', {
-        path: fullPath
+      const result = await WzRequest.apiReq('DELETE', '/manager/files',
+      {
+        params: {
+          path: fullPath
+        }
       });
       return result;
     } catch (error) {
