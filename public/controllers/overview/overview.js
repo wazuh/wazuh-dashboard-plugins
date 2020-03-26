@@ -23,7 +23,6 @@ export class OverviewController {
    * @param {*} $scope
    * @param {*} $location
    * @param {*} $rootScope
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} apiReq
    * @param {*} tabVisualizations
@@ -35,7 +34,6 @@ export class OverviewController {
     $scope,
     $location,
     $rootScope,
-    appState,
     errorHandler,
     apiReq,
     tabVisualizations,
@@ -46,7 +44,6 @@ export class OverviewController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.tabVisualizations = tabVisualizations;

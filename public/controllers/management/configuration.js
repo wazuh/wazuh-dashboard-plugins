@@ -20,13 +20,11 @@ export class ConfigurationController {
    * @param {*} $location
    * @param {*} errorHandler
    * @param {*} apiReq
-   * @param {*} appState
    */
-  constructor($scope, $location, errorHandler, apiReq, appState) {
+  constructor($scope, $location, errorHandler, apiReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.$location = $location;
     this.load = false;
     this.isArray = Array.isArray;

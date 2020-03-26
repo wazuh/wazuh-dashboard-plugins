@@ -34,7 +34,6 @@ app.directive('wzXmlFileEditor', function() {
       $scope,
       $document,
       $location,
-      appState,
       errorHandler,
       groupHandler,
       rulesetHandler,

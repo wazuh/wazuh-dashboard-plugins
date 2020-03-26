@@ -28,7 +28,6 @@ export class AgentsController {
    * @param {Object} $scope
    * @param {Object} $location
    * @param {Object} $rootScope
-   * @param {Object} appState
    * @param {Object} apiReq
    * @param {Object} errorHandler
    * @param {Object} tabVisualizations
@@ -43,7 +42,6 @@ export class AgentsController {
     $scope,
     $location,
     $rootScope,
-    appState,
     apiReq,
     errorHandler,
     tabVisualizations,
@@ -59,7 +57,6 @@ export class AgentsController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.appState = appState;
     this.apiReq = apiReq;
     this.errorHandler = errorHandler;
     this.tabVisualizations = tabVisualizations;

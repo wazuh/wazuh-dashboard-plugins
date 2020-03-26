@@ -17,13 +17,11 @@ export class GenericRequest {
    * Class constructor
    * @param {*} $q
    * @param {*} $http
-   * @param {*} appState
    * @param {*} wazuhConfig
    */
-  constructor($q, $http, appState, wazuhConfig) {
+  constructor($q, $http, wazuhConfig) {
     this.$q = $q;
     this.$http = $http;
-    this.appState = appState;
     this.wazuhConfig = wazuhConfig;
   }
 

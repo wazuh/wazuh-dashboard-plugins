@@ -18,7 +18,6 @@ export class GroupsController {
     $location,
     apiReq,
     errorHandler,
-    appState,
     shareAgent,
     groupHandler,
     reportingService
@@ -27,7 +26,6 @@ export class GroupsController {
     this.location = $location;
     this.apiReq = apiReq;
     this.errorHandler = errorHandler;
-    this.appState = appState;
     this.shareAgent = shareAgent;
     this.groupHandler = groupHandler;
     this.wazuhConfig = new WazuhConfig();

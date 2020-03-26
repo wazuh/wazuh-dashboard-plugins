@@ -25,7 +25,6 @@ export class ManagementController {
     $rootScope,
     $location,
     shareAgent,
-    appState,
     configHandler,
     errorHandler,
     $interval,
@@ -35,7 +34,6 @@ export class ManagementController {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
-    this.appState = appState;
     this.shareAgent = shareAgent;
     this.wazuhConfig = new WazuhConfig();
     this.configHandler = configHandler;
@@ -151,7 +149,6 @@ export class ManagementController {
         ? this.restartCluster()
         : this.restartManager();
     });
-    this.appState = appState;
 
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)

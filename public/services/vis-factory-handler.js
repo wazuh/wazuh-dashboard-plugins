@@ -16,7 +16,6 @@ export class VisFactoryService {
   /**
    * Class Constructor
    * @param {*} $rootScope
-   * @param {*} appState
    * @param {*} discoverPendingUpdates
    * @param {*} rawVisualizations
    * @param {*} tabVisualizations
@@ -26,7 +25,6 @@ export class VisFactoryService {
    */
   constructor(
     $rootScope,
-    appState,
     discoverPendingUpdates,
     rawVisualizations,
     tabVisualizations,
@@ -35,7 +33,6 @@ export class VisFactoryService {
     visHandlers
   ) {
     this.$rootScope = $rootScope;
-    this.appState = appState;
     this.genericReq = GenericRequest;
     this.discoverPendingUpdates = discoverPendingUpdates;
     this.rawVisualizations = rawVisualizations;

@@ -27,8 +27,6 @@ export function ClusterController(
   loadedVisualizations,
   visHandlers,
   tabVisualizations,
-  appState,
-  genericReq
 ) {
   timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {

@@ -21,7 +21,6 @@ export class DecodersController {
    * @param {*} $scope
    * @param {*} $sce
    * @param {*} errorHandler
-   * @param {*} appState
    * @param {*} csvReq
    * @param {*} wzTableFilter
    */
@@ -30,7 +29,6 @@ export class DecodersController {
     $sce,
     $location,
     errorHandler,
-    appState,
     apiReq,
     csvReq,
     wzTableFilter,
@@ -40,7 +38,6 @@ export class DecodersController {
     this.$sce = $sce;
     this.errorHandler = errorHandler;
     this.$location = $location;
-    this.appState = appState;
     this.apiReq = apiReq;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;

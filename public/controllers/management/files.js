@@ -17,14 +17,12 @@ export class FilesController {
     $scope,
     rulesetHandler,
     errorHandler,
-    appState,
     $location
   ) {
     this.$scope = $scope;
     this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
     this.errorHandler = errorHandler;
-    this.appState = appState;
     this.$location = $location;
     this.appliedFilters = [];
     this.searchTerm = '';

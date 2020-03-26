@@ -22,7 +22,6 @@ export class RulesController {
     * @param {Objet} $scope
     * @param {Objet} $sce
     * @param {Objet} errorHandler
-    * @param {Objet} appState
     * @param {Objet} csvReq
     * @param {Objet} wzTableFilter
     * @param {Objet} $location
@@ -34,7 +33,6 @@ export class RulesController {
     $scope,
     $sce,
     errorHandler,
-    appState,
     csvReq,
     wzTableFilter,
     $location,
@@ -44,7 +42,6 @@ export class RulesController {
     this.scope = $scope;
     this.sce = $sce;
     this.errorHandler = errorHandler;
-    this.appState = appState;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.location = $location;

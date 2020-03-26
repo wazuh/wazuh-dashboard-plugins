@@ -17,8 +17,6 @@ export class CommonData {
    * Class constructor
    * @param {*} $rootScope
    * @param {*} $timeout
-   * @param {*} genericReq
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} $location
    * @param {*} shareAgent
@@ -27,8 +25,6 @@ export class CommonData {
   constructor(
     $rootScope,
     $timeout,
-    genericReq,
-    appState,
     errorHandler,
     $location,
     shareAgent,
@@ -37,7 +33,6 @@ export class CommonData {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.$location = $location;
     this.shareAgent = shareAgent;

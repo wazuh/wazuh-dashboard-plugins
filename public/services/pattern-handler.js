@@ -17,14 +17,12 @@ export class PatternHandler {
    * Class constructor
    * @param {*} $location
    * @param {*} genericReq
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} wzMisc
    */
-  constructor($location, genericReq, appState, errorHandler) {
+  constructor($location, genericReq, errorHandler) {
     this.$location = $location;
     this.genericReq = genericReq;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.wzMisc = new WzMisc();
   }

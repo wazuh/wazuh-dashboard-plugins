@@ -27,7 +27,6 @@ export class DevToolsController {
    * @param {*} $scope
    * @param {*} apiReq
    * @param {*} $window
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} $document
    */
@@ -35,14 +34,12 @@ export class DevToolsController {
     $scope,
     apiReq,
     $window,
-    appState,
     errorHandler,
     $document
   ) {
     this.apiReq = apiReq;
     this.genericReq = GenericRequest;
     this.$window = $window;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.$document = $document;
     this.groups = [];

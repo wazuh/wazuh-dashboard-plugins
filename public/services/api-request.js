@@ -16,12 +16,10 @@ export class ApiRequest {
   /**
    * Class constructor
    * @param {*} $q
-   * @param {*} appState
    */
-  constructor($q, appState) {
+  constructor($q) {
     this.$q = $q;
     this.genericReq = GenericRequest;
-    this.appState = appState;
   }
 
   /**

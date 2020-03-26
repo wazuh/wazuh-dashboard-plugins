@@ -18,13 +18,11 @@ export class ConfigurationGroupsController {
    * @param {*} $location
    * @param {*} errorHandler
    * @param {*} apiReq
-   * @param {*} appState
    */
-  constructor($scope, $location, errorHandler, apiReq, appState, groupHandler) {
+  constructor($scope, $location, errorHandler, apiReq, groupHandler) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;

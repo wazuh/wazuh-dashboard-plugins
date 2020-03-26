@@ -19,20 +19,17 @@ export class ConfigurationRulesetController {
    * @param {*} $location
    * @param {*} errorHandler
    * @param {*} apiReq
-   * @param {*} appState
    */
   constructor(
     $scope,
     $location,
     errorHandler,
     apiReq,
-    appState,
     rulesetHandler
   ) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;

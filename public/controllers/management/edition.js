@@ -20,14 +20,12 @@ export class EditionController {
    * @param {*} $location
    * @param {*} errorHandler
    * @param {*} apiReq
-   * @param {*} appState
    */
   constructor(
     $scope,
     $location,
     errorHandler,
     apiReq,
-    appState,
     configHandler,
     $rootScope,
     checkDaemonsStatus
@@ -35,7 +33,6 @@ export class EditionController {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.configHandler = configHandler;
     this.$location = $location;
     this.$rootScope = $rootScope;

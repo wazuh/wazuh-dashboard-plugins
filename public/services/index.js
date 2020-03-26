@@ -13,7 +13,6 @@ import { ErrorHandler } from './error-handler';
 import './theming';
 import { ApiRequest } from './api-request';
 import { GenericRequest } from './generic-request';
-import { AppState } from './app-state';
 import { PatternHandler } from './pattern-handler';
 import './routes';
 import { CSVRequest } from './csv-request';
@@ -35,7 +34,6 @@ app
   .service('errorHandler', ErrorHandler)
   .service('apiReq', ApiRequest)
   .service('genericReq', GenericRequest)
-  .service('appState', AppState)
   .service('patternHandler', PatternHandler)
   .service('csvReq', CSVRequest)
   .service('commonData', CommonData)

@@ -33,7 +33,6 @@ app.directive('wzListManage', function() {
       errorHandler,
       $filter,
       rulesetHandler,
-      appState,
       csvReq
     ) {
       const wazuhConfig = new WazuhConfig();

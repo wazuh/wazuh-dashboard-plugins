@@ -18,7 +18,6 @@ export class CdbListsController {
   constructor(
     $scope,
     errorHandler,
-    appState,
     csvReq,
     wzTableFilter,
     $location,
@@ -27,7 +26,6 @@ export class CdbListsController {
   ) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
-    this.appState = appState;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.$location = $location;

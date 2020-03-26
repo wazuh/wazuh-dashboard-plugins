@@ -17,7 +17,6 @@ export class LogsController {
    * @param {*} apiReq
    * @param {*} errorHandler
    * @param {*} csvReq
-   * @param {*} appState
    * @param {*} wzTableFilter
    */
   constructor(

@@ -27,7 +27,6 @@ export class HealthCheck {
    * @param {*} $location
    * @param {*} genericReq
    * @param {*} apiReq
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} Private
    * @param {*} $window
@@ -37,9 +36,7 @@ export class HealthCheck {
     $rootScope,
     $timeout,
     $location,
-    genericReq,
     apiReq,
-    appState,
     errorHandler,
     Private,
     $window
@@ -50,7 +47,6 @@ export class HealthCheck {
     this.$location = $location;
     this.genericReq = GenericRequest;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.wazuhConfig = new WazuhConfig();
     this.$window = $window;

@@ -22,7 +22,6 @@ export class AgentsPreviewController {
   /**
    * Class constructor
    * @param {Object} $scope
-   * @param {Object} appState
    * @param {Object} $location
    * @param {Object} errorHandler
    * @param {Object} csvReq
@@ -32,7 +31,6 @@ export class AgentsPreviewController {
   constructor(
     $scope,
     apiReq,
-    appState,
     $location,
     $route,
     errorHandler,
@@ -46,7 +44,6 @@ export class AgentsPreviewController {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
     this.apiReq = apiReq;
-    this.appState = appState;
     this.$location = $location;
     this.$route = $route;
     this.errorHandler = errorHandler;
