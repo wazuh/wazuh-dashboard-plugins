@@ -24,7 +24,7 @@ app.directive('wzTagFilter', function() {
       queryFn: '&',
       fieldsModel: '='
     },
-    controller($scope, $timeout, apiReq, $document, errorHandler) {
+    controller($scope, $timeout, $document, errorHandler) {
       //Use when api call be implemented
       /* const instance = new DataFactory(
         apiReq,

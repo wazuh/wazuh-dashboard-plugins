@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { AppState } from "../../react-services/app-state";
+import { ApiRequest } from "../../react-services/api-request";
 
 export class ConfigurationGroupsController {
   /**
@@ -17,12 +18,11 @@ export class ConfigurationGroupsController {
    * @param {*} $scope
    * @param {*} $location
    * @param {*} errorHandler
-   * @param {*} apiReq
    */
-  constructor($scope, $location, errorHandler, apiReq, groupHandler) {
+  constructor($scope, $location, errorHandler, groupHandler) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;

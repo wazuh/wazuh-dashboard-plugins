@@ -13,6 +13,7 @@ import * as FileSaver from '../../services/file-saver';
 import { stringToObj } from '../../utils/cdblist-to-object';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class CdbListsController {
   constructor(
@@ -21,7 +22,6 @@ export class CdbListsController {
     csvReq,
     wzTableFilter,
     $location,
-    apiReq,
     rulesetHandler
   ) {
     this.$scope = $scope;
@@ -29,7 +29,7 @@ export class CdbListsController {
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.$location = $location;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
 

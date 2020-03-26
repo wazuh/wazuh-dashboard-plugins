@@ -17,6 +17,7 @@ import { PatternHandler } from '../../react-services/pattern-handler'
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class HealthCheck {
   /**
@@ -25,7 +26,6 @@ export class HealthCheck {
    * @param {*} $rootScope
    * @param {*} $timeout
    * @param {*} $location
-   * @param {*} apiReq
    * @param {*} errorHandler
    * @param {*} Private
    * @param {*} $window
@@ -35,7 +35,6 @@ export class HealthCheck {
     $rootScope,
     $timeout,
     $location,
-    apiReq,
     errorHandler,
     Private,
     $window
@@ -45,7 +44,7 @@ export class HealthCheck {
     this.$timeout = $timeout;
     this.$location = $location;
     this.genericReq = GenericRequest;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
     this.wazuhConfig = new WazuhConfig();
     this.$window = $window;

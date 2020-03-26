@@ -10,21 +10,21 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ApiRequest } from "../../react-services/api-request";
+
 export class LogsController {
   /**
    * Class constructor
    * @param {*} $scope
-   * @param {*} apiReq
    * @param {*} errorHandler
    * @param {*} csvReq
    * @param {*} wzTableFilter
    */
   constructor(
     $scope,
-    apiReq
   ) {
     this.$scope = $scope;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
   }
 
   /**

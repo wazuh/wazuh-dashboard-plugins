@@ -12,6 +12,7 @@
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class ConfigurationController {
   /**
@@ -19,12 +20,11 @@ export class ConfigurationController {
    * @param {*} $scope
    * @param {*} $location
    * @param {*} errorHandler
-   * @param {*} apiReq
    */
-  constructor($scope, $location, errorHandler, apiReq) {
+  constructor($scope, $location, errorHandler) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.$location = $location;
     this.load = false;
     this.isArray = Array.isArray;

@@ -14,6 +14,7 @@ import * as FileSaver from '../../services/file-saver';
 import { colors } from './colors';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
 
 
 export class RulesController {
@@ -25,7 +26,6 @@ export class RulesController {
     * @param {Objet} csvReq
     * @param {Objet} wzTableFilter
     * @param {Objet} $location
-    * @param {Objet} apiReq
     * @param {Objet} rulesetHandler
    */
 
@@ -36,7 +36,6 @@ export class RulesController {
     csvReq,
     wzTableFilter,
     $location,
-    apiReq,
     rulesetHandler
   ) {
     this.scope = $scope;
@@ -45,7 +44,7 @@ export class RulesController {
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.location = $location;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.wazuhConfig = new WazuhConfig();
     this.rulesetHandler = rulesetHandler;
 

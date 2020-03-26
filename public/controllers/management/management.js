@@ -12,6 +12,7 @@
 import { TabNames } from '../../utils/tab-names';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class ManagementController {
   /**
@@ -28,7 +29,6 @@ export class ManagementController {
     configHandler,
     errorHandler,
     $interval,
-    apiReq,
     rulesetHandler
   ) {
     this.$scope = $scope;
@@ -39,7 +39,7 @@ export class ManagementController {
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';

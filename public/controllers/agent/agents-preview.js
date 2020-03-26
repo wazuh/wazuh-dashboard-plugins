@@ -17,6 +17,7 @@ import { clickAction } from '../../directives/wz-table/lib/click-action';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class AgentsPreviewController {
   /**
@@ -30,7 +31,6 @@ export class AgentsPreviewController {
    */
   constructor(
     $scope,
-    apiReq,
     $location,
     $route,
     errorHandler,
@@ -43,7 +43,7 @@ export class AgentsPreviewController {
   ) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.$location = $location;
     this.$route = $route;
     this.errorHandler = errorHandler;

@@ -13,6 +13,7 @@
 import template from './wz-register-agents.html';
 import { uiModules } from 'ui/modules';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -27,7 +28,7 @@ class WzRegisterAgents {
       reload: '&'
     };
   }
-  controller($scope, errorHandler, apiReq) {
+  controller($scope, errorHandler) {
     const wazuhConfig = new WazuhConfig();
     const configuration = wazuhConfig.getConfig();
     $scope.adminMode = !!(configuration || {}).admin;
@@ -101,7 +102,7 @@ class WzRegisterAgents {
     $scope.addAgent = async () => {
       try {
         $scope.addingAgent = true;
-        const data = await apiReq.request('POST', '/agents', {
+        const data = await ApiRequest.request('POST', '/agents', {
           name:
             $scope.registerObj.systems[$scope.registerObj.selectedSystem]
               .steps[0].agentName,
@@ -135,7 +136,7 @@ class WzRegisterAgents {
     $scope.restartAgent = async () => {
       $scope.restartingAgent = true;
       try {
-        const data = await apiReq.request(
+        const data = await ApiRequest.request(
           'PUT',
           `/agents/${$scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[3].id}/restart`,
           {}

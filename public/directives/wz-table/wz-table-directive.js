@@ -24,6 +24,7 @@ import { clickAction } from './lib/click-action';
 import { initTable } from './lib/init';
 import { checkGap } from './lib/check-gap';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -43,7 +44,6 @@ app.directive('wzTable', function() {
     },
     controller(
       $scope,
-      apiReq,
       $timeout,
       shareAgent,
       $location,
@@ -99,7 +99,7 @@ app.directive('wzTable', function() {
        */
       let realTime = false;
       const instance = new DataFactory(
-        apiReq,
+        ApiRequest,
         $scope.path,
         $scope.implicitFilter,
         $scope.implicitSort

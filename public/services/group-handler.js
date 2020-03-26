@@ -9,9 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { ApiRequest } from "../react-services/api-request";
+
 export class GroupHandler {
-  constructor(apiReq) {
-    this.apiReq = apiReq;
+  constructor() {
+    this.apiReq = ApiRequest;
   }
 
   async removeGroup(group) {

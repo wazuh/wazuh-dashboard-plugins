@@ -9,14 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "../../react-services/app-state";
 import { WazuhConfig } from "../../react-services/wazuh-config";
+import { ApiRequest } from "../../react-services/api-request";
 
 export class GroupsController {
   constructor(
     $scope,
     $location,
-    apiReq,
     errorHandler,
     shareAgent,
     groupHandler,
@@ -24,7 +23,7 @@ export class GroupsController {
   ) {
     this.scope = $scope;
     this.location = $location;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
     this.shareAgent = shareAgent;
     this.groupHandler = groupHandler;

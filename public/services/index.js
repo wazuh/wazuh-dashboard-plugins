@@ -11,7 +11,6 @@
  */
 import { ErrorHandler } from './error-handler';
 import './theming';
-import { ApiRequest } from './api-request';
 import { PatternHandler } from './pattern-handler';
 import './routes';
 import { CSVRequest } from './csv-request';
@@ -31,7 +30,6 @@ const app = uiModules.get('app/wazuh', []);
 
 app
   .service('errorHandler', ErrorHandler)
-  .service('apiReq', ApiRequest)
   .service('patternHandler', PatternHandler)
   .service('csvReq', CSVRequest)
   .service('commonData', CommonData)

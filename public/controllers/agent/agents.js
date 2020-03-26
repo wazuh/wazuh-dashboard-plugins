@@ -21,6 +21,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class AgentsController {
   /**
@@ -28,7 +29,6 @@ export class AgentsController {
    * @param {Object} $scope
    * @param {Object} $location
    * @param {Object} $rootScope
-   * @param {Object} apiReq
    * @param {Object} errorHandler
    * @param {Object} tabVisualizations
    * @param {Object} shareAgent
@@ -42,7 +42,6 @@ export class AgentsController {
     $scope,
     $location,
     $rootScope,
-    apiReq,
     errorHandler,
     tabVisualizations,
     shareAgent,
@@ -57,7 +56,7 @@ export class AgentsController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
     this.tabVisualizations = tabVisualizations;
     this.$scope.visualizations = visualizations;

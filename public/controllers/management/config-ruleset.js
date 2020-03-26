@@ -11,6 +11,7 @@
  */
 import { stringToObj } from '../../utils/cdblist-to-object';
 import { AppState } from '../../react-services/app-state';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class ConfigurationRulesetController {
   /**
@@ -18,18 +19,16 @@ export class ConfigurationRulesetController {
    * @param {*} $scope
    * @param {*} $location
    * @param {*} errorHandler
-   * @param {*} apiReq
    */
   constructor(
     $scope,
     $location,
     errorHandler,
-    apiReq,
     rulesetHandler
   ) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;

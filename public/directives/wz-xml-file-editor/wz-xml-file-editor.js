@@ -16,6 +16,7 @@ import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
+import { ApiRequest } from '../../react-services/api-request';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -38,7 +39,6 @@ app.directive('wzXmlFileEditor', function() {
       groupHandler,
       rulesetHandler,
       configHandler,
-      apiReq,
       $rootScope,
       $window
     ) {
@@ -181,7 +181,7 @@ app.directive('wzXmlFileEditor', function() {
       const validateAfterSent = async (node = false) => {
         $scope.configError = false;
         try {
-          const clusterStatus = await apiReq.request(
+          const clusterStatus = await ApiRequest.request(
             'GET',
             `/cluster/status`,
             {}
@@ -193,19 +193,19 @@ app.directive('wzXmlFileEditor', function() {
 
           let validation = false;
           if (node && isCluster) {
-            validation = await apiReq.request(
+            validation = await ApiRequest.request(
               'GET',
               `/cluster/${node}/configuration/validation`,
               {}
             );
           } else {
             validation = isCluster
-              ? await apiReq.request(
+              ? await ApiRequest.request(
                   'GET',
                   `/cluster/configuration/validation`,
                   {}
                 )
-              : await apiReq.request(
+              : await ApiRequest.request(
                   'GET',
                   `/manager/configuration/validation`,
                   {}

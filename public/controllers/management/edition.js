@@ -12,6 +12,7 @@
 import { ConfigurationHandler } from '../../utils/config-handler';
 import store from '../../redux/store';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class EditionController {
   /**
@@ -19,20 +20,18 @@ export class EditionController {
    * @param {*} $scope
    * @param {*} $location
    * @param {*} errorHandler
-   * @param {*} apiReq
    */
   constructor(
     $scope,
     $location,
     errorHandler,
-    apiReq,
     configHandler,
     $rootScope,
     checkDaemonsStatus
   ) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.configHandler = configHandler;
     this.$location = $location;
     this.$rootScope = $rootScope;
