@@ -27,6 +27,7 @@ export class SettingsController {
    * @param {*} wazuhConfig
    */
   constructor(
+    $rootScope,
     $scope,
     $window,
     $location,
@@ -38,6 +39,7 @@ export class SettingsController {
     wazuhConfig
   ) {
     this.kibanaVersion = (kibana || {}).version || false;
+    this.$rootScope = $rootScope;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
@@ -201,7 +203,7 @@ export class SettingsController {
         }
       }
       return numError;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Set default API
@@ -222,15 +224,15 @@ export class SettingsController {
           id: id
         })
       );
-
+      this.$rootScope.$emit('currentAPIsetted', {});
       this.$scope.$emit('updateAPI', {});
 
       const currentApi = this.appState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
-      this.apiTableProps.currentDefault = this.currentDefault;
+      (this.apiTableProps || {}).currentDefault = this.currentDefault;
       this.$scope.$applyAsync();
 
-      this.errorHandler.info(`API ${manager} set as default`);
+      this.errorHandler.info(`API ${id} set as default`);
 
       this.getCurrentAPIIndex();
       if (currentApi && !this.appState.getExtensions(id)) {
@@ -241,6 +243,7 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return this.currentDefault;
     } catch (error) {
+      this.$rootScope.$emit('currentAPIsetted', {});
       this.errorHandler.handle(error);
     }
   }
@@ -338,7 +341,6 @@ export class SettingsController {
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry
       await this.updateClusterInfoInRegistry(id, cluster_info);
-      this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
       this.apiEntries[index].status = 'online';
       this.wzMisc.setApiIsDown(false);
@@ -402,6 +404,7 @@ export class SettingsController {
       this.load = false;
       const config = this.wazuhConfig.getConfig();
       this.appState.setPatternSelector(config['ip.selector']);
+      this.appState.setAPISelector(config['api.selector']);
       const pattern = this.appState.getCurrentPattern();
       this.selectedIndexPattern = pattern || config['pattern'];
 
@@ -479,9 +482,15 @@ export class SettingsController {
         { key, value }
       );
       const response = data.data.data;
-      if (response) {
+      if (response.needRestart) {
         this.errorHandler.handle(
           'You must restart Kibana for the changes to take effect',
+          '',
+          true
+        );
+      } else if (response.needWait) {
+        this.errorHandler.handle(
+          'The configuration has been successfully updated, but it may take a few seconds for the change to take effect',
           '',
           true
         );
@@ -545,7 +554,7 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      this.apiEntries = (this.apiTableProps || {}).apiEntries = (this.apiIsDownProps || {}).apiEntries = hosts;
       if (!hosts.length) {
         this.apiIsDown = false;
         this.addingApi = true;
