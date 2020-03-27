@@ -63,7 +63,7 @@ export default class SettingsLogs extends Component {
   }
 
   formatDate(date) {
-    const ts = new TimeService();
+    const ts = TimeService;
     return ts.offset(date).replace("-", "/")
       .replace("T", " ")
       .replace("Z", "")
