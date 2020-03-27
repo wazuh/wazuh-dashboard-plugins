@@ -24,7 +24,7 @@ import {
   EuiProgress
 } from '@elastic/eui';
 
-import { TimeService } from '../../../services/time-service'
+import { TimeService } from '../../../react-services/time-service'
 
 export default class SettingsLogs extends Component {
   constructor(props) {
