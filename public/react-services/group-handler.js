@@ -9,14 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export class GroupHandler {
-  constructor(apiReq) {
-    this.apiReq = apiReq;
-  }
+import { ApiRequest } from "./api-request";
 
-  async removeGroup(group) {
+export class GroupHandler {
+
+  static async removeGroup(group) {
     try {
-      const result = await this.apiReq.request(
+      const result = await ApiRequest.request(
         'DELETE',
         `/agents/groups/${group}`,
         {}
@@ -27,9 +26,9 @@ export class GroupHandler {
     }
   }
 
-  async removeAgentFromGroup(group, agentId) {
+  static async removeAgentFromGroup(group, agentId) {
     try {
-      const result = await this.apiReq.request(
+      const result = await ApiRequest.request(
         'DELETE',
         `/agents/${agentId}/group/${group}`,
         {}
@@ -40,9 +39,9 @@ export class GroupHandler {
     }
   }
 
-  async addAgentToGroup(group, agentId) {
+  static async addAgentToGroup(group, agentId) {
     try {
-      const result = await this.apiReq.request(
+      const result = await ApiRequest.request(
         'PUT',
         `/agents/${agentId}/group/${group}`,
         {}
@@ -53,9 +52,9 @@ export class GroupHandler {
     }
   }
 
-  async sendConfiguration(group, content) {
+  static async sendConfiguration(group, content) {
     try {
-      const result = await this.apiReq.request(
+      const result = await ApiRequest.request(
         'POST',
         `/agents/groups/${group}/files/agent.conf`,
         { content, origin: 'xmleditor' }
@@ -66,9 +65,9 @@ export class GroupHandler {
     }
   }
 
-  async createGroup(name) {
+  static async createGroup(name) {
     try {
-      const result = await this.apiReq.request(
+      const result = await ApiRequest.request(
         'PUT',
         `/agents/groups/${name}`,
         {}

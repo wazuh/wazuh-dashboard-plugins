@@ -24,7 +24,7 @@ import {
   EuiProgress
 } from '@elastic/eui';
 
-import { TimeService } from '../../../services/time-service'
+import { TimeService } from '../../../react-services/time-service'
 
 export default class SettingsLogs extends Component {
   constructor(props) {
@@ -63,7 +63,7 @@ export default class SettingsLogs extends Component {
   }
 
   formatDate(date) {
-    const ts = new TimeService();
+    const ts = TimeService;
     return ts.offset(date).replace("-", "/")
       .replace("T", " ")
       .replace("Z", "")

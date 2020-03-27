@@ -9,27 +9,24 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "../../react-services/app-state";
 import { WazuhConfig } from "../../react-services/wazuh-config";
+import { ApiRequest } from "../../react-services/api-request";
+import { ShareAgent } from "../../factories/share-agent";
+import { GroupHandler } from "../../react-services/group-handler";
 
 export class GroupsController {
   constructor(
     $scope,
     $location,
-    apiReq,
     errorHandler,
-    appState,
-    shareAgent,
-    groupHandler,
     reportingService
   ) {
     this.scope = $scope;
     this.location = $location;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
-    this.appState = appState;
-    this.shareAgent = shareAgent;
-    this.groupHandler = groupHandler;
+    this.shareAgent = new ShareAgent();
+    this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.reportingService = reportingService;
   }
