@@ -254,14 +254,24 @@ export default class RulesetHandler {
         const result = await WzRequest.apiReq(
           'PUT',
           `/manager/files?path=${path}/${list}&overwrite=${overwrite}`,
-          { content, origin: 'raw' }
+          {
+            body: {
+              content,
+              origin: 'raw'
+            }
+          }
         );
         return result;
       }else{
         const result = await WzRequest.apiReq(
           'PUT',
           `/manager/files?path=${path}&overwrite=${overwrite}`,
-          { content, origin: 'raw' }
+          {
+            body: {
+              content,
+              origin: 'raw'
+            }
+          }
         );
         return result;
       }
@@ -276,7 +286,12 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq(
         'PUT',
         `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
-        { content, origin: 'raw' }
+        {
+          body: {
+            content,
+            origin: 'raw'
+          }
+        }
       );
       return result;
     } catch (error) {
