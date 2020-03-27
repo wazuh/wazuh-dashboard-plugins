@@ -65,8 +65,6 @@ export class MainFim extends Component {
       {
         text: this.props.agent.name,
         href: `/app/wazuh#/agents?agent=${this.props.agent.id}`,
-        // text: 'ip-10-0-0-246.us-west-1.compute.internal (001)',
-        // href: '/app/wazuh#/agents?agent=001',
         truncate: true,
       },
       {
