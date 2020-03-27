@@ -27,6 +27,8 @@ import { Pie } from "../../../components/d3/pie";
 import { ProgressChart } from "../../../components/d3/progress";
 import { AgentsTable } from './agents-table'
 import { WzRequest } from '../../../react-services/wz-request';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../redux/store';
 
 export class AgentsPreview extends Component {
 
@@ -35,7 +37,16 @@ export class AgentsPreview extends Component {
     this.state = { data: [], loading: false }
   }
 
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Agents', },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
   componentDidMount() {
+    this.setGlobalBreadcrumb();
     this.getSummary();
   }
 

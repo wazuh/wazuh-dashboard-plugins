@@ -25,6 +25,9 @@ import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { TimeService } from '../../react-services/time-service';
+import { GroupHandler } from "../../react-services/group-handler";
+import store from '../../redux/store';
+import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 
 export class AgentsController {
   /**
@@ -737,6 +740,12 @@ export class AgentsController {
       const agentInfo = ((((data || {}).data || {}).data || {}).affected_items || [])[0] || false;
       // Agent
       this.$scope.agent = agentInfo;
+      const breadcrumb = [
+        { text: '' },
+        { text: 'Agents', href: '/app/wazuh#/agents-preview' },
+        { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` },
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
