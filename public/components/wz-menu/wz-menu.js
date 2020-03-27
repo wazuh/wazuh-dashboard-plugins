@@ -120,7 +120,7 @@ class WzMenu extends Component {
 
   async load() {
     try {
-      this.setState({ showMenu: true, isOverviewPopoverOpen: false , isManagementPopoverOpen: false });
+      this.setState({ showMenu: true, isOverviewPopoverOpen: false, isManagementPopoverOpen: false });
 
       const currentTab = this.getCurrentTab();
       if (currentTab !== this.state.currentMenuTab) {
@@ -269,7 +269,7 @@ class WzMenu extends Component {
   }
 
   managementPopoverToggle() {
-    if(!this.state.isManagementPopoverOpen){
+    if (!this.state.isManagementPopoverOpen) {
       this.setState(state => {
         return { isManagementPopoverOpen: true, isOverviewPopoverOpen: false }
       });
@@ -282,9 +282,9 @@ class WzMenu extends Component {
   }
 
   overviewPopoverToggle() {
-    if(!this.state.isOverviewPopoverOpen){
+    if (!this.state.isOverviewPopoverOpen) {
       this.setState(state => {
-        return { isOverviewPopoverOpen: true, isManagementPopoverOpen:false  }
+        return { isOverviewPopoverOpen: true, isManagementPopoverOpen: false }
       });
     }
   }
@@ -295,10 +295,10 @@ class WzMenu extends Component {
   }
 
   switchMenuOpened = () => {
-    if(!this.state.menuOpened && this.state.currentMenuTab === "manager"){
-      this.managementPopoverToggle();      
-    }else{
-      this.overviewPopoverToggle();      
+    if (!this.state.menuOpened && this.state.currentMenuTab === "manager") {
+      this.managementPopoverToggle();
+    } else {
+      this.overviewPopoverToggle();
     }
     this.setState({ menuOpened: !this.state.menuOpened });
   }
@@ -312,8 +312,9 @@ class WzMenu extends Component {
             color="text"
             onClick={this.onClickOverviewButton.bind(this)}>
             <EuiIcon type='visualizeApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Overview</span> &nbsp; 
-            {!this.state.isOverviewPopoverOpen && ( <EuiIcon color='subdued' type='arrowRight' />)}
+            <span className="wz-menu-button-title ">Overview</span>
+            <span className="flex"></span>
+            {this.state.isOverviewPopoverOpen && (<EuiIcon color='subdued' type='arrowRight' />)}
           </EuiButtonEmpty>
 
           <EuiButtonEmpty
@@ -321,8 +322,9 @@ class WzMenu extends Component {
             color="text"
             onClick={this.onClickManagementButton.bind(this)}>
             <EuiIcon type='managementApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Management</span> &nbsp;
-            {!this.state.isManagementPopoverOpen && ( <EuiIcon color='subdued' type='arrowRight' />)}
+            <span className="wz-menu-button-title ">Management</span>
+            <span className="flex"></span>
+            {this.state.isManagementPopoverOpen && (<EuiIcon color='subdued' type='arrowRight' />)}
           </EuiButtonEmpty>
 
           <EuiButtonEmpty

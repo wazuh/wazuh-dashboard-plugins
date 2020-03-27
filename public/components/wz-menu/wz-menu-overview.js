@@ -85,7 +85,7 @@ class WzMenuOverview extends Component {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
-          this.createItem(this.overviewSections.securityEvents),
+          this.createItem(this.overviewSections.securityInformation),
           this.createItem(this.overviewSections.fim),
           this.createItem(this.overviewSections.aws),
         ],
