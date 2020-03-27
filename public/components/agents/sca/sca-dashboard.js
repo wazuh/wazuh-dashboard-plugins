@@ -5,7 +5,7 @@ import {
   EuiTitle, EuiButton, EuiButtonIcon, EuiStat, EuiHealth, EuiDescriptionList, EuiButtonEmpty, EuiToolTip, EuiCallOut
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import timeService from '../../../services/time-service'
+import TimeService from '../../../react-services/time-service'
 
 export class ScaDashboard extends Component {
   constructor(props) {
@@ -14,7 +14,7 @@ export class ScaDashboard extends Component {
     this.state = { agent, itemIdToExpandedRowMap: {}, showChecksum: false, loading: false }
     this.policies = [];
     this.wzReq = WzRequest;
-    this.timeService = timeService;
+    this.timeService = TimeService;
     this.columnsPolicies = [
       {
         field: 'name',

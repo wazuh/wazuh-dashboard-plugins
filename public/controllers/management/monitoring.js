@@ -13,23 +13,22 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiRequest } from '../../react-services/api-request';
+import { TabVisualizations } from '../../factories/tab-visualizations';
 
 export function ClusterController(
   $scope,
   $rootScope,
   $timeout,
   errorHandler,
-  apiReq,
   $window,
   $location,
   discoverPendingUpdates,
   rawVisualizations,
   loadedVisualizations,
   visHandlers,
-  tabVisualizations,
-  appState,
-  genericReq
 ) {
+  const tabVisualizations = new TabVisualizations()
   timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
@@ -118,8 +117,8 @@ export function ClusterController(
         monitoring: 1
       });
       $scope.currentNode = parameters.node;
-      const data = await apiReq.request('GET', '/cluster/healthcheck', {
-        list_nodes: $scope.currentNode.name
+      const data = await ApiRequest.request('GET', '/cluster/healthcheck', {
+        node: $scope.currentNode.name
       });
 
       $scope.currentNode.healthCheck =
@@ -235,7 +234,7 @@ export function ClusterController(
       rawVisualizations.removeAll();
       loadedVisualizations.removeAll();
 
-      const status = await apiReq.request('GET', '/cluster/status', {});
+      const status = await ApiRequest.request('GET', '/cluster/status', {});
       $scope.status = status.data.data.running;
       if ($scope.status === 'no') {
         $scope.isClusterRunning = false;
@@ -244,10 +243,11 @@ export function ClusterController(
       }
 
       const data = await Promise.all([
-        apiReq.request('GET', '/cluster/nodes', {}),
-        apiReq.request('GET', '/cluster/local/config', {}),
-        apiReq.request('GET', '//', {}),
-        apiReq.request('GET', '/agents', { limit: 1 })
+        ApiRequest.request('GET', '/cluster/nodes', {}),
+        ApiRequest.request('GET', '/cluster/config', {}),
+        ApiRequest.request('GET', '/version', {}),
+        ApiRequest.request('GET', '/agents', { limit: 1 }),
+        ApiRequest.request('GET', '/cluster/healthcheck', {})
       ]);
 
       const nodeList = (((data[0] || {}).data || {}).data || {}) || false;

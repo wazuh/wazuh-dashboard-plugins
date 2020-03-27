@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Load all the directives.
+ * Wazuh app - App State Reducers
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,9 +9,19 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './wz-enter/wz-enter';
-import './wz-table';
-import './wz-table-eui';
-import './wz-multiple-selector/wz-multiple-selector';
-import './wz-multiple-selector/wz-multiple-selector.less';
-import './wz-src/wz-src';
+
+const initialState = {
+  breadcrumb: ""
+};
+
+const globalBreadcrumbReducers = (state = initialState, action) => {
+  if (action.type === 'UPDATE_GLOBAL_BREADCRUMB') {
+    return {
+      ...state,
+      breadcrumb: action.breadcrumb,
+    };
+  }
+  return state;
+};
+
+export default globalBreadcrumbReducers;

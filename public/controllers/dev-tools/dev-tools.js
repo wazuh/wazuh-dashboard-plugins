@@ -20,29 +20,25 @@ import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
+import { ApiRequest } from '../../react-services/api-request';
 
 export class DevToolsController {
   /**
    * Constructor
    * @param {*} $scope
-   * @param {*} apiReq
    * @param {*} $window
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} $document
    */
   constructor(
     $scope,
-    apiReq,
     $window,
-    appState,
     errorHandler,
     $document
   ) {
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.genericReq = GenericRequest;
     this.$window = $window;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.$document = $document;
     this.groups = [];

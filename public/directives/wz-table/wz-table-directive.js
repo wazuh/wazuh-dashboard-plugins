@@ -24,6 +24,10 @@ import { clickAction } from './lib/click-action';
 import { initTable } from './lib/init';
 import { checkGap } from './lib/check-gap';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
+import { TimeService } from '../../react-services/time-service';
+import RulesetHandler from '../../controllers/management/components/management/ruleset/utils/ruleset-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -43,19 +47,16 @@ app.directive('wzTable', function() {
     },
     controller(
       $scope,
-      apiReq,
       $timeout,
-      shareAgent,
       $location,
       errorHandler,
       wzTableFilter,
       $window,
-      appState,
-      groupHandler,
-      rulesetHandler,
       $sce,
-      timeService
     ) {
+      const rulesetHandler = RulesetHandler;
+      const timeService = TimeService;
+      const shareAgent = new ShareAgent();
       const wazuhConfig = new WazuhConfig();
       $scope.showColumns = false;
       $scope.scapepath = $scope.path.split('/').join('');
@@ -100,7 +101,7 @@ app.directive('wzTable', function() {
        */
       let realTime = false;
       const instance = new DataFactory(
-        apiReq,
+        ApiRequest,
         $scope.path,
         $scope.implicitFilter,
         $scope.implicitSort
@@ -429,7 +430,7 @@ app.directive('wzTable', function() {
       $scope.confirmRemoveAgent = async agent => {
         try {
           const group = instance.path.split('/').pop();
-          const data = await groupHandler.removeAgentFromGroup(group, agent);
+          const data = await GroupHandler.removeAgentFromGroup(group, agent);
           errorHandler.info(((data || {}).data || {}).data);
         } catch (error) {
           errorHandler.handle(error.message || error);

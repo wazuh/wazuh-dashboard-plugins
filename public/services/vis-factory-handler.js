@@ -11,35 +11,31 @@
  */
 import { AppState } from "../react-services/app-state";
 import { GenericRequest } from "../react-services/generic-request";
+import { TabVisualizations } from "../factories/tab-visualizations";
 
 export class VisFactoryService {
   /**
    * Class Constructor
    * @param {*} $rootScope
-   * @param {*} appState
    * @param {*} discoverPendingUpdates
    * @param {*} rawVisualizations
-   * @param {*} tabVisualizations
    * @param {*} loadedVisualizations
    * @param {*} commonData
    * @param {*} visHandlers
    */
   constructor(
     $rootScope,
-    appState,
     discoverPendingUpdates,
     rawVisualizations,
-    tabVisualizations,
     loadedVisualizations,
     commonData,
     visHandlers
   ) {
     this.$rootScope = $rootScope;
-    this.appState = appState;
     this.genericReq = GenericRequest;
     this.discoverPendingUpdates = discoverPendingUpdates;
     this.rawVisualizations = rawVisualizations;
-    this.tabVisualizations = tabVisualizations;
+    this.tabVisualizations = new TabVisualizations();
     this.loadedVisualizations = loadedVisualizations;
     this.commonData = commonData;
     this.visHandlers = visHandlers;
