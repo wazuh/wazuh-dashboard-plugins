@@ -28,6 +28,8 @@ import {
   EuiCallOut,
   EuiPage
 } from '@elastic/eui';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../redux/store';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
 
@@ -39,6 +41,18 @@ export class WelcomeScreen extends Component {
     this.state = {
       extensions: this.props.extensions
     };
+  }
+
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      {},
+      { text: 'Overview', },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
+  componentDidMount() {
+    this.setGlobalBreadcrumb();
   }
 
   onButtonClick(btn) {
