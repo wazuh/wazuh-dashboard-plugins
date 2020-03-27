@@ -48,8 +48,11 @@ export class MainFim extends Component {
     this.state = {
       selectView: 'states',
     };
+    console.log(this.props)
   }
-
+  componentWillUnmount(){
+    store.dispatch(updateGlobalBreadcrumb());
+  }
   setGlobalBreadcrumb() {
     const breadcrumb = [
       {
@@ -60,8 +63,10 @@ export class MainFim extends Component {
         href: '/app/wazuh#/agents',
       },
       {
-        text: 'ip-10-0-0-246.us-west-1.compute.internal (001)',
-        href: '/app/wazuh#/agents?agent=001',
+        text: this.props.agent.name,
+        href: `/app/wazuh#/agents?agent=${this.props.agent.id}`,
+        // text: 'ip-10-0-0-246.us-west-1.compute.internal (001)',
+        // href: '/app/wazuh#/agents?agent=001',
         truncate: true,
       },
       {
@@ -81,7 +86,7 @@ export class MainFim extends Component {
         <EuiFlexItem>
           <EuiTitle size="s">
             <EuiHealth color="success">
-              <h1>Agent - <b>Integrity monitoring</b></h1>
+              <h1>{this.props.agent.name} - <b>Integrity monitoring</b></h1>
             </EuiHealth>
           </EuiTitle>
         </EuiFlexItem>
@@ -118,8 +123,8 @@ export class MainFim extends Component {
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
-        <EuiButton iconType="wrench">Configuration</EuiButton>
+      <EuiFlexItem grow={false} style={{marginLeft: 0}}>
+        <EuiButton fill={this.state.selectView === 'settings'}iconType="wrench" onClick={() => this.onSelectedTabChanged('settings')} style={{minWidth: 50}}>Configuration</EuiButton>
       </EuiFlexItem>
     );
   }
