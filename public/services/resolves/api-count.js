@@ -19,10 +19,11 @@
  * @param {*} $location Angular.js library for URL and paths manipulation.
  */
 import { AppState } from "../../react-services/app-state";
+import { GenericRequest } from "../../react-services/generic-request";
 
-export function apiCount($q, genericReq, $location) {
+export function apiCount($q, $location) {
   const deferred = $q.defer();
-  genericReq
+  GenericRequest
     .request('GET', '/hosts/apis')
     .then(async data => {
       if (!data || !data.data || !data.data.length)

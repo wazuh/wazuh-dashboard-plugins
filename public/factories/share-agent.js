@@ -15,9 +15,16 @@ export class ShareAgent {
    * Class constructor
    */
   constructor() {
+    if (!!ShareAgent.instance) {
+      return ShareAgent.instance;
+    }
+    
     this.agent = null;
     this.selectedGroup = null;
     this.targetLocation = null;
+
+    ShareAgent.instance = this;
+    return this;
   }
 
   /**

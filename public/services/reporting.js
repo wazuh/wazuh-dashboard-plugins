@@ -20,8 +20,7 @@ export class ReportingService {
     $rootScope,
     vis2png,
     rawVisualizations,
-    visHandlers,
-    genericReq,
+    visHandlers,    
     errorHandler,
   ) {
     this.$rootScope = $rootScope;
