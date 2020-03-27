@@ -20,7 +20,6 @@ import './region-maps';
 import './order-object-by';
 import { uiModules } from 'ui/modules';
 import { ConfigHandler } from './config-handler';
-import { TimeService } from './time-service';
 import { CheckDaemonsStatus } from './check-daemon-status';
 
 const app = uiModules.get('app/wazuh', []);
@@ -32,5 +31,4 @@ app
   .service('reportingService', ReportingService)
   .service('visFactoryService', VisFactoryService)
   .service('configHandler', ConfigHandler)
-  .service('timeService', TimeService)
   .service('checkDaemonsStatus', CheckDaemonsStatus);

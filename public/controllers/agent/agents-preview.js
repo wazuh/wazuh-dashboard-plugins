@@ -19,6 +19,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
+import { TimeService } from '../../react-services/time-service';
 
 export class AgentsPreviewController {
   /**
@@ -38,7 +39,6 @@ export class AgentsPreviewController {
     wzTableFilter,
     commonData,
     $window,
-    timeService
   ) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
@@ -53,7 +53,7 @@ export class AgentsPreviewController {
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
-    this.timeService = timeService;
+    this.timeService = TimeService;
   }
 
   /**

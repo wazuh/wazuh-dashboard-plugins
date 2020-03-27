@@ -24,6 +24,7 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
+import { TimeService } from '../../react-services/time-service';
 
 export class AgentsController {
   /**
@@ -48,7 +49,6 @@ export class AgentsController {
     visFactoryService,
     csvReq,
     wzTableFilter,
-    timeService
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -65,7 +65,7 @@ export class AgentsController {
     this.wzTableFilter = wzTableFilter;
     this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
-    this.timeService = timeService;
+    this.timeService = TimeService;
     this.genericReq = GenericRequest;
 
     // Config on-demand

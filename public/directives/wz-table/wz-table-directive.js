@@ -26,6 +26,7 @@ import { checkGap } from './lib/check-gap';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
+import { TimeService } from '../../react-services/time-service';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -52,8 +53,8 @@ app.directive('wzTable', function() {
       $window,
       rulesetHandler,
       $sce,
-      timeService
     ) {
+      const timeService = TimeService;
       const shareAgent = new ShareAgent();
       const wazuhConfig = new WazuhConfig();
       $scope.showColumns = false;
