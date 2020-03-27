@@ -21,6 +21,13 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
+import { TabVisualizations } from '../../factories/tab-visualizations';
+import { TimeService } from '../../react-services/time-service';
+import { GroupHandler } from "../../react-services/group-handler";
+import store from '../../redux/store';
+import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 
 export class AgentsController {
   /**
@@ -28,11 +35,7 @@ export class AgentsController {
    * @param {Object} $scope
    * @param {Object} $location
    * @param {Object} $rootScope
-   * @param {Object} appState
-   * @param {Object} apiReq
    * @param {Object} errorHandler
-   * @param {Object} tabVisualizations
-   * @param {Object} shareAgent
    * @param {Object} commonData
    * @param {Object} reportingService
    * @param {Object} visFactoryService
@@ -43,41 +46,34 @@ export class AgentsController {
     $scope,
     $location,
     $rootScope,
-    appState,
-    apiReq,
     errorHandler,
-    tabVisualizations,
-    shareAgent,
     commonData,
     reportingService,
     visFactoryService,
     csvReq,
     wzTableFilter,
-    groupHandler,
-    timeService
   ) {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.appState = appState;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
-    this.tabVisualizations = tabVisualizations;
+    this.tabVisualizations = new TabVisualizations();
     this.$scope.visualizations = visualizations;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.commonData = commonData;
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
-    this.groupHandler = groupHandler;
+    this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
-    this.timeService = timeService;
+    this.timeService = TimeService;
     this.genericReq = GenericRequest;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
-    this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
+    this.configurationHandler = new ConfigurationHandler(this.apiReq, errorHandler);
     this.$scope.currentConfig = null;
     this.$scope.configurationTab = '';
     this.$scope.configurationSubTab = '';
@@ -740,6 +736,13 @@ export class AgentsController {
 
       // Agent
       this.$scope.agent = agentInfo;
+      const breadcrumb = [
+        { text: '' },
+        { text: 'Agents', href: '/app/wazuh#/agents-preview' },
+        { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` },
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+      
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');

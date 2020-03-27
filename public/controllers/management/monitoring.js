@@ -13,23 +13,24 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiRequest } from '../../react-services/api-request';
+import { TabVisualizations } from '../../factories/tab-visualizations';
+import store from '../../redux/store';
+import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 
 export function ClusterController(
   $scope,
   $rootScope,
   $timeout,
   errorHandler,
-  apiReq,
   $window,
   $location,
   discoverPendingUpdates,
   rawVisualizations,
   loadedVisualizations,
   visHandlers,
-  tabVisualizations,
-  appState,
-  genericReq
 ) {
+  const tabVisualizations = new TabVisualizations()
   timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
@@ -118,7 +119,7 @@ export function ClusterController(
         monitoring: 1
       });
       $scope.currentNode = parameters.node;
-      const data = await apiReq.request('GET', '/cluster/healthcheck', {
+      const data = await ApiRequest.request('GET', '/cluster/healthcheck', {
         node: $scope.currentNode.name
       });
 
@@ -229,13 +230,20 @@ export function ClusterController(
    * This set some required settings at init
    */
   const load = async () => {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: 'Cluster' },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+
     try {
       visHandlers.removeAll();
       discoverPendingUpdates.removeAll();
       rawVisualizations.removeAll();
       loadedVisualizations.removeAll();
 
-      const status = await apiReq.request('GET', '/cluster/status', {});
+      const status = await ApiRequest.request('GET', '/cluster/status', {});
       $scope.status = status.data.data.running;
       if ($scope.status === 'no') {
         $scope.isClusterRunning = false;
@@ -244,11 +252,11 @@ export function ClusterController(
       }
 
       const data = await Promise.all([
-        apiReq.request('GET', '/cluster/nodes', {}),
-        apiReq.request('GET', '/cluster/config', {}),
-        apiReq.request('GET', '/version', {}),
-        apiReq.request('GET', '/agents', { limit: 1 }),
-        apiReq.request('GET', '/cluster/healthcheck', {})
+        ApiRequest.request('GET', '/cluster/nodes', {}),
+        ApiRequest.request('GET', '/cluster/config', {}),
+        ApiRequest.request('GET', '/version', {}),
+        ApiRequest.request('GET', '/agents', { limit: 1 }),
+        ApiRequest.request('GET', '/cluster/healthcheck', {})
       ]);
 
       const result = data.map(item => ((item || {}).data || {}).data || false);

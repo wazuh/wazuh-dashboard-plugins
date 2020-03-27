@@ -13,12 +13,11 @@ import chrome from 'ui/chrome';
 import moment from 'moment-timezone'
 
 export class TimeService {
-  constructor() { }
   /**
    * Returns given date adding the timezone offset
    * @param {string} date Date
    */
-  offset(d) {
+  static offset(d) {
     try {
       const dateUTC = moment.utc(d);
       const kibanaTz = chrome.getUiSettingsClient().get('dateFormat:tz');

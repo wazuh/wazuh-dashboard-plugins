@@ -17,47 +17,43 @@ import { clickAction } from '../../directives/wz-table/lib/click-action';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
+import { TimeService } from '../../react-services/time-service';
 
 export class AgentsPreviewController {
   /**
    * Class constructor
    * @param {Object} $scope
-   * @param {Object} appState
    * @param {Object} $location
    * @param {Object} errorHandler
    * @param {Object} csvReq
-   * @param {Object} shareAgent
    * @param {Object} wzTableFilter
    */
   constructor(
     $scope,
-    apiReq,
-    appState,
     $location,
     $route,
     errorHandler,
     csvReq,
-    shareAgent,
     wzTableFilter,
     commonData,
     $window,
-    timeService
   ) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
-    this.apiReq = apiReq;
-    this.appState = appState;
+    this.apiReq = ApiRequest;
     this.$location = $location;
     this.$route = $route;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
-    this.timeService = timeService;
+    this.timeService = TimeService;
   }
 
   /**

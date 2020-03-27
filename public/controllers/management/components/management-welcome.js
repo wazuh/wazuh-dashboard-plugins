@@ -22,6 +22,8 @@ import {
   EuiTitle,
   EuiPage
 } from '@elastic/eui';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../redux/store';
 
 import {
   updateManagementSection,
@@ -34,6 +36,18 @@ class WelcomeScreen extends Component {
     super(props);
 
     this.state = {};
+  }
+
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Management', },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
+  componentDidMount() {
+    this.setGlobalBreadcrumb();
   }
 
   switchSection(section) {

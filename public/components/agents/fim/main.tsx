@@ -50,9 +50,7 @@ export class MainFim extends Component {
     };
     console.log(this.props)
   }
-  componentWillUnmount(){
-    store.dispatch(updateGlobalBreadcrumb());
-  }
+
   setGlobalBreadcrumb() {
     const breadcrumb = [
       {
@@ -60,7 +58,7 @@ export class MainFim extends Component {
       },
       {
         text: 'Agents',
-        href: '/app/wazuh#/agents',
+        href: "#/agents-preview"
       },
       {
         text: this.props.agent.name,

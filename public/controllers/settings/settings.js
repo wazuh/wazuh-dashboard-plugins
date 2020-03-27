@@ -16,6 +16,8 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzMisc } from '../../factories/misc';
 import { ApiCheck } from '../../react-services/wz-api-check';
+import store from '../../redux/store';
+import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 
 export class SettingsController {
   /**
@@ -23,23 +25,18 @@ export class SettingsController {
    * @param {*} $scope
    * @param {*} $window
    * @param {*} $location
-   * @param {*} appState
-   * @param {*} genericReq
    * @param {*} errorHandler
    */
   constructor(
     $scope,
     $window,
     $location,
-    appState,
-    genericReq,
     errorHandler,
   ) {
     this.kibanaVersion = (kibana || {}).version || false;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
-    this.appState = appState;
     this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.wzMisc = new WzMisc();
@@ -65,6 +62,11 @@ export class SettingsController {
    */
   async $onInit() {
     try {
+      const breadcrumb = [
+        { text: '' },
+        { text: 'App Settings', },
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       // Set component props
       this.setComponentProps();
       // Loading data

@@ -1,2 +1,0 @@
-<div flex="auto" layout="column" ng-controller="managementConfigurationController as mconfigctrl" ng-if="mctrl.tab === 'configuration'"
-    ng-init="mconfigctrl.switchConfigurationTab('welcome', false)">
