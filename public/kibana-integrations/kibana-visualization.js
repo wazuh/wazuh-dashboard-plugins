@@ -18,6 +18,8 @@ import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
 
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { GenericRequest } from '../react-services/generic-request';
+import { TabVisualizations } from '../factories/tab-visualizations';
 const app = getAngularModule('app/wazuh');
 let lockFields = false;
 
@@ -34,11 +36,10 @@ app.directive('kbnVis', function () {
       errorHandler,
       rawVisualizations,
       loadedVisualizations,
-      tabVisualizations,
       discoverPendingUpdates,
-      visHandlers,
-      genericReq
+      visHandlers
     ) {
+      const tabVisualizations = new TabVisualizations();
       let rendered = false;
       let visualization = null;
       let visHandler = null;
@@ -159,7 +160,7 @@ app.directive('kbnVis', function () {
             if (!lockFields) {
               try {
                 lockFields = true;
-                await genericReq.request(
+                await GenericRequest.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}

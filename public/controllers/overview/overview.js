@@ -16,6 +16,8 @@ import { TabDescription } from '../../../server/reporting/tab-description';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
+import { TabVisualizations } from '../../factories/tab-visualizations';
 
 export class OverviewController {
   /**
@@ -23,10 +25,7 @@ export class OverviewController {
    * @param {*} $scope
    * @param {*} $location
    * @param {*} $rootScope
-   * @param {*} appState
    * @param {*} errorHandler
-   * @param {*} apiReq
-   * @param {*} tabVisualizations
    * @param {*} commonData
    * @param {*} reportingService
    * @param {*} visFactoryService
@@ -35,10 +34,7 @@ export class OverviewController {
     $scope,
     $location,
     $rootScope,
-    appState,
     errorHandler,
-    apiReq,
-    tabVisualizations,
     commonData,
     reportingService,
     visFactoryService,
@@ -46,10 +42,9 @@ export class OverviewController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.appState = appState;
     this.errorHandler = errorHandler;
-    this.apiReq = apiReq;
-    this.tabVisualizations = tabVisualizations;
+    this.apiReq = ApiRequest;
+    this.tabVisualizations = new TabVisualizations();
     this.commonData = commonData;
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;

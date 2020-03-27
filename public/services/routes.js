@@ -37,6 +37,7 @@ import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { WzMisc } from '../factories/misc';
 import { ApiCheck } from '../react-services/wz-api-check';
+import { AppState } from '../react-services/app-state';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -52,7 +53,6 @@ function ip(
   $window,
   $location,
   Private,
-  appState,
   errorHandler
 ) {
   const wzMisc = new WzMisc();
@@ -63,7 +63,7 @@ function ip(
     $window,
     $location,
     Private,
-    appState,
+    AppState,
     GenericRequest,
     errorHandler,
     wzMisc
@@ -76,7 +76,6 @@ function nestedResolve(
   $rootScope,
   $location,
   $window,
-  appState
 ) {
   const wzMisc = new WzMisc();
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
@@ -90,7 +89,7 @@ function nestedResolve(
       $q,
       $window,
       ApiCheck,
-      appState,
+      AppState,
       GenericRequest,
       errorHandler,
       wzMisc,
