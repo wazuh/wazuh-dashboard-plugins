@@ -348,8 +348,14 @@ export class AgentsController {
       this.$scope.$applyAsync();
     };
 
+
     this.$scope.switchNewFim = () => {
-      this.$scope.showNewFim = !this.$scope.showNewFim;
+      this.$scope.showNewFim = !this.$scope.showNewFim; 
+      if(this.$scope.showNewFim){
+        this.$scope.fimProps = {
+          agent: this.$scope.agent
+        }
+      }
       this.$scope.$applyAsync();
     };
 
