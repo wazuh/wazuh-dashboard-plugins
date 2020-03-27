@@ -11,13 +11,13 @@
  */
 import { WazuhConfig } from "../../react-services/wazuh-config";
 import { ApiRequest } from "../../react-services/api-request";
+import { ShareAgent } from "../../factories/share-agent";
 
 export class GroupsController {
   constructor(
     $scope,
     $location,
     errorHandler,
-    shareAgent,
     groupHandler,
     reportingService
   ) {
@@ -25,7 +25,7 @@ export class GroupsController {
     this.location = $location;
     this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.groupHandler = groupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.reportingService = reportingService;

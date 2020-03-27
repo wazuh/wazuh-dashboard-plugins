@@ -22,6 +22,7 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
 
 export class AgentsController {
   /**
@@ -31,7 +32,6 @@ export class AgentsController {
    * @param {Object} $rootScope
    * @param {Object} errorHandler
    * @param {Object} tabVisualizations
-   * @param {Object} shareAgent
    * @param {Object} commonData
    * @param {Object} reportingService
    * @param {Object} visFactoryService
@@ -44,7 +44,6 @@ export class AgentsController {
     $rootScope,
     errorHandler,
     tabVisualizations,
-    shareAgent,
     commonData,
     reportingService,
     visFactoryService,
@@ -60,7 +59,7 @@ export class AgentsController {
     this.errorHandler = errorHandler;
     this.tabVisualizations = tabVisualizations;
     this.$scope.visualizations = visualizations;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.commonData = commonData;
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;

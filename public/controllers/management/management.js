@@ -13,19 +13,18 @@ import { TabNames } from '../../utils/tab-names';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
 
 export class ManagementController {
   /**
    * Class constructor
    * @param {*} $scope
    * @param {*} $location
-   * @param {*} shareAgent
    */
   constructor(
     $scope,
     $rootScope,
     $location,
-    shareAgent,
     configHandler,
     errorHandler,
     $interval,
@@ -34,7 +33,7 @@ export class ManagementController {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.wazuhConfig = new WazuhConfig();
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;

@@ -18,6 +18,7 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
 
 export class AgentsPreviewController {
   /**
@@ -26,7 +27,6 @@ export class AgentsPreviewController {
    * @param {Object} $location
    * @param {Object} errorHandler
    * @param {Object} csvReq
-   * @param {Object} shareAgent
    * @param {Object} wzTableFilter
    */
   constructor(
@@ -35,7 +35,6 @@ export class AgentsPreviewController {
     $route,
     errorHandler,
     csvReq,
-    shareAgent,
     wzTableFilter,
     commonData,
     $window,
@@ -48,7 +47,7 @@ export class AgentsPreviewController {
     this.$route = $route;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
     this.wazuhConfig = new WazuhConfig();

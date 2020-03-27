@@ -15,7 +15,6 @@ import { TabVisualizations } from './tab-visualizations';
 import { DiscoverPendingUpdates } from './discover-pending-updates';
 import { VisHandlers } from './vis-handlers';
 import { Vis2PNG } from './vis2png';
-import { ShareAgent } from './share-agent';
 import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
@@ -27,4 +26,3 @@ app
   .service('discoverPendingUpdates', DiscoverPendingUpdates)
   .service('visHandlers', VisHandlers)
   .service('vis2png', Vis2PNG)
-  .service('shareAgent', ShareAgent)

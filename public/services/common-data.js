@@ -11,6 +11,7 @@
  */
 import { AppState } from "../react-services/app-state";
 import { GenericRequest } from "../react-services/generic-request";
+import { ShareAgent } from "../factories/share-agent";
 
 export class CommonData {
   /**
@@ -19,7 +20,6 @@ export class CommonData {
    * @param {*} $timeout
    * @param {*} errorHandler
    * @param {*} $location
-   * @param {*} shareAgent
    * @param {*} globalState
    */
   constructor(
@@ -27,7 +27,6 @@ export class CommonData {
     $timeout,
     errorHandler,
     $location,
-    shareAgent,
     globalState
   ) {
     this.$rootScope = $rootScope;
@@ -35,7 +34,7 @@ export class CommonData {
     this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.$location = $location;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.globalState = globalState;
     this.savedTimefilter = null;
     this.refreshInterval = { pause: true, value: 0 };
