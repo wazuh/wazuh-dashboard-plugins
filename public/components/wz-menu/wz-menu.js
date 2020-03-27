@@ -49,6 +49,11 @@ class WzMenu extends Component {
     this.indexPatterns = npStart.plugins.data.indexPatterns;
   }
 
+  async componentDidMount() {
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
+  }
+
   showToast = (color, title, text, time) => {
     toastNotifications.add({
       color: color,
@@ -165,7 +170,7 @@ class WzMenu extends Component {
       if (!AppState.getPatternSelector()) return;
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
-      location.reload();
+      this.router.reload();
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
     }
@@ -212,9 +217,7 @@ class WzMenu extends Component {
           { name: apiData[0].cluster_info.manager, id: apiId }
         ));
       if (this.state.currentMenuTab !== 'wazuh-dev') {
-        const $injector = await chrome.dangerouslyGetActiveInjector();
-        const tmpRouter = $injector.get('$route');
-        tmpRouter.reload();
+        this.router.reload();
       }
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
