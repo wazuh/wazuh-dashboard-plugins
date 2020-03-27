@@ -1,5 +1,5 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-    <div ng-if="!showNewFim">
+    <div ng-if="!showNewFim && tab !== 'welcome'">
         <!-- Navigation section -->
         <div layout="row" layout-align="start center" ng-if="agent">
             <!-- Breadcrumbs -->
@@ -12,13 +12,6 @@
                         ({{agent.id}})</span>
                     <span> / </span>
                     <span>{{ tabNames[tab] }}</span>
-                </div>
-
-                <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
-                <div ng-if="tab === 'welcome'">
-                    <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
-                    <span> / </span>
-                    <span>{{agent.name}} ({{agent.id}})</span>
                 </div>
 
                 <div ng-if="tab === 'configuration' && configurationTab === 'welcome'">
@@ -44,14 +37,8 @@
             </div>
             <!-- End breadcrumbs -->
 
-            <!-- Agent status section -->
-            <div ng-if="agent.status">
-                <react-component name="EuiHealth"
-                    props="{color: agent.status === 'Active' ? 'success' : 'danger', children: agent.status}" />
-            </div>
-            <!-- End agent status section -->
             <!-- Separator -->
-            <span flex></span>
+            <span ng-show="tab !== 'welcome'" flex></span>
             <!-- End separator -->
 
             <!-- Reporting button section -->

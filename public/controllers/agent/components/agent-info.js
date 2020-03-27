@@ -12,10 +12,9 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel } from '@elastic/eui';
 
-export class Stats extends Component {
+export class AgentInfo extends Component {
   constructor(props) {
     super(props);
 
@@ -40,32 +39,23 @@ export class Stats extends Component {
   }
 
   render() {
+    const { agent } = this.props;
     const stats = this.buildStats([
-      { title: this.props.id, description: 'ID', style: { maxWidth: 100 } },
-      { title: this.props.ip, description: 'IP' },
-      { title: this.props.version, description: 'Version' },
+      { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
+      { title: agent.ip, description: 'IP' },
+      { title: agent.version, description: 'Version' },
       {
-        title: this.props.agentOS,
+        title: agent.agentOS,
         description: 'OS',
         style: { minWidth: 400 }
       },
-      { title: this.props.dateAdd, description: 'Registration date' },
-      { title: this.props.lastKeepAlive, description: 'Last keep alive' }
+      { title: agent.dateAdd, description: 'Registration date' },
+      { title: agent.lastKeepAlive, description: 'Last keep alive' }
     ]);
     return (
-      <EuiPanel betaBadgeLabel={this.props.name}>
+      <EuiPanel>
         <EuiFlexGroup>{stats}</EuiFlexGroup>
       </EuiPanel>
     );
   }
 }
-
-Stats.propTypes = {
-  id: PropTypes.string,
-  ip: PropTypes.string,
-  version: PropTypes.string,
-  agentOS: PropTypes.string,
-  dateAdd: PropTypes.any,
-  lastKeepAlive: PropTypes.any,
-  name: PropTypes.string
-};
