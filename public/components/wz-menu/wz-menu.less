@@ -27,7 +27,6 @@ wz-menu {
     border-bottom: 1px solid #d3dae6;
     font-size: 14px;
     position: relative !important;
-    height: 50px;
 }
 
 .wz-menu a:focus{
@@ -35,11 +34,35 @@ wz-menu {
 }
 
 .wz-menu-wrapper{
-    width: 100%;
+    margin-top: -16px;
+    margin-left: -16px;
+    margin-bottom: -16px;
+    display: flex;
+}
+
+.wz-menu-left-side{
+    width: 200px;
+    background: #fafbfd;
+    padding: 16px;
+    border-right: 1px solid #d3dae6;
+}
+
+.wz-menu-right-side{
+    padding: 16px;
+}
+
+.navBarLogo {
+    width: 100px;
+    filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
+  }
+
+.wz-menu-popover{
     position: fixed;
-    padding-left: 48px;
-    z-index: 999;
-    left: 0;
+    top: 56px !important;
+    left: 48px !important;
+    z-index: 8!important;
+    border-radius: 0px 0px 4px 0px;
+    max-height: unset!important;
 }
 
 @media only screen and (max-width: 767px){
