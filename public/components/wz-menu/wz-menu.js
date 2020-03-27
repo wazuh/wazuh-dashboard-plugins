@@ -18,7 +18,8 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
-import Management from './management';
+import Management from './wz-menu-management';
+import Overview from './wz-menu-overview';
 import { npStart } from 'ui/new_platform'
 import { toastNotifications } from 'ui/notify';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -41,7 +42,7 @@ class WzMenu extends Component {
       patternList: [],
       currentSelectedPattern: "",
       isManagementPopoverOpen: false,
-      isVisualizePopoverOpen: false
+      isOverviewPopoverOpen: false,
     };
     this.store = store;
     this.genericReq = GenericRequest;
@@ -119,7 +120,7 @@ class WzMenu extends Component {
 
   async load() {
     try {
-      this.setState({ showMenu: true });
+      this.setState({ showMenu: true, isOverviewPopoverOpen: false , isManagementPopoverOpen: false });
 
       const currentTab = this.getCurrentTab();
       if (currentTab !== this.state.currentMenuTab) {
@@ -268,14 +269,38 @@ class WzMenu extends Component {
   }
 
   managementPopoverToggle() {
-    this.setState(state => {
-      return { isManagementPopoverOpen: !state.isManagementPopoverOpen }
-    });
+    if(!this.state.isManagementPopoverOpen){
+      this.setState(state => {
+        return { isManagementPopoverOpen: true, isOverviewPopoverOpen: false }
+      });
+    }
   }
 
   onClickManagementButton() {
     this.setMenuItem('manager');
     this.managementPopoverToggle();
+  }
+
+  overviewPopoverToggle() {
+    if(!this.state.isOverviewPopoverOpen){
+      this.setState(state => {
+        return { isOverviewPopoverOpen: true, isManagementPopoverOpen:false  }
+      });
+    }
+  }
+
+  onClickOverviewButton() {
+    this.setMenuItem('overview');
+    this.overviewPopoverToggle();
+  }
+
+  switchMenuOpened = () => {
+    if(!this.state.menuOpened && this.state.currentMenuTab === "manager"){
+      this.managementPopoverToggle();      
+    }else{
+      this.overviewPopoverToggle();      
+    }
+    this.setState({ menuOpened: !this.state.menuOpened });
   }
 
   render() {
@@ -285,10 +310,10 @@ class WzMenu extends Component {
           <EuiButtonEmpty
             className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
             color="text"
-            href="#/overview"
-            onClick={() => { this.setMenuItem('overview'); this.setState({ menuOpened: false }) }} >
+            onClick={this.onClickOverviewButton.bind(this)}>
             <EuiIcon type='visualizeApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Overview</span>
+            <span className="wz-menu-button-title ">Overview</span> &nbsp; 
+            {!this.state.isOverviewPopoverOpen && ( <EuiIcon color='subdued' type='arrowRight' />)}
           </EuiButtonEmpty>
 
           <EuiButtonEmpty
@@ -296,7 +321,8 @@ class WzMenu extends Component {
             color="text"
             onClick={this.onClickManagementButton.bind(this)}>
             <EuiIcon type='managementApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Management</span>
+            <span className="wz-menu-button-title ">Management</span> &nbsp;
+            {!this.state.isManagementPopoverOpen && ( <EuiIcon color='subdued' type='arrowRight' />)}
           </EuiButtonEmpty>
 
           <EuiButtonEmpty
@@ -348,7 +374,12 @@ class WzMenu extends Component {
         <div className="wz-menu-right-side">
           {this.state.isManagementPopoverOpen &&
             (
-              <Management></Management>
+              <Management closePopover={() => this.setState({ menuOpened: false })}></Management>
+            )}
+
+          {this.state.isOverviewPopoverOpen &&
+            (
+              <Overview closePopover={() => this.setState({ menuOpened: false })}></Overview>
             )}
         </div>
       </div>
@@ -356,7 +387,7 @@ class WzMenu extends Component {
 
     const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
     const mainButton = (
-      <button onClick={() => this.setState({ menuOpened: !this.state.menuOpened })}>
+      <button onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup direction="row" style={{ paddingTop: 5 }}>
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
             <img src={logotype_url} className="navBarLogo" alt=""></img>

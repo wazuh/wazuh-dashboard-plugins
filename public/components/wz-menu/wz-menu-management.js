@@ -16,27 +16,10 @@ import {
   EuiSideNav,
   EuiIcon
 } from '@elastic/eui';
-import {
-  updateRulesetSection,
-  updateLoadingStatus,
-  toggleShowFiles,
-  cleanFilters,
-  updateAdminMode,
-  updateError,
-  updateIsProcessing,
-  updatePageIndex,
-  updateSortDirection,
-  updateSortField,
-  cleanInfo,
-} from '../../redux/actions/rulesetActions';
-import {
-  updateManagementSection,
-} from '../../redux/actions/managementActions';
-import checkAdminMode from '../../controllers/management/components/management/ruleset/utils/check-admin-mode';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
-class WzManagementSideMenu extends Component {
+class WzMenuManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -78,38 +61,10 @@ class WzManagementSideMenu extends Component {
   }
 
   componentDidMount() {
-    // Fetch the data in the first mount
-    if (['rules', 'decoders', 'lists'].includes(this.state.selectedItemName)) {
-      this.fetchData(this.managementSections.rules.id);
-    }
-    this.props.updateManagementSection(this.state.selectedItemName);
-  }
-
-  /**
- * Fetch the data for a section: rules, decoders, lists...
- * @param {String} newSection
- */
-  async fetchData(newSection) {
-    try {
-      const currentSection = this.props.state.section;
-      if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
-      this.props.changeRulesetSection(newSection);
-      this.props.changeSection(newSection);
-      this.props.cleanInfo();
-      this.props.updateLoadingStatus(true);
-      //Set the admin mode
-      const admin = await checkAdminMode();
-      this.props.updateAdminMode(admin);
-      this.props.toggleShowFiles(false);
-      this.props.changeRulesetSection(newSection);
-      this.props.changeSection(newSection);
-    } catch (error) {
-      this.props.updateError(error);
-    }
   }
 
   clickMenuItem = section => {
-    this.props.managementPopoverToggle();
+    this.props.closePopover();
     window.location.href = `#/manager/${section}?tab=${section}`;
   };
 
@@ -119,7 +74,7 @@ class WzManagementSideMenu extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      isSelected: this.state.selectedItemName === item.id,
+      isSelected: this.props.state.section === item.id,
       onClick: () => this.clickMenuItem(item.id),
     };
   };
@@ -180,22 +135,5 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    changeRulesetSection: section => dispatch(updateRulesetSection(section)),
-    changeSection: section => dispatch(updateManagementSection(section)),
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    toggleShowFiles: status => dispatch(toggleShowFiles(status)),
-    cleanFilters: () => dispatch(cleanFilters()),
-    updateAdminMode: status => dispatch(updateAdminMode(status)),
-    updateError: error => dispatch(updateError(error)),
-    updateIsProcessing: isPorcessing => dispatch(updateIsProcessing(isPorcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: sortField => dispatch(updateSortField(sortField)),
-    updateManagementSection: section => dispatch(updateManagementSection(section)),
-    cleanInfo: () => dispatch(cleanInfo()),
-  }
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzManagementSideMenu);
+export default connect(mapStateToProps, null)(WzMenuManagement);
