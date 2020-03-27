@@ -18,6 +18,7 @@ import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { ApiRequest } from '../../react-services/api-request';
 import { GroupHandler } from '../../react-services/group-handler';
+import RulesetHandler from '../../controllers/management/components/management/ruleset/utils/ruleset-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -37,11 +38,11 @@ app.directive('wzXmlFileEditor', function() {
       $document,
       $location,
       errorHandler,
-      rulesetHandler,
       configHandler,
       $rootScope,
       $window
     ) {
+      const rulesetHandler = RulesetHandler;
       const groupHandler = GroupHandler;
       const window = $window;
       const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');

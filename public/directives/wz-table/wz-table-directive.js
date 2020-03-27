@@ -27,6 +27,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
+import RulesetHandler from '../../controllers/management/components/management/ruleset/utils/ruleset-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -51,9 +52,9 @@ app.directive('wzTable', function() {
       errorHandler,
       wzTableFilter,
       $window,
-      rulesetHandler,
       $sce,
     ) {
+      const rulesetHandler = RulesetHandler;
       const timeService = TimeService;
       const shareAgent = new ShareAgent();
       const wazuhConfig = new WazuhConfig();

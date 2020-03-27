@@ -17,6 +17,7 @@ import { checkGap } from '../wz-table/lib/check-gap';
 import * as FileSaver from '../../services/file-saver';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import RulesetHandler from '../../controllers/management/components/management/ruleset/utils/ruleset-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -32,9 +33,9 @@ app.directive('wzListManage', function() {
       $scope,
       errorHandler,
       $filter,
-      rulesetHandler,
       csvReq
     ) {
+      const rulesetHandler = RulesetHandler;
       const wazuhConfig = new WazuhConfig();
       const clusterInfo = AppState.getClusterInfo();
 
