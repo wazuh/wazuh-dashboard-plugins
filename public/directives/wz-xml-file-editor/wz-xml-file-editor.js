@@ -17,6 +17,7 @@ import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
 import { AppState } from '../../react-services/app-state';
 import { ApiRequest } from '../../react-services/api-request';
+import { GroupHandler } from '../../react-services/group-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -36,12 +37,12 @@ app.directive('wzXmlFileEditor', function() {
       $document,
       $location,
       errorHandler,
-      groupHandler,
       rulesetHandler,
       configHandler,
       $rootScope,
       $window
     ) {
+      const groupHandler = GroupHandler;
       const window = $window;
       const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
       $scope.targetNameShown = $scope.targetName;

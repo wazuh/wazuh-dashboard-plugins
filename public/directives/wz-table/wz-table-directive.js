@@ -50,7 +50,6 @@ app.directive('wzTable', function() {
       errorHandler,
       wzTableFilter,
       $window,
-      groupHandler,
       rulesetHandler,
       $sce,
       timeService
@@ -429,7 +428,7 @@ app.directive('wzTable', function() {
       $scope.confirmRemoveAgent = async agent => {
         try {
           const group = instance.path.split('/').pop();
-          const data = await groupHandler.removeAgentFromGroup(group, agent);
+          const data = await GroupHandler.removeAgentFromGroup(group, agent);
           errorHandler.info(((data || {}).data || {}).data);
         } catch (error) {
           errorHandler.handle(error.message || error);

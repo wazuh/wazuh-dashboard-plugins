@@ -19,21 +19,19 @@ import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
 import { uiModules } from 'ui/modules';
-import { GroupHandler } from './group-handler';
 import { RulesetHandler } from './ruleset-handler';
 import { ConfigHandler } from './config-handler';
 import { TimeService } from './time-service';
 import { CheckDaemonsStatus } from './check-daemon-status';
 
 const app = uiModules.get('app/wazuh', []);
-
+ 
 app
   .service('errorHandler', ErrorHandler)
   .service('csvReq', CSVRequest)
   .service('commonData', CommonData)
   .service('reportingService', ReportingService)
   .service('visFactoryService', VisFactoryService)
-  .service('groupHandler', GroupHandler)
   .service('rulesetHandler', RulesetHandler)
   .service('configHandler', ConfigHandler)
   .service('timeService', TimeService)

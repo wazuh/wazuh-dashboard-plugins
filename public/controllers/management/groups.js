@@ -12,13 +12,13 @@
 import { WazuhConfig } from "../../react-services/wazuh-config";
 import { ApiRequest } from "../../react-services/api-request";
 import { ShareAgent } from "../../factories/share-agent";
+import { GroupHandler } from "../../react-services/group-handler";
 
 export class GroupsController {
   constructor(
     $scope,
     $location,
     errorHandler,
-    groupHandler,
     reportingService
   ) {
     this.scope = $scope;
@@ -26,7 +26,7 @@ export class GroupsController {
     this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
     this.shareAgent = new ShareAgent();
-    this.groupHandler = groupHandler;
+    this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.reportingService = reportingService;
   }

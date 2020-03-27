@@ -48,7 +48,6 @@ export class AgentsController {
     visFactoryService,
     csvReq,
     wzTableFilter,
-    groupHandler,
     timeService
   ) {
     this.$scope = $scope;
@@ -64,7 +63,7 @@ export class AgentsController {
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
-    this.groupHandler = groupHandler;
+    this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.timeService = timeService;
     this.genericReq = GenericRequest;
