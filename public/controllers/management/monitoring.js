@@ -15,6 +15,8 @@ import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
+import store from '../../redux/store';
+import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 
 export function ClusterController(
   $scope,
@@ -228,6 +230,13 @@ export function ClusterController(
    * This set some required settings at init
    */
   const load = async () => {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: 'Cluster' },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+
     try {
       visHandlers.removeAll();
       discoverPendingUpdates.removeAll();

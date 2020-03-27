@@ -16,7 +16,8 @@ import WzRulesetTable from './ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-
+import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../../../redux/store';
 
 class WzRulesetOverview extends Component {
   constructor(props) {
@@ -28,6 +29,18 @@ class WzRulesetOverview extends Component {
     }
   }
 
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: this.sectionNames[this.props.state.section] },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
+  componentDidUpdate() {
+    this.setGlobalBreadcrumb();
+  }
 
   clickActionFilterBar(obj) {
     console.log('clicking ', obj)
@@ -56,11 +69,11 @@ class WzRulesetOverview extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-            <WzRulesetSearchBar />
+          <WzRulesetSearchBar />
           <EuiFlexGroup>
             <EuiFlexItem>
               <WzRulesetTable
-                  request={`${section}`}
+                request={`${section}`}
               />
             </EuiFlexItem>
           </EuiFlexGroup>

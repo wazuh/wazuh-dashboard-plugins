@@ -21,7 +21,8 @@ import {
 import 'brace/mode/less';
 import 'brace/theme/github';
 import { ApiRequest } from '../../../../../react-services/api-request';
-
+import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../../../redux/store';
 
 export default class WzLogs extends Component {
     constructor(props) {
@@ -53,9 +54,17 @@ export default class WzLogs extends Component {
         this.forceUpdate();
     }
 
-
+    setGlobalBreadcrumb() {
+        const breadcrumb = [
+            { text: '' },
+            { text: 'Management', href: '/app/wazuh#/manager' },
+            { text: 'Logs' },
+        ];
+        store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    }
 
     async componentDidMount() {
+        this.setGlobalBreadcrumb();
         this.height = window.innerHeight - this.offset;
         window.addEventListener('resize', this.updateHeight);
         this.setState({ isLoading: true })
