@@ -17,6 +17,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
+import { TabVisualizations } from '../../factories/tab-visualizations';
 
 export class OverviewController {
   /**
@@ -25,7 +26,6 @@ export class OverviewController {
    * @param {*} $location
    * @param {*} $rootScope
    * @param {*} errorHandler
-   * @param {*} tabVisualizations
    * @param {*} commonData
    * @param {*} reportingService
    * @param {*} visFactoryService
@@ -35,7 +35,6 @@ export class OverviewController {
     $location,
     $rootScope,
     errorHandler,
-    tabVisualizations,
     commonData,
     reportingService,
     visFactoryService,
@@ -45,7 +44,7 @@ export class OverviewController {
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
     this.apiReq = ApiRequest;
-    this.tabVisualizations = tabVisualizations;
+    this.tabVisualizations = new TabVisualizations();
     this.commonData = commonData;
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;

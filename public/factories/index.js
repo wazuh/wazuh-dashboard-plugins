@@ -11,7 +11,6 @@
  */
 import { RawVisualizations } from './raw-visualizations';
 import { LoadedVisualizations } from './loaded-visualizations';
-import { TabVisualizations } from './tab-visualizations';
 import { DiscoverPendingUpdates } from './discover-pending-updates';
 import { VisHandlers } from './vis-handlers';
 import { Vis2PNG } from './vis2png';
@@ -22,7 +21,6 @@ const app = uiModules.get('app/wazuh', []);
 app
   .service('rawVisualizations', RawVisualizations)
   .service('loadedVisualizations', LoadedVisualizations)
-  .service('tabVisualizations', TabVisualizations)
   .service('discoverPendingUpdates', DiscoverPendingUpdates)
   .service('visHandlers', VisHandlers)
   .service('vis2png', Vis2PNG)

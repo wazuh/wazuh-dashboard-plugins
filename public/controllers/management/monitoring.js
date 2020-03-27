@@ -14,6 +14,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
+import { TabVisualizations } from '../../factories/tab-visualizations';
 
 export function ClusterController(
   $scope,
@@ -26,8 +27,8 @@ export function ClusterController(
   rawVisualizations,
   loadedVisualizations,
   visHandlers,
-  tabVisualizations,
 ) {
+  const tabVisualizations = new TabVisualizations()
   timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
