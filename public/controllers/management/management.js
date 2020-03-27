@@ -14,6 +14,7 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
+import RulesetHandler from './components/management/ruleset/utils/ruleset-handler';
 
 export class ManagementController {
   /**
@@ -28,7 +29,6 @@ export class ManagementController {
     configHandler,
     errorHandler,
     $interval,
-    rulesetHandler
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -48,7 +48,8 @@ export class ManagementController {
     this.currentGroup = false;
     this.logtestOpened = false;
     this.uploadOpened = false;
-    this.rulesetHandler = rulesetHandler;
+    this.rulesetHandler = RulesetHandler;
+    
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;

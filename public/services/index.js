@@ -19,7 +19,6 @@ import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
 import { uiModules } from 'ui/modules';
-import { RulesetHandler } from './ruleset-handler';
 import { ConfigHandler } from './config-handler';
 import { TimeService } from './time-service';
 import { CheckDaemonsStatus } from './check-daemon-status';
@@ -32,7 +31,6 @@ app
   .service('commonData', CommonData)
   .service('reportingService', ReportingService)
   .service('visFactoryService', VisFactoryService)
-  .service('rulesetHandler', RulesetHandler)
   .service('configHandler', ConfigHandler)
   .service('timeService', TimeService)
   .service('checkDaemonsStatus', CheckDaemonsStatus);
