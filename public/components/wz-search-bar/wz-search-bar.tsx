@@ -10,12 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, KeyboardEvent } from 'react';
-import PropTypes, {InferProps} from 'prop-types';
 import { EuiSuggest } from '../eui-suggest';
 import { WzSearchFormatSelector } from './wz-search-format-selector';
 import { WzSearchBadges } from './wz-search-badges';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { QHandler, qSuggests } from './lib/q-handler';
+import { QTagsHandler } from './lib/q-tags-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
 import { WzSearchButtons, filterButton } from './wz-search-buttons';
 
@@ -25,9 +25,9 @@ export interface suggestItem {
   description?: string
 }
 
-export default class WzSearchBar extends Component {
+export class WzSearchBar extends Component {
   state: {
-    searchFormat: string
+    searchFormat: 'API' | '?Q' | 'qTags'
     suggestions: suggestItem[]
     isProcessing: boolean
     inputValue: string
@@ -38,14 +38,14 @@ export default class WzSearchBar extends Component {
     filters: {}
     isPopoverOpen: boolean
   };
-  suggestHandler!: QHandler | ApiHandler;
+  suggestHandler!: QHandler | ApiHandler | QTagsHandler;
   props!:{
-    qSuggests: qSuggests[]
-    apiSuggests: apiSuggests[]
+    qSuggests: qSuggests[] | null
+    apiSuggests: apiSuggests[] | null
     onInputChange: Function
     buttonOptions?: filterButton[]
     searchDisable?: boolean
-    defaultFormat?: string
+    defaultFormat?: 'API' | '?Q' | 'qTags'
     placeholder?: string
     initFilters?: {}
     noDeleteFiltersOnUpdateSuggests?: boolean
@@ -74,6 +74,7 @@ export default class WzSearchBar extends Component {
       : (props.apiSuggests)
         ? 'API'
         : '';
+    console.log(searchFormat);
 
     return searchFormat;
   }
@@ -81,11 +82,20 @@ export default class WzSearchBar extends Component {
   selectSuggestHandler(searchFormat):void {
     const { noDeleteFiltersOnUpdateSuggests } = this.props;
     const { filters } = this.state;
-    if(searchFormat === '?Q') {
-      this.suggestHandler = new QHandler(this.props.qSuggests);
-    } else {
-      this.suggestHandler = new ApiHandler(this.props.apiSuggests);
+    switch (searchFormat) {
+      case '?Q':
+        this.suggestHandler = new QHandler(this.props.qSuggests);
+        break;
+      case 'qTags':
+        this.suggestHandler = new QTagsHandler(this.props.qSuggests);
+        break;
+      case 'API':
+        this.suggestHandler = new ApiHandler(this.props.apiSuggests);
+        break;
+      default:
+        break;
     }
+
     this.setState({ 
       isProcessing: true, 
       suggestions: [], 
@@ -135,24 +145,16 @@ export default class WzSearchBar extends Component {
       this.selectSuggestHandler(this.state.searchFormat);
     }
 
-    const { isProcessing } = this.state;
-    if (!isProcessing){
-      return;
-    }
+    if (!this.state.isProcessing) { return;}
     const { inputValue, isInvalid, searchFormat } = this.state;
-    const { searchDisable } = this.props;
     if (isInvalid) {
       this.buildSuggestInvalid();
     } else {
       const suggestsItems = !!searchFormat ?
         [...await this.suggestHandler.buildSuggestItems(inputValue)]
         : [];
-      const isSearchEnabled = (this.suggestHandler.inputStage === 'fields'
-        && !searchDisable
-        && inputValue !== '')
-        || !searchFormat;
 
-      if (isSearchEnabled) {
+      if (this.isSearchEnabled()) {
         const suggestSearch = this.buildSuggestFieldsSearch();
         suggestSearch && suggestsItems.unshift(suggestSearch);
       }
@@ -163,6 +165,15 @@ export default class WzSearchBar extends Component {
         isProcessing: false,
       });
     }
+  }
+
+  isSearchEnabled() {
+    const { inputValue, searchFormat} = this.state;
+    const { searchDisable } = this.props;
+    return (this.suggestHandler.inputStage === 'fields'
+    && !searchDisable
+    && inputValue !== '')
+    || !searchFormat;
   }
 
   buildSuggestInvalid() {
@@ -190,7 +201,7 @@ export default class WzSearchBar extends Component {
     }
   }
 
-  makeSearch(item:suggestItem):void {
+  makeSearch():void {
     const { inputValue, filters:currentFilters } = this.state;
     const filters = {...currentFilters};
 
@@ -288,7 +299,7 @@ export default class WzSearchBar extends Component {
 
   onItemClick(item: suggestItem) {
     if (item.type.iconType === 'search') {
-      this.makeSearch(item);
+      this.makeSearch();
     } else {
       this.makeFilter(item);
     }

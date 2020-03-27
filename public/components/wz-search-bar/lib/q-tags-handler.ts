@@ -13,15 +13,9 @@
 import { BaseHandler } from './base-handler';
 import { QInterpreter, queryObject } from './q-interpreter';
 import { suggestItem } from '../wz-search-bar';
+import { qSuggests } from './q-handler';
 
-export interface qSuggests {
-  label: string
-  description?: string
-  operators?: string[]
-  values: Function | [] | undefined
-}
-
-export class QHandler extends BaseHandler {
+export class QTagsHandler extends BaseHandler {
   operators = {
     '=': 'Equal',
     '!=': 'Not equal',
@@ -49,8 +43,6 @@ export class QHandler extends BaseHandler {
       return this.buildSuggestOperators(inputValue);
     } else if (this.inputStage === 'values') {
       return await this.buildSuggestValues(inputValue);
-    } else if (this.inputStage === 'conjuntions'){
-      return this.buildSuggestConjuntions(inputValue);
     }
     return this.buildSuggestFields(inputValue);
   }
@@ -89,20 +81,6 @@ export class QHandler extends BaseHandler {
 
     return suggestions;
   }
-
-  buildSuggestConjuntions(inputValue:string):suggestItem[] {
-    const suggestions = [
-      {'label':',', 'description':'OR'},
-      {'label':';', 'description':'AND'}
-    ].map((item) => {
-      return {
-        type: { iconType: 'kqlSelector', color: 'tint3' },
-        label: item.label,
-        description: item.description
-      }
-    })
-    return suggestions;
-  }
   
   //#endregion
   
@@ -134,7 +112,10 @@ export class QHandler extends BaseHandler {
   onItemClick(item:suggestItem, inputValue:string, currentFilters:object):{
     inputValue:string, filters:object
   } {
-    const filters = {...currentFilters};
+    const filters = {
+      ...currentFilters,
+    };
+
     const qInterpreter = new QInterpreter(inputValue);
     switch (item.type.iconType) {
       case'kqlField':
@@ -147,11 +128,10 @@ export class QHandler extends BaseHandler {
         break;
       case'kqlValue':
         qInterpreter.setlastQuery(item.label);
-        filters['q'] = qInterpreter.toString();
-        this.inputStage = 'conjuntions';
-        break;
-      case'kqlSelector':
-        qInterpreter.addNewQuery(item.label);
+        filters['q'] = !filters['q'] 
+          ? qInterpreter.toString() 
+          : `${filters['q']};${qInterpreter.toString()}`
+        qInterpreter.cleanQuery();
         this.inputStage = 'fields';
         break;
     }
