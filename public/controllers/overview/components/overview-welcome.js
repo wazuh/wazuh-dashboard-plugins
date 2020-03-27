@@ -45,7 +45,7 @@ export class WelcomeScreen extends Component {
 
   setGlobalBreadcrumb() {
     const breadcrumb = [
-      {},
+      { text: '' },
       { text: 'Overview', },
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
