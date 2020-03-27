@@ -11,8 +11,12 @@
  */
 
 import axios from 'axios';
-import { ManageHosts } from './manage-hosts';
-import { UpdateRegistry } from './update-registry';
+import {
+  ManageHosts
+} from './manage-hosts';
+import {
+  UpdateRegistry
+} from './update-registry';
 
 export class ApiInterceptor {
   constructor() {
@@ -81,7 +85,7 @@ export class ApiInterceptor {
           return response;
         })
         .catch(async error => {
-          if (attempts > 0) {
+          if (attempts > 0 && error.response) {
             if (error.response.status === 401) {
               const responseAuth = await this.authenticateApi(options.idHost);
 
@@ -91,8 +95,15 @@ export class ApiInterceptor {
                 return responseAuth;
               }
             }
+            return error.response;
+          } else {
+            return {
+              data: {
+                detail: error.code,
+              },
+              status: 500,
+            };
           }
-          return error.response;
         });
     } else {
       return {
