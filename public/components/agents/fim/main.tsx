@@ -61,7 +61,7 @@ export class MainFim extends Component {
         href: "#/agents-preview"
       },
       {
-        text: this.props.agent.name,
+        text: `${this.props.agent.name} (${this.props.agent.id})`,
         href: `/app/wazuh#/agents?agent=${this.props.agent.id}`,
         truncate: true,
       },
