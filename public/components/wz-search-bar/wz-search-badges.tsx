@@ -14,17 +14,18 @@ import React, {
   Component,
 } from 'react';
 import { EuiBadge } from '@elastic/eui';
+import { QInterpreter } from './lib/q-interpreter';
 
-interface filter { field:string, value:string }
+interface iFilter { field:string, value:string }
 
 export interface Props {
-  filters: filter[]
+  filters: iFilter[]
   onChange: (badge) => void
 }
 
 export class WzSearchBadges extends Component {
   props!: {
-    filters: filter[]
+    filters: iFilter[]
     onChange: Function
   }
   constructor(props) {
@@ -38,25 +39,46 @@ export class WzSearchBadges extends Component {
     return false;
   }
 
-  buildBadge(title:filter) {
-    const idGenerator = () => {return '_' + Math.random().toString(36).substr(2, 9)};
+  
+  idGenerator() {
+    return '_' + Math.random().toString(36).substr(2, 9)
+  }
+
+  buildBadge(filter:iFilter) {
+    if (filter.field === 'q') { return this.buildQBadges(filter); }
     return (
       <EuiBadge
-        key={idGenerator()}
+        key={this.idGenerator()}
         iconType="cross"
         iconSide="right"
         iconOnClickAriaLabel="Remove"
         color="hollow"
         className="globalFilterItem"
-        iconOnClick={() => this.props.onChange(title)}>
-        {`${title.field}:${title.value}`}
+        iconOnClick={() => this.props.onChange(filter)}>
+        {`${filter.field}:${filter.value}`}
       </EuiBadge>
     );
   }
 
+  buildQBadges(filter:iFilter) {
+    const qInterpreter = new QInterpreter(filter.value);
+    console.log(qInterpreter.queryObjects)
+    const qBadges = qInterpreter.queryObjects.map((qFilter,index) => (
+      <EuiBadge
+        key={this.idGenerator()}
+        iconType="cross"
+        iconSide="right"
+        iconOnClickAriaLabel="Remove"
+        iconOnClick={()=> console.log(index, qFilter)}>
+        {qFilter.conjuntion} {qFilter.field} {qFilter.operator} {qFilter.value}
+      </EuiBadge>
+    ));
+    return qBadges;
+  }
+  
   render() {
     const { filters } = this.props;
-    const badges = filters.filter((item) => item.field !== 'q').map((item) => this.buildBadge(item))
+    const badges = filters.map((item) => this.buildBadge(item))
     return (
       <div
         data-testid="search-badges" >
