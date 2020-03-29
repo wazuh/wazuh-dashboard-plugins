@@ -114,6 +114,10 @@ export class QInterpreter {
     this.queryObjects.push(newQuery);
   }
 
+  deleteByIndex(index:number) {
+    this.queryObjects = this.queryObjects.filter((f, i) => index !== i)
+  } 
+
   cleanQuery() {
     this.query = '';
     this.queryObjects = [];
