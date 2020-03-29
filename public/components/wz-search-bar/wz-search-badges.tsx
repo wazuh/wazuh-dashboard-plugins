@@ -65,35 +65,30 @@ export class WzSearchBadges extends Component {
     const qInterpreter = new QInterpreter(filter.value);
     console.log(qInterpreter.queryObjects)
     const qBadges = qInterpreter.queryObjects.map((qFilter,index) => (
-      <EuiBadge
-        key={this.idGenerator()}
-        iconType="cross"
-        iconSide="right"
-        iconOnClickAriaLabel="Remove"
-        iconOnClick={()=> {
-          qInterpreter.deleteByIndex(index);
-          console.log("queryObjects", qInterpreter.queryObjects);
-          console.log("qNumber", qInterpreter.qNumber());
-          console.log("length", qInterpreter.queryObjects.length);
-          if (qInterpreter.qNumber() > 0){
-            const filters = {
-              ...this.filtersToObject(),
-              q: qInterpreter.toString()
-            }
-            console.log(filters)
-            this.props.onChange(filters);
-          } else {
-            const filters = this.filtersToObject();
-            this.onDeleteFilter({field:'q', value:''})
-          }
-        }}>
-        {qFilter.conjuntion} {qFilter.field} {qFilter.operator} {qFilter.value}
-      </EuiBadge>
+      this.buildQBadge(qInterpreter, index, qFilter)
     ));
     return qBadges;
   }
 
 
+
+  private buildQBadge(qInterpreter, index, qFilter): JSX.Element {
+    return <EuiBadge key={this.idGenerator()} iconType="cross" iconSide="right" iconOnClickAriaLabel="Remove" iconOnClick={() => {
+      qInterpreter.deleteByIndex(index);
+      if (qInterpreter.qNumber() > 0) {
+        const filters = {
+          ...this.filtersToObject(),
+          q: qInterpreter.toString()
+        };
+        this.props.onChange(filters);
+      }
+      else {
+        this.onDeleteFilter({ field: 'q', value: '' });
+      }
+    } }>
+      {qFilter.conjuntion} {qFilter.field} {qFilter.operator} {qFilter.value}
+    </EuiBadge>;
+  }
 
   filtersToObject() {
     const filters = {}

@@ -116,6 +116,9 @@ export class QInterpreter {
 
   deleteByIndex(index:number) {
     this.queryObjects = this.queryObjects.filter((f, i) => index !== i)
+    if (this.queryObjects.length && this.queryObjects[0].conjuntion){
+      delete this.queryObjects[0].conjuntion;  
+    }
   } 
 
   cleanQuery() {
