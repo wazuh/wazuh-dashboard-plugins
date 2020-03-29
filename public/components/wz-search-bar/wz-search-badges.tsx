@@ -54,11 +54,12 @@ export class WzSearchBadges extends Component {
         iconOnClickAriaLabel="Remove"
         color="hollow"
         className="globalFilterItem"
-        iconOnClick={() => this.props.onChange(filter)}>
+        iconOnClick={() => this.onDeleteFilter(filter)}>
         {`${filter.field}:${filter.value}`}
       </EuiBadge>
     );
   }
+
 
   buildQBadges(filter:iFilter) {
     const qInterpreter = new QInterpreter(filter.value);
@@ -75,7 +76,21 @@ export class WzSearchBadges extends Component {
     ));
     return qBadges;
   }
-  
+
+  filtersToObject() {
+    const filters = {}
+    for (const f of this.props.filters) {
+      filters[f.field] = f.value;
+    }
+    return filters;
+  }
+
+  onDeleteFilter(filter) {
+    const filters = this.filtersToObject();
+    delete filters[filter.field]
+    this.props.onChange(filters);
+  }
+
   render() {
     const { filters } = this.props;
     const badges = filters.map((item) => this.buildBadge(item))

@@ -305,9 +305,7 @@ export class WzSearchBar extends Component {
     }
   }
 
-  onDeleteBadge(badge) {
-    const { filters } = this.state;
-    delete filters[badge.field];
+  onChangeBadge(filters) {
     this.props.onInputChange(filters);
     this.setState({filters, isProcessing: true});
   }
@@ -392,7 +390,7 @@ export class WzSearchBar extends Component {
           <EuiFlexItem grow={false}>
             <WzSearchBadges
               filters={formatedFilter}
-              onChange={this.onDeleteBadge.bind(this)} />
+              onChange={this.onChangeBadge.bind(this)} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
