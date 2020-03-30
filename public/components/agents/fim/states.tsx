@@ -1,3 +1,4 @@
+
 /*
  * Wazuh app - Integrity monitoring components
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -12,17 +13,34 @@
 
 import React, { Component } from 'react';
 import { EuiPanel, EuiPage } from '@elastic/eui';
+import { StatesTable, FilterBar } from './states/'
 
 export class States extends Component {
+  state: {
+    filters: {}
+  }
   constructor(props) {
     super(props);
+
+    this.state = {
+      filters: {}
+    }
+  }
+
+  onFiltersChange(filters) {
+    this.setState({ filters });
   }
 
   render() {
+    const { filters } = this.state;
     return (
       <EuiPage>
         <EuiPanel>
           <div>States</div>
+          <FilterBar
+            onFiltersChange={this.onFiltersChange.bind(this)} />
+          <StatesTable
+            filters={filters} />
         </EuiPanel>
       </EuiPage>
     )

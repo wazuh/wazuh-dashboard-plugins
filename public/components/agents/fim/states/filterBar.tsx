@@ -30,6 +30,10 @@ export class FilterBar extends Component {
     {label: 'size', values: value => !!value ? [value] : [0]}, // TODO: Adapt code to return and array with description
   ]
 
+  props!:{
+    onFiltersChange: Function
+  }
+
   constructor(props) {
     super(props);
   }
@@ -37,7 +41,7 @@ export class FilterBar extends Component {
   render() {
     return (
       <WzSearchBar
-        onInputChange={(...args) => console.log(args)}
+        onInputChange={this.props.onFiltersChange}
         qSuggests={this.suggestions}
         apiSuggests={null}
         defaultFormat='qTags'
