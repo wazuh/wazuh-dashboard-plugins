@@ -12,18 +12,33 @@
  */
 
 import React, { Component } from 'react';
-import { StatesTable } from './states/table'
+import { StatesTable, FilterBar } from './states/'
 
 export class States extends Component {
+  state: {
+    filters: {}
+  }
   constructor(props) {
     super(props);
+
+    this.state = {
+      filters: {}
+    }
+  }
+
+  onFiltersChange(filters) {
+    this.setState({filters});
   }
 
   render() {
+    const { filters } = this.state;
     return (
       <section>
         <div>States</div>
-        <StatesTable />
+        <FilterBar
+          onFiltersChange={this.onFiltersChange.bind(this)} />
+        <StatesTable
+          filters={filters} />
       </section>
     )
   }
