@@ -180,7 +180,7 @@ class WzRulesetSearchBar extends Component {
   }
 
   buttonOptions = {
-    rules: [{label: "Custom rules", field:"path", value:"etc/rules"}, ],
+    rules: [{label: "Custom rules", field:"relative_dirname", value:"etc/rules"}, ],
     decoders: [{label: "Custom decoders", field:"path", value:"etc/decoders"}, ],
     list: []
   }
