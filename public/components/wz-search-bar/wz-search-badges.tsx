@@ -11,16 +11,37 @@
  */
 
 import React, {
-  Component,
+  Component, useState
 } from 'react';
 import { EuiBadge } from '@elastic/eui';
 import { QInterpreter } from './lib/q-interpreter';
+import { EuiButtonEmpty, EuiPopover } from '@elastic/eui';
 
 interface iFilter { field:string, value:string }
 
 export interface Props {
   filters: iFilter[]
   onChange: (badge) => void
+}
+
+function PopOver(props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const conjuntions = {';': 'AND ', ':': 'OR '}
+  const operators = {'=': ' is ', '!=': ' is not ', '<': ' less than ', '>': ' greater than ', '~': ' like '}
+  console.log("popOverProps",props)
+  const { conjuntion=false, field, value, operator } = props.qFilter;
+  const button = (<EuiButtonEmpty color='text' size="xs" onClick={() => setIsOpen(!isOpen)}>
+    <strong>{conjuntion && conjuntions[conjuntion] }</strong>
+    {field}
+    {operators[operator]}
+    {value}
+  </EuiButtonEmpty>)
+  return (<EuiPopover button={button} isOpen={isOpen} closePopover={() => setIsOpen(false)}>
+    Change conjuntion
+    Edit filter
+    Invert operator
+    Delete filter
+  </EuiPopover>);
 }
 
 export class WzSearchBadges extends Component {
@@ -44,11 +65,11 @@ export class WzSearchBadges extends Component {
     return '_' + Math.random().toString(36).substr(2, 9)
   }
 
-  buildBadge(filter:iFilter) {
+  buildBadge(filter:iFilter, index:number) {
     if (filter.field === 'q') { return this.buildQBadges(filter); }
     return (
       <EuiBadge
-        key={this.idGenerator()}
+        key={index}
         iconType="cross"
         iconSide="right"
         iconOnClickAriaLabel="Remove"
@@ -73,21 +94,26 @@ export class WzSearchBadges extends Component {
 
 
   private buildQBadge(qInterpreter, index, qFilter): JSX.Element {
-    return <EuiBadge key={this.idGenerator()} iconType="cross" iconSide="right" iconOnClickAriaLabel="Remove" iconOnClick={() => {
-      qInterpreter.deleteByIndex(index);
-      if (qInterpreter.qNumber() > 0) {
-        const filters = {
-          ...this.filtersToObject(),
-          q: qInterpreter.toString()
-        };
-        this.props.onChange(filters);
-      }
-      else {
-        this.onDeleteFilter({ field: 'q', value: '' });
-      }
+    return <EuiBadge key={index} iconType="cross" iconSide="right" 
+      color="hollow" iconOnClickAriaLabel="Remove" iconOnClick={() => {
+      this.qBadgeIconOnClick(qInterpreter, index);
     } }>
-      {qFilter.conjuntion} {qFilter.field} {qFilter.operator} {qFilter.value}
+      <PopOver qFilter={qFilter} index={index} qInterpreter={qInterpreter} />
     </EuiBadge>;
+  }
+
+  private qBadgeIconOnClick(qInterpreter: any, index: number) {
+    qInterpreter.deleteByIndex(index);
+    if (qInterpreter.qNumber() > 0) {
+      const filters = {
+        ...this.filtersToObject(),
+        q: qInterpreter.toString()
+      };
+      this.props.onChange(filters);
+    }
+    else {
+      this.onDeleteFilter({ field: 'q', value: '' });
+    }
   }
 
   filtersToObject() {
@@ -106,7 +132,7 @@ export class WzSearchBadges extends Component {
 
   render() {
     const { filters } = this.props;
-    const badges = filters.map((item) => this.buildBadge(item))
+    const badges = filters.map((item, index) => this.buildBadge(item, index))
     return (
       <div
         data-testid="search-badges" >
@@ -115,3 +141,4 @@ export class WzSearchBadges extends Component {
     );
   }
 }
+
