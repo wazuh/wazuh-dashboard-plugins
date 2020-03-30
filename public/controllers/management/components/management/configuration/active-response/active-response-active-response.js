@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show configuration of active response - active response tab.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
