@@ -169,7 +169,7 @@ export default class RulesetColumns {
             name: 'Actions',
             align: 'left',
             render: item => {
-              if (item.path.startsWith('ruleset/')) {
+              if (item.relative_dirname.startsWith('ruleset/')) {
                 return (
                   <EuiToolTip position="top" content={`Show ${item.filename} content`}>
                     <EuiButtonIcon
@@ -177,8 +177,8 @@ export default class RulesetColumns {
                       iconType="eye"
                       onClick={async (ev) => {
                         ev.stopPropagation();
-                        const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.file}`);
-                        const file = { name: item.file, content: result, path: item.relative_dirname };
+                        const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);
+                        const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.tableProps.updateFileContent(file);
                       }}
                       color="primary"
@@ -188,20 +188,20 @@ export default class RulesetColumns {
               } else {
                 return (
                   <div>
-                    <EuiToolTip position="top" content={`Edit ${item.file} content`}>
+                    <EuiToolTip position="top" content={`Edit ${item.filename} content`}>
                       <EuiButtonIcon
                         aria-label="Edit content"
                         iconType="pencil"
                         onClick={async (ev) => {
                           ev.stopPropagation();
-                          const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.file}`);
-                          const file = { name: item.file, content: result, path: item.relative_dirname };
+                          const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);
+                          const file = { name: item.filename, content: result, path: item.relative_dirname };
                           this.tableProps.updateFileContent(file);
                         }}
                         color="primary"
                       />
                     </EuiToolTip>
-                    <EuiToolTip position="top" content={`Remove ${item.file} file`}>
+                    <EuiToolTip position="top" content={`Remove ${item.filename} file`}>
                       <EuiButtonIcon
                         aria-label="Delete content"
                         iconType="trash"
