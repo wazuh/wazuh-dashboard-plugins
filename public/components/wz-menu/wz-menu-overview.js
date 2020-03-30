@@ -18,13 +18,13 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
+import store from '../../redux/store';
+import { updateCurrentTab } from '../../redux/actions/appStateActions';
 
 class WzMenuOverview extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // TODO: Fix the selected section
-      selectedItemName: null
     };
 
     this.overviewSections = {
@@ -55,9 +55,6 @@ class WzMenuOverview extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // You don't have to do this check first, but it can help prevent an unneeded render
-    if (nextProps.section !== this.state.selectedItemName) {
-      this.setState({ selectedItemName: nextProps.section });
-    }
   }
 
   componentDidMount() {
@@ -65,16 +62,22 @@ class WzMenuOverview extends Component {
 
   clickMenuItem = section => {
     this.props.closePopover();
-    window.location.href = `#/overview/?tab=${section}`;
+    const currentTab = (((store || {}).getState() || {}).appStateReducers || {}).currentTab;
+    if(currentTab !== section){ // do not redirect if we already are in that tab
+      window.location.href = `#/overview/?tab=${section}`;
+      store.dispatch(updateCurrentTab(section));
+    }
   };
 
   createItem = (item, data = {}) => {
     // NOTE: Duplicate `name` values will cause `id` collisions.
+    const currentTab = (((store || {}).getState() || {}).appStateReducers || {}).currentTab;
+
     return {
       ...data,
       id: item.id,
       name: item.text,
-      isSelected: this.state.selectedItemName === item.id,
+      isSelected: currentTab === item.id,
       onClick: () => this.clickMenuItem(item.id),
     };
   };
@@ -85,7 +88,7 @@ class WzMenuOverview extends Component {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
-          this.createItem(this.overviewSections.securityInformation),
+          this.createItem(this.overviewSections.general),
           this.createItem(this.overviewSections.fim),
           this.createItem(this.overviewSections.aws),
         ],

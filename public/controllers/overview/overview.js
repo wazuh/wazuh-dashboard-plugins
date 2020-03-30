@@ -91,6 +91,11 @@ export class OverviewController {
         AppState.setExtensions(api, extensions)
     };
 
+    this.currentOverviewSectionProps = {
+      switchTab: tab => this.switchTab(tab),
+      currentTab: this.tab
+    }
+
     this.setTabs();
 
     this.visualizeProps = {
@@ -251,6 +256,7 @@ export class OverviewController {
 
       this.$location.search('tab', newTab);
       this.tab = newTab;
+      //this.currentOverviewSectionProps.currentTab=this.tab;
 
       await this.switchSubtab('panels', true);
     } catch (error) {
