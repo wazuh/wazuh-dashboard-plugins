@@ -53,6 +53,18 @@
                 value="currentConfig['syscheck-syscheck'].syscheck.skip_nfs">
             </wz-config-item>
             <wz-config-item
+                label="Skip scan of /dev directory"
+                value="currentConfig['syscheck-syscheck'].syscheck.skip_dev">
+            </wz-config-item>
+            <wz-config-item
+                label="Skip scan of /sys directory"
+                value="currentConfig['syscheck-syscheck'].syscheck.skip_sys">
+            </wz-config-item>
+            <wz-config-item
+                label="Skip scan of /proc directory"
+                value="currentConfig['syscheck-syscheck'].syscheck.skip_proc">
+            </wz-config-item>
+            <wz-config-item
                 label="Remove old local snapshots"
                 value="currentConfig['syscheck-syscheck'].syscheck.remove_old_diff || 'yes'">
             </wz-config-item>
@@ -67,6 +79,18 @@
             <wz-config-item
                 label="Command to prevent prelinking"
                 value="currentConfig['syscheck-syscheck'].syscheck.prefilter_cmd || '-'">
+            </wz-config-item>
+            <wz-config-item
+                label="Maximum event reporting throughput"
+                value="currentConfig['syscheck-syscheck'].syscheck.max_eps">
+            </wz-config-item>
+            <wz-config-item
+                label="Process priority"
+                value="currentConfig['syscheck-syscheck'].syscheck.process_priority">
+            </wz-config-item>
+            <wz-config-item
+                label="Database type"
+                value="currentConfig['syscheck-syscheck'].syscheck.database">
             </wz-config-item>
 
         </div>
