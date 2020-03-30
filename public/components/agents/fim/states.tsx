@@ -12,6 +12,7 @@
  */
 
 import React, { Component } from 'react';
+import { EuiPanel, EuiPage } from '@elastic/eui';
 import { StatesTable, FilterBar } from './states/'
 
 export class States extends Component {
@@ -27,19 +28,21 @@ export class States extends Component {
   }
 
   onFiltersChange(filters) {
-    this.setState({filters});
+    this.setState({ filters });
   }
 
   render() {
     const { filters } = this.state;
     return (
-      <section>
-        <div>States</div>
-        <FilterBar
-          onFiltersChange={this.onFiltersChange.bind(this)} />
-        <StatesTable
-          filters={filters} />
-      </section>
+      <EuiPage>
+        <EuiPanel>
+          <div>States</div>
+          <FilterBar
+            onFiltersChange={this.onFiltersChange.bind(this)} />
+          <StatesTable
+            filters={filters} />
+        </EuiPanel>
+      </EuiPage>
     )
   }
 }

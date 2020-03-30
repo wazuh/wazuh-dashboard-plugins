@@ -11,15 +11,8 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
-import {
-  EuiProgress,
-  EuiSpacer,
-  EuiText,
-  EuiTitle,
-  EuiFieldText
-} from '@elastic/eui';
+import { EuiSpacer, EuiTitle, EuiPanel, EuiPage } from '@elastic/eui';
 
 import { i18n } from '@kbn/i18n';
 
@@ -29,7 +22,7 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 
 type SettingsPropTypes = {
   agent: { id: string },
-  clusterNodeSelected?: string 
+  clusterNodeSelected?: string
 }
 
 type SettingsState = {
@@ -42,7 +35,7 @@ export class Settings extends Component<SettingsPropTypes, SettingsState> {
       badge: null
     }
   }
-  updateBadge(badge){
+  updateBadge(badge) {
     this.setState({ badge })
   }
   render() {
@@ -51,11 +44,20 @@ export class Settings extends Component<SettingsPropTypes, SettingsState> {
     return (
       <Fragment>
         <WzReduxProvider>
-          <EuiTitle>
-            <span>{i18n.translate('wazuh.fim.configuration', { defaultMessage: 'Configuration' })} {typeof badge === 'boolean' ? <WzBadge enabled={badge}/> : null}</span>
-          </EuiTitle>
-          <EuiSpacer size='m'/>
-          <WzConfigurationIntegrityMonitoring clusterNodeSelected={clusterNodeSelected} agent={agent} updateBadge={(e) => this.updateBadge(e)}/>
+          <EuiPage>
+            <EuiPanel>
+              <EuiTitle>
+                <span>{i18n.translate('wazuh.fim.configuration', { defaultMessage: 'Configuration' })} {typeof badge === 'boolean' ?
+                  <WzBadge enabled={badge} /> : null}
+                </span>
+              </EuiTitle>
+              <EuiSpacer size='m' />
+              <WzConfigurationIntegrityMonitoring
+                clusterNodeSelected={clusterNodeSelected}
+                agent={agent}
+                updateBadge={(e) => this.updateBadge(e)} />
+            </EuiPanel>
+          </EuiPage>
         </WzReduxProvider>
       </Fragment>
     )

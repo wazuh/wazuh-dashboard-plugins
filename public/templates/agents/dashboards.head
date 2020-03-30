@@ -1,5 +1,5 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-    <div ng-if="!showNewFim && tab !== 'welcome'">
+    <div ng-if="tab !== 'fim' && tab !== 'welcome'">
         <!-- Navigation section -->
         <div layout="row" layout-align="start center" ng-if="agent">
             <!-- Breadcrumbs -->
@@ -46,8 +46,8 @@
                 <!-- Report button -->
                 <button class="kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
                     tooltip-placement="bottom"
-                    ng-class="{'euiButtonEmpty--disabled': (!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'}"
-                    ng-disabled="(!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'"
+                    ng-class="{'euiButtonEmpty--disabled': (!rendered || loading || resultState !== 'ready' || showScaScan) && tab !== 'syscollector'}"
+                    ng-disabled="(!rendered || loading || resultState !== 'ready' || showScaScan) && tab !== 'syscollector'"
                     ng-click="startVis2Png()" aria-label="Generate report button">
                     <i class="fa fa-fw fa-print" aria-hidden="true"></i>
                 </button>
@@ -63,7 +63,7 @@
                 </button>
 
                 <!-- Discover button -->
-                <button ng-if="tabView === 'panels' && !showSyscheckFiles && !showScaScan"
+                <button ng-if="tabView === 'panels' && !showScaScan"
                     class="kuiButton kuiButton--secondary small wz-margin-right-8" ng-click="switchSubtab('discover')"
                     aria-label="Discover button">
                     <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
@@ -82,7 +82,7 @@
 
         <!-- Discover search bar section -->
         <kbn-dis
-            ng-show="((tab !== 'welcome') && (tab !== 'configuration') && tab !== 'sca' && tab !== 'syscollector' && !showSyscheckFiles && !showScaScan) || (tab === 'sca' && tabView === 'discover')">
+            ng-show="((tab !== 'welcome') && (tab !== 'configuration') && tab !== 'sca' && tab !== 'syscollector' && !showScaScan) || (tab === 'sca' && tabView === 'discover')">
         </kbn-dis>
         <!-- End Discover search bar section -->
 
@@ -121,23 +121,9 @@
         <!-- End report status section -->
 
         <!-- No results section -->
-        <div layout="row"
-            ng-if="!showSyscheckFiles && !showScaScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'">
-            <span flex></span>
-            <md-button ng-click="switchNewFim()" class="discoverSectionSwitchBtn pull-right">
-                NEW FIM</md-button>
-            <span></span>
-            <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i
-                    class="fa fa-fw fa-play"></i> Run
-                scan</md-button>
-            <span></span>
-            <md-button ng-click="switchSyscheckFiles()" class="discoverSectionSwitchBtn pull-right"><i
-                    class="fa fa-fw fa-database"></i>
-                Show files</md-button>
-        </div>
 
         <div layout="row" class="wz-margin-right-8 wz-margin-left-8" style="margin-top: 16px;"
-            ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
+            ng-if="!showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
             ng-show="resultState === 'none' && tabView === 'panels'">
             <react-component flex name="EuiCallOut"
                 props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />

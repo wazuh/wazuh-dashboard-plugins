@@ -82,7 +82,7 @@ export class AgentsController {
     this.targetLocation = null;
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
-    this.$scope.showSyscheckFiles = false;
+    this.$scope.showNewFim = true;
     this.$scope.showScaScan = false;
 
     this.$scope.editGroup = false;
@@ -343,22 +343,6 @@ export class AgentsController {
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
-    this.$scope.switchSyscheckFiles = () => {
-      this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
-      this.$scope.$applyAsync();
-    };
-
-
-    this.$scope.switchNewFim = () => {
-      this.$scope.showNewFim = !this.$scope.showNewFim; 
-      if(this.$scope.showNewFim){
-        this.$scope.fimProps = {
-          agent: this.$scope.agent
-        }
-      }
-      this.$scope.$applyAsync();
-    };
-
     this.$scope.switchScaScan = () => {
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
@@ -497,7 +481,6 @@ export class AgentsController {
       cardReqs: {}
     }
     try {
-      this.$scope.showSyscheckFiles = false;
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
         this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
@@ -752,10 +735,9 @@ export class AgentsController {
         this.$scope.agent.agentPlatform = false;
       }
 
-      this.$scope.syscheckTableProps = {
-        wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-        agentId: this.$scope.agent.id,
-      };
+      this.$scope.fimProps = {
+        agent: this.$scope.agent
+      }
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
