@@ -34,7 +34,6 @@ export class States extends Component {
     const { filters } = this.state;
     return (
       <section>
-        <div>States</div>
         <FilterBar
           onFiltersChange={this.onFiltersChange.bind(this)} />
         <StatesTable

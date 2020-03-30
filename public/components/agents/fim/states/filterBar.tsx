@@ -12,6 +12,7 @@
 import React, { Component } from 'react';
 import { WzSearchBar, qSuggests } from '../../../../components/wz-search-bar'
 import { getFilterValues } from './lib';
+import { EuiFlexGroup, EuiFlexItem, EuiSuperDatePicker } from '@elastic/eui';
 
 export class FilterBar extends Component {
   suggestions: qSuggests[] = [
@@ -40,12 +41,18 @@ export class FilterBar extends Component {
 
   render() {
     return (
-      <WzSearchBar
-        onInputChange={this.props.onFiltersChange}
-        qSuggests={this.suggestions}
-        apiSuggests={null}
-        defaultFormat='qTags'
-      />
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <WzSearchBar
+            onInputChange={this.props.onFiltersChange}
+            qSuggests={this.suggestions}
+            apiSuggests={null}
+            defaultFormat='qTags' />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiSuperDatePicker onTimeChange={(...args) => console.log(args)} />
+        </EuiFlexItem>
+      </EuiFlexGroup>
     )
   }
 }
