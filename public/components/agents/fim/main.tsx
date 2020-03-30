@@ -16,8 +16,6 @@ import {
   EuiFlexItem,
   EuiButton,
   EuiHealth,
-  EuiPanel,
-  EuiPage,
   EuiTab,
   EuiTabs,
   EuiTitle,
@@ -29,13 +27,14 @@ import {
   Events,
   Settings
 } from './index';
+import { Dashboard } from '../../common/modulesDashboards/dashboard';
 import '../../../less/components/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 
 export class MainFim extends Component {
   state: {
-    selectView: 'states' | 'events' | 'settings'
+    selectView: 'states' | 'events' | 'dashboard' | 'settings'
   };
 
   tabs = [
@@ -112,15 +111,25 @@ export class MainFim extends Component {
   renderDashboardButton() {
     return (
       <EuiFlexItem grow={false}>
-        <EuiButton iconType="visLine">Dashboard</EuiButton>
+        <EuiButton
+          fill={this.state.selectView === 'dashboard'}
+          iconType="visLine"
+          onClick={() => this.onSelectedTabChanged('dashboard')}>
+          Dashboard
+          </EuiButton>
       </EuiFlexItem>
     );
   }
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false} style={{marginLeft: 0}}>
-        <EuiButton fill={this.state.selectView === 'settings'}iconType="wrench" onClick={() => this.onSelectedTabChanged('settings')} style={{minWidth: 50}}>Configuration</EuiButton>
+      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
+        <EuiButton
+          fill={this.state.selectView === 'settings'}
+          iconType="wrench"
+          onClick={() => this.onSelectedTabChanged('settings')}>
+          Configuration
+          </EuiButton>
       </EuiFlexItem>
     );
   }
@@ -149,13 +158,12 @@ export class MainFim extends Component {
             </EuiFlexGroup>
           </div>
         </div>
-        <EuiPage className='wz-module-body'>
-          <EuiPanel>
-            {selectView === 'states' && <States {...this.props} />}
-            {selectView === 'events' && <Events {...this.props} />}
-            {selectView === 'settings' && <Settings {...this.props} />}
-          </EuiPanel>
-        </EuiPage>
+        <div className='wz-module-body'>
+          {selectView === 'states' && <States {...this.props} />}
+          {selectView === 'events' && <Events {...this.props} />}
+          {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
+          {selectView === 'settings' && <Settings {...this.props} />}
+        </div>
       </div>
     );
   }

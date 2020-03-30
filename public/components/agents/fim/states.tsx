@@ -11,6 +11,7 @@
  */
 
 import React, { Component } from 'react';
+import { EuiPanel, EuiPage } from '@elastic/eui';
 
 export class States extends Component {
   constructor(props) {
@@ -19,7 +20,11 @@ export class States extends Component {
 
   render() {
     return (
-      <div>States</div>
+      <EuiPage>
+        <EuiPanel>
+          <div>States</div>
+        </EuiPanel>
+      </EuiPage>
     )
   }
 }
