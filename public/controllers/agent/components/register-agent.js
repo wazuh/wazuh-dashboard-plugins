@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component for registering agents.
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,36 +145,36 @@ export class RegisterAgent extends Component {
       zIndex: '100'
     };
     const customTexts = {
-      rpmText: `sudo WAZUH_MANAGER_IP='${this.state.serverAddress}'${
+      rpmText: `sudo WAZUH_MANAGER='${this.state.serverAddress}'${
         this.state.needsPassword
-          ? ` WAZUH_PASSWORD='${this.state.wazuhPassword}' `
+          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
       }yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
         this.state.wazuhVersion
       }-1.x86_64.rpm`,
       debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
         this.state.wazuhVersion
-      }-1_amd64.deb && sudo WAZUH_MANAGER_IP='${this.state.serverAddress}'${
+      }-1_amd64.deb && sudo WAZUH_MANAGER='${this.state.serverAddress}'${
         this.state.needsPassword
-          ? ` WAZUH_PASSWORD='${this.state.wazuhPassword}' `
+          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
-      } dpkg -i ./wazuh-agent.deb`,
+      }dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.pkg && sudo launchctl setenv WAZUH_MANAGER_IP '${
+      }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
         this.state.serverAddress
       }'${
         this.state.needsPassword
-          ? ` WAZUH_PASSWORD '${this.state.wazuhPassword}'`
+          ? ` WAZUH_REGISTRATION_PASSWORD '${this.state.wazuhPassword}' `
           : ' '
-      } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
+      }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ADDRESS='${
+      }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q WAZUH_MANAGER='${
         this.state.serverAddress
-      }' AUTHD_SERVER='${this.state.serverAddress}'${
+      }' WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}'${
         this.state.needsPassword
-          ? ` PASSWORD='${this.state.wazuhPassword}' `
+          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
       }`
     };
