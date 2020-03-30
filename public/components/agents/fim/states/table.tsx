@@ -32,6 +32,7 @@ export class StatesTable extends Component {
     q: String,
     search: String,
   };
+  
   constructor(props) {
     super(props);
 
@@ -109,78 +110,14 @@ export class StatesTable extends Component {
   };
 
   columns() {
-    return [
-      {
-        field: 'file',
-        name: 'file',
-        sortable: true,
-      },
-      {
-        field: 'gname',
-        name: 'gname',
-        sortable: true,
-      },
-      {
-        field: 'date',
-        name: 'date',
-        sortable: true,
-      },
-      {
-        field: 'sha1',
-        name: 'sha1',
-        sortable: true,
-      },
-      {
-        field: 'inode',
-        name: 'inode',
-        sortable: true,
-      },
-      {
-        field: 'mtime',
-        name: 'mtime',
-        sortable: true,
-      },
-      {
-        field: 'md5',
-        name: 'md5',
-        sortable: true,
-      },
-      {
-        field: 'sha256',
-        name: 'sha256',
-        sortable: true,
-      },
-      {
-        field: 'gid',
-        name: 'gid',
-        sortable: true,
-      },
-      {
-        field: 'type',
-        name: 'type',
-        sortable: true,
-      },
-      {
-        field: 'perm',
-        name: 'perm',
-        sortable: true,
-      },
-      {
-        field: 'uid',
-        name: 'uid',
-        sortable: true,
-      },
-      {
-        field: 'uname',
-        name: 'uname',
-        sortable: true,
-      },
-      {
-        field: 'size',
-        name: 'size',
-        sortable: true,
-      },
-    ]
+    const buildColumn = fieldName => ({
+      field:fieldName, name: fieldName, sortable: true
+    })
+    return ['file','gname','date',
+    'sha1','inode','mtime',
+    'md5','sha256','gid',
+    'type','perm','uid',
+    'uname','size',].map(buildColumn)
   }
 
   renderFilesTable() {
@@ -194,11 +131,11 @@ export class StatesTable extends Component {
       pageSizeOptions: [15, 20, 30],
     }
     const sorting = {
-      sort: {
-        field: sortField,
-        direction: sortDirection,
-      },
-    }
+			sort: {
+				field: sortField,
+				direction: sortDirection,
+			},
+    };
 
     return (
       <EuiFlexGroup>
