@@ -14,12 +14,12 @@ import React, { Component } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiBasicTable
+  EuiBasicTable,
+  Direction,
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request'
-import { filter } from 'bluebird';
 
 export class StatesTable extends Component {
   state: {
@@ -28,7 +28,7 @@ export class StatesTable extends Component {
     pageSize: number,
     totalItems: number,
     sortField: string,
-    sortDirection: string,
+    sortDirection: Direction,
     isLoading: boolean,
   };
 
@@ -53,23 +53,6 @@ export class StatesTable extends Component {
   async componentDidMount() {
     await this.getSyscheck();
   }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   const { filters } = this.props;
-  //   const { syscheck, pageIndex, pageSize, sortField, sortDirection } = this.state;
-
-  //   if (JSON.stringify(filters) !== JSON.stringify(nextProps.filters))
-  //     return true;
-  //   if (pageIndex !== nextState.pageIndex)
-  //     return true;
-  //   if (pageSize !== nextState.pageSize)
-  //     return true;
-  //   if (sortField !== nextState.sortField)
-  //     return true;
-  //   if (sortDirection !== nextState.sortDirection)
-  //     return true;
-  //   return false;
-  // }
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
