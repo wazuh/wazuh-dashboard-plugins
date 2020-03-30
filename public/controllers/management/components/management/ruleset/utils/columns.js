@@ -51,7 +51,7 @@ export default class RulesetColumns {
             width: '5%'
           },
           {
-            field: 'file',
+            field: 'filename',
             name: 'File',
             align: 'left',
             sortable: true,
@@ -61,9 +61,9 @@ export default class RulesetColumns {
                 <EuiToolTip position="top" content={`Show ${value} content`}>
                   <EuiLink onClick={async (ev) => {
                     ev.stopPropagation();
-                    const noLocal = item.path.startsWith('ruleset/');
+                    const noLocal = item.relative_dirname.startsWith('ruleset/');
                     const result = await this.rulesetHandler.getRuleContent(value, noLocal);
-                    const file = { name: value, content: result, path: item.path };
+                    const file = { name: value, content: result, path: item.relative_dirname };
                     this.tableProps.updateFileContent(file);
                   }
                   }>
@@ -74,7 +74,7 @@ export default class RulesetColumns {
             }
           },
           {
-            field: 'path',
+            field: 'relative_dirname',
             name: 'Path',
             align: 'left',
             sortable: true,
@@ -101,7 +101,7 @@ export default class RulesetColumns {
             sortable: false
           },
           {
-            field: 'file',
+            field: 'filename',
             name: 'File',
             align: 'left',
             sortable: true,
@@ -112,7 +112,7 @@ export default class RulesetColumns {
                     ev.stopPropagation();
                     const noLocal = item.path.startsWith('ruleset/');
                     const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
-                    const file = { name: value, content: result, path: item.path };
+                    const file = { name: value, content: result, path: item.relative_dirname };
                     this.tableProps.updateFileContent(file);
                   }
                   }>{value}</EuiLink>
@@ -121,7 +121,7 @@ export default class RulesetColumns {
             }
           },
           {
-            field: 'path',
+            field: 'relative_dirname',
             name: 'Path',
             align: 'left',
             sortable: true
@@ -135,7 +135,7 @@ export default class RulesetColumns {
             sortable: true,
           },
           {
-            field: 'path',
+            field: 'relative_dirname',
             name: 'Path',
             align: 'left',
             sortable: true
@@ -150,7 +150,7 @@ export default class RulesetColumns {
                   iconType="exportAction"
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    await exportCsv(`/lists?path=${item.path}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.path}/${item.name}`}], item.name)
+                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.name}`}], item.name)
                   }}
                   color="primary"
                 />
@@ -160,7 +160,7 @@ export default class RulesetColumns {
         ],
         files: [
           {
-            field: 'file',
+            field: 'filename',
             name: 'File',
             align: 'left',
             sortable: true
@@ -171,14 +171,14 @@ export default class RulesetColumns {
             render: item => {
               if (item.path.startsWith('ruleset/')) {
                 return (
-                  <EuiToolTip position="top" content={`Show ${item.file} content`}>
+                  <EuiToolTip position="top" content={`Show ${item.filename} content`}>
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="eye"
                       onClick={async (ev) => {
                         ev.stopPropagation();
-                        const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
-                        const file = { name: item.file, content: result, path: item.path };
+                        const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.file}`);
+                        const file = { name: item.file, content: result, path: item.relative_dirname };
                         this.tableProps.updateFileContent(file);
                       }}
                       color="primary"
@@ -194,8 +194,8 @@ export default class RulesetColumns {
                         iconType="pencil"
                         onClick={async (ev) => {
                           ev.stopPropagation();
-                          const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
-                          const file = { name: item.file, content: result, path: item.path };
+                          const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.file}`);
+                          const file = { name: item.file, content: result, path: item.relative_dirname };
                           this.tableProps.updateFileContent(file);
                         }}
                         color="primary"
@@ -236,14 +236,14 @@ export default class RulesetColumns {
                       iconType="pencil"
                       onClick={async (ev) => {
                         ev.stopPropagation();
-                        const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
-                        const file = { name: item.name, content: result, path: item.path };
+                        const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.name}`);
+                        const file = { name: item.name, content: result, path: item.relative_dirname };
                         this.tableProps.updateListContent(file);
                       }}
                       color="primary"
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
+                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
@@ -253,7 +253,7 @@ export default class RulesetColumns {
                         this.tableProps.updateShowModal(true);
                       }}
                       color="danger"
-                      disabled={defaultItems.indexOf(`${item.path}`) !== -1}
+                      disabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
                     />
                   </EuiToolTip>
                   <EuiToolTip position="top" content={`Export ${item.name}`}>
@@ -262,7 +262,7 @@ export default class RulesetColumns {
                       iconType="exportAction"
                       onClick={async (ev) => {
                         ev.stopPropagation();
-                        await exportCsv(`/lists?path=${item.path}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.path}/${item.name}`}], item.name)
+                        await exportCsv(`/lists?path=${item.relative_dirname}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.name}`}], item.name)
                       }}
                       color="primary"
                     />
