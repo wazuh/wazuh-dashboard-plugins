@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show configuration of integrity monitoring - monitored tab.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -68,7 +68,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component{
           <WzConfigurationSettingsTabSelector
             title='Monitored directories'
             description='These directories are included on the integrity scan'
-            currentConfig={currentConfig}
+            currentConfig={currentConfig['syscheck-syscheck']}
             minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
               <WzConfigurationListSelector
