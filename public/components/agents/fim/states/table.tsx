@@ -29,7 +29,8 @@ export class StatesTable extends Component {
     totalItems: Number,
     sortField: String,
     sortDirection: String,
-    isProcessing: Boolean
+    isProcessing: Boolean,
+    search: String,
   };
 
   props!: {
@@ -47,6 +48,7 @@ export class StatesTable extends Component {
       sortField: 'file',
       sortDirection: 'asc',
       isProcessing: true,
+      search: '',
     }
   }
 
@@ -83,7 +85,7 @@ export class StatesTable extends Component {
     const syscheck = await WzRequest.apiReq(
       'GET',
       '/syscheck/001',
-      filters
+      this.buildFilter()
     );
 
     this.setState({
@@ -91,6 +93,36 @@ export class StatesTable extends Component {
       totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
       isProcessing: false
     });
+  }
+
+  buildSortFilter() {
+    const {sortField, sortDirection} = this.state;
+
+    const field = (sortField === 'os_name') ? '' : sortField;
+    const direction = (sortDirection === 'asc') ? '+' : '-';
+
+    return direction+field;
+  }
+
+  buildFilter() {
+    const { pageIndex, pageSize, search, q} = this.state;
+
+     const filter = {
+      offset: pageIndex * pageSize,
+      limit: pageSize,
+      sort: this.buildSortFilter(),
+
+    };
+
+     if (q !== ''){
+      filter.q = q
+    }
+
+     if (search !== '') {
+      filter.search = search;
+    }
+
+     return filter;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -187,7 +219,8 @@ export class StatesTable extends Component {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      hidePerPageOptions: true,
+      /* hidePerPageOptions: false, */
+      pageSizeOptions: [15, 20, 30],
     }
     const sorting = {
       sort: {
