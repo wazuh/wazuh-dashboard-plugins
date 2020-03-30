@@ -25,7 +25,7 @@
 
     <!-- Integrity monitoring navigation bar -->
     <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
-      ng-init="buildProps([{id:'fim-general', name: 'General'}, {id: 'fim-monitored', name: 'Monitored'}, {id: 'fim-ignored', name: 'Ignored'}, {id: 'fim-nodiff', name: 'No diff'}, {id: 'fim-whodata', name: 'Who-data', agent}])">
+      ng-init="buildProps([{id:'fim-general', name: 'General'}, {id: 'fim-monitored', name: 'Monitored'}, {id: 'fim-ignored', name: 'Ignored'}, {id: 'fim-nodiff', name: 'No diff'}, {id: 'fim-whodata', name: 'Who-data', agent}, {id: 'fim-synchronization', name: 'Synchronization'}])">
       <react-component name="Tabs" props="configurationTabsProps" />
     </div>
     <!-- End Integrity monitoring navigation bar -->
