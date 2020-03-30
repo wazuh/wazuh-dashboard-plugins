@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show configuration of integrity monitoring - nodiff tab.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,7 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component{
           <WzConfigurationSettingsTabSelector
             title='No diff directories'
             description="This files won't have their diff calculated"
-            currentConfig={currentConfig}
+            currentConfig={currentConfig['syscheck-syscheck']}
             minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
             <EuiBasicTable

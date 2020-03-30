@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show configuration of integrity monitoring - whodata tab.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component{
           <WzConfigurationSettingsTabSelector
             title='Who-data audit keys'
             description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
-            currentConfig={currentConfig}
+            currentConfig={currentConfig['syscheck-syscheck']}
             minusHeight={this.props.agent.id === '000' ? 340 : 410}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsGroup 

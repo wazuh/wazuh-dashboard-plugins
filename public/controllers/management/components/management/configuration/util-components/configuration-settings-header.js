@@ -25,10 +25,6 @@ import {
 
 import WzHelpButtonPopover from './help-button-popover';
 
-const Separator = () => (
-  <span style={{margin: '0 4px'}}>·</span>
-);
-
 class WzConfigurationSettingsHeader extends Component{
   constructor(props){
     super(props);
@@ -48,18 +44,16 @@ class WzConfigurationSettingsHeader extends Component{
             <EuiFlexGroup alignItems='center' gutterSize='none' justifyContent='flexEnd'>
               { settings && (
                 <Fragment>
-                  <span>
+                  <span style={{marginRight: '6px'}}>
                     <ButtonLink viewSelected={viewSelected} view='' text='SETTINGS' onClick={settings}/>
                   </span>
-                  <Separator />
                 </Fragment>
               )}
               { json && xml && (
                 <Fragment>
-                  <span>
+                  <span style={{marginRight: '6px'}}>
                     <ButtonLink viewSelected={viewSelected} view='json' text='JSON' onClick={json}/>
                   </span>
-                  <Separator />
                   <span>
                     <ButtonLink viewSelected={viewSelected} view='xml' text='XML' onClick={xml}/>
                   </span>
