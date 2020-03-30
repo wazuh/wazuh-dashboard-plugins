@@ -19,20 +19,23 @@ import {
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request'
+import { filter } from 'bluebird';
 
 export class StatesTable extends Component {
   state: {
-    syscheck: {},
-    pageIndex: Number,
-    pageSize: Number,
-    totalItems: Number,
-    sortField: String,
-    sortDirection: String,
-    isProcessing: Boolean,
-    q: String,
-    search: String,
+    syscheck: [],
+    pageIndex: number,
+    pageSize: number,
+    totalItems: number,
+    sortField: string,
+    sortDirection: string,
+    isLoading: boolean,
   };
-  
+
+  props!: {
+    filters: {}
+  }
+
   constructor(props) {
     super(props);
 
@@ -43,9 +46,7 @@ export class StatesTable extends Component {
       totalItems: 0,
       sortField: 'file',
       sortDirection: 'asc',
-      isProcessing: true,
-      q: '',
-      search: '',
+      isLoading: true,
     }
   }
 
@@ -53,7 +54,32 @@ export class StatesTable extends Component {
     await this.getSyscheck();
   }
 
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   const { filters } = this.props;
+  //   const { syscheck, pageIndex, pageSize, sortField, sortDirection } = this.state;
+
+  //   if (JSON.stringify(filters) !== JSON.stringify(nextProps.filters))
+  //     return true;
+  //   if (pageIndex !== nextState.pageIndex)
+  //     return true;
+  //   if (pageSize !== nextState.pageSize)
+  //     return true;
+  //   if (sortField !== nextState.sortField)
+  //     return true;
+  //   if (sortDirection !== nextState.sortDirection)
+  //     return true;
+  //   return false;
+  // }
+
+  componentDidUpdate(prevProps) {
+    const { filters } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters))
+      this.getSyscheck();
+  }
+
   async getSyscheck() {
+    const { filters } = this.props;
+    console.log("getSyscheck",filters)
     const syscheck = await WzRequest.apiReq(
       'GET',
       '/syscheck/001',
@@ -63,7 +89,7 @@ export class StatesTable extends Component {
     this.setState({
       syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
       totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
-      isProcessing: false
+      isLoading: false
     });
   }
 
@@ -77,22 +103,15 @@ export class StatesTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex, pageSize, search, q} = this.state;
+    const { pageIndex, pageSize} = this.state;
+    const { filters } = this.props;
 
      const filter = {
+      ...filters,
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
-
     };
-
-     if (q !== ''){
-      filter.q = q
-    }
-
-     if (search !== '') {
-      filter.search = search;
-    }
 
      return filter;
   }
@@ -105,8 +124,9 @@ export class StatesTable extends Component {
       pageSize,
       sortField,
       sortDirection,
-      isProcessing: true,
+      isLoading: true,
     });
+    this.getSyscheck();
   };
 
   columns() {
@@ -121,7 +141,7 @@ export class StatesTable extends Component {
   }
 
   renderFilesTable() {
-    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection } = this.state;
+    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading } = this.state;
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
@@ -148,6 +168,7 @@ export class StatesTable extends Component {
               sorting={sorting}
               itemId="file"
               isExpandable={true}
+              loading={isLoading}
             />
         </EuiFlexItem>
       </EuiFlexGroup>
