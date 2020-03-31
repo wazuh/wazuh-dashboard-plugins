@@ -40,6 +40,7 @@ export class States extends Component {
           <FilterBar
             onFiltersChange={this.onFiltersChange.bind(this)} />
           <StatesTable
+            {...this.props}
             filters={filters} />
         </EuiPanel>
       </EuiPage>

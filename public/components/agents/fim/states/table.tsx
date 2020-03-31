@@ -79,9 +79,8 @@ export class StatesTable extends Component {
   }
 
   async getSyscheck() {
-		const { filters } = this.props;
-    //const agentID = this.props.agentID; //we should get the syscheck of the current agent received by props
-    const agentID = "001";
+    const { filters } = this.props;
+    const agentID = this.props.agent.id;
 
     const syscheck = await WzRequest.apiReq(
       'GET',
