@@ -56,9 +56,6 @@ export class StatesTable extends Component {
       isLoading: true,
       isFlyoutVisible: false,
     }
-
-    this.closeFlyout = this.closeFlyout.bind(this);
-    this.showFlyout = this.showFlyout.bind(this);
   }
 
   async componentDidMount() {
@@ -178,10 +175,9 @@ export class StatesTable extends Component {
 
   renderFilesTable() {
     const getRowProps = item => {
-      const { id } = item;
+      const { file } = item;
       return {
-        'data-test-subj': `row-${id}`,
-        className: 'customRowClass',
+        'data-test-subj': `row-${file}`,
         onClick: () => this.showFlyout(),
       };
     };
@@ -226,7 +222,7 @@ export class StatesTable extends Component {
 
     if (this.state.isFlyoutVisible) {
       flyout = (
-        <EuiFlyout onClose={this.closeFlyout} aria-labelledby="flyoutTitle">
+        <EuiFlyout onClose={() => this.closeFlyout} aria-labelledby="flyoutTitle">
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
               <h2 id="flyoutTitle">A typical flyout</h2>
