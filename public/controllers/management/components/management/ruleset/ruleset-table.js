@@ -203,10 +203,10 @@ class WzRulesetTable extends Component {
           onClick: async () => {
             const { section } = this.props.state;
             if (section === 'rules') {
-              const result = await this.rulesetHandler.getRuleInformation(item.file, id);
+              const result = await this.rulesetHandler.getRuleInformation(item.filename, id);
               this.props.updateRuleInfo(result);
             } else if (section === 'decoders') {
-              const result = await this.rulesetHandler.getDecoderInformation(item.file, name);
+              const result = await this.rulesetHandler.getDecoderInformation(item.filename, name);
               this.props.updateDecoderInfo(result);
             } else {
               const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);

@@ -38,9 +38,7 @@ export default class RulesetHandler {
    */
   static async getDecoderInformation(file, name) {
     try {
-      const result = await WzRequest.apiReq('GET', `/decoders`, {
-        file
-      });
+      const result = await WzRequest.apiReq('GET', `/decoders`, {params: {filename: file}});
       const info = ((result || {}).data || {}).data || false;
       if (info) Object.assign(info, { current: name });
       return info;

@@ -53,7 +53,7 @@ class WzDecoderInfo extends Component {
         sortable: true
       },
       {
-        field: 'file',
+        field: 'filename',
         name: 'File',
         align: 'left',
         sortable: true,
@@ -61,9 +61,9 @@ class WzDecoderInfo extends Component {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink onClick={async () => {
-                const noLocal = item.path.startsWith('ruleset/');
+                const noLocal = item.relative_dirname.startsWith('ruleset/');
                 const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
-                const file = { name: value, content: result, path: item.path };
+                const file = { name: value, content: result, path: item.relative_dirname };
                 this.props.updateFileContent(file);
               }
               }>{value}</EuiLink>
@@ -72,7 +72,7 @@ class WzDecoderInfo extends Component {
         }
       },
       {
-        field: 'path',
+        field: 'relative_dirname',
         name: 'Path',
         align: 'left',
         sortable: true
@@ -195,7 +195,7 @@ class WzDecoderInfo extends Component {
     const decoders = decoderInfo.affected_items;
     const currentDecoderArr = decoders.filter(r => { return r.name === currentDecoder });
     const currentDecoderInfo = currentDecoderArr[0];
-    const { position, details, file, name, path } = currentDecoderInfo;
+    const { position, details, filename, name, relative_dirname } = currentDecoderInfo;
     const columns = this.columns;
 
     const onClickRow = item => {
@@ -238,7 +238,7 @@ class WzDecoderInfo extends Component {
                     <h3>Information</h3>
                   </EuiTitle>
                   <EuiSpacer size="s" />
-                  {this.renderInfo(position, file, path)}
+                  {this.renderInfo(position, filename, relative_dirname)}
                 </EuiPanel>
               </EuiFlexItem>
               {/* Details */}
