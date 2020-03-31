@@ -74,7 +74,6 @@ export class WzSearchBar extends Component {
       : (props.apiSuggests)
         ? 'API'
         : '';
-    console.log(searchFormat);
 
     return searchFormat;
   }

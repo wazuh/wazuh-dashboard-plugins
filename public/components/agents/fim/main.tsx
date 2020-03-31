@@ -47,7 +47,6 @@ export class MainFim extends Component {
     this.state = {
       selectView: 'states',
     };
-    console.log(this.props)
   }
 
   setGlobalBreadcrumb() {

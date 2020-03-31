@@ -14,8 +14,8 @@ import React, {
   Component, useState
 } from 'react';
 import { EuiBadge } from '@elastic/eui';
-import { QInterpreter } from './lib/q-interpreter';
-import { EuiButtonEmpty, EuiPopover } from '@elastic/eui';
+import { QInterpreter, queryObject } from './lib/q-interpreter';
+import { EuiButtonEmpty, EuiPopover, EuiContextMenu } from '@elastic/eui';
 
 interface iFilter { field:string, value:string }
 
@@ -24,25 +24,65 @@ export interface Props {
   onChange: (badge) => void
 }
 
+function flattenPanelTree(tree, array = []) {
+  array.push(tree);
+
+  if (tree.items) {
+    tree.items.forEach(item => {
+      if (item.panel) {
+        flattenPanelTree(item.panel, array);
+        item.panel = item.panel.id;
+      }
+    });
+  }
+
+  return array;
+}
+
+const panelTree = (props) => {
+  console.log(props)
+  const panels = {
+    id: 0,
+    items: [
+      { 
+        name: 'Edit filter',
+        icon: 'pencil'
+      },
+      {
+        name: 'Delete filter',
+        icon: 'trash',
+        onClick: props.deleteFilter
+      },
+    ]
+  }
+  props.qFilter.operator !== '~' && panels.items.unshift({
+      name: 'Invert operator',
+      icon: 'kqlOperand',
+      onClick: props.invertOperator
+    })
+  !!props.qFilter.conjuntion && panels.items.unshift({
+      name: 'Change conjuntion',
+      icon: 'kqlSelector',
+      onClick: props.changeConjuntuion
+    })
+  return panels;
+}
+
+
 function PopOver(props) {
   const [isOpen, setIsOpen] = useState(false);
-  const conjuntions = {';': 'AND ', ':': 'OR '}
+  const panels = flattenPanelTree(panelTree(props));
+  const conjuntions = {';': 'AND ', ',': 'OR '}
   const operators = {'=': ' is ', '!=': ' is not ', '<': ' less than ', '>': ' greater than ', '~': ' like '}
-  console.log("popOverProps",props)
   const { conjuntion=false, field, value, operator } = props.qFilter;
   const button = (<EuiButtonEmpty color='text' size="xs" onClick={() => setIsOpen(!isOpen)}>
-    <strong>{conjuntion && conjuntions[conjuntion] }</strong>
-    {field}
-    {operators[operator]}
-    {value}
+    <strong>{conjuntion && conjuntions[conjuntion]}</strong> {field} {operators[operator]} {value}
   </EuiButtonEmpty>)
   return (<EuiPopover button={button} isOpen={isOpen} closePopover={() => setIsOpen(false)}>
-    Change conjuntion
-    Edit filter
-    Invert operator
-    Delete filter
+    <EuiContextMenu initialPanelId={0} panels={panels} />
   </EuiPopover>);
 }
+
 
 export class WzSearchBadges extends Component {
   props!: {
@@ -84,7 +124,6 @@ export class WzSearchBadges extends Component {
 
   buildQBadges(filter:iFilter) {
     const qInterpreter = new QInterpreter(filter.value);
-    console.log(qInterpreter.queryObjects)
     const qBadges = qInterpreter.queryObjects.map((qFilter,index) => (
       this.buildQBadge(qInterpreter, index, qFilter)
     ));
@@ -96,13 +135,16 @@ export class WzSearchBadges extends Component {
   private buildQBadge(qInterpreter, index, qFilter): JSX.Element {
     return <EuiBadge key={index} iconType="cross" iconSide="right" 
       color="hollow" iconOnClickAriaLabel="Remove" iconOnClick={() => {
-      this.qBadgeIconOnClick(qInterpreter, index);
+      this.deleteFilter(qInterpreter, index);
     } }>
-      <PopOver qFilter={qFilter} index={index} qInterpreter={qInterpreter} />
+      <PopOver qFilter={qFilter} index={index} qInterpreter={qInterpreter} 
+      deleteFilter={() => this.deleteFilter(qInterpreter, index)} 
+      changeConjuntuion={() => this.changeConjuntuion(qInterpreter, index)}
+      invertOperator={() => this.invertOperator(qInterpreter, index)}/>
     </EuiBadge>;
   }
 
-  private qBadgeIconOnClick(qInterpreter: any, index: number) {
+  private deleteFilter(qInterpreter: QInterpreter, index: number) {
     qInterpreter.deleteByIndex(index);
     if (qInterpreter.qNumber() > 0) {
       const filters = {
@@ -114,6 +156,43 @@ export class WzSearchBadges extends Component {
     else {
       this.onDeleteFilter({ field: 'q', value: '' });
     }
+  }
+
+  private changeConjuntuion(qInterpreter: QInterpreter, index: number){
+    const oldQuery = qInterpreter.getQuery(index)
+    const newQuery:queryObject = { 
+      ...oldQuery,
+      conjuntion: oldQuery.conjuntion === ';' ? ',' : ';',
+    };
+    qInterpreter.editByIndex(index, newQuery);
+    const filters = {
+      ...this.filtersToObject(),
+      q: qInterpreter.toString(),
+    }
+    this.props.onChange(filters);
+  }
+
+  private invertOperator(qInterpreter: QInterpreter, index: number){
+    const oldQuery = qInterpreter.getQuery(index)
+    let newOperator = '=';
+    switch (oldQuery.operator) {
+      case '!=': newOperator = '='; break;
+      case '=': newOperator = '!='; break;
+      case '<': newOperator = '>'; break;
+      case '>': newOperator = '<'; break;
+      case '~': newOperator = '~'; break;
+    }
+    const newQuery:queryObject = { 
+      ...oldQuery,
+      //@ts-ignore
+      operator: newOperator,
+    };
+    qInterpreter.editByIndex(index, newQuery);
+    const filters = {
+      ...this.filtersToObject(),
+      q: qInterpreter.toString(),
+    }
+    this.props.onChange(filters);
   }
 
   filtersToObject() {

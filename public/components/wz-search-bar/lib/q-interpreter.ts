@@ -12,9 +12,9 @@
 
 export interface queryObject {
   field: string
-  operator?: string
+  operator?: '=' | '!=' | '<' | '>' | '~'
   value?: string 
-  conjuntion?: string 
+  conjuntion?: ';' | ','
 }
 
 export class QInterpreter {
@@ -71,11 +71,9 @@ export class QInterpreter {
   }
 
 
-  getQuery():queryObject {return {
-    field: 'string',
-    operator: 'string',
-    value: 'string'
-  }}
+  getQuery(index:number):queryObject {
+    return this.queryObjects[index];
+  }
 
   
   setlastQuery(newInput: string):queryObject {
@@ -112,6 +110,10 @@ export class QInterpreter {
       newQuery['value'] = value;
     }
     this.queryObjects.push(newQuery);
+  }
+
+  editByIndex(index: number, newQuery: queryObject) {
+    this.queryObjects[index] = newQuery;
   }
 
   deleteByIndex(index:number) {
