@@ -148,10 +148,6 @@ export class QTagsHandler extends BaseHandler {
     const { field, value=false } = this.getLastQuery(inputValue);
     let isInvalid = false;
 
-    if (inputValue.length === 0) {
-      delete filters['q'];
-    }
-
     if (value !== false) {
       const fieldExist = this.qSuggests.find(item => item.label === field);
       if (fieldExist) {
@@ -172,7 +168,7 @@ export class QTagsHandler extends BaseHandler {
   } { 
     const filters = {...currentFilters};
     filters['q'] = inputValue;
-    return { inputValue, filters }; 
+    return { inputValue: '', filters }; 
   }
 
   //#endregion 
