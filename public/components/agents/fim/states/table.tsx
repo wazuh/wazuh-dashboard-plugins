@@ -15,17 +15,20 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiBasicTable,
+<<<<<<< HEAD
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
   EuiText,
   EuiCodeBlock
+=======
+  Direction,
+>>>>>>> e21bf16b00551e0cab8634b15ec519dab61ab7ab
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request'
-import { filter } from 'bluebird';
 
 export class StatesTable extends Component {
   state: {
@@ -34,6 +37,7 @@ export class StatesTable extends Component {
     pageSize: number,
     totalItems: number,
     sortField: string,
+<<<<<<< HEAD
     sortDirection: string,
 		isLoading: boolean,
 		index: String,
@@ -41,6 +45,10 @@ export class StatesTable extends Component {
 		field: String,
     direction: String,
     isFlyoutVisible: Boolean
+=======
+    sortDirection: Direction,
+    isLoading: boolean,
+>>>>>>> e21bf16b00551e0cab8634b15ec519dab61ab7ab
   };
 
   props!: {

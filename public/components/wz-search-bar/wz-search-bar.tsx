@@ -336,6 +336,9 @@ export class WzSearchBar extends Component {
   renderFormatSelector() {
     const { qSuggests, apiSuggests } = this.props;
     const { searchFormat } = this.state;
+    if (searchFormat === 'qTags') {
+      return;
+    }
     const qFilterEnabled = !!qSuggests;
     const apiFilterEnabled = !!apiSuggests;
     if (!qFilterEnabled && !apiFilterEnabled) {
