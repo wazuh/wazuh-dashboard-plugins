@@ -62,10 +62,6 @@ wz-menu {
     display: contents;
 }
 
-.wz-menu-left-side .wz-menu-select{
-    background: transparent;
-}
-
 .wz-menu-right-side{
     padding: 16px;
 }
@@ -109,6 +105,15 @@ wz-menu {
     filter: hue-rotate(30deg) brightness(0.8);
     margin-top: 4px;
   }
+
+.wz-menu-selectors {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 16px;
+    background: #f5f7fa;
+    border-top: 1px solid #d3dae6;
+    margin-bottom: -16px;
+}
   
 .wz-menu-button {
     font-size: 14px !important;
@@ -146,9 +151,12 @@ wz-menu {
 
 /* Style for index-pattern selector */
 .wz-menu-select {
-    border: none;
     cursor: pointer;
-    padding-right: 6px;
+    padding: 8px;
+    background: white;
+    border: 1px solid #d3dae6;
+    width: 100%;
+    max-width: 100%;
 }
 
 .wz-menu-select option {

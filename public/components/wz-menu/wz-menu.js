@@ -11,7 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
-import { EuiFlexGroup, EuiFlexItem, EuiPopover, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiToolTip } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPopover, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiToolTip, EuiFormRow } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -228,10 +228,8 @@ class WzMenu extends Component {
 
   buildPatternSelector() {
     return (
-      <EuiButtonEmpty>
-        <EuiToolTip position="bottom" content="Selected index pattern">
-          <EuiIcon type='ip' color="primary" size='m'></EuiIcon>
-        </EuiToolTip>
+      <EuiFormRow
+        label="Selected index pattern">
         <select className="wz-menu-select" value={this.state.currentSelectedPattern}
           onChange={this.changePattern} aria-label="Index pattern selector">
           {this.state.patternList.map((item, idx) => {
@@ -241,16 +239,14 @@ class WzMenu extends Component {
               </option>)
           })}
         </select>
-      </EuiButtonEmpty>
+      </EuiFormRow>
     )
   }
 
   buildApiSelector() {
     return (
-      <EuiButtonEmpty>
-        <EuiToolTip position="bottom" content="Selected API">
-          <EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon>
-        </EuiToolTip>
+      <EuiFormRow
+        label="Selected API">
         <select onMouseEnter={async () => this.loadApiList()} className="wz-menu-select" value={this.state.currentAPI}
           onChange={this.changeAPI} aria-label="API selector">
           {this.state.APIlist.map((item, idx) => {
@@ -260,7 +256,7 @@ class WzMenu extends Component {
               </option>)
           })}
         </select>
-      </EuiButtonEmpty>
+      </EuiFormRow>
     )
   }
 
@@ -345,10 +341,31 @@ class WzMenu extends Component {
             <span className="wz-menu-button-title ">Dev Tools</span>
           </EuiButtonEmpty>
 
-          <div style={{ marginTop: 65 }}>
+          <EuiButtonEmpty
+            className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
+            style={{marginTop: 30}}
+            href="#/settings"
+            color="text"
+            aria-label="Settings"
+            onClick={() => { this.setMenuItem('settings'); this.setState({ menuOpened: false }) }}>
+            <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
+            <span className="wz-menu-button-title ">App settings</span>
+          </EuiButtonEmpty>
+
+          <div className="wz-menu-selectors">
             {this.state.currentAPI && this.state.APIlist && this.state.APIlist.length > 1 &&
               (
                 this.buildApiSelector()
+              )
+            }
+            {this.state.currentAPI && !this.state.APIlist &&
+              (
+                <span>
+                  <EuiToolTip position="bottom" content="Selected API">
+                    <EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon>
+                  </EuiToolTip>
+                  <span>{this.state.currentAPI} </span>
+                </span>
               )
             }
             {!this.state.currentAPI &&
@@ -362,16 +379,6 @@ class WzMenu extends Component {
               )
             }
           </div>
-
-          <EuiButtonEmpty
-            className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
-            href="#/settings"
-            color="text"
-            aria-label="Settings"
-            onClick={() => { this.setMenuItem('settings'); this.setState({ menuOpened: false }) }}>
-            <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">App settings</span>
-          </EuiButtonEmpty>
         </div>
         <div className="wz-menu-right-side">
           {this.state.isManagementPopoverOpen &&
