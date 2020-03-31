@@ -45,8 +45,10 @@ class WzCurrentOverviewSection extends Component {
 
 
   async componentDidUpdate() {
-    console.log("jaaaaaa")
-    if(this.props.state.currentTab) this.props.switchTab(this.props.state.currentTab);
+    if(this.props.state.currentTab !== this.props.currentTab){
+      const forceUpdate = this.props.tabView === 'discover';
+      if(this.props.state.currentTab) this.props.switchTab(this.props.state.currentTab,forceUpdate);
+    }
     this.setGlobalBreadcrumb();
   }
   
