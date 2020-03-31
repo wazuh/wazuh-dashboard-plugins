@@ -37,6 +37,7 @@ export class StatesTable extends Component {
     isFlyoutVisible: Boolean
     sortDirection: Direction,
     isLoading: boolean,
+    currentFile: string,
   };
 
   props!: {
@@ -55,6 +56,7 @@ export class StatesTable extends Component {
       sortDirection: 'asc',
       isLoading: true,
       isFlyoutVisible: false,
+      currentFile: ""
     }
   }
 
@@ -63,11 +65,11 @@ export class StatesTable extends Component {
   }
 
   closeFlyout() {
-    this.setState({ isFlyoutVisible: false });
+    this.setState({ isFlyoutVisible: false, currentFile: "" });
   }
 
-  showFlyout() {
-    this.setState({ isFlyoutVisible: true });
+  showFlyout(file) {
+    this.setState({ isFlyoutVisible: true, currentFile: file});
   }
 
   componentDidUpdate(prevProps) {
@@ -78,10 +80,12 @@ export class StatesTable extends Component {
 
   async getSyscheck() {
 		const { filters } = this.props;
-		
+    //const agentID = this.props.agentID; //we should get the syscheck of the current agent received by props
+    const agentID = "001";
+
     const syscheck = await WzRequest.apiReq(
       'GET',
-      '/syscheck/001',
+      `/syscheck/${agentID}`,
       this.buildFilter()
     );
 
@@ -178,7 +182,7 @@ export class StatesTable extends Component {
       const { file } = item;
       return {
         'data-test-subj': `row-${file}`,
-        onClick: () => this.showFlyout(),
+        onClick: () => this.showFlyout(file),
       };
     };
 
@@ -225,14 +229,13 @@ export class StatesTable extends Component {
         <EuiFlyout onClose={() => this.closeFlyout()} aria-labelledby="flyoutTitle">
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
-              <h2 id="flyoutTitle">A typical flyout</h2>
+              <h2 id="flyoutTitle">{this.state.currentFile} details</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
             <EuiText>
               <p>
-                For consistency across the many flyouts, please utilize the
-                following code for implementing the flyout with a header.
+                Details
               </p>
             </EuiText>
             <EuiCodeBlock language="html">Example text</EuiCodeBlock>
