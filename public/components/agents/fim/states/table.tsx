@@ -34,12 +34,6 @@ export class StatesTable extends Component {
     pageSize: number,
     totalItems: number,
     sortField: string,
-    sortDirection: string,
-		isLoading: boolean,
-		index: String,
-		size: String,
-		field: String,
-    direction: String,
     isFlyoutVisible: Boolean
     sortDirection: Direction,
     isLoading: boolean,
@@ -70,23 +64,6 @@ export class StatesTable extends Component {
   async componentDidMount() {
     await this.getSyscheck();
   }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   const { filters } = this.props;
-  //   const { syscheck, pageIndex, pageSize, sortField, sortDirection } = this.state;
-
-  //   if (JSON.stringify(filters) !== JSON.stringify(nextProps.filters))
-  //     return true;
-  //   if (pageIndex !== nextState.pageIndex)
-  //     return true;
-  //   if (pageSize !== nextState.pageSize)
-  //     return true;
-  //   if (sortField !== nextState.sortField)
-  //     return true;
-  //   if (sortDirection !== nextState.sortDirection)
-  //     return true;
-  //   return false;
-  // }
 
   closeFlyout() {
     this.setState({ isFlyoutVisible: false });
