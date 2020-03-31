@@ -200,6 +200,15 @@ export class StatesTable extends Component {
   }
 
   renderFilesTable() {
+    const getRowProps = item => {
+      const { id } = item;
+      return {
+        'data-test-subj': `row-${id}`,
+        className: 'customRowClass',
+        onClick: () => this.showFlyout(),
+      };
+    };
+
     const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading } = this.state;
     const columns = this.columns();
     const pagination = {
@@ -223,7 +232,7 @@ export class StatesTable extends Component {
               columns={columns}
               pagination={pagination}
               onChange={this.onTableChange}
-              onClick={this.showFlyout}
+              rowProps={getRowProps}
               sorting={sorting}
               itemId="file"
               isExpandable={true}
