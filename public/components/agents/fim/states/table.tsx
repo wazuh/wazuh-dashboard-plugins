@@ -26,6 +26,8 @@ import {
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request'
+import { FileDetails } from './fileDetail';
+import './states.less';
 
 export class StatesTable extends Component {
   state: {
@@ -37,7 +39,7 @@ export class StatesTable extends Component {
     isFlyoutVisible: Boolean
     sortDirection: Direction,
     isLoading: boolean,
-    currentFile: string,
+    currentFile: object,
   };
 
   props!: {
@@ -56,7 +58,7 @@ export class StatesTable extends Component {
       sortDirection: 'asc',
       isLoading: true,
       isFlyoutVisible: false,
-      currentFile: ""
+      currentFile: {}
     }
   }
 
@@ -65,11 +67,15 @@ export class StatesTable extends Component {
   }
 
   closeFlyout() {
-    this.setState({ isFlyoutVisible: false, currentFile: "" });
+    this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
 
   showFlyout(file) {
-    this.setState({ isFlyoutVisible: true, currentFile: file});
+    const fileData = this.state.syscheck.filter(item => {
+      return item.file === file;
+    });
+
+    this.setState({ isFlyoutVisible: true, currentFile: fileData[0]});
   }
 
   componentDidUpdate(prevProps) {
@@ -199,7 +205,7 @@ export class StatesTable extends Component {
 				direction: sortDirection,
 			},
     };
-
+    
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -225,19 +231,14 @@ export class StatesTable extends Component {
 
     if (this.state.isFlyoutVisible) {
       flyout = (
-        <EuiFlyout onClose={() => this.closeFlyout()} aria-labelledby="flyoutTitle">
-          <EuiFlyoutHeader hasBorder>
+        <EuiFlyout onClose={() => this.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
+          <EuiFlyoutHeader hasBorder className="flyout-header" >
             <EuiTitle size="m">
-              <h2 id="flyoutTitle">{this.state.currentFile} details</h2>
+              <h2 id="flyoutTitle">{this.state.currentFile.file} details</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiText>
-              <p>
-                Details
-              </p>
-            </EuiText>
-            <EuiCodeBlock language="html">Example text</EuiCodeBlock>
+          <EuiFlyoutBody className="flyout-body" >
+            <FileDetails currentFile={this.state.currentFile} /> 
           </EuiFlyoutBody>
         </EuiFlyout>
       );
