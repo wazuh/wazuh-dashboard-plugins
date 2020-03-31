@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show configuration of integrity monitoring - general tab.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -29,10 +29,16 @@ const mainSettings = [
   { field: 'alert_new_files', label: 'Alert when new files are created', render: renderValueOrNo, when: 'manager' },
   { field: 'scan_on_start', label: 'Scan on start' },
   { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
+  { field: 'skip_dev', label: 'Skip scan of /dev directory' },
+  { field: 'skip_sys', label: 'Skip scan of /sys directory' },
+  { field: 'skip_proc', label: 'Skip scan of /proc directory' },
   { field: 'remove_old_diff', label: 'Remove old local snapshots', render: renderValueOrYes },
   { field: 'restart_audit', label: 'Restart the Audit daemon' },
   { field: 'windows_audit_interval', label: 'Interval (in seconds) to check directories\' SACLs', render: renderValueOrDefault('300') },
   { field: 'prefilter_cmd', label: 'Command to prevent prelinking', render: renderValueOrNoValue },
+  { field: 'max_eps', label: 'Maximum event reporting throughput' },
+  { field: 'process_priority', label: 'Process priority' },
+  { field: 'database', label: 'Database type' }
 ];
 
 const mainSettingsFroAgentOrManager = (agent) => agent.id === '000' ? mainSettings : mainSettings.filter(setting => setting.when !== 'manager' )
@@ -48,7 +54,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component{
         <WzConfigurationSettingsTabSelector
           title='General'
           description='The settings shown below are applied globally'
-          currentConfig={currentConfig}
+          currentConfig={currentConfig['syscheck-syscheck']}
           minusHeight={this.props.agent.id === '000' ? 340 : 410}
           helpLinks={helpLinks}
         >
