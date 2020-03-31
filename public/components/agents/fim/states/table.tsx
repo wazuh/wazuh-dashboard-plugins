@@ -222,7 +222,7 @@ export class StatesTable extends Component {
 
     if (this.state.isFlyoutVisible) {
       flyout = (
-        <EuiFlyout onClose={() => this.closeFlyout} aria-labelledby="flyoutTitle">
+        <EuiFlyout onClose={() => this.closeFlyout()} aria-labelledby="flyoutTitle">
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
               <h2 id="flyoutTitle">A typical flyout</h2>
