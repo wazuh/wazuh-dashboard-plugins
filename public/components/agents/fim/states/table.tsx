@@ -14,7 +14,13 @@ import React, { Component } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiBasicTable
+  EuiBasicTable,
+  EuiFlyout,
+  EuiFlyoutHeader,
+  EuiFlyoutBody,
+  EuiTitle,
+  EuiText,
+  EuiCodeBlock
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -29,7 +35,12 @@ export class StatesTable extends Component {
     totalItems: number,
     sortField: string,
     sortDirection: string,
-    isLoading: boolean,
+		isLoading: boolean,
+		index: String,
+		size: String,
+		field: String,
+    direction: String,
+    isFlyoutVisible: Boolean
   };
 
   props!: {
@@ -47,7 +58,11 @@ export class StatesTable extends Component {
       sortField: 'file',
       sortDirection: 'asc',
       isLoading: true,
+      isFlyoutVisible: false,
     }
+
+    this.closeFlyout = this.closeFlyout.bind(this);
+    this.showFlyout = this.showFlyout.bind(this);
   }
 
   async componentDidMount() {
@@ -71,6 +86,14 @@ export class StatesTable extends Component {
   //   return false;
   // }
 
+  closeFlyout() {
+    this.setState({ isFlyoutVisible: false });
+  }
+
+  showFlyout() {
+    this.setState({ isFlyoutVisible: true });
+  }
+
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
     if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters))
@@ -78,8 +101,8 @@ export class StatesTable extends Component {
   }
 
   async getSyscheck() {
-    const { filters } = this.props;
-    console.log("getSyscheck",filters)
+		const { filters } = this.props;
+		
     const syscheck = await WzRequest.apiReq(
       'GET',
       '/syscheck/001',
@@ -130,14 +153,48 @@ export class StatesTable extends Component {
   };
 
   columns() {
-    const buildColumn = fieldName => ({
-      field:fieldName, name: fieldName, sortable: true
-    })
-    return ['file','gname','date',
-    'sha1','inode','mtime',
-    'md5','sha256','gid',
-    'type','perm','uid',
-    'uname','size',].map(buildColumn)
+    return [
+      {
+        field: 'file',
+        name: 'File',
+        sortable: true,
+      },
+      {
+        field: 'date',
+        name: 'Last Modified',
+        sortable: true,
+      },
+      {
+        field: 'uname',
+        name: 'User',
+        sortable: true,
+      },
+      {
+        field: 'uid',
+        name: 'User ID',
+        sortable: true,
+      },
+      {
+        field: 'gname',
+        name: 'Group',
+        sortable: true,
+      },
+      {
+        field: 'gid',
+        name: 'Group ID',
+        sortable: true,
+      },
+      {
+        field: 'perm',
+        name: 'Permissions',
+        sortable: true,
+      },
+      {
+        field: 'size',
+        name: 'Size',
+        sortable: true,
+      }
+    ]
   }
 
   renderFilesTable() {
@@ -147,8 +204,7 @@ export class StatesTable extends Component {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      /* hidePerPageOptions: false, */
-      pageSizeOptions: [15, 20, 30],
+      pageSizeOptions: [15, 25, 50, 100],
     }
     const sorting = {
 			sort: {
@@ -165,6 +221,7 @@ export class StatesTable extends Component {
               columns={columns}
               pagination={pagination}
               onChange={this.onTableChange}
+              onClick={this.showFlyout}
               sorting={sorting}
               itemId="file"
               isExpandable={true}
@@ -177,10 +234,33 @@ export class StatesTable extends Component {
 
   render() {
     const filesTable = this.renderFilesTable();
+    let flyout;
+
+    if (this.state.isFlyoutVisible) {
+      flyout = (
+        <EuiFlyout onClose={this.closeFlyout} aria-labelledby="flyoutTitle">
+          <EuiFlyoutHeader hasBorder>
+            <EuiTitle size="m">
+              <h2 id="flyoutTitle">A typical flyout</h2>
+            </EuiTitle>
+          </EuiFlyoutHeader>
+          <EuiFlyoutBody>
+            <EuiText>
+              <p>
+                For consistency across the many flyouts, please utilize the
+                following code for implementing the flyout with a header.
+              </p>
+            </EuiText>
+            <EuiCodeBlock language="html">Example text</EuiCodeBlock>
+          </EuiFlyoutBody>
+        </EuiFlyout>
+      );
+    }
 
     return (
       <div>
         {filesTable}
+        {flyout}
       </div>
     )
   }
