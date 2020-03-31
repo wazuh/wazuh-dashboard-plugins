@@ -73,7 +73,7 @@ class WzRuleInfo extends Component {
         width: '5%'
       },
       {
-        field: 'file',
+        field: 'filename',
         name: 'File',
         align: 'left',
         sortable: true,
@@ -84,9 +84,9 @@ class WzRuleInfo extends Component {
               <EuiLink
                 onClick={async (event) => {
                   event.stopPropagation();
-                  const noLocal = item.path.startsWith('ruleset/');
+                  const noLocal = item.relative_dirname.startsWith('ruleset/');
                   const result = await this.rulesetHandler.getRuleContent(value, noLocal);
-                  const file = { name: value, content: result, path: item.path };
+                  const file = { name: value, content: result, path: item.relative_dirname };
                   this.props.updateFileContent(file);
                 }} >
                 {value}
@@ -179,7 +179,7 @@ class WzRuleInfo extends Component {
         <EuiSpacer size="s" />
         <li key="file"><b>File:</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ filename: file })}>
               &nbsp;{file}
             </EuiLink>
           </EuiToolTip>
@@ -187,7 +187,7 @@ class WzRuleInfo extends Component {
         <EuiSpacer size="s" />
         <li key="path"><b>Path:</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ relative_dirname: path })}>
               &nbsp;{path}
             </EuiLink>
           </EuiToolTip>
@@ -300,7 +300,7 @@ class WzRuleInfo extends Component {
     const rules = ruleInfo.affected_items;
     const currentRuleArr = rules.filter(r => { return r.id === currentRuleId });
     const currentRuleInfo = currentRuleArr[0];
-    const { description, details, file, path, level, id, groups } = currentRuleInfo;
+    const { description, details, filename, relative_dirname, level, id, groups } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
@@ -344,7 +344,7 @@ class WzRuleInfo extends Component {
                     <h3>Information</h3>
                   </EuiTitle>
                   <EuiSpacer size="s" />
-                  {this.renderInfo(id, level, file, path)}
+                  {this.renderInfo(id, level, filename, relative_dirname)}
                   {/* Groups */}
                   <EuiSpacer size={'m'} />
                   <EuiTitle size={'s'}>
