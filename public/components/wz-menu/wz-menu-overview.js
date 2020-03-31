@@ -20,11 +20,15 @@ import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
 import { updateCurrentTab } from '../../redux/actions/appStateActions';
+import { AppState } from '../../react-services/app-state';
 
 class WzMenuOverview extends Component {
   constructor(props) {
     super(props);
+    this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
+    const extensions = AppState.getExtensions(this.currentApi);
     this.state = {
+      extensions
     };
 
     this.overviewSections = {
@@ -63,16 +67,27 @@ class WzMenuOverview extends Component {
   clickMenuItem = section => {
     this.props.closePopover();
     const currentTab = (((store || {}).getState() || {}).appStateReducers || {}).currentTab;
-    if(currentTab !== section){ // do not redirect if we already are in that tab
+    if (currentTab !== section) { // do not redirect if we already are in that tab
       window.location.href = `#/overview/?tab=${section}`;
       store.dispatch(updateCurrentTab(section));
     }
   };
 
+  createItems = (items) => {
+    let result = [];
+    const keyExists = key => Object.keys(this.state.extensions).includes(key);
+    const keyIsTrue = key => (this.state.extensions || [])[key];
+    items.forEach((item) => {
+      if (!keyExists(item.id) || keyIsTrue(item.id)) {
+        result.push(this.createItem(item));
+      }
+    });
+    return result;
+  };
+
   createItem = (item, data = {}) => {
     // NOTE: Duplicate `name` values will cause `id` collisions.
     const currentTab = (((store || {}).getState() || {}).appStateReducers || {}).currentTab;
-
     return {
       ...data,
       id: item.id,
@@ -87,11 +102,12 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.securityInformation, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: [
-          this.createItem(this.overviewSections.general),
-          this.createItem(this.overviewSections.fim),
-          this.createItem(this.overviewSections.aws),
-        ],
+        items: this.createItems(
+          [
+            this.overviewSections.general,
+            this.overviewSections.fim,
+            this.overviewSections.aws
+          ])
       })
     ];
 
@@ -99,12 +115,13 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.auditing, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: [
-          this.createItem(this.overviewSections.pm),
-          this.createItem(this.overviewSections.audit),
-          this.createItem(this.overviewSections.oscap),
-          this.createItem(this.overviewSections.ciscat),
-        ],
+        items: this.createItems(
+          [
+            this.overviewSections.pm,
+            this.overviewSections.audit,
+            this.overviewSections.oscap,
+            this.overviewSections.ciscat,
+          ]),
       })
     ];
 
@@ -112,13 +129,14 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.threatDetection, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: [
-          this.createItem(this.overviewSections.vuls),
-          this.createItem(this.overviewSections.virustotal),
-          this.createItem(this.overviewSections.osquery),
-          this.createItem(this.overviewSections.docker),
-          this.createItem(this.overviewSections.mitre)
-        ],
+        items: this.createItems(
+          [
+            this.overviewSections.vuls,
+            this.overviewSections.virustotal,
+            this.overviewSections.osquery,
+            this.overviewSections.docker,
+            this.overviewSections.mitre
+          ]),
       })
     ];
 
@@ -127,25 +145,26 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.regulatoryCompliance, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: [
-          this.createItem(this.overviewSections.pci),
-          this.createItem(this.overviewSections.gdpr),
-          this.createItem(this.overviewSections.hipaa),
-          this.createItem(this.overviewSections.nist),
-        ],
+        items: this.createItems(
+          [
+            this.overviewSections.pci,
+            this.overviewSections.gdpr,
+            this.overviewSections.hipaa,
+            this.overviewSections.nist,
+          ]),
       })
     ];
 
     return (
       <div className="WzManagementSideMenu">
         <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={1}>
             <EuiSideNav
               items={securityInformation}
               style={{ padding: '4px 12px' }}
             />
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={1}>
             <EuiSideNav
               items={auditing}
               style={{ padding: '4px 12px' }}
@@ -154,13 +173,13 @@ class WzMenuOverview extends Component {
         </EuiFlexGroup>
 
         <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={1}>
             <EuiSideNav
               items={threatDetection}
               style={{ padding: '4px 12px' }}
             />
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={1}>
             <EuiSideNav
               items={regulatoryCompliance}
               style={{ padding: '4px 12px' }}

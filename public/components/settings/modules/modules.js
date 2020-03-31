@@ -17,8 +17,8 @@ import { AppState } from '../../../react-services/app-state';
 export default class EnableModules extends Component {
   constructor(props) {
     super(props);
-    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(currentApi);
+    this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
+    const extensions = AppState.getExtensions(this.currentApi);
     this.state = {
       extensions,
       groups: [
@@ -70,8 +70,7 @@ export default class EnableModules extends Component {
     extensions[extension.name] = !extensions[extension.name];
     this.setState({ extensions });
     try {
-      const api = JSON.parse(this.props.api).id;
-      api && AppState.setExtensions(api, extensions);
+      this.currentApi && AppState.setExtensions(this.currentApi, extensions);
     } catch (error) { } //eslint-disable-line
   }
 
@@ -124,7 +123,7 @@ export default class EnableModules extends Component {
       </div>
     );
   }
-  
+
   render() {
     return (
       this.state.groups.map((group, i) => {
