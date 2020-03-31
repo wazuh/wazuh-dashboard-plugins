@@ -103,7 +103,7 @@ class WzDecoderInfo extends Component {
         <EuiSpacer size="s" />
         <li key="file"><b>File:</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ filename: file })}>
               &nbsp;{file}
             </EuiLink>
           </EuiToolTip>
@@ -111,7 +111,7 @@ class WzDecoderInfo extends Component {
         <EuiSpacer size="s" />
         <li key="path"><b>Path:</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ relative_dirname: path })}>
               &nbsp;{path}
             </EuiLink>
           </EuiToolTip>
