@@ -16,7 +16,7 @@ import ConfigurationHandler from './utils/configuration-handler';
 import { toastNotifications } from 'ui/notify';
 
 import ConfigurationColums from './utils/columns';
-import { configEquivalences } from '../../../../utils/config-equivalences';
+import { configEquivalences } from '../../../utils/config-equivalences';
 
 export class WzConfigurationTable extends Component {
   _isMounted = false;

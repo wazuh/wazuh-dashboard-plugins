@@ -86,9 +86,7 @@ export class OverviewController {
     this.welcomeCardsProps = {
       api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
-      extensions: this.extensions,
-      setExtensions: (api, extensions) =>
-        AppState.setExtensions(api, extensions)
+      extensions: this.extensions
     };
 
     this.currentOverviewSectionProps = {
