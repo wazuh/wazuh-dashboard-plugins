@@ -24,7 +24,7 @@ export class QTagsHandler extends BaseHandler {
     '~': 'Like',
   }
   qSuggests: qSuggests[];
-
+  inputStage: 'fields' | 'values' | 'operators'
   constructor(qSuggests) {
     super();
     this.qSuggests = qSuggests;
@@ -165,10 +165,20 @@ export class QTagsHandler extends BaseHandler {
 
   onKeyPress(inputValue:string, currentFilters:object):{
     inputValue:string, filters: object
-  } { 
-    const filters = {...currentFilters};
-    filters['q'] = inputValue;
-    return { inputValue: '', filters }; 
+  } {
+    if (this.inputStage !== 'values'){
+      return { inputValue, filters: currentFilters }; 
+    }
+    const qInterpreter = new QInterpreter(inputValue);
+
+    const filters = {
+      ...currentFilters,
+      q: !currentFilters['q'] 
+        ? qInterpreter.toString() 
+        : `${currentFilters['q']};${qInterpreter.toString()}`
+    };
+    this.inputStage = 'fields';
+    return {inputValue: '', filters};
   }
 
   //#endregion 
