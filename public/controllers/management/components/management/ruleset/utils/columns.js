@@ -129,7 +129,7 @@ export default class RulesetColumns {
         ],
         lists: [
           {
-            field: 'name',
+            field: 'filename',
             name: 'Name',
             align: 'left',
             sortable: true,
@@ -150,7 +150,7 @@ export default class RulesetColumns {
                   iconType="exportAction"
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.name}`}], item.name)
+                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}`}], item.name)
                   }}
                   color="primary"
                 />

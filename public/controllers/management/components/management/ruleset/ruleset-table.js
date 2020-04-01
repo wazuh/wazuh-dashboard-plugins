@@ -209,8 +209,8 @@ class WzRulesetTable extends Component {
               const result = await this.rulesetHandler.getDecoderInformation(item.filename, name);
               this.props.updateDecoderInfo(result);
             } else {
-              const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
-              const file = { name: item.name, content: result, path: item.path };
+              const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.filename}`);
+              const file = { name: item.filename, content: result, path: item.relative_dirname };
               this.props.updateListContent(file);
             }
           },
