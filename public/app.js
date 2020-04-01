@@ -94,8 +94,8 @@ app.run(function () {
   chrome
     .setRootTemplate(`
     <react-component name="WzMenuWrapper" props="" />
-    <div ng-view class="mainView">
-    </div>
+    <div class="wazuhNotReadyYet"></div>
+    <div ng-view class="mainView"></div>
   `)
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();

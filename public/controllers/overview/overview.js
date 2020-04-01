@@ -86,12 +86,14 @@ export class OverviewController {
     this.welcomeCardsProps = {
       api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
-      extensions: this.extensions,
-      setExtensions: (api, extensions) =>
-        AppState.setExtensions(api, extensions)
+      extensions: this.extensions
     };
 
-    this.setTabs();
+    this.currentOverviewSectionProps = {
+      switchTab: (tab,force) => this.switchTab(tab,force),
+      currentTab: this.tab
+    }
+
 
     this.visualizeProps = {
       selectedTab: this.tab,
@@ -123,34 +125,6 @@ export class OverviewController {
     this.showingMitreTable = !this.showingMitreTable
   }
 
-  /**
-   * Build the current section tabs
-   */
-  setTabs() {
-    this.overviewTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
-
-    if (!this.currentPanel) return;
-
-    const tabs = this.commonData.getTabsFromCurrentPanel(
-      this.currentPanel,
-      this.extensions,
-      this.tabNames
-    );
-
-    this.overviewTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab:
-        this.tab ||
-        (this.currentPanel && this.currentPanel.length
-          ? this.currentPanel[0]
-          : ''),
-      tabs
-    };
-    this.$scope.$applyAsync();
-  }
 
   // Switch subtab
   async switchSubtab(
@@ -160,13 +134,20 @@ export class OverviewController {
       this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear();
       this.$location.search('tabView', subtab);
+      const previousTab = this.currentOverviewSectionProps.currentTab;
+
+      this.currentOverviewSectionProps = {
+        tabView: subtab,
+        currentTab: this.tab,
+        switchTab: (tab,force) => this.switchTab(tab,force),         
+      };
 
       if (subtab === 'panels' && this.tab !== 'welcome') {
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
           this.tab,
           subtab,
-          this.tabView === 'discover'
+          this.tabView === 'discover' && this.tab === previousTab
         );
       } else {
         this.$scope.$emit('changeTabView', {
@@ -248,7 +229,6 @@ export class OverviewController {
 
       // Restore force value if we come from md-nav action
       if (force === 'nav') force = false;
-
       this.$location.search('tab', newTab);
       this.tab = newTab;
 
@@ -256,7 +236,6 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    this.setTabs();
     this.$scope.$applyAsync();
     return;
   }
