@@ -15,7 +15,17 @@ import React, {
 } from 'react';
 import { EuiBadge } from '@elastic/eui';
 import { QInterpreter, queryObject } from './lib/q-interpreter';
-import { EuiButtonEmpty, EuiPopover, EuiContextMenu } from '@elastic/eui';
+import {
+  EuiButtonEmpty,
+  EuiPopover,
+  EuiContextMenu,
+  EuiForm,
+  EuiFormRow,
+  EuiSuperSelect,
+  EuiButtonGroup,
+  EuiFieldText,
+  EuiButton,
+} from '@elastic/eui';
 
 interface iFilter { field:string, value:string }
 
@@ -39,14 +49,64 @@ function flattenPanelTree(tree, array = []) {
   return array;
 }
 
+function EditFilter(props) {
+  const query = props.qInterpreter.getQuery(props.index);
+  const [conjuntion, setConjuntion] = useState(query.conjuntion);
+  const [operator, setOperator] = useState(query.operator);
+  const [value, setValue] = useState(query.value);
+  return <EuiForm>
+    {conjuntion && 
+    <EuiFormRow label="Conjuntion">
+        <EuiButtonGroup 
+          options={[
+            {id: `conjuntion;`, label:"AND"},
+            {id: `conjuntion,`, label:"OR"},
+            ]}
+          idSelected={`conjuntion${conjuntion}`}
+          onChange={() => setConjuntion(conjuntion === ';' ? ',' : ';')}/>
+    </EuiFormRow>}
+    <EuiFormRow label="Operator">
+      <EuiSuperSelect
+        options={[
+          {value: '=', inputDisplay: 'is'},
+          {value: '!=', inputDisplay: 'is not'},
+          {value: '<', inputDisplay: 'less than'},
+          {value: '>', inputDisplay: 'greater than'},
+          {value: '~', inputDisplay: 'like'},
+        ]}
+        valueOfSelected={operator}
+        onChange={setOperator}
+      />
+    </EuiFormRow>
+    <EuiFormRow label="Value">
+      <EuiFieldText
+        value={value}
+        onChange={setValue} />
+    </EuiFormRow>
+    <EuiButton 
+      fill={true}
+      onClick={() => {
+        const newFilter = {field: query.field, operator, value};
+        conjuntion && (newFilter['conjuntion'] = conjuntion);
+        props.qInterpreter.editByIndex(props.index, newFilter);
+        props.updateFilters();
+      }} >
+      Save
+    </EuiButton>
+  </EuiForm>;
+}
 const panelTree = (props) => {
-  console.log(props)
   const panels = {
     id: 0,
     items: [
       { 
         name: 'Edit filter',
-        icon: 'pencil'
+        icon: 'pencil',
+        panel: {
+          id: 1,
+          title: 'Edit filter',
+          content: <EditFilter {...props} />
+        }
       },
       {
         name: 'Delete filter',
@@ -67,7 +127,6 @@ const panelTree = (props) => {
     })
   return panels;
 }
-
 
 function PopOver(props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -140,8 +199,17 @@ export class WzSearchBadges extends Component {
       <PopOver qFilter={qFilter} index={index} qInterpreter={qInterpreter} 
       deleteFilter={() => this.deleteFilter(qInterpreter, index)} 
       changeConjuntuion={() => this.changeConjuntuion(qInterpreter, index)}
-      invertOperator={() => this.invertOperator(qInterpreter, index)}/>
+      invertOperator={() => this.invertOperator(qInterpreter, index)}
+      updateFilters={() => this.updateFilters(qInterpreter)} />
     </EuiBadge>;
+  }
+
+  private updateFilters(qInterpreter:QInterpreter) {
+    const filters = {
+      ...this.filtersToObject(),
+      q: qInterpreter.toString(),
+    }
+    this.props.onChange(filters);
   }
 
   private deleteFilter(qInterpreter: QInterpreter, index: number) {
