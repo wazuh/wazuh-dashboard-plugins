@@ -1,10 +1,11 @@
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
+import { ApiRequest } from '../react-services/api-request';
 
 export class CheckDaemonsStatus {
-  constructor($rootScope, apiReq, $timeout) {
+  constructor($rootScope, $timeout) {
     this.$rootScope = $rootScope;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.tries = 10;
     this.$timeout = $timeout;
     this.busy = false;

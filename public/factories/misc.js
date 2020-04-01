@@ -15,12 +15,18 @@ export class WzMisc {
    * Class constructor
    */
   constructor() {
+    if (!!WzMisc.instance) {
+      return WzMisc.instance;
+    }
     this.state = {
       apiIsDown: false,
       comeFromWizard: false,
       blankScreenError: false,
       lastRestart: null
     };
+
+    WzMisc.instance = this;
+    return this;
   }
 
   /**

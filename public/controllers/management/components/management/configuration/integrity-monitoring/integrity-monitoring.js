@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show configuration of integrity monitoring.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import WzConfigurationIntegrityMonitoringMonitored from './integrity-monitoring-
 import WzConfigurationIntegrityMonitoringIgnored from './integrity-monitoring-ignored';
 import WzConfigurationIntegrityMonitoringNoDiff from './integrity-monitoring-no-diff';
 import WzConfigurationIntegrityMonitoringWhoData from './integrity-monitoring-who-data';
+import WzConfigurationIntegrityMonitoringSynchronization from './integrity-monitoring-synchronization';
 
 class WzConfigurationIntegrityMonitoring extends Component{
   constructor(props){
@@ -64,6 +65,9 @@ class WzConfigurationIntegrityMonitoring extends Component{
             </WzTabSelectorTab>
             <WzTabSelectorTab label='Who-data'>
               <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label='Synchronization'>
+              <WzConfigurationIntegrityMonitoringSynchronization {...this.props} />
             </WzTabSelectorTab>
           </WzTabSelector>
         )}

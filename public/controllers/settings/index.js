@@ -14,14 +14,16 @@ import { SettingsController } from './settings';
 
 const app = uiModules.get('app/wazuh', []);
 
-import { ApiTable } from './components/api-table';
-import { AddApi } from './components/add-api';
-import { ApiIsDown } from './components/api-is-down';
-import { WzConfigurationSettings } from './components/configuration/configuration';
-import SettingsLogs from './components/logs';
+import { ApiTable } from '../../components/settings/api/api-table';
+import { AddApi } from '../../components/settings/api/add-api';
+import { ApiIsDown } from '../../components/settings/api/api-is-down';
+import EnableModules from '../../components/settings/modules/modules';
+import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
+import SettingsLogs from '../../components/settings/settings-logs/logs';
 
 app
   .controller('settingsController', SettingsController)
+  .value('EnableModules', EnableModules)
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsLogs', SettingsLogs)
   .value('ApiTable', ApiTable)

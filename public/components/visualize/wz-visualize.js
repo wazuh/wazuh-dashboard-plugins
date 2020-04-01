@@ -41,40 +41,35 @@ export class WzVisualize extends Component {
   }
 
   async componentDidMount() {
-    const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
-    const result = ((data || {}).data || {}).data || false;
-
-    if (result) {
-      const active = result.Active - 1;
-      const total = result.Total - 1;
-      this.agentsCountActive = active;
-      this.agentsCountDisconnected = result.Disconnected;
-      this.agentsCountNeverConnected = result['Never connected'];
-      this.agentsCountTotal = total;
-      this.agentsCoverity = total ? (active / total) * 100 : 0;
+    this.agentsStatus = false;
+    if (!this.monitoringEnabled) {
+      const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
+      const result = ((data || {}).data || {}).data || false;
+      if (result) {
+        this.agentsStatus = [
+          {
+            title: 'Total',
+            description: result.Total - 1,
+          },
+          {
+            title: 'Active',
+            description: result.Active - 1,
+          },
+          {
+            title: 'Disconnected',
+            description: result.Disconnected,
+          },
+          {
+            title: 'Never Connected',
+            description: result['Never connected'],
+          },
+          {
+            title: 'Agents coverage',
+            description: ((result.Total - 1) ? ((result.Active - 1) / (result.Total - 1)) * 100 : 0) + '%',
+          },
+        ];
+      }
     }
-    this.agentsStatus = [
-      {
-        title: 'Total',
-        description: this.agentsCountTotal,
-      },
-      {
-        title: 'Active',
-        description: this.agentsCountActive,
-      },
-      {
-        title: 'Disconnected',
-        description: this.agentsCountDisconnected,
-      },
-      {
-        title: 'Never Connected',
-        description: this.agentsCountNeverConnected,
-      },
-      {
-        title: 'Agents coverage',
-        description: this.agentsCoverity + '%',
-      },
-    ];
   }
 
   async componentDidUpdate() {
@@ -117,7 +112,7 @@ export class WzVisualize extends Component {
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = (vis) => {
       return (
-        <EuiFlexItem grow={parseInt((vis.width || 10)/10)} key={vis.id}  style={{maxWidth: vis.width + "%", margin: 0, padding: 12}}>
+        <EuiFlexItem grow={parseInt((vis.width || 10) / 10)} key={vis.id} style={{ maxWidth: vis.width + "%", margin: 0, padding: 12 }}>
           <EuiPanel paddingSize="none" className={this.state.expandedVis === vis.id ? 'fullscreen h-100' : 'h-100'}>
             <EuiFlexItem className="h-100" >
               <EuiFlexGroup style={{ padding: '12px 12px 0px' }} className="embPanel__header">
@@ -155,7 +150,7 @@ export class WzVisualize extends Component {
 
     const renderVisualizationRow = (rows, width, idx) => {
       return (
-        <EuiFlexItem grow={(width || 10)/10} key={idx} style={{maxWidth: width + "%", margin: 0, padding: 12}}>
+        <EuiFlexItem grow={(width || 10) / 10} key={idx} style={{ maxWidth: width + "%", margin: 0, padding: 12 }}>
           {rows.map((visRow, j) => {
             return (
               <EuiFlexGroup key={j} style={{ height: visRow.height + 'px', marginBottom: visRow.noMargin ? "" : "4px" }}>
@@ -203,7 +198,7 @@ export class WzVisualize extends Component {
         {selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab] &&
           this.visualizations[selectedTab].rows.map((row, i) => {
             return (
-              <EuiFlexGroup key={i} style={{ height: row.height + 'px', margin: 0, maxWidth: "100%"}}>
+              <EuiFlexGroup key={i} style={{ height: row.height + 'px', margin: 0, maxWidth: "100%" }}>
                 {row.vis.map((vis, n) => {
                   return !vis.hasRows ? (
                     renderVisualizations(vis)

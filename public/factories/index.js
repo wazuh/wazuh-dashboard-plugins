@@ -11,13 +11,9 @@
  */
 import { RawVisualizations } from './raw-visualizations';
 import { LoadedVisualizations } from './loaded-visualizations';
-import { TabVisualizations } from './tab-visualizations';
 import { DiscoverPendingUpdates } from './discover-pending-updates';
 import { VisHandlers } from './vis-handlers';
 import { Vis2PNG } from './vis2png';
-import { ShareAgent } from './share-agent';
-import { WzMisc } from './misc';
-import { WazuhConfig } from './wazuh-config';
 import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
@@ -25,10 +21,6 @@ const app = uiModules.get('app/wazuh', []);
 app
   .service('rawVisualizations', RawVisualizations)
   .service('loadedVisualizations', LoadedVisualizations)
-  .service('tabVisualizations', TabVisualizations)
   .service('discoverPendingUpdates', DiscoverPendingUpdates)
   .service('visHandlers', VisHandlers)
   .service('vis2png', Vis2PNG)
-  .service('shareAgent', ShareAgent)
-  .service('wzMisc', WzMisc)
-  .service('wazuhConfig', WazuhConfig);

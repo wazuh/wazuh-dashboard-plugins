@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for render button to refresh cluster nodes info.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify

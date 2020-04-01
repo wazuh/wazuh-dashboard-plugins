@@ -9,9 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { ApiRequest } from "../react-services/api-request";
+
 export class ConfigHandler {
-  constructor($rootScope, apiReq, errorHandler) {
-    this.apiReq = apiReq;
+  constructor($rootScope, errorHandler) {
+    this.apiReq = ApiRequest;
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
   }

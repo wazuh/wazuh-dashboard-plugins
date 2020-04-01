@@ -5,14 +5,12 @@
     <div ng-show="!actrl.addingNewAgent">
         <div flex="auto" layout="column" ng-cloak ng-controller="overviewController as octrl">
             <!-- Navigation section -->
-            <div layout="row" layout-align="start center" ng-if="octrl.tab !== 'welcome'">
+            <div layout="row" ng-show="octrl.tab !== 'welcome'" layout-align="start center">
                 <!-- Breadcrumbs -->
                 <div layout="row" layout-padding>
                     <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-                    <div ng-if="octrl.tab !== 'welcome'">
-                        <span class="wz-text-link cursor-pointer" ng-click="octrl.switchTab('welcome')">Overview</span>
-                        <span> / </span>
-                        <span>{{ octrl.tabNames[octrl.tab] }}</span>
+                    <div ng-show="octrl.tab !== 'welcome'" style="padding-left: 5px">
+                        <react-component flex name="WzCurrentOverviewSectionWrapper" props="octrl.currentOverviewSectionProps" />
                     </div>
                 </div>
                 <!-- End breadcrumbs -->
@@ -49,12 +47,6 @@
                 <!-- End Discover/Dashboard buttons section -->
             </div>
             <!-- End navigation section -->
-
-            <!-- Navigation bar -->
-            <div ng-if="octrl.overviewTabsProps">
-                <react-component name="Tabs" props="octrl.overviewTabsProps" />
-            </div>
-            <!-- End of navigation bar -->
 
             <!-- Discover search bar section -->
             <kbn-dis ng-show="octrl.tab !== 'welcome'"></kbn-dis>

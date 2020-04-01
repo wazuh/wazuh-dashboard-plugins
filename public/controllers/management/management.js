@@ -12,36 +12,33 @@
 import { TabNames } from '../../utils/tab-names';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
+import RulesetHandler from './components/management/ruleset/utils/ruleset-handler';
 
 export class ManagementController {
   /**
    * Class constructor
    * @param {*} $scope
    * @param {*} $location
-   * @param {*} shareAgent
    */
   constructor(
     $scope,
     $rootScope,
     $location,
-    shareAgent,
-    appState,
     configHandler,
     errorHandler,
     $interval,
-    apiReq,
-    rulesetHandler
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
-    this.appState = appState;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.wazuhConfig = new WazuhConfig();
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;
-    this.apiReq = apiReq;
+    this.apiReq = ApiRequest;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
@@ -51,7 +48,8 @@ export class ManagementController {
     this.currentGroup = false;
     this.logtestOpened = false;
     this.uploadOpened = false;
-    this.rulesetHandler = rulesetHandler;
+    this.rulesetHandler = RulesetHandler;
+    
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -151,7 +149,6 @@ export class ManagementController {
         ? this.restartCluster()
         : this.restartManager();
     });
-    this.appState = appState;
 
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
