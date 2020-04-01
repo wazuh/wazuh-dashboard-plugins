@@ -260,6 +260,39 @@ class WzMenu extends Component {
     )
   }
 
+  buildWazuhNotReadyYet() {
+    const container = document.getElementsByClassName('wazuhNotReadyYet');
+    return (
+      ReactDOM.createPortal(
+        <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning">
+          <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
+            <EuiFlexItem>
+              <p></p>
+            </EuiFlexItem>
+            {this.props.state.wazuhNotReadyYet.includes("Restarting") &&
+              (
+                <EuiFlexItem grow={false}>
+                  <p> <EuiLoadingSpinner size="l" /> &nbsp; &nbsp; </p>
+                </EuiFlexItem>
+              )
+            }
+            {this.props.state.wazuhNotReadyYet === "Wazuh could not be recovered." &&
+              (
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty grow={false} onClick={() => location.reload()} className="WzNotReadyButton" >
+                    <span> Reload </span>
+                  </EuiButtonEmpty>
+                </EuiFlexItem>
+              )
+            }
+          </EuiFlexGroup>
+        </EuiCallOut>
+        ,
+        container[0]
+      )
+    )
+  }
+
   setMenuItem(item) {
     this.setState({ currentMenuTab: item })
   }
@@ -432,31 +465,7 @@ class WzMenu extends Component {
               </EuiPopover>
               <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
               {this.props.state.wazuhNotReadyYet &&
-                (
-                  <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning" style={{ margin: "60px 8px -50px 8px", }}>
-                    <EuiFlexGroup responsive={false} direction="row" style={{ maxHeight: "40px", marginTop: "-45px" }}>
-                      <EuiFlexItem>
-                        <p></p>
-                      </EuiFlexItem>
-                      {this.props.state.wazuhNotReadyYet.includes("Restarting") &&
-                        (
-                          <EuiFlexItem grow={false}>
-                            <p> <EuiLoadingSpinner size="l" /> &nbsp; &nbsp; </p>
-                          </EuiFlexItem>
-                        )
-                      }
-                      {this.props.state.wazuhNotReadyYet === "Wazuh could not be recovered." &&
-                        (
-                          <EuiFlexItem grow={false}>
-                            <EuiButtonEmpty grow={false} onClick={() => location.reload()} className="WzNotReadyButton" >
-                              <span> Reload </span>
-                            </EuiButtonEmpty>
-                          </EuiFlexItem>
-                        )
-                      }
-                    </EuiFlexGroup>
-                  </EuiCallOut>
-                )
+                this.buildWazuhNotReadyYet()
               }
             </Fragment>
           )}
