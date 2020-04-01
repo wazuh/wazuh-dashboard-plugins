@@ -247,7 +247,7 @@ class WzMenu extends Component {
     return (
       <EuiFormRow
         label="Selected API">
-        <select onMouseEnter={async () => this.loadApiList()} className="wz-menu-select" value={this.state.currentAPI}
+        <select className="wz-menu-select" value={this.state.currentAPI}
           onChange={this.changeAPI} aria-label="API selector">
           {this.state.APIlist.map((item, idx) => {
             return (
@@ -296,7 +296,10 @@ class WzMenu extends Component {
     } else {
       this.overviewPopoverToggle();
     }
-    this.setState({ menuOpened: !this.state.menuOpened });
+    this.setState({ menuOpened: !this.state.menuOpened }, async() => {
+      if(this.state.menuOpened) await this.loadApiList();
+      
+    });
   }
 
   render() {
@@ -353,12 +356,12 @@ class WzMenu extends Component {
           </EuiButtonEmpty>
 
           <div className="wz-menu-selectors">
-            {this.state.currentAPI && this.state.APIlist && this.state.APIlist.length > 1 &&
+            {AppState.getAPISelector() && this.state.currentAPI && this.state.APIlist && this.state.APIlist.length > 1 &&
               (
                 this.buildApiSelector()
               )
             }
-            {this.state.currentAPI && !this.state.APIlist &&
+            {(!AppState.getAPISelector() || (AppState.getAPISelector && this.state.APIlist && this.state.APIlist.length < 2)) && this.state.currentAPI &&
               (
                 <span>
                   <EuiToolTip position="bottom" content="Selected API">

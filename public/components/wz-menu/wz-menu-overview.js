@@ -12,7 +12,7 @@
 import React, { Component } from 'react';
 import {
   EuiFlexItem,
-  EuiFlexGroup,
+  EuiFlexGrid,
   EuiSideNav,
   EuiIcon
 } from '@elastic/eui';
@@ -157,35 +157,32 @@ class WzMenuOverview extends Component {
 
     return (
       <div className="WzManagementSideMenu">
-        <EuiFlexGroup>
-          <EuiFlexItem grow={1}>
+        <EuiFlexGrid columns={2}>
+          <EuiFlexItem>
             <EuiSideNav
               items={securityInformation}
               style={{ padding: '4px 12px' }}
             />
           </EuiFlexItem>
-          <EuiFlexItem grow={1}>
+          <EuiFlexItem>
             <EuiSideNav
               items={auditing}
               style={{ padding: '4px 12px' }}
             />
           </EuiFlexItem>
-        </EuiFlexGroup>
-
-        <EuiFlexGroup>
-          <EuiFlexItem grow={1}>
+          <EuiFlexItem>
             <EuiSideNav
               items={threatDetection}
               style={{ padding: '4px 12px' }}
             />
           </EuiFlexItem>
-          <EuiFlexItem grow={1}>
+          <EuiFlexItem>
             <EuiSideNav
               items={regulatoryCompliance}
               style={{ padding: '4px 12px' }}
             />
           </EuiFlexItem>
-        </EuiFlexGroup>
+        </EuiFlexGrid>
       </div>
     );
   }

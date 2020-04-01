@@ -25,6 +25,7 @@ import {
   EuiButton
 } from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -60,7 +61,7 @@ export class WelcomeScreen extends Component {
           icon={<EuiIcon size="xl" type={icon} color='primary' />}
           className='homSynopsis__card'
           title={TabDescription[tab].title}
-          onClick={() => this.props.switchTab(tab)}
+          onClick={() => store.dispatch(updateCurrentTab(tab))}
           data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
           description={TabDescription[tab].description}
         />

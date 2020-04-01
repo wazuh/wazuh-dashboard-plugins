@@ -91,8 +91,12 @@ export class WzConfigurationTable extends Component {
       this.newValueItem(newValue, key, type);
       this.setState({ editingKey: null, isLoading: false });
 
-      if (result.data.data) {
+      const response = result.data.data;
+      if (response.needRestart) {
         this.showToast('warning', 'You must restart Kibana for the changes to take effect', 3000);
+      } else if (response.needWait) {
+        this.showToast('warning', 'The configuration has been successfully updated, but it may take a few seconds for the change to take effect', 3000);
+
       } else {
         this.showToast('success', 'The configuration has been successfully updated', 3000);
       }
