@@ -110,7 +110,7 @@ export default class RulesetColumns {
                 <EuiToolTip position="top" content={`Show ${value} content`}>
                   <EuiLink onClick={async (ev) => {
                     ev.stopPropagation();
-                    const noLocal = item.path.startsWith('ruleset/');
+                    const noLocal = item.relative_dirname.startsWith('ruleset/');
                     const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
                     const file = { name: value, content: result, path: item.relative_dirname };
                     this.tableProps.updateFileContent(file);
