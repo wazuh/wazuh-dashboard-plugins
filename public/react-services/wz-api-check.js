@@ -36,6 +36,7 @@ export class ApiCheck {
 
       if(Object.keys(configuration).length){
         AppState.setPatternSelector(configuration['ip.selector']);
+        AppState.setAPISelector(configuration['api.selector']);
       }
 
 

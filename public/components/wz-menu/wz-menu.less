@@ -42,13 +42,44 @@ wz-menu {
 
 .wz-menu-left-side{
     width: 200px;
-    background: #fafbfd;
+    background: #f5f7fa;
     padding: 16px;
     border-right: 1px solid #d3dae6;
 }
 
+.wz-menu-left-side .euiButtonEmpty {
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.wz-menu-left-side .euiButtonEmpty__content {
+    justify-content: left;
+}
+
+.wz-menu-left-side .euiButtonEmpty__text {
+    width: 100%;
+    text-align: left;
+    display: contents;
+}
+
+.wz-menu-sections {
+    margin: -16px;
+    padding: 16px;
+    background: #fafbfd;
+}
+
+.wz-menu-selectors {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 16px;
+    background: #f5f7fa;
+    border-top: 1px solid #d3dae6;
+    margin-bottom: -16px;
+}
+
 .wz-menu-right-side{
     padding: 16px;
+    max-width: 650px;
 }
 
 .navBarLogo {
@@ -72,7 +103,44 @@ wz-menu {
     .wz-menu-wrapper{
         padding-left: 0!important;
     }
-
+    .wz-menu-popover {
+        left: -1px !important;
+        width: 100vw;
+        box-shadow: none;
+        max-width: unset;
+    }
+    .wz-menu-left-side{
+        width: 70px;
+    }
+    .wz-menu-left-side .euiButtonEmpty {
+        width: 50px;
+    }
+    .wz-menu-right-side{
+        overflow-y: auto;
+        max-height: 288px;
+        margin-right: -16px;
+    }
+    .wz-menu-selectors {
+        width: 97vw;
+        display: inline-flex;
+    }
+    .euiFormRow + .euiFormRow {
+        margin-left: 16px;
+        margin-top: 0;
+    }
+    .wz-menu-select {
+        max-width: 150px!important;
+        width: 150px!important;
+    }
+    .euiSideNav__mobileToggle.euiLink{
+        display: none;
+    }
+    .euiSideNav__content{
+        visibility: visible;
+        opacity: 1;
+        max-height: unset;
+        margin: 0;
+    }
     .wz-menu-button-title {
         display: none;
     }
@@ -127,9 +195,12 @@ wz-menu {
 
 /* Style for index-pattern selector */
 .wz-menu-select {
-    border: none;
     cursor: pointer;
-    padding-right: 6px;
+    padding: 8px;
+    background: white;
+    border: 1px solid #d3dae6;
+    width: 100%;
+    max-width: 100%;
 }
 
 .wz-menu-select option {
@@ -143,6 +214,11 @@ wz-menu {
     background-color: #FFF;
 }
 
+.wz-menu-selectors-api{
+    overflow: hidden;
+    max-width: 168px;
+    text-overflow: ellipsis;
+}
 
 .euiHeader {
     box-shadow: none !important;

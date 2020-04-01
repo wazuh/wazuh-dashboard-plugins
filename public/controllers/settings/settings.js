@@ -133,6 +133,7 @@ export class SettingsController {
       selectedTab: this.tab || 'api',
       tabs: [
         { id: 'api', name: 'API' },
+        { id: 'modules', name: 'Modules' },
         { id: 'configuration', name: 'Configuration' },
         { id: 'logs', name: 'Logs' },
         { id: 'about', name: 'About' }
@@ -151,10 +152,7 @@ export class SettingsController {
    * This switch to a selected tab
    * @param {Object} tab
    */
-  switchTab(tab, setNav = false) {
-    if (setNav) {
-      AppState.setNavigation({ status: true });
-    }
+  switchTab(tab) {
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }

@@ -69,6 +69,13 @@
 # Default: 20000
 #timeout: 20000
 #
+# -------------------------------- API selector --------------------------------
+#
+# Defines if the user is allowed to change the selected
+# API directly from the Wazuh app top menu.
+# Default: false
+#api.selector: false
+#
 # --------------------------- Index pattern selector ---------------------------
 #
 # Defines if the user is allowed to change the selected
