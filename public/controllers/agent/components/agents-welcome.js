@@ -11,7 +11,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiCard,
   EuiIcon,
@@ -19,15 +19,12 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiSpacer,
-  EuiSwitch,
-  EuiPopover,
-  EuiButtonIcon,
-  EuiFormRow,
   EuiFlexGrid,
   EuiCallOut,
   EuiTitle,
   EuiHealth,
-  EuiPage
+  EuiPage,
+  EuiButton
 } from '@elastic/eui';
 import { AgentInfo } from './agent-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -40,30 +37,6 @@ export class AgentWelcomeScreen extends Component {
     this.state = {
       extensions: this.props.extensions,
     };
-  }
-
-  onButtonClick(btn) {
-    this.setState({
-      [btn]: !this.state[btn],
-    });
-  }
-
-  closePopover(popover) {
-    this.setState({
-      [popover]: false,
-    });
-  }
-
-  toggleExtension(extension) {
-    const extensions = this.state.extensions;
-    extensions[extension] = !extensions[extension];
-    this.setState({
-      extensions,
-    });
-    try {
-      const api = JSON.parse(this.props.api).id;
-      api && this.props.setExtensions(api, extensions);
-    } catch (error) { } //eslint-disable-line
   }
 
   renderTitle() {
@@ -96,39 +69,6 @@ export class AgentWelcomeScreen extends Component {
     );
   }
 
-  buildPopover(popoverName, extensions) {
-    const switches = extensions
-      .filter(extension => this.props.extensions[extension] !== undefined)
-      .map(extension => {
-        return (
-          <EuiFormRow key={extension}>
-            <EuiSwitch
-              label={`${TabDescription[extension].title} extension`}
-              checked={this.state.extensions[extension]}
-              onChange={() => this.toggleExtension(extension)}
-            />
-          </EuiFormRow>
-        );
-      });
-
-    return (
-      <EuiPopover
-        id={popoverName}
-        button={
-          <EuiButtonIcon
-            aria-label="Extensions"
-            iconType="eye"
-            onClick={() => this.onButtonClick(popoverName)}
-          />
-        }
-        isOpen={this.state[popoverName]}
-        closePopover={() => this.closePopover(popoverName)}
-      >
-        {switches}
-      </EuiPopover>
-    );
-  }
-
   render() {
     const title = this.renderTitle();
     return (
@@ -149,7 +89,7 @@ export class AgentWelcomeScreen extends Component {
                     <EuiFlexGroup gutterSize="xs">
                       <EuiFlexItem />
                     </EuiFlexGroup>
-                    <EuiSpacer size="l" />
+                    <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('general', 'dashboardApp')}
                       {this.buildTabCard('fim', 'filebeatApp')}
@@ -160,16 +100,7 @@ export class AgentWelcomeScreen extends Component {
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
-                    <EuiFlexGroup gutterSize="xs">
-                      <EuiFlexItem />
-                      <EuiFlexItem grow={false}>
-                        {this.buildPopover('popoverAuditing', [
-                          'audit',
-                          'oscap',
-                          'ciscat'
-                        ])}
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
+                    <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('pm', 'advancedSettingsApp')}
                       {this.buildTabCard('sca', 'securityAnalyticsApp')}
@@ -188,17 +119,7 @@ export class AgentWelcomeScreen extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiPanel betaBadgeLabel="Threat Detection and Response">
-                    <EuiFlexGroup gutterSize="xs">
-                      <EuiFlexItem />
-                      <EuiFlexItem grow={false}>
-                        {this.buildPopover('popoverThreat', [
-                          'virustotal',
-                          'osquery',
-                          'docker',
-                          'mitre'
-                        ])}
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
+                    <EuiSpacer size="s" />
                     {(
                       UnsupportedComponents[this.props.agent.agentPlatform] ||
                       UnsupportedComponents['other']
@@ -214,7 +135,7 @@ export class AgentWelcomeScreen extends Component {
                                 <p>
                                   Click the <EuiIcon type="eye" /> icon to show thread detection and
                                   response extensions.
-                          </p>
+                                </p>
                               }
                               color="success"
                               iconType="help"
@@ -241,17 +162,7 @@ export class AgentWelcomeScreen extends Component {
 
                 <EuiFlexItem>
                   <EuiPanel betaBadgeLabel="Regulatory Compliance">
-                    <EuiFlexGroup gutterSize="xs">
-                      <EuiFlexItem />
-                      <EuiFlexItem grow={false}>
-                        {this.buildPopover('popoverRegulatory', [
-                          'pci',
-                          'gdpr',
-                          'hipaa',
-                          'nist'
-                        ])}
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
+                    <EuiSpacer size="s" />
                     {!this.props.extensions.pci &&
                       !this.props.extensions.gdpr &&
                       !this.props.extensions.hipaa &&
@@ -263,7 +174,7 @@ export class AgentWelcomeScreen extends Component {
                                 <p>
                                   Click the <EuiIcon type="eye" /> icon to show
                                   regulatory compliance extensions.
-                          </p>
+                                </p>
                               }
                               color="success"
                               iconType="help"
@@ -278,17 +189,28 @@ export class AgentWelcomeScreen extends Component {
                         <EuiFlexGrid columns={2}>
                           {this.props.extensions.pci &&
                             this.buildTabCard('pci', 'visTagCloud')}
+                          {this.props.extensions.nist &&
+                            this.buildTabCard('nist', 'apmApp')}
                           {this.props.extensions.gdpr &&
                             this.buildTabCard('gdpr', 'visBarVertical')}
                           {this.props.extensions.hipaa &&
                             this.buildTabCard('hipaa', 'emsApp')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
                         </EuiFlexGrid>
                       )}
                   </EuiPanel>
                 </EuiFlexItem>
               </EuiFlexGroup>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPage>
+        <EuiPage>
+          <EuiFlexGroup justifyContent="spaceAround">
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                onClick={() => window.location.href = "#/settings?tab=modules"}
+                iconType="eye">
+                Configure the modules
+              </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPage>

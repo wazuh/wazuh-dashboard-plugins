@@ -13,7 +13,8 @@
 const initialState = {
   currentAPI: "",
   showMenu: false,
-  wazuhNotReadyYet: ""
+  wazuhNotReadyYet: "",
+  currentTab: ""
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -38,6 +39,14 @@ const appStateReducers = (state = initialState, action) => {
       wazuhNotReadyYet: action.wazuhNotReadyYet,
     };
   }
+
+  if (action.type === 'UPDATE_WAZUH_CURRENT_TAB') {
+    return {
+      ...state,
+      currentTab: action.currentTab,
+    };
+  }
+
 
   return state;
 };
