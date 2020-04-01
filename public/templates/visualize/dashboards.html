@@ -5,7 +5,7 @@
     <div ng-show="!actrl.addingNewAgent">
         <div flex="auto" layout="column" ng-cloak ng-controller="overviewController as octrl">
             <!-- Navigation section -->
-            <div layout="row" layout-align="start center">
+            <div layout="row" ng-show="octrl.tab !== 'welcome'" layout-align="start center">
                 <!-- Breadcrumbs -->
                 <div layout="row" layout-padding>
                     <!-- If you're not on the Welcome tab, show a functional breadcrumb -->

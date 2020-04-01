@@ -296,9 +296,9 @@ class WzMenu extends Component {
     } else {
       this.overviewPopoverToggle();
     }
-    this.setState({ menuOpened: !this.state.menuOpened }, async() => {
-      if(this.state.menuOpened) await this.loadApiList();
-      
+    this.setState({ menuOpened: !this.state.menuOpened }, async () => {
+      if (this.state.menuOpened) await this.loadApiList();
+
     });
   }
 
@@ -306,55 +306,56 @@ class WzMenu extends Component {
     const menu = (
       <div className="wz-menu-wrapper">
         <div className="wz-menu-left-side">
-          <EuiButtonEmpty
-            className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
-            color="text"
-            onClick={this.onClickOverviewButton.bind(this)}>
-            <EuiIcon type='visualizeApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Overview</span>
-            <span className="flex"></span>
-            {this.state.isOverviewPopoverOpen && (<EuiIcon color='subdued' type='arrowRight' />)}
-          </EuiButtonEmpty>
+          <div className="wz-menu-sections">
+            <EuiButtonEmpty
+              className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
+              color="text"
+              onClick={this.onClickOverviewButton.bind(this)}>
+              <EuiIcon type='visualizeApp' color='primary' size='m' />
+              <span className="wz-menu-button-title ">Overview</span>
+              <span className="flex"></span>
+              {this.state.isOverviewPopoverOpen && (<EuiIcon color='subdued' type='arrowRight' />)}
+            </EuiButtonEmpty>
 
-          <EuiButtonEmpty
-            className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
-            color="text"
-            onClick={this.onClickManagementButton.bind(this)}>
-            <EuiIcon type='managementApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Management</span>
-            <span className="flex"></span>
-            {this.state.isManagementPopoverOpen && (<EuiIcon color='subdued' type='arrowRight' />)}
-          </EuiButtonEmpty>
+            <EuiButtonEmpty
+              className={"wz-menu-button " + (this.state.currentMenuTab === "manager" ? "wz-menu-active" : "")}
+              color="text"
+              onClick={this.onClickManagementButton.bind(this)}>
+              <EuiIcon type='managementApp' color='primary' size='m' />
+              <span className="wz-menu-button-title ">Management</span>
+              <span className="flex"></span>
+              {this.state.isManagementPopoverOpen && (<EuiIcon color='subdued' type='arrowRight' />)}
+            </EuiButtonEmpty>
 
-          <EuiButtonEmpty
-            className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
-            color="text"
-            href="#/agents-preview"
-            onClick={() => { this.setMenuItem('agents-preview'); this.setState({ menuOpened: false }) }}>
-            <EuiIcon type='watchesApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Agents</span>
-          </EuiButtonEmpty>
+            <EuiButtonEmpty
+              className={"wz-menu-button " + (this.state.currentMenuTab === "agents-preview" || this.state.currentMenuTab === 'agents' ? "wz-menu-active" : "")}
+              color="text"
+              href="#/agents-preview"
+              onClick={() => { this.setMenuItem('agents-preview'); this.setState({ menuOpened: false }) }}>
+              <EuiIcon type='watchesApp' color='primary' size='m' />
+              <span className="wz-menu-button-title ">Agents</span>
+            </EuiButtonEmpty>
 
-          <EuiButtonEmpty
-            className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
-            color="text"
-            href="#/wazuh-dev"
-            onClick={() => { this.setMenuItem('wazuh-dev'); this.setState({ menuOpened: false }) }}>
-            <EuiIcon type='console' color='primary' size='m' />
-            <span className="wz-menu-button-title ">Dev Tools</span>
-          </EuiButtonEmpty>
+            <EuiButtonEmpty
+              className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
+              color="text"
+              href="#/wazuh-dev"
+              onClick={() => { this.setMenuItem('wazuh-dev'); this.setState({ menuOpened: false }) }}>
+              <EuiIcon type='console' color='primary' size='m' />
+              <span className="wz-menu-button-title ">Dev Tools</span>
+            </EuiButtonEmpty>
 
-          <EuiButtonEmpty
-            className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
-            style={{marginTop: 30}}
-            href="#/settings"
-            color="text"
-            aria-label="Settings"
-            onClick={() => { this.setMenuItem('settings'); this.setState({ menuOpened: false }) }}>
-            <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
-            <span className="wz-menu-button-title ">App settings</span>
-          </EuiButtonEmpty>
-
+            <EuiButtonEmpty
+              className={"wz-menu-button" + (this.state.currentMenuTab === "settings" ? " wz-menu-active" : "")}
+              style={{ marginTop: 50, marginBottom: 16 }}
+              href="#/settings"
+              color="text"
+              aria-label="Settings"
+              onClick={() => { this.setMenuItem('settings'); this.setState({ menuOpened: false }) }}>
+              <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
+              <span className="wz-menu-button-title ">App settings</span>
+            </EuiButtonEmpty>
+          </div>
           <div className="wz-menu-selectors">
             {AppState.getAPISelector() && this.state.currentAPI && this.state.APIlist && this.state.APIlist.length > 1 &&
               (
@@ -363,12 +364,10 @@ class WzMenu extends Component {
             }
             {(!AppState.getAPISelector() || (AppState.getAPISelector && this.state.APIlist && this.state.APIlist.length < 2)) && this.state.currentAPI &&
               (
-                <span>
-                  <EuiToolTip position="bottom" content="Selected API">
-                    <EuiIcon type='starFilledSpace' color="primary" size='m'></EuiIcon>
-                  </EuiToolTip>
-                  <span>{this.state.currentAPI} </span>
-                </span>
+                <EuiFormRow
+                  label="Selected API">
+                  <p className='wz-menu-selectors-api'>{this.state.currentAPI} </p>
+                </EuiFormRow>
               )
             }
             {!this.state.currentAPI &&
@@ -400,7 +399,7 @@ class WzMenu extends Component {
     const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
     const mainButton = (
       <button onClick={() => this.switchMenuOpened()}>
-        <EuiFlexGroup direction="row" style={{ paddingTop: 5 }}>
+        <EuiFlexGroup direction="row" responsive={false} style={{ paddingTop: 5 }}>
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
             <img src={logotype_url} className="navBarLogo" alt=""></img>
           </EuiFlexItem>

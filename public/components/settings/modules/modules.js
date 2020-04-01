@@ -77,12 +77,12 @@ export default class EnableModules extends Component {
   buildModuleGroup(extensions) {
     const switches = extensions.map(extension => {
       return (
-        <EuiFlexGroup key={extension.name}>
+        <EuiFlexGroup key={extension.name} responsive={false}>
           <EuiFlexItem grow={false} style={{ minWidth: 90 }}>
             {!extension.default &&
               <EuiSwitch
                 label=''
-                style={{ padding: 8, right: 0, position: 'absolute', top: 0 }}
+                style={{ padding: '8px 0px', right: 0, position: 'absolute', top: 0 }}
                 checked={this.state.extensions[extension.name]}
                 onChange={() => this.toggleExtension(extension)}
               />
@@ -91,7 +91,7 @@ export default class EnableModules extends Component {
               <EuiBetaBadge
                 label="Default"
                 tooltipContent="This module is enabled by default"
-                style={{ margin: '8px 0px' }}
+                style={{ margin: '6px 0px' }}
               />
             }
           </EuiFlexItem>
@@ -99,7 +99,7 @@ export default class EnableModules extends Component {
             <EuiDescriptionList listItems={
               [
                 {
-                  title: <span style={{ fontSize: 16 }}>
+                  title: <span>
                     {extension.agent &&
                       <span>
                         <EuiBadge color='#006bb4'>{"Agent module"}</EuiBadge>
@@ -108,7 +108,7 @@ export default class EnableModules extends Component {
                     }
                     {TabDescription[extension.name].title}
                   </span>,
-                  description: <span style={{ fontSize: 14 }}>{TabDescription[extension.name].description}</span>
+                  description: <span>{TabDescription[extension.name].description}</span>
                 }
               ]
             } />

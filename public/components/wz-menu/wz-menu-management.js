@@ -110,7 +110,7 @@ class WzMenuManagement extends Component {
 
     return (
       <div className="WzManagementSideMenu">
-        <EuiFlexGroup>
+        <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav
               items={sideNavAdmin}

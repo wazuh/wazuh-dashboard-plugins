@@ -60,7 +60,7 @@ class WzCurrentOverviewSection extends Component {
     return (
       <span>
       {this.props.currentTab && TabDescription[this.props.currentTab] && TabDescription[this.props.currentTab].title && (
-      <EuiTitle>
+      <EuiTitle size='s'>
         <h2>
           {TabDescription[this.props.currentTab].title}
        </h2>
