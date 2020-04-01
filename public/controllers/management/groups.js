@@ -91,7 +91,7 @@ export class GroupsController {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
         const data = await this.apiReq.request('GET', 
-        '/agents/groups', 
+        '/groups', 
         { params: { limit: 1000 },
         });
         const filtered = data.data.data.affected_items.filter(group => group.name === globalGroup);
@@ -105,7 +105,7 @@ export class GroupsController {
         this.shareAgent.deleteAgent();
       } else {
         const loadedGroups = await this.apiReq.request('GET', 
-        '/agents/groups', 
+        '/groups', 
         { params: { limit: 1000 } } 
         );
         this.buildGroupsTableProps(loadedGroups.data.data.affected_items);
@@ -153,7 +153,7 @@ export class GroupsController {
       }
       const result = await this.apiReq.request(
         'GET',
-        `/agents/groups/${this.currentGroup.name}`,
+        `/agents/groups/${this.currentGroup.name}`, //TODO: 
         { params: params },
       );
       this.totalSelectedAgents = result.data.data.total_affected_items;

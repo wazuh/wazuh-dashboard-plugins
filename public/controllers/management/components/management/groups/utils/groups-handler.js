@@ -85,7 +85,7 @@ export default class GroupsHandler {
    */
   static async listGroups(filters) {
     try {
-      const result = await WzRequest.apiReq('GET', '/agents/groups', filters);
+      const result = await WzRequest.apiReq('GET', '/groups', filters);
       return result;
     } catch (error) {
       return Promise.reject(error);
