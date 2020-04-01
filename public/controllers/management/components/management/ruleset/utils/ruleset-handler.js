@@ -22,10 +22,14 @@ export default class RulesetHandler {
   static async getRuleInformation(file, id) {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, {
-        file
+        params: {
+          filename: file
+        }
       });
       const info = ((result || {}).data || {}).data || false;
-      if (info) Object.assign(info, { current: id }); //Assign the current rule ID to filter later in the component
+      if (info) Object.assign(info, {
+        current: id
+      }); //Assign the current rule ID to filter later in the component
       return info;
     } catch (error) {
       return Promise.reject(error);
@@ -39,10 +43,14 @@ export default class RulesetHandler {
   static async getDecoderInformation(file, name) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
-        file
+        params: {
+          filename: file
+        }
       });
       const info = ((result || {}).data || {}).data || false;
-      if (info) Object.assign(info, { current: name });
+      if (info) Object.assign(info, {
+        current: name
+      });
       return info;
     } catch (error) {
       return Promise.reject(error);
@@ -117,7 +125,9 @@ export default class RulesetHandler {
   static async getLocalRules() {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, {
-        path: 'etc/rules'
+        params: {
+          relative_dirname: 'etc/rules'
+        }
       });
       return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
@@ -161,9 +171,9 @@ export default class RulesetHandler {
    */
   static async getDecoderContent(path, nolocal = true) {
     try {
-      const _path = nolocal
-        ? `ruleset/decoders/${path}`
-        : `etc/decoders/${path}`;
+      const _path = nolocal ?
+        `ruleset/decoders/${path}` :
+        `etc/decoders/${path}`;
       const result = await this.getFileContent(_path);
       return result;
     } catch (error) {
@@ -212,8 +222,9 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq(
         'PUT',
         `/manager/files?path=etc/rules/${rule.file ||
-        rule}&overwrite=${overwrite}`,
-        { body: content }
+        rule}&overwrite=${overwrite}`, {
+          body: content
+        }
       );
       return result;
     } catch (error) {
@@ -232,8 +243,9 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq(
         'PUT',
         `/manager/files?path=etc/decoders/${decoder.file ||
-        decoder}&overwrite=${overwrite}`,
-        { body: content }
+        decoder}&overwrite=${overwrite}`, {
+          body: content
+        }
       );
       return result;
     } catch (error) {
@@ -248,13 +260,12 @@ export default class RulesetHandler {
    * @param {String} content 
    * @param {Boolean} overwrite 
    */
-  static async sendCdbList(list, path, content, overwrite,addingNew=false) {
+  static async sendCdbList(list, path, content, overwrite, addingNew = false) {
     try {
-      if(!addingNew){
+      if (!addingNew) {
         const result = await WzRequest.apiReq(
           'PUT',
-          `/manager/files?path=${path}/${list}&overwrite=${overwrite}`,
-          {
+          `/manager/files?path=${path}/${list}&overwrite=${overwrite}`, {
             body: {
               content,
               origin: 'raw'
@@ -262,11 +273,10 @@ export default class RulesetHandler {
           }
         );
         return result;
-      }else{
+      } else {
         const result = await WzRequest.apiReq(
           'PUT',
-          `/manager/files?path=${path}&overwrite=${overwrite}`,
-          {
+          `/manager/files?path=${path}&overwrite=${overwrite}`, {
             body: {
               content,
               origin: 'raw'
@@ -285,8 +295,7 @@ export default class RulesetHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
-        {
+        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`, {
           body: {
             content,
             origin: 'raw'
@@ -298,7 +307,7 @@ export default class RulesetHandler {
       return Promise.reject(error);
     }
   }
-  
+
   /**
    * Delete a file
    * @param {String} file 
@@ -306,12 +315,11 @@ export default class RulesetHandler {
    */
   static async deleteFile(file, path) {
     let fullPath = `${path}/${file}`;
-    if(path.startsWith("etc/lists")){
+    if (path.startsWith("etc/lists")) {
       fullPath = path;
     }
     try {
-      const result = await WzRequest.apiReq('DELETE', '/manager/files',
-      {
+      const result = await WzRequest.apiReq('DELETE', '/manager/files', {
         params: {
           path: fullPath
         }
