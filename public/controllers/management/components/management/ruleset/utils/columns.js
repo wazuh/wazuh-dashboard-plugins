@@ -129,7 +129,7 @@ export default class RulesetColumns {
         ],
         lists: [
           {
-            field: 'name',
+            field: 'filename',
             name: 'Name',
             align: 'left',
             sortable: true,
@@ -144,13 +144,13 @@ export default class RulesetColumns {
             name: 'Actions',
             align: 'left',
             render: (item) => (
-              <EuiToolTip position="top" content={`Export ${item.name}`}>
+              <EuiToolTip position="top" content={`Export ${item.filename}`}>
                 <EuiButtonIcon
                   aria-label="Export list"
                   iconType="exportAction"
                   onClick={async (ev) => {
                     ev.stopPropagation();
-                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.name}`}], item.name)
+                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}`}], item.filename)
                   }}
                   color="primary"
                 />
@@ -230,20 +230,20 @@ export default class RulesetColumns {
               const defaultItems = this.tableProps.state.defaultItems;
               return (
                 <div>
-                  <EuiToolTip position="top" content={`Edit ${item.name} content`}>
+                  <EuiToolTip position="top" content={`Edit ${item.filename} content`}>
                     <EuiButtonIcon
                       aria-label="Edit content"
                       iconType="pencil"
                       onClick={async (ev) => {
                         ev.stopPropagation();
-                        const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.name}`);
-                        const file = { name: item.name, content: result, path: item.relative_dirname };
+                        const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.filename}`);
+                        const file = { name: item.filename, content: result, path: item.relative_dirname };
                         this.tableProps.updateListContent(file);
                       }}
                       color="primary"
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.name}` : `The ${item.name} list cannot be deleted`}>
+                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted`}>
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
@@ -256,13 +256,13 @@ export default class RulesetColumns {
                       disabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={`Export ${item.name}`}>
+                  <EuiToolTip position="top" content={`Export ${item.filename}`}>
                     <EuiButtonIcon
                       aria-label="Export list"
                       iconType="exportAction"
                       onClick={async (ev) => {
                         ev.stopPropagation();
-                        await exportCsv(`/lists?path=${item.relative_dirname}/${item.name}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.name}`}], item.name)
+                        await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
                       }}
                       color="primary"
                     />

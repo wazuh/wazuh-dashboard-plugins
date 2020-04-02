@@ -1117,23 +1117,22 @@ export class WazuhApiCtrl {
         if (isArrayOfLists) {
           const flatLists = [];
           for (const list of itemsArray) {
-            const { path, items } = list;
-            flatLists.push(...items.map(item => ({ path, key: item.key, value: item.value })));
+            const { relative_dirname, items } = list;
+            flatLists.push(...items.map(item => ({ relative_dirname, key: item.key, value: item.value })));
           }
-          fields = ['path', 'key', 'value'];
+          fields = ['relative_dirname', 'key', 'value'];
           itemsArray = [...flatLists];
         }
 
         if (isList) {
           fields = ['key', 'value'];
-          itemsArray = output.body.data.items[0];
+          itemsArray = output.data.data.affected_items[0].items;
         }
         fields = fields.map(item => ({ value: item, default: '-' }));
 
         const json2csvParser = new Parser({ fields });
-
-        let csv = json2csvParser.parse(itemsArray);
-
+        
+        let csv = json2csvParser.parse(itemsArray);        
         for (const field of fields) {
           const { value } = field;
           if (csv.includes(value)) {
