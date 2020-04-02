@@ -147,7 +147,12 @@ function EditFilterValue(value, setValue, suggest): React.ReactNode {
         onChange={(e) => setValue(e.target.value)} />}
       isOpen={isPopoverOpen}
       closePopover={() => setIsPopoverOpen(false)} >
-        {suggetsValues.map(item => <EuiSuggestItem type={{ iconType: 'kqlValue', color: 'tint0' }} label={item} onClick={() => {setValue(item); setIsPopoverOpen(false)}} />)}
+        {suggetsValues.map((item, key) => (
+          <EuiSuggestItem key={key}
+            label={item} 
+            type={{ iconType: 'kqlValue', color: 'tint0' }} 
+            onClick={() => {setValue(item); setIsPopoverOpen(false)}}/>
+          ))}
       </EuiInputPopover> 
   </EuiFormRow>;
 }
