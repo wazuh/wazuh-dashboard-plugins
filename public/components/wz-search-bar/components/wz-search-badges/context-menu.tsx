@@ -1,0 +1,159 @@
+/*
+ * Wazuh app - React component for show search and filter
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+import React, { useState } from 'react';
+import {
+  EuiButton,
+  EuiButtonEmpty,
+  EuiButtonGroup,
+  EuiContextMenu,
+  EuiFieldText,
+  EuiForm,
+  EuiFormRow,
+  EuiPopover,
+  EuiSuperSelect
+} from '@elastic/eui';
+
+const conjuntions = { ';': 'AND ', ',': 'OR ' }
+const operators = {
+  '=': ' is ',
+  '!=': ' is not ',
+  '<': ' less than ',
+  '>': ' greater than ',
+  '~': ' like '
+}
+
+export function ContextMenu(props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const panels = flattenPanelTree(panelTree(props));
+  const { conjuntion = false, field, value, operator } = props.qFilter;
+  const button = (<EuiButtonEmpty color='text' size="xs" onClick={() => setIsOpen(!isOpen)}>
+    <strong>{conjuntion && conjuntions[conjuntion]}</strong> {field} {operators[operator]} {value}
+  </EuiButtonEmpty>)
+  return (<EuiPopover button={button} isOpen={isOpen} closePopover={() => setIsOpen(false)}>
+    <EuiContextMenu initialPanelId={0} panels={panels} />
+  </EuiPopover>);
+}
+
+function flattenPanelTree(tree, array = []) {
+  // @ts-ignore
+  array.push(tree);
+  const treeEach = item => {
+    if (item.panel) {
+      flattenPanelTree(item.panel, array);
+      item.panel = item.panel.id;
+    }
+  }
+
+  if (!tree.items) {
+    return array;
+  }
+  tree.items.forEach(treeEach);
+
+  return array;
+}
+
+const panelTree = (props) => {
+  const { operator, conjuntion } = props.qFilter;
+  const { invertOperator, changeConjuntion } = props;
+  const panels = {
+    id: 0,
+    items: [
+      {
+        name: 'Edit filter',
+        icon: 'pencil',
+        panel: {
+          id: 1,
+          title: 'Edit filter',
+          content: <EditFilter {...props} />
+        }
+      },
+      {
+        name: 'Delete filter',
+        icon: 'trash',
+        onClick: props.deleteFilter
+      },
+    ]
+  }
+  operator !== '~' && panels.items.unshift(operatorItem(invertOperator))
+  !!conjuntion && panels.items.unshift(conjuntionItem(changeConjuntion))
+  return panels;
+}
+
+const operatorItem = (invertOperator) => {
+  return {
+    name: 'Invert operator',
+    icon: 'kqlOperand',
+    onClick: invertOperator
+  }
+}
+
+const conjuntionItem = (changeConjuntion) => {
+  return {
+    name: 'Change conjuntion',
+    icon: 'kqlSelector',
+    onClick: changeConjuntion
+  }
+}
+
+function EditFilter(props) {
+  const query = props.qInterpreter.getQuery(props.index);
+  const [conjuntion, setConjuntion] = useState(query.conjuntion);
+  const [operator, setOperator] = useState(query.operator);
+  const [value, setValue] = useState(query.value);
+  return <EuiForm>
+    {conjuntion &&
+      EditFilterConjuntion(conjuntion, setConjuntion)}
+    {EditFilterOperator(operator, setOperator)}
+    {EditFilterValue(value, setValue)}
+    {EditFilterSaveButton(query, operator, value, conjuntion, props)}
+  </EuiForm>;
+}
+
+function EditFilterSaveButton(query: any, operator: any, value: any, conjuntion: any, props: any): React.ReactNode {
+  return <EuiButton fill={true} onClick={() => {
+    const newFilter = { field: query.field, operator, value };
+    conjuntion && (newFilter['conjuntion'] = conjuntion);
+    props.qInterpreter.editByIndex(props.index, newFilter);
+    props.updateFilters();
+  }}>
+    Save
+  </EuiButton>;
+}
+
+function EditFilterValue(value: any, setValue: React.Dispatch<any>): React.ReactNode {
+  return <EuiFormRow label="Value">
+    <EuiFieldText value={value} onChange={(e) => setValue(e.target.value)} />
+  </EuiFormRow>;
+}
+
+function EditFilterOperator(operator: any, setOperator: React.Dispatch<any>) {
+  return <EuiFormRow label="Operator">
+    <EuiSuperSelect options={[
+      { value: '=', inputDisplay: 'is' },
+      { value: '!=', inputDisplay: 'is not' },
+      { value: '<', inputDisplay: 'less than' },
+      { value: '>', inputDisplay: 'greater than' },
+      { value: '~', inputDisplay: 'like' },
+    ]} valueOfSelected={operator} onChange={setOperator} />
+  </EuiFormRow>;
+}
+
+function EditFilterConjuntion(conjuntion: any, setConjuntion: React.Dispatch<any>): React.ReactNode {
+  return <EuiFormRow label="Conjuntion">
+    <EuiButtonGroup options={[
+      { id: `conjuntion;`, label: "AND" },
+      { id: `conjuntion,`, label: "OR" },
+    ]} idSelected={`conjuntion${conjuntion}`} onChange={() => setConjuntion(conjuntion === ';' ? ',' : ';')} />
+  </EuiFormRow>;
+}
+
