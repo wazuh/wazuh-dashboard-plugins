@@ -1,19 +1,9 @@
 <div ng-if="tab === 'fim'">
-    <div ng-if="agent && agent.os">
-        <react-component name="MainFim" props="fimProps" />
-        <div ng-if='!loadingDashboard'>
-            <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
-                <kbn-dis></kbn-dis>
-                <react-component ng-if='showModuleDashboard === "fim"' name="WzVisualize" props="visualizeProps" />
-            </div>
+    <react-component name="MainFim" props="fimProps" />
+    <div ng-if='!loadingDashboard'>
+        <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
+            <kbn-dis></kbn-dis>
         </div>
     </div>
-    <div ng-if="!agent || !agent.os">
-        <div flex class="euiCallOut euiCallOut--warning">
-            <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-                <span class="euiCallOutHeader__title">This agent has never connected.</span>
-            </div>
-        </div>
-    </div>
+    <react-component ng-show='showModuleDashboard === "fim"' name="WzVisualize" props="visualizeProps" />
 </div>

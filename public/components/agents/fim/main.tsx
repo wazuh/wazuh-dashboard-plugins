@@ -19,7 +19,8 @@ import {
   EuiTab,
   EuiTabs,
   EuiTitle,
-  EuiToolTip
+  EuiToolTip,
+  EuiCallOut
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -175,30 +176,38 @@ export class MainFim extends Component {
     const dashboardButton = this.renderDashboardButton();
     const settingsButton = this.renderSettingsButton();
     return (
-      <div className='wz-module'>
-        <div className='wz-module-header-wrapper'>
-          <div className='wz-module-header'>
-            {title}
-            <EuiFlexGroup>
-              {tabs}
-              {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
-              {dashboardButton}
-              {settingsButton}
-            </EuiFlexGroup>
+      <Fragment>
+        {(this.props.agent && this.props.agent.os) &&
+          <div className='wz-module'>
+            <div className='wz-module-header-wrapper'>
+              <div className='wz-module-header'>
+                {title}
+                <EuiFlexGroup>
+                  {tabs}
+                  {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
+                  {dashboardButton}
+                  {settingsButton}
+                </EuiFlexGroup>
+              </div>
+            </div>
+            <div className='wz-module-body'>
+              {selectView === 'states' && <States {...this.props} />}
+              {selectView === 'events' && <Events {...this.props} section='fim' />}
+              {selectView === 'loader' &&
+                <Loader {...this.props}
+                  loadSection={(section) => this.loadSection(section)}
+                  redirect={this.afterLoad}>
+                </Loader>}
+              {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
+              {selectView === 'settings' && <Settings {...this.props} />}
+            </div>
           </div>
-        </div>
-        <div className='wz-module-body'>
-          {selectView === 'states' && <States {...this.props} />}
-          {selectView === 'events' && <Events {...this.props} section='fim' />}
-          {selectView === 'loader' &&
-            <Loader {...this.props}
-              loadSection={(section) => this.loadSection(section)}
-              redirect={this.afterLoad}>
-            </Loader>}
-          {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
-          {selectView === 'settings' && <Settings {...this.props} />}
-        </div>
-      </div>
+        }
+        {(!this.props.agent || !this.props.agent.os) &&
+          <EuiCallOut title=" This agent has never connected" color="warning" iconType="alert">
+          </EuiCallOut>
+        }
+      </Fragment>
     );
   }
 }

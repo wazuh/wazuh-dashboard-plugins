@@ -12,10 +12,6 @@
 
 import React, { Component, Fragment } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import {
-  EuiLoadingSpinner,
-  EuiSpacer,
-} from '@elastic/eui';
 
 const app = getAngularModule('app/wazuh');
 
@@ -45,10 +41,6 @@ export class Loader extends Component {
     const redirect = this.redirect();
     return (
       <Fragment>
-        <EuiSpacer size='xl' />
-        <div style={{ margin: '0 auto', width: 32 }}>
-          <EuiLoadingSpinner size="xl" />
-        </div>
         {redirect}
       </Fragment>
     );
