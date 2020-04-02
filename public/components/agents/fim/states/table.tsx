@@ -25,7 +25,7 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
-import { WzRequest } from '../../../../react-services/wz-request'
+import { WzRequest } from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
 import './states.less';
 
@@ -119,6 +119,7 @@ export class StatesTable extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
+      type: 'file'
     };
 
      return filter;
@@ -145,7 +146,7 @@ export class StatesTable extends Component {
         sortable: true,
       },
       {
-        field: 'date',
+        field: 'mtime',
         name: 'Last Modified',
         sortable: true,
       },
