@@ -1126,14 +1126,13 @@ export class WazuhApiCtrl {
 
         if (isList) {
           fields = ['key', 'value'];
-          itemsArray = output.body.data.items[0];
+          itemsArray = output.data.data.affected_items[0].items;
         }
         fields = fields.map(item => ({ value: item, default: '-' }));
 
         const json2csvParser = new Parser({ fields });
-
-        let csv = json2csvParser.parse(itemsArray);
-
+        
+        let csv = json2csvParser.parse(itemsArray);        
         for (const field of fields) {
           const { value } = field;
           if (csv.includes(value)) {
