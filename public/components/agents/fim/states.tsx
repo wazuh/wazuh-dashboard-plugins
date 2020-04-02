@@ -35,7 +35,7 @@ export class States extends Component {
     totalItemsRegistry: Number
   }
   props: any;
-    
+
   constructor(props) {
     super(props);
 
@@ -62,7 +62,7 @@ export class States extends Component {
         disabled: false,
       },
     ) : null;
-    return(auxTabs);
+    return (auxTabs);
   }
 
   async componentDidMount() {
@@ -75,9 +75,9 @@ export class States extends Component {
   }
 
   onSelectedTabChanged = id => {
-    this.setState({selectedTabId: id});
+    this.setState({ selectedTabId: id });
   }
-  
+
   async getTotalFiles() {
     const agentID = this.props.agent.id;
     const totalItemsFile = await WzRequest.apiReq(
@@ -88,7 +88,7 @@ export class States extends Component {
         type: 'file'
       }
     );
-    this.setState({totalItemsFile: ((totalItemsFile.data || {}).data || {}).totalItems || 0});
+    this.setState({ totalItemsFile: ((totalItemsFile.data || {}).data || {}).totalItems || 0 });
   }
 
   async getTotalRegistry() {
@@ -101,20 +101,32 @@ export class States extends Component {
         type: 'registry'
       }
     );
-    this.setState({totalItemsRegistry: ((totalItemsRegistry.data || {}).data || {}).totalItems || 0});
+    this.setState({ totalItemsRegistry: ((totalItemsRegistry.data || {}).data || {}).totalItems || 0 });
   }
 
   renderTabs() {
     const tabs = this.tabs();
-    return tabs.map((tab, index) => (
-      <EuiTab
-        onClick={() => this.onSelectedTabChanged(tab.id)}
-        isSelected={tab.id === this.state.selectedTabId}
-        disabled={tab.disabled}
-        key={index}>
-        {tab.name}
-      </EuiTab>
-    ));
+    if (tabs.length > 1) {
+      return (
+        <EuiTabs>
+          {tabs.map((tab, index) => (
+            <EuiTab
+              onClick={() => this.onSelectedTabChanged(tab.id)}
+              isSelected={tab.id === this.state.selectedTabId}
+              disabled={tab.disabled}
+              key={index}>
+              {tab.name}
+            </EuiTab>
+          ))}
+        </EuiTabs>
+      )
+    } else {
+      return (
+        <EuiTitle size="s">
+          <h1> {tabs[0].name} </h1>
+        </EuiTitle>
+      )
+    }
   }
 
   renderFiles() {
@@ -144,10 +156,8 @@ export class States extends Component {
     return (
       <EuiPage>
         <EuiPanel>
-          <EuiTabs>
-            {tabs}
-          </EuiTabs>
-          <EuiSpacer size="l" />
+          {tabs}
+          <EuiSpacer size="m" />
           {selectedTabId === 'files' && files}
           {this.props.agent.os.platform === 'windows' && (selectedTabId === 'registry' && registry)}
         </EuiPanel>

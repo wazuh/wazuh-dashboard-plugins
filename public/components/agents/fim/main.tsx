@@ -29,6 +29,7 @@ import { Events, Dashboard, Loader } from '../../common/modules';
 import '../../../less/components/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
+import { ReportingService } from '../../../react-services/reporting';
 
 export class MainFim extends Component {
   state: {
@@ -39,6 +40,7 @@ export class MainFim extends Component {
     { id: 'events', name: i18n.translate('wazuh.fim.events', { defaultMessage: 'Events' }) },
   ]
   afterLoad = false;
+  reportingService = new ReportingService();
 
   constructor(props) {
     super(props);
@@ -119,7 +121,7 @@ export class MainFim extends Component {
       <EuiFlexItem grow={false}>
         <EuiButton
           iconType="document"
-          onClick={() => this.onSelectedTabChanged('dashboard')}>
+          onClick={() => this.reportingService.startVis2Png('fim', this.props.agent.id)}>
           Generate report
           </EuiButton>
       </EuiFlexItem>

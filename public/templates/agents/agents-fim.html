@@ -5,5 +5,36 @@
             <kbn-dis></kbn-dis>
         </div>
     </div>
+    <!-- Loading status section -->
+    <div ng-if="tabView === 'panels' && showModuleDashboard === 'fim' && !rendered && resultState !== 'none'"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{loadingStatus}}</div>
+        </div>
+    </div>
+    <!-- End loading status section -->
+    <!-- Report status section -->
+    <div ng-if="reportBusy && reportStatus && showModuleDashboard === 'fim'"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{reportStatus}}</div>
+            <div class="euiSpacer euiSpacer--l"></div>
+        </div>
+    </div>
+    <!-- End report status section -->
     <react-component ng-show='showModuleDashboard === "fim"' name="WzVisualize" props="visualizeProps" />
 </div>
