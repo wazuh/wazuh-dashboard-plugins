@@ -12,9 +12,11 @@
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 export async function getFilterValues(field, value) {
+
   const filter = {
     distinct: true,
     select: field,
+    limit: 30,
   };
   if (value) {
     filter['search'] = value;
