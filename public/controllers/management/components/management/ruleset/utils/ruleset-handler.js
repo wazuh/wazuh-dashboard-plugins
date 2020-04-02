@@ -10,7 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WzRequest } from '../../../../../../react-services/wz-request';
+import {
+  WzRequest
+} from '../../../../../../react-services/wz-request';
 
 export default class RulesetHandler {
 
@@ -262,29 +264,17 @@ export default class RulesetHandler {
    */
   static async sendCdbList(list, path, content, overwrite, addingNew = false) {
     try {
-      if (!addingNew) {
-        const result = await WzRequest.apiReq(
-          'PUT',
-          `/manager/files?path=${path}/${list}&overwrite=${overwrite}`, {
-            body: {
-              content,
-              origin: 'raw'
-            }
-          }
-        );
-        return result;
-      } else {
-        const result = await WzRequest.apiReq(
-          'PUT',
-          `/manager/files?path=${path}&overwrite=${overwrite}`, {
-            body: {
-              content,
-              origin: 'raw'
-            }
-          }
-        );
-        return result;
-      }
+      const result = await WzRequest.apiReq(
+        'PUT',
+        `/manager/files`, {
+          params: {
+            path: `${path}/${list}`,
+            overwrite: overwrite
+          },
+          body: content.toString()
+        }
+      );
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -295,11 +285,12 @@ export default class RulesetHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`, {
-          body: {
-            content,
-            origin: 'raw'
-          }
+        `/manager/files`, {
+          params: {
+            path: `etc/lists/${list}`,
+            overwrite: !overwrite
+          },
+          body: content.toString()
         }
       );
       return result;
