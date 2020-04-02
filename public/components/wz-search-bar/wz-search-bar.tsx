@@ -359,7 +359,7 @@ export class WzSearchBar extends Component {
       filters,
       isPopoverOpen
     } = this.state;
-    const { placeholder, buttonOptions } = this.props;
+    const { placeholder, buttonOptions, qSuggests } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     return (
@@ -392,7 +392,8 @@ export class WzSearchBar extends Component {
           <EuiFlexItem grow={false}>
             <WzSearchBadges
               filters={formatedFilter}
-              onChange={this.onChangeBadge.bind(this)} />
+              onChange={this.onChangeBadge.bind(this)}
+              qSuggests={qSuggests} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
