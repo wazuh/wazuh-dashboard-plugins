@@ -306,9 +306,6 @@ export default class RulesetHandler {
    */
   static async deleteFile(file, path) {
     let fullPath = `${path}/${file}`;
-    if (path.startsWith("etc/lists")) {
-      fullPath = path;
-    }
     try {
       const result = await WzRequest.apiReq('DELETE', '/manager/files', {
         params: {
