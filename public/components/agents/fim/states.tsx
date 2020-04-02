@@ -17,7 +17,8 @@ import {
   EuiPage,
   EuiTabs,
   EuiTab,
-  EuiSpacer
+  EuiSpacer,
+  EuiTitle
 } from '@elastic/eui';
 import {
   StatesTable,
@@ -33,6 +34,7 @@ export class States extends Component {
     totalItemsFile: Number,
     totalItemsRegistry: Number
   }
+  props: any;
     
   constructor(props) {
     super(props);
@@ -46,18 +48,21 @@ export class States extends Component {
   }
 
   tabs() {
-    return [
+    let auxTabs = [
       {
         id: 'files',
         name: `Files (${this.state.totalItemsFile})`,
         disabled: false,
       },
+    ]
+    this.props.agent.os.platform === 'windows' ? auxTabs.push(
       {
         id: 'registry',
         name: `Windows Registry (${this.state.totalItemsRegistry})`,
         disabled: false,
       },
-    ]
+    ) : null;
+    return(auxTabs);
   }
 
   async componentDidMount() {
@@ -134,16 +139,17 @@ export class States extends Component {
   render() {
     const files = this.renderFiles();
     const registry = this.renderWindowRegistry();
+    const tabs = this.renderTabs()
     const { selectedTabId } = this.state;
     return (
       <EuiPage>
         <EuiPanel>
-          <EuiTabs display="condensed">
-            {this.renderTabs()}
+          <EuiTabs>
+            {tabs}
           </EuiTabs>
           <EuiSpacer size="l" />
           {selectedTabId === 'files' && files}
-          {selectedTabId === 'registry' && registry}
+          {this.props.agent.os.platform === 'windows' && (selectedTabId === 'registry' && registry)}
         </EuiPanel>
       </EuiPage>
     )
