@@ -16,6 +16,7 @@ import React, {
 import { EuiBadge } from '@elastic/eui';
 import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { ContextMenu } from './components/wz-search-badges';
+import { qSuggests } from '.';
 
 
 interface iFilter { field:string, value:string }
@@ -29,6 +30,7 @@ export class WzSearchBadges extends Component {
   props!: {
     filters: iFilter[]
     onChange: Function
+    qSuggests: qSuggests[]
   }
   constructor(props) {
     super(props);
@@ -74,6 +76,7 @@ export class WzSearchBadges extends Component {
 
 
   private buildQBadge(qInterpreter, index, qFilter): JSX.Element {
+    const { qSuggests } = this.props;
     return <EuiBadge key={index} iconType="cross" iconSide="right" 
       color="hollow" iconOnClickAriaLabel="Remove" iconOnClick={() => {
       this.deleteFilter(qInterpreter, index);
@@ -82,7 +85,9 @@ export class WzSearchBadges extends Component {
       deleteFilter={() => this.deleteFilter(qInterpreter, index)} 
       changeConjuntion={() => this.changeConjuntion(qInterpreter, index)}
       invertOperator={() => this.invertOperator(qInterpreter, index)}
-      updateFilters={() => this.updateFilters(qInterpreter)} />
+      updateFilters={() => this.updateFilters(qInterpreter)}
+      qSuggest={qSuggests.find(item => item.label === qFilter.field)}
+       />
     </EuiBadge>;
   }
 

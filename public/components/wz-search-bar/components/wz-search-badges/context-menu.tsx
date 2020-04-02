@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -20,7 +20,9 @@ import {
   EuiForm,
   EuiFormRow,
   EuiPopover,
-  EuiSuperSelect
+  EuiSuperSelect,
+  EuiInputPopover,
+  EuiSuggestItem,
 } from '@elastic/eui';
 
 const conjuntions = { ';': 'AND ', ',': 'OR ' }
@@ -106,7 +108,8 @@ const conjuntionItem = (changeConjuntion) => {
 }
 
 function EditFilter(props) {
-  const query = props.qInterpreter.getQuery(props.index);
+  const { index, qSuggest } = props
+  const query = props.qInterpreter.getQuery(index);
   const [conjuntion, setConjuntion] = useState(query.conjuntion);
   const [operator, setOperator] = useState(query.operator);
   const [value, setValue] = useState(query.value);
@@ -114,7 +117,7 @@ function EditFilter(props) {
     {conjuntion &&
       EditFilterConjuntion(conjuntion, setConjuntion)}
     {EditFilterOperator(operator, setOperator)}
-    {EditFilterValue(value, setValue)}
+    {EditFilterValue(value, setValue, qSuggest)}
     {EditFilterSaveButton(query, operator, value, conjuntion, props)}
   </EuiForm>;
 }
@@ -130,13 +133,32 @@ function EditFilterSaveButton(query: any, operator: any, value: any, conjuntion:
   </EuiButton>;
 }
 
-function EditFilterValue(value: any, setValue: React.Dispatch<any>): React.ReactNode {
+function EditFilterValue(value, setValue, suggest): React.ReactNode {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [suggetsValues, setSuggetsValues] = useState([]);
+  useEffect(() => {
+    updateSuggestsValues(suggest, value, setSuggetsValues);
+  }, [value])
   return <EuiFormRow label="Value">
-    <EuiFieldText value={value} onChange={(e) => setValue(e.target.value)} />
+    <EuiInputPopover
+      input={<EuiFieldText 
+        value={value} 
+        onFocus={() => setIsPopoverOpen(true)} 
+        onChange={(e) => setValue(e.target.value)} />}
+      isOpen={isPopoverOpen}
+      closePopover={() => setIsPopoverOpen(false)} >
+        {suggetsValues.map(item => <EuiSuggestItem type={{ iconType: 'kqlValue', color: 'tint0' }} label={item} onClick={() => {setValue(item); setIsPopoverOpen(false)}} />)}
+      </EuiInputPopover> 
   </EuiFormRow>;
 }
 
-function EditFilterOperator(operator: any, setOperator: React.Dispatch<any>) {
+async function updateSuggestsValues(suggest: any, value: any, setSuggetsValues: React.Dispatch<React.SetStateAction<never[]>>) {
+  (suggest.values && {}.toString.call(suggest.values) === '[object Function]')
+    ? setSuggetsValues(await suggest.values(value))
+    : setSuggetsValues(suggest.values || []);
+}
+
+function EditFilterOperator(operator, setOperator) {
   return <EuiFormRow label="Operator">
     <EuiSuperSelect options={[
       { value: '=', inputDisplay: 'is' },
@@ -148,7 +170,7 @@ function EditFilterOperator(operator: any, setOperator: React.Dispatch<any>) {
   </EuiFormRow>;
 }
 
-function EditFilterConjuntion(conjuntion: any, setConjuntion: React.Dispatch<any>): React.ReactNode {
+function EditFilterConjuntion(conjuntion, setConjuntion): React.ReactNode {
   return <EuiFormRow label="Conjuntion">
     <EuiButtonGroup options={[
       { id: `conjuntion;`, label: "AND" },
