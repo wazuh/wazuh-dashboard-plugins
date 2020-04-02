@@ -11,15 +11,27 @@
  */
 
 import React, { Component } from 'react';
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+
+const app = getAngularModule('app/wazuh');
 
 export class Events extends Component {
   constructor(props) {
     super(props);
   }
 
+  componentDidMount() {
+    this.$rootScope = app.$injector.get('$rootScope');
+    this.$rootScope.showModuleEvents = this.props.section;
+    this.$rootScope.$applyAsync();
+  }
+
+  componentWillUnmount() {
+    this.$rootScope.showModuleEvents = false;
+    this.$rootScope.$applyAsync();
+  }
+
   render() {
-    return (
-      <div>Events</div>
-    )
+    return false;
   }
 }

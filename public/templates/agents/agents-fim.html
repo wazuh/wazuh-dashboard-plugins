@@ -1,9 +1,9 @@
 <div ng-if="tab === 'fim'">
     <div ng-if="agent && agent.os">
         <react-component name="MainFim" props="fimProps" />
-        <div ng-if='showModuleDashboard === "fim"' class="wz-module-body">
+        <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
             <kbn-dis></kbn-dis>
-            <react-component name="WzVisualize" props="visualizeProps" />
+            <react-component ng-if='showModuleDashboard === "fim"' name="WzVisualize" props="visualizeProps" />
         </div>
     </div>
     <div ng-if="!agent || !agent.os">

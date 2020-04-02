@@ -247,8 +247,7 @@ export class AgentsTable extends Component {
       <span className="euiTableCellContent__text euiTableCellContent--truncateText">
         <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
       </span>
-    );
-
+    );    
   }
 
   addHealthStatusRender(status) {

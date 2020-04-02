@@ -11,7 +11,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   EuiCard,
   EuiIcon,
@@ -24,7 +24,8 @@ import {
   EuiTitle,
   EuiHealth,
   EuiPage,
-  EuiButton
+  EuiButton,
+  EuiToolTip
 } from '@elastic/eui';
 import { AgentInfo } from './agent-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -39,14 +40,23 @@ export class AgentWelcomeScreen extends Component {
     };
   }
 
+  color = (status) => {
+    if (status.toLowerCase() === 'active') { return 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
+  }
+  
   renderTitle() {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiTitle size="s">
-            <EuiHealth color={this.props.agent.status === 'Active' ? 'success' : 'danger'}>
-              <h1>{`${this.props.agent.name} (${this.props.agent.id})`}</h1>
-            </EuiHealth>
+        <EuiFlexItem className="wz-module-header-title">
+        <EuiTitle size="s">
+            <h1>
+              <EuiToolTip position="right" content={this.props.agent.status}>
+                <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
+              </EuiToolTip>
+              {this.props.agent.name} ({this.props.agent.id}) - <b>Integrity monitoring</b>
+            </h1>
           </EuiTitle>
         </EuiFlexItem>
       </EuiFlexGroup>

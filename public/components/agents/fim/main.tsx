@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -19,15 +19,13 @@ import {
   EuiTab,
   EuiTabs,
   EuiTitle,
+  EuiToolTip
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
-import {
-  States,
-  Events,
-  Settings
-} from './index';
-import { Dashboard } from '../../common/modulesDashboards/dashboard';
+import { States, Settings } from './index';
+import { Dashboard } from '../../common/modules/dashboard';
+import { Events } from '../../common/modules/events';
 import '../../../less/components/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
@@ -74,14 +72,23 @@ export class MainFim extends Component {
     this.setGlobalBreadcrumb();
   }
 
+  color = (status) => {
+    if (status.toLowerCase() === 'active') { return 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
+  }
+
   renderTitle() {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem className="wz-module-header-title">
           <EuiTitle size="s">
-            <EuiHealth color="success">
-              <h1>{this.props.agent.name} - <b>Integrity monitoring</b></h1>
-            </EuiHealth>
+            <h1>
+              <EuiToolTip position="right" content={this.props.agent.status}>
+                <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
+              </EuiToolTip>
+              {this.props.agent.name} ({this.props.agent.id}) - <b>Integrity monitoring</b>
+            </h1>
           </EuiTitle>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -107,9 +114,21 @@ export class MainFim extends Component {
     );
   }
 
-  renderDashboardButton() {
+  renderReportButton() {
     return (
       <EuiFlexItem grow={false}>
+        <EuiButton
+          iconType="document"
+          onClick={() => this.onSelectedTabChanged('dashboard')}>
+          Generate report
+          </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderDashboardButton() {
+    return (
+      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
         <EuiButton
           fill={this.state.selectView === 'dashboard'}
           iconType="visLine"
@@ -134,15 +153,20 @@ export class MainFim extends Component {
   }
 
   onSelectedTabChanged(id) {
-    this.setState({
-      selectView: id,
-    });
+    if (id === 'events' || id === 'dashboard') {
+      this.setState({ selectView: false });
+      window.location.href = window.location.href.replace(
+        new RegExp("tabView=" + "[^\&]*"),
+        `tabView=${id === 'events' ? 'discover' : 'panels'}`);
+    }
+    this.setState({ selectView: id });
   }
 
   render() {
     const { selectView } = this.state;
     const title = this.renderTitle();
     const tabs = this.renderTabs();
+    const reportButton = this.renderReportButton();
     const dashboardButton = this.renderDashboardButton();
     const settingsButton = this.renderSettingsButton();
     return (
@@ -152,6 +176,7 @@ export class MainFim extends Component {
             {title}
             <EuiFlexGroup>
               {tabs}
+              {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
               {dashboardButton}
               {settingsButton}
             </EuiFlexGroup>
@@ -159,7 +184,7 @@ export class MainFim extends Component {
         </div>
         <div className='wz-module-body'>
           {selectView === 'states' && <States {...this.props} />}
-          {selectView === 'events' && <Events {...this.props} />}
+          {selectView === 'events' && <Events {...this.props} section='fim' />}
           {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
           {selectView === 'settings' && <Settings {...this.props} />}
         </div>

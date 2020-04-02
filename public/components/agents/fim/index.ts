@@ -12,5 +12,4 @@
 
 export { MainFim } from './main';
 export { States} from './states';
-export { Events } from './events';
 export { Settings } from './settings';
