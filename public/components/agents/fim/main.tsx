@@ -24,21 +24,20 @@ import {
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { States, Settings } from './index';
-import { Dashboard } from '../../common/modules/dashboard';
-import { Events } from '../../common/modules/events';
+import { Events, Dashboard, Loader } from '../../common/modules';
 import '../../../less/components/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 
 export class MainFim extends Component {
   state: {
-    selectView: 'states' | 'events' | 'dashboard' | 'settings'
+    selectView: 'states' | 'events' | 'loader' | 'dashboard' | 'settings'
   };
-
   tabs = [
     { id: 'states', name: i18n.translate('wazuh.fim.states', { defaultMessage: 'States' }) },
     { id: 'events', name: i18n.translate('wazuh.fim.events', { defaultMessage: 'Events' }) },
   ]
+  afterLoad = false;
 
   constructor(props) {
     super(props);
@@ -152,14 +151,20 @@ export class MainFim extends Component {
     );
   }
 
+  loadSection(id) {
+    this.setState({ selectView: id });
+  }
+
   onSelectedTabChanged(id) {
     if (id === 'events' || id === 'dashboard') {
-      this.setState({ selectView: false });
       window.location.href = window.location.href.replace(
         new RegExp("tabView=" + "[^\&]*"),
         `tabView=${id === 'events' ? 'discover' : 'panels'}`);
+      this.afterLoad = id;
+      this.loadSection('loader');
+    } else {
+      this.loadSection(id);
     }
-    this.setState({ selectView: id });
   }
 
   render() {
@@ -185,6 +190,11 @@ export class MainFim extends Component {
         <div className='wz-module-body'>
           {selectView === 'states' && <States {...this.props} />}
           {selectView === 'events' && <Events {...this.props} section='fim' />}
+          {selectView === 'loader' &&
+            <Loader {...this.props}
+              loadSection={(section) => this.loadSection(section)}
+              redirect={this.afterLoad}>
+            </Loader>}
           {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
           {selectView === 'settings' && <Settings {...this.props} />}
         </div>
