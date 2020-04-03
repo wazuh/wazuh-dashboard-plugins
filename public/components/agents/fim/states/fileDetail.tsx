@@ -14,8 +14,13 @@ import React, { Component } from 'react';
 import {
   EuiFlexGrid,
   EuiFlexItem,
-  EuiText
+  EuiText,
+  EuiFlexGroup,
+  EuiTitle,
+  EuiButtonEmpty
 } from '@elastic/eui';
+import { EuiHorizontalRule } from '@elastic/eui';
+import { Discover } from '../../../discover'
 
 export class FileDetails extends Component {
   state: {
@@ -33,16 +38,17 @@ export class FileDetails extends Component {
   }
 
 
-  columns() {
-    // TODO -- add all the columns we need to show in the specific order
+  generalColumns() {
     return [
       {
-        field: 'file',
-        name: 'File',
+        field: 'date',
+        name: 'Last analysis',
+        grow: 2
       },
       {
-        field: 'date',
-        name: 'Last Modified',
+        field: 'mtime',
+        name: 'Last modified',
+        grow: 2
       },
       {
         field: 'uname',
@@ -67,21 +73,53 @@ export class FileDetails extends Component {
       {
         field: 'size',
         name: 'Size',
-      }
+      },
+      {
+        field: 'inode',
+        name: 'Inode',
+      },
     ]
   }
 
-  async componentDidMount() {
-    console.log(this.props.currentFile)
+  extraColumns(){
+    return [
+          {
+            field: 'md5',
+            name: 'MD5',
+          },
+          {
+            field: 'sha1',
+            name: 'SHA1',
+          },
+          {
+            field: 'sha256',
+            name: 'SHA256',
+          }
+        ]
   }
 
+
   getDetails(){
-    const columns = this.columns();
-    const details = columns.map((item,idx) => {
+    const columns = this.generalColumns();
+    const generalDetails = columns.map((item,idx) => {
       const value = this.props.currentFile[item.field] || '-';
-      
+      const grow = item.grow || 1;
       return (
-        <EuiFlexItem key={idx}>
+        <EuiFlexItem key={idx} grow={grow}>
+          <EuiText className="detail-title">
+            {item.name}
+          </EuiText>
+          <EuiText>
+            {value}
+          </EuiText>
+        </EuiFlexItem>
+        )
+    });
+    const extraColumns = this.extraColumns();
+    const extraDetails = extraColumns.map((item,idx) => {
+      const value = this.props.currentFile[item.field] || '-';
+      return (
+        <EuiFlexItem key={idx} >
           <EuiText className="detail-title">
             {item.name}
           </EuiText>
@@ -92,14 +130,36 @@ export class FileDetails extends Component {
         )
     });
 
-    return (<EuiFlexGrid>{details}</EuiFlexGrid>);
+    return (
+      <span>
+        <EuiFlexGroup gutterSize="m">{generalDetails}</EuiFlexGroup>
+        <EuiFlexGroup gutterSize="m">{extraDetails}</EuiFlexGroup>
+      </span>);
   }
-
+  
   render() {
     return (
-      <div>
+      <span>
         {this.getDetails()}
-      </div>
+        <EuiHorizontalRule margin="xs" />
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <EuiTitle >
+              <h2>File events</h2>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty onClick={() => alert("clicked")}>
+              View in Events
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <Discover filters={{'syscheck.path': this.props.currentFile.file}} />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </span>
     )
   }
 }

@@ -655,7 +655,7 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 4009, 500, reply);
     }
   }
-
+ 
   /**
    * Reload elastic index
    * @param {Object} req
@@ -705,44 +705,24 @@ export class WazuhElasticCtrl {
       const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
-      const size = req.payload.size || 10;
+      const size = req.payload.size || 500;
+      const sort = req.payload.sort || { "timestamp" : {"order" : "asc"}};
       const payload = Base(pattern, [], from, to);
 
+      
       payload.query = { bool: { must: [] } };
-
-      const agent = req.payload['agent.id'];
-      const manager = req.payload['manager.name'];
-      const cluster = req.payload['cluster.name'];
-      const rulegGroups = req.payload['rule.groups'];
-      if (agent)
-        payload.query.bool.must.push({
-          match: { 'agent.id': agent }
+      if(req.payload.filters){
+        req.payload.filters.map((item) => {
+          payload.query.bool.must.push({
+            match: item 
+          });
         });
-      if (cluster)
-        payload.query.bool.must.push({
-          match: { 'cluster.name': cluster }
-        });
-      if (manager)
-        payload.query.bool.must.push({
-          match: { 'manager.name': manager }
-        });
-      if (rulegGroups)
-        payload.query.bool.must.push({
-          match: { 'rule.groups': rulegGroups }
-        });
-
+      }
+      payload.sort.push(sort);
       payload.size = size;
-      payload.docvalue_fields = [
-        'timestamp',
-        'cluster.name',
-        'manager.name',
-        'agent.id',
-        'rule.id',
-        'rule.group',
-        'rule.description'
-      ];
+      payload.from = req.payload.offset || 0;
       const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
-      return { alerts: data.hits.hits };
+      return { alerts: data.hits.hits, hits: data.hits.total.value };
     } catch (error) {
       log('wazuh-elastic:alerts', error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, reply);

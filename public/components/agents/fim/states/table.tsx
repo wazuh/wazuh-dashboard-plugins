@@ -244,7 +244,7 @@ export class StatesTable extends Component {
         <EuiFlyout onClose={() => this.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
           <EuiFlyoutHeader hasBorder className="flyout-header" >
             <EuiTitle size="m">
-              <h2 id="flyoutTitle">{this.state.currentFile.file} details</h2>
+              <h2 id="flyoutTitle">{this.state.currentFile.file}</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody className="flyout-body" >
