@@ -125,7 +125,7 @@ class WelcomeScreen extends Component {
                       icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
                       title="Modules"
                       onClick={() => this.switchSection('modules')}
-                      description="Add data to modules"
+                      description="Add data to modules."
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
