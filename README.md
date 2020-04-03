@@ -151,7 +151,7 @@ service kibana restart
 | Wazuh app version | Kibana version | Package                                                         |
 | :---------------: | :------------: | :-------------------------------------------------------------- |
 |       3.12.1      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.1_7.6.2.zip> |
-|       3.12.1      |      7.4.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.1_7.4.2.zip> |
+|       3.12.1      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.1_7.6.1.zip> |
 |       3.12.1      |      6.8.8     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.1_6.8.8.zip> |
 |       3.12.0      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.2.zip> |
 |       3.12.0      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.1.zip> |
