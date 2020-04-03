@@ -18,7 +18,10 @@ import {
   EuiSuperDatePicker,
   OnTimeChangeProps,
 } from '@elastic/eui';
-import dateMath from '@elastic/datemath';
+import {  getServices } from 'plugins/kibana/discover/kibana_services';
+
+interface IDiscoverTime { from:string, to:string };
+
 export class FilterBar extends Component {
   suggestions: qSuggests[] = [
     {label: 'file', values: async (value) => getFilterValues('file', value)},
@@ -36,6 +39,11 @@ export class FilterBar extends Component {
     {label: 'size', values: value => !!value ? [value] : [0]}, // TODO: Adapt code to return and array with description
   ]
 
+  timefilter: {
+    getTime(): IDiscoverTime
+    setTime(time:IDiscoverTime): void
+  };
+
   state: {
     datePicker: OnTimeChangeProps,
     filterBar: {}
@@ -48,25 +56,31 @@ export class FilterBar extends Component {
 
   constructor(props) {
     super(props);
+    const { timefilter } = getServices();
+    this.timefilter = timefilter;
+    const { from, to } = this.timefilter.getTime();
     this.state = {
       datePicker: {
-        start: "now/d", 
-        end: "now/d",
+        start: from, 
+        end: to,
         isQuickSelection: true,
         isInvalid: false,
       },
       filterBar: {}
     }
+    this.onTimeChange.bind(this);
   }
 
-  componentDidMount() {
-    const { filterBar } = this.state;
-    this.props.onFiltersChange(filterBar);
+  onTimeChange = (datePicker: OnTimeChangeProps) => {
+    const {start:from, end:to} = datePicker;
+    this.setState({datePicker});
+    this.timefilter.setTime({from, to});
+    this.props.onDateChange(datePicker);
   }
 
   render() {
     const { datePicker } = this.state;
-    const { onDateChange, onFiltersChange } = this.props;
+    const { onFiltersChange } = this.props;
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -78,7 +92,7 @@ export class FilterBar extends Component {
             placeholder='Add filter or search' />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiSuperDatePicker  {...datePicker} onTimeChange={onDateChange} />
+          <EuiSuperDatePicker  {...datePicker} onTimeChange={this.onTimeChange} />
         </EuiFlexItem>
       </EuiFlexGroup>
     )
