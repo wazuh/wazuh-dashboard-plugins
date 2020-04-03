@@ -62,6 +62,10 @@ export class StatesTable extends Component {
     }
   }
 
+  async componentDidMount() {
+    await this.getSyscheck();
+  }
+
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
@@ -144,46 +148,36 @@ export class StatesTable extends Component {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
-        width: '200px',
       },
       {
         field: 'uname',
         name: 'User',
         sortable: true,
-        width: '150px',
-        truncateText: true,
       },
       {
         field: 'uid',
         name: 'User ID',
         sortable: true,
-        truncateText: true,
       },
       {
         field: 'gname',
         name: 'Group',
         sortable: true,
-        width: '150px',
-        truncateText: true,
       },
       {
         field: 'gid',
         name: 'Group ID',
         sortable: true,
-        truncateText: true,
       },
       {
         field: 'perm',
         name: 'Permissions',
         sortable: true,
-        width: '150px',
-        truncateText: true,
       },
       {
         field: 'size',
         name: 'Size',
         sortable: true,
-        width: '150px',
       }
     ]
   }

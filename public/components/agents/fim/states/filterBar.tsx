@@ -43,6 +43,7 @@ export class FilterBar extends Component {
 
   props!:{
     onFiltersChange: Function
+    onDateChange(props:OnTimeChangeProps):() => void
   }
 
   constructor(props) {
@@ -56,59 +57,28 @@ export class FilterBar extends Component {
       },
       filterBar: {}
     }
-    this.onTimeChange.bind(this);
-    this.onFiltersChange.bind(this);
   }
 
   componentDidMount() {
-    this.onChange();
-  }
-
-  createDateFilter() {
-    const { start, end } = this.state.datePicker;
-    
-    const startUtc = dateMath.parse(start)?.unix();
-    const endUtc = dateMath.parse(end, { roundUp: true })?.unix();
-
-    return `date>${startUtc};date<${endUtc}`;
-  }
-
-  onChange() {
-    const timeFilter = this.createDateFilter();
-    const filters = {...this.state.filterBar};
-
-    if(filters['q']) {
-      filters['q'] = `(${timeFilter};${filters['q']})`;
-    } else {
-      filters['q'] = timeFilter;
-    }
-    this.props.onFiltersChange(filters);
-  }
-
-  onFiltersChange = async (filterBar) => {
-    await this.setState({filterBar});
-    this.onChange();
-  }
-
-  onTimeChange = async (datePicker) => {
-    await this.setState({datePicker})
-    this.onChange();
+    const { filterBar } = this.state;
+    this.props.onFiltersChange(filterBar);
   }
 
   render() {
     const { datePicker } = this.state;
+    const { onDateChange, onFiltersChange } = this.props;
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <WzSearchBar
-            onInputChange={this.onFiltersChange}
+            onInputChange={onFiltersChange}
             qSuggests={this.suggestions}
             apiSuggests={null}
             defaultFormat='qTags'
             placeholder='Add filter or search' />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiSuperDatePicker  {...datePicker} onTimeChange={this.onTimeChange} />
+          <EuiSuperDatePicker  {...datePicker} onTimeChange={onDateChange} />
         </EuiFlexItem>
       </EuiFlexGroup>
     )
