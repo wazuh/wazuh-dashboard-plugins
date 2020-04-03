@@ -30,6 +30,7 @@ import '../../../less/components/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
+import chrome from 'ui/chrome';
 
 export class MainFim extends Component {
   state: {
@@ -60,7 +61,11 @@ export class MainFim extends Component {
       },
       {
         text: `${this.props.agent.name} (${this.props.agent.id})`,
-        href: `/app/wazuh#/agents?agent=${this.props.agent.id}`,
+        onClick: () => {
+          window.location.href = `#/agents?agent=${this.props.agent.id}`;
+          this.router.reload();
+        },
+        className: 'wz-global-breadcrumb-btn',
         truncate: true,
       },
       {
@@ -70,8 +75,10 @@ export class MainFim extends Component {
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setGlobalBreadcrumb();
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
   }
 
   color = (status) => {

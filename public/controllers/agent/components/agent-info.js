@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel } from '@elastic/eui';
+import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel, EuiToolTip } from '@elastic/eui';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -37,9 +37,11 @@ export class AgentInfo extends Component {
       + ' ' + checkField(((agent || {}).os || {}).version);
 
     return (
-      <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-        <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
-      </span>
+      <EuiToolTip position="bottom" content={os_name === '--' ? '-' : os_name}>
+        <p className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 300, margin: '0 auto' }}>
+          <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
+        </p>
+      </EuiToolTip>
     );
   }
 
@@ -48,7 +50,11 @@ export class AgentInfo extends Component {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
-            title={<span>{item.description === 'OS' ? this.addIconPlatformRender(this.props.agent) : item.title}</span>}
+            title={
+              item.description === 'OS'
+                ? this.addIconPlatformRender(this.props.agent)
+                : <p style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{item.title}</p>
+            }
             description={item.description}
             textAlign="center"
             titleSize="s"
