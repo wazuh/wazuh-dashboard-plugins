@@ -135,11 +135,12 @@ export class States extends Component {
   }
 
   renderFiles() {
-    const { filters } = this.state;
+    const { filters, selectedTabId } = this.state;
     return (
       <div>
         <FilterBar
-          onFiltersChange={this.onFiltersChange.bind(this)} />
+          onFiltersChange={this.onFiltersChange.bind(this)}
+          selectView={selectedTabId} />
         <StatesTable
           {...this.props}
           filters={filters} />
@@ -149,11 +150,12 @@ export class States extends Component {
 
   renderWindowRegistry() {
 
-    const { filters } = this.state;
+    const { filters, selectedTabId } = this.state;
     return (
       <div>
         <FilterBar
-          onFiltersChange={this.onFiltersChange.bind(this)} />
+          onFiltersChange={this.onFiltersChange.bind(this)}
+          selectView={selectedTabId} />
         <RegistryTable
           {...this.props}
           filters={filters} />

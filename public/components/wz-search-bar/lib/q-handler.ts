@@ -17,7 +17,7 @@ import { suggestItem } from '../wz-search-bar';
 export interface qSuggests {
   label: string
   description?: string
-  operators?: string[]
+  operators?: ('=' | '!=' | '<' | '>' | '~')[]
   values: Function | [] | undefined
 }
 
