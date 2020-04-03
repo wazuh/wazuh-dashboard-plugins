@@ -93,7 +93,7 @@ export default class GroupsColums {
 
   async showGroupConfiguration(groupId) {
     const result = await this.groupsHandler.getFileContent(
-      `/agents/groups/${groupId}/files/agent.conf/xml`
+      `/groups/${groupId}/files/agent.conf/xml`
     );
 
     const file = {

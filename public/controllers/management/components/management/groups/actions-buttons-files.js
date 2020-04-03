@@ -140,7 +140,7 @@ class WzGroupsActionButtonsFiles extends Component {
   async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
     const result = await this.groupsHandler.getFileContent(
-      `/agents/groups/${itemDetail.name}/files/agent.conf/xml`
+      `/groups/${itemDetail.name}/files/agent.conf/xml`
     );
 
     const data = this.autoFormat(result);
