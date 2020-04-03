@@ -144,7 +144,6 @@ export class StatesTable extends Component {
         field: 'file',
         name: 'File',
         sortable: true,
-        width: '300px',
       },
       {
         field: 'mtime',
@@ -157,30 +156,33 @@ export class StatesTable extends Component {
         name: 'User',
         sortable: true,
         width: '150px',
+        truncateText: true,
       },
       {
         field: 'uid',
         name: 'User ID',
         sortable: true,
-        width: '150px',
+        truncateText: true,
       },
       {
         field: 'gname',
         name: 'Group',
         sortable: true,
         width: '150px',
+        truncateText: true,
       },
       {
         field: 'gid',
         name: 'Group ID',
         sortable: true,
-        width: '150px',
+        truncateText: true,
       },
       {
         field: 'perm',
         name: 'Permissions',
         sortable: true,
         width: '150px',
+        truncateText: true,
       },
       {
         field: 'size',

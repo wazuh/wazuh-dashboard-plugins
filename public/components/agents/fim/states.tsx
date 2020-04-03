@@ -54,14 +54,14 @@ export class States extends Component {
     let auxTabs = [
       {
         id: 'files',
-        name: `Files ${this.state.isLoading === true ? '' : '('+this.state.totalItemsFile+')'}`,
+        name: `Files ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsFile + ')'}`,
         disabled: false,
       },
     ]
     this.props.agent.os.platform === 'windows' ? auxTabs.push(
       {
         id: 'registry',
-        name: `Windows Registry ${this.state.isLoading === true ? '' : '('+this.state.totalItemsRegistry+')'}`,
+        name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
         disabled: false,
       },
     ) : null;
@@ -71,7 +71,7 @@ export class States extends Component {
   async componentDidMount() {
     await this.getTotalFiles();
     await this.getTotalRegistry();
-    this.setState({isLoading: false});
+    this.setState({ isLoading: false });
   }
 
   onFiltersChange(filters) {
@@ -148,8 +148,16 @@ export class States extends Component {
   }
 
   renderWindowRegistry() {
+
+    const { filters } = this.state;
     return (
-      <RegistryTable />
+      <div>
+        <FilterBar
+          onFiltersChange={this.onFiltersChange.bind(this)} />
+        <RegistryTable
+          {...this.props}
+          filters={filters} />
+      </div>
     )
   }
 
