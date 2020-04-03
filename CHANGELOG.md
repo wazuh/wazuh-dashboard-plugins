@@ -2,6 +2,21 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.12.1 - Kibana v6.8.8, v7.4.2, v7.6.2 - Revision 872
+
+### Added
+
+- Support Wazuh 3.12.1
+- Add new FIM settings on configuration on demand. [#2147](https://github.com/wazuh/wazuh-kibana-app/issues/2147)
+
+### Changed
+
+- 3.12 - Fix agent deployment command variables. [#2169](https://github.com/wazuh/wazuh-kibana-app/pull/2169)
+
+### Fixed
+
+- Pagination is not shown in table-type visualizations. [#2180](https://github.com/wazuh/wazuh-kibana-app/issues/2180)
+
 ## Wazuh v3.12.0 - Kibana v6.8.8, v7.6.2 - Revision 871
 
 ### Added
