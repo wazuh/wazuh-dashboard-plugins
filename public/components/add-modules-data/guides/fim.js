@@ -14,6 +14,7 @@ export default {
   xml_tag: 'syscheck',
   name: 'Integrity monitoring',
   description: 'Configuration options for file integrity monitoring.',
+  category: 'Security information management',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html',
   icon: 'filebeatApp',
   avaliable_for_manager: true,
@@ -180,17 +181,16 @@ export default {
     },
     {
       title: 'Ignore directories and/or files',
-      description: 'List of files or directories to be ignored.',
+      description: 'List of files or directories to be ignored. You can add multiple times this option. These files and directories are still checked, but the results are ignored.',
       elements: [
         {
           name: 'ignore',
-          description: 'List of files or directories to be ignored (one entry per line). Multiple lines may be entered to include multiple files or directories. These files and directories are still checked, but the results are ignored.',
+          description: 'File or directory to be ignored.',
           type: 'input',
           removable: true,
           required: true,
           repeatable: true,
-          placeholder: 'Files or directories to be ignored',
-          validate_error_message: 'Any directory or file name.',
+          placeholder: 'File/directory path',
           attributes: [
             {
               name: 'type',
@@ -206,13 +206,13 @@ export default {
     },
     {
       title: 'Not compute',
-      description: 'List of files to not compute the diff (one entry per line). It could be used for sensitive files like a private key, credentials stored in a file or database configuration, avoiding data leaking by sending the file content changes through alerts.',
+      description: 'List of files to not compute the diff. You can add multiple times this option. It could be used for sensitive files like a private key, credentials stored in a file or database configuration, avoiding data leaking by sending the file content changes through alerts.',
       elements: [
         {
           name: 'nodiff',
-          description: 'List of files to not compute the diff (one entry per line). It could be used for sensitive files like a private key, credentials stored in a file or database configuration, avoiding data leaking by sending the file content changes through alerts.',
+          description: 'File to not compute the diff.',
           type: 'input',
-          placeholder: 'List of files to not compute the diff',
+          placeholder: 'File path',
           required: true,
           removable: true,
           repeatable: true,
@@ -224,7 +224,7 @@ export default {
               type: 'input',
               placeholder: 'sregex',
               default_value: 'sregex',
-              field_only_read: true
+              field_read_only: true
             }
           ]
         }
@@ -232,11 +232,11 @@ export default {
     },
     {
       title: 'Scan day',
-      description: 'Day of the week to run the scans',
+      description: 'Day of the week to run the scans. You can add multiple times this option.',
       elements: [
         {
           name: 'scan_day',
-          description: `Day of the week to run the scans(one entry per line). Multiple lines may be entered to include multiple registry entries.`,
+          description: 'Day of the week to run the scans.',
           type: 'select',
           removable: true,
           required: true,
@@ -257,11 +257,11 @@ export default {
     },
     {
       title: 'Windows registry',
-      description: 'Use this option to monitor specified Windows registry entries.',
+      description: 'Use this option to monitor specified Windows registry entries. You can add multiple times this option.',
       elements: [
         {
           name: 'windows_registry',
-          description: `Use this option to monitor specified Windows registry entries (one entry per line). Multiple lines may be entered to include multiple registry entries.`,
+          description: 'Use this option to monitor specified Windows registry entries',
           info: 'New entries will not trigger alerts, only changes to existing entries.',
           type: 'input',
           placeholder: 'Windows registry entry',
@@ -325,31 +325,35 @@ export default {
           name: 'frequency',
           description: 'Frequency that the syscheck will be run (in seconds).',
           type: 'input-number',
+          required: true,
           default_value: 43200,
           values: { min: 1 },
-          placeholder: 'A positive number, time in seconds.',
+          placeholder: 'Time in seconds.',
           validate_error_message: `A positive number, time in seconds.`
         },
         {
           name: 'scan_time',
-          description: `Time to run the scans. Times may be represented as 9pm or 8:30.`,
+          description: 'Time to run the scans. Times may be represented as 9pm or 8:30.',
           info: 'This may delay the initialization of real-time scans.',
           type: 'input',
-          placeholder: '9pm or 8:30',
+          placeholder: 'Time of day',
           validate_error_message: 'Time of day represented as 9pm or 8:30',
           validate_regex: /^(((0?[1-9]|1[012])(:[0-5][0-9])?am)|(((0?[0-9])|(1[0-9])|(2[0-4]))(:[0-5][0-9])?pm))|(((0?[0-9])|(1[012])|(2[0-4])):([0-5][0-9]))$/,
           warning: 'This may delay the initialization of real-time scans.'
         },
         {
           name: 'auto_ignore',
-          description: `Specifies whether or not syscheck will ignore files that change too many times (manager only).`,
+          description: 'Specifies whether or not syscheck will ignore files that change too many times (manager only).',
           info: 'It is valid on: server and local.',
           type: 'switch',
+          agent_type: 'manager',
+          show_attributes: true,
           attributes: [
             {
               name: 'frequency',
-              description: 'Number of times the alert can be repeated in the’timeframe’ time interval.',
+              description: 'Number of times the alert can be repeated in the \'timeframe\' time interval.',
               type: 'input-number',
+              required: true,
               values: { min: 1, max: 99 },
               default_value: 10,
               validate_error_message: 'Any number between 1 and 99.'
@@ -358,6 +362,8 @@ export default {
               name: 'timeframe',
               description: 'Time interval in which the number of alerts generated by a file accumulates.',
               type: 'input-number',
+              required: true,
+              placeholder: 'Time in seconds',
               values: { min: 1, max: 43200 },
               default_value: 3600,
               validate_error_message: 'Any number between 1 and 43200.'
@@ -390,8 +396,7 @@ export default {
           info: `This option may negatively impact performance as the configured command will be run for each file checked.
           This option is ignored when defined at agent.conf if allow_remote_prefilter_cmd is set to no at ossec.conf.`,
           type: 'input',
-          placeholder: 'Command to prevent prelinking.',
-          validate_error_message: 'Command to prevent prelinking.'
+          placeholder: 'Command to prevent prelinking.'
         },
         {
           name: 'skip_nfs',
@@ -432,6 +437,7 @@ export default {
           description: 'Set the nice value for Syscheck process.',
           info: 'The "niceness" scale in Linux goes from -20 to 19, whereas -20 is the highest priority and 19 the lowest priority.',
           type: 'input-number',
+          placholder: 'Process priority',
           default_value: 10,
           values: { min: -20, max: 19 },
           validate_error_message: 'Integer number between -20 and 19.'
@@ -441,6 +447,7 @@ export default {
           description: 'Set the maximum event reporting throughput. Events are messages that will produce an alert.',
           info: '0 means disabled.',
           type: 'input-number',
+          placholder: 'Process priority',
           default_value: 100,
           values: { min: 0, max: 1000000 },
           validate_error_message: 'Integer number between 0 and 1000000.'

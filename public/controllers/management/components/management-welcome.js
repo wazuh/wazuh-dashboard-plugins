@@ -118,7 +118,16 @@ class WelcomeScreen extends Component {
                       description="Manage your Wazuh cluster configuration."
                     />
                   </EuiFlexItem>
-                  <EuiFlexItem />
+                  <EuiFlexItem>
+                    <EuiCard
+                      layout="horizontal"
+                      className='homSynopsis__card'
+                      icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
+                      title="Modules"
+                      onClick={() => this.switchSection('modules')}
+                      description="Add data to modules"
+                    />
+                  </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>

@@ -14,6 +14,7 @@ export default {
   xml_tag: 'vulnerabilities-detector',
   name: 'Vulnerabilities',
   description: 'Configuration options for vulnerabilities.',
+  category: 'Threat detection and response',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/vuln-detector.html',
   icon: 'securityApp',
   avaliable_for_manager: true,
@@ -34,7 +35,7 @@ export default {
           type: 'input',
           required: true,
           default_value: '5m',
-          placeholder: 'A positive number that should contain a suffix character indicating a time unit: s (seconds), m (minutes), h (hours) or d (days).',
+          placeholder: 'Time in format <number><time unit suffix>',
           validate_error_message: 'A positive number that should contain a suffix character indicating a time unit: s (seconds), m (minutes), h (hours) or d (days).',
           validate_regex: /^[1-9]\d*[s|m|h|d]$/
         },
@@ -50,16 +51,26 @@ export default {
           description: ' Time during which vulnerabilities that have already been alerted will be ignored.',
           type: 'input',
           default_value: '6h',
-          placeholder: 'A positive number that should contain a suffix character indicating a time unit: s (seconds), m (minutes), h (hours) or d (days).',
+          placeholder: 'Time in format <number><time unit suffix>',
           validate_error_message: 'A positive number that should contain a suffix character indicating a time unit: s (seconds), m (minutes), h (hours) or d (days).',
           validate_regex: /^[1-9]\d*[s|m|h|d]$/
-        },
+        }
+      ]
+    },
+    {
+      title: 'Providers',
+      description: 'Define providers of vulnerability updates.',
+      elements: [
         {
           name: 'provider',
           description: 'Configuration block to specify vulnerability updates.',
           repeatable: true,
           required: true,
           removable: true,
+          repeatable_insert_first: true,
+          repeatable_insert_first_properties: {
+            removable: false
+          },
           attributes: [
             {
               name: 'name',

@@ -14,6 +14,7 @@ export default {
   name: 'System auditing',
   xml_tag: 'localfile',
   description: 'Configuration options of the System auditing extension.',
+  category: 'Auditing and policy monitoring',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/localfile.html',
   icon: 'securityApp',
   avaliable_for_manager: true,
@@ -59,7 +60,7 @@ export default {
           type: 'input-number',
           values: { min: 1 },
           default_value: '',
-          placeholder: 'Any positive number of seconds',
+          placeholder: 'Frecuency',
           validate_error_message: 'Any positive number of seconds'
         },
         {
@@ -108,7 +109,7 @@ export default {
           hostname:	System’s host name.
           host_ip:	Host’s primary IP address.`,
           type: 'input',
-          placeholder: 'Formatting logs from Logcollector using field substitution.',
+          placeholder: 'Formatting logs from Logcollector using field substitution',
           show_attributes: true,
           attributes: [
             {
@@ -132,9 +133,16 @@ export default {
           description: `This specifies to read-only files that have been modified before the specified age.
           For example, if the age is set to 1 day, all files that have not been modified since 1 day will be ignored.`,
           type: 'input',
-          placeholder: 'Positive number that should contain a suffix character',
+          placeholder: 'Time in format <number><time unit suffix>',
           validate_error_message: `A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days).`,
           validate_regex: /^[1-9]\d*[s|m|h|d]$/
+        },
+        {
+          name: 'exclude',
+          description: `This indicates the location of a wild-carded group of logs to be excluded.
+          For example, we may want to read all the files from a directory, but exclude those files whose name starts with an e.`,
+          type: 'input',
+          placeholder: 'Any log file or wildcard'
         },
         {
           name: 'exclude',

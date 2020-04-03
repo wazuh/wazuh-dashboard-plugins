@@ -14,6 +14,7 @@ export default {
   name: 'Osquery',
   wodle_name: 'osquery',
   description: 'Configuration options of the osquery wodle.',
+  category: 'Threat detection and response',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html',
   icon: 'securityApp',
   callout_warning: 'Osquery is not installed by default. It is an open source software that you have to obtain for using this module.',
@@ -22,7 +23,7 @@ export default {
   steps: [
     {
       title: 'Settings',
-      description: 'Add or remove directories to be monitored',
+      description: '',
       elements: [
         {
           name: 'disabled',
@@ -39,7 +40,7 @@ export default {
         },
         {
           name: 'bin_path',
-          description: `Full path to the folder that contains the osqueryd executable.`,
+          description: 'Full path to the folder that contains the osqueryd executable.',
           type: 'input',
           required: true,
           placeholder: 'Any valid path.',
@@ -52,7 +53,6 @@ export default {
           type: 'input',
           required: true,
           placeholder: 'Any valid path.',
-          default_value: '',
           default_value_linux: '/var/log/osquery/osqueryd.results.log',
           default_value_windows: 'C:\\Program Files\\osquery\\log\\osqueryd.results.log',
           validate_error_message: 'Any valid path.'
@@ -77,11 +77,11 @@ export default {
     },
     {
       title: 'Packs',
-      description: 'Add a query pack to the configuration',
+      description: 'Add a query pack to the configuration. This option can be defined multiple times.',
       elements: [
         {
           name: 'pack',
-          description: 'Add a query pack to the configuration. This option can be defined multiple times.',
+          description: 'Add a query pack to the configuration.',
           type: 'input',
           placeholder: 'Path to pack configuration file',
           default_value: '',

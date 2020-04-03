@@ -10,10 +10,11 @@
 * Find more information about this on the LICENSE file.
 */
 export default {
-  id: 'open-scap',
+  id: 'oscap',
   name: 'OpenSCAP',
   wodle_name: 'open-scap',
   description: 'Configuration options of the OpenSCAP wodle.',
+  category: 'Auditing and policy monitoring',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-openscap.html',
   icon: 'securityApp',
   avaliable_for_manager: true,
@@ -21,7 +22,7 @@ export default {
   steps: [
     {
       title: 'Settings',
-      description: 'Add or remove directories to be monitored',
+      description: '',
       elements: [
         {
           name: 'disabled',
@@ -34,7 +35,7 @@ export default {
           description: 'Timeout for each evaluation in seconds',
           type: 'input-number',
           required: true,
-          placeholder: 'A positive number (seconds)',
+          placeholder: 'Time in seconds',
           values: { min: 1 },
           default_value: 1800,
           validate_error_message: 'A positive number (seconds)'
@@ -44,7 +45,7 @@ export default {
           description: 'Interval between OpenSCAP executions.',
           type: 'input',
           required: true,
-          placeholder: 'Positive number with suffix character indicating a time unit',
+          placeholder: 'Time in format <number><time unit suffix>, e.g.: 1d',
           default_value: '1d',
           validate_error_message: 'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days).',
           validate_regex: /^[1-9]\d*[s|m|h|d]$/
@@ -92,7 +93,8 @@ export default {
               Default path: /var/ossec/wodles/oscap/content`,
               type: 'input',
               required: true,
-              placeholder: '/var/ossec/wodles/oscap/content',
+              placeholder: 'Policy file',
+              default_value: '/var/ossec/wodles/oscap/content',
               validate_error_message: 'Use the specified policy file'
             },
             {
@@ -100,7 +102,8 @@ export default {
               description: `Timeout for the evaluation (in seconds).
               Use of this attribute overwrites the generic timeout.`,
               type: 'input-number',
-              values: {min: 1},
+              placeholder: 'Time in seconds',
+              values: { min: 1 },
               default_value: 1800,
               validate_error_message: 'A positive number'
             },
@@ -108,19 +111,19 @@ export default {
               name: 'xccdf-id',
               description: 'XCCDF id.',
               type: 'input',
-              placeholder: 'XCCDF id.'
+              placeholder: 'XCCDF id'
             },
             {
               name: 'oval-id',
               description: 'OVAL id.',
               type: 'input',
-              placeholder: 'OVAL id.'
+              placeholder: 'OVAL id'
             },
             {
               name: 'datastream-id',
               description: 'Datastream id.',
               type: 'input',
-              placeholder: 'Datastream id.'
+              placeholder: 'Datastream id'
             },
             {
               name: 'cpe',
@@ -138,10 +141,14 @@ export default {
               name: 'profile',
               description: 'Select profile.',
               type: 'input',
-              placeholder: 'Select profile.',
+              placeholder: 'Profile',
               repeatable: true,
               removable: true,
-              required: true
+              required: true,
+              repeatable_insert_first: true,
+              repeatable_insert_first_properties: {
+                removable: false
+              }
             }
           ]
         }

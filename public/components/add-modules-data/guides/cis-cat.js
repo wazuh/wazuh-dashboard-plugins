@@ -10,10 +10,11 @@
 * Find more information about this on the LICENSE file.
 */
 export default {
-  id: 'cis-cat',
+  id: 'ciscat',
   name: 'CIS-CAT',
   wodle_name: 'cis-cat',
   description: 'Configuration options of the CIS-CAT wodle.',
+  category: 'Auditing and policy monitoring',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-ciscat.html',
   icon: 'securityApp',
   callout_warning: `CIS-CAT is not installed by default. It is a proprietary software that you have to obtain for using this module.`,
@@ -22,7 +23,7 @@ export default {
   steps: [
     {
       title: 'Settings',
-      description: 'Add or remove directories to be monitored',
+      description: '',
       elements: [
         {
           name: 'disabled',
@@ -35,26 +36,25 @@ export default {
           description: 'Timeout for each evaluation. In case the execution takes longer that the specified timeout, it stops.',
           type: 'input-number',
           required: true,
-          placeholder: 'A positive number (seconds)',
+          placeholder: 'Time in seconds',
           values: { min: 1 },
           default_value: 1800,
           validate_error_message: 'A positive number (seconds)'
         },
         {
           name: 'java_path',
-          description: `Define where Java is located. If this parameter is not set, the wodle will search for the Java location in the default environment variable $PATH.`,
+          description: 'Define where Java is located. If this parameter is not set, the wodle will search for the Java location in the default environment variable $PATH.',
           warning: 'For this field, it can be set a full path or a relative path. Whether you specify a relative path, it concatenates to the Wazuh installation path. ciscat_path has the same behavior.',
           type: 'input',
-          placeholder: 'Any valid path.',
-          default_value: '$PATH'
+          placeholder: 'Java location'
         },
         {
           name: 'ciscat_path',
           description: 'Define where CIS-CAT is located.',
           type: 'input',
           required: true,
-          default_value: 'wodles/ciscat',
-          placeholder: 'Any valid path.'
+          placeholder: 'CIS-CAT location',
+          validate_error_message: 'Any valid path.'
         },
         {
           name: 'scan-on-start',
@@ -67,7 +67,7 @@ export default {
           The interval option is conditioned by the following described options day, wday and time. If none of these options are set, the interval can take any allowed value.`,
           type: 'input',
           default_value: '1d',
-          placeholder: 'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days), w (weeks), M (months)',
+          placeholder: 'Time in format <number><time unit suffix>, e.g.: 1d',
           validate_error_message: 'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days), w (weeks), M (months). e.g: 1d',
           validate_regex: /^[1-9]\d*[s|m|h|d|w|M]$/
         },
@@ -133,8 +133,8 @@ export default {
           name: 'time',
           description: 'Time of the day to run the scan. It has to be represented in the format hh:mm.',
           type: 'input',
-          placeholder: 'Time of day [hh:mm]',
-          validate_error_message: 'Time of day [hh:mm]',
+          placeholder: 'Time of day',
+          validate_error_message: 'Time of day in hh:mm format',
           validate_regex: /^(((0[0-9])|(1[0-9])|(2[0-4])):[0-5][0-9])$/
         }
       ]
@@ -147,25 +147,25 @@ export default {
           name: 'content',
           description: `Define an evaluation. At present, you can only run assessments for XCCDF policy files.`,
           removable: false,
+          required: true,
           validate_error_message: 'Any directory or file name.',
           show_attributes: true,
+          show_options: true,
           attributes: [
             {
               name: 'type',
               description: 'Select content type.',
-              type: 'select',
+              type: 'input',
               required: true,
-              values: [
-                {value: 'xccdf ', text: 'xccdf '},
-                {value: 'oval', text: 'oval'}
-              ],
-              default_value: 'xccdf'
+              default_value: 'xccdf',
+              field_read_only: true
             },
             {
               name: 'path',
               description: 'Use the specified policy file.',
               info: 'The path attribute can be filled in with the whole path where the benchmark files are located, or with a relative path to the CIS-CAT tool location.',
               type: 'input',
+              required: true,
               placeholder: 'Path where the benchmark files are located',
               validate_error_message: 'Path where the benchmark files are located'
             },
@@ -184,8 +184,9 @@ export default {
               name: 'profile',
               description: 'Select profile.',
               type: 'input',
-              placeholder: 'Select profile.',
-              validate_error_message: 'Select profile.'
+              required: true,
+              placeholder: 'Profile',
+              validate_error_message: 'A valid profile.'
             }
           ]
         }

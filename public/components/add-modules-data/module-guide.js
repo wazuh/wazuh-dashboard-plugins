@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for show a extension guide.
+* Wazuh app - React component for show a module guide.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -40,10 +40,11 @@ import {
   EuiButtonGroup,
   EuiTabs,
   EuiTab,
-  EuiCode
+  EuiCode,
+  EuiBadge
 } from "@elastic/eui";
 
-import extensionGuides from './guides';
+import moduleGuides from './guides';
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from '../../controllers/management/components/management/configuration/utils/xml-beautifier';
 import { toastNotifications } from 'ui/notify';
@@ -78,14 +79,17 @@ const agentOsTabs = [
   }
 ];
 
-class WzExtensionGuide extends Component {
+const renderOSIcon = (os) => <i className={`fa fa-${os} AgentsTable__soBadge AgentsTable__soBadge--${os}`} aria-hidden="true"/>;
+
+class WzModuleGuide extends Component {
   constructor(props) {
     super(props);
-    this.guide = extensionGuides[props.guideId];
+    this.guide = Object.keys(moduleGuides).map(key => moduleGuides[key]).find(guide => guide.id === props.guideId);
+    this.specificGuide = Boolean(this.props.agent);
     this.state = {
-      resetModalVisible: false,
-      agentTypeSelected: this.guide.avaliable_for_manager ? 'manager' : 'agent',
-      agentOSSelected: 'linux'
+      modalRestartIsVisble: false,
+      agentTypeSelected: (this.props.agent && ((this.props.agent.id === '000' ? 'manager' : 'agent') || this.props.agent.type)) || (this.guide.avaliable_for_manager ? 'manager' : 'agent'),
+      agentOSSelected: this.props.agent && (typeof this.props.agent.os === 'string' ? this.props.agent.os : (this.props.agent.os.platform === 'windows' ? 'windows' : 'linux')) || ''
     };
     this.state.steps = this.buildInitialSteps(this.guide.steps);
   }
@@ -135,9 +139,9 @@ class WzExtensionGuide extends Component {
   }
   filterElementByAgent(element){
     if(element.agent_os && element.agent_type){
-      return element.agent_os === this.state.agentOSSelected && element.agent_type === this.state.agentTypeSelected;
+      return this.state.agentOSSelected !== '' ? element.agent_os === this.state.agentOSSelected && element.agent_type === this.state.agentTypeSelected : true;
     }else if(element.agent_os){
-      return element.agent_os === this.state.agentOSSelected;
+      return this.state.agentOSSelected !== '' ? element.agent_os === this.state.agentOSSelected : true;
     }else if(element.agent_type){
       return element.agent_type === this.state.agentTypeSelected;
     }
@@ -153,7 +157,7 @@ class WzExtensionGuide extends Component {
   resetGuide(){
     this.setState({
       steps: this.buildInitialSteps(this.guide.steps),
-      resetModalVisible: false
+      modalRestartIsVisble: false
     });
   }
   addToast({color, title, text, time = 3000}){
@@ -304,12 +308,12 @@ class WzExtensionGuide extends Component {
                 <EuiSpacer size='s'/>
                 {this.state.agentTypeSelected === 'manager' ? (
                   <Fragment>
-                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>Management</EuiCode> {'>'} <EuiCode>Configuration</EuiCode> {'>'} <EuiCode>Edit configuration</EuiCode>, paste configuration, save and restart manager or node.</EuiText>
+                    <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>Management</EuiCode> {'>'} <EuiCode>Configuration</EuiCode> {'>'} <EuiCode>Edit configuration</EuiCode>, paste configuration, save and restart manager or node.</EuiText>
                   </Fragment>
                   ) : this.state.agentOSSelected === 'linux' ? (
-                    <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>/var/ossec/etc</EuiCode> in Linux agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
+                    <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>/var/ossec/etc</EuiCode> in Linux agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
                     ) : (
-                      <EuiText>When you finish of configure the extension, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
+                      <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
                 )}
                 <EuiSpacer size='s' />
                 <EuiText>The above section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
@@ -350,7 +354,7 @@ class WzExtensionGuide extends Component {
                     <EuiSpacer size='m' />
                     <EuiFlexGrid columns={2} style={{ marginLeft: '8px' }}>
                       {guideOption.attributes.map((guideSubOption, key) => (
-                        <EuiFlexItem key={`extension-guide-${guideOption.name}-${guideSubOption.name}`}>
+                        <EuiFlexItem key={`module-guide-${guideOption.name}-${guideSubOption.name}`}>
                           {this.renderOptionSetting(guideSubOption, [...keyID, 'attributes', key], { ignore_description: true })}
                         </EuiFlexItem>
                       ))}
@@ -382,7 +386,7 @@ class WzExtensionGuide extends Component {
                       return !guideSubOption.elements ? (
                       <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
                         <EuiFlexGroup>
-                          <EuiFlexItem key={`extension-guide-${guideOption.name}-${guideSubOption.name}`}>
+                          <EuiFlexItem key={`module-guide-${guideOption.name}-${guideSubOption.name}`}>
                             {/* {this.renderOptionSetting(guideSubOption, [...keyID, 'options', key], { ignore_description: true })} */}
                             {this.renderOption(guideSubOption, [...keyID, 'options', key])}
                             <EuiSpacer size='s'/>
@@ -392,7 +396,7 @@ class WzExtensionGuide extends Component {
                     ) : (
                       <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
                         {guideSubOption.elements.map((guideSubOptionElement, keyGuideSubOptionElement) => (
-                          <Fragment key={`extension-guide-${guideOption.name}-${guideSubOption.name}-${keyGuideSubOptionElement}`}>
+                          <Fragment key={`module-guide-${guideOption.name}-${guideSubOption.name}-${keyGuideSubOptionElement}`}>
                             <EuiFlexGroup>
                               <EuiFlexItem>
                                 {this.renderOption(guideSubOptionElement, [...keyID,'options', key,'elements',keyGuideSubOptionElement])}
@@ -422,7 +426,7 @@ class WzExtensionGuide extends Component {
         ) : (
           <Fragment>
             {guideOption.elements.map((guideSubOption, key) => (
-              <Fragment key={`extension-guide-${guideSubOption.name}-${key}`}>
+              <Fragment key={`module-guide-${guideSubOption.name}-${key}`}>
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     {this.renderOption(guideSubOption, [...keyID, 'elements', key])}
@@ -664,10 +668,10 @@ class WzExtensionGuide extends Component {
     }
   }
   toggleResetGuideModal = () => {
-    this.setState({ resetModalVisible: !this.state.resetModalVisible });
+    this.setState({ modalRestartIsVisble: !this.state.modalRestartIsVisble });
   }
   onChangeAgentTypeSelected = (agentTypeSelected) => {
-    this.setState({ agentTypeSelected }, () => {
+    this.setState({ agentTypeSelected, agentOSSelected: agentTypeSelected === 'agent' ? 'linux' : '' }, () => {
       this.resetGuide()
     });
   }
@@ -678,9 +682,9 @@ class WzExtensionGuide extends Component {
   }
   render() {
     const { guide } = this;
-    const { resetModalVisible, agentTypeSelected, agentOSSelected } = this.state;
+    const { modalRestartIsVisble, agentTypeSelected, agentOSSelected } = this.state;
     return (
-      <Fragment>
+      <div>
         <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
             <EuiFlexGroup>
@@ -689,9 +693,9 @@ class WzExtensionGuide extends Component {
                   <h2>
                     <EuiToolTip
                       position='top'
-                      content='Back to extensions'
+                      content='Back to add modules data'
                     >
-                      <EuiButtonIcon onClick={() => this.props.closeGuide()} iconType='arrowLeft' iconSize='l' aria-label='Back to extensions'/>
+                      <EuiButtonIcon onClick={() => this.props.close()} iconType='arrowLeft' iconSize='l' aria-label='Back to add modules data'/>
                     </EuiToolTip>
                     {guide.icon && (
                       <EuiIcon size='xl' type={guide.icon} />
@@ -707,12 +711,6 @@ class WzExtensionGuide extends Component {
                     </EuiLink>
                   )}
                 </EuiText>
-                {/* <EuiSpacer size='s' />
-                <EuiSwitch
-                  label={this.props.extensionEnabled ? 'Show extension' : 'Hide extension'}
-                  checked={this.props.extensionEnabled !== undefined ? this.props.extensionEnabled : false}
-                  onChange={(e) => this.props.onChangeToggleExtensionVisibility(this.props.guideId,e.target.checked)}
-                /> */}
                 <EuiSpacer size='m' />
                 {guide.callout_warning && (
                   <EuiFlexGroup>
@@ -722,6 +720,24 @@ class WzExtensionGuide extends Component {
                       </EuiCallOut>
                     </EuiFlexItem>
                   </EuiFlexGroup>
+                )}
+                {this.specificGuide && (
+                  <Fragment>
+                    {guide.callout_warning && (
+                      <EuiSpacer size='s' />
+                    )}
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <span>
+                          <EuiBadge color='hollow' style={{padding: '4px'}}>{capitalize(agentTypeSelected)}</EuiBadge>
+                          <EuiBadge color='hollow' style={{padding: '4px'}}>
+                            <span style={{marginLeft: '6px'}}>
+                              {renderOSIcon(agentOSSelected)} {capitalize(agentOSSelected)}
+                            </span></EuiBadge>
+                        </span>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </Fragment>
                 )}
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -736,7 +752,7 @@ class WzExtensionGuide extends Component {
             </EuiFlexItem>
           )}
         </EuiFlexGroup>
-        {guide.avaliable_for_manager && guide.avaliable_for_agent && (
+        {!this.specificGuide && guide.avaliable_for_manager && guide.avaliable_for_agent && (
           <EuiFlexGroup justifyContent='center'>
             <EuiFlexItem grow={false}>
               <EuiButtonGroup
@@ -751,7 +767,7 @@ class WzExtensionGuide extends Component {
         <EuiSpacer size='l' />
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel style={{width: '92vw'}}>
+            <EuiPanel>
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
@@ -770,7 +786,7 @@ class WzExtensionGuide extends Component {
               </EuiFlexGroup>
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  {agentTypeSelected === 'agent' && (
+                  {!this.specificGuide && agentTypeSelected === 'agent' && (
                     <Fragment>
                       <EuiTabs size='m' display='default' expand={false}>
                         {agentOsTabs.map((agentOSTab) => (
@@ -791,7 +807,7 @@ class WzExtensionGuide extends Component {
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
-        {resetModalVisible && (
+        {modalRestartIsVisble && (
           <EuiOverlayMask>
             <EuiConfirmModal
               title="Do you want reset the guide?"
@@ -803,21 +819,27 @@ class WzExtensionGuide extends Component {
             </EuiConfirmModal>
           </EuiOverlayMask>
         )}
-      </Fragment>
+      </div>
     )
   }
 }
 
-WzExtensionGuide.propTypes = {
-  currentExtensionData: PropTypes.shape({
-    enabled: PropTypes.bool,
-    title: PropTypes.string,
-    url: PropTypes.string,
-    description: PropTypes.string,
-    icon: PropTypes.string
-  }),
-  closeGuide: PropTypes.func,
-  guideId: PropTypes.string
+WzModuleGuide.propTypes = {
+  close: PropTypes.func,
+  guideId: PropTypes.string,
+  agent: PropTypes.oneOfType([
+    PropTypes.shape({
+      id: PropTypes.string,
+      os: {
+        platform: PropTypes.string
+      }
+    }),
+    PropTypes.shape({
+      type: PropTypes.oneOf['manager','agent'],
+      os: PropTypes.oneOf['linux','windows']
+    }),
+    PropTypes.any
+  ])
 }
 
-export default WzExtensionGuide;
+export default WzModuleGuide;

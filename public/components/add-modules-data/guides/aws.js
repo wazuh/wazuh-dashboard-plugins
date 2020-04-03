@@ -14,6 +14,7 @@ export default {
   name: 'Amazon AWS services',
   wodle_name: 'aws-s3',
   description: 'Configuration options of the AWS-S3 wodle.',
+  category: 'Security information management',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html',
   icon: 'logoAWSMono',
   avaliable_for_manager: true,
@@ -69,11 +70,11 @@ export default {
     },
     {
       title: 'Buckets',
-      description: 'Defines a bucket to process.',
+      description: 'Defines one or more buckets to process.',
       elements: [
         {
           name: 'bucket',
-          description: 'Defines a bucket to process. Must have its attribute type defined. (Supports multiple instances of this option).',
+          description: 'Defines a bucket to process.',
           removable: true,
           required: true,
           repeatable: true,
@@ -86,7 +87,7 @@ export default {
           attributes: [
             {
               name: 'type',
-              description: 'Specifies type of bucket. Is an attribute of the bucket tag.',
+              description: 'Specifies type of bucket.',
               info: 'Different configurations as macie has custom type.',
               type: 'select',
               required: true,
@@ -119,7 +120,7 @@ export default {
               name: 'aws_account_alias',
               description: 'A user-friendly name for the AWS account.',
               type: 'input',
-              placeholder: 'A user-friendly name for the AWS account'
+              placeholder: 'AWS account user-friendly name'
             },
             {
               name: 'access_key',
@@ -155,8 +156,8 @@ export default {
               name: 'only_logs_after',
               description: 'A valid date, in YYYY-MMM-DD format, that only logs from after that date will be parsed. All logs from before that date will be skipped.',
               type: 'input',
-              placeholder: 'Date, e.g.: 1970-JAN-01',
-              validate_regex: /^\d{4}-((JAN)|(FEB)|(MAR)|(APR)|(MAY)|(JUN)|(JUL)|(AUG)|(SEP)|(OCT)|(NOV)|(DEC))-\d{2}$/,
+              placeholder: 'Date, e.g.: 2020-APR-02',
+              validate_regex: /^[1-9]\d{3}-((JAN)|(FEB)|(MAR)|(APR)|(MAY)|(JUN)|(JUL)|(AUG)|(SEP)|(OCT)|(NOV)|(DEC))-\d{2}$/,
               validate_error_message: 'A valid date, in YYYY-MMM-DD format'
             },
             {

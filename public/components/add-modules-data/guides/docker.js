@@ -14,6 +14,7 @@ export default {
   name: 'Docker Listener',
   wodle_name: 'docker-listener',
   description: 'Configuration options of the Docker wodle.',
+  category: 'Threat detection and response',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html',
   icon: 'logoDocker',
   avaliable_for_manager: true,
@@ -21,7 +22,7 @@ export default {
   steps: [
     {
       title: 'Settings',
-      description: 'Add or remove directories to be monitored',
+      description: '',
       elements: [
         {
           name: 'disabled',
@@ -34,17 +35,17 @@ export default {
           description: 'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days)',
           type: 'input',
           required: true,
-          placeholder: 'A positive number that should contain a suffix character indicating a time unit',
+          placeholder: 'Time in format <number><time unit suffix>',
           default_value: '1m',
           validate_error_message: 'A positive number that should contain a suffix character indicating a time unit. e.g.: 1m',
           validate_regex: /^[1-9]\d*[s|m|h|d]$/
         },
         {
           name: 'attempts',
-          description: `Number of attempts to execute the wodle.`,
+          description: 'Number of attempts to execute the wodle.',
           type: 'input-number',
           required: true,
-          placeholder: 'Number of attempts to execute the wodle.',
+          placeholder: 'Number of attempts',
           values: { min: 1 },
           default_value: 5,
           validate_error_message: 'Number of attempts to execute the wodle.'

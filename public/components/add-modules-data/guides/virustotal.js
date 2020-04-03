@@ -13,7 +13,8 @@ export default {
   id: 'virustotal',
   xml_tag: 'integration',
   name: 'VirusTotal',
-  description: 'This configures the manager to connect Wazuh to external APIs and alerting tools such as Slack, PagerDuty and VirusTotal.',
+  description: 'Configuration options of the VirusTotal integration.',
+  category: 'Threat detection and response',
   documentation_link: 'https://documentation.wazuh.com/3.10/user-manual/reference/ossec-conf/integration.html',
   icon: 'securityApp',
   avaliable_for_manager: true,
@@ -32,7 +33,7 @@ export default {
         },
         {
           name: 'api_key',
-          description: `This is the key that you would have retrieved from the VirusTotal API. This is mandatory for VirusTotal.`,
+          description: 'This is the key that you would have retrieved from the VirusTotal API.',
           type: 'input',
           required: true,
           placeholder: 'VirusTotal Api key'
@@ -45,7 +46,7 @@ export default {
       elements: [
         {
           name: 'level',
-          description: `This filters alerts by rule level so that only alerts with the specified level or above are pushed.`,
+          description: 'This filters alerts by rule level so that only alerts with the specified level or above are pushed.',
           type: 'input-number',
           values: { min: 0, max: 16 },
           default_value: 0,
@@ -54,7 +55,7 @@ export default {
         },
         {
           name: 'rule_id',
-          description: `This filters alerts by rule ID.`,
+          description: 'This filters alerts by rule ID.',
           type: 'input',
           default_value: '',
           placeholder: 'Comma-separated rule IDs',
@@ -62,7 +63,7 @@ export default {
         },
         {
           name: 'group',
-          description: `This filters alerts by rule group. For the VirusTotal integration, only rules from the syscheck group are available.`,
+          description: 'This filters alerts by rule group. For the VirusTotal integration, only rules from the syscheck group are available.',
           type: 'input',
           placeholder: 'Any rule group or comma-separated rule groups.'
         },
