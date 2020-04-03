@@ -18,7 +18,8 @@ import {
   EuiTabs,
   EuiTab,
   EuiSpacer,
-  EuiTitle
+  EuiTitle,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 import {
   StatesTable,
@@ -32,7 +33,8 @@ export class States extends Component {
     filters: {},
     selectedTabId: String,
     totalItemsFile: Number,
-    totalItemsRegistry: Number
+    totalItemsRegistry: Number,
+    isLoading: Boolean
   }
   props: any;
 
@@ -43,7 +45,8 @@ export class States extends Component {
       filters: {},
       selectedTabId: 'files',
       totalItemsFile: 0,
-      totalItemsRegistry: 0
+      totalItemsRegistry: 0,
+      isLoading: true
     }
   }
 
@@ -51,14 +54,14 @@ export class States extends Component {
     let auxTabs = [
       {
         id: 'files',
-        name: `Files (${this.state.totalItemsFile})`,
+        name: `Files ${this.state.isLoading === true ? '' : '('+this.state.totalItemsFile+')'}`,
         disabled: false,
       },
     ]
     this.props.agent.os.platform === 'windows' ? auxTabs.push(
       {
         id: 'registry',
-        name: `Windows Registry (${this.state.totalItemsRegistry})`,
+        name: `Windows Registry ${this.state.isLoading === true ? '' : '('+this.state.totalItemsRegistry+')'}`,
         disabled: false,
       },
     ) : null;
@@ -68,6 +71,7 @@ export class States extends Component {
   async componentDidMount() {
     await this.getTotalFiles();
     await this.getTotalRegistry();
+    this.setState({isLoading: false});
   }
 
   onFiltersChange(filters) {
@@ -106,6 +110,7 @@ export class States extends Component {
 
   renderTabs() {
     const tabs = this.tabs();
+    const { isLoading } = this.state;
     if (tabs.length > 1) {
       return (
         <EuiTabs>
@@ -115,7 +120,7 @@ export class States extends Component {
               isSelected={tab.id === this.state.selectedTabId}
               disabled={tab.disabled}
               key={index}>
-              {tab.name}
+              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner />}
             </EuiTab>
           ))}
         </EuiTabs>
@@ -123,7 +128,7 @@ export class States extends Component {
     } else {
       return (
         <EuiTitle size="s">
-          <h1> {tabs[0].name} </h1>
+          <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner />}</h1>
         </EuiTitle>
       )
     }
