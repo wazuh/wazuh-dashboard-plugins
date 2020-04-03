@@ -153,7 +153,7 @@ export class GroupsController {
       }
       const result = await this.apiReq.request(
         'GET',
-        `/agents/groups/${this.currentGroup.name}`, //TODO: 
+        `/groups/${this.currentGroup.name}/agents`,
         { params: params },
       );
       this.totalSelectedAgents = result.data.data.total_affected_items;

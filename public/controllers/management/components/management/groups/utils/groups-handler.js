@@ -59,7 +59,7 @@ export default class GroupsHandler {
    */
   static async agentsGroup(name, filters) {
     try {
-      const result = await WzRequest.apiReq('GET', `/agents/groups/${name}`, filters);
+      const result = await WzRequest.apiReq('GET', `/groups/${name}/agents`, filters);
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -72,7 +72,7 @@ export default class GroupsHandler {
    */
   static async filesGroup(name, filters) {
     try {
-      const result = await WzRequest.apiReq('GET', `/agents/groups/${name}/files`, filters);
+      const result = await WzRequest.apiReq('GET', `/groups/${name}/files`, filters);
       return result;
     } catch (error) {
       return Promise.reject(error);
