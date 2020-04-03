@@ -62,10 +62,6 @@ export class StatesTable extends Component {
     }
   }
 
-  async componentDidMount() {
-    await this.getSyscheck();
-  }
-
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
@@ -85,7 +81,6 @@ export class StatesTable extends Component {
   }
 
   async getSyscheck() {
-    const { filters } = this.props;
     const agentID = this.props.agent.id;
 
     const syscheck = await WzRequest.apiReq(
