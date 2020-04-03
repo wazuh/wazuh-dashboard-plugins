@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
-  "version": "3.12.0",
-  "revision": "0871",
-  "code": "0871-0",
+  "version": "3.12.1",
+  "revision": "0872",
+  "code": "0872-0",
   "kibana": {
     "version": "7.6.2"
   },
