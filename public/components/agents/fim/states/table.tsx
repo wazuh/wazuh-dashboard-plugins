@@ -75,7 +75,7 @@ export class StatesTable extends Component {
       return item.file === file;
     });
 
-    this.setState({ isFlyoutVisible: true, currentFile: fileData[0]});
+    this.setState({ isFlyoutVisible: true, currentFile: fileData[0] });
   }
 
   componentDidUpdate(prevProps) {
@@ -101,19 +101,19 @@ export class StatesTable extends Component {
   }
 
   buildSortFilter() {
-    const {sortField, sortDirection} = this.state;
+    const { sortField, sortDirection } = this.state;
 
     const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
 
-    return direction+field;
+    return direction + field;
   }
 
   buildFilter() {
-    const { pageIndex, pageSize} = this.state;
+    const { pageIndex, pageSize } = this.state;
     const { filters } = this.props;
 
-     const filter = {
+    const filter = {
       ...filters,
       offset: pageIndex * pageSize,
       limit: pageSize,
@@ -121,7 +121,7 @@ export class StatesTable extends Component {
       type: 'file'
     };
 
-     return filter;
+    return filter;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -210,26 +210,26 @@ export class StatesTable extends Component {
       pageSizeOptions: [15, 25, 50, 100],
     }
     const sorting = {
-			sort: {
-				field: sortField,
-				direction: sortDirection,
-			},
+      sort: {
+        field: sortField,
+        direction: sortDirection,
+      },
     };
-    
+
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
-              items={syscheck}
-              columns={columns}
-              pagination={pagination}
-              onChange={this.onTableChange}
-              rowProps={getRowProps}
-              sorting={sorting}
-              itemId="file"
-              isExpandable={true}
-              loading={isLoading}
-            />
+            items={syscheck}
+            columns={columns}
+            pagination={pagination}
+            onChange={this.onTableChange}
+            rowProps={getRowProps}
+            sorting={sorting}
+            itemId="file"
+            isExpandable={true}
+            loading={isLoading}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -243,12 +243,12 @@ export class StatesTable extends Component {
       flyout = (
         <EuiFlyout onClose={() => this.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
           <EuiFlyoutHeader hasBorder className="flyout-header" >
-            <EuiTitle size="m">
+            <EuiTitle size="s">
               <h2 id="flyoutTitle">{this.state.currentFile.file}</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody className="flyout-body" >
-            <FileDetails currentFile={this.state.currentFile} /> 
+            <FileDetails currentFile={this.state.currentFile} />
           </EuiFlyoutBody>
         </EuiFlyout>
       );

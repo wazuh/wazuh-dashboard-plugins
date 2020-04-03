@@ -21,11 +21,11 @@ import {
 import './discover.less';
 import { EuiFlexGroup } from '@elastic/eui';
 import { EuiFlexItem } from '@elastic/eui';
-import { GenericRequest } from '../../react-services/generic-request';
+import { GenericRequest } from '../../../../react-services/generic-request';
 import { agent } from 'supertest';
 import { EuiFlexGrid } from '@elastic/eui';
 import { RowDetails } from './row-details';
-import { FilterBar } from '../agents/fim/states/filterBar'
+import { FilterBar } from '../../../agents/fim/states/filterBar'
 
 
 export class Discover extends Component {
@@ -88,7 +88,7 @@ export class Discover extends Component {
     } else {
       const newItemIdToExpandedRowMap = {};
       newItemIdToExpandedRowMap[item._id] = (
-        (<div style={{width: "100%", border: "1px solid #a1a1a14d"}}> <RowDetails item={item}/></div>)
+        (<div style={{width: "100%"}}> <RowDetails item={item}/></div>)
       );
       this.setState({ itemIdToExpandedRowMap:newItemIdToExpandedRowMap });
     }

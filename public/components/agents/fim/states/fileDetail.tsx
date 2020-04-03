@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGrid,
   EuiFlexItem,
@@ -20,7 +20,7 @@ import {
   EuiButtonEmpty
 } from '@elastic/eui';
 import { EuiHorizontalRule } from '@elastic/eui';
-import { Discover } from '../../../discover'
+import { Discover } from '../../../common/modules/discover'
 
 export class FileDetails extends Component {
   state: {
@@ -81,27 +81,27 @@ export class FileDetails extends Component {
     ]
   }
 
-  extraColumns(){
+  extraColumns() {
     return [
-          {
-            field: 'md5',
-            name: 'MD5',
-          },
-          {
-            field: 'sha1',
-            name: 'SHA1',
-          },
-          {
-            field: 'sha256',
-            name: 'SHA256',
-          }
-        ]
+      {
+        field: 'md5',
+        name: 'MD5',
+      },
+      {
+        field: 'sha1',
+        name: 'SHA1',
+      },
+      {
+        field: 'sha256',
+        name: 'SHA256',
+      }
+    ]
   }
 
 
-  getDetails(){
+  getDetails() {
     const columns = this.generalColumns();
-    const generalDetails = columns.map((item,idx) => {
+    const generalDetails = columns.map((item, idx) => {
       const value = this.props.currentFile[item.field] || '-';
       const grow = item.grow || 1;
       return (
@@ -113,21 +113,21 @@ export class FileDetails extends Component {
             {value}
           </EuiText>
         </EuiFlexItem>
-        )
+      )
     });
     const extraColumns = this.extraColumns();
-    const extraDetails = extraColumns.map((item,idx) => {
+    const extraDetails = extraColumns.map((item, idx) => {
       const value = this.props.currentFile[item.field] || '-';
       return (
         <EuiFlexItem key={idx} >
           <EuiText className="detail-title">
             {item.name}
           </EuiText>
-          <EuiText>
+          <EuiText size="xs">
             {value}
           </EuiText>
         </EuiFlexItem>
-        )
+      )
     });
 
     return (
@@ -136,12 +136,13 @@ export class FileDetails extends Component {
         <EuiFlexGroup gutterSize="m">{extraDetails}</EuiFlexGroup>
       </span>);
   }
-  
+
   render() {
     return (
-      <span>
-        {this.getDetails()}
-        <EuiHorizontalRule margin="xs" />
+      <Fragment>
+        <div className='details-row'>
+          {this.getDetails()}
+        </div>
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle >
@@ -156,10 +157,10 @@ export class FileDetails extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Discover filters={{'syscheck.path': this.props.currentFile.file}} />
+            <Discover filters={{ 'syscheck.path': this.props.currentFile.file }} />
           </EuiFlexItem>
         </EuiFlexGroup>
-      </span>
+      </Fragment>
     )
   }
 }

@@ -30,7 +30,7 @@ import {
 import './discover.less';
 import { EuiFlexItem } from '@elastic/eui';
 import { EuiFlexGrid } from '@elastic/eui';
-import { ApiRequest } from '../../react-services/api-request';
+import { ApiRequest } from '../../../../react-services/api-request';
 
 
 
@@ -41,7 +41,7 @@ export class RowDetails extends Component {
   };
 
   props!: {
-    item:Object
+    item: Object
   }
 
   constructor(props) {
@@ -55,35 +55,34 @@ export class RowDetails extends Component {
 
   propertiesToArray(obj) {
     const isObject = val =>
-        typeof val === 'object' && !Array.isArray(val);
+      typeof val === 'object' && !Array.isArray(val);
 
     const addDelimiter = (a, b) =>
-        a ? `${a}.${b}` : b;
+      a ? `${a}.${b}` : b;
 
     const paths = (obj = {}, head = '') => {
-        return Object.entries(obj)
-            .reduce((product, [key, value]) => 
-                {
-                    let fullPath = addDelimiter(head, key)
-                    return isObject(value) ?
-                        product.concat(paths(value, fullPath))
-                    : product.concat(fullPath)
-                }, []);
+      return Object.entries(obj)
+        .reduce((product, [key, value]) => {
+          let fullPath = addDelimiter(head, key)
+          return isObject(value) ?
+            product.concat(paths(value, fullPath))
+            : product.concat(fullPath)
+        }, []);
     }
 
     return paths(obj);
   }
 
   async componentDidMount() {
-    const rulesDataResponse = await ApiRequest.request('GET', `/rules`, {q:`id=${this.props.item.rule.id}`});
+    const rulesDataResponse = await ApiRequest.request('GET', `/rules`, { q: `id=${this.props.item.rule.id}` });
     const ruleData = (rulesDataResponse.data || {}).data || {};
-    this.setState({ruleData})
+    this.setState({ ruleData })
   }
 
 
-  getExtraDetails(item){
+  getExtraDetails(item) {
     const syscheckPaths = this.propertiesToArray(item.syscheck);
-    const table = syscheckPaths.map((item,idx) => {
+    const table = syscheckPaths.map((item, idx) => {
       return (
         <>
           <EuiFlexItem>
@@ -97,8 +96,8 @@ export class RowDetails extends Component {
           </EuiFlexItem>
         </>
       )
-      })
-    return ( <EuiFlexGrid columns={3}>{table}</EuiFlexGrid>)
+    })
+    return (<EuiFlexGrid columns={3}>{table}</EuiFlexGrid>)
   }
 
   columns() {
@@ -106,21 +105,21 @@ export class RowDetails extends Component {
       {
         field: 'timestamp',
         name: 'Time',
-        sortable:true
+        sortable: true
       },
     ]
   }
 
-  getChildFromPath(object, path){
+  getChildFromPath(object, path) {
     const pathArray = path.split('.');
-      var child = object[pathArray[0]];
-      for(var i=1; i<pathArray.length; i++){
-        child = child[pathArray[i]];
-      }
-      return child;
+    var child = object[pathArray[0]];
+    for (var i = 1; i < pathArray.length; i++) {
+      child = child[pathArray[i]];
+    }
+    return child;
   }
 
-  renderRows(syscheckPaths){
+  renderRows(syscheckPaths) {
     const columns = [
       {
         id: 'actions',
@@ -133,27 +132,27 @@ export class RowDetails extends Component {
       }
     ];
 
-    const rows = syscheckPaths.map( (item,idx) => {
-      const cells = columns.map((currentColumn,idx) => {
+    const rows = syscheckPaths.map((item, idx) => {
+      const cells = columns.map((currentColumn, idx) => {
         var child = (<span></span>);
-        if(currentColumn.id === 'actions'){
+        if (currentColumn.id === 'actions') {
           child = (<span></span>);
-        } 
-        if(currentColumn.id === 'key'){
+        }
+        if (currentColumn.id === 'key') {
           child = <span>{"syscheck." + item}</span>;
-        } 
-        if(currentColumn.id === 'value'){
-        child = <span>{"syscheck." + this.getChildFromPath(this.props.item.syscheck, item)}</span>;
-        } 
-            return (
-            <EuiTableRowCell
-              key={currentColumn.id}
-              textOnly={true}
-              style={{borderBottom: "none", borderTop: "none", lineHeight: 1.15}}>
-              {child}
-            </EuiTableRowCell>
-          );
-        });
+        }
+        if (currentColumn.id === 'value') {
+          child = <span>{"syscheck." + this.getChildFromPath(this.props.item.syscheck, item)}</span>;
+        }
+        return (
+          <EuiTableRowCell
+            key={currentColumn.id}
+            textOnly={true}
+            style={{ borderBottom: "none", borderTop: "none", lineHeight: 1.15 }}>
+            {child}
+          </EuiTableRowCell>
+        );
+      });
 
       return (
         <EuiTableRow
@@ -161,65 +160,65 @@ export class RowDetails extends Component {
           {cells}
         </EuiTableRow>
       );
-    });    
+    });
     return rows;
   }
 
-  renderHeaderCells(){
+  renderHeaderCells() {
     const header = [];
-    
+
     header.push(
       <EuiTableHeaderCell
         key="actions"
         width={40}>
-        
-        </EuiTableHeaderCell>
-      )
-       
+
+      </EuiTableHeaderCell>
+    )
+
     header.push(
       <EuiTableHeaderCell
         key="key"
         width={220}>
-        
-        </EuiTableHeaderCell>
-      )
-       
+
+      </EuiTableHeaderCell>
+    )
+
     header.push(
       <EuiTableHeaderCell
         key="value">
-        
-        </EuiTableHeaderCell>
-      )
-      return header;
+
+      </EuiTableHeaderCell>
+    )
+    return header;
   }
 
-  getTable(){
+  getTable() {
     const syscheckPaths = this.propertiesToArray(this.props.item.syscheck);
-      return (
-       <div>
-         <EuiTable>
-          <EuiTableHeader style={{visibility: "collapse"}}>{this.renderHeaderCells()}</EuiTableHeader>
-            <EuiTableBody>{this.renderRows(syscheckPaths)}</EuiTableBody>
-          </EuiTable>
-            
-         </div>)
+    return (
+      <div style={{height: 400, overflow: 'auto'}}>
+        <EuiTable>
+          <EuiTableHeader style={{ visibility: "collapse" }}>{this.renderHeaderCells()}</EuiTableHeader>
+          <EuiTableBody>{this.renderRows(syscheckPaths)}</EuiTableBody>
+        </EuiTable>
+
+      </div>)
   }
 
-  getJSON(){
+  getJSON() {
     const str = JSON.stringify(this.props.item, null, 2);
     return (
-        <div>
+      <div>
         <EuiCodeBlock
-              language="json"
-              fontSize="m"
-              paddingSize="m"
-              color="dark"
-              overflowHeight={920}
-              isCopyable>
-              {str}
-            </EuiCodeBlock>
+          language="json"
+          fontSize="s"
+          paddingSize="m"
+          color="dark"
+          overflowHeight={400}
+          isCopyable>
+          {str}
+        </EuiCodeBlock>
 
-        </div>
+      </div>
     )
   }
 
@@ -237,7 +236,7 @@ export class RowDetails extends Component {
         <EuiSpacer size="s" />
         <li key="level"><b>Level:</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
-            <EuiLink onClick={async () =>  alert( "TODO ")}>
+            <EuiLink onClick={async () => alert("TODO ")}>
               &nbsp;{level}
             </EuiLink>
           </EuiToolTip>
@@ -246,7 +245,7 @@ export class RowDetails extends Component {
         <EuiSpacer size="s" />
         <li key="file"><b>File:</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink onClick={async () =>  alert( "TODO ")}>
+            <EuiLink onClick={async () => alert("TODO ")}>
               &nbsp;{file}
             </EuiLink>
           </EuiToolTip>
@@ -254,7 +253,7 @@ export class RowDetails extends Component {
         <EuiSpacer size="s" />
         <li key="path"><b>Path:</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink onClick={async () => alert( "TODO ")}>
+            <EuiLink onClick={async () => alert("TODO ")}>
               &nbsp;{path}
             </EuiLink>
           </EuiToolTip>
@@ -266,11 +265,11 @@ export class RowDetails extends Component {
   }
 
 
-   /**
-   * Render a list with the details
+  /**
+  * Render a list with the details
 * @param {Array} details
-    */
-   renderDetails(details) {
+   */
+  renderDetails(details) {
     const detailsToRender = [];
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
@@ -284,16 +283,16 @@ export class RowDetails extends Component {
     )
   }
 
-   /**
-   * Render the groups
+  /**
+  * Render the groups
 * @param {Array} groups
-    */
-   renderGroups(groups) {
+   */
+  renderGroups(groups) {
     const listGroups = [];
     groups.forEach((group, index) => {
       listGroups.push(
         <span key={group}>
-          <EuiLink onClick={async () => alert( "TODO ")}>
+          <EuiLink onClick={async () => alert("TODO ")}>
             <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
               <span>
                 {group}
@@ -313,40 +312,40 @@ export class RowDetails extends Component {
     )
   }
 
-  getRule(){
+  getRule() {
     const item = this.state.ruleData.items[0];
     const { id, level, file, path, groups, details } = item;
-      return (
-        <EuiFlexGroup>
-          {/* General info */}
-          <EuiFlexItem>
-            <EuiPanel paddingSize="m">
-              <EuiTitle size={'s'}>
-                <h3>Information</h3>
-              </EuiTitle>
-              <EuiSpacer size="s" />
-              {this.renderInfo(id, level, file, path)}
-              {/* Groups */}
-              <EuiSpacer size={'m'} />
-              <EuiTitle size={'s'}>
-                <h3>Groups</h3>
-              </EuiTitle>
-              <EuiSpacer size="s" />
-              {this.renderGroups(groups)}
-            </EuiPanel>
-          </EuiFlexItem>
-          {/* Details */}
-          <EuiFlexItem>
-            <EuiPanel paddingSize="m">
-              <EuiTitle size={'s'}>
-                <h3>Details</h3>
-              </EuiTitle>
-              <EuiSpacer size="s" />
-              {this.renderDetails(details)}
-            </EuiPanel>
-          </EuiFlexItem>
-          {/* Compliance  -- TODO -- */}
-          { /*Object.keys(compliance).length > 0 && ( 
+    return (
+      <EuiFlexGroup  style={{height: 412, marginTop: 0}}>
+        {/* General info */}
+        <EuiFlexItem>
+          <EuiPanel paddingSize="m">
+            <EuiTitle size={'s'}>
+              <h3>Information</h3>
+            </EuiTitle>
+            <EuiSpacer size="s" />
+            {this.renderInfo(id, level, file, path)}
+            {/* Groups */}
+            <EuiSpacer size={'m'} />
+            <EuiTitle size={'s'}>
+              <h3>Groups</h3>
+            </EuiTitle>
+            <EuiSpacer size="s" />
+            {this.renderGroups(groups)}
+          </EuiPanel>
+        </EuiFlexItem>
+        {/* Details */}
+        <EuiFlexItem>
+          <EuiPanel paddingSize="m">
+            <EuiTitle size={'s'}>
+              <h3>Details</h3>
+            </EuiTitle>
+            <EuiSpacer size="s" />
+            {this.renderDetails(details)}
+          </EuiPanel>
+        </EuiFlexItem>
+        {/* Compliance  -- TODO -- */}
+        { /*Object.keys(compliance).length > 0 && ( 
             <EuiFlexItem>
               <EuiPanel paddingSize="m">
                 <EuiTitle size={'s'}>
@@ -357,17 +356,17 @@ export class RowDetails extends Component {
               </EuiPanel>
             </EuiFlexItem>
           ) */}
-        </EuiFlexGroup>
-      )
+      </EuiFlexGroup>
+    )
   }
 
-  
+
   onSelectedTabChanged = id => {
     this.setState({
       selectedTabId: id,
     });
   };
-  
+
   getTabs() {
     const tabs = [
       {
@@ -398,29 +397,29 @@ export class RowDetails extends Component {
     ));
   }
 
-  render(){
-    
+  render() {
+
     return (
       <div>
 
         {this.getTabs()}
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          {this.state.selectedTabId === 'table' && (
-            this.getTable()
-          )}
-          {this.state.selectedTabId === 'json' && (
-            this.getJSON()
-          )}
-          {this.state.selectedTabId === 'rule' && this.state.ruleData.totalItems === 1 && (
-            this.getRule()
-          ) ||  this.state.selectedTabId === 'rule' &&
-          (
-            <span>There was an error loading rule ID: {this.props.item.rule.id}</span> 
-          )}
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            {this.state.selectedTabId === 'table' && (
+              this.getTable()
+            )}
+            {this.state.selectedTabId === 'json' && (
+              this.getJSON()
+            )}
+            {this.state.selectedTabId === 'rule' && this.state.ruleData.totalItems === 1 && (
+              this.getRule()
+            ) || this.state.selectedTabId === 'rule' &&
+              (
+                <span>There was an error loading rule ID: {this.props.item.rule.id}</span>
+              )}
           </EuiFlexItem>
-        
-      </EuiFlexGroup>
+
+        </EuiFlexGroup>
 
       </div>
     );
