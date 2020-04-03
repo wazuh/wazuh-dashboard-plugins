@@ -46,7 +46,7 @@ export class Loader extends Component {
     return (
       <Fragment>
         <EuiSpacer size='xl' />
-        <div style={{ margin: '0 auto', width: 32 }}>
+        <div style={{ margin: '-8px auto', width: 32 }}>
           <EuiLoadingSpinner size="xl" />
         </div>
         {redirect}

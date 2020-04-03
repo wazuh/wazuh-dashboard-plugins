@@ -431,7 +431,7 @@ class WzMenu extends Component {
 
     const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
     const mainButton = (
-      <button onClick={() => this.switchMenuOpened()}>
+      <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup direction="row" responsive={false} style={{ paddingTop: 5 }}>
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
             <img src={logotype_url} className="navBarLogo" alt=""></img>

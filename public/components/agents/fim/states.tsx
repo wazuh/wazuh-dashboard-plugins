@@ -17,7 +17,9 @@ import {
   EuiPage,
   EuiTabs,
   EuiTab,
-  EuiSpacer
+  EuiSpacer,
+  EuiTitle,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 import {
   StatesTable,
@@ -31,9 +33,11 @@ export class States extends Component {
     filters: {},
     selectedTabId: String,
     totalItemsFile: Number,
-    totalItemsRegistry: Number
+    totalItemsRegistry: Number,
+    isLoading: Boolean
   }
-    
+  props: any;
+
   constructor(props) {
     super(props);
 
@@ -41,28 +45,33 @@ export class States extends Component {
       filters: {},
       selectedTabId: 'files',
       totalItemsFile: 0,
-      totalItemsRegistry: 0
+      totalItemsRegistry: 0,
+      isLoading: true
     }
   }
 
   tabs() {
-    return [
+    let auxTabs = [
       {
         id: 'files',
-        name: `Files (${this.state.totalItemsFile})`,
-        disabled: false,
-      },
-      {
-        id: 'registry',
-        name: `Windows Registry (${this.state.totalItemsRegistry})`,
+        name: `Files ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsFile + ')'}`,
         disabled: false,
       },
     ]
+    this.props.agent.os.platform === 'windows' ? auxTabs.push(
+      {
+        id: 'registry',
+        name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
+        disabled: false,
+      },
+    ) : null;
+    return (auxTabs);
   }
 
   async componentDidMount() {
     await this.getTotalFiles();
     await this.getTotalRegistry();
+    this.setState({ isLoading: false });
   }
 
   onFiltersChange(filters) {
@@ -70,9 +79,9 @@ export class States extends Component {
   }
 
   onSelectedTabChanged = id => {
-    this.setState({selectedTabId: id});
+    this.setState({ selectedTabId: id });
   }
-  
+
   async getTotalFiles() {
     const agentID = this.props.agent.id;
     const totalItemsFile = await WzRequest.apiReq(
@@ -83,7 +92,7 @@ export class States extends Component {
         type: 'file'
       }
     );
-    this.setState({totalItemsFile: ((totalItemsFile.data || {}).data || {}).totalItems || 0});
+    this.setState({ totalItemsFile: ((totalItemsFile.data || {}).data || {}).totalItems || 0 });
   }
 
   async getTotalRegistry() {
@@ -96,20 +105,33 @@ export class States extends Component {
         type: 'registry'
       }
     );
-    this.setState({totalItemsRegistry: ((totalItemsRegistry.data || {}).data || {}).totalItems || 0});
+    this.setState({ totalItemsRegistry: ((totalItemsRegistry.data || {}).data || {}).totalItems || 0 });
   }
 
   renderTabs() {
     const tabs = this.tabs();
-    return tabs.map((tab, index) => (
-      <EuiTab
-        onClick={() => this.onSelectedTabChanged(tab.id)}
-        isSelected={tab.id === this.state.selectedTabId}
-        disabled={tab.disabled}
-        key={index}>
-        {tab.name}
-      </EuiTab>
-    ));
+    const { isLoading } = this.state;
+    if (tabs.length > 1) {
+      return (
+        <EuiTabs>
+          {tabs.map((tab, index) => (
+            <EuiTab
+              onClick={() => this.onSelectedTabChanged(tab.id)}
+              isSelected={tab.id === this.state.selectedTabId}
+              disabled={tab.disabled}
+              key={index}>
+              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner />}
+            </EuiTab>
+          ))}
+        </EuiTabs>
+      )
+    } else {
+      return (
+        <EuiTitle size="s">
+          <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner />}</h1>
+        </EuiTitle>
+      )
+    }
   }
 
   renderFiles() {
@@ -126,24 +148,31 @@ export class States extends Component {
   }
 
   renderWindowRegistry() {
+
+    const { filters } = this.state;
     return (
-      <RegistryTable />
+      <div>
+        <FilterBar
+          onFiltersChange={this.onFiltersChange.bind(this)} />
+        <RegistryTable
+          {...this.props}
+          filters={filters} />
+      </div>
     )
   }
 
   render() {
     const files = this.renderFiles();
     const registry = this.renderWindowRegistry();
+    const tabs = this.renderTabs()
     const { selectedTabId } = this.state;
     return (
       <EuiPage>
         <EuiPanel>
-          <EuiTabs display="condensed">
-            {this.renderTabs()}
-          </EuiTabs>
-          <EuiSpacer size="l" />
+          {tabs}
+          <EuiSpacer size="m" />
           {selectedTabId === 'files' && files}
-          {selectedTabId === 'registry' && registry}
+          {this.props.agent.os.platform === 'windows' && (selectedTabId === 'registry' && registry)}
         </EuiPanel>
       </EuiPage>
     )

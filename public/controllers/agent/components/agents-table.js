@@ -241,7 +241,7 @@ export class AgentsTable extends Component {
       icon = 'apple'
     }
     const os_name = checkField(((agent || {}).os || {}).name)
-      + checkField(((agent || {}).os || {}).version);
+      + ' ' + checkField(((agent || {}).os || {}).version);
 
     return (
       <span className="euiTableCellContent__text euiTableCellContent--truncateText">

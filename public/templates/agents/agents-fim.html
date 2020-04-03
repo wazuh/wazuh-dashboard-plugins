@@ -1,19 +1,40 @@
 <div ng-if="tab === 'fim'">
-    <div ng-if="agent && agent.os">
-        <react-component name="MainFim" props="fimProps" />
-        <div ng-if='!loadingDashboard'>
-            <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
-                <kbn-dis></kbn-dis>
-                <react-component ng-if='showModuleDashboard === "fim"' name="WzVisualize" props="visualizeProps" />
-            </div>
+    <react-component name="MainFim" props="fimProps" />
+    <div ng-if='!loadingDashboard'>
+        <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
+            <kbn-dis></kbn-dis>
         </div>
     </div>
-    <div ng-if="!agent || !agent.os">
-        <div flex class="euiCallOut euiCallOut--warning">
-            <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-                <span class="euiCallOutHeader__title">This agent has never connected.</span>
-            </div>
+    <!-- Loading status section -->
+    <div ng-if="tabView === 'panels' && showModuleDashboard === 'fim' && !rendered && resultState !== 'none'"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{loadingStatus}}</div>
         </div>
     </div>
+    <!-- End loading status section -->
+    <!-- Report status section -->
+    <div ng-if="reportBusy && reportStatus && showModuleDashboard === 'fim'"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{reportStatus}}</div>
+            <div class="euiSpacer euiSpacer--l"></div>
+        </div>
+    </div>
+    <!-- End report status section -->
+    <react-component ng-show='showModuleDashboard === "fim"' name="WzVisualize" props="visualizeProps" />
 </div>

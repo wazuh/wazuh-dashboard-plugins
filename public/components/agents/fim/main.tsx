@@ -19,7 +19,8 @@ import {
   EuiTab,
   EuiTabs,
   EuiTitle,
-  EuiToolTip
+  EuiToolTip,
+  EuiCallOut
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -28,6 +29,8 @@ import { Events, Dashboard, Loader } from '../../common/modules';
 import '../../../less/components/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
+import { ReportingService } from '../../../react-services/reporting';
+import chrome from 'ui/chrome';
 
 export class MainFim extends Component {
   state: {
@@ -38,6 +41,7 @@ export class MainFim extends Component {
     { id: 'events', name: i18n.translate('wazuh.fim.events', { defaultMessage: 'Events' }) },
   ]
   afterLoad = false;
+  reportingService = new ReportingService();
 
   constructor(props) {
     super(props);
@@ -57,7 +61,11 @@ export class MainFim extends Component {
       },
       {
         text: `${this.props.agent.name} (${this.props.agent.id})`,
-        href: `/app/wazuh#/agents?agent=${this.props.agent.id}`,
+        onClick: () => {
+          window.location.href = `#/agents?agent=${this.props.agent.id}`;
+          this.router.reload();
+        },
+        className: 'wz-global-breadcrumb-btn',
         truncate: true,
       },
       {
@@ -67,8 +75,10 @@ export class MainFim extends Component {
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setGlobalBreadcrumb();
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
   }
 
   color = (status) => {
@@ -118,7 +128,7 @@ export class MainFim extends Component {
       <EuiFlexItem grow={false}>
         <EuiButton
           iconType="document"
-          onClick={() => this.onSelectedTabChanged('dashboard')}>
+          onClick={() => this.reportingService.startVis2Png('fim', this.props.agent.id)}>
           Generate report
           </EuiButton>
       </EuiFlexItem>
@@ -175,30 +185,38 @@ export class MainFim extends Component {
     const dashboardButton = this.renderDashboardButton();
     const settingsButton = this.renderSettingsButton();
     return (
-      <div className='wz-module'>
-        <div className='wz-module-header-wrapper'>
-          <div className='wz-module-header'>
-            {title}
-            <EuiFlexGroup>
-              {tabs}
-              {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
-              {dashboardButton}
-              {settingsButton}
-            </EuiFlexGroup>
+      <Fragment>
+        {(this.props.agent && this.props.agent.os) &&
+          <div className='wz-module'>
+            <div className='wz-module-header-wrapper'>
+              <div className='wz-module-header'>
+                {title}
+                <EuiFlexGroup>
+                  {tabs}
+                  {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
+                  {dashboardButton}
+                  {settingsButton}
+                </EuiFlexGroup>
+              </div>
+            </div>
+            <div className='wz-module-body'>
+              {selectView === 'states' && <States {...this.props} />}
+              {selectView === 'events' && <Events {...this.props} section='fim' />}
+              {selectView === 'loader' &&
+                <Loader {...this.props}
+                  loadSection={(section) => this.loadSection(section)}
+                  redirect={this.afterLoad}>
+                </Loader>}
+              {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
+              {selectView === 'settings' && <Settings {...this.props} />}
+            </div>
           </div>
-        </div>
-        <div className='wz-module-body'>
-          {selectView === 'states' && <States {...this.props} />}
-          {selectView === 'events' && <Events {...this.props} section='fim' />}
-          {selectView === 'loader' &&
-            <Loader {...this.props}
-              loadSection={(section) => this.loadSection(section)}
-              redirect={this.afterLoad}>
-            </Loader>}
-          {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
-          {selectView === 'settings' && <Settings {...this.props} />}
-        </div>
-      </div>
+        }
+        {(!this.props.agent || !this.props.agent.os) &&
+          <EuiCallOut title=" This agent has never connected" color="warning" iconType="alert">
+          </EuiCallOut>
+        }
+      </Fragment>
     );
   }
 }

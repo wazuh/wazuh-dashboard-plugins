@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel } from '@elastic/eui';
+import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel, EuiToolTip } from '@elastic/eui';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -21,16 +21,43 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
+  addIconPlatformRender(agent) {
+    let icon = false;
+    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+    const os = (agent || {}).os;
+
+    if (((os || {}).uname || '').includes('Linux')) {
+      icon = 'linux'
+    } else if ((os || {}).platform === 'windows') {
+      icon = 'windows'
+    } else if ((os || {}).platform === 'darwin') {
+      icon = 'apple'
+    }
+    const os_name = checkField(((agent || {}).os || {}).name)
+      + ' ' + checkField(((agent || {}).os || {}).version);
+
+    return (
+      <EuiToolTip position="bottom" content={os_name === '--' ? '-' : os_name}>
+        <p className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 300, margin: '0 auto' }}>
+          <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
+        </p>
+      </EuiToolTip>
+    );
+  }
+
   buildStats(items) {
     const stats = items.map(item => {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
-            title={item.title}
+            title={
+              item.description === 'OS'
+                ? this.addIconPlatformRender(this.props.agent)
+                : <p style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{item.title}</p>
+            }
             description={item.description}
             textAlign="center"
             titleSize="s"
-            reverse
           />
         </EuiFlexItem>
       );
@@ -45,7 +72,7 @@ export class AgentInfo extends Component {
       { title: agent.ip, description: 'IP' },
       { title: agent.version, description: 'Version' },
       {
-        title: agent.agentOS,
+        title: agent.name,
         description: 'OS',
         style: { minWidth: 400 }
       },
