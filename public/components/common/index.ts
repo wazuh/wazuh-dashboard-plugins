@@ -1,1 +1,0 @@
-export { WzGlobalBreadcrumb } from './globalBreadcrumb';

@@ -5,34 +5,8 @@
             <!-- Breadcrumbs -->
             <div layout="row" layout-padding>
                 <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-                <div ng-if="tab !== 'welcome' && tab !== 'configuration'">
-                    <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
-                    <span> / </span>
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}}
-                        ({{agent.id}})</span>
-                    <span> / </span>
-                    <span>{{ tabNames[tab] }}</span>
-                </div>
-
-                <div ng-if="tab === 'configuration' && configurationTab === 'welcome'">
-                    <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
-                    <span> / </span>
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}}
-                        ({{agent.id}})</span>
-                    <span> / </span>
-                    <span>{{ tabNames[tab] }}</span>
-                </div>
-
-                <div ng-if="tab === 'configuration' && configurationTab !== 'welcome'">
-                    <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
-                    <span> / </span>
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}}
-                        ({{agent.id}})</span>
-                    <span> / </span>
-                    <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome', true)">{{
-                    tabNames[tab] }}</span>
-                    <span> / </span>
-                    <span>{{ tabNames[configurationTab] === 'Alerts' ? 'Labels' : tabNames[configurationTab] }}</span>
+                <div ng-show="octrl.tab !== 'welcome'" style="padding-left: 5px">
+                    <react-component flex name="WzCurrentAgentsSectionWrapper" props="currentAgentsSectionProps" />
                 </div>
             </div>
             <!-- End breadcrumbs -->
@@ -73,12 +47,6 @@
 
         </div>
         <!-- End navigation section -->
-
-        <!-- Navigation bar -->
-        <div ng-if="agentsTabsProps" ng-show="tab !== 'welcome'">
-            <react-component name="Tabs" props="agentsTabsProps" />
-        </div>
-        <!-- End of navigation bar -->
 
         <!-- Discover search bar section -->
         <kbn-dis

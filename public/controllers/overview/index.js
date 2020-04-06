@@ -12,7 +12,8 @@
 import { uiModules } from 'ui/modules';
 import { OverviewController } from './overview';
 import { WelcomeScreen } from './components/overview-welcome';
-import  { WzCurrentOverviewSectionWrapper } from './components/overview-current-section-wrapper';
+import { WzCurrentOverviewSectionWrapper } from '../../components/common/modules/overview-current-section-wrapper';
+import { WzCurrentAgentsSectionWrapper } from '../../components/common/modules/agents-current-section-wrapper';
 import { Stats } from './components/stats';
 import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';
@@ -23,6 +24,7 @@ app
   .controller('overviewController', OverviewController)
   .value('WelcomeScreenOverview', WelcomeScreen)
   .value('WzCurrentOverviewSectionWrapper', WzCurrentOverviewSectionWrapper)
+  .value('WzCurrentAgentsSectionWrapper', WzCurrentAgentsSectionWrapper)
   .value('StatsOverview', Stats)
   .value('SelectAgent', SelectAgent)
   .value('RequirementCard', RequirementCard);
