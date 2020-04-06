@@ -13,17 +13,11 @@
 import React, { Component } from 'react';
 import {
   EuiBasicTable,
-  EuiButtonIcon,
-  EuiHealth,
-  EuiButton,
-  EuiDescriptionList,
 } from '@elastic/eui';
 import './discover.less';
 import { EuiFlexGroup } from '@elastic/eui';
 import { EuiFlexItem } from '@elastic/eui';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { agent } from 'supertest';
-import { EuiFlexGrid } from '@elastic/eui';
 import { RowDetails } from './row-details';
 import { FilterBar } from '../../../agents/fim/states/filterBar'
 
@@ -77,8 +71,13 @@ export class Discover extends Component {
     }
   }
 
- 
-
+  async componentDidUpdate() {
+    try{
+      await this.getAlerts();
+    }catch(err){
+      console.log(err);
+    }
+  }
 
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
