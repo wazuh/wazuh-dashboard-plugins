@@ -248,7 +248,7 @@ export class StatesTable extends Component {
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody className="flyout-body" >
-            <FileDetails currentFile={this.state.currentFile} />
+            <FileDetails currentFile={this.state.currentFile} {...this.props} />
           </EuiFlyoutBody>
         </EuiFlyout>
       );
