@@ -12,7 +12,7 @@
  */
 import React, { Component } from 'react';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import WzCurrentOverviewSection from './agents-current-section'
+import WzCurrentOverviewSection from './overview-current-section'
 
 export class WzCurrentOverviewSectionWrapper extends Component {
  constructor(props) {

@@ -1,13 +1,10 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-    <div ng-if="tab !== 'fim' && tab !== 'welcome'">
+    <div ng-if="tab !== 'fim' && tab !== 'welcome' && tab !== 'configuration'">
         <!-- Navigation section -->
-        <div layout="row" layout-align="start center" ng-if="agent">
-            <!-- Breadcrumbs -->
-            <div layout="row" layout-padding>
-                <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-                <div ng-show="octrl.tab !== 'welcome'" style="padding-left: 5px">
-                    <react-component flex name="WzCurrentAgentsSectionWrapper" props="currentAgentsSectionProps" />
-                </div>
+        <div layout="row" layout-align="start center" ng-if="agent" style="padding: 10px 0px 2px 4px">
+            <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
+            <div ng-show="tab !== 'welcome' && tab !== 'configuration'" style="padding-left: 5px">
+                <react-component flex name="WzCurrentAgentsSectionWrapper" props="currentAgentsSectionProps" />
             </div>
             <!-- End breadcrumbs -->
 
