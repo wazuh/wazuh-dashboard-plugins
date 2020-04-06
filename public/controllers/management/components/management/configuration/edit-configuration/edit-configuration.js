@@ -137,10 +137,10 @@ class WzEditConfiguration extends Component{
       // try if it is a cluster
       const nodes = await clusterNodes();
       // set cluster nodes in Redux Store
-      this.props.updateClusterNodes(nodes.data.data.items);
+      this.props.updateClusterNodes(nodes.data.data.affected_items);
       // set cluster node selected in Redux Store
-      const existsClusterCurrentNodeSelected = nodes.data.data.items.find(node => node.name === this.props.clusterNodeSelected);
-      this.props.updateClusterNodeSelected(existsClusterCurrentNodeSelected ? existsClusterCurrentNodeSelected.name : nodes.data.data.items.find(node => node.type === 'master').name);
+      const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(node => node.name === this.props.clusterNodeSelected);
+      this.props.updateClusterNodeSelected(existsClusterCurrentNodeSelected ? existsClusterCurrentNodeSelected.name : nodes.data.data.affected_items.find(node => node.type === 'master').name);
       this.props.updateConfigurationSection('edit-configuration', 'Cluster configuration');
       this.props.updateLoadingStatus(true);
       setTimeout(() => this.props.updateLoadingStatus(false),1); // Trick to unmount this component and redo the request to get XML configuration
