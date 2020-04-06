@@ -11,8 +11,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
-import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel, EuiToolTip } from '@elastic/eui';
+import React, { Component, Fragment } from 'react';
+import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiToolTip } from '@elastic/eui';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -38,7 +38,7 @@ export class AgentInfo extends Component {
 
     return (
       <EuiToolTip position="bottom" content={os_name === '--' ? '-' : os_name}>
-        <p className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 300, margin: '0 auto' }}>
+        <p className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>
           <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
         </p>
       </EuiToolTip>
@@ -57,7 +57,7 @@ export class AgentInfo extends Component {
             }
             description={item.description}
             textAlign="center"
-            titleSize="s"
+            titleSize="xs"
           />
         </EuiFlexItem>
       );
@@ -80,9 +80,9 @@ export class AgentInfo extends Component {
       { title: agent.lastKeepAlive, description: 'Last keep alive' }
     ]);
     return (
-      <EuiPanel>
+      <Fragment>
         <EuiFlexGroup>{stats}</EuiFlexGroup>
-      </EuiPanel>
+      </Fragment>
     );
   }
 }

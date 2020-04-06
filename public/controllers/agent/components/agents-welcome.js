@@ -45,17 +45,17 @@ export class AgentWelcomeScreen extends Component {
     else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
     else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
   }
-  
+
   renderTitle() {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-title">
-        <EuiTitle size="s">
+          <EuiTitle size="s">
             <h1>
               <EuiToolTip position="right" content={this.props.agent.status}>
                 <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
               </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id}) - <b>Integrity monitoring</b>
+              {this.props.agent.name} ({this.props.agent.id})
             </h1>
           </EuiTitle>
         </EuiFlexItem>
@@ -86,144 +86,147 @@ export class AgentWelcomeScreen extends Component {
         <div className='wz-module-header-wrapper'>
           <div className='wz-module-header wz-module-header-main'>
             {title}
-            <EuiSpacer size="s" />
-            <AgentInfo agent={this.props.agent}></AgentInfo>
           </div>
         </div>
-        <EuiPage className='wz-module-body wz-module-body-main'>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Security Information Management">
-                    <EuiFlexGroup gutterSize="xs">
-                      <EuiFlexItem />
-                    </EuiFlexGroup>
-                    <EuiSpacer size="s" />
-                    <EuiFlexGrid columns={2}>
-                      {this.buildTabCard('general', 'dashboardApp')}
-                      {this.buildTabCard('fim', 'filebeatApp')}
-                      {this.buildTabCard('configuration', 'gear')}
-                      {this.buildTabCard('syscollector', 'notebookApp')}
-                    </EuiFlexGrid>
-                  </EuiPanel>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
-                    <EuiSpacer size="s" />
-                    <EuiFlexGrid columns={2}>
-                      {this.buildTabCard('pm', 'advancedSettingsApp')}
-                      {this.buildTabCard('sca', 'securityAnalyticsApp')}
-                      {this.props.extensions.audit &&
-                        this.buildTabCard('audit', 'monitoringApp')}
-                      {this.props.extensions.oscap &&
-                        this.buildTabCard('oscap', 'codeApp')}
-                      {this.props.extensions.ciscat &&
-                        this.buildTabCard('ciscat', 'auditbeatApp')}
-                    </EuiFlexGrid>
-                  </EuiPanel>
-                </EuiFlexItem>
-              </EuiFlexGroup>
+        <div className='wz-module-body wz-module-body-main'>
+          <div className="wz-module-body-agent-info">
+            <AgentInfo agent={this.props.agent}></AgentInfo>
+          </div>
+          <EuiPage>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiPanel betaBadgeLabel="Security Information Management">
+                      <EuiFlexGroup gutterSize="xs">
+                        <EuiFlexItem />
+                      </EuiFlexGroup>
+                      <EuiSpacer size="s" />
+                      <EuiFlexGrid columns={2}>
+                        {this.buildTabCard('general', 'dashboardApp')}
+                        {this.buildTabCard('fim', 'filebeatApp')}
+                        {this.buildTabCard('configuration', 'gear')}
+                        {this.buildTabCard('syscollector', 'notebookApp')}
+                      </EuiFlexGrid>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
+                      <EuiSpacer size="s" />
+                      <EuiFlexGrid columns={2}>
+                        {this.buildTabCard('pm', 'advancedSettingsApp')}
+                        {this.buildTabCard('sca', 'securityAnalyticsApp')}
+                        {this.props.extensions.audit &&
+                          this.buildTabCard('audit', 'monitoringApp')}
+                        {this.props.extensions.oscap &&
+                          this.buildTabCard('oscap', 'codeApp')}
+                        {this.props.extensions.ciscat &&
+                          this.buildTabCard('ciscat', 'auditbeatApp')}
+                      </EuiFlexGrid>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
 
-              <EuiSpacer size="xl" />
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Threat Detection and Response">
-                    <EuiSpacer size="s" />
-                    {(
-                      UnsupportedComponents[this.props.agent.agentPlatform] ||
-                      UnsupportedComponents['other']
-                    ).includes('vuls') &&
-                      !this.props.extensions.virustotal &&
-                      !this.props.extensions.osquery &&
-                      !this.props.extensions.mitre &&
-                      !this.props.extensions.docker && (
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiCallOut
-                              title={
-                                <p>
-                                  Click the <EuiIcon type="eye" /> icon to show thread detection and
-                                  response extensions.
-                                </p>
-                              }
-                              color="success"
-                              iconType="help"
-                            />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      )}
-                    <EuiFlexGrid columns={2}>
-                      {!(
+                <EuiSpacer size="xl" />
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiPanel betaBadgeLabel="Threat Detection and Response">
+                      <EuiSpacer size="s" />
+                      {(
                         UnsupportedComponents[this.props.agent.agentPlatform] ||
                         UnsupportedComponents['other']
-                      ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
-                      {this.props.extensions.virustotal &&
-                        this.buildTabCard('virustotal', 'savedObjectsApp')}
-                      {this.props.extensions.osquery &&
-                        this.buildTabCard('osquery', 'searchProfilerApp')}
-                      {this.props.extensions.docker &&
-                        this.buildTabCard('docker', 'logoDocker')}
-                      {this.props.extensions.mitre &&
-                        this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
-                    </EuiFlexGrid>
-                  </EuiPanel>
-                </EuiFlexItem>
-
-                <EuiFlexItem>
-                  <EuiPanel betaBadgeLabel="Regulatory Compliance">
-                    <EuiSpacer size="s" />
-                    {!this.props.extensions.pci &&
-                      !this.props.extensions.gdpr &&
-                      !this.props.extensions.hipaa &&
-                      !this.props.extensions.nist && (
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiCallOut
-                              title={
-                                <p>
-                                  Click the <EuiIcon type="eye" /> icon to show
-                                  regulatory compliance extensions.
+                      ).includes('vuls') &&
+                        !this.props.extensions.virustotal &&
+                        !this.props.extensions.osquery &&
+                        !this.props.extensions.mitre &&
+                        !this.props.extensions.docker && (
+                          <EuiFlexGroup>
+                            <EuiFlexItem>
+                              <EuiCallOut
+                                title={
+                                  <p>
+                                    Click the <EuiIcon type="eye" /> icon to show thread detection and
+                                    response extensions.
                                 </p>
-                              }
-                              color="success"
-                              iconType="help"
-                            />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      )}
-                    {(this.props.extensions.pci ||
-                      this.props.extensions.gdpr ||
-                      this.props.extensions.hipaa ||
-                      this.props.extensions.nist) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                        </EuiFlexGrid>
-                      )}
-                  </EuiPanel>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
-        <EuiPage>
-          <EuiFlexGroup justifyContent="spaceAround">
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                onClick={() => window.location.href = "#/settings?tab=modules"}
-                iconType="eye">
-                Configure the modules
+                                }
+                                color="success"
+                                iconType="help"
+                              />
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+                        )}
+                      <EuiFlexGrid columns={2}>
+                        {!(
+                          UnsupportedComponents[this.props.agent.agentPlatform] ||
+                          UnsupportedComponents['other']
+                        ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
+                        {this.props.extensions.virustotal &&
+                          this.buildTabCard('virustotal', 'savedObjectsApp')}
+                        {this.props.extensions.osquery &&
+                          this.buildTabCard('osquery', 'searchProfilerApp')}
+                        {this.props.extensions.docker &&
+                          this.buildTabCard('docker', 'logoDocker')}
+                        {this.props.extensions.mitre &&
+                          this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
+                      </EuiFlexGrid>
+                    </EuiPanel>
+                  </EuiFlexItem>
+
+                  <EuiFlexItem>
+                    <EuiPanel betaBadgeLabel="Regulatory Compliance">
+                      <EuiSpacer size="s" />
+                      {!this.props.extensions.pci &&
+                        !this.props.extensions.gdpr &&
+                        !this.props.extensions.hipaa &&
+                        !this.props.extensions.nist && (
+                          <EuiFlexGroup>
+                            <EuiFlexItem>
+                              <EuiCallOut
+                                title={
+                                  <p>
+                                    Click the <EuiIcon type="eye" /> icon to show
+                                    regulatory compliance extensions.
+                                </p>
+                                }
+                                color="success"
+                                iconType="help"
+                              />
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+                        )}
+                      {(this.props.extensions.pci ||
+                        this.props.extensions.gdpr ||
+                        this.props.extensions.hipaa ||
+                        this.props.extensions.nist) && (
+                          <EuiFlexGrid columns={2}>
+                            {this.props.extensions.pci &&
+                              this.buildTabCard('pci', 'visTagCloud')}
+                            {this.props.extensions.nist &&
+                              this.buildTabCard('nist', 'apmApp')}
+                            {this.props.extensions.gdpr &&
+                              this.buildTabCard('gdpr', 'visBarVertical')}
+                            {this.props.extensions.hipaa &&
+                              this.buildTabCard('hipaa', 'emsApp')}
+                          </EuiFlexGrid>
+                        )}
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPage>
+          <EuiPage>
+            <EuiFlexGroup justifyContent="spaceAround">
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  onClick={() => window.location.href = "#/settings?tab=modules"}
+                  iconType="eye">
+                  Configure the modules
               </EuiButton>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPage>
+        </div>
       </div>
     );
   }

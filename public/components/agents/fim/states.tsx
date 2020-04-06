@@ -120,7 +120,7 @@ export class States extends Component {
               isSelected={tab.id === this.state.selectedTabId}
               disabled={tab.disabled}
               key={index}>
-              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner />}
+              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
             </EuiTab>
           ))}
         </EuiTabs>
@@ -128,7 +128,7 @@ export class States extends Component {
     } else {
       return (
         <EuiTitle size="s">
-          <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner />}</h1>
+          <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}</h1>
         </EuiTitle>
       )
     }
