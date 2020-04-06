@@ -1060,11 +1060,13 @@ export class WazuhApiCtrl {
       
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
       
-      const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
+      const isFileGroups = req.payload.path.startsWith('/groups/') && req.payload.path.endsWith('/files');
+
+      const totalItems = isFileGroups ? (((output || {}).data || {}).data || {}).totalItems : (((output || {}).data || {}).data || {}).total_affected_items;
 
       if (totalItems && !isList) {
         params.offset = 0;
-        itemsArray.push(...output.data.data.affected_items);
+        isFileGroups ? itemsArray.push(...output.data.data.items) : itemsArray.push(...output.data.data.affected_items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await this.apiInterceptor.request(
@@ -1073,7 +1075,7 @@ export class WazuhApiCtrl {
             { params: params },
             { idHost: req.payload.id }
           );
-          itemsArray.push(...tmpData.data.data.affected_items);
+          isFileGroups ? itemsArray.push(...tmpData.data.data.items) : itemsArray.push(...tmpData.data.data.affected_items);
         }
       }
 
@@ -1082,9 +1084,9 @@ export class WazuhApiCtrl {
         const isArrayOfLists =
           path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
-        const isAgentsOfGroup = path.startsWith('/agents/groups/');
+        const isAgentsOfGroup = path.startsWith('/groups/') && path.endsWith('/agents');
         const isFiles = path.endsWith('/files');
-        let fields = Object.keys(output.data.data.affected_items[0]);
+        let fields = isFileGroups ? Object.keys(output.data.data.items[0]) : Object.keys(output.data.data.affected_items[0]);
 
         if (isAgents || isAgentsOfGroup) {
           if (isFiles) {

@@ -224,7 +224,7 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(`/agents/groups/${this.props.state.itemDetail.name}/files`, filters, 'Groups');
+      await this.exportCsv(`/groups/${this.props.state.itemDetail.name}/files`, filters, 'Groups');
       this.showToast(
         'success',
         'Success',
