@@ -11,9 +11,10 @@
  */
 import { WzRequest } from '../../../../../react-services/wz-request';
 
-export async function getFilterValues(field, value) {
+export async function getFilterValues(field, value, agentId, filters={}) {
 
   const filter = {
+    ...filters,
     distinct: true,
     select: field,
     limit: 30,
@@ -21,7 +22,6 @@ export async function getFilterValues(field, value) {
   if (value) {
     filter['search'] = value;
   }
-  // TODO: Get the agent from paramentes
-  const result = await WzRequest.apiReq('GET', '/syscheck/001', filter)
+  const result = await WzRequest.apiReq('GET', `/syscheck/${agentId}`, filter)
   return (((result || {}).data || {}).data || {}).items.map((item) => {return item[field]});
 }

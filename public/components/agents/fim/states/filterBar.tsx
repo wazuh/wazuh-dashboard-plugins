@@ -26,22 +26,22 @@ interface IDiscoverTime { from:string, to:string };
 export class FilterBar extends Component {
   suggestions: {[key:string]: qSuggests[]} = {
     files: [
-      {label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value)},
-      {label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value)},
-      {label: 'uname', description:"Owner of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uname', value)},
-      {label: 'uid', description:"Id of the onwner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uid', value)},
-      {label: 'gname', description:"Name of the group owner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('gname', value)},
-      {label: 'gid', description:"Id of the group owner", operators:['=','!=', '~'], values: async (value) => getFilterValues('gid', value)},
-      {label: 'md5', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('md5', value)},
-      // {label: 'date', values: async (value) => getFilterValues('date', value)},
-      {label: 'sha1', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha1', value)},
-      {label: 'sha256', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha256', value)},
-      // {label: 'mtime', values: async (value) => getFilterValues('mtime', value)},
-      {label: 'inode', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('inode', value)},
+      {label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agentId, {type:'file'})},
+      {label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value, this.props.agentId)},
+      {label: 'uname', description:"Owner of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uname', value, this.props.agentId)},
+      {label: 'uid', description:"Id of the onwner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uid', value, this.props.agentId)},
+      {label: 'gname', description:"Name of the group owner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('gname', value, this.props.agentId)},
+      {label: 'gid', description:"Id of the group owner", operators:['=','!=', '~'], values: async (value) => getFilterValues('gid', value, this.props.agentId)},
+      {label: 'md5', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('md5', value, this.props.agentId)},
+      // {label: 'date', values: async (value) => getFilterValues('date', value, this.props.agentId)},
+      {label: 'sha1', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha1', value, this.props.agentId)},
+      {label: 'sha256', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha256', value, this.props.agentId)},
+      // {label: 'mtime', values: async (value) => getFilterValues('mtime', value, this.props.agentId)},
+      {label: 'inode', description:"", operators:['=','!=', '~'], values: async (value) => getFilterValues('inode', value, this.props.agentId)},
       {label: 'size', description:"Size of the file in Bytes", values: value => !!value ? [value] : [0]}, // TODO: Adapt code to return and array with description
     ],
     registry: [
-      {label: 'file', description:"Name of the registry", values: async (value) => getFilterValues('file', value)},
+      {label: 'file', description:"Name of the registry", values: async (value) => getFilterValues('file', value, this.props.agentId, {type:'registry'})},
     ]
   }
 
@@ -71,8 +71,9 @@ export class FilterBar extends Component {
 
   props!:{
     onFiltersChange: Function
-    onDateChange(props:OnTimeChangeProps):() => void,
+    onDateChange(props:OnTimeChangeProps):() => void
     selectView: 'files' | 'registry'
+    agentId: string
   }
 
   constructor(props) {
