@@ -43,7 +43,7 @@ export class QHandler extends BaseHandler {
     this.isSearch = false;
     if (this.inputStage === 'fields' || inputValue === ''){
       const qInterpreter = new QInterpreter(inputValue);
-      this.isSearch = qInterpreter.qNumber() <= 1;
+      this.isSearch = qInterpreter.qNumber() <= 0;
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'operators') {
       return this.buildSuggestOperators(inputValue);

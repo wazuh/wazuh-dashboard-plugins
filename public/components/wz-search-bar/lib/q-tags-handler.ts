@@ -36,8 +36,7 @@ export class QTagsHandler extends BaseHandler {
   async buildSuggestItems(inputValue:string):Promise<suggestItem[]> {
     this.isSearch = false;
     if (this.inputStage === 'fields' || inputValue === ''){
-      const qInterpreter = new QInterpreter(inputValue);
-      this.isSearch = qInterpreter.qNumber() <= 1;
+      this.isSearch = inputValue.length >= 0;
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'operators') {
       return this.buildSuggestOperators(inputValue);
