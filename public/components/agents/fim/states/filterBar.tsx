@@ -26,7 +26,7 @@ interface IDiscoverTime { from:string, to:string };
 export class FilterBar extends Component {
   suggestions: {[key:string]: qSuggests[]} = {
     files: [
-      {label: 'file', description:"Name of the file or registry", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value)},
+      {label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value)},
       {label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value)},
       {label: 'uname', description:"Owner of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uname', value)},
       {label: 'uid', description:"Id of the onwner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uid', value)},
@@ -41,7 +41,7 @@ export class FilterBar extends Component {
       {label: 'size', description:"Size of the file in Bytes", values: value => !!value ? [value] : [0]}, // TODO: Adapt code to return and array with description
     ],
     registry: [
-      {label: 'file', description:"Name of the file or registry", values: async (value) => getFilterValues('file', value)},
+      {label: 'file', description:"Name of the registry", values: async (value) => getFilterValues('file', value)},
     ]
   }
 
