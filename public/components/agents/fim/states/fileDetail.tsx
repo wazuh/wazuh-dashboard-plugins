@@ -17,7 +17,8 @@ import {
   EuiText,
   EuiFlexGroup,
   EuiTitle,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiToolTip
 } from '@elastic/eui';
 import { EuiHorizontalRule } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
@@ -102,16 +103,18 @@ export class FileDetails extends Component {
   getDetails() {
     const columns = this.generalColumns();
     const generalDetails = columns.map((item, idx) => {
-      const value = this.props.currentFile[item.field] || '-';
+      var value = this.props.currentFile[item.field] || '-';
       const grow = item.grow || 1;
       return (
-        <EuiFlexItem key={idx} grow={grow}>
+        <EuiFlexItem key={idx} grow={grow} style={{maxWidth: 160, maxHeight: 100}}>
           <EuiText className="detail-title">
             {item.name}
           </EuiText>
-          <EuiText>
-            {value}
-          </EuiText>
+          <EuiToolTip position="bottom" content={value} delay="long">
+            <EuiText className="detail-value">
+              {value}
+            </EuiText>
+          </EuiToolTip>
         </EuiFlexItem>
       )
     });
