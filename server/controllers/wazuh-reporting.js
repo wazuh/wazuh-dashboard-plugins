@@ -529,8 +529,8 @@ export class WazuhReportingCtrl {
       if (isAgents && typeof isAgents === 'string') {
         const agent = await this.apiRequest.makeGenericRequest(
           'GET',
-          `/agents/${isAgents}`,
-          {},
+          `/agents`,
+          { params: { list_agents: isAgents }},
           apiId
         );
         if (
@@ -696,7 +696,7 @@ export class WazuhReportingCtrl {
       if (multi) {
         const agents = await this.apiRequest.makeGenericRequest(
           'GET',
-          `/agents/groups/${multi}`,
+          `/groups/${multi}/agents`,
           {},
           apiId
         );
@@ -1890,7 +1890,7 @@ export class WazuhReportingCtrl {
             try {
               configuration = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}/configuration`, 
+                `/groups/${g_id}/configuration`, 
                 {},
                 apiId
               );
@@ -2088,7 +2088,7 @@ export class WazuhReportingCtrl {
             try {
               agentsInGroup = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}`,
+                `/groups/${g_id}/agents`,
                 {},
                 apiId
               );
