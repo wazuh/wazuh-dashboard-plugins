@@ -90,23 +90,30 @@ export class GroupsController {
       if (this.globalAgent) {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
-        const data = await this.apiReq.request('GET', 
-        '/agents/groups', 
-        { params: { limit: 1000 },
-        });
+        const data = await this.apiReq.request('GET',
+          '/groups', {
+            params: {
+              limit: 1000
+            },
+          });
         const filtered = data.data.data.affected_items.filter(group => group.name === globalGroup);
         if (Array.isArray(filtered) && filtered.length) {
           // Load that our group
-          this.buildGroupsTableProps(data.data.data.items, {group: filtered[0]});
+          this.buildGroupsTableProps(data.data.data.items, {
+            group: filtered[0]
+          });
         } else {
           throw Error(`Group ${globalGroup} not found`);
         }
 
         this.shareAgent.deleteAgent();
       } else {
-        const loadedGroups = await this.apiReq.request('GET', 
-        '/agents/groups', 
-        { params: { limit: 1000 } } 
+        const loadedGroups = await this.apiReq.request('GET',
+          '/groups', {
+            params: {
+              limit: 1000
+            }
+          }
         );
         this.buildGroupsTableProps(loadedGroups.data.data.affected_items);
         const configuration = this.wazuhConfig.getConfig();
@@ -153,12 +160,16 @@ export class GroupsController {
       }
       const result = await this.apiReq.request(
         'GET',
-        `/agents/groups/${this.currentGroup.name}`,
-        { params: params },
+        `/groups/${this.currentGroup.name}/agents`, {
+          params: params
+        },
       );
       this.totalSelectedAgents = result.data.data.total_affected_items;
       const mapped = result.data.data.affected_items.map(item => {
-        return { key: item.id, value: item.name };
+        return {
+          key: item.id,
+          value: item.name
+        };
       });
       this.firstSelectedList = mapped;
       if (searchTerm) {
@@ -193,7 +204,9 @@ export class GroupsController {
         this.availableAgents.offset = 0;
       }
 
-      const req = await this.apiReq.request('GET', '/agents', { params: params });
+      const req = await this.apiReq.request('GET', '/agents', {
+        params: params
+      });
 
       this.totalAgents = req.data.data.total_affected_items;
 
@@ -206,7 +219,10 @@ export class GroupsController {
           );
         })
         .map(item => {
-          return { key: item.id, value: item.name };
+          return {
+            key: item.id,
+            value: item.name
+          };
         });
 
       if (searchTerm || start) {
@@ -286,7 +302,10 @@ export class GroupsController {
     const addedIds = [...new Set(this.addedAgents.map(x => x.key))];
     const deletedIds = [...new Set(this.deletedAgents.map(x => x.key))];
 
-    return { addedIds, deletedIds };
+    return {
+      addedIds,
+      deletedIds
+    };
   }
 
   /**
@@ -322,8 +341,12 @@ export class GroupsController {
       if (itemsToSave.addedIds.length) {
         const addResponse = await this.apiReq.request(
           'PUT',
-          `/agents/group/${this.currentGroup.name}`,
-          { params: { list_agents: itemsToSave.addedIds.toString() }}
+          `/agents/group`, {
+            params: {
+              group_id: this.currentGroup.name,
+              list_agents: itemsToSave.addedIds.toString()
+            }
+          }
         );
         if (addResponse.data.data.total_failed_items) {
           failedIds.push(...addResponse.data.data.failed_items);
@@ -335,8 +358,12 @@ export class GroupsController {
       if (itemsToSave.deletedIds.length) {
         const deleteResponse = await this.apiReq.request(
           'DELETE',
-          `/agents/group/${this.currentGroup.name}`,
-          { params: { list_agents: itemsToSave.deletedIds.toString() } }
+          `/agents/group`, {
+            params: {
+              group_id: this.currentGroup.name,
+              list_agents: itemsToSave.deletedIds.toString()
+            }
+          }
         );
         if (deleteResponse.data.data.total_failed_items) {
           failedIds.push(...deleteResponse.data.data.failed_items);
@@ -392,7 +419,7 @@ export class GroupsController {
     this.addingGroup = !this.addingGroup;
   }
 
-  buildGroupsTableProps(items,params={}) {
+  buildGroupsTableProps(items, params = {}) {
     this.redirectGroup = params.group || false;
     this.groupsTableProps = {
       items,
