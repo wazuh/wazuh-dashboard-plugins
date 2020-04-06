@@ -106,7 +106,7 @@ export class FilterBar extends Component {
     );
     return (
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem className="fim-search-bar">
           <WzSearchBar
             onInputChange={onFiltersChange}
             qSuggests={this.suggestions[selectView]}
@@ -114,7 +114,7 @@ export class FilterBar extends Component {
             defaultFormat='qTags'
             placeholder='Add filter or search' />
         </EuiFlexItem>
-        <EuiFlexItem grow={false}>
+        <EuiFlexItem className="fim-date-picker" grow={false}>
           <EuiSuperDatePicker 
             commonlyUsedRanges={this.commonDurationRanges} 
             recentlyUsedRanges={recentlyUsedRanges}
