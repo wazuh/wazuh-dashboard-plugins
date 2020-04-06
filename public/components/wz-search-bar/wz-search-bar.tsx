@@ -105,6 +105,7 @@ export class WzSearchBar extends Component {
   }
 
   async componentDidMount() {
+    this.props.onInputChange(this.state.filters);
     this.selectSuggestHandler(this.state.searchFormat);
     if(this.state.searchFormat) {
       const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
