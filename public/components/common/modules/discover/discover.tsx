@@ -13,6 +13,7 @@
 import React, { Component } from 'react';
 import {
   EuiBasicTable,
+  EuiLoadingContent
 } from '@elastic/eui';
 import './discover.less';
 import { EuiFlexGroup } from '@elastic/eui';
@@ -181,6 +182,9 @@ export class Discover extends Component {
 
 
   render() {
+    if(this.state.isLoading)
+      return (<EuiLoadingContent lines={3} />)
+
     const getRowProps = item => {
       const { _id } = item;
       return {
@@ -204,38 +208,38 @@ export class Discover extends Component {
       totalItemCount: this.state.total,
       pageSizeOptions: [10, 25, 50],
     };
-    if(this.state.total){
       return (
         <div>
-             <EuiFlexGroup>
-            <EuiFlexItem>
-             {/*  TODO -- search bar */}
-            
-              <FilterBar
-                onFiltersChange={() => alert("TODO")} />
-            </EuiFlexItem>
-            </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-             {pageIndexItems.length && (
-              <EuiBasicTable
-                items={pageIndexItems}
-                itemId="_id"
-                itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
-                isExpandable={true}
-                columns={columns}
-                rowProps={getRowProps}
-                pagination={pagination}
-                sorting={sorting}
-                onChange={this.onTableChange}
-              />
+          {this.state.total && (
+            <div>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  {/*  TODO -- search bar */}
+                  <FilterBar
+                    onFiltersChange={() => alert("TODO")} />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                {pageIndexItems.length && (
+                  <EuiBasicTable
+                    items={pageIndexItems}
+                    itemId="_id"
+                    itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
+                    isExpandable={true}
+                    columns={columns}
+                    rowProps={getRowProps}
+                    pagination={pagination}
+                    sorting={sorting}
+                    onChange={this.onTableChange}
+                  />
+                )}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+          </div>
+          ) || (
+            <div>There are no events for this file.</div>
           )}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </div>);
-    }else{
-      return ( <div>There are no events for this file.</div>)
-    }
-    
+        </div>);    
   }
 }
