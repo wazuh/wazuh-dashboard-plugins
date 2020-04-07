@@ -17,6 +17,7 @@ import { EuiBadge } from '@elastic/eui';
 import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { ContextMenu } from './components/wz-search-badges';
 import { qSuggests } from '.';
+import './src/style/wz-search-badges.less'
 
 
 interface iFilter { field:string, value:string }
@@ -57,7 +58,7 @@ export class WzSearchBadges extends Component {
         iconSide="right"
         iconOnClickAriaLabel="Remove"
         color="hollow"
-        className="globalFilterItem"
+        className="globalFilterItem wz-search-badge"
         iconOnClick={() => this.onDeleteFilter(filter)}>
         {`${filter.field}:${filter.value}`}
       </EuiBadge>
@@ -77,17 +78,16 @@ export class WzSearchBadges extends Component {
 
   private buildQBadge(qInterpreter, index, qFilter): JSX.Element {
     const { qSuggests } = this.props;
-    return <EuiBadge key={index} iconType="cross" iconSide="right" 
-      color="hollow" iconOnClickAriaLabel="Remove" iconOnClick={() => {
-      this.deleteFilter(qInterpreter, index);
-    } }>
-      <ContextMenu qFilter={qFilter} index={index} qInterpreter={qInterpreter} 
-      deleteFilter={() => this.deleteFilter(qInterpreter, index)} 
-      changeConjuntion={() => this.changeConjuntion(qInterpreter, index)}
-      invertOperator={() => this.invertOperator(qInterpreter, index)}
-      updateFilters={() => this.updateFilters(qInterpreter)}
-      qSuggest={qSuggests.find(item => item.label === qFilter.field)}
-       />
+    return <EuiBadge className="wz-search-badge" key={index} iconType="cross" 
+      iconSide="right" color="hollow" iconOnClickAriaLabel="Remove" 
+      iconOnClick={() => {this.deleteFilter(qInterpreter, index);} }>
+        <ContextMenu qFilter={qFilter} index={index} qInterpreter={qInterpreter} 
+        deleteFilter={() => this.deleteFilter(qInterpreter, index)} 
+        changeConjuntion={() => this.changeConjuntion(qInterpreter, index)}
+        invertOperator={() => this.invertOperator(qInterpreter, index)}
+        updateFilters={() => this.updateFilters(qInterpreter)}
+        qSuggest={qSuggests.find(item => item.label === qFilter.field)}
+        />
     </EuiBadge>;
   }
 
