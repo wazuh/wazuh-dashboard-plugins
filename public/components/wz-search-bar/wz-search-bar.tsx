@@ -367,10 +367,11 @@ export class WzSearchBar extends Component {
     const { placeholder, buttonOptions, qSuggests, onTimeChange } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
+    !!onTimeChange && import('./src/style/wz-date-picker.less');
     return (
       <div>
         <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem className="wz-search-bar">
             <EuiSuggest
               status={status}
               value={inputValue}
@@ -393,7 +394,7 @@ export class WzSearchBar extends Component {
               onChange={this.onButtonPress.bind(this)} />
           </EuiFlexItem>
           {onTimeChange &&
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false}  className="wz-date-picker">
               <WzDatePicker onTimeChange={onTimeChange} />
             </EuiFlexItem>
           }
