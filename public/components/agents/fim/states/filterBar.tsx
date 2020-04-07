@@ -28,10 +28,8 @@ export class FilterBar extends Component {
       ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'gname', description:"Name of the group owner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('gname', value, this.props.agent.id)}]: []),
       ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'gid', description:"Id of the group owner", operators:['=','!=', '~'], values: async (value) => getFilterValues('gid', value, this.props.agent.id)}]: []),
       {label: 'md5', description:"md5 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('md5', value, this.props.agent.id)},
-      // {label: 'date', values: async (value) => getFilterValues('date', value, this.props.agent.idId)},
       {label: 'sha1', description:"sha1 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha1', value, this.props.agent.id)},
       {label: 'sha256', description:"sha256 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha256', value, this.props.agent.id)},
-      // {label: 'mtime', values: async (value) => getFilterValues('mtime', value, this.props.agent.idId)},
       ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'inode', description:"Inode of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('inode', value, this.props.agent.id)}]: []),
       {label: 'size', description:"Size of the file in Bytes", values: value => !!value ? [value] : [0]}, // TODO: Adapt code to return and array with description
     ],
