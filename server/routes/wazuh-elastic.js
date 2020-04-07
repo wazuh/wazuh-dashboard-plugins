@@ -83,4 +83,28 @@ export function WazuhElasticRouter(server) {
       return ctrl.alerts(req, res);
     }
   });
+  // Fetch alerts directly from Elasticsearch
+  server.route({
+    method: 'GET',
+    path: '/elastic/samplealerts/{category}',
+    handler(req, res) {
+      return ctrl.haveSampleAlerts(req, res);
+    }
+  });
+  // Fetch alerts directly from Elasticsearch
+  server.route({
+    method: 'POST',
+    path: '/elastic/samplealerts',
+    handler(req, res) {
+      return ctrl.createSampleAlerts(req, res);
+    }
+  });
+  // Fetch alerts directly from Elasticsearch
+  server.route({
+    method: 'DELETE',
+    path: '/elastic/samplealerts',
+    handler(req, res) {
+      return ctrl.deleteSampleAlerts(req, res);
+    }
+  });
 }
