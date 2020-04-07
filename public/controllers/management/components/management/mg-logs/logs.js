@@ -106,6 +106,7 @@ export default class WzLogs extends Component {
                 path,
                 {}
             );
+            console.log('data ', data);
             const formattedData = (((data || {}).data || {}).data || {}).affected_items || [];
             const daemonsList = [...['all'], ...Object.keys(formattedData)];
             this.setState({ daemonsList })
