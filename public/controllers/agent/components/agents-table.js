@@ -707,7 +707,7 @@ export class AgentsTable extends Component {
         render: this.addHealthStatusRender,
       },
       {
-        align: 'left',
+        align: 'right',
         width: '100px',
         field: 'actions',
         name: 'Actions',
@@ -1028,10 +1028,10 @@ export class AgentsTable extends Component {
 
     return (
       <div>
-        {title}
         {filter}
         <EuiSpacer size="m" />
         <EuiPanel paddingSize="m">
+          {title}
           {loadItems}
           {(selectedItems.length > 0 &&
             barButtons
