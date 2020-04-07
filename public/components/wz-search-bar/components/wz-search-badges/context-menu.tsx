@@ -41,9 +41,15 @@ export function ContextMenu(props) {
   const button = (<EuiButtonEmpty color='text' size="xs" onClick={() => setIsOpen(!isOpen)}>
     <strong>{conjuntion && conjuntions[conjuntion]}</strong> {field} {operators[operator]} {value}
   </EuiButtonEmpty>)
-  return (<EuiPopover button={button} isOpen={isOpen} closePopover={() => setIsOpen(false)}>
-    <EuiContextMenu initialPanelId={0} panels={panels} />
-  </EuiPopover>);
+  return (
+    <EuiPopover
+      button={button}
+      isOpen={isOpen}
+      closePopover={() => setIsOpen(false)}
+      panelPaddingSize="none"
+      anchorPosition="downLeft">
+      <EuiContextMenu initialPanelId={0} panels={panels} />
+    </EuiPopover>);
 }
 
 function flattenPanelTree(tree, array = []) {
@@ -113,7 +119,7 @@ function EditFilter(props) {
   const [conjuntion, setConjuntion] = useState(query.conjuntion);
   const [operator, setOperator] = useState(query.operator);
   const [value, setValue] = useState(query.value);
-  return <EuiForm>
+  return <EuiForm className="globalFilterItem__editorForm">
     {conjuntion &&
       EditFilterConjuntion(conjuntion, setConjuntion)}
     {EditFilterOperator(operator, setOperator)}
@@ -141,19 +147,19 @@ function EditFilterValue(value, setValue, suggest): React.ReactNode {
   }, [value])
   return <EuiFormRow label="Value">
     <EuiInputPopover
-      input={<EuiFieldText 
-        value={value} 
-        onFocus={() => setIsPopoverOpen(true)} 
+      input={<EuiFieldText
+        value={value}
+        onFocus={() => setIsPopoverOpen(true)}
         onChange={(e) => setValue(e.target.value)} />}
       isOpen={isPopoverOpen}
       closePopover={() => setIsPopoverOpen(false)} >
-        {suggetsValues.map((item, key) => (
-          <EuiSuggestItem key={key}
-            label={item} 
-            type={{ iconType: 'kqlValue', color: 'tint0' }} 
-            onClick={() => {setValue(item); setIsPopoverOpen(false)}}/>
-          ))}
-      </EuiInputPopover> 
+      {suggetsValues.map((item, key) => (
+        <EuiSuggestItem key={key}
+          label={item}
+          type={{ iconType: 'kqlValue', color: 'tint0' }}
+          onClick={() => { setValue(item); setIsPopoverOpen(false) }} />
+      ))}
+    </EuiInputPopover>
   </EuiFormRow>;
 }
 

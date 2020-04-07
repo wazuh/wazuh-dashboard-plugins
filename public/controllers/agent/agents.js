@@ -555,6 +555,11 @@ export class AgentsController {
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
+      this.$scope.currentAgentsSectionProps = {
+        switchTab: (tab, force) => this.$scope.switchTab(tab, force),
+        currentTab: this.$scope.tab,
+        agent: this.$scope.agent
+      }
       this.$scope.$applyAsync();
     } catch (error) {
       return Promise.reject(error);
@@ -725,7 +730,7 @@ export class AgentsController {
         { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      
+
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
@@ -738,7 +743,6 @@ export class AgentsController {
       this.$scope.fimProps = {
         agent: this.$scope.agent
       }
-
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});
