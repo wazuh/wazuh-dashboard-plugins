@@ -31,6 +31,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
 import chrome from 'ui/chrome';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 export class MainFim extends Component {
   state: {
@@ -79,6 +80,13 @@ export class MainFim extends Component {
     this.setGlobalBreadcrumb();
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
+  }
+
+  componentWillUnmount() {
+    const { filterManager } = getServices();
+    if (filterManager.filters && filterManager.filters.length) {
+      filterManager.removeAll();
+    }
   }
 
   color = (status) => {
@@ -161,6 +169,22 @@ export class MainFim extends Component {
     );
   }
 
+  checkFilterManager(filters) {
+    const { filterManager } = getServices();
+    if (filterManager.filters && filterManager.filters.length) {
+      filterManager.addFilters([filters]);
+    } else {
+      setTimeout(() => {
+        this.checkFilterManager(filters);
+      }, 200);
+    }
+  }
+
+  loadEventsWithFilter(filters) {
+    this.onSelectedTabChanged('events');
+    this.checkFilterManager(filters);
+  }
+
   loadSection(id) {
     this.setState({ selectView: id });
   }
@@ -200,7 +224,7 @@ export class MainFim extends Component {
               </div>
             </div>
             <div className='wz-module-body'>
-              {selectView === 'states' && <States {...this.props} />}
+              {selectView === 'states' && <States {...this.props} loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)} />}
               {selectView === 'events' && <Events {...this.props} section='fim' />}
               {selectView === 'loader' &&
                 <Loader {...this.props}

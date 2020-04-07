@@ -20,7 +20,6 @@ import {
   EuiButtonEmpty,
   EuiToolTip
 } from '@elastic/eui';
-import { EuiHorizontalRule } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
 
 export class FileDetails extends Component {
@@ -37,7 +36,6 @@ export class FileDetails extends Component {
     this.state = {
     }
   }
-
 
   generalColumns() {
     return [
@@ -99,6 +97,20 @@ export class FileDetails extends Component {
     ]
   }
 
+  viewInEvents() {
+    const filters = [{
+      "meta": {
+        "disabled": false,
+        "key": "syscheck.path",
+        "params": { "query": this.props.currentFile.file },
+        "type": "phrase",
+        "index": "wazuh-alerts-3.x-*"
+      },
+      "query": { "match_phrase": { "syscheck.path": this.props.currentFile.file } },
+      "$state": { "store": "appState" }
+    }];
+    this.props.loadEventsWithFilters(filters);
+  }
 
   getDetails() {
     const columns = this.generalColumns();
@@ -106,7 +118,7 @@ export class FileDetails extends Component {
       var value = this.props.currentFile[item.field] || '-';
       const grow = item.grow || 1;
       return (
-        <EuiFlexItem key={idx} grow={grow} style={{maxWidth: 160, maxHeight: 100}}>
+        <EuiFlexItem key={idx} grow={grow} style={{ maxWidth: 160, maxHeight: 100 }}>
           <EuiText className="detail-title">
             {item.name}
           </EuiText>
@@ -153,7 +165,7 @@ export class FileDetails extends Component {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty onClick={() => alert("clicked")}>
+            <EuiButtonEmpty onClick={() => this.viewInEvents()}>
               View in Events
             </EuiButtonEmpty>
           </EuiFlexItem>
