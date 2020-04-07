@@ -387,12 +387,14 @@ export class WzSearchBar extends Component {
               placeholder={placeholder}
             />
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <WzSearchButtons
-              options={buttonOptions || []}
-              filters={filters}
-              onChange={this.onButtonPress.bind(this)} />
-          </EuiFlexItem>
+          {!!buttonOptions &&
+            <EuiFlexItem grow={false}>
+              <WzSearchButtons
+                options={buttonOptions || []}
+                filters={filters}
+                onChange={this.onButtonPress.bind(this)} />
+            </EuiFlexItem>
+          }
           {onTimeChange &&
             <EuiFlexItem grow={false}  className="wz-date-picker">
               <WzDatePicker onTimeChange={onTimeChange} />
