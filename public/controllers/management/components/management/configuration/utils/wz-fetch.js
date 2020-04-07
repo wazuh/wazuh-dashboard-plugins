@@ -389,9 +389,12 @@ export const saveFileCluster = async (text, node) => {
   try {
     await WzRequest.apiReq(
       'PUT',
-      `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`, {
-        content: xml,
-        origin: 'xmleditor'
+      `/cluster/${node}/files`, {
+        params: {
+          path: 'etc/ossec.conf',
+          overwrite: true
+        },
+        body: xml.toString()
       }
     );
     await validateAfterSent(node);
@@ -409,9 +412,12 @@ export const saveFileManager = async (text) => { //TODO: Check when manager
   try {
     await WzRequest.apiReq(
       'PUT',
-      `/manager/files?path=etc/ossec.conf&overwrite=true`, {
-        content: xml,
-        origin: 'xmleditor'
+      `/manager/files`, {
+        params: {
+          path: 'etc/ossec.conf',
+          overwrite: true
+        },
+        body: xml.toString()
       }
     );
     await validateAfterSent(false);
