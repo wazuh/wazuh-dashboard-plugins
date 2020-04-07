@@ -710,7 +710,17 @@ export class WazuhElasticCtrl {
       const payload = Base(pattern, [], from, to);
 
       
-      payload.query = { bool: { must: [] } };
+      payload.query = { bool: { must: [
+        {
+          range: {
+            timestamp: {
+              gte: from,
+              lte: to,
+              format: 'epoch_millis'
+            }
+          }
+        }]
+      } };
       if(req.payload.filters){
         req.payload.filters.map((item) => {
           payload.query.bool.must.push({

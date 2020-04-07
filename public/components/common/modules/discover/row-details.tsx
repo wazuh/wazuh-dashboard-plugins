@@ -161,6 +161,9 @@ export class RowDetails extends Component {
         </EuiTableRow>
       );
     });
+    if(!rows.length){
+      return (<div>No syscheck data was found.</div>)
+    }
     return rows;
   }
 
