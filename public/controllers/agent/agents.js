@@ -194,9 +194,9 @@ export class AgentsController {
       agentStatus === 'active' ? 'teal' : 'red';
 
     this.$scope.formatAgentStatus = agentStatus => {
-      return ['active', 'disconnected'].includes(agentStatus)
-        ? agentStatus
-        : 'never connected';
+      return ['active', 'disconnected'].includes(agentStatus) ?
+        agentStatus :
+        'never connected';
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
@@ -204,13 +204,22 @@ export class AgentsController {
       this.downloadCsv(path, fileName, filters);
 
     this.$scope.search = (term, specificPath) =>
-      this.$scope.$broadcast('wazuhSearch', { term, specificPath });
+      this.$scope.$broadcast('wazuhSearch', {
+        term,
+        specificPath
+      });
 
     this.$scope.searchSyscheckFile = (term, specificFilter) =>
-      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+      this.$scope.$broadcast('wazuhSearch', {
+        term,
+        specificFilter
+      });
 
     this.$scope.searchRootcheck = (term, specificFilter) =>
-      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+      this.$scope.$broadcast('wazuhSearch', {
+        term,
+        specificFilter
+      });
 
     this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
     this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
@@ -383,14 +392,21 @@ export class AgentsController {
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
     this.$scope.loadScaChecks = policy =>
-      (this.$scope.lookingSca = { ...policy, id: policy.policy_id });
+      (this.$scope.lookingSca = {
+        ...policy,
+        id: policy.policy_id
+      });
 
     this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
 
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
         .addAgentToGroup(group, this.$scope.agent.id)
-        .then(() => this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {}))
+        .then(() => this.apiReq.request('GET', `/agents`, {
+          params: {
+            list_agents: this.$scope.agent.id,
+          }
+        }))
         .then(agent => {
           this.$scope.agent.group = agent.data.data.affected_items[0].group;
           this.$scope.groups = this.$scope.groups.filter(
@@ -466,7 +482,10 @@ export class AgentsController {
     this.falseAllExpand();
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
-      timefilter.setRefreshInterval({ pause: true, value: 0 });
+      timefilter.setRefreshInterval({
+        pause: true,
+        value: 0
+      });
     } else if (this.ignoredTabs.includes(this.$scope.tab)) {
       timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
@@ -476,13 +495,14 @@ export class AgentsController {
       try {
         const agentInfo = await this.apiReq.request(
           'GET',
-          `/agents/${this.$scope.agent.id}`,
-          { 
+          `/agents`, {
             params: {
+              list_agents: this.$scope.agent.id,
               select: 'status'
             }
           }
         );
+        console.log('agentInfo ', agentInfo);
         this.$scope.agent.status =
           (((((agentInfo || {}).data || {}).data || {}).affected_items || [])[0] || {}).status ||
           this.$scope.agent.status;
@@ -502,10 +522,16 @@ export class AgentsController {
       this.$scope.showSyscheckFiles = false;
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
-        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
+        this.$scope.visualizeProps.cardReqs = {
+          items: await this.commonData.getPCI(),
+          reqTitle: 'PCI DSS Requirement'
+        };
       }
       if (tab === 'gdpr') {
-        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getGDPR(), reqTitle: 'GDPR Requirement' };
+        this.$scope.visualizeProps.cardReqs = {
+          items: await this.commonData.getGDPR(),
+          reqTitle: 'GDPR Requirement'
+        };
       }
 
       if (tab === 'mitre') {
@@ -522,11 +548,17 @@ export class AgentsController {
       }
 
       if (tab === 'hipaa') {
-        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getHIPAA(), reqTitle: 'HIPAA Requirement' };
+        this.$scope.visualizeProps.cardReqs = {
+          items: await this.commonData.getHIPAA(),
+          reqTitle: 'HIPAA Requirement'
+        };
       }
 
       if (tab === 'nist') {
-        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
+        this.$scope.visualizeProps.cardReqs = {
+          items: await this.commonData.getNIST(),
+          reqTitle: 'NIST 800-53 Requirement'
+        };
       }
 
       if (tab === 'sca') {
@@ -541,7 +573,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -564,9 +596,9 @@ export class AgentsController {
       this.$scope.tab = tab;
 
       const targetSubTab =
-        this.targetLocation && typeof this.targetLocation === 'object'
-          ? this.targetLocation.subTab
-          : 'panels';
+        this.targetLocation && typeof this.targetLocation === 'object' ?
+        this.targetLocation.subTab :
+        'panels';
 
       if (!this.ignoredTabs.includes(this.$scope.tab)) {
         this.$scope.switchSubtab(targetSubTab, true, onlyAgent, sameTab, preserveDiscover);
@@ -614,7 +646,9 @@ export class AgentsController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
-    this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
+    this.$rootScope.$emit('addNewKibanaFilter', {
+      filter: JSON.parse(filter)
+    });
   }
 
   /**
@@ -653,8 +687,7 @@ export class AgentsController {
         clickAction: tab => {
           this.switchTab(tab, true);
         },
-        selectedTab:
-          this.$scope.tab ||
+        selectedTab: this.$scope.tab ||
           (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
         tabs: cleanTabs,
       };
@@ -694,8 +727,7 @@ export class AgentsController {
   async checkSync() {
     const isSync = await this.apiReq.request(
       'GET',
-      `/agents/${this.$scope.agent.id}/group/is_sync`,
-      {}
+      `/agents/${this.$scope.agent.id}/group/is_sync`, {}
     );
     this.$scope.isSynchronized =
       (((((isSync || {}).data || {}).data || {}).affected_items || [])[0] || {}).synced || false;
@@ -735,18 +767,28 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = await this.apiReq.request('GET', `/agents/${id}`, {});
+      const data = await this.apiReq.request('GET', `/agents`, {
+        params: {
+          list_agents: id,
+        }
+      });
 
       const agentInfo = ((((data || {}).data || {}).data || {}).affected_items || [])[0] || false;
       // Agent
       this.$scope.agent = agentInfo;
-      const breadcrumb = [
-        { text: '' },
-        { text: 'Agents', href: '/app/wazuh#/agents-preview' },
-        { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` },
+      const breadcrumb = [{
+          text: ''
+        },
+        {
+          text: 'Agents',
+          href: '/app/wazuh#/agents-preview'
+        },
+        {
+          text: `${this.$scope.agent.name} (${this.$scope.agent.id})`
+        },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      
+
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
@@ -763,7 +805,8 @@ export class AgentsController {
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
-      const groups = await this.apiReq.request('GET', '/agents/groups', {});
+      const groups = await this.apiReq.request('GET', '/groups', {});
+      console.log(groups);
       this.$scope.groups = groups.data.data.affected_items
         .map(item => item.name)
         .filter(item => this.$scope.agent.group && !this.$scope.agent.group.includes(item));
@@ -850,7 +893,9 @@ export class AgentsController {
    * @param {*} group
    */
   goGroups(agent, group) {
-    AppState.setNavigation({ status: true });
+    AppState.setNavigation({
+      status: true
+    });
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');
@@ -869,7 +914,9 @@ export class AgentsController {
       this.errorHandler.info('Your download should begin automatically...', 'CSV');
       const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(path, currentApi, filters);
-      const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
+      const blob = new Blob([output], {
+        type: 'text/csv'
+      }); // eslint-disable-line
 
       FileSaver.saveAs(blob, fileName);
     } catch (error) {

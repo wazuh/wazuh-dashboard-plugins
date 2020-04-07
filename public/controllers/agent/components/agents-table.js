@@ -407,7 +407,7 @@ export class AgentsTable extends Component {
   }
 
   async filterBarModelGroups() {
-    const rawGroups = await WzRequest.apiReq('GET', '/agents/groups', {});
+    const rawGroups = await WzRequest.apiReq('GET', '/groups', {});
     const itemsGroups = (((rawGroups || {}).data || {}).data || {}).affected_items;
     const groups = itemsGroups
       .filter((item) => { return item.count > 0; })
