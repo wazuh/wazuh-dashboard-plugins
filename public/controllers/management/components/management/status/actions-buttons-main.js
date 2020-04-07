@@ -102,11 +102,11 @@ class WzStatusActionButtons extends Component {
       this.props.updateSelectedNode(node);
 
       const daemons = await this.statusHandler.clusterNodeStatus(node);
-      const listDaemons = this.objToArr(daemons.data.data);
+      const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
       this.props.updateListDaemons(listDaemons);
 
       const nodeInfo = await this.statusHandler.clusterNodeInfo(node);
-      this.props.updateNodeInfo(nodeInfo.data.data);
+      this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
 
       this.props.updateLoadingStatus(false);
     } catch (error) {
