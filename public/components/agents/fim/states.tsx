@@ -141,7 +141,7 @@ export class States extends Component {
         <FilterBar
           onFiltersChange={this.onFiltersChange.bind(this)}
           selectView={selectedTabId}
-          agentId={this.props.agent.id}
+          agent={this.props.agent}
           onTimeChange={(timeFilter) => {}} />
         <StatesTable
           {...this.props}
@@ -158,7 +158,7 @@ export class States extends Component {
         <FilterBar
           onFiltersChange={this.onFiltersChange.bind(this)}
           selectView={selectedTabId}
-          agentId={this.props.agent.id}
+          agent={this.props.agent.id}
           onTimeChange={(timeFilter) => {}} />
         <RegistryTable
           {...this.props}
