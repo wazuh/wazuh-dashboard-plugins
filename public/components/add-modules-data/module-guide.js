@@ -513,6 +513,7 @@ class WzModuleGuide extends Component {
                 content='Show / hide option'
               >
               <EuiButtonToggle
+                label=''
                 color={this.checkInvalidElements([guideOption]) ? 'danger' : 'primary'}
                 isEmpty
                 isIconOnly

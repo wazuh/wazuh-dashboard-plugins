@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for add sample data
+ * Wazuh app - React component for render add modules data
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -46,18 +46,13 @@ interface IPropsWzAddModulesData {
 
 interface IStateWzAddModulesData {
 	guide: string
-	selectedGuideCategory: string
+	selectedGuideCategory: any
 };
 
 export default class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
 	tabs: any
 	constructor(props){
 		super(props);
-		this.state = {
-			guide: '',
-			selectedGuideCategory: ''
-		}
-		
 		const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
 		this.tabs = [
 			...categories.map(category => ({
@@ -67,7 +62,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 					<Fragment>
 						<EuiSpacer size='m' />
 						<EuiFlexGrid columns={4}>
-							{this.getExtensionsFromCategory(category).map(extension => (
+							{this.getModulesFromCategory(category).map(extension => (
 								<EuiFlexItem key={`add-modules-data--${extension.id}`}>
 									<EuiCard
 										layout='horizontal'
@@ -92,7 +87,11 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 					</Fragment>
 				)
 			}
-		]
+		];
+		this.state = {
+			guide: '',
+			selectedGuideCategory: this.tabs[0]
+		}
 	}
 	setGlobalBreadcrumb() {
     const breadcrumb = [
@@ -102,7 +101,6 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
-
   componentDidMount() {
     this.setGlobalBreadcrumb();
   }
@@ -112,7 +110,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 	changeSelectedGuideCategory = (selectedGuideCategory: string = '') => {
 		this.setState({ selectedGuideCategory });
 	}
-	getExtensionsFromCategory(category: string = ''){
+	getModulesFromCategory(category: string = ''){
 		return category !== '' ? guides.filter(guide => guide.category === category) : guides;
 	}
 	render(){
