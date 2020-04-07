@@ -74,8 +74,8 @@ export class StatesTable extends Component {
     const fileData = this.state.syscheck.filter(item => {
       return item.file === file;
     });
-
-    this.setState({ isFlyoutVisible: true, currentFile: fileData[0] });
+    //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
+    this.setState({isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
   componentDidUpdate(prevProps) {
