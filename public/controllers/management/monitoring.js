@@ -253,8 +253,8 @@ export function ClusterController(
 
       const data = await Promise.all([
         ApiRequest.request('GET', '/cluster/nodes', {}),
-        ApiRequest.request('GET', '/cluster/config', {}),
-        ApiRequest.request('GET', '/version', {}),
+        ApiRequest.request('GET', '/cluster/local/config', {}),
+        ApiRequest.request('GET', '//', {}),
         ApiRequest.request('GET', '/agents', { limit: 1 }),
         ApiRequest.request('GET', '/cluster/healthcheck', {})
       ]);

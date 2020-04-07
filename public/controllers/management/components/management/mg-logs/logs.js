@@ -101,13 +101,18 @@ export default class WzLogs extends Component {
     async initDaemonsList(logsPath) {
         try {
             const path = logsPath + "/summary";
+            console.log('path ', path);
             const data = await ApiRequest.request(
                 'GET',
                 path,
                 {}
             );
+            console.log('data ', data);
             const formattedData = (((data || {}).data || {}).data || {}).affected_items || [];
-            const daemonsList = [...['all'], ...Object.keys(formattedData)]
+            console.log('formattedData ', formattedData);
+            console.log(Object.keys(formattedData));
+            const daemonsList = [...['all'], ...Object.keys(formattedData)];
+            console.log(daemonsList);
             this.setState({ daemonsList })
         } catch (err) {
             throw new Error("Error obtaining daemons list.");
