@@ -25,7 +25,9 @@ import {
 } from '@elastic/eui';
 import { Pie } from "../../../components/d3/pie";
 import { ProgressChart } from "../../../components/d3/progress";
-import { AgentsTable } from './agents-table'
+import { AgentsTable } from './agents-table';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../redux/store';
 
 export class AgentsPreview extends Component {
 
@@ -34,7 +36,16 @@ export class AgentsPreview extends Component {
     this.state = { data: [], loading: false }
   }
 
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Agents', },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
   componentDidMount() {
+    this.setGlobalBreadcrumb();
     this.getSummary();
   }
 
@@ -103,7 +114,7 @@ export class AgentsPreview extends Component {
               <EuiFlexItem grow={false}>
                 <EuiPanel betaBadgeLabel="Details" style={{ paddingBottom: 0 }}>
                   <EuiFlexGroup style={{ minWidth: 500 }}>
-                    <EuiFlexItem></EuiFlexItem>
+                    <EuiFlexItem grow={false}></EuiFlexItem>
                     <EuiFlexItem>
                       {(this.summary &&
                         <EuiFlexItem style={{ padding: '12px 0px' }}>
@@ -137,10 +148,10 @@ export class AgentsPreview extends Component {
                             </EuiFlexItem>
                             <EuiFlexItem>
                               <EuiStat
-                                title={`${this.agentsCoverity}%`}
+                                title={`${this.agentsCoverity.toFixed(2)}%`}
                                 titleSize={'s'}
                                 description="Agents coverage"
-                                titleColor="primary"
+                                titleColor="text"
                                 style={{ whiteSpace: 'nowrap' }}
                               />
                             </EuiFlexItem>
@@ -178,7 +189,7 @@ export class AgentsPreview extends Component {
                         </EuiFlexGroup>
                       </EuiFlexItem>
                     </EuiFlexItem>
-                    <EuiFlexItem></EuiFlexItem>
+                    <EuiFlexItem grow={false}></EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>
               </EuiFlexItem>

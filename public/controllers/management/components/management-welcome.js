@@ -22,6 +22,8 @@ import {
   EuiTitle,
   EuiPage
 } from '@elastic/eui';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import store from '../../../redux/store';
 
 import {
   updateManagementSection,
@@ -36,6 +38,18 @@ class WelcomeScreen extends Component {
     this.state = {};
   }
 
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Management', },
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
+  componentDidMount() {
+    this.setGlobalBreadcrumb();
+  }
+
   switchSection(section) {
     this.props.switchTab(section, true);
     this.props.updateManagementSection(section);
@@ -47,17 +61,39 @@ class WelcomeScreen extends Component {
         <EuiPage>
           <EuiFlexGroup>
             <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Administration">
-              <EuiSpacer size="m" />
+              <EuiPanel betaBadgeLabel="Administration">
+                <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
                       className='homSynopsis__card'
                       icon={<EuiIcon size="xl" type="indexRollupApp" color='primary' />}
-                      title="Ruleset"
-                      onClick={() => this.switchSection('ruleset')}
-                      description="Manage your Wazuh cluster ruleset."
+                      title="Rules"
+                      onClick={() => this.switchSection('rules')}
+                      description="Manage your Wazuh cluster rules."
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiCard
+                      layout="horizontal"
+                      className='homSynopsis__card'
+                      icon={<EuiIcon size="xl" type="indexRollupApp" color='primary' />}
+                      title="Decoders"
+                      onClick={() => this.switchSection('decoders')}
+                      description="Manage your Wazuh cluster decoders."
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiCard
+                      layout="horizontal"
+                      className='homSynopsis__card'
+                      icon={<EuiIcon size="xl" type="indexRollupApp" color='primary' />}
+                      title="CDB lists"
+                      onClick={() => this.switchSection('lists')}
+                      description="Manage your Wazuh cluster CDB lists."
                     />
                   </EuiFlexItem>
                   <EuiFlexItem>
@@ -87,8 +123,8 @@ class WelcomeScreen extends Component {
               </EuiPanel>
             </EuiFlexItem>
             <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Status and reports">
-              <EuiSpacer size="m" />
+              <EuiPanel betaBadgeLabel="Status and reports">
+                <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiCard

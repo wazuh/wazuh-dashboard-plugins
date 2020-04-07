@@ -158,7 +158,7 @@ export class AppState {
             if (API) {
                 Cookies.set('currentApi', encodedApi, { expires: exp, path: window.location.pathname });
                 try{
-                    const updateApiMenu = updateCurrentApi(JSON.parse(API).name);
+                    const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
                     store.dispatch(updateApiMenu);
                 }catch(err){ }
             }
@@ -167,6 +167,22 @@ export class AppState {
             console.log(err);
             throw err;
         }
+    }
+
+    /**
+     * Get 'APISelector' value   
+     */
+    static getAPISelector() {
+        return Cookies.get('APISelector') ? decodeURI(Cookies.get('APISelector'))=="true" : false;
+    }
+
+    /**
+     * Set a new value to the 'patternSelector' cookie
+     * @param {*} value 
+     */
+    static setAPISelector(value) {
+        const encodedPattern = encodeURI(value);
+        Cookies.set('APISelector', encodedPattern, { path: window.location.pathname});
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Replace Wazuh name string by logo
+ * Wazuh app - Remove Wazuh name
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,18 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import chrome from 'ui/chrome';
-
-// Adds the logowz-menu
+// Remove Kibana Wazuh name and breadcrumb
 export const changeWazuhNavLogo = () => {
   const interval = setInterval(() => {
     const nav = $('nav');
     if (nav.length) {
       clearInterval(interval);
     }
-    const url = chrome.addBasePath('/plugins/wazuh/img/logo.svg');
-    $('.euiBreadcrumbs').html(
-      `<img src="${url}" class="navBarLogo" alt="">`
+    $('.euiHeader > .euiBreadcrumbs  > .euiBreadcrumb').html(
+      ``
     );
   }, 100);
 };

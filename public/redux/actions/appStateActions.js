@@ -44,3 +44,14 @@ export const updateWazuhNotReadyYet = wazuhNotReadyYet => {
     wazuhNotReadyYet: wazuhNotReadyYet
   };
 };
+
+/**
+ * Updates currentTab in the appState store
+ * @param currentTab
+ */
+export const updateCurrentTab = currentTab => {
+  return {
+    type: 'UPDATE_WAZUH_CURRENT_TAB',
+    currentTab: currentTab
+  };
+};

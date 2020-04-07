@@ -15,6 +15,10 @@ export class TabVisualizations {
    * Class constructor
    */
   constructor() {
+    if (!!TabVisualizations.instance) {
+      return TabVisualizations.instance;
+    }
+    
     this.agents = {
       welcome: 0,
       general: 11,
@@ -56,9 +60,6 @@ export class TabVisualizations {
       mitre: 6,
     };
 
-    if (!!TabVisualizations.instance) {
-      return TabVisualizations.instance;
-    }
 
     this.tabVisualizations = {};
     this.currentTab = '';

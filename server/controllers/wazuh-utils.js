@@ -56,7 +56,7 @@ export class WazuhUtilsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: result.needRestart
+        data: { needRestart : result.needRestart, needWait: result.needWait}
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3021, 500, reply);
@@ -72,7 +72,7 @@ export class WazuhUtilsCtrl {
   async getAppLogs(req, reply) {
     try {
       const lastLogs = await simpleTail(
-        path.join(__dirname, '../../../../optimize/wazuh-logs/wazuhapp.log'),
+        path.join(__dirname, '../../../../optimize/wazuh/logs/wazuhapp.log'),
         50
       );
       return lastLogs && Array.isArray(lastLogs)

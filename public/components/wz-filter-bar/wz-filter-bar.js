@@ -270,6 +270,7 @@ export class WzFilterBar extends Component {
     const { options, selectedOptions } = this.state;
     return (
       <EuiComboBox
+        className="wz-search-bar"
         placeholder="Add filter or search"
         options={options}
         selectedOptions={selectedOptions}

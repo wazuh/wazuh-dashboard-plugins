@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - Fetch API function and utils.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -448,7 +448,7 @@ export const validateAfterSent = async (node = false) => {
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
-      throw new Error('Validation error');
+      throw data;
     }
     return true;
   } catch (error) {

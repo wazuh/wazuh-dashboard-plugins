@@ -27,7 +27,7 @@ const needRestartFields = [
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../wazuh.yml');
+    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml');
   }
 
   /**
@@ -77,7 +77,7 @@ export class UpdateConfigurationFile {
         'Updating configuration',
         'debug'
       );
-      return { needRestart: needRestartFields.includes(key) };
+      return { needRestart: needRestartFields.includes(key), needWait: key === 'api.selector' };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;

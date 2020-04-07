@@ -21,6 +21,8 @@ import { sort } from './lib/sort';
 import React from 'react';
 import { EuiHealth } from '@elastic/eui';
 import * as ProcessEquivalence from '../../../util/process-state-equivalence';
+import { ApiRequest } from '../../react-services/api-request';
+import { TimeService } from '../../react-services/time-service';
 const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzTableEui', function() {
@@ -31,7 +33,8 @@ app.directive('wzTableEui', function() {
       keys: '=keys',
       initialSortField: '=initialSortField'
     },
-    controller($scope, apiReq, errorHandler, wzTableFilter, timeService) {
+    controller($scope, errorHandler, wzTableFilter) {
+      const timeService = TimeService;
       const health = (state, config) => (
         <EuiHealth color={state === config.success ? 'success' : 'danger'}>
           {state}
@@ -100,7 +103,7 @@ app.directive('wzTableEui', function() {
         //noItemsMessage: 'Change this'
       };
 
-      const instance = new DataFactory(apiReq, $scope.path);
+      const instance = new DataFactory(ApiRequest, $scope.path);
 
       $scope.wazuh_table_loading = true;
       $scope.items = [];

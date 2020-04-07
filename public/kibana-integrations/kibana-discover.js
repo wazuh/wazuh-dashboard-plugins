@@ -599,7 +599,6 @@ function discoverController(
   $scope.opts.fetch = $scope.fetch = function () {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-    $scope.hideCloseButtons();
     // ignore requests to fetch before the app inits
     if (!init.complete) return;
 
@@ -647,7 +646,13 @@ function discoverController(
     if (!filtersAreReady()) return;
 
     timefilter.setTime(dateRange);
-    if (query && typeof query === 'object') $state.query = query;
+    if (query && typeof query === 'object') {
+      /// Wazuh 7.6.1
+      if ($scope.tabView !== 'discover')
+        query.update_Id = new Date().getTime().toString();
+      ///
+      $state.query = query;
+    }
     // Update query from search bar
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, filterManager.filters);
@@ -688,7 +693,6 @@ function discoverController(
     });
 
     $scope.fetchStatus = fetchStatuses.COMPLETE;
-    $scope.activeNoImplicitsFilters();
   }
 
   let inspectorRequest;
@@ -1050,23 +1054,13 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  $scope.hideCloseButtons = () => {
+  const hideCloseImplicitsFilters = () => {
     const closeButtons = $(`.globalFilterItem .euiBadge__iconButton`);
+    const optionsButtons = $(`.globalFilterItem .euiBadge__childButton`);
     for (let i = 0; i < closeButtons.length; i++) {
       $(closeButtons[i]).addClass('hide-close-button');
+      $(optionsButtons[i]).off("click");
     };
-    $scope.$applyAsync();
-  };
-
-  $rootScope.$watch('rendered', () => {
-    if (!$rootScope.rendered) {
-      $scope.hideCloseButtons();
-    } else {
-      $scope.activeNoImplicitsFilters();
-    }
-  });
-
-  $scope.activeNoImplicitsFilters = () => {
     if (!implicitFilters) return;
     const filters = $(`.globalFilterItem .euiBadge__childButton`);
     for (let i = 0; i < filters.length; i++) {
@@ -1080,9 +1074,12 @@ function discoverController(
           found = true;
         }
       });
-      const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
       if (!found) {
+        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
         $(closeButton).removeClass('hide-close-button');
+      } else {
+        const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
+        $(optionsButton).on("click", (ev) => { ev.stopPropagation(); });
       }
     }
     $scope.$applyAsync();
@@ -1101,10 +1098,9 @@ function discoverController(
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
       }
-
+      
       filterManager.addFilters([...wzCurrentFilters, ...globalFilters || []]);
       $scope.filters = filterManager.filters;
-      $scope.hideCloseButtons();
     }
   };
 
@@ -1121,9 +1117,11 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
+    hideCloseImplicitsFilters();
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;
+    delete (($state || {}).query || {}).update_Id;
     evt.stopPropagation();
     if ($scope.tabView === 'discover') {
       $scope.rows = false;
@@ -1144,7 +1142,7 @@ function discoverController(
       let filters = filterManager.filters;
       filters = Array.isArray(filters)
         ? filters.filter(
-          item => (((item || {}).$state || {}).store || '') === 'appState'
+          item => ['appState', 'globalState'].includes(((item || {}).$state || {}).store || '')
         )
         : [];
       if (!filters || !filters.length) return false;

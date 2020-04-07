@@ -46,7 +46,7 @@ export class AgentsTable extends Component {
       isLoading: false,
       isProcessing: true,
       pageIndex: 0,
-      pageSize: 10,
+      pageSize: 15,
       q: '',
       search: '',
       selectedOptions: selectedOptions || [],
@@ -134,7 +134,7 @@ export class AgentsTable extends Component {
       await this.getItems();
     }
     if (prevState.allSelected === false && this.state.allSelected === true) {
-      this.setState({loadingAllItem: true});
+      this.setState({ loadingAllItem: true });
       this.getAllItems();
     }
   }
@@ -164,7 +164,7 @@ export class AgentsTable extends Component {
       sort: this.buildSortFilter(),
     }
 
-    const filterAll= {
+    const filterAll = {
       q: this.buildQFilter(),
       sort: this.buildSortFilter(),
     }
@@ -172,14 +172,14 @@ export class AgentsTable extends Component {
     const rawAgents = await this.props.wzReq(
       'GET',
       '/agents',
-      filterTable 
+      filterTable
     );
 
     const agentsFiltered = await this.props.wzReq(
       'GET',
       '/agents',
       filterAll
-    ).then(() => {this.setState({loadingAllItem: false})});
+    ).then(() => { this.setState({ loadingAllItem: false }) });
 
     const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent.bind(this));
     this.setState({
@@ -392,10 +392,10 @@ export class AgentsTable extends Component {
   renderUpgradeButtonAll() {
     const { selectedItems, avaibleAgents, managerVersion } = this.state;
 
-    if ( selectedItems.length > 0 &&
-        avaibleAgents.filter(agent => agent.version !== ('Wazuh ' + managerVersion) && agent.status === 'Active').length === 0) {  
+    if (selectedItems.length > 0 &&
+      avaibleAgents.filter(agent => agent.version !== ('Wazuh ' + managerVersion) && agent.status === 'Active').length === 0) {
       return;
-    } 
+    }
 
     return (
       <EuiFlexItem grow={false}>
@@ -438,7 +438,7 @@ export class AgentsTable extends Component {
         </EuiButton>
       </EuiFlexItem>
     );
-}
+  }
 
   renderPurgeButton() {
     const { selectedItems } = this.state;
@@ -724,6 +724,11 @@ export class AgentsTable extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
+                {(!!this.state.totalItems &&
+                  <EuiTitle size={"s"} style={{ padding: '6px 0px' }}>
+                    <h2>{this.state.totalItems} Agents</h2>
+                  </EuiTitle>
+                )}
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -733,11 +738,6 @@ export class AgentsTable extends Component {
           </EuiButtonEmpty>
           </EuiFlexItem>
           {formattedButton}
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="refresh" onClick={() => this.reloadAgents()}>
-              Refresh
-          </EuiButtonEmpty>
-          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="xs" />
       </div>
@@ -899,12 +899,17 @@ export class AgentsTable extends Component {
 
     return (
       <EuiFlexGroup>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ marginRight: 0 }}>
           <WzFilterBar
             model={model}
             clickAction={this.onQueryChange}
             selectedOptions={selectedOptions}
           />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton iconType="refresh" fill={true} onClick={() => this.reloadAgents()}>
+            Refresh
+          </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -929,12 +934,14 @@ export class AgentsTable extends Component {
 
     const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state
     const columns = this.columns();
-    const pagination = {
-      pageIndex: pageIndex,
-      pageSize: pageSize,
-      totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100],
-    }
+    const pagination = totalItems > 15
+      ? {
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        totalItemCount: totalItems,
+        pageSizeOptions: [15, 25, 50, 100],
+      }
+      : false;
     const sorting = {
       sort: {
         field: sortField,
@@ -1020,17 +1027,20 @@ export class AgentsTable extends Component {
     }
 
     return (
-      <EuiPanel paddingSize="l">
+      <div>
         {title}
         {filter}
-        {loadItems}
-        {(selectedItems.length > 0 &&
-          barButtons
-        )}
-        {callOut}
-        {table}
-        {renderPurgeModal}
-      </EuiPanel>
+        <EuiSpacer size="m" />
+        <EuiPanel paddingSize="m">
+          {loadItems}
+          {(selectedItems.length > 0 &&
+            barButtons
+          )}
+          {callOut}
+          {table}
+          {renderPurgeModal}
+        </EuiPanel>
+      </div>
     );
   }
 }

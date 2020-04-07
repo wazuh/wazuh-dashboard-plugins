@@ -11,36 +11,30 @@
  */
 import { AppState } from "../react-services/app-state";
 import { GenericRequest } from "../react-services/generic-request";
+import { ShareAgent } from "../factories/share-agent";
 
 export class CommonData {
   /**
    * Class constructor
    * @param {*} $rootScope
    * @param {*} $timeout
-   * @param {*} genericReq
-   * @param {*} appState
    * @param {*} errorHandler
    * @param {*} $location
-   * @param {*} shareAgent
    * @param {*} globalState
    */
   constructor(
     $rootScope,
     $timeout,
-    genericReq,
-    appState,
     errorHandler,
     $location,
-    shareAgent,
     globalState
   ) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
-    this.appState = appState;
     this.errorHandler = errorHandler;
     this.$location = $location;
-    this.shareAgent = shareAgent;
+    this.shareAgent = new ShareAgent();
     this.globalState = globalState;
     this.savedTimefilter = null;
     this.refreshInterval = { pause: true, value: 0 };
@@ -133,7 +127,7 @@ export class CommonData {
    * @param {*} localChange
    * @param {*} agent
    */
-  af(filterHandler, tab, localChange, agent) {
+  af(filterHandler, tab, agent) {
     try {
       const tabFilters = {
         general: { group: '' },
@@ -187,10 +181,10 @@ export class CommonData {
         }
       }
       if (agent) filters.push(filterHandler.agentQuery(agent));
-      this.$rootScope.$emit('wzEventFilters', { filters, localChange, tab });
+      this.$rootScope.$emit('wzEventFilters', { filters, tab });
       if (!this.$rootScope.$$listenerCount['wzEventFilters']) {
         this.$timeout(100).then(() =>
-          this.af(filterHandler, tab, localChange, (agent = false))
+          this.af(filterHandler, tab, (agent = false))
         );
       }
     } catch (error) {
@@ -274,11 +268,10 @@ export class CommonData {
    * Assign given filter
    * @param {Object} filterHandler
    * @param {Object} tab
-   * @param {Object} localChange
    * @param {Object} agent
    */
-  assignFilters(filterHandler, tab, localChange, agent) {
-    return this.af(filterHandler, tab, localChange, agent);
+  assignFilters(filterHandler, tab, agent) {
+    return this.af(filterHandler, tab, agent);
   }
 
   /**

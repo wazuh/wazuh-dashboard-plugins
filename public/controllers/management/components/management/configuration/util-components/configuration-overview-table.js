@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for overview table.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,7 @@ class WzConfigurationOverviewTable extends Component{
 							<EuiTableHeaderCell key={`${title}-${column.name}`}>{column.name}</EuiTableHeaderCell>
 						))}
 					</EuiTableHeader>
-          <EuiTableBody>
+        			<EuiTableBody>
 						{items.map((item, key) => (
 							<EuiTableRow key={`${title}-row-${key}`} onClick={() => onClick(item.goto, item.name, item.description)}>
 								{columns.map((column, keyColumn) => (
@@ -50,7 +50,7 @@ class WzConfigurationOverviewTable extends Component{
 							</EuiTableRow>
 						))}	
 					</EuiTableBody>
-        </EuiTable>
+        		</EuiTable>
 				<EuiSpacer/>
 			</Fragment>
 		)

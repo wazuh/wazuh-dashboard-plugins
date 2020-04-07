@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
-  "version": "3.11.4",
-  "revision": "0590",
-  "code": "0590-0",
+  "version": "3.12.0",
+  "revision": "0870",
+  "code": "0870-0",
   "kibana": {
-    "version": "7.6.0"
+    "version": "7.6.2"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -47,7 +47,6 @@
     "angular-material": "1.1.18",
     "axios": "^0.19.0",
     "babel-polyfill": "^6.13.0",
-    "dom-to-image": "^2.6.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",

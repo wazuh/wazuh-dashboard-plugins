@@ -1,5 +1,3 @@
-<div layout="column" layout-align="start stretch" ng-if="mctrl.tab === 'welcome'">
-    <div layout="row" layout-padding>
-        <react-component flex name="WelcomeWrapper" props="mctrl.welcomeCardsProps" />
-    </div>
+<div ng-if="mctrl.tab === 'welcome'" style="padding-top: 16px;">
+    <react-component flex name="WelcomeWrapper" props="mctrl.welcomeCardsProps" />
 </div>

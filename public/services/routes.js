@@ -35,6 +35,9 @@ import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
+import { WzMisc } from '../factories/misc';
+import { ApiCheck } from '../react-services/wz-api-check';
+import { AppState } from '../react-services/app-state';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -50,10 +53,9 @@ function ip(
   $window,
   $location,
   Private,
-  appState,
-  errorHandler,
-  wzMisc
+  errorHandler
 ) {
+  const wzMisc = new WzMisc();
   assignPreviousLocation($rootScope, $location);
   return getIp(
     npStart.plugins.data.indexPatterns,
@@ -61,7 +63,7 @@ function ip(
     $window,
     $location,
     Private,
-    appState,
+    AppState,
     GenericRequest,
     errorHandler,
     wzMisc
@@ -74,10 +76,8 @@ function nestedResolve(
   $rootScope,
   $location,
   $window,
-  testAPI,
-  appState,
-  wzMisc
 ) {
+  const wzMisc = new WzMisc();
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
   const wazuhConfig = new WazuhConfig();
@@ -88,8 +88,8 @@ function nestedResolve(
       $location,
       $q,
       $window,
-      testAPI,
-      appState,
+      ApiCheck,
+      AppState,
       GenericRequest,
       errorHandler,
       wzMisc,
@@ -126,10 +126,12 @@ function wzConfig($q, $rootScope, $location) {
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
-  // Sets ?_a=(columns:!(_source),filters:!())
-  $location.search('_a', '(columns:!(_source),filters:!())');
-  // Removes ?_g
-  $location.search('_g', null);
+  if ($location.$$path !== "/visualize/create") {
+    // Sets ?_a=(columns:!(_source),filters:!())
+    $location.search('_a', '(columns:!(_source),filters:!())');
+    // Removes ?_g
+    $location.search('_g', null);
+  }
   return goToKibana($location, $window);
 }
 
@@ -175,15 +177,15 @@ routes
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
   .when('/discover/context/:pattern?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {

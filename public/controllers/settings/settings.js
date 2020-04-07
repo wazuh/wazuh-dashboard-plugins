@@ -14,6 +14,10 @@ import { kibana } from '../../../package.json';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { WzMisc } from '../../factories/misc';
+import { ApiCheck } from '../../react-services/wz-api-check';
+import store from '../../redux/store';
+import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 
 export class SettingsController {
   /**
@@ -21,31 +25,21 @@ export class SettingsController {
    * @param {*} $scope
    * @param {*} $window
    * @param {*} $location
-   * @param {*} testAPI
-   * @param {*} appState
-   * @param {*} genericReq
    * @param {*} errorHandler
-   * @param {*} wzMisc
    */
   constructor(
     $scope,
     $window,
     $location,
-    testAPI,
-    appState,
-    genericReq,
     errorHandler,
-    wzMisc,
   ) {
     this.kibanaVersion = (kibana || {}).version || false;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
-    this.testAPI = testAPI;
-    this.appState = appState;
     this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
-    this.wzMisc = wzMisc;
+    this.wzMisc = new WzMisc();
     this.wazuhConfig = new WazuhConfig();
 
     if (this.wzMisc.getWizard()) {
@@ -68,6 +62,11 @@ export class SettingsController {
    */
   async $onInit() {
     try {
+      const breadcrumb = [
+        { text: '' },
+        { text: 'App Settings', },
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       // Set component props
       this.setComponentProps();
       // Loading data
@@ -100,7 +99,7 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
-      testApi: entry => this.testAPI.check(entry),
+      testApi: entry => ApiCheck.checkApi(entry),
       showAddApiWithInitialError: error => this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
@@ -116,7 +115,7 @@ export class SettingsController {
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
       setDefault: entry => this.setDefault(entry),
-      testApi: entry => this.testAPI.check(entry),
+      testApi: entry => ApiCheck.checkApi(entry),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
@@ -134,6 +133,7 @@ export class SettingsController {
       selectedTab: this.tab || 'api',
       tabs: [
         { id: 'api', name: 'API' },
+        { id: 'modules', name: 'Modules' },
         { id: 'configuration', name: 'Configuration' },
         { id: 'logs', name: 'Logs' },
         { id: 'about', name: 'About' }
@@ -152,10 +152,7 @@ export class SettingsController {
    * This switch to a selected tab
    * @param {Object} tab
    */
-  switchTab(tab, setNav = false) {
-    if (setNav) {
-      AppState.setNavigation({ status: true });
-    }
+  switchTab(tab) {
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
@@ -323,7 +320,7 @@ export class SettingsController {
       };
 
       // Test the connection
-      const data = await this.testAPI.check(tmpData);
+      const data = await ApiCheck.checkApi(tmpData);
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry

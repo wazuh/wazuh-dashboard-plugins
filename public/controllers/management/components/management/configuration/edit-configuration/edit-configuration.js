@@ -1,5 +1,5 @@
 /*
-* Wazuh app - React component for registering agents.
+* Wazuh app - React component for show Edit configuration.
 * Copyright (C) 2015-2020 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,6 @@ class WzEditConfiguration extends Component{
     this.state = {
       xml: '',
       editorValue: '',
-      xmlError: false,
       restart: false,
       restarting: false,
       saving: false,
@@ -72,15 +71,27 @@ class WzEditConfiguration extends Component{
         color: 'success'
       });
     }catch(error){
-      this.props.addToast({
-        title: (
-          <Fragment>
-            <EuiIcon type='alert'/>&nbsp;
-            <span>Error saving configuration</span>
-          </Fragment>),
-        color: 'danger',
-        text: typeof error === 'string' ? error : error.message
-      });
+      if(error.details) {
+        this.props.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type='alert'/>&nbsp;
+              <span>File ossec.conf saved, but there were found several error while validating the configuration.</span>
+            </Fragment>),
+          color: 'warning',
+          text: error.details
+        });
+      } else {
+        this.props.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type='alert'/>&nbsp;
+              <span>Error saving configuration</span>
+            </Fragment>),
+          color: 'danger',
+          text: typeof error === 'string' ? error : error.message
+        });
+      }
       this.setState({ saving: false, infoChangesAfterRestart: false });
     }
   }
@@ -94,8 +105,7 @@ class WzEditConfiguration extends Component{
     this.setState({ restart: !this.state.restart }); 
   }
   onChange(editorValue){
-    const xmlError = validateXML(editorValue);
-    this.setState({ editorValue, xmlError });
+    this.setState({ editorValue });
   }
   onDidMount(xmlFetched){
     this.setState({ editorValue: xmlFetched })
@@ -144,8 +154,9 @@ class WzEditConfiguration extends Component{
     }
   }
   render(){
-    const { xmlError, restart, restarting, saving } = this.state;
+    const { restart, restarting, saving, editorValue } = this.state;
     const { clusterNodeSelected, loadingStatus } = this.props;
+    const xmlError = validateXML(editorValue);
     return (
       <Fragment>
         <WzConfigurationPath title={`${clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`} updateConfigurationSection={this.props.updateConfigurationSection}>
@@ -174,6 +185,7 @@ class WzEditConfiguration extends Component{
              toggleRestart={() => this.toggleRestart()}
              confirmRestart={() => this.confirmRestart()}
              {...this.state}
+             xmlError={xmlError}
             />
             {restart && !restarting && (
               <EuiOverlayMask>
