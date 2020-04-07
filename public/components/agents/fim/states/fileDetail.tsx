@@ -172,7 +172,7 @@ export class FileDetails extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Discover filters={{ 'syscheck.path': this.props.currentFile.file }} />
+            <Discover filters={[{'rule.groups': "syscheck"}, { 'syscheck.path': this.props.currentFile.file }]} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
