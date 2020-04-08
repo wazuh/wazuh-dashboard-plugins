@@ -43,7 +43,8 @@ export class StatesTable extends Component {
   };
 
   props!: {
-    filters: {}
+    filters: {},
+    agent: any
   }
 
   constructor(props) {
@@ -77,6 +78,14 @@ export class StatesTable extends Component {
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
+
+  // TODO: Check when is necesary re-render the component
+  // shouldComponentUpdate(nextProps) {
+  //   const { filters } = this.props;
+  //   if (JSON.stringify(filters) !== JSON.stringify(nextProps.filters))
+  //     return true
+  //   return false
+  // }
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
@@ -124,10 +133,10 @@ export class StatesTable extends Component {
     return filter;
   }
 
-  onTableChange = ({ page = {}, sort = {} }) => {
+  onTableChange = async ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-    this.setState({
+    await this.setState({
       pageIndex,
       pageSize,
       sortField,
@@ -138,56 +147,61 @@ export class StatesTable extends Component {
   };
 
   columns() {
+    let width;
+    this.props.agent.os.platform === 'windows' ? width = '60px' : width = '80px';
     return [
       {
         field: 'file',
         name: 'File',
         sortable: true,
+        width: '250px'
       },
       {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
-        width: '200px',
+        width: '100px'
       },
       {
         field: 'uname',
         name: 'User',
         sortable: true,
-        width: '150px',
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'uid',
         name: 'User ID',
         sortable: true,
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'gname',
         name: 'Group',
         sortable: true,
-        width: '150px',
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'gid',
         name: 'Group ID',
         sortable: true,
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'perm',
         name: 'Permissions',
         sortable: true,
-        width: '150px',
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'size',
         name: 'Size',
         sortable: true,
-        width: '150px',
+        width: `${width}`
       }
     ]
   }
