@@ -12,18 +12,32 @@
 
 import React, { Component } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-
-const app = getAngularModule('app/wazuh');
-
+import { EventsSelectedFiles } from './events-selected-fields'
 export class Events extends Component {
   constructor(props) {
     super(props);
   }
 
-  componentDidMount() {
+
+  async getDiscoverScope() {
+    const app = getAngularModule('app/wazuh');
+    if (app.discoverScope) {
+      app.discoverScope.removeColumn('_source');
+      const fields = EventsSelectedFiles[this.props.section];
+      fields.forEach(field => {
+        app.discoverScope.addColumn(field);
+      });
+    } else {
+      setTimeout(() => { this.getDiscoverScope() }, 200);
+    }
+  }
+
+  async componentDidMount() {
+    const app = getAngularModule('app/wazuh');
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
     this.$rootScope.$applyAsync();
+    this.getDiscoverScope();
   }
 
   componentWillUnmount() {

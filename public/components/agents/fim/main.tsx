@@ -32,6 +32,7 @@ import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
 import chrome from 'ui/chrome';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 
 export class MainFim extends Component {
   state: {
@@ -169,10 +170,20 @@ export class MainFim extends Component {
     );
   }
 
+  getDiscoverScope() {
+    const app = getAngularModule('app/wazuh');
+    if (app.discoverScope) {
+      app.discoverScope.updateQueryAndFetch({ query: null });
+    } else {
+      setTimeout(() => { this.getDiscoverScope() }, 200);
+    }
+  }
+
   checkFilterManager(filters) {
     const { filterManager } = getServices();
     if (filterManager.filters && filterManager.filters.length) {
       filterManager.addFilters([filters]);
+      this.getDiscoverScope();
     } else {
       setTimeout(() => {
         this.checkFilterManager(filters);
