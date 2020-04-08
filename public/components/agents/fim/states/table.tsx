@@ -140,7 +140,7 @@ export class StatesTable extends Component {
 
   columns() {
     let width;
-    this.props.agent.os.platform === 'windows' ? width = '80px' : width = '100px';
+    this.props.agent.os.platform === 'windows' ? width = '60px' : width = '80px';
     return [
       {
         field: 'file',
