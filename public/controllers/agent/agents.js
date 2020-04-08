@@ -502,7 +502,6 @@ export class AgentsController {
             }
           }
         );
-        console.log('agentInfo ', agentInfo);
         this.$scope.agent.status =
           (((((agentInfo || {}).data || {}).data || {}).affected_items || [])[0] || {}).status ||
           this.$scope.agent.status;
@@ -806,7 +805,6 @@ export class AgentsController {
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/groups', {});
-      console.log(groups);
       this.$scope.groups = groups.data.data.affected_items
         .map(item => item.name)
         .filter(item => this.$scope.agent.group && !this.$scope.agent.group.includes(item));
