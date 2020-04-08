@@ -67,7 +67,8 @@ export class Discover extends Component {
   };
 
   props!: {
-    filters: Array<Object>
+    implicitFilters: Array<Object>,
+    initialFilters: Array<Object>
   }
 
   constructor(props) {
@@ -103,8 +104,9 @@ export class Discover extends Component {
 
   async componentDidMount() {
     try{
+      const initialFilters = this.props.initialFilters || []
       const { timefilter } = getServices();
-      this.setState({TimeFilter: timefilter, filters: this.props.filters});
+      this.setState({TimeFilter: timefilter, filters: initialFilters});
     }catch(err){
       console.log(err);
     }
@@ -141,7 +143,7 @@ export class Discover extends Component {
     } else {
       const newItemIdToExpandedRowMap = {};
       newItemIdToExpandedRowMap[item._id] = (
-        (<div style={{width: "100%"}}> <RowDetails item={item}/></div>)
+        (<div style={{width: "100%"}}> <RowDetails item={item} addFilter={(filter) => this.addFilter(filter)}/></div>)
       );
       this.setState({ itemIdToExpandedRowMap:newItemIdToExpandedRowMap });
     }
@@ -164,11 +166,15 @@ export class Discover extends Component {
     const newFilters = this.buildFilter();
     if(JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading){
       this.setState({ isLoading: true})
+      console.log("fil", newFilters);
+      const oldFilters = newFilters.filters;
+      newFilters.filters =  this.props.implicitFilters.concat(newFilters.filters);; // we add the implicit filters
       const alerts = await GenericRequest.request(
         'POST',
         `/elastic/alerts`,
         newFilters
       );
+      newFilters.filters = oldFilters;
 
       this.setState({alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters:newFilters.filters})
     }
@@ -243,6 +249,16 @@ export class Discover extends Component {
       result = {...result, ...filters[i]}
     }
     return result;
+  }
+
+  /**
+   * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
+   * @param filter 
+   */
+  addFilter(filter){
+    const filters = this.state.filters;
+    filters.push(filter);
+    this.setState({filters});
   }
 
   getSearchBar(){
