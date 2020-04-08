@@ -43,7 +43,8 @@ export class StatesTable extends Component {
   };
 
   props!: {
-    filters: {}
+    filters: {},
+    agent: any
   }
 
   constructor(props) {
@@ -138,56 +139,61 @@ export class StatesTable extends Component {
   };
 
   columns() {
+    let width;
+    this.props.agent.os.platform === 'windows' ? width = '80px' : width = '100px';
     return [
       {
         field: 'file',
         name: 'File',
         sortable: true,
+        width: '250px'
       },
       {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
-        width: '200px',
+        width: '100px'
       },
       {
         field: 'uname',
         name: 'User',
         sortable: true,
-        width: '150px',
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'uid',
         name: 'User ID',
         sortable: true,
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'gname',
         name: 'Group',
         sortable: true,
-        width: '150px',
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'gid',
         name: 'Group ID',
         sortable: true,
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'perm',
         name: 'Permissions',
         sortable: true,
-        width: '150px',
         truncateText: true,
+        width: `${width}`
       },
       {
         field: 'size',
         name: 'Size',
         sortable: true,
-        width: '150px',
+        width: `${width}`
       }
     ]
   }
