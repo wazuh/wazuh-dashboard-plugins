@@ -115,8 +115,9 @@ export class RegistryTable extends Component {
       sortField,
       sortDirection,
       isLoading: true,
-    });
-    this.getSyscheck();
+    },
+      () => this.getSyscheck()
+    );
   };
 
   columns() {
