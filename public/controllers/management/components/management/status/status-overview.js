@@ -99,13 +99,13 @@ export class WzStatusOverview extends Component {
     const [stats, clusterStatus, managerInfo] = parsedData;
 
     // Once Wazuh core fixes agent 000 issues, this should be adjusted
-    const active = stats.Active - 1;
-    const total = stats.Total - 1;
+    const active = stats.active - 1;
+    const total = stats.total - 1;
 
     this.props.updateStats({
       agentsCountActive: active,
-      agentsCountDisconnected: stats.Disconnected,
-      agentsCountNeverConnected: stats['Never connected'],
+      agentsCountDisconnected: stats.disconnected,
+      agentsCountNeverConnected: stats.never_connected,
       agentsCountTotal: total,
       agentsCoverity: total ? (active / total) * 100 : 0,
     });
@@ -122,7 +122,7 @@ export class WzStatusOverview extends Component {
       const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
       this.props.updateListDaemons(listDaemons);
       const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
-      this.props.updateNodeInfo(nodeInfo.data.data);
+      this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
     } else {
       if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'no') {
         this.showToast(
