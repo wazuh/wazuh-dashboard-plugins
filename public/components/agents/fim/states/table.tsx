@@ -79,6 +79,14 @@ export class StatesTable extends Component {
     this.setState({isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
+  // TODO: Check when is necesary re-render the component
+  // shouldComponentUpdate(nextProps) {
+  //   const { filters } = this.props;
+  //   if (JSON.stringify(filters) !== JSON.stringify(nextProps.filters))
+  //     return true
+  //   return false
+  // }
+
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
     if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters))
@@ -125,10 +133,10 @@ export class StatesTable extends Component {
     return filter;
   }
 
-  onTableChange = ({ page = {}, sort = {} }) => {
+  onTableChange = async ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-    this.setState({
+    await this.setState({
       pageIndex,
       pageSize,
       sortField,
