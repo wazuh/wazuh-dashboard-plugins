@@ -19,13 +19,11 @@ import {
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
-  EuiText,
-  EuiCodeBlock,
+  
   Direction,
 } from '@elastic/eui';
-import { i18n } from '@kbn/i18n';
-import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request';
+import { AppState } from '../../../../react-services/app-state';
 import { FileDetails } from './fileDetail';
 import './states.less';
 
@@ -39,7 +37,10 @@ export class StatesTable extends Component {
     isFlyoutVisible: Boolean
     sortDirection: Direction,
     isLoading: boolean,
-    currentFile: object,
+    currentFile: {
+      file: string
+    },
+    clusterFilter: Object
   };
 
   props!: {
@@ -59,11 +60,20 @@ export class StatesTable extends Component {
       sortDirection: 'asc',
       isLoading: true,
       isFlyoutVisible: false,
-      currentFile: {}
+      currentFile: {
+        file: ""
+      },
+      clusterFilter: {}
     }
   }
 
   async componentDidMount() {
+    const isCluster = (AppState.getClusterInfo() || {}).status === "enabled" ;
+    const clusterFilter =  isCluster
+    ? { "cluster.name" :AppState.getClusterInfo().cluster }
+    : { "manager.name" : AppState.getClusterInfo().manager };
+    this.setState({clusterFilter});
+
     await this.getSyscheck();
   }
 
@@ -255,7 +265,7 @@ export class StatesTable extends Component {
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody className="flyout-body" >
-            <FileDetails currentFile={this.state.currentFile} {...this.props} />
+            <FileDetails currentFile={this.state.currentFile} {...this.props} implicitFilters={[{'rule.groups': "syscheck"}, { 'syscheck.path': this.state.currentFile.file }, {'agent.id': this.props.agent.id}, this.state.clusterFilter]}/>
           </EuiFlyoutBody>
         </EuiFlyout>
       );

@@ -30,7 +30,11 @@ export class FileDetails extends Component {
   };
 
   props!: {
-    currentFile: {}
+    currentFile: {
+      file: string
+    },
+    implicitFilters: Array<Object>,
+    loadEventsWithFilters: Function
   }
 
   constructor(props) {
@@ -39,6 +43,7 @@ export class FileDetails extends Component {
     this.state = {
     }
   }
+
 
   generalColumns() {
     return [
@@ -194,7 +199,7 @@ export class FileDetails extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Discover filters={[{ 'rule.groups': "syscheck" }, { 'syscheck.path': this.props.currentFile.file }]} />
+            <Discover implicitFilters={this.props.implicitFilters} initialFilters={[]}/>
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
