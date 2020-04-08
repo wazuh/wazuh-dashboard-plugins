@@ -12,13 +12,14 @@
 
 import React, { Component, Fragment } from 'react';
 import {
-  EuiFlexGrid,
+  EuiAccordion,
   EuiFlexItem,
   EuiText,
   EuiFlexGroup,
   EuiTitle,
   EuiButtonEmpty,
-  EuiToolTip
+  EuiToolTip,
+  EuiSpacer
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
 
@@ -155,24 +156,34 @@ export class FileDetails extends Component {
   render() {
     return (
       <Fragment>
-        <div className='details-row'>
-          {this.getDetails()}
-        </div>
+        <EuiAccordion
+          buttonContent={
+            <EuiTitle size="s">
+              <h3>Details</h3>
+            </EuiTitle>
+          }
+          paddingSize="none"
+          initialIsOpen={true}>
+          <div className='details-row'>
+            {this.getDetails()}
+          </div>
+        </EuiAccordion>
+        <EuiSpacer size='l' />
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
-            <EuiTitle >
+            <EuiTitle size="s">
               <h2>File events</h2>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty onClick={() => this.viewInEvents()}>
+            <EuiButtonEmpty onClick={() => this.viewInEvents()} className="view-in-events-btn">
               View in Events
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Discover filters={[{'rule.groups': "syscheck"}, { 'syscheck.path': this.props.currentFile.file }]} />
+            <Discover filters={[{ 'rule.groups': "syscheck" }, { 'syscheck.path': this.props.currentFile.file }]} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
