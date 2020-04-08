@@ -44,7 +44,7 @@ export class WzSearchBar extends Component {
     qSuggests: qSuggests[] | null
     apiSuggests: apiSuggests[] | null
     onInputChange: Function
-    onTimeChange?(props:OnTimeChangeProps):() => void
+    onTimeChange?(props:OnTimeChangeProps): void
     buttonOptions?: filterButton[]
     searchDisable?: boolean
     defaultFormat?: 'API' | '?Q' | 'qTags'
