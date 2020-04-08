@@ -14,33 +14,22 @@ import React, { Component } from 'react';
 import {
   EuiBasicTable,
   EuiLoadingSpinner,
-  EuiSuperDatePicker,
-  OnTimeChangeProps
+  OnTimeChangeProps,
+  EuiTableSortingType,
+  EuiFlexItem,
+  EuiFlexGroup,
+  Direction
 } from '@elastic/eui';
 import './discover.less';
-import { EuiFlexGroup } from '@elastic/eui';
-import { EuiFlexItem } from '@elastic/eui';
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { RowDetails } from './row-details';
-import {  getServices } from 'plugins/kibana/discover/kibana_services';
 import { WzSearchBar } from '../../../../components/wz-search-bar';
+//@ts-ignore
+import { getServices } from 'plugins/kibana/discover/kibana_services';
+
 interface IDiscoverTime { from:string, to:string };
 
-
-
 export class Discover extends Component {
-  commonDurationRanges = [
-    {"start":"now/d","end":"now/d","label":"Today"},
-    {"start":"now/w","end":"now/w","label":"This week"},
-    {"start":"now-15m","end":"now","label":"Last 15 minutes"},
-    {"start":"now-30m","end":"now","label":"Last 30 minutes"},
-    {"start":"now-1h","end":"now","label":"Last 1 hour"},
-    {"start":"now-24h","end":"now","label":"Last 24 hours"},
-    {"start":"now-7d","end":"now","label":"Last 7 days"},
-    {"start":"now-30d","end":"now","label":"Last 30 days"},
-    {"start":"now-90d","end":"now","label":"Last 90 days"},
-    {"start":"now-1y","end":"now","label":"Last 1 year"},
-  ]
 
   timefilter: {
     getTime(): IDiscoverTime
@@ -49,20 +38,19 @@ export class Discover extends Component {
   };
   
   state: {
-    filters: Array<Object>,
-    sort: Object,
-    alerts: Array<Object>,
-    total: Number,
-    pageIndex: Number,
-    pageSize: Number,
+    filters: object[],
+    sort: object,
+    alerts: {_source:{}, _id:string}[],
+    total: number,
+    pageIndex: number,
+    pageSize: number,
     sortField: string,
-    sortDirection: string,
+    sortDirection: Direction,
     isLoading: boolean,
-    requestFilters: Object,
-    requestSize: Number
-    requestOffset: Number
-    itemIdToExpandedRowMap: Object,
-    TimeFilter: Object,
+    requestFilters: object,
+    requestSize: number
+    requestOffset: number
+    itemIdToExpandedRowMap: any,
     datePicker: OnTimeChangeProps,
   };
 
@@ -76,7 +64,6 @@ export class Discover extends Component {
     const { from, to } = this.timefilter.getTime();
 
     this.state = {
-      TimeFilter: {},
       filters: [],
       sort: {},
       alerts: [],
@@ -103,8 +90,7 @@ export class Discover extends Component {
 
   async componentDidMount() {
     try{
-      const { timefilter } = getServices();
-      this.setState({TimeFilter: timefilter, filters: this.props.filters});
+      this.setState({ filters: this.props.filters });
     }catch(err){
       console.log(err);
     }
@@ -120,7 +106,7 @@ export class Discover extends Component {
 
   filtersAsArray(filters){
     const keys = Object.keys(filters);
-    const result = [];
+    const result:{}[] = [];
     for(var i=0; i<keys.length; i++){
       const item = {};
       item[keys[i]] = filters[keys[i]];
@@ -148,15 +134,12 @@ export class Discover extends Component {
   };
 
   buildFilter(){
-    const filters = this.state.filters;
-    const sort = {};
-    if(this.state.sortField){
-      sort[this.state.sortField] = {"order" : this.state.sortDirection};
-    }
+    const { filters, sortField, sortDirection } = this.state;
+    const {from, to} = this.timefilter.getTime();
+    const sort = {...(sortField && {[sortField]: {"order": sortDirection}})};
     const offset = Math.floor( (this.state.pageIndex * this.state.pageSize) / this.state.requestSize ) * this.state.requestSize;
-    const timeFilter = { from : this.state.datePicker.start, to: this.state.datePicker.end};
 
-   return {filters: filters, sort, ...timeFilter, offset};
+    return {filters, sort, from, to, offset};
   }
 
   async getAlerts() {
@@ -209,7 +192,7 @@ export class Discover extends Component {
     const { field: sortField, direction: sortDirection } = sort;
 
     this.setState({
-      pageIndex: pageIndex,
+      pageIndex,
       pageSize,
       sortField,
       sortDirection,
@@ -218,7 +201,7 @@ export class Discover extends Component {
   
 
   getpageIndexItems(){
-    let items = [];
+    let items:{}[] = [];
     
     const start = (this.state.pageIndex * this.state.pageSize)%this.state.requestSize;
     const end = start + this.state.pageSize
@@ -246,11 +229,6 @@ export class Discover extends Component {
   }
 
   getSearchBar(){
-    const recentlyUsedRanges = this.timefilter._history.history.items.map(
-      item => ({start:item.from, end: item.to})
-    );
-    const { datePicker } = this.state;
-
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -261,15 +239,8 @@ export class Discover extends Component {
           initFilters={this.getFiltersAsObject(this.state.filters)}
           defaultFormat='qTags'
           noDeleteFiltersOnUpdateSuggests={true}
-          placeholder='Search' />
-        </EuiFlexItem>
-        <EuiFlexItem>
-
-        <EuiSuperDatePicker 
-          commonlyUsedRanges={this.commonDurationRanges} 
-          recentlyUsedRanges={recentlyUsedRanges}
-          onTimeChange={this.onTimeChange}
-          {...datePicker} />
+          placeholder='Search'
+          onTimeChange={this.onTimeChange} />
         </EuiFlexItem>
       </EuiFlexGroup>)
   }
@@ -291,9 +262,11 @@ export class Discover extends Component {
     const pageIndexItems = this.getpageIndexItems();
     const columns = this.columns();
 
-    const sorting = {sort:  {
-      field: this.state.sortField,
-      direction: this.state.sortDirection,
+    const sorting:EuiTableSortingType<{}> = {
+      sort:  {
+        //@ts-ignore
+        field: this.state.sortField,
+        direction: this.state.sortDirection,
       }
     };
     const pagination = {
