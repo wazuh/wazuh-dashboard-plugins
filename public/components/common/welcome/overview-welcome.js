@@ -27,10 +27,10 @@ import {
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
-
+import './welcome.less';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 
-export class WelcomeScreen extends Component {
+export class OverviewWelcome extends Component {
   constructor(props) {
     super(props);
     this.strtools = new StringsTools();
@@ -72,7 +72,7 @@ export class WelcomeScreen extends Component {
   render() {
     return (
       <Fragment>
-        <EuiPage>
+        <EuiPage className='wz-welcome-page'>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiFlexGroup>

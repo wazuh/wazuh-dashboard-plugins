@@ -11,7 +11,7 @@
  */
 import { uiModules } from 'ui/modules';
 import { OverviewController } from './overview';
-import { WelcomeScreen } from './components/overview-welcome';
+import { OverviewWelcome } from '../../components/common/welcome/overview-welcome';
 import { WzCurrentOverviewSectionWrapper } from '../../components/common/modules/overview-current-section-wrapper';
 import { WzCurrentAgentsSectionWrapper } from '../../components/common/modules/agents-current-section-wrapper';
 import { Stats } from './components/stats';
@@ -22,7 +22,7 @@ const app = uiModules.get('app/wazuh', ['react']);
 
 app
   .controller('overviewController', OverviewController)
-  .value('WelcomeScreenOverview', WelcomeScreen)
+  .value('OverviewWelcome', OverviewWelcome)
   .value('WzCurrentOverviewSectionWrapper', WzCurrentOverviewSectionWrapper)
   .value('WzCurrentAgentsSectionWrapper', WzCurrentAgentsSectionWrapper)
   .value('StatsOverview', Stats)

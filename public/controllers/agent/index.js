@@ -14,7 +14,7 @@ import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
 import { RegisterAgent } from './components/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
-import { AgentWelcomeScreen } from './components/agents-welcome';
+import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
 import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
 import { MainFim } from '../../components/agents/fim';
@@ -26,7 +26,7 @@ app
   .controller('agentsPreviewController', AgentsPreviewController)
   .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
-  .value('AgentWelcomeScreen', AgentWelcomeScreen)
+  .value('AgentsWelcome', AgentsWelcome)
   .value('AgentsPreview', AgentsPreview)
   .value('AgentsTable', AgentsTable)
 

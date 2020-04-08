@@ -27,11 +27,12 @@ import {
   EuiButton,
   EuiToolTip
 } from '@elastic/eui';
-import { AgentInfo } from './agent-info';
+import { AgentInfo } from '../../../controllers/agent/components/agent-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
+import './welcome.less';
 
-export class AgentWelcomeScreen extends Component {
+export class AgentsWelcome extends Component {
   constructor(props) {
     super(props);
 
@@ -92,7 +93,7 @@ export class AgentWelcomeScreen extends Component {
           <div className="wz-module-body-agent-info">
             <AgentInfo agent={this.props.agent}></AgentInfo>
           </div>
-          <EuiPage>
+          <EuiPage className='wz-welcome-page'>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup>
