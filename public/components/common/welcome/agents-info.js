@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiToolTip } from '@elastic/eui';
+import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiToolTip, EuiButton } from '@elastic/eui';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -81,7 +81,25 @@ export class AgentInfo extends Component {
     ]);
     return (
       <Fragment>
-        <EuiFlexGroup>{stats}</EuiFlexGroup>
+        <EuiFlexGroup className='wz-welcome-page-agent-info-details'>
+          {stats}
+        </EuiFlexGroup>
+        <EuiFlexGroup className='wz-welcome-page-agent-info-actions'>
+          <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+            <EuiButton
+              onClick={() => this.props.switchTab('syscollector')}
+              iconType="inspect">
+              Inventory data
+              </EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              onClick={() => this.props.switchTab('configuration')}
+              iconType="gear">
+              Configuration
+              </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </Fragment>
     );
   }

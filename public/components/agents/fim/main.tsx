@@ -26,7 +26,7 @@ import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { States, Settings } from './index';
 import { Events, Dashboard, Loader } from '../../common/modules';
-import '../../../less/components/module.less';
+import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';

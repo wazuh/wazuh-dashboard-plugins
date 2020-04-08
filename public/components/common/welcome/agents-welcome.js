@@ -27,7 +27,7 @@ import {
   EuiButton,
   EuiToolTip
 } from '@elastic/eui';
-import { AgentInfo } from '../../../controllers/agent/components/agent-info';
+import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
 import './welcome.less';
@@ -90,8 +90,8 @@ export class AgentsWelcome extends Component {
           </div>
         </div>
         <div className='wz-module-body wz-module-body-main'>
-          <div className="wz-module-body-agent-info">
-            <AgentInfo agent={this.props.agent}></AgentInfo>
+          <div className="wz-welcome-page-agent-info">
+            <AgentInfo agent={this.props.agent} {...this.props}></AgentInfo>
           </div>
           <EuiPage className='wz-welcome-page'>
             <EuiFlexGroup>
@@ -106,8 +106,6 @@ export class AgentsWelcome extends Component {
                       <EuiFlexGrid columns={2}>
                         {this.buildTabCard('general', 'dashboardApp')}
                         {this.buildTabCard('fim', 'filebeatApp')}
-                        {this.buildTabCard('configuration', 'gear')}
-                        {this.buildTabCard('syscollector', 'notebookApp')}
                       </EuiFlexGrid>
                     </EuiPanel>
                   </EuiFlexItem>
