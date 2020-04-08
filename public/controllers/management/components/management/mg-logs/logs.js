@@ -107,8 +107,8 @@ export default class WzLogs extends Component {
                 {}
             );
             const formattedData = (((data || {}).data || {}).data || {}).affected_items || [];
-            const daemonsList = [...['all'], ...Object.keys(formattedData)]
-            this.setState({ daemonsList })
+            const daemonsList = [...['all'], ...formattedData.map((item) => { return Object.keys(item)})];
+            this.setState({ daemonsList });
         } catch (err) {
             throw new Error("Error obtaining daemons list.");
         } // eslint-disable-line
@@ -152,7 +152,7 @@ export default class WzLogs extends Component {
                 const tmpResult = await ApiRequest.request(
                     'GET',
                     logsPath,
-                    this.buildFilters(customOffset)
+                    { params: this.buildFilters(customOffset) }
                 )
                 const resultItems = (((tmpResult || {}).data).data || {}).affected_items;
                 totalItems = (((tmpResult || {}).data).data || {}).total_affected_items;
