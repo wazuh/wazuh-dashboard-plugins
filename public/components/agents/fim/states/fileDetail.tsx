@@ -13,13 +13,15 @@
 import React, { Component, Fragment } from 'react';
 import {
   EuiAccordion,
+  EuiFlexGrid,
   EuiFlexItem,
   EuiText,
   EuiFlexGroup,
   EuiTitle,
   EuiButtonEmpty,
   EuiToolTip,
-  EuiSpacer
+  EuiSpacer,
+  EuiStat
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
 
@@ -74,15 +76,15 @@ export class FileDetails extends Component {
         field: 'size',
         name: 'Size',
       },
+    ]
+  }
+
+  checksumColumns() {
+    return [
       {
         field: 'inode',
         name: 'Inode',
       },
-    ]
-  }
-
-  extraColumns() {
-    return [
       {
         field: 'md5',
         name: 'MD5',
@@ -117,40 +119,49 @@ export class FileDetails extends Component {
     const columns = this.generalColumns();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
-      const grow = item.grow || 1;
       return (
-        <EuiFlexItem key={idx} grow={grow} style={{ maxWidth: 160, maxHeight: 100 }}>
-          <EuiText className="detail-title">
-            {item.name}
-          </EuiText>
-          <EuiToolTip position="bottom" content={value} delay="long">
-            <EuiText className="detail-value">
-              {value}
-            </EuiText>
-          </EuiToolTip>
+        <EuiFlexItem key={idx} style={{ margin: '4px 12px', maxWidth: 'calc(25% - 24px)' }}>
+          <EuiStat
+            title={
+              <EuiToolTip position="bottom" content={value}>
+                <EuiText className="detail-value">
+                  {value}
+                </EuiText>
+              </EuiToolTip>
+            }
+            description={item.name}
+            textAlign="left"
+            titleSize="xs"
+          />
         </EuiFlexItem>
       )
     });
-    const extraColumns = this.extraColumns();
-    const extraDetails = extraColumns.map((item, idx) => {
+    const checksumColumns = this.checksumColumns();
+    const checksumDetails = checksumColumns.map((item, idx) => {
       const value = this.props.currentFile[item.field] || '-';
       return (
-        <EuiFlexItem key={idx} >
-          <EuiText className="detail-title">
-            {item.name}
-          </EuiText>
-          <EuiText size="xs">
-            {value}
-          </EuiText>
+        <EuiFlexItem key={idx} style={{ margin: '4px 12px' }}>
+          <EuiStat
+            title={
+              <EuiToolTip position="bottom" content={value}>
+                <EuiText className="detail-value" size={item.name !== 'Inode' ? 's' : 'm'}>
+                  {value}
+                </EuiText>
+              </EuiToolTip>
+            }
+            description={item.name}
+            textAlign="left"
+            titleSize="xs"
+          />
         </EuiFlexItem>
       )
     });
 
     return (
-      <span>
-        <EuiFlexGroup gutterSize="m">{generalDetails}</EuiFlexGroup>
-        <EuiFlexGroup gutterSize="m">{extraDetails}</EuiFlexGroup>
-      </span>);
+      <div>
+        <EuiFlexGrid columns={4}> {generalDetails} </EuiFlexGrid>
+        <EuiFlexGrid columns={4} style={{ paddingTop: 12 }}> {checksumDetails} </EuiFlexGrid>
+      </div>);
   }
 
   render() {
@@ -168,14 +179,14 @@ export class FileDetails extends Component {
             {this.getDetails()}
           </div>
         </EuiAccordion>
-        <EuiSpacer size='l' />
+        <EuiSpacer size='m' />
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
               <h2>File events</h2>
             </EuiTitle>
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
             <EuiButtonEmpty onClick={() => this.viewInEvents()} className="view-in-events-btn">
               View in Events
             </EuiButtonEmpty>
