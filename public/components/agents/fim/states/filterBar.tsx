@@ -23,6 +23,8 @@ export class FilterBar extends Component {
     files: [
       {label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'file'})},
       ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value, this.props.agent.id)}]: []),
+      {label: 'mtime', description:"Date the file was modified", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('mtime', value, this.props.agent.id)},
+      {label: 'date', description:"Date of registration of the event", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('date', value, this.props.agent.id)},
       {label: 'uname', description:"Owner of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uname', value, this.props.agent.id)},
       {label: 'uid', description:"Id of the onwner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uid', value, this.props.agent.id)},
       ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'gname', description:"Name of the group owner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('gname', value, this.props.agent.id)}]: []),
