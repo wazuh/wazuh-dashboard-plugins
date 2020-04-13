@@ -27,7 +27,7 @@ import {
 } from '@elastic/eui';
 
 import WzModuleGuide from './module-guide';
-import { SampleData } from './sample-data';
+import WzSampleData from './sample-data';
 import modeGuides from './guides';
 
 import { TabDescription } from '../../../server/reporting/tab-description';
@@ -78,20 +78,21 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 				)
 			})),
 			{
-				id: 'Sample Data',
+				id: 'sample-data',
 				name: 'Sample Data',
 				content: (
 					<Fragment>
 						<EuiSpacer size='m' />
-						<SampleData/>
+						<WzSampleData/>
 					</Fragment>
 				)
 			}
 		];
 		this.state = {
 			guide: '',
-			selectedGuideCategory: this.tabs[0]
+			selectedGuideCategory: window.location.href.includes('redirect=sample-data') ? this.tabs.find(tab => tab.id === 'sample-data') : this.tabs[0]
 		}
+		// "redirect=sample-data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
 	}
 	setGlobalBreadcrumb() {
     const breadcrumb = [

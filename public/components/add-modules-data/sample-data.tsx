@@ -26,9 +26,14 @@ import {
 
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
+import { connect } from 'react-redux';
 
-export class SampleData extends Component {
-  categories: {title: string, description: string, categorySampleAlertsIndex: string}[]
+interface IWzSampleDataProps{
+  currentPattern: string
+}
+
+class WzSampleData extends Component<IWzSampleDataProps> {
+  categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
   state: {[name: string]: {
     exists: boolean
     addDataLoading: boolean
@@ -40,23 +45,27 @@ export class SampleData extends Component {
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
       {
-        title: 'Security Information',
-        description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, quas enim! Commodi, obcaecati quis ea ducimus vel reprehenderit, dolor distinctio quaerat.',
+        title: 'Sample security information',
+        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services).',
+        image: '',
         categorySampleAlertsIndex: 'security'
       },
       {
-        title: 'Auditing and Policy Monitoring',
-        description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, quas enim! Commodi, obcaecati quis ea ducimus vel reprehenderit, dolor distinctio quaerat.',
+        title: 'Sample auditing and policy monitoring',
+        description: 'Sample data, visualizations and dashboards for events of auditing and policy monitoring (policy monitoring, system auditing, OpenSCAP, CIS-CAT).',
+        image: '',
         categorySampleAlertsIndex: 'auditing-pm'
       },
       {
-        title: 'Threat detection and response',
-        description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, quas enim! Commodi, obcaecati quis ea ducimus vel reprehenderit, dolor distinctio quaerat.',
+        title: 'Sample threat detection and response',
+        description: 'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener, MITRE ATT&CK).',
+        image: '',
         categorySampleAlertsIndex: 'threat-detection'
       },
       {
-        title: 'Regulatory Compliance',
-        description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, quas enim! Commodi, obcaecati quis ea ducimus vel reprehenderit, dolor distinctio quaerat.',
+        title: 'Sample regulatory compliance',
+        description: 'Sample data, visualizations and dashboards for events of regulatory compliance (PCI DSS, GDPR, HIPAA, NIST 800-53).',
+        image: '',
         categorySampleAlertsIndex: 'regulatory-compliance'
       },
     ];
@@ -72,7 +81,7 @@ export class SampleData extends Component {
   async componentDidMount(){
     // Check if sample data for each category was added
     const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
-      accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`)
+      accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${this.props.currentPattern}/${cur.categorySampleAlertsIndex}`)
       return accum
     },{}));
 
@@ -86,7 +95,7 @@ export class SampleData extends Component {
 
     // Get values of cluster/manager
     try{
-      const managerInfo = await WzRequest.apiReq('GET', `/manager/info`, {});
+      const managerInfo = await WzRequest.apiReq('GET', '/manager/info', {});
       this.generateAlertsParams.manager = {
         name: managerInfo.data.data.name
       }
@@ -112,7 +121,7 @@ export class SampleData extends Component {
         ...this.state[category.categorySampleAlertsIndex],
         addDataLoading: true
       } });
-      await WzRequest.genericReq('POST', '/elastic/samplealerts', { category: category.categorySampleAlertsIndex, params: this.generateAlertsParams });
+      await WzRequest.genericReq('POST', `/elastic/samplealerts/${this.props.currentPattern}/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
       this.showToast('success', `${category.title} alerts installed`);
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
@@ -133,7 +142,7 @@ export class SampleData extends Component {
         ...this.state[category.categorySampleAlertsIndex],
         removeDataLoading: true
       } });
-      await WzRequest.genericReq('DELETE', '/elastic/samplealerts', { category: category.categorySampleAlertsIndex } );
+      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${this.props.currentPattern}/${category.categorySampleAlertsIndex}` );
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
         exists: false,
@@ -156,39 +165,27 @@ export class SampleData extends Component {
           textAlign='left'
           title={category.title}
           description={category.description}
+          image={category.image}
           betaBadgeLabel={exists ? 'Installed' : undefined}
           footer={(
-            <Fragment>
-              {exists && (
-                <EuiFlexGroup justifyContent="spaceBetween">
-                  <EuiFlexItem grow={false}>
-                    <EuiButtonEmpty
-                      isLoading={removeDataLoading}
-                      color='danger'
-                      onClick={() => this.removeSampleData(category)}>
-                        {addDataLoading && 'Removing data' || 'Remove'}
-                    </EuiButtonEmpty>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiButton
-                      isLoading={removeDataLoading}
-                      onClick={() => alert('view data')}>
-                        View data
-                    </EuiButton>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              ) || (
-              <EuiFlexGroup justifyContent="flexEnd">
-                <EuiFlexItem grow={false}>
+            <EuiFlexGroup justifyContent="flexEnd">
+              <EuiFlexItem grow={false}>
+                {exists && (
+                  <EuiButton
+                  isLoading={removeDataLoading}
+                  color='danger'
+                  onClick={() => this.removeSampleData(category)}>
+                    {addDataLoading && 'Removing data' || 'Remove data'}
+                </EuiButton>
+                ) || (
                   <EuiButton
                     isLoading={addDataLoading}
                     onClick={() => this.addSampleData(category)}>
                       {addDataLoading && 'Adding data' || 'Add data'}
                   </EuiButton>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              )}
-            </Fragment>
+                )}
+              </EuiFlexItem>
+            </EuiFlexGroup>
           )}
         />
       </EuiFlexItem>
@@ -204,6 +201,12 @@ export class SampleData extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  currentPattern: state.appStateReducers.currentPattern
+});
+
+export default connect(mapStateToProps)(WzSampleData);
 
 const zipObject = (keys = [], values = []) => {
   return keys.reduce((accumulator, key, index) => {

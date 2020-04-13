@@ -83,26 +83,34 @@ export function WazuhElasticRouter(server) {
       return ctrl.alerts(req, res);
     }
   });
-  // Fetch alerts directly from Elasticsearch
+  // Check if there is some sample alerts index
   server.route({
     method: 'GET',
-    path: '/elastic/samplealerts/{category}',
+    path: '/elastic/samplealerts/{pattern}',
     handler(req, res) {
       return ctrl.haveSampleAlerts(req, res);
     }
   });
-  // Fetch alerts directly from Elasticsearch
+  // Check if there is sample alerts index created of category
+  server.route({
+    method: 'GET',
+    path: '/elastic/samplealerts/{pattern}/{category}',
+    handler(req, res) {
+      return ctrl.haveSampleAlertsOfCategory(req, res);
+    }
+  });
+  // Create sample alert index
   server.route({
     method: 'POST',
-    path: '/elastic/samplealerts',
+    path: '/elastic/samplealerts/{pattern}/{category}',
     handler(req, res) {
       return ctrl.createSampleAlerts(req, res);
     }
   });
-  // Fetch alerts directly from Elasticsearch
+  // Delete sample alert index by category
   server.route({
     method: 'DELETE',
-    path: '/elastic/samplealerts',
+    path: '/elastic/samplealerts/{pattern}/{category}',
     handler(req, res) {
       return ctrl.deleteSampleAlerts(req, res);
     }

@@ -14,12 +14,13 @@ import React, { Component } from 'react';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
-import { EuiPage, EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon, EuiDescriptionList } from '@elastic/eui';
+import { EuiPage, EuiFlexGroup, EuiPanel, EuiFlexItem, EuiButtonIcon, EuiDescriptionList, EuiCallOut, EuiLink } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card'
 import AlertsStats from '../../controllers/overview/components/alerts-stats'
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
+import store from '../../redux/store';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -29,6 +30,7 @@ export class WzVisualize extends Component {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
       cardReqs: {},
+      thereAreSampleAlerts: false,
       metricItems: this.props.selectedTab !== 'welcome'
         ? this.getMetricItems(this.props.selectedTab)
         : []
@@ -70,6 +72,13 @@ export class WzVisualize extends Component {
         ];
       }
     }
+
+    // Check if there sample alerts installed
+    try{
+      this.setState({
+        thereAreSampleAlerts: (await WzRequest.genericReq('GET', `/elastic/samplealerts/${store.getState().appStateReducers.currentPattern}`, {})).data.sampleAlertsInstalled
+      });
+    }catch(error){}
   }
 
   async componentDidUpdate() {
@@ -178,6 +187,13 @@ export class WzVisualize extends Component {
             })}
           </div>
         }
+
+        {/* Sample alerts Callout */}
+        {this.state.thereAreSampleAlerts && (
+          <EuiCallOut title='There are sample data installed' color='warning' iconType='alert' style={{margin: '0 8px'}}>
+            <p>The data displayed may contain sample alerts. Go <EuiLink href='#/manager/modules?redirect=sample-data&tab=modules' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.</p>
+          </EuiCallOut>
+        )}
 
         {/* Metrics of Dashboard */}
         {(selectedTab && selectedTab !== 'welcome' && this.visualizations[selectedTab] && this.visualizations[selectedTab].metrics && this.state.metricItems) &&

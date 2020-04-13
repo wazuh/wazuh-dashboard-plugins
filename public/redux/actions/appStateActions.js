@@ -22,6 +22,16 @@ export const updateCurrentApi = currentAPI => {
   };
 };
 
+/**
+ * Updates CurrentPattern in the appState store
+ * @param currentPattern
+ */
+export const updateCurrentPattern = currentPattern => {
+  return {
+    type: 'UPDATE_CURRENT_PATTERN',
+    currentPattern: currentPattern
+  };
+};
 
 /**
  * Updates ShowMenu in the appState store

@@ -33,11 +33,12 @@ export class WazuhElasticCtrl {
     this.wzWrapper = new ElasticWrapper(server);
     this.wzAlertsSampleIndexBase = 'wazuh-alerts-3.x-sample';
     this.wzAlertsSampleCaterories = {
-      'security': [{ syscheck: true }, { aws: true }], // TODO: security events?
+      'security': [{ syscheck: true }, { aws: true }],
       'auditing-pm': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }],
-      'regulatory-compliance': [{ aws: true }] // what type/group alerts
+      'regulatory-compliance': [{ pci_dss: true }, { gdpr: true }, { hipaa: true }, { nist_800_53: true }] // what type/group alerts
     }
+    this.defaultNumSampleAlerts = 1000;
   }
 
   /**
@@ -757,7 +758,7 @@ export class WazuhElasticCtrl {
     }
   }
   /**
-   * This creates sample alerts in wazuh-sample-alerts
+   * This checks if there is sample alerts
    * @param {*} req
    * GET /elastic/samplealerts
    * {
@@ -776,11 +777,46 @@ export class WazuhElasticCtrl {
     if(!req.params || typeof req.params !== 'object'){
       return ErrorResponse('Missing params', 1000, 500, reply);
     };
+    if(!req.params.pattern){
+      return ErrorResponse('Missing index pattern', 1000, 500, reply);
+    };
+    try{
+      // Check if wazuh sample alerts index exists
+      const results = await Promise.all(Object.keys(this.wzAlertsSampleCaterories).map((category) => this.wzWrapper.checkIfIndexExists(buildSampleIndexByCategory(req.params.pattern, category))));
+      
+      return { sampleAlertsInstalled: results.some(result => result) }
+    }catch(error){
+      return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
+    }
+  }
+  /**
+   * This creates sample alerts in wazuh-sample-alerts
+   * @param {*} req
+   * GET /elastic/samplealerts
+   * {
+   *   "agent.id": 100 ,
+   *   "cluster.name": "wazuh",
+   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
+   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
+   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
+   *   "size": 5 // Optional parameter
+   * }
+   *
+   * @param {*} reply
+   * {alerts: [...]} or Error
+   */
+  async haveSampleAlertsOfCategory(req, reply){
+    if(!req.params || typeof req.params !== 'object'){
+      return ErrorResponse('Missing params', 1000, 500, reply);
+    };
+    if(!req.params.pattern){
+      return ErrorResponse('Missing index pattern', 1000, 500, reply);
+    };
     if(!req.params.category || !Object.keys(this.wzAlertsSampleCaterories).includes(req.params.category)){
       return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
     };
     try{
-      const sampleAlertsIndex = `${this.wzAlertsSampleIndexBase}-${req.params.category}`;
+      const sampleAlertsIndex = buildSampleIndexByCategory(req.params.pattern, req.params.category);
       // Check if wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       return { index: sampleAlertsIndex, exists: existsSampleIndex }
@@ -805,23 +841,25 @@ export class WazuhElasticCtrl {
    * {alerts: [...]} or Error
    */
   async createSampleAlerts(req, reply){
-    if(!req.payload || typeof req.payload !== 'object'){
-      return ErrorResponse('Missing payload', 1000, 500, reply);
+    if(!req.params || typeof req.params !== 'object'){
+      return ErrorResponse('Missing params', 1000, 500, reply);
     };
-    if(!req.payload.category || !Object.keys(this.wzAlertsSampleCaterories).includes(req.payload.category)){
+    if(!req.params.pattern){
+      return ErrorResponse('Missing index pattern', 1000, 500, reply);
+    };
+    if(!req.params.category || !Object.keys(this.wzAlertsSampleCaterories).includes(req.params.category)){
       return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
     };
-
-    // Set number of alerts
-    const numberAlerts = req.payload.alerts || 1000;
-    const sampleAlertsIndex = `${this.wzAlertsSampleIndexBase}-${req.payload.category}`;
+    
+    const sampleAlertsIndex = buildSampleIndexByCategory(req.params.pattern, req.params.category);
     const bulkPrefix = JSON.stringify({
       index: {
         _index: sampleAlertsIndex
       }
     });
+    const alertGenerateParams = req.payload && req.payload.params || {};
 
-    const sampleAlerts = this.wzAlertsSampleCaterories[req.payload.category].map((typeAlert) => generateAlerts({...typeAlert, ...req.payload.params}, numberAlerts)).flat();
+    const sampleAlerts = this.wzAlertsSampleCaterories[req.params.category].map((typeAlert) => generateAlerts({...typeAlert, ...alertGenerateParams}, req.payload.alerts || typeAlert.alerts || this.defaultNumSampleAlerts)).flat();
     const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}`).join('\n');
     // Index alerts
     try{
@@ -879,13 +917,16 @@ export class WazuhElasticCtrl {
    */
   async deleteSampleAlerts(req, reply){
     // Delete Wazuh sample alert index
-    if(!req.payload || typeof req.payload !== 'object'){
-      return ErrorResponse('Missing payload', 1000, 500, reply);
+    if(!req.params || typeof req.params !== 'object'){
+      return ErrorResponse('Missing params', 1000, 500, reply);
     };
-    if(!req.payload.category || !Object.keys(this.wzAlertsSampleCaterories).includes(req.payload.category)){
+    if(!req.params.pattern){
+      return ErrorResponse('Missing index pattern', 1000, 500, reply);
+    };
+    if(!req.params.category || !Object.keys(this.wzAlertsSampleCaterories).includes(req.params.category)){
       return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
     };
-    const sampleAlertsIndex = `${this.wzAlertsSampleIndexBase}-${req.payload.category}`;
+    const sampleAlertsIndex = buildSampleIndexByCategory(req.params.pattern,req.params.category);
     try{
       // Check if wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
@@ -910,3 +951,5 @@ export class WazuhElasticCtrl {
     }
   }
 }
+
+const buildSampleIndexByCategory = (pattern, category) => `${pattern.replace('*','')}-sample-${category}`;
