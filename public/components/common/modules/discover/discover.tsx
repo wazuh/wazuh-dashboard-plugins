@@ -22,6 +22,7 @@ import {
 } from '@elastic/eui';
 import './discover.less';
 import { GenericRequest } from '../../../../react-services/generic-request';
+import { AppState } from '../../../../react-services/app-state';
 import { RowDetails } from './row-details';
 import { WzSearchBar } from '../../../../components/wz-search-bar';
 //@ts-ignore
@@ -136,12 +137,13 @@ export class Discover extends Component {
   };
 
   buildFilter(){
+    const pattern = AppState.getCurrentPattern();
     const { filters, sortField, sortDirection } = this.state;
     const {from, to} = this.timefilter.getTime();
     const sort = {...(sortField && {[sortField]: {"order": sortDirection}})};
     const offset = Math.floor( (this.state.pageIndex * this.state.pageSize) / this.state.requestSize ) * this.state.requestSize;
 
-    return {filters, sort, from, to, offset};
+    return {filters, sort, from, to, offset, pattern};
   }
 
   async getAlerts() {
