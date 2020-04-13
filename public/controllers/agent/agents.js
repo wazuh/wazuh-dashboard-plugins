@@ -84,7 +84,7 @@ export class AgentsController {
     this.targetLocation = null;
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
-    this.$scope.showSyscheckFiles = false;
+    this.$scope.showNewFim = true;
     this.$scope.showScaScan = false;
 
     this.$scope.editGroup = false;
@@ -345,11 +345,6 @@ export class AgentsController {
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
-    this.$scope.switchSyscheckFiles = () => {
-      this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
-      this.$scope.$applyAsync();
-    };
-
     this.$scope.switchScaScan = () => {
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
@@ -490,7 +485,6 @@ export class AgentsController {
       cardReqs: {}
     }
     try {
-      this.$scope.showSyscheckFiles = false;
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
         this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
@@ -565,6 +559,11 @@ export class AgentsController {
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
+      this.$scope.currentAgentsSectionProps = {
+        switchTab: (tab, force) => this.$scope.switchTab(tab, force),
+        currentTab: this.$scope.tab,
+        agent: this.$scope.agent
+      }
       this.$scope.$applyAsync();
     } catch (error) {
       return Promise.reject(error);
@@ -781,7 +780,7 @@ export class AgentsController {
         { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      
+
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
@@ -791,11 +790,9 @@ export class AgentsController {
         this.$scope.agent.agentPlatform = false;
       }
 
-      this.$scope.syscheckTableProps = {
-        wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-        agentId: this.$scope.agent.id,
-      };
-
+      this.$scope.fimProps = {
+        agent: this.$scope.agent
+      }
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});

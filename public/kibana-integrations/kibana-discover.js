@@ -66,7 +66,8 @@ import {
   tabifyAggResponse,
   vislibSeriesResponseHandlerProvider,
   Vis,
-  registerTimefilterWithGlobalStateFactory
+  registerTimefilterWithGlobalStateFactory,
+  getAngularModule
 } from 'plugins/kibana/discover/kibana_services';
 
 import { generateFilters } from 'plugins/kibana/../../../../plugins/data/public';
@@ -83,6 +84,7 @@ const fetchStatuses = {
 };
 
 const app = uiModules.get('app/discover', []);
+const wazuhApp = getAngularModule('app/wazuh');
 app.run(async (globalState, $rootScope) => {
   const services = await buildServices(npStart.core, npStart.plugins, pluginInstance.docViewsRegistry);
   setServices(services);
@@ -133,6 +135,7 @@ function discoverController(
     toastNotifications,
   } = getServices();
   const wazuhConfig = new WazuhConfig();
+  wazuhApp.discoverScope = $scope;
   //////
   const responseHandler = vislibSeriesResponseHandlerProvider().handler;
   const filterStateManager = new FilterStateManager(globalState, getAppState, filterManager);
@@ -185,6 +188,7 @@ function discoverController(
     filterStateManager.destroy();
     if (filterListener) filterListener();
     if (tabListener) tabListener();
+    delete wazuhApp.discoverScope;
     implicitFilters = null;
   });
 
@@ -1106,12 +1110,6 @@ function discoverController(
 
   const filterListener = $rootScope.$on('wzEventFilters', (evt, parameters) => {
     loadFilters(parameters.filters, parameters.tab);
-  });
-
-  $rootScope.$on('testAGENT', (evt, parameters) => {
-    $scope.updateQueryAndFetch({
-      query: $state.query
-    });
   });
 
   $scope.tabView = $location.search().tabView || 'panels';

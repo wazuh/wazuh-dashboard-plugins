@@ -11,7 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
-import { EuiFlexGroup, EuiFlexItem, EuiPopover, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiToolTip, EuiFormRow } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPopover, EuiIcon, EuiButtonEmpty, EuiCallOut, EuiLoadingSpinner, EuiFormRow } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -25,7 +25,7 @@ import { toastNotifications } from 'ui/notify';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import chrome from 'ui/chrome';
-import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumbWrapper';
+import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -431,7 +431,7 @@ class WzMenu extends Component {
 
     const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
     const mainButton = (
-      <button onClick={() => this.switchMenuOpened()}>
+      <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup direction="row" responsive={false} style={{ paddingTop: 5 }}>
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
             <img src={logotype_url} className="navBarLogo" alt=""></img>

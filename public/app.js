@@ -90,7 +90,7 @@ app.config([
   }
 ]);
 
-app.run(function () {
+app.run(['$injector', function (_$injector) {
   chrome
     .setRootTemplate(`
     <react-component name="WzMenuWrapper" props="" />
@@ -99,6 +99,7 @@ app.run(function () {
   `)
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
-});
+  app.$injector = _$injector;
+}]);
 
 

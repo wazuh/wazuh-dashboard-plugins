@@ -11,7 +11,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import {
   EuiCard,
   EuiIcon,
@@ -19,7 +18,6 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiSpacer,
-  EuiTitle,
   EuiPage
 } from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -31,7 +29,7 @@ import {
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { connect } from 'react-redux';
 
-class WelcomeScreen extends Component {
+class ManagementWelcome extends Component {
   constructor(props) {
     super(props);
 
@@ -58,7 +56,7 @@ class WelcomeScreen extends Component {
   render() {
     return (
       <WzReduxProvider>
-        <EuiPage>
+        <EuiPage className='wz-welcome-page'>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiPanel betaBadgeLabel="Administration">
@@ -178,14 +176,10 @@ class WelcomeScreen extends Component {
   }
 }
 
-WelcomeScreen.propTypes = {
-  switchTab: PropTypes.func
-};
-
 const mapDispatchToProps = (dispatch) => {
   return {
     updateManagementSection: section => dispatch(updateManagementSection(section)),
   }
 };
 
-export default connect(null, mapDispatchToProps)(WelcomeScreen);
+export default connect(null, mapDispatchToProps)(ManagementWelcome);

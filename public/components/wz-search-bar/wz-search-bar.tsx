@@ -10,12 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, KeyboardEvent } from 'react';
-import PropTypes, {InferProps} from 'prop-types';
 import { EuiSuggest } from '../eui-suggest';
+import { WzDatePicker } from '../wz-date-picker';
 import { WzSearchFormatSelector } from './wz-search-format-selector';
 import { WzSearchBadges } from './wz-search-badges';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, OnTimeChangeProps } from '@elastic/eui';
 import { QHandler, qSuggests } from './lib/q-handler';
+import { QTagsHandler } from './lib/q-tags-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
 import { WzSearchButtons, filterButton } from './wz-search-buttons';
 
@@ -25,9 +26,9 @@ export interface suggestItem {
   description?: string
 }
 
-export default class WzSearchBar extends Component {
+export class WzSearchBar extends Component {
   state: {
-    searchFormat: string
+    searchFormat: 'API' | '?Q' | 'qTags'
     suggestions: suggestItem[]
     isProcessing: boolean
     inputValue: string
@@ -38,14 +39,15 @@ export default class WzSearchBar extends Component {
     filters: {}
     isPopoverOpen: boolean
   };
-  suggestHandler!: QHandler | ApiHandler;
+  suggestHandler!: QHandler | ApiHandler | QTagsHandler;
   props!:{
-    qSuggests: qSuggests[]
-    apiSuggests: apiSuggests[]
+    qSuggests: qSuggests[] | null
+    apiSuggests: apiSuggests[] | null
     onInputChange: Function
+    onTimeChange?(props:OnTimeChangeProps): void
     buttonOptions?: filterButton[]
     searchDisable?: boolean
-    defaultFormat?: string
+    defaultFormat?: 'API' | '?Q' | 'qTags'
     placeholder?: string
     initFilters?: {}
     noDeleteFiltersOnUpdateSuggests?: boolean
@@ -81,11 +83,20 @@ export default class WzSearchBar extends Component {
   selectSuggestHandler(searchFormat):void {
     const { noDeleteFiltersOnUpdateSuggests } = this.props;
     const { filters } = this.state;
-    if(searchFormat === '?Q') {
-      this.suggestHandler = new QHandler(this.props.qSuggests);
-    } else {
-      this.suggestHandler = new ApiHandler(this.props.apiSuggests);
+    switch (searchFormat) {
+      case '?Q':
+        this.suggestHandler = new QHandler(this.props.qSuggests);
+        break;
+      case 'qTags':
+        this.suggestHandler = new QTagsHandler(this.props.qSuggests);
+        break;
+      case 'API':
+        this.suggestHandler = new ApiHandler(this.props.apiSuggests);
+        break;
+      default:
+        break;
     }
+
     this.setState({ 
       isProcessing: true, 
       suggestions: [], 
@@ -96,6 +107,7 @@ export default class WzSearchBar extends Component {
   }
 
   async componentDidMount() {
+    this.props.onInputChange(this.state.filters);
     this.selectSuggestHandler(this.state.searchFormat);
     if(this.state.searchFormat) {
       const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
@@ -127,7 +139,10 @@ export default class WzSearchBar extends Component {
     if (this.updateSuggestOnProps(nextProps.qSuggests, nextProps.apiSuggests)){
       return true;
     }
-    return true; // if false, it dont't update search field in Search bar in CDB lists section, maybe it would have to remove the function because always returns true (ReactComponent.shouldComponentUpdate returns true by default too)
+    if (JSON.stringify(this.state.suggestions) !== JSON.stringify(nextState.suggestions)){
+      return true;
+    }
+    return false;
   }
 
   async componentDidUpdate(prevProps) {
@@ -135,24 +150,16 @@ export default class WzSearchBar extends Component {
       this.selectSuggestHandler(this.state.searchFormat);
     }
 
-    const { isProcessing } = this.state;
-    if (!isProcessing){
-      return;
-    }
+    if (!this.state.isProcessing) { return;}
     const { inputValue, isInvalid, searchFormat } = this.state;
-    const { searchDisable } = this.props;
     if (isInvalid) {
       this.buildSuggestInvalid();
     } else {
       const suggestsItems = !!searchFormat ?
         [...await this.suggestHandler.buildSuggestItems(inputValue)]
         : [];
-      const isSearchEnabled = (this.suggestHandler.inputStage === 'fields'
-        && !searchDisable
-        && inputValue !== '')
-        || !searchFormat;
 
-      if (isSearchEnabled) {
+      if (this.isSearchEnabled()) {
         const suggestSearch = this.buildSuggestFieldsSearch();
         suggestSearch && suggestsItems.unshift(suggestSearch);
       }
@@ -163,6 +170,14 @@ export default class WzSearchBar extends Component {
         isProcessing: false,
       });
     }
+  }
+
+  isSearchEnabled() {
+    const { searchFormat} = this.state;
+    const { searchDisable } = this.props;
+    return ((this.suggestHandler || {}).inputStage === 'fields'
+    && !searchDisable)
+    || !searchFormat;
   }
 
   buildSuggestInvalid() {
@@ -180,7 +195,7 @@ export default class WzSearchBar extends Component {
 
   buildSuggestFieldsSearch():suggestItem | undefined {
     const { inputValue, searchFormat } = this.state;
-    if (this.suggestHandler.isSearch || !searchFormat ) {
+    if ((this.suggestHandler || {}).isSearch || !searchFormat) {
       const searchSuggestItem: suggestItem = {
         type: { iconType: 'search', color: 'tint8' },
         label: inputValue,
@@ -190,7 +205,7 @@ export default class WzSearchBar extends Component {
     }
   }
 
-  makeSearch(item:suggestItem):void {
+  makeSearch():void {
     const { inputValue, filters:currentFilters } = this.state;
     const filters = {...currentFilters};
 
@@ -267,7 +282,7 @@ export default class WzSearchBar extends Component {
     const { searchDisable } = this.props;
     let filters = {};
     let newInputValue = '';
-    if ((this.suggestHandler.isSearch && !searchDisable)|| !searchFormat) {
+    if (((this.suggestHandler || {}).isSearch && !searchDisable)|| !searchFormat) {
       filters = {
         ...currentFilters,
         ['search']: inputValue,
@@ -288,15 +303,13 @@ export default class WzSearchBar extends Component {
 
   onItemClick(item: suggestItem) {
     if (item.type.iconType === 'search') {
-      this.makeSearch(item);
+      this.makeSearch();
     } else {
       this.makeFilter(item);
     }
   }
 
-  onDeleteBadge(badge) {
-    const { filters } = this.state;
-    delete filters[badge.field];
+  onChangeBadge(filters) {
     this.props.onInputChange(filters);
     this.setState({filters, isProcessing: true});
   }
@@ -327,6 +340,9 @@ export default class WzSearchBar extends Component {
   renderFormatSelector() {
     const { qSuggests, apiSuggests } = this.props;
     const { searchFormat } = this.state;
+    if (searchFormat === 'qTags') {
+      return;
+    }
     const qFilterEnabled = !!qSuggests;
     const apiFilterEnabled = !!apiSuggests;
     if (!qFilterEnabled && !apiFilterEnabled) {
@@ -348,13 +364,14 @@ export default class WzSearchBar extends Component {
       filters,
       isPopoverOpen
     } = this.state;
-    const { placeholder, buttonOptions } = this.props;
+    const { placeholder, buttonOptions, qSuggests, onTimeChange } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
+    !!onTimeChange && import('./src/style/wz-date-picker.less');
     return (
       <div>
         <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem className="wz-search-bar">
             <EuiSuggest
               status={status}
               value={inputValue}
@@ -370,18 +387,26 @@ export default class WzSearchBar extends Component {
               placeholder={placeholder}
             />
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <WzSearchButtons
-              options={buttonOptions || []}
-              filters={filters}
-              onChange={this.onButtonPress.bind(this)} />
-          </EuiFlexItem>
+          {!!buttonOptions &&
+            <EuiFlexItem grow={false}>
+              <WzSearchButtons
+                options={buttonOptions || []}
+                filters={filters}
+                onChange={this.onButtonPress.bind(this)} />
+            </EuiFlexItem>
+          }
+          {onTimeChange &&
+            <EuiFlexItem grow={false}  className="wz-date-picker">
+              <WzDatePicker onTimeChange={onTimeChange} />
+            </EuiFlexItem>
+          }
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <WzSearchBadges
               filters={formatedFilter}
-              onChange={this.onDeleteBadge.bind(this)} />
+              onChange={this.onChangeBadge.bind(this)}
+              qSuggests={qSuggests} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>

@@ -282,14 +282,13 @@ export class AgentsTable extends Component {
       icon = 'apple'
     }
     const os_name = checkField(((agent || {}).os || {}).name)
-      + checkField(((agent || {}).os || {}).version);
+      + ' ' + checkField(((agent || {}).os || {}).version);
 
     return (
       <span className="euiTableCellContent__text euiTableCellContent--truncateText">
         <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
       </span>
-    );
-
+    );    
   }
 
   addHealthStatusRender(status) {

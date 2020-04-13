@@ -27,8 +27,6 @@ export default class EnableModules extends Component {
           modules: [
             { name: 'general', default: true, agent: false },
             { name: 'fim', default: true, agent: false },
-            { name: 'configuration', default: true, agent: true },
-            { name: 'syscollector', default: true, agent: true },
             { name: 'aws', default: false, agent: false }
           ]
         },

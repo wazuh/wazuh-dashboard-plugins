@@ -5,8 +5,6 @@ include ./agents-pm.html
 include ./agents-mitre.html
 include ./agents-syscollector.html
 include ./agents-sca.html
-<div ng-if="tab === 'configuration' && agent" style="margin-top: 10px;">
-  <react-component ng-if="tab === 'configuration' && agent" name="WzManagementConfiguration" props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"/>
-</div>
+<react-component ng-if="tab === 'configuration' && agent" name="WzManagementConfiguration" props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"/>
 include ./dashboards.html
 include ../footer.foot

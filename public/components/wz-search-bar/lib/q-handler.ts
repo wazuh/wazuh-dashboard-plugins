@@ -13,12 +13,11 @@
 import { BaseHandler } from './base-handler';
 import { QInterpreter, queryObject } from './q-interpreter';
 import { suggestItem } from '../wz-search-bar';
-import value from '@elastic/eui/dist/eui_theme_*.json';
 
 export interface qSuggests {
   label: string
-  description: string
-  operators?: string[]
+  description?: string
+  operators?: ('=' | '!=' | '<' | '>' | '~')[]
   values: Function | [] | undefined
 }
 
@@ -44,7 +43,7 @@ export class QHandler extends BaseHandler {
     this.isSearch = false;
     if (this.inputStage === 'fields' || inputValue === ''){
       const qInterpreter = new QInterpreter(inputValue);
-      this.isSearch = qInterpreter.qNumber() <= 1;
+      this.isSearch = qInterpreter.qNumber() <= 0;
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'operators') {
       return this.buildSuggestOperators(inputValue);
@@ -79,6 +78,7 @@ export class QHandler extends BaseHandler {
     const rawSuggestions:string[] = typeof values === 'function'
       ? await values(value)
       : values;
+    //@ts-ignore
     const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
     const suggestions:suggestItem[] = [];
 
