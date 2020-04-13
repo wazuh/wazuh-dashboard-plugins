@@ -15,16 +15,10 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiBasicTable,
-  EuiFlyout,
-  EuiFlyoutHeader,
-  EuiFlyoutBody,
-  EuiTitle,
-  
   Direction,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
-import { AppState } from '../../../../react-services/app-state';
-import { FileDetails } from './fileDetail';
+import { FlyoutDetail } from './flyout';
 import './states.less';
 
 export class StatesTable extends Component {
@@ -39,8 +33,7 @@ export class StatesTable extends Component {
     isLoading: boolean,
     currentFile: {
       file: string
-    },
-    clusterFilter: Object
+    }
   };
 
   props!: {
@@ -62,18 +55,11 @@ export class StatesTable extends Component {
       isFlyoutVisible: false,
       currentFile: {
         file: ""
-      },
-      clusterFilter: {}
+      }
     }
   }
 
   async componentDidMount() {
-    const isCluster = (AppState.getClusterInfo() || {}).status === "enabled" ;
-    const clusterFilter =  isCluster
-    ? { "cluster.name" :AppState.getClusterInfo().cluster }
-    : { "manager.name" : AppState.getClusterInfo().manager };
-    this.setState({clusterFilter});
-
     await this.getSyscheck();
   }
 
@@ -86,7 +72,7 @@ export class StatesTable extends Component {
       return item.file === file;
     });
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
   componentDidUpdate(prevProps) {
@@ -254,27 +240,17 @@ export class StatesTable extends Component {
 
   render() {
     const filesTable = this.renderFilesTable();
-    let flyout;
-
-    if (this.state.isFlyoutVisible) {
-      flyout = (
-        <EuiFlyout onClose={() => this.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
-          <EuiFlyoutHeader hasBorder className="flyout-header" >
-            <EuiTitle size="s">
-              <h2 id="flyoutTitle">{this.state.currentFile.file}</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody className="flyout-body" >
-            <FileDetails currentFile={this.state.currentFile} {...this.props} implicitFilters={[{'rule.groups': "syscheck"}, { 'syscheck.path': this.state.currentFile.file }, {'agent.id': this.props.agent.id}, this.state.clusterFilter]}/>
-          </EuiFlyoutBody>
-        </EuiFlyout>
-      );
-    }
-
     return (
       <div>
         {filesTable}
-        {flyout}
+        {this.state.isFlyoutVisible &&
+          <FlyoutDetail
+            fileName={this.state.currentFile.file}
+            agentId={this.props.agent.id}
+            closeFlyout={() => this.closeFlyout()}
+            {...this.props}>
+          </FlyoutDetail>
+        }
       </div>
     )
   }

@@ -1,4 +1,4 @@
-<div ng-if="tab === 'fim'">
+<div ng-if="tab === 'fim' && agent">
     <react-component name="MainFim" props="fimProps" />
     <div ng-if='!loadingDashboard'>
         <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
