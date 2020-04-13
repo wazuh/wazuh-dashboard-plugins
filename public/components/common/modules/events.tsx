@@ -11,31 +11,12 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import ReactDOM from 'react-dom';
-import {
-  EuiButtonEmpty,
-} from '@elastic/eui';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { EventsSelectedFiles } from './events-selected-fields'
-import { FlyoutDetail } from '../../agents/fim/states/flyout';
+import { EventsFim } from '../../agents/fim/events';
 export class Events extends Component {
-  state: {
-    isFlyoutVisible: Boolean
-  };
   constructor(props) {
     super(props);
-    this.state = {
-      isFlyoutVisible: false,
-    }
-  }
-
-  async getRowsField(scope, index) {
-    this.elements = document.querySelectorAll(`.kbn-table tbody tr td:nth-child(${index}) div`);
-    if ((scope.rows || []).length && (this.elements || {}).length) {
-      this.forceUpdate();
-    } else if ((scope.rows || []).length) {
-      setTimeout(() => { this.getRowsField(scope, index) }, 200);
-    }
   }
 
   async getDiscoverScope() {
@@ -48,10 +29,6 @@ export class Events extends Component {
           app.discoverScope.addColumn(field);
         }
       });
-      app.discoverScope.$watchCollection('rows',
-        () => {
-          this.getRowsField(app.discoverScope, 3);
-        });
     } else {
       setTimeout(() => { this.getDiscoverScope() }, 200);
     }
@@ -70,47 +47,11 @@ export class Events extends Component {
     this.$rootScope.$applyAsync();
   }
 
-  showFlyout(file) {
-    //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file }));
-  }
-  closeFlyout() {
-    this.setState({ isFlyoutVisible: false, currentFile: false });
-  }
-
   render() {
     return (
       <Fragment>
-        {this.elements &&
-          [...this.elements].map(element => {
-            const file = element.textContent;
-            if (element.firstChild.tagName === 'SPAN') {
-              element.removeChild(element.firstChild);
-            }
-            return (
-              ReactDOM.createPortal(
-                <Fragment>
-                  <EuiButtonEmpty
-                    style={{ height: 20, fontSize: '12px' }}
-                    size="xs"
-                    onClick={() => this.showFlyout(file)}>
-                    {file}
-                  </EuiButtonEmpty>
-                </Fragment>
-                ,
-                element
-              )
-            )
-          }
-          )
-        }
-        {this.state.isFlyoutVisible &&
-          <FlyoutDetail
-            fileName={this.state.currentFile}
-            agentId={this.props.agent.id}
-            closeFlyout={() => this.closeFlyout()}
-            {...this.props}>
-          </FlyoutDetail>
+        {this.props.section === 'fim' &&
+          <EventsFim {...this.props}></EventsFim>
         }
       </Fragment>
     )

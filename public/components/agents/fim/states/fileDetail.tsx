@@ -191,15 +191,17 @@ export class FileDetails extends Component {
               <h2>File events</h2>
             </EuiTitle>
           </EuiFlexItem>
-          <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
-            <EuiButtonEmpty onClick={() => this.viewInEvents()} className="view-in-events-btn">
-              View in Events
+          {this.props.showViewInEvents &&
+            <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
+              <EuiButtonEmpty onClick={() => this.viewInEvents()} className="view-in-events-btn">
+                View in Events
             </EuiButtonEmpty>
-          </EuiFlexItem>
+            </EuiFlexItem>
+          }
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Discover implicitFilters={this.props.implicitFilters} initialFilters={[]}/>
+            <Discover implicitFilters={this.props.implicitFilters} initialFilters={[]} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
