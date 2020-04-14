@@ -11,7 +11,7 @@ export class States extends Component {
   constructor(props) {
     super(props);
     const { agent } = this.props;
-    this.state = { agent, itemIdToExpandedRowMap: {}, showChecksum: false, loading: false }
+    this.state = { agent, itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false }
     this.policies = [];
     this.wzReq = WzRequest;
     this.timeService = TimeService;
@@ -334,8 +334,8 @@ export class States extends Component {
                             iconType="iInCircle"
                             iconSize="m"
                             aria-label="Help"
-                            onClick={() => this.setState({ showChecksum: !this.state.showChecksum })}>
-                            Checksum
+                            onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}>
+                            More info
                           </EuiButtonEmpty>
                         </EuiToolTip>
                       </h2>
@@ -355,12 +355,14 @@ export class States extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
-                {(this.state.showChecksum &&
+                {(this.state.showMoreInfo &&
                   <div>
-                    <EuiSpacer size="m" />
+                    <EuiSpacer size="s" />
                     <EuiText>
                       <pre>
-                        <code>Policy checksum: {this.state.lookingPolicy.hash_file}</code>
+                        <code><b>Policy description:</b> {this.state.lookingPolicy.description}</code>
+                        <br></br>
+                        <code><b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}</code>
                       </pre>
                     </EuiText>
                   </div>
