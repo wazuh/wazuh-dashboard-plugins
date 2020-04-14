@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Pie } from "../../d3/pie";
 import {
   EuiFlexItem, EuiFlexGroup, EuiPanel, EuiPage, EuiBasicTable, EuiInMemoryTable, EuiSpacer, EuiText, EuiProgress,
@@ -7,7 +7,7 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 
-export class ScaDashboard extends Component {
+export class States extends Component {
   constructor(props) {
     super(props);
     const { agent } = this.props;
@@ -60,7 +60,7 @@ export class ScaDashboard extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: 50
+        width: 100
       },
       {
         field: 'title',
@@ -267,20 +267,25 @@ export class ScaDashboard extends Component {
     };
 
     return (
-      <div>
-        {(this.state.loading &&
-          <EuiProgress size="xs" color="primary" style={{ margin: 16 }} />
-        )}
-        {((this.state.agent && (this.state.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
-          <EuiCallOut title="No scans available" iconType="iInCircle" style={{ margin: 16 }}>
-            <EuiButton color="primary" onClick={() => this.initialize()}>
-              Refresh
+      <Fragment>
+        <div>
+          {(this.state.loading &&
+            <div style={{ margin: 16 }}>
+              <EuiSpacer size="m" />
+              <EuiProgress size="xs" color="primary" />
+            </div>
+          )}
+        </div>
+        <EuiPage>
+          {((this.state.agent && (this.state.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
+            <EuiCallOut title="No scans available" iconType="iInCircle">
+              <EuiButton color="primary" onClick={() => this.initialize()}>
+                Refresh
            </EuiButton>
-          </EuiCallOut>
-        )}
-        {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
-          <div>
-            <EuiPage>
+            </EuiCallOut>
+          )}
+          {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
+            <div>
               {((this.state.data || []).length &&
                 <EuiFlexGroup style={{ 'marginTop': 0 }}>
                   {(this.state.data || []).map((pie, idx) => (
@@ -292,8 +297,7 @@ export class ScaDashboard extends Component {
                   ))}
                 </EuiFlexGroup>
               )}
-            </EuiPage>
-            <EuiPage style={{ paddingTop: 0 }}>
+              <EuiSpacer size="m" />
               <EuiPanel paddingSize="l">
                 <EuiFlexGroup>
                   <EuiFlexItem>
@@ -305,34 +309,34 @@ export class ScaDashboard extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPanel>
-            </EuiPage>
-          </div>
-        )}
-        {((this.state.agent && (this.state.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
-          <div>
-            <EuiPage>
+            </div>
+          )}
+          {((this.state.agent && (this.state.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
+            <div>
               <EuiPanel paddingSize="l">
                 <EuiFlexGroup>
                   <EuiFlexItem grow={false}>
                     <EuiButtonIcon
                       color='primary'
                       iconSize='l'
-                      style={{ padding: '6px' }}
+                      style={{ padding: '6px 0px' }}
                       onClick={() => this.loadScaPolicy(false)}
                       iconType="arrowLeft"
                       aria-label="Back to policies"
                     />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiTitle>
+                    <EuiTitle
+                      size="s">
                       <h2>{this.state.lookingPolicy.name}&nbsp;
                         <EuiToolTip position="right" content="Show policy checksum">
-                          <EuiButtonIcon
+                          <EuiButtonEmpty
                             iconType="iInCircle"
-                            iconSize="l"
+                            iconSize="m"
                             aria-label="Help"
-                            onClick={() => this.setState({ showChecksum: !this.state.showChecksum })}
-                          />
+                            onClick={() => this.setState({ showChecksum: !this.state.showChecksum })}>
+                            Checksum
+                          </EuiButtonEmpty>
                         </EuiToolTip>
                       </h2>
                     </EuiTitle>
@@ -397,10 +401,10 @@ export class ScaDashboard extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPanel>
-            </EuiPage>
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </EuiPage>
+      </Fragment>
     );
   }
 }

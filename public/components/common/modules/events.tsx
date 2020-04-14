@@ -21,9 +21,9 @@ export class Events extends Component {
 
   async getDiscoverScope() {
     const app = getAngularModule('app/wazuh');
-    if (app.discoverScope && app.discoverScope.addColumn) {
+    const fields = EventsSelectedFiles[this.props.section];
+    if (fields && app.discoverScope && app.discoverScope.addColumn) {
       app.discoverScope.state.columns = [];
-      const fields = EventsSelectedFiles[this.props.section];
       fields.forEach(field => {
         if (!app.discoverScope.state.columns.includes(field)) {
           app.discoverScope.addColumn(field);

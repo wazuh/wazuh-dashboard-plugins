@@ -1,5 +1,5 @@
 <div ng-if="tab === 'fim' && agent">
-    <react-component name="MainFim" props="fimProps" />
+    <react-component name="MainFim" props="{agent}" />
     <div ng-if='!loadingDashboard'>
         <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
             <kbn-dis></kbn-dis>

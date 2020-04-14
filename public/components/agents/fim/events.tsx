@@ -92,7 +92,8 @@ export class EventsFim extends Component {
                 ReactDOM.createPortal(
                   <Fragment>
                     <a
-                      href={`#/manager/rules?tab=rules&redirectRule=${text}`} target="_blank">
+                      href={`#/manager/rules?tab=rules&redirectRule=${text}`} target="_blank"
+                      style={{ minWidth: 55, display: 'block' }}>
                       {text}
                     </a>
                   </Fragment>

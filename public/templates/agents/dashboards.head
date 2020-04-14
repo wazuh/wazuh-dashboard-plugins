@@ -1,5 +1,5 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-    <div ng-if="tab !== 'fim' && tab !== 'welcome' && tab !== 'configuration'">
+    <div ng-if="tab !== 'fim' && tab !== 'sca' && tab !== 'welcome' && tab !== 'configuration'">
         <!-- Navigation section -->
         <div layout="row" layout-align="start center" ng-if="agent" style="padding: 10px 0px 2px 4px">
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
