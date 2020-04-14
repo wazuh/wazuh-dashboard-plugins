@@ -900,7 +900,7 @@ export class WazuhElasticCtrl {
         `Added sample alerts to ${sampleAlertsIndex} index`,
         'debug'
       );
-      return sampleAlerts      
+      return { index: sampleAlertsIndex, alerts: sampleAlerts, count: sampleAlerts.length }
     }catch(error){
       log(
         'wazuh-elastic:createSampleAlerts',
@@ -938,7 +938,7 @@ export class WazuhElasticCtrl {
           `Deleted ${sampleAlertsIndex} index`,
           'debug'
         );
-        return { result: `Deleted ${sampleAlertsIndex} index` };
+        return { result: `deleted`, index: sampleAlertsIndex };
       }else{
         return ErrorResponse(`${sampleAlertsIndex} index doesn't exist`, 1000, 500, reply)
       }

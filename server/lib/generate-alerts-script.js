@@ -31,14 +31,14 @@ const auditExe = ["/usr/sbin/sudo", "/usr/sbin/sshd", "/usr/sbin/crond", "/usr/b
 const auditFileName = ["/etc/samplefile", "/etc/sample/file", "/var/sample"];
 
 // CIS-CAT
-const ciscatRuleTitle = ["Sample CIS-CAT 1", "Sample CIS-CAT 2"];
-const ciscatGroup = ["Access", "Authentication", "Authorization"];
-const ciscatNotchecked = ["yes", "no"];
-const ciscatPass = ["yes", "no"];
-const ciscatFail = ["yes", "no"];
-const ciscatBenchmark = ["yes", "no"];
-const ciscatUnknown = ["yes", "no"];
-const ciscatResult = ["yes", "no"];
+const ciscatRuleTitle = ["Sample CIS-CAT 1", "Sample CIS-CAT 2", "Sample CIS-CAT 3", "Sample CIS-CAT 4", "Sample CIS-CAT 5", "Sample CIS-CAT 6"];
+const ciscatGroup = ["Access, Authentication and Authorization"];
+const ciscatNotchecked = ["yes", "no"]; //FIXME: is this yes/no?
+const ciscatPass = ["yes", "no"]; //FIXME: is this yes/no?
+const ciscatFail = ["yes", "no"]; //FIXME: is this yes/no?
+const ciscatBenchmark = ["yes", "no"]; //FIXME: is this yes/no?
+const ciscatUnknown = ["yes", "no"]; //FIXME: is this yes/no?
+const ciscatResult = ["fail", "error"];//FIXME: fail seems to exists, but error is valid?
 
 // Docker listener
 const dockerActorAttributesImage = ["wazuh/wazuh:3.12.0-7.6.1", "docker.elastic.co/elasticsearch/elasticsearch:7.6.2", "docker.elastic.co/kibana/kibana:7.6.2", "nginx:latest"];
@@ -84,8 +84,8 @@ const pmTitle = ["Sample policy monitoring 1", "Sample policy monitoring 2", "Sa
 const virustotalSourceFile = ['/usr/share/sample/program', "/etc/data/file", "/etc/sample/script", "/root/super-script", "/bin/node", "/var/opt/amazing-file"];
 const virustotalPermalink = ['https://www.virustotal.com/gui/file/0a049436fa6c103d4e413fc3a5a8f7152245a36750773a19fdd32f5f6e278347/detection', "https://www.virustotal.com/gui/file/417871ee18a4c782df7ae9b7a64ca060547f7c88a4a405b2fa2487940eaa3c31/detection", "https://www.virustotal.com/gui/file/1bbf37332af75ea682fb4523afc8e61adb22f47f2bf3a8362e310f6d33085a6e/detection", "https://www.virustotal.com/gui/file/e68cda15a436dfcbbabb42c232afe6caa88076c8cb7bc107b6cfe8a08f6044dc/detection", "https://www.virustotal.com/gui/file/509790d92c2c8846bf4ffacfb03c4f8817ac548262c70c13b08ef5cdfba6f596/detection"];
 const virustotalSourceMd5 = ["31ce29c49fcbfdb6529619dd4396f86f", "01e24436a87c7e243322db106b963fb7", "0af7650be50a47adb8dcf9c00d210ad9", "a30529c04af5fef076781585ccec4810", "8692d6cc1108db34cd55ce904a991d06", "702be1ff0a5bd7f8f32ab276b87e8d38", "c6d9876d5d92a422525d11f267d37abb"];
-const virustotalMalicious = ["10", ""];
-const virustotalPositives = ["system_info", "pack_incident-response_logged_in_users"];
+const virustotalMalicious = ["0", "1"];
+const virustotalPositives = ["0", "1"];
 
 // Vulnerability
 const vulnerabilitySeverity = ["low", "medium", "high", "critical"];
@@ -220,6 +220,15 @@ function generateAlert(params) {
         }
     }
 
+    if (params.cluster) {
+        if (params.cluster.name) {
+            alert.cluster.name = params.cluster.name;
+        }
+        if (params.cluster.node) {
+            alert.cluster.node = params.cluster.node;
+        }
+    }
+
     if (params.aws) {
         alert.rule.groups.push("amazon");
         alert.data.aws = {};
@@ -253,7 +262,7 @@ function generateAlert(params) {
         alert.data.cis.score = randomInterval(0, 100);
         alert.data.cis.pass = getRandomFromArray(ciscatPass);
         alert.data.cis.timestamp = randomDate();
-        alert.data.cis.error = getRandomFromArray(ciscatFail);
+        alert.data.cis.error = randomInterval(0, 1);
         alert.data.cis.benchmark = getRandomFromArray(ciscatBenchmark);
         alert.data.cis.unknown = getRandomFromArray(ciscatUnknown);
         alert.data.cis.result = getRandomFromArray(ciscatResult);
@@ -315,8 +324,7 @@ function generateAlert(params) {
         alert.data.virustotal.permalink = getRandomFromArray(virustotalPermalink);;
         alert.data.virustotal.source.md5 = getRandomFromArray(virustotalSourceMd5);
         alert.data.virustotal.malicious = getRandomFromArray(virustotalMalicious);
-        alert.data.virustotal.malicious = randomInterval(false,true); //TODO: is string or some falsy/truthy
-        alert.data.virustotal.positives = randomInterval(0,1); //TODO: is string or some falsy/truthy
+        alert.data.virustotal.positives = getRandomFromArray(virustotalPositives);
     }
 
     if (params.vulnerabilities) {
@@ -436,7 +444,7 @@ function randomDate() {
     let randomHour = lastWeek.getHours();
     let randomMinutes = lastWeek.getMinutes();
     let randomSeconds = lastWeek.getSeconds();
-    let randomMiliSeconds = lastWeek.getMiliSeconds();
+    let randomMilliSeconds = lastWeek.getMilliseconds();
 
     let randomMonthFormatted = ("00" + randomMonth.toString()).slice(-2);
     let randomDayFormatted = ("00" + randomDay.toString()).slice(-2);
@@ -444,9 +452,9 @@ function randomDate() {
     let randomHourFormatted = ("00" + randomHour.toString()).slice(-2);
     let randomMinutesFormatted = ("00" + randomMinutes.toString()).slice(-2);
     let randomSecondsFormatted = ("00" + randomSeconds.toString()).slice(-2);
-    let randomMiliSecondsFormatted = ("000" + randomMiliSeconds.toString()).slice(-3);
+    let randomMilliSecondsFormatted = ("000" + randomMilliSeconds.toString()).slice(-3);
 
-    return randomYearFormatted + "-" + randomMonthFormatted + "-" + randomDayFormatted + "T" + randomHourFormatted + ":" + randomMinutesFormatted + ":" + randomSecondsFormatted + "." + randomMiliSecondsFormatted + "+0000";
+    return randomYearFormatted + "-" + randomMonthFormatted + "-" + randomDayFormatted + "T" + randomHourFormatted + ":" + randomMinutesFormatted + ":" + randomSecondsFormatted + "." + randomMilliSecondsFormatted + "+0000";
 }
 
 export {

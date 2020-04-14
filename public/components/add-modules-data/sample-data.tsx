@@ -100,7 +100,8 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         name: managerInfo.data.data.name
       }
       this.generateAlertsParams.cluster = {
-        name: managerInfo.data.data.cluster.name
+        name: managerInfo.data.data.cluster.name,
+        node: managerInfo.data.data.cluster.node_name
       } 
       
     }catch(error){
