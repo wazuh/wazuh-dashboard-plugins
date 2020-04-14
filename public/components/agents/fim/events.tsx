@@ -12,9 +12,6 @@
 
 import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
-import {
-  EuiButtonEmpty,
-} from '@elastic/eui';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { FlyoutDetail } from './states/flyout';
 export class EventsFim extends Component {
@@ -28,12 +25,29 @@ export class EventsFim extends Component {
     }
   }
 
-  async getRowsField(scope, index) {
-    this.elements = document.querySelectorAll(`.kbn-table tbody tr td:nth-child(${index}) div`);
+  async getRowsField(scope) {
+    this.indices = [];
+    this.cols = document.querySelectorAll(`.kbn-table thead th`);
+    if (!(this.cols || []).length) {
+      setTimeout(() => { this.getRowsField(scope) }, 1000);
+    }
+    this.cols.forEach((col, idx) => {
+      if (['syscheck.path', 'rule.id'].includes(col.textContent)) {
+        this.indices.push(idx + 1);
+      }
+    });
+    let query = '';
+    this.indices.forEach((position, idx) => {
+      query += `.kbn-table tbody tr td:nth-child(${position}) div`
+      if (idx !== this.indices.length - 1) {
+        query += ', ';
+      }
+    });
+    this.elements = document.querySelectorAll(query);
     if ((scope.rows || []).length && (this.elements || {}).length) {
       this.forceUpdate();
     } else if ((scope.rows || []).length) {
-      setTimeout(() => { this.getRowsField(scope, index) }, 1000);
+      setTimeout(() => { this.getRowsField(scope) }, 1000);
     }
   }
 
@@ -44,7 +58,7 @@ export class EventsFim extends Component {
         () => {
           if (app.discoverScope.fetchStatus === 'complete') {
             this.elements = false;
-            setTimeout(() => { this.getRowsField(app.discoverScope, 3) }, 1000);
+            setTimeout(() => { this.getRowsField(app.discoverScope) }, 1000);
           }
         });
     } else {
@@ -68,21 +82,34 @@ export class EventsFim extends Component {
     return (
       <Fragment>
         {this.elements &&
-          [...this.elements].map(element => {
-            const file = element.textContent;
+          [...this.elements].map((element, idx) => {
+            const text = element.textContent;
             if (element.firstChild.tagName === 'SPAN') {
               element.removeChild(element.firstChild);
             }
             return (
-              ReactDOM.createPortal(
-                <Fragment>
-                  <a
-                    onClick={() => this.showFlyout(file)}>
-                    {file}
-                  </a>
-                </Fragment>
-                ,
-                element
+              idx % 2 && (
+                ReactDOM.createPortal(
+                  <Fragment>
+                    <a
+                      href={`#/manager/rules?tab=rules&redirectRule=${text}`} target="_blank">
+                      {text}
+                    </a>
+                  </Fragment>
+                  ,
+                  element
+                )
+              ) || (
+                ReactDOM.createPortal(
+                  <Fragment>
+                    <a
+                      onClick={() => this.showFlyout(text)}>
+                      {text}
+                    </a>
+                  </Fragment>
+                  ,
+                  element
+                )
               )
             )
           }
