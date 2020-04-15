@@ -3,15 +3,11 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiButton,
-  EuiHealth,
   EuiTab,
   EuiTabs,
-  EuiTitle,
-  EuiToolTip,
 } from '@elastic/eui';
 import { States, Settings } from './index';
 import { Events, Loader } from '../../common/modules';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 
 export class MainSca extends Component {
   state: {
@@ -28,29 +24,6 @@ export class MainSca extends Component {
     this.state = {
       selectView: 'states',
     };
-  }
-
-  color = (status) => {
-    if (status.toLowerCase() === 'active') { return 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
-  }
-
-  renderTitle() {
-    return (
-      <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-title">
-          <EuiTitle size="s">
-            <h1>
-              <EuiToolTip position="right" content={this.props.agent.status}>
-                <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
-              </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id}) - <b>Security configuration assessment</b>
-            </h1>
-          </EuiTitle>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    );
   }
 
   renderTabs() {
@@ -85,15 +58,6 @@ export class MainSca extends Component {
     );
   }
 
-  getDiscoverScope() {
-    const app = getAngularModule('app/wazuh');
-    if (app.discoverScope) {
-      app.discoverScope.updateQueryAndFetch({ query: null });
-    } else {
-      setTimeout(() => { this.getDiscoverScope() }, 200);
-    }
-  }
-
   loadSection(id) {
     this.setState({ selectView: id });
   }
@@ -112,31 +76,27 @@ export class MainSca extends Component {
 
   render() {
     const { selectView } = this.state;
-    const title = this.renderTitle();
     const tabs = this.renderTabs();
     const settingsButton = this.renderSettingsButton();
     return (
       <Fragment>
-        <div className='wz-module'>
-          <div className='wz-module-header-wrapper'>
-            <div className='wz-module-header'>
-              {title}
-              <EuiFlexGroup>
-                {tabs}
-                {settingsButton}
-              </EuiFlexGroup>
-            </div>
+        <div className='wz-module-header-wrapper wz-module-header-wrapper-nav'>
+          <div className='wz-module-header wz-module-header-nav'>
+            <EuiFlexGroup>
+              {tabs}
+              {settingsButton}
+            </EuiFlexGroup>
           </div>
-          <div className='wz-module-body'>
-            {selectView === 'states' && <States {...this.props} />}
-            {selectView === 'events' && <Events {...this.props} section='sca' />}
-            {selectView === 'loader' &&
-              <Loader {...this.props}
-                loadSection={(section) => this.loadSection(section)}
-                redirect={this.afterLoad}>
-              </Loader>}
-            {selectView === 'settings' && <Settings {...this.props} />}
-          </div>
+        </div>
+        <div className='wz-module-body'>
+          {selectView === 'states' && <States {...this.props} />}
+          {selectView === 'events' && <Events {...this.props} section='sca' />}
+          {selectView === 'loader' &&
+            <Loader {...this.props}
+              loadSection={(section) => this.loadSection(section)}
+              redirect={this.afterLoad}>
+            </Loader>}
+          {selectView === 'settings' && <Settings {...this.props} />}
         </div>
       </Fragment>
     );

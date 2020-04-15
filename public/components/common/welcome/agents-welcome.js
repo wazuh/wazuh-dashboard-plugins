@@ -85,7 +85,7 @@ export class AgentsWelcome extends Component {
     return (
       <div className='wz-module'>
         <div className='wz-module-header-wrapper'>
-          <div className='wz-module-header wz-module-header-main'>
+          <div className='wz-module-header wz-module-header-main wz-module-header-agent-title'>
             {title}
           </div>
         </div>
