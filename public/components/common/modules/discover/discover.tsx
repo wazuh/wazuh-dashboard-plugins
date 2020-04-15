@@ -24,8 +24,8 @@ import {
 } from '@elastic/eui';
 
 import './discover.less';
-import { SearchBar } from 'kbn_ui/search_bar'
 import { KibanaContextProvider } from '../../../../../../../src/plugins/kibana_react/public/context'
+import { SearchBar } from '../../../../../../../src/plugins/data/public/'
 
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
@@ -34,7 +34,7 @@ import { WzDatePicker } from '../../../../components/wz-date-picker';
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { IIndexPattern } from '../../../../../../../src/plugins/data/common';
-import { Filter } from 'es_query/filters';
+import { esFilters } from '../../../../../../../src/plugins/data/common/es_query';
 
 interface IDiscoverTime { from:string, to:string };
 
@@ -46,7 +46,7 @@ export class Discover extends Component {
   };
   
   state: {
-    filters: Filter[],
+    filters: esFilters.Filter[],
     sort: object,
     alerts: {_source:{}, _id:string}[],
     total: number,
@@ -66,7 +66,6 @@ export class Discover extends Component {
     implicitFilters: object[],
     initialFilters: object[],
   }
-
   constructor(props) {
     super(props);
     this.timefilter = getServices().timefilter;
@@ -264,17 +263,24 @@ export class Discover extends Component {
             <WzDatePicker onTimeChange={this.onTimeChange} />
           </EuiFlexItem>
         </EuiFlexGroup>
-        <KibanaContextProvider services={getServices()} > 
+        <KibanaContextProvider services={{...getServices(), storage: {...window.localStorage, get: (key) => window.localStorage.getItem(key), set: (key, value) => window.localStorage.setItem(key, value), remove: (key) => window.localStorage.removeItem(key) }}} > 
           <I18nProvider>
             <SearchBar 
               indexPatterns={[this.indexPattern]}
               filters={this.state.filters}
+              dateRangeFrom="now-15m"
+              screenTitle=""
+              dateRangeTo="now"
+              onQuerySubmit={e=> console.log(e)}
+              onQueryChange={e=> console.log(e)}
+              onRefreshChange={e=> console.log(e)}
+              onClearSavedQuery={()=> console.log()}
+              isRefreshPaused={true}
+              refreshInterval={0}
               onFiltersUpdated={filters => {this.setState({filters}); getServices().data.query.filterManager.setFilters(filters)}}
               query={{language: "kuery", query: ""}}
-              timeHistory={{add:() =>[], get:() =>[]}}
+              timeHistory={this.timefilter._history}
               savedQuery={undefined}
-              key={1}
-              {...{data:getServices().data}}
                />
           </I18nProvider>
         </KibanaContextProvider>
