@@ -1,12 +1,12 @@
-<div ng-if="tab === 'fim'">
-    <react-component name="MainFim" props="fimProps" />
+<div ng-if="tab !== 'welcome' && agent">
+    <react-component name="MainModule" props="{agent, section: tab}" />
     <div ng-if='!loadingDashboard'>
-        <div ng-if='showModuleDashboard === "fim" || showModuleEvents === "fim"' class="wz-module-body">
+        <div ng-if='showModuleDashboard || showModuleEvents' class="wz-module-body">
             <kbn-dis></kbn-dis>
         </div>
     </div>
     <!-- Loading status section -->
-    <div ng-if="tabView === 'panels' && showModuleDashboard === 'fim' && !rendered && resultState !== 'none'"
+    <div ng-if="tabView === 'panels' && showModuleDashboard && !rendered && resultState !== 'none'"
         class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
             <span class="euiLoadingChart euiLoadingChart--large">
@@ -21,7 +21,7 @@
     </div>
     <!-- End loading status section -->
     <!-- Report status section -->
-    <div ng-if="reportBusy && reportStatus && showModuleDashboard === 'fim'"
+    <div ng-if="reportBusy && reportStatus && showModuleDashboard"
         class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
             <span class="euiLoadingChart euiLoadingChart--large">
@@ -36,5 +36,5 @@
         </div>
     </div>
     <!-- End report status section -->
-    <react-component ng-show='showModuleDashboard === "fim"' name="WzVisualize" props="visualizeProps" />
+    <react-component ng-show='showModuleDashboard' name="WzVisualize" props="visualizeProps" />
 </div>

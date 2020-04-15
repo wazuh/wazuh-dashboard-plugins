@@ -17,7 +17,7 @@ import { ExportConfiguration } from './components/export-configuration';
 import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
 import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
-import { MainFim } from '../../components/agents/fim';
+import { MainModule } from '../../components/common/modules/main';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -29,5 +29,5 @@ app
   .value('AgentsWelcome', AgentsWelcome)
   .value('AgentsPreview', AgentsPreview)
   .value('AgentsTable', AgentsTable)
+  .value('MainModule', MainModule);
 
-  .value('MainFim', MainFim);

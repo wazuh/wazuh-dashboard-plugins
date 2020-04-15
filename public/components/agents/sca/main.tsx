@@ -20,41 +20,26 @@ import {
   EuiTabs,
   EuiTitle,
   EuiToolTip,
-  EuiCallOut
 } from '@elastic/eui';
-import { i18n } from '@kbn/i18n';
-import { FormattedMessage } from '@kbn/i18n/react';
 import { States, Settings } from './index';
-import { Events, Dashboard, Loader } from '../../common/modules';
-import '../../common/modules/module.less';
-import { ReportingService } from '../../../react-services/reporting';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { Events, Loader } from '../../common/modules';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import { TabDescription } from '../../../../server/reporting/tab-description';
 
-export class MainFim extends Component {
+export class MainSca extends Component {
   state: {
-    selectView: 'states' | 'events' | 'loader' | 'dashboard' | 'settings'
+    selectView: 'states' | 'events' | 'loader' | 'settings'
   };
   tabs = [
-    { id: 'states', name: i18n.translate('wazuh.fim.states', { defaultMessage: 'States' }) },
-    { id: 'events', name: i18n.translate('wazuh.fim.events', { defaultMessage: 'Events' }) },
+    { id: 'states', name: 'States' },
+    { id: 'events', name: 'Events' },
   ]
   afterLoad = false;
-  reportingService = new ReportingService();
 
   constructor(props) {
     super(props);
     this.state = {
       selectView: 'states',
     };
-  }
-
-  componentWillUnmount() {
-    const { filterManager } = getServices();
-    if (filterManager.filters && filterManager.filters.length) {
-      filterManager.removeAll();
-    }
   }
 
   color = (status) => {
@@ -72,7 +57,7 @@ export class MainFim extends Component {
               <EuiToolTip position="right" content={this.props.agent.status}>
                 <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
               </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id}) - <b>{TabDescription[this.props.section].title}</b>
+              {this.props.agent.name} ({this.props.agent.id}) - <b>Security configuration assessment</b>
             </h1>
           </EuiTitle>
         </EuiFlexItem>
@@ -99,31 +84,6 @@ export class MainFim extends Component {
     );
   }
 
-  renderReportButton() {
-    return (
-      <EuiFlexItem grow={false}>
-        <EuiButton
-          iconType="document"
-          onClick={() => this.reportingService.startVis2Png('fim', this.props.agent.id)}>
-          Generate report
-          </EuiButton>
-      </EuiFlexItem>
-    );
-  }
-
-  renderDashboardButton() {
-    return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
-        <EuiButton
-          fill={this.state.selectView === 'dashboard'}
-          iconType="visLine"
-          onClick={() => this.onSelectedTabChanged('dashboard')}>
-          Dashboard
-          </EuiButton>
-      </EuiFlexItem>
-    );
-  }
-
   renderSettingsButton() {
     return (
       <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
@@ -146,32 +106,15 @@ export class MainFim extends Component {
     }
   }
 
-  checkFilterManager(filters) {
-    const { filterManager } = getServices();
-    if (filterManager.filters && filterManager.filters.length) {
-      filterManager.addFilters([filters]);
-      this.getDiscoverScope();
-    } else {
-      setTimeout(() => {
-        this.checkFilterManager(filters);
-      }, 200);
-    }
-  }
-
-  loadEventsWithFilter(filters) {
-    this.onSelectedTabChanged('events');
-    this.checkFilterManager(filters);
-  }
-
   loadSection(id) {
     this.setState({ selectView: id });
   }
 
   onSelectedTabChanged(id) {
-    if (id === 'events' || id === 'dashboard') {
+    if (id === 'events') {
       window.location.href = window.location.href.replace(
         new RegExp("tabView=" + "[^\&]*"),
-        `tabView=${id === 'events' ? 'discover' : 'panels'}`);
+        "tabView=discover");
       this.afterLoad = id;
       this.loadSection('loader');
     } else {
@@ -183,8 +126,6 @@ export class MainFim extends Component {
     const { selectView } = this.state;
     const title = this.renderTitle();
     const tabs = this.renderTabs();
-    const reportButton = this.renderReportButton();
-    const dashboardButton = this.renderDashboardButton();
     const settingsButton = this.renderSettingsButton();
     return (
       <Fragment>
@@ -194,21 +135,18 @@ export class MainFim extends Component {
               {title}
               <EuiFlexGroup>
                 {tabs}
-                {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
-                {dashboardButton}
                 {settingsButton}
               </EuiFlexGroup>
             </div>
           </div>
           <div className='wz-module-body'>
-            {selectView === 'states' && <States {...this.props} loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)} />}
-            {selectView === 'events' && <Events {...this.props} section='fim' />}
+            {selectView === 'states' && <States {...this.props} />}
+            {selectView === 'events' && <Events {...this.props} section='sca' />}
             {selectView === 'loader' &&
               <Loader {...this.props}
                 loadSection={(section) => this.loadSection(section)}
                 redirect={this.afterLoad}>
               </Loader>}
-            {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
             {selectView === 'settings' && <Settings {...this.props} />}
           </div>
         </div>

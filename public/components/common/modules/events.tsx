@@ -10,22 +10,24 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { EventsSelectedFiles } from './events-selected-fields'
+import { EventsFim } from '../../agents/fim/events';
 export class Events extends Component {
   constructor(props) {
     super(props);
   }
 
-
   async getDiscoverScope() {
     const app = getAngularModule('app/wazuh');
-    if (app.discoverScope) {
-      app.discoverScope.removeColumn('_source');
-      const fields = EventsSelectedFiles[this.props.section];
+    const fields = EventsSelectedFiles[this.props.section];
+    if (fields && app.discoverScope && app.discoverScope.addColumn) {
+      app.discoverScope.state.columns = [];
       fields.forEach(field => {
-        app.discoverScope.addColumn(field);
+        if (!app.discoverScope.state.columns.includes(field)) {
+          app.discoverScope.addColumn(field);
+        }
       });
     } else {
       setTimeout(() => { this.getDiscoverScope() }, 200);
@@ -46,6 +48,12 @@ export class Events extends Component {
   }
 
   render() {
-    return false;
+    return (
+      <Fragment>
+        {this.props.section === 'fim' &&
+          <EventsFim {...this.props}></EventsFim>
+        }
+      </Fragment>
+    )
   }
 }

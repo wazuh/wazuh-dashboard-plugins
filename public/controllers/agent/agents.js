@@ -740,9 +740,6 @@ export class AgentsController {
         this.$scope.agent.agentPlatform = false;
       }
 
-      this.$scope.fimProps = {
-        agent: this.$scope.agent
-      }
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});
