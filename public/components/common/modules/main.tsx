@@ -17,8 +17,8 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { MainFim } from '../../agents/fim/main';
-import { MainSca } from '../../agents/sca/main';
+import { MainFim } from '../../agents/fim';
+import { MainSca } from '../../agents/sca';
 
 export class MainModule extends Component {
   constructor(props) {

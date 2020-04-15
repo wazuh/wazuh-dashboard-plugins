@@ -43,7 +43,7 @@ export class FileDetails extends Component {
   }
 
 
-  generalColumns() {
+  details() {
     return [
       {
         field: 'date',
@@ -79,11 +79,6 @@ export class FileDetails extends Component {
         field: 'size',
         name: 'Size',
       },
-    ]
-  }
-
-  checksumColumns() {
-    return [
       {
         field: 'inode',
         name: 'Inode',
@@ -119,38 +114,16 @@ export class FileDetails extends Component {
   }
 
   getDetails() {
-    const columns = this.generalColumns();
+    const columns = this.details();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
       return (
-        <EuiFlexItem key={idx} style={{ margin: '4px 12px', maxWidth: 'calc(25% - 24px)' }}>
+        <EuiFlexItem key={idx}>
           <EuiStat
             title={
-              <EuiToolTip position="bottom" content={value}>
-                <EuiText className="detail-value">
-                  {value}
-                </EuiText>
-              </EuiToolTip>
-            }
-            description={item.name}
-            textAlign="left"
-            titleSize="xs"
-          />
-        </EuiFlexItem>
-      )
-    });
-    const checksumColumns = this.checksumColumns();
-    const checksumDetails = checksumColumns.map((item, idx) => {
-      const value = this.props.currentFile[item.field] || '-';
-      return (
-        <EuiFlexItem key={idx} style={{ margin: '4px 12px' }}>
-          <EuiStat
-            title={
-              <EuiToolTip position="bottom" content={value}>
-                <EuiText className="detail-value" size={item.name !== 'Inode' ? 's' : 'm'}>
-                  {value}
-                </EuiText>
-              </EuiToolTip>
+              <EuiText className="detail-value">
+                {value}
+              </EuiText>
             }
             description={item.name}
             textAlign="left"
@@ -162,8 +135,7 @@ export class FileDetails extends Component {
 
     return (
       <div>
-        <EuiFlexGrid columns={4}> {generalDetails} </EuiFlexGrid>
-        <EuiFlexGrid columns={4} style={{ paddingTop: 12 }}> {checksumDetails} </EuiFlexGrid>
+        <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
       </div>);
   }
 
