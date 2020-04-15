@@ -20,14 +20,9 @@ import {
   EuiTabs,
   EuiTitle,
   EuiToolTip,
-  EuiCallOut
 } from '@elastic/eui';
 import { States, Settings } from './index';
 import { Events, Loader } from '../../common/modules';
-import '../../common/modules/module.less';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../redux/store';
-import chrome from 'ui/chrome';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 
 export class MainSca extends Component {
@@ -45,37 +40,6 @@ export class MainSca extends Component {
     this.state = {
       selectView: 'states',
     };
-  }
-
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      {
-        text: '',
-      },
-      {
-        text: 'Agents',
-        href: "#/agents-preview"
-      },
-      {
-        text: `${this.props.agent.name} (${this.props.agent.id})`,
-        onClick: () => {
-          window.location.href = `#/agents?agent=${this.props.agent.id}`;
-          this.router.reload();
-        },
-        className: 'wz-global-breadcrumb-btn',
-        truncate: true,
-      },
-      {
-        text: 'Security configuration assessment',
-      },
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
-  async componentDidMount() {
-    this.setGlobalBreadcrumb();
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.router = $injector.get('$route');
   }
 
   color = (status) => {
@@ -165,33 +129,27 @@ export class MainSca extends Component {
     const settingsButton = this.renderSettingsButton();
     return (
       <Fragment>
-        {(this.props.agent && this.props.agent.os) &&
-          <div className='wz-module'>
-            <div className='wz-module-header-wrapper'>
-              <div className='wz-module-header'>
-                {title}
-                <EuiFlexGroup>
-                  {tabs}
-                  {settingsButton}
-                </EuiFlexGroup>
-              </div>
-            </div>
-            <div className='wz-module-body'>
-              {selectView === 'states' && <States {...this.props} />}
-              {selectView === 'events' && <Events {...this.props} section='sca' />}
-              {selectView === 'loader' &&
-                <Loader {...this.props}
-                  loadSection={(section) => this.loadSection(section)}
-                  redirect={this.afterLoad}>
-                </Loader>}
-              {selectView === 'settings' && <Settings {...this.props} />}
+        <div className='wz-module'>
+          <div className='wz-module-header-wrapper'>
+            <div className='wz-module-header'>
+              {title}
+              <EuiFlexGroup>
+                {tabs}
+                {settingsButton}
+              </EuiFlexGroup>
             </div>
           </div>
-        }
-        {(!this.props.agent || !this.props.agent.os) &&
-          <EuiCallOut title=" This agent has never connected" color="warning" iconType="alert">
-          </EuiCallOut>
-        }
+          <div className='wz-module-body'>
+            {selectView === 'states' && <States {...this.props} />}
+            {selectView === 'events' && <Events {...this.props} section='sca' />}
+            {selectView === 'loader' &&
+              <Loader {...this.props}
+                loadSection={(section) => this.loadSection(section)}
+                redirect={this.afterLoad}>
+              </Loader>}
+            {selectView === 'settings' && <Settings {...this.props} />}
+          </div>
+        </div>
       </Fragment>
     );
   }

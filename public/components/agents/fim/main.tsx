@@ -27,12 +27,10 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { States, Settings } from './index';
 import { Events, Dashboard, Loader } from '../../common/modules';
 import '../../common/modules/module.less';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
-import chrome from 'ui/chrome';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { TabDescription } from '../../../../server/reporting/tab-description';
 
 export class MainFim extends Component {
   state: {
@@ -50,37 +48,6 @@ export class MainFim extends Component {
     this.state = {
       selectView: 'states',
     };
-  }
-
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      {
-        text: '',
-      },
-      {
-        text: 'Agents',
-        href: "#/agents-preview"
-      },
-      {
-        text: `${this.props.agent.name} (${this.props.agent.id})`,
-        onClick: () => {
-          window.location.href = `#/agents?agent=${this.props.agent.id}`;
-          this.router.reload();
-        },
-        className: 'wz-global-breadcrumb-btn',
-        truncate: true,
-      },
-      {
-        text: 'Integrity monitoring',
-      },
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
-  async componentDidMount() {
-    this.setGlobalBreadcrumb();
-    const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.router = $injector.get('$route');
   }
 
   componentWillUnmount() {
@@ -105,7 +72,7 @@ export class MainFim extends Component {
               <EuiToolTip position="right" content={this.props.agent.status}>
                 <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
               </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id}) - <b>Integrity monitoring</b>
+              {this.props.agent.name} ({this.props.agent.id}) - <b>{TabDescription[this.props.section].title}</b>
             </h1>
           </EuiTitle>
         </EuiFlexItem>
@@ -221,36 +188,30 @@ export class MainFim extends Component {
     const settingsButton = this.renderSettingsButton();
     return (
       <Fragment>
-        {(this.props.agent && this.props.agent.os) &&
-          <div className='wz-module'>
-            <div className='wz-module-header-wrapper'>
-              <div className='wz-module-header'>
-                {title}
-                <EuiFlexGroup>
-                  {tabs}
-                  {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
-                  {dashboardButton}
-                  {settingsButton}
-                </EuiFlexGroup>
-              </div>
-            </div>
-            <div className='wz-module-body'>
-              {selectView === 'states' && <States {...this.props} loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)} />}
-              {selectView === 'events' && <Events {...this.props} section='fim' />}
-              {selectView === 'loader' &&
-                <Loader {...this.props}
-                  loadSection={(section) => this.loadSection(section)}
-                  redirect={this.afterLoad}>
-                </Loader>}
-              {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
-              {selectView === 'settings' && <Settings {...this.props} />}
+        <div className='wz-module'>
+          <div className='wz-module-header-wrapper'>
+            <div className='wz-module-header'>
+              {title}
+              <EuiFlexGroup>
+                {tabs}
+                {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
+                {dashboardButton}
+                {settingsButton}
+              </EuiFlexGroup>
             </div>
           </div>
-        }
-        {(!this.props.agent || !this.props.agent.os) &&
-          <EuiCallOut title=" This agent has never connected" color="warning" iconType="alert">
-          </EuiCallOut>
-        }
+          <div className='wz-module-body'>
+            {selectView === 'states' && <States {...this.props} loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)} />}
+            {selectView === 'events' && <Events {...this.props} section='fim' />}
+            {selectView === 'loader' &&
+              <Loader {...this.props}
+                loadSection={(section) => this.loadSection(section)}
+                redirect={this.afterLoad}>
+              </Loader>}
+            {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
+            {selectView === 'settings' && <Settings {...this.props} />}
+          </div>
+        </div>
       </Fragment>
     );
   }

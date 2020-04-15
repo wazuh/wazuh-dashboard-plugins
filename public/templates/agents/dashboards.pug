@@ -1,10 +1,9 @@
 include ./dashboards.head
 include ./agents-welcome.html
-include ./agents-fim.html
+include ./agents-module.html
 include ./agents-pm.html
 include ./agents-mitre.html
 include ./agents-syscollector.html
-include ./agents-sca.html
 <react-component ng-if="tab === 'configuration' && agent" name="WzManagementConfiguration" props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"/>
 include ./dashboards.html
 include ../footer.foot
