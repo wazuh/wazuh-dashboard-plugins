@@ -109,9 +109,9 @@ class KibanaVis extends Component {
         }
         // This check if data.value.visData.tables exists and dispatch that value as stat
         // FIXME: this is correct?
-        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-1-1']){
+        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && data.value.visData.tables['0'] && data.value.visData.tables['0'].rows && data.value.visData.tables['0'].rows['0'] && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']){
           store.dispatch(
-            this.updateMetric({ name: this.visID, value: data.value.visData.tables['0'].rows['0']['col-1-1'] })
+            this.updateMetric({ name: this.visID, value: data.value.visData.tables['0'].rows['0']['col-0-2'] })
           );
         }
       }

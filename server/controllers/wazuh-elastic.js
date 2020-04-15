@@ -31,13 +31,12 @@ export class WazuhElasticCtrl {
   constructor(server) {
     this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
-    this.wzAlertsSampleIndexBase = 'wazuh-alerts-3.x-sample';
     this.wzAlertsSampleCaterories = {
-      'security': [{ syscheck: true }, { aws: true }],
+      'security': [{ syscheck: true }, { aws: true }, { alerts: 250, probability_win_authentication_failed: 5}],
       'auditing-pm': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }],
-      'regulatory-compliance': [{ pci_dss: true }, { gdpr: true }, { hipaa: true }, { nist_800_53: true }] // what type/group alerts
-    }
+      'regulatory-compliance': [{ pci_dss: true }, { gdpr: true }, { hipaa: true }, { nist_800_53: true }]
+    };
     this.defaultNumSampleAlerts = 1000;
   }
 
@@ -760,18 +759,10 @@ export class WazuhElasticCtrl {
   /**
    * This checks if there is sample alerts
    * @param {*} req
-   * GET /elastic/samplealerts
-   * {
-   *   "agent.id": 100 ,
-   *   "cluster.name": "wazuh",
-   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
-   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
-   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
-   *   "size": 5 // Optional parameter
-   * }
+   * GET /elastic/samplealerts/{pattern}
    *
    * @param {*} reply
-   * {alerts: [...]} or Error
+   * {alerts: [...]} or ErrorResponse
    */
   async haveSampleAlerts(req, reply){
     if(!req.params || typeof req.params !== 'object'){
@@ -792,18 +783,10 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * GET /elastic/samplealerts
-   * {
-   *   "agent.id": 100 ,
-   *   "cluster.name": "wazuh",
-   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
-   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
-   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
-   *   "size": 5 // Optional parameter
-   * }
+   * GET /elastic/samplealerts/{pattern}/{category}
    *
    * @param {*} reply
-   * {alerts: [...]} or Error
+   * {alerts: [...]} or ErrorResponse
    */
   async haveSampleAlertsOfCategory(req, reply){
     if(!req.params || typeof req.params !== 'object'){
@@ -827,18 +810,19 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * POST /elastic/samplealerts
+   * POST /elastic/samplealerts/{pattern}/{category}
    * {
-   *   "agent.id": 100 ,
-   *   "cluster.name": "wazuh",
-   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
-   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
-   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
-   *   "size": 5 // Optional parameter
+   *   "manager": {
+   *      "name": "manager_name"
+   *    },
+   *    cluster: {
+   *      name: "mycluster",
+   *      node: "mynode"
+   *    }
    * }
    *
    * @param {*} reply
-   * {alerts: [...]} or Error
+   * {index: string, alerts: [...], count: number} or ErrorResponse
    */
   async createSampleAlerts(req, reply){
     if(!req.params || typeof req.params !== 'object'){
@@ -913,7 +897,7 @@ export class WazuhElasticCtrl {
    * This deletes sample alerts
    * @param {*} req
    * @param {*} reply
-   * {alerts: [...]} or Error
+   * {result: "deleted", index: string} or ErrorResponse
    */
   async deleteSampleAlerts(req, reply){
     // Delete Wazuh sample alert index
@@ -928,17 +912,17 @@ export class WazuhElasticCtrl {
     };
     const sampleAlertsIndex = buildSampleIndexByCategory(req.params.pattern,req.params.category);
     try{
-      // Check if wazuh sample alerts index exists
+      // Check if Wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       if(existsSampleIndex){
-        // Delete wazuh sample alerts index
+        // Delete Wazuh sample alerts index
         await this.wzWrapper.elasticRequest.callWithInternalUser('indices.delete',{index: sampleAlertsIndex});
         log(
           'wazuh-elastic:deleteSampleAlerts',
           `Deleted ${sampleAlertsIndex} index`,
           'debug'
         );
-        return { result: `deleted`, index: sampleAlertsIndex };
+        return { result: 'deleted', index: sampleAlertsIndex };
       }else{
         return ErrorResponse(`${sampleAlertsIndex} index doesn't exist`, 1000, 500, reply)
       }

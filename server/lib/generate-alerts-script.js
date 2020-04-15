@@ -10,11 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
+ //Alert
+const alertIDMax = 6000;
+
 // Agents
 const agents = [{ "id": "000", "name": "master" }, { "id": "001", "name": "agent-jcr" }, { "id": "002", "name": "agent-pt" }, { "id": "003", "name": "agent-js" }, { "id": "004", "name": "agent-aa" }, { "id": "005", "name": "agent-vs" }, { "id": "006", "name": "agent-ag" }, { "id": "007", "name": "agent-jr" }] // Yes, each developer has an agent :P
 
 // Rule
 const ruleDescription = ["Sample alert 1", "Sample alert 2", "Sample alert 3", "Sample alert 4", "Sample alert 5"];
+const ruleMaxLevel = 14;
+const ruleMaxFiredtimes = 10;
 
 // Modules
 
@@ -31,14 +36,11 @@ const auditExe = ["/usr/sbin/sudo", "/usr/sbin/sshd", "/usr/sbin/crond", "/usr/b
 const auditFileName = ["/etc/samplefile", "/etc/sample/file", "/var/sample"];
 
 // CIS-CAT
+// More info https://documentation.wazuh.com/3.12/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html
 const ciscatRuleTitle = ["Sample CIS-CAT 1", "Sample CIS-CAT 2", "Sample CIS-CAT 3", "Sample CIS-CAT 4", "Sample CIS-CAT 5", "Sample CIS-CAT 6"];
 const ciscatGroup = ["Access, Authentication and Authorization"];
-const ciscatNotchecked = ["yes", "no"]; //FIXME: is this yes/no?
-const ciscatPass = ["yes", "no"]; //FIXME: is this yes/no?
-const ciscatFail = ["yes", "no"]; //FIXME: is this yes/no?
-const ciscatBenchmark = ["yes", "no"]; //FIXME: is this yes/no?
-const ciscatUnknown = ["yes", "no"]; //FIXME: is this yes/no?
-const ciscatResult = ["fail", "error"];//FIXME: fail seems to exists, but error is valid?
+const ciscatBenchmark = ["CIS Ubuntu Linux 16.04 LTS Benchmark"]; // TODO: add more benchmarks
+const ciscatResult = ["fail", "error"]; // FIXME: 'fail' seems to exists, but 'error' is valid?
 
 // Docker listener
 const dockerActorAttributesImage = ["wazuh/wazuh:3.12.0-7.6.1", "docker.elastic.co/elasticsearch/elasticsearch:7.6.2", "docker.elastic.co/kibana/kibana:7.6.2", "nginx:latest"];
@@ -68,13 +70,11 @@ const oscapScanProfileTitle = ["xccdf_org.ssgproject.content_profile_standard", 
 const oscapCheckSeverity = ["low", "medium", "high"];
 const oscapCheckResult = ["fail"];
 const oscapScanContent = ["ssg-centos-7-ds.xml", "ssg-centos-6-ds.xml", "ssg-rhel6-ds.xml", "ssg-ubuntu18-ds.xml", "ssg-debian-ds.xml", "ssg-fedora-ds.xml"];
-// const oscapScanScore = ;
 const oscapCheckTitle = ["Sample OpenSCAP title 1", "Sample OpenSCAP title 2", "Sample OpenSCAP title 3", "Sample OpenSCAP title 4", "Sample OpenSCAP title 5", "Sample OpenSCAP title 6"];
 
 // Osquery
 const osqueryName = ["Sample Osquery alert 1", "Sample Osquery alert 2", "Sample Osquery alert 3", "Sample Osquery alert 4", "Sample Osquery alert 5"];
 const osqueryAction = ["added", "removed"];
-const osqueryCalendarTime = ["low", "medium", "high"];
 const osqueryPack = ["/etc/osquery-packs/custom_pack.conf", "/etc/osquery-packs/custom_pack2.conf", "/etc/osquery-packs/custom_pack3.conf", "/etc/osquery-packs/custom_pack4.conf", "/etc/osquery-packs/custom_pack5.conf", "/etc/osquery-packs/custom_pack6.conf"];
 
 // Policy monitoring
@@ -88,7 +88,7 @@ const virustotalMalicious = ["0", "1"];
 const virustotalPositives = ["0", "1"];
 
 // Vulnerability
-const vulnerabilitySeverity = ["low", "medium", "high", "critical"];
+const vulnerabilitySeverity = ["Low", "Medium", "High", "Critical"];
 const vulnerabilityPackageName = ["bluez", "gcc-mingw-w64", "squashfs-tools", "util-linux", "accountsservice", "git", "node", "zip", "kernel"];
 const vulnerabilityCve = ["CVE-2017-11671", "CVE-2008-7320", "CVE-2011-1011", "CVE-2012-0881", "CVE-2012-1093"];
 const vulnerabilityCwe_reference = ["CWE-527", "CWE-911", "CWE-409", "CWE-102", "CWE-120", "CWE-420", "CWE-322", "CWE-789"];
@@ -108,25 +108,31 @@ function getRandomFromArray(array) {
  * Generate a alert
  * @param {any} params - params to configure the alert
  * @param {boolean} params.aws - if true, set aws fields
- * @param {boolean} params.audit - if true, set aws fields
- * @param {boolean} params.ciscat - if true, set cis-cat fields
- * @param {boolean} params.docker - if true, set docker fields
+ * @param {boolean} params.audit - if true, set System Auditing fields
+ * @param {boolean} params.ciscat - if true, set CIS-CAT fields
+ * @param {boolean} params.docker - if true, set Docker fields
  * @param {boolean} params.mitre - if true, set Mitre att&ck fields
  * @param {boolean} params.openscap - if true, set OpenSCAP fields
- * @param {boolean} params.osquery - if true, set aws fields
+ * @param {boolean} params.osquery - if true, set Osquery fields
  * @param {boolean} params.rootcheck - if true, set Policy monitoring fields
  * @param {boolean} params.syscheck - if true, set integrity monitoring fields
- * @param {boolean} params.virustotal - if true, set virustotal fields
+ * @param {boolean} params.virustotal - if true, set VirusTotal fields
  * @param {boolean} params.vulnerabilities - if true, set vulnerabilities fields
  * @param {boolean} params.pci_dss - if true, set pci_dss fields
  * @param {boolean} params.gdpr - if true, set gdpr fields
  * @param {boolean} params.gpg13 - if true, set gpg13 fields
  * @param {boolean} params.hipaa - if true, set hipaa fields
  * @param {boolean} params.nist_800_53 - if true, set nist_800_53 fields
+ * @param {boolean} params.nist_800_53 - if true, set nist_800_53 fields
+ * @param {boolean} params.win_authentication_failed - if true, add win_authentication_failed to rule.groups
+ * @param {number} params.probability_win_authentication_failed - probability to add win_authentication_failed to rule.groups. Example: 20 will be 20% of probability to add this to rule.groups
+ * @param {boolean} params.authentication_failed - if true, add win_authentication_failed to rule.groups
+ * @param {number} params.probability_authentication_failed - probability to add authentication_failed to rule.groups
+ * @param {boolean} params.authentication_failures - if true, add win_authentication_failed to rule.groups
+ * @param {number} params.probability_authentication_failures - probability to add authentication_failures to rule.groups
  * @return {any} - Alert generated 
  */
 function generateAlert(params) {
-
     let alert = {
         "timestamp": "2020-01-27T11:08:47.777+0000",
         "rule": {
@@ -169,50 +175,14 @@ function generateAlert(params) {
         "location": "/random"
     }
 
+    // alert.id = // TODO: generate random?;
     alert.agent = getRandomFromArray(agents);
     alert.rule.description = getRandomFromArray(ruleDescription);
-    alert.id = randomInterval(1,6000);
-    alert.rule.level = randomInterval(1,15);
+    alert.rule.id = randomInterval(1,alertIDMax);
+    alert.rule.level = randomInterval(1,ruleMaxLevel);
+    alert.rule.firedtimes = randomInterval(1,ruleMaxFiredtimes);
     alert.timestamp = randomDate();
-
-    if (params.rule) {
-        if (params.rule.level) {
-            let level = 3;
-
-            if (Array.isArray(params.rule.level)) {
-                level = getRandomFromArray(params.rule.level);
-            } else {
-                level = params.rule.level;
-            }
-            alert.rule.level = level;
-        }
-        if (params.rule.mitre) {
-            alert.rule.mitre = {
-                id: generateRandomMitreNumerId(),
-                tactics: generateRandomMitreNumerTactics()
-            }
-        }
-    } else {
-        alert.rule.level = randomInterval(1, 7);
-    }
-
-    if (params.agent) {
-        if (params.agent.id) {
-            let id = params.agent.id;
-            if (Array.isArray(params.agent.id)) {
-                id = getRandomFromArray(params.agent.id);
-            } else {
-                id = params.agent.id;
-            }
-            alert.agent.id = id;
-        }
-
-        if (!params.agent.name) {
-            alert.agent.name = "agent" + params.agent.id;
-        } else {
-            alert.agent.name = params.agent.name;
-        }
-    }
+    
 
     if (params.manager) {
         if (params.manager.name) {
@@ -256,15 +226,15 @@ function generateAlert(params) {
         alert.data.cis = {};
 
         alert.data.cis.group = getRandomFromArray(ciscatGroup);
-        alert.data.cis.fail = getRandomFromArray(ciscatFail);
+        alert.data.cis.fail = randomInterval(0, 100);
         alert.data.cis.rule_title = getRandomFromArray(ciscatRuleTitle);
-        alert.data.cis.notchecked = getRandomFromArray(ciscatNotchecked);
+        alert.data.cis.notchecked = randomInterval(0, 100);
         alert.data.cis.score = randomInterval(0, 100);
-        alert.data.cis.pass = getRandomFromArray(ciscatPass);
+        alert.data.cis.pass = randomInterval(0, 100);
         alert.data.cis.timestamp = randomDate();
         alert.data.cis.error = randomInterval(0, 1);
         alert.data.cis.benchmark = getRandomFromArray(ciscatBenchmark);
-        alert.data.cis.unknown = getRandomFromArray(ciscatUnknown);
+        alert.data.cis.unknown = randomInterval(0, 1);
         alert.data.cis.result = getRandomFromArray(ciscatResult);
     }
 
@@ -282,8 +252,8 @@ function generateAlert(params) {
 
     if (params.mitre) {
         alert.rule.mitre = {
-            id: generateRandomMitreNumerId(),
-            tactics: generateRandomMitreNumerTactics()
+            id: generateRandomMitreNumberId(),
+            tactics: generateRandomMitreNumberTactics()
         }
         //TODO: add info
     }
@@ -324,7 +294,7 @@ function generateAlert(params) {
         alert.data.virustotal.permalink = getRandomFromArray(virustotalPermalink);;
         alert.data.virustotal.source.md5 = getRandomFromArray(virustotalSourceMd5);
         alert.data.virustotal.malicious = getRandomFromArray(virustotalMalicious);
-        alert.data.virustotal.positives = getRandomFromArray(virustotalPositives);
+        alert.data.virustotal.positives = `${randomInterval(0,20)}`;
     }
 
     if (params.vulnerabilities) {
@@ -350,20 +320,32 @@ function generateAlert(params) {
         alert.data.osquery.pack = getRandomFromArray(osqueryPack);
     }
 
+    if (params.win_authentication_failed || (params.probability_win_authentication_failed && randomProbability(params.probability_win_authentication_failed))){
+        alert.rule.groups.push('win_authentication_failed')
+    }
+
+    if (params.authentication_failed || (params.probability_authentication_failed && randomProbability(params.probability_authentication_failed))){
+        alert.rule.groups.push('authentication_failed')
+    }
+
+    if (params.authentication_failures || (params.probability_authentication_failures && randomProbability(params.probability_authentication_failures))){
+        alert.rule.groups.push('authentication_failures')
+    }
+
     // Regulatory compliance
-    if (params.pci_dss || params.regulatory_compliance || (params.random_regulatory_compliance && randomInterval(0,1))) {
+    if (params.pci_dss || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomProbability(params.random_probability_regulatory_compliance))) {
         alert.rule.pci_dss = [getRandomFromArray(pci_dss)];
     }
-    if (params.gdpr || params.regulatory_compliance || (params.random_regulatory_compliance && randomInterval(0,1))) {
+    if (params.gdpr || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomProbability(params.random_probability_regulatory_compliance))) {
         alert.rule.gdpr = [getRandomFromArray(gdpr)];
     }
-    if (params.gpg13 || params.regulatory_compliance || (params.random_regulatory_compliance && randomInterval(0,1))) {
+    if (params.gpg13 || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomProbability(params.random_probability_regulatory_compliance))) {
         alert.rule.gpg13 = [getRandomFromArray(gpg13)];
     }
-    if (params.hipaa || params.regulatory_compliance || (params.random_regulatory_compliance && randomInterval(0,1))) {
+    if (params.hipaa || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomInterval(params.random_probability_regulatory_compliance))) {
         alert.rule.hipaa = [getRandomFromArray(hipaa)];
     }
-    if (params.nist_800_83 || params.regulatory_compliance || (params.random_regulatory_compliance && randomInterval(0,1))) {
+    if (params.nist_800_83 || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomInterval(params.random_probability_regulatory_compliance))) {
         alert.rule.nist_800_53 = [getRandomFromArray(nist_800_53)];
     }
 
@@ -384,7 +366,7 @@ function randomInterval(min, max) {
  * Get random Mitre ID
  * @returns {[]} - Random Mitre IDs
  */
-function generateRandomMitreNumerId() {
+function generateRandomMitreNumberId() {
     let random = randomInterval(1, 3);
     let array = [];
 
@@ -400,7 +382,7 @@ function generateRandomMitreNumerId() {
  * Get random Mitre Tactics
  * @returns {[]} - Random mitre tactics
  */
-function generateRandomMitreNumerTactics() {
+function generateRandomMitreNumberTactics() {
     let random = randomInterval(1, mitreTactics.length);
     let array = [];
 
@@ -414,15 +396,15 @@ function generateRandomMitreNumerTactics() {
 /**
  * Generate random alerts
  * @param {*} params 
- * @param {number} numAlerts - Define number or alerts
+ * @param {number} numAlerts - Define number of alerts
  * @return {*} - Random generated alerts defined with params
  */
 function generateAlerts(params, numAlerts) {
     const alerts = [];
     for (let i = 0; i < numAlerts; i++) {
-        alerts.push(generateAlert(params))
+        alerts.push(generateAlert(params));
     }
-    return alerts
+    return alerts;
 }
 
 /**
@@ -457,11 +439,38 @@ function randomDate() {
     return randomYearFormatted + "-" + randomMonthFormatted + "-" + randomDayFormatted + "T" + randomHourFormatted + ":" + randomMinutesFormatted + ":" + randomSecondsFormatted + "." + randomMilliSecondsFormatted + "+0000";
 }
 
+/**
+ * Return a random probability
+ * @param {number} probability 
+ * @param {number[=100]} maximum 
+ */
+function randomProbability(probability, maximum = 100){
+    return randomInterval(0,maximum) <= probability
+}
+
 export {
     generateAlert,
     generateAlerts
 };
 
-// Use:
-// generateAlerts(params)
-// generateAlerts(params, numberAlerts)
+/* Use:
+    generateAlert(params)
+    generateAlerts(params, numberAlerts)
+
+Examples:
+
+    - Generate syscheck (Integrity monitoring) sample alert
+    generateAlert({syscheck: true});
+    
+    - Generate syscheck alert with PCI DSS
+    generateAlert({syscheck: true, pci_dss: true});
+    
+    - Generate OpenSCAP alert with manager name and cluster info
+    generateAlert({openscap: true, manager: {name: 'mymanager'}, cluster: {name: 'mycluster', node: 'mynode'}});
+
+    - Generate 1000 random alerts of Osquery
+    generateAlerts({osquery: true}, 1000);
+
+    - Generate 1000 random alerts of PCI DSS with manager name and cluster info
+    generateAlerts({pci_dss: true, manager: {name: 'mymanager'}, cluster: {name: 'mycluster', node: 'mynode'}}, 1000);
+*/

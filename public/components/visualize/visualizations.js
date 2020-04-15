@@ -680,14 +680,14 @@ export const visualizations = {
   },
   ciscat: {
     metrics: [
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-error', description: 'Last not checked', color: 'accent'  },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-fail', description: 'Last pass', color: 'primary' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-not-checked', description: 'Last scan score', color: 'secondary' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-pass', description: 'Last scan date', color: 'subdued' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-score', description: 'Last errors', color: 'accent' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-timestamp', description: 'Last fails',  color: 'primary' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark', description: 'Last unknown', color: 'secondary' },
-      { id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown', description: 'Last scan benchmark', color: 'subdued' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-error', description: 'Last errors', color: 'accent' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-fail', description: 'Last fails',  color: 'subdued' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-not-checked', description: 'Last not checked', color: 'primary'  },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-pass', description: 'Last pass', color: 'secondary' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown', description: 'Last unknown', color: 'accent' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-score', description: 'Last scan score', color: 'subdued' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-timestamp', description: 'Last scan date', color: 'primary' },
+      { id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark', description: 'Last scan benchmark', color: 'secondary' }
     ],
     rows: [
       {

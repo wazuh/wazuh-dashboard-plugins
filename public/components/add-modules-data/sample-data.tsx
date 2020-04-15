@@ -80,18 +80,20 @@ class WzSampleData extends Component<IWzSampleDataProps> {
   }
   async componentDidMount(){
     // Check if sample data for each category was added
-    const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
-      accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${this.props.currentPattern}/${cur.categorySampleAlertsIndex}`)
-      return accum
-    },{}));
-
-    this.setState(Object.keys(results).reduce((accum, cur) => {
-      accum[cur] = {
-        ...this.state[cur],
-        exists: results[cur].data.exists
-      }
-      return accum
-    },{...this.state}));
+    try{
+      const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
+        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${this.props.currentPattern}/${cur.categorySampleAlertsIndex}`)
+        return accum
+      },{}));
+  
+      this.setState(Object.keys(results).reduce((accum, cur) => {
+        accum[cur] = {
+          ...this.state[cur],
+          exists: results[cur].data.exists
+        }
+        return accum
+      },{...this.state}));
+    }catch(error){}
 
     // Get values of cluster/manager
     try{
@@ -104,11 +106,9 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         node: managerInfo.data.data.cluster.node_name
       } 
       
-    }catch(error){
-
-    }
+    }catch(error){}
   }
-  showToast = (color: string, title: string = '', text: string = '', time: number = 3000) => {
+  showToast(color: string, title: string = '', text: string = '', time: number = 3000){
     toastNotifications.add({
         color: color,
         title: title,
