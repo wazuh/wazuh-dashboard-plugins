@@ -10,7 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment, } from 'react';
+import { I18nProvider } from '../../../../../../../packages/kbn-i18n/src/react'
 import {
   EuiBasicTable,
   EuiLoadingSpinner,
@@ -18,20 +19,26 @@ import {
   EuiTableSortingType,
   EuiFlexItem,
   EuiFlexGroup,
-  Direction
+  Direction,
+  EuiFieldText
 } from '@elastic/eui';
+
 import './discover.less';
+import { SearchBar } from 'kbn_ui/search_bar'
+import { KibanaContextProvider } from '../../../../../../../src/plugins/kibana_react/public/context'
+
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
 import { RowDetails } from './row-details';
-import { WzSearchBar } from '../../../../components/wz-search-bar';
+import { WzDatePicker } from '../../../../components/wz-date-picker';
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { IIndexPattern } from '../../../../../../../src/plugins/data/common';
+import { Filter } from 'es_query/filters';
 
 interface IDiscoverTime { from:string, to:string };
 
 export class Discover extends Component {
-
   timefilter: {
     getTime(): IDiscoverTime
     setTime(time:IDiscoverTime): void
@@ -39,7 +46,7 @@ export class Discover extends Component {
   };
   
   state: {
-    filters: object[],
+    filters: Filter[],
     sort: object,
     alerts: {_source:{}, _id:string}[],
     total: number,
@@ -54,17 +61,16 @@ export class Discover extends Component {
     itemIdToExpandedRowMap: any,
     datePicker: OnTimeChangeProps,
   };
-
+  indexPattern!: IIndexPattern
   props!: {
     implicitFilters: object[],
-    initialFilters: object[]
+    initialFilters: object[],
   }
 
   constructor(props) {
     super(props);
     this.timefilter = getServices().timefilter;
     const { from, to } = this.timefilter.getTime();
-
     this.state = {
       filters: [],
       sort: {},
@@ -92,6 +98,7 @@ export class Discover extends Component {
 
   async componentDidMount() {
     try{
+      this.indexPattern = await getServices().indexPatterns.get("wazuh-alerts-3.x-*")
       const { initialFilters = [] } = this.props;
       this.setState({ filters: initialFilters });
     }catch(err){
@@ -101,7 +108,7 @@ export class Discover extends Component {
 
   async componentDidUpdate() {
     try{
-      await this.getAlerts();
+      // await this.getAlerts();
     }catch(err){
       console.log(err);
     }
@@ -151,16 +158,15 @@ export class Discover extends Component {
     const newFilters = this.buildFilter();
     if(JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading){
       this.setState({ isLoading: true})
-      console.log("fil", newFilters);
       const oldFilters = newFilters.filters;
-      newFilters.filters =  this.props.implicitFilters.concat(newFilters.filters);; // we add the implicit filters
+      newFilters.filters =  this.props.implicitFilters.concat(newFilters.filters); // we add the implicit filters
+      
       const alerts = await GenericRequest.request(
         'POST',
         `/elastic/alerts`,
         newFilters
       );
       newFilters.filters = oldFilters;
-
       this.setState({alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters:newFilters.filters})
     }
   }
@@ -248,19 +254,32 @@ export class Discover extends Component {
 
   getSearchBar(){
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem>
-        <WzSearchBar
-          onInputChange={this.onFiltersChange}
-          qSuggests={[]}
-          apiSuggests={null}
-          initFilters={this.getFiltersAsObject(this.state.filters)}
-          defaultFormat='qTags'
-          noDeleteFiltersOnUpdateSuggests={true}
-          placeholder='Search'
-          onTimeChange={this.onTimeChange} />
-        </EuiFlexItem>
-      </EuiFlexGroup>)
+      <Fragment>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFieldText
+              fullWidth={true} />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <WzDatePicker onTimeChange={this.onTimeChange} />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <KibanaContextProvider services={getServices()} > 
+          <I18nProvider>
+            <SearchBar 
+              indexPatterns={[this.indexPattern]}
+              filters={this.state.filters}
+              onFiltersUpdated={filters => {this.setState({filters}); getServices().data.query.filterManager.setFilters(filters)}}
+              query={{language: "kuery", query: ""}}
+              timeHistory={{add:() =>[], get:() =>[]}}
+              savedQuery={undefined}
+              key={1}
+              {...{data:getServices().data}}
+               />
+          </I18nProvider>
+        </KibanaContextProvider>
+      </Fragment>
+    )
   }
 
   render() {

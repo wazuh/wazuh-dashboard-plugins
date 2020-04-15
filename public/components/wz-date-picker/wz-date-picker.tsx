@@ -45,7 +45,7 @@ export class WzDatePicker extends Component {
   };
 
   props!:{
-    onTimeChange(props:OnTimeChangeProps):() => void
+    onTimeChange(props:OnTimeChangeProps): void
   };
 
   constructor(props) {

@@ -26,8 +26,6 @@ import {
 import { Discover } from '../../../common/modules/discover'
 
 export class FileDetails extends Component {
-  state: {
-  };
 
   props!: {
     currentFile: {
