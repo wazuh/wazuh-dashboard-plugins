@@ -16,19 +16,26 @@ import {
   EuiFlexItem,
   EuiHealth,
   EuiTitle,
-  EuiToolTip
+  EuiToolTip,
+  EuiButton,
+  EuiTab,
+  EuiTabs,
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
 import { TabDescription } from '../../../../server/reporting/tab-description';
+import { MainGeneral } from '../../agents/general';
 import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
 
 export class MainModule extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      selectView: false,
+    };
   }
 
   setGlobalBreadcrumb() {
@@ -85,9 +92,95 @@ export class MainModule extends Component {
     );
   }
 
+  setTabs(tabs, buttons) {
+    this.buttons = buttons;
+    this.tabs = tabs;
+  }
+
+  renderTabs() {
+    const { selectView } = this.state;
+    return (
+      <EuiFlexItem>
+        <EuiTabs display="condensed">
+          {this.tabs.map((tab, index) =>
+            <EuiTab
+              onClick={() => this.onSelectedTabChanged(tab.id)}
+              isSelected={selectView === tab.id}
+              key={index}
+            >
+              {tab.name}
+            </EuiTab>
+          )}
+        </EuiTabs>
+      </EuiFlexItem>
+    );
+  }
+
+  renderReportButton() {
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          iconType="document"
+          onClick={() => this.reportingService.startVis2Png('fim', this.props.agent.id)}>
+          Generate report
+          </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderDashboardButton() {
+    return (
+      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
+        <EuiButton
+          fill={this.state.selectView === 'dashboard'}
+          iconType="visLine"
+          onClick={() => this.onSelectedTabChanged('dashboard')}>
+          Dashboard
+          </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderSettingsButton() {
+    return (
+      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
+        <EuiButton
+          fill={this.state.selectView === 'settings'}
+          iconType="wrench"
+          onClick={() => this.onSelectedTabChanged('settings')}>
+          Configuration
+          </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  loadSection(id) {
+    this.setState({ selectView: id });
+  }
+
+  onSelectedTabChanged(id) {
+    if (id === 'events' || id === 'dashboard') {
+      window.location.href = window.location.href.replace(
+        new RegExp("tabView=" + "[^\&]*"),
+        `tabView=${id === 'events' ? 'discover' : 'panels'}`);
+      this.afterLoad = id;
+      this.loadSection('loader');
+    } else {
+      this.loadSection(id);
+    }
+  }
+
   render() {
-    const { section, agent } = this.props;
+    const { agent, section } = this.props;
+    const { selectView } = this.state;
     const title = this.renderTitle();
+    const mainProps = {
+      selectView,
+      setTabs: (tabs, buttons) => this.setTabs(tabs, buttons),
+      onSelectedTabChanged: (id) => this.onSelectedTabChanged(id),
+      loadSection: (id) => this.loadSection(id),
+      afterLoad: this.afterLoad
+    }
     return (
       <Fragment>
         {(agent && agent.os) &&
@@ -97,8 +190,23 @@ export class MainModule extends Component {
                 {title}
               </div>
             </div>
-            {section === 'fim' && <MainFim {...this.props} />}
-            {section === 'sca' && <MainSca {...this.props} />}
+            <div className='wz-module-header-nav-wrapper'>
+              <div className='wz-module-header-nav'>
+                {(this.tabs && this.tabs.length) &&
+                  <EuiFlexGroup>
+                    {this.renderTabs()}
+                    {(this.buttons || []).includes('dashboard') && selectView === 'dashboard' &&
+                      <Fragment>{this.renderReportButton()}</Fragment>
+                    }
+                    {(this.buttons || []).includes('dashboard') && this.renderDashboardButton()}
+                    {(this.buttons || []).includes('settings') && this.renderSettingsButton()}
+                  </EuiFlexGroup>
+                }
+              </div>
+            </div>
+            {section === 'general' && <MainGeneral {...{ ...this.props, ...mainProps }} />}
+            {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
+            {section === 'sca' && <MainSca {...{ ...this.props, ...mainProps }} />}
           </div>
         }
         {(!agent || !agent.os) &&
