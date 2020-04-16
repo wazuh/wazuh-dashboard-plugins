@@ -253,38 +253,22 @@ export class Discover extends Component {
 
   getSearchBar(){
     return (
-      <Fragment>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiFieldText
-              fullWidth={true} />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <WzDatePicker onTimeChange={this.onTimeChange} />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <KibanaContextProvider services={{...getServices(), storage: {...window.localStorage, get: (key) => window.localStorage.getItem(key), set: (key, value) => window.localStorage.setItem(key, value), remove: (key) => window.localStorage.removeItem(key) }}} > 
-          <I18nProvider>
-            <SearchBar 
-              indexPatterns={[this.indexPattern]}
-              filters={this.state.filters}
-              dateRangeFrom="now-15m"
-              screenTitle=""
-              dateRangeTo="now"
-              onQuerySubmit={e=> console.log(e)}
-              onQueryChange={e=> console.log(e)}
-              onRefreshChange={e=> console.log(e)}
-              onClearSavedQuery={()=> console.log()}
-              isRefreshPaused={true}
-              refreshInterval={0}
-              onFiltersUpdated={filters => {this.setState({filters}); getServices().data.query.filterManager.setFilters(filters)}}
-              query={{language: "kuery", query: ""}}
-              timeHistory={this.timefilter._history}
-              savedQuery={undefined}
-               />
-          </I18nProvider>
-        </KibanaContextProvider>
-      </Fragment>
+      <KibanaContextProvider services={{...getServices(), storage: {...window.localStorage, get: (key) => window.localStorage.getItem(key), set: (key, value) => window.localStorage.setItem(key, value), remove: (key) => window.localStorage.removeItem(key) }}} > 
+        <I18nProvider>
+          <SearchBar 
+            indexPatterns={[this.indexPattern]}
+            filters={this.state.filters}
+            dateRangeFrom="now-15m"
+            screenTitle=""
+            dateRangeTo="now"
+            onQuerySubmit={(e) => console.log(e)}
+            onFiltersUpdated={filters => {this.setState({filters}); getServices().data.query.filterManager.setFilters(filters)}}
+            query={{language: "kuery", query: "asd"}}
+            timeHistory={this.timefilter._history}
+            {...{appName:'wazuh-fim'}}
+              />
+        </I18nProvider>
+      </KibanaContextProvider>
     )
   }
 
