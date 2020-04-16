@@ -19,6 +19,8 @@ import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
 import { RowDetails } from './row-details';
 //@ts-ignore
+import { npSetup } from 'ui/new_platform';
+//@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import {
   EuiBasicTable,
@@ -32,15 +34,14 @@ import {
   IIndexPattern,
   TimeRange,
   Query,
-  esFilters
+  esFilters,
+  esQuery
 } from '../../../../../../../src/plugins/data/common';
-
-interface IDiscoverTime { from:string, to:string };
 
 export class Discover extends Component {
   timefilter: {
-    getTime(): IDiscoverTime
-    setTime(time:IDiscoverTime): void
+    getTime(): TimeRange
+    setTime(time:TimeRange): void
     _history: {history:{items:{from:string, to:string}[]}}
   };
   
@@ -58,7 +59,8 @@ export class Discover extends Component {
     requestSize: number
     requestOffset: number
     itemIdToExpandedRowMap: any,
-    datePicker: TimeRange,
+    dateRange: TimeRange,
+    query: Query,
   };
   indexPattern!: IIndexPattern
   props!: {
@@ -82,11 +84,12 @@ export class Discover extends Component {
       requestSize: 500,
       requestOffset: 0,
       itemIdToExpandedRowMap: {},
-      datePicker: this.timefilter.getTime(),
+      dateRange: this.timefilter.getTime(),
+      query: {language: "kuery", query: ""}
     }
 
     this.onQuerySubmit.bind(this);
-    this.onTimeChange.bind(this);
+    this.onFiltersUpdated.bind(this);
   }
 
   async componentDidMount() {
@@ -100,8 +103,20 @@ export class Discover extends Component {
   }
 
   async componentDidUpdate() {
+    const { filters, query } = this.state;
+    // TODO: This is an example to build the Elastic query
+    console.log(
+      "Elastic query:",
+      esQuery.buildEsQuery(
+        undefined, 
+        query, 
+        filters, 
+        esQuery.getEsQueryConfig(npSetup.core.uiSettings)
+      )
+    )
+
     try{
-      await this.getAlerts();
+      // await this.getAlerts();
     }catch(err){
       console.log(err);
     }
@@ -220,11 +235,6 @@ export class Discover extends Component {
 
   }
 
-  onTimeChange = (datePicker: TimeRange) => {
-    this.setState({datePicker});
-    this.timefilter.setTime(datePicker);
-  }
-
   getFiltersAsObject(filters){
     var result = {};
     for (var i = 0; i < filters.length; i++) {
@@ -245,7 +255,13 @@ export class Discover extends Component {
 
   onQuerySubmit = (payload:{dateRange: TimeRange, query?: Query | undefined}) => {
     const { dateRange, query } = payload;
-    this.onTimeChange(dateRange);
+    this.timefilter.setTime(dateRange);
+    this.setState({dateRange, query});
+  }
+
+  onFiltersUpdated = (filters: esFilters.Filter[]) => {
+    getServices().data.query.filterManager.setFilters(filters);
+    this.setState({filters});
   }
 
   getSearchBar(){
@@ -255,22 +271,21 @@ export class Discover extends Component {
       set: (key, value) => window.localStorage.setItem(key, value),
       remove: (key) => window.localStorage.removeItem(key) 
     }
-    const { datePicker } = this.state;
+    const { dateRange, query, filters } = this.state;
     return (
       <KibanaContextProvider services={{...getServices(), storage}} > 
         <I18nProvider>
           <SearchBar 
             indexPatterns={[this.indexPattern]}
-            filters={this.state.filters}
-            dateRangeFrom={datePicker.from}
+            filters={filters}
+            dateRangeFrom={dateRange.from}
             screenTitle=""
-            dateRangeTo={datePicker.to}
+            dateRangeTo={dateRange.to}
             onQuerySubmit={this.onQuerySubmit}
-            onFiltersUpdated={filters => {this.setState({filters}); getServices().data.query.filterManager.setFilters(filters)}}
-            query={{language: "kuery", query: ""}}
+            onFiltersUpdated={this.onFiltersUpdated}
+            query={query}
             timeHistory={this.timefilter._history}
-            {...{appName:'wazuh-fim'}}
-              />
+            {...{appName:'wazuh-fim'}} />
         </I18nProvider>
       </KibanaContextProvider>
     );
