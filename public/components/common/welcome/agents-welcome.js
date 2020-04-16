@@ -50,7 +50,7 @@ export class AgentsWelcome extends Component {
   renderTitle() {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-title">
+        <EuiFlexItem className="wz-module-header-agent-title">
           <EuiTitle size="s">
             <h1>
               <EuiToolTip position="right" content={this.props.agent.status}>
@@ -84,8 +84,8 @@ export class AgentsWelcome extends Component {
     const title = this.renderTitle();
     return (
       <div className='wz-module'>
-        <div className='wz-module-header-wrapper'>
-          <div className='wz-module-header wz-module-header-main wz-module-header-agent-title'>
+        <div className='wz-module-header-agent-wrapper'>
+          <div className='wz-module-header-agent'>
             {title}
           </div>
         </div>

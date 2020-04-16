@@ -147,8 +147,8 @@ export class MainFim extends Component {
     const settingsButton = this.renderSettingsButton();
     return (
       <Fragment>
-        <div className='wz-module-header-wrapper wz-module-header-wrapper-nav'>
-          <div className='wz-module-header wz-module-header-nav'>
+        <div className='wz-module-header-nav-wrapper'>
+          <div className='wz-module-header-nav'>
             <EuiFlexGroup>
               {tabs}
               {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
