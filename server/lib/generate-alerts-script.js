@@ -14,6 +14,7 @@
 const IPs = ['141.98.81.37', '54.10.24.5', '187.80.4.18', '134.87.21.47', '40.220.102.15', '45.124.37.241', '45.75.196.15', '16.4.20.20'];
 const Users = ['juanca','pablo','jose', 'alberto', 'antonio', 'victor', 'jesus', 'santiago', 'pedro', 'root', 'admin']
 const Ports = [22, 55047, 26874, 8905, 3014, 2222, 4547];
+const Win_Hostnames = ['Win_Server_01', 'Win_Server_02', 'Win_Server_03','Win_Server_04'];
 
 //Alert
 const alertIDMax = 6000;
@@ -102,9 +103,8 @@ const vulnerabilityCwe_reference = ["CWE-527", "CWE-911", "CWE-409", "CWE-102", 
 const vulnerabilityReference = ["Sample vulnerability reference 1", "Sample vulnerability reference 2", "Sample vulnerability reference 3", "Sample vulnerability reference 4"];
 const vulnerabilityTitle = ["Sample vulnerability 1", "Sample vulnerability 2", "Sample vulnerability 3", "Sample vulnerability 4"];
 
-// SSH
+// Authenticathin
 const sshRuleDescription = ['sshd: authentication failed.', 'sshd: Multiple authentication failures.']
-const sshInvalidLoginRuleDescription = ['sshd: Attempt to login using a non-existent user'];
 
 // Geolocation {country_name, location: {lon, lat}, region_name}
 const geolocation = [
@@ -114,7 +114,8 @@ const geolocation = [
             lon: 37.1881714,
             lat: -3.6066699
         },
-        region_name: 'Granada'
+        region_name: 'Andalusia',
+        city_name: 'Granada'
     },
     {
         country_name: 'France',
@@ -122,7 +123,8 @@ const geolocation = [
             lon: 48.8534088,
             lat: 2.3487999
         },
-        region_name: 'Paris'
+        region_name: 'Paris',
+        city_name: 'Paris'
     },
     {
         country_name: 'England',
@@ -130,7 +132,8 @@ const geolocation = [
             lon: 51.5085297,
             lat: -0.12574
         },
-        region_name: 'London'
+        region_name: 'London',
+        city_name: 'London'
     },
     {
         country_name: 'Germany',
@@ -138,7 +141,8 @@ const geolocation = [
             lon: 52.524,
             lat: 13.411
         },
-        region_name: 'Berlin'
+        region_name: 'Berlin',
+        city_name: 'Berlin'
     },
     {
         country_name: 'United States of America',
@@ -146,7 +150,9 @@ const geolocation = [
             lon: 40.7142715,
             lat: -74.0059662
         },
-        region_name: 'New York'
+        region_name: 'New York',
+        city_name: 'New York'
+
     },
     {
         country_name: 'Canada',
@@ -154,7 +160,8 @@ const geolocation = [
             lon: 49.2496605,
             lat: -123.119339
         },
-        region_name: 'Vancouver'
+        region_name: 'Vancouver',
+        city_name: 'Vancouver'
     },
     {
         country_name: 'Brasil',
@@ -162,7 +169,8 @@ const geolocation = [
             lon: -22.9064198,
             lat: -43.1822319
         },
-        region_name: 'Río de Janeiro'
+        region_name: 'Río de Janeiro',
+        city_name: 'Río de Janeiro'
     },
     {
         country_name: 'India',
@@ -170,7 +178,8 @@ const geolocation = [
             lon: 19.0728302,
             lat: 72.8826065
         },
-        region_name: 'Bombay'
+        region_name: 'Bombay',
+        city_name: 'Bombay'
     },
     {
         country_name: 'Australia',
@@ -178,7 +187,8 @@ const geolocation = [
             lon: -33.8678513,
             lat: 151.2073212
         },
-        region_name: 'Sydney'
+        region_name: 'Sydney',
+        city_name: 'Sydney'
     },
     {
         country_name: 'China',
@@ -186,7 +196,8 @@ const geolocation = [
             lon: 31.222,
             lat: 121.458
         },
-        region_name: 'Shanghai'
+        region_name: 'Shanghai',
+        city_name: 'Shanghai'
     },
 ]
 /**
@@ -446,7 +457,7 @@ function generateAlert(params) {
         alert.rule.nist_800_53 = [getRandomFromArray(nist_800_53)];
     }
 
-    if (params.ssh) {
+    if (params.authentication) {
         alert.data.srcip = getRandomFromArray(IPs);
         alert.data.srcuser = getRandomFromArray(Users);
         alert.data.srcport = getRandomFromArray(Ports);
@@ -455,14 +466,16 @@ function generateAlert(params) {
             name: 'sshd',
             parent: 'sshd'
         }
-        alert.input.type = 'log';
+        alert.input = {
+            type: 'log'
+        };
         alert.location = '/var/log/auth.log';
         alert.rule.description = getRandomFromArray(sshRuleDescription);
         alert.rule.groups = ['syslog', 'sshd'];
         alert.predecoder = {
             hostname: '',// TODO:ip-10-0-0-179
             program_name: 'sshd',
-            timestamp: ''// TODO:Apr 16 11:21:10
+            timestamp: alert.timestamp // TODO:Apr 16 11:21:10
         }
         alert.rule.pci_dss = [getRandomFromArray(pci_dss)];
         alert.rule.gdpr = [getRandomFromArray(gdpr)];
@@ -470,26 +483,80 @@ function generateAlert(params) {
         alert.rule.hipaa = [getRandomFromArray(hipaa)];
         alert.rule.nist_800_53 = [getRandomFromArray(nist_800_53)];
 
-        if(params.ssh.invalid_login_password){
+        if(params.authentication.invalid_login_password){
             alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
             alert.location = '/var/log/secure';
+            alert.rule.description = 'sshd: authentication failed.';
             alert.rule.groups = ['syslog', 'sshd', 'invalid_login', 'authentication_failed'];
             alert.rule.id = 5710;
+            alert.rule.id = 5;
         }
-        if (params.ssh.invalid_login_user){
+        if (params.authentication.invalid_login_user){
             alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[10022]: Invalid user admin from ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
             alert.location = '/var/log/secure';
             alert.rule.description = 'sshd: Attempt to login using a non-existent user';
             alert.rule.groups = ['syslog', 'sshd', 'invalid_login', 'authentication_failed'];
             alert.rule.id = 5710;
+            alert.rule.id = 5;
         }
-        if (params.ssh.multiple_authentication_failures) {
+        if (params.authentication.multiple_authentication_failures) {
             alert.full_log = alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
             alert.location = '/var/log/secure';
             alert.rule.description = 'sshd: Multiple authentication failures.';
             alert.rule.frequency = randomIntegerFromInterval(5,50);
             alert.rule.groups = ['syslog', 'sshd', 'authentication_failures'];
             alert.rule.id = 5720;
+            alert.rule.level = 10;
+        }
+        if (params.authentication.windows) {
+            alert.full_log = alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
+            alert.data.win = {
+                eventdata: {
+                    authenticationPackageName: 'NTLM',
+                    failureReason: '%%2313',
+                    ipAddress: getRandomFromArray(IPs),
+                    ipPort: getRandomFromArray(Ports),
+                    keyLength: 0,
+                    logonProcessName: 'NtLmSsp',
+                    logonType: '3',
+                    processId: '0x0',
+                    status: '0xc000006d',
+                    subStatus: '0xc0000064',
+                    subjectLogonId: '0x0',
+                    subjectUserSid: "S-1-0-0",
+                    targetUserName: "DIRECTION"
+                },
+                system: {
+                    channel: 'Security',
+                    computer: getRandomFromArray(Win_Hostnames),
+                    eventID: `${randomIntegerFromInterval(1,600)}`,
+                    eventRecordID: `${randomIntegerFromInterval(10000,50000)}`,
+                    keywords: '0x8010000000000000',
+                    level: '0',
+                    message: '',
+                    opcode: '0',
+                    processID: `${randomIntegerFromInterval(1,1200)}`,
+                    providerGuid: '{54849625-5478-4994-a5ba-3e3b0328c30d}',
+                    providerName: 'Microsoft-Windows-Security-Auditing',
+                    severityValue: 'AUDIT_FAILURE',
+                    systemTime: alert.timestamp,
+                    task: `${randomIntegerFromInterval(1,1800)}`,
+                    threadID: `${randomIntegerFromInterval(1,500)}`,
+                    version: '0'
+                }
+            }
+            alert.decoder.name = 'windows_eventchannel';
+            alert.location = 'EventChannel';
+            alert.rule.description = 'Logon Failure - Unknown user or bad password';
+            alert.rule.frequency = randomIntegerFromInterval(5,50);
+            alert.rule.groups = ['windows',  'windows_security', 'win_authentication_failed'];
+            alert.rule.id = 60122;
+            alert.rule.level = 5
+            alert.gdpr = ['IV_35.7.d', 'IV_32.2'];
+            alert.gpg13 = ['7.1'];
+            alert.hipaa = ['164.312.b'];
+            alert.nist_800_53 = ['AU.1', 'AC.7'];
+            alert.gdpr = ['10.2.4', '10.2.5'];
         }
     }
 
@@ -553,15 +620,21 @@ function randomDate() {
 
 // Format date
 const formatterNumber = (number, zeros = 0) => ("0".repeat(zeros) + `${number}`).slice(-zeros);
+const monthNames = {
+    long: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+};
 function formatDate(date, format){ // It could use "moment" library to format strings too,
     const tokens = {
-        'D': (d) => formatterNumber(date.getDate(), 2),
-        'M': (d) => formatterNumber(date.getMonth() + 1, 2),
-        'Y': (d) => date.getFullYear(),
-        'h': (d) => formatterNumber(date.getHours(), 2),
-        'm': (d) => formatterNumber(date.getMinutes(), 2),
-        's': (d) => formatterNumber(date.getSeconds(), 2),
-        'l': (d) => formatterNumber(date.getMilliseconds(), 3)
+        'D': (d) => formatterNumber(date.getDate(), 2), // 01-31
+        'M': (d) => formatterNumber(date.getMonth() + 1, 2), // 01-12
+        'J': (d) => monthNames.long(date.getMonth()), // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        'N': (d) => monthNames.short(date.getMonth()), // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        'Y': (d) => date.getFullYear(), // 2020
+        'h': (d) => formatterNumber(date.getHours(), 2), // 00-23
+        'm': (d) => formatterNumber(date.getMinutes(), 2), // 00-59
+        's': (d) => formatterNumber(date.getSeconds(), 2), // 00-59
+        'l': (d) => formatterNumber(date.getMilliseconds(), 3) // 000-999
     }
 
     return format.split('').reduce((accum, token) => {
