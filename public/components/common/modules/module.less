@@ -4,7 +4,7 @@
     width: 100%;
 }
 
-.wz-module-header-wrapper{
+.wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
     width: 100%;
     position: fixed;
     padding-left: 48px;
@@ -12,65 +12,51 @@
     left: 0;
 }
 
-.wz-module-header-wrapper-nav{
+.wz-module-header-agent, .wz-module-header-nav{
     border-bottom: 1px solid #D3DAE6;
-    margin-top: 50px;
-    height: 50px;
-}
-
-.wz-module-header {
-    padding: 16px;
-    height: 50px;
-}
-
-.wz-module-header-agent-title{
-    height: 100px;
     background:white;
+    padding: 16px;
+}
+
+.wz-module-header-agent{
+    height: 50px;
 }
 
 .wz-module-header-nav{
-    padding-top: 0px;
+    margin-top: 11px;
+    padding: 0px 16px;
+    min-height: 55px;
 }
 
-.wz-module-header-nav .euiFlexItem{
-    margin-top: 7px;
+.wz-module-header-nav > .euiFlexGroup {
+    margin-top: -16px;
 }
 
-.wz-module-header .wz-module-header-title{    
+.wz-module-header-nav > .euiFlexGroup .euiFlexItem{
+    margin-top: 0px;
+}
+
+.wz-module-header-agent-title{    
     margin: 6px 12px!important;
 }
 
-.wz-module-header-main{
-    height: 50px;
-    background: white;
-    border-bottom: 1px solid #D3DAE6;
-}
-
-.wz-module-header-main .wz-module-header-title{    
-    margin: 6px 12px 14px 12px!important;
-}
-
-.wz-module-header-main .euiStat .euiTitle{    
-    height: 30px;
-}
-
-.wz-module-header h1{    
+.wz-module-header-agent h1{    
     font-weight: 300;
 }
 
-.wz-module-header-main h1{    
-    font-weight: 400;
-}
-
-.wz-module-header h1 b{    
+.wz-module-header-agent h1 b{    
     font-weight: 500;
 }
 
-.wz-module-header .euiTabs{
+.wz-module-header-nav-wrapper{
+    margin-top: 50px;
+}
+
+.wz-module-header-nav .euiTabs{
     padding-top: 6px;
 }
 
-.wz-module-header .euiTab__content{
+.wz-module-header-nav .euiTab__content{
     font-size: 16px!important;
 }
 
@@ -86,14 +72,32 @@
     margin-top: 62px!important;
 }
 
-
 discover-app-w .sidebar-container {
     background-color: transparent!important;
 }
 
 @media only screen and (max-width: 767px){
-    .wz-module-agent-title-wrapper, .wz-module-nav-wrapper{
+    .wz-module-header-agent h1{    
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .wz-module-body {
+        margin-top: 0px;
+    }
+
+    .wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
+        position: relative;
         padding-left: 0px;
+    }
+
+    .wz-module-header-nav-wrapper{
+        margin-top: 15px;
+    }
+
+    .wz-module-header-nav {
+        padding-bottom: 16px;
     }
 
     .wz-module-body-agent-info > .euiFlexGroup > .euiFlexItem {
