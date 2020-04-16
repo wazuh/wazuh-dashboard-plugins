@@ -376,7 +376,7 @@ function generateAlert(params) {
         alert.data.cis.notchecked = randomIntegerFromInterval(0, 100);
         alert.data.cis.score = randomIntegerFromInterval(0, 100);
         alert.data.cis.pass = randomIntegerFromInterval(0, 100);
-        alert.data.cis.timestamp = randomDate();
+        alert.data.cis.timestamp = new Date(randomDate());
         alert.data.cis.error = randomIntegerFromInterval(0, 1);
         alert.data.cis.benchmark = getRandomFromArray(ciscatBenchmark);
         alert.data.cis.unknown = randomIntegerFromInterval(0, 1);
