@@ -12,6 +12,8 @@
 import { GenericRequest } from "./generic-request";
 import { AppState } from "./app-state";
 import { WzMisc } from "../factories/misc";
+import { SavedObject } from './saved-objects';
+import { toastNotifications } from 'ui/notify';
 
 export class PatternHandler {
 
@@ -20,32 +22,46 @@ export class PatternHandler {
    */
   static async getPatternList() {
     try {
-      const patternList = await GenericRequest.request(
-        'GET',
-        '/elastic/index-patterns',
-        {}
-      );
+      var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
 
-      if (!patternList.data.data.length) {
-        AppState.removeCurrentPattern();
+      if (!patternList.length) { // if no valid index patterns are found we try to create the wazuh-alerts-3.x-*
+        try{
+          toastNotifications.add({
+            color: 'warning',
+            title: 'No valid index patterns were found, proceeding to create default wauzh-alerts-3.x-* index pattern',
+            toastLifeTimeMs: 5000,
+          });
 
-        this.wzMisc = new WzMisc();
-        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen')){
-          window.location.href = "/app/wazuh#/blank-screen/";
+          await SavedObject.createWazuhIndexPattern();
+        }catch(err){
+
+          toastNotifications.add({
+            color: 'error',
+            title: 'Error creating the index pattern.',
+            toastLifeTimeMs: 3000,
+          });
+          AppState.removeCurrentPattern();
+
+          this.wzMisc = new WzMisc();
+          this.wzMisc.setBlankScr('Sorry but no valid index patterns were found and creation was unsuccessful');
+          if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen')){
+            window.location.href = "/app/wazuh#/blank-screen/";
+          }
+          return;
         }
-        return;
+        // retry again with the newly created index pattern
+        patternList =  await SavedObject.getListOfWazuhValidIndexPatterns();
       }
 
       if (AppState.getCurrentPattern()) {
-        let filtered = patternList.data.data.filter(item =>
+        let filtered = patternList.filter(item =>
           item.id === AppState.getCurrentPattern()
         );
         if (!filtered.length)
-          AppState.setCurrentPattern(patternList.data.data[0].id);
+          AppState.setCurrentPattern(patternList[0].id);
       }
 
-      return patternList.data.data;
+      return patternList;
     } catch (error) {
       throw new Error('Error Pattern Handler (getPatternList)')
     }
