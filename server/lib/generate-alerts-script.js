@@ -76,7 +76,7 @@ const oscapScanProfileTitle = ["xccdf_org.ssgproject.content_profile_standard", 
 const oscapCheckSeverity = ["low", "medium", "high"];
 const oscapCheckResult = ["fail"];
 const oscapScanContent = ["ssg-centos-7-ds.xml", "ssg-centos-6-ds.xml", "ssg-rhel6-ds.xml", "ssg-ubuntu18-ds.xml", "ssg-debian-ds.xml", "ssg-fedora-ds.xml"];
-const oscapCheckTitle = ["Sample OpenSCAP title 1", "Sample OpenSCAP title 2", "Sample OpenSCAP title 3", "Sample OpenSCAP title 4", "Sample OpenSCAP title 5", "Sample OpenSCAP title 6"];
+const oscapCheckTitle = ["Record Attempts to Alter the localtime File", "Record Attempts to Alter Time Through clock_settime", "Ensure auditd Collects Unauthorized Access Attempts to Files (unsuccessful)", "Ensure auditd Collects System Administrator Actions", "Ensure auditd Collects File Deletion Events by User"];
 
 // Osquery
 const osqueryName = ["Sample Osquery alert 1", "Sample Osquery alert 2", "Sample Osquery alert 3", "Sample Osquery alert 4", "Sample Osquery alert 5"];
