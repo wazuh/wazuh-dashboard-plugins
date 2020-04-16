@@ -39,6 +39,7 @@ const awsBuckets = ["aws-bucket1", "aws-bucket2", "aws-bucket3"];
 const auditCommand = ["sudo", "ssh", "cron", "ls"];
 const auditExe = ["/usr/sbin/sudo", "/usr/sbin/sshd", "/usr/sbin/crond", "/usr/bin/ls"]; // https://wazuh.com/blog/monitoring-root-actions-on-linux-using-auditd-and-wazuh/
 const auditFileName = ["/etc/samplefile", "/etc/sample/file", "/var/sample"];
+const auditRuleDescription = ["Auditd: device enables promiscuous mode", "Auditd: SELinux permission check", "Auditd: End", "Auditd: Configuration changed", "Audit: Command: "];
 
 // CIS-CAT
 // More info https://documentation.wazuh.com/3.12/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html
@@ -312,6 +313,8 @@ function generateAlert(params) {
         alert.data.audit.command = getRandomFromArray(auditCommand);
         alert.data.audit.file = { name: getRandomFromArray(auditFileName) };
         alert.data.audit.exe = getRandomFromArray(auditExe);
+        alert.rule.description = getRandomFromArray(auditRuleDescription);
+        alert.rule.description = alert.rule.description === 'Audit: Command: ' ? `Audit: Command: ${alert.rule.description}` : alert.rule.description;
     }
 
     if (params.ciscat) {
