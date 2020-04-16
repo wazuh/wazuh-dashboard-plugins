@@ -26,6 +26,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
 import { TabDescription } from '../../../../server/reporting/tab-description';
+import { Events, Dashboard, Loader } from '../../common/modules';
 import { MainGeneral } from '../../agents/general';
 import { MainFim } from '../../agents/fim';
 import { MainPm } from '../../agents/pm';
@@ -216,21 +217,30 @@ export class MainModule extends Component {
                 }
               </div>
             </div>
-            {section === 'general' && <MainGeneral {...{ ...this.props, ...mainProps }} />}
-            {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
-            {section === 'pm' && <MainPm {...{ ...this.props, ...mainProps }} />}
-            {section === 'sca' && <MainSca {...{ ...this.props, ...mainProps }} />}
-            {section === 'audit' && <MainAudit {...{ ...this.props, ...mainProps }} />}
-            {section === 'oscap' && <MainOscap {...{ ...this.props, ...mainProps }} />}
-            {section === 'ciscat' && <MainCiscat {...{ ...this.props, ...mainProps }} />}
-            {section === 'vuls' && <MainVuls {...{ ...this.props, ...mainProps }} />}
-            {section === 'virustotal' && <MainVirustotal {...{ ...this.props, ...mainProps }} />}
-            {section === 'osquery' && <MainOsquery {...{ ...this.props, ...mainProps }} />}
-            {section === 'docker' && <MainDocker {...{ ...this.props, ...mainProps }} />}
-            {section === 'pci' && <MainPci {...{ ...this.props, ...mainProps }} />}
-            {section === 'gdpr' && <MainGdpr {...{ ...this.props, ...mainProps }} />}
-            {section === 'hipaa' && <MainHipaa {...{ ...this.props, ...mainProps }} />}
-            {section === 'nist' && <MainNist {...{ ...this.props, ...mainProps }} />}
+            <div className='wz-module-body'>
+              {selectView === 'events' && <Events {...this.props} />}
+              {selectView === 'loader' &&
+                <Loader {...this.props}
+                  loadSection={(section) => this.loadSection(section)}
+                  redirect={this.afterLoad}>
+                </Loader>}
+              {selectView === 'dashboard' && <Dashboard {...this.props} />}
+              {section === 'general' && <MainGeneral {...{ ...this.props, ...mainProps }} />}
+              {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
+              {section === 'pm' && <MainPm {...{ ...this.props, ...mainProps }} />}
+              {section === 'sca' && <MainSca {...{ ...this.props, ...mainProps }} />}
+              {section === 'audit' && <MainAudit {...{ ...this.props, ...mainProps }} />}
+              {section === 'oscap' && <MainOscap {...{ ...this.props, ...mainProps }} />}
+              {section === 'ciscat' && <MainCiscat {...{ ...this.props, ...mainProps }} />}
+              {section === 'vuls' && <MainVuls {...{ ...this.props, ...mainProps }} />}
+              {section === 'virustotal' && <MainVirustotal {...{ ...this.props, ...mainProps }} />}
+              {section === 'osquery' && <MainOsquery {...{ ...this.props, ...mainProps }} />}
+              {section === 'docker' && <MainDocker {...{ ...this.props, ...mainProps }} />}
+              {section === 'pci' && <MainPci {...{ ...this.props, ...mainProps }} />}
+              {section === 'gdpr' && <MainGdpr {...{ ...this.props, ...mainProps }} />}
+              {section === 'hipaa' && <MainHipaa {...{ ...this.props, ...mainProps }} />}
+              {section === 'nist' && <MainNist {...{ ...this.props, ...mainProps }} />}
+            </div>
           </div>
         }
         {(!agent || !agent.os) &&

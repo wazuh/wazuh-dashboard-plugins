@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Events, Dashboard, Loader } from '../../common/modules';
 
 export class MainVuls extends Component {
   tabs = [
@@ -14,21 +13,7 @@ export class MainVuls extends Component {
   }
 
   render() {
-    const { selectView } = this.props;
-    if (selectView) {
-      return (
-        <div className='wz-module-body'>
-          {selectView === 'events' && <Events {...this.props} />}
-          {selectView === 'loader' &&
-            <Loader {...this.props}
-              loadSection={(section) => this.props.loadSection(section)}
-              redirect={this.props.afterLoad}>
-            </Loader>}
-          {selectView === 'dashboard' && <Dashboard {...this.props} />}
-        </div>
-      );
-    } else {
-      return false;
-    }
+    return false;
   }
 }
+

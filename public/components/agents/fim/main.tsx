@@ -57,19 +57,11 @@ export class MainFim extends Component {
     const { selectView } = this.props;
     if (selectView) {
       return (
-        <div className='wz-module-body'>
+        <div>
           {selectView === 'states' &&
             <States {...this.props}
               loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)}
             />}
-          {selectView === 'events' && <Events {...this.props} />}
-          {selectView === 'loader' &&
-            <Loader {...this.props}
-              loadSection={(section) => this.props.loadSection(section)}
-              redirect={this.props.afterLoad}>
-            </Loader>}
-          {selectView === 'dashboard' && <Dashboard {...this.props} />}
-          {selectView === 'settings' && <Settings {...this.props} />}
         </div>
       );
     } else {

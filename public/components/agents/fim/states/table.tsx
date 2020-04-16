@@ -249,6 +249,7 @@ export class StatesTable extends Component {
             agentId={this.props.agent.id}
             closeFlyout={() => this.closeFlyout()}
             showViewInEvents={true}
+            type='file'
             {...this.props}>
           </FlyoutDetail>
         }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { States, Settings } from './index';
-import { Events, Loader } from '../../common/modules';
+import { States } from './index';
 
 export class MainSca extends Component {
   tabs = [
@@ -20,15 +19,8 @@ export class MainSca extends Component {
     const { selectView } = this.props;
     if (selectView) {
       return (
-        <div className='wz-module-body'>
+        <div>
           {selectView === 'states' && <States {...this.props} />}
-          {selectView === 'events' && <Events {...this.props} />}
-          {selectView === 'loader' &&
-            <Loader {...this.props}
-              loadSection={(section) => this.props.loadSection(section)}
-              redirect={this.props.afterLoad}>
-            </Loader>}
-          {selectView === 'settings' && <Settings {...this.props} />}
         </div>
       );
     } else {

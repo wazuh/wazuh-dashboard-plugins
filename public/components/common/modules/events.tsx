@@ -36,19 +36,21 @@ export class Events extends Component {
   async getDiscoverScope() {
     const app = getAngularModule('app/wazuh');
     const fields = EventsSelectedFiles[this.props.section];
-    if (fields && app.discoverScope && app.discoverScope.addColumn) {
+    if (app.discoverScope && app.discoverScope.addColumn) {
       app.discoverScope.state.columns = [];
-      fields.forEach(field => {
-        if (!app.discoverScope.state.columns.includes(field)) {
-          app.discoverScope.addColumn(field);
-        }
-      });
+      if (fields) {
+        fields.forEach(field => {
+          if (!app.discoverScope.state.columns.includes(field)) {
+            app.discoverScope.addColumn(field);
+          }
+        });
+      }
       app.discoverScope.$watchCollection('fetchStatus',
-      () => {
-        if (app.discoverScope.fetchStatus === 'complete') {
-          setTimeout(() => { this.cleanAvailableFields() }, 1000);
-        }
-      });
+        () => {
+          if (app.discoverScope.fetchStatus === 'complete') {
+            setTimeout(() => { this.cleanAvailableFields() }, 1000);
+          }
+        });
     } else {
       setTimeout(() => { this.getDiscoverScope() }, 200);
     }
