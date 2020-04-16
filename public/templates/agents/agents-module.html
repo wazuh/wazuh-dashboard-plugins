@@ -36,5 +36,7 @@
         </div>
     </div>
     <!-- End report status section -->
-    <react-component ng-show='showModuleDashboard' name="WzVisualize" props="visualizeProps" />
+    <div ng-if="visualizeProps">
+        <react-component ng-show='showModuleDashboard' name="WzVisualize" props="visualizeProps" />
+    </div>
 </div>

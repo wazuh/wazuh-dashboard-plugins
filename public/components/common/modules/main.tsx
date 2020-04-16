@@ -29,6 +29,10 @@ import { TabDescription } from '../../../../server/reporting/tab-description';
 import { MainGeneral } from '../../agents/general';
 import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
+import { MainPci } from '../../agents/pci';
+import { MainGdpr } from '../../agents/gdpr';
+import { MainHipaa } from '../../agents/hipaa';
+import { MainNist } from '../../agents/nist';
 
 export class MainModule extends Component {
   constructor(props) {
@@ -207,6 +211,11 @@ export class MainModule extends Component {
             {section === 'general' && <MainGeneral {...{ ...this.props, ...mainProps }} />}
             {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
             {section === 'sca' && <MainSca {...{ ...this.props, ...mainProps }} />}
+
+            {section === 'pci' && <MainPci {...{ ...this.props, ...mainProps }} />}
+            {section === 'gdpr' && <MainGdpr {...{ ...this.props, ...mainProps }} />}
+            {section === 'hipaa' && <MainHipaa {...{ ...this.props, ...mainProps }} />}
+            {section === 'nist' && <MainNist {...{ ...this.props, ...mainProps }} />}
           </div>
         }
         {(!agent || !agent.os) &&

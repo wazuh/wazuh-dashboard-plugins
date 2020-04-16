@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { States, Settings } from './index';
@@ -57,22 +57,20 @@ export class MainFim extends Component {
     const { selectView } = this.props;
     if (selectView) {
       return (
-        <Fragment>
-          <div className='wz-module-body'>
-            {selectView === 'states' &&
-              <States {...this.props}
-                loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)}
-              />}
-            {selectView === 'events' && <Events {...this.props} />}
-            {selectView === 'loader' &&
-              <Loader {...this.props}
-                loadSection={(section) => this.props.loadSection(section)}
-                redirect={this.props.afterLoad}>
-              </Loader>}
-            {selectView === 'dashboard' && <Dashboard {...this.props} />}
-            {selectView === 'settings' && <Settings {...this.props} />}
-          </div>
-        </Fragment>
+        <div className='wz-module-body'>
+          {selectView === 'states' &&
+            <States {...this.props}
+              loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)}
+            />}
+          {selectView === 'events' && <Events {...this.props} />}
+          {selectView === 'loader' &&
+            <Loader {...this.props}
+              loadSection={(section) => this.props.loadSection(section)}
+              redirect={this.props.afterLoad}>
+            </Loader>}
+          {selectView === 'dashboard' && <Dashboard {...this.props} />}
+          {selectView === 'settings' && <Settings {...this.props} />}
+        </div>
       );
     } else {
       return false;

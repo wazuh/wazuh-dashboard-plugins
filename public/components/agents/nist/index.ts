@@ -1,0 +1,1 @@
+export { MainNist } from './main';

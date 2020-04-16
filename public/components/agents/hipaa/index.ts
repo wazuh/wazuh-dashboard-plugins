@@ -1,0 +1,1 @@
+export { MainHipaa } from './main';

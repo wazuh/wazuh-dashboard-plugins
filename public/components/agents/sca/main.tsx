@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { States, Settings } from './index';
 import { Events, Loader } from '../../common/modules';
 
@@ -20,18 +20,16 @@ export class MainSca extends Component {
     const { selectView } = this.props;
     if (selectView) {
       return (
-        <Fragment>
-          <div className='wz-module-body'>
-            {selectView === 'states' && <States {...this.props} />}
-            {selectView === 'events' && <Events {...this.props} />}
-            {selectView === 'loader' &&
-              <Loader {...this.props}
-                loadSection={(section) => this.props.loadSection(section)}
-                redirect={this.props.afterLoad}>
-              </Loader>}
-            {selectView === 'settings' && <Settings {...this.props} />}
-          </div>
-        </Fragment>
+        <div className='wz-module-body'>
+          {selectView === 'states' && <States {...this.props} />}
+          {selectView === 'events' && <Events {...this.props} />}
+          {selectView === 'loader' &&
+            <Loader {...this.props}
+              loadSection={(section) => this.props.loadSection(section)}
+              redirect={this.props.afterLoad}>
+            </Loader>}
+          {selectView === 'settings' && <Settings {...this.props} />}
+        </div>
       );
     } else {
       return false;

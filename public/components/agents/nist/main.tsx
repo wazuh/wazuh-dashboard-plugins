@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Events, Dashboard, Loader } from '../../common/modules';
 
-export class MainGeneral extends Component {
+export class MainNist extends Component {
   tabs = [
     { id: 'events', name: 'Events' },
   ]

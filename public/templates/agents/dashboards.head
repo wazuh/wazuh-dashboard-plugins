@@ -3,6 +3,10 @@
     tab !== 'general' && 
     tab !== 'fim' && 
     tab !== 'sca' && 
+    tab !== 'pci' && 
+    tab !== 'gdpr' && 
+    tab !== 'hipaa' && 
+    tab !== 'nist' && 
     tab !== 'welcome' 
     && tab !== 'configuration'">
         <!-- Navigation section -->
