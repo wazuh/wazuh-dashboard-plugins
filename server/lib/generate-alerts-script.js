@@ -83,7 +83,8 @@ const osqueryAction = ["added", "removed"];
 const osqueryPack = ["/etc/osquery-packs/custom_pack.conf", "/etc/osquery-packs/custom_pack2.conf", "/etc/osquery-packs/custom_pack3.conf", "/etc/osquery-packs/custom_pack4.conf", "/etc/osquery-packs/custom_pack5.conf", "/etc/osquery-packs/custom_pack6.conf"];
 
 // Policy monitoring
-const pmTitle = ["Sample policy monitoring 1", "Sample policy monitoring 2", "Sample policy monitoring 3", "Sample policy monitoring 4", "Sample policy monitoring 5", "Sample policy monitoring 6"];
+const pmTitle = ["Trojaned version of file detected."];
+const pmRuleDescription = ["Host-based anomaly detection event (rootcheck).", "System Audit event."];
 
 // Virustotal
 const virustotalSourceFile = ['/usr/share/sample/program', "/etc/data/file", "/etc/sample/script", "/root/super-script", "/bin/node", "/var/opt/amazing-file"];
@@ -367,6 +368,7 @@ function generateAlert(params) {
 
     if (params.rootcheck) {
         alert.rule.groups.push('rootcheck');
+        alert.rule.description = getRandomFromArray(pmRuleDescription);
         alert.data.title = getRandomFromArray(pmTitle);
     }
 
