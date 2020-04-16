@@ -28,7 +28,15 @@ import chrome from 'ui/chrome';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { MainGeneral } from '../../agents/general';
 import { MainFim } from '../../agents/fim';
+import { MainPm } from '../../agents/pm';
 import { MainSca } from '../../agents/sca';
+import { MainAudit } from '../../agents/audit';
+import { MainOscap } from '../../agents/oscap';
+import { MainCiscat } from '../../agents/ciscat';
+import { MainVuls } from '../../agents/vuls';
+import { MainVirustotal } from '../../agents/virustotal';
+import { MainOsquery } from '../../agents/osquery';
+import { MainDocker } from '../../agents/docker';
 import { MainPci } from '../../agents/pci';
 import { MainGdpr } from '../../agents/gdpr';
 import { MainHipaa } from '../../agents/hipaa';
@@ -210,8 +218,15 @@ export class MainModule extends Component {
             </div>
             {section === 'general' && <MainGeneral {...{ ...this.props, ...mainProps }} />}
             {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
+            {section === 'pm' && <MainPm {...{ ...this.props, ...mainProps }} />}
             {section === 'sca' && <MainSca {...{ ...this.props, ...mainProps }} />}
-
+            {section === 'audit' && <MainAudit {...{ ...this.props, ...mainProps }} />}
+            {section === 'oscap' && <MainOscap {...{ ...this.props, ...mainProps }} />}
+            {section === 'ciscat' && <MainCiscat {...{ ...this.props, ...mainProps }} />}
+            {section === 'vuls' && <MainVuls {...{ ...this.props, ...mainProps }} />}
+            {section === 'virustotal' && <MainVirustotal {...{ ...this.props, ...mainProps }} />}
+            {section === 'osquery' && <MainOsquery {...{ ...this.props, ...mainProps }} />}
+            {section === 'docker' && <MainDocker {...{ ...this.props, ...mainProps }} />}
             {section === 'pci' && <MainPci {...{ ...this.props, ...mainProps }} />}
             {section === 'gdpr' && <MainGdpr {...{ ...this.props, ...mainProps }} />}
             {section === 'hipaa' && <MainHipaa {...{ ...this.props, ...mainProps }} />}

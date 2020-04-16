@@ -1,0 +1,1 @@
+export { MainVirustotal } from './main';

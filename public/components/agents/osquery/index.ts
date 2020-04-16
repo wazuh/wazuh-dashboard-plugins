@@ -1,0 +1,1 @@
+export { MainOsquery } from './main';
