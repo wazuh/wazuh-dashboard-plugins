@@ -191,8 +191,7 @@ export class MainModule extends Component {
       selectView,
       setTabs: (tabs, buttons) => this.setTabs(tabs, buttons),
       onSelectedTabChanged: (id) => this.onSelectedTabChanged(id),
-      loadSection: (id) => this.loadSection(id),
-      afterLoad: this.afterLoad
+      loadSection: (id) => this.loadSection(id)
     }
     return (
       <Fragment>
