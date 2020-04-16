@@ -542,27 +542,8 @@ function randomDate() {
 
     const unix_timestamp = nowTimestamp - time; // Last 7 days from now
 
-    const lastWeek = new Date(unix_timestamp);
-    const formmated = formatDate(lastWeek, 'Y-M-DT-h:m:s.l+0000')
-    return formmated
-
-    let randomMonth = lastWeek.getMonth() + 1;
-    let randomDay = lastWeek.getDate();
-    let randomYear = lastWeek.getFullYear();
-    let randomHour = lastWeek.getHours();
-    let randomMinutes = lastWeek.getMinutes();
-    let randomSeconds = lastWeek.getSeconds();
-    let randomMilliSeconds = lastWeek.getMilliseconds();
-
-    let randomMonthFormatted = ("00" + randomMonth.toString()).slice(-2);
-    let randomDayFormatted = ("00" + randomDay.toString()).slice(-2);
-    let randomYearFormatted = ("0000" + randomYear.toString()).slice(-4);
-    let randomHourFormatted = ("00" + randomHour.toString()).slice(-2);
-    let randomMinutesFormatted = ("00" + randomMinutes.toString()).slice(-2);
-    let randomSecondsFormatted = ("00" + randomSeconds.toString()).slice(-2);
-    let randomMilliSecondsFormatted = ("000" + randomMilliSeconds.toString()).slice(-3);
-
-    return randomYearFormatted + "-" + randomMonthFormatted + "-" + randomDayFormatted + "T" + randomHourFormatted + ":" + randomMinutesFormatted + ":" + randomSecondsFormatted + "." + randomMilliSecondsFormatted + "+0000";
+    const lastWeek = new Date(unix_timestamp); 
+    return formatDate(lastWeek, 'Y-M-DTh:m:s.l+0000')
 }
 
 // Format date
@@ -571,7 +552,7 @@ function formatDate(date, format){ // It could use "moment" library to format st
     const tokens = {
         'D': (d) => formatterNumber(date.getDate(), 2),
         'M': (d) => formatterNumber(date.getMonth() + 1, 2),
-        'Y': (d) => formatterNumber(date.getFullYear(), 2),
+        'Y': (d) => date.getFullYear(),
         'h': (d) => formatterNumber(date.getHours(), 2),
         'm': (d) => formatterNumber(date.getMinutes(), 2),
         's': (d) => formatterNumber(date.getSeconds(), 2),
