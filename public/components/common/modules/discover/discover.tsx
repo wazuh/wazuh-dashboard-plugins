@@ -10,31 +10,30 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment, } from 'react';
+import React, { Component, } from 'react';
 import { I18nProvider } from '../../../../../../../packages/kbn-i18n/src/react'
+import './discover.less';
+import { KibanaContextProvider } from '../../../../../../../src/plugins/kibana_react/public/context'
+import { SearchBar } from '../../../../../../../src/plugins/data/public/'
+import { GenericRequest } from '../../../../react-services/generic-request';
+import { AppState } from '../../../../react-services/app-state';
+import { RowDetails } from './row-details';
+//@ts-ignore
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 import {
   EuiBasicTable,
   EuiLoadingSpinner,
-  OnTimeChangeProps,
   EuiTableSortingType,
   EuiFlexItem,
   EuiFlexGroup,
   Direction,
-  EuiFieldText
 } from '@elastic/eui';
-
-import './discover.less';
-import { KibanaContextProvider } from '../../../../../../../src/plugins/kibana_react/public/context'
-import { SearchBar } from '../../../../../../../src/plugins/data/public/'
-
-import { GenericRequest } from '../../../../react-services/generic-request';
-import { AppState } from '../../../../react-services/app-state';
-import { RowDetails } from './row-details';
-import { WzDatePicker } from '../../../../components/wz-date-picker';
-//@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
-import { IIndexPattern } from '../../../../../../../src/plugins/data/common';
-import { esFilters } from '../../../../../../../src/plugins/data/common/es_query';
+import {
+  IIndexPattern,
+  TimeRange,
+  Query,
+  esFilters
+} from '../../../../../../../src/plugins/data/common';
 
 interface IDiscoverTime { from:string, to:string };
 
@@ -59,7 +58,7 @@ export class Discover extends Component {
     requestSize: number
     requestOffset: number
     itemIdToExpandedRowMap: any,
-    datePicker: OnTimeChangeProps,
+    datePicker: TimeRange,
   };
   indexPattern!: IIndexPattern
   props!: {
@@ -69,7 +68,6 @@ export class Discover extends Component {
   constructor(props) {
     super(props);
     this.timefilter = getServices().timefilter;
-    const { from, to } = this.timefilter.getTime();
     this.state = {
       filters: [],
       sort: {},
@@ -84,14 +82,10 @@ export class Discover extends Component {
       requestSize: 500,
       requestOffset: 0,
       itemIdToExpandedRowMap: {},
-      datePicker: {
-        start: from, 
-        end: to,
-        isQuickSelection: true,
-        isInvalid: false,
-      },
+      datePicker: this.timefilter.getTime(),
     }
 
+    this.onQuerySubmit.bind(this);
     this.onTimeChange.bind(this);
   }
 
@@ -107,7 +101,7 @@ export class Discover extends Component {
 
   async componentDidUpdate() {
     try{
-      // await this.getAlerts();
+      await this.getAlerts();
     }catch(err){
       console.log(err);
     }
@@ -157,15 +151,14 @@ export class Discover extends Component {
     const newFilters = this.buildFilter();
     if(JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading){
       this.setState({ isLoading: true})
-      const oldFilters = newFilters.filters;
-      newFilters.filters =  this.props.implicitFilters.concat(newFilters.filters); // we add the implicit filters
-      
       const alerts = await GenericRequest.request(
         'POST',
         `/elastic/alerts`,
-        newFilters
+        {
+          ...newFilters,
+          filters: [...newFilters['filters'], ...this.props.implicitFilters]
+        }
       );
-      newFilters.filters = oldFilters;
       this.setState({alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters:newFilters.filters})
     }
   }
@@ -227,10 +220,9 @@ export class Discover extends Component {
 
   }
 
-  onTimeChange = (datePicker: OnTimeChangeProps) => {
-    const {start:from, end:to} = datePicker;
+  onTimeChange = (datePicker: TimeRange) => {
     this.setState({datePicker});
-    this.timefilter.setTime({from, to});
+    this.timefilter.setTime(datePicker);
   }
 
   getFiltersAsObject(filters){
@@ -251,25 +243,37 @@ export class Discover extends Component {
     this.setState({filters});
   }
 
+  onQuerySubmit = (payload:{dateRange: TimeRange, query?: Query | undefined}) => {
+    const { dateRange, query } = payload;
+    this.onTimeChange(dateRange);
+  }
+
   getSearchBar(){
+    const storage = {
+      ...window.localStorage,
+      get: (key) => window.localStorage.getItem(key),
+      set: (key, value) => window.localStorage.setItem(key, value),
+      remove: (key) => window.localStorage.removeItem(key) 
+    }
+    const { datePicker } = this.state;
     return (
-      <KibanaContextProvider services={{...getServices(), storage: {...window.localStorage, get: (key) => window.localStorage.getItem(key), set: (key, value) => window.localStorage.setItem(key, value), remove: (key) => window.localStorage.removeItem(key) }}} > 
+      <KibanaContextProvider services={{...getServices(), storage}} > 
         <I18nProvider>
           <SearchBar 
             indexPatterns={[this.indexPattern]}
             filters={this.state.filters}
-            dateRangeFrom="now-15m"
+            dateRangeFrom={datePicker.from}
             screenTitle=""
-            dateRangeTo="now"
-            onQuerySubmit={(e) => console.log(e)}
+            dateRangeTo={datePicker.to}
+            onQuerySubmit={this.onQuerySubmit}
             onFiltersUpdated={filters => {this.setState({filters}); getServices().data.query.filterManager.setFilters(filters)}}
-            query={{language: "kuery", query: "asd"}}
+            query={{language: "kuery", query: ""}}
             timeHistory={this.timefilter._history}
             {...{appName:'wazuh-fim'}}
               />
         </I18nProvider>
       </KibanaContextProvider>
-    )
+    );
   }
 
   render() {
