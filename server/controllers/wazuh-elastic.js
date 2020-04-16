@@ -32,7 +32,7 @@ export class WazuhElasticCtrl {
     this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
     this.wzAlertsSampleCaterories = {
-      'security': [{ syscheck: true }, { aws: true }, { alerts: 250, probability_win_authentication_failed: 5}],
+      'security': [{ syscheck: true }, { aws: true }, { authentication: { invalid_login_user: true }, alerts: 250 }, { authentication: { invalid_login_password: true }, alerts: 250 }, { authentication: { multiple_authentication_failures: true }, alerts: 250 }, { authentication: { windows: true }, alerts: 250 }],
       'auditing-pm': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }],
       'regulatory-compliance': [{ pci_dss: true }, { gdpr: true }, { hipaa: true }, { nist_800_53: true }]
