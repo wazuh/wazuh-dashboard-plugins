@@ -12,11 +12,28 @@
     left: 0;
 }
 
-.wz-module-header {
-    background:white;
+.wz-module-header-wrapper-nav{
     border-bottom: 1px solid #D3DAE6;
+    margin-top: 50px;
+    height: 50px;
+}
+
+.wz-module-header {
     padding: 16px;
+    height: 50px;
+}
+
+.wz-module-header-agent-title{
     height: 100px;
+    background:white;
+}
+
+.wz-module-header-nav{
+    padding-top: 0px;
+}
+
+.wz-module-header-nav .euiFlexItem{
+    margin-top: 7px;
 }
 
 .wz-module-header .wz-module-header-title{    
@@ -25,6 +42,8 @@
 
 .wz-module-header-main{
     height: 50px;
+    background: white;
+    border-bottom: 1px solid #D3DAE6;
 }
 
 .wz-module-header-main .wz-module-header-title{    
@@ -64,7 +83,7 @@
 }
 
 .wz-module-body-main {
-    margin-top: 50px;
+    margin-top: 62px!important;
 }
 
 
@@ -73,7 +92,7 @@ discover-app-w .sidebar-container {
 }
 
 @media only screen and (max-width: 767px){
-    .wz-module-header-wrapper{
+    .wz-module-agent-title-wrapper, .wz-module-nav-wrapper{
         padding-left: 0px;
     }
 

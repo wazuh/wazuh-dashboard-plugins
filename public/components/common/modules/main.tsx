@@ -11,7 +11,13 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { EuiCallOut } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHealth,
+  EuiTitle,
+  EuiToolTip
+} from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
@@ -56,12 +62,41 @@ export class MainModule extends Component {
     this.setGlobalBreadcrumb();
   }
 
+  color = (status) => {
+    if (status.toLowerCase() === 'active') { return 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
+  }
+
+  renderTitle() {
+    return (
+      <EuiFlexGroup>
+        <EuiFlexItem className="wz-module-header-title">
+          <EuiTitle size="s">
+            <h1>
+              <EuiToolTip position="right" content={this.props.agent.status}>
+                <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
+              </EuiToolTip>
+              {this.props.agent.name} ({this.props.agent.id}) - <b>{TabDescription[this.props.section].title}</b>
+            </h1>
+          </EuiTitle>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    );
+  }
+
   render() {
     const { section, agent } = this.props;
+    const title = this.renderTitle();
     return (
       <Fragment>
         {(agent && agent.os) &&
-          <div>
+          <div className='wz-module'>
+            <div className='wz-module-header-wrapper'>
+              <div className='wz-module-header wz-module-header-agent-title'>
+                {title}
+              </div>
+            </div>
             {section === 'fim' && <MainFim {...this.props} />}
             {section === 'sca' && <MainSca {...this.props} />}
           </div>

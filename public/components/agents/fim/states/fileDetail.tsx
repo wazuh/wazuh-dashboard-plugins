@@ -19,7 +19,7 @@ import {
   EuiFlexGroup,
   EuiTitle,
   EuiButtonEmpty,
-  EuiToolTip,
+  EuiIcon,
   EuiSpacer,
   EuiStat
 } from '@elastic/eui';
@@ -48,52 +48,64 @@ export class FileDetails extends Component {
       {
         field: 'date',
         name: 'Last analysis',
-        grow: 2
+        grow: 2,
+        icon: 'clock'
       },
       {
         field: 'mtime',
         name: 'Last modified',
-        grow: 2
+        grow: 2,
+        icon: 'clock'
       },
       {
         field: 'uname',
         name: 'User',
+        icon: 'user'
       },
       {
         field: 'uid',
         name: 'User ID',
+        icon: 'user'
       },
       {
         field: 'gname',
         name: 'Group',
+        icon: 'usersRolesApp'
       },
       {
         field: 'gid',
         name: 'Group ID',
+        icon: 'usersRolesApp'
       },
       {
         field: 'perm',
         name: 'Permissions',
+        icon: 'lock'
       },
       {
         field: 'size',
         name: 'Size',
+        icon: 'number'
       },
       {
         field: 'inode',
         name: 'Inode',
+        icon: 'link'
       },
       {
         field: 'md5',
         name: 'MD5',
+        icon: 'nested'
       },
       {
         field: 'sha1',
         name: 'SHA1',
+        icon: 'nested'
       },
       {
         field: 'sha256',
         name: 'SHA256',
+        icon: 'nested'
       }
     ]
   }
@@ -125,7 +137,12 @@ export class FileDetails extends Component {
                 {value}
               </EuiText>
             }
-            description={item.name}
+            description={
+              <span>
+                <EuiIcon size="m" type={item.icon} color='subdued' className="detail-icon"/>
+                <span className="detail-title">{item.name}</span>
+              </span>
+            }
             textAlign="left"
             titleSize="xs"
           />

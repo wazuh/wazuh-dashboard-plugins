@@ -19,6 +19,20 @@ export class Events extends Component {
     super(props);
   }
 
+  async cleanAvailableFields() {
+    const fields = document.querySelectorAll(`.dscFieldChooser .dscFieldList--unpopular li`);
+    if (fields.length) {
+      fields.forEach(field => {
+        const attr = field.getAttribute('attr-field');
+        if (attr.startsWith("_")) {
+          field.style.display = "none";
+        }
+      });
+    } else if ((scope.rows || []).length) {
+      setTimeout(() => { this.getDiscoverScope() }, 200);
+    }
+  }
+
   async getDiscoverScope() {
     const app = getAngularModule('app/wazuh');
     const fields = EventsSelectedFiles[this.props.section];
@@ -27,6 +41,12 @@ export class Events extends Component {
       fields.forEach(field => {
         if (!app.discoverScope.state.columns.includes(field)) {
           app.discoverScope.addColumn(field);
+        }
+      });
+      app.discoverScope.$watchCollection('fetchStatus',
+      () => {
+        if (app.discoverScope.fetchStatus === 'complete') {
+          setTimeout(() => { this.cleanAvailableFields() }, 1000);
         }
       });
     } else {

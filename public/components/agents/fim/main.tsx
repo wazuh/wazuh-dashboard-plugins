@@ -3,11 +3,8 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiButton,
-  EuiHealth,
   EuiTab,
   EuiTabs,
-  EuiTitle,
-  EuiToolTip
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -17,7 +14,6 @@ import '../../common/modules/module.less';
 import { ReportingService } from '../../../react-services/reporting';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import { TabDescription } from '../../../../server/reporting/tab-description';
 
 export class MainFim extends Component {
   state: {
@@ -42,29 +38,6 @@ export class MainFim extends Component {
     if (filterManager.filters && filterManager.filters.length) {
       filterManager.removeAll();
     }
-  }
-
-  color = (status) => {
-    if (status.toLowerCase() === 'active') { return 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
-  }
-
-  renderTitle() {
-    return (
-      <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-title">
-          <EuiTitle size="s">
-            <h1>
-              <EuiToolTip position="right" content={this.props.agent.status}>
-                <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
-              </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id}) - <b>{TabDescription[this.props.section].title}</b>
-            </h1>
-          </EuiTitle>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    );
   }
 
   renderTabs() {
@@ -168,36 +141,32 @@ export class MainFim extends Component {
 
   render() {
     const { selectView } = this.state;
-    const title = this.renderTitle();
     const tabs = this.renderTabs();
     const reportButton = this.renderReportButton();
     const dashboardButton = this.renderDashboardButton();
     const settingsButton = this.renderSettingsButton();
     return (
       <Fragment>
-        <div className='wz-module'>
-          <div className='wz-module-header-wrapper'>
-            <div className='wz-module-header'>
-              {title}
-              <EuiFlexGroup>
-                {tabs}
-                {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
-                {dashboardButton}
-                {settingsButton}
-              </EuiFlexGroup>
-            </div>
+        <div className='wz-module-header-wrapper wz-module-header-wrapper-nav'>
+          <div className='wz-module-header wz-module-header-nav'>
+            <EuiFlexGroup>
+              {tabs}
+              {selectView === 'dashboard' && <Fragment>{reportButton}</Fragment>}
+              {dashboardButton}
+              {settingsButton}
+            </EuiFlexGroup>
           </div>
-          <div className='wz-module-body'>
-            {selectView === 'states' && <States {...this.props} loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)} />}
-            {selectView === 'events' && <Events {...this.props} section='fim' />}
-            {selectView === 'loader' &&
-              <Loader {...this.props}
-                loadSection={(section) => this.loadSection(section)}
-                redirect={this.afterLoad}>
-              </Loader>}
-            {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
-            {selectView === 'settings' && <Settings {...this.props} />}
-          </div>
+        </div>
+        <div className='wz-module-body'>
+          {selectView === 'states' && <States {...this.props} loadEventsWithFilters={(filters) => this.loadEventsWithFilter(filters)} />}
+          {selectView === 'events' && <Events {...this.props} section='fim' />}
+          {selectView === 'loader' &&
+            <Loader {...this.props}
+              loadSection={(section) => this.loadSection(section)}
+              redirect={this.afterLoad}>
+            </Loader>}
+          {selectView === 'dashboard' && <Dashboard {...this.props} section='fim' />}
+          {selectView === 'settings' && <Settings {...this.props} />}
         </div>
       </Fragment>
     );
