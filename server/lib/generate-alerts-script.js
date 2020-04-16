@@ -80,7 +80,8 @@ const oscapScanContent = ["ssg-centos-7-ds.xml", "ssg-centos-6-ds.xml", "ssg-rhe
 const oscapCheckTitle = ["Record Attempts to Alter the localtime File", "Record Attempts to Alter Time Through clock_settime", "Ensure auditd Collects Unauthorized Access Attempts to Files (unsuccessful)", "Ensure auditd Collects System Administrator Actions", "Ensure auditd Collects File Deletion Events by User"];
 
 // Osquery
-const osqueryName = ["Sample Osquery alert 1", "Sample Osquery alert 2", "Sample Osquery alert 3", "Sample Osquery alert 4", "Sample Osquery alert 5"];
+const osqueryName = ["pack_vuln-management_rpm_packages", "pack_osquery-monitoring_schedule", "pack_osquery-monitoring_osquery_info", "pack_it-compliance_rpm_packages", "pack_it-compliance_mounts", "pack_incident-response_process_env", "pack_incident-response_open_files", "pack_incident-response_listening_ports", "pack_incident-response_last"];
+const osqueryRuleDescription = ["osquery error message", "osquery: osquery-monitoring schedule: The pack executed is high_load_average and the interval is 900", "osquery: incident-response process_memory: Process 1194 /run/log/journal/ff05fd7dc5b84794a0a2d9f30c5284e6/system.journal memory start 0x7fbfd2cd9000, memory end 0x7fbfd34d9000", "osquery: incident-response mounts: Mount point at cgroup with 0 free blocks"];
 const osqueryAction = ["added", "removed"];
 const osqueryPack = ["/etc/osquery-packs/custom_pack.conf", "/etc/osquery-packs/custom_pack2.conf", "/etc/osquery-packs/custom_pack3.conf", "/etc/osquery-packs/custom_pack4.conf", "/etc/osquery-packs/custom_pack5.conf", "/etc/osquery-packs/custom_pack6.conf"];
 
@@ -458,6 +459,7 @@ function generateAlert(params) {
     
     if (params.osquery) {
         alert.rule.groups.push("osquery");
+        alert.rule.description = getRandomFromArray(osqueryRuleDescription);
         alert.data.osquery = {};
 
         alert.data.osquery.name = getRandomFromArray(osqueryName);
