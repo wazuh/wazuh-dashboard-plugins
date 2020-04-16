@@ -10,7 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
- //Alert
+// General
+const IPs = ['141.98.81.37', '54.10.24.5', '187.80.4.18', '134.87.21.47', '40.220.102.15', '45.124.37.241', '45.75.196.15', '16.4.20.20'];
+const Users = ['juanca','pablo','jose', 'alberto', 'antonio', 'victor', 'jesus', 'santiago', 'pedro', 'root', 'admin']
+const Ports = [22, 55047, 26874, 8905, 3014, 2222, 4547];
+
+//Alert
 const alertIDMax = 6000;
 
 // Agents
@@ -95,6 +100,93 @@ const vulnerabilityCwe_reference = ["CWE-527", "CWE-911", "CWE-409", "CWE-102", 
 const vulnerabilityReference = ["Sample vulnerability reference 1", "Sample vulnerability reference 2", "Sample vulnerability reference 3", "Sample vulnerability reference 4"];
 const vulnerabilityTitle = ["Sample vulnerability 1", "Sample vulnerability 2", "Sample vulnerability 3", "Sample vulnerability 4"];
 
+// SSH
+const sshRuleDescription = ['sshd: authentication failed.', 'sshd: Multiple authentication failures.']
+const sshInvalidLoginRuleDescription = ['sshd: Attempt to login using a non-existent user'];
+
+// Geolocation {country_name, location: {lon, lat}, region_name}
+const geolocation = [
+    {
+        country_name: 'España',
+        location: {
+            lon: 37.1881714,
+            lat: -3.6066699
+        },
+        region_name: 'Granada'
+    },
+    {
+        country_name: 'France',
+        location: {
+            lon: 48.8534088,
+            lat: 2.3487999
+        },
+        region_name: 'Paris'
+    },
+    {
+        country_name: 'England',
+        location: {
+            lon: 51.5085297,
+            lat: -0.12574
+        },
+        region_name: 'London'
+    },
+    {
+        country_name: 'Germany',
+        location: {
+            lon: 52.524,
+            lat: 13.411
+        },
+        region_name: 'Berlin'
+    },
+    {
+        country_name: 'United States of America',
+        location: {
+            lon: 40.7142715,
+            lat: -74.0059662
+        },
+        region_name: 'New York'
+    },
+    {
+        country_name: 'Canada',
+        location: {
+            lon: 49.2496605,
+            lat: -123.119339
+        },
+        region_name: 'Vancouver'
+    },
+    {
+        country_name: 'Brasil',
+        location: {
+            lon: -22.9064198,
+            lat: -43.1822319
+        },
+        region_name: 'Río de Janeiro'
+    },
+    {
+        country_name: 'India',
+        location: {
+            lon: 19.0728302,
+            lat: 72.8826065
+        },
+        region_name: 'Bombay'
+    },
+    {
+        country_name: 'Australia',
+        location: {
+            lon: -33.8678513,
+            lat: 151.2073212
+        },
+        region_name: 'Sydney'
+    },
+    {
+        country_name: 'China',
+        location: {
+            lon: 31.222,
+            lat: 121.458
+        },
+        region_name: 'Shanghai'
+    },
+]
 /**
  * Get a random element of an array
  * @param {[]} array - Array to get a randomized element
@@ -178,9 +270,9 @@ function generateAlert(params) {
     // alert.id = // TODO: generate random?;
     alert.agent = getRandomFromArray(agents);
     alert.rule.description = getRandomFromArray(ruleDescription);
-    alert.rule.id = randomInterval(1,alertIDMax);
-    alert.rule.level = randomInterval(1,ruleMaxLevel);
-    alert.rule.firedtimes = randomInterval(1,ruleMaxFiredtimes);
+    alert.rule.id = randomIntegerFromInterval(1,alertIDMax);
+    alert.rule.level = randomIntegerFromInterval(1,ruleMaxLevel);
+    alert.rule.firedtimes = randomIntegerFromInterval(1,ruleMaxFiredtimes);
     alert.timestamp = randomDate();
     
 
@@ -226,15 +318,15 @@ function generateAlert(params) {
         alert.data.cis = {};
 
         alert.data.cis.group = getRandomFromArray(ciscatGroup);
-        alert.data.cis.fail = randomInterval(0, 100);
+        alert.data.cis.fail = randomIntegerFromInterval(0, 100);
         alert.data.cis.rule_title = getRandomFromArray(ciscatRuleTitle);
-        alert.data.cis.notchecked = randomInterval(0, 100);
-        alert.data.cis.score = randomInterval(0, 100);
-        alert.data.cis.pass = randomInterval(0, 100);
+        alert.data.cis.notchecked = randomIntegerFromInterval(0, 100);
+        alert.data.cis.score = randomIntegerFromInterval(0, 100);
+        alert.data.cis.pass = randomIntegerFromInterval(0, 100);
         alert.data.cis.timestamp = randomDate();
-        alert.data.cis.error = randomInterval(0, 1);
+        alert.data.cis.error = randomIntegerFromInterval(0, 1);
         alert.data.cis.benchmark = getRandomFromArray(ciscatBenchmark);
-        alert.data.cis.unknown = randomInterval(0, 1);
+        alert.data.cis.unknown = randomIntegerFromInterval(0, 1);
         alert.data.cis.result = getRandomFromArray(ciscatResult);
     }
 
@@ -252,8 +344,8 @@ function generateAlert(params) {
 
     if (params.mitre) {
         alert.rule.mitre = {
-            id: generateRandomMitreNumberId(),
-            tactics: generateRandomMitreNumberTactics()
+            id: randomUniqueValuesFromArray(mitreId, 3).sort(),
+            tactics: randomUniqueValuesFromArray(mitreTactics, 3).sort()
         }
         //TODO: add info
     }
@@ -267,7 +359,7 @@ function generateAlert(params) {
 
         alert.data.oscap.scan.profile.title = getRandomFromArray(oscapScanProfileTitle);
         alert.data.oscap.scan.content = getRandomFromArray(oscapScanContent);
-        alert.data.oscap.scan.score = randomInterval(50, 80);
+        alert.data.oscap.scan.score = randomIntegerFromInterval(50, 80);
         alert.data.oscap.check.result = getRandomFromArray(oscapCheckResult);
         alert.data.oscap.check.severity = getRandomFromArray(oscapCheckSeverity);
         alert.data.oscap.check.title = getRandomFromArray(oscapCheckTitle);
@@ -294,7 +386,7 @@ function generateAlert(params) {
         alert.data.virustotal.permalink = getRandomFromArray(virustotalPermalink);;
         alert.data.virustotal.source.md5 = getRandomFromArray(virustotalSourceMd5);
         alert.data.virustotal.malicious = getRandomFromArray(virustotalMalicious);
-        alert.data.virustotal.positives = `${randomInterval(0,20)}`;
+        alert.data.virustotal.positives = `${randomIntegerFromInterval(0,20)}`;
     }
 
     if (params.vulnerabilities) {
@@ -342,55 +434,87 @@ function generateAlert(params) {
     if (params.gpg13 || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomProbability(params.random_probability_regulatory_compliance))) {
         alert.rule.gpg13 = [getRandomFromArray(gpg13)];
     }
-    if (params.hipaa || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomInterval(params.random_probability_regulatory_compliance))) {
+    if (params.hipaa || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomIntegerFromInterval(params.random_probability_regulatory_compliance))) {
         alert.rule.hipaa = [getRandomFromArray(hipaa)];
     }
-    if (params.nist_800_83 || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomInterval(params.random_probability_regulatory_compliance))) {
+    if (params.nist_800_83 || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomIntegerFromInterval(params.random_probability_regulatory_compliance))) {
         alert.rule.nist_800_53 = [getRandomFromArray(nist_800_53)];
+    }
+
+    if (params.ssh) {
+        alert.data.srcip = getRandomFromArray(IPs);
+        alert.data.srcuser = getRandomFromArray(Users);
+        alert.data.srcport = getRandomFromArray(Ports);
+        alert.GeoLocation = getRandomFromArray(geolocation);
+        alert.decoder = {
+            name: 'sshd',
+            parent: 'sshd'
+        }
+        alert.input.type = 'log';
+        alert.location = '/var/log/auth.log';
+        alert.rule.description = getRandomFromArray(sshRuleDescription);
+        alert.rule.groups = ['syslog', 'sshd'];
+        alert.predecoder = {
+            hostname: '',// TODO:ip-10-0-0-179
+            program_name: 'sshd',
+            timestamp: ''// TODO:Apr 16 11:21:10
+        }
+        alert.rule.pci_dss = [getRandomFromArray(pci_dss)];
+        alert.rule.gdpr = [getRandomFromArray(gdpr)];
+        alert.rule.gpg13 = [getRandomFromArray(gpg13)];
+        alert.rule.hipaa = [getRandomFromArray(hipaa)];
+        alert.rule.nist_800_53 = [getRandomFromArray(nist_800_53)];
+
+        if(params.ssh.invalid_login_password){
+            alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
+            alert.location = '/var/log/secure';
+            alert.rule.groups = ['syslog', 'sshd', 'invalid_login', 'authentication_failed'];
+            alert.rule.id = 5710;
+        }
+        if (params.ssh.invalid_login_user){
+            alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[10022]: Invalid user admin from ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
+            alert.location = '/var/log/secure';
+            alert.rule.description = 'sshd: Attempt to login using a non-existent user';
+            alert.rule.groups = ['syslog', 'sshd', 'invalid_login', 'authentication_failed'];
+            alert.rule.id = 5710;
+        }
+        if (params.ssh.multiple_authentication_failures) {
+            alert.full_log = alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
+            alert.location = '/var/log/secure';
+            alert.rule.description = 'sshd: Multiple authentication failures.';
+            alert.rule.frequency = randomIntegerFromInterval(5,50);
+            alert.rule.groups = ['syslog', 'sshd', 'authentication_failures'];
+            alert.rule.id = 5720;
+        }
     }
 
     return alert;
 }
 
 /**
- * Get a number within a range 
+ * Get a random array with unique values
+ * @param {[]} array Array to extract the values
+ * @param {*} randomMaxExtractions Number max of random extractions
+ * @param {function} sort Funciton to seort elements
+ * @return {*} Array with random values extracted of paramater array passed
+ */
+function randomUniqueValuesFromArray(array, randomMaxExtractions = 1, sort){
+    const repetitions = randomIntegerFromInterval(1, randomMaxExtractions);
+    const set = new Set();
+    for (let i = 0; i < repetitions; i++) {
+        set.add(array[randomIntegerFromInterval(0, array.length - 1)]);
+    }
+    return sort ? Array.from(set).sort(sort) : Array.from(set)
+}
+
+/**
+ * Get a integer within a range 
  * @param {number} min - Minimum limit
  * @param {number} max - Maximum limit
  * @returns {number} - Randomized number in interval
  */
-function randomInterval(min, max) {
+function randomIntegerFromInterval(min, max) {
     return Math.floor(Math.random() * (max - (min - 1))) + min;
-}
-
-/**
- * Get random Mitre ID
- * @returns {[]} - Random Mitre IDs
- */
-function generateRandomMitreNumberId() {
-    let random = randomInterval(1, 3);
-    let array = [];
-
-    for (let i = 0; i < random; i++) {
-        array.push(mitreId[randomInterval(0, mitreId.length - 1)]);
-    }
-
-    array.sort();
-    return Array.from(new Set(array));
-}
-
-/**
- * Get random Mitre Tactics
- * @returns {[]} - Random mitre tactics
- */
-function generateRandomMitreNumberTactics() {
-    let random = randomInterval(1, mitreTactics.length);
-    let array = [];
-
-    for (let i = 0; i < random; i++) {
-        array.push(mitreTactics[randomInterval(0, mitreTactics.length - 1)]);
-    }
-
-    return Array.from(new Set(array));
 }
 
 /**
@@ -413,12 +537,14 @@ function generateAlerts(params, numAlerts) {
  */
 function randomDate() {
 
-    let nowTimestamp = Date.now();
-    let time = randomInterval(0, 604800000); // Random 7 days in miliseconds
+    const nowTimestamp = Date.now();
+    const time = randomIntegerFromInterval(0, 604800000); // Random 7 days in miliseconds
 
-    let unix_timestamp = nowTimestamp - time; // Last 7 days from now
+    const unix_timestamp = nowTimestamp - time; // Last 7 days from now
 
-    let lastWeek = new Date(unix_timestamp);
+    const lastWeek = new Date(unix_timestamp);
+    const formmated = formatDate(lastWeek, 'Y-M-DT-h:m:s.l+0000')
+    return formmated
 
     let randomMonth = lastWeek.getMonth() + 1;
     let randomDay = lastWeek.getDate();
@@ -439,13 +565,34 @@ function randomDate() {
     return randomYearFormatted + "-" + randomMonthFormatted + "-" + randomDayFormatted + "T" + randomHourFormatted + ":" + randomMinutesFormatted + ":" + randomSecondsFormatted + "." + randomMilliSecondsFormatted + "+0000";
 }
 
+// Format date
+const formatterNumber = (number, zeros = 0) => ("0".repeat(zeros) + `${number}`).slice(-zeros);
+function formatDate(date, format){ // It could use "moment" library to format strings too,
+    const tokens = {
+        'D': (d) => formatterNumber(date.getDate(), 2),
+        'M': (d) => formatterNumber(date.getMonth() + 1, 2),
+        'Y': (d) => formatterNumber(date.getFullYear(), 2),
+        'h': (d) => formatterNumber(date.getHours(), 2),
+        'm': (d) => formatterNumber(date.getMinutes(), 2),
+        's': (d) => formatterNumber(date.getSeconds(), 2),
+        'l': (d) => formatterNumber(date.getMilliseconds(), 3)
+    }
+
+    return format.split('').reduce((accum, token) => {
+        if(tokens[token]){
+            return accum + tokens[token](date)
+        }
+        return accum + token
+    },'')
+}
+
 /**
  * Return a random probability
  * @param {number} probability 
  * @param {number[=100]} maximum 
  */
 function randomProbability(probability, maximum = 100){
-    return randomInterval(0,maximum) <= probability
+    return randomIntegerFromInterval(0,maximum) <= probability
 }
 
 export {

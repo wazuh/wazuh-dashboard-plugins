@@ -42,7 +42,7 @@ class WzMenuManagement extends Component {
       logs: { id: 'logs', text: 'Logs' },
       reporting: { id: 'reporting', text: 'Reporting' },
       statistics: { id: 'statistics', text: 'Statistics' },
-      modules: { id: 'modules', text: 'Modules' },
+      sample_data: { id: 'sample_data', text: 'Sample Data' },
     };
 
     this.paths = {
@@ -91,7 +91,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.lists),
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
-          this.createItem(this.managementSections.modules)
+          this.createItem(this.managementSections.sample_data)
         ],
       })
     ];

@@ -191,7 +191,7 @@ export class WzVisualize extends Component {
         {/* Sample alerts Callout */}
         {this.state.thereAreSampleAlerts && (
           <EuiCallOut title='There are sample data installed' color='warning' iconType='alert' style={{margin: '0 8px'}}>
-            <p>The data displayed may contain sample alerts. Go <EuiLink href='#/manager/modules?redirect=sample-data&tab=modules' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.</p>
+            <p>The data displayed may contain sample alerts. Go <EuiLink href='#/manager/sample_data?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.</p>
           </EuiCallOut>
         )}
 

@@ -123,9 +123,9 @@ class WelcomeScreen extends Component {
                       layout="horizontal"
                       className='homSynopsis__card'
                       icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
-                      title="Modules"
-                      onClick={() => this.switchSection('modules')}
-                      description="Add data to modules."
+                      title="Sample data"
+                      onClick={() => this.switchSection('sample_data')}
+                      description="Add sample data to modules."
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>

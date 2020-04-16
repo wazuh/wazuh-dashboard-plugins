@@ -22,6 +22,7 @@ import {
 	EuiPageBody,
 	EuiSpacer,
 	EuiTabbedContent,
+	EuiText,
 	EuiTitle,
 	EuiToolTip
 } from '@elastic/eui';
@@ -53,52 +54,53 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 	tabs: any
 	constructor(props){
 		super(props);
-		const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
-		this.tabs = [
-			...categories.map(category => ({
-				id: category,
-				name: category,
-				content: (
-					<Fragment>
-						<EuiSpacer size='m' />
-						<EuiFlexGrid columns={4}>
-							{this.getModulesFromCategory(category).map(extension => (
-								<EuiFlexItem key={`add-modules-data--${extension.id}`}>
-									<EuiCard
-										layout='horizontal'
-										icon={(<EuiIcon size='xl' type={extension.icon} />) }
-										title={extension.name}
-										description={(TabDescription[extension.id] && TabDescription[extension.id].description) || extension.description}
-										onClick={() => this.changeGuide(extension.id) }
-									/>
-								</EuiFlexItem>
-							))}
-						</EuiFlexGrid>
-					</Fragment>
-				)
-			})),
-			{
-				id: 'sample-data',
-				name: 'Sample Data',
-				content: (
-					<Fragment>
-						<EuiSpacer size='m' />
-						<WzSampleData/>
-					</Fragment>
-				)
-			}
-		];
-		this.state = {
-			guide: '',
-			selectedGuideCategory: window.location.href.includes('redirect=sample-data') ? this.tabs.find(tab => tab.id === 'sample-data') : this.tabs[0]
-		}
-		// "redirect=sample-data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
+		// DON'T DELETE THE BELOW CODE. IT'S FOR MODULE GUIDES.
+		// const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
+		// this.tabs = [
+		// 	...categories.map(category => ({
+		// 		id: category,
+		// 		name: category,
+		// 		content: (
+		// 			<Fragment>
+		// 				<EuiSpacer size='m' />
+		// 				<EuiFlexGrid columns={4}>
+		// 					{this.getModulesFromCategory(category).map(extension => (
+		// 						<EuiFlexItem key={`add-modules-data--${extension.id}`}>
+		// 							<EuiCard
+		// 								layout='horizontal'
+		// 								icon={(<EuiIcon size='xl' type={extension.icon} />) }
+		// 								title={extension.name}
+		// 								description={(TabDescription[extension.id] && TabDescription[extension.id].description) || extension.description}
+		// 								onClick={() => this.changeGuide(extension.id) }
+		// 							/>
+		// 						</EuiFlexItem>
+		// 					))}
+		// 				</EuiFlexGrid>
+		// 			</Fragment>
+		// 		)
+		// 	})),
+		// 	{
+		// 		id: 'sample_data',
+		// 		name: 'Sample Data',
+		// 		content: (
+		// 			<Fragment>
+		// 				<EuiSpacer size='m' />
+		// 				<WzSampleData/>
+		// 			</Fragment>
+		// 		)
+		// 	}
+		// ];
+		// this.state = {
+		// 	guide: '',
+		// 	selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
+		// }
+		// "redirect=sample_data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
 	}
 	setGlobalBreadcrumb() {
     const breadcrumb = [
 			{ text: '' },
 			{ text: 'Management', href: '/app/wazuh#/manager' },
-			{ text: 'Modules' }
+			{ text: 'Sample Data' }
 		];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
@@ -115,11 +117,12 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		return category !== '' ? guides.filter(guide => guide.category === category) : guides;
 	}
 	render(){
-		const { guide, selectedGuideCategory } = this.state;
+		// const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES. 
 		return (
 			<EuiPage restrictWidth='1200px'>
 				<EuiPageBody>
-					{guide && (
+					{/** Module guides with sample data rendered as tabs */}
+					{/* {guide && (
 						<WzModuleGuide guideId={guide} close={() => this.changeGuide('')} {...this.props}/>
 						) || (
 						<Fragment>
@@ -138,12 +141,12 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 													<span> </span>
 												</Fragment>
 											)}
-											<span>Add modules data</span>
+											<span>Sample data</span>
 										</h2>
 									</EuiTitle>
 								</EuiFlexItem>
 							</EuiFlexGroup>
-							<EuiSpacer size='m' />
+							<EuiSpacer size='m'/>
 							<EuiFlexGroup>
 								<EuiFlexItem>
 									<EuiTabbedContent
@@ -156,7 +159,20 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 								</EuiFlexItem>
 							</EuiFlexGroup>
 						</Fragment>
-					)}
+					)} */}
+					{/* Only sample data */}
+					<EuiFlexGroup>
+						<EuiFlexItem>
+							<EuiTitle size='l'><span>Sample data</span></EuiTitle>
+							<EuiText color='subdued'>Add sample data to modules.</EuiText>
+						</EuiFlexItem>
+					</EuiFlexGroup>
+					<EuiSpacer size='m'/>
+					<EuiFlexGroup>
+						<EuiFlexItem>
+							<WzSampleData/>
+						</EuiFlexItem>
+					</EuiFlexGroup>
 				</EuiPageBody>
 			</EuiPage>
 		)
