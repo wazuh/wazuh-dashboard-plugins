@@ -464,7 +464,7 @@ function generateAlert(params) {
 
         alert.data.osquery.name = getRandomFromArray(osqueryName);
         alert.data.osquery.action = getRandomFromArray(osqueryAction);
-        alert.data.osquery.calendarTime = randomDate();
+        alert.data.osquery.calendarTime = new Date(randomDate());
         alert.data.osquery.pack = getRandomFromArray(osqueryPack);
     }
 
