@@ -46,7 +46,6 @@ export class Discover extends Component {
   };
   
   state: {
-    filters: esFilters.Filter[],
     sort: object,
     alerts: {_source:{}, _id:string}[],
     total: number,
@@ -61,6 +60,8 @@ export class Discover extends Component {
     itemIdToExpandedRowMap: any,
     dateRange: TimeRange,
     query: Query,
+    searchBarFilters: esFilters.Filter[],
+    elasticQuery: object
   };
   indexPattern!: IIndexPattern
   props!: {
@@ -85,7 +86,8 @@ export class Discover extends Component {
       requestOffset: 0,
       itemIdToExpandedRowMap: {},
       dateRange: this.timefilter.getTime(),
-      query: {language: "kuery", query: ""}
+      query: {language: "kuery", query: ""},
+      searchBarFilters: [],
     }
 
     this.onQuerySubmit.bind(this);
@@ -103,20 +105,8 @@ export class Discover extends Component {
   }
 
   async componentDidUpdate() {
-    const { filters, query } = this.state;
-    // TODO: This is an example to build the Elastic query
-    console.log(
-      "Elastic query:",
-      esQuery.buildEsQuery(
-        undefined, 
-        query, 
-        filters, 
-        esQuery.getEsQueryConfig(npSetup.core.uiSettings)
-      )
-    )
-
     try{
-      // await this.getAlerts();
+      await this.getAlerts();
     }catch(err){
       console.log(err);
     }
@@ -152,13 +142,21 @@ export class Discover extends Component {
   };
 
   buildFilter(){
+    const { searchBarFilters, query } = this.state;
+    const elasticQuery = 
+      esQuery.buildEsQuery(
+        undefined, 
+        query, 
+        searchBarFilters, 
+        esQuery.getEsQueryConfig(npSetup.core.uiSettings)
+      );
     const pattern = AppState.getCurrentPattern();
     const { filters, sortField, sortDirection } = this.state;
     const {from, to} = this.timefilter.getTime();
     const sort = {...(sortField && {[sortField]: {"order": sortDirection}})};
     const offset = Math.floor( (this.state.pageIndex * this.state.pageSize) / this.state.requestSize ) * this.state.requestSize;
 
-    return {filters, sort, from, to, offset, pattern};
+    return {filters, sort, from, to, offset, pattern, elasticQuery};
   }
 
   async getAlerts() {
@@ -248,9 +246,14 @@ export class Discover extends Component {
    * @param filter 
    */
   addFilter(filter){
-    const filters = this.state.filters;
-    filters.push(filter);
-    this.setState({filters});
+    const key = Object.keys(filter)[0];
+    const value = filter[key];
+    const formattedFilter = esFilters.buildPhraseFilter({name: key, type: "string"}, value, this.indexPattern);
+
+    const filters = this.state.searchBarFilters;
+    filters.push(formattedFilter);
+    getServices().data.query.filterManager.setFilters(filters);
+    this.setState({searchBarFilters: filters});
   }
 
   onQuerySubmit = (payload:{dateRange: TimeRange, query?: Query | undefined}) => {
@@ -261,7 +264,7 @@ export class Discover extends Component {
 
   onFiltersUpdated = (filters: esFilters.Filter[]) => {
     getServices().data.query.filterManager.setFilters(filters);
-    this.setState({filters});
+    this.setState({searchBarFilters: filters});
   }
 
   getSearchBar(){
@@ -278,13 +281,13 @@ export class Discover extends Component {
       },
       remove: (key) => window.localStorage.removeItem(key) 
     }
-    const { dateRange, query, filters } = this.state;
+    const { dateRange, query, searchBarFilters } = this.state;
     return (
       <KibanaContextProvider services={{...getServices(), appName: "wazuhFim", storage}} > 
         <I18nProvider>
           <SearchBar 
             indexPatterns={[this.indexPattern]}
-            filters={filters}
+            filters={searchBarFilters}
             dateRangeFrom={dateRange.from}
             dateRangeTo={dateRange.to}
             onQuerySubmit={this.onQuerySubmit}

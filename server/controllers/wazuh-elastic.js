@@ -685,18 +685,18 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * This returns de the alerts of an angent
+   * This returns the alerts of an agent
    * @param {*} req
    * POST /elastic/alerts
    * {
-   *   "agent.id": 100 ,
-   *   "cluster.name": "wazuh",
-   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
-   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
-   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
-   *   "size": 5 // Optional parameter
+   *   elasticQuery: {bool: {must: [], filter: [{match_all: {}}], should: [], must_not: []}}
+   *   filters: [{rule.groups: "syscheck"}, {agent.id: "001"} ]
+   *   from: "now-1y"
+   *   offset: 0
+   *   pattern: "wazuh-alerts-3.x-*"
+   *   sort: {timestamp: {order: "asc"}}
+   *   to: "now"
    * }
-   *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
    */
@@ -709,18 +709,20 @@ export class WazuhElasticCtrl {
       const sort = req.payload.sort || { "timestamp" : {"order" : "asc"}};
       const payload = Base(pattern, [], from, to);
 
+
+      payload.query = req.payload.elasticQuery || { bool: { must: [ ] } }; // if an already formatted elastic query is received we use it as a base otherwise we create a simple elastic query
+
+      const range = {range: {
+        timestamp: {
+          gte: from,
+          lte: to,
+          format: 'epoch_millis'
+        }
+      }};
+
+      payload.query.bool.must.push(range);
       
-      payload.query = { bool: { must: [
-        {
-          range: {
-            timestamp: {
-              gte: from,
-              lte: to,
-              format: 'epoch_millis'
-            }
-          }
-        }]
-      } };
+      // add custom key:value filters to the elastic query
       if(req.payload.filters){
         req.payload.filters.map((item) => {
           payload.query.bool.must.push({
