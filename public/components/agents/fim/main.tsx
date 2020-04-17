@@ -4,7 +4,7 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { States } from './index';
 import '../../common/modules/module.less';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-import { AngularHelper } from '../../common/modules/angular-helper'
+import { ModulesHelper } from '../../common/modules/modules-helper'
 
 export class MainFim extends Component {
   tabs = [
@@ -15,7 +15,7 @@ export class MainFim extends Component {
 
   constructor(props) {
     super(props);
-    this.angularHelper = AngularHelper;
+    this.modulesHelper = ModulesHelper;
     this.props.loadSection('states');
     this.props.setTabs(this.tabs, this.buttons);
   }
@@ -31,7 +31,7 @@ export class MainFim extends Component {
     const { filterManager } = getServices();
     if (filterManager.filters && filterManager.filters.length) {
       filterManager.addFilters([filters]);
-      const scope = await this.angularHelper.getDiscoverScope();
+      const scope = await this.modulesHelper.getDiscoverScope();
       scope.updateQueryAndFetch({ query: null });
     } else {
       setTimeout(() => {

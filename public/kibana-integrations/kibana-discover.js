@@ -76,6 +76,7 @@ import { buildServices } from 'plugins/kibana/discover/build_services';
 import { npStart } from 'ui/new_platform';
 import { pluginInstance } from 'plugins/kibana/discover/index';
 import { WazuhConfig } from '../react-services/wazuh-config';
+import { ModulesHelper } from '../components/common/modules/modules-helper'
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -135,6 +136,7 @@ function discoverController(
     toastNotifications,
   } = getServices();
   const wazuhConfig = new WazuhConfig();
+  const modulesHelper = ModulesHelper;
   wazuhApp.discoverScope = $scope;
   //////
   const responseHandler = vislibSeriesResponseHandlerProvider().handler;
@@ -164,7 +166,7 @@ function discoverController(
   $scope.fetchStatus = fetchStatuses.UNINITIALIZED;
   $scope.refreshInterval = timefilter.getRefreshInterval();
   $scope.showSaveQuery = uiCapabilities.discover.saveQuery;
-  let implicitFilters = null;
+  $scope.implicitFilters = null;
 
   $scope.$watch(
     () => uiCapabilities.discover.saveQuery,
@@ -189,7 +191,7 @@ function discoverController(
     if (filterListener) filterListener();
     if (tabListener) tabListener();
     delete wazuhApp.discoverScope;
-    implicitFilters = null;
+    $scope.implicitFilters = null;
   });
 
   const $appStatus = ($scope.appStatus = this.appStatus = {
@@ -1058,37 +1060,6 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const hideCloseImplicitsFilters = () => {
-    const closeButtons = $(`.globalFilterItem .euiBadge__iconButton`);
-    const optionsButtons = $(`.globalFilterItem .euiBadge__childButton`);
-    for (let i = 0; i < closeButtons.length; i++) {
-      $(closeButtons[i]).addClass('hide-close-button');
-      $(optionsButtons[i]).off("click");
-    };
-    if (!implicitFilters) return;
-    const filters = $(`.globalFilterItem .euiBadge__childButton`);
-    for (let i = 0; i < filters.length; i++) {
-      let found = false;
-      (implicitFilters || []).forEach(x => {
-        const objKey = x.query ? Object.keys(x.query.match)[0] : x.meta.key;
-        const key = `filter-key-${objKey}`;
-        const value = x.query ? `filter-value-${x.query.match[objKey].query}` : `filter-value-${x.meta.value}`;
-        const data = filters[i].attributes[3];
-        if (data.value.includes(key) && data.value.includes(value)) {
-          found = true;
-        }
-      });
-      if (!found) {
-        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
-        $(closeButton).removeClass('hide-close-button');
-      } else {
-        const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
-        $(optionsButton).on("click", (ev) => { ev.stopPropagation(); });
-      }
-    }
-    $scope.$applyAsync();
-  }
-
   const loadFilters = async (wzCurrentFilters, tab) => {
     const appState = getAppState();
     if (!appState || !globalState) {
@@ -1096,8 +1067,8 @@ function discoverController(
         return loadFilters(wzCurrentFilters);
       });
     } else {
-      implicitFilters = [];
-      wzCurrentFilters.forEach(x => implicitFilters.push({ ...x }));
+      $scope.implicitFilters = [];
+      wzCurrentFilters.forEach(x => $scope.implicitFilters.push({ ...x }));
       const globalFilters = globalState.filters;
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
@@ -1115,7 +1086,7 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
-    hideCloseImplicitsFilters();
+    modulesHelper.hideCloseImplicitsFilters($scope);
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;
