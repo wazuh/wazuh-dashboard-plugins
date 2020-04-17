@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { FlyoutDetail } from './states/flyout';
-import { AngularHelper } from '../../common/modules/angular-helper'
+import { ModulesHelper } from '../../common/modules/modules-helper'
 export class EventsFim extends Component {
   state: {
     isFlyoutVisible: Boolean
@@ -23,7 +23,7 @@ export class EventsFim extends Component {
     this.state = {
       isFlyoutVisible: false,
     };
-    this.angularHelper = AngularHelper;
+    this.modulesHelper = ModulesHelper;
   }
 
   async getRowsField(scope) {
@@ -53,7 +53,7 @@ export class EventsFim extends Component {
   }
 
   async componentDidMount() {
-    const scope = await this.angularHelper.getDiscoverScope();
+    const scope = await this.modulesHelper.getDiscoverScope();
     scope.$watchCollection('fetchStatus',
       () => {
         if (scope.fetchStatus === 'complete') {

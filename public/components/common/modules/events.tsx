@@ -14,23 +14,11 @@ import React, { Component, Fragment } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { EventsSelectedFiles } from './events-selected-fields'
 import { EventsFim } from '../../agents/fim/events';
-import { AngularHelper } from './angular-helper'
+import { ModulesHelper } from './modules-helper'
 export class Events extends Component {
   constructor(props) {
     super(props);
-    this.angularHelper = AngularHelper;
-  }
-
-  async cleanAvailableFields() {
-    const fields = document.querySelectorAll(`.dscFieldChooser .dscFieldList--unpopular li`);
-    if (fields.length) {
-      fields.forEach(field => {
-        const attr = field.getAttribute('attr-field');
-        if (attr.startsWith("_")) {
-          field.style.display = "none";
-        }
-      });
-    }
+    this.modulesHelper = ModulesHelper;
   }
 
   async componentDidMount() {
@@ -40,7 +28,8 @@ export class Events extends Component {
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
     this.$rootScope.$applyAsync();
-    const scope = await this.angularHelper.getDiscoverScope();
+    const scope = await this.modulesHelper.getDiscoverScope();
+    this.modulesHelper.hideCloseImplicitsFilters(scope);
     this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();
     const fields = EventsSelectedFiles[this.props.section];
@@ -55,7 +44,7 @@ export class Events extends Component {
     scope.$watchCollection('fetchStatus',
       () => {
         if (scope.fetchStatus === 'complete') {
-          setTimeout(() => { this.cleanAvailableFields() }, 1000);
+          setTimeout(() => { this.modulesHelper.cleanAvailableFields() }, 1000);
         }
       });
   }

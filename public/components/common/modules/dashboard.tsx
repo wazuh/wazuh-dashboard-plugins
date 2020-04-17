@@ -12,12 +12,12 @@
 
 import { Component } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import { AngularHelper } from './angular-helper'
+import { ModulesHelper } from './modules-helper'
 
 export class Dashboard extends Component {
   constructor(props) {
     super(props);
-    this.angularHelper = AngularHelper;
+    this.modulesHelper = ModulesHelper;
   }
 
   async componentDidMount() {
@@ -27,13 +27,15 @@ export class Dashboard extends Component {
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleDashboard = this.props.section;
     this.$rootScope.$applyAsync();
-    await this.angularHelper.getDiscoverScope();
+    const scope = await this.modulesHelper.getDiscoverScope();
+    this.modulesHelper.hideCloseImplicitsFilters(scope);
     this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();
   }
 
   componentWillUnmount() {
     this.$rootScope.showModuleDashboard = false;
+    this.$rootScope.moduleDiscoverReady = false;
     this.$rootScope.$applyAsync();
   }
 
