@@ -26,7 +26,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { Events, Dashboard, Loader } from '../../common/modules';
+import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import { MainGeneral } from '../../agents/general';
 import { MainFim } from '../../agents/fim';
 import { MainPm } from '../../agents/pm';
@@ -224,6 +224,9 @@ export class MainModule extends Component {
                   redirect={this.afterLoad}>
                 </Loader>}
               {selectView === 'dashboard' && <Dashboard {...this.props} />}
+              {selectView === 'settings' && <Settings {...this.props} />}
+
+              {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
               {section === 'general' && <MainGeneral {...{ ...this.props, ...mainProps }} />}
               {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
               {section === 'pm' && <MainPm {...{ ...this.props, ...mainProps }} />}
@@ -239,6 +242,7 @@ export class MainModule extends Component {
               {section === 'gdpr' && <MainGdpr {...{ ...this.props, ...mainProps }} />}
               {section === 'hipaa' && <MainHipaa {...{ ...this.props, ...mainProps }} />}
               {section === 'nist' && <MainNist {...{ ...this.props, ...mainProps }} />}
+              {/* -------------------------------------------------------------------------- */}
             </div>
           </div>
         }

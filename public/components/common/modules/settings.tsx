@@ -10,15 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
-
+import React, { Component } from 'react';
 import { EuiSpacer, EuiTitle, EuiPanel, EuiPage } from '@elastic/eui';
-
 import { i18n } from '@kbn/i18n';
-
-import WzConfigurationIntegrityMonitoring from '../../../controllers/management/components/management/configuration/integrity-monitoring/integrity-monitoring'
 import WzBadge from '../../../controllers/management/components/management/configuration/util-components/badge'
 import WzReduxProvider from '../../../redux/wz-redux-provider';
+import WzConfigurationIntegrityMonitoring from '../../../controllers/management/components/management/configuration/integrity-monitoring/integrity-monitoring'
+import WzConfigurationPolicyMonitoring from '../../../controllers/management/components/management/configuration/policy-monitoring/policy-monitoring'
 
 type SettingsPropTypes = {
   agent: { id: string },
@@ -40,26 +38,22 @@ export class Settings extends Component<SettingsPropTypes, SettingsState> {
   }
   render() {
     const { badge } = this.state;
-    const { agent, clusterNodeSelected } = this.props;
+    const { section } = this.props;
     return (
-      <Fragment>
-        <WzReduxProvider>
-          <EuiPage>
-            <EuiPanel>
-              <EuiTitle>
-                <span>{i18n.translate('wazuh.fim.configuration', { defaultMessage: 'Configuration' })} {typeof badge === 'boolean' ?
-                  <WzBadge enabled={badge} /> : null}
-                </span>
-              </EuiTitle>
-              <EuiSpacer size='m' />
-              <WzConfigurationIntegrityMonitoring
-                clusterNodeSelected={clusterNodeSelected}
-                agent={agent}
-                updateBadge={(e) => this.updateBadge(e)} />
-            </EuiPanel>
-          </EuiPage>
-        </WzReduxProvider>
-      </Fragment>
+      <WzReduxProvider>
+        <EuiPage>
+          <EuiPanel>
+            <EuiTitle>
+              <span>{i18n.translate('wazuh.configuration', { defaultMessage: 'Configuration' })} {typeof badge === 'boolean' ?
+                <WzBadge enabled={badge} /> : null}
+              </span>
+            </EuiTitle>
+            <EuiSpacer size='m' />
+            {section === 'fim' && <WzConfigurationIntegrityMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+            {section === 'sca' && <WzConfigurationPolicyMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+          </EuiPanel>
+        </EuiPage>
+      </WzReduxProvider>
     )
   }
 }
