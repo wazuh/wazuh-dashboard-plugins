@@ -44,6 +44,8 @@ export class Discover extends Component {
     setTime(time:TimeRange): void
     _history: {history:{items:{from:string, to:string}[]}}
   };
+
+  KibanaServices: {};
   
   state: {
     sort: object,
@@ -70,9 +72,9 @@ export class Discover extends Component {
   }
   constructor(props) {
     super(props);
-    this.timefilter = getServices().timefilter;
+    this.KibanaServices = getServices();
+    this.timefilter = this.KibanaServices.timefilter;
     this.state = {
-      filters: [],
       sort: {},
       alerts: [],
       total: 0,
@@ -88,6 +90,7 @@ export class Discover extends Component {
       dateRange: this.timefilter.getTime(),
       query: {language: "kuery", query: ""},
       searchBarFilters: [],
+      elasticQuery: {}
     }
 
     this.onQuerySubmit.bind(this);
@@ -96,7 +99,7 @@ export class Discover extends Component {
 
   async componentDidMount() {
     try{
-      this.indexPattern = await getServices().indexPatterns.get("wazuh-alerts-3.x-*")
+      this.indexPattern = await this.KibanaServices.indexPatterns.get("wazuh-alerts-3.x-*")
       const { initialFilters = [] } = this.props;
       this.setState({ filters: initialFilters });
     }catch(err){
@@ -252,7 +255,7 @@ export class Discover extends Component {
 
     const filters = this.state.searchBarFilters;
     filters.push(formattedFilter);
-    getServices().data.query.filterManager.setFilters(filters);
+    this.KibanaServices.data.query.filterManager.setFilters(filters);
     this.setState({searchBarFilters: filters});
   }
 
@@ -263,27 +266,26 @@ export class Discover extends Component {
   }
 
   onFiltersUpdated = (filters: esFilters.Filter[]) => {
-    getServices().data.query.filterManager.setFilters(filters);
+    this.KibanaServices.data.query.filterManager.setFilters(filters);
     this.setState({searchBarFilters: filters});
   }
 
   getSearchBar(){
     const storage = {
       ...window.localStorage,
-      get: (key) => window.localStorage.getItem(key),
-      set: (key, value) => {
-        const history = window.localStorage.getItem(key) || '';
-        const newHistory = [
-          JSON.parse(history),
-          value
-        ]
-        return window.localStorage.setItem(key, JSON.stringify(newHistory));
-      },
+      get: (key) => JSON.parse(window.localStorage.getItem(key)),
+      set: (key, value) =>  window.localStorage.setItem(key, JSON.stringify(value)),
       remove: (key) => window.localStorage.removeItem(key) 
+    }
+    const http = {
+      ...this.KibanaServices.indexPatterns.apiClient.http
+    }
+    const savedObjects = {
+      ...this.KibanaServices.indexPatterns.savedObjectsClient
     }
     const { dateRange, query, searchBarFilters } = this.state;
     return (
-      <KibanaContextProvider services={{...getServices(), appName: "wazuhFim", storage}} > 
+      <KibanaContextProvider services={{...this.KibanaServices, appName: "wazuhFim", storage, http, savedObjects}} > 
         <I18nProvider>
           <SearchBar 
             indexPatterns={[this.indexPattern]}
