@@ -130,6 +130,9 @@ export class WzSearchBar extends Component {
     if (nextState.isProcessing) {
       return true;
     }
+    if (JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
+      return true;
+    }
     if (nextState.isPopoverOpen !== this.state.isPopoverOpen){
       return true;
     }
@@ -148,6 +151,12 @@ export class WzSearchBar extends Component {
   async componentDidUpdate(prevProps) {
     if (this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests)) {
       this.selectSuggestHandler(this.state.searchFormat);
+    }
+    if (JSON.stringify(prevProps.initFilters) !== JSON.stringify(this.props.initFilters)){
+      this.setState({
+        filters: this.props.initFilters,
+        isProcessing: true
+      })
     }
 
     if (!this.state.isProcessing) { return;}
