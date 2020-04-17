@@ -38,6 +38,7 @@ export class StatesTable extends Component {
 
   props!: {
     filters: {},
+    onFilterSelect(): void
     agent: any
   }
 

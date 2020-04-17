@@ -57,6 +57,7 @@ export class WzSearchBar extends Component {
   constructor(props) {
     super(props);
     const searchFormat = this.selectSearchFormat(props);
+    console.log('INITFILTERS : ', props.initFilters);
     this.state = {
       searchFormat,
       suggestions: [],
@@ -128,6 +129,9 @@ export class WzSearchBar extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState){
+    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
+      return true;
+    }
     if (nextState.isProcessing) {
       return true;
     }
@@ -150,6 +154,11 @@ export class WzSearchBar extends Component {
   }
 
   async componentDidUpdate(prevProps) {
+    console.log(this.props.initFilters);
+    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(prevProps.initFilters)){
+      this.setState({filters: this.props.initFilters});
+    }
+
     if (this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests)) {
       this.selectSuggestHandler(this.state.searchFormat);
     }

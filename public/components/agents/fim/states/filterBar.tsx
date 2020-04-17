@@ -49,6 +49,7 @@ export class FilterBar extends Component {
     onTimeChange(props:OnTimeChangeProps):() => void
     selectView: 'files' | 'registry'
     agent: {id: string, agentPlatform: string}
+    filters: {}
   }
 
   constructor(props) {
@@ -60,10 +61,12 @@ export class FilterBar extends Component {
 
   render() {
     const { onFiltersChange, selectView, onTimeChange } = this.props;
+
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <WzSearchBar
+            initFilters={this.props.filters}
             onInputChange={onFiltersChange}
             qSuggests={this.suggestions[selectView]}
             apiSuggests={null}

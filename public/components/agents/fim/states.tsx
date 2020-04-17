@@ -48,6 +48,7 @@ export class States extends Component {
       totalItemsRegistry: 0,
       isLoading: true
     }
+    this.onFilterSelect.bind(this);
   }
 
   tabs() {
@@ -134,18 +135,29 @@ export class States extends Component {
     }
   }
 
+  onFilterSelect = (filter) => {
+    const { filters:oldFilter } = this.state;
+    const filters = { 
+      ...oldFilter,
+      q: !!oldFilter['q'] ? `${oldFilter['q']};${filter}` : filter 
+    };
+    this.setState({filters});
+  }
+
   renderFiles() {
     const { filters, selectedTabId } = this.state;
     return (
       <div>
         <FilterBar
+          filters={filters}
           onFiltersChange={this.onFiltersChange.bind(this)}
           selectView={selectedTabId}
           agent={this.props.agent}
           onTimeChange={(timeFilter) => {}} />
         <StatesTable
           {...this.props}
-          filters={filters} />
+          filters={filters}
+          onFilterSelect={this.onFilterSelect} />
       </div>
     )
   }
@@ -162,7 +174,8 @@ export class States extends Component {
           onTimeChange={(timeFilter) => {}} />
         <RegistryTable
           {...this.props}
-          filters={filters} />
+          filters={filters}
+          onFilterSelect={this.onFilterSelect} />
       </div>
     )
   }
