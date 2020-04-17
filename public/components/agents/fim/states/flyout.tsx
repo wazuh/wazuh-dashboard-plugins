@@ -27,19 +27,24 @@ export class FlyoutDetail extends Component {
     this.state = {
       currentFile: false,
       clusterFilter: {},
-      isLoading: true
+      isLoading: true,
+      error: false
     }
   }
 
   async componentDidMount() {
-    const isCluster = (AppState.getClusterInfo() || {}).status === "enabled";
-    const clusterFilter = isCluster
-      ? { "cluster.name": AppState.getClusterInfo().cluster }
-      : { "manager.name": AppState.getClusterInfo().manager };
-    this.setState({ clusterFilter });
-    const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
-    const currentFile = ((((data || {}).data || {}).data || {}) .items || [])[0];
-    this.setState({ currentFile, isLoading: false });
+    try{
+      const isCluster = (AppState.getClusterInfo() || {}).status === "enabled";
+      const clusterFilter = isCluster
+        ? { "cluster.name": AppState.getClusterInfo().cluster }
+        : { "manager.name": AppState.getClusterInfo().manager };
+      this.setState({ clusterFilter });
+      const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
+      const currentFile = ((((data || {}).data || {}).data || {}) .items || [])[0];
+      this.setState({ currentFile, isLoading: false });
+    }catch(err){
+      this.setState({error: `Data could not be fetched for ${this.props.fileName}`})
+    }
   }
 
   render() {
@@ -53,7 +58,7 @@ export class FlyoutDetail extends Component {
                 </EuiTitle>
               </EuiFlyoutHeader>
               <EuiFlyoutBody className="flyout-body" > 
-                <EuiLoadingContent />
+               {this.state.error && (<div>{this.state.error}</div>)  || (<EuiLoadingContent />) } 
               </EuiFlyoutBody>
             </Fragment>
             )}
