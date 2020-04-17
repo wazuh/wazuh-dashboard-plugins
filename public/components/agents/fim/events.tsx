@@ -64,9 +64,12 @@ export class EventsFim extends Component {
   }
 
   showFlyout(file) {
-    //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file }));
+    if(file !== " - "){ 
+      //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
+      this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file }));
+    }
   }
+
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: false });
   }

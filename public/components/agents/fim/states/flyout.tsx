@@ -27,41 +27,54 @@ export class FlyoutDetail extends Component {
     this.state = {
       currentFile: false,
       clusterFilter: {},
-      isLoading: true
+      isLoading: true,
+      error: false
     }
   }
 
   async componentDidMount() {
-    const isCluster = (AppState.getClusterInfo() || {}).status === "enabled";
-    const clusterFilter = isCluster
-      ? { "cluster.name": AppState.getClusterInfo().cluster }
-      : { "manager.name": AppState.getClusterInfo().manager };
-    this.setState({ clusterFilter });
-    const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
-    const currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
-    this.setState({ currentFile, isLoading: false });
+    try{
+      const isCluster = (AppState.getClusterInfo() || {}).status === "enabled";
+      const clusterFilter = isCluster
+        ? { "cluster.name": AppState.getClusterInfo().cluster }
+        : { "manager.name": AppState.getClusterInfo().manager };
+      this.setState({ clusterFilter });
+      const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
+      const currentFile = ((((data || {}).data || {}).data || {}) .items || [])[0];
+      this.setState({ currentFile, isLoading: false });
+    }catch(err){
+      this.setState({error: `Data could not be fetched for ${this.props.fileName}`})
+    }
   }
 
   render() {
     return (
-      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
-        <Fragment>
-          <EuiFlyoutHeader hasBorder className="flyout-header" >
-            <EuiTitle size="s">
-              <h2 id="flyoutTitle">{this.props.fileName}</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-
-          <EuiFlyoutBody className="flyout-body" >
-            {this.state.isLoading &&
-              <EuiLoadingContent style={{ margin: 16 }} />
+          <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
+            {this.state.isLoading && (
+              <Fragment>
+              <EuiFlyoutHeader hasBorder className="flyout-header" >
+                <EuiTitle size="s">
+                  <h2 id="flyoutTitle">{this.props.fileName}</h2>
+                </EuiTitle>
+              </EuiFlyoutHeader>
+              <EuiFlyoutBody className="flyout-body" > 
+               {this.state.error && (<div>{this.state.error}</div>)  || (<EuiLoadingContent style={{ margin: 16 }} />) } 
+              </EuiFlyoutBody>
+            </Fragment>
+            )}
+            {this.state.currentFile && !this.state.isLoading &&
+              <Fragment>
+                <EuiFlyoutHeader hasBorder className="flyout-header" >
+                  <EuiTitle size="s">
+                    <h2 id="flyoutTitle">{this.state.currentFile.file}</h2>
+                  </EuiTitle>
+                </EuiFlyoutHeader>
+                <EuiFlyoutBody className="flyout-body" > 
+                  <FileDetails currentFile={this.state.currentFile} {...this.props} implicitFilters={[{ 'rule.groups': "syscheck" }, { 'syscheck.path': this.state.currentFile.file }, { 'agent.id': this.props.agentId }, this.state.clusterFilter]} />
+                </EuiFlyoutBody>
+              </Fragment>
             }
-            {this.state.currentFile &&
-              <FileDetails currentFile={this.state.currentFile} {...this.props} implicitFilters={[{ 'rule.groups': "syscheck" }, { 'syscheck.path': this.state.currentFile.file }, { 'agent.id': this.props.agentId }, this.state.clusterFilter]} />
-            }
-          </EuiFlyoutBody>
-        </Fragment>
-      </EuiFlyout>
+          </EuiFlyout>
     )
   }
 }
