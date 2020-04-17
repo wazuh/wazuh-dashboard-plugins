@@ -16,6 +16,7 @@ import {
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
+  EuiLoadingContent
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
@@ -25,7 +26,8 @@ export class FlyoutDetail extends Component {
     super(props);
     this.state = {
       currentFile: false,
-      clusterFilter: {}
+      clusterFilter: {},
+      isLoading: true
     }
   }
 
@@ -37,25 +39,26 @@ export class FlyoutDetail extends Component {
     this.setState({ clusterFilter });
     const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
     const currentFile = ((((data || {}).data || {}).data || {}) .items || [])[0];
-    this.setState({ currentFile });
+    this.setState({ currentFile, isLoading: false });
   }
 
   render() {
     return (
-      <Fragment>
-        {this.state.currentFile &&
           <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
-            <EuiFlyoutHeader hasBorder className="flyout-header" >
-              <EuiTitle size="s">
-                <h2 id="flyoutTitle">{this.state.currentFile.file}</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody className="flyout-body" >
-              <FileDetails currentFile={this.state.currentFile} {...this.props} implicitFilters={[{ 'rule.groups': "syscheck" }, { 'syscheck.path': this.state.currentFile.file }, { 'agent.id': this.props.agentId }, this.state.clusterFilter]} />
-            </EuiFlyoutBody>
+            {this.state.isLoading && <EuiLoadingContent />}
+            {this.state.currentFile &&
+              <Fragment>
+                <EuiFlyoutHeader hasBorder className="flyout-header" >
+                  <EuiTitle size="s">
+                    <h2 id="flyoutTitle">{this.state.currentFile.file}</h2>
+                  </EuiTitle>
+                </EuiFlyoutHeader>
+                <EuiFlyoutBody className="flyout-body" > 
+                  <FileDetails currentFile={this.state.currentFile} {...this.props} implicitFilters={[{ 'rule.groups': "syscheck" }, { 'syscheck.path': this.state.currentFile.file }, { 'agent.id': this.props.agentId }, this.state.clusterFilter]} />
+                </EuiFlyoutBody>
+              </Fragment>
+            }
           </EuiFlyout>
-        }
-      </Fragment >
     )
   }
 }
