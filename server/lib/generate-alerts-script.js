@@ -35,6 +35,7 @@ const awsGeoLocation = [{ "lat": 40.12, "lon": -71.34 }, { "lat": 37.14, "lon": 
 const awsAccountId = ["aws-account1", "aws-account2", "aws-account3"];
 const awsRegion = ["eu-west-1", "eu-west-2", "us-east-1", "us-east-2", "us-west-1", "us-west-2", "me-south-1", "ap-east-1", "ap-south-1"]; // https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-regions
 const awsBuckets = ["aws-bucket1", "aws-bucket2", "aws-bucket3"];
+const awsRuleDescription = ["AWS GuardDuty: PORT_PROBE - Unprotected port on EC2 instance i-01483f6bf55b49f10 is being probed. [IP: 185.143.221.85] [Port: 443]", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a Kali Linux computer.", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a known malicious IP address.", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a Parrot Security Linux computer.", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a Pentoo Linux computer.", "AWS GuardDuty: AWS_API_CALL - Credentials for instance role GeneratedFindingUserName used from external IP address.", "AWS GuardDuty: AWS_API_CALL - Principal IAMUser:GeneratedFindingUserName attempted to add a policy to themselves that is highly permissive.", "AWS GuardDuty: AWS_API_CALL - Reconnaissance API GeneratedFindingAPIName was invoked from a Tor exit node.", "AWS GuardDuty: AWS_API_CALL - Unusual network permission reconnaissance activity by jctello.", "AWS GuardDuty: DNS_REQUEST - Bitcoin-related domain name queried by EC2 instance i-99999999.", "AWS GuardDuty: DNS_REQUEST - EC2 instance i-99999999 may be the target of a DNS rebinding attack.", "AWS GuardDuty: NETWORK_CONNECTION - 103.81.51.4 is performing SSH brute force attacks against i-09d8f992c53358cdc.", "AWS GuardDuty: PORT_PROBE - Unprotected port on EC2 instance i-01483f6bf55b49f10 is being probed. [IP: 185.143.221.85] [Port: 443]", "AWS Macie CRITICAL: S3 Bucket IAM policy grants global read rights - S3 Bucket uses IAM policy to grant read rights to Everyone. Your IAM policy contains a clause that effectively grants read access to any user. Please audit this bucket, and data contained within and confirm that this is intentional. If intentional, please use the alert whitelist feature to prevent future alerts", "AWS Macie INFO: Access Denied from Create Role - User attempted to create a new role and received error code AccessDenied. This could be an indicator of a compromised account", "AWS Macie INFO: User or role Access Denied while attempting to List S3 buckets from non-AWS IP - User or role Access Denied while attempting to List S3 buckets from an IP address outside the AWS environment. This could be an indication of attempted access to restricted content", "AWS Macie LOW: Change to Cloudtrail logging policy - Alerting on attempts to disrupt Cloudtrail logging, including deleting trails, reducing trails (for example disabling multi-region logging), encrypting trails in an unsafe manner including a key policy restricted to Cloudtrail, changing of the bucket's lifecycle policy, or stopping logging. Please investigate AWS CloudTrail records to determine if these updates affect production applications or accounts"];
 
 // Audit
 const auditCommand = ["sudo", "ssh", "cron", "ls"];
@@ -80,7 +81,8 @@ const oscapScanContent = ["ssg-centos-7-ds.xml", "ssg-centos-6-ds.xml", "ssg-rhe
 const oscapCheckTitle = ["Record Attempts to Alter the localtime File", "Record Attempts to Alter Time Through clock_settime", "Ensure auditd Collects Unauthorized Access Attempts to Files (unsuccessful)", "Ensure auditd Collects System Administrator Actions", "Ensure auditd Collects File Deletion Events by User"];
 
 // Osquery
-const osqueryName = ["Sample Osquery alert 1", "Sample Osquery alert 2", "Sample Osquery alert 3", "Sample Osquery alert 4", "Sample Osquery alert 5"];
+const osqueryName = ["pack_vuln-management_rpm_packages", "pack_osquery-monitoring_schedule", "pack_osquery-monitoring_osquery_info", "pack_it-compliance_rpm_packages", "pack_it-compliance_mounts", "pack_incident-response_process_env", "pack_incident-response_open_files", "pack_incident-response_listening_ports", "pack_incident-response_last"];
+const osqueryRuleDescription = ["osquery error message", "osquery: osquery-monitoring schedule: The pack executed is high_load_average and the interval is 900", "osquery: incident-response process_memory: Process 1194 /run/log/journal/ff05fd7dc5b84794a0a2d9f30c5284e6/system.journal memory start 0x7fbfd2cd9000, memory end 0x7fbfd34d9000", "osquery: incident-response mounts: Mount point at cgroup with 0 free blocks"];
 const osqueryAction = ["added", "removed"];
 const osqueryPack = ["/etc/osquery-packs/custom_pack.conf", "/etc/osquery-packs/custom_pack2.conf", "/etc/osquery-packs/custom_pack3.conf", "/etc/osquery-packs/custom_pack4.conf", "/etc/osquery-packs/custom_pack5.conf", "/etc/osquery-packs/custom_pack6.conf"];
 
@@ -100,8 +102,45 @@ const vulnerabilitySeverity = ["Low", "Medium", "High", "Critical"];
 const vulnerabilityPackageName = ["bluez", "gcc-mingw-w64", "squashfs-tools", "util-linux", "accountsservice", "git", "node", "zip", "kernel"];
 const vulnerabilityCve = ["CVE-2017-11671", "CVE-2008-7320", "CVE-2011-1011", "CVE-2012-0881", "CVE-2012-1093"];
 const vulnerabilityCwe_reference = ["CWE-527", "CWE-911", "CWE-409", "CWE-102", "CWE-120", "CWE-420", "CWE-322", "CWE-789"];
-const vulnerabilityReference = ["Sample vulnerability reference 1", "Sample vulnerability reference 2", "Sample vulnerability reference 3", "Sample vulnerability reference 4"];
-const vulnerabilityTitle = ["Sample vulnerability 1", "Sample vulnerability 2", "Sample vulnerability 3", "Sample vulnerability 4"];
+
+const vulnerabilityData = [
+    {
+        title: 'An issue was discovered in zlib_decompress_extra in modules/demux/mkv/util.cpp in VideoLAN VLC media player 3.x through 3.0.7. The Matroska demuxer, while parsing a malformed MKV file type, has a double free.',
+        reference: 'http://git.videolan.org/?p=vlc.git;a=commit;h=81023659c7de5ac2637b4a879195efef50846102'
+    },
+    {
+        title: 'bash: BASH_CMD is writable in restricted bash shells',
+        reference: 'https://access.redhat.com/security/cve/CVE-2019-9924'
+    },
+    {
+        title: 'CVE-2017-16808',
+        reference: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16808'
+    },
+    {
+        title: 'CVE-2017-9763 on Ubuntu 18.04 LTS (bionic) - medium.',
+        reference: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-9763'
+    },
+    {
+        title: 'CVE-2018-10105',
+        reference: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-10105'
+    },
+    {
+        title: 'CVE-2018-14462',
+        reference: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-14462'
+    },
+    {
+        title: 'CVE-2018-14463',
+        reference: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-14463'
+    },
+    {
+        title: 'CVE-2018-14466',
+        reference: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-14466'
+    },
+    {
+        title: 'CVE-2018-5710 on Ubuntu 18.04 LTS (bionic) - low.',
+        reference: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-5710'
+    }
+]
 
 // Authenticathin
 const sshRuleDescription = ['sshd: authentication failed.', 'sshd: Multiple authentication failures.']
@@ -306,6 +345,7 @@ function generateAlert(params) {
 
     if (params.aws) {
         alert.rule.groups.push("amazon");
+        alert.rule.description = getRandomFromArray(awsRuleDescription);
         alert.data.aws = {};
         alert.data.aws.source = getRandomFromArray(awsSource);
         alert.GeoLocation = {
@@ -338,7 +378,7 @@ function generateAlert(params) {
         alert.data.cis.notchecked = randomIntegerFromInterval(0, 100);
         alert.data.cis.score = randomIntegerFromInterval(0, 100);
         alert.data.cis.pass = randomIntegerFromInterval(0, 100);
-        alert.data.cis.timestamp = randomDate();
+        alert.data.cis.timestamp = new Date(randomDate());
         alert.data.cis.error = randomIntegerFromInterval(0, 1);
         alert.data.cis.benchmark = getRandomFromArray(ciscatBenchmark);
         alert.data.cis.unknown = randomIntegerFromInterval(0, 1);
@@ -414,17 +454,19 @@ function generateAlert(params) {
         alert.data.vulnerability.package.name = getRandomFromArray(vulnerabilityPackageName);
         alert.data.vulnerability.cve = getRandomFromArray(vulnerabilityCve);
         alert.data.vulnerability.cwe_reference = getRandomFromArray(vulnerabilityCwe_reference);
-        alert.data.vulnerability.reference = getRandomFromArray(vulnerabilityReference);
-        alert.data.vulnerability.title = getRandomFromArray(vulnerabilityTitle);
+        const dataVulnerability = getRandomFromArray(vulnerabilityData);
+        alert.data.vulnerability.reference = dataVulnerability.reference;
+        alert.data.vulnerability.title = dataVulnerability.title;
     }
     
     if (params.osquery) {
         alert.rule.groups.push("osquery");
+        alert.rule.description = getRandomFromArray(osqueryRuleDescription);
         alert.data.osquery = {};
 
         alert.data.osquery.name = getRandomFromArray(osqueryName);
         alert.data.osquery.action = getRandomFromArray(osqueryAction);
-        alert.data.osquery.calendarTime = randomDate();
+        alert.data.osquery.calendarTime = new Date(randomDate());
         alert.data.osquery.pack = getRandomFromArray(osqueryPack);
     }
 
