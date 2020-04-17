@@ -226,7 +226,7 @@ export class FileDetails extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Discover implicitFilters={this.props.implicitFilters} initialFilters={[]} />
+            <Discover implicitFilters={this.props.implicitFilters} initialFilters={[]} type={this.props.type} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>

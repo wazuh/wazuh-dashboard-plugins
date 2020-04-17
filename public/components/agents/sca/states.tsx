@@ -188,6 +188,9 @@ export class States extends Component {
     if (itemIdToExpandedRowMap[item.id]) {
       delete itemIdToExpandedRowMap[item.id];
     } else {
+      let checks = '';
+      checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
+      checks += item.condition ? ` (Condition: ${item.condition})` : ''
       const listItems = [
         {
           title: 'Check not applicable due to:',
@@ -196,10 +199,6 @@ export class States extends Component {
         {
           title: 'Rationale',
           description: item.rationale,
-        },
-        {
-          title: 'Condition',
-          description: item.condition,
         },
         {
           title: 'Remediation',
@@ -214,7 +213,7 @@ export class States extends Component {
           description: item.directory,
         },
         {
-          title: (item.rules || []).length > 1 ? 'Checks' : 'Check',
+          title: checks,
           description: item.rulesText,
         },
         {

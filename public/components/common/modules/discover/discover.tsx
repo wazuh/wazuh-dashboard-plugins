@@ -29,6 +29,8 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   Direction,
+  EuiSpacer,
+  EuiCallOut
 } from '@elastic/eui';
 import {
   IIndexPattern,
@@ -41,15 +43,15 @@ import {
 export class Discover extends Component {
   timefilter: {
     getTime(): TimeRange
-    setTime(time:TimeRange): void
-    _history: {history:{items:{from:string, to:string}[]}}
+    setTime(time: TimeRange): void
+    _history: { history: { items: { from: string, to: string }[] } }
   };
 
   KibanaServices: {};
   
   state: {
     sort: object,
-    alerts: {_source:{}, _id:string}[],
+    alerts: { _source: {}, _id: string }[],
     total: number,
     pageIndex: number,
     pageSize: number,
@@ -88,7 +90,7 @@ export class Discover extends Component {
       requestOffset: 0,
       itemIdToExpandedRowMap: {},
       dateRange: this.timefilter.getTime(),
-      query: {language: "kuery", query: ""},
+      query: { language: "kuery", query: "" },
       searchBarFilters: [],
       elasticQuery: {}
     }
@@ -102,23 +104,23 @@ export class Discover extends Component {
       this.indexPattern = await this.KibanaServices.indexPatterns.get("wazuh-alerts-3.x-*")
       const { initialFilters = [] } = this.props;
       this.setState({ filters: initialFilters });
-    }catch(err){
+    } catch (err) {
       console.log(err);
     }
   }
 
   async componentDidUpdate() {
-    try{
+    try {
       await this.getAlerts();
-    }catch(err){
+    } catch (err) {
       console.log(err);
     }
   }
 
-  filtersAsArray(filters){
+  filtersAsArray(filters) {
     const keys = Object.keys(filters);
-    const result:{}[] = [];
-    for(var i=0; i<keys.length; i++){
+    const result: {}[] = [];
+    for (var i = 0; i < keys.length; i++) {
       const item = {};
       item[keys[i]] = filters[keys[i]];
       result.push(item);
@@ -127,7 +129,7 @@ export class Discover extends Component {
   }
 
   onFiltersChange = (filters) => {
-    this.setState({filters: this.filtersAsArray(filters)});
+    this.setState({ filters: this.filtersAsArray(filters) });
   }
 
   toggleDetails = item => {
@@ -138,35 +140,35 @@ export class Discover extends Component {
     } else {
       const newItemIdToExpandedRowMap = {};
       newItemIdToExpandedRowMap[item._id] = (
-        (<div style={{width: "100%"}}> <RowDetails item={item} addFilter={(filter) => this.addFilter(filter)}/></div>)
+        (<div style={{ width: "100%" }}> <RowDetails item={item} addFilter={(filter) => this.addFilter(filter)} /></div>)
       );
-      this.setState({ itemIdToExpandedRowMap:newItemIdToExpandedRowMap });
+      this.setState({ itemIdToExpandedRowMap: newItemIdToExpandedRowMap });
     }
   };
 
-  buildFilter(){
+  buildFilter() {
     const { searchBarFilters, query } = this.state;
-    const elasticQuery = 
+    const elasticQuery =
       esQuery.buildEsQuery(
-        undefined, 
-        query, 
-        searchBarFilters, 
+        undefined,
+        query,
+        searchBarFilters,
         esQuery.getEsQueryConfig(npSetup.core.uiSettings)
       );
     const pattern = AppState.getCurrentPattern();
     const { filters, sortField, sortDirection } = this.state;
-    const {from, to} = this.timefilter.getTime();
-    const sort = {...(sortField && {[sortField]: {"order": sortDirection}})};
-    const offset = Math.floor( (this.state.pageIndex * this.state.pageSize) / this.state.requestSize ) * this.state.requestSize;
+    const { from, to } = this.timefilter.getTime();
+    const sort = { ...(sortField && { [sortField]: { "order": sortDirection } }) };
+    const offset = Math.floor((this.state.pageIndex * this.state.pageSize) / this.state.requestSize) * this.state.requestSize;
 
-    return {filters, sort, from, to, offset, pattern, elasticQuery};
+    return { filters, sort, from, to, offset, pattern, elasticQuery };
   }
 
   async getAlerts() {
     //compare filters so we only make a request into Elasticsearch if needed
     const newFilters = this.buildFilter();
-    if(JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading){
-      this.setState({ isLoading: true})
+    if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading) {
+      this.setState({ isLoading: true })
       const alerts = await GenericRequest.request(
         'POST',
         `/elastic/alerts`,
@@ -175,7 +177,7 @@ export class Discover extends Component {
           filters: [...newFilters['filters'], ...this.props.implicitFilters]
         }
       );
-      this.setState({alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters:newFilters.filters})
+      this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters })
     }
   }
 
@@ -184,27 +186,27 @@ export class Discover extends Component {
       {
         field: 'timestamp',
         name: 'Time',
-        sortable:true
+        sortable: true
       },
       {
         field: 'syscheck.event',
         name: 'Action',
-        sortable:true
+        sortable: true
       },
       {
         field: 'rule.description',
         name: 'Rule description',
-        sortable:true
+        sortable: true
       },
       {
         field: 'rule.level',
         name: 'Rule level',
-        sortable:true
+        sortable: true
       },
       {
         field: 'rule.id',
         name: 'Rule ID',
-        sortable:true
+        sortable: true
       },
     ]
   }
@@ -218,28 +220,28 @@ export class Discover extends Component {
       pageSize,
       sortField,
       sortDirection,
-    }, async() => this.getAlerts())
+    }, async () => this.getAlerts())
   };
-  
 
-  getpageIndexItems(){
-    let items:{}[] = [];
-    
-    const start = (this.state.pageIndex * this.state.pageSize)%this.state.requestSize;
+
+  getpageIndexItems() {
+    let items: {}[] = [];
+
+    const start = (this.state.pageIndex * this.state.pageSize) % this.state.requestSize;
     const end = start + this.state.pageSize
-    for(let i=start; i<end && (this.state.pageIndex * this.state.pageSize) < this.state.total ; i++){
-      if(this.state.alerts[i] && this.state.alerts[i]._source){
-        items.push( { ...this.state.alerts[i]._source, _id :this.state.alerts[i]._id })
+    for (let i = start; i < end && (this.state.pageIndex * this.state.pageSize) < this.state.total; i++) {
+      if (this.state.alerts[i] && this.state.alerts[i]._source) {
+        items.push({ ...this.state.alerts[i]._source, _id: this.state.alerts[i]._id })
       }
     }
     return items;
 
   }
 
-  getFiltersAsObject(filters){
+  getFiltersAsObject(filters) {
     var result = {};
     for (var i = 0; i < filters.length; i++) {
-      result = {...result, ...filters[i]}
+      result = { ...result, ...filters[i] }
     }
     return result;
   }
@@ -248,10 +250,10 @@ export class Discover extends Component {
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
    * @param filter 
    */
-  addFilter(filter){
+  addFilter(filter) {
     const key = Object.keys(filter)[0];
     const value = filter[key];
-    const formattedFilter = esFilters.buildPhraseFilter({name: key, type: "string"}, value, this.indexPattern);
+    const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, value, this.indexPattern);
 
     const filters = this.state.searchBarFilters;
     filters.push(formattedFilter);
@@ -259,10 +261,10 @@ export class Discover extends Component {
     this.setState({searchBarFilters: filters});
   }
 
-  onQuerySubmit = (payload:{dateRange: TimeRange, query?: Query | undefined}) => {
+  onQuerySubmit = (payload: { dateRange: TimeRange, query?: Query | undefined }) => {
     const { dateRange, query } = payload;
     this.timefilter.setTime(dateRange);
-    this.setState({dateRange, query});
+    this.setState({ dateRange, query });
   }
 
   onFiltersUpdated = (filters: esFilters.Filter[]) => {
@@ -270,7 +272,7 @@ export class Discover extends Component {
     this.setState({searchBarFilters: filters});
   }
 
-  getSearchBar(){
+  getSearchBar() {
     const storage = {
       ...window.localStorage,
       get: (key) => JSON.parse(window.localStorage.getItem(key)),
@@ -287,7 +289,7 @@ export class Discover extends Component {
     return (
       <KibanaContextProvider services={{...this.KibanaServices, appName: "wazuhFim", storage, http, savedObjects}} > 
         <I18nProvider>
-          <SearchBar 
+          <SearchBar
             indexPatterns={[this.indexPattern]}
             filters={searchBarFilters}
             dateRangeFrom={dateRange.from}
@@ -296,17 +298,17 @@ export class Discover extends Component {
             onFiltersUpdated={this.onFiltersUpdated}
             query={query}
             timeHistory={this.timefilter._history}
-            {...{appName:'wazuhFim'}} />
+            {...{ appName: 'wazuhFim' }} />
         </I18nProvider>
       </KibanaContextProvider>
     );
   }
 
   render() {
-   if(this.state.isLoading)
-      return (<div style={{alignSelf: "center"}}><EuiLoadingSpinner  size="xl"/> </div>)
+    if (this.state.isLoading)
+      return (<div style={{ alignSelf: "center" }}><EuiLoadingSpinner size="xl" /> </div>)
 
-  
+
     const getRowProps = item => {
       const { _id } = item;
       return {
@@ -319,8 +321,8 @@ export class Discover extends Component {
     const pageIndexItems = this.getpageIndexItems();
     const columns = this.columns();
 
-    const sorting:EuiTableSortingType<{}> = {
-      sort:  {
+    const sorting: EuiTableSortingType<{}> = {
+      sort: {
         //@ts-ignore
         field: this.state.sortField,
         direction: this.state.sortDirection,
@@ -332,13 +334,14 @@ export class Discover extends Component {
       totalItemCount: this.state.total,
       pageSizeOptions: [10, 25, 50],
     };
-      return (
-        <div>
-          {this.state.total && (
-            <div>
-              {this.getSearchBar()}
-              <EuiFlexGroup>
-                <EuiFlexItem>
+    const noResultsText = `No results match for this ${this.props.type === 'file' ? 'file' : 'registry'} and search criteria`
+    return (
+      <div>
+        {this.state.total && (
+          <div>
+            {this.getSearchBar()}
+            <EuiFlexGroup>
+              <EuiFlexItem>
                 {pageIndexItems.length && (
                   <EuiBasicTable
                     items={pageIndexItems}
@@ -352,19 +355,20 @@ export class Discover extends Component {
                     onChange={this.onTableChange}
                   />
                 )}
-                </EuiFlexItem>
-              </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </div>
-          ) || (
+        ) || (
             <div>
               {this.getSearchBar()}
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  There are no events for this file.
+                  <EuiSpacer size="s" />
+                  <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
                 </EuiFlexItem>
               </EuiFlexGroup>
             </div>
           )}
-        </div>);    
+      </div>);
   }
 }
