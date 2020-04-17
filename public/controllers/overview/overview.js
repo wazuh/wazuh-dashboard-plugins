@@ -139,7 +139,7 @@ export class OverviewController {
       this.currentOverviewSectionProps = {
         tabView: subtab,
         currentTab: this.tab,
-        switchTab: (tab,force) => this.switchTab(tab,force),         
+        switchTab: (tab,force) => this.switchTab(tab,force),
       };
 
       if (subtab === 'panels' && this.tab !== 'welcome') {
@@ -175,7 +175,7 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
-    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist') {
+    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist' && newTab !== 'tsc') {
       this.visualizeProps.cardReqs = {};
     }
     if (newTab === 'pci') {
@@ -189,6 +189,9 @@ export class OverviewController {
     }
     if (newTab === 'nist') {
       this.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
+    }
+    if (newTab === 'tsc') {
+      this.visualizeProps.cardReqs = { items: await this.commonData.getTSC(), reqTitle: 'TSC Requirement' };
     }
     this.visualizeProps.selectedTab = newTab;
     this.showingMitreTable = false;
@@ -291,7 +294,7 @@ export class OverviewController {
 
   /**
  * Filter by Mitre.ID
- * @param {*} id 
+ * @param {*} id
  */
   addMitrefilter(id) {
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;

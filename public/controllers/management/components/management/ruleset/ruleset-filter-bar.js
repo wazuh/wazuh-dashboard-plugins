@@ -33,7 +33,7 @@ class WzRulesetFilterBar extends Component {
 
     this.rulesetHandler = RulesetHandler;
     this.availableOptions = {
-      rules: ['nist-800-53', 'hipaa', 'gdpr', 'pci', 'gpg13', 'group', 'level', 'path', 'file'],
+      rules: ['nist-800-53', 'hipaa', 'gdpr', 'pci', 'gpg13', 'tsc', 'group', 'level', 'path', 'file'],
       decoders: ['path', 'file'],
       lists: []
     }
@@ -54,7 +54,7 @@ class WzRulesetFilterBar extends Component {
     this.notValidMessage = false;
     const options = this.availableOptions[this.props.state.section];
     const valueSplit = lowerValue.split(':');
-    const oneTwoDots = valueSplit.length - 1 === 1; // Has : once 
+    const oneTwoDots = valueSplit.length - 1 === 1; // Has : once
     const moreTwoDots = valueSplit.length - 1 > 1; // Has : several times
     const notAvailable = !options.includes(valueSplit[0]); // Not include in the available options
     if (moreTwoDots || (oneTwoDots && notAvailable)) {
@@ -93,7 +93,7 @@ class WzRulesetFilterBar extends Component {
 
   /**
    * Fetch items (rules, decoders)
-   * @param {Object} filters 
+   * @param {Object} filters
    */
   async fetchItems(filters) {
     try {

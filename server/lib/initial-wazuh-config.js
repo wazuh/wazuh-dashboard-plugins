@@ -53,6 +53,7 @@
 #extensions.gdpr      : true
 #extensions.hipaa     : true
 #extensions.nist      : true
+#extensions.tsc       : true
 #extensions.audit     : true
 #extensions.oscap     : false
 #extensions.ciscat    : false
@@ -139,7 +140,7 @@
 #     url: http(s)://<url>
 #     port: <port>
 #     user: <user>
-#     password: <password> 
+#     password: <password>
 
 hosts:
   - default:

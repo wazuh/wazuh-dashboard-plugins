@@ -142,6 +142,7 @@ export class WelcomeScreen extends Component {
                     {!this.props.extensions.pci &&
                       !this.props.extensions.gdpr &&
                       !this.props.extensions.hipaa &&
+                      !this.props.extensions.tsc &&
                       !this.props.extensions.nist && (
                         <EuiFlexGroup>
                           <EuiFlexItem>
@@ -161,12 +162,15 @@ export class WelcomeScreen extends Component {
                     {(this.props.extensions.pci ||
                       this.props.extensions.gdpr ||
                       this.props.extensions.hipaa ||
+                      this.props.extensions.tsc ||
                       this.props.extensions.nist) && (
                         <EuiFlexGrid columns={2}>
                           {this.props.extensions.pci &&
                             this.buildTabCard('pci', 'visTagCloud')}
                           {this.props.extensions.nist &&
                             this.buildTabCard('nist', 'apmApp')}
+                          {this.props.extensions.tsc &&
+                            this.buildTabCard('tsc', 'apmApp')}
                           {this.props.extensions.gdpr &&
                             this.buildTabCard('gdpr', 'visBarVertical')}
                           {this.props.extensions.hipaa &&

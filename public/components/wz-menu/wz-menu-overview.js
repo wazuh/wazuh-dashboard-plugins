@@ -52,6 +52,7 @@ class WzMenuOverview extends Component {
       gdpr: { id: 'gdpr', text: 'GDPR' },
       hipaa: { id: 'hipaa', text: 'HIPAA' },
       nist: { id: 'nist', text: 'NIST 800-53' },
+      tsc: { id: 'tsc', text: 'TSC' },
     };
 
     this.wzReq = WzRequest;
@@ -151,6 +152,7 @@ class WzMenuOverview extends Component {
             this.overviewSections.gdpr,
             this.overviewSections.hipaa,
             this.overviewSections.nist,
+            this.overviewSections.tsc,
           ]),
       })
     ];

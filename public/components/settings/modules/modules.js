@@ -58,7 +58,8 @@ export default class EnableModules extends Component {
             { name: 'pci', default: true, agent: false },
             { name: 'nist', default: true, agent: false },
             { name: 'gdpr', default: false, agent: false },
-            { name: 'hipaa', default: false, agent: false }
+            { name: 'hipaa', default: false, agent: false },
+            { name: 'tsc', default: false, agent: false }
           ]
         }
       ]

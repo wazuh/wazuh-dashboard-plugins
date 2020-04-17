@@ -116,6 +116,15 @@ class WzRulesetSearchBar extends Component {
         return (((result || {}).data || {}).data || {}).items;
       }
     },
+    {
+      label: 'tsc',
+      description: 'Filters the rules by TSC requirement',
+      values: async () => {
+        const wzReq = (...args) => WzRequest.apiReq(...args);
+        const result = await wzReq('GET', '/rules/tsc', {});
+        return (((result || {}).data || {}).data || {}).items;
+      }
+    },
   ]
   rulesFiles = [
     {
@@ -184,7 +193,7 @@ class WzRulesetSearchBar extends Component {
     decoders: [{label: "Custom decoders", field:"path", value:"etc/decoders"}, ],
     list: []
   }
-  
+
 
   render() {
     const { section, showingFiles, filters } = this.props.state;
@@ -195,7 +204,7 @@ class WzRulesetSearchBar extends Component {
     <WzSearchBar
       apiSuggests={apiSuggests}
       onInputChange={this.props.updateFilters}
-      placeholder={"Add filter or search"} 
+      placeholder={"Add filter or search"}
       buttonOptions={buttonOptions}
       noDeleteFiltersOnUpdateSuggests={true}
       initFilters={filters} />

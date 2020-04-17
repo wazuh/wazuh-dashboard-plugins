@@ -516,6 +516,10 @@ export class AgentsController {
         this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
       }
 
+      if (tab === 'tsc') {
+        this.$scope.visualizeProps.cardReqs = { items: await this.commonData.getTSC(), reqTitle: 'TSC Requirement' };
+      }
+
       if (tab === 'sca') {
         //remove to component
         this.$scope.scaProps = {
@@ -731,7 +735,7 @@ export class AgentsController {
         { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      
+
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');

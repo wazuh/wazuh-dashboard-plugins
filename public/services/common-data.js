@@ -43,14 +43,14 @@ export class CommonData {
       hostMonitoringTabs: ['general', 'fim', 'aws'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
-      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc']
     };
 
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker','mitre'],
-      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc']
     };
   }
 
@@ -141,6 +141,7 @@ export class CommonData {
         gdpr: { group: 'gdpr' },
         hipaa: { group: 'hipaa' },
         nist: { group: 'nist' },
+        tsc: { group: 'tsc' },
         aws: { group: 'amazon' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
@@ -172,6 +173,9 @@ export class CommonData {
         } else if (tab === 'nist') {
           this.removeDuplicateExists('rule.nist_800_53');
           filters.push(filterHandler.nistQuery());
+        } else if (tab === 'tsc') {
+          this.removeDuplicateExists('rule.tsc');
+          filters.push(filterHandler.tscQuery());
         } else if (tab === 'mitre') {
           this.removeDuplicateExists('rule.mitre.id');
           filters.push(filterHandler.mitreQuery());
@@ -259,6 +263,23 @@ export class CommonData {
         nistTabs.push({ title: key, content: data.data[key] });
       }
       return nistTabs;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * GET TSC
+   */
+  async getTSC() {
+    try {
+      const tscTabs = [];
+      const data = await this.genericReq.request('GET', '/api/tsc/all');
+      if (!data.data) return [];
+      for (const key in data.data) {
+        tscTabs.push({ title: key, content: data.data[key] });
+      }
+      return tscTabs;
     } catch (error) {
       return Promise.reject(error);
     }

@@ -339,6 +339,59 @@ export const visualizations = {
       },
     ],
   },
+  tsc: {
+    rows: [
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'Most active agents',
+            id: 'Wazuh-App-Overview-TSC-Agents',
+            width: 20,
+          },
+          {
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
+            width: 50,
+          },
+          {
+            title: 'Requiments distribution by agent',
+            id: 'Wazuh-App-Overview-TSC-requirements-by-agents',
+            width: 30,
+          },
+        ],
+      },
+      {
+        height: 350,
+        vis: [
+          {
+            title: 'Alerts volume by agent',
+            id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
+            width: 50,
+          },
+          {
+            title: 'Stats',
+            id: 'Wazuh-App-Overview-TSC-Metrics',
+            width: 20,
+          },
+          {
+            title: 'Top 10 requirements',
+            id: 'Wazuh-App-Overview-TSC-Top-10-requirements',
+            width: 30,
+          },
+        ],
+      },
+      {
+        height: 600,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-TSC-Alerts-summary',
+          },
+        ],
+      },
+    ],
+  },
   hipaa: {
     rows: [
       {

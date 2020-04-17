@@ -254,6 +254,48 @@ export const agentVisualizations = {
       },
     ],
   },
+  tsc: {
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Stats',
+            id: 'Wazuh-App-Agents-NIST-Stats',
+            width: 25,
+          },
+          {
+            title: 'Top 10 requirements',
+            id: 'Wazuh-App-Agents-NIST-top-10-requirements',
+            width: 25,
+          },
+          {
+            title: 'Requirements distributed by level',
+            id: 'Wazuh-App-Agents-NIST-Requirement-by-level',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Requirements over time',
+            id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime',
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-NIST-Last-alerts',
+          },
+        ],
+      },
+    ],
+  },
   hipaa: {
     rows: [
       {
