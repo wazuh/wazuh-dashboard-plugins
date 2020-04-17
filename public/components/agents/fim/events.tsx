@@ -12,8 +12,8 @@
 
 import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { FlyoutDetail } from './states/flyout';
+import { AngularHelper } from '../../common/modules/angular-helper'
 export class EventsFim extends Component {
   state: {
     isFlyoutVisible: Boolean
@@ -22,7 +22,8 @@ export class EventsFim extends Component {
     super(props);
     this.state = {
       isFlyoutVisible: false,
-    }
+    };
+    this.angularHelper = AngularHelper;
   }
 
   async getRowsField(scope) {
@@ -51,23 +52,15 @@ export class EventsFim extends Component {
     }
   }
 
-  async getDiscoverScope() {
-    const app = getAngularModule('app/wazuh');
-    if (app.discoverScope) {
-      app.discoverScope.$watchCollection('fetchStatus',
-        () => {
-          if (app.discoverScope.fetchStatus === 'complete') {
-            this.elements = false;
-            setTimeout(() => { this.getRowsField(app.discoverScope) }, 1000);
-          }
-        });
-    } else {
-      setTimeout(() => { this.getDiscoverScope() }, 200);
-    }
-  }
-
   async componentDidMount() {
-    this.getDiscoverScope();
+    const scope = await this.angularHelper.getDiscoverScope();
+    scope.$watchCollection('fetchStatus',
+      () => {
+        if (scope.fetchStatus === 'complete') {
+          this.elements = false;
+          setTimeout(() => { this.getRowsField(scope) }, 1000);
+        }
+      });
   }
 
   showFlyout(file) {

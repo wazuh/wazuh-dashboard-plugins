@@ -202,9 +202,9 @@ export class MainModule extends Component {
                 {title}
               </div>
             </div>
-            <div className='wz-module-header-nav-wrapper'>
-              <div className='wz-module-header-nav'>
-                {(this.tabs && this.tabs.length) &&
+            {(this.tabs && this.tabs.length) &&
+              <div className='wz-module-header-nav-wrapper'>
+                <div className='wz-module-header-nav'>
                   <EuiFlexGroup>
                     {this.renderTabs()}
                     {(this.buttons || []).includes('dashboard') && selectView === 'dashboard' &&
@@ -213,9 +213,9 @@ export class MainModule extends Component {
                     {(this.buttons || []).includes('dashboard') && this.renderDashboardButton()}
                     {(this.buttons || []).includes('settings') && this.renderSettingsButton()}
                   </EuiFlexGroup>
-                }
+                </div>
               </div>
-            </div>
+            }
             <div className='wz-module-body'>
               {selectView === 'events' && <Events {...this.props} />}
               {selectView === 'loader' &&

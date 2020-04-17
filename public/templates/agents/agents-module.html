@@ -2,13 +2,16 @@
     <react-component name="MainModule" props="{agent, section: tab}" />
     <div ng-if='!loadingDashboard'>
         <div ng-if='showModuleDashboard || showModuleEvents' class="wz-module-body">
-            <kbn-dis></kbn-dis>
+            <div ng-show="moduleDiscoverReady">
+                <kbn-dis></kbn-dis>
+            </div>
         </div>
     </div>
     <!-- Loading status section -->
     <div ng-if="tabView === 'panels' && showModuleDashboard && !rendered && resultState !== 'none'"
         class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <div class="euiSpacer euiSpacer--m"></div>
             <span class="euiLoadingChart euiLoadingChart--large">
                 <span class="euiLoadingChart__bar"></span>
                 <span class="euiLoadingChart__bar"></span>
@@ -24,6 +27,7 @@
     <div ng-if="reportBusy && reportStatus && showModuleDashboard"
         class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <div class="euiSpacer euiSpacer--m"></div>
             <span class="euiLoadingChart euiLoadingChart--large">
                 <span class="euiLoadingChart__bar"></span>
                 <span class="euiLoadingChart__bar"></span>
@@ -37,6 +41,8 @@
     </div>
     <!-- End report status section -->
     <div ng-if="visualizeProps">
-        <react-component ng-show='showModuleDashboard' name="WzVisualize" props="visualizeProps" />
+        <div ng-show="moduleDiscoverReady">
+            <react-component ng-show='showModuleDashboard' name="WzVisualize" props="visualizeProps" />
+        </div>
     </div>
 </div>

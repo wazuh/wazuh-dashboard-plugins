@@ -14,9 +14,11 @@ import React, { Component, Fragment } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { EventsSelectedFiles } from './events-selected-fields'
 import { EventsFim } from '../../agents/fim/events';
+import { AngularHelper } from './angular-helper'
 export class Events extends Component {
   constructor(props) {
     super(props);
+    this.angularHelper = AngularHelper;
   }
 
   async cleanAvailableFields() {
@@ -28,53 +30,46 @@ export class Events extends Component {
           field.style.display = "none";
         }
       });
-    } else if ((scope.rows || []).length) {
-      setTimeout(() => { this.getDiscoverScope() }, 200);
-    }
-  }
-
-  async getDiscoverScope() {
-    const app = getAngularModule('app/wazuh');
-    const fields = EventsSelectedFiles[this.props.section];
-    if (app.discoverScope && app.discoverScope.addColumn) {
-      app.discoverScope.state.columns = [];
-      if (fields) {
-        fields.forEach(field => {
-          if (!app.discoverScope.state.columns.includes(field)) {
-            app.discoverScope.addColumn(field);
-          }
-        });
-      }
-      app.discoverScope.$watchCollection('fetchStatus',
-        () => {
-          if (app.discoverScope.fetchStatus === 'complete') {
-            setTimeout(() => { this.cleanAvailableFields() }, 1000);
-          }
-        });
-    } else {
-      setTimeout(() => { this.getDiscoverScope() }, 200);
     }
   }
 
   async componentDidMount() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
     const app = getAngularModule('app/wazuh');
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
     this.$rootScope.$applyAsync();
-    this.getDiscoverScope();
+    const scope = await this.angularHelper.getDiscoverScope();
+    this.$rootScope.moduleDiscoverReady = true;
+    this.$rootScope.$applyAsync();
+    const fields = EventsSelectedFiles[this.props.section];
+    if (fields) {
+      scope.state.columns = [];
+      fields.forEach(field => {
+        if (!scope.state.columns.includes(field)) {
+          scope.addColumn(field);
+        }
+      });
+    }
+    scope.$watchCollection('fetchStatus',
+      () => {
+        if (scope.fetchStatus === 'complete') {
+          setTimeout(() => { this.cleanAvailableFields() }, 1000);
+        }
+      });
   }
 
   componentWillUnmount() {
     this.$rootScope.showModuleEvents = false;
+    this.$rootScope.moduleDiscoverReady = false;
     this.$rootScope.$applyAsync();
   }
 
   render() {
     return (
       <Fragment>
-        {this.props.section === 'fim' &&
-          <EventsFim {...this.props}></EventsFim>
-        }
+        {this.props.section === 'fim' && <EventsFim {...this.props}></EventsFim>}
       </Fragment>
     )
   }
