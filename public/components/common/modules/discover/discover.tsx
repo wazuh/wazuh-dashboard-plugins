@@ -11,7 +11,7 @@
  */
 
 import React, { Component, } from 'react';
-import { I18nProvider } from '../../../../../../../packages/kbn-i18n/src/react'
+import { I18nProvider } from '@kbn/i18n/react'
 import './discover.less';
 import { KibanaContextProvider } from '../../../../../../../src/plugins/kibana_react/public/context'
 import { SearchBar } from '../../../../../../../src/plugins/data/public/'
