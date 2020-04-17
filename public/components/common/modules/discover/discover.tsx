@@ -332,6 +332,7 @@ export class Discover extends Component {
       totalItemCount: this.state.total,
       pageSizeOptions: [10, 25, 50],
     };
+    const noResultsText = `No results match for this ${this.props.type === 'file' ? 'file' : 'registry'} and search criteria`
     return (
       <div>
         {this.state.total && (
@@ -361,7 +362,7 @@ export class Discover extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiSpacer size="s" />
-                  <EuiCallOut title="There are no events for this file" color="warning" iconType="alert" />
+                  <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
                 </EuiFlexItem>
               </EuiFlexGroup>
             </div>
