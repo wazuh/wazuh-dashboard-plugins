@@ -41,6 +41,7 @@ import {
 } from '../../../../../../../src/plugins/data/common';
 
 export class Discover extends Component {
+  _isMount!: boolean;
   timefilter: {
     getTime(): TimeRange
     setTime(time: TimeRange): void
@@ -66,6 +67,7 @@ export class Discover extends Component {
     query: Query,
     searchBarFilters: esFilters.Filter[],
     elasticQuery: object
+    filters: []
   };
   indexPattern!: IIndexPattern
   props!: {
@@ -92,7 +94,8 @@ export class Discover extends Component {
       dateRange: this.timefilter.getTime(),
       query: { language: "kuery", query: "" },
       searchBarFilters: [],
-      elasticQuery: {}
+      elasticQuery: {},
+      filters: props.initialFilters
     }
 
     this.onQuerySubmit.bind(this);
@@ -100,16 +103,21 @@ export class Discover extends Component {
   }
 
   async componentDidMount() {
+    this._isMount = true;
     try{
-      this.indexPattern = await this.KibanaServices.indexPatterns.get("wazuh-alerts-3.x-*")
-      const { initialFilters = [] } = this.props;
-      this.setState({ filters: initialFilters });
+      this.indexPattern = await this.KibanaServices.indexPatterns.get("wazuh-alerts-3.x-*");
+      this.getAlerts();
     } catch (err) {
       console.log(err);
     }
   }
 
+  componentWillUnmount() {
+    this._isMount = false;
+  }
+
   async componentDidUpdate() {
+    if(!this._isMount) { return; }
     try {
       await this.getAlerts();
     } catch (err) {
@@ -177,7 +185,9 @@ export class Discover extends Component {
           filters: [...newFilters['filters'], ...this.props.implicitFilters]
         }
       );
-      this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters })
+      if (this._isMount) {
+        this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters })
+      }
     }
   }
 
