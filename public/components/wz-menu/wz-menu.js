@@ -157,11 +157,11 @@ class WzMenu extends Component {
         ? filtered
         : await this.indexPatterns.get(AppState.getCurrentPattern());
       this.setState({ theresPattern: true, currentPattern: data.title });
+      this.props.updateCurrentPattern({id: data[0].id, title: data[0].title});
 
       // Getting the list of index patterns
       if (list) {
         this.setState({ patternList: list, currentSelectedPattern: AppState.getCurrentPattern() })
-        this.props.updateCurrentPattern(AppState.getCurrentPattern());
       }
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
@@ -173,7 +173,7 @@ class WzMenu extends Component {
       if (!AppState.getPatternSelector()) return;
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
-      this.props.updateCurrentPattern(event.target.value);
+      this.props.updateCurrentPattern(this.state.patternList.find(pattern => pattern.id === event.target.value));
       this.router.reload();
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);

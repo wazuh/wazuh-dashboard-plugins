@@ -29,7 +29,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
 interface IWzSampleDataProps{
-  currentPattern: string
+  currentPattern: {id: string, title: string}
 }
 
 class WzSampleData extends Component<IWzSampleDataProps> {
@@ -82,7 +82,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
     // Check if sample data for each category was added
     try{
       const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
-        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${this.props.currentPattern}/${cur.categorySampleAlertsIndex}`)
+        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${this.props.currentPattern.title}/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
   
@@ -122,7 +122,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         ...this.state[category.categorySampleAlertsIndex],
         addDataLoading: true
       } });
-      await WzRequest.genericReq('POST', `/elastic/samplealerts/${this.props.currentPattern}/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
+      await WzRequest.genericReq('POST', `/elastic/samplealerts/${this.props.currentPattern.title}/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
       this.showToast('success', `${category.title} alerts installed`);
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
@@ -143,7 +143,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         ...this.state[category.categorySampleAlertsIndex],
         removeDataLoading: true
       } });
-      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${this.props.currentPattern}/${category.categorySampleAlertsIndex}` );
+      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${this.props.currentPattern.title}/${category.categorySampleAlertsIndex}` );
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
         exists: false,

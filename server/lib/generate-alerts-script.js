@@ -508,7 +508,7 @@ function generateAlert(params) {
             alert.rule.id = 5720;
             alert.rule.level = 10;
         }
-        if (params.authentication.windows) {
+        if (params.authentication.windows_invalid_login_password) {
             alert.full_log = alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
             alert.data.win = {
                 eventdata: {
@@ -558,6 +558,47 @@ function generateAlert(params) {
             alert.nist_800_53 = ['AU.1', 'AC.7'];
             alert.gdpr = ['10.2.4', '10.2.5'];
         }
+    }
+    if ( params.windows ){
+        alert.rule.groups.push('windows');
+        if(params.windows.service_control_manager){
+            alert.predecoder = {
+                program_name: 'WinEvtLog',
+                timestamp: '2020 Apr 17 05:59:05'
+            };
+            alert.input = {
+                type: 'log'
+            };
+            alert.data = {
+                extra_data: 'Service Control Manager',
+                dstuser: 'SYSTEM',
+                system_name: getRandomFromArray(Win_Hostnames),
+                id: '7040',
+                type: 'type',
+                status: 'INFORMATION'
+            }
+            alert.rule.description = 'Windows: Service startup type was changed.'
+            alert.rule.firedtimes = randomIntegerFromInterval(1,20);
+            alert.rule.mail = false
+            alert.rule.level = 3;
+            alert.rule.groups.push('windows', 'policy_changed');
+            alert.rule.pci = ['10.6'];
+            alert.rule.hipaa = ['164.312.b'];
+            alert.rule.gdpr = ['IV_35.7.d'];
+            alert.rule.nist_800_53 = ['AU.6'];
+            alert.rule.info = 'This does not appear to be logged on Windows 2000.';
+            alert.location = 'WinEvtLog';
+            alert.decoder = {
+                parent: 'windows',
+                name: 'windows'
+            }
+            alert.full_log = `2020 Apr 17 05:59:05 WinEvtLog: type: INFORMATION(7040): Service Control Manager: SYSTEM: NT AUTHORITY: ${alert.data.system_name}: Background Intelligent Transfer Service auto start demand start BITS ` //TODO: date
+            alert.id = 18145;
+            alert.fields = {
+                timestamp: alert.timestamp
+            };
+        }
+
     }
 
     return alert;

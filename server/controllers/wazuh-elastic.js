@@ -32,7 +32,7 @@ export class WazuhElasticCtrl {
     this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
     this.wzAlertsSampleCaterories = {
-      'security': [{ syscheck: true }, { aws: true }, { authentication: { invalid_login_user: true }, alerts: 250 }, { authentication: { invalid_login_password: true }, alerts: 250 }, { authentication: { multiple_authentication_failures: true }, alerts: 250 }, { authentication: { windows: true }, alerts: 250 }],
+      'security': [{ syscheck: true }, { aws: true }, { authentication: { invalid_login_user: true }, alerts: 250 }, { authentication: { invalid_login_password: true }, alerts: 250 }, { authentication: { multiple_authentication_failures: true }, alerts: 250 }, { authentication: { windows_invalid_login_password: true }, alerts: 250 }, { windows: {service_control_manager: true}, alerts: 250}],
       'auditing-pm': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }],
       'regulatory-compliance': [{ pci_dss: true }, { gdpr: true }, { hipaa: true }, { nist_800_53: true }]
@@ -888,7 +888,7 @@ export class WazuhElasticCtrl {
     }catch(error){
       log(
         'wazuh-elastic:createSampleAlerts',
-        `Error adding sample alerts of ${sampleAlertsIndex} index`
+        `Error adding sample alerts to ${sampleAlertsIndex} index`
       );
       return ErrorResponse(error.message || error, 1000, 400, reply);
     }
