@@ -45,8 +45,19 @@ export class FlyoutDetail extends Component {
   render() {
     return (
           <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby="flyoutTitle" maxWidth="70%">
-            {this.state.isLoading && <EuiLoadingContent />}
-            {this.state.currentFile &&
+            {this.state.isLoading && (
+              <Fragment>
+              <EuiFlyoutHeader hasBorder className="flyout-header" >
+                <EuiTitle size="s">
+                  <h2 id="flyoutTitle">{this.props.fileName}</h2>
+                </EuiTitle>
+              </EuiFlyoutHeader>
+              <EuiFlyoutBody className="flyout-body" > 
+                <EuiLoadingContent />
+              </EuiFlyoutBody>
+            </Fragment>
+            )}
+            {this.state.currentFile && !this.state.isLoading &&
               <Fragment>
                 <EuiFlyoutHeader hasBorder className="flyout-header" >
                   <EuiTitle size="s">
