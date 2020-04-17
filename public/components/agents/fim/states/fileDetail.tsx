@@ -178,7 +178,7 @@ export class FileDetails extends Component {
                   !link ? value :
                   <EuiLink
                   onClick={async (event) => {
-                    this.props.onFilterSelect(`${item.field}:${value}`);
+                    this.props.onFilterSelect(`${item.field}=${value}`);
                     this.props.closeFlyout();
                   }} >
                   {value}
