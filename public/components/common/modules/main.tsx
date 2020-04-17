@@ -25,6 +25,7 @@ import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
+import { ReportingService } from '../../../react-services/reporting';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import { MainGeneral } from '../../agents/general';
@@ -46,6 +47,7 @@ import { MainNist } from '../../agents/nist';
 export class MainModule extends Component {
   constructor(props) {
     super(props);
+    this.reportingService = new ReportingService();
     this.state = {
       selectView: false,
     };
@@ -134,7 +136,7 @@ export class MainModule extends Component {
       <EuiFlexItem grow={false}>
         <EuiButton
           iconType="document"
-          onClick={() => this.reportingService.startVis2Png('fim', this.props.agent.id)}>
+          onClick={() => this.reportingService.startVis2Png(this.props.section, this.props.agent.id)}>
           Generate report
           </EuiButton>
       </EuiFlexItem>

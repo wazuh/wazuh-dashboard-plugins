@@ -2,7 +2,7 @@
     <react-component name="MainModule" props="{agent, section: tab}" />
     <div ng-if='!loadingDashboard'>
         <div ng-if='showModuleDashboard || showModuleEvents' class="wz-module-body">
-            <div ng-show="moduleDiscoverReady">
+            <div ng-class="{'no-opacity': !moduleDiscoverReady}">
                 <kbn-dis></kbn-dis>
             </div>
         </div>
@@ -41,7 +41,7 @@
     </div>
     <!-- End report status section -->
     <div ng-if="visualizeProps">
-        <div ng-show="moduleDiscoverReady">
+        <div ng-class="{'no-opacity': !moduleDiscoverReady}">
             <react-component ng-show='showModuleDashboard' name="WzVisualize" props="visualizeProps" />
         </div>
     </div>
