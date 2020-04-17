@@ -30,8 +30,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.12.0
-- Wazuh RESTful API 3.12.0
+- Wazuh HIDS 3.12.2
+- Wazuh RESTful API 3.12.2
 - Kibana 7.4.2
 - Elasticsearch 7.4.2
 
@@ -41,7 +41,14 @@ Install the app
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.4.2.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.4.2.zip
+```
+
+It is recommended to increase the heap size of Kibana to ensure the plugin installation:
+```
+cat >> /etc/default/kibana << EOF
+NODE_OPTIONS="--max_old_space_size=2048"
+EOF
 ```
 
 Restart Kibana
@@ -60,7 +67,7 @@ service kibana restart
 
 ## Upgrade
 
-Note: In Wazuh 3.12.0 (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
+Note: Since Wazuh 3.12.0 (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
 
 Stop Kibana
 
@@ -107,7 +114,7 @@ Install the app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.4.2.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.4.2.zip
 ```
 
 Update configuration file permissions.
@@ -115,6 +122,13 @@ Update configuration file permissions.
 ```
 sudo chown kibana:kibana /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 sudo chmod 600 /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+```
+
+It is recommended to increase the heap size of Kibana to ensure the plugin installation:
+```
+cat >> /etc/default/kibana << EOF
+NODE_OPTIONS="--max_old_space_size=2048"
+EOF
 ```
 
 Restart Kibana
@@ -136,8 +150,16 @@ service kibana restart
  
 | Wazuh app version | Kibana version | Package                                                         |
 | :---------------: | :------------: | :-------------------------------------------------------------- |
+|       3.12.2      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.2.zip> |
+|       3.12.2      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.1.zip> |
+|       3.12.2      |      6.8.8     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_6.8.8.zip> |
+|       3.12.1      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.1_7.6.2.zip> |
+|       3.12.1      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.1_7.6.1.zip> |
+|       3.12.1      |      6.8.8     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.1_6.8.8.zip> |
+|       3.12.0      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.2.zip> |
 |       3.12.0      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.6.1.zip> |
 |       3.12.0      |      7.4.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_7.4.2.zip> |
+|       3.12.0      |      6.8.8     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_6.8.8.zip> |
 |       3.12.0      |      6.8.7     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.0_6.8.7.zip> |
 |       3.11.4      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.1.zip> |
 |       3.11.4      |      7.6.0     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.4_7.6.0.zip> |
@@ -255,10 +277,13 @@ If you want to contribute to our project please don't hesitate to send a pull re
 ## Software and libraries used
 
 - https://elastic.co
+- https://elastic.github.io/eui
 - https://material.angularjs.org
 - https://angularjs.org
 - https://nodejs.org
 - https://npmjs.com
+- https://reactjs.org
+- https://redux.js.org
 
 ## Copyright & License
 
