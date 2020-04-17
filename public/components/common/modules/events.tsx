@@ -29,7 +29,7 @@ export class Events extends Component {
     this.$rootScope.showModuleEvents = this.props.section;
     this.$rootScope.$applyAsync();
     const scope = await this.modulesHelper.getDiscoverScope();
-    this.modulesHelper.hideCloseImplicitsFilters(scope);
+    this.modulesHelper.hideCloseImplicitsFilters();
     this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();
     const fields = EventsSelectedFiles[this.props.section];

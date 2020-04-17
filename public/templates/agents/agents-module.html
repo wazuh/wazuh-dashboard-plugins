@@ -2,7 +2,7 @@
     <react-component name="MainModule" props="{agent, section: tab}" />
     <div ng-if='!loadingDashboard'>
         <div ng-if='showModuleDashboard || showModuleEvents' class="wz-module-body">
-            <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+            <div ng-class="{'no-opacity': !moduleDiscoverReady && !showModuleEvents}">
                 <kbn-dis></kbn-dis>
             </div>
         </div>

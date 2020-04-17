@@ -27,8 +27,8 @@ export class Dashboard extends Component {
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleDashboard = this.props.section;
     this.$rootScope.$applyAsync();
-    const scope = await this.modulesHelper.getDiscoverScope();
-    this.modulesHelper.hideCloseImplicitsFilters(scope);
+    await this.modulesHelper.getDiscoverScope();
+    this.modulesHelper.hideCloseImplicitsFilters();
     this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();
   }

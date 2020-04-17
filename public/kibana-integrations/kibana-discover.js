@@ -166,7 +166,6 @@ function discoverController(
   $scope.fetchStatus = fetchStatuses.UNINITIALIZED;
   $scope.refreshInterval = timefilter.getRefreshInterval();
   $scope.showSaveQuery = uiCapabilities.discover.saveQuery;
-  $scope.implicitFilters = null;
 
   $scope.$watch(
     () => uiCapabilities.discover.saveQuery,
@@ -191,7 +190,6 @@ function discoverController(
     if (filterListener) filterListener();
     if (tabListener) tabListener();
     delete wazuhApp.discoverScope;
-    $scope.implicitFilters = null;
   });
 
   const $appStatus = ($scope.appStatus = this.appStatus = {
@@ -1067,8 +1065,7 @@ function discoverController(
         return loadFilters(wzCurrentFilters);
       });
     } else {
-      $scope.implicitFilters = [];
-      wzCurrentFilters.forEach(x => $scope.implicitFilters.push({ ...x }));
+      wzCurrentFilters.forEach(x => x.isImplicit = true);
       const globalFilters = globalState.filters;
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
@@ -1086,7 +1083,7 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
-    modulesHelper.hideCloseImplicitsFilters($scope);
+    modulesHelper.hideCloseImplicitsFilters();
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;

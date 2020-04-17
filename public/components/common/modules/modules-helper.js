@@ -1,4 +1,5 @@
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 export class ModulesHelper {
 
@@ -26,8 +27,9 @@ export class ModulesHelper {
         }
     }
 
-    static hideCloseImplicitsFilters(scope) {
-        const implicitFilters = scope.implicitFilters;
+    static hideCloseImplicitsFilters() {
+        const { filterManager } = getServices();
+        const implicitFilters = filterManager.filters.filter(x => x.isImplicit);
         if (!implicitFilters) return;
         const closeButtons = document.querySelectorAll('.globalFilterItem .euiBadge__iconButton');
         const optionsButtons = document.querySelectorAll('.globalFilterItem .euiBadge__childButton');
