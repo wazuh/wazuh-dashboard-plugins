@@ -40,6 +40,7 @@ export class WzSearchBar extends Component {
     isPopoverOpen: boolean
   };
   suggestHandler!: QHandler | ApiHandler | QTagsHandler;
+  inputRef!: HTMLImageElement;
   props!:{
     qSuggests: qSuggests[] | null
     apiSuggests: apiSuggests[] | null
@@ -232,6 +233,7 @@ export class WzSearchBar extends Component {
     const { inputValue, filters } = this.state;
 
     const {inputValue:newInputValue, filters:newFilters } = this.suggestHandler.onItemClick(item, inputValue, filters);
+    this.inputRef.focus();
     this.updateFilters(newFilters);
 
     this.setState({
@@ -383,6 +385,7 @@ export class WzSearchBar extends Component {
           <EuiFlexItem className="wz-search-bar">
             <EuiSuggest
               status={status}
+              inputRef={e => {this.inputRef = e}}
               value={inputValue}
               onKeyPress={this.onKeyPress}
               onItemClick={this.onItemClick.bind(this)}

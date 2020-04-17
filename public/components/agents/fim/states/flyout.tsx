@@ -58,7 +58,7 @@ export class FlyoutDetail extends Component {
                 </EuiTitle>
               </EuiFlyoutHeader>
               <EuiFlyoutBody className="flyout-body" > 
-               {this.state.error && (<div>{this.state.error}</div>)  || (<EuiLoadingContent />) } 
+               {this.state.error && (<div>{this.state.error}</div>)  || (<EuiLoadingContent style={{ margin: 16 }} />) } 
               </EuiFlyoutBody>
             </Fragment>
             )}
