@@ -99,7 +99,14 @@ export class MainModule extends Component {
               <EuiToolTip position="right" content={this.props.agent.status}>
                 <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
               </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id}) - <b>{TabDescription[this.props.section].title}</b>
+              <span
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  window.location.href = `#/agents?agent=${this.props.agent.id}`;
+                  this.router.reload();
+                }}>{this.props.agent.name} ({this.props.agent.id})
+              </span>
+              <span>&nbsp;-&nbsp;<b>{TabDescription[this.props.section].title}</b></span>
             </h1>
           </EuiTitle>
         </EuiFlexItem>
