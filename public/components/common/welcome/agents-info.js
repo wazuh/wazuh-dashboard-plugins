@@ -13,12 +13,23 @@
  */
 import React, { Component, Fragment } from 'react';
 import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiToolTip, EuiButton } from '@elastic/eui';
+import { WzRequest } from '../../../react-services/wz-request'
+import { ActionAgents } from '../../../react-services/action-agents'
+import { AgentsTable } from '../../../controllers/agent/components/agents-table';
 
 export class AgentInfo extends Component {
   constructor(props) {
     super(props);
 
     this.state = {};
+  }
+
+  async componentDidMount() {
+    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+
+    this.setState({
+      managerVersion: (((managerVersion || {} ).data || {}).data || {}),
+    });
   }
 
   addIconPlatformRender(agent) {
@@ -38,9 +49,9 @@ export class AgentInfo extends Component {
 
     return (
       <EuiToolTip position="bottom" content={os_name === '--' ? '-' : os_name}>
-        <p className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>
+        <span className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>
           <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
-        </p>
+        </span>
       </EuiToolTip>
     );
   }
@@ -53,7 +64,7 @@ export class AgentInfo extends Component {
             title={
               item.description === 'OS'
                 ? this.addIconPlatformRender(this.props.agent)
-                : <p style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{item.title}</p>
+                : <span style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{item.title}</span>
             }
             description={item.description}
             textAlign="center"
@@ -63,6 +74,32 @@ export class AgentInfo extends Component {
       );
     });
     return stats;
+  }
+
+  onClickRestartAgent = () => {
+    const { agent } = this.props;
+    ActionAgents.restartAgent(agent.id);
+  }
+
+  onClickUpgradeAgent = () => {
+    const { agent } = this.props;
+    ActionAgents.upgradeAgent(agent.id);
+  }
+
+  renderUpgradeButton() {
+    const { managerVersion } = this.state;
+    const { agent } = this.props;
+    let outDated = ActionAgents.compareVersions(managerVersion, agent.version);
+    
+    if (outDated === true ) return;
+
+    return(
+      <EuiFlexItem grow={false}>
+        <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgradeAgent}>
+          Upgrade
+        </EuiButton>
+      </EuiFlexItem>
+    );
   }
 
   render() {
@@ -79,25 +116,41 @@ export class AgentInfo extends Component {
       { title: agent.dateAdd, description: 'Registration date' },
       { title: agent.lastKeepAlive, description: 'Last keep alive' }
     ]);
+    const upgradeButton = this.renderUpgradeButton();
+
     return (
       <Fragment>
         <EuiFlexGroup className='wz-welcome-page-agent-info-details'>
           {stats}
         </EuiFlexGroup>
-        <EuiFlexGroup className='wz-welcome-page-agent-info-actions'>
-          <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <EuiButton
-              onClick={() => this.props.switchTab('syscollector')}
-              iconType="inspect">
-              Inventory data
-              </EuiButton>
+        <EuiFlexGroup className='wz-welcome-page-agent-info-actions' justifyContent="spaceBetween">
+          <EuiFlexItem grow={true}>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+                <EuiButton
+                  onClick={() => this.props.switchTab('syscollector')}
+                  iconType="inspect">
+                  Inventory data
+                  </EuiButton>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  onClick={() => this.props.switchTab('configuration')}
+                  iconType="gear">
+                  Configuration
+                  </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton
-              onClick={() => this.props.switchTab('configuration')}
-              iconType="gear">
-              Configuration
-              </EuiButton>
+          <EuiFlexItem grow={true}>
+            <EuiFlexGroup justifyContent="flexEnd">
+              <EuiFlexItem grow={false}>
+                <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestartAgent}>
+                  Restart
+                </EuiButton>
+              </EuiFlexItem>            
+              {upgradeButton}
+            </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>

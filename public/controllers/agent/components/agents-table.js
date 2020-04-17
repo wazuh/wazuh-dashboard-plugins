@@ -34,7 +34,8 @@ import {
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
 import { CheckUpgrade } from './checkUpgrade';
 import { toastNotifications } from 'ui/notify';
-import { WzRequest } from '../../../react-services/wz-request'
+import { WzRequest } from '../../../react-services/wz-request';
+import { ActionAgents } from '../../../react-services/action-agents';
 
 export class AgentsTable extends Component {
 
@@ -375,14 +376,17 @@ export class AgentsTable extends Component {
     if (selectedItems.length === 0 ||
       (selectedItems.length > 0 && selectedItems.filter(item => item.outdated).length === 0) ||
       (selectedItems.length > 0 && selectedItems.filter(item => item.upgrading).length > 0) ||
-      (selectedItems.length > 0 && selectedItems.filter(item => item.status === 'Active').length === 0)) {
+      (selectedItems.length > 0 && selectedItems.filter(item => item.status === 'Active').length === 0) ||
+      (selectedItems.length > 0 && selectedItems.filter(item => item.status === 'Active').length === 0 && 
+      selectedItems.filter(item => item.status === 'Disconnected').length > 0) ||
+      (selectedItems.filter(item => item.outdated && item.status === 'Active').length === 0)) {
       return;
     }
 
     return (
       <EuiFlexItem grow={false}>
         <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgrade}>
-          Upgrade {selectedItems.filter(item => item.outdated).length} agents
+          Upgrade {selectedItems.filter(item => item.outdated && item.status === 'Active').length} agents
         </EuiButton>
       </EuiFlexItem>
     );
@@ -518,91 +522,24 @@ export class AgentsTable extends Component {
 
   onClickUpgrade = () => {
     const { selectedItems } = this.state;
-    /* let upgradeStorage = []; */
-
-    for (let item of selectedItems.filter(item => item.outdated)) {
-      WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1').then(() => {
-        /* upgradeStorage = [
-          ...upgradeStorage,
-          {
-            'itemId': item.id,
-            'lastTimeUpgrade': new Date()
-          }
-        ];
-        localStorage.setItem('upgradeAgents', JSON.stringify(upgradeStorage)); */
-      })
-        .catch(error => {
-          error !== 'Wazuh API error: 3021 - Timeout executing API request' ?
-            this.showToast('danger', 'Error upgrading selected agents', error, 5000) :
-            false;
-        });
-    }
-    this.showToast('success', 'Upgrading selected agents...', '', 5000)
+    ActionAgents.upgradeAgents(selectedItems);
   }
 
   onClickUpgradeAll = () => {
     const { avaibleAgents, managerVersion } = this.state;
-
-    avaibleAgents.forEach(agent => {
-      if (agent.id !== '000' && agent.version !== ('Wazuh ' + managerVersion) && agent.status === 'Active') {
-        WzRequest.apiReq('PUT', `/agents/${agent.id}/upgrade`, '1').then(() => {
-          /* upgradeStorage = [
-          ...upgradeStorage,
-          {
-            'itemId': item.id,
-            'lastTimeUpgrade': new Date()
-          }
-        ];
-        localStorage.setItem('upgradeAgents', JSON.stringify(upgradeStorage)); */
-        })
-          .catch(error => {
-            error !== 'Wazuh API error: 3021 - Timeout executing API request' ?
-              this.showToast('danger', 'Error upgrading all agents', error, 5000) :
-              false;
-          })
-      }
-    });
-    this.showToast('success', 'Upgrading all agents...', '', 5000);
+    ActionAgents.upgradeAllAgents(avaibleAgents, managerVersion);
   }
 
   onClickRestart = () => {
     const { selectedItems } = this.state;
-    const agentsId = selectedItems.map(item => item.id);
-
-    WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...agentsId] }).then(value => {
-      value.status === 200 ?
-        this.showToast('success', 'Restarting selected agents...', '', 5000) :
-        this.showToast('warning', 'Error restarting selected agents', '', 5000);
-    })
-      .catch(error => {
-        this.showToast('danger', 'Error restarting selected agents', error, 5000);
-      })
-      .finally(() => {
-        this.reloadAgents();
-      });
+    ActionAgents.restartAgents(selectedItems);
+    this.reloadAgents();
   };
 
   onClickRestartAll = () => {
     const { avaibleAgents } = this.state;
-    let idAvaibleAgents = [];
-    avaibleAgents.forEach(agent => {
-      if (agent.id !== '000' && agent.status === 'Active') {
-        idAvaibleAgents.push(agent.id);
-      }
-    });
-
-    WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...idAvaibleAgents] }).then((value) => {
-      value.status === 200 ?
-        this.showToast('success', 'Restarting all agents...', '', 5000) :
-        this.showToast('warning', 'Error restarting all agents.', '', 5000);
-    }
-    )
-      .catch(error => {
-        this.showToast('danger', 'Error restarting all agents.', error, 5000);
-      })
-      .finally(() => {
-        this.reloadAgents();
-      });
+    ActionAgents.restartAllAgents(avaibleAgents);
+    this.reloadAgents();
   }
 
   onClickPurge = () => {
@@ -614,14 +551,13 @@ export class AgentsTable extends Component {
         this.showToast('success', `Selected agents were successfully deleted`, '', 5000) :
         this.showToast('warning', `Failed to delete selected agents`, '', 5000);
     })
-      .catch(error => {
-        this.showToast('danger', `Failed to delete selected agents`, error, 5000);
-      })
-      .finally(() => {
-        this.getAllItems();
-        this.reloadAgents();
-      });
-
+    .catch(error => {
+      this.showToast('danger', `Failed to delete selected agents`, error, 5000);
+    })
+    .finally(() => {
+      this.getAllItems();
+      this.reloadAgents();
+    });
     this.setState({ purgeModal: false });
   }
 
