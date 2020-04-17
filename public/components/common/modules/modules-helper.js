@@ -29,7 +29,7 @@ export class ModulesHelper {
 
     static hideCloseImplicitsFilters() {
         const { filterManager } = getServices();
-        const implicitFilters = filterManager.filters.filter(x => x.isImplicit);
+        const implicitFilters = filterManager.filters.filter(x => x.$state.isImplicit);
         if (!implicitFilters) return;
         const closeButtons = document.querySelectorAll('.globalFilterItem .euiBadge__iconButton');
         const optionsButtons = document.querySelectorAll('.globalFilterItem .euiBadge__childButton');
