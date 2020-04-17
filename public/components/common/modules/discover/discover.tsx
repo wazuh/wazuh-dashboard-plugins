@@ -268,24 +268,30 @@ export class Discover extends Component {
     const storage = {
       ...window.localStorage,
       get: (key) => window.localStorage.getItem(key),
-      set: (key, value) => window.localStorage.setItem(key, value),
+      set: (key, value) => {
+        const history = window.localStorage.getItem(key) || '';
+        const newHistory = [
+          JSON.parse(history),
+          value
+        ]
+        return window.localStorage.setItem(key, JSON.stringify(newHistory));
+      },
       remove: (key) => window.localStorage.removeItem(key) 
     }
     const { dateRange, query, filters } = this.state;
     return (
-      <KibanaContextProvider services={{...getServices(), storage}} > 
+      <KibanaContextProvider services={{...getServices(), appName: "wazuhFim", storage}} > 
         <I18nProvider>
           <SearchBar 
             indexPatterns={[this.indexPattern]}
             filters={filters}
             dateRangeFrom={dateRange.from}
-            screenTitle=""
             dateRangeTo={dateRange.to}
             onQuerySubmit={this.onQuerySubmit}
             onFiltersUpdated={this.onFiltersUpdated}
             query={query}
             timeHistory={this.timefilter._history}
-            {...{appName:'wazuh-fim'}} />
+            {...{appName:'wazuhFim'}} />
         </I18nProvider>
       </KibanaContextProvider>
     );
