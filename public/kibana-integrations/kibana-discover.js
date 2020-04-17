@@ -1065,7 +1065,7 @@ function discoverController(
         return loadFilters(wzCurrentFilters);
       });
     } else {
-      wzCurrentFilters.forEach(x => x.isImplicit = true);
+      wzCurrentFilters.forEach(x => x.$state.isImplicit = true);
       const globalFilters = globalState.filters;
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
