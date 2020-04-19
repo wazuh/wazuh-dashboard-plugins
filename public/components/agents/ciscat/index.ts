@@ -1,1 +1,0 @@
-export { MainCiscat } from './main';

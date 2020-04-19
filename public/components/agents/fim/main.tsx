@@ -16,15 +16,6 @@ export class MainFim extends Component {
   constructor(props) {
     super(props);
     this.modulesHelper = ModulesHelper;
-    this.props.loadSection('states');
-    this.props.setTabs(this.tabs, this.buttons);
-  }
-
-  componentWillUnmount() {
-    const { filterManager } = getServices();
-    if (filterManager.filters && filterManager.filters.length) {
-      filterManager.removeAll();
-    }
   }
 
   async checkFilterManager(filters) {

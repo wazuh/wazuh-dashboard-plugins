@@ -1,1 +1,0 @@
-export { MainVuls } from './main';

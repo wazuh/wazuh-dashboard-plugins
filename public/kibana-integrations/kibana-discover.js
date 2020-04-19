@@ -187,7 +187,6 @@ function discoverController(
     savedSearch.destroy();
     subscriptions.unsubscribe();
     filterStateManager.destroy();
-    if (filterListener) filterListener();
     if (tabListener) tabListener();
     delete wazuhApp.discoverScope;
   });
@@ -1058,7 +1057,7 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const loadFilters = async (wzCurrentFilters, tab) => {
+  $scope.loadFilters = async (wzCurrentFilters, tab) => {
     const appState = getAppState();
     if (!appState || !globalState) {
       $timeout(100).then(() => {
@@ -1075,10 +1074,6 @@ function discoverController(
       $scope.filters = filterManager.filters;
     }
   };
-
-  const filterListener = $rootScope.$on('wzEventFilters', (evt, parameters) => {
-    loadFilters(parameters.filters, parameters.tab);
-  });
 
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {

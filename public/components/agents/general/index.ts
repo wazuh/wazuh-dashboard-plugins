@@ -1,1 +1,0 @@
-export { MainGeneral } from './main';

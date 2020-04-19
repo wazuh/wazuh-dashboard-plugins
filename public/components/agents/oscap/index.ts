@@ -1,1 +1,0 @@
-export { MainOscap } from './main';

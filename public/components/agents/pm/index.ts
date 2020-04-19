@@ -1,1 +1,0 @@
-export { MainPm } from './main';

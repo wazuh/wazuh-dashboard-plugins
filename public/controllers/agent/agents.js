@@ -156,14 +156,6 @@ export class AgentsController {
       this.$scope.tabView = this.commonData.checkTabViewLocation();
       this.$scope.tab = this.commonData.checkTabLocation();
     }
-    this.$scope.visualizeProps = {
-      selectedTab: this.$scope.tab,
-      isAgent: true,
-      updateRootScope: (prop, value) => {
-        this.$rootScope[prop] = value;
-        this.$rootScope.$applyAsync();
-      }
-    }
     this.tabHistory = [];
     if (!this.ignoredTabs.includes(this.$scope.tab)) this.tabHistory.push(this.$scope.tab);
 
@@ -423,8 +415,7 @@ export class AgentsController {
           this.filterHandler,
           this.$scope.tab,
           subtab,
-          this.$scope.agent.id,
-          this.$scope.tabView === 'discover'
+          this.$scope.agent.id
         );
 
         this.changeAgent = false;
@@ -469,8 +460,6 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status || this.$scope.agent.status;
       } catch (error) { } // eslint-disable-line
     }
-
-    this.$scope.visualizeProps.selectedTab = tab;
 
     /*     if (tab === 'mitre') {
           const result = await this.apiReq.request('GET', '/rules/mitre', {});

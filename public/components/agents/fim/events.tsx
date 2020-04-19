@@ -28,6 +28,8 @@ export class EventsFim extends Component {
 
   async getRowsField(scope) {
     this.indices = [];
+    if (!document)
+      this.getRowsField(scope);
     this.cols = document.querySelectorAll(`.kbn-table thead th`);
     if (!(this.cols || []).length) {
       setTimeout(() => { this.getRowsField(scope) }, 1000);
@@ -64,7 +66,7 @@ export class EventsFim extends Component {
   }
 
   showFlyout(file) {
-    if(file !== " - "){ 
+    if (file !== " - ") {
       //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
       this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file }));
     }

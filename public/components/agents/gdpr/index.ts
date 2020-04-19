@@ -1,1 +1,0 @@
-export { MainGdpr } from './main';

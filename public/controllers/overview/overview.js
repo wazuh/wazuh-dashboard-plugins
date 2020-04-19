@@ -97,10 +97,6 @@ export class OverviewController {
 
     this.visualizeProps = {
       selectedTab: this.tab,
-      updateRootScope: (prop, value) => {
-        this.$rootScope[prop] = value;
-        this.$rootScope.$applyAsync();
-      },
       cardReqs: {}
     }
 

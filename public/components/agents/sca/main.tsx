@@ -11,8 +11,6 @@ export class MainSca extends Component {
 
   constructor(props) {
     super(props);
-    this.props.loadSection('states');
-    this.props.setTabs(this.tabs, this.buttons);
   }
 
   render() {

@@ -1,1 +1,0 @@
-export { MainDocker } from './main';
