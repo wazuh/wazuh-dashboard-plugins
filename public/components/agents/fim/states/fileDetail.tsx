@@ -33,7 +33,8 @@ export class FileDetails extends Component {
       file: string
     },
     implicitFilters: Array<Object>,
-    loadEventsWithFilters: Function
+    loadEventsWithFilters: Function,
+    [key:string]: any
   }
 
   constructor(props) {
@@ -210,9 +211,11 @@ export class FileDetails extends Component {
   }
 
   render() {
+    const { fileName, type, showViewInEvents, implicitFilters } = this.props;
     return (
       <Fragment>
         <EuiAccordion
+          id={fileName}
           buttonContent={
             <EuiTitle size="s">
               <h3>Details</h3>
@@ -228,10 +231,10 @@ export class FileDetails extends Component {
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
-              <h2>{this.props.type === 'file' ? 'File' : 'Registry'} events</h2>
+              <h2>{type === 'file' ? 'File' : 'Registry'} events</h2>
             </EuiTitle>
           </EuiFlexItem>
-          {this.props.showViewInEvents &&
+          {showViewInEvents &&
             <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
               <EuiButtonEmpty onClick={() => this.viewInEvents()} className="view-in-events-btn">
                 View in Events
@@ -241,7 +244,7 @@ export class FileDetails extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Discover implicitFilters={this.props.implicitFilters} initialFilters={[]} type={this.props.type} />
+            <Discover implicitFilters={implicitFilters} initialFilters={[]} type={type} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>

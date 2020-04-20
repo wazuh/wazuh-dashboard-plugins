@@ -75,6 +75,7 @@ export class Discover extends Component {
   props!: {
     implicitFilters: object[],
     initialFilters: object[],
+    type: any
   }
   constructor(props) {
     super(props);
