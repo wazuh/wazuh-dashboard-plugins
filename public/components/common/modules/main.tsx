@@ -226,31 +226,37 @@ export class MainModule extends Component {
                 </div>
               </div>
             }
-            <div className='wz-module-body'>
-              {selectView === 'events' &&
-                <Events {...this.props} />
-              }
-              {selectView === 'loader' &&
-                <Loader {...this.props}
-                  loadSection={(section) => this.loadSection(section)}
-                  redirect={this.afterLoad}>
-                </Loader>}
-              {selectView === 'dashboard' &&
-                <Dashboard {...this.props} />
-              }
-              {selectView === 'settings' &&
-                <Settings {...this.props} />
-              }
+            {!['syscollector', 'configuration'].includes(this.props.section) &&
+              <div className='wz-module-body'>
+                {selectView === 'events' &&
+                  <Events {...this.props} />
+                }
+                {selectView === 'loader' &&
+                  <Loader {...this.props}
+                    loadSection={(section) => this.loadSection(section)}
+                    redirect={this.afterLoad}>
+                  </Loader>}
+                {selectView === 'dashboard' &&
+                  <Dashboard {...this.props} />
+                }
+                {selectView === 'settings' &&
+                  <Settings {...this.props} />
+                }
 
-              {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-              {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
-              {section === 'sca' && <MainSca {...{ ...this.props, ...mainProps }} />}
-              {/* -------------------------------------------------------------------------- */}
-            </div>
+                {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
+                {section === 'fim' && <MainFim {...{ ...this.props, ...mainProps }} />}
+                {section === 'sca' && <MainSca {...{ ...this.props, ...mainProps }} />}
+                {/* -------------------------------------------------------------------------- */}
+              </div>
+            }
           </Fragment>
         }
         {(!agent || !agent.os) &&
-          <EuiCallOut style={{ marginTop: 50 }} title=" This agent has never connected" color="warning" iconType="alert">
+          <EuiCallOut
+            style={{ margin: '66px 16px 0 16px' }}
+            title=" This agent has never connected"
+            color="warning"
+            iconType="alert">
           </EuiCallOut>
         }
       </div>
