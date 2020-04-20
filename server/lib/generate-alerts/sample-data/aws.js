@@ -1,0 +1,19 @@
+/*
+ * Wazuh app - AWS sample data
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+ // Amazon AWS services
+export const source = ["guardduty", "cloudtrail", "vpcflow", "config"];
+export const geoLocation = [{ "lat": 40.12, "lon": -71.34 }, { "lat": 37.14, "lon": -3.61 }, { "lat": 31, "lon": 121 }, { "lat": 28, "lon": 77 }, { "lat": 55, "lon": 13 }];
+export const accountId = ["aws-account1", "aws-account2", "aws-account3"];
+export const region = ["eu-west-1", "eu-west-2", "us-east-1", "us-east-2", "us-west-1", "us-west-2", "me-south-1", "ap-east-1", "ap-south-1"]; // https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-regions
+export const buckets = ["aws-bucket1", "aws-bucket2", "aws-bucket3"];
+export const ruleDescription = ["AWS GuardDuty: PORT_PROBE - Unprotected port on EC2 instance i-01483f6bf55b49f10 is being probed. [IP: 185.143.221.85] [Port: 443]", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a Kali Linux computer.", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a known malicious IP address.", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a Parrot Security Linux computer.", "AWS GuardDuty: AWS_API_CALL - API GeneratedFindingAPIName was invoked from a Pentoo Linux computer.", "AWS GuardDuty: AWS_API_CALL - Credentials for instance role GeneratedFindingUserName used from external IP address.", "AWS GuardDuty: AWS_API_CALL - Principal IAMUser:GeneratedFindingUserName attempted to add a policy to themselves that is highly permissive.", "AWS GuardDuty: AWS_API_CALL - Reconnaissance API GeneratedFindingAPIName was invoked from a Tor exit node.", "AWS GuardDuty: AWS_API_CALL - Unusual network permission reconnaissance activity by jctello.", "AWS GuardDuty: DNS_REQUEST - Bitcoin-related domain name queried by EC2 instance i-99999999.", "AWS GuardDuty: DNS_REQUEST - EC2 instance i-99999999 may be the target of a DNS rebinding attack.", "AWS GuardDuty: NETWORK_CONNECTION - 103.81.51.4 is performing SSH brute force attacks against i-09d8f992c53358cdc.", "AWS GuardDuty: PORT_PROBE - Unprotected port on EC2 instance i-01483f6bf55b49f10 is being probed. [IP: 185.143.221.85] [Port: 443]", "AWS Macie CRITICAL: S3 Bucket IAM policy grants global read rights - S3 Bucket uses IAM policy to grant read rights to Everyone. Your IAM policy contains a clause that effectively grants read access to any user. Please audit this bucket, and data contained within and confirm that this is intentional. If intentional, please use the alert whitelist feature to prevent future alerts", "AWS Macie INFO: Access Denied from Create Role - User attempted to create a new role and received error code AccessDenied. This could be an indicator of a compromised account", "AWS Macie INFO: User or role Access Denied while attempting to List S3 buckets from non-AWS IP - User or role Access Denied while attempting to List S3 buckets from an IP address outside the AWS environment. This could be an indication of attempted access to restricted content", "AWS Macie LOW: Change to Cloudtrail logging policy - Alerting on attempts to disrupt Cloudtrail logging, including deleting trails, reducing trails (for example disabling multi-region logging), encrypting trails in an unsafe manner including a key policy restricted to Cloudtrail, changing of the bucket's lifecycle policy, or stopping logging. Please investigate AWS CloudTrail records to determine if these updates affect production applications or accounts"];

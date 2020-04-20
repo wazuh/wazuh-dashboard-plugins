@@ -21,7 +21,7 @@ import {
 
 import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
-import { generateAlerts } from '../lib/generate-alerts-script';
+import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 
 export class WazuhElasticCtrl {
   /**
