@@ -297,9 +297,11 @@ function generateAlert(params) {
     }
 
     if (params.authentication) {
-        alert.data.srcip = randomArrayItem(IPs);
-        alert.data.srcuser = randomArrayItem(Users);
-        alert.data.srcport = randomArrayItem(Ports);
+        alert.data = {
+            srcip: randomArrayItem(IPs),
+            srcuser: randomArrayItem(Users),
+            srcport: randomArrayItem(Ports)
+        }
         alert.GeoLocation = randomArrayItem(GeoLocation);
         alert.decoder = {
             name: 'sshd',
@@ -308,44 +310,31 @@ function generateAlert(params) {
         alert.input = {
             type: 'log'
         };
-        alert.location = '/var/log/auth.log';
-        alert.rule.description = randomArrayItem(Authentication.sshRuleDescription);
-        alert.rule.groups = ['syslog', 'sshd'];
         alert.predecoder = {
-            hostname: '',// TODO:ip-10-0-0-179
             program_name: 'sshd',
-            timestamp: alert.timestamp // TODO:Apr 16 11:21:10
+            timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
+            hostname: alert.manager.name
         }
-        alert.rule.pci_dss = [randomArrayItem(PCI_DSS)];
-        alert.rule.gdpr = [randomArrayItem(GDPR)];
-        alert.rule.gpg13 = [randomArrayItem(GPG13)];
-        alert.rule.hipaa = [randomArrayItem(HIPAA)];
-        alert.rule.nist_800_53 = [randomArrayItem(NIST_800_53)];
 
         if(params.authentication.invalid_login_password){
-            alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
-            alert.location = '/var/log/secure';
-            alert.rule.description = 'sshd: authentication failed.';
-            alert.rule.groups = ['syslog', 'sshd', 'invalid_login', 'authentication_failed'];
-            alert.rule.id = 5710;
-            alert.rule.id = 5;
+            alert.location = Authentication.invalidLoginPassword.location;
+            alert.rule = {...Authentication.invalidLoginPassword.rule};
+            alert.rule.groups = [...Authentication.invalidLoginPassword.rule.groups];
+            alert.full_log = interpolateAlertProps(Authentication.invalidLoginPassword.full_log, alert)
+            // `${alert.predecoder.timestamp} ${alert.manager.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
         }
         if (params.authentication.invalid_login_user){
-            alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[10022]: Invalid user admin from ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
-            alert.location = '/var/log/secure';
-            alert.rule.description = 'sshd: Attempt to login using a non-existent user';
-            alert.rule.groups = ['syslog', 'sshd', 'invalid_login', 'authentication_failed'];
-            alert.rule.id = 5710;
-            alert.rule.id = 5;
+            alert.full_log = `${alert.predecoder.timestamp} ${alert.manager.name} sshd[10022]: Invalid user admin from ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
+            alert.location = Authentication.invalidLoginUser.location;
+            alert.rule = {...Authentication.invalidLoginUser.rule};
+            alert.rule.groups = [...Authentication.invalidLoginUser.groups];
         }
         if (params.authentication.multiple_authentication_failures) {
-            alert.full_log = alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
-            alert.location = '/var/log/secure';
-            alert.rule.description = 'sshd: Multiple authentication failures.';
+            alert.full_log = Athentication.multipleAuthenticationFailures.full_log;
+            alert.location = Athentication.multipleAuthenticationFailures.location;
+            alert.rule = {...Authentication.multipleAuthenticationFailures.rule};
+            alert.rule.groups = [Authentication.multipleAuthenticationFailures.rule.groups];
             alert.rule.frequency = randomIntervalInteger(5,50);
-            alert.rule.groups = ['syslog', 'sshd', 'authentication_failures'];
-            alert.rule.id = 5720;
-            alert.rule.level = 10;
         }
         if (params.authentication.windows_invalid_login_password) {
             alert.full_log = alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
@@ -507,8 +496,8 @@ function formatDate(date, format){ // It could use "moment" library to format st
     const tokens = {
         'D': (d) => formatterNumber(date.getDate(), 2), // 01-31
         'M': (d) => formatterNumber(date.getMonth() + 1, 2), // 01-12
-        'J': (d) => monthNames.long(date.getMonth()), // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        'N': (d) => monthNames.short(date.getMonth()), // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        'J': (d) => monthNames.long[date.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        'N': (d) => monthNames.short[date.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
         'Y': (d) => date.getFullYear(), // 2020
         'h': (d) => formatterNumber(date.getHours(), 2), // 00-23
         'm': (d) => formatterNumber(date.getMinutes(), 2), // 00-59
@@ -522,6 +511,23 @@ function formatDate(date, format){ // It could use "moment" library to format st
         }
         return accum + token
     },'')
+}
+
+/**
+ * 
+ * @param {string} str String with interpolations
+ * @param {*} alert Alert object
+ * @param {*} extra Extra parameters to interpolate what aren't in alert objet. Only admit one level of depth
+ */
+function interpolateAlertProps(str, alert, extra = {}){
+    const matches = str.match(/{([\w\._]+)}/g);
+    return matches.reduce((accum, cur) => {
+      const match = cur.match(/{([\w\._]+)}/)
+      const items = match[1].split('.')
+      const value = items.reduce((a,c) => (a && a[c]) || extra[c] || undefined, alert) || cur
+      console.log(match, items, cur, value)
+      return accum.replace(cur,value)
+    }, str)
 }
 
 /**
