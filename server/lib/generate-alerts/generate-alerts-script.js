@@ -247,13 +247,15 @@ function generateAlert(params) {
         alert.data.vulnerability = {};
         alert.data.vulnerability.package = {};
 
-        alert.data.vulnerability.severity = randomArrayItem(Vulnerability.severity);
         alert.data.vulnerability.package.name = randomArrayItem(Vulnerability.packageName);
-        alert.data.vulnerability.cve = randomArrayItem(Vulnerability.cve);
         alert.data.vulnerability.cwe_reference = randomArrayItem(Vulnerability.cweReference);
         const dataVulnerability = randomArrayItem(Vulnerability.data);
-        alert.data.vulnerability.reference = dataVulnerability.reference;
+        alert.data.vulnerability.severity = dataVulnerability.severity;
+        alert.data.vulnerability.state = dataVulnerability.state;
+        alert.data.vulnerability.cve = dataVulnerability.cve;
         alert.data.vulnerability.title = dataVulnerability.title;
+        alert.rule.description = dataVulnerability.title;
+        alert.data.vulnerability.reference = dataVulnerability.reference;
     }
     
     if (params.osquery) {
