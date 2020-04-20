@@ -40,9 +40,8 @@ export class States extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
-      filters: {},
+      filters: this.getStoreFilters(props),
       selectedTabId: 'files',
       totalItemsFile: 0,
       totalItemsRegistry: 0,
@@ -69,13 +68,33 @@ export class States extends Component {
     return (auxTabs);
   }
 
+  getStoreFilters(props) {
+    const { section, selectView, agent } = props;
+    const filters = JSON.parse(window.localStorage.getItem(`wazuh-${section}-${selectView}-${((this.state || {}).selectedTabId || 'files')}-${agent['id']}`) || '{}');
+    return filters;
+  }
+
+  setStoreFilters(filters) {
+    const { section, selectView, agent } = this.props;
+    window.localStorage.setItem(`wazuh-${section}-${selectView}-${(this.state || {}).selectedTabId || 'files'}-${agent['id']}`, JSON.stringify(filters))
+  }
+
   async componentDidMount() {
     await this.getTotalFiles();
     await this.getTotalRegistry();
     this.setState({ isLoading: false });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { selectedTabId } = this.state;
+    if (selectedTabId !== prevState.selectedTabId) {
+      const filters = this.getStoreFilters(this.props);
+      this.setState({filters});
+    }
+  }
+
   onFiltersChange(filters) {
+    this.setStoreFilters(filters);
     this.setState({ filters });
   }
 
@@ -141,6 +160,7 @@ export class States extends Component {
       ...oldFilter,
       q: !!oldFilter['q'] ? `${oldFilter['q']};${filter}` : filter 
     };
+    this.setStoreFilters(filters);
     this.setState({filters});
   }
 

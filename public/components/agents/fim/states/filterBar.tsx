@@ -15,7 +15,6 @@ import { getFilterValues } from './lib';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  OnTimeChangeProps,
 } from '@elastic/eui';
 
 export class FilterBar extends Component {
@@ -59,13 +58,14 @@ export class FilterBar extends Component {
   }
 
   render() {
-    const { onFiltersChange, selectView } = this.props;
+    const { onFiltersChange, selectView, filters } = this.props;
 
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <WzSearchBar
-            initFilters={this.props.filters}
+            noDeleteFiltersOnUpdateSuggests
+            initFilters={filters}
             onInputChange={onFiltersChange}
             qSuggests={this.suggestions[selectView]}
             apiSuggests={null}
