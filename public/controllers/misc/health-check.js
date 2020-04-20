@@ -18,6 +18,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ApiRequest } from '../../react-services/api-request';
+import { toastNotifications } from 'ui/notify';
 
 export class HealthCheck {
   /**
@@ -71,6 +72,15 @@ export class HealthCheck {
   $onInit() {
     this.load();
   }
+
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
 
   /**
    * Manage an error
@@ -133,6 +143,26 @@ export class HealthCheck {
     }
   }
 
+  async trySetDefault(){
+    try{
+      const response = await GenericRequest.request('GET', '/hosts/apis');
+      const hosts = response.data;
+      
+      if(hosts.length){
+        for(var i=0; i<hosts.length; i++){
+          try{
+            const API = await ApiCheck.checkApi(hosts[i]);
+            if( API && API.data && API.data.status === "enabled"){
+              return hosts[i].id;
+            }
+          }catch(err){ }
+        }
+      }
+    }catch(err){ }
+    throw new Error("Error connecting to the API.")
+  }
+
+
   /**
    * This attempts to connect with API
    */
@@ -140,13 +170,25 @@ export class HealthCheck {
     try {
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (this.checks.api && currentApi && currentApi.id) {
-        const data = await ApiCheck.checkStored(currentApi.id);
+        let data;
+        try{
+          data = await ApiCheck.checkStored(currentApi.id);
+        }catch(err){
+          const newApi = await this.trySetDefault();
+          data = await ApiCheck.checkStored(newApi,true);
+        }
 
         if (((data || {}).data || {}).idChanged) {
+          this.showToast('warning', 'Selected Wazuh API has been updated', '', 3000);
           const apiRaw = JSON.parse(AppState.getCurrentAPI());
           AppState.setCurrentAPI(
             JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
           );
+        }
+        //update cluster info
+        const cluster_info = (((data || {}).data || {}).data || {}).cluster_info;
+        if(cluster_info){
+          AppState.setClusterInfo(cluster_info);
         }
         const i = this.results.map(item => item.id).indexOf(0);
         if (data === 3099) {
@@ -202,6 +244,8 @@ export class HealthCheck {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      this.results[0].status = 'Error';
+      this.results[1].status = 'Error';
       AppState.removeNavigation();
       if (error && error.data && error.data.code && error.data.code === 3002) {
         return error;
@@ -291,8 +335,6 @@ export class HealthCheck {
    * This navigates to app root path or an a previous stored location
    */
   goApp() {
-    this.$window.location.assign(
-      chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
-    );
+    window.location.href = "/app/wazuh#/settings";
   }
 }

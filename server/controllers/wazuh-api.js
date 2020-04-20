@@ -115,7 +115,7 @@ export class WazuhApiCtrl {
         return {
           statusCode: 200,
           data: copied,
-          idChanged: req.idChanged || null
+          idChanged: req.idChanged || req.payload.idChanged || null
         };
       }
 

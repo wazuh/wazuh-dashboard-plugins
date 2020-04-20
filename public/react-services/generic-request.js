@@ -15,6 +15,8 @@ import axios from 'axios';
 import chrome from 'ui/chrome';
 import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
+import { ApiCheck } from './wz-api-check';
+import { WzMisc } from '../factories/misc';
 
 export class GenericRequest {
 
@@ -86,6 +88,22 @@ export class GenericRequest {
       }
       return data;
     }catch(err){
+      //if the requests fails, we need to check if the API is down
+      const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
+      if (currentApi && currentApi.id) {
+        try{
+          await ApiCheck.checkStored(currentApi.id);
+        }catch(err){
+          const wzMisc = new WzMisc();
+          wzMisc.setApiIsDown(true);
+    
+          if(!window.location.hash.includes('#/settings')){
+            window.location.href = "/app/wazuh#/health-check";
+          }
+          return;
+        }
+      }
+
         return ((err || {}).message) || false
         ? Promise.reject(err.message)
         : Promise.reject(err || 'Server did not respond');
