@@ -41,7 +41,7 @@ export class Events extends Component {
         }
       });
     }
-    scope.$watchCollection('fetchStatus',
+    this.fetchWatch = scope.$watchCollection('fetchStatus',
       () => {
         if (scope.fetchStatus === 'complete') {
           setTimeout(() => { this.modulesHelper.cleanAvailableFields() }, 1000);
@@ -50,6 +50,7 @@ export class Events extends Component {
   }
 
   componentWillUnmount() {
+    if (this.fetchWatch) this.fetchWatch();
     this.$rootScope.showModuleEvents = false;
     this.$rootScope.moduleDiscoverReady = false;
     this.$rootScope.$applyAsync();

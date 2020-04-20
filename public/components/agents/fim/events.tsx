@@ -46,7 +46,8 @@ export class EventsFim extends Component {
         query += ', ';
       }
     });
-    this.elements = document.querySelectorAll(query);
+    if (query)
+      this.elements = document.querySelectorAll(query);
     if ((scope.rows || []).length && (this.elements || {}).length) {
       this.forceUpdate();
     } else if ((scope.rows || []).length) {
@@ -56,13 +57,17 @@ export class EventsFim extends Component {
 
   async componentDidMount() {
     const scope = await this.modulesHelper.getDiscoverScope();
-    scope.$watchCollection('fetchStatus',
+    this.fetchWatch = scope.$watchCollection('fetchStatus',
       () => {
         if (scope.fetchStatus === 'complete') {
           this.elements = false;
           setTimeout(() => { this.getRowsField(scope) }, 1000);
         }
       });
+  }
+
+  componentWillUnmount() {
+    if (this.fetchWatch) this.fetchWatch();
   }
 
   showFlyout(file) {
