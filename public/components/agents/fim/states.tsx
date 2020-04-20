@@ -31,7 +31,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 export class States extends Component {
   state: {
     filters: {},
-    selectedTabId: String,
+    selectedTabId: 'files' | 'registry',
     totalItemsFile: Number,
     totalItemsRegistry: Number,
     isLoading: Boolean
@@ -144,7 +144,7 @@ export class States extends Component {
     this.setState({filters});
   }
 
-  renderFiles() {
+  renderTable() {
     const { filters, selectedTabId } = this.state;
     return (
       <div>
@@ -152,46 +152,32 @@ export class States extends Component {
           filters={filters}
           onFiltersChange={this.onFiltersChange.bind(this)}
           selectView={selectedTabId}
-          agent={this.props.agent}
-          onTimeChange={(timeFilter) => {}} />
-        <StatesTable
-          {...this.props}
-          filters={filters}
-          onFilterSelect={this.onFilterSelect} />
-      </div>
-    )
-  }
-
-  renderWindowRegistry() {
-
-    const { filters, selectedTabId } = this.state;
-    return (
-      <div>
-        <FilterBar
-          onFiltersChange={this.onFiltersChange.bind(this)}
-          selectView={selectedTabId}
-          agent={this.props.agent}
-          onTimeChange={(timeFilter) => {}} />
-        <RegistryTable
-          {...this.props}
-          filters={filters}
-          onFilterSelect={this.onFilterSelect} />
+          agent={this.props.agent} />
+        {selectedTabId === 'files' &&
+          <StatesTable
+            {...this.props}
+            filters={filters}
+            onFilterSelect={this.onFilterSelect} />
+        }
+        {selectedTabId === 'registry' &&
+          <RegistryTable
+            {...this.props}
+            filters={filters}
+            onFilterSelect={this.onFilterSelect} />
+        }
       </div>
     )
   }
 
   render() {
-    const files = this.renderFiles();
-    const registry = this.renderWindowRegistry();
+    const table = this.renderTable();
     const tabs = this.renderTabs()
-    const { selectedTabId } = this.state;
     return (
       <EuiPage>
         <EuiPanel>
           {tabs}
           <EuiSpacer size="m" />
-          {selectedTabId === 'files' && files}
-          {this.props.agent.os.platform === 'windows' && (selectedTabId === 'registry' && registry)}
+          {table}
         </EuiPanel>
       </EuiPage>
     )

@@ -46,7 +46,6 @@ export class FilterBar extends Component {
 
   props!:{
     onFiltersChange: Function
-    onTimeChange(props:OnTimeChangeProps):() => void
     selectView: 'files' | 'registry'
     agent: {id: string, agentPlatform: string}
     filters: {}
@@ -60,7 +59,7 @@ export class FilterBar extends Component {
   }
 
   render() {
-    const { onFiltersChange, selectView, onTimeChange } = this.props;
+    const { onFiltersChange, selectView } = this.props;
 
     return (
       <EuiFlexGroup>
