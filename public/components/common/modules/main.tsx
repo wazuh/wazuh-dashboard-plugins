@@ -74,7 +74,7 @@ export class MainModule extends Component {
     this.setGlobalBreadcrumb();
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
       this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'events', name: 'Events' }];
-      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['dashboard', 'reporting'];
+      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['dashboard', 'reporting', 'settings'];
       this.loadSection((ModulesDefaults[this.props.section] || {}).init || 'dashboard');
     }
   }
