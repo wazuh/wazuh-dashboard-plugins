@@ -48,7 +48,9 @@ export class Discover extends Component {
     _history: { history: { items: { from: string, to: string }[] } }
   };
 
-  KibanaServices: {};
+  KibanaServices: {
+    [key:string]: any
+  };
   
   state: {
     sort: object,
@@ -285,7 +287,7 @@ export class Discover extends Component {
   getSearchBar() {
     const storage = {
       ...window.localStorage,
-      get: (key) => JSON.parse(window.localStorage.getItem(key)),
+      get: (key) => JSON.parse(window.localStorage.getItem(key) || '{}'),
       set: (key, value) =>  window.localStorage.setItem(key, JSON.stringify(value)),
       remove: (key) => window.localStorage.removeItem(key) 
     }
