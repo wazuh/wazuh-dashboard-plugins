@@ -56,7 +56,7 @@ export class Settings extends Component<SettingsPropTypes, SettingsState> {
             <EuiSpacer size='m' />
             {section === 'fim' && <WzConfigurationIntegrityMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
             {(section === 'pm' || section === 'sca' || section === 'audit') &&
-              <WzConfigurationPolicyMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+              <WzConfigurationPolicyMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} onlyShowTab={section === 'pm' ? 'Policy Monitoring' : section === 'audit' ? 'System audit' : section === 'sca' ? 'SCA': undefined}/>}
             {section === 'oscap' && <WzConfigurationOpenSCAP {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
             {section === 'ciscat' && <WzConfigurationCisCat {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
             {section === 'vuls' && <WzConfigurationVulnerabilities {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
