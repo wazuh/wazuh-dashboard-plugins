@@ -15,8 +15,13 @@ import { EuiSpacer, EuiTitle, EuiPanel, EuiPage } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import WzBadge from '../../../controllers/management/components/management/configuration/util-components/badge'
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import WzConfigurationIntegrityMonitoring from '../../../controllers/management/components/management/configuration/integrity-monitoring/integrity-monitoring'
-import WzConfigurationPolicyMonitoring from '../../../controllers/management/components/management/configuration/policy-monitoring/policy-monitoring'
+import WzConfigurationIntegrityMonitoring from '../../../controllers/management/components/management/configuration/integrity-monitoring/integrity-monitoring';
+import WzConfigurationPolicyMonitoring from '../../../controllers/management/components/management/configuration/policy-monitoring/policy-monitoring';
+import WzConfigurationOpenSCAP from '../../../controllers/management/components/management/configuration/open-scap/open-scap';
+import WzConfigurationCisCat from '../../../controllers/management/components/management/configuration/cis-cat/cis-cat';
+import WzConfigurationVulnerabilities from '../../../controllers/management/components/management/configuration/vulnerabilities/vulnerabilities';
+import WzConfigurationOsquery from '../../../controllers/management/components/management/configuration/osquery/osquery';
+import WzConfigurationDockerListener from '../../../controllers/management/components/management/configuration/docker-listener/docker-listener';
 
 type SettingsPropTypes = {
   agent: { id: string },
@@ -50,7 +55,13 @@ export class Settings extends Component<SettingsPropTypes, SettingsState> {
             </EuiTitle>
             <EuiSpacer size='m' />
             {section === 'fim' && <WzConfigurationIntegrityMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
-            {section === 'sca' && <WzConfigurationPolicyMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+            {(section === 'pm' || section === 'sca' || section === 'audit') &&
+              <WzConfigurationPolicyMonitoring {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+            {section === 'oscap' && <WzConfigurationOpenSCAP {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+            {section === 'ciscat' && <WzConfigurationCisCat {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+            {section === 'vuls' && <WzConfigurationVulnerabilities {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+            {section === 'osquery' && <WzConfigurationOsquery {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
+            {section === 'docker' && <WzConfigurationDockerListener {...this.props} updateBadge={(e) => this.updateBadge(e)} />}
           </EuiPanel>
         </EuiPage>
       </WzReduxProvider>
