@@ -836,6 +836,11 @@ export class WazuhApiCtrl {
         data = data.content;
       }
       const delay = (data || {}).delay || 0;
+      if (path.includes("upgrade")) {
+        (Object.keys(data) || []).forEach(key => {
+          path += `${path.includes('?') ? '&' : '?'}${key}${data[key] ? '=' : ''}${data[key]}`
+        });
+      }
       let fullUrl = getPath(api) + path;
       if (delay) {
         const current = new Date();
