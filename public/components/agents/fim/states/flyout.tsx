@@ -49,7 +49,7 @@ export class FlyoutDetail extends Component {
 
   render() {
     return (
-          <EuiFlyout ownFocus onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.props.fileName} maxWidth="70%">
+          <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.props.fileName} maxWidth="70%">
             <EuiFlyoutHeader hasBorder className="flyout-header" >
               <EuiTitle size="s">
                 <h2 id={this.props.fileName}>{this.props.fileName}</h2>
