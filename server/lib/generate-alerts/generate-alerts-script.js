@@ -18,7 +18,7 @@ import { PCI_DSS, GDPR, HIPAA, GPG13, NIST_800_53 } from './sample-data/regulato
 import * as Audit from './sample-data/audit';
 import * as Authentication from './sample-data/authentication';
 import * as AWS from './sample-data/aws';
-import * as IM from './sample-data/im';
+import * as IntegrityMonitoring from './sample-data/integrity-monitoring';
 import * as CISCAT from './sample-data/ciscat';
 import * as Docker from './sample-data/docker';
 import * as Mitre from './sample-data/mitre';
@@ -233,7 +233,7 @@ function generateAlert(params) {
     if (params.syscheck) {
         alert.rule.groups.push("syscheck");
         alert.syscheck = {};
-        alert.syscheck.event = randomArrayItem(IM.events);
+        alert.syscheck.event = randomArrayItem(IntegrityMonitoring.events);
         alert.syscheck.path = randomArrayItem(Paths);
         alert.syscheck.uname_after = randomArrayItem(Users);
     }
