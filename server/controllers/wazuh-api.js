@@ -28,7 +28,6 @@ import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
-import querystring from 'querystring';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
@@ -173,7 +172,7 @@ export class WazuhApiCtrl {
                   req.idChanged = id;
                   return this.checkStoredAPI(req, reply, false);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             return ErrorResponse(error.message || error, 3020, 500, reply);
@@ -836,11 +835,6 @@ export class WazuhApiCtrl {
         data = data.content;
       }
       const delay = (data || {}).delay || 0;
-      if (path.includes("upgrade")) {
-        (Object.keys(data) || []).forEach(key => {
-          path += `${path.includes('?') ? '&' : '?'}${key}${data[key] ? '=' : ''}${data[key]}`
-        });
-      }
       let fullUrl = getPath(api) + path;
       if (delay) {
         const current = new Date();
@@ -892,10 +886,11 @@ export class WazuhApiCtrl {
         }
       }
 
-      // DELETE must use URL query but we accept objects in Dev Tools
-      if (method === 'DELETE' && dataProperties.length) {
-        const query = querystring.stringify(data);
-        fullUrl += fullUrl.includes('?') ? `&${query}` : `?${query}`;
+      // DELETE and PUT must use URL query but we accept objects in Dev Tools
+      if ((method === 'DELETE' || method === 'PUT') && dataProperties.length) {
+        (Object.keys(data) || []).forEach(key => {
+          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${data[key] !== '' ? '=' : ''}${data[key]}`
+        });
         data = {};
       }
 
