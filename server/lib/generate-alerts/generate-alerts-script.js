@@ -27,6 +27,7 @@ import * as OpenSCAP from './sample-data/openscap';
 import * as PolicyMonitoring from './sample-data/policy-monitoring';
 import * as Virustotal from './sample-data/virustotal';
 import * as Vulnerability from './sample-data/vulnerabilities';
+import * as SSH from './sample-data/ssh';
 
 //Alert
 const alertIDMax = 6000;
@@ -75,53 +76,59 @@ function randomArrayItem(array) {
  */
 function generateAlert(params) {
     let alert = {
-        "timestamp": "2020-01-27T11:08:47.777+0000",
-        "rule": {
-            "level": 3,
-            "description": "Sample alert",
-            "id": "5502",
-            "firedtimes": 3,
-            "mail": false,
-            "groups": ["ossec"],
+        timestamp: "2020-01-27T11:08:47.777+0000",
+        rule: {
+            level: 3,
+            description: "Sample alert",
+            id: "5502",
+            mail: false,
+            groups: [],
+            // "firedtimes": 3,
             // "pci_dss": ["10.2.5"],
             // "gpg13": ["7.8", "7.9"],
             // "gdpr": ["IV_32.2"],
             // "hipaa": ["164.312.b"],
             // "nist_800_53": ["AU.14", "AC.7"]
         },
-        "agent": {
-            "id": "000",
-            "name": "master"
+        agent: {
+            id: "000",
+            name: "master"
         },
-        "manager": {
-            "name": "master"
+        manager: {
+            name: "master"
         },
-        "cluster": {
-            "name": "wazuh"
+        cluster: {
+            name: "wazuh"
         },
-        "id": "1580123327.49031",
-        "full_log": "Sample alert full log",
-        "predecoder": {
-            "program_name": "sshd",
-            "timestamp": "Jan 27 11:08:46",
-            "hostname": "master"
-        },
-        "decoder": {
-            "parent": "pam",
-            "name": "pam"
-        },
-        "data": {
-            "dstuser": "root"
-        },
-        "location": "/random"
+        id: "1580123327.49031",
+        predecoder: {},
+        decoder: {},
+        data: {},
+        location: ""
+
+        // "full_log": "Sample alert full log",
+        // "predecoder": {
+        //     "program_name": "sshd",
+        //     "timestamp": "Jan 27 11:08:46",
+        //     "hostname": "master"
+        // },
+        // "decoder": {
+        //     "parent": "pam",
+        //     "name": "pam"
+        // },
+        // "data": {
+        //     "dstuser": "root"
+        // },
+        // "location": "/random"
     }
 
+    // Random fields for base alert
     // alert.id = // TODO: generate random?;
     alert.agent = randomArrayItem(Agents);
     alert.rule.description = randomArrayItem(ruleDescription);
-    alert.rule.id = randomIntervalInteger(1,alertIDMax);
+    alert.rule.id = `${randomIntervalInteger(1,alertIDMax)}`;
     alert.rule.level = randomIntervalInteger(1,ruleMaxLevel);
-    alert.rule.firedtimes = randomIntervalInteger(1,ruleMaxFiredtimes);
+    // alert.rule.firedtimes = randomIntervalInteger(1,ruleMaxFiredtimes);
     alert.timestamp = randomDate();
     
 
@@ -303,12 +310,12 @@ function generateAlert(params) {
             srcip: randomArrayItem(IPs),
             srcuser: randomArrayItem(Users),
             srcport: randomArrayItem(Ports)
-        }
+        };
         alert.GeoLocation = randomArrayItem(GeoLocation);
         alert.decoder = {
             name: 'sshd',
             parent: 'sshd'
-        }
+        };
         alert.input = {
             type: 'log'
         };
@@ -316,78 +323,145 @@ function generateAlert(params) {
             program_name: 'sshd',
             timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
             hostname: alert.manager.name
-        }
+        };
+        let typeAlert = randomArrayItem(['invalidLoginPassword','invalidLoginUser', 'multipleAuthenticationFailures','windowsInvalidLoginPassword','userLoginFailed', 'passwordCheckFailed', 'nonExistentUser', 'bruteForceTryingAccessSystem']);
 
-        if(params.authentication.invalid_login_password){
-            alert.location = Authentication.invalidLoginPassword.location;
-            alert.rule = {...Authentication.invalidLoginPassword.rule};
-            alert.rule.groups = [...Authentication.invalidLoginPassword.rule.groups];
-            alert.full_log = interpolateAlertProps(Authentication.invalidLoginPassword.full_log, alert)
-            // `${alert.predecoder.timestamp} ${alert.manager.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
-        }
-        if (params.authentication.invalid_login_user){
-            alert.full_log = `${alert.predecoder.timestamp} ${alert.manager.name} sshd[10022]: Invalid user admin from ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
-            alert.location = Authentication.invalidLoginUser.location;
-            alert.rule = {...Authentication.invalidLoginUser.rule};
-            alert.rule.groups = [...Authentication.invalidLoginUser.groups];
-        }
-        if (params.authentication.multiple_authentication_failures) {
-            alert.full_log = Athentication.multipleAuthenticationFailures.full_log;
-            alert.location = Athentication.multipleAuthenticationFailures.location;
-            alert.rule = {...Authentication.multipleAuthenticationFailures.rule};
-            alert.rule.groups = [Authentication.multipleAuthenticationFailures.rule.groups];
-            alert.rule.frequency = randomIntervalInteger(5,50);
-        }
-        if (params.authentication.windows_invalid_login_password) {
-            alert.full_log = alert.full_log = `${alert.predecoder.timestamp} ip-${alert.agent.name} sshd[5413]: Failed password for invalid user ${alert.data.srcuser} from ${alert.data.srcip} port ${alert.data.srcport} ssh2`;
-            alert.data.win = {
-                eventdata: {
-                    authenticationPackageName: 'NTLM',
-                    failureReason: '%%2313',
-                    ipAddress: randomArrayItem(IPs),
-                    ipPort: randomArrayItem(Ports),
-                    keyLength: 0,
-                    logonProcessName: 'NtLmSsp',
-                    logonType: '3',
-                    processId: '0x0',
-                    status: '0xc000006d',
-                    subStatus: '0xc0000064',
-                    subjectLogonId: '0x0',
-                    subjectUserSid: "S-1-0-0",
-                    targetUserName: "DIRECTION"
-                },
-                system: {
-                    channel: 'Security',
-                    computer: randomArrayItem(Win_Hostnames),
-                    eventID: `${randomIntervalInteger(1,600)}`,
-                    eventRecordID: `${randomIntervalInteger(10000,50000)}`,
-                    keywords: '0x8010000000000000',
-                    level: '0',
-                    message: '',
-                    opcode: '0',
-                    processID: `${randomIntervalInteger(1,1200)}`,
-                    providerGuid: '{54849625-5478-4994-a5ba-3e3b0328c30d}',
-                    providerName: 'Microsoft-Windows-Security-Auditing',
-                    severityValue: 'AUDIT_FAILURE',
-                    systemTime: alert.timestamp,
-                    task: `${randomIntervalInteger(1,1800)}`,
-                    threadID: `${randomIntervalInteger(1,500)}`,
-                    version: '0'
-                }
+        switch (typeAlert){
+            case 'invalidLoginPassword':{
+                alert.location = Authentication.invalidLoginPassword.location;
+                alert.rule = {...Authentication.invalidLoginPassword.rule};
+                alert.rule.groups = [...Authentication.invalidLoginPassword.rule.groups];
+                alert.full_log = interpolateAlertProps(Authentication.invalidLoginPassword.full_log, alert);
+                break
             }
-            alert.decoder.name = 'windows_eventchannel';
-            alert.location = 'EventChannel';
-            alert.rule.description = 'Logon Failure - Unknown user or bad password';
-            alert.rule.frequency = randomIntervalInteger(5,50);
-            alert.rule.groups = ['windows',  'windows_security', 'win_authentication_failed'];
-            alert.rule.id = 60122;
-            alert.rule.level = 5
-            alert.gdpr = ['IV_35.7.d', 'IV_32.2'];
-            alert.gpg13 = ['7.1'];
-            alert.hipaa = ['164.312.b'];
-            alert.nist_800_53 = ['AU.1', 'AC.7'];
-            alert.gdpr = ['10.2.4', '10.2.5'];
+            case 'invalidLoginUser':{
+                alert.location = Authentication.invalidLoginUser.location;
+                alert.rule = {...Authentication.invalidLoginUser.rule};
+                alert.rule.groups = [...Authentication.invalidLoginUser.rule.groups];
+                alert.full_log = interpolateAlertProps(Authentication.invalidLoginUser.full_log, alert);
+                break
+            }
+            case 'multipleAuthenticationFailures':{
+                alert.location = Authentication.multipleAuthenticationFailures.location;
+                alert.rule = {...Authentication.multipleAuthenticationFailures.rule};
+                alert.rule.groups = [...Authentication.multipleAuthenticationFailures.rule.groups];
+                alert.rule.frequency = randomIntervalInteger(5,50);
+                alert.full_log = interpolateAlertProps(Authentication.multipleAuthenticationFailures.full_log, alert);
+                break
+            }
+            case 'windowsInvalidLoginPassword':{
+                alert.location = Authentication.windowsInvalidLoginPassword.location;
+                alert.rule = {...Authentication.windowsInvalidLoginPassword.rule };
+                alert.rule.groups = [...Authentication.windowsInvalidLoginPassword.rule.groups];
+                alert.rule.frequency = randomIntervalInteger(5,50);
+                alert.data.win = {...Authentication.windowsInvalidLoginPassword.data_win}
+                alert.data.win.eventdata.ipAddress = randomArrayItem(IPs);
+                alert.data.win.eventdata.ipPort = randomArrayItem(Ports);
+                alert.data.win.system.computer = randomArrayItem(Win_Hostnames);
+                alert.data.win.system.eventID = `${randomIntervalInteger(1,600)}`;
+                alert.data.win.system.eventRecordID = `${randomIntervalInteger(10000,50000)}`;
+                alert.data.win.system.processID = `${randomIntervalInteger(1,1200)}`;
+                alert.data.win.system.systemTime = alert.timestamp;
+                alert.data.win.system.processID = `${randomIntervalInteger(1,1200)}`;
+                alert.data.win.system.task = `${randomIntervalInteger(1,1800)}`;
+                alert.data.win.system.threadID = `${randomIntervalInteger(1,500)}`;
+                alert.full_log = interpolateAlertProps(Authentication.windowsInvalidLoginPassword.full_log, alert);
+                break
+            }
+            case 'userLoginFailed':{
+                alert.location = Authentication.userLoginFailed.location;
+                alert.rule = {...Authentication.userLoginFailed.rule};
+                alert.rule.groups = [...Authentication.userLoginFailed.rule.groups];
+                alert.data = {
+                    srcip: randomArrayItem(IPs),
+                    dstuser: randomArrayItem(Users),
+                    uid: `${randomIntervalInteger(0,50)}`,
+                    euid: `${randomIntervalInteger(0,50)}`,
+                    tty: "ssh"
+                };
+                alert.decoder = {...Authentication.userLoginFailed.decoder}
+                alert.full_log = interpolateAlertProps(Authentication.userLoginFailed.full_log, alert);
+                break
+            }
+            case 'passwordCheckFailed':{
+                alert.location = Authentication.passwordCheckFailed.location;
+                alert.rule = {...Authentication.passwordCheckFailed.rule};
+                alert.rule.groups = [...Authentication.passwordCheckFailed.rule.groups];
+                alert.data = {
+                    srcuser: randomArrayItem(Users)
+                };
+                alert.predecoder.program_name = "unix_chkpwd";
+                alert.decoder = {...Authentication.passwordCheckFailed.decoder};
+                alert.full_log = interpolateAlertProps(Authentication.passwordCheckFailed.full_log, alert);
+                break
+            }
+            case 'nonExistentUser':{
+                alert.location = Authentication.nonExistentUser.location;
+                alert.rule = {...Authentication.nonExistentUser.rule};
+                alert.rule.groups = [...Authentication.nonExistentUser.rule.groups];
+                alert.rule.firedtimes = randomIntervalInteger(2,15);
+                alert.full_log = interpolateAlertProps(Authentication.nonExistentUser.full_log, alert);
+                break
+            }
+            case 'bruteForceTryingAccessSystem':{
+                alert.location = Authentication.bruteForceTryingAccessSystem.location;
+                alert.rule = {...Authentication.bruteForceTryingAccessSystem.rule};
+                alert.rule.groups = [...Authentication.bruteForceTryingAccessSystem.rule.groups];
+                alert.rule.firedtimes = randomIntervalInteger(2,15);
+                alert.full_log = interpolateAlertProps(Authentication.bruteForceTryingAccessSystem.full_log, alert);
+                break
+            }
+            case 'reverseLoockupError':{
+                alert.location = Authentication.reverseLoockupError.location;
+                alert.rule = {...Authentication.reverseLoockupError.rule};
+                alert.rule.groups = [...Authentication.reverseLoockupError.rule.groups];
+                alert.data = {
+                    srcip: randomArrayItem(IPs)
+                }
+                alert.rule.firedtimes = randomIntervalInteger(2,15);
+                alert.full_log = interpolateAlertProps(Authentication.reverseLoockupError.full_log, alert);
+            }
+            case 'insecureConnectionAttempt':{
+                alert.location = Authentication.insecureConnectionAttempt.location;
+                alert.rule = {...Authentication.insecureConnectionAttempt.rule};
+                alert.rule.groups = [...Authentication.insecureConnectionAttempt.rule.groups];
+                alert.data = {
+                    srcip: randomArrayItem(IPs),
+                    srcport: randomArrayItem(Ports),
+                }
+                alert.rule.firedtimes = randomIntervalInteger(2,15);
+                alert.full_log = interpolateAlertProps(Authentication.insecureConnectionAttempt.full_log, alert);
+            }
+            default: {}
         }
+    }
+
+    if( params.ssh ){
+        alert.data = {
+            srcip: randomArrayItem(IPs),
+            srcuser: randomArrayItem(Users),
+            srcport: randomArrayItem(Ports)
+        };
+        alert.GeoLocation = randomArrayItem(GeoLocation);
+        alert.decoder = {
+            name: 'sshd',
+            parent: 'sshd'
+        };
+        alert.input = {
+            type: 'log'
+        };
+        alert.predecoder = {
+            program_name: 'sshd',
+            timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
+            hostname: alert.manager.name
+        };
+        const shhAlert = randomArrayItem(SSH.data);
+        alert.location = shhAlert.location;
+        alert.rule = {...shhAlert.rule};
+        alert.rule.groups = [...shhAlert.rule.groups];
+        alert.rule.firedtimes = randomIntervalInteger(4,15);
+        alert.full_log = interpolateAlertProps(shhAlert.full_log, alert);
+
     }
     if ( params.windows ){
         alert.rule.groups.push('windows');
@@ -494,7 +568,7 @@ const monthNames = {
     long: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 };
-function formatDate(date, format){ // It could use "moment" library to format strings too,
+function formatDate(date, format){ // It could use "moment" library to format strings too
     const tokens = {
         'D': (d) => formatterNumber(date.getDate(), 2), // 01-31
         'M': (d) => formatterNumber(date.getMonth() + 1, 2), // 01-12
@@ -523,13 +597,12 @@ function formatDate(date, format){ // It could use "moment" library to format st
  */
 function interpolateAlertProps(str, alert, extra = {}){
     const matches = str.match(/{([\w\._]+)}/g);
-    return matches.reduce((accum, cur) => {
-      const match = cur.match(/{([\w\._]+)}/)
-      const items = match[1].split('.')
-      const value = items.reduce((a,c) => (a && a[c]) || extra[c] || undefined, alert) || cur
-      console.log(match, items, cur, value)
-      return accum.replace(cur,value)
-    }, str)
+    return (matches && matches.reduce((accum, cur) => {
+      const match = cur.match(/{([\w\._]+)}/);
+      const items = match[1].split('.');
+      const value = items.reduce((a,c) => (a && a[c]) || extra[c] || undefined, alert) || cur;
+      return accum.replace(cur,value);
+    }, str)) || str
 }
 
 /**
