@@ -158,7 +158,7 @@ export class WazuhApiCtrl {
                 if (this.checkResponseIsDown(response)) {
                   return ErrorResponse(
                     `ERROR3099 - ${response.body.message ||
-                      'Wazuh not ready yet'}`,
+                    'Wazuh not ready yet'}`,
                     3099,
                     500,
                     reply
@@ -836,6 +836,11 @@ export class WazuhApiCtrl {
         data = data.content;
       }
       const delay = (data || {}).delay || 0;
+      if (path.includes("upgrade")) {
+        (Object.keys(data) || []).forEach(key => {
+          path += `${path.includes('?') ? '&' : '?'}${key}${data[key] ? '=' : ''}${data[key]}`
+        });
+      }
       let fullUrl = getPath(api) + path;
       if (delay) {
         const current = new Date();
@@ -911,8 +916,8 @@ export class WazuhApiCtrl {
       if (!responseData) {
         responseData =
           typeof responseData === 'string' &&
-          path.includes('/files') &&
-          method === 'GET'
+            path.includes('/files') &&
+            method === 'GET'
             ? ' '
             : false;
         response.body.data = responseData;
@@ -998,7 +1003,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -1139,9 +1144,9 @@ export class WazuhApiCtrl {
         params,
         cred
       );
-      
+
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
-      
+
       const totalItems = (((output || {}).body || {}).data || {}).totalItems;
 
       if (totalItems && !isList) {
@@ -1392,7 +1397,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${error.message ||
-          error}`,
+        error}`,
         4005,
         500,
         reply
@@ -1441,7 +1446,7 @@ export class WazuhApiCtrl {
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
