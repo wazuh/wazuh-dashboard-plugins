@@ -30,7 +30,8 @@ import {
   EuiFlexGroup,
   Direction,
   EuiSpacer,
-  EuiCallOut
+  EuiCallOut,
+  EuiIcon
 } from '@elastic/eui';
 import {
   IIndexPattern,
@@ -49,9 +50,9 @@ export class Discover extends Component {
   };
 
   KibanaServices: {
-    [key:string]: any
+    [key: string]: any
   };
-  
+
   state: {
     sort: object,
     alerts: { _source: {}, _id: string }[],
@@ -107,7 +108,7 @@ export class Discover extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    try{
+    try {
       this.indexPattern = await this.KibanaServices.indexPatterns.get("wazuh-alerts-3.x-*");
       this.getAlerts();
     } catch (err) {
@@ -120,7 +121,7 @@ export class Discover extends Component {
   }
 
   async componentDidUpdate() {
-    if(!this._isMount) { return; }
+    if (!this._isMount) { return; }
     try {
       await this.getAlerts();
     } catch (err) {
@@ -197,9 +198,23 @@ export class Discover extends Component {
   columns() {
     return [
       {
+        field: '',
+        name: '',
+        width: 25,
+        render: item => {
+          return (
+            <EuiIcon size="s" type={this.state.itemIdToExpandedRowMap[item._id] ? "arrowDown" : "arrowRight"} />
+          )
+        },
+      },
+      {
         field: 'timestamp',
         name: 'Time',
-        sortable: true
+        sortable: true,
+        render: time => {
+          const date = time.split('.')[0];
+          return <span>{date.split('T')[0]} {date.split('T')[1]}</span>
+        },
       },
       {
         field: 'syscheck.event',
@@ -271,7 +286,7 @@ export class Discover extends Component {
     const filters = this.state.searchBarFilters;
     filters.push(formattedFilter);
     this.KibanaServices.data.query.filterManager.setFilters(filters);
-    this.setState({searchBarFilters: filters});
+    this.setState({ searchBarFilters: filters });
   }
 
   onQuerySubmit = (payload: { dateRange: TimeRange, query?: Query | undefined }) => {
@@ -282,15 +297,15 @@ export class Discover extends Component {
 
   onFiltersUpdated = (filters: esFilters.Filter[]) => {
     this.KibanaServices.data.query.filterManager.setFilters(filters);
-    this.setState({searchBarFilters: filters});
+    this.setState({ searchBarFilters: filters });
   }
 
   getSearchBar() {
     const storage = {
       ...window.localStorage,
       get: (key) => JSON.parse(window.localStorage.getItem(key) || '{}'),
-      set: (key, value) =>  window.localStorage.setItem(key, JSON.stringify(value)),
-      remove: (key) => window.localStorage.removeItem(key) 
+      set: (key, value) => window.localStorage.setItem(key, JSON.stringify(value)),
+      remove: (key) => window.localStorage.removeItem(key)
     }
     const http = {
       ...this.KibanaServices.indexPatterns.apiClient.http
@@ -300,7 +315,7 @@ export class Discover extends Component {
     }
     const { dateRange, query, searchBarFilters } = this.state;
     return (
-      <KibanaContextProvider services={{...this.KibanaServices, appName: "wazuhFim", storage, http, savedObjects}} > 
+      <KibanaContextProvider services={{ ...this.KibanaServices, appName: "wazuhFim", storage, http, savedObjects }} >
         <I18nProvider>
           <SearchBar
             indexPatterns={[this.indexPattern]}
@@ -357,6 +372,7 @@ export class Discover extends Component {
               <EuiFlexItem>
                 {pageIndexItems.length && (
                   <EuiBasicTable
+                    className="module-discover-table"
                     items={pageIndexItems}
                     itemId="_id"
                     itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
