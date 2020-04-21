@@ -11,7 +11,7 @@
  */
 
 // General
-import { IPs, Users, Ports, Paths, Win_Hostnames, GeoLocation, Agents } from './sample-data/common';
+import { IPs, Users, Ports, Paths, Win_Hostnames, GeoLocation, Agents, randomElements } from './sample-data/common';
 import { PCI_DSS, GDPR, HIPAA, GPG13, NIST_800_53 } from './sample-data/regulatory-compliance';
 
 //AWS
@@ -240,13 +240,28 @@ function generateAlert(params) {
 
     if (params.virustotal) {
         alert.rule.groups.push("virustotal");
+        alert.location = 'virustotal';
         alert.data.virustotal = {};
-        alert.data.virustotal.source = {};
-        alert.data.virustotal.source.file = randomArrayItem(Virustotal.sourceFile);;
-        alert.data.virustotal.permalink = randomArrayItem(Virustotal.permalink);;
-        alert.data.virustotal.source.md5 = randomArrayItem(Virustotal.sourceMd5);
-        alert.data.virustotal.malicious = randomArrayItem(Virustotal.malicious);
-        alert.data.virustotal.positives = `${randomIntervalInteger(0,20)}`;
+        alert.data.virustotal.found = randomArrayItem(['0', '1', '1', '1']);
+
+        alert.data.virustotal.source = {
+          sha1: randomElements(40, 'abcdef0123456789'),
+          file: randomArrayItem(Virustotal.sourceFile),
+          alert_id: `${randomElements(10, '0123456789')}.${randomElements(7, '0123456789')}`,
+          md5: randomElements(32, 'abcdef0123456789')
+        };
+    
+        if (alert.data.virustotal.found === '1') {
+          alert.data.virustotal.malicious = randomArrayItem(Virustotal.malicious);
+          alert.data.virustotal.positives = `${randomIntervalInteger(0,65)}`;
+          alert.data.virustotal.total = alert.data.virustotal.malicious + alert.data.virustotal.positives;
+          alert.rule.description = `VirusTotal: Alert - ${alert.data.virustotal.source.file} - ${alert.data.virustotal.positives} engines detected this file`;
+          alert.data.virustotal.permalink = randomArrayItem(Virustotal.permalink);
+          alert.data.virustotal.scan_date = new Date(Date.parse(alert.timestamp)- (4 * 60000));
+        } else {
+          alert.data.virustotal.malicious = '0';
+          alert.rule.description = 'VirusTotal: Alert - No records in VirusTotal database';
+        }
     }
 
     if (params.vulnerabilities) {

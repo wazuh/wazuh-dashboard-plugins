@@ -123,3 +123,23 @@ export const GeoLocation = [
       city_name: 'Shanghai'
   },
 ];
+
+/**
+ * Get a random element of an array
+ * @param {[]} array - Array to get a randomized element
+ * @returns {any} - Element randomized
+ */
+function randomArrayItem(str) {
+    let array = str.split('');
+    return array[Math.floor(array.length * Math.random())];
+}
+
+export const randomElements = (length, elements) => {
+    let hash = '';
+
+    for(let i = 0; i < length; i++) {
+        hash += randomArrayItem(elements);
+    }
+
+    return hash;
+}

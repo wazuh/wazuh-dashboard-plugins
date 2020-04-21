@@ -301,9 +301,9 @@ export default [
     _id: 'Wazuh-App-Overview-Virustotal-Malicious-Per-Agent',
     _type: 'visualization',
     _source: {
-      title: 'Malicious Per Agent',
+      title: 'Top 5 agents with unique malicious files',
       visState:
-        '{"title":"Malicious Per Agent","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"cardinality","schema":"metric","params":{"field":"data.virustotal.source.md5"}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":1,"order":"desc","orderBy":"1"}}]}',
+        '{"title":"Top 5 agents with unique malicious files","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"cardinality","schema":"metric","params":{"field":"data.virustotal.source.md5"}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
