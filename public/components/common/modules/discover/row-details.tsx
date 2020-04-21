@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   EuiTableRowCell,
   EuiTableRow,
@@ -29,7 +29,6 @@ import {
 } from '@elastic/eui';
 import './discover.less';
 import { EuiFlexItem } from '@elastic/eui';
-import { EuiFlexGrid } from '@elastic/eui';
 import { ApiRequest } from '../../../../react-services/api-request';
 
 
