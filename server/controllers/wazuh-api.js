@@ -887,10 +887,11 @@ export class WazuhApiCtrl {
         }
       }
 
-      // DELETE must use URL query but we accept objects in Dev Tools
-      if (method === 'DELETE' && dataProperties.length) {
-        const query = querystring.stringify(data);
-        fullUrl += fullUrl.includes('?') ? `&${query}` : `?${query}`;
+      // DELETE and PUT must use URL query but we accept objects in Dev Tools
+      if ((method === 'DELETE' || method === 'PUT') && dataProperties.length) {
+        (Object.keys(data) || []).forEach(key => {
+          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${data[key] !== '' ? '=' : ''}${data[key]}`
+        });
         data = {};
       }
 
