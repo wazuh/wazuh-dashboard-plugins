@@ -11,15 +11,24 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiPanel,
   EuiPage,
   EuiTabs,
   EuiTab,
-  EuiSpacer,
   EuiTitle,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiEmptyPrompt,
+  EuiButton,
+  EuiSpacer,
+  EuiPageBody,
+  EuiPageContent,
+  EuiProgress,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiLink,
+  EuiHorizontalRule
 } from '@elastic/eui';
 import {
   StatesTable,
@@ -32,8 +41,8 @@ export class States extends Component {
   state: {
     filters: {},
     selectedTabId: 'files' | 'registry',
-    totalItemsFile: Number,
-    totalItemsRegistry: Number,
+    totalItemsFile: number,
+    totalItemsRegistry: number,
     isLoading: Boolean
   }
   props: any;
@@ -80,9 +89,10 @@ export class States extends Component {
   }
 
   async componentDidMount() {
-    await this.getTotalFiles();
-    await this.getTotalRegistry();
-    this.setState({ isLoading: false });
+    const { agentPlatform } = this.props.agent;
+    const totalItemsFile = await this.getItemNumber('file');
+    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
+    this.setState({ totalItemsFile, totalItemsRegistry, isLoading: false });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -102,30 +112,17 @@ export class States extends Component {
     this.setState({ selectedTabId: id });
   }
 
-  async getTotalFiles() {
+  async getItemNumber(type: 'file' | 'registry') {
     const agentID = this.props.agent.id;
     const totalItemsFile = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
       {
         limit: '1',
-        type: 'file'
+        type
       }
     );
-    this.setState({ totalItemsFile: ((totalItemsFile.data || {}).data || {}).totalItems || 0 });
-  }
-
-  async getTotalRegistry() {
-    const agentID = this.props.agent.id;
-    const totalItemsRegistry = await WzRequest.apiReq(
-      'GET',
-      `/syscheck/${agentID}`,
-      {
-        limit: '1',
-        type: 'registry'
-      }
-    );
-    this.setState({ totalItemsRegistry: ((totalItemsRegistry.data || {}).data || {}).totalItems || 0 });
+    return ((totalItemsFile.data || {}).data || {}).totalItems || 0;
   }
 
   renderTabs() {
@@ -189,17 +186,65 @@ export class States extends Component {
     )
   }
 
+  noConfiguredMonitoring() {
+    return (<EuiPage> 
+      <EuiPageBody component="div">
+        <EuiPageContent verticalPosition="center" horizontalPosition="center">
+          <EuiEmptyPrompt 
+            iconType="filebeatApp"
+            title={<h2>Integrity monitoring is not configured for this agent</h2>} 
+            body={<Fragment>
+              <EuiHorizontalRule margin='s' />
+              <EuiLink 
+                href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html' 
+                target="_blank"
+                style={{textAlign: "center"}}
+                >
+                https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
+              </EuiLink>
+              <EuiHorizontalRule margin='s' />
+              </Fragment>} 
+            actions={
+              <EuiButton 
+                href='#/manager/configuration?_g=()&tab=configuration' 
+                target="_blank" 
+                color="primary"
+                iconType="gear"
+                fill>
+                Configure it
+              </EuiButton>
+            } />
+        </EuiPageContent>
+      </EuiPageBody>
+    </EuiPage>);
+  }
+
+  loadingStates() {
+    return <EuiPage>
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <EuiProgress size="xs" color="primary" />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiPage>;
+  }
+
   render() {
+    const { totalItemsFile, totalItemsRegistry, isLoading } = this.state;
+    if (isLoading) {
+      return this.loadingStates()
+    }
     const table = this.renderTable();
     const tabs = this.renderTabs()
-    return (
-      <EuiPage>
-        <EuiPanel>
-          {tabs}
-          <EuiSpacer size="m" />
-          {table}
-        </EuiPanel>
-      </EuiPage>
-    )
+    const notItems = !(totalItemsFile + totalItemsRegistry)
+    return notItems
+        ? this.noConfiguredMonitoring()
+        : (<EuiPage>
+            <EuiPanel>
+              {tabs}
+              <EuiSpacer size="m" />
+              {table}
+            </EuiPanel>
+          </EuiPage>)
   }
 }
