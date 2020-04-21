@@ -126,7 +126,7 @@ export class RowDetails extends Component {
 
     const rows = syscheckPaths.map((item, idx) => {
       const cells = columns.map((currentColumn, idx) => {
-        var child = (<span></span>);
+        let child = (<span></span>);
         const key = "syscheck." + item;
         if (currentColumn.id === 'actions') {
           child = (<span></span>);
@@ -145,12 +145,10 @@ export class RowDetails extends Component {
             </EuiLink>
           </EuiToolTip>
           )
-          
-          
         }
         return (
           <EuiTableRowCell
-            key={currentColumn.id}
+            key={idx}
             textOnly={true}
             style={{ borderBottom: "none", borderTop: "none", lineHeight: 1.15 }}>
             {child}
@@ -160,7 +158,7 @@ export class RowDetails extends Component {
 
       return (
         <EuiTableRow
-          key={item.file}>
+          key={idx}>
           {cells}
         </EuiTableRow>
       );
