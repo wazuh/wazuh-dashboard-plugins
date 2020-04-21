@@ -12,11 +12,7 @@
 
 import React, { Component } from 'react';
 import {
-  EuiTableRowCell,
-  EuiTableRow,
-  EuiTableHeader,
-  EuiTableHeaderCell,
-  EuiTableBody,
+  EuiDescriptionList,
   EuiCodeBlock,
   EuiPanel,
   EuiTitle,
@@ -25,6 +21,7 @@ import {
   EuiToolTip,
   EuiFlexGroup,
   EuiLink,
+  EuiTabs,
   EuiTab
 } from '@elastic/eui';
 import './discover.less';
@@ -110,97 +107,40 @@ export class RowDetails extends Component {
     return child;
   }
 
-  renderRows(syscheckPaths) {
-    const columns = [
-      {
-        id: 'actions',
-      },
-      {
-        id: 'key',
-      },
-      {
-        id: 'value',
-      }
-    ];
-
-    const rows = syscheckPaths.map((item, idx) => {
-      const cells = columns.map((currentColumn, idx) => {
-        let child = (<span></span>);
-        const key = "syscheck." + item;
-        if (currentColumn.id === 'actions') {
-          child = (<span></span>);
-        }
-        if (currentColumn.id === 'key') {
-          child = <span>{key}</span>;
-        }
-        if (currentColumn.id === 'value') {
-          const value = this.getChildFromPath(this.props.item.syscheck, item);
-          const filter = {};
-          filter[key] = value;
-          child = (
-          <EuiToolTip position="top" content={`Filter by ${key} : ${value}`}>
-            <EuiLink onClick={async () => this.props.addFilter(filter)}>
-              &nbsp;{value}
-            </EuiLink>
-          </EuiToolTip>
-          )
-        }
-        return (
-          <EuiTableRowCell
-            key={idx}
-            textOnly={true}
-            style={{ borderBottom: "none", borderTop: "none", lineHeight: 1.15 }}>
-            {child}
-          </EuiTableRowCell>
-        );
-      });
-
-      return (
-        <EuiTableRow
-          key={idx}>
-          {cells}
-        </EuiTableRow>
-      );
+  renderRows() {
+    const columns = [];
+    const syscheckPaths = this.propertiesToArray(this.props.item.syscheck);
+    syscheckPaths.map((item, idx) => {
+      let child = {};
+      const key = "syscheck." + item;
+      child['title'] = key;
+      const value = this.getChildFromPath(this.props.item.syscheck, item);
+      const filter = {};
+      filter[key] = value;
+      child['description'] = (
+        <EuiToolTip position="top" content={`Filter by ${key} : ${value}`}>
+          <EuiLink onClick={async () => this.props.addFilter(filter)}>
+            &nbsp;{value}
+          </EuiLink>
+        </EuiToolTip>
+      )
+      columns.push(child);
     });
-    if (!rows.length) {
-      return (<div style={{width: 200}}>No syscheck data was found.</div>)
+    if (!columns.length) {
+      return (<div style={{ width: 200 }}>No syscheck data was found.</div>)
     }
-    return rows;
-  }
-
-  renderHeaderCells() {
-    const header: Array<JSX.Element> = [];
-
-    header.push(
-      <EuiTableHeaderCell
-        key="actions"
-        width="40">
-      </EuiTableHeaderCell>
-    )
-    header.push(
-      <EuiTableHeaderCell
-        key="key"
-        width="220">
-      </EuiTableHeaderCell>
-    )
-    header.push(
-      <EuiTableHeaderCell
-        key="value">
-      </EuiTableHeaderCell>
-    )
-
-    return header;
+    return columns;
   }
 
   getTable() {
-    const syscheckPaths = this.propertiesToArray(this.props.item.syscheck);
     return (
-      <div style={{ height: 400, overflow: 'auto' }}>
-        <EuiTable>
-          <EuiTableHeader style={{ visibility: "collapse" }}>{this.renderHeaderCells()}</EuiTableHeader>
-          <EuiTableBody>{this.renderRows(syscheckPaths)}</EuiTableBody>
-        </EuiTable>
-
+      <div style={{ height: 425, overflow: 'auto' }}>
+        <EuiDescriptionList
+          className="module-discover-table-description-list"
+          type="column"
+          listItems={this.renderRows()}
+          compressed
+        />
       </div>)
   }
 
@@ -213,7 +153,7 @@ export class RowDetails extends Component {
           fontSize="s"
           paddingSize="m"
           color="dark"
-          overflowHeight={400}
+          overflowHeight={425}
           isCopyable>
           {str}
         </EuiCodeBlock>
@@ -234,7 +174,7 @@ export class RowDetails extends Component {
       <ul>
         <li key="id"><b>ID:</b>&nbsp;
           <EuiToolTip position="top" content={`Filter by this rule id: ${id}`}>
-            <EuiLink onClick={async () => this.props.addFilter({"rule.id": id})}>
+            <EuiLink onClick={async () => this.props.addFilter({ "rule.id": id })}>
               &nbsp;{id}
             </EuiLink>
           </EuiToolTip>
@@ -242,7 +182,7 @@ export class RowDetails extends Component {
         <EuiSpacer size="s" />
         <li key="level"><b>Level:</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
-            <EuiLink onClick={async () => this.props.addFilter({"rule.level":level})}>
+            <EuiLink onClick={async () => this.props.addFilter({ "rule.level": level })}>
               &nbsp;{level}
             </EuiLink>
           </EuiToolTip>
@@ -268,7 +208,7 @@ export class RowDetails extends Component {
 * @param {Array} details
    */
   renderDetails(details) {
-    const detailsToRender:Array<JSX.Element> = [];
+    const detailsToRender: Array<JSX.Element> = [];
 
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
@@ -287,11 +227,11 @@ export class RowDetails extends Component {
 * @param {Array} groups
    */
   renderGroups(groups) {
-    const listGroups:Array<JSX.Element> = [];
+    const listGroups: Array<JSX.Element> = [];
     groups.forEach((group, index) => {
       listGroups.push(
         <span key={group}>
-          <EuiLink onClick={async () => this.props.addFilter({ "rule.groups": group})}>
+          <EuiLink onClick={async () => this.props.addFilter({ "rule.groups": group })}>
             <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
               <span>
                 {group}
@@ -323,20 +263,20 @@ export class RowDetails extends Component {
     return compliance || {};
   }
 
-  getComplianceKey(key){
-    if( key === 'pci'){
+  getComplianceKey(key) {
+    if (key === 'pci') {
       return 'rule.pci_dss'
     }
-    if( key === 'gdpr'){
+    if (key === 'gdpr') {
       return 'rule.gdpr'
     }
-    if( key === 'gpg13'){
+    if (key === 'gpg13') {
       return 'rule.gpg13'
     }
-    if( key === 'hipaa'){
+    if (key === 'hipaa') {
       return 'rule.hipaa'
     }
-    if( key === 'nist-800-53'){
+    if (key === 'nist-800-53') {
       return 'rule.nist_800_53'
     }
 
@@ -344,7 +284,7 @@ export class RowDetails extends Component {
   }
 
   renderCompliance = (compliance) => {
-    const listCompliance:Array<JSX.Element> = [];
+    const listCompliance: Array<JSX.Element> = [];
     const keys = Object.keys(compliance);
     for (let i in Object.keys(keys)) {
       const key = keys[i];
@@ -353,7 +293,7 @@ export class RowDetails extends Component {
         const filters = {};
         filters[key] = element;
         const filter = {};
-        if(this.getComplianceKey(key)){
+        if (this.getComplianceKey(key)) {
           filter[this.getComplianceKey(key)] = element;
         }
         return (
@@ -389,9 +329,9 @@ export class RowDetails extends Component {
     const item = this.state.ruleData.items[0];
     const { id, level, file, path, groups, details } = item;
     const compliance = this.buildCompliance(item);
- 
+
     return (
-      <EuiFlexGroup style={{ height: 412, marginTop: 0 }}>
+      <EuiFlexGroup style={{ height: 437, marginTop: 0 }}>
         {/* General info */}
         <EuiFlexItem>
           <EuiPanel paddingSize="m">
@@ -419,17 +359,17 @@ export class RowDetails extends Component {
             {this.renderDetails(details)}
           </EuiPanel>
         </EuiFlexItem>
-        { Object.keys(compliance).length > 0 && ( 
-            <EuiFlexItem>
-              <EuiPanel paddingSize="m">
-                <EuiTitle size={'s'}>
-                  <h3>Compliance</h3>
-                </EuiTitle>
-                <EuiSpacer size="s" />
-                {this.renderCompliance(compliance)}
-              </EuiPanel>
-            </EuiFlexItem>
-          ) }
+        {Object.keys(compliance).length > 0 && (
+          <EuiFlexItem>
+            <EuiPanel paddingSize="m">
+              <EuiTitle size={'s'}>
+                <h3>Compliance</h3>
+              </EuiTitle>
+              <EuiSpacer size="s" />
+              {this.renderCompliance(compliance)}
+            </EuiPanel>
+          </EuiFlexItem>
+        )}
       </EuiFlexGroup>
     )
   }
@@ -459,26 +399,27 @@ export class RowDetails extends Component {
         disabled: false,
       }
     ];
-
-    return tabs.map((tab, index) => (
-      <EuiTab
-        onClick={() => this.onSelectedTabChanged(tab.id)}
-        isSelected={tab.id === this.state.selectedTabId}
-        disabled={tab.disabled}
-        key={index}>
-        {tab.name}
-      </EuiTab>
-    ));
+    return (
+      <EuiTabs>
+        {tabs.map((tab, index) => (
+          <EuiTab
+            onClick={() => this.onSelectedTabChanged(tab.id)}
+            isSelected={tab.id === this.state.selectedTabId}
+            disabled={tab.disabled}
+            key={index}>
+            {tab.name}
+          </EuiTab>
+        ))}
+      </EuiTabs>
+    )
   }
 
   render() {
-
     return (
       <div>
-
         {this.getTabs()}
         <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem style={{ padding: '16px 0px' }}>
             {this.state.selectedTabId === 'table' && (
               this.getTable()
             )}
@@ -492,9 +433,7 @@ export class RowDetails extends Component {
                 <span>There was an error loading rule ID: {this.props.item.rule.id}</span>
               )}
           </EuiFlexItem>
-
         </EuiFlexGroup>
-
       </div>
     );
   }
