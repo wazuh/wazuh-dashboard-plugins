@@ -86,8 +86,8 @@ export class GenericRequest {
       }
       return data;
     }catch(err){
-        return ((err || {}).message) || false
-        ? Promise.reject(err.message)
+        return (((err || {}).response || {}).data || {}).message || false
+        ? Promise.reject(err.response.data.message)
         : Promise.reject(err || 'Server did not respond');
     }
   }

@@ -18,6 +18,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ApiRequest } from '../../react-services/api-request';
+import { SavedObject } from '../../react-services/saved-objects';
 
 export class HealthCheck {
   /**
@@ -86,19 +87,14 @@ export class HealthCheck {
    */
   async checkPatterns() {
     try {
-      const data = await this.savedObjectsClient.get(
-        'index-pattern',
-        AppState.getCurrentPattern()
-      );
-      const patternTitle = data.attributes.title;
 
+      const patternId = AppState.getCurrentPattern();
+      let patternTitle = "";
       if (this.checks.pattern) {
         const i = this.results.map(item => item.id).indexOf(2);
-        const patternData = await this.genericReq.request(
-          'GET',
-          `/elastic/index-patterns/${patternTitle}`
-        );
-        if (!patternData.data.status) {
+        var patternData = await SavedObject.existsIndexPattern(patternId);
+        patternTitle = patternData.title;
+        if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList();
           if(patternList.length){
             return this.checkPatterns();
@@ -113,6 +109,10 @@ export class HealthCheck {
       }
 
       if (this.checks.template) {
+        if(!patternTitle){
+          var patternData = await SavedObject.existsIndexPattern(patternId);
+          patternTitle = patternData.title;
+        }
         const i = this.results.map(item => item.id).indexOf(3);
         const templateData = await this.genericReq.request(
           'GET',

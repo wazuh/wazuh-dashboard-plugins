@@ -13,6 +13,7 @@
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
+import { SavedObject } from '../../react-services/saved-objects';
 
 export function getIp(
   indexPatterns,
@@ -45,9 +46,9 @@ export function getIp(
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
       } else {
-        const data = await genericReq.request('GET', '/elastic/index-patterns');
+        const data = await SavedObject.getListOfWazuhValidIndexPatterns();
 
-        if (!data || !data.data || !data.data.data || !data.data.data.length) {
+        if (!data || !data.length) {
           wzMisc.setBlankScr('Sorry but no valid index patterns were found');
           $location.search('tab', null);
           $location.path('/blank-screen');

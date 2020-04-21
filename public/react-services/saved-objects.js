@@ -85,7 +85,15 @@ export class SavedObject {
         `/api/saved_objects/index-pattern/${patternID}`
       );
 
-      return result.data;
+      const title = (((result || {}).data || {}).attributes || {}).title;
+      if(title){
+        return {
+          data: "Index pattern found",
+          status: true,
+          statusCode: 200,
+          title: title
+        };
+      }
     } catch (error) {
       return ((error || {}).data || {}).message || false
         ? error.data.message
