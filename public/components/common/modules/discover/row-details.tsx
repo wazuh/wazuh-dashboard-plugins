@@ -10,14 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiDescriptionList,
   EuiCodeBlock,
   EuiPanel,
   EuiTitle,
   EuiSpacer,
-  EuiTable,
+  EuiIcon,
   EuiToolTip,
   EuiFlexGroup,
   EuiLink,
@@ -331,46 +331,56 @@ export class RowDetails extends Component {
     const compliance = this.buildCompliance(item);
 
     return (
-      <EuiFlexGroup style={{ height: 437, marginTop: 0 }}>
-        {/* General info */}
-        <EuiFlexItem>
-          <EuiPanel paddingSize="m">
-            <EuiTitle size={'s'}>
-              <h3>Information</h3>
-            </EuiTitle>
-            <EuiSpacer size="s" />
-            {this.renderInfo(id, level, file, path)}
-            {/* Groups */}
-            <EuiSpacer size={'m'} />
-            <EuiTitle size={'s'}>
-              <h3>Groups</h3>
-            </EuiTitle>
-            <EuiSpacer size="s" />
-            {this.renderGroups(groups)}
-          </EuiPanel>
-        </EuiFlexItem>
-        {/* Details */}
-        <EuiFlexItem>
-          <EuiPanel paddingSize="m">
-            <EuiTitle size={'s'}>
-              <h3>Details</h3>
-            </EuiTitle>
-            <EuiSpacer size="s" />
-            {this.renderDetails(details)}
-          </EuiPanel>
-        </EuiFlexItem>
-        {Object.keys(compliance).length > 0 && (
+      <Fragment>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false} style={{ fontSize: 14 }}>
+            <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank">
+              <EuiIcon type="popout" color='primary' />&nbsp;
+              View in Rules
+            </a>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup style={{ height: 416, marginTop: 0 }}>
+          {/* General info */}
           <EuiFlexItem>
             <EuiPanel paddingSize="m">
               <EuiTitle size={'s'}>
-                <h3>Compliance</h3>
+                <h3>Information</h3>
               </EuiTitle>
               <EuiSpacer size="s" />
-              {this.renderCompliance(compliance)}
+              {this.renderInfo(id, level, file, path)}
+              {/* Groups */}
+              <EuiSpacer size={'m'} />
+              <EuiTitle size={'s'}>
+                <h3>Groups</h3>
+              </EuiTitle>
+              <EuiSpacer size="s" />
+              {this.renderGroups(groups)}
             </EuiPanel>
           </EuiFlexItem>
-        )}
-      </EuiFlexGroup>
+          {/* Details */}
+          <EuiFlexItem>
+            <EuiPanel paddingSize="m">
+              <EuiTitle size={'s'}>
+                <h3>Details</h3>
+              </EuiTitle>
+              <EuiSpacer size="s" />
+              {this.renderDetails(details)}
+            </EuiPanel>
+          </EuiFlexItem>
+          {Object.keys(compliance).length > 0 && (
+            <EuiFlexItem>
+              <EuiPanel paddingSize="m">
+                <EuiTitle size={'s'}>
+                  <h3>Compliance</h3>
+                </EuiTitle>
+                <EuiSpacer size="s" />
+                {this.renderCompliance(compliance)}
+              </EuiPanel>
+            </EuiFlexItem>
+          )}
+        </EuiFlexGroup>
+      </Fragment>
     )
   }
 
@@ -419,7 +429,7 @@ export class RowDetails extends Component {
       <div>
         {this.getTabs()}
         <EuiFlexGroup>
-          <EuiFlexItem style={{ padding: '16px 0px' }}>
+          <EuiFlexItem style={{ padding: '16px 0px 4px 16px' }}>
             {this.state.selectedTabId === 'table' && (
               this.getTable()
             )}
