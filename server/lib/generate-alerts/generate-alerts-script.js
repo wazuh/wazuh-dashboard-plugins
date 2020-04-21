@@ -266,6 +266,8 @@ function generateAlert(params) {
 
     if (params.vulnerabilities) {
         alert.rule.groups.push("vulnerability-detector");
+        alert.rule.gdpr = ['IV_35.7.d'];
+        alert.rule.pci_dss = ['11.2.1', '11.2.3'];
         alert.data.vulnerability = {};
         alert.data.vulnerability.package = {};
 
