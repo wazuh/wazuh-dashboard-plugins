@@ -284,13 +284,16 @@ function generateAlert(params) {
     
     if (params.osquery) {
         alert.rule.groups.push("osquery");
-        alert.rule.description = randomArrayItem(Osquery.ruleDescription);
         alert.data.osquery = {};
-
-        alert.data.osquery.name = randomArrayItem(Osquery.name);
-        alert.data.osquery.action = randomArrayItem(Osquery.action);
-        alert.data.osquery.calendarTime = new Date(randomDate());
-        alert.data.osquery.pack = randomArrayItem(Osquery.pack);
+        if(randomIntervalInteger(0, 5) === 0) {
+            alert.rule.description = 'osquery error message';
+        } else {
+            let dataOsquery = randomArrayItem(Osquery.dataOsquery);
+            alert.data.osquery = dataOsquery.osquery;
+            alert.data.osquery.calendarTime = alert.timestamp;
+            alert.rule.description = dataOsquery.rule.description;
+            (randomIntervalInteger(0, 99) === 0) ? alert.data.osquery.action = 'removed': null;
+        }
     }
 
     if (params.win_authentication_failed || (params.probability_win_authentication_failed && randomProbability(params.probability_win_authentication_failed))){
