@@ -31,6 +31,7 @@ import { ApiRequest } from '../../../../react-services/api-request';
 
 
 export class RowDetails extends Component {
+  _isMount = false;
   state: {
     selectedTabId: string,
     ruleData: {
@@ -93,9 +94,16 @@ export class RowDetails extends Component {
   }
 
   async componentDidMount() {
+    this._isMount = true;
     const rulesDataResponse = await ApiRequest.request('GET', `/rules`, { q: `id=${this.props.item.rule.id}` });
     const ruleData = (rulesDataResponse.data || {}).data || {};
-    this.setState({ ruleData })
+    if(this._isMount){
+      this.setState({ ruleData })
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   getChildFromPath(object, path) {
