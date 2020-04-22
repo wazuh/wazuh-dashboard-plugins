@@ -43,7 +43,6 @@ export function getIp(
 
       let currentPattern = '';
 
-      console.log("aki")
       if (AppState.getCurrentPattern()) {
         // There's cookie for the pattern
         currentPattern = AppState.getCurrentPattern();
@@ -52,18 +51,6 @@ export function getIp(
           $location.search('tab', null);
           $location.path('/health-check');
         }
-        /*
-        const data = await PatternHandler.getPatternList();
-        console.log("22", data)
-
-        if (!data || !data.length) {
-          wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-          $location.search('tab', null);
-          $location.path('/blank-screen');
-          return;
-        }
-        currentPattern = data[0].id;
-        AppState.setCurrentPattern(currentPattern);*/
       }
 
       const onlyWazuhAlerts = savedObjects.filter(
@@ -85,7 +72,6 @@ export function getIp(
         stateValFound: false
       });
     } catch (error) {
-      console.log("12", error)
       deferred.reject(error);
       wzMisc.setBlankScr(
         errorHandler.handle(error, 'Elasticsearch', false, true)

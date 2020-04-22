@@ -329,7 +329,6 @@ export class HealthCheck {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
-      console.log("getlist", error)
       this.handleError(error);
     }
   }
