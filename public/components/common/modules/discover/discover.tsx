@@ -22,6 +22,7 @@ import { RowDetails } from './row-details';
 import { npSetup } from 'ui/new_platform';
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import DateMatch from '@elastic/datemath'
 import {
   EuiBasicTable,
   EuiLoadingSpinner,
@@ -159,6 +160,7 @@ export class Discover extends Component {
   };
 
   buildFilter() {
+    const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds)?.toDate().getTime() : ds;
     const { searchBarFilters, query } = this.state;
     const elasticQuery =
       esQuery.buildEsQuery(
@@ -169,10 +171,11 @@ export class Discover extends Component {
       );
     const pattern = AppState.getCurrentPattern();
     const { filters, sortField, sortDirection } = this.state;
-    const { from, to } = this.timefilter.getTime();
+    const { from:oldFrom, to:oldTo } = this.timefilter.getTime();
     const sort = { ...(sortField && { [sortField]: { "order": sortDirection } }) };
     const offset = Math.floor((this.state.pageIndex * this.state.pageSize) / this.state.requestSize) * this.state.requestSize;
-
+    const from = dateParse(oldFrom);
+    const to = dateParse(oldTo);
     return { filters, sort, from, to, offset, pattern, elasticQuery };
   }
 
