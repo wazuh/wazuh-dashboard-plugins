@@ -190,15 +190,10 @@ function generateAlert(params) {
     }
 
     if (params.docker) {
-        alert.rule.groups.push("docker");
-        alert.data.docker = {};
-        alert.data.docker.Actor = {};
-        alert.data.docker.Actor.Attributes = {};
-
-        alert.data.docker.Actor.Attributes.image = randomArrayItem(Docker.actorAttributesImage);
-        alert.data.docker.Actor.Attributes.name = randomArrayItem(Docker.actorAttributesName);
-        alert.data.docker.Type = randomArrayItem(Docker.type);
-        alert.data.docker.Action = randomArrayItem(Docker.action);
+        const dataDocker = randomArrayItem(Docker.dataDocker);
+        alert.data = {};
+        alert.data = dataDocker.data;
+        alert.rule = dataDocker.rule;
     }
 
     if (params.mitre) {
