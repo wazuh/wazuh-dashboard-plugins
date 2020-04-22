@@ -198,9 +198,8 @@ export class Discover extends Component {
   columns() {
     return [
       {
-        field: '',
-        name: '',
-        width: 25,
+        width: "25px",
+        isExpander: true,
         render: item => {
           return (
             <EuiIcon size="s" type={this.state.itemIdToExpandedRowMap[item._id] ? "arrowDown" : "arrowRight"} />
