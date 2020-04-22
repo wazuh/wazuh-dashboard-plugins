@@ -14,6 +14,7 @@
 import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import { updateCurrentApi, updateShowMenu } from '../redux/actions/appStateActions';
+import { GenericRequest } from '../react-services/generic-request';
 
 
 export class AppState {
@@ -22,12 +23,12 @@ export class AppState {
      * Returns if the extension 'id' is enabled
      * @param {id} id 
      */
-    static getExtensions(id) {
-        try{
-            const extensions = Cookies.get('currentExtensions') ? decodeURI(Cookies.get('currentExtensions')) : false;
-            const parsedExtensions = extensions ? JSON.parse(extensions) : false;
-            return parsedExtensions ? parsedExtensions[id] : false; 
-        }catch(err){
+    static getExtensions = async (id) => {
+        try {
+            const data = await GenericRequest.request('GET', `/api/extensions/${id}`);
+            const extensions = data.data.extensions;
+            return Object.keys(extensions).length ? extensions : false;
+        } catch (err) {
             console.log("Error get extensions");
             console.log(err);
             throw err;
@@ -39,18 +40,10 @@ export class AppState {
      * @param {*} id 
      * @param {*} extensions 
      */
-    static setExtensions(id, extensions) {
-        try{
-            const decodedExtensions = Cookies.get('currentExtensions') ? decodeURI(Cookies.get('currentExtensions')) : false;
-            const current = decodedExtensions ? JSON.parse(decodedExtensions) : {};
-            current[id] = extensions;
-            const exp = new Date();
-            exp.setDate(exp.getDate() + 365);
-            if (extensions) {
-                const encodedExtensions = encodeURI(JSON.stringify(current));
-                Cookies.set('currentExtensions', encodedExtensions, { expires: exp, path: window.location.pathname});
-            }
-        }catch(err){
+    static setExtensions = async (id, extensions) => {
+        try {
+            await GenericRequest.request('POST', '/api/extensions', { id, extensions });
+        } catch (err) {
             console.log("Error set extensions");
             console.log(err);
             throw err;
@@ -62,10 +55,10 @@ export class AppState {
      * Cluster setters and getters
      **/
     static getClusterInfo() {
-        try{
+        try {
             const clusterInfo = Cookies.get('clusterInfo') ? decodeURI(Cookies.get('clusterInfo')) : false;
-            return clusterInfo ?  JSON.parse(clusterInfo) : {};
-        }catch(err){
+            return clusterInfo ? JSON.parse(clusterInfo) : {};
+        } catch (err) {
             console.log("Error get cluster info");
             console.log(err);
             throw err;
@@ -77,14 +70,14 @@ export class AppState {
      * @param {*} cluster_info 
      */
     static setClusterInfo(cluster_info) {
-        try{
+        try {
             const encodedClusterInfo = encodeURI(JSON.stringify(cluster_info));
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (cluster_info) {
-                Cookies.set('clusterInfo', encodedClusterInfo, { expires: exp, path: window.location.pathname  });
+                Cookies.set('clusterInfo', encodedClusterInfo, { expires: exp, path: window.location.pathname });
             }
-        }catch(err){
+        } catch (err) {
             console.log("Error set cluster info");
             console.log(err);
             throw err;
@@ -96,26 +89,26 @@ export class AppState {
      * @param {*} date 
      */
     static setCreatedAt(date) {
-        try{
+        try {
             const createdAt = encodeURI(date);
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             Cookies.set('createdAt', createdAt, { expires: exp, path: window.location.pathname });
-        }catch(err){
+        } catch (err) {
             console.log("Error set createdAt date");
             console.log(err);
             throw err;
         }
-       }
+    }
 
     /**
      * Get 'createdAt' value   
      */
     static getCreatedAt() {
-        try{
+        try {
             const createdAt = Cookies.get('createdAt') ? decodeURI(Cookies.get('createdAt')) : false;
             return createdAt ? createdAt : false;
-        }catch(err){
+        } catch (err) {
             console.log("Error get createdAt date");
             console.log(err);
             throw err;
@@ -127,10 +120,10 @@ export class AppState {
      * Get 'API' value   
      */
     static getCurrentAPI() {
-        try{
+        try {
             const currentAPI = Cookies.get('currentApi');
             return currentAPI ? decodeURI(currentAPI) : false;
-        }catch(err){
+        } catch (err) {
             console.log("Error get current Api");
             console.log(err);
             throw err;
@@ -143,7 +136,7 @@ export class AppState {
     static removeCurrentAPI() {
         const updateApiMenu = updateCurrentApi(false);
         store.dispatch(updateApiMenu);
-        return Cookies.remove('currentApi', { path : window.location.pathname });
+        return Cookies.remove('currentApi', { path: window.location.pathname });
     }
 
     /**
@@ -151,18 +144,18 @@ export class AppState {
      * @param {*} date 
      */
     static setCurrentAPI(API) {
-        try{
+        try {
             const encodedApi = encodeURI(API);
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (API) {
                 Cookies.set('currentApi', encodedApi, { expires: exp, path: window.location.pathname });
-                try{
+                try {
                     const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
                     store.dispatch(updateApiMenu);
-                }catch(err){ }
+                } catch (err) { }
             }
-        }catch(err){
+        } catch (err) {
             console.log("Error set current API");
             console.log(err);
             throw err;
@@ -173,7 +166,7 @@ export class AppState {
      * Get 'APISelector' value   
      */
     static getAPISelector() {
-        return Cookies.get('APISelector') ? decodeURI(Cookies.get('APISelector'))=="true" : false;
+        return Cookies.get('APISelector') ? decodeURI(Cookies.get('APISelector')) == "true" : false;
     }
 
     /**
@@ -182,7 +175,7 @@ export class AppState {
      */
     static setAPISelector(value) {
         const encodedPattern = encodeURI(value);
-        Cookies.set('APISelector', encodedPattern, { path: window.location.pathname});
+        Cookies.set('APISelector', encodedPattern, { path: window.location.pathname });
     }
 
 
@@ -190,7 +183,7 @@ export class AppState {
      * Get 'patternSelector' value   
      */
     static getPatternSelector() {
-        return Cookies.get('patternSelector') ? decodeURI(Cookies.get('patternSelector'))=="true" : false;
+        return Cookies.get('patternSelector') ? decodeURI(Cookies.get('patternSelector')) == "true" : false;
     }
 
     /**
@@ -199,7 +192,7 @@ export class AppState {
      */
     static setPatternSelector(value) {
         const encodedPattern = encodeURI(value);
-        Cookies.set('patternSelector', encodedPattern, { path: window.location.pathname});
+        Cookies.set('patternSelector', encodedPattern, { path: window.location.pathname });
     }
 
 
@@ -222,9 +215,9 @@ export class AppState {
      */
     static getCurrentPattern() {
         const currentPattern = Cookies.get('currentPattern') ? decodeURI(Cookies.get('currentPattern')) : "";
-         // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
-        if(currentPattern && currentPattern[0] === '"' && currentPattern[currentPattern.length-1] === '"'){
-            const newPattern = currentPattern.substring(1, currentPattern.length-1);
+        // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
+        if (currentPattern && currentPattern[0] === '"' && currentPattern[currentPattern.length - 1] === '"') {
+            const newPattern = currentPattern.substring(1, currentPattern.length - 1);
             this.setCurrentPattern(newPattern);
         }
         return Cookies.get('currentPattern') ? decodeURI(Cookies.get('currentPattern')) : "";
@@ -235,7 +228,7 @@ export class AppState {
      * Remove 'currentPattern' value   
      */
     static removeCurrentPattern() {
-        return Cookies.remove('currentPattern', { path : window.location.pathname });
+        return Cookies.remove('currentPattern', { path: window.location.pathname });
     }
 
 
@@ -286,9 +279,9 @@ export class AppState {
         for (var key in params) {
             navigate[key] = params[key];
         }
-        if(navigate){
+        if (navigate) {
             const encodedURI = encodeURI(JSON.stringify(navigate));
-            Cookies.set('navigate', encodedURI, {path: window.location.pathname});
+            Cookies.set('navigate', encodedURI, { path: window.location.pathname });
         }
     }
 
@@ -299,10 +292,10 @@ export class AppState {
     }
 
     static removeNavigation() {
-        return Cookies.remove('navigate', {path: window.location.pathname});
+        return Cookies.remove('navigate', { path: window.location.pathname });
     }
 
-    static setWzMenu(isVisible=true) {
+    static setWzMenu(isVisible = true) {
         const showMenu = updateShowMenu(isVisible);
         store.dispatch(showMenu);
     }

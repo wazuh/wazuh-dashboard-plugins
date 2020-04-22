@@ -55,7 +55,7 @@ export class OverviewController {
   /**
    * On controller loads
    */
-  $onInit() {
+  async $onInit() {
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -65,7 +65,7 @@ export class OverviewController {
     this.visFactoryService.clearAll();
 
     const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(currentApi);
+    const extensions = await AppState.getExtensions(currentApi);
     this.extensions = extensions;
 
     this.wzMonitoringEnabled = false;

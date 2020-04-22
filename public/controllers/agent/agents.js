@@ -111,7 +111,7 @@ export class AgentsController {
   /**
    * On controller loads
    */
-  $onInit() {
+  async $onInit() {
     const savedTimefilter = this.commonData.getTimefilter();
     if (savedTimefilter) {
       timefilter.setTime(savedTimefilter);
@@ -143,7 +143,7 @@ export class AgentsController {
     this.visFactoryService.clearAll();
 
     const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(currentApi);
+    const extensions = await AppState.getExtensions(currentApi);
     this.$scope.extensions = extensions;
 
     // Getting possible target location
