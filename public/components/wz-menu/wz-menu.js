@@ -48,6 +48,7 @@ class WzMenu extends Component {
     this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
     this.indexPatterns = npStart.plugins.data.indexPatterns;
+    this.isLoading = false;
   }
 
   async componentDidMount() {
@@ -126,7 +127,7 @@ class WzMenu extends Component {
       if (currentTab !== this.state.currentMenuTab) {
         this.setState({ currentMenuTab: currentTab })
       }
-
+    
       const list = await PatternHandler.getPatternList();
       if (!list) return;
 
@@ -164,6 +165,7 @@ class WzMenu extends Component {
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
     }
+    this.isLoading = false;
   }
 
   changePattern = (event) => {

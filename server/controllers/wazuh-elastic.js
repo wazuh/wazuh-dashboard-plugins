@@ -303,6 +303,24 @@ export class WazuhElasticCtrl {
     }
     return list;
   }
+  
+  /**
+   * This get the current space
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} current namespace
+   */
+  async getCurrentSpace(req, reply){
+    try{
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      return {namespace};
+    }catch(err){
+      log('wazuh-elastic:getCurrentSpace', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+
+  }
 
   /**
    * This get the list of index-patterns

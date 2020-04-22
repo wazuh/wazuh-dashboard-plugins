@@ -14,6 +14,16 @@ import { WazuhElasticCtrl } from '../controllers';
 export function WazuhElasticRouter(server) {
   const ctrl = new WazuhElasticCtrl(server);
 
+    // Get index patterns list
+    server.route({
+      method: 'GET',
+      path: '/elastic/current-space',
+      handler(req, res) {
+        return ctrl.getCurrentSpace(req, res);
+      }
+    });
+  
+
   // Get index patterns list
   server.route({
     method: 'GET',
