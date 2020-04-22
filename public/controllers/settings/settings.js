@@ -16,6 +16,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzMisc } from '../../factories/misc';
 import { ApiCheck } from '../../react-services/wz-api-check';
+import { SavedObject } from '../../react-services/saved-objects';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 
@@ -239,9 +240,9 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      const patternList = await this.genericReq.request('GET', '/elastic/index-patterns', {});
+      const patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
 
-      this.indexPatterns = patternList.data.data;
+      this.indexPatterns = patternList;
 
       if (!this.indexPatterns.length) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
@@ -334,6 +335,8 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      this.load=false;
+      this.$scope.$applyAsync();
       if (!silent) {
         this.errorHandler.handle(error);
       }
