@@ -14,7 +14,6 @@
 import { IPs, Users, Ports, Paths, Win_Hostnames, GeoLocation, Agents } from './sample-data/common';
 import { PCI_DSS, GDPR, HIPAA, GPG13, NIST_800_53 } from './sample-data/regulatory-compliance';
 
-//AWS
 import * as Audit from './sample-data/audit';
 import * as Authentication from './sample-data/authentication';
 import * as AWS from './sample-data/aws';
@@ -148,18 +147,124 @@ function generateAlert(params) {
     }
 
     if (params.aws) {
-        alert.rule.groups.push("amazon");
-        alert.rule.description = randomArrayItem(AWS.ruleDescription);
-        alert.data.aws = {};
-        alert.data.aws.source = randomArrayItem(AWS.source);
-        alert.GeoLocation = {
-            location: randomArrayItem(AWS.geoLocation)
-        };
-        alert.data.aws.log_info = {
-            s3bucket: randomArrayItem(AWS.buckets)
-        };
-        alert.data.aws.accountId = randomArrayItem(AWS.accountId);
-        alert.data.aws.region = randomArrayItem(AWS.region);
+        let randomType = randomArrayItem(['guarddutyPortProbe', 'apiCall', 'networkConnection', 'iamPolicyGrantGlobal']);
+
+        const beforeDate = new Date(new Date(alert.timestamp) - 3*24*60*60*1000);
+        switch (randomType){
+            case 'guarddutyPortProbe': {
+                const typeAlert = AWS.guarddutyPortProbe;
+
+                alert.data = { ...typeAlert.data };
+                alert.data.integration = 'aws';
+                
+                alert.data.aws.resource.instanceDetails = {...randomArrayItem(AWS.instanceDetails)};
+                alert.data.aws.resource.instanceDetails.iamInstanceProfile.arn = interpolateAlertProps(typeAlert.data.aws.resource.instanceDetails.iamInstanceProfile.arn, alert);
+                alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
+                alert.data.aws.accountId = randomArrayItem(AWS.accountId);
+                alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.service.eventLastSeen = formatDate(new Date(alert.timestamp), 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.service.action.portProbeAction.portProbeDetails.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)}
+                alert.data.aws.log_info = {
+                    s3bucket: 'wazuh-aws-wodle',
+                    log_file: `guardduty/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
+                }
+                alert.data.aws.service.count = `${randomIntervalInteger(400,4000)}`;
+                alert.data.aws.createdAt = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ')
+                
+                alert.rule = {...typeAlert.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,50);
+                alert.rule.description = interpolateAlertProps(typeAlert.rule.description, alert);
+
+                alert.decoder = {...typeAlert.decoder};
+                alert.location = typeAlert.location;
+                break
+            }
+            case 'apiCall': {
+                const typeAlert = AWS.apiCall;
+
+                alert.data = { ...typeAlert.data };
+                alert.data.integration = 'aws';
+                
+                alert.data.aws.resource.accessKeyDetails.userName = randomArrayItem(Users);
+                alert.data.aws.log_info = {
+                    s3bucket: 'wazuh-aws-wodle',
+                    log_file: `guardduty/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
+                }
+                alert.data.aws.accountId = randomArrayItem(AWS.accountId);
+                alert.data.aws.service.action.awsApiCallAction.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)}
+                alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.service.eventLastSeen = formatDate(new Date(alert.timestamp), 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.createdAt = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
+                alert.data.aws.description = interpolateAlertProps(alert.data.aws.description, alert);
+                const count = `${randomIntervalInteger(400,4000)}`;
+                alert.data.aws.service.additionalInfo.recentApiCalls.count = count;
+                alert.data.aws.service.count = count;
+
+                alert.rule = {...typeAlert.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,50);
+                alert.rule.description = interpolateAlertProps(typeAlert.rule.description, alert);
+
+                alert.decoder = {...typeAlert.decoder};
+                alert.location = typeAlert.location;
+                break
+            }
+            case 'networkConnection': {
+                const typeAlert = AWS.networkConnection;
+
+                alert.data = { ...typeAlert.data };
+                alert.data.integration = 'aws';
+                
+                alert.data.aws.resource.instanceDetails = {...randomArrayItem(AWS.instanceDetails)};
+                alert.data.aws.log_info = {
+                    s3bucket: 'wazuh-aws-wodle',
+                    log_file: `guardduty/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`
+                }
+                alert.data.aws.description = interpolateAlertProps(alert.data.aws.description, alert);
+                alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
+                alert.data.aws.accountId = randomArrayItem(AWS.accountId);
+                alert.data.aws.createdAt = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.service.action.networkConnectionAction.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)}
+                alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.service.eventLastSeen = formatDate(new Date(alert.timestamp), 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.service.additionalInfo = {
+                    localPort: `${randomArrayItem(Ports)}`,
+                    outBytes: `${randomIntervalInteger(1000,3000)}`,
+                    inBytes: `${randomIntervalInteger(1000,10000)}`,
+                    unusual: `${randomIntervalInteger(1000,10000)}`
+                };
+                alert.data.aws.service.count = `${randomIntervalInteger(400,4000)}`;
+                alert.data.aws.service.action.networkConnectionAction.localIpDetails.ipAddressV4 = alert.data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress;
+
+                alert.rule = {...typeAlert.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,50);
+                alert.rule.description = interpolateAlertProps(typeAlert.rule.description, alert);
+
+                alert.decoder = {...typeAlert.decoder};
+                alert.location = typeAlert.location;
+                break
+            }
+            case 'iamPolicyGrantGlobal': {
+                const typeAlert = AWS.iamPolicyGrantGlobal;
+
+                alert.data = { ...typeAlert.data };
+                alert.data.integration = 'aws';
+                alert.data.aws.summary.Timestamps = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.log_info = {
+                    s3bucket: 'wazuh-aws-wodle',
+                    log_file: `macie/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_macie-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s')}-0b1ede94-f399-4e54-8815-1c6587eee3b1//firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
+                };
+                alert.data.aws["created-at"] = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                
+                alert.rule = {...typeAlert.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,50);
+
+                alert.decoder = {...typeAlert.decoder};
+                alert.location = typeAlert.location;
+                break
+            }
+            default: {}
+        }
     }
 
     if (params.audit) {
@@ -324,8 +429,8 @@ function generateAlert(params) {
             timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
             hostname: alert.manager.name
         };
-        let typeAlert = randomArrayItem(['invalidLoginPassword','invalidLoginUser', 'multipleAuthenticationFailures','windowsInvalidLoginPassword','userLoginFailed', 'passwordCheckFailed', 'nonExistentUser', 'bruteForceTryingAccessSystem']);
-
+        let typeAlert = randomArrayItem(['invalidLoginPassword','invalidLoginUser', 'multipleAuthenticationFailures','windowsInvalidLoginPassword','userLoginFailed', 'passwordCheckFailed', 'nonExistentUser', 'bruteForceTryingAccessSystem', 'authenticationSuccess', 'maximumAuthenticationAttemptsExceeded']);
+        
         switch (typeAlert){
             case 'invalidLoginPassword':{
                 alert.location = Authentication.invalidLoginPassword.location;
@@ -354,7 +459,7 @@ function generateAlert(params) {
                 alert.rule = {...Authentication.windowsInvalidLoginPassword.rule };
                 alert.rule.groups = [...Authentication.windowsInvalidLoginPassword.rule.groups];
                 alert.rule.frequency = randomIntervalInteger(5,50);
-                alert.data.win = {...Authentication.windowsInvalidLoginPassword.data_win}
+                alert.data.win = {...Authentication.windowsInvalidLoginPassword.data_win};
                 alert.data.win.eventdata.ipAddress = randomArrayItem(IPs);
                 alert.data.win.eventdata.ipPort = randomArrayItem(Ports);
                 alert.data.win.system.computer = randomArrayItem(Win_Hostnames);
@@ -399,7 +504,6 @@ function generateAlert(params) {
                 alert.location = Authentication.nonExistentUser.location;
                 alert.rule = {...Authentication.nonExistentUser.rule};
                 alert.rule.groups = [...Authentication.nonExistentUser.rule.groups];
-                alert.rule.firedtimes = randomIntervalInteger(2,15);
                 alert.full_log = interpolateAlertProps(Authentication.nonExistentUser.full_log, alert);
                 break
             }
@@ -407,7 +511,6 @@ function generateAlert(params) {
                 alert.location = Authentication.bruteForceTryingAccessSystem.location;
                 alert.rule = {...Authentication.bruteForceTryingAccessSystem.rule};
                 alert.rule.groups = [...Authentication.bruteForceTryingAccessSystem.rule.groups];
-                alert.rule.firedtimes = randomIntervalInteger(2,15);
                 alert.full_log = interpolateAlertProps(Authentication.bruteForceTryingAccessSystem.full_log, alert);
                 break
             }
@@ -417,8 +520,7 @@ function generateAlert(params) {
                 alert.rule.groups = [...Authentication.reverseLoockupError.rule.groups];
                 alert.data = {
                     srcip: randomArrayItem(IPs)
-                }
-                alert.rule.firedtimes = randomIntervalInteger(2,15);
+                };
                 alert.full_log = interpolateAlertProps(Authentication.reverseLoockupError.full_log, alert);
             }
             case 'insecureConnectionAttempt':{
@@ -428,12 +530,34 @@ function generateAlert(params) {
                 alert.data = {
                     srcip: randomArrayItem(IPs),
                     srcport: randomArrayItem(Ports),
-                }
-                alert.rule.firedtimes = randomIntervalInteger(2,15);
+                };
                 alert.full_log = interpolateAlertProps(Authentication.insecureConnectionAttempt.full_log, alert);
+            }
+            case 'authenticationSuccess':{
+                alert.location = Authentication.authenticationSuccess.location;
+                alert.rule = {...Authentication.authenticationSuccess.rule};
+                alert.rule.groups = [...Authentication.authenticationSuccess.rule.groups];
+                alert.data = {
+                    srcip: randomArrayItem(IPs),
+                    srcport: randomArrayItem(Ports),
+                    dstuser: randomArrayItem(Users)
+                };
+                alert.full_log = interpolateAlertProps(Authentication.authenticationSuccess.full_log, alert);
+            }
+            case 'maximumAuthenticationAttemptsExceeded':{
+                alert.location = Authentication.maximumAuthenticationAttemptsExceeded.location;
+                alert.rule = {...Authentication.maximumAuthenticationAttemptsExceeded.rule};
+                alert.rule.groups = [...Authentication.maximumAuthenticationAttemptsExceeded.rule.groups];
+                alert.data = {
+                    srcip: randomArrayItem(IPs),
+                    srcport: randomArrayItem(Ports),
+                    dstuser: randomArrayItem(Users)
+                };
+                alert.full_log = interpolateAlertProps(Authentication.maximumAuthenticationAttemptsExceeded.full_log, alert);
             }
             default: {}
         }
+        alert.rule.firedtimes = randomIntervalInteger(2,15);
     }
 
     if( params.ssh ){
@@ -455,14 +579,15 @@ function generateAlert(params) {
             timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
             hostname: alert.manager.name
         };
-        const shhAlert = randomArrayItem(SSH.data);
-        alert.location = shhAlert.location;
-        alert.rule = {...shhAlert.rule};
-        alert.rule.groups = [...shhAlert.rule.groups];
-        alert.rule.firedtimes = randomIntervalInteger(4,15);
-        alert.full_log = interpolateAlertProps(shhAlert.full_log, alert);
+        const typeAlert = randomArrayItem(SSH.data);
+        alert.location = typeAlert.location;
+        alert.rule = {...typeAlert.rule};
+        alert.rule.groups = [...typeAlert.rule.groups];
+        alert.rule.firedtimes = randomIntervalInteger(1,15);
+        alert.full_log = interpolateAlertProps(typeAlert.full_log, alert);
 
     }
+
     if ( params.windows ){
         alert.rule.groups.push('windows');
         if(params.windows.service_control_manager){
@@ -625,7 +750,7 @@ export {
 
 Examples:
 
-    // --------- Generate one alert ---------
+    // --------- Generate an alert ---------
 
     - Generate syscheck (Integrity monitoring) sample alert
     generateAlert({syscheck: true});
