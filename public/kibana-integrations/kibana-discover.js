@@ -326,7 +326,7 @@ function discoverController(
         $scope.searchSource.getField('query') || {
           query: '',
           language:
-            localStorage.get('kibana.userQueryLanguage') || config.get('search:queryLanguage'),
+            (localStorage.get('kibana.userQueryLanguage') || [])[1] || config.get('search:queryLanguage'),
         },
       sort: getSort.array(
         savedSearch.sort,
