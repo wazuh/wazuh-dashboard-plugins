@@ -21,7 +21,15 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
 import { AppState } from '../../../../react-services/app-state';
+
 export class FlyoutDetail extends Component {
+  props!: {
+    fileName: string
+    agentId: string
+    type: string
+    closeFlyout():void
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -49,29 +57,29 @@ export class FlyoutDetail extends Component {
 
   render() {
     return (
-          <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.props.fileName} maxWidth="70%">
-            <EuiFlyoutHeader hasBorder className="flyout-header" >
-              <EuiTitle size="s">
-                <h2 id={this.props.fileName}>{this.props.fileName}</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            {this.state.isLoading && (
-              <EuiFlyoutBody className="flyout-body" > 
-                {this.state.error && (<div>{this.state.error}</div>)  || (<EuiLoadingContent style={{ margin: 16 }} />) } 
-              </EuiFlyoutBody>
-            )}
-            {this.state.currentFile && !this.state.isLoading &&
-              <EuiFlyoutBody className="flyout-body" > 
-                <FileDetails 
-                  currentFile={this.state.currentFile} 
-                  {...this.props} 
-                  implicitFilters={[{ 'rule.groups': "syscheck" },
-                  { 'syscheck.path': this.state.currentFile.file },
-                  { 'agent.id': this.props.agentId },
-                  this.state.clusterFilter]} />
-              </EuiFlyoutBody>
-            }
-          </EuiFlyout>
+      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.props.fileName} maxWidth="70%">
+        <EuiFlyoutHeader hasBorder className="flyout-header" >
+          <EuiTitle size="s">
+            <h2 id={this.props.fileName}>{this.props.fileName}</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        {this.state.isLoading && (
+          <EuiFlyoutBody className="flyout-body" > 
+            {this.state.error && (<div>{this.state.error}</div>)  || (<EuiLoadingContent style={{ margin: 16 }} />) } 
+          </EuiFlyoutBody>
+        )}
+        {this.state.currentFile && !this.state.isLoading &&
+          <EuiFlyoutBody className="flyout-body" > 
+            <FileDetails 
+              currentFile={this.state.currentFile} 
+              {...this.props} 
+              implicitFilters={[{ 'rule.groups': "syscheck" },
+              { 'syscheck.path': this.state.currentFile.file },
+              { 'agent.id': this.props.agentId },
+              this.state.clusterFilter]} />
+          </EuiFlyoutBody>
+        }
+      </EuiFlyout>
     )
   }
 }

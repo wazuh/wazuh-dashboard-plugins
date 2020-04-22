@@ -14,6 +14,7 @@ import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { FlyoutDetail } from './states/flyout';
 import { ModulesHelper } from '../../common/modules/modules-helper'
+import { EuiOverlayMask } from '@elastic/eui';
 export class EventsFim extends Component {
   state: {
     isFlyoutVisible: Boolean
@@ -120,12 +121,15 @@ export class EventsFim extends Component {
           )
         }
         {this.state.isFlyoutVisible &&
-          <FlyoutDetail
-            fileName={this.state.currentFile}
-            agentId={this.props.agent.id}
-            closeFlyout={() => this.closeFlyout()}
-            {...this.props}>
-          </FlyoutDetail>
+          <EuiOverlayMask 
+            onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+            <FlyoutDetail
+              fileName={this.state.currentFile}
+              agentId={this.props.agent.id}
+              closeFlyout={() => this.closeFlyout()}
+              type='file'
+              {...this.props}/>
+          </EuiOverlayMask>
         }
       </Fragment>
     )
