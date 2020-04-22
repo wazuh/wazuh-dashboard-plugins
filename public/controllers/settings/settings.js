@@ -335,6 +335,8 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      this.load=false;
+      this.$scope.$applyAsync();
       if (!silent) {
         this.errorHandler.handle(error);
       }
