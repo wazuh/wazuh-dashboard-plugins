@@ -224,6 +224,7 @@ export class WzSearchBar extends Component {
 
   makeSearch():void {
     const { inputValue, filters:currentFilters } = this.state;
+    if ( !inputValue ) { return; }
     const filters = {...currentFilters};
 
     filters['search'] = inputValue;
@@ -303,7 +304,7 @@ export class WzSearchBar extends Component {
     if (((this.suggestHandler || {}).isSearch && !searchDisable)|| !searchFormat) {
       filters = {
         ...currentFilters,
-        ['search']: inputValue,
+        ...(inputValue && {search: inputValue}),
       };
     } else if(inputValue.length > 0) {
       const { inputValue:newInput, filters:newFilters } = this.suggestHandler.onKeyPress(inputValue, currentFilters);
