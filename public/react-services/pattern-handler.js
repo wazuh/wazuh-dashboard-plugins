@@ -23,12 +23,11 @@ export class PatternHandler {
   static async getPatternList() {
     try {
       var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
-
       if (!patternList.length) { // if no valid index patterns are found we try to create the wazuh-alerts-3.x-*
         try{
           toastNotifications.add({
             color: 'warning',
-            title: 'No valid index patterns were found, proceeding to create default wauzh-alerts-3.x-* index pattern',
+            title: 'No valid index patterns were found, proceeding to create default wazuh-alerts-3.x-* index pattern',
             toastLifeTimeMs: 5000,
           });
 
@@ -50,6 +49,9 @@ export class PatternHandler {
           return;
         }
         // retry again with the newly created index pattern
+        if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/health-check')){
+          window.location.href = "/app/wazuh#/health-check/";
+        }
         patternList =  await SavedObject.getListOfWazuhValidIndexPatterns();
       }
 

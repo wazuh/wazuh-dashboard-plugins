@@ -102,7 +102,7 @@ export class SavedObject {
   }
 
 
-  static async createSavedObject(type, id, params) {
+  static async createSavedObject(type, id, params, fields='') {
     try {
       const result = await GenericRequest.request(
         'POST',
@@ -110,7 +110,8 @@ export class SavedObject {
         params
       );
 
-      await this.refreshFieldsOfIndexPattern(id);
+      if(type === 'index-pattern')
+        await this.refreshFieldsOfIndexPattern(id,fields);
       
       return result;
     } catch (error) {
@@ -120,15 +121,10 @@ export class SavedObject {
     }
   }
 
-  static async refreshFieldsOfIndexPattern(id) {
+  static async refreshFieldsOfIndexPattern(id,fields) {
     try {
       // same logic as Kibana when a new index is created, you need to refresh it to see its fields
       // we force the refresh of the index by requesting its fields and the assign these fields
-      const fields = await GenericRequest.request(
-        'GET',
-        `/api/index_patterns/_fields_for_wildcard?pattern=${id}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
-        {}
-      );
 
       await GenericRequest.request(
         'PUT',
@@ -154,7 +150,13 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern() {
     try {
-      await this.createSavedObject('index-pattern', 'wazuh-alerts-3.x-*', { "attributes": { "title": "wazuh-alerts-3.x-*", "timeFieldName": 'timestamp' } });
+      const fields = await GenericRequest.request( //we check if indices exist before creating the index pattern
+        'GET',
+        `/api/index_patterns/_fields_for_wildcard?pattern=wazuh-alerts-3.x-*&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+        {}
+      );
+
+      await this.createSavedObject('index-pattern', 'wazuh-alerts-3.x-*', { "attributes": { "title": "wazuh-alerts-3.x-*", "timeFieldName": 'timestamp' } }, fields);
       return;
     } catch (error) {
       return ((error || {}).data || {}).message || false

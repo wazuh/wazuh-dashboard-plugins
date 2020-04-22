@@ -128,11 +128,8 @@ class WzMenu extends Component {
         this.setState({ currentMenuTab: currentTab })
       }
     
-      if(!this.isLoading){
-        this.isLoading = true;
-        const list = await PatternHandler.getPatternList();
-        if (!list) return;
-      }
+      const list = await PatternHandler.getPatternList();
+      if (!list) return;
 
       // Get the configuration to check if pattern selector is enabled
       const config = this.wazuhConfig.getConfig();

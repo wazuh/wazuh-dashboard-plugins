@@ -97,6 +97,8 @@ export class HealthCheck {
         if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList();
           if(patternList.length){
+            const currentPattern = patternList[0].id;
+            AppState.setCurrentPattern(currentPattern);
             return this.checkPatterns();
           }else{
             this.errors.push('The selected index-pattern is not present.');
@@ -283,6 +285,7 @@ export class HealthCheck {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      console.log("getlist", error)
       this.handleError(error);
     }
   }
