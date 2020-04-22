@@ -28,7 +28,6 @@ import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
-import querystring from 'querystring';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
@@ -115,7 +114,7 @@ export class WazuhApiCtrl {
         return {
           statusCode: 200,
           data: copied,
-          idChanged: req.idChanged || null
+          idChanged: req.idChanged || req.payload.idChanged || null
         };
       }
 
@@ -158,7 +157,7 @@ export class WazuhApiCtrl {
                 if (this.checkResponseIsDown(response)) {
                   return ErrorResponse(
                     `ERROR3099 - ${response.body.message ||
-                      'Wazuh not ready yet'}`,
+                    'Wazuh not ready yet'}`,
                     3099,
                     500,
                     reply
@@ -173,7 +172,7 @@ export class WazuhApiCtrl {
                   req.idChanged = id;
                   return this.checkStoredAPI(req, reply, false);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             return ErrorResponse(error.message || error, 3020, 500, reply);
@@ -887,10 +886,11 @@ export class WazuhApiCtrl {
         }
       }
 
-      // DELETE must use URL query but we accept objects in Dev Tools
-      if (method === 'DELETE' && dataProperties.length) {
-        const query = querystring.stringify(data);
-        fullUrl += fullUrl.includes('?') ? `&${query}` : `?${query}`;
+      // DELETE and PUT must use URL query but we accept objects in Dev Tools
+      if ((method === 'DELETE' || method === 'PUT') && dataProperties.length) {
+        (Object.keys(data) || []).forEach(key => {
+          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${data[key] !== '' ? '=' : ''}${data[key]}`
+        });
         data = {};
       }
 
@@ -911,8 +911,8 @@ export class WazuhApiCtrl {
       if (!responseData) {
         responseData =
           typeof responseData === 'string' &&
-          path.includes('/files') &&
-          method === 'GET'
+            path.includes('/files') &&
+            method === 'GET'
             ? ' '
             : false;
         response.body.data = responseData;
@@ -998,7 +998,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -1139,9 +1139,9 @@ export class WazuhApiCtrl {
         params,
         cred
       );
-      
+
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
-      
+
       const totalItems = (((output || {}).body || {}).data || {}).totalItems;
 
       if (totalItems && !isList) {
@@ -1392,7 +1392,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${error.message ||
-          error}`,
+        error}`,
         4005,
         500,
         reply
@@ -1441,7 +1441,7 @@ export class WazuhApiCtrl {
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
