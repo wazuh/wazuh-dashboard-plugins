@@ -66,8 +66,9 @@ export class RegistryTable extends Component {
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters))
-      this.getSyscheck();
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
+      this.setState({pageIndex: 0}, this.getSyscheck)
+    }
   }
 
   closeFlyout() {
