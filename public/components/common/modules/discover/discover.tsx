@@ -109,7 +109,7 @@ export class Discover extends Component {
   async componentDidMount() {
     this._isMount = true;
     try {
-      this.indexPattern = await this.KibanaServices.indexPatterns.get("wazuh-alerts-3.x-*");
+      this.indexPattern = await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern());
       this.getAlerts();
     } catch (err) {
       console.log(err);
