@@ -254,6 +254,7 @@ export class StatesTable extends Component {
               agentId={this.props.agent.id}
               closeFlyout={() => this.closeFlyout()}
               type='file'
+              view='states'
               {...this.props} />
           </EuiOverlayMask>
         }

@@ -207,10 +207,9 @@ export class RegistryTable extends Component {
             fileName={this.state.currentFile.file}
             agentId={this.props.agent.id}
             closeFlyout={() => this.closeFlyout()}
-            showViewInEvents={true}
             type='registry'
-            {...this.props}>
-          </FlyoutDetail>
+            view='states'
+            {...this.props} />
         }
       </div>
     )

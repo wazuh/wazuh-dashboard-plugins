@@ -128,6 +128,7 @@ export class EventsFim extends Component {
               agentId={this.props.agent.id}
               closeFlyout={() => this.closeFlyout()}
               type='file'
+              view='events'
               {...this.props}/>
           </EuiOverlayMask>
         }

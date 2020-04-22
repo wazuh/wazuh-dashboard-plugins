@@ -175,7 +175,7 @@ export class FileDetails extends Component {
           <EuiFlexItem key={idx}>
             <EuiStat
               title={
-                  !link 
+                  !(link && this.props.view === 'states')
                   ? <span className={className}>{value}</span>
                   : <EuiLink
                       className={className}

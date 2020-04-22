@@ -27,6 +27,7 @@ export class FlyoutDetail extends Component {
     fileName: string
     agentId: string
     type: string
+    view: 'states' | 'events'
     closeFlyout():void
   }
 
