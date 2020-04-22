@@ -57,12 +57,12 @@ export class EventsFim extends Component {
   }
 
   async componentDidMount() {
-    const scope = await this.modulesHelper.getDiscoverScope();
-    this.fetchWatch = scope.$watchCollection('fetchStatus',
+    this.scope = await this.modulesHelper.getDiscoverScope();
+    this.fetchWatch = this.scope.$watchCollection('fetchStatus',
       () => {
-        if (scope.fetchStatus === 'complete') {
+        if (this.scope.fetchStatus === 'complete') {
           this.elements = false;
-          setTimeout(() => { this.getRowsField(scope) }, 1000);
+          setTimeout(() => { this.getRowsField(this.scope) }, 1000);
         }
       });
   }
@@ -85,10 +85,10 @@ export class EventsFim extends Component {
   render() {
     return (
       <Fragment>
-        {this.elements &&
+        {(this.elements && this.elements[0].firstChild) &&
           [...this.elements].map((element, idx) => {
             const text = element.textContent;
-            if (element.firstChild.tagName === 'SPAN') {
+            if ((element.firstChild || {}).tagName === 'SPAN') {
               element.removeChild(element.firstChild);
             }
             return (
