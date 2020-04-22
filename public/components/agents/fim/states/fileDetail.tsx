@@ -22,6 +22,7 @@ import {
   EuiSpacer,
   EuiStat,
   EuiLink,
+  EuiToolTip
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
 
@@ -164,19 +165,18 @@ export class FileDetails extends Component {
     const columns = this.props.type === 'file' ? this.details() : this.registryDetails();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
-      if(item.field === 'perm'){
-        //FIXIT
-        value = value.replace(/:/g, '\n').replace(/,/g, '\n');
-      }
       var link = item.link || false;
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent.agentPlatform !== 'windows')){
-        const className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
+        let className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
+        className += item.field === 'perm' ? " detail-value-perm" : "";
         return (
           <EuiFlexItem key={idx}>
             <EuiStat
               title={
-                  !(link && this.props.view === 'states')
-                  ? <span className={className}>{value}</span>
+                  !link 
+                  ? <EuiToolTip position="top" anchorClassName="detail-tooltip" content={value} delay="long">
+                      <span className={className}>{value}</span>
+                    </EuiToolTip> 
                   : <EuiLink
                       className={className}
                       onClick={() => {
