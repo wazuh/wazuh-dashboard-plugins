@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -23,6 +23,9 @@ import {
   EuiSuperSelect,
   EuiInputPopover,
   EuiSuggestItem,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSpacer
 } from '@elastic/eui';
 
 const conjuntions = { ';': 'AND ', ',': 'OR ' }
@@ -36,7 +39,7 @@ const operators = {
 
 export function ContextMenu(props) {
   const [isOpen, setIsOpen] = useState(false);
-  const panels = flattenPanelTree(panelTree(props));
+  const panels = flattenPanelTree(panelTree({...props, setIsOpen}));
   const { conjuntion = false, field, value, operator } = props.qFilter;
   const button = (<EuiButtonEmpty color='text' size="xs" onClick={() => setIsOpen(!isOpen)}>
     <strong>{conjuntion && conjuntions[conjuntion]}</strong> {field} {operators[operator]} {value}
@@ -82,6 +85,7 @@ const panelTree = (props) => {
         panel: {
           id: 1,
           title: 'Edit filter',
+          width: 400,
           content: <EditFilter {...props} />
         }
       },
@@ -129,14 +133,31 @@ function EditFilter(props) {
 }
 
 function EditFilterSaveButton(query: any, operator: any, value: any, conjuntion: any, props: any): React.ReactNode {
-  return <EuiButton fill={true} onClick={() => {
-    const newFilter = { field: query.field, operator, value };
-    conjuntion && (newFilter['conjuntion'] = conjuntion);
-    props.qInterpreter.editByIndex(props.index, newFilter);
-    props.updateFilters();
-  }}>
-    Save
-  </EuiButton>;
+  return (
+    <Fragment>
+      <EuiSpacer />
+      <EuiFlexGroup direction='rowReverse'>
+        <EuiFlexItem grow={false}>
+          <EuiButton fill onClick={() => {
+            const newFilter = { field: query.field, operator, value };
+            conjuntion && (newFilter['conjuntion'] = conjuntion);
+            props.qInterpreter.editByIndex(props.index, newFilter);
+            props.updateFilters();
+            props.setIsOpen(false);
+          }}>
+            Save
+          </EuiButton>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButton onClick={() => {
+            props.setIsOpen(false);
+          }}>
+            Cancel
+          </EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </Fragment>
+  );
 }
 
 function EditFilterValue(value, setValue, suggest): React.ReactNode {
