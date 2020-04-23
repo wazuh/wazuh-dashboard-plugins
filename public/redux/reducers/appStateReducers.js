@@ -12,7 +12,6 @@
 
 const initialState = {
   currentAPI: "",
-  currentPattern: "",
   showMenu: false,
   wazuhNotReadyYet: "",
   currentTab: ""
@@ -23,13 +22,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentAPI: action.currentAPI,
-    };
-  }
-
-  if (action.type === 'UPDATE_CURRENT_PATTERN') {
-    return {
-      ...state,
-      currentPattern: action.currentPattern,
     };
   }
   
