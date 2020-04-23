@@ -37,15 +37,16 @@ export class AgentInfo extends Component {
       + ' ' + checkField(((agent || {}).os || {}).version);
 
     return (
-      <EuiToolTip position="bottom" content={os_name === '--' ? '-' : os_name}>
+      <EuiToolTip position="bottom" content={os_name === '- -' ? '-' : os_name}>
         <span className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>
-          <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
+          <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i>{os_name === '- -' ? '-' : " " + os_name}
         </span>
       </EuiToolTip>
     );
   }
 
   buildStats(items) {
+    const checkField = (field) => { console.log(field); return (field !== undefined || field) ? field : "-"; };
     const stats = items.map(item => {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
@@ -53,7 +54,7 @@ export class AgentInfo extends Component {
             title={
               item.description === 'OS'
                 ? this.addIconPlatformRender(this.props.agent)
-                : <span style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{item.title}</span>
+                : <span style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{checkField(item.title)}</span>
             }
             description={item.description}
             textAlign="center"
