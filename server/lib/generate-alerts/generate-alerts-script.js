@@ -268,13 +268,10 @@ function generateAlert(params) {
     }
 
     if (params.audit) {
-        alert.rule.groups.push('audit');
-        alert.data.audit = {};
-        alert.data.audit.command = randomArrayItem(Audit.command);
-        alert.data.audit.file = { name: randomArrayItem(Audit.fileName) };
-        alert.data.audit.exe = randomArrayItem(Audit.exe);
-        alert.rule.description = randomArrayItem(Audit.ruleDescription);
-        alert.rule.description = alert.rule.description === 'Audit: Command: ' ? `Audit: Command: ${alert.rule.description}` : alert.rule.description;
+        let dataAudit = randomArrayItem(Audit.dataAudit);
+        alert.data = dataAudit.data;
+        alert.data.audit.file ? alert.data.audit.file.name === '' ?  alert.data.audit.file.name = randomArrayItem(Audit.fileName) : null : null;
+        alert.rule = dataAudit.rule;
     }
 
     if (params.ciscat) {
