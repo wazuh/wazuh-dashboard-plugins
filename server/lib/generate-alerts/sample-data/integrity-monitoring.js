@@ -10,4 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
- export const events = ["modified", "deleted", "added"];
+export const events = ["modified", "deleted", "added"];
+export const attributes = ["mtime", "inode", "size", "tmp", "md5", "sha1", "sha256" ];
+export const tags = ["tmp"];
