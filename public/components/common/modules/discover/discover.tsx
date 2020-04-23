@@ -160,7 +160,7 @@ export class Discover extends Component {
   };
 
   buildFilter() {
-    const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds)?.toDate().getTime() : ds;
+    const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
     const { searchBarFilters, query } = this.state;
     const elasticQuery =
       esQuery.buildEsQuery(

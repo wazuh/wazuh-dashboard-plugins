@@ -16,7 +16,8 @@ import {
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
-  EuiLoadingContent
+  EuiLoadingContent,
+  EuiCallOut
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
@@ -28,7 +29,7 @@ export class FlyoutDetail extends Component {
     agentId: string
     type: string
     view: 'states' | 'events'
-    closeFlyout():void
+    closeFlyout(): void
   }
 
   constructor(props) {
@@ -42,17 +43,17 @@ export class FlyoutDetail extends Component {
   }
 
   async componentDidMount() {
-    try{
+    try {
       const isCluster = (AppState.getClusterInfo() || {}).status === "enabled";
       const clusterFilter = isCluster
         ? { "cluster.name": AppState.getClusterInfo().cluster }
         : { "manager.name": AppState.getClusterInfo().manager };
       this.setState({ clusterFilter });
       const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
-      const currentFile = ((((data || {}).data || {}).data || {}) .items || [])[0];
+      const currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
       this.setState({ currentFile, isLoading: false });
-    }catch(err){
-      this.setState({error: `Data could not be fetched for ${this.props.fileName}`})
+    } catch (err) {
+      this.setState({ error: `Data could not be fetched for ${this.props.fileName}` })
     }
   }
 
@@ -65,15 +66,17 @@ export class FlyoutDetail extends Component {
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
-          <EuiFlyoutBody className="flyout-body" > 
-            {this.state.error && (<div>{this.state.error}</div>)  || (<EuiLoadingContent style={{ margin: 16 }} />) } 
+          <EuiFlyoutBody className="flyout-body" >
+            {this.state.error && (
+              <EuiCallOut title={this.state.error} color="warning" iconType="alert" />
+            ) || (<EuiLoadingContent style={{ margin: 16 }} />)}
           </EuiFlyoutBody>
         )}
         {this.state.currentFile && !this.state.isLoading &&
-          <EuiFlyoutBody className="flyout-body" > 
-            <FileDetails 
-              currentFile={this.state.currentFile} 
-              {...this.props} 
+          <EuiFlyoutBody className="flyout-body" >
+            <FileDetails
+              currentFile={this.state.currentFile}
+              {...this.props}
               implicitFilters={[{ 'rule.groups': "syscheck" },
               { 'syscheck.path': this.state.currentFile.file },
               { 'agent.id': this.props.agentId },
