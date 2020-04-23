@@ -15,54 +15,65 @@ import ReactDOM from 'react-dom';
 import { FlyoutDetail } from './states/flyout';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
+
 export class EventsFim extends Component {
   state: {
-    isFlyoutVisible: Boolean
+    isFlyoutVisible: Boolean,
+    elements: HTMLElement[],
+    currentFile: string
   };
+  props!: {
+    [key: string]: any
+  }
+  modulesHelper: ModulesHelper;
+  fetchWatch!: any;
+  
   constructor(props) {
     super(props);
     this.state = {
       isFlyoutVisible: false,
+      elements: [],
+      currentFile: ''
     };
     this.modulesHelper = ModulesHelper;
   }
 
   async getRowsField(scope) {
-    this.indices = [];
+    const indices: number[] = [];
     if (!document)
       this.getRowsField(scope);
-    this.cols = document.querySelectorAll(`.kbn-table thead th`);
-    if (!(this.cols || []).length) {
+    const cols = document.querySelectorAll(`.kbn-table thead th`);
+    if (!(cols || []).length) {
       setTimeout(() => { this.getRowsField(scope) }, 1000);
     }
-    this.cols.forEach((col, idx) => {
-      if (['syscheck.path', 'rule.id'].includes(col.textContent)) {
-        this.indices.push(idx + 1);
+    cols.forEach((col, idx) => {
+      if (['syscheck.path', 'rule.id'].includes(col.textContent || '')) {
+        indices.push(idx + 1);
       }
     });
     let query = '';
-    this.indices.forEach((position, idx) => {
+    indices.forEach((position, idx) => {
       query += `.kbn-table tbody tr td:nth-child(${position}) div`
-      if (idx !== this.indices.length - 1) {
+      if (idx !== indices.length - 1) {
         query += ', ';
       }
     });
-    if (query)
-      this.elements = document.querySelectorAll(query);
-    if ((scope.rows || []).length && (this.elements || {}).length) {
-      this.forceUpdate();
-    } else if ((scope.rows || []).length) {
-      setTimeout(() => { this.getRowsField(scope) }, 1000);
+    if (query){
+      const elements = document.querySelectorAll(query);
+      if ((scope.rows || []).length && (elements || {}).length) {
+        this.setState({elements});
+      } else if ((scope.rows || []).length) {
+        setTimeout(() => { this.getRowsField(scope) }, 1000);
+      }
     }
   }
 
   async componentDidMount() {
-    this.scope = await this.modulesHelper.getDiscoverScope();
-    this.fetchWatch = this.scope.$watchCollection('fetchStatus',
+    const scope = await this.modulesHelper.getDiscoverScope();
+    this.fetchWatch = scope.$watchCollection('fetchStatus',
       () => {
-        if (this.scope.fetchStatus === 'complete') {
-          this.elements = false;
-          setTimeout(() => { this.getRowsField(this.scope) }, 1000);
+        if (scope.fetchStatus === 'complete') {
+          this.setState({elements:[]}, () => setTimeout(() => { this.getRowsField(scope) }, 1000));
         }
       });
   }
@@ -74,7 +85,7 @@ export class EventsFim extends Component {
   showFlyout(file) {
     if (file !== " - ") {
       //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-      this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file }));
+      this.setState({ isFlyoutVisible: true, currentFile: file });
     }
   }
 
@@ -83,45 +94,50 @@ export class EventsFim extends Component {
   }
 
   render() {
+    const { elements } = this.state;
+    console.log(elements)
     return (
       <Fragment>
-        {(this.elements && this.elements[0].firstChild) &&
-          [...this.elements].map((element, idx) => {
+        {
+          [...elements].map((element, idx) => {
             const text = element.textContent;
-            if ((element.firstChild || {}).tagName === 'SPAN') {
-              element.removeChild(element.firstChild);
-            }
-            return (
-              idx % 2 && (
-                ReactDOM.createPortal(
-                  <Fragment>
-                    <a
-                      href={`#/manager/rules?tab=rules&redirectRule=${text}`} target="_blank"
-                      style={{ minWidth: 55, display: 'block' }}>
-                      {text}
-                    </a>
-                  </Fragment>
-                  ,
-                  element
+            element.childNodes.forEach(child => {
+              if (child.nodeName === 'SPAN') {
+                // @ts-ignore
+                child.setAttribute('style', `display: none`)
+              }
+            })
+            if(element.childNodes.length < 2) {
+                return (
+                  idx % 2 
+                  ? (
+                    ReactDOM.createPortal(
+                      <a
+                        href={`#/manager/rules?tab=rules&redirectRule=${text}`} target="_blank"
+                        style={{ minWidth: 55, display: 'block' }}>
+                        {text}
+                      </a>
+                      ,
+                      element
+                    )
+                  )
+                  : (
+                    ReactDOM.createPortal(
+                      <a
+                        onClick={() => this.showFlyout(text)}>
+                        {text}
+                      </a>
+                      ,
+                      element
+                    )
+                  )
                 )
-              ) || (
-                ReactDOM.createPortal(
-                  <Fragment>
-                    <a
-                      onClick={() => this.showFlyout(text)}>
-                      {text}
-                    </a>
-                  </Fragment>
-                  ,
-                  element
-                )
-              )
-            )
-          }
-          )
+              }
+          })
         }
         {this.state.isFlyoutVisible &&
           <EuiOverlayMask 
+          // @ts-ignore
             onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
             <FlyoutDetail
               fileName={this.state.currentFile}
