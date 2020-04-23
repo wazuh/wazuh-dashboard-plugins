@@ -14,7 +14,7 @@ import React, { Component, } from 'react';
 import { I18nProvider } from '@kbn/i18n/react'
 import './discover.less';
 import { KibanaContextProvider } from '../../../../../../../src/plugins/kibana_react/public/context'
-import { SearchBar } from '../../../../../../../src/plugins/data/public/'
+import { SearchBar, FilterManager } from '../../../../../../../src/plugins/data/public/'
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
 import { RowDetails } from './row-details';
@@ -50,10 +50,8 @@ export class Discover extends Component {
     _history: { history: { items: { from: string, to: string }[] } }
   };
 
-  KibanaServices: {
-    [key: string]: any
-  };
-
+  KibanaServices: { [key: string]: any };
+  filterManager: FilterManager;
   state: {
     sort: object,
     alerts: { _source: {}, _id: string }[],
@@ -82,6 +80,7 @@ export class Discover extends Component {
   constructor(props) {
     super(props);
     this.KibanaServices = getServices();
+    this.filterManager = new FilterManager(npSetup.core.uiSettings);
     this.timefilter = this.KibanaServices.timefilter;
     this.state = {
       sort: {},
@@ -287,7 +286,7 @@ export class Discover extends Component {
 
     const filters = this.state.searchBarFilters;
     filters.push(formattedFilter);
-    this.KibanaServices.data.query.filterManager.setFilters(filters);
+    this.filterManager.setFilters(filters);
     this.setState({ searchBarFilters: filters });
   }
 
@@ -298,11 +297,12 @@ export class Discover extends Component {
   }
 
   onFiltersUpdated = (filters: esFilters.Filter[]) => {
-    this.KibanaServices.data.query.filterManager.setFilters(filters);
+    this.filterManager.setFilters(filters);
     this.setState({ searchBarFilters: filters });
   }
 
   getSearchBar() {
+    const { filterManager, KibanaServices } = this;
     const storage = {
       ...window.localStorage,
       get: (key) => JSON.parse(window.localStorage.getItem(key) || '{}'),
@@ -310,14 +310,29 @@ export class Discover extends Component {
       remove: (key) => window.localStorage.removeItem(key)
     }
     const http = {
-      ...this.KibanaServices.indexPatterns.apiClient.http
+      ...KibanaServices.indexPatterns.apiClient.http
     }
     const savedObjects = {
-      ...this.KibanaServices.indexPatterns.savedObjectsClient
+      ...KibanaServices.indexPatterns.savedObjectsClient
+    }
+    const data = {
+      ...KibanaServices.data,
+      query: {
+        ...KibanaServices.data.query,
+        filterManager,
+      }
     }
     const { dateRange, query, searchBarFilters } = this.state;
     return (
-      <KibanaContextProvider services={{ ...this.KibanaServices, appName: "wazuhFim", storage, http, savedObjects }} >
+      <KibanaContextProvider services={{
+          ...KibanaServices,
+          appName: "wazuhFim",
+          data,
+          filterManager,
+          storage,
+          http,
+          savedObjects
+        }} >
         <I18nProvider>
           <SearchBar
             indexPatterns={[this.indexPattern]}
