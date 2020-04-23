@@ -32,14 +32,14 @@ export class WazuhElasticCtrl {
     this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
     this.wzSampleAlertsCaterories = {
-      'security': [{ syscheck: true }, { aws: true }, { authentication: true }, { ssh: true }, { windows: { service_control_manager: true}, alerts: 250}],
+      'security': [{ syscheck: true }, { aws: true }, { authentication: true }, { ssh: true }, { apache: true, alerts: 400 }, { windows: { service_control_manager: true}, alerts: 250}],
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }],
       'regulatory-compliance': [{ pci_dss: true }, { gdpr: true }, { hipaa: true }, { nist_800_53: true }]
     };
     this.wzSampleAlertsIndexPrefix = 'wazuh-alerts-3.x-';
     this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-3.x-sample-security, wazuh-alerts-3.x-sample-auditing-policy-monitoring, wazuh-alerts-3.x-threat-detection
-    this.defaultNumSampleAlerts = 1000;
+    this.defaultNumSampleAlerts = 3000;
   }
 
   /**
