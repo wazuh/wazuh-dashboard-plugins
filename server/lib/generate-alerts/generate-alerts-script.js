@@ -276,13 +276,10 @@ function generateAlert(params) {
     }
 
     if (params.audit) {
-        alert.rule.groups.push('audit');
-        alert.data.audit = {};
-        alert.data.audit.command = randomArrayItem(Audit.command);
-        alert.data.audit.file = { name: randomArrayItem(Audit.fileName) };
-        alert.data.audit.exe = randomArrayItem(Audit.exe);
-        alert.rule.description = randomArrayItem(Audit.ruleDescription);
-        alert.rule.description = alert.rule.description === 'Audit: Command: ' ? `Audit: Command: ${alert.rule.description}` : alert.rule.description;
+        let dataAudit = randomArrayItem(Audit.dataAudit);
+        alert.data = dataAudit.data;
+        alert.data.audit.file ? alert.data.audit.file.name === '' ?  alert.data.audit.file.name = randomArrayItem(Audit.fileName) : null : null;
+        alert.rule = dataAudit.rule;
     }
 
     if (params.ciscat) {
@@ -373,6 +370,55 @@ function generateAlert(params) {
         alert.syscheck.event = randomArrayItem(IntegrityMonitoring.events);
         alert.syscheck.path = randomArrayItem(Paths);
         alert.syscheck.uname_after = randomArrayItem(Users);
+        alert.syscheck.gname_after = "root";
+        alert.syscheck.mtime_after = new Date(randomDate());
+        alert.syscheck.size_after = randomIntervalInteger(0,65);
+        alert.syscheck.uid_after = "0";
+        alert.syscheck.gid_after = "0";
+        alert.syscheck.perm_after = "rw-r--r--";
+        alert.syscheck.inode_after = randomIntervalInteger(0,100000);
+
+        switch (alert.syscheck.event) {
+            case "added":
+                alert.rule = IntegrityMonitoring.regulatory[0];
+                break;
+            case "modified":
+                alert.rule = IntegrityMonitoring.regulatory[1];
+                alert.syscheck.mtime_before = new Date(alert.syscheck.mtime_after.getTime() - 1000 * 60);
+                alert.syscheck.inode_before = randomIntervalInteger(0,100000);
+                alert.syscheck.sha1_afeer = randomElements(40, 'abcdef0123456789');
+                alert.syscheck.changed_attributes = [randomArrayItem(IntegrityMonitoring.attributes)];
+                alert.syscheck.md5_after = randomElements(32, 'abcdef0123456789');
+                alert.syscheck.sha256_after = randomElements(60, 'abcdef0123456789');
+                break;
+            case "deleted":
+                alert.rule = IntegrityMonitoring.regulatory[2];
+                alert.syscheck.tags = [randomArrayItem(IntegrityMonitoring.tags)];
+                alert.syscheck.sha1_afeer = randomElements(40, 'abcdef0123456789');
+                alert.syscheck.audit = {
+                    "process": {
+                        "name": randomArrayItem(Paths),
+                        "id": randomIntervalInteger(0,100000),
+                        "ppid": randomIntervalInteger(0,100000)
+                    },
+                    "effective_user": {
+                        "name": randomArrayItem(Users),
+                        "id": randomIntervalInteger(0,100)
+                    },
+                    "user": {
+                        "name": randomArrayItem(Users),
+                        "id": randomIntervalInteger(0,100)
+                    },
+                    "group": {
+                        "name": randomArrayItem(Users),
+                        "id": randomIntervalInteger(0,100)
+                    }
+                }
+                alert.syscheck.md5_after = randomElements(32, 'abcdef0123456789');
+                alert.syscheck.sha256_after = randomElements(60, 'abcdef0123456789');
+                break;
+            default: {}
+        }
     }
 
     if (params.virustotal) {
