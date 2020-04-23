@@ -363,16 +363,16 @@ function generateAlert(params) {
                         "ppid": randomIntervalInteger(0,100000)
                     },
                     "effective_user": {
-                        "name": "root",
-                        "id": randomIntervalInteger(0,100000)
+                        "name": randomArrayItem(Users),
+                        "id": randomIntervalInteger(0,100)
                     },
                     "user": {
-                        "name": "root",
-                        "id": randomIntervalInteger(0,100000)
+                        "name": randomArrayItem(Users),
+                        "id": randomIntervalInteger(0,100)
                     },
                     "group": {
-                        "name": "ossec",
-                        "id": randomIntervalInteger(0,100000)
+                        "name": randomArrayItem(Users),
+                        "id": randomIntervalInteger(0,100)
                     }
                 }
                 alert.syscheck.md5_after = randomElements(32, 'abcdef0123456789');
