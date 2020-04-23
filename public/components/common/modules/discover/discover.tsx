@@ -160,7 +160,7 @@ export class Discover extends Component {
   };
 
   buildFilter() {
-    const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds)?.toDate().getTime() : ds;
+    const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
     const { searchBarFilters, query } = this.state;
     const elasticQuery =
       esQuery.buildEsQuery(
@@ -291,7 +291,7 @@ export class Discover extends Component {
     this.setState({ searchBarFilters: filters });
   }
 
-  onQuerySubmit = (payload: { dateRange: TimeRange, query?: Query | undefined }) => {
+  onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
     const { dateRange, query } = payload;
     this.timefilter.setTime(dateRange);
     this.setState({ dateRange, query });
