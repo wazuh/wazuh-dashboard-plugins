@@ -38,9 +38,9 @@ export class AgentInfo extends Component {
 
     return (
       <EuiToolTip position="bottom" content={os_name === '--' ? '-' : os_name}>
-        <p className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>
+        <span className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>
           <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
-        </p>
+        </span>
       </EuiToolTip>
     );
   }
@@ -53,7 +53,7 @@ export class AgentInfo extends Component {
             title={
               item.description === 'OS'
                 ? this.addIconPlatformRender(this.props.agent)
-                : <p style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{item.title}</p>
+                : <span style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{item.title}</span>
             }
             description={item.description}
             textAlign="center"
