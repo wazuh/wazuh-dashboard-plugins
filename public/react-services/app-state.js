@@ -15,6 +15,7 @@ import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import { updateCurrentApi, updateShowMenu } from '../redux/actions/appStateActions';
 import { GenericRequest } from '../react-services/generic-request';
+import { WazuhConfig } from './wazuh-config';
 
 
 export class AppState {
@@ -26,8 +27,30 @@ export class AppState {
     static getExtensions = async (id) => {
         try {
             const data = await GenericRequest.request('GET', `/api/extensions/${id}`);
+
             const extensions = data.data.extensions;
-            return Object.keys(extensions).length ? extensions : false;
+            if(Object.keys(extensions).length){
+                return extensions;
+            }else{ 
+                const wazuhConfig = new WazuhConfig();
+                const config = wazuhConfig.getConfig();
+                const extensions = {
+                    audit: config['extensions.audit'],
+                    pci: config['extensions.pci'],
+                    gdpr: config['extensions.gdpr'],
+                    hipaa: config['extensions.hipaa'],
+                    nist: config['extensions.nist'],
+                    oscap: config['extensions.oscap'],
+                    ciscat: config['extensions.ciscat'],
+                    aws: config['extensions.aws'],
+                    virustotal: config['extensions.virustotal'],
+                    osquery: config['extensions.osquery'],
+                    mitre: config['extensions.mitre'],
+                    docker: config['extensions.docker']
+                };
+                AppState.setExtensions(id, extensions);   
+                return extensions;
+            }
         } catch (err) {
             console.log("Error get extensions");
             console.log(err);
