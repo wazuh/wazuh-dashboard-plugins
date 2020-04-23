@@ -26,7 +26,6 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import chrome from 'ui/chrome';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumbWrapper';
-import { updateCurrentPattern } from '../../redux/actions/appStateActions';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -158,7 +157,6 @@ class WzMenu extends Component {
         ? filtered
         : await this.indexPatterns.get(AppState.getCurrentPattern());
       this.setState({ theresPattern: true, currentPattern: data.title });
-      this.props.updateCurrentPattern({id: data[0].id, title: data[0].title});
 
       // Getting the list of index patterns
       if (list) {
@@ -175,7 +173,6 @@ class WzMenu extends Component {
       if (!AppState.getPatternSelector()) return;
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
-      this.props.updateCurrentPattern(this.state.patternList.find(pattern => pattern.id === event.target.value));
       this.router.reload();
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
@@ -487,8 +484,4 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  updateCurrentPattern: (currentSelectedPattern) => dispatch(updateCurrentPattern(currentSelectedPattern))
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzMenu);
+export default connect(mapStateToProps)(WzMenu);

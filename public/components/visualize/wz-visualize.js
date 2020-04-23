@@ -20,7 +20,6 @@ import AlertsStats from '../../controllers/overview/components/alerts-stats'
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
-import store from '../../redux/store';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -76,7 +75,7 @@ export class WzVisualize extends Component {
     // Check if there is sample alerts installed
     try{
       this.setState({
-        thereAreSampleAlerts: (await WzRequest.genericReq('GET', `/elastic/samplealerts/${store.getState().appStateReducers.currentPattern.title}`, {})).data.sampleAlertsInstalled
+        thereAreSampleAlerts: (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled
       });
     }catch(error){}
   }

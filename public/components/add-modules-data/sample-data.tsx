@@ -28,11 +28,7 @@ import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
-interface IWzSampleDataProps{
-  currentPattern: {id: string, title: string}
-}
-
-class WzSampleData extends Component<IWzSampleDataProps> {
+export default class WzSampleData extends Component {
   categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
   state: {[name: string]: {
     exists: boolean
@@ -54,7 +50,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         title: 'Sample auditing and policy monitoring',
         description: 'Sample data, visualizations and dashboards for events of auditing and policy monitoring (policy monitoring, system auditing, OpenSCAP, CIS-CAT).',
         image: '',
-        categorySampleAlertsIndex: 'auditing-pm'
+        categorySampleAlertsIndex: 'auditing-policy-monitoring'
       },
       {
         title: 'Sample threat detection and response',
@@ -67,7 +63,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         description: 'Sample data, visualizations and dashboards for events of regulatory compliance (PCI DSS, GDPR, HIPAA, NIST 800-53).',
         image: '',
         categorySampleAlertsIndex: 'regulatory-compliance'
-      },
+      }
     ];
     this.state = {};
     this.categories.forEach(category => {
@@ -82,7 +78,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
     // Check if sample data for each category was added
     try{
       const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
-        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${this.props.currentPattern.title}/${cur.categorySampleAlertsIndex}`)
+        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
   
@@ -100,11 +96,13 @@ class WzSampleData extends Component<IWzSampleDataProps> {
       const managerInfo = await WzRequest.apiReq('GET', '/manager/info', {});
       this.generateAlertsParams.manager = {
         name: managerInfo.data.data.name
-      }
-      this.generateAlertsParams.cluster = {
-        name: managerInfo.data.data.cluster.name,
-        node: managerInfo.data.data.cluster.node_name
-      } 
+      };
+      if (managerInfo.data.data.cluster) {
+        this.generateAlertsParams.cluster = {
+          name: managerInfo.data.data.cluster.name,
+          node: managerInfo.data.data.cluster.node_name
+        };
+      };
       
     }catch(error){}
   }
@@ -122,8 +120,8 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         ...this.state[category.categorySampleAlertsIndex],
         addDataLoading: true
       } });
-      await WzRequest.genericReq('POST', `/elastic/samplealerts/${this.props.currentPattern.title}/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
-      this.showToast('success', `${category.title} alerts installed`);
+      await WzRequest.genericReq('POST', `/elastic/samplealerts/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
+      this.showToast('success', `${category.title} alerts installed`, 'Date range for sample data is now-7 days ago', 5000);
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
         exists: true,
@@ -143,7 +141,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         ...this.state[category.categorySampleAlertsIndex],
         removeDataLoading: true
       } });
-      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${this.props.currentPattern.title}/${category.categorySampleAlertsIndex}` );
+      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${category.categorySampleAlertsIndex}` );
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
         exists: false,
@@ -176,7 +174,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
                   isLoading={removeDataLoading}
                   color='danger'
                   onClick={() => this.removeSampleData(category)}>
-                    {addDataLoading && 'Removing data' || 'Remove data'}
+                    {removeDataLoading && 'Removing data' || 'Remove data'}
                 </EuiButton>
                 ) || (
                   <EuiButton
@@ -194,20 +192,12 @@ class WzSampleData extends Component<IWzSampleDataProps> {
   }
   render() {
     return(
-      <Fragment>
-        <EuiFlexGrid columns={3}>
-          {this.categories.map(category => this.renderCard(category))}
-        </EuiFlexGrid>
-      </Fragment>
+      <EuiFlexGrid columns={3}>
+        {this.categories.map(category => this.renderCard(category))}
+      </EuiFlexGrid>
     )
   }
 }
-
-const mapStateToProps = (state) => ({
-  currentPattern: state.appStateReducers.currentPattern
-});
-
-export default connect(mapStateToProps)(WzSampleData);
 
 const zipObject = (keys = [], values = []) => {
   return keys.reduce((accumulator, key, index) => {
