@@ -273,32 +273,31 @@ export const dataAudit = [{
       ]
     },
   },
-  {
-    data: {
-      audit: {
-        res: "1",
-        id: "1002556",
-        type: "CONFIG_CHANGE",
-        list: "4",
-        command: 'sh',
-        key: "wazuh_fim"
-      },
-    },
-    rule: {
-      firedtimes: 10,
-      mail: false,
-      level: 3,
-      description: "Auditd: Configuration changed",
-      groups: [
-        "audit",
-        "audit_configuration"
-      ],
-      gpg13: [
-        "10.1"
-      ],
-      gdpr: [
-        "IV_30.1.g"
-      ]
-    },
-  },
+//   {
+//     data: {
+//       audit: {
+//         res: "1",
+//         id: "1002556",
+//         type: "CONFIG_CHANGE",
+//         list: "4",
+//         key: "wazuh_fim"
+//       },
+//     },
+//     rule: {
+//       firedtimes: 10,
+//       mail: false,
+//       level: 3,
+//       description: "Auditd: Configuration changed",
+//       groups: [
+//         "audit",
+//         "audit_configuration"
+//       ],
+//       gpg13: [
+//         "10.1"
+//       ],
+//       gdpr: [
+//         "IV_30.1.g"
+//       ]
+//     },
+//   },
 ]
