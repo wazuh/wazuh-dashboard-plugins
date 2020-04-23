@@ -131,15 +131,9 @@ class WzMenu extends Component {
       const list = await PatternHandler.getPatternList();
       if (!list) return;
 
-      // Get the configuration to check if pattern selector is enabled
-      const config = this.wazuhConfig.getConfig();
-      AppState.setPatternSelector(config['ip.selector']);
 
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
-
-      // Show the pattern selector
-      this.setState({ showSelector: true });
 
       let filtered = false;
       // If there is no current pattern, fetch it
@@ -410,7 +404,7 @@ class WzMenu extends Component {
                 <span> No API </span>
               )
             }
-            {this.state.showSelector && this.state.theresPattern && this.state.patternList && this.state.patternList.length > 1 &&
+            {AppState.getPatternSelector() && this.state.theresPattern && this.state.patternList && this.state.patternList.length > 1 &&
               (
                 this.buildPatternSelector()
               )

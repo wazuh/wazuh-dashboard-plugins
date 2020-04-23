@@ -586,12 +586,12 @@ export class AgentsTable extends Component {
           <EuiBasicTable
             items={agents}
             columns={columns}
-            pagination={pagination}
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
             rowProps={getRowProps}
             noItemsMessage="No agents found"
+            {...(pagination && {pagination})}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
