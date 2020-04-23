@@ -70,6 +70,11 @@ export class SettingsController {
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       this.admin = await checkAdminMode();
+      
+      const location = this.$location.search();
+      if (location && location.tab) {
+        this.tab = location.tab;
+      }
       // Set component props
       this.setComponentProps();
       // Loading data
@@ -78,11 +83,6 @@ export class SettingsController {
       //Checks if all the API entries are down
       this.apiIsDown = down >= this.apiEntries.length && this.apiEntries.length > 0;
 
-      const location = this.$location.search();
-      if (location && location.tab) {
-        this.tab = location.tab;
-        this.settingsTabsProps.selectedTab = this.tab;
-      }
       await this.getAppInfo();
     } catch (error) {
       this.errorHandler.handle('Cannot initialize Settings');
