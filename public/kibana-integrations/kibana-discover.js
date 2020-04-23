@@ -418,9 +418,7 @@ function discoverController(
       );
       subscriptions.add(
         subscribeWithScope($scope, timefilter.getFetch$(), {
-          next: () => {
-            $scope.fetch;
-          }
+          next: $scope.fetch
         })
       );
 
