@@ -151,7 +151,6 @@ export class AgentsPreview extends Component {
                                 title={`${this.agentsCoverity.toFixed(2)}%`}
                                 titleSize={'s'}
                                 description="Agents coverage"
-                                titleColor="text"
                                 style={{ whiteSpace: 'nowrap' }}
                               />
                             </EuiFlexItem>
