@@ -132,6 +132,7 @@ export class OverviewController {
         switchTab: (tab, force) => this.switchTab(tab, force),
       };
 
+      this.tabView = this.commonData.checkTabViewLocation();
       if (subtab === 'panels' && this.tab !== 'welcome') {
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
