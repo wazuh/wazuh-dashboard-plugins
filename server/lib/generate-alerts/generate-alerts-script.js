@@ -345,7 +345,11 @@ function generateAlert(params) {
         alert.syscheck.inode_after = randomIntervalInteger(0,100000);
 
         switch (alert.syscheck.event) {
+            case "added":
+                alert.rule = IntegrityMonitoring.regulatory[0];
+                break;
             case "modified":
+                alert.rule = IntegrityMonitoring.regulatory[1];
                 alert.syscheck.mtime_before = new Date(alert.syscheck.mtime_after.getTime() - 1000 * 60);
                 alert.syscheck.inode_before = randomIntervalInteger(0,100000);
                 alert.syscheck.sha1_afeer = randomElements(40, 'abcdef0123456789');
@@ -354,6 +358,7 @@ function generateAlert(params) {
                 alert.syscheck.sha256_after = randomElements(60, 'abcdef0123456789');
                 break;
             case "deleted":
+                alert.rule = IntegrityMonitoring.regulatory[2];
                 alert.syscheck.tags = [randomArrayItem(IntegrityMonitoring.tags)];
                 alert.syscheck.sha1_afeer = randomElements(40, 'abcdef0123456789');
                 alert.syscheck.audit = {
