@@ -51,6 +51,9 @@ export class FlyoutDetail extends Component {
       this.setState({ clusterFilter });
       const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
       const currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
+      if (!currentFile) {
+        throw (false);
+      }
       this.setState({ currentFile, isLoading: false });
     } catch (err) {
       this.setState({ error: `Data could not be fetched for ${this.props.fileName}` })
