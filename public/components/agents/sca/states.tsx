@@ -10,6 +10,7 @@ import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 
 export class States extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
     const { agent } = this.props;
@@ -108,6 +109,15 @@ export class States extends Component {
     ];
   }
 
+  async componentDidMount() {
+    this._isMount = true;
+    this.initialize();
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
+  }
+
   offsetTimestamp(text, time) {
     try {
       return text + this.timeService.offset(time);
@@ -136,7 +146,7 @@ export class States extends Component {
 
   async initialize() {
     try {
-      this.setState({ loading: true });
+      this._isMount && this.setState({ loading: true });
       this.lookingPolicy = false;
       const policies = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}`, {});
       this.policies = (((policies || {}).data || {}).data || {}).items || [];
@@ -152,23 +162,19 @@ export class States extends Component {
         }
         )
       }
-      this.setState({ data: models, loading: false });
+      this._isMount && this.setState({ data: models, loading: false });
     } catch (error) {
       this.policies = [];
     }
   }
 
-  async componentDidMount() {
-    this.initialize();
-  }
-
   async loadScaPolicy(policy) {
-    this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
+    this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       const checks = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}/checks/${policy.policy_id}`, {});
       this.checks = (((checks || {}).data || {}).data || {}).items || [];
     }
-    this.setState({ lookingPolicy: policy, loadingPolicy: false });
+    this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
   }
 
   toggleDetails = item => {
