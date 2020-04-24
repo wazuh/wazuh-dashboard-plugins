@@ -11,6 +11,7 @@
  */
 
 import { WzRequest } from '../../../../react-services/wz-request';
+import { AppState } from '../../../../react-services/app-state';
 
 export default class ConfigurationHandler {
   /**
@@ -18,7 +19,16 @@ export default class ConfigurationHandler {
    */
   static async editKey(key, value) {
     try {
-      const result = await WzRequest.genericReq('PUT', '/utils/configuration', { key, value });
+      if (key === 'api.selector') {
+        AppState.setAPISelector(value);
+      }
+      if (key === 'ip.selector') {
+        AppState.setPatternSelector(value);
+      }
+      const result = await WzRequest.genericReq('PUT', '/utils/configuration', {
+        key,
+        value
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);

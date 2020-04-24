@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { checkTimestamp } from './check-timestamp';
+
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -96,11 +96,11 @@ export function settingsWizard(
           ? JSON.stringify({ name: clusterInfo.manager, id: currentApi })
           : JSON.stringify({ name: clusterInfo.cluster, id: currentApi });
 
-          AppState.setCurrentAPI(str);
+      AppState.setCurrentAPI(str);
       AppState.setClusterInfo(clusterInfo);
     };
 
-    const callCheckStored = () => {
+    const callCheckStored = async () => {
       const config = wazuhConfig.getConfig();
       let currentApi = false;
 
@@ -112,7 +112,8 @@ export function settingsWizard(
           error
         );
       }
-      if (currentApi && !AppState.getExtensions(currentApi)) {
+      const extensions = await AppState.getExtensions(currentApi);
+      if (currentApi && !extensions) {
         const extensions = {
           audit: config['extensions.audit'],
           pci: config['extensions.pci'],
@@ -130,7 +131,6 @@ export function settingsWizard(
         AppState.setExtensions(currentApi, extensions);
       }
       deferred.resolve();
-      
     };
 
     const setUpCredentials = (msg, redirect = false) => {
@@ -139,7 +139,6 @@ export function settingsWizard(
       wzMisc.setWizard(true);
       if (redirect) {
         AppState.setCurrentAPI(redirect);
-
       } else if (!$location.path().includes('/settings')) {
         $location.search('_a', null);
         $location.search('tab', 'api');

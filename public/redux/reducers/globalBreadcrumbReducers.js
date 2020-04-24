@@ -11,14 +11,14 @@
  */
 
 const initialState = {
-  breadcrumb: ""
+  breadcrumb: ''
 };
 
 const globalBreadcrumbReducers = (state = initialState, action) => {
   if (action.type === 'UPDATE_GLOBAL_BREADCRUMB') {
     return {
       ...state,
-      breadcrumb: action.breadcrumb,
+      breadcrumb: action.breadcrumb
     };
   }
   return state;

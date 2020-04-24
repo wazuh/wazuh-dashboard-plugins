@@ -9,18 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WazuhConfig } from "../../react-services/wazuh-config";
-import { ApiRequest } from "../../react-services/api-request";
-import { ShareAgent } from "../../factories/share-agent";
-import { GroupHandler } from "../../react-services/group-handler";
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
+import { GroupHandler } from '../../react-services/group-handler';
 
 export class GroupsController {
-  constructor(
-    $scope,
-    $location,
-    errorHandler,
-    reportingService
-  ) {
+  constructor($scope, $location, errorHandler, reportingService) {
     this.scope = $scope;
     this.location = $location;
     this.apiReq = ApiRequest;
@@ -48,13 +43,13 @@ export class GroupsController {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.selectedAgents = {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.addMultipleAgents(false);
         if (!value) {
@@ -65,12 +60,13 @@ export class GroupsController {
 
       // Props
       this.exportConfigurationProps = {
-        exportConfiguration: enabledComponents => this.exportConfiguration(enabledComponents),
-        type: 'group',
+        exportConfiguration: enabledComponents =>
+          this.exportConfiguration(enabledComponents),
+        type: 'group'
       };
 
       this.filesInGroupTableProps = {
-        exportConfigurationProps: this.exportConfigurationProps,
+        exportConfigurationProps: this.exportConfigurationProps
       };
 
       return;
@@ -91,21 +87,29 @@ export class GroupsController {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
         const data = await this.apiReq.request('GET', '/agents/groups/', {
-          limit: 1000,
+          limit: 1000
         });
-        const filtered = data.data.data.items.filter(group => group.name === globalGroup);
+        const filtered = data.data.data.items.filter(
+          group => group.name === globalGroup
+        );
         if (Array.isArray(filtered) && filtered.length) {
           // Load that our group
-          this.buildGroupsTableProps(data.data.data.items, {group: filtered[0]});
+          this.buildGroupsTableProps(data.data.data.items, {
+            group: filtered[0]
+          });
         } else {
           throw Error(`Group ${globalGroup} not found`);
         }
 
         this.shareAgent.deleteAgent();
       } else {
-        const loadedGroups = await this.apiReq.request('GET', '/agents/groups/', {
-          limit: 1000,
-        });
+        const loadedGroups = await this.apiReq.request(
+          'GET',
+          '/agents/groups/',
+          {
+            limit: 1000
+          }
+        );
         this.buildGroupsTableProps(loadedGroups.data.data.items);
         const configuration = this.wazuhConfig.getConfig();
         this.adminMode = !!(configuration || {}).admin;
@@ -132,20 +136,23 @@ export class GroupsController {
     this.scope.$applyAsync();
   }
 
-
   /**
    *
    * @param {Object} enabledComponents
    */
   exportConfiguration(enabledComponents, group) {
-    this.reportingService.startConfigReport(group, 'groupConfig', enabledComponents);
+    this.reportingService.startConfigReport(
+      group,
+      'groupConfig',
+      enabledComponents
+    );
   }
 
   async loadSelectedAgents(searchTerm) {
     try {
       let params = {
         offset: !searchTerm ? this.selectedAgents.offset : 0,
-        select: ['id', 'name'],
+        select: ['id', 'name']
       };
       if (searchTerm) {
         params.search = searchTerm;
@@ -184,7 +191,7 @@ export class GroupsController {
       const params = {
         limit: 500,
         offset: !searchTerm ? this.availableAgents.offset : 0,
-        select: ['id', 'name'],
+        select: ['id', 'name']
       };
 
       if (searchTerm) {
@@ -236,13 +243,13 @@ export class GroupsController {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.selectedAgents = {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.multipleSelectorLoading = true;
         while (!this.selectedAgents.loadedAll) {
@@ -341,7 +348,7 @@ export class GroupsController {
       if (failedIds.length) {
         const failedErrors = failedIds.map(item => ({
           id: (item || {}).id,
-          message: ((item || {}).error || {}).message,
+          message: ((item || {}).error || {}).message
         }));
         this.failedErrors = this.groupBy(failedErrors, 'message') || false;
         this.errorHandler.info(
@@ -380,7 +387,7 @@ export class GroupsController {
     this.addingGroup = !this.addingGroup;
   }
 
-  buildGroupsTableProps(items,params={}) {
+  buildGroupsTableProps(items, params = {}) {
     this.redirectGroup = params.group || false;
     this.groupsTableProps = {
       items,
@@ -391,7 +398,7 @@ export class GroupsController {
       exportConfigurationProps: {
         exportConfiguration: (enabledComponents, group) =>
           this.exportConfiguration(enabledComponents, group),
-        type: 'group',
+        type: 'group'
       },
       currentGroup: group => {
         this.currentGroup = group;

@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-
 /**
  * Updates CurrentAPI in the appState store
  * @param currentAPI

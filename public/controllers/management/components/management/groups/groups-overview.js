@@ -11,7 +11,14 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiPanel, EuiTitle, EuiText, EuiPage } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiPanel,
+  EuiTitle,
+  EuiText,
+  EuiPage
+} from '@elastic/eui';
 
 // Wazuh components
 import WzGroupsTable from './groups-table';
@@ -63,7 +70,8 @@ export class WzGroupsOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                From here you can list and check your groups, its agents and files.
+                From here you can list and check your groups, its agents and
+                files.
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -80,14 +88,17 @@ export class WzGroupsOverview extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateAdminMode: status => dispatch(updateAdminMode(status)),
+    updateAdminMode: status => dispatch(updateAdminMode(status))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsOverview);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupsOverview);

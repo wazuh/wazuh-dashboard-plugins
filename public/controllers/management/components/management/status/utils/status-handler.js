@@ -54,7 +54,11 @@ export default class StatusHandler {
    */
   static async clusterNodeStatus(nodeId) {
     try {
-      const result = await WzRequest.apiReq('GET', `/cluster/${nodeId}/status`, {});
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/cluster/${nodeId}/status`,
+        {}
+      );
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -66,7 +70,11 @@ export default class StatusHandler {
    */
   static async clusterNodeInfo(nodeId) {
     try {
-      const result = await WzRequest.apiReq('GET', `/cluster/${nodeId}/info`, {});
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/cluster/${nodeId}/info`,
+        {}
+      );
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -105,7 +113,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('GET', '/agents', {
         limit: 1,
         sort: '-dateAdd',
-        q: 'id!=000',
+        q: 'id!=000'
       });
       return result;
     } catch (error) {

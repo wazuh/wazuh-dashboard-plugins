@@ -7,7 +7,7 @@ import {
   EuiFieldNumber,
   EuiSelect,
   EuiTextArea,
-  EuiIconTip,
+  EuiIconTip
 } from '@elastic/eui';
 
 export default class configurationColumns {
@@ -23,7 +23,7 @@ export default class configurationColumns {
           name: 'Setting',
           align: 'left',
           sortable: true,
-          width: '200px',
+          width: '200px'
         },
         {
           field: 'value',
@@ -41,7 +41,11 @@ export default class configurationColumns {
               return (
                 <EuiFieldText
                   onChange={event => {
-                    this.newValueItem(event.target.value, item.setting, item.typeof);
+                    this.newValueItem(
+                      event.target.value,
+                      item.setting,
+                      item.typeof
+                    );
                   }}
                   value={value}
                   aria-label="Edit"
@@ -54,7 +58,11 @@ export default class configurationColumns {
                   value={value}
                   min={0}
                   onChange={event => {
-                    this.newValueItem(event.target.value, item.setting, item.typeof);
+                    this.newValueItem(
+                      event.target.value,
+                      item.setting,
+                      item.typeof
+                    );
                   }}
                   aria-label="Edit"
                 />
@@ -66,17 +74,24 @@ export default class configurationColumns {
                   id="select"
                   options={[
                     { value: true, text: 'true' },
-                    { value: false, text: 'false' },
+                    { value: false, text: 'false' }
                   ]}
                   value={value}
                   onChange={event => {
-                    this.newValueItem(event.target.value, item.setting, item.typeof);
+                    this.newValueItem(
+                      event.target.value,
+                      item.setting,
+                      item.typeof
+                    );
                   }}
                   aria-label="Select boolean"
                 />
               );
             }
-            if (editingKey === item.setting && item.setting === 'wazuh.monitoring.creation') {
+            if (
+              editingKey === item.setting &&
+              item.setting === 'wazuh.monitoring.creation'
+            ) {
               return (
                 <EuiSelect
                   id="select"
@@ -84,11 +99,15 @@ export default class configurationColumns {
                     { value: 'h', text: 'hourly' },
                     { value: 'd', text: 'daily' },
                     { value: 'w', text: 'weekly' },
-                    { value: 'm', text: 'monthly' },
+                    { value: 'm', text: 'monthly' }
                   ]}
                   value={value}
                   onChange={event => {
-                    this.newValueItem(event.target.value, item.setting, item.typeof);
+                    this.newValueItem(
+                      event.target.value,
+                      item.setting,
+                      item.typeof
+                    );
                   }}
                   aria-label="Select creation"
                 />
@@ -100,11 +119,15 @@ export default class configurationColumns {
                   id="select"
                   options={[
                     { value: 'info', text: 'info' },
-                    { value: 'debug', text: 'debug' },
+                    { value: 'debug', text: 'debug' }
                   ]}
                   value={value}
                   onChange={event => {
-                    this.newValueItem(event.target.value, item.setting, item.typeof);
+                    this.newValueItem(
+                      event.target.value,
+                      item.setting,
+                      item.typeof
+                    );
                   }}
                   aria-label="Select creation"
                 />
@@ -114,7 +137,11 @@ export default class configurationColumns {
               return (
                 <EuiTextArea
                   onChange={event => {
-                    this.newValueItem(event.target.value, item.setting, item.typeof);
+                    this.newValueItem(
+                      event.target.value,
+                      item.setting,
+                      item.typeof
+                    );
                   }}
                   value={value}
                   aria-label="Edit"
@@ -129,7 +156,7 @@ export default class configurationColumns {
               return <span>{JSON.stringify(value)}</span>;
             }
             return <span>{value}</span>;
-          },
+          }
         },
         {
           field: 'description',
@@ -153,8 +180,8 @@ export default class configurationColumns {
                 </span>
               );
             }
-          },
-        },
+          }
+        }
       ];
 
       this.columns.push({
@@ -198,7 +225,9 @@ export default class configurationColumns {
                       onClick={async () => {
                         this.editKey(
                           item.setting,
-                          item.setting === 'ip.ignore' ? this.formatObject(item.value) : item.value,
+                          item.setting === 'ip.ignore'
+                            ? this.formatObject(item.value)
+                            : item.value,
                           item.typeof
                         );
                       }}
@@ -209,7 +238,7 @@ export default class configurationColumns {
               );
             }
           }
-        },
+        }
       });
     };
 
@@ -223,7 +252,9 @@ export default class configurationColumns {
         let item = itemWithoutCommas.trim();
         if (item.length !== 0) {
           arrayValues.push(
-            (item[0] !== '"' ? '"' : '') + item + (item[item.length - 1] !== '"' ? '"' : '')
+            (item[0] !== '"' ? '"' : '') +
+              item +
+              (item[item.length - 1] !== '"' ? '"' : '')
           );
         }
       }

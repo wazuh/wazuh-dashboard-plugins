@@ -184,19 +184,19 @@ export class ApiTable extends Component {
                 </EuiToolTip>
               </span>
             ) : (
-                  <span>
-                    <EuiHealth color="danger">Offline</EuiHealth>
-                    <EuiToolTip position="top" content={item.downReason}>
-                      <EuiButtonIcon
-                        color="primary"
-                        style={{ marginTop: '-12px' }}
-                        iconType="questionInCircle"
-                        aria-label="Info about the error"
-                        onClick={() => this.props.copyToClipBoard(item.downReason)}
-                      />
-                    </EuiToolTip>
-                  </span>
-                );
+              <span>
+                <EuiHealth color="danger">Offline</EuiHealth>
+                <EuiToolTip position="top" content={item.downReason}>
+                  <EuiButtonIcon
+                    color="primary"
+                    style={{ marginTop: '-12px' }}
+                    iconType="questionInCircle"
+                    aria-label="Info about the error"
+                    onClick={() => this.props.copyToClipBoard(item.downReason)}
+                  />
+                </EuiToolTip>
+              </span>
+            );
           } else {
             return (
               <span>
@@ -270,7 +270,7 @@ export class ApiTable extends Component {
                 onClick={() => this.props.showAddApi()}
               >
                 Add new
-            </EuiButtonEmpty>
+              </EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
@@ -278,14 +278,15 @@ export class ApiTable extends Component {
                 onClick={async () => await this.refresh()}
               >
                 Refresh
-            </EuiButtonEmpty>
+              </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                From here you can manage and configure the API entries. You can also check their connection and status.
-            </EuiText>
+                From here you can manage and configure the API entries. You can
+                also check their connection and status.
+              </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiInMemoryTable

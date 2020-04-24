@@ -9,14 +9,15 @@
  * (at your option) any later version.
  *
  * Find more information about this on the LICENSE file.
- * 
+ *
  * DELETE THIS WRAPPER WHEN WELCOME SCREEN WAS NOT BE CALLED FROM ANGULARJS
  */
 import React, { Component } from 'react';
-import WelcomeScreen from './management-welcome'
+import ManagementWelcome from './management-welcome';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
+import './welcome.less';
 
-export class WelcomeWrapper extends Component {
+export class ManagementWelcomeWrapper extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -25,7 +26,7 @@ export class WelcomeWrapper extends Component {
   render() {
     return (
       <WzReduxProvider>
-        <WelcomeScreen {...this.props} />
+        <ManagementWelcome {...this.props} />
       </WzReduxProvider>
     );
   }

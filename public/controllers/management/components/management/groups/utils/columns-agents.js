@@ -12,44 +12,44 @@ export default class GroupsAgentsColumns {
           field: 'id',
           name: 'Id',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'name',
           name: 'Name',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'ip',
           name: 'Ip',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'status',
           name: 'Status',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'os.name',
           name: 'Os name',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'os.version',
           name: 'Os version',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'version',
           name: 'Version',
           align: 'left',
-          sortable: true,
-        },
+          sortable: true
+        }
       ];
       this.columns.push({
         name: 'Actions',
@@ -98,7 +98,7 @@ export default class GroupsAgentsColumns {
               )}
             </div>
           );
-        },
+        }
       });
     };
 

@@ -19,7 +19,6 @@ import { connect } from 'react-redux';
 import RulesetHandler from './utils/ruleset-handler';
 import { colors } from './utils/colors';
 
-
 import {
   updateFileContent,
   cleanFileContent,
@@ -60,15 +59,25 @@ class WzDecoderInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async () => {
-                const noLocal = item.path.startsWith('ruleset/');
-                const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
-                const file = { name: value, content: result, path: item.path };
-                this.props.updateFileContent(file);
-              }
-              }>{value}</EuiLink>
+              <EuiLink
+                onClick={async () => {
+                  const noLocal = item.path.startsWith('ruleset/');
+                  const result = await this.rulesetHandler.getDecoderContent(
+                    value,
+                    noLocal
+                  );
+                  const file = {
+                    name: value,
+                    content: result,
+                    path: item.path
+                  };
+                  this.props.updateFileContent(file);
+                }}
+              >
+                {value}
+              </EuiLink>
             </EuiToolTip>
-          )
+          );
         }
       },
       {
@@ -92,43 +101,52 @@ class WzDecoderInfo extends Component {
 
   /**
    * Render the basic information in a list
-   * @param {Number} position 
-   * @param {String} file 
-   * @param {String} path 
+   * @param {Number} position
+   * @param {String} file
+   * @param {String} path
    */
   renderInfo(position, file, path) {
     return (
       <ul>
-        <li key="position"><b>Position:</b>&nbsp;<span className="subdued-color">{position}</span></li>
+        <li key="position">
+          <b>Position:</b>&nbsp;
+          <span className="subdued-color">{position}</span>
+        </li>
         <EuiSpacer size="s" />
-        <li key="file"><b>File:</b>
+        <li key="file">
+          <b>File:</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack({ file: file })}
+            >
               &nbsp;{file}
             </EuiLink>
           </EuiToolTip>
         </li>
         <EuiSpacer size="s" />
-        <li key="path"><b>Path:</b>
+        <li key="path">
+          <b>Path:</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack({ path: path })}
+            >
               &nbsp;{path}
             </EuiLink>
           </EuiToolTip>
         </li>
         <EuiSpacer size="s" />
       </ul>
-    )
+    );
   }
 
   /**
    * Render a list with the details
-   * @param {Array} details 
+   * @param {Array} details
    */
   renderDetails(details) {
     const detailsToRender = [];
     Object.keys(details).forEach(key => {
-      let content = details[key]
+      let content = details[key];
       if (key === 'regex') {
         content = this.colorRegex(content);
       } else if (key === 'order') {
@@ -138,16 +156,14 @@ class WzDecoderInfo extends Component {
       }
       detailsToRender.push(
         <Fragment key={`decoder-detail-${key}`}>
-          <li><b>{key}:</b>&nbsp;{content}</li>
+          <li>
+            <b>{key}:</b>&nbsp;{content}
+          </li>
           <EuiSpacer size="s" />
         </Fragment>
       );
     });
-    return (
-      <ul>
-        {detailsToRender}
-      </ul>
-    )
+    return <ul>{detailsToRender}</ul>;
   }
 
   /**
@@ -159,23 +175,41 @@ class WzDecoderInfo extends Component {
     let valuesArray = order.split(',');
     const result = [];
     for (let i = 0, len = valuesArray.length; i < len; i++) {
-      const coloredString = <span key={`decoder-info-color-order-${i}`} style={{ color: colors[i] }}>{valuesArray[i]}</span>;
+      const coloredString = (
+        <span
+          key={`decoder-info-color-order-${i}`}
+          style={{ color: colors[i] }}
+        >
+          {valuesArray[i]}
+        </span>
+      );
       result.push(coloredString);
     }
     return result;
   }
 
   /**
-     * This set a color to a given regex
-     * @param {String} regex
-     */
+   * This set a color to a given regex
+   * @param {String} regex
+   */
   colorRegex(regex) {
     regex = regex.toString();
-    const starts = <span key={`decoder-info-color-regex-start`} className="subdued-color">{regex.split('(')[0]}</span>;
+    const starts = (
+      <span key={`decoder-info-color-regex-start`} className="subdued-color">
+        {regex.split('(')[0]}
+      </span>
+    );
     let valuesArray = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gim);
     const result = [starts];
     for (let i = 0, len = valuesArray.length; i < len; i++) {
-      const coloredString = <span key={`decoder-info-color-regex-${i}`} style={{ color: colors[i] }}>{valuesArray[i]}</span>;
+      const coloredString = (
+        <span
+          key={`decoder-info-color-regex-${i}`}
+          style={{ color: colors[i] }}
+        >
+          {valuesArray[i]}
+        </span>
+      );
       result.push(coloredString);
     }
     return result;
@@ -183,7 +217,7 @@ class WzDecoderInfo extends Component {
 
   /**
    * Changes between decoders
-   * @param {Number} name 
+   * @param {Number} name
    */
   changeBetweenDecoders(name) {
     this.setState({ currentDecoder: name });
@@ -191,9 +225,14 @@ class WzDecoderInfo extends Component {
 
   render() {
     const { decoderInfo, isLoading } = this.props.state;
-    const currentDecoder = (this.state && this.state.currentDecoder) ? this.state.currentDecoder : decoderInfo.current;
+    const currentDecoder =
+      this.state && this.state.currentDecoder
+        ? this.state.currentDecoder
+        : decoderInfo.current;
     const decoders = decoderInfo.items;
-    const currentDecoderArr = decoders.filter(r => { return r.name === currentDecoder });
+    const currentDecoderArr = decoders.filter(r => {
+      return r.name === currentDecoder;
+    });
     const currentDecoderInfo = currentDecoderArr[0];
     const { position, details, file, name, path } = currentDecoderInfo;
     const columns = this.columns;
@@ -202,7 +241,7 @@ class WzDecoderInfo extends Component {
       return {
         onClick: () => {
           this.changeBetweenDecoders(item.name);
-        },
+        }
       };
     };
 
@@ -221,7 +260,8 @@ class WzDecoderInfo extends Component {
                         color="subdued"
                         iconSize="l"
                         iconType="arrowLeft"
-                        onClick={() => this.props.cleanInfo()} />
+                        onClick={() => this.props.cleanInfo()}
+                      />
                     </EuiToolTip>
                     {name}
                   </h2>
@@ -261,9 +301,7 @@ class WzDecoderInfo extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiTitle size="s">
-                        <h5>
-                          Related decoders
-                      </h5>
+                        <h5>Related decoders</h5>
                       </EuiTitle>
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -292,21 +330,23 @@ class WzDecoderInfo extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     updateFileContent: content => dispatch(updateFileContent(content)),
     cleanFileContent: () => dispatch(cleanFileContent()),
     updateFilters: filters => dispatch(updateFilters(filters)),
     cleanFilters: () => dispatch(cleanFilters()),
     cleanInfo: () => dispatch(cleanInfo())
-  }
+  };
 };
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzDecoderInfo);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzDecoderInfo);

@@ -14,7 +14,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   cleanInfo,
-  updateFileContent,
+  updateFileContent
 } from '../../../../../redux/actions/rulesetActions';
 
 // Eui components
@@ -29,7 +29,7 @@ import {
   EuiButton,
   EuiFieldText,
   EuiCodeEditor,
-  EuiPanel,
+  EuiPanel
 } from '@elastic/eui';
 
 import RulesetHandler from './utils/ruleset-handler';
@@ -44,16 +44,18 @@ class WzRulesetEditor extends Component {
     this.codeEditorOptions = {
       fontSize: '14px',
       displayIndentGuides: false,
-      indentedSoftWrap: false, 
+      indentedSoftWrap: false,
       behavioursEnabled: false,
       animatedScroll: true,
       enableBasicAutocompletion: true,
       enableSnippets: true,
       enableLiveAutocompletion: false
-    }
+    };
     this.rulesetHandler = RulesetHandler;
     const { fileContent, addingRulesetFile } = this.props.state;
-    const { name, content, path } = fileContent ? fileContent : addingRulesetFile;
+    const { name, content, path } = fileContent
+      ? fileContent
+      : addingRulesetFile;
 
     this.state = {
       isSaving: false,
@@ -61,8 +63,8 @@ class WzRulesetEditor extends Component {
       inputValue: '',
       content,
       name,
-      path,
-    }
+      path
+    };
   }
 
   componentWillUnmount() {
@@ -76,25 +78,28 @@ class WzRulesetEditor extends Component {
   }
 
   /**
-   * Save the new content 
-   * @param {String} name 
-   * @param {Boolean} overwrite 
+   * Save the new content
+   * @param {String} name
+   * @param {Boolean} overwrite
    */
   async save(name, overwrite = true) {
     if (!this._isMounted) {
       return;
     }
     try {
-      const { content } = this.state
+      const { content } = this.state;
       this.setState({ isSaving: true, error: false });
       const { section } = this.props.state;
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
-      if (section === 'decoders') saver = this.rulesetHandler.sendDecoderConfiguration;
-      await saver(name, content , overwrite);
+      if (section === 'decoders')
+        saver = this.rulesetHandler.sendDecoderConfiguration;
+      await saver(name, content, overwrite);
       try {
         await validateConfigAfterSent();
       } catch (error) {
-        const warning = Object.assign(error, { savedMessage: `File ${name} saved, but there were found several error while validating the configuration.` });
+        const warning = Object.assign(error, {
+          savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
+        });
         this.setState({ isSaving: false });
         this.goToEdit(name);
         this.showToast('warning', warning.savedMessage, warning.details, 3000);
@@ -103,14 +108,19 @@ class WzRulesetEditor extends Component {
       this.setState({ isSaving: false });
       this.goToEdit(name);
 
-      let textSuccess = 'New file successfully created'
-      if(overwrite) {
-        textSuccess = 'File successfully edited'
+      let textSuccess = 'New file successfully created';
+      if (overwrite) {
+        textSuccess = 'File successfully edited';
       }
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
-      this.showToast('danger', 'Error', 'Error saving CDB list: ' + error, 3000);
+      this.showToast(
+        'danger',
+        'Error',
+        'Error saving CDB list: ' + error,
+        3000
+      );
     }
   }
 
@@ -119,31 +129,40 @@ class WzRulesetEditor extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
-  goToEdit = (name) => {
+  goToEdit = name => {
     const { content, path } = this.state;
     const file = { name: name, content: content, path: path };
     this.props.updateFileContent(file);
-  }
+  };
 
   /**
    * onChange the input value in case adding new file
    */
   onChange = e => {
     this.setState({
-      inputValue: e.target.value,
+      inputValue: e.target.value
     });
   };
 
   render() {
-    const { section, adminMode, addingRulesetFile, fileContent } = this.props.state;
+    const {
+      section,
+      adminMode,
+      addingRulesetFile,
+      fileContent
+    } = this.props.state;
     const { name, content, path } = this.state;
-    const isEditable = addingRulesetFile ? true : (path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode);
+    const isEditable = addingRulesetFile
+      ? true
+      : path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode;
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
-    nameForSaving = name.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
+    nameForSaving = name.endsWith('.xml')
+      ? nameForSaving
+      : `${nameForSaving}.xml`;
     const overwrite = fileContent ? true : false;
 
     const saveButton = (
@@ -152,7 +171,8 @@ class WzRulesetEditor extends Component {
         iconType="save"
         isLoading={this.state.isSaving}
         isDisabled={nameForSaving.length <= 4}
-        onClick={() => this.save(nameForSaving, overwrite)}>
+        onClick={() => this.save(nameForSaving, overwrite)}
+      >
         Save
       </EuiButton>
     );
@@ -165,49 +185,56 @@ class WzRulesetEditor extends Component {
               {/* File name and back button */}
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  {!fileContent && (
+                  {(!fileContent && (
                     <EuiFlexGroup>
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip position="right" content={`Back to ${section}`}>
-                        <EuiButtonIcon
-                          aria-label="Back"
-                          color="primary"
-                          iconSize="l"
-                          iconType="arrowLeft"
-                          onClick={() => this.props.cleanInfo()} />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <EuiFieldText
-                        style={{ width: '300px' }}
-                        placeholder={`Type your new ${section} file name here`}
-                        value={this.state.inputValue}
-                        onChange={this.onChange}
-                        aria-label="aria-label to prevent react warning"
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  ) || (
-                    <EuiTitle>
-                      <h2>
-                        <EuiToolTip position="right" content={`Back to ${section}`}>
+                      <EuiFlexItem grow={false}>
+                        <EuiToolTip
+                          position="right"
+                          content={`Back to ${section}`}
+                        >
                           <EuiButtonIcon
                             aria-label="Back"
                             color="primary"
                             iconSize="l"
                             iconType="arrowLeft"
-                            onClick={() => this.props.cleanInfo()} />
+                            onClick={() => this.props.cleanInfo()}
+                          />
+                        </EuiToolTip>
+                      </EuiFlexItem>
+                      <EuiFlexItem>
+                        <EuiFieldText
+                          style={{ width: '300px' }}
+                          placeholder={`Type your new ${section} file name here`}
+                          value={this.state.inputValue}
+                          onChange={this.onChange}
+                          aria-label="aria-label to prevent react warning"
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )) || (
+                    <EuiTitle>
+                      <h2>
+                        <EuiToolTip
+                          position="right"
+                          content={`Back to ${section}`}
+                        >
+                          <EuiButtonIcon
+                            aria-label="Back"
+                            color="primary"
+                            iconSize="l"
+                            iconType="arrowLeft"
+                            onClick={() => this.props.cleanInfo()}
+                          />
                         </EuiToolTip>
                         {nameForSaving}
                       </h2>
                     </EuiTitle>
                   )}
                 </EuiFlexItem>
-                <EuiFlexItem />{/* This flex item is for separating between title and save button */}
+                <EuiFlexItem />
+                {/* This flex item is for separating between title and save button */}
                 {isEditable && (
-                  <EuiFlexItem grow={false}>
-                    {saveButton}
-                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
                 )}
               </EuiFlexGroup>
               <EuiSpacer size="m" />
@@ -219,7 +246,9 @@ class WzRulesetEditor extends Component {
                         width="100%"
                         height="calc(100vh - 225px)"
                         value={content}
-                        onChange={newContent => this.setState({content: newContent})}
+                        onChange={newContent =>
+                          this.setState({ content: newContent })
+                        }
                         mode="xml"
                         isReadOnly={!isEditable}
                         wrapEnabled
@@ -233,22 +262,25 @@ class WzRulesetEditor extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>
-      </EuiPage >
-    )
+      </EuiPage>
+    );
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
-    updateFileContent: content => dispatch(updateFileContent(content)),
-  }
+    updateFileContent: content => dispatch(updateFileContent(content))
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetEditor);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzRulesetEditor);

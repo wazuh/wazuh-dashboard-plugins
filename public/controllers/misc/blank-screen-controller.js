@@ -1,4 +1,4 @@
-import { AppState } from "../../react-services/app-state";
+import { AppState } from '../../react-services/app-state';
 import { WzMisc } from '../../factories/misc';
 
 /*
@@ -41,14 +41,14 @@ export class BlankScreenController {
       this.errorToShow = parsed || catchedError;
       this.$scope.$applyAsync();
       this.wzMisc.setBlankScr(false);
-    }else{
+    } else {
       this.goOverview();
       return;
     }
     this.$scope.blankScreenProps = {
       errorToShow: this.errorToShow,
       goToOverview: () => this.goOverview()
-    }
+    };
     this.showErrorPage = true;
     AppState.setWzMenu(false);
   }

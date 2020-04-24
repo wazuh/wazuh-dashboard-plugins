@@ -32,7 +32,11 @@ export default class ReportingHandler {
    */
   static async deleteReport(name) {
     try {
-      const result = await WzRequest.genericReq('DELETE', `/reports/${name}`, {});
+      const result = await WzRequest.genericReq(
+        'DELETE',
+        `/reports/${name}`,
+        {}
+      );
       return result;
     } catch (error) {
       return Promise.reject(error);

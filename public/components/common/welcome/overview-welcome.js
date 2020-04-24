@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React component building the welcome screen of an agent.
- * version, OS, registration date, last keep alive.
+ * Wazuh app - React component for building the Overview welcome screen.
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
@@ -12,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { StringsTools } from '../../../utils/strings-tools';
 import {
   EuiCard,
   EuiIcon,
@@ -24,17 +24,29 @@ import {
   EuiPage,
   EuiButton
 } from '@elastic/eui';
-
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import { updateCurrentTab } from '../../../redux/actions/appStateActions';
+import store from '../../../redux/store';
+import './welcome.less';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { UnsupportedComponents } from '../../../utils/components-os-support';
 
-export class WelcomeScreen extends Component {
+export class OverviewWelcome extends Component {
   constructor(props) {
     super(props);
+    this.strtools = new StringsTools();
 
     this.state = {
-      extensions: this.props.extensions,
+      extensions: this.props.extensions
     };
+  }
+
+  setGlobalBreadcrumb() {
+    const breadcrumb = [{ text: '' }, { text: 'Overview' }];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
+  componentDidMount() {
+    this.setGlobalBreadcrumb();
   }
 
   buildTabCard(tab, icon) {
@@ -46,7 +58,8 @@ export class WelcomeScreen extends Component {
           icon={<EuiIcon size="xl" type={icon} color="primary" />}
           className="homSynopsis__card"
           title={TabDescription[tab].title}
-          onClick={() => this.props.switchTab(tab)}
+          onClick={() => store.dispatch(updateCurrentTab(tab))}
+          data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
           description={TabDescription[tab].description}
         />
       </EuiFlexItem>
@@ -56,21 +69,18 @@ export class WelcomeScreen extends Component {
   render() {
     return (
       <Fragment>
-        <EuiPage>
+        <EuiPage className="wz-welcome-page">
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiPanel betaBadgeLabel="Security Information Management">
-                    <EuiFlexGroup gutterSize="xs">
-                      <EuiFlexItem />
-                    </EuiFlexGroup>
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('general', 'dashboardApp')}
                       {this.buildTabCard('fim', 'filebeatApp')}
-                      {this.buildTabCard('configuration', 'gear')}
-                      {this.buildTabCard('syscollector', 'notebookApp')}
+                      {this.props.extensions.aws &&
+                        this.buildTabCard('aws', 'logoAWSMono')}
                     </EuiFlexGrid>
                   </EuiPanel>
                 </EuiFlexItem>
@@ -79,7 +89,6 @@ export class WelcomeScreen extends Component {
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('pm', 'advancedSettingsApp')}
-                      {this.buildTabCard('sca', 'securityAnalyticsApp')}
                       {this.props.extensions.audit &&
                         this.buildTabCard('audit', 'monitoringApp')}
                       {this.props.extensions.oscap &&
@@ -96,34 +105,8 @@ export class WelcomeScreen extends Component {
                 <EuiFlexItem>
                   <EuiPanel betaBadgeLabel="Threat Detection and Response">
                     <EuiSpacer size="s" />
-                    {(
-                      UnsupportedComponents[this.props.agent.agentPlatform] ||
-                      UnsupportedComponents['other']
-                    ).includes('vuls') &&
-                      !this.props.extensions.virustotal &&
-                      !this.props.extensions.osquery &&
-                      !this.props.extensions.mitre &&
-                      !this.props.extensions.docker && (
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiCallOut
-                              title={
-                                <p>
-                                  Click the <EuiIcon type="eye" /> icon to show thread detection and
-                                  response extensions.
-                                </p>
-                              }
-                              color="success"
-                              iconType="help"
-                            />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      )}
                     <EuiFlexGrid columns={2}>
-                      {!(
-                        UnsupportedComponents[this.props.agent.agentPlatform] ||
-                        UnsupportedComponents['other']
-                      ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
+                      {this.buildTabCard('vuls', 'securityApp')}
                       {this.props.extensions.virustotal &&
                         this.buildTabCard('virustotal', 'savedObjectsApp')}
                       {this.props.extensions.osquery &&
@@ -131,7 +114,8 @@ export class WelcomeScreen extends Component {
                       {this.props.extensions.docker &&
                         this.buildTabCard('docker', 'logoDocker')}
                       {this.props.extensions.mitre &&
-                        this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
+                        this.buildTabCard('mitre', 'spacesApp')}{' '}
+                      {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
                   </EuiPanel>
                 </EuiFlexItem>
@@ -162,31 +146,20 @@ export class WelcomeScreen extends Component {
                       this.props.extensions.gdpr ||
                       this.props.extensions.hipaa ||
                       this.props.extensions.nist) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                        </EuiFlexGrid>
-                      )}
+                      <EuiFlexGrid columns={2}>
+                        {this.props.extensions.pci &&
+                          this.buildTabCard('pci', 'visTagCloud')}
+                        {this.props.extensions.nist &&
+                          this.buildTabCard('nist', 'apmApp')}
+                        {this.props.extensions.gdpr &&
+                          this.buildTabCard('gdpr', 'visBarVertical')}
+                        {this.props.extensions.hipaa &&
+                          this.buildTabCard('hipaa', 'emsApp')}
+                      </EuiFlexGrid>
+                    )}
                   </EuiPanel>
                 </EuiFlexItem>
               </EuiFlexGroup>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
-        <EuiPage>
-          <EuiFlexGroup justifyContent="spaceAround">
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                onClick={() => window.location.href = "#/settings?tab=modules"}
-                iconType="eye">
-                Configure the modules
-              </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPage>

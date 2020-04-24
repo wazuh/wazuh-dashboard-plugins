@@ -30,7 +30,7 @@ import 'angular-sanitize';
 // Require CSS
 import './less/loader';
 // Require lib to dashboards PDFs
-require ('./utils/dom-to-image.js');
+require('./utils/dom-to-image.js');
 
 // EUI React components wrapper
 import './components';
@@ -76,7 +76,7 @@ const app = getAngularModule('app/wazuh');
 
 app.config([
   '$compileProvider',
-  function ($compileProvider) {
+  function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -85,20 +85,24 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function ($httpProvider) {
+  function($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function () {
-  chrome
-    .setRootTemplate(`
+app.run([
+  '$injector',
+  function(_$injector) {
+    chrome
+      .setRootTemplate(
+        `
     <react-component name="WzMenuWrapper" props="" />
     <div class="wazuhNotReadyYet"></div>
     <div ng-view class="mainView"></div>
-  `)
-    .setRootController(() => require('./app'));
-  changeWazuhNavLogo();
-});
-
-
+  `
+      )
+      .setRootController(() => require('./app'));
+    changeWazuhNavLogo();
+    app.$injector = _$injector;
+  }
+]);

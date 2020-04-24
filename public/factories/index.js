@@ -23,4 +23,4 @@ app
   .service('loadedVisualizations', LoadedVisualizations)
   .service('discoverPendingUpdates', DiscoverPendingUpdates)
   .service('visHandlers', VisHandlers)
-  .service('vis2png', Vis2PNG)
+  .service('vis2png', Vis2PNG);

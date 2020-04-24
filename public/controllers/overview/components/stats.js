@@ -24,19 +24,22 @@ export class Stats extends Component {
   goToAgents(status) {
     let selectedOptions = [];
 
-    if(status !== null) {
+    if (status !== null) {
       selectedOptions = [
         {
-          className: "wzFilterBarOperator",
-          group: "status",
-          label: "status:" + status,
+          className: 'wzFilterBarOperator',
+          group: 'status',
+          label: 'status:' + status,
           label_: status,
-          type: "AND",
+          type: 'AND'
         }
       ];
     }
-    
-    sessionStorage.setItem('agents_preview_selected_options', JSON.stringify(selectedOptions));
+
+    sessionStorage.setItem(
+      'agents_preview_selected_options',
+      JSON.stringify(selectedOptions)
+    );
     window.location.href = '#/agents-preview';
   }
 

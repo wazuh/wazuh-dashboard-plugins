@@ -10,7 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiInMemoryTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import {
+  EuiInMemoryTable,
+  EuiCallOut,
+  EuiOverlayMask,
+  EuiConfirmModal
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import ReportingHandler from './utils/reporting-handler';
@@ -30,7 +35,7 @@ class WzReportingTable extends Component {
     super(props);
     this.state = {
       items: [],
-      isLoading: false,
+      isLoading: false
     };
 
     this.reportingHandler = ReportingHandler;
@@ -60,7 +65,7 @@ class WzReportingTable extends Component {
       const items = ((rawItems || {}).data || {}).list || [];
       this.setState({
         items,
-        isProcessing: false,
+        isProcessing: false
       });
       this.props.updateIsProcessing(false);
     } catch (error) {
@@ -79,8 +84,8 @@ class WzReportingTable extends Component {
     const sorting = {
       sort: {
         field: 'date',
-        direction: 'desc',
-      },
+        direction: 'desc'
+      }
     };
 
     if (!error) {
@@ -124,7 +129,7 @@ class WzReportingTable extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -142,16 +147,21 @@ class WzReportingTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.reportingReducers,
+    state: state.reportingReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
+    updateListItemsForRemove: itemList =>
+      dispatch(updateListItemsForRemove(itemList))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzReportingTable);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzReportingTable);

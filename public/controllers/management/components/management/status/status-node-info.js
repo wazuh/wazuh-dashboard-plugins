@@ -32,10 +32,12 @@ export class WzStatusNodeInfo extends Component {
 
   render() {
     const { nodeInfo, selectedNode } = this.props.state;
-    const title = selectedNode ? selectedNode + ' information' : 'Manager information';
+    const title = selectedNode
+      ? selectedNode + ' information'
+      : 'Manager information';
 
     const greyStyle = {
-      color: 'grey',
+      color: 'grey'
     };
 
     return (
@@ -57,7 +59,9 @@ export class WzStatusNodeInfo extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Compilation date</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{nodeInfo.compilation_date}</EuiFlexItem>
+          <EuiFlexItem style={greyStyle}>
+            {nodeInfo.compilation_date}
+          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Installation path</EuiFlexItem>
@@ -73,7 +77,9 @@ export class WzStatusNodeInfo extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>OpenSSL Support</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{nodeInfo.openssl_support}</EuiFlexItem>
+          <EuiFlexItem style={greyStyle}>
+            {nodeInfo.openssl_support}
+          </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
     );
@@ -82,7 +88,7 @@ export class WzStatusNodeInfo extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers,
+    state: state.statusReducers
   };
 };
 

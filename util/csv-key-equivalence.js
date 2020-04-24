@@ -120,6 +120,6 @@ export const KeyEquivalence = {
   rules: 'Rules',
   reason: 'Reason',
   registerIP: 'Register IP',
-  'hotfix': 'Update code',
+  hotfix: 'Update code',
   'scan.time': 'Registered by Wazuh at'
 };

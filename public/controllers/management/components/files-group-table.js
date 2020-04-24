@@ -34,7 +34,7 @@ export class FilesInGroupTable extends Component {
       groupName: this.props.group.name || 'Group',
       files: [],
       originalfiles: [],
-      isLoading: false,
+      isLoading: false
     };
 
     this.filters = { name: 'search', value: '' };
@@ -48,23 +48,23 @@ export class FilesInGroupTable extends Component {
         originalfiles: files
       });
     } catch (error) {
-      console.error('error mounting the component ', error)
+      console.error('error mounting the component ', error);
     }
   }
 
   onQueryChange = ({ query }) => {
     if (query) {
       this.setState({ isLoading: true });
-      const filter = query.text || "";
+      const filter = query.text || '';
       this.filters.value = filter;
       const items = filter
         ? this.state.originalfiles.filter(item => {
-          return item.filename.toLowerCase().includes(filter.toLowerCase());
-        })
+            return item.filename.toLowerCase().includes(filter.toLowerCase());
+          })
         : this.state.originalfiles;
       this.setState({
         isLoading: false,
-        files: items,
+        files: items
       });
     }
   };
@@ -82,7 +82,7 @@ export class FilesInGroupTable extends Component {
       });
     } catch (error) {
       this.setState({ refreshingFiles: false });
-      console.error('error refreshing files ', error)
+      console.error('error refreshing files ', error);
     }
   }
 
@@ -103,13 +103,15 @@ export class FilesInGroupTable extends Component {
 
         render: item => {
           return (
-            <EuiToolTip
-              position="right"
-              content="See file content"
-            >
+            <EuiToolTip position="right" content="See file content">
               <EuiButtonIcon
                 aria-label="See file content"
-                onClick={() => this.props.openFileContent(this.state.groupName, item.filename)}
+                onClick={() =>
+                  this.props.openFileContent(
+                    this.state.groupName,
+                    item.filename
+                  )
+                }
                 iconType="eye"
               />
             </EuiToolTip>
@@ -127,7 +129,7 @@ export class FilesInGroupTable extends Component {
     };
 
     return (
-      <EuiPanel paddingSize="l" className='wz-margin-16'>
+      <EuiPanel paddingSize="l" className="wz-margin-16">
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFlexGroup>
@@ -149,13 +151,20 @@ export class FilesInGroupTable extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <ExportConfiguration
-              exportConfiguration={enabledComponents => this.props.exportConfigurationProps.exportConfiguration(enabledComponents)}
-              type={this.props.exportConfigurationProps.type} />
+              exportConfiguration={enabledComponents =>
+                this.props.exportConfigurationProps.exportConfiguration(
+                  enabledComponents
+                )
+              }
+              type={this.props.exportConfigurationProps.type}
+            />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
               iconType="importAction"
-              onClick={async () => await this.props.export(this.state.groupName, [this.filters])}
+              onClick={async () =>
+                await this.props.export(this.state.groupName, [this.filters])
+              }
             >
               Export formatted
             </EuiButtonEmpty>
@@ -169,7 +178,8 @@ export class FilesInGroupTable extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can list and see your group files, also, you can edit the group configuration
+              From here you can list and see your group files, also, you can
+              edit the group configuration
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -194,4 +204,3 @@ FilesInGroupTable.propTypes = {
   editConfig: PropTypes.func,
   openFileContent: PropTypes.func
 };
-

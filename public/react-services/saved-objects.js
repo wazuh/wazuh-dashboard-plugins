@@ -10,16 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { GenericRequest } from './generic-request'
+import { GenericRequest } from './generic-request';
 
 export class SavedObject {
-  
   /**
-   * 
+   *
    * Returns the full list of index patterns
    * ONLY indices that matches the pattern "wazuh*" will be returned
    */
-  static async getListOfIndexPatterns() { 
+  static async getListOfIndexPatterns() {
     try {
       const result = await GenericRequest.request(
         'GET',
@@ -35,8 +34,8 @@ export class SavedObject {
     }
   }
 
-   /**
-   * 
+  /**
+   *
    * Returns the full list of index patterns that are valid
    * An index is valid if its fields contain at least these 4 fields: 'timestamp', 'rule.groups', 'agent.id' and 'manager.name'
    */
@@ -44,18 +43,23 @@ export class SavedObject {
     try {
       const list = await this.getListOfIndexPatterns();
       const result = list.filter(item => {
-        if(item.attributes && item.attributes.fields){
+        if (item.attributes && item.attributes.fields) {
           const fields = JSON.parse(item.attributes.fields);
-          const minimum = {'timestamp' : true, 'rule.groups': true, 'manager.name': true, 'agent.id': true};
+          const minimum = {
+            timestamp: true,
+            'rule.groups': true,
+            'manager.name': true,
+            'agent.id': true
+          };
           let validCount = 0;
 
           fields.map(currentField => {
-            if(minimum[currentField.name]){
+            if (minimum[currentField.name]) {
               validCount++;
             }
           });
 
-          if(validCount === 4){
+          if (validCount === 4) {
             return true;
           }
         }
@@ -63,8 +67,8 @@ export class SavedObject {
       });
 
       const validIndexPatterns = result.map(item => {
-        return {id: item.id, title: item.attributes.title}
-      })
+        return { id: item.id, title: item.attributes.title };
+      });
       return validIndexPatterns;
     } catch (error) {
       return ((error || {}).data || {}).message || false
@@ -73,9 +77,8 @@ export class SavedObject {
     }
   }
 
-
   /**
-   * 
+   *
    * Given an index pattern ID, checks if it exists
    */
   static async existsIndexPattern(patternID) {
@@ -86,9 +89,9 @@ export class SavedObject {
       );
 
       const title = (((result || {}).data || {}).attributes || {}).title;
-      if(title){
+      if (title) {
         return {
-          data: "Index pattern found",
+          data: 'Index pattern found',
           status: true,
           statusCode: 200,
           title: title
@@ -101,8 +104,7 @@ export class SavedObject {
     }
   }
 
-
-  static async createSavedObject(type, id, params, fields='') {
+  static async createSavedObject(type, id, params, fields = '') {
     try {
       const result = await GenericRequest.request(
         'POST',
@@ -110,9 +112,9 @@ export class SavedObject {
         params
       );
 
-      if(type === 'index-pattern')
-        await this.refreshFieldsOfIndexPattern(id,fields);
-      
+      if (type === 'index-pattern')
+        await this.refreshFieldsOfIndexPattern(id, fields);
+
       return result;
     } catch (error) {
       return ((error || {}).data || {}).message || false
@@ -121,7 +123,7 @@ export class SavedObject {
     }
   }
 
-  static async refreshFieldsOfIndexPattern(id,fields) {
+  static async refreshFieldsOfIndexPattern(id, fields) {
     try {
       // same logic as Kibana when a new index is created, you need to refresh it to see its fields
       // we force the refresh of the index by requesting its fields and the assign these fields
@@ -130,10 +132,10 @@ export class SavedObject {
         'PUT',
         `/api/saved_objects/index-pattern/${id}`,
         {
-          attributes:{
+          attributes: {
             fields: JSON.stringify(fields.data.fields),
-            timeFieldName: "timestamp",
-            title: "wazuh-alerts-3.x-*"
+            timeFieldName: 'timestamp',
+            title: 'wazuh-alerts-3.x-*'
           }
         }
       );
@@ -146,17 +148,28 @@ export class SavedObject {
   }
 
   /**
-   * Creates the 'wazuh-alerts-3.x-*'  index pattern 
+   * Creates the 'wazuh-alerts-3.x-*'  index pattern
    */
   static async createWazuhIndexPattern() {
     try {
-      const fields = await GenericRequest.request( //we check if indices exist before creating the index pattern
+      const fields = await GenericRequest.request(
+        //we check if indices exist before creating the index pattern
         'GET',
         `/api/index_patterns/_fields_for_wildcard?pattern=wazuh-alerts-3.x-*&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
         {}
       );
 
-      await this.createSavedObject('index-pattern', 'wazuh-alerts-3.x-*', { "attributes": { "title": "wazuh-alerts-3.x-*", "timeFieldName": 'timestamp' } }, fields);
+      await this.createSavedObject(
+        'index-pattern',
+        'wazuh-alerts-3.x-*',
+        {
+          attributes: {
+            title: 'wazuh-alerts-3.x-*',
+            timeFieldName: 'timestamp'
+          }
+        },
+        fields
+      );
       return;
     } catch (error) {
       return ((error || {}).data || {}).message || false

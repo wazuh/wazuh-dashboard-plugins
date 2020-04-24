@@ -13,7 +13,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
-import { PatternHandler } from '../../react-services/pattern-handler'
+import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
@@ -79,7 +79,7 @@ export class HealthCheck {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -97,20 +97,19 @@ export class HealthCheck {
    */
   async checkPatterns() {
     try {
-
       const patternId = AppState.getCurrentPattern();
-      let patternTitle = "";
+      let patternTitle = '';
       if (this.checks.pattern) {
         const i = this.results.map(item => item.id).indexOf(2);
         var patternData = await SavedObject.existsIndexPattern(patternId);
         patternTitle = patternData.title;
         if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList();
-          if(patternList.length){
+          if (patternList.length) {
             const currentPattern = patternList[0].id;
             AppState.setCurrentPattern(currentPattern);
             return this.checkPatterns();
-          }else{
+          } else {
             this.errors.push('The selected index-pattern is not present.');
             this.results[i].status = 'Error';
           }
@@ -121,7 +120,7 @@ export class HealthCheck {
       }
 
       if (this.checks.template) {
-        if(!patternTitle){
+        if (!patternTitle) {
           var patternData = await SavedObject.existsIndexPattern(patternId);
           patternTitle = patternData.title;
         }
@@ -145,25 +144,24 @@ export class HealthCheck {
     }
   }
 
-  async trySetDefault(){
-    try{
+  async trySetDefault() {
+    try {
       const response = await GenericRequest.request('GET', '/hosts/apis');
       const hosts = response.data;
-      
-      if(hosts.length){
-        for(var i=0; i<hosts.length; i++){
-          try{
+
+      if (hosts.length) {
+        for (var i = 0; i < hosts.length; i++) {
+          try {
             const API = await ApiCheck.checkApi(hosts[i]);
-            if( API && API.data && API.data.status === "enabled"){
+            if (API && API.data && API.data.status === 'enabled') {
               return hosts[i].id;
             }
-          }catch(err){ }
+          } catch (err) {}
         }
       }
-    }catch(err){ }
-    throw new Error("Error connecting to the API.")
+    } catch (err) {}
+    throw new Error('Error connecting to the API.');
   }
-
 
   /**
    * This attempts to connect with API
@@ -173,23 +171,29 @@ export class HealthCheck {
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (this.checks.api && currentApi && currentApi.id) {
         let data;
-        try{
+        try {
           data = await ApiCheck.checkStored(currentApi.id);
-        }catch(err){
+        } catch (err) {
           const newApi = await this.trySetDefault();
-          data = await ApiCheck.checkStored(newApi,true);
+          data = await ApiCheck.checkStored(newApi, true);
         }
 
         if (((data || {}).data || {}).idChanged) {
-          this.showToast('warning', 'Selected Wazuh API has been updated', '', 3000);
+          this.showToast(
+            'warning',
+            'Selected Wazuh API has been updated',
+            '',
+            3000
+          );
           const apiRaw = JSON.parse(AppState.getCurrentAPI());
           AppState.setCurrentAPI(
             JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
           );
         }
         //update cluster info
-        const cluster_info = (((data || {}).data || {}).data || {}).cluster_info;
-        if(cluster_info){
+        const cluster_info = (((data || {}).data || {}).data || {})
+          .cluster_info;
+        if (cluster_info) {
           AppState.setClusterInfo(cluster_info);
         }
         const i = this.results.map(item => item.id).indexOf(0);
@@ -308,7 +312,7 @@ export class HealthCheck {
 
       this.checksDone = true;
 
-      if(this.checks.fields){
+      if (this.checks.fields) {
         try {
           await this.genericReq.request('GET', '/elastic/known-fields/all', {});
           this.results[this.results.length - 1].status = 'Ready';
@@ -337,6 +341,6 @@ export class HealthCheck {
    * This navigates to app root path or an a previous stored location
    */
   goApp() {
-    window.location.href = "/app/wazuh#/settings";
+    window.location.href = '/app/wazuh#/settings';
   }
 }

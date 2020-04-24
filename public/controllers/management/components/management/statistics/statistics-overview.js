@@ -11,9 +11,24 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, EuiInMemoryTable, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiSpacer, EuiSelect, EuiProgress } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiButtonEmpty,
+  EuiInMemoryTable,
+  EuiPanel,
+  EuiTitle,
+  EuiPage,
+  EuiText,
+  EuiCallOut,
+  EuiTabs,
+  EuiTab,
+  EuiSpacer,
+  EuiSelect,
+  EuiProgress
+} from '@elastic/eui';
 
-import StatisticsHandler from './utils/statistics-handler'
+import StatisticsHandler from './utils/statistics-handler';
 import { clusterNodes } from '../configuration/utils/wz-fetch';
 
 export class WzStatisticsOverview extends Component {
@@ -36,12 +51,14 @@ export class WzStatisticsOverview extends Component {
       {
         id: 'analysisd',
         name: 'analysisd'
-      },
+      }
     ];
 
     this.info = {
-      remoted: 'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
-      analysisd: "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'."
+      remoted:
+        'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
+      analysisd:
+        "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'."
     };
   }
 
@@ -50,7 +67,7 @@ export class WzStatisticsOverview extends Component {
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.items.map(item => {
-        return { value: item.name, text: `${item.name} (${item.type})` }
+        return { value: item.name, text: `${item.name} (${item.type})` };
       });
       this.setState({
         clusterNodes: nodes,
@@ -65,26 +82,32 @@ export class WzStatisticsOverview extends Component {
     this.fetchData();
   }
 
-  componentDidUpdate() { }
+  componentDidUpdate() {}
 
   componentWillUnmount() {
     this._isMounted = false;
   }
 
   onSelectedTabChanged = id => {
-    this.setState({
-      selectedTabId: id,
-      searchvalue: ''
-    }, () => {
-      this.fetchData();
-    });
+    this.setState(
+      {
+        selectedTabId: id,
+        searchvalue: ''
+      },
+      () => {
+        this.fetchData();
+      }
+    );
   };
 
   async fetchData() {
     this.setState({
-      isLoading: true,
+      isLoading: true
     });
-    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId, this.state.clusterNodeSelected);
+    const data = await this.statisticsHandler.demonStatistics(
+      this.state.selectedTabId,
+      this.state.clusterNodeSelected
+    );
     this.setState({
       stats: data.data.data,
       isLoading: false
@@ -104,16 +127,22 @@ export class WzStatisticsOverview extends Component {
   }
 
   onSelectNode = e => {
-    this.setState({
-      clusterNodeSelected: e.target.value
-    }, () => {
-      this.fetchData();
-    });
+    this.setState(
+      {
+        clusterNodeSelected: e.target.value
+      },
+      () => {
+        this.fetchData();
+      }
+    );
   };
 
   render() {
     const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.fetchData()}>
+      <EuiButtonEmpty
+        iconType="refresh"
+        onClick={async () => await this.fetchData()}
+      >
         Refresh
       </EuiButtonEmpty>
     );
@@ -137,8 +166,12 @@ export class WzStatisticsOverview extends Component {
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
-            {!!(this.state.clusterNodes && this.state.clusterNodes.length && this.state.clusterNodeSelected) && (
-              <EuiFlexItem grow={false} >
+            {!!(
+              this.state.clusterNodes &&
+              this.state.clusterNodes.length &&
+              this.state.clusterNodeSelected
+            ) && (
+              <EuiFlexItem grow={false}>
                 <EuiSelect
                   id="selectNode"
                   options={this.state.clusterNodes}
@@ -158,29 +191,31 @@ export class WzStatisticsOverview extends Component {
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiTabs>{
-                this.renderTabs()
-              }</EuiTabs>
+              <EuiTabs>{this.renderTabs()}</EuiTabs>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size={'m'} />
-          {this.state.isLoading &&
-            <EuiProgress size="xs" color="primary" />
-          }
-          {!!((Object.entries(this.state.stats) || []).length && !this.state.isLoading) && (
+          {this.state.isLoading && <EuiProgress size="xs" color="primary" />}
+          {!!(
+            (Object.entries(this.state.stats) || []).length &&
+            !this.state.isLoading
+          ) && (
             <div>
-              <EuiCallOut title={this.info[this.state.selectedTabId]} iconType="iInCircle" />
+              <EuiCallOut
+                title={this.info[this.state.selectedTabId]}
+                iconType="iInCircle"
+              />
               <EuiSpacer size={'m'} />
               <EuiInMemoryTable
                 items={Object.entries(this.state.stats)}
                 columns={[
                   {
                     field: '0',
-                    name: 'Indicator',
+                    name: 'Indicator'
                   },
                   {
                     field: '1',
-                    name: 'Value',
+                    name: 'Value'
                   }
                 ]}
                 pagination={true}

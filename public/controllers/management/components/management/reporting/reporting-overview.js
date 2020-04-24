@@ -11,7 +11,14 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiPanel, EuiTitle, EuiPage, EuiText } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiPanel,
+  EuiTitle,
+  EuiPage,
+  EuiText
+} from '@elastic/eui';
 
 // Wazuh components
 import WzReportingTable from './reporting-table';

@@ -10,12 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiSideNav,
-  EuiIcon
-} from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
@@ -49,7 +44,7 @@ class WzMenuManagement extends Component {
       rules: '/rules',
       decoders: '/decoders',
       lists: '/lists/files'
-    }
+    };
 
     this.wzReq = WzRequest;
   }
@@ -61,8 +56,7 @@ class WzMenuManagement extends Component {
     }
   }
 
-  componentDidMount() {
-  }
+  componentDidMount() {}
 
   clickMenuItem = section => {
     this.props.closePopover();
@@ -76,7 +70,7 @@ class WzMenuManagement extends Component {
       id: item.id,
       name: item.text,
       isSelected: this.props.state.section === item.id,
-      onClick: () => this.clickMenuItem(item.id),
+      onClick: () => this.clickMenuItem(item.id)
     };
   };
 
@@ -106,7 +100,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.statistics),
           this.createItem(this.managementSections.logs),
           this.createItem(this.managementSections.reporting)
-        ],
+        ]
       })
     ];
 
@@ -114,16 +108,10 @@ class WzMenuManagement extends Component {
       <div className="WzManagementSideMenu">
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
-            <EuiSideNav
-              items={sideNavAdmin}
-              style={{ padding: '4px 12px' }}
-            />
+            <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiSideNav
-              items={sideNavStatus}
-              style={{ padding: '4px 12px' }}
-            />
+            <EuiSideNav items={sideNavStatus} style={{ padding: '4px 12px' }} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
@@ -131,11 +119,13 @@ class WzMenuManagement extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-
-export default connect(mapStateToProps, null)(WzMenuManagement);
+export default connect(
+  mapStateToProps,
+  null
+)(WzMenuManagement);

@@ -6,12 +6,12 @@ import { EuiSuggestInput } from './suggest_input';
 export class EuiSuggest extends Component {
   state = {
     value: '',
-    status: 'unsaved',
+    status: 'unsaved'
   };
 
   getValue = val => {
     this.setState({
-      value: val,
+      value: val
     });
   };
 
@@ -80,5 +80,5 @@ EuiSuggest.propTypes = {
 };
 
 EuiSuggestInput.defaultProps = {
-  status: 'unchanged',
+  status: 'unchanged'
 };
