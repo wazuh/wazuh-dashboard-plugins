@@ -394,11 +394,10 @@ function generateAlert(params) {
         alert.syscheck.gname_after = "root";
         alert.syscheck.mtime_after = new Date(randomDate());
         alert.syscheck.size_after = randomIntervalInteger(0,65);
-        alert.syscheck.uid_after = "0";
-        alert.syscheck.gid_after = "0";
+        alert.syscheck.uid_after = randomArrayItem(IntegrityMonitoring.uid_after);
+        alert.syscheck.gid_after = randomArrayItem(IntegrityMonitoring.gid_after);
         alert.syscheck.perm_after = "rw-r--r--";
         alert.syscheck.inode_after = randomIntervalInteger(0,100000);
-
         switch (alert.syscheck.event) {
             case "added":
                 alert.rule = IntegrityMonitoring.regulatory[0];

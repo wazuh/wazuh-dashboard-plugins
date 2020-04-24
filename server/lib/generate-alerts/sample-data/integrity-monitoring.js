@@ -30,7 +30,9 @@ export const paths = [
   "/var/ossec/queue/fim/db/fim.db",
   "/var/osquery/osquery.db/CURRENT",
   "/run/utmp"
-]
+];
+export const uid_after = ["0", "S-1-5-18", "S-1-5-32-544", "996", "S-1-5-19"];
+export const gid_after = ["994", "0", "993", "190", "22"];
 export const tags = ["tmp"];
 export const regulatory = [
   {
