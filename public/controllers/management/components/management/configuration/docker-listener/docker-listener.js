@@ -95,7 +95,7 @@ class WzConfigurationDockerListener extends Component {
             title="Main settings"
             description="General Docker listener settings"
             currentConfig={this.wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 280 : 350}
+            minusHeight={this.props.agent.id === '000' ? 240 : 350}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsGroup

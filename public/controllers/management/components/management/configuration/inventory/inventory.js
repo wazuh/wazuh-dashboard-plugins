@@ -91,7 +91,7 @@ class WzConfigurationInventory extends Component {
             title="Main settings"
             description="General settings applied to all the scans"
             currentConfig={this.wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 280 : 350}
+            minusHeight={this.props.agent.id === '000' ? 245 : 350}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsGroup

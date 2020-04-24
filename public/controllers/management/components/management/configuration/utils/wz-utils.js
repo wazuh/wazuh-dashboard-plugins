@@ -11,7 +11,6 @@
  */
 
 import { UnsupportedComponents } from '../../../../../../utils/components-os-support';
-import WzConfigurationSettings from '../configuration-settings';
 
 export const shouldShowComponent = (component, agent) => {
   return !(

@@ -27,7 +27,7 @@ import store from '../../../../../redux/store';
 export default class WzLogs extends Component {
   constructor(props) {
     super(props);
-    this.offset = 377;
+    this.offset = 325;
     this.state = {
       isCluster: false,
       selectedDaemon: '',
