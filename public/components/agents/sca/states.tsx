@@ -343,11 +343,11 @@ export class States extends Component {
                   <EuiFlexItem grow={false}>
                     <EuiButtonIcon
                       color='primary'
-                      iconSize='l'
                       style={{ padding: '6px 0px' }}
                       onClick={() => this.loadScaPolicy(false)}
                       iconType="arrowLeft"
                       aria-label="Back to policies"
+                      {...{iconSize:'l'}}
                     />
                   </EuiFlexItem>
                   <EuiFlexItem>
@@ -357,7 +357,6 @@ export class States extends Component {
                         <EuiToolTip position="right" content="Show policy checksum">
                           <EuiButtonEmpty
                             iconType="iInCircle"
-                            iconSize="m"
                             aria-label="Help"
                             onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}>
                             More info
