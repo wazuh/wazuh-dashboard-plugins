@@ -36,17 +36,17 @@ export class States extends Component {
       {
         field: 'pass',
         name: 'Pass',
-        width: 100
+        width: "100px"
       },
       {
         field: 'fail',
         name: 'Fail',
-        width: 100
+        width: "100px"
       },
       {
         field: 'invalid',
         name: 'Not applicable',
-        width: 100
+        width: "100px"
       },
       {
         field: 'score',
@@ -54,7 +54,7 @@ export class States extends Component {
         render: score => {
           return `${score}%`;
         },
-        width: 100
+        width: "100px"
       },
     ];
     this.columnsChecks = [
@@ -62,7 +62,7 @@ export class States extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: 100
+        width: "100px"
       },
       {
         field: 'title',
@@ -90,12 +90,12 @@ export class States extends Component {
         name: 'Result',
         truncateText: true,
         sortable: true,
-        width: 150,
+        width: "150px",
         render: this.addHealthResultRender,
       },
       {
         align: 'right',
-        width: 40,
+        width: "40px",
         isExpander: true,
         render: item => (
           <EuiButtonIcon
