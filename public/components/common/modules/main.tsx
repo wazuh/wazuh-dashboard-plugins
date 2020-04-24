@@ -40,6 +40,7 @@ export class MainModule extends Component {
     this.reportingService = new ReportingService();
     this.state = {
       selectView: false,
+      loadingReport: false
     };
   }
 
@@ -135,12 +136,20 @@ export class MainModule extends Component {
     );
   }
 
+  async startReport(){
+    this.setState({loadingReport: true});
+    await this.reportingService.startVis2Png(this.props.section, this.props.agent.id);
+    this.setState({loadingReport: false});
+  }
+
   renderReportButton() {
     return (
       <EuiFlexItem grow={false}>
         <EuiButton
           iconType="document"
-          onClick={() => this.reportingService.startVis2Png(this.props.section, this.props.agent.id)}>
+          isLoading={this.state.loadingReport}
+          isDisabled={this.props.disabledReport}
+          onClick={async() => this.startReport()}>
           Generate report
           </EuiButton>
       </EuiFlexItem>

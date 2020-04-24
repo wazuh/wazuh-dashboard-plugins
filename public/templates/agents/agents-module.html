@@ -1,5 +1,5 @@
 <div ng-if="tab !== 'welcome' && agent">
-    <react-component name="MainModule" props="{agent, section: tab}" />
+    <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
     <div ng-if='!loadingDashboard'>
         <div ng-if='showModuleDashboard || showModuleEvents'>
             <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
