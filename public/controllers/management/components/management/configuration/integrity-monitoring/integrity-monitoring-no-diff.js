@@ -43,7 +43,7 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component {
               title="No diff directories"
               description="This files won't have their diff calculated"
               currentConfig={currentConfig['syscheck-syscheck']}
-              minusHeight={this.props.agent.id === '000' ? 340 : 410}
+              minusHeight={this.props.agent.id === '000' ? 310 : 410}
               helpLinks={helpLinks}
             >
               <EuiBasicTable

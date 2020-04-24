@@ -152,7 +152,7 @@ class WzConfigurationIntegrations extends Component {
                 <WzSettingsViewer
                   mode="json"
                   value={currentConfig}
-                  minusHeight={280}
+                  minusHeight={245}
                 />
               </WzViewSelectorSwitch>
               <WzViewSelectorSwitch view="xml">
@@ -167,7 +167,7 @@ class WzConfigurationIntegrations extends Component {
                 <WzSettingsViewer
                   mode="xml"
                   value={currentConfig}
-                  minusHeight={280}
+                  minusHeight={245}
                 />
               </WzViewSelectorSwitch>
             </WzViewSelector>

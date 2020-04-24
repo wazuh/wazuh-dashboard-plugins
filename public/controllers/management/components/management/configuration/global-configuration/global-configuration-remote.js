@@ -105,7 +105,7 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
             <WzConfigurationSettingsTabSelector
               title="Remote settings"
               description="Configuration to listen for events from the agents or a syslog client"
-              minusHeight={340}
+              minusHeight={310}
               currentConfig={currentConfig}
               helpLinks={helpLinks}
             >

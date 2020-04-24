@@ -85,7 +85,7 @@ class WzConfigurationLogCollectionCommands extends Component {
             title="Command monitoring"
             description="All output from these commands will be read as one or more log messages depending on whether command or full_command is used."
             currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 340 : 410}
+            minusHeight={this.props.agent.id === '000' ? 310 : 410}
             helpLinks={helpLinks}
           >
             <WzConfigurationListSelector

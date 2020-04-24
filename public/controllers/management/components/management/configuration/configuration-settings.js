@@ -102,7 +102,7 @@ export default [
         description:
           'Configuration assessment and automation of compliance monitoring using SCAP checks',
         goto: 'open-scap',
-        when: agent => shouldShowComponent('docker', agent)
+        when: agent => shouldShowComponent('oscap', agent)
       },
       {
         name: 'CIS-CAT',

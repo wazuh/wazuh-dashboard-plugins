@@ -52,7 +52,7 @@ class WzConfigurationCisCatBenchmarks extends Component {
               title="Benchmarks"
               description="List of CIS-CAT benchmark templates to perform scans"
               currentConfig={wodleConfig}
-              minusHeight={this.props.agent.id === '000' ? 340 : 410}
+              minusHeight={this.props.agent.id === '000' ? 310 : 410}
               helpLinks={helpLinks}
             >
               <EuiBasicTable
