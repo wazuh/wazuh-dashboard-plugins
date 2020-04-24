@@ -18,6 +18,8 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
+import { updateCurrentTab } from '../../redux/actions/appStateActions';
+import store from '../../redux/store';
 
 export class OverviewController {
   /**
@@ -282,6 +284,7 @@ export class OverviewController {
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
+      store.dispatch(updateCurrentTab(this.tab));
 
       this.$scope.$on('sendVisDataRows', (ev, param) => {
         const rows = (param || {}).mitreRows.tables[0].rows
