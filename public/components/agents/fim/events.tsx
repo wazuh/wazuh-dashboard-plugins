@@ -10,17 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
-import ReactDOM from 'react-dom';
+import React, { Component } from 'react';
 import { FlyoutDetail } from './states/flyout';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
 
+
 export class EventsFim extends Component {
   state: {
     isFlyoutVisible: Boolean,
-    elements: HTMLElement[],
-    currentFile: string
+    currentFile: string,
+    fetchStatus: 'loading' | 'complete',
+    rows: number
   };
   props!: {
     [key: string]: any
@@ -32,19 +33,26 @@ export class EventsFim extends Component {
     super(props);
     this.state = {
       isFlyoutVisible: false,
-      elements: [],
-      currentFile: ''
+      currentFile: '',
+      fetchStatus: 'loading',
+      rows: 0
     };
     this.modulesHelper = ModulesHelper;
+    this.getRowsField.bind(this);
   }
 
-  async getRowsField(scope) {
+  getRowsField = async () => {
     const indices: number[] = [];
+    const { rows } = this.state;
+    if (!rows) {
+      this.setState({elements:[]})
+      return;
+    }
     if (!document)
-      this.getRowsField(scope);
+      this.getRowsField();
     const cols = document.querySelectorAll(`.kbn-table thead th`);
     if (!(cols || []).length) {
-      setTimeout(() => { this.getRowsField(scope) }, 1000);
+      setTimeout(this.getRowsField, 10);
     }
     cols.forEach((col, idx) => {
       if (['syscheck.path', 'rule.id'].includes(col.textContent || '')) {
@@ -60,11 +68,51 @@ export class EventsFim extends Component {
     });
     if (query){
       const elements = document.querySelectorAll(query);
-      if ((scope.rows || []).length && (elements || {}).length) {
-        this.setState({elements});
-      } else if ((scope.rows || []).length) {
-        setTimeout(() => { this.getRowsField(scope) }, 1000);
-      }
+        elements.forEach((element, idx) => {
+          const text = element.textContent;
+          if (idx % 2){
+            element.childNodes.forEach(child => {
+              if (child.nodeName === 'SPAN'){
+                const link = document.createElement('a')
+                link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
+                link.setAttribute('target', '_blank')
+                link.setAttribute('style', 'minWidth: 55, display: "block"');
+                link.textContent = text
+                child.replaceWith(link)
+              }
+            })
+          } else {
+            element.childNodes.forEach(child => {
+              if (child.nodeName === 'SPAN'){
+                const link = document.createElement('a')
+                link.onclick = () => this.showFlyout(text);
+                link.textContent = text
+                child.replaceWith(link);
+              }
+            })
+          }
+        })
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const {fetchStatus, isFlyoutVisible, rows} = this.state;
+    if (nextState.isFlyoutVisible !== isFlyoutVisible ){
+      return true;
+    }
+    if (nextState.fetchStatus !== fetchStatus){
+      return true;
+    }
+    if (nextState.rows !== rows) {
+      return true;
+    }
+    return false;
+  }
+
+  componentDidUpdate() {
+    const {fetchStatus, rows} = this.state;
+    if(fetchStatus === 'complete' && rows){
+      this.getRowsField();
     }
   }
 
@@ -72,8 +120,10 @@ export class EventsFim extends Component {
     const scope = await this.modulesHelper.getDiscoverScope();
     this.fetchWatch = scope.$watchCollection('fetchStatus',
       () => {
-        if (scope.fetchStatus === 'complete') {
-          this.setState({elements:[]}, () => setTimeout(() => { this.getRowsField(scope) }, 1000));
+        const {fetchStatus} = this.state;
+        if (fetchStatus !== scope.fetchStatus){
+          const rows = scope.fetchStatus === 'complete' ? scope.rows.length : 0;
+          this.setState({fetchStatus: scope.fetchStatus, rows})
         }
       });
   }
@@ -94,61 +144,19 @@ export class EventsFim extends Component {
   }
 
   render() {
-    const { elements } = this.state;
-    console.log(elements)
     return (
-      <Fragment>
-        {
-          [...elements].map((element, idx) => {
-            const text = element.textContent;
-            element.childNodes.forEach(child => {
-              if (child.nodeName === 'SPAN') {
-                // @ts-ignore
-                child.setAttribute('style', `display: none`)
-              }
-            })
-            if(element.childNodes.length < 2) {
-                return (
-                  idx % 2 
-                  ? (
-                    ReactDOM.createPortal(
-                      <a
-                        href={`#/manager/rules?tab=rules&redirectRule=${text}`} target="_blank"
-                        style={{ minWidth: 55, display: 'block' }}>
-                        {text}
-                      </a>
-                      ,
-                      element
-                    )
-                  )
-                  : (
-                    ReactDOM.createPortal(
-                      <a
-                        onClick={() => this.showFlyout(text)}>
-                        {text}
-                      </a>
-                      ,
-                      element
-                    )
-                  )
-                )
-              }
-          })
-        }
-        {this.state.isFlyoutVisible &&
-          <EuiOverlayMask 
-          // @ts-ignore
-            onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
-            <FlyoutDetail
-              fileName={this.state.currentFile}
-              agentId={this.props.agent.id}
-              closeFlyout={() => this.closeFlyout()}
-              type='file'
-              view='events'
-              {...this.props}/>
-          </EuiOverlayMask>
-        }
-      </Fragment>
+      this.state.isFlyoutVisible &&
+      <EuiOverlayMask 
+      // @ts-ignore
+        onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+        <FlyoutDetail
+          fileName={this.state.currentFile}
+          agentId={this.props.agent.id}
+          closeFlyout={() => this.closeFlyout()}
+          type='file'
+          view='events'
+          {...this.props}/>
+      </EuiOverlayMask>
     )
   }
 }
