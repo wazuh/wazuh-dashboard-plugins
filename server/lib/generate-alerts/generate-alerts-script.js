@@ -27,6 +27,8 @@ import * as PolicyMonitoring from './sample-data/policy-monitoring';
 import * as Virustotal from './sample-data/virustotal';
 import * as Vulnerability from './sample-data/vulnerabilities';
 import * as SSH from './sample-data/ssh';
+import * as Apache from './sample-data/apache';
+import * as Web from './sample-data/web';
 
 //Alert
 const alertIDMax = 6000;
@@ -75,6 +77,7 @@ function randomArrayItem(array) {
  */
 function generateAlert(params) {
     let alert = {
+        sampledata: true,
         timestamp: "2020-01-27T11:08:47.777+0000",
         rule: {
             level: 3,
@@ -156,16 +159,16 @@ function generateAlert(params) {
 
                 alert.data = { ...typeAlert.data };
                 alert.data.integration = 'aws';
-                
+                alert.data.aws.region = randomArrayItem(AWS.region);
                 alert.data.aws.resource.instanceDetails = {...randomArrayItem(AWS.instanceDetails)};
                 alert.data.aws.resource.instanceDetails.iamInstanceProfile.arn = interpolateAlertProps(typeAlert.data.aws.resource.instanceDetails.iamInstanceProfile.arn, alert);
                 alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
                 alert.data.aws.accountId = randomArrayItem(AWS.accountId);
                 alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
                 alert.data.aws.service.eventLastSeen = formatDate(new Date(alert.timestamp), 'Y-M-DTh:m:s.lZ');
-                alert.data.aws.service.action.portProbeAction.portProbeDetails.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)}
+                alert.data.aws.service.action.portProbeAction.portProbeDetails.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)};
                 alert.data.aws.log_info = {
-                    s3bucket: 'wazuh-aws-wodle',
+                    s3bucket: randomArrayItem(AWS.buckets),
                     log_file: `guardduty/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
                 }
                 alert.data.aws.service.count = `${randomIntervalInteger(400,4000)}`;
@@ -184,14 +187,14 @@ function generateAlert(params) {
 
                 alert.data = { ...typeAlert.data };
                 alert.data.integration = 'aws';
-                
+                alert.data.aws.region = randomArrayItem(AWS.region);
                 alert.data.aws.resource.accessKeyDetails.userName = randomArrayItem(Users);
                 alert.data.aws.log_info = {
-                    s3bucket: 'wazuh-aws-wodle',
+                    s3bucket: randomArrayItem(AWS.buckets),
                     log_file: `guardduty/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
                 }
                 alert.data.aws.accountId = randomArrayItem(AWS.accountId);
-                alert.data.aws.service.action.awsApiCallAction.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)}
+                alert.data.aws.service.action.awsApiCallAction.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)};
                 alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
                 alert.data.aws.service.eventLastSeen = formatDate(new Date(alert.timestamp), 'Y-M-DTh:m:s.lZ');
                 alert.data.aws.createdAt = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
@@ -214,17 +217,17 @@ function generateAlert(params) {
 
                 alert.data = { ...typeAlert.data };
                 alert.data.integration = 'aws';
-                
+                alert.data.aws.region = randomArrayItem(AWS.region);
                 alert.data.aws.resource.instanceDetails = {...randomArrayItem(AWS.instanceDetails)};
                 alert.data.aws.log_info = {
-                    s3bucket: 'wazuh-aws-wodle',
+                    s3bucket: randomArrayItem(AWS.buckets),
                     log_file: `guardduty/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`
                 }
                 alert.data.aws.description = interpolateAlertProps(alert.data.aws.description, alert);
                 alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
                 alert.data.aws.accountId = randomArrayItem(AWS.accountId);
                 alert.data.aws.createdAt = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
-                alert.data.aws.service.action.networkConnectionAction.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)}
+                alert.data.aws.service.action.networkConnectionAction.remoteIpDetails = {...randomArrayItem(AWS.remoteIpDetails)};
                 alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
                 alert.data.aws.service.eventLastSeen = formatDate(new Date(alert.timestamp), 'Y-M-DTh:m:s.lZ');
                 alert.data.aws.service.additionalInfo = {
@@ -235,10 +238,11 @@ function generateAlert(params) {
                 };
                 alert.data.aws.service.count = `${randomIntervalInteger(400,4000)}`;
                 alert.data.aws.service.action.networkConnectionAction.localIpDetails.ipAddressV4 = alert.data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress;
-
+                alert.data.aws.arn = interpolateAlertProps(typeAlert.data.aws.arn, alert);
                 alert.rule = {...typeAlert.rule};
                 alert.rule.firedtimes = randomIntervalInteger(1,50);
                 alert.rule.description = interpolateAlertProps(typeAlert.rule.description, alert);
+                
 
                 alert.decoder = {...typeAlert.decoder};
                 alert.location = typeAlert.location;
@@ -249,12 +253,15 @@ function generateAlert(params) {
 
                 alert.data = { ...typeAlert.data };
                 alert.data.integration = 'aws';
+                alert.data.aws.region = randomArrayItem(AWS.region);
                 alert.data.aws.summary.Timestamps = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
                 alert.data.aws.log_info = {
-                    s3bucket: 'wazuh-aws-wodle',
+                    s3bucket: randomArrayItem(AWS.buckets),
                     log_file: `macie/${formatDate(new Date(alert.timestamp), 'Y/M/D/h')}/firehose_macie-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s')}-0b1ede94-f399-4e54-8815-1c6587eee3b1//firehose_guardduty-1-${formatDate(new Date(alert.timestamp), 'Y-M-D-h-m-s-l')}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
                 };
                 alert.data.aws["created-at"] = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+                alert.data.aws.url = interpolateAlertProps(typeAlert.data.aws.url, alert);
+                alert.data.aws['alert-arn'] = interpolateAlertProps(typeAlert.data.aws['alert-arn'], alert);
                 
                 alert.rule = {...typeAlert.rule};
                 alert.rule.firedtimes = randomIntervalInteger(1,50);
@@ -265,6 +272,8 @@ function generateAlert(params) {
             }
             default: {}
         }
+        alert.input = {type: 'log'};
+        alert.GeoLocation = randomArrayItem(GeoLocation);
     }
 
     if (params.audit) {
@@ -307,24 +316,72 @@ function generateAlert(params) {
     }
 
     if (params.openscap) {
-        alert.rule.groups.push("oscap");
+        alert.data = {};
         alert.data.oscap = {};
-        alert.data.oscap.scan = {};
-        alert.data.oscap.scan.profile = {};
-        alert.data.oscap.check = {};
+        const typeAlert = {...randomArrayItem(OpenSCAP.data)}
+        alert.data = {...typeAlert.data};
+        alert.rule = {...typeAlert.rule};
+        alert.rule.firedtimes = randomIntervalInteger(2,10);
+        alert.input = {
+            type: 'log'
+        };
+        alert.decoder = {...OpenSCAP.decoder};
+        alert.location = OpenSCAP.location;
+        if(typeAlert.full_log){
+            alert.full_log = interpolateAlertProps(typeAlert.full_log, alert);
+        }
+        // alert.data.oscap.scan = {};
+        // alert.data.oscap.scan.profile = {};
+        // alert.data.oscap.check = {};
 
-        alert.data.oscap.scan.profile.title = randomArrayItem(OpenSCAP.scanProfileTitle);
-        alert.data.oscap.scan.content = randomArrayItem(OpenSCAP.scanContent);
-        alert.data.oscap.scan.score = randomIntervalInteger(50, 80);
-        alert.data.oscap.check.result = randomArrayItem(OpenSCAP.checkResult);
-        alert.data.oscap.check.severity = randomArrayItem(OpenSCAP.checkSeverity);
-        alert.data.oscap.check.title = randomArrayItem(OpenSCAP.checkTitle);
+        // alert.data.oscap.scan.profile.title = randomArrayItem(OpenSCAP.scanProfileTitle);
+        // alert.data.oscap.scan.content = randomArrayItem(OpenSCAP.scanContent);
+        // alert.data.oscap.scan.score = randomIntervalInteger(50, 80);
+        // alert.data.oscap.check.result = randomArrayItem(OpenSCAP.checkResult);
+        // alert.data.oscap.check.severity = randomArrayItem(OpenSCAP.checkSeverity);
+        // alert.data.oscap.check.title = randomArrayItem(OpenSCAP.checkTitle);
     }
 
     if (params.rootcheck) {
-        alert.rule.groups.push('rootcheck');
-        alert.rule.description = randomArrayItem(PolicyMonitoring.ruleDescription);
-        alert.data.title = randomArrayItem(PolicyMonitoring.title);
+        alert.location = PolicyMonitoring.location;
+        alert.decoder = {...PolicyMonitoring.decoder};
+        alert.input = {
+            type: 'log'
+        };
+
+        const alertCategory = randomArrayItem(['Rootkit', 'Trojan']);
+
+        switch (alertCategory){
+            case 'Rootkit':{
+                const rootkitCategory = randomArrayItem(Object.keys(PolicyMonitoring.rootkits));
+                const rootkit = randomArrayItem(PolicyMonitoring.rootkits[rootkitCategory]);
+                alert.data = {
+                    title: interpolateAlertProps(PolicyMonitoring.rootkitsData.data.title, alert, {
+                        _rootkit_category: rootkitCategory,
+                        _rootkit_file: rootkit
+                    })
+                };
+                alert.rule = {...PolicyMonitoring.rootkitsData.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,10);
+                alert.full_log = alert.data.title;
+                break;
+                
+            }
+            case 'Trojan':{
+                const trojan = randomArrayItem(PolicyMonitoring.trojans);
+                alert.data = {
+                    file: trojan.file,
+                    title: "Trojaned version of file detected."
+                };
+                alert.rule = {...PolicyMonitoring.trojansData.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,10);
+                alert.full_log = interpolateAlertProps(PolicyMonitoring.trojansData.full_log, alert, {
+                    _trojan_signature: trojan.signature
+                });
+                break;
+            }
+            default: {}
+        }
     }
 
     if (params.syscheck) {
@@ -442,18 +499,6 @@ function generateAlert(params) {
         }
     }
 
-    if (params.win_authentication_failed || (params.probability_win_authentication_failed && randomProbability(params.probability_win_authentication_failed))){
-        alert.rule.groups.push('win_authentication_failed')
-    }
-
-    if (params.authentication_failed || (params.probability_authentication_failed && randomProbability(params.probability_authentication_failed))){
-        alert.rule.groups.push('authentication_failed')
-    }
-
-    if (params.authentication_failures || (params.probability_authentication_failures && randomProbability(params.probability_authentication_failures))){
-        alert.rule.groups.push('authentication_failures')
-    }
-
     // Regulatory compliance
     if (params.pci_dss || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomProbability(params.random_probability_regulatory_compliance))) {
         alert.rule.pci_dss = [randomArrayItem(PCI_DSS)];
@@ -487,7 +532,7 @@ function generateAlert(params) {
         };
         alert.predecoder = {
             program_name: 'sshd',
-            timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
+            timestamp: formatDate(new Date(alert.timestamp), 'N D h:m:s'),
             hostname: alert.manager.name
         };
         let typeAlert = randomArrayItem(['invalidLoginPassword','invalidLoginUser', 'multipleAuthenticationFailures','windowsInvalidLoginPassword','userLoginFailed', 'passwordCheckFailed', 'nonExistentUser', 'bruteForceTryingAccessSystem', 'authenticationSuccess', 'maximumAuthenticationAttemptsExceeded']);
@@ -637,7 +682,7 @@ function generateAlert(params) {
         };
         alert.predecoder = {
             program_name: 'sshd',
-            timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
+            timestamp: formatDate(new Date(alert.timestamp), 'N D h:m:s'),
             hostname: alert.manager.name
         };
         const typeAlert = randomArrayItem(SSH.data);
@@ -688,7 +733,64 @@ function generateAlert(params) {
                 timestamp: alert.timestamp
             };
         }
+    }
 
+    if ( params.apache ){
+        const typeAlert = {...Apache.data[0]}; // there is only one type alert in data array at the moment. Randomize if add more type of alerts to data array
+        alert.data = {
+            srcip: randomArrayItem(IPs),
+            srcport: randomArrayItem(Ports),
+            id: `AH${randomIntervalInteger(10000,99999)}`
+        };
+        alert.GeoLocation = {...randomArrayItem(GeoLocation)};
+        alert.rule = {...typeAlert.rule };
+        alert.rule.firedtimes = randomIntervalInteger(2,10);
+        alert.input = { type: 'log' };
+        alert.location = Apache.location;
+        alert.decoder = {...Apache.decoder};
+        //Thu Apr 23 13:23:29.375928 2020
+        alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
+            _timestamp_apache: formatDate(new Date(alert.timestamp), 'E N D h:m:s.l Y'),
+            _pi_id: randomIntervalInteger(10000,30000)
+        });
+    }
+
+    if ( params.web ){
+        alert.input = {
+            type: 'log'
+        };
+        alert.data = {
+            protocol: 'GET',
+            srcip: randomArrayItem(IPs),
+            id: '404',
+            url: randomArrayItem(Web.urls)
+        };
+        alert.GeoLocation = {...randomArrayItem(GeoLocation)};
+
+        const typeAlert = randomArrayItem(Web.data);
+        const userAgent = randomArrayItem(Web.userAgents)
+        alert.rule = {...typeAlert.rule};
+        alert.rule.firedtimes = randomIntervalInteger(1,10);
+        alert.decoder = {...typeAlert.decoder};
+        alert.location = typeAlert.location;
+        alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
+            _user_agent: userAgent,
+            _date: formatDate(new Date(alert.timestamp), 'D/N/Y:h:m:s +0000')
+        });
+        if(typeAlert.previous_output){
+            const previousOutput = []
+            const beforeSeconds = 4
+            for(let i = beforeSeconds; i > 0; i--){
+                const beforeDate = new Date(new Date(alert.timestamp) - ((2+i)*1000));
+                previousOutput.push(
+                    interpolateAlertProps(typeAlert.full_log, alert, {
+                        _user_agent: userAgent,
+                        _date: formatDate(new Date(beforeDate), 'D/N/Y:h:m:s +0000')
+                    })
+                )
+            }
+            alert.previous_output = previousOutput.join('\n');
+        }
     }
     return alert;
 }
@@ -754,17 +856,25 @@ const monthNames = {
     long: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 };
+
+const dayNames = {
+    long: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    short: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+};
+
 function formatDate(date, format){ // It could use "moment" library to format strings too
     const tokens = {
-        'D': (d) => formatterNumber(date.getDate(), 2), // 01-31
-        'M': (d) => formatterNumber(date.getMonth() + 1, 2), // 01-12
-        'J': (d) => monthNames.long[date.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        'N': (d) => monthNames.short[date.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-        'Y': (d) => date.getFullYear(), // 2020
-        'h': (d) => formatterNumber(date.getHours(), 2), // 00-23
-        'm': (d) => formatterNumber(date.getMinutes(), 2), // 00-59
-        's': (d) => formatterNumber(date.getSeconds(), 2), // 00-59
-        'l': (d) => formatterNumber(date.getMilliseconds(), 3) // 000-999
+        'D': (d) => formatterNumber(d.getDate(), 2), // 01-31
+        'A': (d) => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+        'E': (d) => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+        'M': (d) => formatterNumber(d.getMonth() + 1, 2), // 01-12
+        'J': (d) => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        'N': (d) => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        'Y': (d) => d.getFullYear(), // 2020
+        'h': (d) => formatterNumber(d.getHours(), 2), // 00-23
+        'm': (d) => formatterNumber(d.getMinutes(), 2), // 00-59
+        's': (d) => formatterNumber(d.getSeconds(), 2), // 00-59
+        'l': (d) => formatterNumber(d.getMilliseconds(), 3) // 000-999
     }
 
     return format.split('').reduce((accum, token) => {
