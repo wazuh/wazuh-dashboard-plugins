@@ -561,8 +561,8 @@ export const visualizations = {
         height: 550,
         vis: [
           {
-            title: 'Top 10 agents with positive scans',
-            id: 'Wazuh-App-Overview-Virustotal-Positives-Heatmap'
+            title: 'Alerts evolution by agents',
+            id: 'Wazuh-App-Overview-Virustotal-Alerts-Evolution'
           }
         ]
       },

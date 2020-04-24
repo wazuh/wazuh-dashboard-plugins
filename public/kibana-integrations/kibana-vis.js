@@ -112,7 +112,7 @@ class KibanaVis extends Component {
           data.value.visData.rows &&
           this.props.state[this.visID] !==
             data.value.visData.rows['0']['col-0-1']
-        )
+        ) {
           store.dispatch(
             this.updateMetric({
               name: this.visID,
