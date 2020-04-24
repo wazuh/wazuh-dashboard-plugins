@@ -13,4 +13,3 @@
 export { Events } from './events';
 export { Dashboard } from './dashboard';
 export { Loader } from './loader';
-export { Settings } from './settings';

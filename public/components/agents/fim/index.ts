@@ -11,4 +11,3 @@
  */
 
 export { MainFim } from './main';
-export { States} from './states';
