@@ -11,8 +11,8 @@
  */
 
 export const events = ["modified", "deleted", "added"];
-export const attributes = ["mtime", "inode", "size", "tmp", "md5", "sha1", "sha256" ];
-export const paths = [
+export const attributes = ["mtime", "inode", "size", "tmp", "md5", "sha1", "sha256"];
+export const pathsLinux = [
   "/etc/resolv.conf",
   "/var/ossec/queue/fim/db/fim.db-journal",
   "/var/ossec/queue/fim/db/fim.db",
@@ -31,11 +31,28 @@ export const paths = [
   "/var/osquery/osquery.db/CURRENT",
   "/run/utmp"
 ];
+export const pathsWindows = [
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpKslDrv",
+  "[x32] HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users\\000001F4",
+  "[x32] HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users\\000001F5",
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\{54b31d7e-36bf-4bbe-9ab2-106a939cd78c}",
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\W32Time\\Config",
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\W32Time\\SecureTimeLimits",
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\W32Time\\SecureTimeLimits\\RunTime",
+  "[x32] HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users\\000001F7",
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\SharedAccess\\Epoch",
+  "c:\\programdata\\microsoft\\windows defender\\scans\\mpenginedb.db-wal",
+  "c:\\program files (x86)\\ossec-agent\\wodles\\syscollector",
+  "c:\\program files (x86)\\ossec-agent\\rids\\sender_counter",
+  "c:\\program files (x86)\\ossec-agent\\queue\\fim\\db\\fim.db",
+  "c:\\program files (x86)\\ossec-agent\\ossec-agent.state",
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\WinDefend",
+  "[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\bam\\State\\UserSettings\\S-1-5-21-856620481-996501011-1859314257-500",
+];
 export const uid_after = ["0", "S-1-5-18", "S-1-5-32-544", "996", "S-1-5-19"];
 export const gid_after = ["994", "0", "993", "190", "22"];
 export const tags = ["tmp"];
-export const regulatory = [
-  {
+export const regulatory = [{
     "firedtimes": 1,
     "mail": false,
     "level": 5,
