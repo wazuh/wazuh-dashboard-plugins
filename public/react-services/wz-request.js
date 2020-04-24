@@ -14,6 +14,7 @@ import chrome from 'ui/chrome';
 import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
+import { WazuhConfig } from './wazuh-config';
 
 export class WzRequest {
     /**
@@ -22,18 +23,22 @@ export class WzRequest {
    * @param {String} path 
    * @param {Object} payload 
    */
-  static async genericReq(method, path, payload = null) {
+  static async genericReq(method, path, payload = null, customTimeout=false) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
+      this.wazuhConfig = new WazuhConfig();
+      const configuration = this.wazuhConfig.getConfig();
+      const timeout = configuration ? configuration.timeout : 20000;
+
       const url = chrome.addBasePath(path);
       const options = {
         method: method,
         headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
         url: url,
         data: payload,
-        timeout: 20000
+        timeout: customTimeout || timeout
       };
       const data = await axios(options);
       if (data.error) {
@@ -96,7 +101,7 @@ export class WzRequest {
       }
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { path, id, filters };
-      const data = await this.genericReq('POST', '/api/csv', requestData);
+      const data = await this.genericReq('POST', '/api/csv', requestData, 0);
       return Promise.resolve(data);
     } catch (error) {
       return ((error || {}).data || {}).message || false
