@@ -41,6 +41,7 @@ import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 
 export class States extends Component {
+  _isMount = false;
   state: {
     filters: {},
     selectedTabId: 'files' | 'registry',
@@ -60,6 +61,28 @@ export class States extends Component {
       isLoading: true
     }
     this.onFilterSelect.bind(this);
+  }
+
+  async componentDidMount() {
+    this._isMount = true;
+    const { agentPlatform } = this.props.agent;
+    const totalItemsFile = await this.getItemNumber('file');
+    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
+    if (this._isMount){
+      this.setState({ totalItemsFile, totalItemsRegistry, isLoading: false });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { selectedTabId } = this.state;
+    if (selectedTabId !== prevState.selectedTabId) {
+      const filters = this.getStoreFilters(this.props);
+      this.setState({ filters });
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   tabs() {
@@ -91,20 +114,7 @@ export class States extends Component {
     window.localStorage.setItem(`wazuh-${section}-${selectView}-${(this.state || {}).selectedTabId || 'files'}-${agent['id']}`, JSON.stringify(filters))
   }
 
-  async componentDidMount() {
-    const { agentPlatform } = this.props.agent;
-    const totalItemsFile = await this.getItemNumber('file');
-    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
-    this.setState({ totalItemsFile, totalItemsRegistry, isLoading: false });
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { selectedTabId } = this.state;
-    if (selectedTabId !== prevState.selectedTabId) {
-      const filters = this.getStoreFilters(this.props);
-      this.setState({ filters });
-    }
-  }
 
   onFiltersChange(filters) {
     this.setStoreFilters(filters);
