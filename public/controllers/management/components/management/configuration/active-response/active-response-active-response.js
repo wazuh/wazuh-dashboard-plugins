@@ -61,7 +61,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component{
             title='Active response definitions'
             description='Find here all the currently defined Active responses'
             currentConfig={currentConfig['analysis-active_response']}
-            minusHeight={340}
+            minusHeight={310}
             helpLinks={helpLinks}>
             <WzConfigurationSettingsListSelector
               items={items}

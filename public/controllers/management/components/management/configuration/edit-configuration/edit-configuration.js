@@ -275,7 +275,7 @@ const WzEditorConfiguration = compose(
               <EuiCallOut iconType='iInCircle' title='Changes will not take effect until a restart is performed.'/>
             )}
             <EuiSpacer size='s'/>
-            <WzCodeEditor mode='xml' value={editorValue} onChange={(value) => onChange(value)} minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 325 : 255}/>
+            <WzCodeEditor mode='xml' value={editorValue} onChange={(value) => onChange(value)} minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 260 : 200}/>
           </Fragment>
         ) : (
           <WzWazuhAPINotReachable error={this.props.errorXMLFetched}/>

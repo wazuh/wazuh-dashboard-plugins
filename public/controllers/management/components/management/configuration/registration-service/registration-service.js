@@ -64,7 +64,7 @@ class WzRegistrationService extends Component{
             title='Main settings'
             description='General settings applied to the registration service'
             currentConfig={currentConfig}
-            minusHeight={280}
+            minusHeight={245}
             helpLinks={helpLinks}>
               <WzConfigurationSettingsGroup
                 config={currentConfig['auth-auth'].auth}
