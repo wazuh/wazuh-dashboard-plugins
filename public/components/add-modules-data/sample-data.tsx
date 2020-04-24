@@ -42,7 +42,7 @@ export default class WzSampleData extends Component {
     this.categories = [
       {
         title: 'Sample security information',
-        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services).',
+        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, authorization, ssh, web).',
         image: '',
         categorySampleAlertsIndex: 'security'
       },
@@ -54,15 +54,9 @@ export default class WzSampleData extends Component {
       },
       {
         title: 'Sample threat detection and response',
-        description: 'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener, MITRE ATT&CK).',
+        description: 'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener).',
         image: '',
         categorySampleAlertsIndex: 'threat-detection'
-      },
-      {
-        title: 'Sample regulatory compliance',
-        description: 'Sample data, visualizations and dashboards for events of regulatory compliance (PCI DSS, GDPR, HIPAA, NIST 800-53).',
-        image: '',
-        categorySampleAlertsIndex: 'regulatory-compliance'
       }
     ];
     this.state = {};
