@@ -60,7 +60,7 @@ class WzConfigurationAlertsReports extends Component{
             title='Main settings'
             description='Output alerts to a syslog server'
             currentConfig={currentConfig} 
-            minusHeight={340}
+            minusHeight={310}
             helpLinks={helpLinks}>
             <EuiBasicTable
               columns={columns}
