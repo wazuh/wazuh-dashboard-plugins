@@ -1,19 +1,21 @@
 /*
-* Wazuh app - React component for show configuration of Alerts.
-* Copyright (C) 2015-2020 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - React component for show configuration of Alerts.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
-import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
+import WzTabSelector, {
+  WzTabSelectorTab
+} from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationAlertsGeneral from './alerts-general';
 import WzConfigurationAlertsLabels from './alerts-labels';
@@ -24,53 +26,50 @@ import WzConfigurationAlertsSyslogOutput from './alerts-syslog-output';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
-class WzConfigurationAlerts extends Component{
-  constructor(props){
+class WzConfigurationAlerts extends Component {
+  constructor(props) {
     super(props);
   }
-  render(){
+  render() {
     return (
       <Fragment>
         <WzTabSelector>
           <WzTabSelectorTab label="General">
-            <WzConfigurationAlertsGeneral {...this.props}/>
+            <WzConfigurationAlertsGeneral {...this.props} />
           </WzTabSelectorTab>
           <WzTabSelectorTab label="Labels">
-            <WzConfigurationAlertsLabels {...this.props}/>
+            <WzConfigurationAlertsLabels {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label='Email alerts'>
-            <WzConfigurationAlertsEmailAlerts {...this.props}/>
+          <WzTabSelectorTab label="Email alerts">
+            <WzConfigurationAlertsEmailAlerts {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label='Reports'>
-            <WzConfigurationAlertsEmailReports {...this.props}/>
+          <WzTabSelectorTab label="Reports">
+            <WzConfigurationAlertsEmailReports {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label='Syslog output'>
-            <WzConfigurationAlertsSyslogOutput {...this.props}/>
+          <WzTabSelectorTab label="Syslog output">
+            <WzConfigurationAlertsSyslogOutput {...this.props} />
           </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>
-    )
+    );
   }
 }
 
 const sections = [
-  {component:'analysis',configuration:'alerts'},
-  {component:'analysis',configuration:'labels'},
-  {component:'mail',configuration:'alerts'},
-  {component:'monitor',configuration:'reports'},
-  {component:'csyslog',configuration:'csyslog'}
+  { component: 'analysis', configuration: 'alerts' },
+  { component: 'analysis', configuration: 'labels' },
+  { component: 'mail', configuration: 'alerts' },
+  { component: 'monitor', configuration: 'reports' },
+  { component: 'csyslog', configuration: 'csyslog' }
 ];
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 WzConfigurationAlerts.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.string
-  ])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 
 export default compose(

@@ -31,12 +31,7 @@ export class DevToolsController {
    * @param {*} errorHandler
    * @param {*} $document
    */
-  constructor(
-    $scope,
-    $window,
-    errorHandler,
-    $document
-  ) {
+  constructor($scope, $window, errorHandler, $document) {
     this.apiReq = ApiRequest;
     this.genericReq = GenericRequest;
     this.$window = $window;
@@ -54,13 +49,14 @@ export class DevToolsController {
    * When controller loads
    */
   $onInit() {
-    if(store.getState() && store.getState().appStateReducers && !store.getState().appStateReducers.showMenu){
+    if (
+      store.getState() &&
+      store.getState().appStateReducers &&
+      !store.getState().appStateReducers.showMenu
+    ) {
       AppState.setWzMenu();
     }
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Dev Tools', },
-    ];
+    const breadcrumb = [{ text: '' }, { text: 'Dev Tools' }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     $(this.$document[0]).keydown(e => {
       if (!this.multipleKeyPressed.includes(e.which)) {

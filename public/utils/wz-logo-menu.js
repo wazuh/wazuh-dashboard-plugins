@@ -17,8 +17,6 @@ export const changeWazuhNavLogo = () => {
     if (nav.length) {
       clearInterval(interval);
     }
-    $('.euiHeader > .euiBreadcrumbs  > .euiBreadcrumb').html(
-      ``
-    );
+    $('.euiHeader > .euiBreadcrumbs  > .euiBreadcrumb').html(``);
   }, 100);
 };

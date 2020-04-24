@@ -15,8 +15,8 @@ import * as FileSaver from '../services/file-saver';
 
 /**
  * Generates a CSV through the given data
- * @param {String} path 
- * @param {Array} filters 
+ * @param {String} path
+ * @param {Array} filters
  * @param {String} exportName
  */
 const exportCsv = async (path, filters = [], exportName = 'data') => {
@@ -28,6 +28,6 @@ const exportCsv = async (path, filters = [], exportName = 'data') => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 export default exportCsv;

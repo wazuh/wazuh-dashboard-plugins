@@ -1,17 +1,17 @@
 /*
-* Wazuh app - React component for show configuration of active response - command tab.
-* Copyright (C) 2015-2020 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - React component for show configuration of active response - command tab.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -22,8 +22,16 @@ import { settingsListBuilder } from '../utils/builders';
 import { connect } from 'react-redux';
 
 const helpLinks = [
-  { text: 'Active response documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html' },
-  { text: 'Commands reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/commands.html' }
+  {
+    text: 'Active response documentation',
+    href:
+      'https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html'
+  },
+  {
+    text: 'Commands reference',
+    href:
+      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/commands.html'
+  }
 ];
 
 const mainSettings = [
@@ -31,55 +39,73 @@ const mainSettings = [
   { field: 'executable', label: 'Name of executable file' },
   { field: 'expect', label: 'List of expected fields' },
   { field: 'extra_args', label: 'Extra arguments' },
-  { field: 'timeout_allowed', label: 'Allow this command to be reverted', render: renderValueNoThenEnabled }
+  {
+    field: 'timeout_allowed',
+    label: 'Allow this command to be reverted',
+    render: renderValueNoThenEnabled
+  }
 ];
 
-class WzConfigurationActiveResponseCommands extends Component{
-  constructor(props){
+class WzConfigurationActiveResponseCommands extends Component {
+  constructor(props) {
     super(props);
   }
-  render(){
+  render() {
     const { currentConfig, wazuhNotReadyYet } = this.props;
-    const items = currentConfig && currentConfig['analysis-command'] && currentConfig['analysis-command'].command ? settingsListBuilder(currentConfig['analysis-command'].command, 'name') : [];
+    const items =
+      currentConfig &&
+      currentConfig['analysis-command'] &&
+      currentConfig['analysis-command'].command
+        ? settingsListBuilder(currentConfig['analysis-command'].command, 'name')
+        : [];
     return (
       <Fragment>
-        {currentConfig['analysis-command'] && isString(currentConfig['analysis-command']) && (
-          <WzNoConfig error={currentConfig['analysis-command']} help={helpLinks} />
-        )}
-        {currentConfig['analysis-command'] && !isString(currentConfig['analysis-command']) && currentConfig['analysis-command'].command && !currentConfig['analysis-command'].command.length && (
-          <WzNoConfig error='not-present' help={helpLinks} />
-        )}
-        {wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-command']) && ( 
-          <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
-        )}
-        {currentConfig['analysis-command'] && !isString(currentConfig['analysis-command']) && currentConfig['analysis-command'].command && currentConfig['analysis-command'].command.length ? (
+        {currentConfig['analysis-command'] &&
+          isString(currentConfig['analysis-command']) && (
+            <WzNoConfig
+              error={currentConfig['analysis-command']}
+              help={helpLinks}
+            />
+          )}
+        {currentConfig['analysis-command'] &&
+          !isString(currentConfig['analysis-command']) &&
+          currentConfig['analysis-command'].command &&
+          !currentConfig['analysis-command'].command.length && (
+            <WzNoConfig error="not-present" help={helpLinks} />
+          )}
+        {wazuhNotReadyYet &&
+          (!currentConfig || !currentConfig['analysis-command']) && (
+            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+          )}
+        {currentConfig['analysis-command'] &&
+        !isString(currentConfig['analysis-command']) &&
+        currentConfig['analysis-command'].command &&
+        currentConfig['analysis-command'].command.length ? (
           <WzConfigurationSettingsTabSelector
-            title='Command definitions'
-            description='Find here all the currently defined commands used for Active response'
+            title="Command definitions"
+            description="Find here all the currently defined commands used for Active response"
             currentConfig={currentConfig['analysis-command']}
             minusHeight={340}
-            helpLinks={helpLinks}>
-              <WzConfigurationSettingsListSelector
-                items={items}
-                settings={mainSettings}
-              />
+            helpLinks={helpLinks}
+          >
+            <WzConfigurationSettingsListSelector
+              items={items}
+              settings={mainSettings}
+            />
           </WzConfigurationSettingsTabSelector>
         ) : null}
       </Fragment>
-    )
+    );
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 WzConfigurationActiveResponseCommands.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.string
-  ])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 
 export default connect(mapStateToProps)(WzConfigurationActiveResponseCommands);

@@ -9,11 +9,11 @@
  * (at your option) any later version.
  *
  * Find more information about this on the LICENSE file.
- * 
+ *
  * DELETE THIS WRAPPER WHEN WELCOME SCREEN WAS NOT BE CALLED FROM ANGULARJS
  */
 import React, { Component } from 'react';
-import ManagementWelcome from './management-welcome'
+import ManagementWelcome from './management-welcome';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import './welcome.less';
 

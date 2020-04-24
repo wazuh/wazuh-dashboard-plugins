@@ -19,62 +19,62 @@ const initialState = {
   stats: false,
   nodeInfo: false,
   agentInfo: false,
-  clusterEnabled: true,
+  clusterEnabled: true
 };
 
 const statusReducers = (state = initialState, action) => {
   if (action.type === 'UPDATE_LOADING_STATUS') {
     return {
       ...state,
-      isLoading: action.status,
+      isLoading: action.status
     };
   }
   if (action.type === 'UPDATE_ADMIN_MODE') {
     return {
       ...state,
-      adminMode: action.status,
+      adminMode: action.status
     };
   }
   if (action.type === 'UPDATE_LIST_NODES') {
     return {
       ...state,
-      listNodes: action.listNodes,
+      listNodes: action.listNodes
     };
   }
   if (action.type === 'UPDATE_SELECTED_NODE') {
     return {
       ...state,
-      selectedNode: action.selectedNode,
+      selectedNode: action.selectedNode
     };
   }
   if (action.type === 'UPDATE_LIST_DAEMONS') {
     return {
       ...state,
-      listDaemons: action.listDaemons,
+      listDaemons: action.listDaemons
     };
   }
   if (action.type === 'UPDATE_STATS') {
     return {
       ...state,
-      stats: action.stats,
+      stats: action.stats
     };
   }
   if (action.type === 'UPDATE_NODE_INFO') {
     return {
       ...state,
-      nodeInfo: action.nodeInfo,
+      nodeInfo: action.nodeInfo
     };
   }
   if (action.type === 'UPDATE_AGENT_INFO') {
     return {
       ...state,
-      agentInfo: action.agentInfo,
+      agentInfo: action.agentInfo
     };
   }
   if (action.type === 'UPDATE_CLUSTER_ENABLED') {
     return {
       ...state,
-      clusterEnabled: action.clusterEnabled,
+      clusterEnabled: action.clusterEnabled
     };
   }
   if (action.type === 'CLEAN_INFO') {
@@ -85,7 +85,7 @@ const statusReducers = (state = initialState, action) => {
       listDaemons: [],
       stats: false,
       nodeInfo: false,
-      agentInfo: false,
+      agentInfo: false
     };
   }
 

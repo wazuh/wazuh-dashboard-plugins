@@ -23,7 +23,7 @@ import { ConfigHandler } from './config-handler';
 import { CheckDaemonsStatus } from './check-daemon-status';
 
 const app = uiModules.get('app/wazuh', []);
- 
+
 app
   .service('errorHandler', ErrorHandler)
   .service('csvReq', CSVRequest)

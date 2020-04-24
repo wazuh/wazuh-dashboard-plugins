@@ -38,7 +38,7 @@ export class AgentsPreviewController {
     csvReq,
     wzTableFilter,
     commonData,
-    $window,
+    $window
   ) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
@@ -118,19 +118,25 @@ export class AgentsPreviewController {
     };
     this.hasAgents = true;
     this.init = false;
-    const instance = new DataFactory(
-      this.apiReq,
-      '/agents',
-      false,
-      false
-    )
+    const instance = new DataFactory(this.apiReq, '/agents', false, false);
     //Props
     this.tableAgentsProps = {
       wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-      addingNewAgent: () => { this.addNewAgent(true); this.$scope.$applyAsync() },
-      downloadCsv: (filters = []) => { this.downloadCsv(filters); this.$scope.$applyAsync() },
-      showAgent: (agent) => { this.showAgent(agent); this.$scope.$applyAsync() },
-      getMostActive: async () => { return await this.getMostActive() },
+      addingNewAgent: () => {
+        this.addNewAgent(true);
+        this.$scope.$applyAsync();
+      },
+      downloadCsv: (filters = []) => {
+        this.downloadCsv(filters);
+        this.$scope.$applyAsync();
+      },
+      showAgent: agent => {
+        this.showAgent(agent);
+        this.$scope.$applyAsync();
+      },
+      getMostActive: async () => {
+        return await this.getMostActive();
+      },
       clickAction: (item, openAction = false) => {
         clickAction(
           item,
@@ -138,13 +144,13 @@ export class AgentsPreviewController {
           instance,
           this.shareAgent,
           this.$location,
-          this.$scope,
+          this.$scope
         );
-        this.$scope.$applyAsync()
+        this.$scope.$applyAsync();
       },
-      timeService: (date) => this.timeService.offset(date),
+      timeService: date => this.timeService.offset(date),
       summary: this.summary
-    }
+    };
     //Load
     this.load();
   }
@@ -177,11 +183,7 @@ export class AgentsPreviewController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const output = await this.csvReq.fetch(
-        '/agents',
-        this.api,
-        filters
-      );
+      const output = await this.csvReq.fetch('/agents', this.api, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
       FileSaver.saveAs(blob, 'agents.csv');
@@ -198,7 +200,7 @@ export class AgentsPreviewController {
       const data = await this.genericReq.request(
         'GET',
         `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}`
-      )
+      );
       this.mostActiveAgent.name = data.data.data;
       const info = await this.genericReq.request(
         'GET',
@@ -210,7 +212,7 @@ export class AgentsPreviewController {
         this.mostActiveAgent.id = info.data.data;
       }
       return this.mostActiveAgent;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   /**

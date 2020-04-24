@@ -17,13 +17,13 @@ import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 
 export class WzRequest {
-    /**
+  /**
    * Permorn a generic request
-   * @param {String} method 
-   * @param {String} path 
-   * @param {Object} payload 
+   * @param {String} method
+   * @param {String} path
+   * @param {Object} payload
    */
-  static async genericReq(method, path, payload = null, customTimeout=false) {
+  static async genericReq(method, path, payload = null, customTimeout = false) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -45,25 +45,25 @@ export class WzRequest {
         throw new Error(data.error);
       }
       return Promise.resolve(data);
-    } catch(err){
+    } catch (err) {
       //if the requests fails, we need to check if the API is down
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (currentApi && currentApi.id) {
-        try{
+        try {
           await ApiCheck.checkStored(currentApi.id);
-        }catch(err){
+        } catch (err) {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
-    
-          if(!window.location.hash.includes('#/settings')){
-            window.location.href = "/app/wazuh#/health-check";
+
+          if (!window.location.hash.includes('#/settings')) {
+            window.location.href = '/app/wazuh#/health-check';
           }
           return;
         }
       }
-      return ((err || {}).message) || false
-      ? Promise.reject(err.message)
-      : Promise.reject(err || 'Server did not respond');
+      return (err || {}).message || false
+        ? Promise.reject(err.message)
+        : Promise.reject(err || 'Server did not respond');
     }
   }
 
@@ -91,10 +91,10 @@ export class WzRequest {
 
   /**
    * Perform a request to generate a CSV
-   * @param {String} path 
-   * @param {Object} filters 
+   * @param {String} path
+   * @param {Object} filters
    */
-  static async csvReq(path, filters){
+  static async csvReq(path, filters) {
     try {
       if (!path || !filters) {
         throw new Error('Missing parameters');

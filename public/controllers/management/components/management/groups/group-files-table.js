@@ -22,7 +22,7 @@ import {
   updatePageIndexFile,
   updateSortDirectionFile,
   updateSortFieldFile,
-  updateFileContent,
+  updateFileContent
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsFilesColumns from './utils/columns-files';
@@ -34,7 +34,7 @@ class WzGroupFilesTable extends Component {
     this.state = {
       items: [],
       pageSize: 10,
-      totalItems: 0,
+      totalItems: 0
     };
 
     this.groupsHandler = GroupsHandler;
@@ -70,7 +70,7 @@ class WzGroupFilesTable extends Component {
       this.setState({
         items,
         totalItems,
-        isProcessing: false,
+        isProcessing: false
       });
       this.props.updateIsProcessing(false);
     } catch (error) {
@@ -85,7 +85,7 @@ class WzGroupFilesTable extends Component {
     const filter = {
       offset: pageIndexFile * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter(),
+      sort: this.buildSortFilter()
     };
 
     return filter;
@@ -112,7 +112,13 @@ class WzGroupFilesTable extends Component {
 
   render() {
     this.groupsAgentsColumns = new GroupsFilesColumns(this.props);
-    const { isLoading, pageIndexFile, error, sortFieldFile, sortDirectionFile } = this.props.state;
+    const {
+      isLoading,
+      pageIndexFile,
+      error,
+      sortFieldFile,
+      sortDirectionFile
+    } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
@@ -120,13 +126,13 @@ class WzGroupFilesTable extends Component {
       pageIndex: pageIndexFile,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100],
+      pageSizeOptions: [10, 25, 50, 100]
     };
     const sorting = {
       sort: {
         field: sortFieldFile,
-        direction: sortDirectionFile,
-      },
+        direction: sortDirectionFile
+      }
     };
 
     if (!error) {
@@ -155,27 +161,33 @@ class WzGroupFilesTable extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 }
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndexFile: pageIndexFile => dispatch(updatePageIndexFile(pageIndexFile)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndexFile: pageIndexFile =>
+      dispatch(updatePageIndexFile(pageIndexFile)),
     updateSortDirectionFile: sortDirectionFile =>
       dispatch(updateSortDirectionFile(sortDirectionFile)),
-    updateSortFieldFile: sortFieldFile => dispatch(updateSortFieldFile(sortFieldFile)),
-    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateSortFieldFile: sortFieldFile =>
+      dispatch(updateSortFieldFile(sortFieldFile)),
+    updateFileContent: content => dispatch(updateFileContent(content))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupFilesTable);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupFilesTable);

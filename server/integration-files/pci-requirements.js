@@ -83,5 +83,5 @@ export const pciRequirementsFile = {
   '11.2.1':
     'Perform quarterly internal vulnerability scans. Address vulnerabilities and perform rescans to verify all “high risk” vulnerabilities are resolved in accordance with the entity’s vulnerability ranking. Scans must be performed by qualified personnel.',
   '11.2.3':
-    'Perform internal and external scans, and rescans as needed, after any significant change. Scans must be performed by qualified personnel.',
+    'Perform internal and external scans, and rescans as needed, after any significant change. Scans must be performed by qualified personnel.'
 };

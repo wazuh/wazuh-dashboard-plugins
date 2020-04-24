@@ -12,8 +12,8 @@
 export function Base(pattern, filters, gte, lte) {
   return {
     pattern: pattern,
-    from : 0,
-    size : 500,
+    from: 0,
+    size: 500,
     aggs: {},
     sort: [],
     script_fields: {},

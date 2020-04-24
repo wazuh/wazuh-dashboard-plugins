@@ -10,5 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 export const EventsSelectedFiles = {
-  fim: ['syscheck.path', 'syscheck.event', 'rule.description', 'rule.level', 'rule.id'],
+  fim: [
+    'syscheck.path',
+    'syscheck.event',
+    'rule.description',
+    'rule.level',
+    'rule.id'
+  ]
 };

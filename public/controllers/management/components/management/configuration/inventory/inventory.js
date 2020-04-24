@@ -1,31 +1,33 @@
 /*
-* Wazuh app - React component for show configuration of inventory.
-* Copyright (C) 2015-2020 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - React component for show configuration of inventory.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
-import {
-  
-} from "@elastic/eui";
+import {} from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import withWzConfig from "../util-hocs/wz-config";
+import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 
 const mainSettings = [
-  { field: 'disabled', label: 'Syscollector integration status', render: renderValueNoThenEnabled },
+  {
+    field: 'disabled',
+    label: 'Syscollector integration status',
+    render: renderValueNoThenEnabled
+  },
   { field: 'interval', label: 'Interval between system scans' },
   { field: 'scan-on-start', label: 'Scan on start' }
 ];
@@ -41,52 +43,71 @@ const scanSettings = [
 ];
 
 const helpLinks = [
-  { text: 'Syscollector module documentation', href: 'https://documentation.wazuh.com/current/user-manual/capabilities/syscollector.html'},
-  { text: 'Syscollector module reference', href: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html'}
+  {
+    text: 'Syscollector module documentation',
+    href:
+      'https://documentation.wazuh.com/current/user-manual/capabilities/syscollector.html'
+  },
+  {
+    text: 'Syscollector module reference',
+    href:
+      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html'
+  }
 ];
 
-class WzConfigurationInventory extends Component{
-  constructor(props){
+class WzConfigurationInventory extends Component {
+  constructor(props) {
     super(props);
     this.wodleConfig = wodleBuilder(this.props.currentConfig, 'syscollector');
   }
-  componentDidMount(){
+  componentDidMount() {
     this.props.updateBadge(this.badgeEnabled());
   }
-  badgeEnabled(){
-    return this.wodleConfig && this.wodleConfig.syscollector && this.wodleConfig.syscollector.disabled === 'no';
+  badgeEnabled() {
+    return (
+      this.wodleConfig &&
+      this.wodleConfig.syscollector &&
+      this.wodleConfig.syscollector.disabled === 'no'
+    );
   }
-  render(){
+  render() {
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
-        )}
-        {currentConfig && !this.wodleConfig.syscollector && !isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error='not-present' help={helpLinks}/>
-        )}
+        {currentConfig['wmodules-wmodules'] &&
+          isString(currentConfig['wmodules-wmodules']) && (
+            <WzNoConfig
+              error={currentConfig['wmodules-wmodules']}
+              help={helpLinks}
+            />
+          )}
+        {currentConfig &&
+          !this.wodleConfig.syscollector &&
+          !isString(currentConfig['wmodules-wmodules']) && (
+            <WzNoConfig error="not-present" help={helpLinks} />
+          )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
           <WzConfigurationSettingsTabSelector
-            title='Main settings'
-            description='General settings applied to all the scans'
+            title="Main settings"
+            description="General settings applied to all the scans"
             currentConfig={this.wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 280 : 350}
-            helpLinks={helpLinks}>
+            helpLinks={helpLinks}
+          >
             <WzConfigurationSettingsGroup
               config={this.wodleConfig.syscollector}
               items={mainSettings}
             />
             <WzConfigurationSettingsGroup
-              title='Scan settings'
-              description='Specific inventory scans to collect'
+              title="Scan settings"
+              description="Specific inventory scans to collect"
               config={this.wodleConfig.syscollector}
               items={scanSettings}
             />
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
-    )
+    );
   }
 }
 

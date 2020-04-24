@@ -10,7 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import {
+  EuiBasicTable,
+  EuiCallOut,
+  EuiOverlayMask,
+  EuiConfirmModal
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -24,7 +29,7 @@ import {
   updateShowModal,
   updateListItemsForRemove,
   updateSortDirectionAgents,
-  updateSortFieldAgents,
+  updateSortFieldAgents
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsAgentsColums from './utils/columns-agents';
@@ -36,7 +41,7 @@ class WzGroupAgentsTable extends Component {
     this.state = {
       items: [],
       pageSize: 10,
-      totalItems: 0,
+      totalItems: 0
     };
 
     this.groupsHandler = GroupsHandler;
@@ -72,7 +77,7 @@ class WzGroupAgentsTable extends Component {
       this.setState({
         items,
         totalItems,
-        isProcessing: false,
+        isProcessing: false
       });
       this.props.updateIsProcessing(false);
     } catch (error) {
@@ -87,7 +92,7 @@ class WzGroupAgentsTable extends Component {
     const filter = {
       offset: pageIndexAgents * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter(),
+      sort: this.buildSortFilter()
     };
 
     return filter;
@@ -114,7 +119,13 @@ class WzGroupAgentsTable extends Component {
 
   render() {
     this.groupsAgentsColumns = new GroupsAgentsColums(this.props);
-    const { isLoading, pageIndexAgents, error, sortFieldAgents, sortDirectionAgents } = this.props.state;
+    const {
+      isLoading,
+      pageIndexAgents,
+      error,
+      sortFieldAgents,
+      sortDirectionAgents
+    } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
@@ -122,13 +133,13 @@ class WzGroupAgentsTable extends Component {
       pageIndex: pageIndexAgents,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100],
+      pageSizeOptions: [10, 25, 50, 100]
     };
     const sorting = {
       sort: {
         field: sortFieldAgents,
-        direction: sortDirectionAgents,
-      },
+        direction: sortDirectionAgents
+      }
     };
 
     if (!error) {
@@ -149,7 +160,9 @@ class WzGroupAgentsTable extends Component {
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title={`Delete ${itemList[0].file ? itemList[0].file : itemList[0].name} agent?`}
+                title={`Delete ${
+                  itemList[0].file ? itemList[0].file : itemList[0].name
+                } agent?`}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
@@ -174,7 +187,7 @@ class WzGroupAgentsTable extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -203,7 +216,7 @@ class WzGroupAgentsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
@@ -211,14 +224,21 @@ const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFileContent: content => dispatch(updateFileContent(content)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndexAgents: pageIndexAgents => dispatch(updatePageIndexAgents(pageIndexAgents)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndexAgents: pageIndexAgents =>
+      dispatch(updatePageIndexAgents(pageIndexAgents)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
+    updateListItemsForRemove: itemList =>
+      dispatch(updateListItemsForRemove(itemList)),
     updateSortDirectionAgents: sortDirectionAgents =>
       dispatch(updateSortDirectionAgents(sortDirectionAgents)),
-    updateSortFieldAgents: sortFieldAgents => dispatch(updateSortFieldAgents(sortFieldAgents)),
+    updateSortFieldAgents: sortFieldAgents =>
+      dispatch(updateSortFieldAgents(sortFieldAgents))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupAgentsTable);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupAgentsTable);

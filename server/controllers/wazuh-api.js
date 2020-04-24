@@ -157,7 +157,7 @@ export class WazuhApiCtrl {
                 if (this.checkResponseIsDown(response)) {
                   return ErrorResponse(
                     `ERROR3099 - ${response.body.message ||
-                    'Wazuh not ready yet'}`,
+                      'Wazuh not ready yet'}`,
                     3099,
                     500,
                     reply
@@ -172,7 +172,7 @@ export class WazuhApiCtrl {
                   req.idChanged = id;
                   return this.checkStoredAPI(req, reply, false);
                 }
-              } catch (error) { } // eslint-disable-line
+              } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
             return ErrorResponse(error.message || error, 3020, 500, reply);
@@ -889,7 +889,9 @@ export class WazuhApiCtrl {
       // DELETE and PUT must use URL query but we accept objects in Dev Tools
       if ((method === 'DELETE' || method === 'PUT') && dataProperties.length) {
         (Object.keys(data) || []).forEach(key => {
-          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${data[key] !== '' ? '=' : ''}${data[key]}`
+          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
+            data[key] !== '' ? '=' : ''
+          }${data[key]}`;
         });
         data = {};
       }
@@ -911,8 +913,8 @@ export class WazuhApiCtrl {
       if (!responseData) {
         responseData =
           typeof responseData === 'string' &&
-            path.includes('/files') &&
-            method === 'GET'
+          path.includes('/files') &&
+          method === 'GET'
             ? ' '
             : false;
         response.body.data = responseData;
@@ -998,7 +1000,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-        ((response || {}).body || {}).message
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -1135,12 +1137,18 @@ export class WazuhApiCtrl {
       let itemsArray = [];
       const output = await needle(
         'get',
-        `${config.url}:${config.port}/${tmpPath}${tmpPath.includes('?') ? '&' : '?'}wait_for_complete`,
+        `${config.url}:${config.port}/${tmpPath}${
+          tmpPath.includes('?') ? '&' : '?'
+        }wait_for_complete`,
         params,
         cred
       );
 
-      const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
+      const isList =
+        req.payload.path.includes('/lists') &&
+        req.payload.filters &&
+        req.payload.filters.length &&
+        req.payload.filters.find(filter => filter._isCDBList);
 
       const totalItems = (((output || {}).body || {}).data || {}).totalItems;
 
@@ -1151,7 +1159,9 @@ export class WazuhApiCtrl {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
-            `${config.url}:${config.port}/${tmpPath}${tmpPath.includes('?') ? '&' : '?'}wait_for_complete`,
+            `${config.url}:${config.port}/${tmpPath}${
+              tmpPath.includes('?') ? '&' : '?'
+            }wait_for_complete`,
             params,
             cred
           );
@@ -1161,8 +1171,7 @@ export class WazuhApiCtrl {
 
       if (totalItems) {
         const { path, filters } = req.payload;
-        const isArrayOfLists =
-          path.includes('/lists') && !isList;
+        const isArrayOfLists = path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
         const isFiles = path.endsWith('/files');
@@ -1375,11 +1384,11 @@ export class WazuhApiCtrl {
   }
 
   /**
-* This get the extensions
-* @param {Object} req
-* @param {Object} reply
-* @returns {Object} extensions object or ErrorResponse
-*/
+   * This get the extensions
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} extensions object or ErrorResponse
+   */
   async setExtensions(req, reply) {
     try {
       const id = req.payload.id;
@@ -1389,7 +1398,6 @@ export class WazuhApiCtrl {
       return {
         statusCode: 200
       };
-
     } catch (error) {
       log('wazuh-api:setExtensions', error.message || error);
       return ErrorResponse(
@@ -1402,11 +1410,11 @@ export class WazuhApiCtrl {
   }
 
   /**
- * This get the extensions
- * @param {Object} req
- * @param {Object} reply
- * @returns {Object} extensions object or ErrorResponse
- */
+   * This get the extensions
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} extensions object or ErrorResponse
+   */
   getExtensions(req, reply) {
     try {
       const source = JSON.parse(
@@ -1415,7 +1423,6 @@ export class WazuhApiCtrl {
       return {
         extensions: (source.hosts[req.params.id] || {}).extensions || {}
       };
-
     } catch (error) {
       log('wazuh-api:getExtensions', error.message || error);
       return ErrorResponse(
@@ -1445,7 +1452,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${error.message ||
-        error}`,
+          error}`,
         4005,
         500,
         reply
@@ -1494,7 +1501,7 @@ export class WazuhApiCtrl {
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:

@@ -17,7 +17,7 @@ import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { ModulesHelper } from "../../components/common/modules/modules-helper"
+import { ModulesHelper } from '../../components/common/modules/modules-helper';
 
 export function ClusterController(
   $scope,
@@ -29,9 +29,9 @@ export function ClusterController(
   discoverPendingUpdates,
   rawVisualizations,
   loadedVisualizations,
-  visHandlers,
+  visHandlers
 ) {
-  const tabVisualizations = new TabVisualizations()
+  const tabVisualizations = new TabVisualizations();
   timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
@@ -231,7 +231,7 @@ export function ClusterController(
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Cluster' },
+      { text: 'Cluster' }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 

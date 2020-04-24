@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import chrome from 'ui/chrome';
-import moment from 'moment-timezone'
+import moment from 'moment-timezone';
 
 export class TimeService {
   /**
@@ -21,9 +21,10 @@ export class TimeService {
     try {
       const dateUTC = moment.utc(d);
       const kibanaTz = chrome.getUiSettingsClient().get('dateFormat:tz');
-      const dateLocate = kibanaTz === 'Browser' 
-        ? moment(dateUTC).local() 
-        : moment(dateUTC).tz(kibanaTz);
+      const dateLocate =
+        kibanaTz === 'Browser'
+          ? moment(dateUTC).local()
+          : moment(dateUTC).tz(kibanaTz);
       return dateLocate.format('YYYY/MM/DD HH:mm:ss');
     } catch (error) {
       throw new Error(error);
