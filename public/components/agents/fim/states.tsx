@@ -28,7 +28,8 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLink,
-  EuiHorizontalRule
+  EuiHorizontalRule,
+  EuiButtonEmpty
 } from '@elastic/eui';
 import {
   StatesTable,
@@ -36,6 +37,8 @@ import {
   RegistryTable
 } from './states/';
 import { WzRequest } from '../../../react-services/wz-request';
+import exportCsv from '../../../react-services/wz-csv';
+import { toastNotifications } from 'ui/notify';
 
 export class States extends Component {
   state: {
@@ -99,7 +102,7 @@ export class States extends Component {
     const { selectedTabId } = this.state;
     if (selectedTabId !== prevState.selectedTabId) {
       const filters = this.getStoreFilters(this.props);
-      this.setState({filters});
+      this.setState({ filters });
     }
   }
 
@@ -130,35 +133,75 @@ export class States extends Component {
     const { isLoading } = this.state;
     if (tabs.length > 1) {
       return (
-        <EuiTabs>
-          {tabs.map((tab, index) => (
-            <EuiTab
-              onClick={() => this.onSelectedTabChanged(tab.id)}
-              isSelected={tab.id === this.state.selectedTabId}
-              disabled={tab.disabled}
-              key={index}>
-              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
-            </EuiTab>
-          ))}
-        </EuiTabs>
+        <div>
+          <EuiTabs>
+            {tabs.map((tab, index) => (
+              <EuiTab
+                onClick={() => this.onSelectedTabChanged(tab.id)}
+                isSelected={tab.id === this.state.selectedTabId}
+                disabled={tab.disabled}
+                key={index}>
+                {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
+              </EuiTab>
+            ))}
+          </EuiTabs>
+          <EuiSpacer size="s" />
+          <EuiFlexGroup>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty iconType="importAction" onClick={() => this.downloadCsv()}>
+                Export formatted
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </div>
       )
     } else {
       return (
-        <EuiTitle size="s">
-          <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}</h1>
-        </EuiTitle>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiTitle size="s">
+              <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}</h1>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="importAction" onClick={() => this.downloadCsv()}>
+              Export formatted
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       )
     }
   }
 
   onFilterSelect = (filter) => {
-    const { filters:oldFilter } = this.state;
-    const filters = { 
+    const { filters: oldFilter } = this.state;
+    const filters = {
       ...oldFilter,
-      q: !!oldFilter['q'] ? `${oldFilter['q']};${filter}` : filter 
+      q: !!oldFilter['q'] ? `${oldFilter['q']};${filter}` : filter
     };
     this.setStoreFilters(filters);
-    this.setState({filters});
+    this.setState({ filters });
+  }
+
+  showToast = (color, title, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      toastLifeTimeMs: time,
+    });
+  };
+  async downloadCsv() {
+    try {
+      this.showToast('success', 'Your download should begin automatically...', 3000);
+      await exportCsv(
+        '/syscheck/' + this.props.agent.id,
+        [{ name: 'type', value: this.state.selectedTabId === 'files' ? 'file' : this.state.selectedTabId }],
+        `fim-${this.state.selectedTabId}`
+      );
+    } catch (error) {
+      this.showToast('danger', error, 3000);
+    }
   }
 
   renderTable() {
@@ -187,27 +230,27 @@ export class States extends Component {
   }
 
   noConfiguredMonitoring() {
-    return (<EuiPage> 
+    return (<EuiPage>
       <EuiPageBody component="div">
         <EuiPageContent verticalPosition="center" horizontalPosition="center">
-          <EuiEmptyPrompt 
+          <EuiEmptyPrompt
             iconType="filebeatApp"
-            title={<h2>Integrity monitoring is not configured for this agent</h2>} 
+            title={<h2>Integrity monitoring is not configured for this agent</h2>}
             body={<Fragment>
               <EuiHorizontalRule margin='s' />
-              <EuiLink 
-                href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html' 
+              <EuiLink
+                href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
                 target="_blank"
-                style={{textAlign: "center"}}
-                >
+                style={{ textAlign: "center" }}
+              >
                 https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
               </EuiLink>
               <EuiHorizontalRule margin='s' />
-              </Fragment>} 
+            </Fragment>}
             actions={
-              <EuiButton 
-                href='#/manager/configuration?_g=()&tab=configuration' 
-                target="_blank" 
+              <EuiButton
+                href='#/manager/configuration?_g=()&tab=configuration'
+                target="_blank"
                 color="primary"
                 iconType="gear"
                 fill>
@@ -238,13 +281,13 @@ export class States extends Component {
     const tabs = this.renderTabs()
     const notItems = !(totalItemsFile + totalItemsRegistry)
     return notItems
-        ? this.noConfiguredMonitoring()
-        : (<EuiPage>
-            <EuiPanel>
-              {tabs}
-              <EuiSpacer size="m" />
-              {table}
-            </EuiPanel>
-          </EuiPage>)
+      ? this.noConfiguredMonitoring()
+      : (<EuiPage>
+        <EuiPanel>
+          {tabs}
+          <EuiSpacer size={this.props.agent.os.platform === 'windows' ? 's' : 'm'} />
+          {table}
+        </EuiPanel>
+      </EuiPage>)
   }
 }

@@ -6,6 +6,8 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
+import exportCsv from '../../../react-services/wz-csv';
+import { toastNotifications } from 'ui/notify';
 
 export class States extends Component {
   constructor(props) {
@@ -229,6 +231,25 @@ export class States extends Component {
     this.setState({ itemIdToExpandedRowMap });
   };
 
+  showToast = (color, title, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      toastLifeTimeMs: time,
+    });
+  };
+  async downloadCsv() {
+    try {
+      this.showToast('success', 'Your download should begin automatically...', 3000);
+      await exportCsv(
+        '/sca/' + this.state.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
+        [],
+        this.state.lookingPolicy.policy_id + '.csv'
+      );
+    } catch (error) {
+      this.showToast('danger', error, 3000);
+    }
+  }
 
   render() {
     const getPoliciesRowProps = (item, idx) => {
@@ -343,8 +364,7 @@ export class States extends Component {
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty
                       iconType="importAction"
-                      onClick={async () => await this.props.downloadCsv('/sca/' + this.state.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
-                        this.state.lookingPolicy.policy_id + '.csv')} >
+                      onClick={async () => await this.downloadCsv()} >
                       Export formatted
                     </EuiButtonEmpty>
                   </EuiFlexItem>
