@@ -46,7 +46,7 @@ export class AgentInfo extends Component {
   }
 
   buildStats(items) {
-    const checkField = (field) => { console.log(field); return (field !== undefined || field) ? field : "-"; };
+    const checkField = (field) => { return (field !== undefined || field) ? field : "-"; };
     const stats = items.map(item => {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
