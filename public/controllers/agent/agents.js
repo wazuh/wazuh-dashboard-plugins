@@ -116,7 +116,7 @@ export class AgentsController {
   /**
    * On controller loads
    */
-  $onInit() {
+  async $onInit() {
     const savedTimefilter = this.commonData.getTimefilter();
     if (savedTimefilter) {
       timefilter.setTime(savedTimefilter);
@@ -148,7 +148,7 @@ export class AgentsController {
     this.visFactoryService.clearAll();
 
     const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(currentApi);
+    const extensions = await AppState.getExtensions(currentApi);
     this.$scope.extensions = extensions;
 
     // Getting possible target location
@@ -161,15 +161,6 @@ export class AgentsController {
       this.$scope.tabView = this.commonData.checkTabViewLocation();
       this.$scope.tab = this.commonData.checkTabLocation();
     }
-    this.$scope.visualizeProps = {
-      selectedTab: this.$scope.tab,
-      isAgent: true,
-      updateRootScope: (prop, value) => {
-        this.$rootScope[prop] = value;
-        this.$rootScope.$applyAsync();
-      },
-      cardReqs: {}
-    };
     this.tabHistory = [];
     if (!this.ignoredTabs.includes(this.$scope.tab))
       this.tabHistory.push(this.$scope.tab);
@@ -473,8 +464,7 @@ export class AgentsController {
           this.filterHandler,
           this.$scope.tab,
           subtab,
-          this.$scope.agent.id,
-          this.$scope.tabView === 'discover'
+          this.$scope.agent.id
         );
 
         this.changeAgent = false;
@@ -525,58 +515,21 @@ export class AgentsController {
       } catch (error) {} // eslint-disable-line
     }
 
-    this.$scope.visualizeProps = {
-      selectedTab: tab,
-      isAgent: true,
-      updateRootScope: (prop, value) => {
-        this.$rootScope[prop] = value;
-        this.$rootScope.$applyAsync();
-      },
-      cardReqs: {}
-    };
+    /*     if (tab === 'mitre') {
+          const result = await this.apiReq.request('GET', '/rules/mitre', {});
+          this.$scope.mitreIds = (((result || {}).data || {}).data || {}).items;
+    
+          this.$scope.mitreCardsSliderProps = {
+            items: this.$scope.mitreIds,
+            attacksCount: this.$scope.attacksCount,
+            reqTitle: 'MITRE',
+            wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+            addFilter: id => this.addMitrefilter(id),
+          };
+        } */
+
     try {
       this.$scope.showScaScan = false;
-      if (tab === 'pci') {
-        this.$scope.visualizeProps.cardReqs = {
-          items: await this.commonData.getPCI(),
-          reqTitle: 'PCI DSS Requirement'
-        };
-      }
-      if (tab === 'gdpr') {
-        this.$scope.visualizeProps.cardReqs = {
-          items: await this.commonData.getGDPR(),
-          reqTitle: 'GDPR Requirement'
-        };
-      }
-
-      if (tab === 'mitre') {
-        const result = await this.apiReq.request('GET', '/rules/mitre', {});
-        this.$scope.mitreIds = (((result || {}).data || {}).data || {}).items;
-
-        this.$scope.mitreCardsSliderProps = {
-          items: this.$scope.mitreIds,
-          attacksCount: this.$scope.attacksCount,
-          reqTitle: 'MITRE',
-          wzReq: (method, path, body) =>
-            this.apiReq.request(method, path, body),
-          addFilter: id => this.addMitrefilter(id)
-        };
-      }
-
-      if (tab === 'hipaa') {
-        this.$scope.visualizeProps.cardReqs = {
-          items: await this.commonData.getHIPAA(),
-          reqTitle: 'HIPAA Requirement'
-        };
-      }
-
-      if (tab === 'nist') {
-        this.$scope.visualizeProps.cardReqs = {
-          items: await this.commonData.getNIST(),
-          reqTitle: 'NIST 800-53 Requirement'
-        };
-      }
-
       if (tab === 'sca') {
         //remove to component
         this.$scope.scaProps = {
@@ -877,9 +830,6 @@ export class AgentsController {
         this.$scope.agent.agentPlatform = false;
       }
 
-      this.$scope.fimProps = {
-        agent: this.$scope.agent
-      };
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});

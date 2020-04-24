@@ -21,6 +21,28 @@ export class Stats extends Component {
     this.state = {};
   }
 
+  goToAgents(status) {
+    let selectedOptions = [];
+
+    if (status !== null) {
+      selectedOptions = [
+        {
+          className: 'wzFilterBarOperator',
+          group: 'status',
+          label: 'status:' + status,
+          label_: status,
+          type: 'AND'
+        }
+      ];
+    }
+
+    sessionStorage.setItem(
+      'agents_preview_selected_options',
+      JSON.stringify(selectedOptions)
+    );
+    window.location.href = '#/agents-preview';
+  }
+
   render() {
     return (
       <EuiPage>
@@ -32,6 +54,8 @@ export class Stats extends Component {
               description="Total agents"
               titleColor="primary"
               textAlign="center"
+              style={{ cursor: 'pointer' }}
+              onClick={() => this.goToAgents(null)}
             />
           </EuiFlexItem>
           <EuiFlexItem>
@@ -40,6 +64,8 @@ export class Stats extends Component {
               description="Active agents"
               titleColor="secondary"
               textAlign="center"
+              style={{ cursor: 'pointer' }}
+              onClick={() => this.goToAgents('Active')}
             />
           </EuiFlexItem>
           <EuiFlexItem>
@@ -48,6 +74,8 @@ export class Stats extends Component {
               description="Disconnected agents"
               titleColor="danger"
               textAlign="center"
+              style={{ cursor: 'pointer' }}
+              onClick={() => this.goToAgents('Disconnected')}
             />
           </EuiFlexItem>
           <EuiFlexItem>
@@ -56,6 +84,8 @@ export class Stats extends Component {
               description="Never connected agents"
               titleColor="subdued"
               textAlign="center"
+              style={{ cursor: 'pointer' }}
+              onClick={() => this.goToAgents('Never connected')}
             />
           </EuiFlexItem>
           <EuiFlexItem />

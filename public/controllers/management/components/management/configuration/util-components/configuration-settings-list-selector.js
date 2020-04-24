@@ -40,8 +40,8 @@ class WzConfigurationSettingsListSelector extends Component {
       <Fragment>
         <EuiSpacer size="m" />
         <EuiFlexGroup alignItems="flexStart">
-          <EuiFlexItem grow={false}>
-            <EuiPanel>
+          <EuiFlexItem grow={false} style={{ maxWidth: 25, minWidth: 250 }}>
+            <EuiPanel style={{ background: '#fafbfd' }}>
               <ul>
                 {items.map((item, key) => (
                   <li key={`${keyList}-${key}`}>

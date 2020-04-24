@@ -11,15 +11,25 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiPanel,
   EuiPage,
   EuiTabs,
   EuiTab,
-  EuiSpacer,
   EuiTitle,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiEmptyPrompt,
+  EuiButton,
+  EuiSpacer,
+  EuiPageBody,
+  EuiPageContent,
+  EuiProgress,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiLink,
+  EuiHorizontalRule,
+  EuiButtonEmpty
 } from '@elastic/eui';
 import {
   StatesTable,
@@ -27,27 +37,52 @@ import {
   RegistryTable
 } from './states/';
 import { WzRequest } from '../../../react-services/wz-request';
+import exportCsv from '../../../react-services/wz-csv';
+import { toastNotifications } from 'ui/notify';
 
 export class States extends Component {
+  _isMount = false;
   state: {
     filters: {},
-    selectedTabId: String,
-    totalItemsFile: Number,
-    totalItemsRegistry: Number,
+    selectedTabId: 'files' | 'registry',
+    totalItemsFile: number,
+    totalItemsRegistry: number,
     isLoading: Boolean
   }
   props: any;
 
   constructor(props) {
     super(props);
-
     this.state = {
-      filters: {},
+      filters: this.getStoreFilters(props),
       selectedTabId: 'files',
       totalItemsFile: 0,
       totalItemsRegistry: 0,
       isLoading: true
     }
+    this.onFilterSelect.bind(this);
+  }
+
+  async componentDidMount() {
+    this._isMount = true;
+    const { agentPlatform } = this.props.agent;
+    const totalItemsFile = await this.getItemNumber('file');
+    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
+    if (this._isMount){
+      this.setState({ totalItemsFile, totalItemsRegistry, isLoading: false });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { selectedTabId } = this.state;
+    if (selectedTabId !== prevState.selectedTabId) {
+      const filters = this.getStoreFilters(this.props);
+      this.setState({ filters });
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   tabs() {
@@ -68,13 +103,21 @@ export class States extends Component {
     return (auxTabs);
   }
 
-  async componentDidMount() {
-    await this.getTotalFiles();
-    await this.getTotalRegistry();
-    this.setState({ isLoading: false });
+  getStoreFilters(props) {
+    const { section, selectView, agent } = props;
+    const filters = JSON.parse(window.localStorage.getItem(`wazuh-${section}-${selectView}-${((this.state || {}).selectedTabId || 'files')}-${agent['id']}`) || '{}');
+    return filters;
   }
 
+  setStoreFilters(filters) {
+    const { section, selectView, agent } = this.props;
+    window.localStorage.setItem(`wazuh-${section}-${selectView}-${(this.state || {}).selectedTabId || 'files'}-${agent['id']}`, JSON.stringify(filters))
+  }
+
+
+
   onFiltersChange(filters) {
+    this.setStoreFilters(filters);
     this.setState({ filters });
   }
 
@@ -82,30 +125,17 @@ export class States extends Component {
     this.setState({ selectedTabId: id });
   }
 
-  async getTotalFiles() {
+  async getItemNumber(type: 'file' | 'registry') {
     const agentID = this.props.agent.id;
     const totalItemsFile = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
       {
         limit: '1',
-        type: 'file'
+        type
       }
     );
-    this.setState({ totalItemsFile: ((totalItemsFile.data || {}).data || {}).totalItems || 0 });
-  }
-
-  async getTotalRegistry() {
-    const agentID = this.props.agent.id;
-    const totalItemsRegistry = await WzRequest.apiReq(
-      'GET',
-      `/syscheck/${agentID}`,
-      {
-        limit: '1',
-        type: 'registry'
-      }
-    );
-    this.setState({ totalItemsRegistry: ((totalItemsRegistry.data || {}).data || {}).totalItems || 0 });
+    return ((totalItemsFile.data || {}).data || {}).totalItems || 0;
   }
 
   renderTabs() {
@@ -113,74 +143,161 @@ export class States extends Component {
     const { isLoading } = this.state;
     if (tabs.length > 1) {
       return (
-        <EuiTabs>
-          {tabs.map((tab, index) => (
-            <EuiTab
-              onClick={() => this.onSelectedTabChanged(tab.id)}
-              isSelected={tab.id === this.state.selectedTabId}
-              disabled={tab.disabled}
-              key={index}>
-              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
-            </EuiTab>
-          ))}
-        </EuiTabs>
+        <div>
+          <EuiTabs>
+            {tabs.map((tab, index) => (
+              <EuiTab
+                onClick={() => this.onSelectedTabChanged(tab.id)}
+                isSelected={tab.id === this.state.selectedTabId}
+                disabled={tab.disabled}
+                key={index}>
+                {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
+              </EuiTab>
+            ))}
+          </EuiTabs>
+          <EuiSpacer size="s" />
+          <EuiFlexGroup>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty iconType="importAction" onClick={() => this.downloadCsv()}>
+                Export formatted
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </div>
       )
     } else {
       return (
-        <EuiTitle size="s">
-          <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}</h1>
-        </EuiTitle>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiTitle size="s">
+              <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}</h1>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="importAction" onClick={() => this.downloadCsv()}>
+              Export formatted
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       )
     }
   }
 
-  renderFiles() {
+  onFilterSelect = (filter) => {
+    const { filters: oldFilter } = this.state;
+    const filters = {
+      ...oldFilter,
+      q: !!oldFilter['q'] ? `${oldFilter['q']};${filter}` : filter
+    };
+    this.setStoreFilters(filters);
+    this.setState({ filters });
+  }
+
+  showToast = (color, title, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      toastLifeTimeMs: time,
+    });
+  };
+  async downloadCsv() {
+    try {
+      this.showToast('success', 'Your download should begin automatically...', 3000);
+      await exportCsv(
+        '/syscheck/' + this.props.agent.id,
+        [{ name: 'type', value: this.state.selectedTabId === 'files' ? 'file' : this.state.selectedTabId }],
+        `fim-${this.state.selectedTabId}`
+      );
+    } catch (error) {
+      this.showToast('danger', error, 3000);
+    }
+  }
+
+  renderTable() {
     const { filters, selectedTabId } = this.state;
     return (
       <div>
         <FilterBar
+          filters={filters}
           onFiltersChange={this.onFiltersChange.bind(this)}
           selectView={selectedTabId}
-          agent={this.props.agent}
-          onTimeChange={(timeFilter) => {}} />
-        <StatesTable
-          {...this.props}
-          filters={filters} />
+          agent={this.props.agent} />
+        {selectedTabId === 'files' &&
+          <StatesTable
+            {...this.props}
+            filters={filters}
+            onFilterSelect={this.onFilterSelect} />
+        }
+        {selectedTabId === 'registry' &&
+          <RegistryTable
+            {...this.props}
+            filters={filters}
+            onFilterSelect={this.onFilterSelect} />
+        }
       </div>
     )
   }
 
-  renderWindowRegistry() {
+  noConfiguredMonitoring() {
+    return (<EuiPage>
+      <EuiPageBody component="div">
+        <EuiPageContent verticalPosition="center" horizontalPosition="center">
+          <EuiEmptyPrompt
+            iconType="filebeatApp"
+            title={<h2>Integrity monitoring is not configured for this agent</h2>}
+            body={<Fragment>
+              <EuiHorizontalRule margin='s' />
+              <EuiLink
+                href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
+                target="_blank"
+                style={{ textAlign: "center" }}
+              >
+                https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
+              </EuiLink>
+              <EuiHorizontalRule margin='s' />
+            </Fragment>}
+            actions={
+              <EuiButton
+                href='#/manager/configuration?_g=()&tab=configuration'
+                target="_blank"
+                color="primary"
+                iconType="gear"
+                fill>
+                Configure it
+              </EuiButton>
+            } />
+        </EuiPageContent>
+      </EuiPageBody>
+    </EuiPage>);
+  }
 
-    const { filters, selectedTabId } = this.state;
-    return (
-      <div>
-        <FilterBar
-          onFiltersChange={this.onFiltersChange.bind(this)}
-          selectView={selectedTabId}
-          agent={this.props.agent}
-          onTimeChange={(timeFilter) => {}} />
-        <RegistryTable
-          {...this.props}
-          filters={filters} />
-      </div>
-    )
+  loadingStates() {
+    return <EuiPage>
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <EuiProgress size="xs" color="primary" />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiPage>;
   }
 
   render() {
-    const files = this.renderFiles();
-    const registry = this.renderWindowRegistry();
+    const { totalItemsFile, totalItemsRegistry, isLoading } = this.state;
+    if (isLoading) {
+      return this.loadingStates()
+    }
+    const table = this.renderTable();
     const tabs = this.renderTabs()
-    const { selectedTabId } = this.state;
-    return (
-      <EuiPage>
+    const notItems = !(totalItemsFile + totalItemsRegistry)
+    return notItems
+      ? this.noConfiguredMonitoring()
+      : (<EuiPage>
         <EuiPanel>
           {tabs}
-          <EuiSpacer size="m" />
-          {selectedTabId === 'files' && files}
-          {this.props.agent.os.platform === 'windows' && (selectedTabId === 'registry' && registry)}
+          <EuiSpacer size={this.props.agent.os.platform === 'windows' ? 's' : 'm'} />
+          {table}
         </EuiPanel>
-      </EuiPage>
-    )
+      </EuiPage>)
   }
 }

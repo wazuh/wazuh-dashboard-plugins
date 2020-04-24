@@ -80,10 +80,7 @@ export class UpdateConfigurationFile {
         'Updating configuration',
         'debug'
       );
-      return {
-        needRestart: needRestartFields.includes(key),
-        needWait: key === 'api.selector'
-      };
+      return { needRestart: needRestartFields.includes(key) };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;

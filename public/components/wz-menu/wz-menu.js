@@ -57,6 +57,7 @@ class WzMenu extends Component {
     this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
     this.indexPatterns = npStart.plugins.data.indexPatterns;
+    this.isLoading = false;
   }
 
   async componentDidMount() {
@@ -151,15 +152,8 @@ class WzMenu extends Component {
       const list = await PatternHandler.getPatternList();
       if (!list) return;
 
-      // Get the configuration to check if pattern selector is enabled
-      const config = this.wazuhConfig.getConfig();
-      AppState.setPatternSelector(config['ip.selector']);
-
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
-
-      // Show the pattern selector
-      this.setState({ showSelector: true });
 
       let filtered = false;
       // If there is no current pattern, fetch it
@@ -188,6 +182,7 @@ class WzMenu extends Component {
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
     }
+    this.isLoading = false;
   }
 
   changePattern = event => {
@@ -492,7 +487,7 @@ class WzMenu extends Component {
                 </EuiFormRow>
               )}
             {!this.state.currentAPI && <span> No API </span>}
-            {this.state.showSelector &&
+            {AppState.getPatternSelector() &&
               this.state.theresPattern &&
               this.state.patternList &&
               this.state.patternList.length > 1 &&

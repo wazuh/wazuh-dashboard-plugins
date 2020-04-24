@@ -41,20 +41,37 @@ class WzPolicyMonitoring extends Component {
   render() {
     return (
       <Fragment>
-        <WzTabSelector>
-          <WzTabSelectorTab label="General">
-            <WzConfigurationPolicyMonitoringGeneral {...this.props} />
-          </WzTabSelectorTab>
-          <WzTabSelectorTab label="System audit">
+        {(this.props.onlyShowTab === 'Policy Monitoring' && (
+          <WzTabSelector>
+            <WzTabSelectorTab label="General">
+              <WzConfigurationPolicyMonitoringGeneral {...this.props} />
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label="Ignored">
+              <WzConfigurationPolicyMonitoringIgnored {...this.props} />
+            </WzTabSelectorTab>
+          </WzTabSelector>
+        )) ||
+          (this.props.onlyShowTab === 'System audit' && (
             <WzConfigurationPolicyMonitoringSystemAudit {...this.props} />
-          </WzTabSelectorTab>
-          <WzTabSelectorTab label="Ignored">
-            <WzConfigurationPolicyMonitoringIgnored {...this.props} />
-          </WzTabSelectorTab>
-          <WzTabSelectorTab label="SCA">
+          )) ||
+          (this.props.onlyShowTab === 'SCA' && (
             <WzConfigurationPolicyMonitoringSCA {...this.props} />
-          </WzTabSelectorTab>
-        </WzTabSelector>
+          )) || (
+            <WzTabSelector>
+              <WzTabSelectorTab label="General">
+                <WzConfigurationPolicyMonitoringGeneral {...this.props} />
+              </WzTabSelectorTab>
+              <WzTabSelectorTab label="System audit">
+                <WzConfigurationPolicyMonitoringSystemAudit {...this.props} />
+              </WzTabSelectorTab>
+              <WzTabSelectorTab label="Ignored">
+                <WzConfigurationPolicyMonitoringIgnored {...this.props} />
+              </WzTabSelectorTab>
+              <WzTabSelectorTab label="SCA">
+                <WzConfigurationPolicyMonitoringSCA {...this.props} />
+              </WzTabSelectorTab>
+            </WzTabSelector>
+          )}
       </Fragment>
     );
   }

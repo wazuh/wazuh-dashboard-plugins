@@ -163,20 +163,6 @@ export class OverviewWelcome extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPage>
-        <EuiPage>
-          <EuiFlexGroup justifyContent="spaceAround">
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                onClick={() =>
-                  (window.location.href = '#/settings?tab=modules')
-                }
-                iconType="eye"
-              >
-                Configure the modules
-              </EuiButton>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
       </Fragment>
     );
   }

@@ -36,6 +36,10 @@ class WzManagementMain extends Component {
     this.props.updateRulesetSection(this.props.section);
   }
 
+  componentWillUnmount() {
+    store.dispatch(updateRulesetSection(''));
+  }
+
   render() {
     const { section } = this.props;
     const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];

@@ -10,93 +10,156 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
-import ReactDOM from 'react-dom';
-import {
-  EuiButtonEmpty,
-} from '@elastic/eui';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import React, { Component } from 'react';
 import { FlyoutDetail } from './states/flyout';
+import { ModulesHelper } from '../../common/modules/modules-helper'
+import { EuiOverlayMask } from '@elastic/eui';
+
+
 export class EventsFim extends Component {
+  _isMount = false;
   state: {
-    isFlyoutVisible: Boolean
+    isFlyoutVisible: Boolean,
+    currentFile: string,
+    fetchStatus: 'loading' | 'complete',
+    rows: number
   };
+  props!: {
+    [key: string]: any
+  }
+  modulesHelper: ModulesHelper;
+  fetchWatch!: any;
+  
   constructor(props) {
     super(props);
     this.state = {
       isFlyoutVisible: false,
-    }
-  }
-
-  async getRowsField(scope, index) {
-    this.elements = document.querySelectorAll(`.kbn-table tbody tr td:nth-child(${index}) div`);
-    if ((scope.rows || []).length && (this.elements || {}).length) {
-      this.forceUpdate();
-    } else if ((scope.rows || []).length) {
-      setTimeout(() => { this.getRowsField(scope, index) }, 1000);
-    }
-  }
-
-  async getDiscoverScope() {
-    const app = getAngularModule('app/wazuh');
-    if (app.discoverScope) {
-      app.discoverScope.$watchCollection('fetchStatus',
-        () => {
-          if (app.discoverScope.fetchStatus === 'complete') {
-            this.elements = false;
-            setTimeout(() => { this.getRowsField(app.discoverScope, 3) }, 1000);
-          }
-        });
-    } else {
-      setTimeout(() => { this.getDiscoverScope() }, 200);
-    }
+      currentFile: '',
+      fetchStatus: 'loading',
+      rows: 0
+    };
+    this.modulesHelper = ModulesHelper;
+    this.getRowsField.bind(this);
   }
 
   async componentDidMount() {
-    this.getDiscoverScope();
+    this._isMount = true;
+    const scope = await this.modulesHelper.getDiscoverScope();
+    this.fetchWatch = scope.$watchCollection('fetchStatus',
+      () => {
+        const {fetchStatus} = this.state;
+        if (fetchStatus !== scope.fetchStatus){
+          const rows = scope.fetchStatus === 'complete' ? scope.rows.length : 0;
+          this._isMount && this.setState({fetchStatus: scope.fetchStatus, rows})
+        }
+      });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const {fetchStatus, isFlyoutVisible, rows} = this.state;
+    if (nextState.isFlyoutVisible !== isFlyoutVisible ){
+      return true;
+    }
+    if (nextState.fetchStatus !== fetchStatus){
+      return true;
+    }
+    if (nextState.rows !== rows) {
+      return true;
+    }
+    return false;
+  }
+
+  componentDidUpdate() {
+    const {fetchStatus, rows} = this.state;
+    if(fetchStatus === 'complete' && rows){
+      this.getRowsField();
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
+    if (this.fetchWatch) this.fetchWatch();
+  }
+
+  getRowsField = async () => {
+    const indices: number[] = [];
+    const { rows } = this.state;
+    if (!rows) {
+      this.setState({elements:[]})
+      return;
+    }
+    if (!document)
+      this.getRowsField();
+    const cols = document.querySelectorAll(`.kbn-table thead th`);
+    if (!(cols || []).length) {
+      setTimeout(this.getRowsField, 10);
+    }
+    cols.forEach((col, idx) => {
+      if (['syscheck.path', 'rule.id'].includes(col.textContent || '')) {
+        indices.push(idx + 1);
+      }
+    });
+    let query = '';
+    indices.forEach((position, idx) => {
+      query += `.kbn-table tbody tr td:nth-child(${position}) div`
+      if (idx !== indices.length - 1) {
+        query += ', ';
+      }
+    });
+    if (query){
+      const elements = document.querySelectorAll(query);
+        elements.forEach((element, idx) => {
+          const text = element.textContent;
+          if (idx % 2){
+            element.childNodes.forEach(child => {
+              if (child.nodeName === 'SPAN'){
+                const link = document.createElement('a')
+                link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
+                link.setAttribute('target', '_blank')
+                link.setAttribute('style', 'minWidth: 55, display: "block"');
+                link.textContent = text
+                child.replaceWith(link)
+              }
+            })
+          } else {
+            element.childNodes.forEach(child => {
+              if (child.nodeName === 'SPAN'){
+                const link = document.createElement('a')
+                link.onclick = () => this.showFlyout(text);
+                link.textContent = text
+                child.replaceWith(link);
+              }
+            })
+          }
+        })
+    }
   }
 
   showFlyout(file) {
-    //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file }));
+    if (file !== " - ") {
+      //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
+      this.setState({ isFlyoutVisible: true, currentFile: file });
+    }
   }
+
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: false });
   }
 
   render() {
     return (
-      <Fragment>
-        {this.elements &&
-          [...this.elements].map(element => {
-            const file = element.textContent;
-            if (element.firstChild.tagName === 'SPAN') {
-              element.removeChild(element.firstChild);
-            }
-            return (
-              ReactDOM.createPortal(
-                <Fragment>
-                  <a
-                    onClick={() => this.showFlyout(file)}>
-                    {file}
-                  </a>
-                </Fragment>
-                ,
-                element
-              )
-            )
-          }
-          )
-        }
-        {this.state.isFlyoutVisible &&
-          <FlyoutDetail
-            fileName={this.state.currentFile}
-            agentId={this.props.agent.id}
-            closeFlyout={() => this.closeFlyout()}
-            {...this.props}>
-          </FlyoutDetail>
-        }
-      </Fragment>
+      this.state.isFlyoutVisible &&
+      <EuiOverlayMask 
+      // @ts-ignore
+        onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+        <FlyoutDetail
+          fileName={this.state.currentFile}
+          agentId={this.props.agent.id}
+          closeFlyout={() => this.closeFlyout()}
+          type='file'
+          view='events'
+          {...this.props}/>
+      </EuiOverlayMask>
     )
   }
 }

@@ -16,6 +16,7 @@ import {
   EuiFlexItem,
   EuiBasicTable,
   Direction,
+  EuiOverlayMask,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
@@ -38,6 +39,7 @@ export class StatesTable extends Component {
 
   props!: {
     filters: {},
+    onFilterSelect(): void
     agent: any
   }
 
@@ -77,8 +79,9 @@ export class StatesTable extends Component {
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters))
-      this.getSyscheck();
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
+      this.setState({pageIndex: 0}, this.getSyscheck)
+    }
   }
 
   async getSyscheck() {
@@ -244,13 +247,16 @@ export class StatesTable extends Component {
       <div>
         {filesTable}
         {this.state.isFlyoutVisible &&
-          <FlyoutDetail
-            fileName={this.state.currentFile.file}
-            agentId={this.props.agent.id}
-            closeFlyout={() => this.closeFlyout()}
-            showViewInEvents={true}
-            {...this.props}>
-          </FlyoutDetail>
+          <EuiOverlayMask 
+            onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+            <FlyoutDetail
+              fileName={this.state.currentFile.file}
+              agentId={this.props.agent.id}
+              closeFlyout={() => this.closeFlyout()}
+              type='file'
+              view='states'
+              {...this.props} />
+          </EuiOverlayMask>
         }
       </div>
     )

@@ -17,6 +17,7 @@ import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
+import { ModulesHelper } from '../../components/common/modules/modules-helper';
 
 export function ClusterController(
   $scope,
@@ -203,7 +204,7 @@ export function ClusterController(
    * This creatie custom filters for visualizations for a given node
    * @param {Object} node
    */
-  const assignFilters = (node = false) => {
+  const assignFilters = async (node = false) => {
     try {
       filters = [];
       filters.push(
@@ -212,11 +213,8 @@ export function ClusterController(
       if (node) {
         filters.push(filterHandler.nodeQuery(node));
       }
-
-      $rootScope.$emit('wzEventFilters', { filters, localChange: false });
-      if (!$rootScope.$$listenerCount['wzEventFilters']) {
-        $timeout(100).then(() => assignFilters(node));
-      }
+      const discoverScope = await ModulesHelper.getDiscoverScope();
+      discoverScope.loadFilters(filters);
     } catch (error) {
       errorHandler.handle(
         'An error occurred while creating custom filters for visualizations',

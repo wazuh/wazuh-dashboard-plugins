@@ -58,7 +58,7 @@ export class AgentInfo extends Component {
       checkField(((agent || {}).os || {}).version);
 
     return (
-      <EuiToolTip position="bottom" content={os_name === '--' ? '-' : os_name}>
+      <EuiToolTip position="bottom" content={os_name === '- -' ? '-' : os_name}>
         <span
           className="euiTableCellContent__text euiTableCellContent--truncateText"
           style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}
@@ -66,14 +66,17 @@ export class AgentInfo extends Component {
           <i
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
             aria-hidden="true"
-          ></i>{' '}
-          {os_name === '--' ? '-' : os_name}
+          ></i>
+          {os_name === '- -' ? '-' : ' ' + os_name}
         </span>
       </EuiToolTip>
     );
   }
 
   buildStats(items) {
+    const checkField = field => {
+      return field !== undefined || field ? field : '-';
+    };
     const stats = items.map(item => {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
@@ -89,7 +92,7 @@ export class AgentInfo extends Component {
                     margin: '0 auto'
                   }}
                 >
-                  {item.title}
+                  {checkField(item.title)}
                 </span>
               )
             }

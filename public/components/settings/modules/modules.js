@@ -18,9 +18,8 @@ export default class EnableModules extends Component {
   constructor(props) {
     super(props);
     this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(this.currentApi);
     this.state = {
-      extensions,
+      extensions: [],
       groups: [
         {
           title: 'Security Information Management',
@@ -46,8 +45,8 @@ export default class EnableModules extends Component {
             { name: 'vuls', default: true, agent: false },
             { name: 'virustotal', default: false, agent: false },
             { name: 'osquery', default: false, agent: false },
-            { name: 'docker', default: false, agent: false },
-            { name: 'mitre', default: false, agent: false }
+            { name: 'docker', default: false, agent: false }
+            /*             { name: 'mitre', default: false, agent: false } */
           ]
         },
         {
@@ -61,6 +60,11 @@ export default class EnableModules extends Component {
         }
       ]
     };
+  }
+
+  async componentDidMount() {
+    const extensions = await AppState.getExtensions(this.currentApi);
+    this.setState({ extensions });
   }
 
   toggleExtension(extension) {

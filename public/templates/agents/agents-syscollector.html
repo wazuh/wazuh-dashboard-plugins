@@ -1,14 +1,4 @@
-<div ng-if="tab === 'syscollector'" ng-show="!load" class="euiPageBody">
-
-  <div layout="row" class="wz-margin-16" ng-if="agent && agent.status === 'Never connected'">
-    <div flex class="euiCallOut euiCallOut--warning">
-      <div class="euiCallOutHeader">
-        <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-        <span class="euiCallOutHeader__title">This agent has never connected.</span>
-      </div>
-    </div>
-  </div>
-
+<div ng-if="tab === 'syscollector'" ng-show="!load" class="euiPageBody wz-module-body-main">
   <div layout="row" class="wz-margin-16" ng-if="agent && agent.status === 'Disconnected'">
     <div flex class="euiCallOut euiCallOut--primary">
       <div class="euiCallOutHeader">

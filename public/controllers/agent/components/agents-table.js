@@ -37,6 +37,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 
 export class AgentsTable extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
     const selectedOptions = JSON.parse(
@@ -155,12 +156,13 @@ export class AgentsTable extends Component {
     const formatedAgents = (
       ((rawAgents || {}).data || {}).data || {}
     ).items.map(this.formatAgent.bind(this));
-    this.setState({
-      agents: formatedAgents,
-      totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
-      isProcessing: false,
-      isLoading: false
-    });
+    this._isMount &&
+      this.setState({
+        agents: formatedAgents,
+        totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
+        isProcessing: false,
+        isLoading: false
+      });
   }
 
   async getAllItems() {
@@ -188,13 +190,14 @@ export class AgentsTable extends Component {
     const formatedAgents = (
       ((rawAgents || {}).data || {}).data || {}
     ).items.map(this.formatAgent.bind(this));
-    this.setState({
-      agents: formatedAgents,
-      avaibleAgents: agentsFiltered.data.data.items,
-      totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
-      isProcessing: false,
-      isLoading: false
-    });
+    this._isMount &&
+      this.setState({
+        agents: formatedAgents,
+        avaibleAgents: agentsFiltered.data.data.items,
+        totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
+        isProcessing: false,
+        isLoading: false
+      });
   }
 
   buildFilter() {
@@ -256,25 +259,27 @@ export class AgentsTable extends Component {
     return (
       <div>
         <EuiToolTip
-          content="Open Discover panel for this agent"
+          content="Open Overview panel for this agent"
           position="left"
         >
           <EuiButtonIcon
-            onClick={ev => {
+            onClick={() => ev => {
               ev.stopPropagation();
               this.props.clickAction(agent, 'discover');
             }}
-            iconType="discoverApp"
-            aria-label="Open Discover panel for this agent"
+            iconType="eye"
+            color={'primary'}
+            aria-label="Open Overview panel for this agent"
           />
         </EuiToolTip>
+        &nbsp;
         <EuiToolTip content="Open configuration for this agent" position="left">
           <EuiButtonIcon
             onClick={ev => {
               ev.stopPropagation();
               this.props.clickAction(agent, 'configuration');
             }}
-            color={'text'}
+            color={'primary'}
             iconType="wrench"
             aria-label="Open configuration for this agent"
           />
@@ -353,7 +358,6 @@ export class AgentsTable extends Component {
     const filterSearch = { name: 'search', value: search };
     this.props.downloadCsv([filterQ, filterSearch]);
   };
-
   formattedButton() {
     return (
       <EuiFlexItem grow={false}>
@@ -404,7 +408,7 @@ export class AgentsTable extends Component {
       (selectedItems.length > 0 &&
         selectedItems.filter(item => item.status === 'Active').length === 0 &&
         selectedItems.filter(item => item.status === 'Disconnected').length >
-          0) ||
+        0) ||
       selectedItems.filter(item => item.outdated && item.status === 'Active')
         .length === 0
     ) {
@@ -645,17 +649,17 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-              'success',
-              `Selected agents were successfully deleted`,
-              '',
-              5000
-            )
+            'success',
+            `Selected agents were successfully deleted`,
+            '',
+            5000
+          )
           : this.showToast(
-              'warning',
-              `Failed to delete selected agents`,
-              '',
-              5000
-            );
+            'warning',
+            `Failed to delete selected agents`,
+            '',
+            5000
+          );
       })
       .catch(error => {
         this.showToast(
@@ -688,11 +692,11 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-              'success',
-              `All agents have been successfully deleted`,
-              '',
-              5000
-            )
+            'success',
+            `All agents have been successfully deleted`,
+            '',
+            5000
+          )
           : this.showToast('warning', `Failed to delete all agents`, '', 5000);
       })
       .catch(error => {
@@ -1001,7 +1005,7 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => {}
+        onClick: () => { }
       };
     };
 
@@ -1023,11 +1027,11 @@ export class AgentsTable extends Component {
     const pagination =
       totalItems > 15
         ? {
-            pageIndex: pageIndex,
-            pageSize: pageSize,
-            totalItemCount: totalItems,
-            pageSizeOptions: [15, 25, 50, 100]
-          }
+          pageIndex: pageIndex,
+          pageSize: pageSize,
+          totalItemCount: totalItems,
+          pageSizeOptions: [15, 25, 50, 100]
+        }
         : false;
     const sorting = {
       sort: {
@@ -1049,7 +1053,6 @@ export class AgentsTable extends Component {
             items={agents}
             itemId="id"
             columns={columns}
-            pagination={pagination}
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
@@ -1058,6 +1061,7 @@ export class AgentsTable extends Component {
             isSelectable={true}
             selection={selection}
             noItemsMessage="No agents found"
+            {...(pagination && { pagination })}
           />
         </EuiFlexItem>
       </EuiFlexGroup>

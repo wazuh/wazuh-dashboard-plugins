@@ -40,6 +40,7 @@ export class WzSearchBar extends Component {
     isPopoverOpen: boolean
   };
   suggestHandler!: QHandler | ApiHandler | QTagsHandler;
+  inputRef!: HTMLImageElement;
   props!:{
     qSuggests: qSuggests[] | null
     apiSuggests: apiSuggests[] | null
@@ -127,7 +128,13 @@ export class WzSearchBar extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState){
+    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
+      return true;
+    }
     if (nextState.isProcessing) {
+      return true;
+    }
+    if (JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
       return true;
     }
     if (nextState.isPopoverOpen !== this.state.isPopoverOpen){
@@ -146,8 +153,18 @@ export class WzSearchBar extends Component {
   }
 
   async componentDidUpdate(prevProps) {
+    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(prevProps.initFilters)){
+      this.setState({filters: this.props.initFilters});
+    }
+
     if (this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests)) {
       this.selectSuggestHandler(this.state.searchFormat);
+    }
+    if (JSON.stringify(prevProps.initFilters) !== JSON.stringify(this.props.initFilters)){
+      this.setState({
+        filters: this.props.initFilters,
+        isProcessing: true
+      })
     }
 
     if (!this.state.isProcessing) { return;}
@@ -207,6 +224,7 @@ export class WzSearchBar extends Component {
 
   makeSearch():void {
     const { inputValue, filters:currentFilters } = this.state;
+    if ( !inputValue ) { return; }
     const filters = {...currentFilters};
 
     filters['search'] = inputValue;
@@ -223,6 +241,7 @@ export class WzSearchBar extends Component {
     const { inputValue, filters } = this.state;
 
     const {inputValue:newInputValue, filters:newFilters } = this.suggestHandler.onItemClick(item, inputValue, filters);
+    this.inputRef.focus();
     this.updateFilters(newFilters);
 
     this.setState({
@@ -285,7 +304,7 @@ export class WzSearchBar extends Component {
     if (((this.suggestHandler || {}).isSearch && !searchDisable)|| !searchFormat) {
       filters = {
         ...currentFilters,
-        ['search']: inputValue,
+        ...(inputValue && {search: inputValue}),
       };
     } else if(inputValue.length > 0) {
       const { inputValue:newInput, filters:newFilters } = this.suggestHandler.onKeyPress(inputValue, currentFilters);
@@ -374,6 +393,7 @@ export class WzSearchBar extends Component {
           <EuiFlexItem className="wz-search-bar">
             <EuiSuggest
               status={status}
+              inputRef={e => {this.inputRef = e}}
               value={inputValue}
               onKeyPress={this.onKeyPress}
               onItemClick={this.onItemClick.bind(this)}

@@ -21,9 +21,8 @@ class WzMenuOverview extends Component {
   constructor(props) {
     super(props);
     this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(this.currentApi);
     this.state = {
-      extensions
+      extensions: []
     };
 
     this.overviewSections = {
@@ -65,7 +64,10 @@ class WzMenuOverview extends Component {
     // You don't have to do this check first, but it can help prevent an unneeded render
   }
 
-  componentDidMount() {}
+  async componentDidMount() {
+    const extensions = await AppState.getExtensions(this.currentApi);
+    this.setState({ extensions });
+  }
 
   clickMenuItem = section => {
     this.props.closePopover();

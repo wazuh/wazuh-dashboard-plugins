@@ -1,10 +1,8 @@
 .wz-module {
-    top: 0;
-    position: absolute;
-    width: 100%;
+    display: contents;
 }
 
-.wz-module-header-wrapper{
+.wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
     width: 100%;
     position: fixed;
     padding-left: 48px;
@@ -12,69 +10,96 @@
     left: 0;
 }
 
-.wz-module-header {
-    background:white;
+.wz-module-header-agent, .wz-module-header-nav{
     border-bottom: 1px solid #D3DAE6;
+    background:white;
     padding: 16px;
-    height: 100px;
 }
 
-.wz-module-header .wz-module-header-title{    
-    margin: 6px 12px!important;
-}
-
-.wz-module-header-main{
+.wz-module-header-agent{
     height: 50px;
 }
 
-.wz-module-header-main .wz-module-header-title{    
-    margin: 6px 12px 14px 12px!important;
+.wz-module-header-nav{
+    margin-top: 11px;
+    padding: 0px 16px;
+    min-height: 55px;
 }
 
-.wz-module-header-main .euiStat .euiTitle{    
-    height: 30px;
+.wz-module-header-nav > .euiFlexGroup {
+    margin-top: -16px;
 }
 
-.wz-module-header h1{    
+.wz-module-header-nav > .euiFlexGroup .euiFlexItem{
+    margin-top: 0px;
+}
+
+.wz-module-header-agent-title{    
+    margin: 6px 12px!important;
+}
+
+.wz-module-header-agent h1{    
     font-weight: 300;
 }
 
-.wz-module-header-main h1{    
-    font-weight: 400;
-}
-
-.wz-module-header h1 b{    
+.wz-module-header-agent h1 b{    
     font-weight: 500;
 }
 
-.wz-module-header .euiTabs{
+.wz-module-header-nav-wrapper{
+    margin-top: 50px;
+}
+
+.wz-module-header-nav .euiTabs{
     padding-top: 6px;
 }
 
-.wz-module-header .euiTab__content{
+.wz-module-header-nav .euiTab__content{
     font-size: 16px!important;
 }
 
 .wz-module-body {
-    margin-top: 100px;
+    padding-top: 100px;
 }
 
 .wz-module-body .globalQueryBar{
     padding: 16px 16px 8px 16px!important;
 }
 
-.wz-module-body-main {
-    margin-top: 50px;
+.wz-module-body .flyout-body .globalQueryBar{
+    padding: 0!important;
 }
 
+.wz-module-body-main {
+    padding-top: 50px!important;
+}
 
 discover-app-w .sidebar-container {
     background-color: transparent!important;
 }
 
 @media only screen and (max-width: 767px){
-    .wz-module-header-wrapper{
+    .wz-module-header-agent h1{    
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .wz-module-body {
+        margin-top: 0px;
+    }
+
+    .wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
+        position: relative;
         padding-left: 0px;
+    }
+
+    .wz-module-header-nav-wrapper{
+        margin-top: 15px;
+    }
+
+    .wz-module-header-nav {
+        padding-bottom: 16px;
     }
 
     .wz-module-body-agent-info > .euiFlexGroup > .euiFlexItem {

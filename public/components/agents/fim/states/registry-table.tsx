@@ -21,6 +21,7 @@ import {
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request';
+import { FlyoutDetail } from './flyout';
 
 export class RegistryTable extends Component {
   state: {
@@ -32,7 +33,9 @@ export class RegistryTable extends Component {
     isFlyoutVisible: Boolean
     sortDirection: Direction,
     isLoading: boolean,
-    currentFile: object,
+    currentFile: {
+      file: string
+    }
   };
 
   props!: {
@@ -51,7 +54,9 @@ export class RegistryTable extends Component {
       sortDirection: 'asc',
       isLoading: true,
       isFlyoutVisible: false,
-      currentFile: {}
+      currentFile: {
+        file: ""
+      }
     }
   }
 
@@ -61,8 +66,21 @@ export class RegistryTable extends Component {
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters))
-      this.getSyscheck();
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
+      this.setState({pageIndex: 0}, this.getSyscheck)
+    }
+  }
+
+  closeFlyout() {
+    this.setState({ isFlyoutVisible: false, currentFile: {} });
+  }
+
+  showFlyout(file) {
+    const fileData = this.state.syscheck.filter(item => {
+      return item.file === file;
+    });
+    //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
   async getSyscheck() {
@@ -137,6 +155,14 @@ export class RegistryTable extends Component {
   }
 
   renderRegistryTable() {
+    const getRowProps = item => {
+      const { file } = item;
+      return {
+        'data-test-subj': `row-${file}`,
+        onClick: () => this.showFlyout(file),
+      };
+    };
+
     const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading } = this.state;
     const columns = this.columns();
     const pagination = {
@@ -160,6 +186,7 @@ export class RegistryTable extends Component {
               columns={columns}
               pagination={pagination}
               onChange={this.onTableChange}
+              rowProps={getRowProps}
               sorting={sorting}
               itemId="file"
               isExpandable={true}
@@ -175,6 +202,15 @@ export class RegistryTable extends Component {
     return (
       <div>
         {registryTable}
+        {this.state.isFlyoutVisible &&
+          <FlyoutDetail
+            fileName={this.state.currentFile.file}
+            agentId={this.props.agent.id}
+            closeFlyout={() => this.closeFlyout()}
+            type='registry'
+            view='states'
+            {...this.props} />
+        }
       </div>
     )
   }

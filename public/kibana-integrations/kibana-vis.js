@@ -27,6 +27,7 @@ import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
 import { toastNotifications } from 'ui/notify';
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -72,6 +73,8 @@ class KibanaVis extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    const app = getAngularModule('app/wazuh');
+    this.$rootScope = app.$injector.get('$rootScope');
   }
 
   componentWillUnmount() {
@@ -211,7 +214,7 @@ class KibanaVis extends Component {
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
           this.rendered = true;
-          this.props.updateRootScope('rendered', 'true');
+          this.$rootScope.rendered = 'true';
           this.visHandler.updateInput(visInput);
           this.setSearchSource(discoverList);
         }
@@ -282,10 +285,10 @@ class KibanaVis extends Component {
     const totalTabVis =
       this.tabVisualizations.getItem(this.props.tab) - deadVis;
 
-    this.props.updateRootScope('loadingStatus', 'Fetching data...');
+    this.$rootScope.loadingStatus = 'Fetching data...';
 
     if (totalTabVis < 1) {
-      this.props.updateRootScope('resultState', 'none');
+      this.$rootScope.resultState = 'none';
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
 
@@ -299,7 +302,7 @@ class KibanaVis extends Component {
         this.callUpdateMetric();
       }
       if (currentCompleted >= 100) {
-        this.props.updateRootScope('rendered', 'true');
+        this.$rootScope.rendered = 'true';
         if (visId.includes('AWS-geo')) {
           const canvas = $(
             '.visChart.leaflet-container .leaflet-control-zoom-in'
@@ -312,7 +315,7 @@ class KibanaVis extends Component {
           }, 1000);
         }
       } else if (this.visID !== 'Wazuh-App-Overview-General-Agents-status') {
-        this.props.updateRootScope('rendered', 'false');
+        this.$rootScope.rendered = 'false';
       }
     }
   };

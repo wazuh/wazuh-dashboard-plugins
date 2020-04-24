@@ -12,24 +12,29 @@
 
 import { Component } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import store from '../../../redux/store';
-import { updateVis } from '../../../redux/actions/visualizationsActions';
-
-const app = getAngularModule('app/wazuh');
+import { ModulesHelper } from './modules-helper'
 
 export class Dashboard extends Component {
   constructor(props) {
     super(props);
+    this.modulesHelper = ModulesHelper;
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    const app = getAngularModule('app/wazuh');
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleDashboard = this.props.section;
+    this.$rootScope.$applyAsync();
+    await this.modulesHelper.getDiscoverScope();
+    this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();
   }
 
   componentWillUnmount() {
     this.$rootScope.showModuleDashboard = false;
+    this.$rootScope.moduleDiscoverReady = false;
     this.$rootScope.$applyAsync();
   }
 
