@@ -14,11 +14,7 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 
 const validateConfigAfterSent = async (node = false) => {
   try {
-    const clusterStatus = await WzRequest.apiReq(
-      'GET',
-      `/cluster/status`,
-      {}
-    );
+    const clusterStatus = await WzRequest.apiReq('GET', `/cluster/status`, {});
 
     const clusterData = ((clusterStatus || {}).data || {}).data || {};
     const isCluster =
@@ -33,16 +29,12 @@ const validateConfigAfterSent = async (node = false) => {
       );
     } else {
       validation = isCluster
-        ? await WzRequest.apiReq(
-          'GET',
-          `/cluster/configuration/validation`,
-          {}
-        )
+        ? await WzRequest.apiReq('GET', `/cluster/configuration/validation`, {})
         : await WzRequest.apiReq(
-          'GET',
-          `/manager/configuration/validation`,
-          {}
-        );
+            'GET',
+            `/manager/configuration/validation`,
+            {}
+          );
     }
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';

@@ -10,9 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiSelect
-} from '@elastic/eui';
+import { EuiSelect } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import {
@@ -22,7 +20,7 @@ import {
   cleanFilters,
   updateAdminMode,
   updateError,
-  updateIsProcessing,
+  updateIsProcessing
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -35,26 +33,30 @@ class WzSectionSelector extends Component {
     this.sections = [
       { value: 'rules', text: 'Rules' },
       { value: 'decoders', text: 'Decoders' },
-      { value: 'lists', text: 'CDB lists' },
+      { value: 'lists', text: 'CDB lists' }
     ];
 
     this.paths = {
       rules: '/rules',
       decoders: '/decoders',
       lists: '/lists/files'
-    }
+    };
 
     this.wzReq = WzRequest;
   }
 
   /**
    * Fetch the data for a section: rules, decoders, lists...
-   * @param {String} newSection 
+   * @param {String} newSection
    */
   async fetchData(newSection) {
     try {
       const currentSection = this.props.state.section;
-      if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
+      if (
+        Object.keys(this.props.state.filters).length &&
+        newSection === currentSection
+      )
+        return; // If there's any filter and the section is de same doesn't fetch again
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
@@ -77,7 +79,6 @@ class WzSectionSelector extends Component {
     this.fetchData(section);
   };
 
-
   render() {
     return (
       <EuiSelect
@@ -91,13 +92,13 @@ class WzSectionSelector extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
@@ -105,8 +106,12 @@ const mapDispatchToProps = (dispatch) => {
     cleanFilters: () => dispatch(cleanFilters()),
     updateAdminMode: status => dispatch(updateAdminMode(status)),
     updateError: error => dispatch(updateError(error)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-  }
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing))
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzSectionSelector);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzSectionSelector);

@@ -30,4 +30,3 @@ app
   .value('AgentsPreview', AgentsPreview)
   .value('AgentsTable', AgentsTable)
   .value('MainModule', MainModule);
-

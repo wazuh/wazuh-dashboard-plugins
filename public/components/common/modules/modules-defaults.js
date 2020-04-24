@@ -10,44 +10,38 @@
  * Find more information about this on the LICENSE file.
  */
 export const ModulesDefaults = {
-    general: {
-        buttons: ['dashboard', 'reporting']
-    },
-    fim: {
-        init: 'states',
-        tabs: [
-            { id: 'states', name: 'States' },
-            { id: 'events', name: 'Events' }
-        ],
-        buttons: ['dashboard', 'reporting', 'settings']
-    },
-    sca: {
-        init: 'states',
-        tabs: [
-            { id: 'states', name: 'States' },
-            { id: 'events', name: 'Events' }
-        ],
-        buttons: ['settings']
-    },
-    virustotal: {
-        buttons: ['dashboard', 'reporting']
-    },
-    pci: {
-        buttons: ['dashboard', 'reporting']
-    },
-    hipaa: {
-        buttons: ['dashboard', 'reporting']
-    },
-    nist: {
-        buttons: ['dashboard', 'reporting']
-    },
-    gdpr: {
-        buttons: ['dashboard', 'reporting']
-    },
-    syscollector: {
-        notModule: true,
-    },
-    configuration: {
-        notModule: true,
-    },
+  general: {
+    buttons: ['dashboard', 'reporting']
+  },
+  fim: {
+    init: 'states',
+    tabs: [{ id: 'states', name: 'States' }, { id: 'events', name: 'Events' }],
+    buttons: ['dashboard', 'reporting', 'settings']
+  },
+  sca: {
+    init: 'states',
+    tabs: [{ id: 'states', name: 'States' }, { id: 'events', name: 'Events' }],
+    buttons: ['settings']
+  },
+  virustotal: {
+    buttons: ['dashboard', 'reporting']
+  },
+  pci: {
+    buttons: ['dashboard', 'reporting']
+  },
+  hipaa: {
+    buttons: ['dashboard', 'reporting']
+  },
+  nist: {
+    buttons: ['dashboard', 'reporting']
+  },
+  gdpr: {
+    buttons: ['dashboard', 'reporting']
+  },
+  syscollector: {
+    notModule: true
+  },
+  configuration: {
+    notModule: true
+  }
 };

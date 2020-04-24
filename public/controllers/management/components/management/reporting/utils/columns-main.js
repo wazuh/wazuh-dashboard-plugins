@@ -16,7 +16,7 @@ export default class ReportingColums {
           field: 'name',
           name: 'File',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'size',
@@ -25,14 +25,14 @@ export default class ReportingColums {
             const fixedSize = size / 1024;
             return `${fixedSize.toFixed(2)}KB`;
           },
-          sortable: true,
+          sortable: true
         },
         {
           field: 'date',
           name: 'Created',
           render: value => this.offsetTimestamp(value),
-          sortable: true,
-        },
+          sortable: true
+        }
       ];
       this.columns.push({
         name: 'Actions',
@@ -63,7 +63,7 @@ export default class ReportingColums {
               </EuiToolTip>
             </div>
           );
-        },
+        }
       });
     };
 
@@ -87,7 +87,9 @@ export default class ReportingColums {
       const dateUTC = moment.utc(d);
       const kibanaTz = chrome.getUiSettingsClient().get('dateFormat:tz');
       const dateLocate =
-        kibanaTz === 'Browser' ? moment(dateUTC).local() : moment(dateUTC).tz(kibanaTz);
+        kibanaTz === 'Browser'
+          ? moment(dateUTC).local()
+          : moment(dateUTC).tz(kibanaTz);
       return dateLocate.format('YYYY/MM/DD HH:mm:ss');
     } catch (error) {
       throw new Error(error);

@@ -17,68 +17,68 @@
 export const updateLoadingStatus = loading => {
   return {
     type: 'UPDATE_LOADING_STATUS',
-    status: loading,
+    status: loading
   };
 };
 
 export const updateAdminMode = status => {
   return {
     type: 'UPDATE_ADMIN_MODE',
-    status: status,
+    status: status
   };
 };
 
 export const updateListNodes = listNodes => {
   return {
     type: 'UPDATE_LIST_NODES',
-    listNodes: listNodes,
+    listNodes: listNodes
   };
 };
 
 export const updateSelectedNode = selectedNode => {
   return {
     type: 'UPDATE_SELECTED_NODE',
-    selectedNode: selectedNode,
+    selectedNode: selectedNode
   };
 };
 
 export const updateListDaemons = listDaemons => {
   return {
     type: 'UPDATE_LIST_DAEMONS',
-    listDaemons: listDaemons,
+    listDaemons: listDaemons
   };
 };
 
 export const updateStats = stats => {
   return {
     type: 'UPDATE_STATS',
-    stats: stats,
+    stats: stats
   };
 };
 
 export const updateNodeInfo = nodeInfo => {
   return {
     type: 'UPDATE_NODE_INFO',
-    nodeInfo: nodeInfo,
+    nodeInfo: nodeInfo
   };
 };
 
 export const updateAgentInfo = agentInfo => {
   return {
     type: 'UPDATE_AGENT_INFO',
-    agentInfo: agentInfo,
+    agentInfo: agentInfo
   };
 };
 
 export const updateClusterEnabled = status => {
   return {
     type: 'UPDATE_CLUSTER_ENABLED',
-    clusterEnabled: status,
+    clusterEnabled: status
   };
 };
 
 export const cleanInfo = () => {
   return {
-    type: 'CLEAN_INFO',
+    type: 'CLEAN_INFO'
   };
 };

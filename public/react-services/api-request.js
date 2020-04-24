@@ -9,11 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "./app-state";
-import { GenericRequest } from "./generic-request";
+import { AppState } from './app-state';
+import { GenericRequest } from './generic-request';
 
 export class ApiRequest {
-
   /**
    * Perform an API request
    * @param {String} method Eg. GET, PUT

@@ -36,7 +36,7 @@ export class ReportingService {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -70,7 +70,8 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const rawVisualizations = this.rawVisualizations.getList()
+      const rawVisualizations = this.rawVisualizations
+        .getList()
         .filter(this.removeTableVis);
 
       let idArray = [];
@@ -94,7 +95,7 @@ export class ReportingService {
       const array = await this.vis2png.checkArray(idArray);
       const name = `wazuh-${
         isAgents ? 'agents' : 'overview'
-        }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
@@ -117,7 +118,12 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast('success', 'Created report', 'Success. Go to Wazuh > Management > Reporting', 4000);
+      this.showToast(
+        'success',
+        'Created report',
+        'Success. Go to Wazuh > Management > Reporting',
+        4000
+      );
       return;
     } catch (error) {
       this.$rootScope.reportBusy = false;
@@ -144,9 +150,7 @@ export class ReportingService {
         array: [],
         name,
         filters: [
-          type === 'agentConfig'
-            ? { agent: obj.id }
-            : { group: obj.name }
+          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
         ],
         time: '',
         searchBar: '',
@@ -161,7 +165,12 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast('success', 'Created report', 'Success. Go to Wazuh > Management > Reporting', 4000);
+      this.showToast(
+        'success',
+        'Created report',
+        'Success. Go to Wazuh > Management > Reporting',
+        4000
+      );
       return;
     } catch (error) {
       this.$rootScope.reportBusy = false;

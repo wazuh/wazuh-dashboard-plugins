@@ -11,7 +11,13 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle, EuiIcon } from '@elastic/eui';
+import {
+  EuiPanel,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiIcon
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
@@ -43,7 +49,7 @@ export class WzStatusAgentInfo extends Component {
     }
 
     const greyStyle = {
-      color: 'grey',
+      color: 'grey'
     };
 
     return (
@@ -87,11 +93,15 @@ export class WzStatusAgentInfo extends Component {
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>Last keep alive</EuiFlexItem>
-              <EuiFlexItem style={greyStyle}>{agentInfo.lastKeepAlive}</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>
+                {agentInfo.lastKeepAlive}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>Operating system</EuiFlexItem>
-              <EuiFlexItem style={greyStyle}>{operatingSystem || '-'}</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>
+                {operatingSystem || '-'}
+              </EuiFlexItem>
             </EuiFlexGroup>
           </div>
         )}
@@ -102,7 +112,7 @@ export class WzStatusAgentInfo extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers,
+    state: state.statusReducers
   };
 };
 

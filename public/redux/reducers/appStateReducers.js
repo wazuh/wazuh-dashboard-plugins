@@ -11,42 +11,40 @@
  */
 
 const initialState = {
-  currentAPI: "",
+  currentAPI: '',
   showMenu: false,
-  wazuhNotReadyYet: "",
-  currentTab: ""
+  wazuhNotReadyYet: '',
+  currentTab: ''
 };
 
 const appStateReducers = (state = initialState, action) => {
   if (action.type === 'UPDATE_CURRENT_API') {
     return {
       ...state,
-      currentAPI: action.currentAPI,
+      currentAPI: action.currentAPI
     };
   }
 
   if (action.type === 'SHOW_MENU') {
     return {
       ...state,
-      showMenu: action.showMenu,
+      showMenu: action.showMenu
     };
   }
-
 
   if (action.type === 'UPDATE_WAZUH_NOT_READY_YET') {
     return {
       ...state,
-      wazuhNotReadyYet: action.wazuhNotReadyYet,
+      wazuhNotReadyYet: action.wazuhNotReadyYet
     };
   }
 
   if (action.type === 'UPDATE_WAZUH_CURRENT_TAB') {
     return {
       ...state,
-      currentTab: action.currentTab,
+      currentTab: action.currentTab
     };
   }
-
 
   return state;
 };

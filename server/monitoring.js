@@ -54,9 +54,9 @@ export class Monitoring {
 
       this.ENABLED =
         configFile &&
-          typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
+        typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
           ? configFile['wazuh.monitoring.enabled'] &&
-          configFile['wazuh.monitoring.enabled'] !== 'worker'
+            configFile['wazuh.monitoring.enabled'] !== 'worker'
           : this.ENABLED;
 
       this.FREQUENCY =
@@ -226,7 +226,8 @@ export class Monitoring {
    */
   async loadCredentials(apiEntries) {
     try {
-      if (typeof apiEntries === 'undefined' || !Array.isArray(apiEntries)) return;
+      if (typeof apiEntries === 'undefined' || !Array.isArray(apiEntries))
+        return;
 
       const filteredApis = (apiEntries || []).filter(
         (element, index, self) =>
@@ -385,13 +386,13 @@ export class Monitoring {
         log(
           'monitoring:createIndex',
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
-          error}`
+            error}`
         );
       !this.quiet &&
         this.server.log(
           monitoringErrorLogColors,
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
-          error}`
+            error}`
         );
     }
   }
@@ -434,13 +435,13 @@ export class Monitoring {
         log(
           'monitoring:insertDocument',
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-          error}`
+            error}`
         );
       !this.quiet &&
         this.server.log(
           monitoringErrorLogColors,
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-          error}`
+            error}`
         );
     }
   }
@@ -479,14 +480,14 @@ export class Monitoring {
         log(
           'monitoring:saveStatus',
           `Could not check if the index ${
-          this.datedIndex
+            this.datedIndex
           } exists due to ${error.message || error}`
         );
       !this.quiet &&
         this.server.log(
           monitoringErrorLogColors,
           `Could not check if the index ${
-          this.datedIndex
+            this.datedIndex
           } exists due to ${error.message || error}`
         );
     }
@@ -559,13 +560,13 @@ export class Monitoring {
         log(
           'monitoring:checkTemplate',
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-          error}`
+            error}`
         );
       !this.quiet &&
         this.server.log(
           monitoringErrorLogColors,
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-          error}`
+            error}`
         );
       return Promise.reject(error);
     }
@@ -729,7 +730,7 @@ export class Monitoring {
           await this.sleep(1000);
           return this.cronTask();
         }
-      } catch (error) { } //eslint-disable-line
+      } catch (error) {} //eslint-disable-line
 
       !this.quiet && log('monitoring:cronTask', error.message || error);
       !this.quiet &&

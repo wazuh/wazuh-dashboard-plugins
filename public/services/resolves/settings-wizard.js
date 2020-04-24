@@ -112,7 +112,7 @@ export function settingsWizard(
           error
         );
       }
-      const extensions = await AppState.getExtensions(currentApi)
+      const extensions = await AppState.getExtensions(currentApi);
       if (currentApi && !extensions) {
         const extensions = {
           audit: config['extensions.audit'],
@@ -128,7 +128,7 @@ export function settingsWizard(
           mitre: config['extensions.mitre'],
           docker: config['extensions.docker']
         };
-        AppState.setExtensions(currentApi, extensions);        
+        AppState.setExtensions(currentApi, extensions);
       }
       deferred.resolve();
     };
@@ -139,7 +139,6 @@ export function settingsWizard(
       wzMisc.setWizard(true);
       if (redirect) {
         AppState.setCurrentAPI(redirect);
-
       } else if (!$location.path().includes('/settings')) {
         $location.search('_a', null);
         $location.search('tab', 'api');

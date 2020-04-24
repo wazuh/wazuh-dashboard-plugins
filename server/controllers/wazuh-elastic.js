@@ -303,23 +303,22 @@ export class WazuhElasticCtrl {
     }
     return list;
   }
-  
+
   /**
    * This get the current space
    * @param {Object} req
    * @param {Object} reply
    * @returns {String} current namespace
    */
-  async getCurrentSpace(req, reply){
-    try{
+  async getCurrentSpace(req, reply) {
+    try {
       const spaces = this._server.plugins.spaces;
       const namespace = spaces && spaces.getSpaceId(req);
-      return {namespace};
-    }catch(err){
+      return { namespace };
+    } catch (err) {
       log('wazuh-elastic:getCurrentSpace', error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, reply);
     }
-
   }
 
   /**
@@ -673,7 +672,7 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 4009, 500, reply);
     }
   }
- 
+
   /**
    * Reload elastic index
    * @param {Object} req
@@ -724,27 +723,28 @@ export class WazuhElasticCtrl {
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
       const size = req.payload.size || 500;
-      const sort = req.payload.sort || { "timestamp" : {"order" : "asc"}};
+      const sort = req.payload.sort || { timestamp: { order: 'asc' } };
       const payload = Base(pattern, [], from, to);
 
+      payload.query = req.payload.elasticQuery || { bool: { must: [] } }; // if an already formatted elastic query is received we use it as a base otherwise we create a simple elastic query
 
-      payload.query = req.payload.elasticQuery || { bool: { must: [ ] } }; // if an already formatted elastic query is received we use it as a base otherwise we create a simple elastic query
-
-      const range = {range: {
-        timestamp: {
-          gte: from,
-          lte: to,
-          format: 'epoch_millis'
+      const range = {
+        range: {
+          timestamp: {
+            gte: from,
+            lte: to,
+            format: 'epoch_millis'
+          }
         }
-      }};
+      };
 
       payload.query.bool.must.push(range);
-      
+
       // add custom key:value filters to the elastic query
-      if(req.payload.filters){
-        req.payload.filters.map((item) => {
+      if (req.payload.filters) {
+        req.payload.filters.map(item => {
           payload.query.bool.must.push({
-            match: item 
+            match: item
           });
         });
       }

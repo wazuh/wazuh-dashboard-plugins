@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-
 /**
  * Updates CurrentAPI in the appState store
  * @param currentAPI
@@ -21,7 +20,6 @@ export const updateCurrentApi = currentAPI => {
     currentAPI: currentAPI
   };
 };
-
 
 /**
  * Updates ShowMenu in the appState store

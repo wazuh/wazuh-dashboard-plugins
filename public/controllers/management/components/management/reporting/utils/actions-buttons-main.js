@@ -48,7 +48,10 @@ class WzReportingActionButtons extends Component {
   render() {
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
+      <EuiButtonEmpty
+        iconType="refresh"
+        onClick={async () => await this.refresh()}
+      >
         Refresh
       </EuiButtonEmpty>
     );
@@ -63,14 +66,18 @@ class WzReportingActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.reportingReducers,
+    state: state.reportingReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzReportingActionButtons);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzReportingActionButtons);

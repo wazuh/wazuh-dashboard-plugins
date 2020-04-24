@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "../react-services/app-state";
-import { GenericRequest } from "../react-services/generic-request";
-import { ShareAgent } from "../factories/share-agent";
-import { ModulesHelper } from "../components/common/modules/modules-helper"
+import { AppState } from '../react-services/app-state';
+import { GenericRequest } from '../react-services/generic-request';
+import { ShareAgent } from '../factories/share-agent';
+import { ModulesHelper } from '../components/common/modules/modules-helper';
 
 export class CommonData {
   /**
@@ -23,13 +23,7 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor(
-    $rootScope,
-    $timeout,
-    errorHandler,
-    $location,
-    globalState
-  ) {
+  constructor($rootScope, $timeout, errorHandler, $location, globalState) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
@@ -368,12 +362,12 @@ export class CommonData {
     return target.hostMonitoringTabs.includes(tab)
       ? target.hostMonitoringTabs
       : target.systemAuditTabs.includes(tab)
-        ? target.systemAuditTabs
-        : target.securityTabs.includes(tab)
-          ? target.securityTabs
-          : target.complianceTabs.includes(tab)
-            ? target.complianceTabs
-            : false;
+      ? target.systemAuditTabs
+      : target.securityTabs.includes(tab)
+      ? target.securityTabs
+      : target.complianceTabs.includes(tab)
+      ? target.complianceTabs
+      : false;
   }
 
   getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {

@@ -19,13 +19,16 @@ export default class ConfigurationHandler {
    */
   static async editKey(key, value) {
     try {
-      if(key==='api.selector'){
+      if (key === 'api.selector') {
         AppState.setAPISelector(value);
       }
-      if(key==='ip.selector'){
+      if (key === 'ip.selector') {
         AppState.setPatternSelector(value);
       }
-      const result = await WzRequest.genericReq('PUT', '/utils/configuration', { key, value });
+      const result = await WzRequest.genericReq('PUT', '/utils/configuration', {
+        key,
+        value
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);

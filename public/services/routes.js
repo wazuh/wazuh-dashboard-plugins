@@ -47,14 +47,7 @@ const assignPreviousLocation = ($rootScope, $location) => {
   }
 };
 
-function ip(
-  $q,
-  $rootScope,
-  $window,
-  $location,
-  Private,
-  errorHandler
-) {
+function ip($q, $rootScope, $window, $location, Private, errorHandler) {
   const wzMisc = new WzMisc();
   assignPreviousLocation($rootScope, $location);
   return getIp(
@@ -70,13 +63,7 @@ function ip(
   );
 }
 
-function nestedResolve(
-  $q,
-  errorHandler,
-  $rootScope,
-  $location,
-  $window,
-) {
+function nestedResolve($q, errorHandler, $rootScope, $location, $window) {
   const wzMisc = new WzMisc();
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
@@ -126,7 +113,7 @@ function wzConfig($q, $rootScope, $location) {
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
-  if ($location.$$path !== "/visualize/create") {
+  if ($location.$$path !== '/visualize/create') {
     // Sets ?_a=(columns:!(_source),filters:!())
     $location.search('_a', '(columns:!(_source),filters:!())');
     // Removes ?_g
@@ -177,15 +164,15 @@ routes
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzConfig, wzKibana }
   })
   .when('/discover/context/:pattern?/:type?/:id?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzKibana }
   })
   .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {

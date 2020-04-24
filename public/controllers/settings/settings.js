@@ -19,7 +19,7 @@ import { ApiCheck } from '../../react-services/wz-api-check';
 import { SavedObject } from '../../react-services/saved-objects';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import checkAdminMode from '../../controllers/management/components/management/status/utils/check-admin-mode'
+import checkAdminMode from '../../controllers/management/components/management/status/utils/check-admin-mode';
 
 export class SettingsController {
   /**
@@ -29,12 +29,7 @@ export class SettingsController {
    * @param {*} $location
    * @param {*} errorHandler
    */
-  constructor(
-    $scope,
-    $window,
-    $location,
-    errorHandler,
-  ) {
+  constructor($scope, $window, $location, errorHandler) {
     this.kibanaVersion = (kibana || {}).version || false;
     this.$scope = $scope;
     this.$window = $window;
@@ -64,13 +59,10 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [
-        { text: '' },
-        { text: 'App Settings', },
-      ];
+      const breadcrumb = [{ text: '' }, { text: 'App Settings' }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       this.admin = await checkAdminMode();
-      
+
       const location = this.$location.search();
       if (location && location.tab) {
         this.tab = location.tab;
@@ -81,7 +73,8 @@ export class SettingsController {
       await this.getSettings();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
-      this.apiIsDown = down >= this.apiEntries.length && this.apiEntries.length > 0;
+      this.apiIsDown =
+        down >= this.apiEntries.length && this.apiEntries.length > 0;
 
       await this.getAppInfo();
     } catch (error) {
@@ -102,16 +95,17 @@ export class SettingsController {
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
       testApi: entry => ApiCheck.checkApi(entry),
-      showAddApiWithInitialError: error => this.showAddApiWithInitialError(error),
+      showAddApiWithInitialError: error =>
+        this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
       showApiIsDown: () => this.showApiIsDown(),
-      copyToClipBoard: msg => this.copyToClipBoard(msg),
+      copyToClipBoard: msg => this.copyToClipBoard(msg)
     };
 
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
-      closeAddApi: () => this.closeAddApi(),
+      closeAddApi: () => this.closeAddApi()
     };
 
     this.apiIsDownProps = {
@@ -122,7 +116,7 @@ export class SettingsController {
       getHosts: () => this.getHosts(),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
-      copyToClipBoard: msg => this.copyToClipBoard(msg),
+      copyToClipBoard: msg => this.copyToClipBoard(msg)
     };
 
     let tabs = [
@@ -130,7 +124,7 @@ export class SettingsController {
       { id: 'configuration', name: 'Configuration' },
       { id: 'logs', name: 'Logs' },
       { id: 'about', name: 'About' }
-    ]
+    ];
     if (this.admin) {
       tabs.splice(1, 0, { id: 'modules', name: 'Modules' });
     }
@@ -149,7 +143,7 @@ export class SettingsController {
     this.settingsLogsProps = {
       getLogs: async () => {
         return await this.getAppLogs();
-      },
+      }
     };
   }
 
@@ -165,7 +159,9 @@ export class SettingsController {
   // Get current API index
   getCurrentAPIIndex() {
     if (this.apiEntries.length) {
-      const idx = this.apiEntries.map(entry => entry.id).indexOf(this.currentDefault);
+      const idx = this.apiEntries
+        .map(entry => entry.id)
+        .indexOf(this.currentDefault);
       this.currentApiEntryIndex = idx;
     }
   }
@@ -190,14 +186,15 @@ export class SettingsController {
           this.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
-          const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason =
+            ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
         }
       }
       return numError;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   // Set default API
@@ -215,7 +212,7 @@ export class SettingsController {
       AppState.setCurrentAPI(
         JSON.stringify({
           name: clusterEnabled ? manager : cluster,
-          id: id,
+          id: id
         })
       );
 
@@ -287,7 +284,7 @@ export class SettingsController {
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
     await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
-      entries: this.apiEntries,
+      entries: this.apiEntries
     });
     return;
   }
@@ -300,7 +297,7 @@ export class SettingsController {
     try {
       const url = `/hosts/update-hostname/${id}`;
       await this.genericReq.request('PUT', url, {
-        cluster_info: clusterInfo,
+        cluster_info: clusterInfo
       });
     } catch (error) {
       return Promise.reject(error);
@@ -322,7 +319,7 @@ export class SettingsController {
         port: port,
         cluster_info: {},
         insecure: 'true',
-        id: id,
+        id: id
       };
 
       // Test the connection
@@ -373,8 +370,8 @@ export class SettingsController {
         {
           date: new Date(),
           level: 'error',
-          message: 'Error when loading Wazuh app logs',
-        },
+          message: 'Error when loading Wazuh app logs'
+        }
       ];
     }
   }
@@ -389,7 +386,7 @@ export class SettingsController {
       this.appInfo = {
         'app-version': response['app-version'],
         installationDate: response['installationDate'],
-        revision: response['revision'],
+        revision: response['revision']
       };
 
       this.load = false;
@@ -412,7 +409,10 @@ export class SettingsController {
       this.$scope.$applyAsync();
     } catch (error) {
       AppState.removeNavigation();
-      this.errorHandler.handle('Error when loading Wazuh setup info', 'Settings');
+      this.errorHandler.handle(
+        'Error when loading Wazuh setup info',
+        'Settings'
+      );
     }
     return;
   }
@@ -437,22 +437,23 @@ export class SettingsController {
         throw {
           message: 'There were not found any API entry in the wazuh.yml',
           type: 'warning',
-          closedEnabled: false,
+          closedEnabled: false
         };
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
         if (notRecheable >= hosts.length) {
           this.apiIsDown = true;
           throw {
-            message: 'Wazuh API not recheable, please review your configuration',
+            message:
+              'Wazuh API not recheable, please review your configuration',
             type: 'danger',
-            closedEnabled: true,
+            closedEnabled: true
           };
         }
         throw {
           message: `Some of the API entries are not reachable. You can still use the Wazuh APP but please, review your hosts configuration.`,
           type: 'warning',
-          closedEnabled: true,
+          closedEnabled: true
         };
       }
       return;
@@ -531,7 +532,8 @@ export class SettingsController {
       this.apiEntries = await this.getHosts();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
-      this.apiIsDown = down >= this.apiEntries.length && this.apiEntries.length > 0;
+      this.apiIsDown =
+        down >= this.apiEntries.length && this.apiEntries.length > 0;
       this.$scope.$applyAsync();
       return this.apiEntries;
     } catch (error) {

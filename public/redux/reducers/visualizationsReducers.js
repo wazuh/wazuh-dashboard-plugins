@@ -18,7 +18,7 @@ const visualizationsReducers = (state = initialState, action) => {
     metric[action.metric.name] = action.metric.value;
     return {
       ...state,
-      ...metric,
+      ...metric
     };
   }
   if (action.type === 'UPDATE_VIS') {

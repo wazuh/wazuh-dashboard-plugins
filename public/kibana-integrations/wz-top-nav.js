@@ -71,7 +71,7 @@ export function createTopNavDirective() {
       };
 
       return linkFn;
-    },
+    }
   };
 }
 
@@ -112,8 +112,11 @@ export const createTopNavHelper = ({ TopNavMenu }) => reactDirective => {
     'isRefreshPaused',
     'refreshInterval',
     'disableAutoFocus',
-    'showAutoRefreshOnly',
+    'showAutoRefreshOnly'
   ]);
 };
 
-module.directive('wzTopNavHelper', createTopNavHelper(npStart.plugins.navigation.ui));
+module.directive(
+  'wzTopNavHelper',
+  createTopNavHelper(npStart.plugins.navigation.ui)
+);

@@ -14,7 +14,7 @@ const initialState = {
   isLoading: false,
   isProcessing: false,
   itemList: [],
-  showModal: false,
+  showModal: false
 };
 
 const statusReducers = (state = initialState, action) => {
@@ -22,19 +22,19 @@ const statusReducers = (state = initialState, action) => {
     return {
       ...state,
       isProcessing: action.isProcessing,
-      isLoading: action.isProcessing,
+      isLoading: action.isProcessing
     };
   }
   if (action.type === 'UPDATE_LIST_ITEMS_FOR_REMOVE') {
     return {
       ...state,
-      itemList: action.itemList,
+      itemList: action.itemList
     };
   }
   if (action.type === 'UPDATE_SHOW_MODAL') {
     return {
       ...state,
-      showModal: action.showModal,
+      showModal: action.showModal
     };
   }
   if (action.type === 'CLEAN_INFO') {
@@ -43,7 +43,7 @@ const statusReducers = (state = initialState, action) => {
       isLoading: false,
       isProcessing: false,
       itemList: [],
-      showModal: false,
+      showModal: false
     };
   }
 

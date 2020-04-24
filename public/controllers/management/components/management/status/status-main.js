@@ -27,7 +27,7 @@ class WzStatus extends Component {
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Status' },
+      { text: 'Status' }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }

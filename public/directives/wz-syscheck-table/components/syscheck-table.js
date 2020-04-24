@@ -12,26 +12,27 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiPanel,
+import {
+  EuiPanel,
   EuiBasicTable,
-  EuiFlexItem, 
+  EuiFlexItem,
   EuiFlexGroup,
   EuiTitle,
   EuiFieldSearch,
   EuiTextColor,
-  EuiToolTip, 
+  EuiToolTip,
   EuiButtonIcon,
   EuiSpacer,
-  EuiDescriptionList,
+  EuiDescriptionList
 } from '@elastic/eui';
 
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 
- export class SyscheckTable extends Component {
+export class SyscheckTable extends Component {
   constructor(props) {
     super(props);
 
-     this.state = {
+    this.state = {
       monitoredFiles: [],
       searchValue: '',
       pageIndex: 0,
@@ -44,13 +45,9 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
       search: '',
       itemIdToExpandedRowMap: {}
     };
-
   }
 
-
-
-
-   async componentDidMount() {
+  async componentDidMount() {
     await this.getItems();
   }
 
@@ -60,116 +57,118 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
     }
   }
 
-   formatFile(file) {
-     return {
-      "file": file.file,
-      "size": file.size,
-      "gname": file.gname,
-      "uname": file.uname,
-      "perm": file.perm,
-      "uid": file.uid,
-      "gid": file.gid,
-      "mtime": file.mtime,
-      "sha256": file.sha256,
-      "sha1": file.sha1,
-      "md5": file.md5,
-      "inode": file.inode,
-      "type": file.type,
-      "date": file.date,
-    }
+  formatFile(file) {
+    return {
+      file: file.file,
+      size: file.size,
+      gname: file.gname,
+      uname: file.uname,
+      perm: file.perm,
+      uid: file.uid,
+      gid: file.gid,
+      mtime: file.mtime,
+      sha256: file.sha256,
+      sha1: file.sha1,
+      md5: file.md5,
+      inode: file.inode,
+      type: file.type,
+      date: file.date
+    };
   }
 
-
-   async getItems(){
-    const files = await this.props.wzReq('GET',`/syscheck/${this.props.agentId}`,this.buildFilter());
-    const formattedFiles =  (((files || {}).data || {}).data || {}).items.map(this.formatFile);
+  async getItems() {
+    const files = await this.props.wzReq(
+      'GET',
+      `/syscheck/${this.props.agentId}`,
+      this.buildFilter()
+    );
+    const formattedFiles = (((files || {}).data || {}).data || {}).items.map(
+      this.formatFile
+    );
     this.setState({
       monitoredFiles: formattedFiles,
       totalItems: (((files || {}).data || {}).data || {}).totalItems - 1,
-      isProcessing: false,
+      isProcessing: false
     });
   }
 
-   buildFilter() {
-    const { pageIndex, pageSize, search, q} = this.state;
+  buildFilter() {
+    const { pageIndex, pageSize, search, q } = this.state;
 
-     const filter = {
+    const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter(),
-
+      sort: this.buildSortFilter()
     };
 
-     if (q !== ''){
-      filter.q = q
+    if (q !== '') {
+      filter.q = q;
     }
 
-     if (search !== '') {
+    if (search !== '') {
       filter.search = search;
     }
 
-     return filter;
+    return filter;
   }
 
+  buildSortFilter() {
+    const { sortField, sortDirection } = this.state;
 
+    const field = sortField === 'os_name' ? '' : sortField;
+    const direction = sortDirection === 'asc' ? '+' : '-';
 
-   buildSortFilter() {
-    const {sortField, sortDirection} = this.state;
-
-    const field = (sortField === 'os_name') ? '' : sortField;
-    const direction = (sortDirection === 'asc') ? '+' : '-';
-
-    return direction+field;
+    return direction + field;
   }
 
   columns() {
-    const itemIdToExpandedRowMap = this.state.itemIdToExpandedRowMap
+    const itemIdToExpandedRowMap = this.state.itemIdToExpandedRowMap;
 
     return [
       {
         field: 'file',
         name: 'File',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'size',
         name: 'Size',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'mtime',
         name: 'Last modified',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'gname',
         name: 'Group',
         sortable: true,
-        width: "100px"
+        width: '100px'
       },
       {
         field: 'uname',
         name: 'User',
         sortable: true,
-        width: "100px"
+        width: '100px'
       },
       {
         field: 'perm',
         name: 'Permissions',
         sortable: true,
-        width: "100px"
+        width: '100px'
       },
       {
         field: 'uid',
         name: 'User ID',
         sortable: true,
-        width: "75px"
+        width: '75px'
       },
       {
         field: 'gid',
         name: 'Group ID',
         sortable: true,
-        width: "75px"
+        width: '75px'
       },
       {
         align: RIGHT_ALIGNMENT,
@@ -178,14 +177,17 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
         render: item => (
           <EuiButtonIcon
             onClick={() => this.toggleDetails(item)}
-            aria-label={itemIdToExpandedRowMap[item.file] ? 'Collapse' : 'Expand'}
-            iconType={itemIdToExpandedRowMap[item.file] ? 'arrowUp' : 'arrowDown'}
+            aria-label={
+              itemIdToExpandedRowMap[item.file] ? 'Collapse' : 'Expand'
+            }
+            iconType={
+              itemIdToExpandedRowMap[item.file] ? 'arrowUp' : 'arrowDown'
+            }
           />
-        ),
-      },
+        )
+      }
     ];
   }
-
 
   actionButtonsRender(tactic) {
     return (
@@ -201,10 +203,9 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
     );
   }
 
-
   onTableBarChange = e => {
     this.setState({
-      searchValue: e.target.value,
+      searchValue: e.target.value
     });
   };
 
@@ -212,13 +213,11 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
     this.setState({
       search: searchTxt,
       pageIndex: 0,
-      isProcessing: true,
+      isProcessing: true
     });
   };
 
-
-
-   onTableChange = ({ page = {}, sort = {} }) => {
+  onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
     this.setState({
@@ -226,15 +225,14 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
       pageSize,
       sortField,
       sortDirection,
-      isProcessing: true,
+      isProcessing: true
     });
   };
 
-
-    /**
-     * The "Export Formatted" button have been removed as long as the API can only returns 10 results.
-     */
-   formattedButton() { 
+  /**
+   * The "Export Formatted" button have been removed as long as the API can only returns 10 results.
+   */
+  formattedButton() {
     return (
       <div>
         {/*
@@ -248,83 +246,85 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
     );
   }
 
-   title() {
-    const formattedButton = this.formattedButton()
+  title() {
+    const formattedButton = this.formattedButton();
     return (
       <div>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiTitle>
-                <h2>Monitored files</h2>
-              </EuiTitle>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-           <EuiSpacer size="m"/>
-          <EuiFlexGroup>
-            <EuiFlexItem style={{ paddingBottom: 10 }}>
-              <EuiTextColor color="subdued">
-                <p>
-                </p>
-              </EuiTextColor>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFlexItem>
-        {formattedButton}
-      </EuiFlexGroup>
-      <EuiSpacer size="m"/>
-      <EuiFlexGroup style={{ marginLeft: 2 }}>
-        <EuiFieldSearch
-                  fullWidth={true}
-                  placeholder="Filter monitored files..."
-                  value={this.state.searchValue}
-                  onChange={this.onTableBarChange}
-                  onSearch={this.onTableBarSearch}
-                  aria-label="Filter monitored files..."
-                />
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle>
+                  <h2>Monitored files</h2>
+                </EuiTitle>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size="m" />
+            <EuiFlexGroup>
+              <EuiFlexItem style={{ paddingBottom: 10 }}>
+                <EuiTextColor color="subdued">
+                  <p></p>
+                </EuiTextColor>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          {formattedButton}
         </EuiFlexGroup>
-        
+        <EuiSpacer size="m" />
+        <EuiFlexGroup style={{ marginLeft: 2 }}>
+          <EuiFieldSearch
+            fullWidth={true}
+            placeholder="Filter monitored files..."
+            value={this.state.searchValue}
+            onChange={this.onTableBarChange}
+            onSearch={this.onTableBarSearch}
+            aria-label="Filter monitored files..."
+          />
+        </EuiFlexGroup>
       </div>
     );
   }
 
-   table(){
-    const {pageIndex, pageSize, totalItems, sortField, sortDirection} = this.state
-    const monitoredFiles = this.state.monitoredFiles
-    const columns = this.columns()
+  table() {
+    const {
+      pageIndex,
+      pageSize,
+      totalItems,
+      sortField,
+      sortDirection
+    } = this.state;
+    const monitoredFiles = this.state.monitoredFiles;
+    const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      hidePerPageOptions: true,
-    }
+      hidePerPageOptions: true
+    };
     const sorting = {
       sort: {
         field: sortField,
-        direction: sortDirection,
-      },
+        direction: sortDirection
+      }
     };
-
 
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
-              items={monitoredFiles}
-              columns={columns}
-              pagination={pagination}
-              onChange={this.onTableChange}
-              sorting={sorting}
-              itemId="file"
-              itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
-              isExpandable={true}
-            />
+            items={monitoredFiles}
+            columns={columns}
+            pagination={pagination}
+            onChange={this.onTableChange}
+            sorting={sorting}
+            itemId="file"
+            itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
+            isExpandable={true}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
     );
   }
-
 
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
@@ -335,106 +335,94 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
       const listItems = [
         {
           field: 'Field',
-          value: item.file,
+          value: item.file
         },
         {
           field: 'Date',
-          value: item.date,
+          value: item.date
         },
         {
           field: 'Last modified',
-          value: item.mtime,
+          value: item.mtime
         },
         {
           field: 'Permissions',
-          value: item.perm,
+          value: item.perm
         },
         {
           field: 'Inode',
-          value: item.inode,
+          value: item.inode
         },
         {
           field: 'MD5',
-          value: item.md5,
+          value: item.md5
         },
         {
           field: 'SHA256',
-          value: item.sha256,
+          value: item.sha256
         },
         {
           field: 'SHA1',
-          value: item.sha1,
+          value: item.sha1
         },
         {
           field: 'User',
-          value: item.uname,
+          value: item.uname
         },
         {
           field: 'User ID',
-          value: item.uid,
+          value: item.uid
         },
         {
           field: 'Group',
-          value: item.gname,
+          value: item.gname
         },
         {
           field: 'Group ID',
-          value: item.gid,
+          value: item.gid
         },
         {
           field: 'Type',
-          value: item.type,
-        },
+          value: item.type
+        }
       ];
       const listColumns = [
         {
           field: 'field',
-          name: "Field",
-          align: "left",
-          width: "120px",
-          
+          name: 'Field',
+          align: 'left',
+          width: '120px'
         },
         {
           field: 'value',
-          name: "Value",
-          align: "left"
-        },
-      ]
+          name: 'Value',
+          align: 'left'
+        }
+      ];
       itemIdToExpandedRowMap[item.file] = (
-        <EuiPanel 
-          className="wz-margin-10"
-          paddingSize="m">
-            <EuiBasicTable
-              items={listItems}
-              columns={listColumns}
-            />
+        <EuiPanel className="wz-margin-10" paddingSize="m">
+          <EuiBasicTable items={listItems} columns={listColumns} />
         </EuiPanel>
       );
     }
     this.setState({ itemIdToExpandedRowMap });
   };
 
-
-
-   filterBar() {
-     return (
+  filterBar() {
+    return (
       <EuiFlexGroup>
-        <EuiFlexItem>
-          
-         </EuiFlexItem>
+        <EuiFlexItem></EuiFlexItem>
       </EuiFlexGroup>
     );
   }
 
-
-   render() {    
-
+  render() {
     const title = this.title();
     const filter = this.filterBar();
     const table = this.table();
 
-     return (
-       <div>
+    return (
+      <div>
         <EuiPanel paddingSize="l">
           {title}
           {filter}

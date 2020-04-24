@@ -12,7 +12,13 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiToolTip, EuiButton } from '@elastic/eui';
+import {
+  EuiStat,
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiToolTip,
+  EuiButton
+} from '@elastic/eui';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -23,38 +29,61 @@ export class AgentInfo extends Component {
 
   addIconPlatformRender(agent) {
     let icon = false;
-    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+    const checkField = field => {
+      return field !== undefined ? field : '-';
+    };
     const os = (agent || {}).os;
 
     if (((os || {}).uname || '').includes('Linux')) {
-      icon = 'linux'
+      icon = 'linux';
     } else if ((os || {}).platform === 'windows') {
-      icon = 'windows'
+      icon = 'windows';
     } else if ((os || {}).platform === 'darwin') {
-      icon = 'apple'
+      icon = 'apple';
     }
-    const os_name = checkField(((agent || {}).os || {}).name)
-      + ' ' + checkField(((agent || {}).os || {}).version);
+    const os_name =
+      checkField(((agent || {}).os || {}).name) +
+      ' ' +
+      checkField(((agent || {}).os || {}).version);
 
     return (
       <EuiToolTip position="bottom" content={os_name === '- -' ? '-' : os_name}>
-        <span className="euiTableCellContent__text euiTableCellContent--truncateText" style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>
-          <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i>{os_name === '- -' ? '-' : " " + os_name}
+        <span
+          className="euiTableCellContent__text euiTableCellContent--truncateText"
+          style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}
+        >
+          <i
+            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+            aria-hidden="true"
+          ></i>
+          {os_name === '- -' ? '-' : ' ' + os_name}
         </span>
       </EuiToolTip>
     );
   }
 
   buildStats(items) {
-    const checkField = (field) => { return (field !== undefined || field) ? field : "-"; };
+    const checkField = field => {
+      return field !== undefined || field ? field : '-';
+    };
     const stats = items.map(item => {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
             title={
-              item.description === 'OS'
-                ? this.addIconPlatformRender(this.props.agent)
-                : <span style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}>{checkField(item.title)}</span>
+              item.description === 'OS' ? (
+                this.addIconPlatformRender(this.props.agent)
+              ) : (
+                <span
+                  style={{
+                    overflow: 'hidden',
+                    maxWidth: 250,
+                    margin: '0 auto'
+                  }}
+                >
+                  {checkField(item.title)}
+                </span>
+              )
             }
             description={item.description}
             textAlign="center"
@@ -82,23 +111,25 @@ export class AgentInfo extends Component {
     ]);
     return (
       <Fragment>
-        <EuiFlexGroup className='wz-welcome-page-agent-info-details'>
+        <EuiFlexGroup className="wz-welcome-page-agent-info-details">
           {stats}
         </EuiFlexGroup>
-        <EuiFlexGroup className='wz-welcome-page-agent-info-actions'>
+        <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
             <EuiButton
               onClick={() => this.props.switchTab('syscollector')}
-              iconType="inspect">
+              iconType="inspect"
+            >
               Inventory data
-              </EuiButton>
+            </EuiButton>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
               onClick={() => this.props.switchTab('configuration')}
-              iconType="gear">
+              iconType="gear"
+            >
               Configuration
-              </EuiButton>
+            </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
