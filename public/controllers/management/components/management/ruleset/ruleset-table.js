@@ -62,7 +62,7 @@ class WzRulesetTable extends Component {
     if (this.props.state.section === 'rules') {
       const regex = new RegExp("redirectRule=" + "[^\&]*");
       const match = window.location.href.match(regex);
-      if (match[0]) {
+      if (match && match[0]) {
         this.setState({ isRedirect: true });
         const id = match[0].split('=')[1]
         const result = await WzRequest.apiReq('GET', `/rules/${id}`, {})
