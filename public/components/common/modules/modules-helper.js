@@ -1,15 +1,23 @@
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import chrome from 'ui/chrome';
 
 export class ModulesHelper {
 
     static async getDiscoverScope() {
+        const $injector = await chrome.dangerouslyGetActiveInjector();
+        const location = $injector.get('$location');
+        const initialTab = location.search().tab;
         return new Promise((resolve) => {
             const checkExist = setInterval(() => {
                 const app = getAngularModule('app/wazuh');
                 if (app.discoverScope) {
                     clearInterval(checkExist);
                     resolve(app.discoverScope);
+                }
+                const currentTab = location.search().tab;
+                if(initialTab !== currentTab){
+                    clearInterval(checkExist);
                 }
             }, 250);
         })
