@@ -12,6 +12,25 @@
 
 export const events = ["modified", "deleted", "added"];
 export const attributes = ["mtime", "inode", "size", "tmp", "md5", "sha1", "sha256" ];
+export const paths = [
+  "/etc/resolv.conf",
+  "/var/ossec/queue/fim/db/fim.db-journal",
+  "/var/ossec/queue/fim/db/fim.db",
+  "/var/osquery/osquery.db/CURRENT",
+  "/etc/sysconfig/network-scripts/ifcfg-eth1",
+  "/etc/filebeat/fields.yml",
+  "/var/log/lastlog",
+  "/tmp/agent.conf",
+  "/etc/elasticsearch/elasticsearch.yml",
+  "/etc/elasticsearch/users",
+  "/etc/elasticsearch/config",
+  "/tmp/wazuh-config",
+  "/run/utmp",
+  "/etc/resolv.conf",
+  "/var/ossec/queue/fim/db/fim.db",
+  "/var/osquery/osquery.db/CURRENT",
+  "/run/utmp"
+]
 export const tags = ["tmp"];
 export const regulatory = [
   {
