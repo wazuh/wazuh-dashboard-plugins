@@ -28,7 +28,6 @@ export class Dashboard extends Component {
     this.$rootScope.showModuleDashboard = this.props.section;
     this.$rootScope.$applyAsync();
     await this.modulesHelper.getDiscoverScope();
-    this.modulesHelper.hideCloseImplicitsFilters();
     this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();
   }
