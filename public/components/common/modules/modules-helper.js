@@ -1,15 +1,23 @@
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import chrome from 'ui/chrome';
 
 export class ModulesHelper {
 
     static async getDiscoverScope() {
+        const $injector = await chrome.dangerouslyGetActiveInjector();
+        const location = $injector.get('$location');
+        const initialTab = location.search().tab;
         return new Promise((resolve) => {
             const checkExist = setInterval(() => {
                 const app = getAngularModule('app/wazuh');
                 if (app.discoverScope) {
                     clearInterval(checkExist);
                     resolve(app.discoverScope);
+                }
+                const currentTab = location.search().tab;
+                if(initialTab !== currentTab){
+                    clearInterval(checkExist);
                 }
             }, 250);
         })
@@ -27,17 +35,20 @@ export class ModulesHelper {
         }
     }
 
-    static hideCloseImplicitsFilters() {
-        const { filterManager } = getServices();
-        const implicitFilters = filterManager.filters.filter(x => x.$state.isImplicit);
-        if (!(implicitFilters || []).length && document) {
-            setTimeout(() => { this.hideCloseImplicitsFilters() }, 100);
-        }
-        const closeButtons = document.querySelectorAll('.globalFilterItem .euiBadge__iconButton');
-        const optionsButtons = document.querySelectorAll('.globalFilterItem .euiBadge__childButton');
+    static hideCloseButtons = () => {
+        const closeButtons = $(`.globalFilterItem .euiBadge__iconButton`);
+        const optionsButtons = $(`.globalFilterItem .euiBadge__childButton`);
         for (let i = 0; i < closeButtons.length; i++) {
             $(closeButtons[i]).addClass('hide-close-button');
             $(optionsButtons[i]).off("click");
+        }
+    };
+
+    static activeNoImplicitsFilters() {
+        const { filterManager } = getServices();
+        const implicitFilters = filterManager.filters.filter(x => x.$state.isImplicit);
+        if (!(implicitFilters || []).length) {
+            setTimeout(() => { this.activeNoImplicitsFilters() }, 100);
         }
         const filters = $(`.globalFilterItem .euiBadge__childButton`);
         for (let i = 0; i < filters.length; i++) {
@@ -52,10 +63,10 @@ export class ModulesHelper {
                 }
             });
             if (!found) {
-                const closeButton = document.querySelectorAll('.globalFilterItem .euiBadge__iconButton')[i];
+                const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
                 $(closeButton).removeClass('hide-close-button');
             } else {
-                const optionsButton = document.querySelectorAll('.globalFilterItem .euiBadge__childButton')[i];
+                const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
                 $(optionsButton).on("click", (ev) => { ev.stopPropagation(); });
             }
         }

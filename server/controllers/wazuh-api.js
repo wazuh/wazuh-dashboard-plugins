@@ -1135,7 +1135,7 @@ export class WazuhApiCtrl {
       let itemsArray = [];
       const output = await needle(
         'get',
-        `${config.url}:${config.port}/${tmpPath}`,
+        `${config.url}:${config.port}/${tmpPath}${tmpPath.includes('?') ? '&' : '?'}wait_for_complete`,
         params,
         cred
       );
@@ -1151,7 +1151,7 @@ export class WazuhApiCtrl {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
-            `${config.url}:${config.port}/${tmpPath}`,
+            `${config.url}:${config.port}/${tmpPath}${tmpPath.includes('?') ? '&' : '?'}wait_for_complete`,
             params,
             cred
           );

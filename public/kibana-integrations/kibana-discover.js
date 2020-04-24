@@ -124,6 +124,7 @@ function discoverController(
   discoverPendingUpdates
 ) {
   //WAZUH
+  wazuhApp.discoverScope = $scope;
   (async () => {
     const services = await buildServices(npStart.core, npStart.plugins, pluginInstance.docViewsRegistry);
     setServices(services);
@@ -137,7 +138,6 @@ function discoverController(
   } = getServices();
   const wazuhConfig = new WazuhConfig();
   const modulesHelper = ModulesHelper;
-  wazuhApp.discoverScope = $scope;
   //////
   const responseHandler = vislibSeriesResponseHandlerProvider().handler;
   const filterStateManager = new FilterStateManager(globalState, getAppState, filterManager);
@@ -324,10 +324,10 @@ function discoverController(
     return {
       query: ($scope.savedQuery && $scope.savedQuery.attributes.query) ||
         $scope.searchSource.getField('query') || {
-          query: '',
-          language:
-            (localStorage.get('kibana.userQueryLanguage') || [])[1] || config.get('search:queryLanguage'),
-        },
+        query: '',
+        language:
+          (localStorage.get('kibana.userQueryLanguage') || [])[1] || config.get('search:queryLanguage'),
+      },
       sort: getSort.array(
         savedSearch.sort,
         $scope.indexPattern,
@@ -600,6 +600,7 @@ function discoverController(
   $scope.opts.fetch = $scope.fetch = function () {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
+    modulesHelper.hideCloseButtons();
     // ignore requests to fetch before the app inits
     if (!init.complete) return;
 
@@ -692,7 +693,6 @@ function discoverController(
         counts[fieldName] = (counts[fieldName] || 0) + 1;
       });
     });
-
     $scope.fetchStatus = fetchStatuses.COMPLETE;
   }
 
@@ -1055,6 +1055,14 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  $scope.$watch('fetchStatus', () => {
+    if ($scope.fetchStatus === fetchStatuses.LOADING) {
+      modulesHelper.hideCloseButtons();
+    } else {
+      modulesHelper.activeNoImplicitsFilters();
+    }
+  });
+
   $scope.loadFilters = async (wzCurrentFilters, tab) => {
     const appState = getAppState();
     if (!appState || !globalState) {
@@ -1067,7 +1075,7 @@ function discoverController(
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
       }
-      
+
       filterManager.addFilters([...wzCurrentFilters, ...globalFilters || []]);
       $scope.filters = filterManager.filters;
     }
@@ -1076,7 +1084,6 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
-    modulesHelper.hideCloseImplicitsFilters();
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;
