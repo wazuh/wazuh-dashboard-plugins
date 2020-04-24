@@ -179,23 +179,25 @@ export class AgentsTable extends Component {
   actionButtonsRender(agent) {
     return (
       <div>
-        <EuiToolTip content="Open Discover panel for this agent" position="left">
+        <EuiToolTip content="Open Overview panel for this agent" position="left">
           <EuiButtonIcon
             onClick={() => (ev) => {
               ev.stopPropagation();
               this.props.clickAction(agent, 'discover')
+              
             }}
-            iconType="discoverApp"
-            aria-label="Open Discover panel for this agent"
+            iconType="eye"
+            color={'primary'}
+            aria-label="Open Overview panel for this agent"
           />
-        </EuiToolTip>
+        </EuiToolTip>&nbsp;
         <EuiToolTip content="Open configuration for this agent" position="left">
           <EuiButtonIcon
             onClick={(ev) => {
               ev.stopPropagation();
               this.props.clickAction(agent, 'configuration')
             }}
-            color={'text'}
+            color={'primary'}
             iconType="wrench"
             aria-label="Open configuration for this agent"
           />
