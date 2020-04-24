@@ -73,7 +73,6 @@ export class States extends Component {
       },
       {
         name: 'Target',
-        sortable: true,
         truncateText: true,
         render: item => (
           <div>
