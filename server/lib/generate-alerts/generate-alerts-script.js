@@ -296,7 +296,8 @@ function generateAlert(params) {
         alert.data.cis.timestamp = new Date(randomDate());
         alert.data.cis.error = randomIntervalInteger(0, 1);
         alert.data.cis.benchmark = randomArrayItem(CISCAT.benchmark);
-        alert.data.cis.unknown = randomIntervalInteger(0, 1);
+        alert.data.cis.unknown = randomIntervalInteger(0, 100);
+        alert.data.cis.notchecked = randomIntervalInteger(0, 5);
         alert.data.cis.result = randomArrayItem(CISCAT.result);
     }
 

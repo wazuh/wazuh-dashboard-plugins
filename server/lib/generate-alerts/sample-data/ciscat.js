@@ -12,7 +12,7 @@
 
  // CIS-CAT
 // More info https://documentation.wazuh.com/3.12/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html
-export const ruleTitle = ["Sample CIS-CAT 1", "Sample CIS-CAT 2", "Sample CIS-CAT 3", "Sample CIS-CAT 4", "Sample CIS-CAT 5", "Sample CIS-CAT 6"];
-export const group = ["Access, Authentication and Authorization"];
+export const ruleTitle = ["CIS-CAT 1", "CIS-CAT 2", "CIS-CAT 3", "CIS-CAT 4", "CIS-CAT 5", "CIS-CAT 6"];
+export const group = ["Access, Authentication and Authorization", "Logging and Auditing"];
 export const benchmark = ["CIS Ubuntu Linux 16.04 LTS Benchmark"]; // TODO: add more benchmarks
-export const result = ["fail", "error"]; // FIXME: 'fail' seems to exists, but 'error' is valid?
+export const result = ["fail", "errors", "pass", "unknown", "notchecked"];
