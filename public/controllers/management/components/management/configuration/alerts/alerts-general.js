@@ -75,7 +75,7 @@ class WzConfigurationAlertsGeneral extends Component {
               title="Main settings"
               description="General alert settings"
               currentConfig={currentConfig}
-              minusHeight={340}
+              minusHeight={310}
               helpLinks={helpLinks}
             >
               <WzConfigurationSettingsGroup

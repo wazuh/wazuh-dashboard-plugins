@@ -101,7 +101,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
           title="General"
           description="The settings shown below are applied globally"
           currentConfig={currentConfig['syscheck-syscheck']}
-          minusHeight={this.props.agent.id === '000' ? 340 : 410}
+          minusHeight={this.props.agent.id === '000' ? 310 : 410}
           helpLinks={helpLinks}
         >
           <WzSettingsGroup

@@ -90,7 +90,7 @@ class WzConfigurationOsquery extends Component {
             title="Main settings"
             description="General Osquery integration settings"
             currentConfig={this.wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 280 : 350}
+            minusHeight={this.props.agent.id === '000' ? 245 : 350}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsGroup

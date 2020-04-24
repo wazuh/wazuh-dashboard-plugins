@@ -83,7 +83,7 @@ class WzConfigurationLogCollectionSockets extends Component {
             title="Output sockets"
             description="Define custom outputs to send log data"
             currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 340 : 410}
+            minusHeight={this.props.agent.id === '000' ? 310 : 410}
             helpLinks={helpLinks}
           >
             <WzConfigurationListSelector

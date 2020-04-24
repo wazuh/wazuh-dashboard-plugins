@@ -55,7 +55,7 @@ class WzConfigurationOpenSCAPGeneral extends Component {
             title="Main settings"
             description="These settings apply to all OpenSCAP evaluations"
             currentConfig={wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 340 : 410}
+            minusHeight={this.props.agent.id === '000' ? 310 : 410}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsGroup
