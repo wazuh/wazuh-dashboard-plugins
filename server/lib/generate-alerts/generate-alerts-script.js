@@ -331,7 +331,7 @@ function generateAlert(params) {
         alert.rule.groups.push("syscheck");
         alert.syscheck = {};
         alert.syscheck.event = randomArrayItem(IntegrityMonitoring.events);
-        alert.syscheck.path = randomArrayItem(Paths);
+        alert.syscheck.path = randomArrayItem(IntegrityMonitoring.paths);
         alert.syscheck.uname_after = randomArrayItem(Users);
         alert.syscheck.gname_after = "root";
         alert.syscheck.mtime_after = new Date(randomDate());
