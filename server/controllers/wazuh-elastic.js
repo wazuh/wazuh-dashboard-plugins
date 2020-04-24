@@ -655,7 +655,7 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 4009, 500, reply);
     }
   }
- 
+
   /**
    * Reload elastic index
    * @param {Object} req
@@ -706,25 +706,28 @@ export class WazuhElasticCtrl {
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
       const size = req.payload.size || 500;
-      const sort = req.payload.sort || { "timestamp" : {"order" : "asc"}};
+      const sort = req.payload.sort || { timestamp: { order: 'asc' } };
       const payload = Base(pattern, [], from, to);
 
-      
-      payload.query = { bool: { must: [
-        {
-          range: {
-            timestamp: {
-              gte: from,
-              lte: to,
-              format: 'epoch_millis'
+      payload.query = {
+        bool: {
+          must: [
+            {
+              range: {
+                timestamp: {
+                  gte: from,
+                  lte: to,
+                  format: 'epoch_millis'
+                }
+              }
             }
-          }
-        }]
-      } };
-      if(req.payload.filters){
-        req.payload.filters.map((item) => {
+          ]
+        }
+      };
+      if (req.payload.filters) {
+        req.payload.filters.map(item => {
           payload.query.bool.must.push({
-            match: item 
+            match: item
           });
         });
       }

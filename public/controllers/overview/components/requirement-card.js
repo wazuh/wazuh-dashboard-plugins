@@ -163,7 +163,10 @@ export class RequirementCard extends Component {
           iconType="arrowRight"
           aria-label="Next"
           onClick={() => this.slideRight()}
-          isDisabled={this.state.sliderLength <= 1 || this.state.position >= this.state.sliderLength - 1}
+          isDisabled={
+            this.state.sliderLength <= 1 ||
+            this.state.position >= this.state.sliderLength - 1
+          }
         />
       </EuiFlexGroup>
     );

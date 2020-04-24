@@ -6,7 +6,7 @@ import {
   EuiPanel,
   EuiPage,
   EuiText,
-  EuiTitle,
+  EuiTitle
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -26,14 +26,14 @@ class WzRulesetOverview extends Component {
       rules: 'Rules',
       decoders: 'Decoders',
       lists: 'CDB lists'
-    }
+    };
   }
 
   setGlobalBreadcrumb() {
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: this.sectionNames[this.props.state.section] },
+      { text: this.sectionNames[this.props.state.section] }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
@@ -43,7 +43,7 @@ class WzRulesetOverview extends Component {
   }
 
   clickActionFilterBar(obj) {
-    console.log('clicking ', obj)
+    console.log('clicking ', obj);
   }
 
   render() {
@@ -58,8 +58,7 @@ class WzRulesetOverview extends Component {
                 <h2>{this.sectionNames[section]}</h2>
               </EuiTitle>
             </EuiFlexItem>
-            <EuiFlexItem>
-            </EuiFlexItem>
+            <EuiFlexItem></EuiFlexItem>
             <WzRulesetActionButtons />
           </EuiFlexGroup>
           <EuiFlexGroup>
@@ -72,9 +71,7 @@ class WzRulesetOverview extends Component {
           <WzRulesetSearchBar />
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzRulesetTable
-                request={`${section}`}
-              />
+              <WzRulesetTable request={`${section}`} />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>
@@ -83,7 +80,7 @@ class WzRulesetOverview extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };

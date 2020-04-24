@@ -56,7 +56,7 @@ export class WazuhUtilsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: { needRestart : result.needRestart, needWait: result.needWait}
+        data: { needRestart: result.needRestart, needWait: result.needWait }
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3021, 500, reply);

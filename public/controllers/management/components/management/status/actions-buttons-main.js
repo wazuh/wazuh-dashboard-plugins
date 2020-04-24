@@ -16,7 +16,7 @@ import {
   EuiButtonEmpty,
   EuiSelect,
   EuiOverlayMask,
-  EuiConfirmModal,
+  EuiConfirmModal
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -25,7 +25,7 @@ import {
   updateLoadingStatus,
   updateListDaemons,
   updateNodeInfo,
-  updateSelectedNode,
+  updateSelectedNode
 } from '../../../../../redux/actions/statusActions';
 
 import StatusHandler from './utils/status-handler';
@@ -41,7 +41,7 @@ class WzStatusActionButtons extends Component {
     this.statusHandler = StatusHandler;
     this.state = {
       isModalVisible: false,
-      isRestarting: false,
+      isRestarting: false
     };
   }
 
@@ -63,7 +63,11 @@ class WzStatusActionButtons extends Component {
     try {
       const result = await this.statusHandler.restartCluster();
       this.setState({ isRestarting: false });
-      this.showToast('success', 'Restarting cluster, it will take up to 30 seconds.', 3000);
+      this.showToast(
+        'success',
+        'Restarting cluster, it will take up to 30 seconds.',
+        3000
+      );
     } catch (error) {
       this.setState({ isRestarting: false });
       this.showToast('danger', error.message || error, 3000);
@@ -133,7 +137,7 @@ class WzStatusActionButtons extends Component {
     toastNotifications.add({
       color: color,
       title: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -142,7 +146,7 @@ class WzStatusActionButtons extends Component {
     for (const node of listNodes) {
       options.push({
         value: node.name,
-        text: `${node.name} (${node.type})`,
+        text: `${node.name} (${node.type})`
       });
     }
     return options;
@@ -159,7 +163,7 @@ class WzStatusActionButtons extends Component {
       selectedNode,
       adminMode,
       clusterEnabled,
-      isRestarting,
+      isRestarting
     } = this.props.state;
 
     let options = this.transforToOptions(listNodes);
@@ -195,7 +199,11 @@ class WzStatusActionButtons extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title={clusterEnabled ? 'Cluster will be restarted' : 'Manager will be restarted'}
+            title={
+              clusterEnabled
+                ? 'Cluster will be restarted'
+                : 'Manager will be restarted'
+            }
             onCancel={this.closeModal}
             onConfirm={() => {
               if (clusterEnabled) {
@@ -227,7 +235,7 @@ class WzStatusActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers,
+    state: state.statusReducers
   };
 };
 
@@ -236,8 +244,12 @@ const mapDispatchToProps = dispatch => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
-    updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
+    updateSelectedNode: selectedNode =>
+      dispatch(updateSelectedNode(selectedNode))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzStatusActionButtons);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzStatusActionButtons);

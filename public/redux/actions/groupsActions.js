@@ -17,14 +17,14 @@
 export const updateFileContent = content => {
   return {
     type: 'UPDATE_FILE_CONTENT',
-    content: content,
+    content: content
   };
 };
 
 export const updateAdminMode = status => {
   return {
     type: 'UPDATE_ADMIN_MODE',
-    status: status,
+    status: status
   };
 };
 
@@ -34,7 +34,7 @@ export const updateAdminMode = status => {
  */
 export const cleanFileContent = () => {
   return {
-    type: 'CLEAN_FILE_CONTENT',
+    type: 'CLEAN_FILE_CONTENT'
   };
 };
 
@@ -45,7 +45,7 @@ export const cleanFileContent = () => {
 export const updateShowModal = showModal => {
   return {
     type: 'UPDATE_SHOW_MODAL',
-    showModal: showModal,
+    showModal: showModal
   };
 };
 
@@ -56,49 +56,49 @@ export const updateShowModal = showModal => {
 export const updateListItemsForRemove = itemList => {
   return {
     type: 'UPDATE_LIST_ITEMS_FOR_REMOVE',
-    itemList: itemList,
+    itemList: itemList
   };
 };
 
 export const updateSortField = sortField => {
   return {
     type: 'UPDATE_SORT_FIELD',
-    sortField: sortField,
+    sortField: sortField
   };
 };
 
 export const updateSortFieldAgents = sortFieldAgents => {
   return {
     type: 'UPDATE_SORT_FIELD_AGENTS',
-    sortFieldAgents: sortFieldAgents,
+    sortFieldAgents: sortFieldAgents
   };
 };
 
 export const updateSortFieldFile = sortFieldFile => {
   return {
     type: 'UPDATE_SORT_FIELD_FILE',
-    sortFieldFile: sortFieldFile,
+    sortFieldFile: sortFieldFile
   };
 };
 
 export const updateSortDirection = sortDirection => {
   return {
     type: 'UPDATE_SORT_DIRECTION',
-    sortDirection: sortDirection,
+    sortDirection: sortDirection
   };
 };
 
 export const updateSortDirectionAgents = sortDirectionAgents => {
   return {
     type: 'UPDATE_SORT_DIRECTION_AGENTS',
-    sortDirectionAgents: sortDirectionAgents,
+    sortDirectionAgents: sortDirectionAgents
   };
 };
 
 export const updateSortDirectionFile = sortDirectionFile => {
   return {
     type: 'UPDATE_SORT_DIRECTION_FILE',
-    sortDirectionFile: sortDirectionFile,
+    sortDirectionFile: sortDirectionFile
   };
 };
 
@@ -109,14 +109,14 @@ export const updateSortDirectionFile = sortDirectionFile => {
 export const updateLoadingStatus = loading => {
   return {
     type: 'UPDATE_LOADING_STATUS',
-    status: loading,
+    status: loading
   };
 };
 
 export const updateGroupDetail = item => {
   return {
     type: 'UPDATE_GROUP_DETAIL',
-    itemDetail: item,
+    itemDetail: item
   };
 };
 
@@ -125,7 +125,7 @@ export const updateGroupDetail = item => {
  */
 export const resetGroup = () => {
   return {
-    type: 'RESET',
+    type: 'RESET'
   };
 };
 
@@ -136,7 +136,7 @@ export const resetGroup = () => {
 export const updateIsProcessing = isProcessing => {
   return {
     type: 'UPDATE_IS_PROCESSING',
-    isProcessing: isProcessing,
+    isProcessing: isProcessing
   };
 };
 
@@ -147,7 +147,7 @@ export const updateIsProcessing = isProcessing => {
 export const updatePageIndex = pageIndex => {
   return {
     type: 'UPDATE_PAGE_INDEX',
-    pageIndex: pageIndex,
+    pageIndex: pageIndex
   };
 };
 
@@ -158,7 +158,7 @@ export const updatePageIndex = pageIndex => {
 export const updatePageIndexFile = pageIndexFile => {
   return {
     type: 'UPDATE_PAGE_INDEX_FILE',
-    pageIndexFile: pageIndexFile,
+    pageIndexFile: pageIndexFile
   };
 };
 
@@ -169,7 +169,7 @@ export const updatePageIndexFile = pageIndexFile => {
 export const updatePageIndexAgents = pageIndexAgents => {
   return {
     type: 'UPDATE_PAGE_INDEX_AGENTS',
-    pageIndexAgents: pageIndexAgents,
+    pageIndexAgents: pageIndexAgents
   };
 };
 
@@ -180,38 +180,38 @@ export const updatePageIndexAgents = pageIndexAgents => {
 export const updateFilters = filters => {
   return {
     type: 'UPDATE_FILTERS',
-    filters: filters,
+    filters: filters
   };
 };
 
 export const cleanFilters = () => {
   return {
-    type: 'CLEAN_FILTERS',
+    type: 'CLEAN_FILTERS'
   };
 };
 
 export const cleanInfo = () => {
   return {
-    type: 'CLEAN_INFO',
+    type: 'CLEAN_INFO'
   };
 };
 
 export const cleanTabs = () => {
   return {
-    type: 'CLEAN_TABS',
+    type: 'CLEAN_TABS'
   };
 };
 
 export const updateShowAddAgents = showAddAgents => {
   return {
     type: 'UPDATE_SHOW_ADD_AGENTS',
-    showAddAgents: showAddAgents,
+    showAddAgents: showAddAgents
   };
 };
 
 export const updateSelectedTab = selectedTabId => {
   return {
     type: 'UPDATE_SELECTED_TAB',
-    selectedTabId: selectedTabId,
+    selectedTabId: selectedTabId
   };
 };

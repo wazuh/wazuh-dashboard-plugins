@@ -28,9 +28,9 @@ export function ClusterController(
   discoverPendingUpdates,
   rawVisualizations,
   loadedVisualizations,
-  visHandlers,
+  visHandlers
 ) {
-  const tabVisualizations = new TabVisualizations()
+  const tabVisualizations = new TabVisualizations();
   timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
@@ -233,7 +233,7 @@ export function ClusterController(
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Cluster' },
+      { text: 'Cluster' }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 

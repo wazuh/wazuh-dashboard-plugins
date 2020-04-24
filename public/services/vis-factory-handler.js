@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "../react-services/app-state";
-import { GenericRequest } from "../react-services/generic-request";
-import { TabVisualizations } from "../factories/tab-visualizations";
+import { AppState } from '../react-services/app-state';
+import { GenericRequest } from '../react-services/generic-request';
+import { TabVisualizations } from '../factories/tab-visualizations';
 
 export class VisFactoryService {
   /**
@@ -67,7 +67,12 @@ export class VisFactoryService {
    * @param {*} tab
    * @param {*} subtab
    */
-  async buildOverviewVisualizations(filterHandler, tab, subtab, fromDiscover = false) {
+  async buildOverviewVisualizations(
+    filterHandler,
+    tab,
+    subtab,
+    fromDiscover = false
+  ) {
     try {
       const currentPattern = AppState.getCurrentPattern();
       const data = await this.genericReq.request(
@@ -75,10 +80,11 @@ export class VisFactoryService {
         `/elastic/visualizations/overview-${tab}/${currentPattern}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
-      if (!fromDiscover)
-        this.commonData.assignFilters(filterHandler, tab);
+      if (!fromDiscover) this.commonData.assignFilters(filterHandler, tab);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
-      this.$rootScope.$broadcast('updateVis', { raw: this.rawVisualizations.getList() });
+      this.$rootScope.$broadcast('updateVis', {
+        raw: this.rawVisualizations.getList()
+      });
       return;
     } catch (error) {
       return Promise.reject(error);
@@ -93,18 +99,23 @@ export class VisFactoryService {
    * @param {*} localChange
    * @param {*} id
    */
-  async buildAgentsVisualizations(filterHandler, tab, subtab, id, fromDiscover = false) {
+  async buildAgentsVisualizations(
+    filterHandler,
+    tab,
+    subtab,
+    id,
+    fromDiscover = false
+  ) {
     try {
       const data =
         tab !== 'sca'
           ? await this.genericReq.request(
-            'GET',
-            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
-          )
+              'GET',
+              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
+            )
           : false;
       data && this.rawVisualizations.assignItems(data.data.raw);
-      if (!fromDiscover)
-        this.commonData.assignFilters(filterHandler, tab, id);
+      if (!fromDiscover) this.commonData.assignFilters(filterHandler, tab, id);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
       this.$rootScope.$broadcast('updateVis');
       return;

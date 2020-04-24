@@ -20,7 +20,7 @@ import {
   EuiPanel,
   EuiPage,
   EuiTitle,
-  EuiText,
+  EuiText
 } from '@elastic/eui';
 import { WzConfigurationTable } from './configuration-table';
 
@@ -30,11 +30,11 @@ export class WzConfigurationSettings extends Component {
 
     this.state = {
       apiEntries: [],
-      refreshingEntries: false,
+      refreshingEntries: false
     };
   }
 
-  componentDidMount() { }
+  componentDidMount() {}
 
   render() {
     return (
@@ -47,7 +47,10 @@ export class WzConfigurationSettings extends Component {
                   <EuiTitle>
                     <h2>
                       App current settings&nbsp;
-                      <EuiToolTip position="right" content="More about configuration file">
+                      <EuiToolTip
+                        position="right"
+                        content="More about configuration file"
+                      >
                         <EuiButtonIcon
                           iconType="questionInCircle"
                           iconSize="l"
@@ -65,7 +68,8 @@ export class WzConfigurationSettings extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                Configuration file located at /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+                Configuration file located at
+                /usr/share/kibana/optimize/wazuh/config/wazuh.yml
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

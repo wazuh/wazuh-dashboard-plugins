@@ -84,14 +84,23 @@ export class UploadFiles extends Component {
               try {
                 await this.props.upload(files, this.props.path);
                 this.closePopover();
-                this.showToast('success', 'Success', (
+                this.showToast(
+                  'success',
+                  'Success',
                   <Fragment>
                     <div>Susccessfully imported</div>
                     <ul>
-                      {files.map(f => (<li key={`ruleset-imported-file-${f.file}`} style={{listStyle: 'circle'}}>{f.file}</li>))}
+                      {files.map(f => (
+                        <li
+                          key={`ruleset-imported-file-${f.file}`}
+                          style={{ listStyle: 'circle' }}
+                        >
+                          {f.file}
+                        </li>
+                      ))}
                     </ul>
                   </Fragment>
-                ))
+                );
               } catch (error) {
                 this.setState({ uploadErrors: error });
               }
@@ -225,12 +234,12 @@ export class UploadFiles extends Component {
     );
   }
 
-  showToast(color, title, text, time = 3000){
+  showToast(color, title, text, time = 3000) {
     toastNotifications.add({
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   }
   render() {

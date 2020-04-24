@@ -18,7 +18,7 @@ export class ShareAgent {
     if (!!ShareAgent.instance) {
       return ShareAgent.instance;
     }
-    
+
     this.agent = null;
     this.selectedGroup = null;
     this.targetLocation = null;

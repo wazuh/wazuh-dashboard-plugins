@@ -21,7 +21,7 @@ import {
   EuiFlexGroup,
   EuiTitle,
   EuiFlexItem,
-  EuiBasicTable,
+  EuiBasicTable
 } from '@elastic/eui';
 
 // import { WzRequest } from '../../../../react-services/wz-request';
@@ -33,13 +33,15 @@ export class SelectAgent extends Component {
 
     this.state = {
       isFlyoutVisible: false,
-      isSwitchChecked: true,
+      isSwitchChecked: true
     };
 
     this.closeFlyout = this.closeFlyout.bind(this);
     this.showFlyout = this.showFlyout.bind(this);
 
-    const selectedOptions = JSON.parse(sessionStorage.getItem('agents_preview_selected_options'));
+    const selectedOptions = JSON.parse(
+      sessionStorage.getItem('agents_preview_selected_options')
+    );
 
     this.state = {
       agents: [],
@@ -52,7 +54,7 @@ export class SelectAgent extends Component {
       selectedOptions: selectedOptions || [],
       sortDirection: 'asc',
       sortField: 'id',
-      totalItems: 0,
+      totalItems: 0
     };
   }
 
@@ -65,7 +67,8 @@ export class SelectAgent extends Component {
       return field !== undefined ? field : '-';
     };
 
-    const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '.';
+    const agentVersion =
+      agent.version !== undefined ? agent.version.split(' ')[1] : '.';
 
     return {
       id: agent,
@@ -77,23 +80,27 @@ export class SelectAgent extends Component {
       version: agentVersion,
       dateAdd: agent.dateAdd,
       lastKeepAlive: agent.lastKeepAlive,
-      actions: agent,
+      actions: agent
     };
   }
 
   async getItems() {
-    const rawAgents = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
+    const rawAgents = await WzRequest.apiReq(
+      'GET',
+      '/agents',
+      this.buildFilter()
+    );
 
     console.log(rawAgents);
 
-    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(
-      this.formatAgent.bind(this)
-    );
+    const formatedAgents = (
+      ((rawAgents || {}).data || {}).data || {}
+    ).items.map(this.formatAgent.bind(this));
     this.setState({
       agents: formatedAgents,
       totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
       isProcessing: false,
-      isLoading: false,
+      isLoading: false
     });
   }
 
@@ -118,7 +125,7 @@ export class SelectAgent extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       q: this.buildQFilter(),
-      sort: this.buildSortFilter(),
+      sort: this.buildSortFilter()
     };
 
     if (search !== '') {
@@ -129,7 +136,7 @@ export class SelectAgent extends Component {
 
   onSwitchChange = () => {
     this.setState({
-      isSwitchChecked: !this.state.isSwitchChecked,
+      isSwitchChecked: !this.state.isSwitchChecked
     });
   };
 
@@ -147,46 +154,46 @@ export class SelectAgent extends Component {
         field: 'name',
         name: 'Name',
         sortable: true,
-        truncateText: true,
+        truncateText: true
       },
       {
         field: 'ip',
         name: 'IP',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'group',
         name: 'Group(s)',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'version',
         name: 'Version',
         width: '100px',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'dateAdd',
         name: 'Registration date',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'status',
         name: 'Status',
         truncateText: true,
         sortable: true,
-        render: this.addHealthStatusRender,
-      },
+        render: this.addHealthStatusRender
+      }
     ];
   }
 
@@ -199,24 +206,31 @@ export class SelectAgent extends Component {
       sortField,
       sortDirection,
       isProcessing: true,
-      isLoading: true,
+      isLoading: true
     });
   };
 
   tableRender() {
-    const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state;
+    const {
+      pageIndex,
+      pageSize,
+      totalItems,
+      agents,
+      sortField,
+      sortDirection
+    } = this.state;
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100],
+      pageSizeOptions: [10, 25, 50, 100]
     };
     const sorting = {
       sort: {
         field: sortField,
-        direction: sortDirection,
-      },
+        direction: sortDirection
+      }
     };
     const isLoading = this.state.isLoading;
     return (
@@ -265,5 +279,5 @@ export class SelectAgent extends Component {
 }
 
 SelectAgent.propTypes = {
-  items: PropTypes.array,
+  items: PropTypes.array
 };

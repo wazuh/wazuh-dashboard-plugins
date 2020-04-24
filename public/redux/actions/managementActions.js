@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const updateManagementSection = (section) => {
+export const updateManagementSection = section => {
   return {
     type: 'UPDATE_MANAGEMENT_SECTION',
     section
-  }
-}
+  };
+};

@@ -14,14 +14,14 @@ import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 // Redux
 import store from '../../../../redux/store';
 
-import { updateRulesetSection } from '../../../../redux/actions/rulesetActions'
+import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
-import WzConfiguration from './configuration/configuration-main'
-import WzStatistics from './statistics/statistics-main'
+import WzConfiguration from './configuration/configuration-main';
+import WzStatistics from './statistics/statistics-main';
 // import { GroupsTable } from './groups/groups-table';
 // import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
@@ -41,17 +41,17 @@ class WzManagementMain extends Component {
     const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
     return (
       <EuiFlexGroup>
-        <EuiFlexItem style={{marginBottom: 0}}>
+        <EuiFlexItem style={{ marginBottom: 0 }}>
           <div>
-            {
-              (section === 'groups' && <WzGroups {...this.props} />) ||
+            {(section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
-              (section === 'reporting' && <WzReporting />) || 
-              (section === 'statistics' && <WzStatistics />) || 
-              (section === 'logs' && <WzLogs />) || 
-              (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-              (ruleset.includes(section) && <WzRuleset />)
-            }
+              (section === 'reporting' && <WzReporting />) ||
+              (section === 'statistics' && <WzStatistics />) ||
+              (section === 'logs' && <WzLogs />) ||
+              (section === 'configuration' && (
+                <WzConfiguration {...this.props.configurationProps} />
+              )) ||
+              (ruleset.includes(section) && <WzRuleset />)}
           </div>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -61,14 +61,17 @@ class WzManagementMain extends Component {
 
 function mapStateToProps(state) {
   return {
-    state: state.managementReducers,
+    state: state.managementReducers
   };
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateRulesetSection: section => dispatch(updateRulesetSection(section)),
+    updateRulesetSection: section => dispatch(updateRulesetSection(section))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzManagementMain);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzManagementMain);

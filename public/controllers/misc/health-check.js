@@ -13,7 +13,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
-import { PatternHandler } from '../../react-services/pattern-handler'
+import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
@@ -100,9 +100,9 @@ export class HealthCheck {
         );
         if (!patternData.data.status) {
           const patternList = await PatternHandler.getPatternList();
-          if(patternList.length){
+          if (patternList.length) {
             return this.checkPatterns();
-          }else{
+          } else {
             this.errors.push('The selected index-pattern is not present.');
             this.results[i].status = 'Error';
           }
@@ -262,7 +262,7 @@ export class HealthCheck {
 
       this.checksDone = true;
 
-      if(this.checks.fields){
+      if (this.checks.fields) {
         try {
           await this.genericReq.request('GET', '/elastic/known-fields/all', {});
           this.results[this.results.length - 1].status = 'Ready';

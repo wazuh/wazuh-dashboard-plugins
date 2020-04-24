@@ -14,7 +14,7 @@
 import { initApp } from './init';
 import { resolve } from 'path';
 
-export default function (kibana) {
+export default function(kibana) {
   return new kibana.Plugin({
     require: ['kibana', 'elasticsearch'],
     id: 'wazuh',
@@ -40,11 +40,12 @@ export default function (kibana) {
 
     config(Joi) {
       return Joi.object({
-        enabled: Joi.boolean().default(true),
+        enabled: Joi.boolean().default(true)
       }).default();
     },
 
-    init(server, options) { // eslint-disable-line no-unused-vars
+    init(server, options) {
+      // eslint-disable-line no-unused-vars
       const xpackMainPlugin = server.plugins.xpack_main;
       if (xpackMainPlugin) {
         const featureId = 'wazuh';
@@ -62,20 +63,20 @@ export default function (kibana) {
               api: [],
               savedObject: {
                 all: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
+                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
               },
-              ui: ['save', 'show'],
+              ui: ['save', 'show']
             },
             read: {
               app: [featureId],
               api: [],
               savedObject: {
                 all: [],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
+                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
               },
-              ui: ['show'],
-            },
-          },
+              ui: ['show']
+            }
+          }
         });
       }
 

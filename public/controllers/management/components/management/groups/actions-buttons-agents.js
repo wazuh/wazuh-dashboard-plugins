@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
   updateIsProcessing,
-  updateShowAddAgents,
+  updateShowAddAgents
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
@@ -35,7 +35,7 @@ class WzGroupsActionButtonsAgents extends Component {
     this.state = {
       generatingCsv: false,
       isPopoverOpen: false,
-      newGroupName: '',
+      newGroupName: ''
     };
     this.exportCsv = exportCsv;
 
@@ -95,19 +95,19 @@ class WzGroupsActionButtonsAgents extends Component {
     this.setState({
       isPopoverOpen: false,
       msg: false,
-      newGroupName: '',
+      newGroupName: ''
     });
   }
 
   clearGroupName() {
     this.setState({
-      newGroupName: '',
+      newGroupName: ''
     });
   }
 
   onChangeNewGroupName = e => {
     this.setState({
-      newGroupName: e.target.value,
+      newGroupName: e.target.value
     });
   };
 
@@ -137,7 +137,12 @@ class WzGroupsActionButtonsAgents extends Component {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
+      this.showToast(
+        'success',
+        'Success',
+        'The group has been created successfully',
+        2000
+      );
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -161,7 +166,11 @@ class WzGroupsActionButtonsAgents extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(`/agents/groups/${this.props.state.itemDetail.name}`, filters, 'Groups');
+      await this.exportCsv(
+        `/agents/groups/${this.props.state.itemDetail.name}`,
+        filters,
+        'Groups'
+      );
       this.showToast(
         'success',
         'Success',
@@ -169,7 +178,12 @@ class WzGroupsActionButtonsAgents extends Component {
         2000
       );
     } catch (error) {
-      this.showToast('danger', 'Error', `Error when exporting the CSV file: ${error}`, 2000);
+      this.showToast(
+        'danger',
+        'Error',
+        `Error when exporting the CSV file: ${error}`,
+        2000
+      );
     }
     this.setState({ generatingCsv: false });
   }
@@ -179,7 +193,7 @@ class WzGroupsActionButtonsAgents extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -222,14 +236,19 @@ class WzGroupsActionButtonsAgents extends Component {
 
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
+      <EuiButtonEmpty
+        iconType="refresh"
+        onClick={async () => await this.refresh()}
+      >
         Refresh
       </EuiButtonEmpty>
     );
 
     return (
       <Fragment>
-        {adminMode && <EuiFlexItem grow={false}>{manageAgentsButton}</EuiFlexItem>}
+        {adminMode && (
+          <EuiFlexItem grow={false}>{manageAgentsButton}</EuiFlexItem>
+        )}
         <EuiFlexItem grow={false}>{exportPDFButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{exportCSVButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
@@ -240,16 +259,21 @@ class WzGroupsActionButtonsAgents extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updateShowAddAgents: showAddAgents => dispatch(updateShowAddAgents(showAddAgents)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updateShowAddAgents: showAddAgents =>
+      dispatch(updateShowAddAgents(showAddAgents))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsAgents);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupsActionButtonsAgents);

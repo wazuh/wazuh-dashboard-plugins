@@ -10,7 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import {
+  EuiBasicTable,
+  EuiCallOut,
+  EuiOverlayMask,
+  EuiConfirmModal
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -25,7 +30,7 @@ import {
   updateListItemsForRemove,
   updateSortDirection,
   updateSortField,
-  updateGroupDetail,
+  updateGroupDetail
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsColums from './utils/columns-main';
@@ -37,7 +42,7 @@ class WzGroupsTable extends Component {
     this.state = {
       items: [],
       pageSize: 10,
-      totalItems: 0,
+      totalItems: 0
     };
 
     this.groupsHandler = GroupsHandler;
@@ -69,7 +74,7 @@ class WzGroupsTable extends Component {
       this.setState({
         items,
         totalItems,
-        isProcessing: false,
+        isProcessing: false
       });
       this.props.updateIsProcessing(false);
     } catch (error) {
@@ -84,7 +89,7 @@ class WzGroupsTable extends Component {
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter(),
+      sort: this.buildSortFilter()
     };
 
     return filter;
@@ -111,7 +116,13 @@ class WzGroupsTable extends Component {
 
   render() {
     this.groupsColumns = new GroupsColums(this.props);
-    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
+    const {
+      isLoading,
+      pageIndex,
+      error,
+      sortField,
+      sortDirection
+    } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsColumns.columns;
     const message = isLoading ? null : 'No results...';
@@ -119,20 +130,20 @@ class WzGroupsTable extends Component {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100],
+      pageSizeOptions: [10, 25, 50, 100]
     };
     const sorting = {
       sort: {
         field: sortField,
-        direction: sortDirection,
-      },
+        direction: sortDirection
+      }
     };
     const getRowProps = item => {
       const { id } = item;
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => this.props.updateGroupDetail(item),
+        onClick: () => this.props.updateGroupDetail(item)
       };
     };
 
@@ -155,7 +166,9 @@ class WzGroupsTable extends Component {
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title={`Delete ${itemList[0].file ? itemList[0].file : itemList[0].name} group?`}
+                title={`Delete ${
+                  itemList[0].file ? itemList[0].file : itemList[0].name
+                } group?`}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
@@ -180,7 +193,7 @@ class WzGroupsTable extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -207,7 +220,7 @@ class WzGroupsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
@@ -215,14 +228,20 @@ const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFileContent: content => dispatch(updateFileContent(content)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
+    updateListItemsForRemove: itemList =>
+      dispatch(updateListItemsForRemove(itemList)),
+    updateSortDirection: sortDirection =>
+      dispatch(updateSortDirection(sortDirection)),
     updateSortField: sortField => dispatch(updateSortField(sortField)),
-    updateGroupDetail: itemDetail => dispatch(updateGroupDetail(itemDetail)),
+    updateGroupDetail: itemDetail => dispatch(updateGroupDetail(itemDetail))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsTable);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupsTable);

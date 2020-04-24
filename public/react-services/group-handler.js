@@ -9,10 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ApiRequest } from "./api-request";
+import { ApiRequest } from './api-request';
 
 export class GroupHandler {
-
   static async removeGroup(group) {
     try {
       const result = await ApiRequest.request(

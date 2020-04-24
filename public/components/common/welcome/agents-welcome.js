@@ -37,15 +37,19 @@ export class AgentsWelcome extends Component {
     super(props);
 
     this.state = {
-      extensions: this.props.extensions,
+      extensions: this.props.extensions
     };
   }
 
-  color = (status) => {
-    if (status.toLowerCase() === 'active') { return 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
-  }
+  color = status => {
+    if (status.toLowerCase() === 'active') {
+      return 'success';
+    } else if (status.toLowerCase() === 'disconnected') {
+      return 'danger';
+    } else if (status.toLowerCase() === 'never connected') {
+      return 'subdued';
+    }
+  };
 
   renderTitle() {
     return (
@@ -54,7 +58,9 @@ export class AgentsWelcome extends Component {
           <EuiTitle size="s">
             <h1>
               <EuiToolTip position="right" content={this.props.agent.status}>
-                <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
+                <EuiHealth
+                  color={this.color(this.props.agent.status)}
+                ></EuiHealth>
               </EuiToolTip>
               {this.props.agent.name} ({this.props.agent.id})
             </h1>
@@ -83,17 +89,15 @@ export class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     return (
-      <div className='wz-module'>
-        <div className='wz-module-header-wrapper'>
-          <div className='wz-module-header wz-module-header-main'>
-            {title}
-          </div>
+      <div className="wz-module">
+        <div className="wz-module-header-wrapper">
+          <div className="wz-module-header wz-module-header-main">{title}</div>
         </div>
-        <div className='wz-module-body wz-module-body-main'>
+        <div className="wz-module-body wz-module-body-main">
           <div className="wz-welcome-page-agent-info">
             <AgentInfo agent={this.props.agent} {...this.props}></AgentInfo>
           </div>
-          <EuiPage className='wz-welcome-page'>
+          <EuiPage className="wz-welcome-page">
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup>
@@ -144,9 +148,10 @@ export class AgentsWelcome extends Component {
                               <EuiCallOut
                                 title={
                                   <p>
-                                    Click the <EuiIcon type="eye" /> icon to show thread detection and
-                                    response extensions.
-                                </p>
+                                    Click the <EuiIcon type="eye" /> icon to
+                                    show thread detection and response
+                                    extensions.
+                                  </p>
                                 }
                                 color="success"
                                 iconType="help"
@@ -156,9 +161,11 @@ export class AgentsWelcome extends Component {
                         )}
                       <EuiFlexGrid columns={2}>
                         {!(
-                          UnsupportedComponents[this.props.agent.agentPlatform] ||
-                          UnsupportedComponents['other']
-                        ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
+                          UnsupportedComponents[
+                            this.props.agent.agentPlatform
+                          ] || UnsupportedComponents['other']
+                        ).includes('vuls') &&
+                          this.buildTabCard('vuls', 'securityApp')}
                         {this.props.extensions.virustotal &&
                           this.buildTabCard('virustotal', 'savedObjectsApp')}
                         {this.props.extensions.osquery &&
@@ -166,7 +173,8 @@ export class AgentsWelcome extends Component {
                         {this.props.extensions.docker &&
                           this.buildTabCard('docker', 'logoDocker')}
                         {this.props.extensions.mitre &&
-                          this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
+                          this.buildTabCard('mitre', 'spacesApp')}{' '}
+                        {/* TODO- Change "spacesApp" icon*/}
                       </EuiFlexGrid>
                     </EuiPanel>
                   </EuiFlexItem>
@@ -183,9 +191,9 @@ export class AgentsWelcome extends Component {
                               <EuiCallOut
                                 title={
                                   <p>
-                                    Click the <EuiIcon type="eye" /> icon to show
-                                    regulatory compliance extensions.
-                                </p>
+                                    Click the <EuiIcon type="eye" /> icon to
+                                    show regulatory compliance extensions.
+                                  </p>
                                 }
                                 color="success"
                                 iconType="help"
@@ -197,17 +205,17 @@ export class AgentsWelcome extends Component {
                         this.props.extensions.gdpr ||
                         this.props.extensions.hipaa ||
                         this.props.extensions.nist) && (
-                          <EuiFlexGrid columns={2}>
-                            {this.props.extensions.pci &&
-                              this.buildTabCard('pci', 'visTagCloud')}
-                            {this.props.extensions.nist &&
-                              this.buildTabCard('nist', 'apmApp')}
-                            {this.props.extensions.gdpr &&
-                              this.buildTabCard('gdpr', 'visBarVertical')}
-                            {this.props.extensions.hipaa &&
-                              this.buildTabCard('hipaa', 'emsApp')}
-                          </EuiFlexGrid>
-                        )}
+                        <EuiFlexGrid columns={2}>
+                          {this.props.extensions.pci &&
+                            this.buildTabCard('pci', 'visTagCloud')}
+                          {this.props.extensions.nist &&
+                            this.buildTabCard('nist', 'apmApp')}
+                          {this.props.extensions.gdpr &&
+                            this.buildTabCard('gdpr', 'visBarVertical')}
+                          {this.props.extensions.hipaa &&
+                            this.buildTabCard('hipaa', 'emsApp')}
+                        </EuiFlexGrid>
+                      )}
                     </EuiPanel>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -218,10 +226,13 @@ export class AgentsWelcome extends Component {
             <EuiFlexGroup justifyContent="spaceAround">
               <EuiFlexItem grow={false}>
                 <EuiButton
-                  onClick={() => window.location.href = "#/settings?tab=modules"}
-                  iconType="eye">
+                  onClick={() =>
+                    (window.location.href = '#/settings?tab=modules')
+                  }
+                  iconType="eye"
+                >
                   Configure the modules
-              </EuiButton>
+                </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPage>

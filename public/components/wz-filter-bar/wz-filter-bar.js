@@ -22,7 +22,7 @@ export class WzFilterBar extends Component {
       selectedOptions: selectedOptions || [],
       toggleIdSelected: 'AND',
       isProcessing: true,
-      options: model,
+      options: model
     };
     this.toggleButtons = [
       {
@@ -44,22 +44,22 @@ export class WzFilterBar extends Component {
       selectedOptions[option].type === 'AND' ? 'OR' : 'AND';
     this.setState({
       isProcessing: true,
-      selectedOptions,
+      selectedOptions
     });
   };
 
   componentDidUpdate(prevProps) {
-    const { model } = this.props
+    const { model } = this.props;
     if (JSON.stringify(prevProps.model) !== JSON.stringify(model)) {
       const { selectedOptions } = this.state;
-      this.clearSeletedOptions(model, selectedOptions)
+      this.clearSeletedOptions(model, selectedOptions);
 
-      for (const selectedOption of selectedOptions){
+      for (const selectedOption of selectedOptions) {
         for (const group of model) {
-          let flag = false
+          let flag = false;
           for (const option of group.options) {
-            if(selectedOption.group === option.group){
-              flag = true
+            if (selectedOption.group === option.group) {
+              flag = true;
               break;
             }
           }
@@ -69,7 +69,7 @@ export class WzFilterBar extends Component {
           }
         }
       }
-      
+
       this.setState({ options: model });
     }
     if (this.state.isProcessing) {
@@ -100,23 +100,24 @@ export class WzFilterBar extends Component {
         }
       }
       this.buildQuery();
-      this.setState({isProcessing: false });
+      this.setState({ isProcessing: false });
     }
   }
 
   checkIfExistsOrIsSearch(selectedOptions, last) {
-    const { group, label, type } = selectedOptions[last]
-    const lastOption = `${group.trim().toLowerCase()}:${label.trim().toLowerCase()}`;
+    const { group, label, type } = selectedOptions[last];
+    const lastOption = `${group
+      .trim()
+      .toLowerCase()}:${label.trim().toLowerCase()}`;
 
     for (const option of selectedOptions) {
       const isSelected = option.label.trim().toLowerCase() === lastOption;
-      const isSearch = (type === 'search' && option.type === 'search')
-      if (isSelected || isSearch){
+      const isSearch = type === 'search' && option.type === 'search';
+      if (isSelected || isSearch) {
         return true;
       }
     }
   }
-  
 
   encodeFilter(option) {
     const newFilter = option;
@@ -125,16 +126,18 @@ export class WzFilterBar extends Component {
     if (!newFilter.label.includes(':')) {
       newFilter.label_ = newFilter.label;
     }
-    
+
     newFilter.label = option.group + ':' + newFilter.label_;
     newFilter.className = 'wzFilterBarOperator';
   }
 
   decodeFilters(options, selectedOptions) {
-    const labels = selectedOptions.map((item) => {return item.label_});
+    const labels = selectedOptions.map(item => {
+      return item.label_;
+    });
     for (const groups of options) {
       for (const option of groups.options) {
-        if(option.label.includes(':') && !labels.includes(option.label_)){
+        if (option.label.includes(':') && !labels.includes(option.label_)) {
           option.label = option.label_;
           delete option.type;
           delete option.label_;
@@ -146,25 +149,24 @@ export class WzFilterBar extends Component {
 
   clearSeletedOptions(options, selectedOptions) {
     selectedOptions
-    .filter(x => {
-      return x.type != 'search';
-    })
-    .forEach(x => {
-      const group = options.findIndex(m => {
-        const g1 = x.group.toLowerCase();
-        const g2 = ((m.options[0] || []).group || '').toLowerCase();
-        return g1 === g2;
-      });
-      if (group != undefined && group != -1) {
-        const idx = options[group].options.findIndex(l => {
-          return (
-            l.label.trim().toLowerCase() === x.label_.trim().toLowerCase()
-          );
+      .filter(x => {
+        return x.type != 'search';
+      })
+      .forEach(x => {
+        const group = options.findIndex(m => {
+          const g1 = x.group.toLowerCase();
+          const g2 = ((m.options[0] || []).group || '').toLowerCase();
+          return g1 === g2;
         });
-        if (idx !== -1) options[group].options.splice(idx, 1);
-        
-      }
-    });
+        if (group != undefined && group != -1) {
+          const idx = options[group].options.findIndex(l => {
+            return (
+              l.label.trim().toLowerCase() === x.label_.trim().toLowerCase()
+            );
+          });
+          if (idx !== -1) options[group].options.splice(idx, 1);
+        }
+      });
   }
 
   onChange = selectedOptions => {
@@ -187,7 +189,7 @@ export class WzFilterBar extends Component {
     this.setState({
       isProcessing: true,
       selectedOptions,
-      options,
+      options
     });
   };
 
@@ -255,14 +257,18 @@ export class WzFilterBar extends Component {
         if (idx != 0) {
           queryObj.query += option.type === 'AND' ? ';' : ',';
         }
-        queryObj.query += (option.query) 
+        queryObj.query += option.query
           ? option.query
           : option.label.replace(':', '=');
       });
       if (twoOrMoreElements) {
         queryObj.query += ')';
       }
-      this.props.clickAction({ q: queryObj.query, search: queryObj.search, selectedOptions: selectedOptions});
+      this.props.clickAction({
+        q: queryObj.query,
+        search: queryObj.search,
+        selectedOptions: selectedOptions
+      });
     } catch (error) {} // eslint-disable-line
   };
 
@@ -285,5 +291,5 @@ export class WzFilterBar extends Component {
 WzFilterBar.propTypes = {
   clickAction: PropTypes.func,
   model: PropTypes.array,
-  selectedOptions: PropTypes.array,
+  selectedOptions: PropTypes.array
 };

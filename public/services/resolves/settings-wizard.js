@@ -96,7 +96,7 @@ export function settingsWizard(
           ? JSON.stringify({ name: clusterInfo.manager, id: currentApi })
           : JSON.stringify({ name: clusterInfo.cluster, id: currentApi });
 
-          AppState.setCurrentAPI(str);
+      AppState.setCurrentAPI(str);
       AppState.setClusterInfo(clusterInfo);
     };
 
@@ -173,7 +173,6 @@ export function settingsWizard(
       wzMisc.setWizard(true);
       if (redirect) {
         AppState.setCurrentAPI(redirect);
-
       } else if (!$location.path().includes('/settings')) {
         $location.search('_a', null);
         $location.search('tab', 'api');

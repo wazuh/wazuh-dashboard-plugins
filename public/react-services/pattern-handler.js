@@ -9,13 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { GenericRequest } from "./generic-request";
-import { AppState } from "./app-state";
-import { WzMisc } from "../factories/misc";
+import { GenericRequest } from './generic-request';
+import { AppState } from './app-state';
+import { WzMisc } from '../factories/misc';
 
 export class PatternHandler {
-
-   /**
+  /**
    * Get the available pattern list
    */
   static async getPatternList() {
@@ -31,15 +30,18 @@ export class PatternHandler {
 
         this.wzMisc = new WzMisc();
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        if(!window.location.hash.includes('#/settings') && !window.location.hash.includes('#/blank-screen')){
-          window.location.href = "/app/wazuh#/blank-screen/";
+        if (
+          !window.location.hash.includes('#/settings') &&
+          !window.location.hash.includes('#/blank-screen')
+        ) {
+          window.location.href = '/app/wazuh#/blank-screen/';
         }
         return;
       }
 
       if (AppState.getCurrentPattern()) {
-        let filtered = patternList.data.data.filter(item =>
-          item.id === AppState.getCurrentPattern()
+        let filtered = patternList.data.data.filter(
+          item => item.id === AppState.getCurrentPattern()
         );
         if (!filtered.length)
           AppState.setCurrentPattern(patternList.data.data[0].id);
@@ -47,12 +49,10 @@ export class PatternHandler {
 
       return patternList.data.data;
     } catch (error) {
-      throw new Error('Error Pattern Handler (getPatternList)')
+      throw new Error('Error Pattern Handler (getPatternList)');
     }
     return;
   }
-
-
 
   /**
    * Change current pattern for the given pattern
@@ -68,9 +68,8 @@ export class PatternHandler {
       );
       return AppState.getCurrentPattern();
     } catch (error) {
-      throw new Error('Error Pattern Handler (changePattern)')
+      throw new Error('Error Pattern Handler (changePattern)');
     }
     return;
   }
-
-} 
+}

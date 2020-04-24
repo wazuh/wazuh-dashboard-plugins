@@ -10,8 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { EuiPage, EuiPageContent, EuiEmptyPrompt, EuiButton, EuiHorizontalRule } from '@elastic/eui';
-
+import {
+  EuiPage,
+  EuiPageContent,
+  EuiEmptyPrompt,
+  EuiButton,
+  EuiHorizontalRule
+} from '@elastic/eui';
 
 export class WzBlankScreen extends Component {
   constructor(props) {
@@ -28,20 +33,24 @@ export class WzBlankScreen extends Component {
             title={<h2>{this.props.errorToShow || 'Something went wrong'}</h2>}
             body={
               <Fragment>
-                <EuiHorizontalRule margin='s' />
+                <EuiHorizontalRule margin="s" />
                 <p>
-                  <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html</a>
+                  <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">
+                    https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+                  </a>
                   <br />
-                  <a href="https://documentation.wazuh.com/current/installation-guide/">https://documentation.wazuh.com/current/installation-guide/</a>
+                  <a href="https://documentation.wazuh.com/current/installation-guide/">
+                    https://documentation.wazuh.com/current/installation-guide/
+                  </a>
                 </p>
-                <EuiHorizontalRule margin='s' />
+                <EuiHorizontalRule margin="s" />
                 <p> </p>
               </Fragment>
             }
             actions={
               <EuiButton onClick={this.props.goToOverview} color="primary" fill>
                 Refresh
-            </EuiButton>
+              </EuiButton>
             }
           />
         </EuiPageContent>
@@ -49,5 +58,3 @@ export class WzBlankScreen extends Component {
     );
   }
 }
-
-

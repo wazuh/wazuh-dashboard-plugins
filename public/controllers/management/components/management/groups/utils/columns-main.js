@@ -14,20 +14,20 @@ export default class GroupsColums {
           field: 'name',
           name: 'Name',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'count',
           name: 'Agents',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'configSum',
           name: 'Configuration checksum',
           align: 'left',
-          sortable: true,
-        },
+          sortable: true
+        }
       ];
       this.columns.push({
         name: 'Actions',
@@ -37,11 +37,14 @@ export default class GroupsColums {
             <div>
               {(this.adminMode && (
                 <div>
-                  <EuiToolTip position="top" content={'Edit group configuration'}>
+                  <EuiToolTip
+                    position="top"
+                    content={'Edit group configuration'}
+                  >
                     <EuiButtonIcon
                       aria-label="Edit group configuration"
                       iconType="pencil"
-                      onClick={async (ev) => {
+                      onClick={async ev => {
                         ev.stopPropagation();
                         this.showGroupConfiguration(item.name);
                       }}
@@ -58,7 +61,7 @@ export default class GroupsColums {
                     <EuiButtonIcon
                       aria-label="Delete content"
                       iconType="trash"
-                      onClick={async (ev) => {
+                      onClick={async ev => {
                         ev.stopPropagation();
                         this.tableProps.updateListItemsForRemove([item]);
                         this.tableProps.updateShowModal(true);
@@ -70,7 +73,10 @@ export default class GroupsColums {
                 </div>
               )) || (
                 <div>
-                  <EuiToolTip position="top" content={`View ${item.name} details`}>
+                  <EuiToolTip
+                    position="top"
+                    content={`View ${item.name} details`}
+                  >
                     <EuiButtonIcon
                       aria-label="View group details"
                       iconType="eye"
@@ -84,7 +90,7 @@ export default class GroupsColums {
               )}
             </div>
           );
-        },
+        }
       });
     };
 
@@ -100,7 +106,7 @@ export default class GroupsColums {
       name: 'agent.conf',
       content: this.autoFormat(result),
       isEditable: true,
-      groupName: groupId,
+      groupName: groupId
     };
     this.tableProps.updateFileContent(file);
   }
@@ -133,7 +139,7 @@ export default class GroupsColums {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0,
+      'other->other': 0
     };
 
     for (var i = 0; i < lines.length; i++) {
@@ -145,7 +151,13 @@ export default class GroupsColums {
       var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
       var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
       var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-      var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
+      var type = single
+        ? 'single'
+        : closing
+        ? 'closing'
+        : opening
+        ? 'opening'
+        : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';

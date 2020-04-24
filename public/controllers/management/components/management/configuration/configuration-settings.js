@@ -1,14 +1,14 @@
 /*
-* Wazuh app - Definitions of configuration sections.
-* Copyright (C) 2015-2020 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - Definitions of configuration sections.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 
 import { shouldShowComponent } from './utils/wz-utils';
 
@@ -55,7 +55,8 @@ export default [
       },
       {
         name: 'Labels',
-        description: 'User-defined information about the agent included in alerts',
+        description:
+          'User-defined information about the agent included in alerts',
         goto: 'alerts-agent',
         when: 'agent'
       }
@@ -79,7 +80,8 @@ export default [
       },
       {
         name: 'Integrations',
-        description: 'Slack, VirusTotal and PagerDuty integrations with external APIs',
+        description:
+          'Slack, VirusTotal and PagerDuty integrations with external APIs',
         goto: 'integrations',
         when: 'manager'
       }
@@ -91,18 +93,21 @@ export default [
     settings: [
       {
         name: 'Policy monitoring',
-        description: 'Configuration to ensure compliance with security policies, standards and hardening guides',
+        description:
+          'Configuration to ensure compliance with security policies, standards and hardening guides',
         goto: 'policy-monitoring'
       },
       {
         name: 'OpenSCAP',
-        description: 'Configuration assessment and automation of compliance monitoring using SCAP checks',
+        description:
+          'Configuration assessment and automation of compliance monitoring using SCAP checks',
         goto: 'open-scap',
-        when: (agent) => shouldShowComponent('docker', agent)
+        when: agent => shouldShowComponent('docker', agent)
       },
       {
         name: 'CIS-CAT',
-        description: 'Configuration assessment using CIS scanner and SCAP checks',
+        description:
+          'Configuration assessment using CIS scanner and SCAP checks',
         goto: 'cis-cat'
       }
     ]
@@ -113,18 +118,21 @@ export default [
     settings: [
       {
         name: 'Vulnerabilities',
-        description: 'Discover what applications are affected by well-known vulnerabilities',
+        description:
+          'Discover what applications are affected by well-known vulnerabilities',
         goto: 'vulnerabilities',
         when: 'manager'
       },
       {
         name: 'Osquery',
-        description: 'Expose an operating system as a high-performance relational database',
+        description:
+          'Expose an operating system as a high-performance relational database',
         goto: 'osquery'
       },
       {
         name: 'Inventory data',
-        description: 'Gather relevant information about system OS, hardware, networking and packages',
+        description:
+          'Gather relevant information about system OS, hardware, networking and packages',
         goto: 'inventory'
       },
       {
@@ -146,9 +154,10 @@ export default [
       },
       {
         name: 'Docker listener',
-        description: 'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
+        description:
+          'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
         goto: 'docker-listener',
-        when: (agent) => shouldShowComponent('docker', agent)
+        when: agent => shouldShowComponent('docker', agent)
       }
     ]
   },
@@ -158,17 +167,20 @@ export default [
     settings: [
       {
         name: 'Log collection',
-        description: 'Log analysis from text files, Windows events or syslog outputs',
+        description:
+          'Log analysis from text files, Windows events or syslog outputs',
         goto: 'log-collection'
       },
       {
         name: 'Integrity monitoring',
-        description: 'Identify changes in content, permissions, ownership, and attributes of files',
+        description:
+          'Identify changes in content, permissions, ownership, and attributes of files',
         goto: 'integrity-monitoring'
       },
       {
         name: 'Agentless',
-        description: 'Run integrity checks on devices such as routers, firewalls and switches',
+        description:
+          'Run integrity checks on devices such as routers, firewalls and switches',
         goto: 'agentless',
         when: 'manager'
       }
@@ -180,7 +192,8 @@ export default [
     settings: [
       {
         name: 'Amazon S3',
-        description: 'Security events related to Amazon AWS services, collected directly via AWS API',
+        description:
+          'Security events related to Amazon AWS services, collected directly via AWS API',
         goto: 'aws-s3',
         when: 'manager'
       },

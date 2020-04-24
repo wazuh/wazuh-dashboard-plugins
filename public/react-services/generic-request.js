@@ -1,4 +1,3 @@
- 
 /*
  * Wazuh app - Generic request
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -17,7 +16,6 @@ import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
 
 export class GenericRequest {
-
   static async request(method, path, payload = null) {
     try {
       if (!method || !path) {
@@ -25,58 +23,56 @@ export class GenericRequest {
       }
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
-      const requestHeaders = { 
+      const requestHeaders = {
         'Content-Type': 'application/json',
-        'kbn-xsrf': 'kibana' 
+        'kbn-xsrf': 'kibana'
       };
       const tmpUrl = chrome.addBasePath(path);
 
       requestHeaders.pattern = AppState.getCurrentPattern();
 
       try {
-        requestHeaders.id = JSON.parse(
-          AppState.getCurrentAPI()
-        ).id;
+        requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
         // Intended
       }
-      var options = { };
+      var options = {};
 
       const data = {};
-      if (method === 'GET'){
+      if (method === 'GET') {
         options = {
-            method: method,
-            headers: requestHeaders,
-            url: tmpUrl,
-            timeout: timeout || 20000
-        }
+          method: method,
+          headers: requestHeaders,
+          url: tmpUrl,
+          timeout: timeout || 20000
+        };
       }
-      if (method === 'PUT'){
+      if (method === 'PUT') {
         options = {
           method: method,
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
           timeout: timeout || 20000
-        }
+        };
       }
-      if (method === 'POST'){
+      if (method === 'POST') {
         options = {
           method: method,
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
           timeout: timeout || 20000
-        }
+        };
       }
-      if (method === 'DELETE'){
+      if (method === 'DELETE') {
         options = {
           method: method,
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
           timeout: timeout || 20000
-        }
+        };
       }
       Object.assign(data, await axios(options));
       if (!data) {
@@ -85,11 +81,10 @@ export class GenericRequest {
         );
       }
       return data;
-    }catch(err){
-        return ((err || {}).message) || false
+    } catch (err) {
+      return (err || {}).message || false
         ? Promise.reject(err.message)
         : Promise.reject(err || 'Server did not respond');
     }
   }
-
-} 
+}

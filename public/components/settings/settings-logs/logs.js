@@ -24,7 +24,7 @@ import {
   EuiProgress
 } from '@elastic/eui';
 
-import { TimeService } from '../../../react-services/time-service'
+import { TimeService } from '../../../react-services/time-service';
 
 export default class SettingsLogs extends Component {
   constructor(props) {
@@ -39,7 +39,7 @@ export default class SettingsLogs extends Component {
   updateHeight = () => {
     this.height = window.innerHeight - this.offset; //eslint-disable-line
     this.forceUpdate();
-  }
+  };
 
   componentDidMount() {
     this.refresh();
@@ -64,15 +64,26 @@ export default class SettingsLogs extends Component {
 
   formatDate(date) {
     const ts = TimeService;
-    return ts.offset(date).replace("-", "/")
-      .replace("T", " ")
-      .replace("Z", "")
-      .split(".")[0];
+    return ts
+      .offset(date)
+      .replace('-', '/')
+      .replace('T', ' ')
+      .replace('Z', '')
+      .split('.')[0];
   }
 
   render() {
     let text = '';
-    (this.state.logs || []).forEach(x => { text = text + (this.formatDate(x.date) + "  " + x.level.toUpperCase() + "  " + x.message + '\n') })
+    (this.state.logs || []).forEach(x => {
+      text =
+        text +
+        (this.formatDate(x.date) +
+          '  ' +
+          x.level.toUpperCase() +
+          '  ' +
+          x.message +
+          '\n');
+    });
     return (
       <EuiPage>
         <EuiPanel paddingSize="l">
@@ -92,25 +103,27 @@ export default class SettingsLogs extends Component {
                 onClick={async () => await this.refresh()}
               >
                 Refresh
-            </EuiButtonEmpty>
+              </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                Log file located at /usr/share/kibana/optimize/wazuh/logs/wazuhapp.log
-            </EuiText>
+                Log file located at
+                /usr/share/kibana/optimize/wazuh/logs/wazuhapp.log
+              </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-          {(this.state.refreshingEntries &&
+          {this.state.refreshingEntries && (
             <EuiProgress size="xs" color="primary" />
           )}
-          {(!this.state.refreshingEntries &&
+          {!this.state.refreshingEntries && (
             <EuiCodeBlock
               fontSize="s"
               paddingSize="m"
               color="dark"
-              overflowHeight={this.height}>
+              overflowHeight={this.height}
+            >
               {text}
             </EuiCodeBlock>
           )}
