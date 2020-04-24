@@ -18,6 +18,8 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
+import { updateCurrentTab } from '../../redux/actions/appStateActions';
+import store from '../../redux/store';
 
 export class OverviewController {
   /**
@@ -55,7 +57,7 @@ export class OverviewController {
   /**
    * On controller loads
    */
-  $onInit() {
+  async $onInit() {
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -65,7 +67,7 @@ export class OverviewController {
     this.visFactoryService.clearAll();
 
     const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(currentApi);
+    const extensions = await AppState.getExtensions(currentApi);
     this.extensions = extensions;
 
     this.wzMonitoringEnabled = false;
@@ -90,18 +92,8 @@ export class OverviewController {
     };
 
     this.currentOverviewSectionProps = {
-      switchTab: (tab,force) => this.switchTab(tab,force),
+      switchTab: (tab, force) => this.switchTab(tab, force),
       currentTab: this.tab
-    }
-
-
-    this.visualizeProps = {
-      selectedTab: this.tab,
-      updateRootScope: (prop, value) => {
-        this.$rootScope[prop] = value;
-        this.$rootScope.$applyAsync();
-      },
-      cardReqs: {}
     }
 
     this.$scope.$on('$destroy', () => {
@@ -139,9 +131,10 @@ export class OverviewController {
       this.currentOverviewSectionProps = {
         tabView: subtab,
         currentTab: this.tab,
-        switchTab: (tab,force) => this.switchTab(tab,force),         
+        switchTab: (tab, force) => this.switchTab(tab, force),
       };
 
+      this.tabView = this.commonData.checkTabViewLocation();
       if (subtab === 'panels' && this.tab !== 'welcome') {
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
@@ -174,23 +167,9 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    this.overviewModuleReady = false;
     this.tabVisualizations.setTab(newTab);
-    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist') {
-      this.visualizeProps.cardReqs = {};
-    }
-    if (newTab === 'pci') {
-      this.visualizeProps.cardReqs = { items: await this.commonData.getPCI(), reqTitle: 'PCI DSS Requirement' };
-    }
-    if (newTab === 'gdpr') {
-      this.visualizeProps.cardReqs = { items: await this.commonData.getGDPR(), reqTitle: 'GDPR Requirement' };
-    }
-    if (newTab === 'hipaa') {
-      this.visualizeProps.cardReqs = { items: await this.commonData.getHIPAA(), reqTitle: 'HIPAA Requirement' };
-    }
-    if (newTab === 'nist') {
-      this.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
-    }
-    this.visualizeProps.selectedTab = newTab;
+
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -231,8 +210,8 @@ export class OverviewController {
       if (force === 'nav') force = false;
       this.$location.search('tab', newTab);
       this.tab = newTab;
-
       await this.switchSubtab('panels', true);
+      this.overviewModuleReady = true;
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
@@ -305,6 +284,7 @@ export class OverviewController {
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
+      store.dispatch(updateCurrentTab(this.tab));
 
       this.$scope.$on('sendVisDataRows', (ev, param) => {
         const rows = (param || {}).mitreRows.tables[0].rows

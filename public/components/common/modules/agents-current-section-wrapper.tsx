@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for building the management welcome screen.
+ * Wazuh app - React component for building the Overview welcome screen.
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
@@ -9,24 +9,21 @@
  * (at your option) any later version.
  *
  * Find more information about this on the LICENSE file.
- * 
- * DELETE THIS WRAPPER WHEN WELCOME SCREEN WAS NOT BE CALLED FROM ANGULARJS
  */
 import React, { Component } from 'react';
-import WelcomeScreen from './management-welcome'
 import WzReduxProvider from '../../../redux/wz-redux-provider';
+import WzCurrentAgentsSection from './agents-current-section'
 
-export class WelcomeWrapper extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+export class WzCurrentAgentsSectionWrapper extends Component {
+ constructor(props) {
+   super(props);
+ }
 
-  render() {
-    return (
-      <WzReduxProvider>
-        <WelcomeScreen {...this.props} />
-      </WzReduxProvider>
-    );
-  }
+ render() {
+   return (
+     <WzReduxProvider>
+       <WzCurrentAgentsSection {...this.props}/>
+     </WzReduxProvider>
+   );
+ }
 }

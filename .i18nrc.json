@@ -1,0 +1,9 @@
+{
+    "paths": {
+      "wazuh": "public"
+    },
+    "exclude": [
+    ],
+    "translations": [
+    ]
+  }

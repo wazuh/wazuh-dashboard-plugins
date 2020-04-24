@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Pie } from "../../d3/pie";
 import {
   EuiFlexItem, EuiFlexGroup, EuiPanel, EuiPage, EuiBasicTable, EuiInMemoryTable, EuiSpacer, EuiText, EuiProgress,
@@ -6,12 +6,15 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
+import exportCsv from '../../../react-services/wz-csv';
+import { toastNotifications } from 'ui/notify';
 
-export class ScaDashboard extends Component {
+export class States extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
     const { agent } = this.props;
-    this.state = { agent, itemIdToExpandedRowMap: {}, showChecksum: false, loading: false }
+    this.state = { agent, itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false }
     this.policies = [];
     this.wzReq = WzRequest;
     this.timeService = TimeService;
@@ -34,17 +37,17 @@ export class ScaDashboard extends Component {
       {
         field: 'pass',
         name: 'Pass',
-        width: 100
+        width: "100px"
       },
       {
         field: 'fail',
         name: 'Fail',
-        width: 100
+        width: "100px"
       },
       {
         field: 'invalid',
         name: 'Not applicable',
-        width: 100
+        width: "100px"
       },
       {
         field: 'score',
@@ -52,7 +55,7 @@ export class ScaDashboard extends Component {
         render: score => {
           return `${score}%`;
         },
-        width: 100
+        width: "100px"
       },
     ];
     this.columnsChecks = [
@@ -60,7 +63,7 @@ export class ScaDashboard extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: 50
+        width: "100px"
       },
       {
         field: 'title',
@@ -70,7 +73,6 @@ export class ScaDashboard extends Component {
       },
       {
         name: 'Target',
-        sortable: true,
         truncateText: true,
         render: item => (
           <div>
@@ -88,12 +90,12 @@ export class ScaDashboard extends Component {
         name: 'Result',
         truncateText: true,
         sortable: true,
-        width: 150,
+        width: "150px",
         render: this.addHealthResultRender,
       },
       {
         align: 'right',
-        width: 40,
+        width: "40px",
         isExpander: true,
         render: item => (
           <EuiButtonIcon
@@ -104,6 +106,15 @@ export class ScaDashboard extends Component {
         ),
       },
     ];
+  }
+
+  async componentDidMount() {
+    this._isMount = true;
+    this.initialize();
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   offsetTimestamp(text, time) {
@@ -134,7 +145,7 @@ export class ScaDashboard extends Component {
 
   async initialize() {
     try {
-      this.setState({ loading: true });
+      this._isMount && this.setState({ loading: true });
       this.lookingPolicy = false;
       const policies = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}`, {});
       this.policies = (((policies || {}).data || {}).data || {}).items || [];
@@ -150,23 +161,19 @@ export class ScaDashboard extends Component {
         }
         )
       }
-      this.setState({ data: models, loading: false });
+      this._isMount && this.setState({ data: models, loading: false });
     } catch (error) {
       this.policies = [];
     }
   }
 
-  async componentDidMount() {
-    this.initialize();
-  }
-
   async loadScaPolicy(policy) {
-    this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
+    this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       const checks = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}/checks/${policy.policy_id}`, {});
       this.checks = (((checks || {}).data || {}).data || {}).items || [];
     }
-    this.setState({ lookingPolicy: policy, loadingPolicy: false });
+    this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
   }
 
   toggleDetails = item => {
@@ -188,6 +195,9 @@ export class ScaDashboard extends Component {
     if (itemIdToExpandedRowMap[item.id]) {
       delete itemIdToExpandedRowMap[item.id];
     } else {
+      let checks = '';
+      checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
+      checks += item.condition ? ` (Condition: ${item.condition})` : ''
       const listItems = [
         {
           title: 'Check not applicable due to:',
@@ -196,10 +206,6 @@ export class ScaDashboard extends Component {
         {
           title: 'Rationale',
           description: item.rationale,
-        },
-        {
-          title: 'Condition',
-          description: item.condition,
         },
         {
           title: 'Remediation',
@@ -214,7 +220,7 @@ export class ScaDashboard extends Component {
           description: item.directory,
         },
         {
-          title: (item.rules || []).length > 1 ? 'Checks' : 'Check',
+          title: checks,
           description: item.rulesText,
         },
         {
@@ -230,6 +236,25 @@ export class ScaDashboard extends Component {
     this.setState({ itemIdToExpandedRowMap });
   };
 
+  showToast = (color, title, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      toastLifeTimeMs: time,
+    });
+  };
+  async downloadCsv() {
+    try {
+      this.showToast('success', 'Your download should begin automatically...', 3000);
+      await exportCsv(
+        '/sca/' + this.state.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
+        [],
+        this.state.lookingPolicy.policy_id + '.csv'
+      );
+    } catch (error) {
+      this.showToast('danger', error, 3000);
+    }
+  }
 
   render() {
     const getPoliciesRowProps = (item, idx) => {
@@ -267,20 +292,25 @@ export class ScaDashboard extends Component {
     };
 
     return (
-      <div>
-        {(this.state.loading &&
-          <EuiProgress size="xs" color="primary" style={{ margin: 16 }} />
-        )}
-        {((this.state.agent && (this.state.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
-          <EuiCallOut title="No scans available" iconType="iInCircle" style={{ margin: 16 }}>
-            <EuiButton color="primary" onClick={() => this.initialize()}>
-              Refresh
+      <Fragment>
+        <div>
+          {(this.state.loading &&
+            <div style={{ margin: 16 }}>
+              <EuiSpacer size="m" />
+              <EuiProgress size="xs" color="primary" />
+            </div>
+          )}
+        </div>
+        <EuiPage>
+          {((this.state.agent && (this.state.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
+            <EuiCallOut title="No scans available" iconType="iInCircle">
+              <EuiButton color="primary" onClick={() => this.initialize()}>
+                Refresh
            </EuiButton>
-          </EuiCallOut>
-        )}
-        {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
-          <div>
-            <EuiPage>
+            </EuiCallOut>
+          )}
+          {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
+            <div>
               {((this.state.data || []).length &&
                 <EuiFlexGroup style={{ 'marginTop': 0 }}>
                   {(this.state.data || []).map((pie, idx) => (
@@ -292,8 +322,7 @@ export class ScaDashboard extends Component {
                   ))}
                 </EuiFlexGroup>
               )}
-            </EuiPage>
-            <EuiPage style={{ paddingTop: 0 }}>
+              <EuiSpacer size="m" />
               <EuiPanel paddingSize="l">
                 <EuiFlexGroup>
                   <EuiFlexItem>
@@ -305,34 +334,33 @@ export class ScaDashboard extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPanel>
-            </EuiPage>
-          </div>
-        )}
-        {((this.state.agent && (this.state.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
-          <div>
-            <EuiPage>
+            </div>
+          )}
+          {((this.state.agent && (this.state.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
+            <div>
               <EuiPanel paddingSize="l">
                 <EuiFlexGroup>
                   <EuiFlexItem grow={false}>
                     <EuiButtonIcon
                       color='primary'
-                      iconSize='l'
-                      style={{ padding: '6px' }}
+                      style={{ padding: '6px 0px' }}
                       onClick={() => this.loadScaPolicy(false)}
                       iconType="arrowLeft"
                       aria-label="Back to policies"
+                      {...{iconSize:'l'}}
                     />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiTitle>
+                    <EuiTitle
+                      size="s">
                       <h2>{this.state.lookingPolicy.name}&nbsp;
                         <EuiToolTip position="right" content="Show policy checksum">
-                          <EuiButtonIcon
+                          <EuiButtonEmpty
                             iconType="iInCircle"
-                            iconSize="l"
                             aria-label="Help"
-                            onClick={() => this.setState({ showChecksum: !this.state.showChecksum })}
-                          />
+                            onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}>
+                            More info
+                          </EuiButtonEmpty>
                         </EuiToolTip>
                       </h2>
                     </EuiTitle>
@@ -340,8 +368,7 @@ export class ScaDashboard extends Component {
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty
                       iconType="importAction"
-                      onClick={async () => await this.props.downloadCsv('/sca/' + this.state.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
-                        this.state.lookingPolicy.policy_id + '.csv')} >
+                      onClick={async () => await this.downloadCsv()} >
                       Export formatted
                     </EuiButtonEmpty>
                   </EuiFlexItem>
@@ -351,12 +378,14 @@ export class ScaDashboard extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
-                {(this.state.showChecksum &&
+                {(this.state.showMoreInfo &&
                   <div>
-                    <EuiSpacer size="m" />
+                    <EuiSpacer size="s" />
                     <EuiText>
                       <pre>
-                        <code>Policy checksum: {this.state.lookingPolicy.hash_file}</code>
+                        <code><b>Policy description:</b> {this.state.lookingPolicy.description}</code>
+                        <br></br>
+                        <code><b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}</code>
                       </pre>
                     </EuiText>
                   </div>
@@ -397,10 +426,10 @@ export class ScaDashboard extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPanel>
-            </EuiPage>
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </EuiPage>
+      </Fragment>
     );
   }
 }

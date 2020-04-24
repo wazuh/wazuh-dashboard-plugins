@@ -93,7 +93,7 @@ export class VisFactoryService {
    * @param {*} localChange
    * @param {*} id
    */
-  async buildAgentsVisualizations(filterHandler, tab, subtab, id, fromDiscover = false) {
+  async buildAgentsVisualizations(filterHandler, tab, subtab, id) {
     try {
       const data =
         tab !== 'sca'
@@ -103,8 +103,7 @@ export class VisFactoryService {
           )
           : false;
       data && this.rawVisualizations.assignItems(data.data.raw);
-      if (!fromDiscover)
-        this.commonData.assignFilters(filterHandler, tab, id);
+      this.commonData.assignFilters(filterHandler, tab, id);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
       this.$rootScope.$broadcast('updateVis');
       return;

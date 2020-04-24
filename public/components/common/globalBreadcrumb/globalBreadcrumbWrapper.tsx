@@ -13,7 +13,7 @@
 */
 import React, { Component } from 'react';
 import WzGlobalBreadcrumb from './globalBreadcrumb'
-import WzReduxProvider from '../../redux/wz-redux-provider';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
 
 export class WzGlobalBreadcrumbWrapper extends Component {
  constructor(props) {

@@ -66,7 +66,8 @@ import {
   tabifyAggResponse,
   vislibSeriesResponseHandlerProvider,
   Vis,
-  registerTimefilterWithGlobalStateFactory
+  registerTimefilterWithGlobalStateFactory,
+  getAngularModule
 } from 'plugins/kibana/discover/kibana_services';
 
 import { generateFilters } from 'plugins/kibana/../../../../plugins/data/public';
@@ -75,6 +76,7 @@ import { buildServices } from 'plugins/kibana/discover/build_services';
 import { npStart } from 'ui/new_platform';
 import { pluginInstance } from 'plugins/kibana/discover/index';
 import { WazuhConfig } from '../react-services/wazuh-config';
+import { ModulesHelper } from '../components/common/modules/modules-helper'
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -83,6 +85,7 @@ const fetchStatuses = {
 };
 
 const app = uiModules.get('app/discover', []);
+const wazuhApp = getAngularModule('app/wazuh');
 app.run(async (globalState, $rootScope) => {
   const services = await buildServices(npStart.core, npStart.plugins, pluginInstance.docViewsRegistry);
   setServices(services);
@@ -121,6 +124,7 @@ function discoverController(
   discoverPendingUpdates
 ) {
   //WAZUH
+  wazuhApp.discoverScope = $scope;
   (async () => {
     const services = await buildServices(npStart.core, npStart.plugins, pluginInstance.docViewsRegistry);
     setServices(services);
@@ -133,6 +137,7 @@ function discoverController(
     toastNotifications,
   } = getServices();
   const wazuhConfig = new WazuhConfig();
+  const modulesHelper = ModulesHelper;
   //////
   const responseHandler = vislibSeriesResponseHandlerProvider().handler;
   const filterStateManager = new FilterStateManager(globalState, getAppState, filterManager);
@@ -161,7 +166,6 @@ function discoverController(
   $scope.fetchStatus = fetchStatuses.UNINITIALIZED;
   $scope.refreshInterval = timefilter.getRefreshInterval();
   $scope.showSaveQuery = uiCapabilities.discover.saveQuery;
-  let implicitFilters = null;
 
   $scope.$watch(
     () => uiCapabilities.discover.saveQuery,
@@ -183,9 +187,8 @@ function discoverController(
     savedSearch.destroy();
     subscriptions.unsubscribe();
     filterStateManager.destroy();
-    if (filterListener) filterListener();
     if (tabListener) tabListener();
-    implicitFilters = null;
+    delete wazuhApp.discoverScope;
   });
 
   const $appStatus = ($scope.appStatus = this.appStatus = {
@@ -321,10 +324,10 @@ function discoverController(
     return {
       query: ($scope.savedQuery && $scope.savedQuery.attributes.query) ||
         $scope.searchSource.getField('query') || {
-          query: '',
-          language:
-            localStorage.get('kibana.userQueryLanguage') || config.get('search:queryLanguage'),
-        },
+        query: '',
+        language:
+          (localStorage.get('kibana.userQueryLanguage') || [])[1] || config.get('search:queryLanguage'),
+      },
       sort: getSort.array(
         savedSearch.sort,
         $scope.indexPattern,
@@ -415,9 +418,7 @@ function discoverController(
       );
       subscriptions.add(
         subscribeWithScope($scope, timefilter.getFetch$(), {
-          next: () => {
-            $scope.fetch;
-          }
+          next: $scope.fetch
         })
       );
 
@@ -599,6 +600,7 @@ function discoverController(
   $scope.opts.fetch = $scope.fetch = function () {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
+    modulesHelper.hideCloseButtons();
     // ignore requests to fetch before the app inits
     if (!init.complete) return;
 
@@ -691,7 +693,6 @@ function discoverController(
         counts[fieldName] = (counts[fieldName] || 0) + 1;
       });
     });
-
     $scope.fetchStatus = fetchStatuses.COMPLETE;
   }
 
@@ -1054,70 +1055,35 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const hideCloseImplicitsFilters = () => {
-    const closeButtons = $(`.globalFilterItem .euiBadge__iconButton`);
-    const optionsButtons = $(`.globalFilterItem .euiBadge__childButton`);
-    for (let i = 0; i < closeButtons.length; i++) {
-      $(closeButtons[i]).addClass('hide-close-button');
-      $(optionsButtons[i]).off("click");
-    };
-    if (!implicitFilters) return;
-    const filters = $(`.globalFilterItem .euiBadge__childButton`);
-    for (let i = 0; i < filters.length; i++) {
-      let found = false;
-      (implicitFilters || []).forEach(x => {
-        const objKey = x.query ? Object.keys(x.query.match)[0] : x.meta.key;
-        const key = `filter-key-${objKey}`;
-        const value = x.query ? `filter-value-${x.query.match[objKey].query}` : `filter-value-${x.meta.value}`;
-        const data = filters[i].attributes[3];
-        if (data.value.includes(key) && data.value.includes(value)) {
-          found = true;
-        }
-      });
-      if (!found) {
-        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
-        $(closeButton).removeClass('hide-close-button');
-      } else {
-        const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
-        $(optionsButton).on("click", (ev) => { ev.stopPropagation(); });
-      }
+  $scope.$watch('fetchStatus', () => {
+    if ($scope.fetchStatus === fetchStatuses.LOADING) {
+      modulesHelper.hideCloseButtons();
+    } else {
+      modulesHelper.activeNoImplicitsFilters();
     }
-    $scope.$applyAsync();
-  }
+  });
 
-  const loadFilters = async (wzCurrentFilters, tab) => {
+  $scope.loadFilters = async (wzCurrentFilters, tab) => {
     const appState = getAppState();
     if (!appState || !globalState) {
       $timeout(100).then(() => {
         return loadFilters(wzCurrentFilters);
       });
     } else {
-      implicitFilters = [];
-      wzCurrentFilters.forEach(x => implicitFilters.push({ ...x }));
+      wzCurrentFilters.forEach(x => x.$state.isImplicit = true);
       const globalFilters = globalState.filters;
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
       }
-      
+
       filterManager.addFilters([...wzCurrentFilters, ...globalFilters || []]);
       $scope.filters = filterManager.filters;
     }
   };
 
-  const filterListener = $rootScope.$on('wzEventFilters', (evt, parameters) => {
-    loadFilters(parameters.filters, parameters.tab);
-  });
-
-  $rootScope.$on('testAGENT', (evt, parameters) => {
-    $scope.updateQueryAndFetch({
-      query: $state.query
-    });
-  });
-
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
-    hideCloseImplicitsFilters();
     $scope.$applyAsync();
     $scope.tabView = parameters.tabView || 'panels';
     $scope.tab = parameters.tab;

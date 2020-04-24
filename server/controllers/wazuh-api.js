@@ -1135,7 +1135,7 @@ export class WazuhApiCtrl {
       let itemsArray = [];
       const output = await needle(
         'get',
-        `${config.url}:${config.port}/${tmpPath}`,
+        `${config.url}:${config.port}/${tmpPath}${tmpPath.includes('?') ? '&' : '?'}wait_for_complete`,
         params,
         cred
       );
@@ -1151,7 +1151,7 @@ export class WazuhApiCtrl {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
-            `${config.url}:${config.port}/${tmpPath}`,
+            `${config.url}:${config.port}/${tmpPath}${tmpPath.includes('?') ? '&' : '?'}wait_for_complete`,
             params,
             cred
           );
@@ -1365,6 +1365,59 @@ export class WazuhApiCtrl {
       }
     } catch (error) {
       log('wazuh-api:getTimeStamp', error.message || error);
+      return ErrorResponse(
+        error.message || 'Could not fetch wazuh-version registry',
+        4001,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+* This get the extensions
+* @param {Object} req
+* @param {Object} reply
+* @returns {Object} extensions object or ErrorResponse
+*/
+  async setExtensions(req, reply) {
+    try {
+      const id = req.payload.id;
+      const extensions = req.payload.extensions;
+      // Update cluster information in the wazuh-registry.json
+      await this.updateRegistry.updateAPIExtensions(id, extensions);
+      return {
+        statusCode: 200
+      };
+
+    } catch (error) {
+      log('wazuh-api:setExtensions', error.message || error);
+      return ErrorResponse(
+        error.message || 'Could not set extensions',
+        4001,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+ * This get the extensions
+ * @param {Object} req
+ * @param {Object} reply
+ * @returns {Object} extensions object or ErrorResponse
+ */
+  getExtensions(req, reply) {
+    try {
+      const source = JSON.parse(
+        fs.readFileSync(this.updateRegistry.file, 'utf8')
+      );
+      return {
+        extensions: (source.hosts[req.params.id] || {}).extensions || {}
+      };
+
+    } catch (error) {
+      log('wazuh-api:getExtensions', error.message || error);
       return ErrorResponse(
         error.message || 'Could not fetch wazuh-version registry',
         4001,

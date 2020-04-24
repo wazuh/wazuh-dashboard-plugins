@@ -1,12 +1,7 @@
 include ./dashboards.head
 include ./agents-welcome.html
-include ./agents-fim.html
-include ./agents-pm.html
+include ./agents-module.html
 include ./agents-mitre.html
 include ./agents-syscollector.html
-include ./agents-sca.html
-<div ng-if="tab === 'configuration' && agent" style="margin-top: 10px;">
-  <react-component ng-if="tab === 'configuration' && agent" name="WzManagementConfiguration" props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"/>
-</div>
-include ./dashboards.html
+<react-component class='wz-module-body-main' ng-if="tab === 'configuration' && agent" name="WzManagementConfiguration" props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"/>
 include ../footer.foot

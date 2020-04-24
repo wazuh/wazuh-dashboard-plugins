@@ -54,7 +54,7 @@ export class WzSearchButtons extends Component {
       return {
         id: item.label,
         label: item.label,
-        name: "gola",
+        name: "options",
         ...(item.iconType && {iconType:item.iconType}),
       }
     });

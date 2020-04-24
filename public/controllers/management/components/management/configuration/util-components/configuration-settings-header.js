@@ -68,7 +68,7 @@ class WzConfigurationSettingsHeader extends Component{
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='xs'/>
-        {title && <EuiHorizontalRule margin='none' style={{ margin: 0 }}/>}
+        {title && <EuiHorizontalRule margin='none' style={{ marginBottom: 16 }}/>}
       </Fragment>
     )
   }

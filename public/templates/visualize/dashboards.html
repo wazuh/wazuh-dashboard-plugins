@@ -5,13 +5,12 @@
     <div ng-show="!actrl.addingNewAgent">
         <div flex="auto" layout="column" ng-cloak ng-controller="overviewController as octrl">
             <!-- Navigation section -->
-            <div layout="row" ng-show="octrl.tab !== 'welcome'" layout-align="start center">
-                <!-- Breadcrumbs -->
-                <div layout="row" layout-padding>
-                    <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-                    <div ng-show="octrl.tab !== 'welcome'" style="padding-left: 5px">
-                        <react-component flex name="WzCurrentOverviewSectionWrapper" props="octrl.currentOverviewSectionProps" />
-                    </div>
+            <div layout="row" ng-show="octrl.tab && octrl.tab !== 'welcome'" layout-align="start center"
+                style="padding: 10px 0px 2px 4px">
+                <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
+                <div ng-show="octrl.tab !== 'welcome'" style="padding-left: 5px">
+                    <react-component flex name="WzCurrentOverviewSectionWrapper"
+                        props="octrl.currentOverviewSectionProps" />
                 </div>
                 <!-- End breadcrumbs -->
 
@@ -20,7 +19,7 @@
                 <!-- End separator -->
 
                 <!-- Reporting button section -->
-                <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
+                <div ng-if="octrl.tab &&  octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
                     <!-- Report button -->
                     <button class="kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
                         tooltip-placement="bottom"
@@ -33,7 +32,7 @@
                 <!-- End Reporting buttons section -->
 
                 <!-- Discover/Dashboard buttons section -->
-                <div ng-if="octrl.tab !== 'welcome'" class="wz-margin-right-8">
+                <div ng-if="octrl.tab &&  octrl.tab !== 'welcome'" class="wz-margin-right-8">
                     <!-- Dashboard button -->
                     <button class="kuiButton kuiButton--secondary small"
                         ng-click="octrl.tabView === 'discover' ? octrl.switchSubtab('panels') : octrl.switchSubtab('discover')"
@@ -49,7 +48,7 @@
             <!-- End navigation section -->
 
             <!-- Discover search bar section -->
-            <kbn-dis ng-show="octrl.tab !== 'welcome'"></kbn-dis>
+            <kbn-dis ng-show="octrl.tab && octrl.tab !== 'welcome'"></kbn-dis>
             <!-- End Discover search bar section -->
 
             <!-- Loading status section -->
@@ -116,6 +115,7 @@
             </div>
             <!-- No results section -->
 
-            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels'">
-                <react-component name="WzVisualize" props="octrl.visualizeProps" />
+            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels'"
+                ng-if="octrl.overviewModuleReady">
+                <react-component name="WzVisualize" props="{selectedTab: octrl.tab}" />
             </div>
