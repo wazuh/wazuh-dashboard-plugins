@@ -12,7 +12,7 @@
 
 // Common data
 export const IPs = ['141.98.81.37', '54.10.24.5', '187.80.4.18', '134.87.21.47', '40.220.102.15', '45.124.37.241', '45.75.196.15', '16.4.20.20'];
-export const Users = ['juanca','pablo','jose', 'alberto', 'antonio', 'victor', 'jesus', 'santiago', 'pedro', 'root', 'admin']
+export const Users = ["ossecm", "root", "ec2-user", "SYSTEM", "wazuh", "Administrators", "suricata", "ossec", "LOCAL\ Service", "NETWORK\ Service"];
 export const Ports = ["22", "55047", "26874", "8905", "3014", "2222", "4547", "3475", "7558","4277","3527","5784","7854"];
 export const Win_Hostnames = ['Win_Server_01', 'Win_Server_02', 'Win_Server_03','Win_Server_04'];
 export const Paths = ["/home/user/sample", "/tmp/sample", "/etc/sample"];
