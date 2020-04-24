@@ -28,6 +28,7 @@ import * as Virustotal from './sample-data/virustotal';
 import * as Vulnerability from './sample-data/vulnerabilities';
 import * as SSH from './sample-data/ssh';
 import * as Apache from './sample-data/apache';
+import * as Web from './sample-data/web';
 
 //Alert
 const alertIDMax = 6000;
@@ -342,26 +343,45 @@ function generateAlert(params) {
     }
 
     if (params.rootcheck) {
-        const typeAlert = {...randomArrayItem(PolicyMonitoring.data)}; // there is only one type alert in data array at the moment. Randomize if add more type of alerts to data array
-        alert.data = {
-            srcip: randomArrayItem(IPs),
-            srcport: randomArrayItem(Ports),
-            id: `AH${randomIntervalInteger(10000,99999)}`
+        alert.location = PolicyMonitoring.location;
+        alert.decoder = {...PolicyMonitoring.decoder};
+        alert.input = {
+            type: 'log'
         };
-        alert.GeoLocation = {...randomArrayItem(GeoLocation)};
-        alert.rule = {...typeAlert.rule };
-        alert.rule.firedtimes = randomIntervalInteger(2,10);
-        alert.input = { type: 'log' };
-        alert.location = Apache.location;
-        alert.decoder = {...Apache.decoder};
-        //Thu Apr 23 13:23:29.375928 2020
-        alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
-            _timestamp_apache: formatDate(new Date(alert.timestamp), 'E N h:m:s.l Y'),
-            _pi_id: randomIntervalInteger(10000,30000)
-        });
-        alert.
-        alert.rule.description = randomArrayItem(PolicyMonitoring.ruleDescription);
-        alert.data.title = randomArrayItem(PolicyMonitoring.title);
+
+        const alertCategory = randomArrayItem(['Rootkit', 'Trojan']);
+
+        switch (alertCategory){
+            case 'Rootkit':{
+                const rootkitCategory = randomArrayItem(Object.keys(PolicyMonitoring.rootkits));
+                const rootkit = randomArrayItem(PolicyMonitoring.rootkits[rootkitCategory]);
+                alert.data = {
+                    title: interpolateAlertProps(PolicyMonitoring.rootkitsData.data.title, alert, {
+                        _rootkit_category: rootkitCategory,
+                        _rootkit_file: rootkit
+                    })
+                };
+                alert.rule = {...PolicyMonitoring.rootkitsData.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,10);
+                alert.full_log = alert.data.title;
+                break;
+                
+            }
+            case 'Trojan':{
+                const trojan = randomArrayItem(PolicyMonitoring.trojans);
+                alert.data = {
+                    file: trojan.file,
+                    title: "Trojaned version of file detected."
+                };
+                alert.rule = {...PolicyMonitoring.trojansData.rule};
+                alert.rule.firedtimes = randomIntervalInteger(1,10);
+                alert.full_log = interpolateAlertProps(PolicyMonitoring.trojansData.full_log, alert, {
+                    _trojan_signature: trojan.signature
+                });
+                break;
+            }
+            default: {}
+        }
     }
 
     if (params.syscheck) {
@@ -512,7 +532,7 @@ function generateAlert(params) {
         };
         alert.predecoder = {
             program_name: 'sshd',
-            timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
+            timestamp: formatDate(new Date(alert.timestamp), 'N D h:m:s'),
             hostname: alert.manager.name
         };
         let typeAlert = randomArrayItem(['invalidLoginPassword','invalidLoginUser', 'multipleAuthenticationFailures','windowsInvalidLoginPassword','userLoginFailed', 'passwordCheckFailed', 'nonExistentUser', 'bruteForceTryingAccessSystem', 'authenticationSuccess', 'maximumAuthenticationAttemptsExceeded']);
@@ -662,7 +682,7 @@ function generateAlert(params) {
         };
         alert.predecoder = {
             program_name: 'sshd',
-            timestamp: formatDate(new Date(alert.timestamp), 'J D h:m:s'),
+            timestamp: formatDate(new Date(alert.timestamp), 'N D h:m:s'),
             hostname: alert.manager.name
         };
         const typeAlert = randomArrayItem(SSH.data);
@@ -730,9 +750,47 @@ function generateAlert(params) {
         alert.decoder = {...Apache.decoder};
         //Thu Apr 23 13:23:29.375928 2020
         alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
-            _timestamp_apache: formatDate(new Date(alert.timestamp), 'E N h:m:s.l Y'),
+            _timestamp_apache: formatDate(new Date(alert.timestamp), 'E N D h:m:s.l Y'),
             _pi_id: randomIntervalInteger(10000,30000)
         });
+    }
+
+    if ( params.web ){
+        alert.input = {
+            type: 'log'
+        };
+        alert.data = {
+            protocol: 'GET',
+            srcip: randomArrayItem(IPs),
+            id: '404',
+            url: randomArrayItem(Web.urls)
+        };
+        alert.GeoLocation = {...randomArrayItem(GeoLocation)};
+
+        const typeAlert = randomArrayItem(Web.data);
+        const userAgent = randomArrayItem(Web.userAgents)
+        alert.rule = {...typeAlert.rule};
+        alert.rule.firedtimes = randomIntervalInteger(1,10);
+        alert.decoder = {...typeAlert.decoder};
+        alert.location = typeAlert.location;
+        alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
+            _user_agent: userAgent,
+            _date: formatDate(new Date(alert.timestamp), 'D/N/Y:h:m:s +0000')
+        });
+        if(typeAlert.previous_output){
+            const previousOutput = []
+            const beforeSeconds = 4
+            for(let i = beforeSeconds; i > 0; i--){
+                const beforeDate = new Date(new Date(alert.timestamp) - ((2+i)*1000));
+                previousOutput.push(
+                    interpolateAlertProps(typeAlert.full_log, alert, {
+                        _user_agent: userAgent,
+                        _date: formatDate(new Date(beforeDate), 'D/N/Y:h:m:s +0000')
+                    })
+                )
+            }
+            alert.previous_output = previousOutput.join('\n');
+        }
     }
     return alert;
 }
@@ -810,8 +868,8 @@ function formatDate(date, format){ // It could use "moment" library to format st
         'A': (d) => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
         'E': (d) => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
         'M': (d) => formatterNumber(d.getMonth() + 1, 2), // 01-12
-        'J': (d) => monthNames.long[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        'N': (d) => monthNames.short[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        'J': (d) => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        'N': (d) => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
         'Y': (d) => d.getFullYear(), // 2020
         'h': (d) => formatterNumber(d.getHours(), 2), // 00-23
         'm': (d) => formatterNumber(d.getMinutes(), 2), // 00-59
