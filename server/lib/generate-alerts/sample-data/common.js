@@ -20,24 +20,24 @@ export const Paths = ["/home/user/sample", "/tmp/sample", "/etc/sample"];
 // Agents
 export const Agents = [
   // { id: '000', name: 'master', ip: '120.17.47.10' }, 
-  { id: '001', name: 'agent-sample-1', ip: '187.54.247.68' }, 
-  { id: '002', name: 'agent-sample-2', ip: '145.80.240.15' }, 
-  { id: '003', name: 'agent-sample-3', ip: '17.45.131.90' }, 
-  { id: '004', name: 'agent-sample-4', ip: '47.204.15.21' }, 
-  { id: '005', name: 'agent-sample-5', ip: '197.17.1.4' }, 
-  { id: '006', name: 'agent-sample-6', ip: '207.45.34.78' }, 
-  { id: '007', name: 'agent-sample-7', ip: '24.273.97.14' }
+  { id: '001', name: 'RHEL7', ip: '187.54.247.68' }, 
+  { id: '002', name: 'Amazon', ip: '145.80.240.15' }, 
+  { id: '003', name: 'ip-10-0-0-180.us-west-1.compute.internal', ip: '10.0.0.180' }, 
+  { id: '004', name: 'Ubuntu', ip: '47.204.15.21' }, 
+  { id: '005', name: 'Centos', ip: '197.17.1.4' }, 
+  { id: '006', name: 'Windows', ip: '207.45.34.78' }, 
+  { id: '007', name: 'Debian', ip: '24.273.97.14' }
 ]; 
 
 // Geolocation {country_name, location: {lat, lon }, region_name}
 export const GeoLocation = [
   {
-      country_name: 'España',
+      country_name: 'Spain',
       location: {
           lat: 37.1881714,
           lon: -3.6066699
       },
-      region_name: 'Andalusia',
+      region_name: 'Andalucía',
       city_name: 'Granada'
   },
   {
