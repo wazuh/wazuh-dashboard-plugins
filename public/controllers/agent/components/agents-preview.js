@@ -49,8 +49,8 @@ export class AgentsPreview extends Component {
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
-  groupBy = function (arr) {
-    return arr.reduce(function (prev, item) {
+  groupBy = function(arr) {
+    return arr.reduce(function(prev, item) {
       if (item in prev) prev[item]++;
       else prev[item] = 1;
       return prev;
@@ -110,7 +110,7 @@ export class AgentsPreview extends Component {
       }
       this._isMount &&
         this.setState({ platforms: platformsModel, loading: false });
-    } catch (error) { }
+    } catch (error) {}
   }
 
   render() {
@@ -231,8 +231,8 @@ export class AgentsPreview extends Component {
                                 onClick={() =>
                                   this.mostActiveAgent.name
                                     ? this.props.tableProps.showAgent(
-                                      this.mostActiveAgent
-                                    )
+                                        this.mostActiveAgent
+                                      )
                                     : ''
                                 }
                               />

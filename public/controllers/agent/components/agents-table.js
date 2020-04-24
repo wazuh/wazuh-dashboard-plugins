@@ -408,7 +408,7 @@ export class AgentsTable extends Component {
       (selectedItems.length > 0 &&
         selectedItems.filter(item => item.status === 'Active').length === 0 &&
         selectedItems.filter(item => item.status === 'Disconnected').length >
-        0) ||
+          0) ||
       selectedItems.filter(item => item.outdated && item.status === 'Active')
         .length === 0
     ) {
@@ -649,17 +649,17 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-            'success',
-            `Selected agents were successfully deleted`,
-            '',
-            5000
-          )
+              'success',
+              `Selected agents were successfully deleted`,
+              '',
+              5000
+            )
           : this.showToast(
-            'warning',
-            `Failed to delete selected agents`,
-            '',
-            5000
-          );
+              'warning',
+              `Failed to delete selected agents`,
+              '',
+              5000
+            );
       })
       .catch(error => {
         this.showToast(
@@ -692,11 +692,11 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-            'success',
-            `All agents have been successfully deleted`,
-            '',
-            5000
-          )
+              'success',
+              `All agents have been successfully deleted`,
+              '',
+              5000
+            )
           : this.showToast('warning', `Failed to delete all agents`, '', 5000);
       })
       .catch(error => {
@@ -1005,7 +1005,7 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => { }
+        onClick: () => {}
       };
     };
 
@@ -1027,11 +1027,11 @@ export class AgentsTable extends Component {
     const pagination =
       totalItems > 15
         ? {
-          pageIndex: pageIndex,
-          pageSize: pageSize,
-          totalItemCount: totalItems,
-          pageSizeOptions: [15, 25, 50, 100]
-        }
+            pageIndex: pageIndex,
+            pageSize: pageSize,
+            totalItemCount: totalItems,
+            pageSizeOptions: [15, 25, 50, 100]
+          }
         : false;
     const sorting = {
       sort: {
