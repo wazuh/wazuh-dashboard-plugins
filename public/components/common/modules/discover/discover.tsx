@@ -39,7 +39,8 @@ import {
   TimeRange,
   Query,
   esFilters,
-  esQuery
+  esQuery,
+  IFieldType
 } from '../../../../../../../src/plugins/data/common';
 
 export class Discover extends Component {
@@ -106,15 +107,17 @@ export class Discover extends Component {
     this.onFiltersUpdated.bind(this);
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     this._isMount = true;
     try {
-      this.indexPattern = await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern());
+      await this.getIndexPattern(); 
       this.getAlerts();
     } catch (err) {
       console.log(err);
     }
   }
+
+ 
 
   componentWillUnmount() {
     this._isMount = false;
@@ -127,6 +130,25 @@ export class Discover extends Component {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async getIndexPattern () {
+    this.indexPattern = {...await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern())};
+    const fields:IFieldType[] = [];
+    Object.keys(this.indexPattern.fields).forEach(item => {
+      if (isNaN(item)) { fields.push(this.indexPattern.fields[item]) }
+      if (['syscheck.size_before', 'syscheck.uname_after', 'syscheck.mtime_after',
+        'syscheck.inode_before', 'syscheck.size_after', 'syscheck.gid_after',
+        'syscheck.md5_before', 'syscheck.sha256_before', 'syscheck.mtime_before',
+        'syscheck.path', 'syscheck.sha1_after', 'syscheck.changed_attributes',
+        'syscheck.gname_after', 'syscheck.uid_after', 'syscheck.perm_after',
+        'syscheck.event', 'syscheck.md5_after', 'syscheck.sha1_before',
+        'syscheck.sha256_after', 'syscheck.inode_after'
+      ].includes(this.indexPattern.fields[item].name)) {
+        fields.push(this.indexPattern.fields[item]);
+      }
+    })
+    this.indexPattern.fields = fields;
   }
 
   filtersAsArray(filters) {
