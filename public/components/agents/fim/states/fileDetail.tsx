@@ -177,14 +177,16 @@ export class FileDetails extends Component {
                   ? <EuiToolTip position="top" anchorClassName="detail-tooltip" content={value} delay="long">
                       <span className={className}>{value}</span>
                     </EuiToolTip> 
-                  : <EuiLink
-                      className={className}
-                      onClick={() => {
-                        this.props.onFilterSelect(`${item.field}=${value}`);
-                        this.props.closeFlyout();
-                      }} >
-                      {value}
-                    </EuiLink>
+                  : <EuiToolTip position="top" anchorClassName="detail-tooltip" content={`Filter by ${item.field} is ${value} in states`} >
+                        <EuiLink
+                          className={className}
+                          onClick={() => {
+                            this.props.onFilterSelect(`${item.field}=${value}`);
+                            this.props.closeFlyout();
+                          }} >
+                          {value}
+                        </EuiLink>
+                    </EuiToolTip>
               }
               description={
                 <span>

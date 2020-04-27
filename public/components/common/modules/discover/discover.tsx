@@ -39,7 +39,8 @@ import {
   TimeRange,
   Query,
   esFilters,
-  esQuery
+  esQuery,
+  IFieldType
 } from '../../../../../../../src/plugins/data/common';
 
 export class Discover extends Component {
@@ -106,15 +107,17 @@ export class Discover extends Component {
     this.onFiltersUpdated.bind(this);
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     this._isMount = true;
     try {
-      this.indexPattern = await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern());
+      await this.getIndexPattern(); 
       this.getAlerts();
     } catch (err) {
       console.log(err);
     }
   }
+
+ 
 
   componentWillUnmount() {
     this._isMount = false;
@@ -127,6 +130,19 @@ export class Discover extends Component {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async getIndexPattern () {
+    this.indexPattern = {...await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern())};
+    const fields:IFieldType[] = [];
+    Object.keys(this.indexPattern.fields).forEach(item => {
+      if (isNaN(item)) { 
+        fields.push(this.indexPattern.fields[item]);
+      } else if (this.indexPattern.fields[item].name.includes('syscheck')) {
+        fields.push(this.indexPattern.fields[item]);
+      }
+    })
+    this.indexPattern.fields = fields;
   }
 
   filtersAsArray(filters) {
@@ -352,7 +368,7 @@ export class Discover extends Component {
   render() {
     if (this.state.isLoading)
       return (<div style={{ alignSelf: "center" }}><EuiLoadingSpinner size="xl" /> </div>)
-
+    const {total, searchBarFilters, itemIdToExpandedRowMap} = this.state;
 
     const getRowProps = item => {
       const { _id } = item;
@@ -381,18 +397,17 @@ export class Discover extends Component {
     };
     const noResultsText = `No results match for this ${this.props.type === 'file' ? 'file' : 'registry'} and search criteria`
     return (
-      <div>
-        {this.state.total && (
-          <div>
-            {this.getSearchBar()}
-            <EuiFlexGroup>
+      <div
+        className='wz-discover hide-filter-controll' >
+        {this.getSearchBar()}
+        {total 
+          ? <EuiFlexGroup>
               <EuiFlexItem>
                 {pageIndexItems.length && (
                   <EuiBasicTable
-                    className="module-discover-table"
                     items={pageIndexItems}
                     itemId="_id"
-                    itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
+                    itemIdToExpandedRowMap={itemIdToExpandedRowMap}
                     isExpandable={true}
                     columns={columns}
                     rowProps={getRowProps}
@@ -403,18 +418,13 @@ export class Discover extends Component {
                 )}
               </EuiFlexItem>
             </EuiFlexGroup>
-          </div>
-        ) || (
-            <div>
-              {this.getSearchBar()}
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiSpacer size="s" />
-                  <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </div>
-          )}
+          : <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiSpacer size="s" />
+                <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+        }
       </div>);
   }
 }
