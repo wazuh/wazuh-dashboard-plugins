@@ -11,6 +11,8 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+
 import {
     EuiFlexItem,
     EuiCard,
@@ -28,13 +30,19 @@ import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
+interface ISampleDataCategoryState{
+  exists: boolean
+  addDataLoading: boolean
+  removeDataLoading: boolean
+}
 export default class WzSampleData extends Component {
   categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
-  state: {[name: string]: {
-    exists: boolean
-    addDataLoading: boolean
-    removeDataLoading: boolean
-  }}
+  state: {
+    adminMode: boolean
+    security: ISampleDataCategoryState
+    'auditing-policy-monitoring': ISampleDataCategoryState
+    'threat-detection': ISampleDataCategoryState
+  }
   generateAlertsParams: any
   constructor(props){
     super(props);
@@ -59,9 +67,11 @@ export default class WzSampleData extends Component {
         categorySampleAlertsIndex: 'threat-detection'
       }
     ];
-    this.state = {};
+    this.state = {
+      adminMode: false
+    };
     this.categories.forEach(category => {
-      this.state[`${category.categorySampleAlertsIndex}`] = {
+      this.state[category.categorySampleAlertsIndex] = {
         exists: false,
         addDataLoading: false,
         removeDataLoading: false
@@ -69,6 +79,15 @@ export default class WzSampleData extends Component {
     });
   }
   async componentDidMount(){
+    // Check adminMode
+    try{
+      const adminMode = await checkAdminMode();
+      this.setState({ adminMode });
+      if(!adminMode){
+        window.location.href = `#/`;
+      }
+    }catch(error){}
+
     // Check if sample data for each category was added
     try{
       const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
@@ -152,6 +171,7 @@ export default class WzSampleData extends Component {
   }
   renderCard(category){
     const { addDataLoading, exists, removeDataLoading } = this.state[category.categorySampleAlertsIndex];
+    const { adminMode } = this.state;
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard
@@ -166,6 +186,7 @@ export default class WzSampleData extends Component {
                 {exists && (
                   <EuiButton
                   isLoading={removeDataLoading}
+                  isDisabled={!adminMode}
                   color='danger'
                   onClick={() => this.removeSampleData(category)}>
                     {removeDataLoading && 'Removing data' || 'Remove data'}
@@ -173,6 +194,7 @@ export default class WzSampleData extends Component {
                 ) || (
                   <EuiButton
                     isLoading={addDataLoading}
+                    isDisabled={!adminMode}
                     onClick={() => this.addSampleData(category)}>
                       {addDataLoading && 'Adding data' || 'Add data'}
                   </EuiButton>

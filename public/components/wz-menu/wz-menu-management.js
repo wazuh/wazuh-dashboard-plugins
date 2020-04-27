@@ -13,13 +13,15 @@ import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
+import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 class WzMenuManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
       // TODO: Fix the selected section
-      selectedItemName: null
+      selectedItemName: null,
+      adminMode: false
     };
 
     this.managementSections = {
@@ -56,7 +58,12 @@ class WzMenuManagement extends Component {
     }
   }
 
-  componentDidMount() {}
+  async componentDidMount() {
+    try{
+      const adminMode = await checkAdminMode();
+      this.setState({ adminMode });
+    }catch(error){}
+  }
 
   clickMenuItem = section => {
     this.props.closePopover();
@@ -85,7 +92,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.lists),
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
-          this.createItem(this.managementSections.sample_data)
+          ...(this.state.adminMode ? [this.createItem(this.managementSections.sample_data)] : [])
         ],
       })
     ];

@@ -26,12 +26,15 @@ import store from '../../../redux/store';
 import { updateManagementSection } from '../../../redux/actions/managementActions';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { connect } from 'react-redux';
+import { checkAdminMode } from '../../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 class ManagementWelcome extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      adminMode: false
+    };
   }
 
   setGlobalBreadcrumb() {
@@ -39,8 +42,12 @@ class ManagementWelcome extends Component {
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setGlobalBreadcrumb();
+    try{
+      const adminMode = await checkAdminMode();
+      this.setState({ adminMode });
+    }catch(error){}
   }
 
   switchSection(section) {
@@ -137,16 +144,18 @@ class ManagementWelcome extends Component {
                       description="Manage your Wazuh cluster configuration."
                     />
                   </EuiFlexItem>
-                  <EuiFlexItem>
-                    <EuiCard
-                      layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
-                      title="Sample data"
-                      onClick={() => this.switchSection('sample_data')}
-                      description="Add sample data to modules."
-                    />
-                  </EuiFlexItem>
+                  {this.state.adminMode ? (
+                    <EuiFlexItem>
+                      <EuiCard
+                        layout="horizontal"
+                        className='homSynopsis__card'
+                        icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
+                        title="Sample data"
+                        onClick={() => this.switchSection('sample_data')}
+                        description="Add sample data to modules."
+                      />
+                    </EuiFlexItem>
+                  ) : (<EuiFlexItem/>)}
                 </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>
