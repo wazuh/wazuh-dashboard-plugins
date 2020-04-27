@@ -162,10 +162,11 @@ export class FileDetails extends Component {
   }
 
   getDetails() {
+    const { view } = this.props
     const columns = this.props.type === 'file' ? this.details() : this.registryDetails();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
-      var link = item.link || false;
+      var link = (item.link && view !== 'events') || false;
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent.agentPlatform !== 'windows')){
         let className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
         className += item.field === 'perm' ? " detail-value-perm" : "";
@@ -173,7 +174,7 @@ export class FileDetails extends Component {
           <EuiFlexItem key={idx}>
             <EuiStat
               title={
-                  !link 
+                  !link
                   ? <EuiToolTip position="top" anchorClassName="detail-tooltip" content={value} delay="long">
                       <span className={className}>{value}</span>
                     </EuiToolTip> 
