@@ -89,7 +89,7 @@ export class Discover extends Component {
       pageIndex: 0,
       pageSize: 10,
       sortField: 'timestamp',
-      sortDirection: 'asc',
+      sortDirection: 'desc',
       isLoading: false,
       requestFilters: {},
       requestSize: 500,

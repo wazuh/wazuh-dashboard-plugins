@@ -115,6 +115,17 @@ export class RowDetails extends Component {
     return child;
   }
 
+  getFilterLink = (key, value) => {
+    const filter = {};
+    filter[key] = value;
+    return (
+      <EuiToolTip position="top" content={`Filter by ${key} : ${value}`}>
+        <EuiLink onClick={async () => this.props.addFilter(filter)}>
+          &nbsp;{value}
+        </EuiLink>
+      </EuiToolTip>)
+  }
+
   renderRows() {
     const columns = [];
     const syscheckPaths = this.propertiesToArray(this.props.item.syscheck);
@@ -123,15 +134,16 @@ export class RowDetails extends Component {
       const key = "syscheck." + item;
       child['title'] = key;
       const value = this.getChildFromPath(this.props.item.syscheck, item);
-      const filter = {};
-      filter[key] = value;
-      child['description'] = (
-        <EuiToolTip position="top" content={`Filter by ${key} : ${value}`}>
-          <EuiLink onClick={async () => this.props.addFilter(filter)}>
-            &nbsp;{value}
-          </EuiLink>
-        </EuiToolTip>
-      )
+      if(Array.isArray(value)){
+        child['description'] = value.map(item => {
+          return this.getFilterLink(key,item);
+        })
+      }else{
+        child['description'] = (
+          this.getFilterLink(key,value)
+        )
+
+      }
       columns.push(child);
     });
     if (!columns.length) {
