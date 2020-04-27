@@ -145,7 +145,7 @@ export class AgentsTable extends Component {
     const { pageIndex, pageSize, search } = this.state;
 
     const filter = {
-      offset: pageIndex * pageSize,
+      offset: (pageIndex * pageSize) || 0,
       limit: pageSize,
       q: this.buildQFilter(),
       sort: this.buildSortFilter()
