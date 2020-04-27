@@ -794,14 +794,14 @@ export const visualizations = {
         description: 'Last fails',
         color: 'primary'
       },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark',
-        description: 'Last unknown',
-        color: 'secondary'
-      },
+      // {
+      //   id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark',
+      //   description: 'Last scan benchmark',
+      //   color: 'secondary'
+      // },
       {
         id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown',
-        description: 'Last scan benchmark',
+        description: 'Last unknown',
         color: 'subdued'
       }
     ],
