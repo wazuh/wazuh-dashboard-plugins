@@ -11,7 +11,12 @@
  */
 
 // Audit
+
+import { randomArrayItem } from './common';
+
 export const fileName = ["/etc/samplefile", "/etc/sample/file", "/var/sample"];
+const ruleId = ['80790', '80784', '80781', '80791'];
+const auditType = ["SYSCALL", "EXECVE", "CWD", "NORMAL", "PATH", "PROCTITLE"];
 
 export const dataAudit = [{
     data: {
@@ -23,9 +28,11 @@ export const dataAudit = [{
         command: 'sudo',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 12,
       mail: false,
       level: 3,
@@ -49,9 +56,11 @@ export const dataAudit = [{
         command: 'ssh',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 3,
       mail: false,
       level: 3,
@@ -75,9 +84,11 @@ export const dataAudit = [{
         command: 'cron',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 1,
       mail: false,
       level: 3,
@@ -101,9 +112,11 @@ export const dataAudit = [{
         command: 'ls',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 6,
       mail: false,
       level: 3,
@@ -127,9 +140,11 @@ export const dataAudit = [{
         command: 'consoletype',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 16,
       mail: false,
       level: 3,
@@ -153,9 +168,11 @@ export const dataAudit = [{
         command: 'bash',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 1,
       mail: false,
       level: 3,
@@ -179,9 +196,11 @@ export const dataAudit = [{
         command: 'id',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 11,
       mail: false,
       level: 3,
@@ -205,9 +224,11 @@ export const dataAudit = [{
         command: 'grep',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 13,
       mail: false,
       level: 3,
@@ -231,9 +252,11 @@ export const dataAudit = [{
         command: 'hostname',
         success: 'yes',
         cwd: "/home/wazuh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 13,
       mail: false,
       level: 3,
@@ -257,9 +280,11 @@ export const dataAudit = [{
         command: 'sh',
         success: 'yes',
         cwd: "/home/sh",
+        type: randomArrayItem(auditType),
       },
     },
     rule: {
+      id: randomArrayItem(ruleId),
       firedtimes: 17,
       mail: false,
       level: 3,
@@ -273,31 +298,32 @@ export const dataAudit = [{
       ]
     },
   },
-//   {
-//     data: {
-//       audit: {
-//         res: "1",
-//         id: "1002556",
-//         type: "CONFIG_CHANGE",
-//         list: "4",
-//         key: "wazuh_fim"
-//       },
-//     },
-//     rule: {
-//       firedtimes: 10,
-//       mail: false,
-//       level: 3,
-//       description: "Auditd: Configuration changed",
-//       groups: [
-//         "audit",
-//         "audit_configuration"
-//       ],
-//       gpg13: [
-//         "10.1"
-//       ],
-//       gdpr: [
-//         "IV_30.1.g"
-//       ]
-//     },
-//   },
+  //   {
+  //     data: {
+  //       audit: {
+  //         res: "1",
+  //         id: "1002556",
+  //         type: "CONFIG_CHANGE",
+  //         list: "4",
+  //         key: "wazuh_fim"
+  //       },
+  //     },
+  //     rule: {
+  // id: randomArrayItem(ruleId),
+  //       firedtimes: 10,
+  //       mail: false,
+  //       level: 3,
+  //       description: "Auditd: Configuration changed",
+  //       groups: [
+  //         "audit",
+  //         "audit_configuration"
+  //       ],
+  //       gpg13: [
+  //         "10.1"
+  //       ],
+  //       gdpr: [
+  //         "IV_30.1.g"
+  //       ]
+  //     },
+  //   },
 ]

@@ -11,7 +11,7 @@
  */
 
 // General
-import { IPs, Users, Ports, Paths, Win_Hostnames, GeoLocation, Agents, randomElements } from './sample-data/common';
+import { IPs, Users, Ports, Paths, Win_Hostnames, GeoLocation, Agents, randomElements, randomArrayItem } from './sample-data/common';
 import { PCI_DSS, GDPR, HIPAA, GPG13, NIST_800_53 } from './sample-data/regulatory-compliance';
 
 import * as Audit from './sample-data/audit';
@@ -37,15 +37,6 @@ const alertIDMax = 6000;
 const ruleDescription = ["Sample alert 1", "Sample alert 2", "Sample alert 3", "Sample alert 4", "Sample alert 5"];
 const ruleMaxLevel = 14;
 const ruleMaxFiredtimes = 10;
-
-/**
- * Get a random element of an array
- * @param {[]} array - Array to get a randomized element
- * @returns {any} - Element randomized
- */
-function randomArrayItem(array) {
-    return array[Math.floor(array.length * Math.random())];
-}
 
 /**
  * Generate a alert
