@@ -136,15 +136,9 @@ export class Discover extends Component {
     this.indexPattern = {...await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern())};
     const fields:IFieldType[] = [];
     Object.keys(this.indexPattern.fields).forEach(item => {
-      if (isNaN(item)) { fields.push(this.indexPattern.fields[item]) }
-      if (['syscheck.size_before', 'syscheck.uname_after', 'syscheck.mtime_after',
-        'syscheck.inode_before', 'syscheck.size_after', 'syscheck.gid_after',
-        'syscheck.md5_before', 'syscheck.sha256_before', 'syscheck.mtime_before',
-        'syscheck.path', 'syscheck.sha1_after', 'syscheck.changed_attributes',
-        'syscheck.gname_after', 'syscheck.uid_after', 'syscheck.perm_after',
-        'syscheck.event', 'syscheck.md5_after', 'syscheck.sha1_before',
-        'syscheck.sha256_after', 'syscheck.inode_after'
-      ].includes(this.indexPattern.fields[item].name)) {
+      if (isNaN(item)) { 
+        fields.push(this.indexPattern.fields[item]);
+      } else if (this.indexPattern.fields[item].name.includes('syscheck')) {
         fields.push(this.indexPattern.fields[item]);
       }
     })
