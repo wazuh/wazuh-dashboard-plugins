@@ -217,10 +217,11 @@ export class RowDetails extends Component {
    */
   renderDetails(details) {
     const detailsToRender: Array<JSX.Element> = [];
+    const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-        <li key={key}><b>{key}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
+        <li key={key} style={{marginTop: 10}}><b>{capitalize(key)}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
       );
     });
     return (
