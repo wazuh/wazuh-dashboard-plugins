@@ -406,7 +406,7 @@ function generateAlert(params) {
                 alert.rule = IntegrityMonitoring.regulatory[1];
                 alert.syscheck.mtime_before = new Date(alert.syscheck.mtime_after.getTime() - 1000 * 60);
                 alert.syscheck.inode_before = randomIntervalInteger(0,100000);
-                alert.syscheck.sha1_afeer = randomElements(40, 'abcdef0123456789');
+                alert.syscheck.sha1_after = randomElements(40, 'abcdef0123456789');
                 alert.syscheck.changed_attributes = [randomArrayItem(IntegrityMonitoring.attributes)];
                 alert.syscheck.md5_after = randomElements(32, 'abcdef0123456789');
                 alert.syscheck.sha256_after = randomElements(60, 'abcdef0123456789');
@@ -414,7 +414,7 @@ function generateAlert(params) {
             case "deleted":
                 alert.rule = IntegrityMonitoring.regulatory[2];
                 alert.syscheck.tags = [randomArrayItem(IntegrityMonitoring.tags)];
-                alert.syscheck.sha1_afeer = randomElements(40, 'abcdef0123456789');
+                alert.syscheck.sha1_after = randomElements(40, 'abcdef0123456789');
                 alert.syscheck.audit = {
                     "process": {
                         "name": randomArrayItem(Paths),
