@@ -39,7 +39,6 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
-import { FormattedMessage } from '@kbn/i18n/target/types/react';
 
 export class States extends Component {
   _isMount = false;
