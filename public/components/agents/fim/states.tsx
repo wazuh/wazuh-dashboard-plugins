@@ -39,6 +39,7 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
+import { FormattedMessage } from '@kbn/i18n/target/types/react';
 
 export class States extends Component {
   _isMount = false;
@@ -203,11 +204,16 @@ export class States extends Component {
     });
   };
   async downloadCsv() {
+    const { filters } = this.state;
     try {
+      const formatedFilters = Object.keys(filters).map(key => ({name: key, value: filters[key]}));
       this.showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
         '/syscheck/' + this.props.agent.id,
-        [{ name: 'type', value: this.state.selectedTabId === 'files' ? 'file' : this.state.selectedTabId }],
+        [
+          { name: 'type', value: this.state.selectedTabId === 'files' ? 'file' : this.state.selectedTabId },
+          ...formatedFilters
+        ],
         `fim-${this.state.selectedTabId}`
       );
     } catch (error) {
