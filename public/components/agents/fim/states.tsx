@@ -54,7 +54,7 @@ export class States extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: this.getStoreFilters(props),
+      filters: [],
       selectedTabId: 'files',
       totalItemsFile: 0,
       totalItemsRegistry: 0,
@@ -73,13 +73,14 @@ export class States extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { selectedTabId } = this.state;
-    if (selectedTabId !== prevState.selectedTabId) {
-      const filters = this.getStoreFilters(this.props);
-      this.setState({ filters });
-    }
-  }
+  // Do not load the localStorage filters when changing tabs
+  // componentDidUpdate(prevProps, prevState) {
+  //   const { selectedTabId } = this.state;
+  //   if (selectedTabId !== prevState.selectedTabId) {
+  //     const filters = this.getStoreFilters(this.props);
+  //     this.setState({ filters });
+  //   }
+  // }
 
   componentWillUnmount() {
     this._isMount = false;
@@ -202,11 +203,16 @@ export class States extends Component {
     });
   };
   async downloadCsv() {
+    const { filters } = this.state;
     try {
+      const formatedFilters = Object.keys(filters).map(key => ({name: key, value: filters[key]}));
       this.showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
         '/syscheck/' + this.props.agent.id,
-        [{ name: 'type', value: this.state.selectedTabId === 'files' ? 'file' : this.state.selectedTabId }],
+        [
+          { name: 'type', value: this.state.selectedTabId === 'files' ? 'file' : this.state.selectedTabId },
+          ...formatedFilters
+        ],
         `fim-${this.state.selectedTabId}`
       );
     } catch (error) {

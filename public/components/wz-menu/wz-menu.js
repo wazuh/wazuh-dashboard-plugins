@@ -233,6 +233,7 @@ class WzMenu extends Component {
       AppState.setCurrentAPI(
         JSON.stringify({ name: apiData[0].cluster_info.manager, id: apiId })
       );
+      this.switchMenuOpened();
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
       }

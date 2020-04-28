@@ -67,7 +67,7 @@ class WzConfigurationOpenScapEvaluations extends Component {
             title="Evaluations"
             description="Scans executed according to specific security policies and their profiles"
             currentConfig={wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 310 : 410}
+            minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
           >
             <EuiBasicTable

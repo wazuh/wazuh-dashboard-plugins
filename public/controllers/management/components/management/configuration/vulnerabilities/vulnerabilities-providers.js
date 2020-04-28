@@ -113,7 +113,7 @@ class WzConfigurationVulnerabilitiesProviders extends Component {
               title="Providers"
               description="List of OVAL databases providers to check for vulnerability scans"
               currentConfig={wodleConfig}
-              minusHeight={310}
+              minusHeight={320}
               helpLinks={helpLinks}
             >
               <EuiBasicTable

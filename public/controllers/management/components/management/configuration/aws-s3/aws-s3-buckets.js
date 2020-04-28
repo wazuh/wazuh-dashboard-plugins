@@ -62,7 +62,7 @@ class WzConfigurationAmazonS3Buckets extends Component {
               title="Main settings"
               description="Common settings applied to all Amazon S3 buckets"
               currentConfig={wodleConfig}
-              minusHeight={310}
+              minusHeight={320}
               helpLinks={helpLinks}
             >
               <WzConfigurationListSelector

@@ -57,7 +57,7 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
             title="Ignored files and directories"
             description="These files and directories are ignored from the rootcheck scan"
             currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 310 : 410}
+            minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
           >
             {(currentConfig['syscheck-rootcheck'].rootcheck.ignore || {})

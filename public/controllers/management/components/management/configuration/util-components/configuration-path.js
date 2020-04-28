@@ -82,7 +82,7 @@ class WzConfigurationPath extends Component {
             </EuiFlexItem>
           )}
         </EuiFlexGroup>
-        <EuiSpacer size="s" />
+        <EuiSpacer size="l" />
       </Fragment>
     );
   }

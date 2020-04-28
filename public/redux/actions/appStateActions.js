@@ -53,3 +53,18 @@ export const updateCurrentTab = currentTab => {
     currentTab: currentTab
   };
 };
+
+
+/**
+ * Updates extensions in the appState store
+ * @param extensions
+ */
+export const updateExtensions = (id, extensions) => {
+  const tmpExtensions = {};
+  tmpExtensions[id] = extensions;
+  return {
+    type: 'UPDATE_EXTENSIONS',
+    extensions: tmpExtensions
+  };
+};
+

@@ -25,6 +25,9 @@ import {
   EuiToolTip
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
+// @ts-ignore
+import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { ModulesHelper } from '../../../common/modules/modules-helper'
 
 export class FileDetails extends Component {
 
@@ -158,7 +161,21 @@ export class FileDetails extends Component {
       "query": { "match_phrase": { "syscheck.path": this.props.currentFile.file } },
       "$state": { "store": "appState" }
     }];
-    this.props.loadEventsWithFilters(filters);
+    this.props.onSelectedTabChanged('events');
+    this.checkFilterManager(filters);
+  }
+
+  async checkFilterManager(filters) {
+    const { filterManager } = getServices();
+    if (filterManager.filters && filterManager.filters.length) {
+      filterManager.addFilters([filters]);
+      const scope = await ModulesHelper.getDiscoverScope();
+      scope.updateQueryAndFetch({ query: null });
+    } else {
+      setTimeout(() => {
+        this.checkFilterManager(filters);
+      }, 200);
+    }
   }
 
   getDetails() {
