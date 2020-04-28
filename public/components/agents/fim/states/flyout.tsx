@@ -78,6 +78,7 @@ export class FlyoutDetail extends Component {
         {this.state.currentFile && !this.state.isLoading &&
           <EuiFlyoutBody className="flyout-body" >
             <FileDetails
+              showViewInEvents={true}
               currentFile={this.state.currentFile}
               {...this.props}
               implicitFilters={[{ 'rule.groups': "syscheck" },
