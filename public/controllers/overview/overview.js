@@ -121,7 +121,6 @@ export class OverviewController {
   async switchSubtab(subtab) {
     try {
       this.tabVisualizations.clearDeadVis();
-      this.visFactoryService.clear();
       this.$location.search('tabView', subtab);
       const previousTab = this.currentOverviewSectionProps.currentTab;
 
@@ -165,6 +164,7 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.overviewModuleReady = false;
+    this.visFactoryService.clear();
     this.tabVisualizations.setTab(newTab);
 
     this.showingMitreTable = false;
