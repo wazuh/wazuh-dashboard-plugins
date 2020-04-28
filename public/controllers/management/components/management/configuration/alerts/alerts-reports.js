@@ -85,7 +85,7 @@ class WzConfigurationAlertsReports extends Component {
             <WzConfigurationSettingsTabSelector
               title="Main settings"
               description="Daily reports about alerts"
-              minusHeight={310}
+              minusHeight={320}
               currentConfig={currentConfig}
               helpLinks={helpLinks}
             >

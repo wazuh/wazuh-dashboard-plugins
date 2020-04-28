@@ -106,7 +106,7 @@ class WzConfigurationAlertsEmailAlerts extends Component {
             title="Main settings"
             description="Granular email alert options"
             currentConfig={currentConfig}
-            minusHeight={310}
+            minusHeight={320}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsListSelector
