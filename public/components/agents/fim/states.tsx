@@ -73,13 +73,14 @@ export class States extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { selectedTabId } = this.state;
-    if (selectedTabId !== prevState.selectedTabId) {
-      const filters = this.getStoreFilters(this.props);
-      this.setState({ filters });
-    }
-  }
+  // Do not load the localStorage filters when changing tabs
+  // componentDidUpdate(prevProps, prevState) {
+  //   const { selectedTabId } = this.state;
+  //   if (selectedTabId !== prevState.selectedTabId) {
+  //     const filters = this.getStoreFilters(this.props);
+  //     this.setState({ filters });
+  //   }
+  // }
 
   componentWillUnmount() {
     this._isMount = false;
