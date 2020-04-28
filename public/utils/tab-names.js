@@ -24,6 +24,7 @@ export const TabNames = {
   hipaa: 'HIPAA',
   nist: 'NIST 800-53',
   aws: 'Amazon AWS',
+  gcp: 'Google Cloud Platform',
   virustotal: 'VirusTotal',
   configuration: 'Configuration',
   syscollector: 'Inventory data',

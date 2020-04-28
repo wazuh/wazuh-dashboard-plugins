@@ -53,6 +53,7 @@ export class TabVisualizations {
       hipaa: 8,
       nist: 7,
       aws: 8,
+      gcp: 1,
       virustotal: 5,
       osquery: 6,
       sca: 8,
