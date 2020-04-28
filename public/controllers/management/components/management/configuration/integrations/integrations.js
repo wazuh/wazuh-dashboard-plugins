@@ -143,7 +143,7 @@ class WzConfigurationIntegrations extends Component {
               <WzViewSelectorSwitch view="json">
                 <WzConfigurationSettingsHeaderViewer
                   mode="json"
-                  view={view}
+                  viewSelected={view}
                   settings={() => this.changeView('')}
                   json={() => this.changeView('json')}
                   xml={() => this.changeView('xml')}
@@ -158,7 +158,7 @@ class WzConfigurationIntegrations extends Component {
               <WzViewSelectorSwitch view="xml">
                 <WzConfigurationSettingsHeaderViewer
                   mode="xml"
-                  view={view}
+                  viewSelected={view}
                   settings={() => this.changeView('')}
                   json={() => this.changeView('json')}
                   xml={() => this.changeView('xml')}

@@ -21,7 +21,7 @@ import {
   updateClusterNodeSelected,
   updateLoadingStatus
 } from '../../../../../../redux/actions/configurationActions';
-import { clusterNodes } from '../utils/wz-fetch';
+import { clusterNodes, clusterReq } from '../utils/wz-fetch';
 
 class WzRefreshClusterInfoButton extends Component {
   constructor(props) {
@@ -30,21 +30,30 @@ class WzRefreshClusterInfoButton extends Component {
   async checkIfClusterOrManager() {
     try {
       // in case which enable/disable cluster configuration, update Redux Store
-      // try if it is a cluster
-      this.props.updateLoadingStatus(true);
-      const nodes = await clusterNodes();
-      // set cluster nodes in Redux Store
-      this.props.updateClusterNodes(nodes.data.data.items);
-      // set cluster node selected in Redux Store
-      const existsClusterCurrentNodeSelected = nodes.data.data.items.find(
-        node => node.name === this.props.clusterNodeSelected
-      );
-      this.props.updateClusterNodeSelected(
-        existsClusterCurrentNodeSelected
-          ? existsClusterCurrentNodeSelected.name
-          : nodes.data.data.items.find(node => node.type === 'master').name
-      );
-      this.timer = setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
+      const cluster = await clusterReq();
+      if(cluster.data.data.enabled === 'yes' && cluster.data.data.running === 'yes'){
+        // try if it is a cluster
+        this.props.updateLoadingStatus(true);
+        const nodes = await clusterNodes();
+        // set cluster nodes in Redux Store
+        this.props.updateClusterNodes(nodes.data.data.items);
+        // set cluster node selected in Redux Store
+        const existsClusterCurrentNodeSelected = nodes.data.data.items.find(
+          node => node.name === this.props.clusterNodeSelected
+        );
+        this.props.updateClusterNodeSelected(
+          existsClusterCurrentNodeSelected
+            ? existsClusterCurrentNodeSelected.name
+            : nodes.data.data.items.find(node => node.type === 'master').name
+        );
+        this.timer = setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
+      }else{
+        // do nothing if it isn't a cluster
+        this.props.updateClusterNodes(false);
+        this.props.updateClusterNodeSelected(false);
+        this.props.updateLoadingStatus(true);
+        this.timer = setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
+      }
     } catch (error) {
       // do nothing if it isn't a cluster
       this.props.updateClusterNodes(false);

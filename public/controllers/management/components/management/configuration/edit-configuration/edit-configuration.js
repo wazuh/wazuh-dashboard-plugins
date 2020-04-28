@@ -46,7 +46,8 @@ import {
   restartNodeSelected,
   saveFileManager,
   saveFileCluster,
-  clusterNodes
+  clusterNodes,
+  clusterReq
 } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
 
@@ -168,25 +169,38 @@ class WzEditConfiguration extends Component {
   async checkIfClusterOrManager() {
     try {
       // in case which enable/disable cluster configuration, update Redux Store
-      // try if it is a cluster
-      const nodes = await clusterNodes();
-      // set cluster nodes in Redux Store
-      this.props.updateClusterNodes(nodes.data.data.items);
-      // set cluster node selected in Redux Store
-      const existsClusterCurrentNodeSelected = nodes.data.data.items.find(
-        node => node.name === this.props.clusterNodeSelected
-      );
-      this.props.updateClusterNodeSelected(
-        existsClusterCurrentNodeSelected
-          ? existsClusterCurrentNodeSelected.name
-          : nodes.data.data.items.find(node => node.type === 'master').name
-      );
-      this.props.updateConfigurationSection(
-        'edit-configuration',
-        'Cluster configuration'
-      );
-      this.props.updateLoadingStatus(true);
-      setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
+      const clusterStatus = await clusterReq();
+      if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
+        // try if it is a cluster
+        const nodes = await clusterNodes();
+        // set cluster nodes in Redux Store
+        this.props.updateClusterNodes(nodes.data.data.items);
+        // set cluster node selected in Redux Store
+        const existsClusterCurrentNodeSelected = nodes.data.data.items.find(
+          node => node.name === this.props.clusterNodeSelected
+        );
+        this.props.updateClusterNodeSelected(
+          existsClusterCurrentNodeSelected
+            ? existsClusterCurrentNodeSelected.name
+            : nodes.data.data.items.find(node => node.type === 'master').name
+        );
+        this.props.updateConfigurationSection(
+          'edit-configuration',
+          'Cluster configuration'
+        );
+        this.props.updateLoadingStatus(true);
+        setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
+      }else{
+        // do nothing if it isn't a cluster
+        this.props.updateClusterNodes(false);
+        this.props.updateClusterNodeSelected(false);
+        this.props.updateConfigurationSection(
+          'edit-configuration',
+          'Manager configuration'
+        );
+        this.props.updateLoadingStatus(true);
+        setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
+      }
     } catch (error) {
       // do nothing if it isn't a cluster
       this.props.updateClusterNodes(false);

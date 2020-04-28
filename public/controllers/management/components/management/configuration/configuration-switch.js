@@ -49,11 +49,12 @@ import WzConfigurationPath from './util-components/configuration-path';
 import WzToastProvider from './util-providers/toast-p';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 
-import { clusterNodes, checkAdminMode } from './utils/wz-fetch';
+import { clusterNodes, checkAdminMode, clusterReq } from './utils/wz-fetch';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
-  updateAdminMode
+  updateAdminMode,
+  updateLoadingStatus
 } from '../../../../../redux/actions/configurationActions';
 import { connect } from 'react-redux';
 
@@ -66,6 +67,7 @@ import {
 } from '@elastic/eui';
 
 import { agentIsSynchronized } from './utils/wz-fetch';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -73,12 +75,15 @@ class WzConfigurationSwitch extends Component {
     this.state = {
       view: '',
       viewProps: {},
-      agentSynchronized: undefined
+      agentSynchronized: undefined,
+      masterNodeInfo: undefined,
+      loadingOverview: this.props.agent.id === '000'
     };
   }
   componentWillUnmount() {
     this.props.updateClusterNodes(false);
     this.props.updateClusterNodeSelected(false);
+    this.props.updateLoadingStatus(false);
   }
   updateConfigurationSection = (view, title, description) => {
     this.setState({ view, viewProps: { title: title, description } });
@@ -108,17 +113,36 @@ class WzConfigurationSwitch extends Component {
     } else {
       try {
         // try if it is a cluster
-        const nodes = await clusterNodes();
-        // set cluster nodes in Redux Store
-        this.props.updateClusterNodes(nodes.data.data.items);
-        // set cluster node selected in Redux Store
-        this.props.updateClusterNodeSelected(
-          nodes.data.data.items.find(node => node.type === 'master').name
-        );
+        const clusterStatus = await clusterReq();
+        if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
+          const nodes = await clusterNodes();
+          // set cluster nodes in Redux Store
+          this.props.updateClusterNodes(nodes.data.data.items);
+          // set cluster node selected in Redux Store
+          this.props.updateClusterNodeSelected(
+            nodes.data.data.items.find(node => node.type === 'master').name
+          );
+        }else{
+          // do nothing if it isn't a cluster
+          this.props.updateClusterNodes(false);
+          this.props.updateClusterNodeSelected(false);
+        }
       } catch (error) {
         // do nothing if it isn't a cluster
         this.props.updateClusterNodes(false);
         this.props.updateClusterNodeSelected(false);
+      }
+      // If manager/cluster require agent platform info to filter sections in overview. It isn't coming from props for Management/Configuration
+      try{
+        this.props.updateLoadingStatus(true);
+        const masterNodeInfo = await WzRequest.apiReq('GET', '/agents/000', {});
+        this.setState({
+          masterNodeInfo: masterNodeInfo.data.data
+        });
+        this.props.updateLoadingStatus(false);
+        this.setState({ loadingOverview: false })
+      }catch(error){
+        this.props.updateLoadingStatus(false);
       }
     }
   }
@@ -126,7 +150,8 @@ class WzConfigurationSwitch extends Component {
     const {
       view,
       viewProps: { title, description, badge },
-      agentSynchronized
+      agentSynchronized,
+      masterNodeInfo
     } = this.state;
     const { agent, goGroups, loadingStatus } = this.props; // TODO: goGroups and exportConfiguration is used for Manager and depends of AngularJS
     return (
@@ -161,13 +186,13 @@ class WzConfigurationSwitch extends Component {
                 )}
               </WzConfigurationPath>
             )}
-            {view === '' && (
-              <WzConfigurationOverview
-                agent={agent}
-                agentSynchronized={agentSynchronized}
-                exportConfiguration={this.props.exportConfiguration}
-                updateConfigurationSection={this.updateConfigurationSection}
-              />
+            {view === '' && !this.state.loadingOverview && (
+                <WzConfigurationOverview
+                  agent={masterNodeInfo || agent}
+                  agentSynchronized={agentSynchronized}
+                  exportConfiguration={this.props.exportConfiguration}
+                  updateConfigurationSection={this.updateConfigurationSection}
+                />
             )}
             {view === 'edit-configuration' && (
               <WzConfigurationEditConfiguration
@@ -388,7 +413,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: clusterNodeSelected =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
+  updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode)),
+  updateLoadingStatus: loadingStatus => dispatch(updateLoadingStatus(loadingStatus))
 });
 
 export default connect(

@@ -31,7 +31,7 @@ class WzConfigurationClusterSelect extends Component {
     this.props.updateLoadingStatus(true);
     this.timer = setTimeout(() => {
       this.props.updateLoadingStatus(false);
-    }, 0); // trick: This unmounts hoc components and mount again it with new cluser node selected
+    }, 1); // trick: This unmounts hoc components and mount again it with new cluser node selected
   };
   componentWillUnmount() {
     if (this.timer) {
