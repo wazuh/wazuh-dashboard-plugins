@@ -99,7 +99,6 @@ export class ErrorHandler {
     const message = this.extractMessage(error);
     const messageIsString = typeof message === 'string';
     if (messageIsString && message.includes('ERROR3099')) {
-      
       const updateNotReadyYet = updateWazuhNotReadyYet('Wazuh not ready yet.');
       store.dispatch(updateNotReadyYet);
 

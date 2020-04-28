@@ -18,13 +18,12 @@
  * @param {*} genericReq Wazuh module for doing generic requests to our backend.
  * @param {*} $location Angular.js library for URL and paths manipulation.
  */
-import { AppState } from "../../react-services/app-state";
-import { GenericRequest } from "../../react-services/generic-request";
+import { AppState } from '../../react-services/app-state';
+import { GenericRequest } from '../../react-services/generic-request';
 
 export function apiCount($q, $location) {
   const deferred = $q.defer();
-  GenericRequest
-    .request('GET', '/hosts/apis')
+  GenericRequest.request('GET', '/hosts/apis')
     .then(async data => {
       if (!data || !data.data || !data.data.length)
         throw new Error('No API entries found');

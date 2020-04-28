@@ -52,7 +52,7 @@ app.directive('wzTable', function() {
       errorHandler,
       wzTableFilter,
       $window,
-      $sce,
+      $sce
     ) {
       const rulesetHandler = RulesetHandler;
       const timeService = TimeService;
@@ -145,14 +145,7 @@ app.directive('wzTable', function() {
        * Common functions
        */
       $scope.clickAction = (item, openAction = false) =>
-        clickAction(
-          item,
-          openAction,
-          instance,
-          shareAgent,
-          $location,
-          $scope
-        );
+        clickAction(item, openAction, instance, shareAgent, $location, $scope);
 
       const fetch = async (options = {}) => {
         try {

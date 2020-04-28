@@ -9,9 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "../react-services/app-state";
-import { GenericRequest } from "../react-services/generic-request";
-import { ShareAgent } from "../factories/share-agent";
+import { AppState } from '../react-services/app-state';
+import { GenericRequest } from '../react-services/generic-request';
+import { ShareAgent } from '../factories/share-agent';
+import { ModulesHelper } from '../components/common/modules/modules-helper';
 
 export class CommonData {
   /**
@@ -22,13 +23,7 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor(
-    $rootScope,
-    $timeout,
-    errorHandler,
-    $location,
-    globalState
-  ) {
+  constructor($rootScope, $timeout, errorHandler, $location, globalState) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
@@ -49,7 +44,7 @@ export class CommonData {
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
-      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker','mitre'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
     };
   }
@@ -127,7 +122,7 @@ export class CommonData {
    * @param {*} localChange
    * @param {*} agent
    */
-  af(filterHandler, tab, agent) {
+  async af(filterHandler, tab, agent = false) {
     try {
       const tabFilters = {
         general: { group: '' },
@@ -181,12 +176,8 @@ export class CommonData {
         }
       }
       if (agent) filters.push(filterHandler.agentQuery(agent));
-      this.$rootScope.$emit('wzEventFilters', { filters, tab });
-      if (!this.$rootScope.$$listenerCount['wzEventFilters']) {
-        this.$timeout(100).then(() =>
-          this.af(filterHandler, tab, (agent = false))
-        );
-      }
+      const discoverScope = await ModulesHelper.getDiscoverScope();
+      discoverScope.loadFilters(filters, tab);
     } catch (error) {
       this.errorHandler.handle(
         'An error occurred while creating custom filters for visualizations',

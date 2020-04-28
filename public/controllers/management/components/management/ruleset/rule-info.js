@@ -11,13 +11,12 @@ import {
   EuiBadge,
   EuiSpacer,
   EuiInMemoryTable,
-  EuiLink,
+  EuiLink
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
 import RulesetHandler from './utils/ruleset-handler';
-
 
 import {
   updateFileContent,
@@ -36,7 +35,7 @@ class WzRuleInfo extends Component {
       gpg13: 'GPG 13',
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53'
-    }
+    };
 
     this.rulesetHandler = RulesetHandler;
     this.columns = [
@@ -63,7 +62,7 @@ class WzRuleInfo extends Component {
       },
       {
         name: 'Compliance',
-        render: this.buildComplianceBadges,
+        render: this.buildComplianceBadges
       },
       {
         field: 'level',
@@ -82,17 +81,25 @@ class WzRuleInfo extends Component {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink
-                onClick={async (event) => {
+                onClick={async event => {
                   event.stopPropagation();
-                  const noLocal = item.relative_dirname.startsWith('ruleset/');
-                  const result = await this.rulesetHandler.getRuleContent(value, noLocal);
-                  const file = { name: value, content: result, path: item.relative_dirname };
+                  const noLocal = item.path.startsWith('ruleset/');
+                  const result = await this.rulesetHandler.getRuleContent(
+                    value,
+                    noLocal
+                  );
+                  const file = {
+                    name: value,
+                    content: result,
+                    path: item.relative_dirname
+                  };
                   this.props.updateFileContent(file);
-                }} >
+                }}
+              >
                 {value}
               </EuiLink>
             </EuiToolTip>
-          )
+          );
         }
       }
     ];
@@ -106,7 +113,8 @@ class WzRuleInfo extends Component {
     const compliance = {};
     const complianceKeys = ['gdpr', 'gpg13', 'hipaa', 'nist-800-53', 'pci'];
     Object.keys(ruleInfo).forEach(key => {
-      if (complianceKeys.includes(key) && ruleInfo[key].length) compliance[key] = ruleInfo[key]
+      if (complianceKeys.includes(key) && ruleInfo[key].length)
+        compliance[key] = ruleInfo[key];
     });
     return compliance || {};
   }
@@ -114,37 +122,44 @@ class WzRuleInfo extends Component {
   buildComplianceBadges(item) {
     const badgeList = [];
     const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53'];
-    const buildBadge = (field) => {
+    const buildBadge = field => {
       const idGenerator = () => {
-        return '_' + Math.random().toString(36).substr(2, 9)
+        return (
+          '_' +
+          Math.random()
+            .toString(36)
+            .substr(2, 9)
+        );
       };
 
       return (
         <EuiToolTip
           content={item[field].join(', ')}
           key={idGenerator()}
-          position="bottom" >
+          position="bottom"
+        >
           <EuiBadge
             title={null}
-            onClick={(ev) => ev.stopPropagation()}
+            onClick={ev => ev.stopPropagation()}
             onClickAriaLabel={field.toUpperCase()}
             color="hollow"
-            style={{ margin: "1px 2px" }}
-          >{field.toUpperCase()}</EuiBadge>
+            style={{ margin: '1px 2px' }}
+          >
+            {field.toUpperCase()}
+          </EuiBadge>
         </EuiToolTip>
       );
     };
     try {
       for (const field of fields) {
         if (item[field].length) {
-          badgeList.push(buildBadge(field))
+          badgeList.push(buildBadge(field));
         }
       }
-    } catch (error) { }
+    } catch (error) {}
 
     return <div>{badgeList}</div>;
   }
-
 
   /**
    * Clean the existing filters and sets the new ones and back to the previous section
@@ -166,28 +181,39 @@ class WzRuleInfo extends Component {
   renderInfo(id, level, file, path) {
     return (
       <ul>
-        <li key="id"><b>ID:</b>&nbsp;{id}</li>
+        <li key="id">
+          <b>ID:</b>&nbsp;{id}
+        </li>
         <EuiSpacer size="s" />
-        <li key="level"><b>Level:</b>
+        <li key="level">
+          <b>Level:</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ level: level })}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack({ level: level })}
+            >
               &nbsp;{level}
             </EuiLink>
           </EuiToolTip>
         </li>
 
         <EuiSpacer size="s" />
-        <li key="file"><b>File:</b>
+        <li key="file">
+          <b>File:</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ filename: file })}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack({ filename: file })}
+            >
               &nbsp;{file}
             </EuiLink>
           </EuiToolTip>
         </li>
         <EuiSpacer size="s" />
-        <li key="path"><b>Path:</b>
+        <li key="path">
+          <b>Path:</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ relative_dirname: path })}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack({ relative_dirname: path })}
+            >
               &nbsp;{path}
             </EuiLink>
           </EuiToolTip>
@@ -195,60 +221,59 @@ class WzRuleInfo extends Component {
 
         <EuiSpacer size="s" />
       </ul>
-    )
+    );
   }
 
   /**
    * Render a list with the details
-* @param {Array} details
-    */
+   * @param {Array} details
+   */
   renderDetails(details) {
     const detailsToRender = [];
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-        <li key={key}><b>{key}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
+        <li key={key}>
+          <b>{key}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}
+        </li>
       );
     });
-    return (
-      <ul style={{ lineHeight: 'initial' }}>
-        {detailsToRender}
-      </ul>
-    )
+    return <ul style={{ lineHeight: 'initial' }}>{detailsToRender}</ul>;
   }
 
   /**
    * Render the groups
-* @param {Array} groups
-    */
+   * @param {Array} groups
+   */
   renderGroups(groups) {
     const listGroups = [];
     groups.forEach((group, index) => {
       listGroups.push(
         <span key={group}>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
-            <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
-              <span>
-                {group}
-              </span>
+          <EuiLink
+            onClick={async () => this.setNewFiltersAndBack({ group: group })}
+          >
+            <EuiToolTip
+              position="top"
+              content={`Filter by this group: ${group}`}
+            >
+              <span>{group}</span>
             </EuiToolTip>
           </EuiLink>
-          {(index < groups.length - 1) && ', '}
+          {index < groups.length - 1 && ', '}
         </span>
       );
     });
     return (
       <ul>
-        <li>
-          {listGroups}
-        </li>
+        <li>{listGroups}</li>
       </ul>
-    )
+    );
   }
 
   /**
    * Render the compliance(HIPAA, NIST...)
-* @param {Array} compliance
-    */
+   * @param {Array} compliance
+   */
   renderCompliance(compliance) {
     const listCompliance = [];
     const keys = Object.keys(compliance);
@@ -260,12 +285,14 @@ class WzRuleInfo extends Component {
         filters[key] = element;
         return (
           <span key={element}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ filters })}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack({ filters })}
+            >
               <EuiToolTip position="top" content="Filter by this compliance">
                 <span>{element}</span>
               </EuiToolTip>
             </EuiLink>
-            {(index < compliance[key].length - 1) && ', '}
+            {index < compliance[key].length - 1 && ', '}
           </span>
         );
       });
@@ -274,22 +301,17 @@ class WzRuleInfo extends Component {
         <li key={key}>
           <b>{this.complianceEquivalences[key]}</b>
           <p>{values}</p>
-          <EuiSpacer size='s' />
+          <EuiSpacer size="s" />
         </li>
-      )
-
+      );
     }
-    return (
-      <ul>
-        {listCompliance}
-      </ul>
-    )
+    return <ul>{listCompliance}</ul>;
   }
 
   /**
    * Changes between rules
-* @param {Number} ruleId
-    */
+   * @param {Number} ruleId
+   */
   changeBetweenRules(ruleId) {
     this.setState({ currentRuleId: ruleId });
   }
@@ -308,7 +330,7 @@ class WzRuleInfo extends Component {
       return {
         onClick: () => {
           this.changeBetweenRules(item.id);
-        },
+        }
       };
     };
 
@@ -327,7 +349,8 @@ class WzRuleInfo extends Component {
                         color="primary"
                         iconSize="l"
                         iconType="arrowLeft"
-                        onClick={() => this.props.cleanInfo()} />
+                        onClick={() => this.props.cleanInfo()}
+                      />
                     </EuiToolTip>
                     {description}
                   </h2>
@@ -385,9 +408,7 @@ class WzRuleInfo extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiTitle size="s">
-                        <h5>
-                          Related rules
-                      </h5>
+                        <h5>Related rules</h5>
                       </EuiTitle>
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -416,21 +437,23 @@ class WzRuleInfo extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     updateFileContent: content => dispatch(updateFileContent(content)),
     cleanFileContent: () => dispatch(cleanFileContent()),
     updateFilters: filters => dispatch(updateFilters(filters)),
     cleanFilters: () => dispatch(cleanFilters()),
     cleanInfo: () => dispatch(cleanInfo())
-  }
+  };
 };
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzRuleInfo);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzRuleInfo);

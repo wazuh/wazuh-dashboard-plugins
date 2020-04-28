@@ -56,7 +56,11 @@ export default class GroupsHandler {
    */
   static async deleteAgent(agentId, groupId) {
     try {
-      const result = await WzRequest.apiReq('DELETE', `/agents/${agentId}/group/${groupId}`, {});
+      const result = await WzRequest.apiReq(
+        'DELETE',
+        `/agents/${agentId}/group/${groupId}`,
+        {}
+      );
       return result;
     } catch (error) {
       return Promise.reject(error);

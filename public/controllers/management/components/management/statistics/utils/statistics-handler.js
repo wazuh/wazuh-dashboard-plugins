@@ -20,7 +20,11 @@ export default class StatisticsHandler {
     try {
       let result = null;
       if (node) {
-        result = await WzRequest.apiReq('GET', `/cluster/${node}/stats/${demon}`, {});
+        result = await WzRequest.apiReq(
+          'GET',
+          `/cluster/${node}/stats/${demon}`,
+          {}
+        );
       } else {
         result = await WzRequest.apiReq('GET', `/manager/stats/${demon}`, {});
       }

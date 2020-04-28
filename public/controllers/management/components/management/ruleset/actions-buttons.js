@@ -1,21 +1,17 @@
 /*
-* Wazuh app - React component for registering agents.
-* Copyright (C) 2015-2020 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - React component for registering agents.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import {
-  EuiFlexItem,
-  EuiButtonEmpty,
-  EuiGlobalToastList
-} from '@elastic/eui';
+import { EuiFlexItem, EuiButtonEmpty, EuiGlobalToastList } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
@@ -25,7 +21,7 @@ import {
   updteAddingRulesetFile,
   updateListContent,
   updateIsProcessing,
-  updatePageIndex,
+  updatePageIndex
 } from '../../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -46,7 +42,7 @@ class WzRulesetActionButtons extends Component {
       rules: '/rules',
       decoders: '/decoders',
       lists: '/lists/files'
-    }
+    };
     this.columns = columns;
     this.rulesetHandler = RulesetHandler;
     this.refreshTimeoutId = null;
@@ -59,7 +55,10 @@ class WzRulesetActionButtons extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      const mapFilters = Object.keys(filters).map(key => ({name: key, value: filters[key]})); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
+      const mapFilters = Object.keys(filters).map(key => ({
+        name: key,
+        value: filters[key]
+      })); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
       await this.exportCsv(`/${section}`, mapFilters, section);
     } catch (error) {
       console.error('Error exporting as CSV ', error);
@@ -95,7 +94,7 @@ class WzRulesetActionButtons extends Component {
             error: 0
           });
         } catch (error) {
-          console.error('ERROR FILE ONLY ONE ', error)
+          console.error('ERROR FILE ONLY ONE ', error);
           errors = true;
           results.push({
             index: idx,
@@ -122,13 +121,13 @@ class WzRulesetActionButtons extends Component {
   async toggleFiles() {
     try {
       this.props.updateLoadingStatus(true);
-      const { showingFiles, } = this.props.state;
+      const { showingFiles } = this.props.state;
       this.props.toggleShowFiles(!showingFiles);
       this.props.updateIsProcessing(true);
       this.props.updatePageIndex(0);
       this.props.updateLoadingStatus(false);
     } catch (error) {
-      console.error('error toggling ', error)
+      console.error('error toggling ', error);
     }
   }
 
@@ -139,7 +138,6 @@ class WzRulesetActionButtons extends Component {
     try {
       this.props.updateIsProcessing(true);
       // this.onRefreshLoading();
-
     } catch (error) {
       return Promise.reject(error);
     }
@@ -174,7 +172,13 @@ class WzRulesetActionButtons extends Component {
     const addNewRuleButton = (
       <EuiButtonEmpty
         iconType="plusInCircle"
-        onClick={() => this.props.updteAddingRulesetFile({ name: '', content: '<!-- Modify it at your will. -->', path: `etc/${section}` })}
+        onClick={() =>
+          this.props.updteAddingRulesetFile({
+            name: '',
+            content: '<!-- Modify it at your will. -->',
+            path: `etc/${section}`
+          })
+        }
       >
         {`Add new ${section} file`}
       </EuiButtonEmpty>
@@ -184,7 +188,13 @@ class WzRulesetActionButtons extends Component {
     const addNewCdbListButton = (
       <EuiButtonEmpty
         iconType="plusInCircle"
-        onClick={() => this.props.updateListContent({ name: false, content: '', path: 'etc/lists' })}
+        onClick={() =>
+          this.props.updateListContent({
+            name: false,
+            content: '',
+            path: 'etc/lists'
+          })
+        }
       >
         {`Add new ${section} file`}
       </EuiButtonEmpty>
@@ -209,7 +219,7 @@ class WzRulesetActionButtons extends Component {
         Refresh
       </EuiButtonEmpty>
     );
-    
+
     const uploadFile = async (files, path) => {
       await this.uploadFiles(files, path);
       await this.refresh();
@@ -217,56 +227,51 @@ class WzRulesetActionButtons extends Component {
 
     return (
       <Fragment>
-        {(section !== 'lists' && adminMode) && (
-          <EuiFlexItem grow={false}>
-            {manageFiles}
-          </EuiFlexItem>
-        )
-        }
-        {(adminMode && section !== 'lists') && (
-          <EuiFlexItem grow={false}>
-            {addNewRuleButton}
-          </EuiFlexItem>
+        {section !== 'lists' && adminMode && (
+          <EuiFlexItem grow={false}>{manageFiles}</EuiFlexItem>
         )}
-        {(adminMode && section === 'lists') && (
-          <EuiFlexItem grow={false}>
-            {addNewCdbListButton}
-          </EuiFlexItem>
+        {adminMode && section !== 'lists' && (
+          <EuiFlexItem grow={false}>{addNewRuleButton}</EuiFlexItem>
         )}
-        {((section === 'lists' || showingFiles) && adminMode) && (
+        {adminMode && section === 'lists' && (
+          <EuiFlexItem grow={false}>{addNewCdbListButton}</EuiFlexItem>
+        )}
+        {(section === 'lists' || showingFiles) && adminMode && (
           <EuiFlexItem grow={false}>
             <UploadFiles
               msg={section}
               path={`etc/${section}`}
-              upload={uploadFile} />
+              upload={uploadFile}
+            />
           </EuiFlexItem>
         )}
-        <EuiFlexItem grow={false}>
-          {exportButton}
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          {refresh}
-        </EuiFlexItem>
+        <EuiFlexItem grow={false}>{exportButton}</EuiFlexItem>
+        <EuiFlexItem grow={false}>{refresh}</EuiFlexItem>
       </Fragment>
     );
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updteAddingRulesetFile: content => dispatch(updteAddingRulesetFile(content)),
+    updteAddingRulesetFile: content =>
+      dispatch(updteAddingRulesetFile(content)),
     updateListContent: content => dispatch(updateListContent(content)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
-  }
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex))
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetActionButtons);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzRulesetActionButtons);

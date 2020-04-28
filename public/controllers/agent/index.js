@@ -14,10 +14,10 @@ import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
 import { RegisterAgent } from './components/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
-import { WelcomeScreen } from './components/agents-welcome';
-import { Stats } from './components/stats';
+import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
 import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
+import { MainModule } from '../../components/common/modules/main';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -26,7 +26,7 @@ app
   .controller('agentsPreviewController', AgentsPreviewController)
   .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
-  .value('WelcomeScreenAgent', WelcomeScreen)
+  .value('AgentsWelcome', AgentsWelcome)
   .value('AgentsPreview', AgentsPreview)
   .value('AgentsTable', AgentsTable)
-  .value('StatsAgent', Stats);
+  .value('MainModule', MainModule);

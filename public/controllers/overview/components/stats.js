@@ -21,12 +21,37 @@ export class Stats extends Component {
     this.state = {};
   }
 
+  goToAgents(status) {
+    let selectedOptions = [];
+
+    if (status !== null) {
+      selectedOptions = [
+        {
+          className: 'wzFilterBarOperator',
+          group: 'status',
+          label: 'status:' + status,
+          label_: status,
+          type: 'AND'
+        }
+      ];
+    }
+
+    sessionStorage.setItem(
+      'agents_preview_selected_options',
+      JSON.stringify(selectedOptions)
+    );
+    window.location.href = '#/agents-preview';
+  }
+
   render() {
     return (
       <EuiPage>
         <EuiFlexGroup>
           <EuiFlexItem />
-          <EuiFlexItem>
+          <EuiFlexItem
+            style={{ cursor: 'pointer' }}
+            onClick={() => this.goToAgents(null)}
+            className="statWithLink">
             <EuiStat
               title={this.props.total}
               description="Total agents"
@@ -34,7 +59,10 @@ export class Stats extends Component {
               textAlign="center"
             />
           </EuiFlexItem>
-          <EuiFlexItem>
+          <EuiFlexItem
+            style={{ cursor: 'pointer' }}
+            onClick={() => this.goToAgents('Active')}
+            className="statWithLink">
             <EuiStat
               title={this.props.active}
               description="Active agents"
@@ -42,7 +70,10 @@ export class Stats extends Component {
               textAlign="center"
             />
           </EuiFlexItem>
-          <EuiFlexItem>
+          <EuiFlexItem
+            style={{ cursor: 'pointer' }}
+            onClick={() => this.goToAgents('Disconnected')}
+            className="statWithLink">
             <EuiStat
               title={this.props.disconnected}
               description="Disconnected agents"
@@ -50,7 +81,10 @@ export class Stats extends Component {
               textAlign="center"
             />
           </EuiFlexItem>
-          <EuiFlexItem>
+          <EuiFlexItem
+            style={{ cursor: 'pointer' }}
+            onClick={() => this.goToAgents('Never connected')}
+            className="statWithLink">
             <EuiStat
               title={this.props.neverConnected}
               description="Never connected agents"

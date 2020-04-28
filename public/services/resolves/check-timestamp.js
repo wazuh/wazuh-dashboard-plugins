@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from "../../react-services/app-state";
+import { AppState } from '../../react-services/app-state';
 
 export async function checkTimestamp(genericReq, $location, wzMisc) {
   try {

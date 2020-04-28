@@ -30,7 +30,7 @@ export default class WzRuleset extends Component {
   }
 
   UNSAFE_componentWillMount() {
-    this._isMount = true
+    this._isMount = true;
     this.store.subscribe(() => {
       const state = this.store.getState().rulesetReducers;
       if (this._isMount) {
@@ -43,24 +43,38 @@ export default class WzRuleset extends Component {
   componentWillUnmount() {
     this._isMount = false;
     // When the component is going to be unmounted the ruleset state is reset
-    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile) this.store.dispatch({ type: 'RESET' });
+    const {
+      ruleInfo,
+      decoderInfo,
+      listInfo,
+      fileContent,
+      addingRulesetFile
+    } = this.state;
+    if (
+      (!ruleInfo && !decoderInfo && !listInfo && !fileContent,
+      !addingRulesetFile)
+    )
+      this.store.dispatch({ type: 'RESET' });
   }
 
   render() {
-    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
+    const {
+      ruleInfo,
+      decoderInfo,
+      listInfo,
+      fileContent,
+      addingRulesetFile
+    } = this.state;
 
     return (
       <WzReduxProvider>
-        {
-          ruleInfo && (<WzRuleInfo />)
-          || decoderInfo && (<WzDecoderInfo />)
-          || listInfo && (<WzListEditor />)
-          || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
-          || (<WzRulesetOverview />)
-        }
+        {(ruleInfo && <WzRuleInfo />) ||
+          (decoderInfo && <WzDecoderInfo />) ||
+          (listInfo && <WzListEditor />) ||
+          ((fileContent || addingRulesetFile) && <WzRulesetEditor />) || (
+            <WzRulesetOverview />
+          )}
       </WzReduxProvider>
-    )
+    );
   }
 }
-

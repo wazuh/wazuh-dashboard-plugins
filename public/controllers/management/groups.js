@@ -9,18 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WazuhConfig } from "../../react-services/wazuh-config";
-import { ApiRequest } from "../../react-services/api-request";
-import { ShareAgent } from "../../factories/share-agent";
-import { GroupHandler } from "../../react-services/group-handler";
+import { WazuhConfig } from '../../react-services/wazuh-config';
+import { ApiRequest } from '../../react-services/api-request';
+import { ShareAgent } from '../../factories/share-agent';
+import { GroupHandler } from '../../react-services/group-handler';
 
 export class GroupsController {
-  constructor(
-    $scope,
-    $location,
-    errorHandler,
-    reportingService
-  ) {
+  constructor($scope, $location, errorHandler, reportingService) {
     this.scope = $scope;
     this.location = $location;
     this.apiReq = ApiRequest;
@@ -48,13 +43,13 @@ export class GroupsController {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.selectedAgents = {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.addMultipleAgents(false);
         if (!value) {
@@ -65,12 +60,13 @@ export class GroupsController {
 
       // Props
       this.exportConfigurationProps = {
-        exportConfiguration: enabledComponents => this.exportConfiguration(enabledComponents),
-        type: 'group',
+        exportConfiguration: enabledComponents =>
+          this.exportConfiguration(enabledComponents),
+        type: 'group'
       };
 
       this.filesInGroupTableProps = {
-        exportConfigurationProps: this.exportConfigurationProps,
+        exportConfigurationProps: this.exportConfigurationProps
       };
 
       return;
@@ -146,7 +142,11 @@ export class GroupsController {
    * @param {Object} enabledComponents
    */
   exportConfiguration(enabledComponents, group) {
-    this.reportingService.startConfigReport(group, 'groupConfig', enabledComponents);
+    this.reportingService.startConfigReport(
+      group,
+      'groupConfig',
+      enabledComponents
+    );
   }
 
   async loadSelectedAgents(searchTerm) {
@@ -253,13 +253,13 @@ export class GroupsController {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.selectedAgents = {
           loaded: false,
           data: [],
           offset: 0,
-          loadedAll: false,
+          loadedAll: false
         };
         this.multipleSelectorLoading = true;
         while (!this.selectedAgents.loadedAll) {
@@ -430,7 +430,7 @@ export class GroupsController {
       exportConfigurationProps: {
         exportConfiguration: (enabledComponents, group) =>
           this.exportConfiguration(enabledComponents, group),
-        type: 'group',
+        type: 'group'
       },
       currentGroup: group => {
         this.currentGroup = group;

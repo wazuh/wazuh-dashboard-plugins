@@ -15,10 +15,9 @@ import {
 } from '../../../../../../react-services/wz-request';
 
 export default class RulesetHandler {
-
   /**
    * Get the information about a rule
-   * @param {String} file 
+   * @param {String} file
    * @param {Number} id
    */
   static async getRuleInformation(file, id) {
@@ -40,7 +39,7 @@ export default class RulesetHandler {
 
   /**
    * Get the default about a decoder
-   * @param {String} file 
+   * @param {String} file
    */
   static async getDecoderInformation(file, name) {
     try {
@@ -83,10 +82,9 @@ export default class RulesetHandler {
     }
   }
 
-
   /**
    * Get the CDB lists
-   * @param {Object} filters 
+   * @param {Object} filters
    */
   static async getLists(filters = {}) {
     try {
@@ -153,8 +151,8 @@ export default class RulesetHandler {
 
   /**
    * Get the content of a rule file
-   * @param {String} path 
-   * @param {Boolean} nolocal 
+   * @param {String} path
+   * @param {Boolean} nolocal
    */
   static async getRuleContent(path, nolocal = true) {
     try {
@@ -168,8 +166,8 @@ export default class RulesetHandler {
 
   /**
    * Get the content of a decoder file
-   * @param {String} path 
-   * @param {Boolean} nolocal 
+   * @param {String} path
+   * @param {Boolean} nolocal
    */
   static async getDecoderContent(path, nolocal = true) {
     try {
@@ -185,7 +183,7 @@ export default class RulesetHandler {
 
   /**
    * Get the content of a CDB list
-   * @param {String} path 
+   * @param {String} path
    */
   static async getCdbList(path) {
     try {
@@ -198,7 +196,7 @@ export default class RulesetHandler {
 
   /**
    * Get the content of any type of file Rules, Decoders, CDB lists...
-   * @param {String} path 
+   * @param {String} path
    */
   static async getFileContent(path) {
     try {
@@ -215,9 +213,9 @@ export default class RulesetHandler {
 
   /**
    * Send the rule content
-   * @param {String} rule 
-   * @param {String} content 
-   * @param {Boolean} overwrite 
+   * @param {String} rule
+   * @param {String} content
+   * @param {Boolean} overwrite
    */
   static async sendRuleConfiguration(rule, content, overwrite) {
     try {
@@ -236,9 +234,9 @@ export default class RulesetHandler {
 
   /**
    * Send the decoders content
-   * @param {String} decoder 
-   * @param {String} content 
-   * @param {Boolean} overwrite 
+   * @param {String} decoder
+   * @param {String} content
+   * @param {Boolean} overwrite
    */
   static async sendDecoderConfiguration(decoder, content, overwrite) {
     try {
@@ -257,10 +255,10 @@ export default class RulesetHandler {
 
   /**
    * Send the cdb list content
-   * @param {String} list 
-   * @param {String} path 
-   * @param {String} content 
-   * @param {Boolean} overwrite 
+   * @param {String} list
+   * @param {String} path
+   * @param {String} content
+   * @param {Boolean} overwrite
    */
   static async sendCdbList(list, path, content, overwrite, addingNew = false) {
     try {
@@ -301,8 +299,8 @@ export default class RulesetHandler {
 
   /**
    * Delete a file
-   * @param {String} file 
-   * @param {String} path 
+   * @param {String} file
+   * @param {String} path
    */
   static async deleteFile(file, path) {
     let fullPath = `${path}/${file}`;

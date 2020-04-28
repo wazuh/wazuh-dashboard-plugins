@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-
 /**
  * Updates CurrentAPI in the appState store
  * @param currentAPI
@@ -21,7 +20,6 @@ export const updateCurrentApi = currentAPI => {
     currentAPI: currentAPI
   };
 };
-
 
 /**
  * Updates ShowMenu in the appState store
@@ -55,3 +53,18 @@ export const updateCurrentTab = currentTab => {
     currentTab: currentTab
   };
 };
+
+
+/**
+ * Updates extensions in the appState store
+ * @param extensions
+ */
+export const updateExtensions = (id, extensions) => {
+  const tmpExtensions = {};
+  tmpExtensions[id] = extensions;
+  return {
+    type: 'UPDATE_EXTENSIONS',
+    extensions: tmpExtensions
+  };
+};
+

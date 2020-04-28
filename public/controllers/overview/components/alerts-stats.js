@@ -28,7 +28,7 @@ class AlertsStats extends Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.state) {
       nextProps.items.forEach(x => {
-        x.value = nextProps.state[x.id] || '-'
+        x.value = nextProps.state[x.id] || '-';
       });
     }
     this.setState({
@@ -69,10 +69,9 @@ class AlertsStats extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.visualizationsReducers,
+    state: state.visualizationsReducers
   };
 };
-
 
 export default connect(mapStateToProps)(AlertsStats);
 

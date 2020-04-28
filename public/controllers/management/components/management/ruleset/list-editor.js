@@ -24,12 +24,15 @@ import {
   EuiPopover,
   EuiFieldText,
   EuiSpacer,
-  EuiPanel,
+  EuiPanel
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
-import { cleanInfo, updateListContent } from '../../../../../redux/actions/rulesetActions';
+import {
+  cleanInfo,
+  updateListContent
+} from '../../../../../redux/actions/rulesetActions';
 
 import RulesetHandler from './utils/ruleset-handler';
 
@@ -48,7 +51,7 @@ class WzListEditor extends Component {
       addingKey: '',
       addingValue: '',
       editingValue: '',
-      newListName: '',
+      newListName: ''
     };
     this.tmpListName = ""
     this.items = {};
@@ -60,14 +63,14 @@ class WzListEditor extends Component {
         field: 'key',
         name: 'Key',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'value',
         name: 'Value',
         align: 'left',
-        sortable: true,
-      },
+        sortable: true
+      }
     ];
 
     this.adminColumns = [
@@ -75,7 +78,7 @@ class WzListEditor extends Component {
         field: 'key',
         name: 'Key',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'value',
@@ -95,7 +98,7 @@ class WzListEditor extends Component {
           } else {
             return <span>{value}</span>;
           }
-        },
+        }
       },
       {
         name: 'Actions',
@@ -132,7 +135,10 @@ class WzListEditor extends Component {
                     aria-label="Edit content"
                     iconType="pencil"
                     onClick={() => {
-                      this.setState({ editing: item.key, editingValue: item.value });
+                      this.setState({
+                        editing: item.key,
+                        editingValue: item.value
+                      });
                     }}
                     color="primary"
                   />
@@ -148,8 +154,8 @@ class WzListEditor extends Component {
               </Fragment>
             );
           }
-        },
-      },
+        }
+      }
     ];
   }
 
@@ -197,7 +203,9 @@ class WzListEditor extends Component {
   itemsToRaw() {
     let raw = '';
     Object.keys(this.items).forEach(key => {
-      raw = raw ? `${raw}\n${key}:${this.items[key]}` : `${key}:${this.items[key]}`;
+      raw = raw
+        ? `${raw}\n${key}:${this.items[key]}`
+        : `${key}:${this.items[key]}`;
     });
     return raw;
   }
@@ -210,7 +218,12 @@ class WzListEditor extends Component {
   async saveList(name, path, addingNew = false) {
     try {
       if (!name) {
-        this.showToast('warning', 'Invalid name', 'Please insert a valid name', 3000);
+        this.showToast(
+          'warning',
+          'Invalid name',
+          'Please insert a valid name',
+          3000
+        );
         return;
       }
       const overwrite = addingNew; // If adding new disable the overwrite
@@ -239,7 +252,12 @@ class WzListEditor extends Component {
         this.showToast('success', 'Success', 'CBD List updated', 3000);
       }
     } catch (error) {
-      this.showToast('danger', 'Error', 'Error saving CDB list: ' + error, 3000);
+      this.showToast(
+        'danger',
+        'Error',
+        'Error saving CDB list: ' + error,
+        3000
+      );
     }
     this.setState({ isSaving: false });
   }
@@ -249,13 +267,13 @@ class WzListEditor extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
   openAddEntry = () => {
     this.setState({
-      isPopoverOpen: true,
+      isPopoverOpen: true
     });
   };
 
@@ -267,25 +285,25 @@ class WzListEditor extends Component {
 
   onChangeKey = e => {
     this.setState({
-      addingKey: e.target.value,
+      addingKey: e.target.value
     });
   };
 
   onChangeValue = e => {
     this.setState({
-      addingValue: e.target.value,
+      addingValue: e.target.value
     });
   };
 
   onChangeEditingValue = e => {
     this.setState({
-      editingValue: e.target.value,
+      editingValue: e.target.value
     });
   };
 
   onNewListNameChange = e => {
     this.setState({
-      newListName: e.target.value,
+      newListName: e.target.value
     });
   };
 
@@ -295,11 +313,14 @@ class WzListEditor extends Component {
   addItem() {
     const { addingKey, addingValue } = this.state;
     if (!addingKey || Object.keys(this.items).includes(addingKey)) {
-      this.showToast('danger', 'Error', (
+      this.showToast(
+        'danger',
+        'Error',
         <Fragment>
           <strong>{addingKey}</strong> key already exists
-        </Fragment>
-      ), 3000);
+        </Fragment>,
+        3000
+      );
       return;
     }
     this.items[addingKey] = addingValue;
@@ -307,7 +328,7 @@ class WzListEditor extends Component {
     this.setState({
       items: itemsArr,
       addingKey: '',
-      addingValue: '',
+      addingValue: ''
     });
   }
 
@@ -393,10 +414,14 @@ class WzListEditor extends Component {
 
     return (
       <Fragment>
-        {(!this.state.isPopoverOpen &&
+        {!this.state.isPopoverOpen && (
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-              iconType="plusInCircle" onClick={() => this.openAddEntry()}>Add new entry</EuiButtonEmpty>
+              iconType="plusInCircle"
+              onClick={() => this.openAddEntry()}
+            >
+              Add new entry
+            </EuiButtonEmpty>
           </EuiFlexItem>
         )}
         {/* Save button */}
@@ -410,7 +435,7 @@ class WzListEditor extends Component {
 
     return (
       <Fragment>
-        {(this.state.isPopoverOpen &&
+        {this.state.isPopoverOpen && (
           <div>
             <EuiSpacer size="l" />
             <EuiFlexGroup>
@@ -437,10 +462,18 @@ class WzListEditor extends Component {
                 <EuiFlexGroup>
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty
-                      iconType="plusInCircle" isDisabled={!addingKey} fill onClick={() => this.addItem()}>Add</EuiButtonEmpty>
+                      iconType="plusInCircle"
+                      isDisabled={!addingKey}
+                      fill
+                      onClick={() => this.addItem()}
+                    >
+                      Add
+                    </EuiButtonEmpty>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
-                    <EuiButtonEmpty onClick={() => this.closeAddEntry()}>Close</EuiButtonEmpty>
+                    <EuiButtonEmpty onClick={() => this.closeAddEntry()}>
+                      Close
+                    </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
@@ -448,7 +481,7 @@ class WzListEditor extends Component {
           </div>
         )}
       </Fragment>
-    )
+    );
   }
 
   /**
@@ -502,7 +535,8 @@ class WzListEditor extends Component {
             <EuiFlexItem>
               {/* File name and back button when watching or editing a CDB list */}
               <EuiFlexGroup>
-                {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
+                {(!addingNew && this.renderTitle(name, path)) ||
+                  this.renderInputNameForNewCdbList()}
                 <EuiFlexItem />
                 {/* This flex item is for separating between title and save button */}
                 {/* Pop over to add new key and value */}
@@ -515,7 +549,17 @@ class WzListEditor extends Component {
                       onClick={async () => {
                         try {
                           this.setState({ generatingCsv: true });
-                          await exportCsv(`/lists?path=${path}/${name}`, [{ _isCDBList: true, name: 'path', value: `${path}/${name}` }], name);
+                          await exportCsv(
+                            `/lists?path=${path}/${name}`,
+                            [
+                              {
+                                _isCDBList: true,
+                                name: 'path',
+                                value: `${path}/${name}`
+                              }
+                            ],
+                            name
+                          );
                           this.setState({ generatingCsv: false });
                         } catch (error) {
                           this.setState({ generatingCsv: false });
@@ -523,13 +567,17 @@ class WzListEditor extends Component {
                       }}
                     >
                       Export formatted
-                  </EuiButtonEmpty>
-                  </EuiFlexItem>)
-                }
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                )}
                 {adminMode &&
                   !this.state.editing &&
-                  this.renderAddAndSave(listName, path, !addingNew, this.state.items)
-                }
+                  this.renderAddAndSave(
+                    listName,
+                    path,
+                    !addingNew,
+                    this.state.items
+                  )}
               </EuiFlexGroup>
               {/* CDB list table */}
               {this.renderAdd()}
@@ -560,15 +608,18 @@ class WzListEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
+    state: state.rulesetReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
-    updateListContent: content => dispatch(updateListContent(content)),
+    updateListContent: content => dispatch(updateListContent(content))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzListEditor);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzListEditor);

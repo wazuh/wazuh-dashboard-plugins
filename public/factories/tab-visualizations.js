@@ -18,7 +18,7 @@ export class TabVisualizations {
     if (!!TabVisualizations.instance) {
       return TabVisualizations.instance;
     }
-    
+
     this.agents = {
       welcome: 0,
       general: 11,
@@ -36,7 +36,7 @@ export class TabVisualizations {
       configuration: 0,
       osquery: 5,
       docker: 5,
-      mitre: 6,
+      mitre: 6
     };
 
     this.overview = {
@@ -57,9 +57,8 @@ export class TabVisualizations {
       osquery: 6,
       sca: 8,
       docker: 5,
-      mitre: 6,
+      mitre: 6
     };
-
 
     this.tabVisualizations = {};
     this.currentTab = '';
@@ -102,7 +101,8 @@ export class TabVisualizations {
     if (typeof tabs === 'object') {
       this.tabVisualizations = tabs;
     } else if (typeof tabs === 'string') {
-      this.tabVisualizations = tabs === 'overview' ? this.overview : this.agents;
+      this.tabVisualizations =
+        tabs === 'overview' ? this.overview : this.agents;
     }
   }
 

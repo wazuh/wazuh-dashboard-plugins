@@ -29,7 +29,7 @@ const initialState = {
   sortFieldFile: 'filename',
   sortFieldAgents: 'name',
   showAddAgents: false,
-  selectedTabId: 'agents',
+  selectedTabId: 'agents'
 };
 
 const groupsReducers = (state = initialState, action) => {
@@ -37,133 +37,133 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       isProcessing: action.isProcessing,
-      isLoading: action.isProcessing,
+      isLoading: action.isProcessing
     };
   }
   if (action.type === 'UPDATE_LOADING_STATUS') {
     return {
       ...state,
-      isLoading: action.status,
+      isLoading: action.status
     };
   }
   if (action.type === 'UPDATE_ADMIN_MODE') {
     return {
       ...state,
-      adminMode: action.status,
+      adminMode: action.status
     };
   }
   if (action.type === 'UPDATE_PAGE_INDEX') {
     return {
       ...state,
-      pageIndex: action.pageIndex,
+      pageIndex: action.pageIndex
     };
   }
   if (action.type === 'UPDATE_PAGE_INDEX_AGENTS') {
     return {
       ...state,
-      pageIndexAgents: action.pageIndexAgents,
+      pageIndexAgents: action.pageIndexAgents
     };
   }
   if (action.type === 'UPDATE_PAGE_INDEX_FILE') {
     return {
       ...state,
-      pageIndexFile: action.pageIndexFile,
+      pageIndexFile: action.pageIndexFile
     };
   }
   if (action.type === 'UPDATE_SORT_DIRECTION') {
     return {
       ...state,
-      sortDirection: action.sortDirection,
+      sortDirection: action.sortDirection
     };
   }
   if (action.type === 'UPDATE_SORT_DIRECTION_AGENTS') {
     return {
       ...state,
-      sortDirectionAgents: action.sortDirectionAgents,
+      sortDirectionAgents: action.sortDirectionAgents
     };
   }
   if (action.type === 'UPDATE_SORT_DIRECTION_FILE') {
     return {
       ...state,
-      sortDirectionFile: action.sortDirectionFile,
+      sortDirectionFile: action.sortDirectionFile
     };
   }
   if (action.type === 'UPDATE_SORT_FIELD') {
     return {
       ...state,
-      sortField: action.sortField,
+      sortField: action.sortField
     };
   }
   if (action.type === 'UPDATE_SORT_FIELD_AGENTS') {
     return {
       ...state,
-      sortFieldAgents: action.sortFieldAgents,
+      sortFieldAgents: action.sortFieldAgents
     };
   }
   if (action.type === 'UPDATE_SORT_FIELD_FILE') {
     return {
       ...state,
-      sortFieldFile: action.sortFieldFile,
+      sortFieldFile: action.sortFieldFile
     };
   }
   if (action.type === 'UPDATE_LIST_ITEMS_FOR_REMOVE') {
     return {
       ...state,
-      itemList: action.itemList,
+      itemList: action.itemList
     };
   }
   if (action.type === 'UPDATE_SHOW_MODAL') {
     return {
       ...state,
-      showModal: action.showModal,
+      showModal: action.showModal
     };
   }
   if (action.type === 'UPDATE_GROUP_DETAIL') {
     return {
       ...state,
-      itemDetail: action.itemDetail,
+      itemDetail: action.itemDetail
     };
   }
   if (action.type === 'CLEAN_FILTERS') {
     return {
       ...state,
-      filters: {},
+      filters: {}
     };
   }
   if (action.type === 'UPDATE_FILTERS') {
     return {
       ...state,
-      filters: filters,
+      filters: filters
     };
   }
   if (action.type === 'CLEAN_INFO') {
     return {
       ...state,
-      itemDetail: false,
+      itemDetail: false
     };
   }
   if (action.type === 'UPDATE_SHOW_ADD_AGENTS') {
     return {
       ...state,
-      showAddAgents: action.showAddAgents,
+      showAddAgents: action.showAddAgents
     };
   }
   if (action.type === 'UPDATE_FILE_CONTENT') {
     return {
       ...state,
-      fileContent: action.content,
+      fileContent: action.content
     };
   }
   if (action.type === 'CLEAN_FILE_CONTENT') {
     return {
       ...state,
-      fileContent: false,
+      fileContent: false
     };
   }
   if (action.type === 'UPDATE_SELECTED_TAB') {
     return {
       ...state,
-      selectedTabId: action.selectedTabId,
+      selectedTabId: action.selectedTabId
     };
   }
   if (action.type === 'CLEAN_TABS') {
@@ -176,7 +176,7 @@ const groupsReducers = (state = initialState, action) => {
       sortDirectionFile: 'asc',
       sortDirectionAgents: 'asc',
       selectedTabId: 'agents',
-      itemDetail: false,
+      itemDetail: false
     };
   }
   if (action.type === 'RESET') {

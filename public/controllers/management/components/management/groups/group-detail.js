@@ -10,14 +10,17 @@ import {
   EuiTab,
   EuiTabs,
   EuiToolTip,
-  EuiButtonIcon,
+  EuiButtonIcon
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
 import GroupsHandler from './utils/groups-handler';
 
-import { cleanTabs, updateSelectedTab } from '../../../../../redux/actions/groupsActions';
+import {
+  cleanTabs,
+  updateSelectedTab
+} from '../../../../../redux/actions/groupsActions';
 import WzGroupsActionButtonsAgents from './actions-buttons-agents';
 import WzGroupsActionButtonsFiles from './actions-buttons-files';
 import WzGroupAgentsTable from './group-agents-table';
@@ -31,17 +34,17 @@ class WzGroupDetail extends Component {
       {
         id: 'agents',
         name: 'Agents',
-        disabled: false,
+        disabled: false
       },
       {
         id: 'files',
         name: 'Files',
-        disabled: false,
-      },
+        disabled: false
+      }
     ];
 
     this.state = {
-      selectedTabId: this.props.state.selectedTabId,
+      selectedTabId: this.props.state.selectedTabId
     };
 
     this.groupsHandler = GroupsHandler;
@@ -53,7 +56,7 @@ class WzGroupDetail extends Component {
 
   onSelectedTabChanged = id => {
     this.setState({
-      selectedTabId: id,
+      selectedTabId: id
     });
     this.props.updateSelectedTab(id);
   };
@@ -101,8 +104,8 @@ class WzGroupDetail extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can list and see your group files, also, you can edit the group
-              configuration
+              From here you can list and see your group files, also, you can
+              edit the group configuration
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -168,15 +171,19 @@ class WzGroupDetail extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     cleanTabs: () => dispatch(cleanTabs()),
-    updateSelectedTab: selectedTabId => dispatch(updateSelectedTab(selectedTabId)),
+    updateSelectedTab: selectedTabId =>
+      dispatch(updateSelectedTab(selectedTabId))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupDetail);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupDetail);

@@ -10,12 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-
-
 export class WazuhConfig {
   constructor() {
     if (!!WazuhConfig.instance) {
-        return WazuhConfig.instance;
+      return WazuhConfig.instance;
     }
     WazuhConfig.instance = this;
 
@@ -45,5 +43,4 @@ export class WazuhConfig {
   isDebug() {
     return ((this.config || {})['logs.level'] || false) === 'debug';
   }
-
-} 
+}

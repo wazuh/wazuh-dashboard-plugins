@@ -36,7 +36,7 @@ export class WzStatusDaemons extends Component {
     const { listDaemons } = this.props.state;
 
     const textStyle = {
-      marginLeft: '4px',
+      marginLeft: '4px'
     };
 
     return (
@@ -62,7 +62,7 @@ export class WzStatusDaemons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers,
+    state: state.statusReducers
   };
 };
 

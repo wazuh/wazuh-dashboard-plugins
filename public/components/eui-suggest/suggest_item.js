@@ -13,14 +13,14 @@ const colorToClassNameMap = {
   tint6: 'euiSuggestItem__type--tint6',
   tint7: 'euiSuggestItem__type--tint7',
   tint8: 'euiSuggestItem__type--tint8',
-  tint9: 'euiSuggestItem__type--tint9',
+  tint9: 'euiSuggestItem__type--tint9'
 };
 
 export const COLORS = Object.keys(colorToClassNameMap);
 
 const labelDisplayToClassMap = {
   fixed: 'euiSuggestItem__labelDisplay--fixed',
-  expand: 'euiSuggestItem__labelDisplay--expand',
+  expand: 'euiSuggestItem__labelDisplay--expand'
 };
 
 export const DISPLAYS = Object.keys(labelDisplayToClassMap);
@@ -37,7 +37,7 @@ export const EuiSuggestItem = ({
   const classes = classNames(
     'euiSuggestItem',
     {
-      'euiSuggestItem-isClickable': onClick,
+      'euiSuggestItem-isClickable': onClick
     },
     className
   );
@@ -48,7 +48,7 @@ export const EuiSuggestItem = ({
     'euiSuggestItem__label',
     labelDisplayToClassMap[labelDisplay],
     {
-      'euiSuggestItem__labelDisplay--expand': !description,
+      'euiSuggestItem__labelDisplay--expand': !description
     }
   );
 
@@ -82,7 +82,6 @@ EuiSuggestItem.propTypes = {
   type: PropTypes.shape({
     iconType: IconPropType,
     color: PropTypes.oneOfType([PropTypes.oneOf(COLORS), PropTypes.string])
-      ,
   }),
   /**
    * Label or primary text.
@@ -99,9 +98,9 @@ EuiSuggestItem.propTypes = {
   /**
    * Handler for click on a suggestItem.
    */
-  onClick: PropTypes.func,
+  onClick: PropTypes.func
 };
 
 EuiSuggestItem.defaultProps = {
-  labelDisplay: 'fixed',
+  labelDisplay: 'fixed'
 };

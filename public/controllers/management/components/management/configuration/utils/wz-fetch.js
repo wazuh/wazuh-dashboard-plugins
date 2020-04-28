@@ -16,11 +16,16 @@ import { replaceIllegalXML } from './xml';
 
 /**
  * Get configuration for an agent/manager of request sections
- * @param {string} [agentId=000] Agent ID 
+ * @param {string} [agentId=000] Agent ID
  * @param {array} sections Sections
- * @param {falsy} [node=false] Node 
+ * @param {falsy} [node=false] Node
  */
-export const getCurrentConfig = async (agentId = '000', sections, node = false, updateWazuhNotReadyYet) => {
+export const getCurrentConfig = async (
+  agentId = '000',
+  sections,
+  node = false,
+  updateWazuhNotReadyYet
+) => {
   try {
     if (
       !agentId ||
@@ -63,7 +68,11 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false, 
         }
 
       } catch (error) {
-        result[`${component}-${configuration}`] = await handleError(error, 'Fetch configuration', updateWazuhNotReadyYet);
+        result[`${component}-${configuration}`] = await handleError(
+          error,
+          'Fetch configuration',
+          updateWazuhNotReadyYet
+        );
       }
     }
     return result;
@@ -76,7 +85,7 @@ export const getCurrentConfig = async (agentId = '000', sections, node = false, 
  * Extracts error message string from any kind of error.
  * @param {*} error
  */
-export const extractMessage = (error) => {
+export const extractMessage = error => {
   if ((error || {}).status === -1) {
     const origin = ((error || {}).config || {}).url || '';
     const isFromAPI =
@@ -104,19 +113,19 @@ export const extractMessage = (error) => {
   if (typeof error === 'string') return error;
   if (typeof error === 'object') return JSON.stringify(error);
   return error || 'Unexpected error';
-}
+};
 
 /**
- * 
- * @param {Error|string} error 
- * @param {*} location 
+ *
+ * @param {Error|string} error
+ * @param {*} location
  */
 export const handleError = async (error, location, updateWazuhNotReadyYet) => {
   const message = extractMessage(error);
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
-      updateWazuhNotReadyYet('Wazuh not ready yet.')
+      updateWazuhNotReadyYet('Wazuh not ready yet.');
       await makePing(updateWazuhNotReadyYet);
       return;
     }
@@ -135,7 +144,7 @@ export const handleError = async (error, location, updateWazuhNotReadyYet) => {
   } catch (error) {
     console.error(error);
   }
-}
+};
 
 /**
  * Check daemons status
@@ -150,26 +159,22 @@ export const checkDaemons = async () => {
     const execd = daemons['ossec-execd'] === 'running';
     const modulesd = daemons['wazuh-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    const clusterd = isCluster ?
-      daemons['wazuh-clusterd'] === 'running' :
-      true;
+    const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
 
     const isValid = execd && modulesd && wazuhdb && clusterd;
 
     if (isValid) {
-      return {
-        isValid
-      }
+      return { isValid };
     } else {
       throw new Error('Wazuh not ready yet');
     }
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Make ping to Wazuh API
@@ -195,11 +200,11 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
     if (!isValid) {
       throw new Error('Not recovered');
     }
-    return Promise.resolve('Wazuh is ready')
+    return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    return Promise.reject('Wazuh could not be recovered.')
+    return Promise.reject('Wazuh could not be recovered.');
   }
-}
+};
 
 /**
  * Get Cluster status from Wazuh API
@@ -207,20 +212,17 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
  */
 export const clusterReq = async () => {
   try {
-    return WzRequest.apiReq(
-      'GET',
-      '/cluster/status', {}
-    );
+    return WzRequest.apiReq('GET', '/cluster/status', {});
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
-/** 
+/**
  * Fetch a config file from cluster node or manager
- * @return {string} 
+ * @return {string}
  */
-export const fetchFile = async (selectedNode) => {
+export const fetchFile = async selectedNode => {
   try {
     const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {}; // TODO: Check, when FIX ISSUE /cluster/status
     const isCluster =
@@ -247,29 +249,31 @@ export const fetchFile = async (selectedNode) => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Restart a node or manager
  * @param {} selectedNode Cluster Node
  */
-export const restartNodeSelected = async (selectedNode, updateWazuhNotReadyYet) => {
+export const restartNodeSelected = async (
+  selectedNode,
+  updateWazuhNotReadyYet
+) => {
   try {
-    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
+    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
 
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    isCluster
-      ?
-      await restartNode(selectedNode) :
-      await restartManager();
+    isCluster ? await restartNode(selectedNode) : await restartManager();
     // Dispatch a Redux action
-    updateWazuhNotReadyYet(`Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`); //FIXME: if it enable/disable cluster, this will show Manager instead node name
+    updateWazuhNotReadyYet(
+      `Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`
+    ); //FIXME: if it enable/disable cluster, this will show Manager instead node name
     return await makePing(updateWazuhNotReadyYet);
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Restart manager (single-node API call)
@@ -291,7 +295,7 @@ export const restartManager = async () => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Restart cluster
@@ -322,13 +326,13 @@ export const restartCluster = async () => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Restart a cluster node
  * @returns {object|Promise}
  */
-export const restartNode = async (node) => {
+export const restartNode = async node => {
   try {
     const validationError = await WzRequest.apiReq(
       'GET',
@@ -349,12 +353,13 @@ export const restartNode = async (node) => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 export const saveConfiguration = async (selectedNode, xml) => {
   try {
-    const clusterStatus = (((await clusterReq() || {}).data || {}).data) || {};
-    const enabledAndRunning = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
+    const enabledAndRunning =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     if (enabledAndRunning) {
       await saveFileCluster(xml, selectedNode);
     } else {
@@ -363,7 +368,7 @@ export const saveConfiguration = async (selectedNode, xml) => {
   } catch (error) {
     return Promise.error(error.message || error);
   }
-}
+};
 
 /**
  * Send ossec.conf content for a cluster node
@@ -383,7 +388,7 @@ export const saveNodeConfiguration = async (node, content) => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Save text to ossec.conf cluster file
@@ -407,13 +412,13 @@ export const saveFileCluster = async (text, node) => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Save text to ossec.conf manager file
  * @param {string} text Text to save
  */
-export const saveFileManager = async (text) => { //TODO: Check when manager
+export const saveFileManager = async text => {
   const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq(
@@ -439,10 +444,7 @@ export const saveFileManager = async (text) => { //TODO: Check when manager
  */
 export const validateAfterSent = async (node = false) => {
   try {
-    const clusterStatus = await WzRequest.apiReq(
-      'GET',
-      `/cluster/status`, {}
-    );
+    const clusterStatus = await WzRequest.apiReq('GET', `/cluster/status`, {});
 
     const clusterData = ((clusterStatus || {}).data || {}).data || {};
     const isCluster =
@@ -455,15 +457,13 @@ export const validateAfterSent = async (node = false) => {
         `/cluster/configuration/validation`, {}
       );
     } else {
-      validation = isCluster ?
-        await WzRequest.apiReq(
-          'GET',
-          `/cluster/configuration/validation`, {}
-        ) :
-        await WzRequest.apiReq(
-          'GET',
-          `/manager/configuration/validation`, {}
-        );
+      validation = isCluster
+        ? await WzRequest.apiReq('GET', `/cluster/configuration/validation`, {})
+        : await WzRequest.apiReq(
+            'GET',
+            `/manager/configuration/validation`,
+            {}
+          );
     }
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
@@ -476,7 +476,7 @@ export const validateAfterSent = async (node = false) => {
   }
 };
 
-export const agentIsSynchronized = async (agent) => {
+export const agentIsSynchronized = async agent => {
   const isSync = await WzRequest.apiReq(
     'GET',
     `/agents/${agent.id}/group/is_sync`, {}
@@ -494,7 +494,7 @@ export const clusterNodes = async () => {
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Check de admin mode and return true or false(if admin mode is not set in the wazuh.yml the default value is true)
@@ -502,11 +502,15 @@ export const clusterNodes = async () => {
 export const checkAdminMode = async () => {
   try {
     let admin = true;
-    const result = await WzRequest.genericReq('GET', '/utils/configuration', {});
-    const data = (((result || {}).data) || {}).data || {};
+    const result = await WzRequest.genericReq(
+      'GET',
+      '/utils/configuration',
+      {}
+    );
+    const data = ((result || {}).data || {}).data || {};
     if (Object.keys(data).includes('admin')) admin = data.admin;
     return admin;
   } catch (error) {
     return Promise.error(error);
   }
-}
+};
