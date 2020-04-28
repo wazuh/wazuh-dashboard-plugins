@@ -85,7 +85,7 @@ class WzConfigurationActiveResponseAgent extends Component {
               title="Active response settings"
               description="Find here all the Active response settings for this agent"
               currentConfig={currentConfig}
-              minusHeight={this.props.agent.id === '000' ? 280 : 350}
+              minusHeight={this.props.agent.id === '000' ? 280 : 355}
               helpLinks={helpLinks}
             >
               <WzConfigurationSettingsGroup

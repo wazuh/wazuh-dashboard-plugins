@@ -77,7 +77,7 @@ class WzConfigurationAgentless extends Component {
               title="Devices list"
               description="List of monitored devices that don't use the agent"
               currentConfig={currentConfig}
-              minusHeight={245}
+              minusHeight={260}
               helpLinks={helpLinks}
             >
               <WzConfigurationListSelector

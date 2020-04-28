@@ -14,42 +14,59 @@ import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import {
   updateCurrentApi,
-  updateShowMenu
+  updateShowMenu,
+  updateExtensions
 } from '../redux/actions/appStateActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { WazuhConfig } from './wazuh-config';
 
 export class AppState {
+
+  static getCachedExtensions = (id) => {
+    const extensions = ((store.getState() || {}).appStateReducers || {}).extensions;
+    if(Object.keys(extensions).length && extensions[id]){
+      return extensions[id];
+    }
+    return false;
+  }
+
+
   /**
    * Returns if the extension 'id' is enabled
    * @param {id} id
    */
   static getExtensions = async id => {
     try {
-      const data = await GenericRequest.request('GET', `/api/extensions/${id}`);
+      const cachedExtensions = this.getCachedExtensions(id);
+      if(cachedExtensions){
+        return cachedExtensions;
+      }else{
+        const data = await GenericRequest.request('GET', `/api/extensions/${id}`);
 
-      const extensions = data.data.extensions;
-      if (Object.keys(extensions).length) {
-        return extensions;
-      } else {
-        const wazuhConfig = new WazuhConfig();
-        const config = wazuhConfig.getConfig();
-        const extensions = {
-          audit: config['extensions.audit'],
-          pci: config['extensions.pci'],
-          gdpr: config['extensions.gdpr'],
-          hipaa: config['extensions.hipaa'],
-          nist: config['extensions.nist'],
-          oscap: config['extensions.oscap'],
-          ciscat: config['extensions.ciscat'],
-          aws: config['extensions.aws'],
-          virustotal: config['extensions.virustotal'],
-          osquery: config['extensions.osquery'],
-          mitre: config['extensions.mitre'],
-          docker: config['extensions.docker']
-        };
-        AppState.setExtensions(id, extensions);
-        return extensions;
+        const extensions = data.data.extensions;
+        if (Object.keys(extensions).length) {
+          AppState.setExtensions(id, extensions);
+          return extensions;
+        } else {
+          const wazuhConfig = new WazuhConfig();
+          const config = wazuhConfig.getConfig();
+          const extensions = {
+            audit: config['extensions.audit'],
+            pci: config['extensions.pci'],
+            gdpr: config['extensions.gdpr'],
+            hipaa: config['extensions.hipaa'],
+            nist: config['extensions.nist'],
+            oscap: config['extensions.oscap'],
+            ciscat: config['extensions.ciscat'],
+            aws: config['extensions.aws'],
+            virustotal: config['extensions.virustotal'],
+            osquery: config['extensions.osquery'],
+            mitre: config['extensions.mitre'],
+            docker: config['extensions.docker']
+          };
+          AppState.setExtensions(id, extensions);
+          return extensions;
+        }
       }
     } catch (err) {
       console.log('Error get extensions');
@@ -69,6 +86,8 @@ export class AppState {
         id,
         extensions
       });
+      const updateExtension = updateExtensions(id,extensions);
+      store.dispatch(updateExtension);
     } catch (err) {
       console.log('Error set extensions');
       console.log(err);

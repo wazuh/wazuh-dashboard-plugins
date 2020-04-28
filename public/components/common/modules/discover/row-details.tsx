@@ -97,7 +97,7 @@ export class RowDetails extends Component {
     this._isMount = true;
     const rulesDataResponse = await ApiRequest.request('GET', `/rules`, { q: `id=${this.props.item.rule.id}` });
     const ruleData = (rulesDataResponse.data || {}).data || {};
-    if(this._isMount){
+    if (this._isMount) {
       this.setState({ ruleData })
     }
   }
@@ -134,13 +134,13 @@ export class RowDetails extends Component {
       const key = "syscheck." + item;
       child['title'] = key;
       const value = this.getChildFromPath(this.props.item.syscheck, item);
-      if(Array.isArray(value)){
+      if (Array.isArray(value)) {
         child['description'] = value.map(item => {
-          return this.getFilterLink(key,item);
+          return this.getFilterLink(key, item);
         })
-      }else{
+      } else {
         child['description'] = (
-          this.getFilterLink(key,value)
+          this.getFilterLink(key, value)
         )
 
       }
@@ -233,7 +233,7 @@ export class RowDetails extends Component {
 
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-        <li key={key} style={{marginTop: 10}}><b>{capitalize(key)}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
+        <li key={key} style={{ marginBottom: 10 }}><b>{capitalize(key)}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
       );
     });
     return (
@@ -353,21 +353,23 @@ export class RowDetails extends Component {
 
     return (
       <Fragment>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false} style={{ fontSize: 14 }}>
-            <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank">
-              <EuiIcon type="popout" color='primary' />&nbsp;
-              View in Rules
-            </a>
-          </EuiFlexItem>
-        </EuiFlexGroup>
         <EuiFlexGroup style={{ height: 416, marginTop: 0 }}>
           {/* General info */}
           <EuiFlexItem>
             <EuiPanel paddingSize="m">
-              <EuiTitle size={'s'}>
-                <h3>Information</h3>
-              </EuiTitle>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiTitle size={'s'}>
+                    <h3>Information</h3>
+                  </EuiTitle>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false} style={{ fontSize: 14 }}>
+                  <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
+                    <EuiIcon type="popout" color='primary' />&nbsp;
+                      View in Rules
+                  </a>
+                </EuiFlexItem>
+              </EuiFlexGroup>
               <EuiSpacer size="s" />
               {this.renderInfo(id, level, file, path)}
               {/* Groups */}
