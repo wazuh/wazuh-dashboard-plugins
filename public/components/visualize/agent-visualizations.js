@@ -140,6 +140,20 @@ export const agentVisualizations = {
       }
     ]
   },
+  gcp: {
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'TODO GCP',
+            id: 'Wazuh-App-Agents-GCP-Top-5-rules',
+            width: 50
+          },
+        ]
+      },
+    ]
+  },
   pci: {
     rows: [
       {
