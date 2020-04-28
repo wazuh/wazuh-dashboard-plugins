@@ -81,7 +81,7 @@ export class EventsFim extends Component {
     if (this.fetchWatch) this.fetchWatch();
   }
 
-  getRowsField = async () => {
+  getRowsField = async (retries = 0) => {
     const indices: number[] = [];
     const { rows } = this.state;
     if (!rows) {
@@ -108,30 +108,32 @@ export class EventsFim extends Component {
     });
     if (query){
       const elements = document.querySelectorAll(query);
-        elements.forEach((element, idx) => {
-          const text = element.textContent;
-          if (idx % 2){
-            element.childNodes.forEach(child => {
-              if (child.nodeName === 'SPAN'){
-                const link = document.createElement('a')
-                link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
-                link.setAttribute('target', '_blank')
-                link.setAttribute('style', 'minWidth: 55, display: "block"');
-                link.textContent = text
-                child.replaceWith(link)
-              }
-            })
-          } else {
-            element.childNodes.forEach(child => {
-              if (child.nodeName === 'SPAN'){
-                const link = document.createElement('a')
-                link.onclick = () => this.showFlyout(text);
-                link.textContent = text
-                child.replaceWith(link);
-              }
-            })
-          }
-        })
+      elements.forEach((element, idx) => {
+        const text = element.textContent;
+        if (idx % 2){
+          element.childNodes.forEach(child => {
+            if (child.nodeName === 'SPAN'){
+              const link = document.createElement('a')
+              link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
+              link.setAttribute('target', '_blank')
+              link.setAttribute('style', 'minWidth: 55, display: "block"');
+              link.textContent = text
+              child.replaceWith(link)
+            }
+          })
+        } else {
+          element.childNodes.forEach(child => {
+            if (child.nodeName === 'SPAN'){
+              const link = document.createElement('a')
+              link.onclick = () => this.showFlyout(text);
+              link.textContent = text
+              child.replaceWith(link);
+            }
+          })
+        }
+      })
+      retries++;
+      retries <= 5 && setTimeout(() => this.getRowsField(retries), 100);
     }
   }
 
