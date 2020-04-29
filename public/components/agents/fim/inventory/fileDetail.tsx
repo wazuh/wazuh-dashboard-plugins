@@ -201,7 +201,7 @@ export class FileDetails extends Component {
                   ? <EuiToolTip position="top" anchorClassName="detail-tooltip" content={value} delay="long">
                       <span className={className}>{value}</span>
                     </EuiToolTip> 
-                  : <EuiToolTip position="top" anchorClassName="detail-tooltip" content={`Filter by ${item.field} is ${value} in states`} >
+                  : <EuiToolTip position="top" anchorClassName="detail-tooltip" content={`Filter by ${item.field} is ${value} in inventory`} >
                         <EuiLink
                           className={className}
                           onClick={() => {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { States } from './index';
+import { Inventory } from './index';
 import '../../common/modules/module.less';
 
 export class MainFim extends Component {
@@ -13,8 +13,8 @@ export class MainFim extends Component {
     if (selectView) {
       return (
         <div>
-          {selectView === 'states' &&
-            <States {...this.props}
+          {selectView === 'inventory' &&
+            <Inventory {...this.props}
             />}
         </div>
       );

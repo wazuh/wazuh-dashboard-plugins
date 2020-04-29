@@ -11,7 +11,7 @@
  */
 
 import React, { Component } from 'react';
-import { FlyoutDetail } from './states/flyout';
+import { FlyoutDetail } from './inventory/flyout';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
 

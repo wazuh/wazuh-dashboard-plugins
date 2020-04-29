@@ -1,6 +1,5 @@
-
 /*
- * Wazuh app - Integrity monitoring components
+ * Wazuh app - Integrity monitoring table component
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,13 +16,13 @@ import {
   EuiFlexItem,
   EuiBasicTable,
   Direction,
+  EuiOverlayMask,
 } from '@elastic/eui';
-import { i18n } from '@kbn/i18n';
-import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
+import './inventory.less';
 
-export class RegistryTable extends Component {
+export class InventoryTable extends Component {
   state: {
     syscheck: [],
     pageIndex: number,
@@ -39,20 +38,23 @@ export class RegistryTable extends Component {
   };
 
   props!: {
-    filters: {}
+    filters: {},
+    onFilterSelect(): void
+    agent: any,
+    items: []
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      syscheck: [],
+      syscheck: props.items,
       pageIndex: 0,
       pageSize: 15,
       totalItems: 0,
       sortField: 'file',
       sortDirection: 'asc',
-      isLoading: true,
+      isLoading: false,
       isFlyoutVisible: false,
       currentFile: {
         file: ""
@@ -60,16 +62,9 @@ export class RegistryTable extends Component {
     }
   }
 
-  async componentDidMount() {
-    await this.getSyscheck();
-  }
-
-  componentDidUpdate(prevProps) {
-    const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
-      this.setState({pageIndex: 0}, this.getSyscheck)
-    }
-  }
+  // async componentDidMount() {
+  //   await this.getSyscheck();
+  // }
 
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
@@ -83,8 +78,14 @@ export class RegistryTable extends Component {
     this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
-  async getSyscheck() {
+  componentDidUpdate(prevProps) {
     const { filters } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
+      this.setState({pageIndex: 0}, this.getSyscheck)
+    }
+  }
+
+  async getSyscheck() {
     const agentID = this.props.agent.id;
 
     const syscheck = await WzRequest.apiReq(
@@ -101,27 +102,27 @@ export class RegistryTable extends Component {
   }
 
   buildSortFilter() {
-    const {sortField, sortDirection} = this.state;
+    const { sortField, sortDirection } = this.state;
 
     const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
 
-    return direction+field;
+    return direction + field;
   }
 
   buildFilter() {
-    const { pageIndex, pageSize} = this.state;
+    const { pageIndex, pageSize } = this.state;
     const { filters } = this.props;
 
-     const filter = {
+    const filter = {
       ...filters,
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
-      type: 'registry'
+      type: 'file'
     };
 
-     return filter;
+    return filter;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -139,22 +140,66 @@ export class RegistryTable extends Component {
   };
 
   columns() {
+    let width;
+    this.props.agent.os.platform === 'windows' ? width = '60px' : width = '80px';
     return [
       {
         field: 'file',
-        name: 'Registry',
+        name: 'File',
         sortable: true,
+        width: '250px'
       },
       {
         field: 'mtime',
         name: 'Last Modified',
         sortable: true,
-        width: '200px',
-      }      
+        width: '100px'
+      },
+      {
+        field: 'uname',
+        name: 'User',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`
+      },
+      {
+        field: 'uid',
+        name: 'User ID',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`
+      },
+      {
+        field: 'gname',
+        name: 'Group',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`
+      },
+      {
+        field: 'gid',
+        name: 'Group ID',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`
+      },
+      {
+        field: 'perm',
+        name: 'Permissions',
+        sortable: true,
+        truncateText: true,
+        width: `${width}`
+      },
+      {
+        field: 'size',
+        name: 'Size',
+        sortable: true,
+        width: `${width}`
+      }
     ]
   }
 
-  renderRegistryTable() {
+  renderFilesTable() {
     const getRowProps = item => {
       const { file } = item;
       return {
@@ -172,44 +217,48 @@ export class RegistryTable extends Component {
       pageSizeOptions: [15, 25, 50, 100],
     }
     const sorting = {
-			sort: {
-				field: sortField,
-				direction: sortDirection,
-			},
+      sort: {
+        field: sortField,
+        direction: sortDirection,
+      },
     };
-    
+
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
-              items={syscheck}
-              columns={columns}
-              pagination={pagination}
-              onChange={this.onTableChange}
-              rowProps={getRowProps}
-              sorting={sorting}
-              itemId="file"
-              isExpandable={true}
-              loading={isLoading}
-            />
+            items={syscheck}
+            columns={columns}
+            pagination={pagination}
+            onChange={this.onTableChange}
+            rowProps={getRowProps}
+            sorting={sorting}
+            itemId="file"
+            isExpandable={true}
+            loading={isLoading}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
     );
   }
 
   render() {
-    const registryTable = this.renderRegistryTable();
+    const filesTable = this.renderFilesTable();
     return (
       <div>
-        {registryTable}
+        {filesTable}
         {this.state.isFlyoutVisible &&
-          <FlyoutDetail
-            fileName={this.state.currentFile.file}
-            agentId={this.props.agent.id}
-            closeFlyout={() => this.closeFlyout()}
-            type='registry'
-            view='states'
-            {...this.props} />
+          <EuiOverlayMask 
+            onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+            <FlyoutDetail
+              fileName={this.state.currentFile.file}
+              agentId={this.props.agent.id}
+              closeFlyout={() => this.closeFlyout()}
+              type='file'
+              view='inventory'
+              showViewInEvents={true}
+              {...this.props } />
+          </EuiOverlayMask>
         }
       </div>
     )

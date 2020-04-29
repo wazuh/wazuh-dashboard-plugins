@@ -32,15 +32,15 @@ import {
   EuiButtonEmpty
 } from '@elastic/eui';
 import {
-  StatesTable,
+  InventoryTable,
   FilterBar,
   RegistryTable
-} from './states/';
+} from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 
-export class States extends Component {
+export class Inventory extends Component {
   _isMount = false;
   state: {
     filters: {},
@@ -238,7 +238,7 @@ export class States extends Component {
           selectView={selectedTabId}
           agent={this.props.agent} />
         {selectedTabId === 'files' &&
-          <StatesTable
+          <InventoryTable
             {...this.props}
             filters={filters}
             items={syscheck}
@@ -287,7 +287,7 @@ export class States extends Component {
     </EuiPage>);
   }
 
-  loadingStates() {
+  loadingInventory() {
     return <EuiPage>
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -300,7 +300,7 @@ export class States extends Component {
   render() {
     const { totalItemsFile, totalItemsRegistry, isLoading } = this.state;
     if (isLoading) {
-      return this.loadingStates()
+      return this.loadingInventory()
     }
     const table = this.renderTable();
     const tabs = this.renderTabs()
