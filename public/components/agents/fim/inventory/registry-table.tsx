@@ -62,12 +62,18 @@ export class RegistryTable extends Component {
 
   async componentDidMount() {
     await this.getSyscheck();
+    const regex = new RegExp('file=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0]) {
+      const file = match[0].split('=')[1];
+      this.showFlyout(decodeURIComponent(file), true);
+    }
   }
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
-      this.setState({pageIndex: 0}, this.getSyscheck)
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0 }, this.getSyscheck)
     }
   }
 
@@ -75,10 +81,18 @@ export class RegistryTable extends Component {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
 
-  showFlyout(file) {
-    const fileData = this.state.syscheck.filter(item => {
-      return item.file === file;
-    });
+  async showFlyout(file, redirect = false) {
+    let fileData = false;
+    if (!redirect) {
+      fileData = this.state.syscheck.filter(item => {
+        return item.file === file;
+      })
+    } else {
+      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, { 'file': file });
+      fileData = ((response.data || {}).data || {}).items || [];
+    }
+    if (!redirect)
+      window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
@@ -101,19 +115,19 @@ export class RegistryTable extends Component {
   }
 
   buildSortFilter() {
-    const {sortField, sortDirection} = this.state;
+    const { sortField, sortDirection } = this.state;
 
     const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
 
-    return direction+field;
+    return direction + field;
   }
 
   buildFilter() {
-    const { pageIndex, pageSize} = this.state;
+    const { pageIndex, pageSize } = this.state;
     const { filters } = this.props;
 
-     const filter = {
+    const filter = {
       ...filters,
       offset: pageIndex * pageSize,
       limit: pageSize,
@@ -121,7 +135,7 @@ export class RegistryTable extends Component {
       type: 'registry'
     };
 
-     return filter;
+    return filter;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -150,7 +164,7 @@ export class RegistryTable extends Component {
         name: 'Last Modified',
         sortable: true,
         width: '200px',
-      }      
+      }
     ]
   }
 
@@ -172,26 +186,26 @@ export class RegistryTable extends Component {
       pageSizeOptions: [15, 25, 50, 100],
     }
     const sorting = {
-			sort: {
-				field: sortField,
-				direction: sortDirection,
-			},
+      sort: {
+        field: sortField,
+        direction: sortDirection,
+      },
     };
-    
+
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
-              items={syscheck}
-              columns={columns}
-              pagination={pagination}
-              onChange={this.onTableChange}
-              rowProps={getRowProps}
-              sorting={sorting}
-              itemId="file"
-              isExpandable={true}
-              loading={isLoading}
-            />
+            items={syscheck}
+            columns={columns}
+            pagination={pagination}
+            onChange={this.onTableChange}
+            rowProps={getRowProps}
+            sorting={sorting}
+            itemId="file"
+            isExpandable={true}
+            loading={isLoading}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
     );
