@@ -178,11 +178,17 @@ export class FileDetails extends Component {
     }
   }
 
+  formatBytes(a,b=2){if(0===a)return"0 Bytes";const c=0>b?0:b,d=Math.floor(Math.log(a)/Math.log(1024));return parseFloat((a/Math.pow(1024,d)).toFixed(c))+" "+["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"][d]}
+
+
   getDetails() {
     const { view } = this.props
     const columns = this.props.type === 'file' ? this.details() : this.registryDetails();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
+      if(item.field === 'size'){
+        value = this.formatBytes(value);
+      }
       var link = (item.link && view !== 'events') || false;
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent.agentPlatform !== 'windows')){
         let className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
