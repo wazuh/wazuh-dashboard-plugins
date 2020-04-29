@@ -40,20 +40,21 @@ export class StatesTable extends Component {
   props!: {
     filters: {},
     onFilterSelect(): void
-    agent: any
+    agent: any,
+    items: []
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      syscheck: [],
+      syscheck: props.items,
       pageIndex: 0,
       pageSize: 15,
       totalItems: 0,
       sortField: 'file',
       sortDirection: 'asc',
-      isLoading: true,
+      isLoading: false,
       isFlyoutVisible: false,
       currentFile: {
         file: ""
@@ -61,9 +62,9 @@ export class StatesTable extends Component {
     }
   }
 
-  async componentDidMount() {
-    await this.getSyscheck();
-  }
+  // async componentDidMount() {
+  //   await this.getSyscheck();
+  // }
 
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
