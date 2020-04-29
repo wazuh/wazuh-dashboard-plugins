@@ -144,15 +144,28 @@ export class MainModule extends Component {
 
   renderReportButton() {
     return (
-      <EuiFlexItem grow={false}>
-        <EuiButton
-          iconType="document"
-          isLoading={this.state.loadingReport}
-          isDisabled={this.props.disabledReport}
-          onClick={async() => this.startReport()}>
-          Generate report
-          </EuiButton>
-      </EuiFlexItem>
+      (this.props.disabledReport && 
+        <EuiFlexItem grow={false}>
+          <EuiToolTip position="top" content="No results match for this search criteria.">
+            <EuiButton
+              iconType="document"
+              isLoading={this.state.loadingReport}
+              isDisabled={true}
+              onClick={async() => this.startReport()}>
+              Generate report
+              </EuiButton>
+          </EuiToolTip>
+        </EuiFlexItem>
+        
+       || (
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            iconType="document"
+            isLoading={this.state.loadingReport}
+            onClick={async() => this.startReport()}>
+            Generate report
+            </EuiButton>
+        </EuiFlexItem>))
     );
   }
 
