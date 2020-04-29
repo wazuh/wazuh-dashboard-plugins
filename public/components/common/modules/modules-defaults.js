@@ -15,8 +15,8 @@ export const ModulesDefaults = {
   },
   fim: {
     init: 'inventory',
-    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting', 'settings']
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    buttons: ['reporting', 'settings']
   },
   sca: {
     init: 'states',

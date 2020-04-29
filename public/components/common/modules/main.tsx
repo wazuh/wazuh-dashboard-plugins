@@ -235,7 +235,7 @@ export class MainModule extends Component {
                 <div className='wz-module-header-nav'>
                   <EuiFlexGroup>
                     {this.renderTabs()}
-                    {((this.buttons || []).includes('dashboard') && selectView === 'dashboard') &&
+                    {(selectView === 'dashboard') &&
                       this.renderReportButton()
                     }
                     {(this.buttons || []).includes('dashboard') &&
