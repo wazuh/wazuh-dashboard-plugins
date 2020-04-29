@@ -17,7 +17,7 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiTitle,
-  EuiButtonEmpty,
+  EuiButtonIcon,
   EuiIcon,
   EuiSpacer,
   EuiStat,
@@ -246,26 +246,32 @@ export class FileDetails extends Component {
             {this.getDetails()}
           </div>
         </EuiAccordion>
-        <EuiSpacer size='m' />
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
+        <EuiSpacer size='s' />
+        <EuiAccordion
+          id={fileName}
+          buttonContent={
             <EuiTitle size="s">
-              <h2>{type === 'file' ? 'File' : 'Registry'} events</h2>
+              <h3>Recent events &nbsp;
+              <EuiToolTip
+                position="top"
+                content="Inspect in discover">
+                  <EuiButtonIcon
+                    onClick={() => this.viewInEvents()}
+                    iconType="link"
+                    aria-label="Inspect in discover"
+                  />
+                </EuiToolTip>
+            </h3>
             </EuiTitle>
-          </EuiFlexItem>
-          {showViewInEvents &&
-            <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
-              <EuiButtonEmpty onClick={() => this.viewInEvents()} className="view-in-events-btn">
-                View in Events
-            </EuiButtonEmpty>
-            </EuiFlexItem>
           }
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <Discover implicitFilters={implicitFilters} initialFilters={[]} type={type} />
-          </EuiFlexItem>
-        </EuiFlexGroup>
+          paddingSize="none"
+          initialIsOpen={true}>
+          <EuiFlexGroup className="details-row">
+            <EuiFlexItem>
+              <Discover implicitFilters={implicitFilters} initialFilters={[]} type={type} />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiAccordion>
       </Fragment>
     )
   }

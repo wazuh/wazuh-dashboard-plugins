@@ -196,19 +196,26 @@ export class Discover extends Component {
 
   async getAlerts() {
     //compare filters so we only make a request into Elasticsearch if needed
-    const newFilters = this.buildFilter();
-    if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading) {
-      this.setState({ isLoading: true })
-      const alerts = await GenericRequest.request(
-        'POST',
-        `/elastic/alerts`,
-        {
-          ...newFilters,
-          filters: [...newFilters['filters'], ...this.props.implicitFilters]
+    try{
+      const newFilters = this.buildFilter();
+      if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading) {
+        this.setState({ isLoading: true })
+        const alerts = await GenericRequest.request(
+          'POST',
+          `/elastic/alerts`,
+          {
+            ...newFilters,
+            filters: [...newFilters['filters'], ...this.props.implicitFilters]
+          }
+        );
+        if (this._isMount) {
+          this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+         
         }
-      );
+      }
+    }catch(err){
       if (this._isMount) {
-        this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters })
+        this.setState({ alerts: [], total: 0, isLoading: false })
       }
     }
   }
