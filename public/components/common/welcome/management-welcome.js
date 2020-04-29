@@ -45,7 +45,9 @@ class ManagementWelcome extends Component {
     this.setGlobalBreadcrumb();
     try{
       const adminMode = await checkAdminMode();
-      this.props.updateAdminMode(adminMode);
+      if(this.props.adminMode !== adminMode){
+        this.props.updateAdminMode(adminMode);
+      };
     }catch(error){}
   }
 

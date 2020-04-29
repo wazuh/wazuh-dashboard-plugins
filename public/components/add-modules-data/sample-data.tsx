@@ -82,10 +82,12 @@ class WzSampleData extends Component<IWzSampleDataProps> {
     // Check adminMode
     try{
       const adminMode: boolean = await checkAdminMode();
-      this.props.updateAdminMode(adminMode);
+      if(this.props.adminMode !== adminMode){
+        this.props.updateAdminMode(adminMode);
+      };
       if(!adminMode){ // redirect to root path of the application
         window.location.href = `#/`;
-      }
+      };
     }catch(error){}
 
     // Check if sample data for each category was added

@@ -61,7 +61,9 @@ class WzMenuManagement extends Component {
   async componentDidMount() {
     try{
       const adminMode = await checkAdminMode();
-      this.props.updateAdminMode(adminMode);
+      if(this.props.adminMode !== adminMode){
+        this.props.updateAdminMode(adminMode);
+      };
     }catch(error){}
   }
 
