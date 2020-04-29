@@ -119,7 +119,7 @@ export class RowDetails extends Component {
     const filter = {};
     filter[key] = value;
     return (
-      <EuiToolTip position="top" content={`Filter by ${key} : ${value}`}>
+      <EuiToolTip position="top" content={`Filter by ${key}:${value}`}>
         <EuiLink onClick={async () => this.props.addFilter(filter)}>
           &nbsp;{value}
         </EuiLink>
