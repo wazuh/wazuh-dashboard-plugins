@@ -277,7 +277,10 @@
                                             </p>
                                             <div class="euiText euiText--small euiStat__description wz-text-gray">
                                                 <div layout="row" ng-repeat="rule in item.rules">
-                                                    <p class="fullWidth">{{rule.rule}}</p>
+                                                    <p class="fullWidth" style="margin-bottom: 5px!important;">
+                                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                                        &nbsp;{{rule.rule}}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
