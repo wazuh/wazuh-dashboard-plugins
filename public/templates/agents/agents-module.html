@@ -42,8 +42,15 @@
             <div class="euiSpacer euiSpacer--l"></div>
         </div>
     </div>
+    <!-- No results section -->
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+    ng-if="tab !== 'welcome'" ng-show="resultState === 'none' && tabView === 'panels' && showModuleDashboard">
+    <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+        one.'}" />
+    </div>
+
     <!-- End report status section -->
-    <div ng-if="tab && tab!=='welcome'">
+    <div ng-if="tab && tab!=='welcome' && resultState !== 'none'">
         <div ng-class="{'no-opacity': !moduleDiscoverReady}">
             <react-component ng-show='showModuleDashboard' name="WzVisualize"
                 props="{selectedTab: tab, isAgent: true}" />
