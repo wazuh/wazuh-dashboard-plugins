@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { updateAdminMode } from '../../redux/actions/appStateActions';
 
 import {
     EuiFlexItem,
@@ -30,20 +31,21 @@ import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
-interface ISampleDataCategoryState{
-  exists: boolean
-  addDataLoading: boolean
-  removeDataLoading: boolean
-}
-export default class WzSampleData extends Component {
+interface IWzSampleDataProps{
+  adminMode?: boolean
+  updateAdminMode: (adminMode: boolean) => void
+};
+
+class WzSampleData extends Component<IWzSampleDataProps> {
   categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
-  state: {
-    adminMode: boolean
-    security: ISampleDataCategoryState
-    'auditing-policy-monitoring': ISampleDataCategoryState
-    'threat-detection': ISampleDataCategoryState
-  }
   generateAlertsParams: any
+  state: {
+    [name: string]: {
+      exists: boolean
+      addDataLoading: boolean
+      removeDataLoading: boolean
+    }
+  }
   constructor(props){
     super(props);
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
@@ -67,9 +69,7 @@ export default class WzSampleData extends Component {
         categorySampleAlertsIndex: 'threat-detection'
       }
     ];
-    this.state = {
-      adminMode: false
-    };
+    this.state = {};
     this.categories.forEach(category => {
       this.state[category.categorySampleAlertsIndex] = {
         exists: false,
@@ -81,9 +81,9 @@ export default class WzSampleData extends Component {
   async componentDidMount(){
     // Check adminMode
     try{
-      const adminMode = await checkAdminMode();
-      this.setState({ adminMode });
-      if(!adminMode){
+      const adminMode: boolean = await checkAdminMode();
+      this.props.updateAdminMode(adminMode);
+      if(!adminMode){ // redirect to root path of the application
         window.location.href = `#/`;
       }
     }catch(error){}
@@ -104,7 +104,7 @@ export default class WzSampleData extends Component {
       },{...this.state}));
     }catch(error){}
 
-    // Get values of cluster/manager
+    // Get information about cluster/manager
     try{
       const managerInfo = await WzRequest.apiReq('GET', '/manager/info', {});
       this.generateAlertsParams.manager = {
@@ -171,7 +171,7 @@ export default class WzSampleData extends Component {
   }
   renderCard(category){
     const { addDataLoading, exists, removeDataLoading } = this.state[category.categorySampleAlertsIndex];
-    const { adminMode } = this.state;
+    const { adminMode } = this.props;
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard
@@ -234,3 +234,17 @@ const PromiseAllRecusiveObject = function (obj) {
   }))
     .then(result => zipObject(keys, result));
 };
+
+const mapStateToProps = state => {
+  return {
+    adminMode: state.appStateReducers.adminMode
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
+  }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(WzSampleData);

@@ -24,6 +24,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 
 import { updateManagementSection } from '../../../redux/actions/managementActions';
+import { updateAdminMode } from '../../../redux/actions/appStateActions';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { connect } from 'react-redux';
 import { checkAdminMode } from '../../../controllers/management/components/management/configuration/utils/wz-fetch';
@@ -32,9 +33,7 @@ class ManagementWelcome extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      adminMode: false
-    };
+    this.state = {};
   }
 
   setGlobalBreadcrumb() {
@@ -46,7 +45,7 @@ class ManagementWelcome extends Component {
     this.setGlobalBreadcrumb();
     try{
       const adminMode = await checkAdminMode();
-      this.setState({ adminMode });
+      this.props.updateAdminMode(adminMode);
     }catch(error){}
   }
 
@@ -144,7 +143,7 @@ class ManagementWelcome extends Component {
                       description="Manage your Wazuh cluster configuration."
                     />
                   </EuiFlexItem>
-                  {this.state.adminMode ? (
+                  {this.props.adminMode ? (
                     <EuiFlexItem>
                       <EuiCard
                         layout="horizontal"
@@ -231,14 +230,22 @@ class ManagementWelcome extends Component {
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    adminMode: state.appStateReducers.adminMode
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   return {
     updateManagementSection: section =>
-      dispatch(updateManagementSection(section))
+      dispatch(updateManagementSection(section)),
+    updateAdminMode: adminMode =>
+      dispatch(updateAdminMode(adminMode))
   };
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(ManagementWelcome);
