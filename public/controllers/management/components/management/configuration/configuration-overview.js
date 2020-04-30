@@ -117,7 +117,7 @@ class WzConfigurationOverview extends Component {
                   <WzRefreshClusterInfoButton />
                 </EuiFlexItem>
               )}
-              {this.props.agent.id === '000' && this.props.adminMode ? (
+              {this.props.agent.id === '000' && this.props.adminMode && (
                 <EuiFlexItem>
                   <EuiButtonEmpty
                     iconSide="left"
@@ -136,7 +136,8 @@ class WzConfigurationOverview extends Component {
                     Edit configuration
                   </EuiButtonEmpty>
                 </EuiFlexItem>
-              ) : this.props.agent.status === 'Active' ? (
+              )}
+              {this.props.agent.id !== '000' && this.props.agent.status === 'Active' && (
                 <EuiFlexItem>
                   <ExportConfiguration
                     agent={this.props.agent}
@@ -146,7 +147,7 @@ class WzConfigurationOverview extends Component {
                     }}
                   />
                 </EuiFlexItem>
-              ) : null}
+              )}
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>
