@@ -46,6 +46,7 @@ export class FileDetails extends Component {
 
     this.state = {
     }
+    this.viewInEvents.bind(this)
   }
 
 
@@ -149,7 +150,7 @@ export class FileDetails extends Component {
     ]
   }
 
-  viewInEvents() {
+  viewInEvents = () => {
     const filters = [{
       "meta": {
         "disabled": false,
@@ -257,17 +258,19 @@ export class FileDetails extends Component {
           id={fileName}
           buttonContent={
             <EuiTitle size="s">
-              <h3>Recent events &nbsp;
+              <h3> 
+              Recent events &nbsp;
               <EuiToolTip
                 position="top"
                 content="Inspect in discover">
-                  <EuiButtonIcon
-                    onClick={() => this.viewInEvents()}
-                    iconType="link"
-                    aria-label="Inspect in discover"
-                  />
-                </EuiToolTip>
-            </h3>
+                <EuiIcon
+                  className='euiButtonIcon euiButtonIcon--primary'
+                  onClick={this.viewInEvents}
+                  type="link"
+                  aria-label="Inspect in discover"
+                />
+              </EuiToolTip>
+              </h3>
             </EuiTitle>
           }
           paddingSize="none"
