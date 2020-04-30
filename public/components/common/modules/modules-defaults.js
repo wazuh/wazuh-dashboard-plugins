@@ -21,8 +21,8 @@ export const ModulesDefaults = {
     buttons: ['reporting', 'settings']
   },
   sca: {
-    init: 'states',
-    tabs: [{ id: 'states', name: 'States' }, { id: 'events', name: 'Events' }],
+    init: 'inventory',
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
     buttons: ['settings']
   },
   virustotal: {
