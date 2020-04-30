@@ -60,6 +60,10 @@ export class FlyoutDetail extends Component {
     }
   }
 
+  componentWillUnmount() {
+    window.location.href = window.location.href.replace(new RegExp("&file=" + "[^\&]*", 'g'), "");
+  }
+
   render() {
     return (
       <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.props.fileName} maxWidth="70%">

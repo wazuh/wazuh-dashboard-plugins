@@ -62,26 +62,39 @@ export class InventoryTable extends Component {
     }
   }
 
-  // async componentDidMount() {
-  //   await this.getSyscheck();
-  // }
+  async componentDidMount() {
+    const regex = new RegExp('file=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0]) {
+      const file = match[0].split('=')[1];
+      this.showFlyout(decodeURIComponent(file), true);
+    }
+  }
 
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
 
-  showFlyout(file) {
-    const fileData = this.state.syscheck.filter(item => {
-      return item.file === file;
-    });
+  async showFlyout(file, redirect = false) {
+    let fileData = false;
+    if (!redirect) {
+      fileData = this.state.syscheck.filter(item => {
+        return item.file === file;
+      })
+    } else {
+      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, { 'file': file });
+      fileData = ((response.data || {}).data || {}).items || [];
+    }
+    if (!redirect)
+      window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
-      this.setState({pageIndex: 0}, this.getSyscheck)
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0 }, this.getSyscheck)
     }
   }
 
@@ -248,8 +261,8 @@ export class InventoryTable extends Component {
       <div>
         {filesTable}
         {this.state.isFlyoutVisible &&
-          <EuiOverlayMask 
-            onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+          <EuiOverlayMask
+            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
             <FlyoutDetail
               fileName={this.state.currentFile.file}
               agentId={this.props.agent.id}
@@ -257,7 +270,7 @@ export class InventoryTable extends Component {
               type='file'
               view='inventory'
               showViewInEvents={true}
-              {...this.props } />
+              {...this.props} />
           </EuiOverlayMask>
         }
       </div>
