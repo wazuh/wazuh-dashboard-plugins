@@ -155,7 +155,7 @@ export class RowDetails extends Component {
           const cells:any[] = [];
           const actionsCell = <EuiTableRowCell
             className={this.state.hover === key ? "hover-row" : " "}
-            style={{width: 80, height: 42,  borderTop: 0, borderBottom: 0}}
+            style={{width: 80, height: 44,  borderTop: 0, borderBottom: 0}}
             key={key+"0"}>
             {(this.state.hover === key && 
             <EuiFlexGroup>
@@ -167,8 +167,7 @@ export class RowDetails extends Component {
                     aria-label="Filter"
                     iconSize="s"
                   />
-                </EuiToolTip>
-    
+                </EuiToolTip>    
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft:0}}>
                   <EuiToolTip position="top" content={`Filter out value`}>

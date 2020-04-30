@@ -298,17 +298,18 @@ export class FileDetails extends Component {
           }
           paddingSize="none"
           initialIsOpen={true}>
-          <div className='details-row'>
+          <div className='flyout-row details-row'>
             {this.getDetails()}
           </div>
         </EuiAccordion>
         <EuiSpacer size='s' />
         <EuiAccordion
           id={fileName}
+          className='events-accordion'
           buttonContent={
             <EuiTitle size="s">
               <h3> 
-              Recent events &nbsp;
+              Recent events
               <EuiToolTip
                 position="top"
                 content="Inspect in discover">
@@ -316,6 +317,7 @@ export class FileDetails extends Component {
                   className='euiButtonIcon euiButtonIcon--primary'
                   onClick={this.viewInEvents}
                   type="link"
+                  style={{marginLeft: 16}}
                   aria-label="Inspect in discover"
                 />
               </EuiToolTip>
@@ -324,7 +326,7 @@ export class FileDetails extends Component {
           }
           paddingSize="none"
           initialIsOpen={true}>
-          <EuiFlexGroup className="details-row">
+          <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
               <Discover implicitFilters={implicitFilters} initialFilters={[]} type={type} />
             </EuiFlexItem>

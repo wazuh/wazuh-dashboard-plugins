@@ -491,6 +491,7 @@ export class Discover extends Component {
                 {pageIndexItems.length && (
                   <EuiBasicTable
                     items={pageIndexItems}
+                    className="module-discover-table"
                     itemId="_id"
                     itemIdToExpandedRowMap={itemIdToExpandedRowMap}
                     isExpandable={true}
