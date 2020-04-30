@@ -11,7 +11,7 @@
  */
 
 import React, { Component } from 'react';
-import { FlyoutDetail } from './states/flyout';
+import { FlyoutDetail } from './inventory/flyout';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
 
@@ -138,7 +138,8 @@ export class EventsFim extends Component {
   }
 
   showFlyout(file) {
-    if (file !== " - ") {
+    if (file !== " - " && !window.location.href.includes('&file=')) {
+      window.location.href = window.location.href += `&file=${file}`;
       //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
       this.setState({ isFlyoutVisible: true, currentFile: file });
     }

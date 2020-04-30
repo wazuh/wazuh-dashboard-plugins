@@ -20,9 +20,9 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import './states.less';
+import './inventory.less';
 
-export class StatesTable extends Component {
+export class InventoryTable extends Component {
   state: {
     syscheck: [],
     pageIndex: number,
@@ -40,20 +40,21 @@ export class StatesTable extends Component {
   props!: {
     filters: {},
     onFilterSelect(): void
-    agent: any
+    agent: any,
+    items: []
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      syscheck: [],
+      syscheck: props.items,
       pageIndex: 0,
       pageSize: 15,
       totalItems: 0,
       sortField: 'file',
       sortDirection: 'asc',
-      isLoading: true,
+      isLoading: false,
       isFlyoutVisible: false,
       currentFile: {
         file: ""
@@ -62,25 +63,38 @@ export class StatesTable extends Component {
   }
 
   async componentDidMount() {
-    await this.getSyscheck();
+    const regex = new RegExp('file=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0]) {
+      const file = match[0].split('=')[1];
+      this.showFlyout(decodeURIComponent(file), true);
+    }
   }
 
   closeFlyout() {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
 
-  showFlyout(file) {
-    const fileData = this.state.syscheck.filter(item => {
-      return item.file === file;
-    });
+  async showFlyout(file, redirect = false) {
+    let fileData = false;
+    if (!redirect) {
+      fileData = this.state.syscheck.filter(item => {
+        return item.file === file;
+      })
+    } else {
+      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, { 'file': file });
+      fileData = ((response.data || {}).data || {}).items || [];
+    }
+    if (!redirect)
+      window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
   componentDidUpdate(prevProps) {
     const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)){
-      this.setState({pageIndex: 0}, this.getSyscheck)
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0 }, this.getSyscheck)
     }
   }
 
@@ -247,16 +261,16 @@ export class StatesTable extends Component {
       <div>
         {filesTable}
         {this.state.isFlyoutVisible &&
-          <EuiOverlayMask 
-            onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+          <EuiOverlayMask
+            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
             <FlyoutDetail
               fileName={this.state.currentFile.file}
               agentId={this.props.agent.id}
               closeFlyout={() => this.closeFlyout()}
               type='file'
-              view='states'
+              view='inventory'
               showViewInEvents={true}
-              {...this.props } />
+              {...this.props} />
           </EuiOverlayMask>
         }
       </div>

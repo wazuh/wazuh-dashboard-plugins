@@ -751,7 +751,9 @@ export class WazuhElasticCtrl {
       payload.sort.push(sort);
       payload.size = size;
       payload.from = req.payload.offset || 0;
-      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload, namespace);
       return { alerts: data.hits.hits, hits: data.hits.total.value };
     } catch (error) {
       log('wazuh-elastic:alerts', error.message || error);
