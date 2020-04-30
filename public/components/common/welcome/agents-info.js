@@ -20,6 +20,8 @@ import {
   EuiButton
 } from '@elastic/eui';
 
+import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
+
 export class AgentInfo extends Component {
   constructor(props) {
     super(props);
@@ -45,21 +47,18 @@ export class AgentInfo extends Component {
       checkField(((agent || {}).os || {}).name) +
       ' ' +
       checkField(((agent || {}).os || {}).version);
+    
+    const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <EuiToolTip position="bottom" content={os_name === '- -' ? '-' : os_name}>
-        <span
-          className="euiTableCellContent__text euiTableCellContent--truncateText"
-          style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}
-        >
-          <i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden="true"
-          ></i>
-          {os_name === '- -' ? '-' : ' ' + os_name}
-        </span>
-      </EuiToolTip>
-    );
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{maxWidth: "250px", margin: "0 auto"}}>
+        <i
+          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+          aria-hidden="true"
+        ></i>
+        {' '}{osName}
+      </WzTextWithTooltipIfTruncated>
+    )
   }
 
   buildStats(items) {
@@ -77,7 +76,7 @@ export class AgentInfo extends Component {
                 <span
                   style={{
                     overflow: 'hidden',
-                    maxWidth: 250,
+                    maxWidth: "250px",
                     margin: '0 auto'
                   }}
                 >

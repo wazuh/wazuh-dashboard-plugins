@@ -45,6 +45,7 @@ export class FileDetails extends Component {
     super(props);
 
     this.state = {
+      hoverAddFilter : ''
     }
     this.viewInEvents.bind(this)
   }
@@ -57,12 +58,14 @@ export class FileDetails extends Component {
         name: 'Last analysis',
         grow: 2,
         icon: 'clock',
+        link: true,
       },
       {
         field: 'mtime',
         name: 'Last modified',
         grow: 2,
         icon: 'clock',
+        link: true,
       },
       {
         field: 'uname',
@@ -94,35 +97,41 @@ export class FileDetails extends Component {
         field: 'perm',
         name: 'Permissions',
         icon: 'lock',
+        link: true,
       },
       {
         field: 'size',
         name: 'Size',
         icon: 'nested',
+        link: true,
       },
       {
         field: 'inode',
         name: 'Inode',
         icon: 'link',
         onlyLinux: true,
+        link: true,
       },
       {
         field: 'md5',
         name: 'MD5',
         checksum: true,
         icon: 'check',
+        link: true,
       },
       {
         field: 'sha1',
         name: 'SHA1',
         checksum: true,
         icon: 'check',
+        link: true,
       },
       {
         field: 'sha256',
         name: 'SHA256',
         checksum: true,
         icon: 'check',
+        link: true,
       }
     ]
   }
@@ -181,6 +190,30 @@ export class FileDetails extends Component {
 
   formatBytes(a,b=2){if(0===a)return"0 Bytes";const c=0>b?0:b,d=Math.floor(Math.log(a)/Math.log(1024));return parseFloat((a/Math.pow(1024,d)).toFixed(c))+" "+["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"][d]}
 
+  formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+  addFilter(field, value) {
+    if( field === 'date' || field === 'mtime') {
+      let value_max = new Date(value);
+      value_max.setDate(new Date(value).getDate() + 1);
+      this.props.onFilterSelect(`${field}>${this.formatDate(value)};${field}<${this.formatDate(value_max)}`);
+    } else {
+      this.props.onFilterSelect(`${field}=${ field === 'size' ? this.props.currentFile[field] : value}`);
+    }
+    this.props.closeFlyout();
+  }
 
   getDetails() {
     const { view } = this.props
@@ -188,7 +221,7 @@ export class FileDetails extends Component {
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
       if(item.field === 'size'){
-        value = this.formatBytes(value);
+        value = !isNaN(value) ? this.formatBytes(value) : 0;
       }
       var link = (item.link && view !== 'events') || false;
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent.agentPlatform !== 'windows')){
@@ -202,16 +235,32 @@ export class FileDetails extends Component {
                   ? <EuiToolTip position="top" anchorClassName="detail-tooltip" content={value} delay="long">
                       <span className={className}>{value}</span>
                     </EuiToolTip> 
-                  : <EuiToolTip position="top" anchorClassName="detail-tooltip" content={`Filter by ${item.field} is ${value} in inventory`} >
-                        <EuiLink
-                          className={className}
-                          onClick={() => {
-                            this.props.onFilterSelect(`${item.field}=${value}`);
-                            this.props.closeFlyout();
-                          }} >
-                          {value}
-                        </EuiLink>
+                  : (
+                  <span className={className}
+                    onMouseEnter={() => {
+                      this.setState({ hoverAddFilter: item });
+                    }}
+                    onMouseLeave={() => {
+                      this.setState({ hoverAddFilter: '' });
+                    }}
+                  >
+                  {value}
+                  {
+                    _.isEqual(this.state.hoverAddFilter, item) &&
+                    <EuiToolTip position="top" anchorClassName="detail-tooltip2" content={`Filter by ${item.field} is ${value} in inventory`} >
+                    <EuiButtonIcon
+                    onClick={() => {
+                      this.addFilter(item.field, value);
+                    }}
+                    iconType="magnifyWithPlus"
+                    aria-label="Next"
+                    iconSize="s"
+                    className="buttonAddFilter"
+                    />
                     </EuiToolTip>
+                  }
+                  </span> 
+                  )
               }
               description={
                 <span>
