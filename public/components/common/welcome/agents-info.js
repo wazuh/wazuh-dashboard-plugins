@@ -47,11 +47,11 @@ export class AgentInfo extends Component {
       checkField(((agent || {}).os || {}).name) +
       ' ' +
       checkField(((agent || {}).os || {}).version);
-    
+
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{maxWidth: "250px", margin: "0 auto"}}>
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", margin: "0 auto" }}>
         <i
           className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
           aria-hidden="true"
@@ -73,16 +73,16 @@ export class AgentInfo extends Component {
               item.description === 'OS' ? (
                 this.addIconPlatformRender(this.props.agent)
               ) : (
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    maxWidth: "250px",
-                    margin: '0 auto'
-                  }}
-                >
-                  {checkField(item.title)}
-                </span>
-              )
+                  <span
+                    style={{
+                      overflow: 'hidden',
+                      maxWidth: "250px",
+                      margin: '0 auto'
+                    }}
+                  >
+                    {checkField(item.title)}
+                  </span>
+                )
             }
             description={item.description}
             textAlign="center"
@@ -113,24 +113,26 @@ export class AgentInfo extends Component {
         <EuiFlexGroup className="wz-welcome-page-agent-info-details">
           {stats}
         </EuiFlexGroup>
-        <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
-          <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <EuiButton
-              onClick={() => this.props.switchTab('syscollector')}
-              iconType="inspect"
-            >
-              Inventory data
+        {(!this.props.hideActions) &&
+          <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
+            <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+              <EuiButton
+                onClick={() => this.props.switchTab('syscollector')}
+                iconType="inspect"
+              >
+                Inventory data
             </EuiButton>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton
-              onClick={() => this.props.switchTab('configuration')}
-              iconType="gear"
-            >
-              Configuration
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                onClick={() => this.props.switchTab('configuration')}
+                iconType="gear"
+              >
+                Configuration
             </EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        }
       </Fragment>
     );
   }

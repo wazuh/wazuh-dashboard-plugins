@@ -22,7 +22,8 @@ import {
   EuiTab,
   EuiTabs,
   EuiIcon,
-  EuiPopover
+  EuiPopover,
+  EuiButtonIcon
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -34,6 +35,7 @@ import { ModulesDefaults } from './modules-defaults';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
+import { AgentInfo } from '../../common/welcome/agents-info';
 import Overview from '../../wz-menu/wz-menu-overview';
 import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
@@ -45,7 +47,8 @@ export class MainModule extends Component {
     this.state = {
       selectView: false,
       loadingReport: false,
-      switchModule: false
+      switchModule: false,
+      showAgentInfo: false
     };
   }
 
@@ -92,10 +95,10 @@ export class MainModule extends Component {
     }
   }
 
-  color = (status) => {
-    if (status.toLowerCase() === 'active') { return 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return 'subdued'; }
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
 
   renderTitle() {
@@ -125,19 +128,34 @@ export class MainModule extends Component {
             </WzReduxProvider>
           </EuiPopover>
         </EuiFlexItem>
-                 <EuiFlexItem />
+        <EuiFlexItem />
         <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
           <EuiTitle size="s">
             <h1>
               <EuiToolTip position="right" content={this.props.agent.status}>
                 <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
               </EuiToolTip>
-              <span
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  window.location.href = `#/agents?agent=${this.props.agent.id}`;
-                  this.router.reload();
-                }}>{this.props.agent.name} ({this.props.agent.id})
+              <span>
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    window.location.href = `#/agents?agent=${this.props.agent.id}`;
+                    this.router.reload();
+                  }}>{this.props.agent.name} ({this.props.agent.id})&nbsp;&nbsp;
+              </span>
+                <EuiPopover
+                  button={
+                    <EuiButtonIcon style={{ marginTop: -6 }} iconSize="l" iconType="iInCircle" color='primary'
+                      onClick={() => this.setState({ showAgentInfo: !this.state.showAgentInfo })}></EuiButtonIcon>
+                  }
+                  isOpen={this.state.showAgentInfo}
+                  closePopover={() => this.setState({ showAgentInfo: false })}
+                  repositionOnScroll={true}
+                  anchorPosition="leftCenter">
+                  <div style={{ width: '80vw' }}>
+                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                  </div>
+                </EuiPopover>
               </span>
             </h1>
           </EuiTitle>
@@ -174,7 +192,7 @@ export class MainModule extends Component {
   renderReportButton() {
     return (
       (this.props.disabledReport &&
-        <EuiFlexItem grow={false}>
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
           <EuiToolTip position="top" content="No results match for this search criteria.">
             <EuiButton
               iconType="document"
@@ -187,7 +205,7 @@ export class MainModule extends Component {
         </EuiFlexItem>
 
         || (
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
             <EuiButton
               iconType="document"
               isLoading={this.state.loadingReport}
@@ -200,7 +218,7 @@ export class MainModule extends Component {
 
   renderDashboardButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
+      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
         <EuiButton
           fill={this.state.selectView === 'dashboard'}
           iconType="visLine"
@@ -213,7 +231,7 @@ export class MainModule extends Component {
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
+      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
         <EuiButton
           fill={this.state.selectView === 'settings'}
           iconType="wrench"
@@ -253,7 +271,7 @@ export class MainModule extends Component {
     return (
       <div className='wz-module'>
         <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent'>
+          <div className='wz-module-header-agent' style={{ borderTop: `4px solid ${this.color(this.props.agent.status, true)}` }}>
             {title}
           </div>
         </div>
