@@ -83,7 +83,7 @@ class WzRuleInfo extends Component {
               <EuiLink
                 onClick={async event => {
                   event.stopPropagation();
-                  const noLocal = item.path.startsWith('ruleset/');
+                  const noLocal = item.relative_dirname.startsWith('ruleset/');
                   const result = await this.rulesetHandler.getRuleContent(
                     value,
                     noLocal
