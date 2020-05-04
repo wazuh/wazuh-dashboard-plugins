@@ -485,6 +485,7 @@ export class Discover extends Component {
       <div
         className='wz-discover hide-filter-controll' >
         {this.getSearchBar()}
+        {!!total && <div style={{textAlign: "center"}}><strong>{total || 0}</strong> hits</div>}
         {total 
           ? <EuiFlexGroup>
               <EuiFlexItem>
