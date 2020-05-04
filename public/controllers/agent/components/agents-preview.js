@@ -76,7 +76,7 @@ export class AgentsPreview extends Component {
       this.lastAgent = lastAgent.data.data.affected_items[0];
       this.mostActiveAgent = await this.props.tableProps.getMostActive();
       const osresult = await WzRequest.apiReq('GET', '/agents/summary/os', {});
-      this.platforms = this.groupBy(osresult.data.data.items);
+      this.platforms = this.groupBy(osresult.data.data.affected_items);
       const platformsModel = [];
       for (let [key, value] of Object.entries(this.platforms)) {
         platformsModel.push({ id: key, label: key, value: value });
