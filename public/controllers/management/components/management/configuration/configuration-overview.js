@@ -26,8 +26,6 @@ import WzClusterSelect from './util-components/configuration-cluster-selector';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 
-import { updateConfigurationSection } from '../../../../../redux/actions/configurationActions';
-
 import configurationSettingsGroup from './configuration-settings';
 
 import { connect } from 'react-redux';
@@ -96,7 +94,6 @@ class WzConfigurationOverview extends Component {
   }
   render() {
     const settings = this.filterSettings(configurationSettingsGroup);
-    const { loadingStatus } = this.props;
     return (
       <Fragment>
         <EuiFlexGroup>
@@ -182,8 +179,7 @@ class WzConfigurationOverview extends Component {
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  adminMode: state.configurationReducers.adminMode,
-  loadingStatus: state.configurationReducers.loadingStatus
+  adminMode: state.configurationReducers.adminMode
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);

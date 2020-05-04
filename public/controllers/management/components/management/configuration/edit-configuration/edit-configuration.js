@@ -15,7 +15,6 @@ import PropTypes from 'prop-types';
 
 import {
   EuiButton,
-  EuiButtonEmpty,
   EuiIcon,
   EuiFlexGroup,
   EuiFlexItem,
@@ -25,21 +24,17 @@ import {
   EuiOverlayMask,
   EuiConfirmModal,
   EuiCallOut,
-  EuiTitle,
-  EuiProgress
 } from '@elastic/eui';
 
 import WzCodeEditor from '../util-components/code-editor';
 import WzWazuhAPINotReachable from '../util-components/wz-api-not-reachable';
 import WzConfigurationPath from '../util-components/configuration-path';
+import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
 import withLoading from '../util-hocs/loading';
-import WzLoading from '../util-components/loading';
-import { withWzToast } from '../util-providers/toast-p';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 import {
   updateClusterNodes,
-  updateClusterNodeSelected,
-  updateLoadingStatus
+  updateClusterNodeSelected
 } from '../../../../../../redux/actions/configurationActions';
 import {
   fetchFile,
@@ -50,6 +45,7 @@ import {
   clusterReq
 } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
+import { toastNotifications } from 'ui/notify';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -63,8 +59,12 @@ class WzEditConfiguration extends Component {
       restart: false,
       restarting: false,
       saving: false,
-      infoChangesAfterRestart: false
+      infoChangesAfterRestart: false,
+      disableSaveRestartButtons: false
     };
+  }
+  addToast(toast){
+    toastNotifications.add(toast);
   }
   async editorSave() {
     try {
@@ -76,7 +76,7 @@ class WzEditConfiguration extends Component {
           )
         : await saveFileManager(this.state.editorValue);
       this.setState({ saving: false, infoChangesAfterRestart: true });
-      this.props.addToast({
+      this.addToast({
         title: (
           <Fragment>
             <EuiIcon type="check" />
@@ -91,7 +91,7 @@ class WzEditConfiguration extends Component {
       });
     } catch (error) {
       if (error.details) {
-        this.props.addToast({
+        this.addToast({
           title: (
             <Fragment>
               <EuiIcon type="alert" />
@@ -106,7 +106,7 @@ class WzEditConfiguration extends Component {
           text: error.details
         });
       } else {
-        this.props.addToast({
+        this.addToast({
           title: (
             <Fragment>
               <EuiIcon type="alert" />
@@ -133,21 +133,24 @@ class WzEditConfiguration extends Component {
   onChange(editorValue) {
     this.setState({ editorValue });
   }
-  onDidMount(xmlFetched) {
-    this.setState({ editorValue: xmlFetched });
+  onDidMount(xmlFetched, errorXMLFetched) {
+    this.setState({ editorValue: xmlFetched, disableSaveRestartButtons: errorXMLFetched});
+  }
+  onLoadingConfiguration(disableSaveRestartButtons) {
+    this.setState({ disableSaveRestartButtons });
   }
   async confirmRestart() {
     try {
-      this.setState({ restarting: true, infoChangesAfterRestart: false });
+      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false });
       await restartNodeSelected(
         this.props.clusterNodeSelected,
         this.props.updateWazuhNotReadyYet
       );
       this.props.updateWazuhNotReadyYet('');
-      this.setState({ restart: false, restarting: false });
+      this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();
       if (this.props.clusterNodes) {
-        this.props.addToast({
+        this.addToast({
           title: (
             <Fragment>
               <EuiIcon type="iInCircle" />
@@ -163,7 +166,7 @@ class WzEditConfiguration extends Component {
       }
     } catch (error) {
       this.props.updateWazuhNotReadyYet('');
-      this.setState({ restart: false, restarting: false });
+      this.setState({ restart: false, saving: false, restarting: false });
     }
   }
   async checkIfClusterOrManager() {
@@ -188,8 +191,6 @@ class WzEditConfiguration extends Component {
           'edit-configuration',
           'Cluster configuration'
         );
-        this.props.updateLoadingStatus(true);
-        setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
       }else{
         // do nothing if it isn't a cluster
         this.props.updateClusterNodes(false);
@@ -198,8 +199,6 @@ class WzEditConfiguration extends Component {
           'edit-configuration',
           'Manager configuration'
         );
-        this.props.updateLoadingStatus(true);
-        setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
       }
     } catch (error) {
       // do nothing if it isn't a cluster
@@ -209,14 +208,12 @@ class WzEditConfiguration extends Component {
         'edit-configuration',
         'Manager configuration'
       );
-      this.props.updateLoadingStatus(true);
-      setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
     }
   }
   render() {
-    const { restart, restarting, saving, editorValue } = this.state;
-    const { clusterNodeSelected, loadingStatus } = this.props;
-    const xmlError = validateXML(editorValue);
+    const { restart, restarting, saving, editorValue, disableSaveRestartButtons } = this.state;
+    const { clusterNodeSelected, agent } = this.props;
+    const xmlError = editorValue && validateXML(editorValue);
     return (
       <Fragment>
         <WzConfigurationPath
@@ -224,9 +221,7 @@ class WzEditConfiguration extends Component {
           updateConfigurationSection={this.props.updateConfigurationSection}
         >
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="refresh" onClick={() => this.refresh()}>
-              Refresh
-            </EuiButtonEmpty>
+            <WzRefreshClusterInfoButton />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             {xmlError ? (
@@ -235,7 +230,7 @@ class WzEditConfiguration extends Component {
               </EuiButton>
             ) : (
               <EuiButton
-                isDisabled={saving}
+                isDisabled={saving || disableSaveRestartButtons}
                 iconType="save"
                 onClick={() => this.editorSave()}
               >
@@ -254,37 +249,36 @@ class WzEditConfiguration extends Component {
                 fill
                 iconType="refresh"
                 onClick={() => this.toggleRestart()}
+                isDisabled={disableSaveRestartButtons}
               >
                 Restart {clusterNodeSelected || 'Manager'}
               </EuiButton>
             )}
           </EuiFlexItem>
         </WzConfigurationPath>
-        {(!loadingStatus && (
-          <Fragment>
-            <WzEditorConfiguration
-              onChange={value => this.onChange(value)}
-              onDidMount={value => this.onDidMount(value)}
-              toggleRestart={() => this.toggleRestart()}
-              confirmRestart={() => this.confirmRestart()}
-              {...this.state}
-              xmlError={xmlError}
-            />
-            {restart && !restarting && (
-              <EuiOverlayMask>
-                <EuiConfirmModal
-                  title={`${clusterNodeSelected ||
-                    'Manager'} will be restarted`}
-                  onCancel={() => this.toggleRestart()}
-                  onConfirm={() => this.confirmRestart()}
-                  cancelButtonText="Cancel"
-                  confirmButtonText="Confirm"
-                  defaultFocusedButton="cancel"
-                ></EuiConfirmModal>
-              </EuiOverlayMask>
-            )}
-          </Fragment>
-        )) || <WzLoading />}
+        <WzEditorConfiguration
+          onChange={value => this.onChange(value)}
+          onDidMount={(xmlFetched, errorXMLFetched) => this.onDidMount(xmlFetched, errorXMLFetched)}
+          toggleRestart={() => this.toggleRestart()}
+          confirmRestart={() => this.confirmRestart()}
+          onLoadingConfiguration={value => this.onLoadingConfiguration(value)}
+          {...this.state}
+          agent={agent}
+          xmlError={xmlError}
+        />
+        {restart && !restarting && (
+          <EuiOverlayMask>
+            <EuiConfirmModal
+              title={`${clusterNodeSelected ||
+                'Manager'} will be restarted`}
+              onCancel={() => this.toggleRestart()}
+              onConfirm={() => this.confirmRestart()}
+              cancelButtonText="Cancel"
+              confirmButtonText="Confirm"
+              defaultFocusedButton="cancel"
+            ></EuiConfirmModal>
+          </EuiOverlayMask>
+        )}
       </Fragment>
     );
   }
@@ -293,8 +287,7 @@ class WzEditConfiguration extends Component {
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  loadingStatus: state.configurationReducers.loadingStatus
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -302,9 +295,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: clusterNodeSelected =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value)),
-  updateLoadingStatus: loadingStatus =>
-    dispatch(updateLoadingStatus(loadingStatus))
+  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value))
 });
 
 WzEditConfiguration.propTypes = {
@@ -312,17 +303,15 @@ WzEditConfiguration.propTypes = {
   updateWazuhNotReadyYet: PropTypes.func
 };
 
-export default compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
-  withWzToast
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
 )(WzEditConfiguration);
 
 const mapStateToPropsEditor = state => ({
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
   clusterNodes: state.configurationReducers.clusterNodes,
+  refreshTime: state.configurationReducers.refreshTime,
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
@@ -330,19 +319,24 @@ const WzEditorConfiguration = compose(
   connect(mapStateToPropsEditor),
   withLoading(async props => {
     try {
+      props.onLoadingConfiguration(true);
       const xmlFetched = await fetchFile(props.clusterNodeSelected);
+      props.onLoadingConfiguration(false);
       return { xmlFetched };
     } catch (error) {
+      props.onLoadingConfiguration(false);
       return { xmlFetched: null, errorXMLFetched: error };
     }
-  })
+  },
+  (props, prevProps) => (props.agent.id === '000' && props.clusterNodeSelected && prevProps.clusterNodeSelected && props.clusterNodeSelected !== prevProps.clusterNodeSelected) || (props.refreshTime !== prevProps.refreshTime)
+  )
 )(
   class WzEditorConfiguration extends Component {
     constructor(props) {
       super(props);
     }
     componentDidMount() {
-      this.props.onDidMount(this.props.xmlFetched);
+      this.props.onDidMount(this.props.xmlFetched, this.props.errorXMLFetched);
     }
     render() {
       const {
@@ -387,7 +381,8 @@ const WzEditorConfiguration = compose(
                 />
               )}
               <EuiSpacer size="s" />
-              <WzCodeEditor
+              {typeof editorValue === 'string' && (
+                <WzCodeEditor
                 mode="xml"
                 value={editorValue}
                 onChange={value => onChange(value)}
@@ -395,6 +390,8 @@ const WzEditorConfiguration = compose(
                   wazuhNotReadyYet || infoChangesAfterRestart ? 260 : 200
                 }
               />
+              )}
+              
             </Fragment>
           ) : (
             <WzWazuhAPINotReachable error={this.props.errorXMLFetched} />
