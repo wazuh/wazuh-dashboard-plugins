@@ -145,7 +145,7 @@ export class MainModule extends Component {
               </span>
                 <EuiPopover
                   button={
-                    <EuiButtonIcon style={{ marginTop: -6 }} iconSize="l" iconType="iInCircle" color='primary'
+                    <EuiButtonIcon style={{ marginTop: -6, padding: 0 }} iconSize="l" iconType="iInCircle" color='primary'
                       onClick={() => this.setState({ showAgentInfo: !this.state.showAgentInfo })}></EuiButtonIcon>
                   }
                   isOpen={this.state.showAgentInfo}
