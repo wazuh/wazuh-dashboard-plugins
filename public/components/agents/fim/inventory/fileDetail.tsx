@@ -309,18 +309,19 @@ export class FileDetails extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3> 
-              Recent events
-              <EuiToolTip
-                position="top"
-                content="Inspect in discover">
-                <EuiIcon
-                  className='euiButtonIcon euiButtonIcon--primary'
-                  onClick={this.viewInEvents}
-                  type="link"
-                  style={{marginLeft: 16}}
-                  aria-label="Inspect in discover"
-                />
-              </EuiToolTip>
+              Recent events {this.props.view !== 'events' && (
+                <EuiToolTip
+                  position="top"
+                  content="Inspect in discover">
+                  <EuiIcon
+                    className='euiButtonIcon euiButtonIcon--primary'
+                    onClick={this.viewInEvents}
+                    type="link"
+                    style={{marginLeft: 16}}
+                    aria-label="Inspect in discover"
+                  />
+                </EuiToolTip>
+              )}
               </h3>
             </EuiTitle>
           }
