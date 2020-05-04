@@ -12,7 +12,6 @@
 
 import React, { Component, Fragment } from 'react';
 import {
-  EuiDescriptionList,
   EuiCodeBlock,
   EuiPanel,
   EuiTitle,
@@ -267,36 +266,33 @@ export class RowDetails extends Component {
    * @param {String} file
    * @param {String} path
    */
-  renderInfo(id, level, file, path) {
+  renderInfo(id, level, file, path, groups) {
     return (
-      <ul>
-        <li key="id"><b>ID:</b>&nbsp;
+      <EuiFlexGroup>
+        <EuiFlexItem key="id" grow={false}><b>ID:</b>
           <EuiToolTip position="top" content={`Filter by this rule id: ${id}`}>
             <EuiLink onClick={async () => this.props.addFilter({ "rule.id": id })}>
-              &nbsp;{id}
+              {id}
             </EuiLink>
           </EuiToolTip>
-        </li>
-        <EuiSpacer size="s" />
-        <li key="level"><b>Level:</b>
+        </EuiFlexItem>
+        <EuiFlexItem key="level" grow={false}><b>Level:</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
             <EuiLink onClick={async () => this.props.addFilter({ "rule.level": level })}>
-              &nbsp;{level}
+              {level}
             </EuiLink>
           </EuiToolTip>
-        </li>
-
-        <EuiSpacer size="s" />
-        <li key="file"><b>File:</b>
-              &nbsp;{file}
-        </li>
-        <EuiSpacer size="s" />
-        <li key="path"><b>Path:</b>
-              &nbsp;{path}
-        </li>
-
-        <EuiSpacer size="s" />
-      </ul>
+        </EuiFlexItem>
+        <EuiFlexItem key="file" grow={false}><b>File:</b>
+          {file}
+        </EuiFlexItem>
+        <EuiFlexItem key="path" grow={false}><b>Path:</b>
+          {path}
+        </EuiFlexItem>
+        <EuiFlexItem key="Groups" grow={false}><b>Groups:</b>
+          {this.renderGroups(groups)}
+        </EuiFlexItem>
+      </EuiFlexGroup>
     )
   }
 
@@ -311,13 +307,13 @@ export class RowDetails extends Component {
 
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-        <li key={key} style={{ marginBottom: 10 }}><b>{capitalize(key)}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}</li>
+        <EuiFlexItem key={key} style={{ marginBottom: 10 }} grow={false}><b>{capitalize(key)}:</b>{details[key] === '' ? 'true' : details[key]}</EuiFlexItem>
       );
     });
     return (
-      <ul style={{ lineHeight: 'initial' }}>
+      <EuiFlexGroup style={{ lineHeight: 'initial' }}>
         {detailsToRender}
-      </ul>
+      </EuiFlexGroup>
     )
   }
 
@@ -408,18 +404,17 @@ export class RowDetails extends Component {
       });
 
       listCompliance.push(
-        <li key={key}>
+        <EuiFlexItem key={key} grow={false}>
           <b>{this.complianceEquivalences[key]}</b>
           <p>{values}</p>
           <EuiSpacer size='s' />
-        </li>
+        </EuiFlexItem>
       )
-
     }
     return (
-      <ul>
+      <EuiFlexGroup>
         {listCompliance}
-      </ul>
+      </EuiFlexGroup>
     )
   }
 
@@ -431,56 +426,48 @@ export class RowDetails extends Component {
 
     return (
       <Fragment>
-        <EuiFlexGroup style={{ height: 416, marginTop: 0 }}>
+        <EuiPanel style={{marginTop: 5}}>
+          <EuiFlexGroup>
           {/* General info */}
           <EuiFlexItem>
-            <EuiPanel paddingSize="m">
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle size={'s'}>
-                    <h3>Information</h3>
-                  </EuiTitle>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false} style={{ fontSize: 14 }}>
-                  <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
-                    <EuiIcon type="popout" color='primary' />&nbsp;
-                      View in Rules
-                  </a>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiSpacer size="s" />
-              {this.renderInfo(id, level, file, path)}
-              {/* Groups */}
-              <EuiSpacer size={'m'} />
-              <EuiTitle size={'s'}>
-                <h3>Groups</h3>
-              </EuiTitle>
-              <EuiSpacer size="s" />
-              {this.renderGroups(groups)}
-            </EuiPanel>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle size={'s'}>
+                  <h3>Information</h3>
+                </EuiTitle>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ fontSize: 14 }}>
+                <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
+                  <EuiIcon type="popout" color='primary' />&nbsp;
+                    View in Rules
+                </a>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size="s" />
+            {this.renderInfo(id, level, file, path, groups)}
           </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiFlexGroup direction="column">
           {/* Details */}
           <EuiFlexItem>
-            <EuiPanel paddingSize="m">
-              <EuiTitle size={'s'}>
-                <h3>Details</h3>
-              </EuiTitle>
-              <EuiSpacer size="s" />
-              {this.renderDetails(details)}
-            </EuiPanel>
+            <EuiTitle size={'s'}>
+              <h3>Details</h3>
+            </EuiTitle>
+            <EuiSpacer size="s" />
+            {this.renderDetails(details)}
+          {/* Compliance */}
           </EuiFlexItem>
           {Object.keys(compliance).length > 0 && (
             <EuiFlexItem>
-              <EuiPanel paddingSize="m">
-                <EuiTitle size={'s'}>
-                  <h3>Compliance</h3>
-                </EuiTitle>
-                <EuiSpacer size="s" />
-                {this.renderCompliance(compliance)}
-              </EuiPanel>
+              <EuiTitle size={'s'}>
+                <h3>Compliance</h3>
+              </EuiTitle>
+              <EuiSpacer size="s" />
+              {this.renderCompliance(compliance)}
             </EuiFlexItem>
           )}
         </EuiFlexGroup>
+        </EuiPanel>
       </Fragment>
     )
   }
