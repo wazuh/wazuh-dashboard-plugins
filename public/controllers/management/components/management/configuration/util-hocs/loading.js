@@ -17,6 +17,7 @@ import WzLoading from '../util-components/loading';
 
 const withLoading = (
   load,
+  didUpdateConditionRecharge,
   LoadingComponent,
   ErrorComponent
 ) => WrappedComponent => {
@@ -33,9 +34,21 @@ const withLoading = (
     async componentDidMount() {
       try {
         const wrappedProps = await load(this.props);
-        this.setState({ isLoading: false, wrappedProps });
+        this.setState({ isLoading: false, error: false, wrappedProps });
       } catch (error) {
-        this.setState({ error });
+        this.setState({ isLoading: false, error, wrappedProps: undefined });
+      }
+    }
+    async componentDidUpdate(prevProps){
+      // if(this.props.agent.id === '000' && this.props.clusterNodeSelected && prevProps.clusterNodeSelected && this.props.clusterNodeSelected !== prevProps.clusterNodeSelected){
+      if(didUpdateConditionRecharge && didUpdateConditionRecharge(this.props, prevProps)){
+        try {
+          this.setState({isLoading: true, error: false, wrappedProps: undefined })
+          const wrappedProps = await load(this.props);
+          this.setState({ isLoading: false, wrappedProps });
+        } catch (error) {
+          this.setState({ isLoading: false, error, wrappedProps: undefined });
+        }
       }
     }
     render() {
