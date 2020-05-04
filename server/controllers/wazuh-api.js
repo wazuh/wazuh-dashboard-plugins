@@ -334,12 +334,6 @@ export class WazuhApiCtrl {
                 status: 'disabled',
               };
             }
-          } else { // TODO: ONLY FOR NOW, PROBLEMS WITH API
-            return {
-              manager: managerName,
-              cluster: 'Disabled',
-              status: 'disabled',
-            };
           }
         }
       }
