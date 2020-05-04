@@ -314,7 +314,7 @@ export class FileDetails extends Component {
                   <EuiIcon
                     className='euiButtonIcon euiButtonIcon--primary'
                     onClick={this.viewInEvents}
-                    type="link"
+                    type="popout"
                     style={{marginLeft: 16}}
                     aria-label="Inspect in discover"
                   />
