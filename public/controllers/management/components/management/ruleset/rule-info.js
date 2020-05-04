@@ -178,49 +178,51 @@ class WzRuleInfo extends Component {
    * @param {String} file
    * @param {String} path
    */
-  renderInfo(id, level, file, path) {
+  renderInfo(id, level, file, path, groups) {
     return (
-      <ul>
-        <li key="id">
-          <b>ID:</b>&nbsp;{id}
-        </li>
+      <EuiFlexGroup>
+        <EuiFlexItem key="id" grow={false}>
+          <b>ID:</b>{id}
+        </EuiFlexItem>
         <EuiSpacer size="s" />
-        <li key="level">
+        <EuiFlexItem key="level" grow={false}>
           <b>Level:</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack({ level: level })}
             >
-              &nbsp;{level}
+              {level}
             </EuiLink>
           </EuiToolTip>
-        </li>
+        </EuiFlexItem>
 
         <EuiSpacer size="s" />
-        <li key="file">
+        <EuiFlexItem key="file" grow={false}>
           <b>File:</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack({ file: file })}
             >
-              &nbsp;{file}
+              {file}
             </EuiLink>
           </EuiToolTip>
-        </li>
+        </EuiFlexItem>
         <EuiSpacer size="s" />
-        <li key="path">
+        <EuiFlexItem key="path" grow={false}>
           <b>Path:</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack({ path: path })}
             >
-              &nbsp;{path}
+              {path}
             </EuiLink>
           </EuiToolTip>
-        </li>
-
+        </EuiFlexItem>
+        <EuiFlexItem key="Groups" grow={false}><b>Groups:</b>
+          {this.renderGroups(groups)}
+        </EuiFlexItem>
         <EuiSpacer size="s" />
-      </ul>
+      </EuiFlexGroup>
     );
   }
 
@@ -232,12 +234,12 @@ class WzRuleInfo extends Component {
     const detailsToRender = [];
     Object.keys(details).forEach((key, inx) => {
       detailsToRender.push(
-        <li key={key}>
-          <b>{key}:</b>&nbsp;{details[key] === '' ? 'true' : details[key]}
-        </li>
+        <EuiFlexItem key={key} grow={false}>
+          <b>{key}:</b>{details[key] === '' ? 'true' : details[key]}
+        </EuiFlexItem>
       );
     });
-    return <ul style={{ lineHeight: 'initial' }}>{detailsToRender}</ul>;
+    return <EuiFlexGroup style={{ lineHeight: 'initial' }}>{detailsToRender}</EuiFlexGroup>;
   }
 
   /**
@@ -265,7 +267,9 @@ class WzRuleInfo extends Component {
     });
     return (
       <ul>
-        <li>{listGroups}</li>
+        <li>
+          {listGroups}
+        </li>
       </ul>
     );
   }
@@ -298,14 +302,14 @@ class WzRuleInfo extends Component {
       });
 
       listCompliance.push(
-        <li key={key}>
+        <EuiFlexItem key={key} grow={false}>
           <b>{this.complianceEquivalences[key]}</b>
           <p>{values}</p>
           <EuiSpacer size="s" />
-        </li>
+        </EuiFlexItem>
       );
     }
-    return <ul>{listCompliance}</ul>;
+    return <EuiFlexGroup>{listCompliance}</EuiFlexGroup>;
   }
 
   /**
@@ -372,47 +376,42 @@ class WzRuleInfo extends Component {
             </EuiFlexGroup>
             {/* Cards */}
             <EuiSpacer size="m" />
-            <EuiFlexGroup>
-              {/* General info */}
-              <EuiFlexItem>
-                <EuiPanel paddingSize="m">
-                  <EuiTitle size={'s'}>
-                    <h3>Information</h3>
-                  </EuiTitle>
+            <EuiPanel style={{ margin: '16px 0' }}>
+              <EuiFlexGroup>
+                {/* General info */}
+                <EuiFlexItem style={{ marginBottom: 16 }}>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiTitle size={'s'}>
+                        <h3 style={{ fontWeight: 400 }}>Information</h3>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                   <EuiSpacer size="s" />
-                  {this.renderInfo(id, level, file, path)}
-                  {/* Groups */}
-                  <EuiSpacer size={'m'} />
+                  {this.renderInfo(id, level, file, path, groups)}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGroup direction="column">
+                {/* Details */}
+                <EuiFlexItem>
                   <EuiTitle size={'s'}>
-                    <h3>Groups</h3>
-                  </EuiTitle>
-                  <EuiSpacer size="s" />
-                  {this.renderGroups(groups)}
-                </EuiPanel>
-              </EuiFlexItem>
-              {/* Details */}
-              <EuiFlexItem>
-                <EuiPanel paddingSize="m">
-                  <EuiTitle size={'s'}>
-                    <h3>Details</h3>
+                    <h3 style={{ fontWeight: 400 }}>Details</h3>
                   </EuiTitle>
                   <EuiSpacer size="s" />
                   {this.renderDetails(details)}
-                </EuiPanel>
-              </EuiFlexItem>
-              {/* Compliance */}
-              {Object.keys(compliance).length > 0 && (
-                <EuiFlexItem>
-                  <EuiPanel paddingSize="m">
+                  {/* Compliance */}
+                </EuiFlexItem>
+                {Object.keys(compliance).length > 0 && (
+                  <EuiFlexItem>
                     <EuiTitle size={'s'}>
-                      <h3>Compliance</h3>
+                      <h3 style={{ fontWeight: 400 }}>Compliance</h3>
                     </EuiTitle>
                     <EuiSpacer size="s" />
                     {this.renderCompliance(compliance)}
-                  </EuiPanel>
-                </EuiFlexItem>
-              )}
-            </EuiFlexGroup>
+                  </EuiFlexItem>
+                )}
+              </EuiFlexGroup>
+            </EuiPanel>
             {/* Table */}
             <EuiSpacer size="l" />
             <EuiPanel paddingSize="m">
