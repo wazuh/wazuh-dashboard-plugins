@@ -257,21 +257,16 @@ export const visualizations = {
   tsc: {
     rows: [
       {
-        height: 300,
+        height: 400,
         vis: [
           {
-            title: 'Stats',
-            id: 'Wazuh-App-Agents-NIST-Stats',
-            width: 25,
+            title: 'TSC requirements',
+            id: 'Wazuh-App-Overview-TSC-requirements',
+            width: 50,
           },
           {
-            title: 'Top 10 requirements',
-            id: 'Wazuh-App-Agents-NIST-top-10-requirements',
-            width: 25,
-          },
-          {
-            title: 'Requirements distributed by level',
-            id: 'Wazuh-App-Agents-NIST-Requirement-by-level',
+            title: 'Top 10 agents by alerts number',
+            id: 'Wazuh-App-Overview-TSC-Agents',
             width: 50,
           },
         ],
@@ -280,17 +275,35 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: 'Requirements over time',
-            id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime',
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
           },
         ],
       },
       {
-        height: 570,
+        height: 530,
+        vis: [
+          {
+            title: 'Last alerts',
+            id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
+          },
+        ],
+      },
+      {
+        height: 255,
+        vis: [
+          {
+            title: 'Requirements by agent',
+            id: 'Wazuh-App-Overview-TSC-Requirements-by-agent',
+          },
+        ],
+      },
+      {
+        height: 600,
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-NIST-Last-alerts',
+            id: 'Wazuh-App-Overview-TSC-Alerts-summary',
           },
         ],
       },

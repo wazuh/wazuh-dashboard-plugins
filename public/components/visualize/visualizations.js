@@ -345,39 +345,41 @@ export const visualizations = {
         height: 400,
         vis: [
           {
-            title: 'Most active agents',
-            id: 'Wazuh-App-Overview-TSC-Agents',
-            width: 20,
-          },
-          {
-            title: 'Top requirements over time',
-            id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
+            title: 'TSC requirements',
+            id: 'Wazuh-App-Overview-TSC-requirements',
             width: 50,
           },
           {
-            title: 'Requiments distribution by agent',
-            id: 'Wazuh-App-Overview-TSC-requirements-by-agents',
-            width: 30,
+            title: 'Top 10 agents by alerts number',
+            id: 'Wazuh-App-Overview-TSC-Agents',
+            width: 50,
           },
         ],
       },
       {
-        height: 350,
+        height: 300,
         vis: [
           {
-            title: 'Alerts volume by agent',
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
+          },
+        ],
+      },
+      {
+        height: 530,
+        vis: [
+          {
+            title: 'Last alerts',
             id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
-            width: 50,
           },
+        ],
+      },
+      {
+        height: 255,
+        vis: [
           {
-            title: 'Stats',
-            id: 'Wazuh-App-Overview-TSC-Metrics',
-            width: 20,
-          },
-          {
-            title: 'Top 10 requirements',
-            id: 'Wazuh-App-Overview-TSC-Top-10-requirements',
-            width: 30,
+            title: 'Requirements by agent',
+            id: 'Wazuh-App-Overview-TSC-Requirements-by-agent',
           },
         ],
       },

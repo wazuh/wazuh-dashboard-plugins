@@ -15,7 +15,7 @@ export default [
     _source: {
       title: 'Requirements over time',
       visState:
-        '{"title":"TSC-Requirements-over-time","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":true,"valueAxis":"ValueAxis-1"},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"filter":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"line","mode":"normal","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"linear"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"labels":{"show":false},"dimensions":{"x":{"accessor":0,"format":{"id":"date","params":{"pattern":"YYYY-MM-DD HH:mm"}},"params":{"date":true,"interval":"PT1H","format":"YYYY-MM-DD HH:mm","bounds":{"min":"2019-08-20T12:33:23.360Z","max":"2019-08-22T12:33:23.360Z"}},"aggType":"date_histogram"},"y":[{"accessor":2,"format":{"id":"number"},"params":{},"aggType":"count"}],"series":[{"accessor":1,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"timestamp","timeRange":{"from":"now-2d","to":"now"},"useNormalizedEsInterval":true,"interval":"auto","drop_partials":false,"min_doc_count":1,"extended_bounds":{}}},{"id":"4","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.tsc","orderBy":"1","order":"desc","size":50,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Requirement"}}]}',
+        '{"title":"Alerts by action over time","type":"area","params":{"type":"area","grid":{"categoryLines":true,"style":{"color":"#eee"},"valueAxis":"ValueAxis-1"},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"area","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"cardinal","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"timestamp","timeRange":{"from":"now-24h","to":"now","mode":"quick"},"useNormalizedEsInterval":true,"interval":"auto","time_zone":"Europe/Berlin","drop_partials":false,"customInterval":"2h","min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.tsc","size":"5","order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -30,11 +30,11 @@ export default [
     _id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
     _type: 'visualization',
     _source: {
-      title: 'Alerts volume by agent',
+      title: 'TSC requirements heatmap',
       visState:
-        '{"aggs":[{"enabled":true,"id":"1","params":{},"schema":"metric","type":"count"},{"enabled":true,"id":"3","params":{"customLabel":"Requirement","field":"rule.tsc","missingBucket":false,"missingBucketLabel":"Missing","order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","size":10},"schema":"group","type":"terms"},{"enabled":true,"id":"2","params":{"customLabel":"Agent","field":"agent.id","missingBucket":false,"missingBucketLabel":"Missing","order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","size":5},"schema":"segment","type":"terms"}],"params":{"addLegend":true,"addTooltip":true,"colorSchema":"Blues","colorsNumber":10,"colorsRange":[],"dimensions":{"series":[{"accessor":0,"aggType":"terms","format":{"id":"terms","params":{"id":"string","missingBucketLabel":"Missing","otherBucketLabel":"Other"}},"params":{}}],"x":{"accessor":1,"aggType":"terms","format":{"id":"terms","params":{"id":"string","missingBucketLabel":"Missing","otherBucketLabel":"Other"}},"params":{}},"y":[{"accessor":2,"aggType":"count","format":{"id":"number"},"params":{}}]},"enableHover":false,"invertColors":false,"legendPosition":"right","percentageMode":false,"setColorRange":false,"times":[],"type":"heatmap","valueAxes":[{"id":"ValueAxis-1","labels":{"color":"black","overwriteColor":false,"rotate":0,"show":false},"scale":{"defaultYExtents":false,"type":"linear"},"show":false,"type":"value"}]},"title":"TSC-Last-alerts","type":"heatmap"}',
+        '{"title":"TSC requirements heatmap","type":"heatmap","params":{"type":"heatmap","addTooltip":true,"addLegend":true,"enableHover":false,"legendPosition":"right","times":[],"colorsNumber":10,"colorSchema":"Greens","setColorRange":false,"colorsRange":[],"invertColors":false,"percentageMode":false,"valueAxes":[{"show":false,"id":"ValueAxis-1","type":"value","scale":{"type":"linear","defaultYExtents":false},"labels":{"show":false,"rotate":0,"overwriteColor":false,"color":"#555"}}]},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.tsc","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Requirements"}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Agents"}}]}',
       uiStateJSON:
-        '{"vis":{"defaultColors":{"0 - 160":"rgb(247,251,255)","160 - 320":"rgb(227,238,249)","320 - 480":"rgb(208,225,242)","480 - 640":"rgb(182,212,233)","640 - 800":"rgb(148,196,223)","800 - 960":"rgb(107,174,214)","960 - 1,120":"rgb(74,152,201)","1,120 - 1,280":"rgb(46,126,188)","1,280 - 1,440":"rgb(23,100,171)","1,440 - 1,600":"rgb(8,74,145)"}}}',
+        '{"vis":{"defaultColors":{"0 - 13":"rgb(247,252,245)","13 - 26":"rgb(233,247,228)","26 - 39":"rgb(211,238,205)","39 - 52":"rgb(184,227,177)","52 - 65":"rgb(152,213,148)","65 - 78":"rgb(116,196,118)","78 - 91":"rgb(75,176,98)","91 - 104":"rgb(47,152,79)","104 - 117":"rgb(21,127,59)","117 - 130":"rgb(0,100,40)"}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -44,43 +44,11 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Overview-TSC-requirements-by-agents',
+    _id: 'Wazuh-App-Overview-TSC-requirements',
     _source: {
-      title: 'Requiments distribution by agent',
+      title: 'TSC requirements',
       visState:
-        '{"title":"TSC-Top-requirements-by-agent","type":"area","params":{"type":"area","grid":{"categoryLines":false},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"filter":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"linear","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"dimensions":{"x":{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},"y":[{"accessor":2,"format":{"id":"number"},"params":{},"aggType":"count"}],"series":[{"accessor":1,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.id","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Agent"}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.tsc","orderBy":"1","order":"desc","size":10,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Requirement"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":false}}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-TSC-Metrics',
-    _source: {
-      title: 'Stats',
-      visState:
-        '{"title":"tsc-metrics","type":"metric","params":{"metric":{"percentageMode":false,"useRanges":false,"colorSchema":"Green to Red","metricColorMode":"None","colorsRange":[{"type":"range","from":0,"to":10000}],"labels":{"show":true},"invertColors":false,"style":{"bgFill":"#000","bgColor":false,"labelColor":false,"subText":"","fontSize":20}},"dimensions":{"metrics":[{"type":"vis_dimension","accessor":0,"format":{"id":"number","params":{}}},{"type":"vis_dimension","accessor":1,"format":{"id":"number","params":{}}}]},"addTooltip":true,"addLegend":false,"type":"metric"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Total alerts"}},{"id":"2","enabled":true,"type":"max","schema":"metric","params":{"field":"rule.level","customLabel":"Max rule level detected"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-TSC-Top-10-requirements',
-    _source: {
-      title: 'Top 10 requirements',
-      visState:
-        '{"title":"TSC-Top-10-requirements","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.tsc","orderBy":"1","order":"desc","size":10,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Requirement"}}]}',
+        '{"title":"TSC requirements","type":"line","params":{"type":"line","grid":{"categoryLines":true,"valueAxis":"ValueAxis-1"},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"filter":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"line","mode":"normal","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":false,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"dimensions":{"x":{"accessor":0,"format":{"id":"date","params":{"pattern":"YYYY-MM-DD"}},"params":{"date":true,"interval":"P1D","format":"YYYY-MM-DD"},"aggType":"date_histogram"},"y":[{"accessor":2,"format":{"id":"number"},"params":{},"aggType":"count"}],"z":[{"accessor":3,"format":{"id":"number"},"params":{},"aggType":"count"}],"series":[{"accessor":1,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]},"radiusRatio":50},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"timestamp","timeRange":{"from":"now-1h","to":"now"},"useNormalizedEsInterval":true,"interval":"auto","drop_partials":false,"min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.tsc","orderBy":"1","order":"desc","size":50,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"4","enabled":true,"type":"count","schema":"radius","params":{}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -94,9 +62,9 @@ export default [
   {
     _id: 'Wazuh-App-Overview-TSC-Agents',
     _source: {
-      title: 'Most active agents',
+      title: 'Agents',
       visState:
-        '{"title":"TSC-Top-10-agents","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","orderBy":"1","order":"desc","size":10,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Agent"}}]}',
+        '{"title":"Agents","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":10,"order":"desc","orderBy":"1"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -108,12 +76,45 @@ export default [
     _type: 'visualization'
   },
   {
+    _id: 'Wazuh-App-Overview-TSC-Requirements-by-agent',
+    _source: {
+      title: 'Requirements by agent',
+      visState:
+        '{"title":"Requirements by agent","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100,"rotate":0},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"radiusRatio":51},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.tsc","size":5,"order":"desc","orderBy":"1","customLabel":"Requirements"}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Overview-TSC-Last-alerts',
+    _type: 'visualization',
+    _source: {
+      title: 'Last alerts',
+      visState:
+        '{"title":"Last alerts","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"agent.name","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Agent name"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.tsc","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Requirement"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Rule description"}}]}',
+      uiStateJSON:
+        '{"vis":{"params":{"sort":{"columnIndex":3,"direction":"desc"}}}}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  {
     _id: 'Wazuh-App-Overview-TSC-Alerts-summary',
     _type: 'visualization',
     _source: {
       title: 'Alerts summary',
       visState:
-        '{"title":"TSC-Alerts-summary","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":3,"direction":"desc"},"showTotal":false,"totalFunc":"sum","dimensions":{"metrics":[{"accessor":3,"format":{"id":"number"},"params":{},"aggType":"count"}],"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},{"accessor":1,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},{"accessor":2,"format":{"id":"terms","params":{"id":"number","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"agent.name","orderBy":"1","order":"desc","size":50,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Agent"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.tsc","orderBy":"1","order":"desc","size":20,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Requirement"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.level","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Rule level"}}]}',
+        '{"title":"Alerts summary","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":3,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"agent.name","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Agent name"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.tsc","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Requirement"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Rule description"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":3,"direction":"desc"}}}}',
       description: '',

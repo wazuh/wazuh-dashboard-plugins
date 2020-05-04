@@ -260,19 +260,19 @@ export const agentVisualizations = {
         height: 300,
         vis: [
           {
-            title: 'Stats',
-            id: 'Wazuh-App-Agents-NIST-Stats',
-            width: 25,
+            title: 'Top 5 rule groups',
+            id: 'Wazuh-App-Agents-TSC-Groups',
+            width: 33,
           },
           {
-            title: 'Top 10 requirements',
-            id: 'Wazuh-App-Agents-NIST-top-10-requirements',
-            width: 25,
+            title: 'Top 5 rules',
+            id: 'Wazuh-App-Agents-TSC-Rule',
+            width: 33,
           },
           {
-            title: 'Requirements distributed by level',
-            id: 'Wazuh-App-Agents-NIST-Requirement-by-level',
-            width: 50,
+            title: 'Top 5 TSC requirements',
+            id: 'Wazuh-App-Agents-TSC-Requirement',
+            width: 34,
           },
         ],
       },
@@ -280,8 +280,14 @@ export const agentVisualizations = {
         height: 300,
         vis: [
           {
-            title: 'Requirements over time',
-            id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime',
+            title: 'TSC Requirements',
+            id: 'Wazuh-App-Agents-TSC-Requirements',
+            width: 75,
+          },
+          {
+            title: 'Rule level distribution',
+            id: 'Wazuh-App-Agents-TSC-Rule-level-distribution',
+            width: 25,
           },
         ],
       },
@@ -290,7 +296,7 @@ export const agentVisualizations = {
         vis: [
           {
             title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-NIST-Last-alerts',
+            id: 'Wazuh-App-Agents-TSC-Last-alerts',
           },
         ],
       },
