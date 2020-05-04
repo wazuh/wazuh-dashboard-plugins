@@ -135,7 +135,8 @@ export class Inventory extends Component {
       `/syscheck/${agentID}`,
       {
         limit: type === 'file' ? '15' : '1',
-        type
+        type,
+        ...(type === 'file' && {sort: '+file'})
       }
     );
     if (type === 'file') {

@@ -21,6 +21,8 @@ class WzGlobalBreadcrumb extends Component {
               className='wz-global-breadcrumb'
               responsive={false}
               truncate={false}
+              max={6}
+              showMaxPopover
               breadcrumbs={this.props.state.breadcrumb}
               aria-label="Wazuh global breadcrumbs"
             />,
