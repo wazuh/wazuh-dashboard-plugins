@@ -136,7 +136,7 @@ export class AgentsTable extends Component {
     this._isMount &&
       this.setState({
         agents: formatedAgents,
-        totalItems: (((rawAgents || {}).data || {}).data || {}).affected_items,
+        totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
         isProcessing: false,
         isLoading: false
       });
