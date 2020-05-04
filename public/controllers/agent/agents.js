@@ -508,7 +508,7 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
 
     /*     if (tab === 'mitre') {
@@ -538,7 +538,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -763,6 +763,7 @@ export class AgentsController {
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
+      if (!this.$scope.agent) return;
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;

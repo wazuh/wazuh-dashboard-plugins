@@ -67,7 +67,7 @@ export class MainModule extends Component {
           window.location.href = `#/agents?agent=${this.props.agent.id}`;
           this.router.reload();
         },
-        className: 'wz-global-breadcrumb-btn',
+        className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
         truncate: false,
       },
       {
