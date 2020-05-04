@@ -11,7 +11,9 @@
  */
 export const ModulesDefaults = {
   general: {
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   fim: {
     init: 'inventory',
@@ -19,24 +21,34 @@ export const ModulesDefaults = {
     buttons: ['reporting', 'settings']
   },
   sca: {
-    init: 'states',
-    tabs: [{ id: 'states', name: 'States' }, { id: 'events', name: 'Events' }],
+    init: 'inventory',
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
     buttons: ['settings']
   },
   virustotal: {
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   pci: {
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   hipaa: {
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   nist: {
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   gdpr: {
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   syscollector: {
     notModule: true

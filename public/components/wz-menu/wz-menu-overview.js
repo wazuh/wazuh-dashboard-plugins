@@ -14,8 +14,10 @@ import { EuiFlexItem, EuiFlexGrid, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
+import chrome from 'ui/chrome';
 import { updateCurrentTab } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
+import { UnsupportedComponents } from '../../utils/components-os-support';
 
 class WzMenuOverview extends Component {
   constructor(props) {
@@ -43,6 +45,7 @@ class WzMenuOverview extends Component {
       fim: { id: 'fim', text: 'Integrity Monitoring' },
       aws: { id: 'aws', text: 'Amazon AWS' },
       pm: { id: 'pm', text: 'Policy Monitoring' },
+      sca: { id: 'sca', text: 'Security configuration assessment' },
       audit: { id: 'audit', text: 'System Auditing' },
       oscap: { id: 'oscap', text: 'OpenSCAP' },
       ciscat: { id: 'ciscat', text: 'CIS-CAT' },
@@ -67,6 +70,8 @@ class WzMenuOverview extends Component {
   async componentDidMount() {
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
   }
 
   clickMenuItem = section => {
@@ -75,8 +80,13 @@ class WzMenuOverview extends Component {
       .currentTab;
     if (currentTab !== section) {
       // do not redirect if we already are in that tab
-      window.location.href = `#/overview/?tab=${section}`;
-      store.dispatch(updateCurrentTab(section));
+      if (!this.props.isAgent) {
+        window.location.href = `#/overview/?tab=${section}`;
+        store.dispatch(updateCurrentTab(section));
+      } else {
+        window.location.href = `#/agents?agent=${this.props.isAgent.id}&tab=${section}`;
+        this.router.reload();
+      }
     }
   };
 
@@ -106,15 +116,36 @@ class WzMenuOverview extends Component {
   };
 
   render() {
+    let securityInformationItems = [
+      this.overviewSections.general,
+      this.overviewSections.fim
+    ];
+    let auditingItems = [
+      this.overviewSections.pm,
+      this.overviewSections.audit,
+      this.overviewSections.oscap,
+      this.overviewSections.ciscat
+    ];
+    let threatDetectionItems = [
+      this.overviewSections.virustotal,
+      this.overviewSections.osquery,
+      this.overviewSections.docker,
+      this.overviewSections.mitre
+    ];
+    if (!this.props.isAgent) {
+      securityInformationItems.push(this.overviewSections.aws);
+      threatDetectionItems.unshift(this.overviewSections.vuls);
+    } else {
+      auditingItems.splice(1, 0, this.overviewSections.sca);
+      if (!(UnsupportedComponents[this.props.isAgent.agentPlatform] || UnsupportedComponents['other']).includes('vuls')) {
+        threatDetectionItems.unshift(this.overviewSections.vuls);
+      }
+    }
     const securityInformation = [
       this.createItem(this.overviewSections.securityInformation, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems([
-          this.overviewSections.general,
-          this.overviewSections.fim,
-          this.overviewSections.aws
-        ])
+        items: this.createItems(securityInformationItems)
       })
     ];
 
@@ -122,12 +153,7 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.auditing, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems([
-          this.overviewSections.pm,
-          this.overviewSections.audit,
-          this.overviewSections.oscap,
-          this.overviewSections.ciscat
-        ])
+        items: this.createItems(auditingItems)
       })
     ];
 
@@ -135,13 +161,7 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.threatDetection, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems([
-          this.overviewSections.vuls,
-          this.overviewSections.virustotal,
-          this.overviewSections.osquery,
-          this.overviewSections.docker,
-          this.overviewSections.mitre
-        ])
+        items: this.createItems(threatDetectionItems)
       })
     ];
 
@@ -162,29 +182,29 @@ class WzMenuOverview extends Component {
       <div className="WzManagementSideMenu">
         {Object.keys(this.state.extensions).length && (
           <EuiFlexGrid columns={2}>
-          <EuiFlexItem>
-            <EuiSideNav
-              items={securityInformation}
-              style={{ padding: '4px 12px' }}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiSideNav
-              items={threatDetection}
-              style={{ padding: '4px 12px' }}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiSideNav
-              items={regulatoryCompliance}
-              style={{ padding: '4px 12px' }}
-            />
-          </EuiFlexItem>
-        </EuiFlexGrid>
-        ) || (<div style={{width: 300}}></div>
+            <EuiFlexItem>
+              <EuiSideNav
+                items={securityInformation}
+                style={{ padding: '4px 12px' }}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiSideNav
+                items={threatDetection}
+                style={{ padding: '4px 12px' }}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiSideNav
+                items={regulatoryCompliance}
+                style={{ padding: '4px 12px' }}
+              />
+            </EuiFlexItem>
+          </EuiFlexGrid>
+        ) || (<div style={{ width: 300 }}></div>
           )}
       </div>
     );

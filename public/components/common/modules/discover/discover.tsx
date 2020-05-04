@@ -22,7 +22,9 @@ import { RowDetails } from './row-details';
 import { npSetup } from 'ui/new_platform';
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-import DateMatch from '@elastic/datemath'
+import DateMatch from '@elastic/datemath';
+import { toastNotifications } from 'ui/notify';
+
 import {
   EuiBasicTable,
   EuiLoadingSpinner,
@@ -32,7 +34,9 @@ import {
   Direction,
   EuiSpacer,
   EuiCallOut,
-  EuiIcon
+  EuiIcon,
+  EuiButtonIcon,
+  EuiToolTip
 } from '@elastic/eui';
 import {
   IIndexPattern,
@@ -70,7 +74,9 @@ export class Discover extends Component {
     query: Query,
     searchBarFilters: esFilters.Filter[],
     elasticQuery: object
-    filters: []
+    filters: [],
+    columns: string[],
+    hover: string
   };
   indexPattern!: IIndexPattern
   props!: {
@@ -100,16 +106,33 @@ export class Discover extends Component {
       query: { language: "kuery", query: "" },
       searchBarFilters: [],
       elasticQuery: {},
-      filters: props.initialFilters
+      filters: props.initialFilters,
+      columns: [],
+      hover: ""
     }
 
+    this.nameEquivalences = {
+      "syscheck.event": "Action",
+      "rule.id": "Rule ID",
+      "rule.description": "Rule description",
+      "rule.level": "Rule level"
+    }
     this.onQuerySubmit.bind(this);
     this.onFiltersUpdated.bind(this);
   }
 
+  showToast = (color, title, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      toastLifeTimeMs: time,
+    });
+  };
+
   async componentDidMount () {
     this._isMount = true;
     try {
+      this.setState({columns: ["icon", "timestamp", 'syscheck.event', 'rule.description', 'rule.level', 'rule.id']}) //initial columns
       await this.getIndexPattern(); 
       this.getAlerts();
     } catch (err) {
@@ -168,7 +191,7 @@ export class Discover extends Component {
     } else {
       const newItemIdToExpandedRowMap = {};
       newItemIdToExpandedRowMap[item._id] = (
-        (<div style={{ width: "100%" }}> <RowDetails item={item} addFilter={(filter) => this.addFilter(filter)} /></div>)
+        (<div style={{ width: "100%" }}> <RowDetails item={item} addFilter={(filter) => this.addFilter(filter)} addFilterOut={(filter) => this.addFilterOut(filter)} toggleColumn={(id) => this.addColumn(id)} /></div>)
       );
       this.setState({ itemIdToExpandedRowMap: newItemIdToExpandedRowMap });
     }
@@ -196,8 +219,8 @@ export class Discover extends Component {
 
   async getAlerts() {
     //compare filters so we only make a request into Elasticsearch if needed
-    try{
       const newFilters = this.buildFilter();
+    try{
       if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading) {
         this.setState({ isLoading: true })
         const alerts = await GenericRequest.request(
@@ -215,52 +238,83 @@ export class Discover extends Component {
       }
     }catch(err){
       if (this._isMount) {
-        this.setState({ alerts: [], total: 0, isLoading: false })
+        this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters, filters: newFilters.filters })
       }
     }
   }
 
-  columns() {
-    return [
-      {
-        width: "25px",
-        isExpander: true,
-        render: item => {
-          return (
-            <EuiIcon size="s" type={this.state.itemIdToExpandedRowMap[item._id] ? "arrowDown" : "arrowRight"} />
-          )
-        },
-      },
-      {
-        field: 'timestamp',
-        name: 'Time',
-        sortable: true,
-        render: time => {
-          const date = time.split('.')[0];
-          return <span>{date.split('T')[0]} {date.split('T')[1]}</span>
-        },
-      },
-      {
-        field: 'syscheck.event',
-        name: 'Action',
+  removeColumn(id){
+    if(this.state.columns.length < 2){
+      this.showToast('warning', "At least one column must be selected",3000);
+      return;
+    }
+    const columns = this.state.columns;
+    columns.splice(columns.findIndex(v => v === id), 1);
+    this.setState(columns)
+  }
+
+  addColumn(id){ 
+    if(this.state.columns.length > 11){
+      this.showToast('warning', 'The maximum number of columns is 10',3000);
+      return;
+    }
+    if(this.state.columns.find(element => element === id)){
+      this.removeColumn(id);
+      return;
+    }
+    const columns = this.state.columns;
+    columns.push(id);
+    this.setState(columns)
+  }
+
+
+  columns = () => {
+    const columns = this.state.columns.map((item) => {
+      if(item === "icon"){
+        return  {
+          width: "25px",
+          isExpander: true,
+          render: item => {
+            return (
+              <EuiIcon size="s" type={this.state.itemIdToExpandedRowMap[item._id] ? "arrowDown" : "arrowRight"} />
+            )
+          },
+        }
+      }
+      if(item === "timestamp"){
+        return  {
+          field: 'timestamp',
+          name: 'Time',
+          sortable: true,
+          render: time => {
+            const date = time.split('.')[0];
+            return <span>{date.split('T')[0]} {date.split('T')[1]}</span>
+          },
+        }
+      }
+
+      return {
+        field: item,
+        name: (<span 
+          onMouseEnter={() => { this.setState({hover: item}) }}
+          onMouseLeave={() => { this.setState({hover: ""}) }}
+          style={{display: "inline-flex"}}>{this.nameEquivalences[item] || item} {this.state.hover === item &&
+          <EuiToolTip position="top" content={`Remove column`}>
+            <EuiButtonIcon
+              style={{paddingBottom: 10, marginBottom: "-10px"}}
+              onClick={(e) => { this.removeColumn(item); e.stopPropagation();}}
+              iconType="cross"
+              aria-label="Filter"
+              iconSize="s"
+            />
+          </EuiToolTip>} 
+        </span>),
         sortable: true
-      },
-      {
-        field: 'rule.description',
-        name: 'Rule description',
-        sortable: true
-      },
-      {
-        field: 'rule.level',
-        name: 'Rule level',
-        sortable: true
-      },
-      {
-        field: 'rule.id',
-        name: 'Rule ID',
-        sortable: true
-      },
-    ]
+      }
+
+
+    })
+    return columns;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -298,6 +352,26 @@ export class Discover extends Component {
     return result;
   }
 
+   /**
+   * Adds a new negated filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
+   * @param filter 
+   */
+  addFilterOut(filter) {
+    const key = Object.keys(filter)[0];
+    const value = filter[key];
+    const valuesArray = Array.isArray(value) ? [...value] : [value];
+    const filters = this.state.searchBarFilters;
+    valuesArray.map((item) => {
+      const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
+      formattedFilter.meta.negate = true;
+
+      filters.push(formattedFilter);
+    })
+
+    this.filterManager.setFilters(filters);
+    this.setState({ searchBarFilters: filters });
+  }
+
   /**
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
    * @param filter 
@@ -305,10 +379,14 @@ export class Discover extends Component {
   addFilter(filter) {
     const key = Object.keys(filter)[0];
     const value = filter[key];
-    const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, value, this.indexPattern);
-
+    const valuesArray = Array.isArray(value) ? [...value] : [value];
     const filters = this.state.searchBarFilters;
-    filters.push(formattedFilter);
+    valuesArray.map((item) => {
+      const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
+
+      filters.push(formattedFilter);
+    })
+
     this.filterManager.setFilters(filters);
     this.setState({ searchBarFilters: filters });
   }
@@ -413,6 +491,7 @@ export class Discover extends Component {
                 {pageIndexItems.length && (
                   <EuiBasicTable
                     items={pageIndexItems}
+                    className="module-discover-table"
                     itemId="_id"
                     itemIdToExpandedRowMap={itemIdToExpandedRowMap}
                     isExpandable={true}

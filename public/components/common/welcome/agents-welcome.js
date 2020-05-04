@@ -41,15 +41,11 @@ export class AgentsWelcome extends Component {
     };
   }
 
-  color = status => {
-    if (status.toLowerCase() === 'active') {
-      return 'success';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
-      return 'subdued';
-    }
-  };
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
 
   renderTitle() {
     return (
@@ -91,7 +87,7 @@ export class AgentsWelcome extends Component {
     return (
       <div className="wz-module">
         <div className="wz-module-header-agent-wrapper">
-          <div className="wz-module-header-agent">{title}</div>
+          <div className="wz-module-header-agent" style={{ borderTop: `4px solid ${this.color(this.props.agent.status, true)}` }}>{title}</div>
         </div>
         <div className="wz-module-body wz-module-body-main">
           <div className="wz-welcome-page-agent-info">

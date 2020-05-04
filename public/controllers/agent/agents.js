@@ -580,11 +580,6 @@ export class AgentsController {
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
-      this.$scope.currentAgentsSectionProps = {
-        switchTab: (tab, force) => this.$scope.switchTab(tab, force),
-        currentTab: this.$scope.tab,
-        agent: this.$scope.agent
-      };
       this.$scope.$applyAsync();
     } catch (error) {
       return Promise.reject(error);

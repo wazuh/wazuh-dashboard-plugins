@@ -22,7 +22,12 @@ import {
   EuiFlexGroup,
   EuiLink,
   EuiTabs,
-  EuiTab
+  EuiTab,
+  EuiTable,
+  EuiTableBody,
+  EuiTableRow,
+  EuiTableRowCell,
+  EuiButtonIcon
 } from '@elastic/eui';
 import './discover.less';
 import { EuiFlexItem } from '@elastic/eui';
@@ -37,13 +42,15 @@ export class RowDetails extends Component {
     ruleData: {
       items: Array<any>,
       totalItems: Number
-    }
+    },
+    hover: string
   };
 
   complianceEquivalences: Object
 
   props!: {
     addFilter: Function,
+    addFilterOut: Function,
     item: {
       rule: {
         id: Number,
@@ -59,8 +66,9 @@ export class RowDetails extends Component {
       selectedTabId: "table",
       ruleData: {
         items: [],
-        totalItems: 0
-      }
+        totalItems: 0,
+      },
+      hover: ''
     }
 
     this.complianceEquivalences = {
@@ -112,6 +120,10 @@ export class RowDetails extends Component {
     for (var i = 1; i < pathArray.length; i++) {
       child = child[pathArray[i]];
     }
+
+    if(!Array.isArray(child)){ 
+      child.toString();
+    }
     return child;
   }
 
@@ -126,42 +138,108 @@ export class RowDetails extends Component {
       </EuiToolTip>)
   }
 
-  renderRows() {
-    const columns = [];
-    const syscheckPaths = this.propertiesToArray(this.props.item.syscheck);
-    syscheckPaths.map((item, idx) => {
-      let child = {};
-      const key = "syscheck." + item;
-      child['title'] = key;
-      const value = this.getChildFromPath(this.props.item.syscheck, item);
-      if (Array.isArray(value)) {
-        child['description'] = value.map(item => {
-          return this.getFilterLink(key, item);
-        })
-      } else {
-        child['description'] = (
-          this.getFilterLink(key, value)
-        )
 
-      }
-      columns.push(child);
-    });
-    if (!columns.length) {
-      return (<div style={{ width: 200 }}>No syscheck data was found.</div>)
-    }
-    return columns;
+
+  renderRows() {
+    const fieldsToShow = ['agent','cluster','manager','rule','decoder','syscheck'];
+    var rows:any[] = [];
+    
+    for(var i=0; i<fieldsToShow.length; i++){
+      if(this.props.item[fieldsToShow[i]]){
+        const itemPaths = this.propertiesToArray(this.props.item[fieldsToShow[i]]);
+        const tmpRows = itemPaths.map((item, idx) => {
+          const key = fieldsToShow[i]+ "." + item; // = agent + . + id = agent.id
+          const value = this.getChildFromPath(this.props.item[fieldsToShow[i]], item);
+          const filter = {};
+          filter[key] = value;
+          const cells:any[] = [];
+          const actionsCell = <EuiTableRowCell
+            className={this.state.hover === key ? "hover-row" : " "}
+            style={{width: 80, height: 44,  borderTop: 0, borderBottom: 0}}
+            key={key+"0"}>
+            {(this.state.hover === key && 
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false} style={{ marginRight: 0}}>
+                <EuiToolTip position="top" content={`Filter for value`}>
+                  <EuiButtonIcon
+                    onClick={() => this.props.addFilter(filter)}
+                    iconType="magnifyWithPlus"
+                    aria-label="Filter"
+                    iconSize="s"
+                  />
+                </EuiToolTip>    
+                </EuiFlexItem>
+                <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft:0}}>
+                  <EuiToolTip position="top" content={`Filter out value`}>
+                    <EuiButtonIcon
+                      onClick={() => this.props.addFilterOut(filter)}
+                      iconType="magnifyWithMinus"
+                      aria-label="Filter"
+                      iconSize="s"
+                    />
+                  </EuiToolTip>
+              </EuiFlexItem>
+                <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft:0}}>
+                  <EuiToolTip position="top" content={`Toggle column`}>
+                    <EuiButtonIcon
+                      onClick={() => this.props.toggleColumn(key)}
+                      iconType="tableOfContents"
+                      aria-label="Filter"
+                      iconSize="s"
+                    />
+                  </EuiToolTip>
+              </EuiFlexItem>
+            </EuiFlexGroup>)}
+          </EuiTableRowCell>
+    
+          cells.push(actionsCell);
+          
+          const keyCell = <EuiTableRowCell
+            className={this.state.hover === key ? "hover-row" : " "}
+            style={{width: "20%", borderTop: 0, borderBottom: 0}}
+            key={key+"1"}>
+            {<div>{key}</div>}
+          </EuiTableRowCell>
+    
+          cells.push(keyCell);
+          
+          const formattedValue = Array.isArray(value) ? value.join(', ') : value.toString();
+         
+          const valueCell = <EuiTableRowCell
+            className={this.state.hover === key ? "hover-row" : " "}
+            style={{borderTop: 0, borderBottom: 0}}
+            key={key+"2"}>
+            {<div>{formattedValue}</div>}
+          </EuiTableRowCell>
+    
+          cells.push(valueCell);
+    
+          return (
+            <EuiTableRow
+              onMouseEnter={() => this.setState({hover: key})}
+              onMouseLeave={() => this.setState({hover: ""})}
+              key={key}>
+              {cells}
+            </EuiTableRow>
+          );
+        }); //map
+        rows =[ ...rows, ...tmpRows]
+      }//if
+    } //for 
+
+
+    return rows;
   }
 
   getTable() {
     return (
-      <div style={{ height: 425, overflow: 'auto' }}>
-        <EuiDescriptionList
-          className="module-discover-table-description-list"
-          type="column"
-          listItems={this.renderRows()}
-          compressed
-        />
-      </div>)
+      <div style={{ height: 500, overflow: 'auto' }}>
+
+        <EuiTable>
+          <EuiTableBody>{this.renderRows()}</EuiTableBody>
+        </EuiTable>
+      </div>
+    )
   }
 
   getJSON() {
@@ -452,7 +530,7 @@ export class RowDetails extends Component {
       <div>
         {this.getTabs()}
         <EuiFlexGroup>
-          <EuiFlexItem style={{ padding: '16px 0px 4px 16px' }}>
+          <EuiFlexItem style={{ padding: 0 }}>
             {this.state.selectedTabId === 'table' && (
               this.getTable()
             )}
