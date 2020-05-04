@@ -50,6 +50,7 @@ export class AppState {
         } else {
           const wazuhConfig = new WazuhConfig();
           const config = wazuhConfig.getConfig();
+          if(!Object.keys(config).length) return;
           const extensions = {
             audit: config['extensions.audit'],
             pci: config['extensions.pci'],
