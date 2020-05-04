@@ -306,19 +306,20 @@ export class FileDetails extends Component {
           className='events-accordion'
           buttonContent={
             <EuiTitle size="s">
-              <h3>
-                Recent events
-              <EuiToolTip
+              <h3> 
+              Recent events {this.props.view !== 'events' && (
+                <EuiToolTip
                   position="top"
                   content="Inspect in discover">
                   <EuiIcon
                     className='euiButtonIcon euiButtonIcon--primary'
                     onClick={this.viewInEvents}
                     type="link"
-                    style={{ marginLeft: 16 }}
+                    style={{marginLeft: 16}}
                     aria-label="Inspect in discover"
                   />
                 </EuiToolTip>
+              )}
               </h3>
             </EuiTitle>
           }
