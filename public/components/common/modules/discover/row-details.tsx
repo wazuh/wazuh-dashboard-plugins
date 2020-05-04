@@ -270,27 +270,27 @@ export class RowDetails extends Component {
   renderInfo(id, level, file, path, groups) {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem key="id" grow={false}><b>ID:</b>
+        <EuiFlexItem key="id" grow={false}><b>ID</b>
           <EuiToolTip position="top" content={`Filter by this rule id: ${id}`}>
             <EuiLink onClick={async () => this.props.addFilter({ "rule.id": id })}>
               {id}
             </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
-        <EuiFlexItem key="level" grow={false}><b>Level:</b>
+        <EuiFlexItem key="level" grow={false}><b>Level</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
             <EuiLink onClick={async () => this.props.addFilter({ "rule.level": level })}>
               {level}
             </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
-        <EuiFlexItem key="file" grow={false}><b>File:</b>
+        <EuiFlexItem key="file" grow={false}><b>File</b>
           {file}
         </EuiFlexItem>
-        <EuiFlexItem key="path" grow={false}><b>Path:</b>
+        <EuiFlexItem key="path" grow={false}><b>Path</b>
           {path}
         </EuiFlexItem>
-        <EuiFlexItem key="Groups" grow={false}><b>Groups:</b>
+        <EuiFlexItem key="Groups" grow={false}><b>Groups</b>
           {this.renderGroups(groups)}
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -306,9 +306,9 @@ export class RowDetails extends Component {
     const detailsToRender: Array<JSX.Element> = [];
     const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
-    Object.keys(details).forEach((key, inx) => {
+    Object.keys(details).forEach((key) => {
       detailsToRender.push(
-        <EuiFlexItem key={key} style={{ marginBottom: 10 }} grow={false}><b>{capitalize(key)}:</b>{details[key] === '' ? 'true' : details[key]}</EuiFlexItem>
+        <EuiFlexItem key={key} style={{ marginBottom: 10 }} grow={false}><b>{capitalize(key)}</b>{details[key] === '' ? 'true' : details[key]}</EuiFlexItem>
       );
     });
     return (

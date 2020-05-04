@@ -156,7 +156,7 @@ class WzRuleInfo extends Component {
           badgeList.push(buildBadge(field));
         }
       }
-    } catch (error) {}
+    } catch (error) { }
 
     return <div>{badgeList}</div>;
   }
@@ -182,11 +182,11 @@ class WzRuleInfo extends Component {
     return (
       <EuiFlexGroup>
         <EuiFlexItem key="id" grow={false}>
-          <b>ID:</b>{id}
+          <b style={{ paddingBottom: 6 }}>ID</b>{id}
         </EuiFlexItem>
         <EuiSpacer size="s" />
         <EuiFlexItem key="level" grow={false}>
-          <b>Level:</b>
+          <b style={{ paddingBottom: 6 }}>Level</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack({ level: level })}
@@ -198,7 +198,7 @@ class WzRuleInfo extends Component {
 
         <EuiSpacer size="s" />
         <EuiFlexItem key="file" grow={false}>
-          <b>File:</b>
+          <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack({ file: file })}
@@ -209,7 +209,7 @@ class WzRuleInfo extends Component {
         </EuiFlexItem>
         <EuiSpacer size="s" />
         <EuiFlexItem key="path" grow={false}>
-          <b>Path:</b>
+          <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack({ path: path })}
@@ -218,7 +218,7 @@ class WzRuleInfo extends Component {
             </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
-        <EuiFlexItem key="Groups" grow={false}><b>Groups:</b>
+        <EuiFlexItem key="Groups" grow={false}><b style={{ paddingBottom: 6 }}>Groups</b>
           {this.renderGroups(groups)}
         </EuiFlexItem>
         <EuiSpacer size="s" />
@@ -232,10 +232,12 @@ class WzRuleInfo extends Component {
    */
   renderDetails(details) {
     const detailsToRender = [];
-    Object.keys(details).forEach((key, inx) => {
+    const capitalize = str => str[0].toUpperCase() + str.slice(1);
+
+    Object.keys(details).forEach((key) => {
       detailsToRender.push(
         <EuiFlexItem key={key} grow={false}>
-          <b>{key}:</b>{details[key] === '' ? 'true' : details[key]}
+          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : details[key]}
         </EuiFlexItem>
       );
     });
@@ -303,7 +305,7 @@ class WzRuleInfo extends Component {
 
       listCompliance.push(
         <EuiFlexItem key={key} grow={false}>
-          <b>{this.complianceEquivalences[key]}</b>
+          <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences[key]}</b>
           <p>{values}</p>
           <EuiSpacer size="s" />
         </EuiFlexItem>
@@ -375,7 +377,6 @@ class WzRuleInfo extends Component {
               </EuiFlexItem>
             </EuiFlexGroup>
             {/* Cards */}
-            <EuiSpacer size="m" />
             <EuiPanel style={{ margin: '16px 0' }}>
               <EuiFlexGroup>
                 {/* General info */}
@@ -413,7 +414,6 @@ class WzRuleInfo extends Component {
               </EuiFlexGroup>
             </EuiPanel>
             {/* Table */}
-            <EuiSpacer size="l" />
             <EuiPanel paddingSize="m">
               <EuiFlexGroup>
                 <EuiFlexItem>
