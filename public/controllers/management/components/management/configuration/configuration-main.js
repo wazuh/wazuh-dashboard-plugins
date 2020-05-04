@@ -46,7 +46,7 @@ class WzConfigurationMain extends Component {
             this.router.reload();
           },
           className: 'wz-global-breadcrumb-btn',
-          truncate: true
+          truncate: false
         },
         { text: 'Configuration' }
       ];
