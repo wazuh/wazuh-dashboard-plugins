@@ -178,6 +178,12 @@ export class FileDetails extends Component {
   async checkFilterManager(filters) {
     const { filterManager } = getServices();
     if (filterManager.filters && filterManager.filters.length) {
+      const syscheckPathFilters = filterManager.filters.filter(x => {
+        return x.meta.key === 'syscheck.path';
+      });
+      syscheckPathFilters.map(x => {
+        filterManager.removeFilter(x);
+      });
       filterManager.addFilters([filters]);
       const scope = await ModulesHelper.getDiscoverScope();
       scope.updateQueryAndFetch({ query: null });
