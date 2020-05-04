@@ -187,8 +187,8 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
     while (tries--) {
       await delay(1200);
       try {
-        const result = await WzRequest.apiReq('GET', '/ping', {}); //TODO: ¿API 4.0?
-        isValid = ((result || {}).data || {}).isValid;
+        const result = await WzRequest.apiReq('GET', '//', {});
+        isValid = (result || {}).api_version;
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
