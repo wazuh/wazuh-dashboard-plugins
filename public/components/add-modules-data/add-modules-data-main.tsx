@@ -34,6 +34,9 @@ import modeGuides from './guides';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import store from '../../redux/store';
+import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { updateAdminMode } from '../../redux/actions/appStateActions';
+import { connect } from 'react-redux';
 
 const guides = Object.keys(modeGuides).map(key => modeGuides[key]).sort((a,b) => {
 	if (a.name < b.name) { return -1 }
@@ -43,6 +46,8 @@ const guides = Object.keys(modeGuides).map(key => modeGuides[key]).sort((a,b) =>
 
 interface IPropsWzAddModulesData {
 	close: Function
+	adminMode: boolean
+	updateAdminMode: (adminMode: boolean) => void
 };
 
 interface IStateWzAddModulesData {
@@ -50,62 +55,72 @@ interface IStateWzAddModulesData {
 	selectedGuideCategory: any
 };
 
-export default class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
+class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
 	tabs: any
 	constructor(props){
 		super(props);
 		// DON'T DELETE THE BELOW CODE. IT'S FOR MODULE GUIDES.
-		// const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
-		// this.tabs = [
-		// 	...categories.map(category => ({
-		// 		id: category,
-		// 		name: category,
-		// 		content: (
-		// 			<Fragment>
-		// 				<EuiSpacer size='m' />
-		// 				<EuiFlexGrid columns={4}>
-		// 					{this.getModulesFromCategory(category).map(extension => (
-		// 						<EuiFlexItem key={`add-modules-data--${extension.id}`}>
-		// 							<EuiCard
-		// 								layout='horizontal'
-		// 								icon={(<EuiIcon size='xl' type={extension.icon} />) }
-		// 								title={extension.name}
-		// 								description={(TabDescription[extension.id] && TabDescription[extension.id].description) || extension.description}
-		// 								onClick={() => this.changeGuide(extension.id) }
-		// 							/>
-		// 						</EuiFlexItem>
-		// 					))}
-		// 				</EuiFlexGrid>
-		// 			</Fragment>
-		// 		)
-		// 	})),
-		// 	{
-		// 		id: 'sample_data',
-		// 		name: 'Sample Data',
-		// 		content: (
-		// 			<Fragment>
-		// 				<EuiSpacer size='m' />
-		// 				<WzSampleData/>
-		// 			</Fragment>
-		// 		)
-		// 	}
-		// ];
-		// this.state = {
-		// 	guide: '',
-		// 	selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
-		// }
+		const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
+		this.tabs = [
+			...categories.map(category => ({
+				id: category,
+				name: category,
+				content: (
+					<Fragment>
+						<EuiSpacer size='m' />
+						<EuiFlexGrid columns={4}>
+							{this.getModulesFromCategory(category).map(extension => (
+								<EuiFlexItem key={`add-modules-data--${extension.id}`}>
+									<EuiCard
+										layout='horizontal'
+										icon={(<EuiIcon size='xl' type={extension.icon} />) }
+										title={extension.name}
+										description={(TabDescription[extension.id] && TabDescription[extension.id].description) || extension.description}
+										onClick={() => this.changeGuide(extension.id) }
+									/>
+								</EuiFlexItem>
+							))}
+						</EuiFlexGrid>
+					</Fragment>
+				)
+			})),
+			{
+				id: 'sample_data',
+				name: 'Sample Data',
+				content: (
+					<Fragment>
+						<EuiSpacer size='m' />
+						<WzSampleData/>
+					</Fragment>
+				)
+			}
+		];
+		this.state = {
+			guide: '',
+			selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
+		}
 		// "redirect=sample_data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
 	}
 	setGlobalBreadcrumb() {
     const breadcrumb = [
 			{ text: '' },
 			{ text: 'Management', href: '/app/wazuh#/manager' },
-			{ text: 'Sample Data' }
+			{ text: 'Add data to modules' }
 		];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
-  componentDidMount() {
-    this.setGlobalBreadcrumb();
+  async componentDidMount() {
+		this.setGlobalBreadcrumb();
+		try{
+      const adminMode = await checkAdminMode();
+      if(this.props.adminMode !== adminMode){
+        this.props.updateAdminMode(adminMode);
+			};
+			if(!adminMode){ // redirect to root path of the application
+        window.location.href = `#/`;
+      };
+		}catch(error){}
+		
   }
 	changeGuide = (guide: string = '') => {
 		this.setState({ guide });
@@ -117,12 +132,12 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		return category !== '' ? guides.filter(guide => guide.category === category) : guides;
 	}
 	render(){
-		// const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES. 
+		const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES. 
 		return (
 			<EuiPage restrictWidth='1200px'>
 				<EuiPageBody>
 					{/** Module guides with sample data rendered as tabs */}
-					{/* {guide && (
+					{guide && (
 						<WzModuleGuide guideId={guide} close={() => this.changeGuide('')} {...this.props}/>
 						) || (
 						<Fragment>
@@ -141,9 +156,10 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 													<span> </span>
 												</Fragment>
 											)}
-											<span>Sample data</span>
+											<span>Add data to modules</span>
 										</h2>
 									</EuiTitle>
+									<EuiText color='subdued'>Create configuration for modules through guides or add sample data.</EuiText>
 								</EuiFlexItem>
 							</EuiFlexGroup>
 							<EuiSpacer size='m'/>
@@ -159,9 +175,9 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 								</EuiFlexItem>
 							</EuiFlexGroup>
 						</Fragment>
-					)} */}
+					)}
 					{/* Only sample data */}
-					<EuiFlexGroup>
+					{/* <EuiFlexGroup>
 						<EuiFlexItem>
 							<EuiTitle size='l'><span>Sample data</span></EuiTitle>
 							<EuiText color='subdued'>Add sample data to modules.</EuiText>
@@ -172,9 +188,23 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 						<EuiFlexItem>
 							<WzSampleData/>
 						</EuiFlexItem>
-					</EuiFlexGroup>
+					</EuiFlexGroup> */}
 				</EuiPageBody>
 			</EuiPage>
 		)
 	}
-}
+};
+
+const mapStateToProps = state => {
+  return {
+    adminMode: state.appStateReducers.adminMode
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
+  }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(WzAddModulesData)

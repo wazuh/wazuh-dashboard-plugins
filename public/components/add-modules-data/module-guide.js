@@ -41,7 +41,8 @@ import {
   EuiTabs,
   EuiTab,
   EuiCode,
-  EuiBadge
+  EuiBadge,
+  EuiTextColor
 } from "@elastic/eui";
 
 import moduleGuides from './guides';
@@ -787,6 +788,21 @@ class WzModuleGuide extends Component {
               </EuiFlexGroup>
               <EuiFlexGroup>
                 <EuiFlexItem>
+                  <EuiText>
+                    <p>
+                      Use the <strong>forms</strong> to generate a configuration for the module.
+                    </p>
+                    <p>
+                      Some <strong>settings</strong> are <EuiCode>optionals</EuiCode>, so you can <strong>check in</strong> to add them to your configuration. Settings can have <strong>attributes</strong> and/or <strong>options</strong> which can be <EuiCode>required</EuiCode> or <EuiCode>optionals</EuiCode>.
+                    </p>
+                    <p>
+                      If any <strong>setting</strong>, <strong>attribute</strong>, <strong>option</strong> or <strong>guide step</strong> is <strong><i>misconfigured</i></strong>, it will be marked in <EuiTextColor color="danger"><strong>red</strong></EuiTextColor> and the last step, which contains the current XML configuration, will show that there is some error.
+                    </p>
+                  </EuiText>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGroup>
+                <EuiFlexItem>
                   {!this.specificGuide && agentTypeSelected === 'agent' && (
                     <Fragment>
                       <EuiTabs size='m' display='default' expand={false}>
@@ -811,7 +827,7 @@ class WzModuleGuide extends Component {
         {modalRestartIsVisble && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title="Do you want reset the guide?"
+              title="Do you want to reset the guide?"
               onCancel={this.toggleResetGuideModal}
               onConfirm={this.resetGuideWithNotification}
               cancelButtonText="No, don't do it"

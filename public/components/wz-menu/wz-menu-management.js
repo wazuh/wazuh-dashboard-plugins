@@ -39,7 +39,7 @@ class WzMenuManagement extends Component {
       logs: { id: 'logs', text: 'Logs' },
       reporting: { id: 'reporting', text: 'Reporting' },
       statistics: { id: 'statistics', text: 'Statistics' },
-      sample_data: { id: 'sample_data', text: 'Sample Data' },
+      add_data_to_modules: { id: 'add_data_to_modules', text: 'Add data to modules' },
     };
 
     this.paths = {
@@ -94,7 +94,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.lists),
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
-          ...(this.props.adminMode ? [this.createItem(this.managementSections.sample_data)] : [])
+          ...(this.props.adminMode ? [this.createItem(this.managementSections.add_data_to_modules)] : [])
         ],
       })
     ];

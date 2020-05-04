@@ -44,6 +44,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
       exists: boolean
       addDataLoading: boolean
       removeDataLoading: boolean
+      loading: boolean
     }
   }
   constructor(props){
@@ -74,7 +75,8 @@ class WzSampleData extends Component<IWzSampleDataProps> {
       this.state[category.categorySampleAlertsIndex] = {
         exists: false,
         addDataLoading: false,
-        removeDataLoading: false
+        removeDataLoading: false,
+        loading: true
       }
     });
   }
@@ -85,9 +87,6 @@ class WzSampleData extends Component<IWzSampleDataProps> {
       if(this.props.adminMode !== adminMode){
         this.props.updateAdminMode(adminMode);
       };
-      if(!adminMode){ // redirect to root path of the application
-        window.location.href = `#/`;
-      };
     }catch(error){}
 
     // Check if sample data for each category was added
@@ -96,15 +95,23 @@ class WzSampleData extends Component<IWzSampleDataProps> {
         accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
-  
       this.setState(Object.keys(results).reduce((accum, cur) => {
         accum[cur] = {
           ...this.state[cur],
-          exists: results[cur].data.exists
-        }
+          exists: results[cur].data.exists,
+          loading: false
+        };
         return accum
       },{...this.state}));
-    }catch(error){}
+    }catch(error){
+      this.setState(Object.keys(this.state).reduce((accum, cur) => {
+        accum[cur] = {
+          ...this.state[cur],
+          loading: false
+        };
+        return accum
+      },{...this.state}));
+    }
 
     // Get information about cluster/manager
     try{
@@ -172,7 +179,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
     }
   }
   renderCard(category){
-    const { addDataLoading, exists, removeDataLoading } = this.state[category.categorySampleAlertsIndex];
+    const { addDataLoading, exists, removeDataLoading, loading } = this.state[category.categorySampleAlertsIndex];
     const { adminMode } = this.props;
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
@@ -185,7 +192,14 @@ class WzSampleData extends Component<IWzSampleDataProps> {
           footer={(
             <EuiFlexGroup justifyContent="flexEnd">
               <EuiFlexItem grow={false}>
-                {exists && (
+                {loading && (
+                  <EuiButton
+                    isLoading={loading}
+                    color='danger'
+                    onClick={() => this.removeSampleData(category)}>
+                      Loading
+                  </EuiButton>) || 
+                exists && (
                   <EuiButton
                   isLoading={removeDataLoading}
                   isDisabled={!adminMode}

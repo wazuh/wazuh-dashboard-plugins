@@ -54,7 +54,7 @@ class WzManagementMain extends Component {
               (section === 'statistics' && <WzStatistics />) || 
               (section === 'logs' && <WzLogs />) || 
               (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-              (section === 'sample_data' && <WzAddModulesData />) ||
+              (section === 'add_data_to_modules' && <WzAddModulesData />) ||
               (ruleset.includes(section) && <WzRuleset />)
             }
           </div>

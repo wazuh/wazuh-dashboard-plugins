@@ -151,9 +151,9 @@ class ManagementWelcome extends Component {
                         layout="horizontal"
                         className='homSynopsis__card'
                         icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
-                        title="Sample data"
-                        onClick={() => this.switchSection('sample_data')}
-                        description="Add sample data to modules."
+                        title="Add data to modules"
+                        onClick={() => this.switchSection('add_data_to_modules')}
+                        description="Configuration module guides and sample data."
                       />
                     </EuiFlexItem>
                   ) : (<EuiFlexItem/>)}
