@@ -120,7 +120,7 @@ export class RowDetails extends Component {
       child = child[pathArray[i]];
     }
 
-    if(!Array.isArray(child)){ 
+    if (!Array.isArray(child)) {
       child.toString();
     }
     return child;
@@ -140,35 +140,35 @@ export class RowDetails extends Component {
 
 
   renderRows() {
-    const fieldsToShow = ['agent','cluster','manager','rule','decoder','syscheck'];
-    var rows:any[] = [];
-    
-    for(var i=0; i<fieldsToShow.length; i++){
-      if(this.props.item[fieldsToShow[i]]){
+    const fieldsToShow = ['agent', 'cluster', 'manager', 'rule', 'decoder', 'syscheck'];
+    var rows: any[] = [];
+
+    for (var i = 0; i < fieldsToShow.length; i++) {
+      if (this.props.item[fieldsToShow[i]]) {
         const itemPaths = this.propertiesToArray(this.props.item[fieldsToShow[i]]);
         const tmpRows = itemPaths.map((item, idx) => {
-          const key = fieldsToShow[i]+ "." + item; // = agent + . + id = agent.id
+          const key = fieldsToShow[i] + "." + item; // = agent + . + id = agent.id
           const value = this.getChildFromPath(this.props.item[fieldsToShow[i]], item);
           const filter = {};
           filter[key] = value;
-          const cells:any[] = [];
+          const cells: any[] = [];
           const actionsCell = <EuiTableRowCell
             className={this.state.hover === key ? "hover-row" : " "}
-            style={{width: 80, height: 44,  borderTop: 0, borderBottom: 0}}
-            key={key+"0"}>
-            {(this.state.hover === key && 
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false} style={{ marginRight: 0}}>
-                <EuiToolTip position="top" content={`Filter for value`}>
-                  <EuiButtonIcon
-                    onClick={() => this.props.addFilter(filter)}
-                    iconType="magnifyWithPlus"
-                    aria-label="Filter"
-                    iconSize="s"
-                  />
-                </EuiToolTip>    
+            style={{ width: 80, height: 44, borderTop: 0, borderBottom: 0 }}
+            key={key + "0"}>
+            {(this.state.hover === key &&
+              <EuiFlexGroup>
+                <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+                  <EuiToolTip position="top" content={`Filter for value`}>
+                    <EuiButtonIcon
+                      onClick={() => this.props.addFilter(filter)}
+                      iconType="magnifyWithPlus"
+                      aria-label="Filter"
+                      iconSize="s"
+                    />
+                  </EuiToolTip>
                 </EuiFlexItem>
-                <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft:0}}>
+                <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft: 0 }}>
                   <EuiToolTip position="top" content={`Filter out value`}>
                     <EuiButtonIcon
                       onClick={() => this.props.addFilterOut(filter)}
@@ -177,8 +177,8 @@ export class RowDetails extends Component {
                       iconSize="s"
                     />
                   </EuiToolTip>
-              </EuiFlexItem>
-                <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft:0}}>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft: 0 }}>
                   <EuiToolTip position="top" content={`Toggle column`}>
                     <EuiButtonIcon
                       onClick={() => this.props.toggleColumn(key)}
@@ -187,42 +187,42 @@ export class RowDetails extends Component {
                       iconSize="s"
                     />
                   </EuiToolTip>
-              </EuiFlexItem>
-            </EuiFlexGroup>)}
+                </EuiFlexItem>
+              </EuiFlexGroup>)}
           </EuiTableRowCell>
-    
+
           cells.push(actionsCell);
-          
+
           const keyCell = <EuiTableRowCell
             className={this.state.hover === key ? "hover-row" : " "}
-            style={{width: "20%", borderTop: 0, borderBottom: 0}}
-            key={key+"1"}>
+            style={{ width: "20%", borderTop: 0, borderBottom: 0 }}
+            key={key + "1"}>
             {<div>{key}</div>}
           </EuiTableRowCell>
-    
+
           cells.push(keyCell);
-          
+
           const formattedValue = Array.isArray(value) ? value.join(', ') : value.toString();
-         
+
           const valueCell = <EuiTableRowCell
             className={this.state.hover === key ? "hover-row" : " "}
-            style={{borderTop: 0, borderBottom: 0}}
-            key={key+"2"}>
+            style={{ borderTop: 0, borderBottom: 0 }}
+            key={key + "2"}>
             {<div>{formattedValue}</div>}
           </EuiTableRowCell>
-    
+
           cells.push(valueCell);
-    
+
           return (
             <EuiTableRow
-              onMouseEnter={() => this.setState({hover: key})}
-              onMouseLeave={() => this.setState({hover: ""})}
+              onMouseEnter={() => this.setState({ hover: key })}
+              onMouseLeave={() => this.setState({ hover: "" })}
               key={key}>
               {cells}
             </EuiTableRow>
           );
         }); //map
-        rows =[ ...rows, ...tmpRows]
+        rows = [...rows, ...tmpRows]
       }//if
     } //for 
 
@@ -232,11 +232,12 @@ export class RowDetails extends Component {
 
   getTable() {
     return (
-      <div style={{ height: 500, overflow: 'auto' }}>
-
-        <EuiTable>
-          <EuiTableBody>{this.renderRows()}</EuiTableBody>
-        </EuiTable>
+      <div style={{ padding: '16px 0' }}>
+        <div style={{ height: 425, overflow: 'auto' }}>
+          <EuiTable>
+            <EuiTableBody>{this.renderRows()}</EuiTableBody>
+          </EuiTable>
+        </div>
       </div>
     )
   }
@@ -244,7 +245,7 @@ export class RowDetails extends Component {
   getJSON() {
     const str = JSON.stringify(this.props.item, null, 2);
     return (
-      <div>
+      <div style={{ padding: '16px 0' }}>
         <EuiCodeBlock
           language="json"
           fontSize="s"
@@ -426,47 +427,47 @@ export class RowDetails extends Component {
 
     return (
       <Fragment>
-        <EuiPanel style={{marginTop: 5}}>
+        <EuiPanel style={{ margin: '16px 0' }}>
           <EuiFlexGroup>
-          {/* General info */}
-          <EuiFlexItem>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiTitle size={'s'}>
-                  <h3>Information</h3>
-                </EuiTitle>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ fontSize: 14 }}>
-                <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
-                  <EuiIcon type="popout" color='primary' />&nbsp;
+            {/* General info */}
+            <EuiFlexItem style={{ marginBottom: 16 }}>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiTitle size={'s'}>
+                    <h3 style={{ fontWeight: 400 }}>Information</h3>
+                  </EuiTitle>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false} style={{ fontSize: 14 }}>
+                  <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
+                    <EuiIcon type="popout" color='primary' />&nbsp;
                     View in Rules
                 </a>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiSpacer size="s" />
-            {this.renderInfo(id, level, file, path, groups)}
-          </EuiFlexItem>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiSpacer size="s" />
+              {this.renderInfo(id, level, file, path, groups)}
+            </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup direction="column">
-          {/* Details */}
-          <EuiFlexItem>
-            <EuiTitle size={'s'}>
-              <h3>Details</h3>
-            </EuiTitle>
-            <EuiSpacer size="s" />
-            {this.renderDetails(details)}
-          {/* Compliance */}
-          </EuiFlexItem>
-          {Object.keys(compliance).length > 0 && (
+            {/* Details */}
             <EuiFlexItem>
               <EuiTitle size={'s'}>
-                <h3>Compliance</h3>
+                <h3 style={{ fontWeight: 400 }}>Details</h3>
               </EuiTitle>
               <EuiSpacer size="s" />
-              {this.renderCompliance(compliance)}
+              {this.renderDetails(details)}
+              {/* Compliance */}
             </EuiFlexItem>
-          )}
-        </EuiFlexGroup>
+            {Object.keys(compliance).length > 0 && (
+              <EuiFlexItem>
+                <EuiTitle size={'s'}>
+                  <h3 style={{ fontWeight: 400 }}>Compliance</h3>
+                </EuiTitle>
+                <EuiSpacer size="s" />
+                {this.renderCompliance(compliance)}
+              </EuiFlexItem>
+            )}
+          </EuiFlexGroup>
         </EuiPanel>
       </Fragment>
     )

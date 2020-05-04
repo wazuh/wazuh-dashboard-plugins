@@ -72,7 +72,6 @@ export class EventsFim extends Component {
   componentDidUpdate() {
     const { fetchStatus, rows } = this.state;
     if (fetchStatus === 'complete' && rows) {
-      console.log("entra")
       this.getRowsField();
     }
   }
@@ -111,12 +110,10 @@ export class EventsFim extends Component {
     if (query) {
       var interval = setInterval(() => {
         const elements = document.querySelectorAll(query);
-        console.log(elements)
         if (!(elements || []).length) {
           clearInterval(interval);
           setTimeout(() => { this.getRowsField(query) }, 100);
         }
-        console.log("entra interval")
         let isClearable = true;
         elements.forEach((element, idx) => {
           const text = element.textContent;
@@ -135,7 +132,6 @@ export class EventsFim extends Component {
           } else {
             element.childNodes.forEach(child => {
               if (child.nodeName === 'SPAN') {
-                console.log(child.nodeName)
                 const link = document.createElement('a')
                 link.onclick = () => this.showFlyout(text);
                 link.textContent = text;
