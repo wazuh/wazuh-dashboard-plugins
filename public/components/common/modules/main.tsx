@@ -126,9 +126,9 @@ export class MainModule extends Component {
                   isOpen={this.state.showAgentInfo}
                   closePopover={() => this.setState({ showAgentInfo: false })}
                   repositionOnScroll={true}
-                  anchorPosition="leftCenter">
-                  <div style={{ width: '80vw' }}>
-                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                  anchorPosition="downCenter">
+                  <div>
+                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props} isVertical={true}></AgentInfo>
                   </div>
                 </EuiPopover>
               </span>

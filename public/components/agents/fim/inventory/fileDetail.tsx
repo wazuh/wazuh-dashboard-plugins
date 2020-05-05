@@ -45,7 +45,8 @@ export class FileDetails extends Component {
     super(props);
 
     this.state = {
-      hoverAddFilter: ''
+      hoverAddFilter: '',
+      totalHits: 0
     }
     this.viewInEvents.bind(this)
   }
@@ -289,6 +290,10 @@ export class FileDetails extends Component {
       </div>);
   }
 
+  updateTotalHits = (total) => {
+    this.setState({totalHits : total});
+  }
+
   render() {
     const { fileName, type, showViewInEvents, implicitFilters } = this.props;
     return (
@@ -310,6 +315,7 @@ export class FileDetails extends Component {
         <EuiAccordion
           id={fileName}
           className='events-accordion'
+          extraAction={<div style={{marginBottom: 5}}><strong>{this.state.totalHits || 0}</strong> hits</div>}
           buttonContent={
             <EuiTitle size="s">
               <h3>
@@ -334,7 +340,7 @@ export class FileDetails extends Component {
           initialIsOpen={true}>
           <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
-              <Discover implicitFilters={implicitFilters} initialFilters={[]} type={type} />
+              <Discover implicitFilters={implicitFilters} initialFilters={[]} type={type} updateTotalHits={(total) => this.updateTotalHits(total)}/>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiAccordion>

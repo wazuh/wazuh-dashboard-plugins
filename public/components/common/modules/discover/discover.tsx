@@ -82,7 +82,8 @@ export class Discover extends Component {
   props!: {
     implicitFilters: object[],
     initialFilters: object[],
-    type: any
+    type: any,
+    updateTotalHits: Function
   }
   constructor(props) {
     super(props);
@@ -233,12 +234,14 @@ export class Discover extends Component {
         );
         if (this._isMount) {
           this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+          this.props.updateTotalHits(alerts.data.hits);
          
         }
       }
     }catch(err){
       if (this._isMount) {
-        this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters, filters: newFilters.filters })
+        this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+        this.props.updateTotalHits(0);
       }
     }
   }
@@ -301,7 +304,7 @@ export class Discover extends Component {
           style={{display: "inline-flex"}}>{this.nameEquivalences[item] || item} {this.state.hover === item &&
           <EuiToolTip position="top" content={`Remove column`}>
             <EuiButtonIcon
-              style={{paddingBottom: 10, marginBottom: "-10px"}}
+              style={{paddingBottom: 12, marginBottom: "-10px", paddingTop: 0}}
               onClick={(e) => { this.removeColumn(item); e.stopPropagation();}}
               iconType="cross"
               aria-label="Filter"
@@ -485,7 +488,6 @@ export class Discover extends Component {
       <div
         className='wz-discover hide-filter-controll' >
         {this.getSearchBar()}
-        {!!total && <div style={{textAlign: "center"}}><strong>{total || 0}</strong> hits</div>}
         {total 
           ? <EuiFlexGroup>
               <EuiFlexItem>
