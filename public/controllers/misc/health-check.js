@@ -324,8 +324,11 @@ export class HealthCheck {
 
       if (!this.errors || !this.errors.length) {
         await this.$timeout(300);
+        const params = this.$rootScope.previousParams || {};
+        var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+        const url = 'wazuh#' + (this.$rootScope.previousLocation || '') + '?' + queryString;
         this.$window.location.assign(
-          chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
+          chrome.addBasePath(url)
         );
         return;
       }

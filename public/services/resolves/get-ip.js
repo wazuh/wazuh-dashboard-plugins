@@ -85,7 +85,7 @@ export function getIp(
     currentParams && (currentParams.agent || currentParams.agent === '000');
   const targetedRule =
     currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
-  if (!targetedAgent && !targetedRule && healthCheck($window)) {
+  if (!targetedRule && healthCheck($window)) {
     deferred.reject();
     $location.path('/health-check');
   } else {
