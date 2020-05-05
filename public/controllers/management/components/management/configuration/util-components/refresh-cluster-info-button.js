@@ -19,50 +19,56 @@ import { connect } from 'react-redux';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
-  updateLoadingStatus
+  updateRefreshTime
 } from '../../../../../../redux/actions/configurationActions';
-import { clusterNodes } from '../utils/wz-fetch';
+import { clusterNodes, clusterReq } from '../utils/wz-fetch';
 
 class WzRefreshClusterInfoButton extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isLoading: false
+    }
   }
   async checkIfClusterOrManager() {
     try {
+      this.setState({isLoading: true});
       // in case which enable/disable cluster configuration, update Redux Store
-      // try if it is a cluster
-      this.props.updateLoadingStatus(true);
-      const nodes = await clusterNodes();
-      // set cluster nodes in Redux Store
-      this.props.updateClusterNodes(nodes.data.data.affected_items);
-      // set cluster node selected in Redux Store
-      const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(
-        node => node.name === this.props.clusterNodeSelected
-      );
-      this.props.updateClusterNodeSelected(
-        existsClusterCurrentNodeSelected
-          ? existsClusterCurrentNodeSelected.name
-          : nodes.data.data.affected_items.find(node => node.type === 'master').name
-      );
-      this.timer = setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
+      const cluster = await clusterReq();
+      if(cluster.data.data.enabled === 'yes' && cluster.data.data.running === 'yes'){
+        // try if it is a cluster
+        const nodes = await clusterNodes();
+        // set cluster nodes in Redux Store
+        this.props.updateClusterNodes(nodes.data.data.affected_items);
+        // set cluster node selected in Redux Store
+        const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(
+          node => node.name === this.props.clusterNodeSelected
+        );
+        this.props.updateClusterNodeSelected(
+          existsClusterCurrentNodeSelected
+            ? existsClusterCurrentNodeSelected.name
+            : nodes.data.data.affected_items.find(node => node.type === 'master').name
+        );
+      }else{
+        // do nothing if it isn't a cluster
+        this.props.updateClusterNodes(false);
+        this.props.updateClusterNodeSelected(false);
+      }
     } catch (error) {
       // do nothing if it isn't a cluster
       this.props.updateClusterNodes(false);
       this.props.updateClusterNodeSelected(false);
-      this.props.updateLoadingStatus(true);
-      this.timer = setTimeout(() => this.props.updateLoadingStatus(false), 1); // Trick to unmount this component and redo the request to get XML configuration
     }
-  }
-  componentWillUnmount() {
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
+    this.setState({isLoading: false});
+    this.props.updateRefreshTime();
   }
   render() {
     return (
       <EuiButtonEmpty
         iconType="refresh"
+        isLoading={this.state.isLoading}
         onClick={() => this.checkIfClusterOrManager()}
+        isDisabled={this.state.isLoading}
       >
         Refresh
       </EuiButtonEmpty>
@@ -79,8 +85,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: clusterNodeSelected =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateLoadingStatus: loadingStatus =>
-    dispatch(updateLoadingStatus(loadingStatus))
+  updateRefreshTime: () =>
+    dispatch(updateRefreshTime())
 });
 
 export default connect(

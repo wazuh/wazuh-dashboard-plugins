@@ -15,8 +15,7 @@ import React, { Component } from 'react';
 import { EuiSelect } from '@elastic/eui';
 
 import {
-  updateClusterNodeSelected,
-  updateLoadingStatus
+  updateClusterNodeSelected
 } from '../../../../../../redux/actions/configurationActions';
 
 import { connect } from 'react-redux';
@@ -27,16 +26,7 @@ class WzConfigurationClusterSelect extends Component {
   }
   onChange = e => {
     this.props.updateClusterNodeSelected(e.target.value);
-    this.props.updateLoadingStatus(true);
-    this.timer = setTimeout(() => {
-      this.props.updateLoadingStatus(false);
-    }, 0); // trick: This unmounts hoc components and mount again it with new cluser node selected
   };
-  componentWillUnmount() {
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-  }
   render() {
     const options = this.props.clusterNodes.map(clusterNode => ({
       value: clusterNode.name,
@@ -62,9 +52,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   updateClusterNodeSelected: clusterNodeSelected =>
-    dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateLoadingStatus: loadingStatus =>
-    dispatch(updateLoadingStatus(loadingStatus))
+    dispatch(updateClusterNodeSelected(clusterNodeSelected))
 });
 
 export default connect(
