@@ -86,7 +86,7 @@ class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModu
 			})),
 			{
 				id: 'sample_data',
-				name: 'Sample Data',
+				name: 'Sample data',
 				content: (
 					<Fragment>
 						<EuiSpacer size='m' />

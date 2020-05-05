@@ -88,7 +88,7 @@ class WzModuleGuide extends Component {
     this.guide = Object.keys(moduleGuides).map(key => moduleGuides[key]).find(guide => guide.id === props.guideId);
     this.specificGuide = Boolean(this.props.agent);
     this.state = {
-      modalRestartIsVisble: false,
+      modalRestart: false,
       agentTypeSelected: (this.props.agent && ((this.props.agent.id === '000' ? 'manager' : 'agent') || this.props.agent.type)) || (this.guide.avaliable_for_manager ? 'manager' : 'agent'),
       agentOSSelected: this.props.agent && (typeof this.props.agent.os === 'string' ? this.props.agent.os : (this.props.agent.os.platform === 'windows' ? 'windows' : 'linux')) || ''
     };
@@ -149,7 +149,7 @@ class WzModuleGuide extends Component {
     return true
   }
   resetGuideWithNotification = () => {
-    this.resetGuide(true);
+    this.resetGuide();
     this.addToast({
       title: 'The guide was restarted',
       color: 'success'
@@ -158,7 +158,17 @@ class WzModuleGuide extends Component {
   resetGuide(){
     this.setState({
       steps: this.buildInitialSteps(this.guide.steps),
-      modalRestartIsVisble: false
+      modalRestart: false
+    });
+  }
+  resetStep(stepResetKey){
+    this.setState({
+      steps: this.state.steps.map((step, stepKey) => stepKey === stepResetKey ? this.buildInitialSteps([this.guide.steps[stepResetKey]])[0] : step),
+      modalRestart: false
+    });
+    this.addToast({
+      title: 'The step guide was restarted',
+      color: 'success'
     });
   }
   addToast({color, title, text, time = 3000}){
@@ -284,6 +294,11 @@ class WzModuleGuide extends Component {
                   <EuiSpacer size='s' />
                 </Fragment>
               ))}
+              <EuiFlexGroup justifyContent='flexEnd'>
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty iconType='refresh' onClick={() => this.resetStep(key)}>Reset step</EuiButtonEmpty>
+                </EuiFlexItem>
+              </EuiFlexGroup>
             </Fragment>
           ) : null}
         </Fragment>
@@ -670,7 +685,7 @@ class WzModuleGuide extends Component {
     }
   }
   toggleResetGuideModal = () => {
-    this.setState({ modalRestartIsVisble: !this.state.modalRestartIsVisble });
+    this.setState({ modalRestart: !this.state.modalRestart });
   }
   onChangeAgentTypeSelected = (agentTypeSelected) => {
     this.setState({ agentTypeSelected, agentOSSelected: agentTypeSelected === 'agent' ? 'linux' : '' }, () => {
@@ -684,7 +699,7 @@ class WzModuleGuide extends Component {
   }
   render() {
     const { guide } = this;
-    const { modalRestartIsVisble, agentTypeSelected, agentOSSelected } = this.state;
+    const { modalRestart, agentTypeSelected, agentOSSelected } = this.state;
     return (
       <div>
         <EuiFlexGroup alignItems='center'>
@@ -757,6 +772,8 @@ class WzModuleGuide extends Component {
         {!this.specificGuide && guide.avaliable_for_manager && guide.avaliable_for_agent && (
           <EuiFlexGroup justifyContent='center'>
             <EuiFlexItem grow={false}>
+              <EuiText style={{textAlign: 'center'}}>Select host type</EuiText>
+              <EuiSpacer size='s'/>
               <EuiButtonGroup
                 color='primary'
                 options={agentTypeButtons}
@@ -824,7 +841,7 @@ class WzModuleGuide extends Component {
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
-        {modalRestartIsVisble && (
+        {modalRestart !== false && (
           <EuiOverlayMask>
             <EuiConfirmModal
               title="Do you want to reset the guide?"

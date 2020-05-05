@@ -44,13 +44,14 @@ export default {
         {
           name: 'java_path',
           description: 'Define where Java is located. If this parameter is not set, the wodle will search for the Java location in the default environment variable $PATH.',
-          warning: 'For this field, it can be set a full path or a relative path. Whether you specify a relative path, it concatenates to the Wazuh installation path. ciscat_path has the same behavior.',
+          warning: 'For this field, it can be set a full path or a relative path. Whether you specify a relative path, it concatenates to the Wazuh installation path.',
           type: 'input',
           placeholder: 'Java location'
         },
         {
           name: 'ciscat_path',
           description: 'Define where CIS-CAT is located.',
+          warning: 'For this field, it can be set a full path or a relative path. Whether you specify a relative path, it concatenates to the Wazuh installation path.',
           type: 'input',
           required: true,
           placeholder: 'CIS-CAT location',
