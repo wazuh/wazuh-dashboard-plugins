@@ -312,20 +312,21 @@ export class FileDetails extends Component {
           className='events-accordion'
           buttonContent={
             <EuiTitle size="s">
-              <h3> 
-              Recent events {this.props.view !== 'events' && (
-                <EuiToolTip
-                  position="top"
-                  content="Inspect in discover">
-                  <EuiIcon
-                    className='euiButtonIcon euiButtonIcon--primary'
-                    onClick={this.viewInEvents}
-                    type="popout"
-                    style={{marginLeft: 16}}
-                    aria-label="Inspect in discover"
-                  />
-                </EuiToolTip>
-              )}
+              <h3>
+                Recent events{this.props.view !== 'events' && (
+                  <span style={{ marginLeft: 16 }}>
+                    <EuiToolTip
+                      position="top"
+                      content="Inspect in Events">
+                      <EuiIcon
+                        className='euiButtonIcon euiButtonIcon--primary'
+                        onClick={this.viewInEvents}
+                        type="popout"
+                        aria-label="Inspect in Events"
+                      />
+                    </EuiToolTip>
+                  </span>
+                )}
               </h3>
             </EuiTitle>
           }
