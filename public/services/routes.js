@@ -40,13 +40,12 @@ import { ApiCheck } from '../react-services/wz-api-check';
 import { AppState } from '../react-services/app-state';
 
 const assignPreviousLocation = ($rootScope, $location) => {
-  let path = $location.path();
-  if (path === '/agents') {
-    path = $location.$$url;
-  }
+  const path = $location.path();	
+  const params = $location.search();
   // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
   if (!path.includes('/health-check')) {
     $rootScope.previousLocation = path;
+    $rootScope.previousParams = params;
   }
 };
 
@@ -133,6 +132,9 @@ function clearRuleId(commonData) {
 function enableWzMenu($rootScope, $location) {
   const location = $location.path();
   $rootScope.hideWzMenu = location.includes('/health-check');
+  if(!$rootScope.hideWzMenu){
+    AppState.setWzMenu();
+  }
 }
 
 //Routes
