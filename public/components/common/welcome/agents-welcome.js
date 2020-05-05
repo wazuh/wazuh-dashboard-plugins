@@ -87,7 +87,7 @@ export class AgentsWelcome extends Component {
     return (
       <div className="wz-module">
         <div className="wz-module-header-agent-wrapper">
-          <div className="wz-module-header-agent" style={{ borderTop: `4px solid ${this.color(this.props.agent.status, true)}` }}>{title}</div>
+          <div className="wz-module-header-agent">{title}</div>
         </div>
         <div className="wz-module-body wz-module-body-main">
           <div className="wz-welcome-page-agent-info">

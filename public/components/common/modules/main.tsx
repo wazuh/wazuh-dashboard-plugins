@@ -105,31 +105,6 @@ export class MainModule extends Component {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
-          <EuiPopover
-            button={
-              <div className="wz-module-header-agent-title-btn"
-                onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
-                <EuiTitle size="s">
-                  <h1>
-                    <span><b>{TabDescription[this.props.section].title}</b>&nbsp;&nbsp;</span>
-                    <EuiIcon size="m" type="arrowDown" color='subdued' />
-                  </h1>
-                </EuiTitle>
-              </div>
-            }
-            isOpen={this.state.switchModule}
-            closePopover={() => this.setState({ switchModule: false })}
-            repositionOnScroll={true}
-            anchorPosition="downLeft">
-            <WzReduxProvider>
-              <div style={{ maxWidth: 650 }}>
-                <Overview isAgent={this.props.agent} closePopover={() => this.setState({ switchModule: false })}></Overview>
-              </div>
-            </WzReduxProvider>
-          </EuiPopover>
-        </EuiFlexItem>
-        <EuiFlexItem />
-        <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
           <EuiTitle size="s">
             <h1>
               <EuiToolTip position="right" content={this.props.agent.status}>
@@ -159,6 +134,30 @@ export class MainModule extends Component {
               </span>
             </h1>
           </EuiTitle>
+        </EuiFlexItem>
+        <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
+          <EuiPopover
+            button={
+              <div className="wz-module-header-agent-title-btn"
+                onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
+                <EuiTitle size="s">
+                  <h1>
+                    <span>{TabDescription[this.props.section].title}&nbsp;&nbsp;</span>
+                    <EuiIcon size="m" type="arrowDown" color='subdued' />
+                  </h1>
+                </EuiTitle>
+              </div>
+            }
+            isOpen={this.state.switchModule}
+            closePopover={() => this.setState({ switchModule: false })}
+            repositionOnScroll={true}
+            anchorPosition="downLeft">
+            <WzReduxProvider>
+              <div style={{ maxWidth: 650 }}>
+                <Overview isAgent={this.props.agent} closePopover={() => this.setState({ switchModule: false })}></Overview>
+              </div>
+            </WzReduxProvider>
+          </EuiPopover>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -271,7 +270,7 @@ export class MainModule extends Component {
     return (
       <div className='wz-module'>
         <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent' style={{ borderTop: `4px solid ${this.color(this.props.agent.status, true)}` }}>
+          <div className='wz-module-header-agent'>
             {title}
           </div>
         </div>
