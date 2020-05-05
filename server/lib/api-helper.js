@@ -18,7 +18,7 @@ export function buildOptionsObject(api) {
     headers: {
       'wazuh-app-version': packageJSON.version
     },
-    username: api.user,
+    username: api.username,
     password: api.password,
     rejectUnauthorized: false
   };

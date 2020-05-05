@@ -110,7 +110,7 @@ hosts:
     - production:
         url: http://172.16.1.2
         port: 55000
-        user: foo
+        username: foo
         password: bar
 `;
 
