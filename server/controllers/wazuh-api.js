@@ -146,7 +146,6 @@ export class WazuhApiCtrl {
             // Hide Wazuh API secret, username, password
             const copied = { ...api };
             copied.secret = '****';
-            copied.username = '****';
             copied.password = '****';
 
             return {
@@ -215,9 +214,9 @@ export class WazuhApiCtrl {
    * @param {Object} payload API params
    */
   validateCheckApiParams(payload) {
-    // if (!('username' in payload)) {  //TODO: why is this commented?
-    //   return 'Missing param: API USERNAME';
-    // }
+    if (!('username' in payload)) {
+      return 'Missing param: API USERNAME';
+    }
 
     if (!('password' in payload) && !('id' in payload)) {
       return 'Missing param: API PASSWORD';

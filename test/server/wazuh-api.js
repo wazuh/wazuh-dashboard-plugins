@@ -10,7 +10,7 @@ const headers = {
 let API_ID = null;
 let API_PORT = null;
 let API_URL = null;
-let API_USER = null;
+let API_USERNAME = null;
 
 describe('wazuh-api', () => {
   before(async () => {
@@ -26,7 +26,7 @@ describe('wazuh-api', () => {
     API_ID = res.body[0]._id;
     API_URL = res.body[0]._source.url;
     API_PORT = res.body[0]._source.api_port;
-    API_USER = res.body[0]._source.api_user;
+    API_USERNAME = res.body[0]._source.api_username;
   });
 
   it('POST /api/csv', async () => {
@@ -43,7 +43,7 @@ describe('wazuh-api', () => {
     const res = await needle(
       'post',
       `localhost:5601/api/check-api`,
-      { user: API_USER, url: API_URL, port: API_PORT, id: API_ID },
+      { username: API_USERNAME, url: API_URL, port: API_PORT, id: API_ID },
       headers
     );
     res.body.should.be.a('object');
@@ -62,7 +62,7 @@ describe('wazuh-api', () => {
     res.body.should.be.a('object');
     res.body.statusCode.should.be.eql(200);
     res.body.data.should.be.a('object');
-    res.body.data.user.should.be.a('string');
+    res.body.data.username.should.be.a('string');
     res.body.data.password.should.be.a('string');
     res.body.data.url.should.be.a('string');
     res.body.data.port.should.be.a('string');

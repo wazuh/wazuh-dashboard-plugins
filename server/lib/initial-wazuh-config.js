@@ -138,15 +138,13 @@ export const initialWazuhConfig = `---
 #  - <id>:
 #     url: http(s)://<url>
 #     port: <port>
-#     user: <user>
 #     username: <username> 
 #     password: <password> 
 
 hosts:
   - default:
-     url: http://localhost
+     url: https://localhost
      port: 55000
-     user: foo
      username: wazuh
      password: wazuh
 `
