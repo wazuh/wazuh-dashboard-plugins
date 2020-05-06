@@ -53,31 +53,38 @@ export class VisHandlers {
         filters: syscollector,
         time: {
           from: 'now-1d/d',
-          to: 'now',
+          to: 'now'
         },
         searchBar: false,
-        tables: [],
+        tables: []
       });
       return appliedFilters;
     }
 
     // Check raw response from all rendered tables
-    let tables = this.list.filter(item => (((item || {}).vis || {})._state || {}).type === 'table');
+    let tables = this.list.filter(
+      item => (((item || {}).vis || {})._state || {}).type === 'table'
+    );
     for (let i = 0; i < tables.length; i++) {
       const columns = [];
-      const title = tables[i].vis._state.title || tables[i].dataLoader.previousVisState.title || 'Table';
+      const title =
+        tables[i].vis._state.title ||
+        tables[i].dataLoader.previousVisState.title ||
+        'Table';
       const item = await tables[i].handler.dataHandler.getData();
       for (const table of item.value.visData.tables) {
         columns.push(...table.columns.map(t => t.name));
       }
 
-      tables[i] = !!(((((item || {}).value || {}).visData || {}).tables || [])[0] || {}).rows
+      tables[i] = !!(
+        ((((item || {}).value || {}).visData || {}).tables || [])[0] || {}
+      ).rows
         ? {
             rows: item.value.visData.tables[0].rows.map(x => {
               return Object.values(x);
             }),
             title,
-            columns,
+            columns
           }
         : false;
     }
@@ -95,10 +102,10 @@ export class VisHandlers {
         filters,
         time: {
           from: dateMath.parse(from),
-          to: dateMath.parse(to),
+          to: dateMath.parse(to)
         },
         searchBar: query,
-        tables,
+        tables
       });
     }
 
@@ -114,7 +121,8 @@ export class VisHandlers {
         item &&
         item.vis &&
         item.vis.title !== 'Agents status' &&
-        ((item.dataLoader || {}).previousVisState || {}).title !== 'Agents status' &&
+        ((item.dataLoader || {}).previousVisState || {}).title !==
+          'Agents status' &&
         item.vis.searchSource &&
         item.vis.searchSource.rawResponse &&
         item.vis.searchSource.rawResponse.hits &&

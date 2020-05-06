@@ -11,7 +11,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -23,24 +22,20 @@ import {
   EuiLoadingChart,
   EuiSpacer
 } from '@elastic/eui';
-import { Pie } from "../../../components/d3/pie";
-import { ProgressChart } from "../../../components/d3/progress";
+import { Pie } from '../../../components/d3/pie';
+import { ProgressChart } from '../../../components/d3/progress';
 import { AgentsTable } from './agents-table';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 
 export class AgentsPreview extends Component {
-
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: false }
+    this.state = { data: [], loading: false };
   }
 
   setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Agents', },
-    ];
+    const breadcrumb = [{ text: '' }, { text: 'Agents' }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
@@ -49,8 +44,8 @@ export class AgentsPreview extends Component {
     this.getSummary();
   }
 
-  groupBy = function (arr) {
-    return arr.reduce(function (prev, item) {
+  groupBy = function(arr) {
+    return arr.reduce(function(prev, item) {
       if (item in prev) prev[item]++;
       else prev[item] = 1;
       return prev;
@@ -60,63 +55,100 @@ export class AgentsPreview extends Component {
   async getSummary() {
     try {
       this.setState({ loading: true });
-      const summaryData = await this.props.tableProps.wzReq('GET', '/agents/summary', {});
+      const summaryData = await this.props.tableProps.wzReq(
+        'GET',
+        '/agents/summary',
+        {}
+      );
       this.summary = summaryData.data.data;
       this.totalAgents = this.summary.Total - 1;
       const model = [
-        { id: 'active', label: "Active", value: (this.summary['Active'] || 1) - 1 },
-        { id: 'disconnected', label: "Disconnected", value: this.summary['Disconnected'] || 0 },
-        { id: 'neverConnected', label: "Never connected", value: this.summary['Never connected'] || 0 }
+        {
+          id: 'active',
+          label: 'Active',
+          value: (this.summary['Active'] || 1) - 1
+        },
+        {
+          id: 'disconnected',
+          label: 'Disconnected',
+          value: this.summary['Disconnected'] || 0
+        },
+        {
+          id: 'neverConnected',
+          label: 'Never connected',
+          value: this.summary['Never connected'] || 0
+        }
       ];
       this.setState({ data: model });
 
-      this.agentsCoverity = this.totalAgents ? (((this.summary['Active'] || 1) - 1) / this.totalAgents) * 100 : 0;
+      this.agentsCoverity = this.totalAgents
+        ? (((this.summary['Active'] || 1) - 1) / this.totalAgents) * 100
+        : 0;
 
-      const lastAgent = await this.props.tableProps.wzReq('GET', '/agents', { limit: 1, sort: '-dateAdd', q: 'id!=000' });
+      const lastAgent = await this.props.tableProps.wzReq('GET', '/agents', {
+        limit: 1,
+        sort: '-dateAdd',
+        q: 'id!=000'
+      });
       this.lastAgent = lastAgent.data.data.items[0];
       this.mostActiveAgent = await this.props.tableProps.getMostActive();
 
-      const osresult = await this.props.tableProps.wzReq('GET', '/agents/summary/os', { q: 'id!=000' });
+      const osresult = await this.props.tableProps.wzReq(
+        'GET',
+        '/agents/summary/os',
+        { q: 'id!=000' }
+      );
       this.platforms = this.groupBy(osresult.data.data.items);
       const platformsModel = [];
       for (let [key, value] of Object.entries(this.platforms)) {
-        platformsModel.push({ id: key, label: key, value: value })
+        platformsModel.push({ id: key, label: key, value: value });
       }
       this.setState({ platforms: platformsModel, loading: false });
-    } catch (error) { }
+    } catch (error) {}
   }
 
   render() {
-    const colors = ["#017D73", "#bd271e", "#69707D"];
+    const colors = ['#017D73', '#bd271e', '#69707D'];
     return (
       <EuiPage>
         <EuiFlexItem>
-          <EuiFlexGroup style={{ 'marginTop': 0 }}>
+          <EuiFlexGroup style={{ marginTop: 0 }}>
             <EuiFlexItem grow={false}>
-              <EuiPanel betaBadgeLabel="Status" style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}>
-                {(this.state.loading &&
+              <EuiPanel
+                betaBadgeLabel="Status"
+                style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}
+              >
+                {this.state.loading && (
                   <EuiFlexItem>
-                    <EuiLoadingChart style={{ margin: '45px auto' }} size="xl" />
+                    <EuiLoadingChart
+                      style={{ margin: '45px auto' }}
+                      size="xl"
+                    />
                   </EuiFlexItem>
                 )}
-                {(!this.state.loading &&
+                {!this.state.loading && (
                   <EuiFlexGroup>
-                    {(this.totalAgents > 0 &&
-                      <EuiFlexItem style={{ alignItems: 'center' }} >
-                        <Pie width={300} height={150} data={this.state.data} colors={colors} />
+                    {this.totalAgents > 0 && (
+                      <EuiFlexItem style={{ alignItems: 'center' }}>
+                        <Pie
+                          width={300}
+                          height={150}
+                          data={this.state.data}
+                          colors={colors}
+                        />
                       </EuiFlexItem>
                     )}
                   </EuiFlexGroup>
                 )}
               </EuiPanel>
             </EuiFlexItem>
-            {((this.totalAgents > 0 && !this.state.loading) &&
+            {this.totalAgents > 0 && !this.state.loading && (
               <EuiFlexItem grow={false}>
                 <EuiPanel betaBadgeLabel="Details" style={{ paddingBottom: 0 }}>
                   <EuiFlexGroup style={{ minWidth: 500 }}>
                     <EuiFlexItem grow={false}></EuiFlexItem>
                     <EuiFlexItem>
-                      {(this.summary &&
+                      {this.summary && (
                         <EuiFlexItem style={{ padding: '12px 0px' }}>
                           <EuiFlexGroup>
                             <EuiFlexItem>
@@ -160,29 +192,44 @@ export class AgentsPreview extends Component {
                       )}
                       <EuiFlexItem>
                         <EuiFlexGroup style={{ marginTop: 0 }}>
-                          {(this.lastAgent &&
+                          {this.lastAgent && (
                             <EuiFlexItem>
                               <EuiStat
-                                className='euiStatLink'
+                                className="euiStatLink"
                                 title={this.lastAgent.name}
                                 titleSize="s"
                                 description="Last registered agent"
                                 titleColor="primary"
-                                style={{ paddingBottom: 12, whiteSpace: 'nowrap' }}
-                                onClick={() => this.props.tableProps.showAgent(this.lastAgent)}
+                                style={{
+                                  paddingBottom: 12,
+                                  whiteSpace: 'nowrap'
+                                }}
+                                onClick={() =>
+                                  this.props.tableProps.showAgent(
+                                    this.lastAgent
+                                  )
+                                }
                               />
                             </EuiFlexItem>
                           )}
-                          {(this.mostActiveAgent &&
+                          {this.mostActiveAgent && (
                             <EuiFlexItem>
                               <EuiStat
-                                className={this.mostActiveAgent.name ? 'euiStatLink' : ''}
+                                className={
+                                  this.mostActiveAgent.name ? 'euiStatLink' : ''
+                                }
                                 title={this.mostActiveAgent.name || '-'}
                                 style={{ whiteSpace: 'nowrap' }}
                                 titleSize="s"
                                 description="Most active agent"
                                 titleColor="primary"
-                                onClick={() => this.mostActiveAgent.name ? this.props.tableProps.showAgent(this.mostActiveAgent) : ''}
+                                onClick={() =>
+                                  this.mostActiveAgent.name
+                                    ? this.props.tableProps.showAgent(
+                                        this.mostActiveAgent
+                                      )
+                                    : ''
+                                }
                               />
                             </EuiFlexItem>
                           )}

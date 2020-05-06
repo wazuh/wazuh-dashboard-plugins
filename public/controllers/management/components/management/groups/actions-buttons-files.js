@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
   updateIsProcessing,
-  updateFileContent,
+  updateFileContent
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
@@ -35,7 +35,7 @@ class WzGroupsActionButtonsFiles extends Component {
     this.state = {
       generatingCsv: false,
       isPopoverOpen: false,
-      newGroupName: '',
+      newGroupName: ''
     };
     this.exportCsv = exportCsv;
 
@@ -108,7 +108,7 @@ class WzGroupsActionButtonsFiles extends Component {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0,
+      'other->other': 0
     };
 
     for (var i = 0; i < lines.length; i++) {
@@ -120,7 +120,13 @@ class WzGroupsActionButtonsFiles extends Component {
       var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
       var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
       var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-      var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
+      var type = single
+        ? 'single'
+        : closing
+        ? 'closing'
+        : opening
+        ? 'opening'
+        : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';
@@ -149,7 +155,7 @@ class WzGroupsActionButtonsFiles extends Component {
       name: 'agent.conf',
       content: data,
       isEditable: true,
-      groupName: itemDetail.name,
+      groupName: itemDetail.name
     };
     this.props.updateFileContent(file);
   }
@@ -158,19 +164,19 @@ class WzGroupsActionButtonsFiles extends Component {
     this.setState({
       isPopoverOpen: false,
       msg: false,
-      newGroupName: '',
+      newGroupName: ''
     });
   }
 
   clearGroupName() {
     this.setState({
-      newGroupName: '',
+      newGroupName: ''
     });
   }
 
   onChangeNewGroupName = e => {
     this.setState({
-      newGroupName: e.target.value,
+      newGroupName: e.target.value
     });
   };
 
@@ -200,7 +206,12 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
+      this.showToast(
+        'success',
+        'Success',
+        'The group has been created successfully',
+        2000
+      );
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -224,7 +235,11 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(`/agents/groups/${this.props.state.itemDetail.name}/files`, filters, 'Groups');
+      await this.exportCsv(
+        `/agents/groups/${this.props.state.itemDetail.name}/files`,
+        filters,
+        'Groups'
+      );
       this.showToast(
         'success',
         'Success',
@@ -232,7 +247,12 @@ class WzGroupsActionButtonsFiles extends Component {
         2000
       );
     } catch (error) {
-      this.showToast('danger', 'Error', `Error when exporting the CSV file: ${error}`, 2000);
+      this.showToast(
+        'danger',
+        'Error',
+        `Error when exporting the CSV file: ${error}`,
+        2000
+      );
     }
     this.setState({ generatingCsv: false });
   }
@@ -242,7 +262,7 @@ class WzGroupsActionButtonsFiles extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -285,14 +305,19 @@ class WzGroupsActionButtonsFiles extends Component {
 
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
+      <EuiButtonEmpty
+        iconType="refresh"
+        onClick={async () => await this.refresh()}
+      >
         Refresh
       </EuiButtonEmpty>
     );
 
     return (
       <Fragment>
-        {adminMode && <EuiFlexItem grow={false}>{groupConfigurationButton}</EuiFlexItem>}
+        {adminMode && (
+          <EuiFlexItem grow={false}>{groupConfigurationButton}</EuiFlexItem>
+        )}
         <EuiFlexItem grow={false}>{exportPDFButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{exportCSVButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
@@ -303,16 +328,20 @@ class WzGroupsActionButtonsFiles extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updateFileContent: content => dispatch(updateFileContent(content))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsFiles);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupsActionButtonsFiles);

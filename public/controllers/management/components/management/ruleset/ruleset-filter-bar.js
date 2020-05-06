@@ -28,15 +28,26 @@ class WzRulesetFilterBar extends Component {
 
     this.state = {
       isInvalid: false,
-      selectedOptions: [],
+      selectedOptions: []
     };
 
     this.rulesetHandler = RulesetHandler;
     this.availableOptions = {
-      rules: ['nist-800-53', 'hipaa', 'gdpr', 'pci', 'gpg13', 'tsc', 'group', 'level', 'path', 'file'],
+      rules: [
+        'nist-800-53',
+        'hipaa',
+        'gdpr',
+        'pci',
+        'gpg13',
+        'tsc',
+        'group',
+        'level',
+        'path',
+        'file'
+      ],
       decoders: ['path', 'file'],
       lists: []
-    }
+    };
     this.notValidMessage = false;
   }
 
@@ -44,13 +55,13 @@ class WzRulesetFilterBar extends Component {
     this.buildSelectedOptions(this.props.state.filters); // If there are any filter in the redux store it will be restored when the component was mounted
   }
 
-
-
   isValid = value => {
     const { section, showingFiles } = this.props.state;
-    if (section === 'lists' || showingFiles) return true;//There are not filters for lists
-    const lowerValue = value.toLowerCase()
-    const availableOptions = this.availableOptions[this.props.state.section].toString();
+    if (section === 'lists' || showingFiles) return true; //There are not filters for lists
+    const lowerValue = value.toLowerCase();
+    const availableOptions = this.availableOptions[
+      this.props.state.section
+    ].toString();
     this.notValidMessage = false;
     const options = this.availableOptions[this.props.state.section];
     const valueSplit = lowerValue.split(':');
@@ -59,14 +70,16 @@ class WzRulesetFilterBar extends Component {
     const notAvailable = !options.includes(valueSplit[0]); // Not include in the available options
     if (moreTwoDots || (oneTwoDots && notAvailable)) {
       if (oneTwoDots) {
-        this.notValidMessage = `${valueSplit[0]} is a not valid filter, the available filters are: ${availableOptions}`;
+        this.notValidMessage = `${
+          valueSplit[0]
+        } is a not valid filter, the available filters are: ${availableOptions}`;
       } else {
         this.notValidMessage = 'Only allow ":" once';
       }
       return false;
     }
     return true;
-  }
+  };
 
   /**
    * Set a valid array of objects for the options in the combo box [{label: value}, {label: value}]
@@ -78,7 +91,7 @@ class WzRulesetFilterBar extends Component {
         const value = filters[key];
         const option = key === 'search' ? value : `${key}:${value}`;
         const newOption = {
-          label: option,
+          label: option
         };
         selectedOptions.push(newOption);
       });
@@ -86,10 +99,9 @@ class WzRulesetFilterBar extends Component {
       //const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       if (Object.keys(filters).length) await this.fetchItems(filters);
     } catch (error) {
-      console.error('error building selected options ', error)
+      console.error('error building selected options ', error);
     }
   }
-
 
   /**
    * Fetch items (rules, decoders)
@@ -98,9 +110,9 @@ class WzRulesetFilterBar extends Component {
   async fetchItems(filters) {
     try {
       const { section } = this.props.state;
-      let fetcher = this.rulesetHandler.getRules// By default the fetcher is for rules
+      let fetcher = this.rulesetHandler.getRules; // By default the fetcher is for rules
       if (section === 'decoders') fetcher = this.rulesetHandler.getDecoders; // If section is decoders the fetcher changes
-      if (section === 'lists') fetcher = this.rulesetHandler.getLists// If the sections is lists the fetcher changes too
+      if (section === 'lists') fetcher = this.rulesetHandler.getLists; // If the sections is lists the fetcher changes too
       this.props.updateLoadingStatus(true);
       const result = await fetcher(filters);
       this.props.updateLoadingStatus(false);
@@ -108,7 +120,6 @@ class WzRulesetFilterBar extends Component {
       this.props.updateError(error);
       return Promise.reject(error);
     }
-
   }
 
   /**
@@ -127,7 +138,9 @@ class WzRulesetFilterBar extends Component {
         remainingKeys.push(keyToRemove);
       });
       const currentOptiosnKeys = Object.keys(currentOptions);
-      const keysToRemove = currentOptiosnKeys.filter(option => { return !remainingKeys.includes(option) });
+      const keysToRemove = currentOptiosnKeys.filter(option => {
+        return !remainingKeys.includes(option);
+      });
       keysToRemove.forEach(key => delete currentOptions[key]);
       this.props.updateFilters(currentOptions);
       await this.fetchItems(currentOptions);
@@ -163,22 +176,21 @@ class WzRulesetFilterBar extends Component {
   onSearchChange = searchValue => {
     if (!searchValue) {
       this.setState({
-        isInvalid: false,
+        isInvalid: false
       });
 
       return;
     }
 
     this.setState({
-      isInvalid: !this.isValid(searchValue),
+      isInvalid: !this.isValid(searchValue)
     });
-
   };
 
   onChange = selectedOptions => {
     this.setState({
       selectedOptions,
-      isInvalid: false,
+      isInvalid: false
     });
     this.cleanCurrentOption(selectedOptions);
   };
@@ -186,8 +198,12 @@ class WzRulesetFilterBar extends Component {
   render() {
     const { section, showingFiles } = this.props.state;
     const { selectedOptions, isInvalid } = this.state;
-    const options = !Object.keys(this.props.state.filters).length ? [] : selectedOptions;
-    const filters = !showingFiles ? `Filter ${section}...` : `Search ${section} files...`;
+    const options = !Object.keys(this.props.state.filters).length
+      ? []
+      : selectedOptions;
+    const filters = !showingFiles
+      ? `Filter ${section}...`
+      : `Search ${section} files...`;
 
     return (
       <EuiFormRow
@@ -209,18 +225,21 @@ class WzRulesetFilterBar extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFilters: filters => dispatch(updateFilters(filters)),
     updateError: error => dispatch(updateError(error))
-  }
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetFilterBar);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzRulesetFilterBar);

@@ -17,14 +17,14 @@ export default class GroupsFilesColumns {
           field: 'filename',
           name: 'File',
           align: 'left',
-          sortable: true,
+          sortable: true
         },
         {
           field: 'hash',
           name: 'Checksum',
           align: 'left',
-          sortable: true,
-        },
+          sortable: true
+        }
       ];
       this.columns.push({
         name: 'Actions',
@@ -43,13 +43,15 @@ export default class GroupsFilesColumns {
 
                     const isEditable = item.filename === 'agent.conf';
                     const data = !isEditable
-                      ? typeof result === 'object' ? JSON.stringify(result, null, 2) : result.toString()
+                      ? typeof result === 'object'
+                        ? JSON.stringify(result, null, 2)
+                        : result.toString()
                       : this.autoFormat(result);
                     const file = {
                       name: item.filename,
                       content: data,
                       isEditable: isEditable,
-                      groupName: itemDetail.name,
+                      groupName: itemDetail.name
                     };
                     this.tableProps.updateFileContent(file);
                   }}
@@ -58,7 +60,7 @@ export default class GroupsFilesColumns {
               </EuiToolTip>
             </div>
           );
-        },
+        }
       });
     };
 
@@ -93,7 +95,7 @@ export default class GroupsFilesColumns {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0,
+      'other->other': 0
     };
 
     for (var i = 0; i < lines.length; i++) {
@@ -105,7 +107,13 @@ export default class GroupsFilesColumns {
       var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
       var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
       var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-      var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
+      var type = single
+        ? 'single'
+        : closing
+        ? 'closing'
+        : opening
+        ? 'opening'
+        : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';

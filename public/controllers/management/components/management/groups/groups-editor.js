@@ -27,7 +27,7 @@ import {
   EuiButton,
   EuiCodeEditor,
   EuiPanel,
-  EuiCodeBlock,
+  EuiCodeBlock
 } from '@elastic/eui';
 
 import GroupsHandler from './utils/groups-handler';
@@ -42,7 +42,7 @@ class WzGroupsEditor extends Component {
       fontSize: '14px',
       enableBasicAutocompletion: true,
       enableSnippets: true,
-      enableLiveAutocompletion: true,
+      enableLiveAutocompletion: true
     };
     this.groupsHandler = GroupsHandler;
     const { fileContent, adminMode } = this.props.state;
@@ -56,7 +56,7 @@ class WzGroupsEditor extends Component {
       name,
       isEditable,
       adminMode,
-      groupName: groupName,
+      groupName: groupName
     };
   }
 
@@ -97,7 +97,7 @@ class WzGroupsEditor extends Component {
         await validateConfigAfterSent();
       } catch (error) {
         const warning = Object.assign(error, {
-          savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`,
+          savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
         });
         this.setState({ isSaving: false });
         this.showToast('warning', warning.savedMessage, warning.details, 3000);
@@ -108,7 +108,12 @@ class WzGroupsEditor extends Component {
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
-      this.showToast('danger', 'Error', 'Error saving group configuration: ' + error, 3000);
+      this.showToast(
+        'danger',
+        'Error',
+        'Error saving group configuration: ' + error,
+        3000
+      );
     }
   }
 
@@ -117,7 +122,7 @@ class WzGroupsEditor extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time,
+      toastLifeTimeMs: time
     });
   };
 
@@ -160,7 +165,9 @@ class WzGroupsEditor extends Component {
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem />
-                {isEditable && adminMode && <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>}
+                {isEditable && adminMode && (
+                  <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
+                )}
               </EuiFlexGroup>
               <EuiSpacer size="m" />
               <EuiFlexGroup>
@@ -172,7 +179,9 @@ class WzGroupsEditor extends Component {
                           width="100%"
                           height="calc(100vh - 225px)"
                           value={content}
-                          onChange={newContent => this.setState({ content: newContent })}
+                          onChange={newContent =>
+                            this.setState({ content: newContent })
+                          }
                           mode="xml"
                           isReadOnly={!adminMode}
                           wrapEnabled
@@ -180,15 +189,15 @@ class WzGroupsEditor extends Component {
                           aria-label="Code Editor"
                         ></EuiCodeEditor>
                       )) || (
-                          <EuiCodeBlock
-                            language="json"
-                            fontSize="m"
-                            paddingSize="m"
-                            overflowHeight={this.height}
-                          >
-                            {content}
-                          </EuiCodeBlock>
-                        )}
+                        <EuiCodeBlock
+                          language="json"
+                          fontSize="m"
+                          paddingSize="m"
+                          overflowHeight={this.height}
+                        >
+                          {content}
+                        </EuiCodeBlock>
+                      )}
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlexItem>
@@ -203,14 +212,17 @@ class WzGroupsEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
+    state: state.groupsReducers
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    cleanFileContent: () => dispatch(cleanFileContent()),
+    cleanFileContent: () => dispatch(cleanFileContent())
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsEditor);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WzGroupsEditor);

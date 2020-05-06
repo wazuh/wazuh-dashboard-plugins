@@ -16,7 +16,7 @@ import { objectWithoutProperties } from './remove-hash-key.js';
 import { ApiRequest } from '../react-services/api-request';
 
 export class ConfigurationHandler {
-  constructor( errorHandler) {
+  constructor(errorHandler) {
     this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
   }

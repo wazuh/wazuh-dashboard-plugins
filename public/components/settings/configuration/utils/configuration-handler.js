@@ -18,7 +18,10 @@ export default class ConfigurationHandler {
    */
   static async editKey(key, value) {
     try {
-      const result = await WzRequest.genericReq('PUT', '/utils/configuration', { key, value });
+      const result = await WzRequest.genericReq('PUT', '/utils/configuration', {
+        key,
+        value
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);

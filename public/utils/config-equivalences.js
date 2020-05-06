@@ -21,8 +21,7 @@ export const configEquivalences = {
     'Enable or disable the VirusTotal tab on Overview and Agents.',
   'extensions.osquery':
     'Enable or disable the Osquery tab on Overview and Agents.',
-  'extensions.mitre':
-    'Enable or disable the MITRE tab on Overview and Agents.',
+  'extensions.mitre': 'Enable or disable the MITRE tab on Overview and Agents.',
   'extensions.docker':
     'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:

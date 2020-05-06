@@ -12,7 +12,7 @@
 export default {
   'A1.1': {
     stack: [
-      "The entity maintains, monitors, and evaluates current processing capacity and use of system components (infrastructure, data, and software) to manage capacity demand and to enable the implementation of additional capacity to help meet its objectives",
+      'The entity maintains, monitors, and evaluates current processing capacity and use of system components (infrastructure, data, and software) to manage capacity demand and to enable the implementation of additional capacity to help meet its objectives',
       { text: '\n' },
       {
         ul: [
@@ -25,7 +25,7 @@ export default {
   },
   'A1.2': {
     stack: [
-      "The entity authorizes, designs, develops or acquires, implements, operates, approves, maintains, and monitors environmental protections, software, data backup processes, and recovery infrastructure to meet its objectives.",
+      'The entity authorizes, designs, develops or acquires, implements, operates, approves, maintains, and monitors environmental protections, software, data backup processes, and recovery infrastructure to meet its objectives.',
       { text: '\n' },
       {
         ul: [
@@ -45,7 +45,7 @@ export default {
   },
   'CC5.1': {
     stack: [
-      "The entity selects and develops control activities that contribute to the mitigation of risks to the achievement of objectives to acceptable levels.",
+      'The entity selects and develops control activities that contribute to the mitigation of risks to the achievement of objectives to acceptable levels.',
       { text: '\n' },
       {
         ul: [
@@ -61,7 +61,7 @@ export default {
   },
   'CC5.2': {
     stack: [
-      "The entity also selects and develops general control activities over technology to support the achievement of objectives.",
+      'The entity also selects and develops general control activities over technology to support the achievement of objectives.',
       { text: '\n' },
       {
         ul: [
@@ -95,7 +95,7 @@ export default {
   },
   'CC6.2': {
     stack: [
-      "Prior to issuing system credentials and granting system access, the entity registers and authorizes new internal and external users whose access is administered by the entity. For those users whose access is administered by the entity, user system credentials are removed when user access is no longer authorized.",
+      'Prior to issuing system credentials and granting system access, the entity registers and authorizes new internal and external users whose access is administered by the entity. For those users whose access is administered by the entity, user system credentials are removed when user access is no longer authorized.',
       { text: '\n' },
       {
         ul: [
@@ -108,7 +108,7 @@ export default {
   },
   'CC6.3': {
     stack: [
-      "The entity authorizes, modifies, or removes access to data, software, functions, and other protected information assets based on roles, responsibilities, or the system design and changes, giving consideration to the concepts of least privilege and segregation of duties, to meet the entity’s objectives.",
+      'The entity authorizes, modifies, or removes access to data, software, functions, and other protected information assets based on roles, responsibilities, or the system design and changes, giving consideration to the concepts of least privilege and segregation of duties, to meet the entity’s objectives.',
       { text: '\n' },
       {
         ul: [
@@ -122,7 +122,7 @@ export default {
   },
   'CC6.4': {
     stack: [
-      "The entity restricts physical access to facilities and protected information assets (for example, data center facilities, backup media storage, and other sensitive locations) to authorized personnel to meet the entity’s objectives",
+      'The entity restricts physical access to facilities and protected information assets (for example, data center facilities, backup media storage, and other sensitive locations) to authorized personnel to meet the entity’s objectives',
       { text: '\n' },
       {
         ul: [
@@ -135,7 +135,7 @@ export default {
   },
   'CC6.6': {
     stack: [
-      "The entity implements logical access security measures to protect against threats from sources outside its system boundaries.",
+      'The entity implements logical access security measures to protect against threats from sources outside its system boundaries.',
       { text: '\n' },
       {
         ul: [
@@ -149,7 +149,7 @@ export default {
   },
   'CC6.7': {
     stack: [
-      "The entity restricts the transmission, movement, and removal of information to authorized internal and external users and processes, and protects it during transmission, movement, or removal to meet the entity’s objectives.",
+      'The entity restricts the transmission, movement, and removal of information to authorized internal and external users and processes, and protects it during transmission, movement, or removal to meet the entity’s objectives.',
       { text: '\n' },
       {
         ul: [
@@ -163,7 +163,7 @@ export default {
   },
   'CC6.8': {
     stack: [
-      "The entity implements controls to prevent or detect and act upon the introduction of unauthorized or malicious software to meet the entity’s objectives.",
+      'The entity implements controls to prevent or detect and act upon the introduction of unauthorized or malicious software to meet the entity’s objectives.',
       { text: '\n' },
       {
         ul: [
@@ -178,7 +178,7 @@ export default {
   },
   'CC7.1': {
     stack: [
-      "To meet its objectives, the entity uses detection and monitoring procedures to identify (1) changes to configurations that result in the introduction of new vulnerabilities, and (2) susceptibilities to newly discovered vulnerabilities.",
+      'To meet its objectives, the entity uses detection and monitoring procedures to identify (1) changes to configurations that result in the introduction of new vulnerabilities, and (2) susceptibilities to newly discovered vulnerabilities.',
       { text: '\n' },
       {
         ul: [
@@ -207,7 +207,7 @@ export default {
   },
   'CC7.3': {
     stack: [
-      "The entity evaluates security events to determine whether they could or have resulted in a failure of the entity to meet its objectives (security incidents) and, if so, takes actions to prevent or address such failures.",
+      'The entity evaluates security events to determine whether they could or have resulted in a failure of the entity to meet its objectives (security incidents) and, if so, takes actions to prevent or address such failures.',
       { text: '\n' },
       {
         ul: [
@@ -220,7 +220,7 @@ export default {
   },
   'CC7.4': {
     stack: [
-      "The entity responds to identified security incidents by executing a defined incident-response program to understand, contain, remediate, and communicate security incidents, as appropriate.",
+      'The entity responds to identified security incidents by executing a defined incident-response program to understand, contain, remediate, and communicate security incidents, as appropriate.',
       { text: '\n' },
       {
         ul: [
@@ -241,7 +241,7 @@ export default {
   },
   'CC8.1': {
     stack: [
-      "The entity authorizes, designs, develops or acquires, configures, documents, tests, approves, and implements changes to infrastructure, data, software, and procedures to meet its objectives",
+      'The entity authorizes, designs, develops or acquires, configures, documents, tests, approves, and implements changes to infrastructure, data, software, and procedures to meet its objectives',
       { text: '\n' },
       {
         ul: [
@@ -264,7 +264,7 @@ export default {
   },
   'PI1.4': {
     stack: [
-      "The entity implements policies and procedures to make available or deliver output completely, accurately, and timely in accordance with specifications to meet the entity’s objectives.",
+      'The entity implements policies and procedures to make available or deliver output completely, accurately, and timely in accordance with specifications to meet the entity’s objectives.',
       { text: '\n' },
       {
         ul: [
@@ -278,7 +278,7 @@ export default {
   },
   'PI1.5': {
     stack: [
-      "The entity implements policies and procedures to store inputs, items in processing, and outputs completely, accurately, and timely in accordance with system specifications to meet the entity’s objectives.",
+      'The entity implements policies and procedures to store inputs, items in processing, and outputs completely, accurately, and timely in accordance with system specifications to meet the entity’s objectives.',
       { text: '\n' },
       {
         ul: [

@@ -12,7 +12,7 @@
 import { uiModules } from 'ui/modules';
 import { OverviewController } from './overview';
 import { WelcomeScreen } from './components/overview-welcome';
-import  { WzCurrentOverviewSectionWrapper } from './components/overview-current-section-wrapper';
+import { WzCurrentOverviewSectionWrapper } from './components/overview-current-section-wrapper';
 import { Stats } from './components/stats';
 import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';

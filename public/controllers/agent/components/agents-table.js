@@ -11,7 +11,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -27,13 +26,14 @@ import {
   EuiHealth,
   EuiSpacer
 } from '@elastic/eui';
-import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
+import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar';
 
 export class AgentsTable extends Component {
-
   constructor(props) {
     super(props);
-    const selectedOptions = JSON.parse(sessionStorage.getItem('agents_preview_selected_options'));
+    const selectedOptions = JSON.parse(
+      sessionStorage.getItem('agents_preview_selected_options')
+    );
     this.state = {
       agents: [],
       isLoading: false,
@@ -45,8 +45,8 @@ export class AgentsTable extends Component {
       selectedOptions: selectedOptions || [],
       sortDirection: 'asc',
       sortField: 'id',
-      totalItems: 0,
-    }
+      totalItems: 0
+    };
     this.downloadCsv.bind(this);
   }
 
@@ -59,18 +59,21 @@ export class AgentsTable extends Component {
       sortField,
       sortDirection,
       isProcessing: true,
-      isLoading: true,
+      isLoading: true
     });
   };
 
   onQueryChange = ({ q = {}, search = {}, selectedOptions = {} }) => {
-    sessionStorage.setItem('agents_preview_selected_options', JSON.stringify(selectedOptions));
+    sessionStorage.setItem(
+      'agents_preview_selected_options',
+      JSON.stringify(selectedOptions)
+    );
     this.setState({
       q,
       search,
       selectedOptions,
       isProcessing: true,
-      isLoading: true,
+      isLoading: true
     });
   };
 
@@ -88,14 +91,14 @@ export class AgentsTable extends Component {
       filterOs,
       filterVersion,
       filterOsPlatform,
-      filterNodes,
+      filterNodes
     });
   }
 
   async reloadAgents() {
     this.setState({
       isProcessing: true,
-      isLoading: true,
+      isLoading: true
     });
     await this.props.reload();
   }
@@ -118,12 +121,14 @@ export class AgentsTable extends Component {
       this.buildFilter()
     );
 
-    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent.bind(this));
+    const formatedAgents = (
+      ((rawAgents || {}).data || {}).data || {}
+    ).items.map(this.formatAgent.bind(this));
     this.setState({
       agents: formatedAgents,
       totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
       isProcessing: false,
-      isLoading: false,
+      isLoading: false
     });
   }
 
@@ -134,7 +139,7 @@ export class AgentsTable extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       q: this.buildQFilter(),
-      sort: this.buildSortFilter(),
+      sort: this.buildSortFilter()
     };
 
     if (search !== '') {
@@ -146,44 +151,52 @@ export class AgentsTable extends Component {
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
 
-    const field = (sortField === 'os_name') ? '' : sortField;
-    const direction = (sortDirection === 'asc') ? '+' : '-';
+    const field = sortField === 'os_name' ? '' : sortField;
+    const direction = sortDirection === 'asc' ? '+' : '-';
 
     return direction + field;
   }
 
   buildQFilter() {
     const { q } = this.state;
-    return (q === '') ? `id!=000` : `id!=000;${q}`;
+    return q === '' ? `id!=000` : `id!=000;${q}`;
   }
 
   formatAgent(agent) {
-    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
-    const lastKeepAlive = (date, timeService) => { return (date !== undefined) ? timeService(date) : "-"; };
-    const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : ".";
+    const checkField = field => {
+      return field !== undefined ? field : '-';
+    };
+    const lastKeepAlive = (date, timeService) => {
+      return date !== undefined ? timeService(date) : '-';
+    };
+    const agentVersion =
+      agent.version !== undefined ? agent.version.split(' ')[1] : '.';
     const { timeService } = this.props;
     return {
-      "id": agent.id,
-      "name": agent.name,
-      "ip": agent.ip,
-      "status": agent.status,
-      "group": checkField(agent.group),
-      "os_name": agent,
-      "version": agentVersion,
-      "dateAdd": timeService(agent.dateAdd),
-      "lastKeepAlive": lastKeepAlive(agent.lastKeepAlive, timeService),
-      "actions": agent
-    }
+      id: agent.id,
+      name: agent.name,
+      ip: agent.ip,
+      status: agent.status,
+      group: checkField(agent.group),
+      os_name: agent,
+      version: agentVersion,
+      dateAdd: timeService(agent.dateAdd),
+      lastKeepAlive: lastKeepAlive(agent.lastKeepAlive, timeService),
+      actions: agent
+    };
   }
 
   actionButtonsRender(agent) {
     return (
       <div>
-        <EuiToolTip content="Open Discover panel for this agent" position="left">
+        <EuiToolTip
+          content="Open Discover panel for this agent"
+          position="left"
+        >
           <EuiButtonIcon
-            onClick={() => (ev) => {
+            onClick={() => ev => {
               ev.stopPropagation();
-              this.props.clickAction(agent, 'discover')
+              this.props.clickAction(agent, 'discover');
             }}
             iconType="discoverApp"
             aria-label="Open Discover panel for this agent"
@@ -191,9 +204,9 @@ export class AgentsTable extends Component {
         </EuiToolTip>
         <EuiToolTip content="Open configuration for this agent" position="left">
           <EuiButtonIcon
-            onClick={(ev) => {
+            onClick={ev => {
               ev.stopPropagation();
-              this.props.clickAction(agent, 'configuration')
+              this.props.clickAction(agent, 'configuration');
             }}
             color={'text'}
             iconType="wrench"
@@ -230,29 +243,35 @@ export class AgentsTable extends Component {
 
   addIconPlatformRender(agent) {
     let icon = false;
-    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+    const checkField = field => {
+      return field !== undefined ? field : '-';
+    };
     const os = (agent || {}).os;
 
     if (((os || {}).uname || '').includes('Linux')) {
-      icon = 'linux'
+      icon = 'linux';
     } else if ((os || {}).platform === 'windows') {
-      icon = 'windows'
+      icon = 'windows';
     } else if ((os || {}).platform === 'darwin') {
-      icon = 'apple'
+      icon = 'apple';
     }
-    const os_name = checkField(((agent || {}).os || {}).name)
-      + checkField(((agent || {}).os || {}).version);
+    const os_name =
+      checkField(((agent || {}).os || {}).name) +
+      checkField(((agent || {}).os || {}).version);
 
     return (
       <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-        <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
+        <i
+          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+          aria-hidden="true"
+        ></i>{' '}
+        {os_name === '--' ? '-' : os_name}
       </span>
     );
-
   }
 
   addHealthStatusRender(status) {
-    const color = (status) => {
+    const color = status => {
       if (status.toLowerCase() === 'active') {
         return 'success';
       } else if (status.toLowerCase() === 'disconnected') {
@@ -262,19 +281,15 @@ export class AgentsTable extends Component {
       }
     };
 
-    return (
-      <EuiHealth color={color(status)}>
-        {status}
-      </EuiHealth>
-    );
+    return <EuiHealth color={color(status)}>{status}</EuiHealth>;
   }
 
   downloadCsv = () => {
     const { q, search = {} } = this.buildFilter();
     const filterQ = { name: 'q', value: q };
-    const filterSearch = { name: 'search', value: search }
-    this.props.downloadCsv([filterQ, filterSearch])
-  }
+    const filterSearch = { name: 'search', value: search };
+    this.props.downloadCsv([filterQ, filterSearch]);
+  };
   formattedButton() {
     return (
       <EuiFlexItem grow={false}>
@@ -291,79 +306,79 @@ export class AgentsTable extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '65px',
+        width: '65px'
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
-        truncateText: true,
+        truncateText: true
       },
       {
         field: 'ip',
         name: 'IP',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'group',
         name: 'Group(s)',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'os_name',
         name: 'OS',
         sortable: true,
         truncateText: true,
-        render: this.addIconPlatformRender,
+        render: this.addIconPlatformRender
       },
       {
         field: 'version',
         name: 'Version',
         width: '100px',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'dateAdd',
         name: 'Registration date',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
         truncateText: true,
-        sortable: true,
+        sortable: true
       },
       {
         field: 'status',
         name: 'Status',
         truncateText: true,
         sortable: true,
-        render: this.addHealthStatusRender,
+        render: this.addHealthStatusRender
       },
       {
         align: 'right',
         width: '100px',
         field: 'actions',
         name: 'Actions',
-        render: (agent) => this.actionButtonsRender(agent)
-      },
+        render: agent => this.actionButtonsRender(agent)
+      }
     ];
   }
 
   headRender() {
-    const formattedButton = this.formattedButton()
+    const formattedButton = this.formattedButton();
     return (
       <div>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                {(!!this.state.totalItems &&
-                  <EuiTitle size={"s"} style={{ padding: '6px 0px' }}>
+                {!!this.state.totalItems && (
+                  <EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
                     <h2>{this.state.totalItems} Agents</h2>
                   </EuiTitle>
                 )}
@@ -371,9 +386,12 @@ export class AgentsTable extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="plusInCircle" onClick={() => this.props.addingNewAgent()}>
+            <EuiButtonEmpty
+              iconType="plusInCircle"
+              onClick={() => this.props.addingNewAgent()}
+            >
               Deploy new agent
-          </EuiButtonEmpty>
+            </EuiButtonEmpty>
           </EuiFlexItem>
           {formattedButton}
         </EuiFlexGroup>
@@ -406,11 +424,15 @@ export class AgentsTable extends Component {
     const rawGroups = await this.props.wzReq('GET', '/agents/groups', {});
     const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
     const groups = itemsGroups
-      .filter((item) => { return item.count > 0; })
-      .map((item) => { return { label: item.name, group: 'group' } });
+      .filter(item => {
+        return item.count > 0;
+      })
+      .map(item => {
+        return { label: item.name, group: 'group' };
+      });
     return {
       label: 'Groups',
-      options: groups,
+      options: groups
     };
   }
 
@@ -419,14 +441,16 @@ export class AgentsTable extends Component {
       'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields': 'os.name,os.version',
-        'q': 'id!=000'
+        fields: 'os.name,os.version',
+        q: 'id!=000'
       }
     );
     const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
     const os = itemsOs
-      .filter((item) => { return Object.keys(item).includes('os') })
-      .map((item) => {
+      .filter(item => {
+        return Object.keys(item).includes('os');
+      })
+      .map(item => {
         const { name, version } = item.os;
         return {
           label: `${name}-${version}`,
@@ -436,7 +460,7 @@ export class AgentsTable extends Component {
       });
     return {
       label: 'OS Name',
-      options: os,
+      options: os
     };
   }
 
@@ -445,14 +469,17 @@ export class AgentsTable extends Component {
       'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields': 'os.platform',
-        'q': 'id!=000'
+        fields: 'os.platform',
+        q: 'id!=000'
       }
     );
-    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {}).items;
+    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {})
+      .items;
     const osPlatform = itemsOsPlatform
-      .filter((item) => { return Object.keys(item).includes('os') })
-      .map((item) => {
+      .filter(item => {
+        return Object.keys(item).includes('os');
+      })
+      .map(item => {
         const { platform } = item.os;
         return {
           label: platform,
@@ -462,7 +489,7 @@ export class AgentsTable extends Component {
       });
     return {
       label: 'OS Platform',
-      options: osPlatform,
+      options: osPlatform
     };
   }
 
@@ -471,14 +498,16 @@ export class AgentsTable extends Component {
       'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields': 'node_name',
-        'q': 'id!=000;node_name!=unknown'
+        fields: 'node_name',
+        q: 'id!=000;node_name!=unknown'
       }
     );
     const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
     const nodes = itemsNodes
-      .filter((item) => { return Object.keys(item).includes('node_name') })
-      .map((item) => {
+      .filter(item => {
+        return Object.keys(item).includes('node_name');
+      })
+      .map(item => {
         const { node_name } = item;
         return {
           label: node_name,
@@ -488,7 +517,7 @@ export class AgentsTable extends Component {
       });
     return {
       label: 'Nodes',
-      options: nodes,
+      options: nodes
     };
   }
 
@@ -497,23 +526,25 @@ export class AgentsTable extends Component {
       'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields': 'version',
-        'q': 'id!=000'
+        fields: 'version',
+        q: 'id!=000'
       }
     );
     const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
     const versions = itemsVersions
-      .filter((item) => { return Object.keys(item).includes('version') })
-      .map((item) => {
+      .filter(item => {
+        return Object.keys(item).includes('version');
+      })
+      .map(item => {
         return {
           label: item.version,
           group: 'version'
-        }
+        };
       });
     return {
       label: 'Version',
-      options: versions,
-    }
+      options: versions
+    };
   }
 
   filterBarRender() {
@@ -523,7 +554,7 @@ export class AgentsTable extends Component {
       filterOs,
       filterVersion,
       filterOsPlatform,
-      filterNodes,
+      filterNodes
     } = this.state;
     const model = [
       filterStatus || { label: 'Status', options: [] },
@@ -531,7 +562,7 @@ export class AgentsTable extends Component {
       filterOs || { label: 'OS Name', options: [] },
       filterOsPlatform || { label: 'OS Platform', options: [] },
       filterVersion || { label: 'Version', options: [] },
-      filterNodes || { label: 'Nodes', options: [] },
+      filterNodes || { label: 'Nodes', options: [] }
     ];
     const { selectedOptions } = this.state;
 
@@ -545,7 +576,11 @@ export class AgentsTable extends Component {
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton iconType="refresh" fill={true} onClick={() => this.reloadAgents()}>
+          <EuiButton
+            iconType="refresh"
+            fill={true}
+            onClick={() => this.reloadAgents()}
+          >
             Refresh
           </EuiButton>
         </EuiFlexItem>
@@ -554,33 +589,40 @@ export class AgentsTable extends Component {
   }
 
   tableRender() {
-
     const getRowProps = item => {
       const { id } = item;
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => this.props.clickAction(item),
+        onClick: () => this.props.clickAction(item)
       };
     };
 
-    const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state
+    const {
+      pageIndex,
+      pageSize,
+      totalItems,
+      agents,
+      sortField,
+      sortDirection
+    } = this.state;
     const columns = this.columns();
-    const pagination = totalItems > 15
-      ? {
-        pageIndex: pageIndex,
-        pageSize: pageSize,
-        totalItemCount: totalItems,
-        pageSizeOptions: [15, 25, 50, 100],
-      }
-      : false;
+    const pagination =
+      totalItems > 15
+        ? {
+            pageIndex: pageIndex,
+            pageSize: pageSize,
+            totalItemCount: totalItems,
+            pageSizeOptions: [15, 25, 50, 100]
+          }
+        : false;
     const sorting = {
       sort: {
         field: sortField,
-        direction: sortDirection,
-      },
+        direction: sortDirection
+      }
     };
-    const isLoading = this.state.isLoading
+    const isLoading = this.state.isLoading;
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -596,7 +638,7 @@ export class AgentsTable extends Component {
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-    )
+    );
   }
 
   render() {

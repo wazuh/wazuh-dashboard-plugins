@@ -1219,7 +1219,11 @@ export class WazuhApiCtrl {
         cred
       );
 
-      const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
+      const isList =
+        req.payload.path.includes('/lists') &&
+        req.payload.filters &&
+        req.payload.filters.length &&
+        req.payload.filters.find(filter => filter._isCDBList);
 
       const totalItems = (((output || {}).body || {}).data || {}).totalItems;
 
@@ -1240,8 +1244,7 @@ export class WazuhApiCtrl {
 
       if (totalItems) {
         const { path, filters } = req.payload;
-        const isArrayOfLists =
-          path.includes('/lists') && !isList;
+        const isArrayOfLists = path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
         const isFiles = path.endsWith('/files');

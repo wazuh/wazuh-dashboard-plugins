@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiButtonIcon } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiPanel,
+  EuiButtonIcon
+} from '@elastic/eui';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 
@@ -9,9 +14,9 @@ export class ClusterTimelions extends Component {
     this.state = {};
   }
 
-  expand = (id) => {
+  expand = id => {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
-  }
+  };
 
   updateRootScope = () => {
     return;
@@ -23,22 +28,40 @@ export class ClusterTimelions extends Component {
         <EuiFlexGroup style={{ height: '450px' }}>
           <EuiFlexItem key={'Wazuh-App-Cluster-monitoring-Overview-Manager'}>
             <EuiPanel paddingSize="none">
-              <EuiFlexItem className={this.state.expandedVis === 'Wazuh-App-Cluster-monitoring-Overview-Manager' ? 'fullscreen h-100' : 'h-100'}>
-                <EuiFlexGroup style={{ padding: '12px 12px 0px' }} className="embPanel__header">
+              <EuiFlexItem
+                className={
+                  this.state.expandedVis ===
+                  'Wazuh-App-Cluster-monitoring-Overview-Manager'
+                    ? 'fullscreen h-100'
+                    : 'h-100'
+                }
+              >
+                <EuiFlexGroup
+                  style={{ padding: '12px 12px 0px' }}
+                  className="embPanel__header"
+                >
                   <h2 className="embPanel__title wz-headline-title">
                     {'Cluster alerts summary'}
                   </h2>
                   <EuiButtonIcon
-                    color='text'
+                    color="text"
                     style={{ padding: '0px 6px', height: 30 }}
-                    onClick={() => this.expand('Wazuh-App-Cluster-monitoring-Overview-Manager')}
+                    onClick={() =>
+                      this.expand(
+                        'Wazuh-App-Cluster-monitoring-Overview-Manager'
+                      )
+                    }
                     iconType="expand"
                     aria-label="Expand"
                   />
                 </EuiFlexGroup>
                 <div style={{ height: '100%' }}>
                   <WzReduxProvider>
-                    <KibanaVis visID={'Wazuh-App-Cluster-monitoring-Overview-Manager'} tab={'monitoring'} updateRootScope={this.updateRootScope}></KibanaVis>
+                    <KibanaVis
+                      visID={'Wazuh-App-Cluster-monitoring-Overview-Manager'}
+                      tab={'monitoring'}
+                      updateRootScope={this.updateRootScope}
+                    ></KibanaVis>
                   </WzReduxProvider>
                 </div>
               </EuiFlexItem>
@@ -46,22 +69,38 @@ export class ClusterTimelions extends Component {
           </EuiFlexItem>
           <EuiFlexItem key={'Wazuh-App-Cluster-monitoring-Overview'}>
             <EuiPanel paddingSize="none">
-              <EuiFlexItem className={this.state.expandedVis === 'Wazuh-App-Cluster-monitoring-Overview' ? 'fullscreen h-100' : 'h-100'}>
-                <EuiFlexGroup style={{ padding: '12px 12px 0px' }} className="embPanel__header">
+              <EuiFlexItem
+                className={
+                  this.state.expandedVis ===
+                  'Wazuh-App-Cluster-monitoring-Overview'
+                    ? 'fullscreen h-100'
+                    : 'h-100'
+                }
+              >
+                <EuiFlexGroup
+                  style={{ padding: '12px 12px 0px' }}
+                  className="embPanel__header"
+                >
                   <h2 className="embPanel__title wz-headline-title">
                     {'Alerts by node summary'}
                   </h2>
                   <EuiButtonIcon
-                    color='text'
+                    color="text"
                     style={{ padding: '0px 6px', height: 30 }}
-                    onClick={() => this.expand('Wazuh-App-Cluster-monitoring-Overview')}
+                    onClick={() =>
+                      this.expand('Wazuh-App-Cluster-monitoring-Overview')
+                    }
                     iconType="expand"
                     aria-label="Expand"
                   />
                 </EuiFlexGroup>
                 <div style={{ height: '100%' }}>
                   <WzReduxProvider>
-                    <KibanaVis visID={'Wazuh-App-Cluster-monitoring-Overview'} tab={'monitoring'} updateRootScope={this.updateRootScope}></KibanaVis>
+                    <KibanaVis
+                      visID={'Wazuh-App-Cluster-monitoring-Overview'}
+                      tab={'monitoring'}
+                      updateRootScope={this.updateRootScope}
+                    ></KibanaVis>
                   </WzReduxProvider>
                 </div>
               </EuiFlexItem>
@@ -72,5 +111,3 @@ export class ClusterTimelions extends Component {
     );
   }
 }
-
-

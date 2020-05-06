@@ -41,10 +41,7 @@ export class WelcomeScreen extends Component {
   }
 
   setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Overview', },
-    ];
+    const breadcrumb = [{ text: '' }, { text: 'Overview' }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
@@ -58,8 +55,8 @@ export class WelcomeScreen extends Component {
         <EuiCard
           size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} color='primary' />}
-          className='homSynopsis__card'
+          icon={<EuiIcon size="xl" type={icon} color="primary" />}
+          className="homSynopsis__card"
           title={TabDescription[tab].title}
           onClick={() => store.dispatch(updateCurrentTab(tab))}
           data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
@@ -117,7 +114,8 @@ export class WelcomeScreen extends Component {
                       {this.props.extensions.docker &&
                         this.buildTabCard('docker', 'logoDocker')}
                       {this.props.extensions.mitre &&
-                        this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
+                        this.buildTabCard('mitre', 'spacesApp')}{' '}
+                      {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
                   </EuiPanel>
                 </EuiFlexItem>
@@ -137,7 +135,7 @@ export class WelcomeScreen extends Component {
                                 <p>
                                   Click the <EuiIcon type="eye" /> icon to show
                                   regulatory compliance extensions.
-                          </p>
+                                </p>
                               }
                               color="success"
                               iconType="help"
@@ -150,19 +148,19 @@ export class WelcomeScreen extends Component {
                       this.props.extensions.hipaa ||
                       this.props.extensions.tsc ||
                       this.props.extensions.nist) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.tsc &&
-                            this.buildTabCard('tsc', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                        </EuiFlexGrid>
-                      )}
+                      <EuiFlexGrid columns={2}>
+                        {this.props.extensions.pci &&
+                          this.buildTabCard('pci', 'visTagCloud')}
+                        {this.props.extensions.nist &&
+                          this.buildTabCard('nist', 'apmApp')}
+                        {this.props.extensions.tsc &&
+                          this.buildTabCard('tsc', 'apmApp')}
+                        {this.props.extensions.gdpr &&
+                          this.buildTabCard('gdpr', 'visBarVertical')}
+                        {this.props.extensions.hipaa &&
+                          this.buildTabCard('hipaa', 'emsApp')}
+                      </EuiFlexGrid>
+                    )}
                   </EuiPanel>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -173,8 +171,11 @@ export class WelcomeScreen extends Component {
           <EuiFlexGroup justifyContent="spaceAround">
             <EuiFlexItem grow={false}>
               <EuiButton
-                onClick={() => window.location.href = "#/settings?tab=modules"}
-                iconType="eye">
+                onClick={() =>
+                  (window.location.href = '#/settings?tab=modules')
+                }
+                iconType="eye"
+              >
                 Configure the modules
               </EuiButton>
             </EuiFlexItem>

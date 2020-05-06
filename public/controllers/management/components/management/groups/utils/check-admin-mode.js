@@ -6,13 +6,17 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 const checkAdminMode = async () => {
   try {
     let admin = true;
-    const result = await WzRequest.genericReq('GET', '/utils/configuration', {});
-    const data = (((result || {}).data) || {}).data || {};
+    const result = await WzRequest.genericReq(
+      'GET',
+      '/utils/configuration',
+      {}
+    );
+    const data = ((result || {}).data || {}).data || {};
     if (Object.keys(data).includes('admin')) admin = data.admin;
     return admin;
   } catch (error) {
     return Promise.error(error);
   }
-}
+};
 
 export default checkAdminMode;

@@ -45,7 +45,7 @@ export class Vis2PNG {
               height: tmpNode.height(),
               id: currentValue
             });
-          } catch (error) { } // eslint-disable-line
+          } catch (error) {} // eslint-disable-line
           currentCompleted++;
           this.$rootScope.reportStatus = `Generating report...${Math.round(
             (currentCompleted / len) * 100

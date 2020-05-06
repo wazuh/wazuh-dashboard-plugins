@@ -28,7 +28,7 @@ export class ManagementController {
     $location,
     configHandler,
     errorHandler,
-    $interval,
+    $interval
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -49,7 +49,6 @@ export class ManagementController {
     this.logtestOpened = false;
     this.uploadOpened = false;
     this.rulesetHandler = RulesetHandler;
-    
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -172,21 +171,21 @@ export class ManagementController {
     };
 
     this.managementProps = {
-      switchTab: (section) => this.switchTab(section, true),
-      section: "",
+      switchTab: section => this.switchTab(section, true),
+      section: '',
       groupsProps: {},
       configurationProps: {
         agent: {
-          id: '000',
+          id: '000'
           // agentPlatform: 'linux'
         }, // TODO: get dynamically the agent?
-        updateWazuhNotReadyYet: (status) => { 
-          this.$rootScope.wazuhNotReadyYet = status
+        updateWazuhNotReadyYet: status => {
+          this.$rootScope.wazuhNotReadyYet = status;
           this.$scope.$applyAsync();
         },
         wazuhNotReadyYet: () => this.$rootScope.wazuhNotReadyYet
       }
-    }
+    };
   }
 
   /**
@@ -329,7 +328,8 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
-    this.managementProps.section = this.tab === 'ruleset' ? this.rulesetTab : this.tab;
+    this.managementProps.section =
+      this.tab === 'ruleset' ? this.rulesetTab : this.tab;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }

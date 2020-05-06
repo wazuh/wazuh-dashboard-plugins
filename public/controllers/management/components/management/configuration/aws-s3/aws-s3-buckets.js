@@ -1,23 +1,21 @@
 /*
-* Wazuh app - React component for show configuration of AWS S3 - buckets tab.
-* Copyright (C) 2015-2020 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - React component for show configuration of AWS S3 - buckets tab.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
-import {
-  
-} from "@elastic/eui";
+import {} from '@elastic/eui';
 
-import WzNoConfig from "../util-components/no-config";
+import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
@@ -38,51 +36,53 @@ const mainSettings = [
   { field: 'regions', label: 'Limit log parsing to these regions' }
 ];
 
-class WzConfigurationAmazonS3Buckets extends Component{
-  constructor(props){
+class WzConfigurationAmazonS3Buckets extends Component {
+  constructor(props) {
     super(props);
   }
-  render(){
+  render() {
     const { currentConfig, wodleConfig, wazuhNotReadyYet } = this.props;
-    const items = wodleConfig && wodleConfig['aws-s3'] && wodleConfig['aws-s3'].buckets ? settingsListBuilder(wodleConfig['aws-s3'].buckets, 'name') : {};
+    const items =
+      wodleConfig && wodleConfig['aws-s3'] && wodleConfig['aws-s3'].buckets
+        ? settingsListBuilder(wodleConfig['aws-s3'].buckets, 'name')
+        : {};
     return (
       <Fragment>
-        {currentConfig && !wodleConfig['aws-s3'] /*&& !currentConfig['aws-s3'].buckets*/ && (
-          <WzNoConfig error='not-present' help={helpLinks}/>
+        {currentConfig &&
+        !wodleConfig['aws-s3'] /*&& !currentConfig['aws-s3'].buckets*/ && (
+            <WzNoConfig error="not-present" help={helpLinks} />
+          )}
+        {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && (
+          <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
         )}
-        {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && ( 
-          <WzNoConfig error='Wazuh not ready yet' help={helpLinks}/>
-        )}
-        {currentConfig && wodleConfig['aws-s3'] && wodleConfig['aws-s3'].buckets && (
-          <WzConfigurationSettingsTabSelector
-            title='Main settings'
-            description='Common settings applied to all Amazon S3 buckets'
-            currentConfig={wodleConfig}
-            minusHeight={340}
-            helpLinks={helpLinks}
-          >
-            <WzConfigurationListSelector
-              items={items}
-              settings={mainSettings}
-            />
-          </WzConfigurationSettingsTabSelector>
-        )}
+        {currentConfig &&
+          wodleConfig['aws-s3'] &&
+          wodleConfig['aws-s3'].buckets && (
+            <WzConfigurationSettingsTabSelector
+              title="Main settings"
+              description="Common settings applied to all Amazon S3 buckets"
+              currentConfig={wodleConfig}
+              minusHeight={340}
+              helpLinks={helpLinks}
+            >
+              <WzConfigurationListSelector
+                items={items}
+                settings={mainSettings}
+              />
+            </WzConfigurationSettingsTabSelector>
+          )}
       </Fragment>
-    )
+    );
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
 });
 
 WzConfigurationAmazonS3Buckets.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.string
-  ])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
-
 
 export default connect(mapStateToProps)(WzConfigurationAmazonS3Buckets);

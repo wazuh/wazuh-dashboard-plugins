@@ -10,37 +10,37 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const updateConfigurationSection = (section) => {
+export const updateConfigurationSection = section => {
   return {
     type: 'UPDATE_CONFIGURATION_SECTION',
     section
-  }
-}
+  };
+};
 
-export const updateClusterNodes = (clusterNodes) => {
+export const updateClusterNodes = clusterNodes => {
   return {
     type: 'UPDATE_CONFIGURATION_CLUSTER_NODES',
     clusterNodes
-  }
-}
+  };
+};
 
-export const updateClusterNodeSelected = (clusterNodeSelected) => {
+export const updateClusterNodeSelected = clusterNodeSelected => {
   return {
     type: 'UPDATE_CONFIGURATION_CLUSTER_NODE_SELECTED',
     clusterNodeSelected
-  }
-}
+  };
+};
 
-export const updateLoadingStatus = (loadingStatus) => {
+export const updateLoadingStatus = loadingStatus => {
   return {
     type: 'UPDATE_CONFIGURATION_LOADING_STATUS',
     loadingStatus
-  }
-}
+  };
+};
 
-export const updateAdminMode = (adminMode) => {
+export const updateAdminMode = adminMode => {
   return {
     type: 'UPDATE_CONFIGURATION_ADMIN_MODE',
     adminMode
-  }
-}
+  };
+};

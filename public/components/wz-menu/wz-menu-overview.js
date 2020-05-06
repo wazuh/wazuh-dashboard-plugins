@@ -10,12 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiFlexItem,
-  EuiFlexGrid,
-  EuiSideNav,
-  EuiIcon
-} from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGrid, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
@@ -32,10 +27,19 @@ class WzMenuOverview extends Component {
     };
 
     this.overviewSections = {
-      securityInformation: { id: 'securityInformation', text: 'Security information management' },
+      securityInformation: {
+        id: 'securityInformation',
+        text: 'Security information management'
+      },
       auditing: { id: 'auditing', text: 'Auditing and Policy Monitoring' },
-      threatDetection: { id: 'threatDetection', text: 'Threat detection and response' },
-      regulatoryCompliance: { id: 'regulatoryCompliance', text: 'Regulatory Compliance' },
+      threatDetection: {
+        id: 'threatDetection',
+        text: 'Threat detection and response'
+      },
+      regulatoryCompliance: {
+        id: 'regulatoryCompliance',
+        text: 'Regulatory Compliance'
+      },
       general: { id: 'general', text: 'Security Events' },
       fim: { id: 'fim', text: 'Integrity Monitoring' },
       aws: { id: 'aws', text: 'Amazon AWS' },
@@ -52,7 +56,7 @@ class WzMenuOverview extends Component {
       gdpr: { id: 'gdpr', text: 'GDPR' },
       hipaa: { id: 'hipaa', text: 'HIPAA' },
       nist: { id: 'nist', text: 'NIST 800-53' },
-      tsc: { id: 'tsc', text: 'TSC' },
+      tsc: { id: 'tsc', text: 'TSC' }
     };
 
     this.wzReq = WzRequest;
@@ -62,23 +66,24 @@ class WzMenuOverview extends Component {
     // You don't have to do this check first, but it can help prevent an unneeded render
   }
 
-  componentDidMount() {
-  }
+  componentDidMount() {}
 
   clickMenuItem = section => {
     this.props.closePopover();
-    const currentTab = (((store || {}).getState() || {}).appStateReducers || {}).currentTab;
-    if (currentTab !== section) { // do not redirect if we already are in that tab
+    const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
+      .currentTab;
+    if (currentTab !== section) {
+      // do not redirect if we already are in that tab
       window.location.href = `#/overview/?tab=${section}`;
       store.dispatch(updateCurrentTab(section));
     }
   };
 
-  createItems = (items) => {
+  createItems = items => {
     let result = [];
     const keyExists = key => Object.keys(this.state.extensions).includes(key);
     const keyIsTrue = key => (this.state.extensions || [])[key];
-    items.forEach((item) => {
+    items.forEach(item => {
       if (!keyExists(item.id) || keyIsTrue(item.id)) {
         result.push(this.createItem(item));
       }
@@ -88,13 +93,14 @@ class WzMenuOverview extends Component {
 
   createItem = (item, data = {}) => {
     // NOTE: Duplicate `name` values will cause `id` collisions.
-    const currentTab = (((store || {}).getState() || {}).appStateReducers || {}).currentTab;
+    const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
+      .currentTab;
     return {
       ...data,
       id: item.id,
       name: item.text,
       isSelected: currentTab === item.id,
-      onClick: () => this.clickMenuItem(item.id),
+      onClick: () => this.clickMenuItem(item.id)
     };
   };
 
@@ -103,12 +109,11 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.securityInformation, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(
-          [
-            this.overviewSections.general,
-            this.overviewSections.fim,
-            this.overviewSections.aws
-          ])
+        items: this.createItems([
+          this.overviewSections.general,
+          this.overviewSections.fim,
+          this.overviewSections.aws
+        ])
       })
     ];
 
@@ -116,13 +121,12 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.auditing, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(
-          [
-            this.overviewSections.pm,
-            this.overviewSections.audit,
-            this.overviewSections.oscap,
-            this.overviewSections.ciscat,
-          ]),
+        items: this.createItems([
+          this.overviewSections.pm,
+          this.overviewSections.audit,
+          this.overviewSections.oscap,
+          this.overviewSections.ciscat
+        ])
       })
     ];
 
@@ -130,30 +134,27 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.threatDetection, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems(
-          [
-            this.overviewSections.vuls,
-            this.overviewSections.virustotal,
-            this.overviewSections.osquery,
-            this.overviewSections.docker,
-            this.overviewSections.mitre
-          ]),
+        items: this.createItems([
+          this.overviewSections.vuls,
+          this.overviewSections.virustotal,
+          this.overviewSections.osquery,
+          this.overviewSections.docker,
+          this.overviewSections.mitre
+        ])
       })
     ];
-
 
     const regulatoryCompliance = [
       this.createItem(this.overviewSections.regulatoryCompliance, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems(
-          [
-            this.overviewSections.pci,
-            this.overviewSections.gdpr,
-            this.overviewSections.hipaa,
-            this.overviewSections.nist,
-            this.overviewSections.tsc,
-          ]),
+        items: this.createItems([
+          this.overviewSections.pci,
+          this.overviewSections.gdpr,
+          this.overviewSections.hipaa,
+          this.overviewSections.nist,
+          this.overviewSections.tsc
+        ])
       })
     ];
 
@@ -167,10 +168,7 @@ class WzMenuOverview extends Component {
             />
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiSideNav
-              items={auditing}
-              style={{ padding: '4px 12px' }}
-            />
+            <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiSideNav
@@ -190,11 +188,13 @@ class WzMenuOverview extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers
   };
 };
 
-
-export default connect(mapStateToProps, null)(WzMenuOverview);
+export default connect(
+  mapStateToProps,
+  null
+)(WzMenuOverview);

@@ -14,11 +14,11 @@ import chrome from 'ui/chrome';
 import { AppState } from './app-state';
 
 export class WzRequest {
-    /**
+  /**
    * Permorn a generic request
-   * @param {String} method 
-   * @param {String} path 
-   * @param {Object} payload 
+   * @param {String} method
+   * @param {String} path
+   * @param {Object} payload
    */
   static async genericReq(method, path, payload = null) {
     try {
@@ -38,10 +38,10 @@ export class WzRequest {
         throw new Error(data.error);
       }
       return Promise.resolve(data);
-    } catch(err){
-      return ((err || {}).message) || false
-      ? Promise.reject(err.message)
-      : Promise.reject(err || 'Server did not respond');
+    } catch (err) {
+      return (err || {}).message || false
+        ? Promise.reject(err.message)
+        : Promise.reject(err || 'Server did not respond');
     }
   }
 
@@ -69,10 +69,10 @@ export class WzRequest {
 
   /**
    * Perform a request to generate a CSV
-   * @param {String} path 
-   * @param {Object} filters 
+   * @param {String} path
+   * @param {Object} filters
    */
-  static async csvReq(path, filters){
+  static async csvReq(path, filters) {
     try {
       if (!path || !filters) {
         throw new Error('Missing parameters');

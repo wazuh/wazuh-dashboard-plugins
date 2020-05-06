@@ -25,9 +25,7 @@ import {
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 
-import {
-  updateManagementSection,
-} from '../../../redux/actions/managementActions';
+import { updateManagementSection } from '../../../redux/actions/managementActions';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { connect } from 'react-redux';
 
@@ -39,10 +37,7 @@ class WelcomeScreen extends Component {
   }
 
   setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', },
-    ];
+    const breadcrumb = [{ text: '' }, { text: 'Management' }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
@@ -67,8 +62,14 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="indexRollupApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon
+                          size="xl"
+                          type="indexRollupApp"
+                          color="primary"
+                        />
+                      }
                       title="Rules"
                       onClick={() => this.switchSection('rules')}
                       description="Manage your Wazuh cluster rules."
@@ -77,8 +78,14 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="indexRollupApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon
+                          size="xl"
+                          type="indexRollupApp"
+                          color="primary"
+                        />
+                      }
                       title="Decoders"
                       onClick={() => this.switchSection('decoders')}
                       description="Manage your Wazuh cluster decoders."
@@ -89,8 +96,14 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="indexRollupApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon
+                          size="xl"
+                          type="indexRollupApp"
+                          color="primary"
+                        />
+                      }
                       title="CDB lists"
                       onClick={() => this.switchSection('lists')}
                       description="Manage your Wazuh cluster CDB lists."
@@ -99,8 +112,14 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="usersRolesApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon
+                          size="xl"
+                          type="usersRolesApp"
+                          color="primary"
+                        />
+                      }
                       title="Groups"
                       onClick={() => this.switchSection('groups')}
                       description="Manage your agent groups."
@@ -111,8 +130,10 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon size="xl" type="devToolsApp" color="primary" />
+                      }
                       title="Configuration"
                       onClick={() => this.switchSection('configuration')}
                       description="Manage your Wazuh cluster configuration."
@@ -129,8 +150,10 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="uptimeApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon size="xl" type="uptimeApp" color="primary" />
+                      }
                       title="Status"
                       onClick={() => this.switchSection('status')}
                       description="Manage your Wazuh cluster status."
@@ -139,8 +162,14 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="indexPatternApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon
+                          size="xl"
+                          type="indexPatternApp"
+                          color="primary"
+                        />
+                      }
                       title="Cluster"
                       onClick={() => this.switchSection('monitoring')}
                       description="Visualize your Wazuh cluster."
@@ -151,8 +180,10 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="filebeatApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon size="xl" type="filebeatApp" color="primary" />
+                      }
                       title="Logs"
                       onClick={() => this.switchSection('logs')}
                       description="Logs from your Wazuh cluster."
@@ -161,8 +192,14 @@ class WelcomeScreen extends Component {
                   <EuiFlexItem>
                     <EuiCard
                       layout="horizontal"
-                      className='homSynopsis__card'
-                      icon={<EuiIcon size="xl" type="reportingApp" color='primary' />}
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon
+                          size="xl"
+                          type="reportingApp"
+                          color="primary"
+                        />
+                      }
                       title="Reporting"
                       onClick={() => this.switchSection('reporting')}
                       description="Check your stored Wazuh reports."
@@ -182,10 +219,14 @@ WelcomeScreen.propTypes = {
   switchTab: PropTypes.func
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateManagementSection: section => dispatch(updateManagementSection(section)),
-  }
+    updateManagementSection: section =>
+      dispatch(updateManagementSection(section))
+  };
 };
 
-export default connect(null, mapDispatchToProps)(WelcomeScreen);
+export default connect(
+  null,
+  mapDispatchToProps
+)(WelcomeScreen);

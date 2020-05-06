@@ -33,7 +33,7 @@ export class WelcomeScreen extends Component {
     super(props);
 
     this.state = {
-      extensions: this.props.extensions,
+      extensions: this.props.extensions
     };
   }
 
@@ -109,8 +109,8 @@ export class WelcomeScreen extends Component {
                             <EuiCallOut
                               title={
                                 <p>
-                                  Click the <EuiIcon type="eye" /> icon to show thread detection and
-                                  response extensions.
+                                  Click the <EuiIcon type="eye" /> icon to show
+                                  thread detection and response extensions.
                                 </p>
                               }
                               color="success"
@@ -123,7 +123,8 @@ export class WelcomeScreen extends Component {
                       {!(
                         UnsupportedComponents[this.props.agent.agentPlatform] ||
                         UnsupportedComponents['other']
-                      ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
+                      ).includes('vuls') &&
+                        this.buildTabCard('vuls', 'securityApp')}
                       {this.props.extensions.virustotal &&
                         this.buildTabCard('virustotal', 'savedObjectsApp')}
                       {this.props.extensions.osquery &&
@@ -131,7 +132,8 @@ export class WelcomeScreen extends Component {
                       {this.props.extensions.docker &&
                         this.buildTabCard('docker', 'logoDocker')}
                       {this.props.extensions.mitre &&
-                        this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
+                        this.buildTabCard('mitre', 'spacesApp')}{' '}
+                      {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
                   </EuiPanel>
                 </EuiFlexItem>
@@ -164,19 +166,19 @@ export class WelcomeScreen extends Component {
                       this.props.extensions.hipaa ||
                       this.props.extensions.tsc ||
                       this.props.extensions.nist) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.tsc &&
-                            this.buildTabCard('tsc', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                        </EuiFlexGrid>
-                      )}
+                      <EuiFlexGrid columns={2}>
+                        {this.props.extensions.pci &&
+                          this.buildTabCard('pci', 'visTagCloud')}
+                        {this.props.extensions.nist &&
+                          this.buildTabCard('nist', 'apmApp')}
+                        {this.props.extensions.tsc &&
+                          this.buildTabCard('tsc', 'apmApp')}
+                        {this.props.extensions.gdpr &&
+                          this.buildTabCard('gdpr', 'visBarVertical')}
+                        {this.props.extensions.hipaa &&
+                          this.buildTabCard('hipaa', 'emsApp')}
+                      </EuiFlexGrid>
+                    )}
                   </EuiPanel>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -187,8 +189,11 @@ export class WelcomeScreen extends Component {
           <EuiFlexGroup justifyContent="spaceAround">
             <EuiFlexItem grow={false}>
               <EuiButton
-                onClick={() => window.location.href = "#/settings?tab=modules"}
-                iconType="eye">
+                onClick={() =>
+                  (window.location.href = '#/settings?tab=modules')
+                }
+                iconType="eye"
+              >
                 Configure the modules
               </EuiButton>
             </EuiFlexItem>

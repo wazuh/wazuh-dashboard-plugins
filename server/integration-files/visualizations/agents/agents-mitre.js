@@ -21,10 +21,10 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}'
+      }
     },
-    _type: 'visualization',
+    _type: 'visualization'
   },
   {
     _id: 'Wazuh-App-Agents-MITRE-Alerts-Evolution',
@@ -37,10 +37,10 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}'
+      }
     },
-    _type: 'visualization',
+    _type: 'visualization'
   },
   {
     _id: 'Wazuh-App-Agents-MITRE-Attacks-By-Agent',
@@ -53,10 +53,10 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}'
+      }
     },
-    _type: 'visualization',
+    _type: 'visualization'
   },
   {
     _id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
@@ -69,10 +69,10 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}'
+      }
     },
-    _type: 'visualization',
+    _type: 'visualization'
   },
   {
     _id: 'Wazuh-App-Agents-MITRE-Level-By-Attack',
@@ -85,10 +85,10 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}'
+      }
     },
-    _type: 'visualization',
+    _type: 'visualization'
   },
   {
     _id: 'Wazuh-App-Agents-MITRE-Attacks-By-Tactic',
@@ -101,10 +101,10 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}'
+      }
     },
-    _type: 'visualization',
+    _type: 'visualization'
   },
   {
     _id: 'Wazuh-App-Agents-MITRE-Top-Tactics',
@@ -117,10 +117,9 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}'
+      }
     },
-    _type: 'visualization',
-  },
-
+    _type: 'visualization'
+  }
 ];

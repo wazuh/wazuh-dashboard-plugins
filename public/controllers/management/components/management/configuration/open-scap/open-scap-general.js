@@ -1,17 +1,17 @@
 /*
-* Wazuh app - React component for show configuration of OpenSCAP - general tab.
-* Copyright (C) 2015-2020 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - React component for show configuration of OpenSCAP - general tab.
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 
-import React, { Component, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -20,33 +20,44 @@ import helpLinks from './help-links';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 
 const mainSettings = [
-  {field: 'disabled', label: 'OpenSCAP integration status', render: renderValueNoThenEnabled },
-  {field: 'timeout', label: 'Timeout (in seconds) for scan executions' },
-  {field: 'interval', label: 'Interval between scan executions' },
-  {field: 'scan-on-start', label: 'Scan on start' }
+  {
+    field: 'disabled',
+    label: 'OpenSCAP integration status',
+    render: renderValueNoThenEnabled
+  },
+  { field: 'timeout', label: 'Timeout (in seconds) for scan executions' },
+  { field: 'interval', label: 'Interval between scan executions' },
+  { field: 'scan-on-start', label: 'Scan on start' }
 ];
 
-class WzConfigurationOpenSCAPGeneral extends Component{
-  constructor(props){
+class WzConfigurationOpenSCAPGeneral extends Component {
+  constructor(props) {
     super(props);
   }
-  render(){
+  render() {
     const { currentConfig, wodleConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>
-        )}
-        {currentConfig && !wodleConfig['open-scap'] && !isString(currentConfig['wmodules-wmodules']) && (
-          <WzNoConfig error='not-present' help={helpLinks}/>
-        )}
+        {currentConfig['wmodules-wmodules'] &&
+          isString(currentConfig['wmodules-wmodules']) && (
+            <WzNoConfig
+              error={currentConfig['wmodules-wmodules']}
+              help={helpLinks}
+            />
+          )}
+        {currentConfig &&
+          !wodleConfig['open-scap'] &&
+          !isString(currentConfig['wmodules-wmodules']) && (
+            <WzNoConfig error="not-present" help={helpLinks} />
+          )}
         {wodleConfig['open-scap'] && (
           <WzConfigurationSettingsTabSelector
-            title='Main settings'
-            description='These settings apply to all OpenSCAP evaluations'
+            title="Main settings"
+            description="These settings apply to all OpenSCAP evaluations"
             currentConfig={wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 340 : 410}
-            helpLinks={helpLinks}>
+            helpLinks={helpLinks}
+          >
             <WzConfigurationSettingsGroup
               config={wodleConfig['open-scap']}
               items={mainSettings}
@@ -54,7 +65,7 @@ class WzConfigurationOpenSCAPGeneral extends Component{
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
-    )
+    );
   }
 }
 
