@@ -641,6 +641,45 @@ export const visualizations = {
       }
     ]
   },
+  mitre: {
+    rows: [
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Alerts evolution over time',
+            id: 'Wazuh-App-Overview-MITRE-Alerts-Evolution',
+            width: 75
+          },
+          {
+            title: 'Top tactics',
+            id: 'Wazuh-App-Overview-MITRE-Top-Tactics',
+            width: 25
+          }
+        ]
+      },
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Attacks by tactic',
+            id: 'Wazuh-App-Overview-MITRE-Attacks-By-Tactic',
+            width: 33
+          },
+          {
+            title: 'Top tactics by agent',
+            id: 'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent',
+            width: 34
+          },
+          {
+            title: 'Mitre tactics by agent',
+            id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
+            width: 33
+          }
+        ]
+      },
+    ]
+  },
   docker: {
     rows: [
       {
