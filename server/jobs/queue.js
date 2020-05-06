@@ -25,7 +25,12 @@ export class Queue {
   static async run(job) {
     try {
       if (job.type === 'request') {
-        await needle(job.method, job.fullUrl, job.data, job.options);
+        await this.apiInterceptor.request(
+          job.method,
+          job.fullUrl,
+          job.data,
+          job.options
+        );
       }
     } catch (error) {
       return Promise.reject(error);
