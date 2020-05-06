@@ -224,14 +224,12 @@ class WzMenu extends Component {
         return item.id === apiId;
       });
 
-      if (!apiData[0].cluster_info) {
-        //if apis have been modified we have to refresh the wazuhregistry
-        this.updateClusterInfoInRegistry(apiId, clusterInfo);
-        apiData[0].cluster_info = clusterInfo;
-      }
+      this.updateClusterInfoInRegistry(apiId, clusterInfo);
+      apiData[0].cluster_info = clusterInfo;
 
+      AppState.setClusterInfo(apiData[0].cluster_info);
       AppState.setCurrentAPI(
-        JSON.stringify({ name: apiData[0].cluster_info.manager, id: apiId })
+        JSON.stringify({ name: apiData[0].manager, id: apiId })
       );
       this.switchMenuOpened();
       if (this.state.currentMenuTab !== 'wazuh-dev') {
