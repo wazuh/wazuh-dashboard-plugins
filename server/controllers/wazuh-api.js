@@ -11,7 +11,6 @@
  */
 
 // Require some libraries
-import needle from 'needle';
 import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
@@ -1167,12 +1166,15 @@ export class WazuhApiCtrl {
 
       const config = await this.manageHosts.getHostById(req.params.api);
 
-      const headers = ApiHelper.buildOptionsObject(config);
+      const distinctUrl = `${config.url}:${config.port}/v4/overview​/agents`;
 
-      const distinctUrl = `${config.url}:${config.port}/summary/agents`;
-
-      const data = await needle('get', distinctUrl, {}, headers);
-      const response = ((data || {}).body || {}).data || {};
+      const data = await this.apiInterceptor.request(
+        'get',
+        distinctUrl,
+        {},
+        { idHost: req.payload.id }
+      );
+      const response = (data || {}).data || {};
 
       const nodes = response.nodes;
       const groups = response.groups;
