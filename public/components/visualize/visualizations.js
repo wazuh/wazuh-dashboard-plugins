@@ -215,7 +215,7 @@ export const visualizations = {
         height: 250,
         vis: [
           {
-            title: 'TODO GCP Events over time by auth answer',
+            title: 'Events over time by auth answer',
             id: 'Wazuh-App-Overview-GCP-Alerts-Evolution-By-AuthAnswer',
             width: 100
           }
@@ -225,12 +225,12 @@ export const visualizations = {
         height: 250,
         vis: [
           {
-            title: 'TODO VMinstances by response code',
+            title: 'VMinstances by response code',
             id: 'Wazuh-App-Overview-GCP-Top-vmInstances-By-ResponseCode',
             width: 25
           },
           {
-            title: 'TODO Resource type by project id',
+            title: 'Resource type by project id',
             id: 'Wazuh-App-Overview-GCP-Top-ResourceType-By-Project-Id',
             width: 50
           },

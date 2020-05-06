@@ -137,7 +137,7 @@ export class CommonData {
         hipaa: { group: 'hipaa' },
         nist: { group: 'nist' },
         aws: { group: 'amazon' },
-        gcp: { group: 'gcp' }, // TODO gcp
+        gcp: { group: 'gcp' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },

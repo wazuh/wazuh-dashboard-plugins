@@ -146,9 +146,49 @@ export const agentVisualizations = {
         height: 300,
         vis: [
           {
-            title: 'TODO GCP',
+            title: 'Top 5 rules',
             id: 'Wazuh-App-Agents-GCP-Top-5-rules',
-            width: 50
+            width: 34
+          },
+          {
+            title: 'Top query events',
+            id: 'Wazuh-App-Agents-GCP-Event-Query-Name',
+            width: 33
+          },
+          {
+            title: 'Top 5 VM instances',
+            id: 'Wazuh-App-Agents-GCP-Top-5-vminstances',
+            width: 33
+          },
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'GCP alerts evolution',
+            id: 'Wazuh-App-Agents-GCP-Events-Over-Time',
+            width: 75
+          },
+          {
+            title: 'Top 5 resource type',
+            id: 'Wazuh-App-Agents-GCP-Top-5-resource-type',
+            width: 25
+          },
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Auth answer count',
+            id: 'Wazuh-App-Agents-GCP-authAnswer-Bar',
+            width: 75
+          },
+          {
+            title: 'Top tag severities',
+            id: 'Wazuh-App-Agents-GCP-Tag-Severities',
+            width: 25
           },
         ]
       },
