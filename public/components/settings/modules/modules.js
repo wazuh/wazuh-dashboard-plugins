@@ -45,8 +45,8 @@ export default class EnableModules extends Component {
             { name: 'vuls', default: true, agent: false },
             { name: 'virustotal', default: false, agent: false },
             { name: 'osquery', default: false, agent: false },
-            { name: 'docker', default: false, agent: false }
-            /*             { name: 'mitre', default: false, agent: false } */
+            { name: 'docker', default: false, agent: false },
+            { name: 'mitre', default: false, agent: false },
           ]
         },
         {
