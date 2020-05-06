@@ -296,7 +296,10 @@ class WzModuleGuide extends Component {
               ))}
               <EuiFlexGroup justifyContent='flexEnd'>
                 <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty iconType='refresh' onClick={() => this.resetStep(key)}>Reset step</EuiButtonEmpty>
+                  <EuiButtonEmpty iconType='refresh' onClick={() => {
+                    this.toggleResetGuideModal();
+                    this.setState({keyStep: key})
+                  }}>Reset step</EuiButtonEmpty>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </Fragment>
@@ -463,7 +466,6 @@ class WzModuleGuide extends Component {
             </EuiFlexGroup>
           </Fragment>
         )}
-        {/* <EuiSpacer size='m' /> */}
       </Fragment>
     )
   }
@@ -699,7 +701,7 @@ class WzModuleGuide extends Component {
   }
   render() {
     const { guide } = this;
-    const { modalRestart, agentTypeSelected, agentOSSelected } = this.state;
+    const { modalRestart, keyStep, agentTypeSelected, agentOSSelected } = this.state;
     return (
       <div>
         <EuiFlexGroup alignItems='center'>
@@ -798,7 +800,10 @@ class WzModuleGuide extends Component {
                 <EuiFlexItem grow={false}>
                   <EuiFlexGroup justifyContent='flexEnd'>
                     <EuiFlexItem>
-                      <EuiButtonEmpty iconType='refresh' onClick={() => this.toggleResetGuideModal()}>Reset guide</EuiButtonEmpty>
+                      <EuiButtonEmpty iconType='refresh' onClick={() => {
+                        this.toggleResetGuideModal();
+                        this.setState({keyStep: 'all'});
+                      }}>Reset guide</EuiButtonEmpty>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlexItem>
@@ -844,9 +849,9 @@ class WzModuleGuide extends Component {
         {modalRestart !== false && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title="Do you want to reset the guide?"
+              title={keyStep === 'all' ? 'Do you want to reset the guide?' : `Reset ${this.state.steps[keyStep].title}`}
               onCancel={this.toggleResetGuideModal}
-              onConfirm={this.resetGuideWithNotification}
+              onConfirm={() => keyStep === 'all' ? this.resetGuide() : this.resetStep(keyStep)}
               cancelButtonText="No, don't do it"
               confirmButtonText="Yes, do it"
               defaultFocusedButton="confirm">
