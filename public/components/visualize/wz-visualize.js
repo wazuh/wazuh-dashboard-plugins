@@ -27,6 +27,7 @@ import AlertsStats from '../../controllers/overview/components/alerts-stats';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
+import { CommonData } from '../../services/common-data';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -46,6 +47,7 @@ export class WzVisualize extends Component {
     this.metricValues = false;
     this.wzReq = WzRequest;
     const wazuhConfig = new WazuhConfig();
+    this.commonData = new CommonData();
     const configuration = wazuhConfig.getConfig();
     this.monitoringEnabled = !!(configuration || {})[
       'wazuh.monitoring.enabled'
@@ -54,6 +56,42 @@ export class WzVisualize extends Component {
 
   async componentDidMount() {
     this.agentsStatus = false;
+    const { selectedTab } = this.state;
+    if (selectedTab === 'pci') {
+      this.setState({
+        cardReqs: {
+          items: await this.commonData.getPCI(),
+          reqTitle: 'PCI DSS Requirement'
+        }
+      });
+    }
+    if (selectedTab === 'gdpr') {
+      this.setState({
+        cardReqs: {
+          items: await this.commonData.getGDPR(),
+          reqTitle: 'GDPR Requirement'
+        }
+      });
+    }
+
+    if (selectedTab === 'hipaa') {
+      this.setState({
+        cardReqs: {
+          items: await this.commonData.getHIPAA(),
+          reqTitle: 'HIPAA Requirement'
+        }
+      });
+    }
+
+    if (selectedTab === 'nist') {
+      this.setState({
+        cardReqs: {
+          items: await this.commonData.getNIST(),
+          reqTitle: 'NIST 800-53 Requirement'
+        }
+      });
+    }
+
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
       const result = ((data || {}).data || {}).data || false;
@@ -96,14 +134,6 @@ export class WzVisualize extends Component {
           this.props.selectedTab !== 'welcome'
             ? this.getMetricItems(this.props.selectedTab)
             : []
-      });
-    }
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.cardReqs) {
-      this.setState({
-        cardReqs: nextProps.cardReqs
       });
     }
   }

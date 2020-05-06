@@ -12,6 +12,7 @@
 import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
 import { ShareAgent } from '../factories/share-agent';
+import { ModulesHelper } from '../components/common/modules/modules-helper';
 
 export class CommonData {
   /**
@@ -121,7 +122,7 @@ export class CommonData {
    * @param {*} localChange
    * @param {*} agent
    */
-  af(filterHandler, tab, agent) {
+  async af(filterHandler, tab, agent = false) {
     try {
       const tabFilters = {
         general: { group: '' },
@@ -179,12 +180,8 @@ export class CommonData {
         }
       }
       if (agent) filters.push(filterHandler.agentQuery(agent));
-      this.$rootScope.$emit('wzEventFilters', { filters, tab });
-      if (!this.$rootScope.$$listenerCount['wzEventFilters']) {
-        this.$timeout(100).then(() =>
-          this.af(filterHandler, tab, (agent = false))
-        );
-      }
+      const discoverScope = await ModulesHelper.getDiscoverScope();
+      discoverScope.loadFilters(filters, tab);
     } catch (error) {
       this.errorHandler.handle(
         'An error occurred while creating custom filters for visualizations',

@@ -90,7 +90,7 @@ class WzConfigurationClient extends Component {
               title="Main settings"
               description="Basic manager-agent communication settings"
               currentConfig={currentConfig}
-              minusHeight={350}
+              minusHeight={355}
               helpLinks={helpLinks}
             >
               <WzConfigurationSettingsGroup

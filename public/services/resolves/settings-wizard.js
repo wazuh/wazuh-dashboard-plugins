@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { checkTimestamp } from './check-timestamp';
+
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -100,7 +100,7 @@ export function settingsWizard(
       AppState.setClusterInfo(clusterInfo);
     };
 
-    const callCheckStored = () => {
+    const callCheckStored = async () => {
       const config = wazuhConfig.getConfig();
       let currentApi = false;
 
@@ -112,7 +112,8 @@ export function settingsWizard(
           error
         );
       }
-      if (currentApi && !AppState.getExtensions(currentApi)) {
+      const extensions = await AppState.getExtensions(currentApi);
+      if (currentApi && !extensions) {
         const extensions = {
           audit: config['extensions.audit'],
           pci: config['extensions.pci'],
@@ -130,42 +131,7 @@ export function settingsWizard(
         };
         AppState.setExtensions(currentApi, extensions);
       }
-      checkTimestamp(genericReq, $location, wzMisc)
-        .then(() => ApiCheck.checkStored(currentApi))
-        .then(data => {
-          if (data === 3099) {
-            deferred.resolve();
-          } else {
-            if (data.data.error || data.data.data.apiIsDown) {
-              checkResponse(data);
-            } else {
-              if (((data || {}).data || {}).idChanged) {
-                let apiRaw = false;
-                try {
-                  apiRaw = JSON.parse(AppState.getCurrentAPI());
-                } catch (error) {
-                  // eslint-disable-next-line
-                  console.log(
-                    `Error parsing JSON (settingsWizards.callCheckStored 2)`
-                  );
-                }
-                AppState.setCurrentAPI(
-                  JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
-                );
-              }
-              wzMisc.setApiIsDown(false);
-              changeCurrentApi(data);
-              deferred.resolve();
-            }
-          }
-        })
-        .catch(error => {
-          AppState.removeCurrentAPI();
-          setUpCredentials(
-            'Wazuh App: Please set up Wazuh API credentials.',
-            false
-          );
-        });
+      deferred.resolve();
     };
 
     const setUpCredentials = (msg, redirect = false) => {

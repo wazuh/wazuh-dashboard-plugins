@@ -29,6 +29,7 @@ import {
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar';
 
 export class AgentsTable extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
     const selectedOptions = JSON.parse(
@@ -48,6 +49,41 @@ export class AgentsTable extends Component {
       totalItems: 0
     };
     this.downloadCsv.bind(this);
+  }
+
+  async componentDidMount() {
+    this._isMount = true;
+    await this.getItems();
+    const filterStatus = this.filterBarModelStatus();
+    const filterGroups = await this.filterBarModelGroups();
+    const filterOs = await this.filterBarModelOs();
+    const filterVersion = await this.filterBarModelWazuhVersion();
+    const filterOsPlatform = await this.filterBarModelOsPlatform();
+    const filterNodes = await this.filterBarModelNodes();
+    this._isMount &&
+      this.setState({
+        filterStatus,
+        filterGroups,
+        filterOs,
+        filterVersion,
+        filterOsPlatform,
+        filterNodes
+      });
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.state.isProcessing) {
+      const { q, search } = this.state;
+      const { q: prevQ, search: prevSearch } = prevState;
+      if (prevQ !== q || prevSearch !== search) {
+        this._isMount && this.setState({ pageIndex: 0 });
+      }
+      await this.getItems();
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -77,41 +113,13 @@ export class AgentsTable extends Component {
     });
   };
 
-  async componentDidMount() {
-    await this.getItems();
-    const filterStatus = this.filterBarModelStatus();
-    const filterGroups = await this.filterBarModelGroups();
-    const filterOs = await this.filterBarModelOs();
-    const filterVersion = await this.filterBarModelWazuhVersion();
-    const filterOsPlatform = await this.filterBarModelOsPlatform();
-    const filterNodes = await this.filterBarModelNodes();
-    this.setState({
-      filterStatus,
-      filterGroups,
-      filterOs,
-      filterVersion,
-      filterOsPlatform,
-      filterNodes
-    });
-  }
-
   async reloadAgents() {
-    this.setState({
-      isProcessing: true,
-      isLoading: true
-    });
+    this._isMount &&
+      this.setState({
+        isProcessing: true,
+        isLoading: true
+      });
     await this.props.reload();
-  }
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (this.state.isProcessing) {
-      const { q, search } = this.state;
-      const { q: prevQ, search: prevSearch } = prevState;
-      if (prevQ !== q || prevSearch !== search) {
-        this.setState({ pageIndex: 0 });
-      }
-      await this.getItems();
-    }
   }
 
   async getItems() {
@@ -124,19 +132,20 @@ export class AgentsTable extends Component {
     const formatedAgents = (
       ((rawAgents || {}).data || {}).data || {}
     ).items.map(this.formatAgent.bind(this));
-    this.setState({
-      agents: formatedAgents,
-      totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
-      isProcessing: false,
-      isLoading: false
-    });
+    this._isMount &&
+      this.setState({
+        agents: formatedAgents,
+        totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
+        isProcessing: false,
+        isLoading: false
+      });
   }
 
   buildFilter() {
     const { pageIndex, pageSize, search } = this.state;
 
     const filter = {
-      offset: pageIndex * pageSize,
+      offset: (pageIndex * pageSize) || 0,
       limit: pageSize,
       q: this.buildQFilter(),
       sort: this.buildSortFilter()
@@ -190,7 +199,7 @@ export class AgentsTable extends Component {
     return (
       <div>
         <EuiToolTip
-          content="Open Discover panel for this agent"
+          content="Open Overview panel for this agent"
           position="left"
         >
           <EuiButtonIcon
@@ -198,17 +207,19 @@ export class AgentsTable extends Component {
               ev.stopPropagation();
               this.props.clickAction(agent, 'discover');
             }}
-            iconType="discoverApp"
-            aria-label="Open Discover panel for this agent"
+            iconType="eye"
+            color={'primary'}
+            aria-label="Open Overview panel for this agent"
           />
         </EuiToolTip>
+        &nbsp;
         <EuiToolTip content="Open configuration for this agent" position="left">
           <EuiButtonIcon
             onClick={ev => {
               ev.stopPropagation();
               this.props.clickAction(agent, 'configuration');
             }}
-            color={'text'}
+            color={'primary'}
             iconType="wrench"
             aria-label="Open configuration for this agent"
           />
@@ -257,6 +268,7 @@ export class AgentsTable extends Component {
     }
     const os_name =
       checkField(((agent || {}).os || {}).name) +
+      ' ' +
       checkField(((agent || {}).os || {}).version);
 
     return (
@@ -629,12 +641,12 @@ export class AgentsTable extends Component {
           <EuiBasicTable
             items={agents}
             columns={columns}
-            pagination={pagination}
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
             rowProps={getRowProps}
             noItemsMessage="No agents found"
+            {...(pagination && { pagination })}
           />
         </EuiFlexItem>
       </EuiFlexGroup>

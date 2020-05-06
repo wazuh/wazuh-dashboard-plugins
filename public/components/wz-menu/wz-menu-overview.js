@@ -21,9 +21,8 @@ class WzMenuOverview extends Component {
   constructor(props) {
     super(props);
     this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = AppState.getExtensions(this.currentApi);
     this.state = {
-      extensions
+      extensions: []
     };
 
     this.overviewSections = {
@@ -66,7 +65,10 @@ class WzMenuOverview extends Component {
     // You don't have to do this check first, but it can help prevent an unneeded render
   }
 
-  componentDidMount() {}
+  async componentDidMount() {
+    const extensions = await AppState.getExtensions(this.currentApi);
+    this.setState({ extensions });
+  }
 
   clickMenuItem = section => {
     this.props.closePopover();
@@ -84,7 +86,7 @@ class WzMenuOverview extends Component {
     const keyExists = key => Object.keys(this.state.extensions).includes(key);
     const keyIsTrue = key => (this.state.extensions || [])[key];
     items.forEach(item => {
-      if (!keyExists(item.id) || keyIsTrue(item.id)) {
+      if (Object.keys(this.state.extensions).length && (!keyExists(item.id) || keyIsTrue(item.id))) {
         result.push(this.createItem(item));
       }
     });
@@ -160,7 +162,8 @@ class WzMenuOverview extends Component {
 
     return (
       <div className="WzManagementSideMenu">
-        <EuiFlexGrid columns={2}>
+        {Object.keys(this.state.extensions).length && (
+          <EuiFlexGrid columns={2}>
           <EuiFlexItem>
             <EuiSideNav
               items={securityInformation}
@@ -183,6 +186,8 @@ class WzMenuOverview extends Component {
             />
           </EuiFlexItem>
         </EuiFlexGrid>
+        ) || (<div style={{width: 300}}></div>
+          )}
       </div>
     );
   }

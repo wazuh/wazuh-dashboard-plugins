@@ -90,15 +90,19 @@ app.config([
   }
 ]);
 
-app.run(function() {
-  chrome
-    .setRootTemplate(
-      `
+app.run([
+  '$injector',
+  function(_$injector) {
+    chrome
+      .setRootTemplate(
+        `
     <react-component name="WzMenuWrapper" props="" />
     <div class="wazuhNotReadyYet"></div>
     <div ng-view class="mainView"></div>
   `
-    )
-    .setRootController(() => require('./app'));
-  changeWazuhNavLogo();
-});
+      )
+      .setRootController(() => require('./app'));
+    changeWazuhNavLogo();
+    app.$injector = _$injector;
+  }
+]);

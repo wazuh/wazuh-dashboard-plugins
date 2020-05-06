@@ -305,6 +305,23 @@ export class WazuhElasticCtrl {
   }
 
   /**
+   * This get the current space
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} current namespace
+   */
+  async getCurrentSpace(req, reply) {
+    try {
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      return { namespace };
+    } catch (err) {
+      log('wazuh-elastic:getCurrentSpace', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+  }
+
+  /**
    * This get the list of index-patterns
    * @param {Object} req
    * @param {Object} reply
@@ -685,18 +702,18 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * This returns de the alerts of an angent
+   * This returns the alerts of an agent
    * @param {*} req
    * POST /elastic/alerts
    * {
-   *   "agent.id": 100 ,
-   *   "cluster.name": "wazuh",
-   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
-   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
-   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
-   *   "size": 5 // Optional parameter
+   *   elasticQuery: {bool: {must: [], filter: [{match_all: {}}], should: [], must_not: []}}
+   *   filters: [{rule.groups: "syscheck"}, {agent.id: "001"} ]
+   *   from: "now-1y"
+   *   offset: 0
+   *   pattern: "wazuh-alerts-3.x-*"
+   *   sort: {timestamp: {order: "asc"}}
+   *   to: "now"
    * }
-   *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
    */
@@ -705,44 +722,37 @@ export class WazuhElasticCtrl {
       const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
-      const size = req.payload.size || 10;
+      const size = req.payload.size || 500;
+      const sort = req.payload.sort || { timestamp: { order: 'asc' } };
       const payload = Base(pattern, [], from, to);
 
-      payload.query = { bool: { must: [] } };
+      payload.query = req.payload.elasticQuery || { bool: { must: [] } }; // if an already formatted elastic query is received we use it as a base otherwise we create a simple elastic query
 
-      const agent = req.payload['agent.id'];
-      const manager = req.payload['manager.name'];
-      const cluster = req.payload['cluster.name'];
-      const rulegGroups = req.payload['rule.groups'];
-      if (agent)
-        payload.query.bool.must.push({
-          match: { 'agent.id': agent }
-        });
-      if (cluster)
-        payload.query.bool.must.push({
-          match: { 'cluster.name': cluster }
-        });
-      if (manager)
-        payload.query.bool.must.push({
-          match: { 'manager.name': manager }
-        });
-      if (rulegGroups)
-        payload.query.bool.must.push({
-          match: { 'rule.groups': rulegGroups }
-        });
+      const range = {
+        range: {
+          timestamp: {
+            gte: from,
+            lte: to,
+            format: 'epoch_millis'
+          }
+        }
+      };
 
+      payload.query.bool.must.push(range);
+
+      // add custom key:value filters to the elastic query
+      if (req.payload.filters) {
+        req.payload.filters.map(item => {
+          payload.query.bool.must.push({
+            match: item
+          });
+        });
+      }
+      payload.sort.push(sort);
       payload.size = size;
-      payload.docvalue_fields = [
-        'timestamp',
-        'cluster.name',
-        'manager.name',
-        'agent.id',
-        'rule.id',
-        'rule.group',
-        'rule.description'
-      ];
+      payload.from = req.payload.offset || 0;
       const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
-      return { alerts: data.hits.hits };
+      return { alerts: data.hits.hits, hits: data.hits.total.value };
     } catch (error) {
       log('wazuh-elastic:alerts', error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, reply);

@@ -11,14 +11,16 @@
  */
 
 import domtoimage from '../utils/dom-to-image';
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+const app = getAngularModule('app/wazuh');
 
 export class Vis2PNG {
   /**
    * Class constructor
    * @param {*} $rootScope
    */
-  constructor($rootScope) {
-    this.$rootScope = $rootScope;
+  constructor() {
+    this.$rootScope = app.$injector.get('$rootScope');
     this.rawArray = [];
     this.htmlObject = {};
     this.working = false;

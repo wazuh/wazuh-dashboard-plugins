@@ -18,10 +18,6 @@ export class ClusterTimelions extends Component {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
-  updateRootScope = () => {
-    return;
-  };
-
   render() {
     return (
       <WzReduxProvider>
@@ -60,7 +56,6 @@ export class ClusterTimelions extends Component {
                     <KibanaVis
                       visID={'Wazuh-App-Cluster-monitoring-Overview-Manager'}
                       tab={'monitoring'}
-                      updateRootScope={this.updateRootScope}
                     ></KibanaVis>
                   </WzReduxProvider>
                 </div>
@@ -99,7 +94,6 @@ export class ClusterTimelions extends Component {
                     <KibanaVis
                       visID={'Wazuh-App-Cluster-monitoring-Overview'}
                       tab={'monitoring'}
-                      updateRootScope={this.updateRootScope}
                     ></KibanaVis>
                   </WzReduxProvider>
                 </div>

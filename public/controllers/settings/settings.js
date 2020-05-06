@@ -16,8 +16,10 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzMisc } from '../../factories/misc';
 import { ApiCheck } from '../../react-services/wz-api-check';
+import { SavedObject } from '../../react-services/saved-objects';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
+import checkAdminMode from '../../controllers/management/components/management/status/utils/check-admin-mode';
 
 export class SettingsController {
   /**
@@ -59,6 +61,12 @@ export class SettingsController {
     try {
       const breadcrumb = [{ text: '' }, { text: 'App Settings' }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+      this.admin = await checkAdminMode();
+
+      const location = this.$location.search();
+      if (location && location.tab) {
+        this.tab = location.tab;
+      }
       // Set component props
       this.setComponentProps();
       // Loading data
@@ -67,12 +75,6 @@ export class SettingsController {
       //Checks if all the API entries are down
       this.apiIsDown =
         down >= this.apiEntries.length && this.apiEntries.length > 0;
-
-      const location = this.$location.search();
-      if (location && location.tab) {
-        this.tab = location.tab;
-        this.settingsTabsProps.selectedTab = this.tab;
-      }
 
       await this.getAppInfo();
     } catch (error) {
@@ -117,6 +119,15 @@ export class SettingsController {
       copyToClipBoard: msg => this.copyToClipBoard(msg)
     };
 
+    let tabs = [
+      { id: 'api', name: 'API' },
+      { id: 'configuration', name: 'Configuration' },
+      { id: 'logs', name: 'Logs' },
+      { id: 'about', name: 'About' }
+    ];
+    if (this.admin) {
+      tabs.splice(1, 0, { id: 'modules', name: 'Modules' });
+    }
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
@@ -125,13 +136,7 @@ export class SettingsController {
         }
       },
       selectedTab: this.tab || 'api',
-      tabs: [
-        { id: 'api', name: 'API' },
-        { id: 'modules', name: 'Modules' },
-        { id: 'configuration', name: 'Configuration' },
-        { id: 'logs', name: 'Logs' },
-        { id: 'about', name: 'About' }
-      ],
+      tabs,
       wazuhConfig: this.wazuhConfig
     };
 
@@ -221,7 +226,8 @@ export class SettingsController {
       this.errorHandler.info(`API ${manager} set as default`);
 
       this.getCurrentAPIIndex();
-      if (currentApi && !AppState.getExtensions(id)) {
+      const extensions = await AppState.getExtensions(id);
+      if (currentApi && !extensions) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
         AppState.setExtensions(id, extensions);
       }
@@ -236,13 +242,9 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      const patternList = await this.genericReq.request(
-        'GET',
-        '/elastic/index-patterns',
-        {}
-      );
+      const patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
 
-      this.indexPatterns = patternList.data.data;
+      this.indexPatterns = patternList;
 
       if (!this.indexPatterns.length) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
@@ -269,8 +271,8 @@ export class SettingsController {
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
         return;
       }
-
-      if (currentApi && !AppState.getExtensions(this.currentDefault)) {
+      const extensions = await AppState.getExtensions(this.currentDefault);
+      if (currentApi && !extensions) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
         const apiExtensions = extensions || {};
         AppState.setExtensions(id, apiExtensions);
@@ -335,6 +337,8 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      this.load = false;
+      this.$scope.$applyAsync();
       if (!silent) {
         this.errorHandler.handle(error);
       }

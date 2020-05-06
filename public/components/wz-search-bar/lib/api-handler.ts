@@ -62,6 +62,7 @@ export class ApiHandler extends BaseHandler {
     const rawSuggestions:string[] = typeof values === 'function'
       ? await values(value)
       : values;
+    //@ts-ignore
     const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
     const suggestions:suggestItem[] = [];
     

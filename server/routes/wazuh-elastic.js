@@ -17,6 +17,15 @@ export function WazuhElasticRouter(server) {
   // Get index patterns list
   server.route({
     method: 'GET',
+    path: '/elastic/current-space',
+    handler(req, res) {
+      return ctrl.getCurrentSpace(req, res);
+    }
+  });
+
+  // Get index patterns list
+  server.route({
+    method: 'GET',
     path: '/elastic/index-patterns',
     handler(req, res) {
       return ctrl.getlist(req, res);

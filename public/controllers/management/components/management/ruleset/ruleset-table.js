@@ -45,7 +45,8 @@ class WzRulesetTable extends Component {
       pageSize: 15,
       pageIndex: 0,
       totalItems: 0,
-      isLoading: false
+      isLoading: false,
+      isRedirect: false
     };
     this.paths = {
       rules: '/rules',
@@ -58,6 +59,25 @@ class WzRulesetTable extends Component {
   async componentDidMount() {
     this.props.updateIsProcessing(true);
     this._isMounted = true;
+    if (this.props.state.section === 'rules') {
+      const regex = new RegExp('redirectRule=' + '[^&]*');
+      const match = window.location.href.match(regex);
+      if (match && match[0]) {
+        this.setState({ isRedirect: true });
+        const id = match[0].split('=')[1];
+        const result = await WzRequest.apiReq('GET', `/rules/${id}`, {});
+        const items = ((result.data || {}).data || {}).items || [];
+        if (items.length) {
+          const info = await this.rulesetHandler.getRuleInformation(
+            items[0].file,
+            parseInt(id)
+          );
+          this.props.updateRuleInfo(info);
+          window.location.href = window.location.href.replace(regex, '');
+        }
+        this.setState({ isRedirect: false });
+      }
+    }
   }
 
   async componentDidUpdate(prevProps) {
@@ -172,7 +192,8 @@ class WzRulesetTable extends Component {
       pageIndex,
       sortField,
       sortDirection,
-      isLoading
+      isLoading,
+      isRedirect
     } = this.state;
     const columns = this.getColumns();
     const message = isLoading ? null : 'No results...';
@@ -236,7 +257,7 @@ class WzRulesetTable extends Component {
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}
-            loading={isLoading}
+            loading={isLoading || isRedirect}
             rowProps={
               (!this.props.state.showingFiles && getRowProps) || undefined
             }

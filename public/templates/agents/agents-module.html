@@ -1,0 +1,52 @@
+<div ng-if="tab !== 'welcome' && agent">
+    <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
+    <div ng-if='!loadingDashboard'>
+        <div ng-if='showModuleDashboard || showModuleEvents'>
+            <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
+                <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
+            </div>
+            <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+                <kbn-dis></kbn-dis>
+            </div>
+        </div>
+    </div>
+    <!-- Loading status section -->
+    <div ng-if="tabView === 'panels' && showModuleDashboard && !rendered && resultState !== 'none'"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <div class="euiSpacer euiSpacer--m"></div>
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{loadingStatus}}</div>
+        </div>
+    </div>
+    <!-- End loading status section -->
+    <!-- Report status section -->
+    <div ng-if="reportBusy && reportStatus && showModuleDashboard"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+            <div class="euiSpacer euiSpacer--m"></div>
+            <span class="euiLoadingChart euiLoadingChart--large">
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+                <span class="euiLoadingChart__bar"></span>
+            </span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="percentage">{{reportStatus}}</div>
+            <div class="euiSpacer euiSpacer--l"></div>
+        </div>
+    </div>
+    <!-- End report status section -->
+    <div ng-if="tab && tab!=='welcome'">
+        <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+            <react-component ng-show='showModuleDashboard' name="WzVisualize"
+                props="{selectedTab: tab, isAgent: true}" />
+        </div>
+    </div>
+</div>

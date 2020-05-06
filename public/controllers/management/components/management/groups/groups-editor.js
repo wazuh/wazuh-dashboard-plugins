@@ -177,7 +177,7 @@ class WzGroupsEditor extends Component {
                       {(isEditable && (
                         <EuiCodeEditor
                           width="100%"
-                          height="calc(100vh - 225px)"
+                          height="calc(100vh - 175px)"
                           value={content}
                           onChange={newContent =>
                             this.setState({ content: newContent })

@@ -98,12 +98,6 @@ export class WzConfigurationTable extends Component {
           'You must restart Kibana for the changes to take effect',
           3000
         );
-      } else if (response.needWait) {
-        this.showToast(
-          'warning',
-          'The configuration has been successfully updated, but it may take a few seconds for the change to take effect',
-          3000
-        );
       } else {
         this.showToast(
           'success',

@@ -23,25 +23,30 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
-import { ProgressChart } from '../../../components/d3/progress';
 import { AgentsTable } from './agents-table';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 
 export class AgentsPreview extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
     this.state = { data: [], loading: false };
   }
 
+  componentDidMount() {
+    this._isMount = true;
+    this.setGlobalBreadcrumb();
+    this.getSummary();
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
+  }
+
   setGlobalBreadcrumb() {
     const breadcrumb = [{ text: '' }, { text: 'Agents' }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
-  componentDidMount() {
-    this.setGlobalBreadcrumb();
-    this.getSummary();
   }
 
   groupBy = function(arr) {
@@ -54,7 +59,7 @@ export class AgentsPreview extends Component {
 
   async getSummary() {
     try {
-      this.setState({ loading: true });
+      this._isMount && this.setState({ loading: true });
       const summaryData = await this.props.tableProps.wzReq(
         'GET',
         '/agents/summary',
@@ -79,7 +84,7 @@ export class AgentsPreview extends Component {
           value: this.summary['Never connected'] || 0
         }
       ];
-      this.setState({ data: model });
+      this._isMount && this.setState({ data: model });
 
       this.agentsCoverity = this.totalAgents
         ? (((this.summary['Active'] || 1) - 1) / this.totalAgents) * 100
@@ -103,7 +108,8 @@ export class AgentsPreview extends Component {
       for (let [key, value] of Object.entries(this.platforms)) {
         platformsModel.push({ id: key, label: key, value: value });
       }
-      this.setState({ platforms: platformsModel, loading: false });
+      this._isMount &&
+        this.setState({ platforms: platformsModel, loading: false });
     } catch (error) {}
   }
 
@@ -183,7 +189,6 @@ export class AgentsPreview extends Component {
                                 title={`${this.agentsCoverity.toFixed(2)}%`}
                                 titleSize={'s'}
                                 description="Agents coverage"
-                                titleColor="text"
                                 style={{ whiteSpace: 'nowrap' }}
                               />
                             </EuiFlexItem>

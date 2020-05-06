@@ -12,18 +12,11 @@
 export function Base(pattern, filters, gte, lte) {
   return {
     pattern: pattern,
-    size: 0,
+    from: 0,
+    size: 500,
     aggs: {},
-    stored_fields: ['*'],
+    sort: [],
     script_fields: {},
-    docvalue_fields: [
-      'timestamp',
-      'data.vulnerability.published',
-      'data.vulnerability.updated',
-      'syscheck.mtime_after',
-      'syscheck.mtime_before',
-      'data.cis.timestamp'
-    ],
     query: {
       bool: {
         must: [

@@ -85,7 +85,7 @@ class WzConfigurationActiveResponseCommands extends Component {
             title="Command definitions"
             description="Find here all the currently defined commands used for Active response"
             currentConfig={currentConfig['analysis-command']}
-            minusHeight={340}
+            minusHeight={320}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsListSelector

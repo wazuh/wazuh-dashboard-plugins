@@ -132,6 +132,22 @@ export function WazuhApiRoutes(server) {
     }
   });
 
+  server.route({
+    method: 'POST',
+    path: '/api/extensions',
+    handler(req, res) {
+      return ctrl.setExtensions(req, res);
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/api/extensions/{id}',
+    handler(req, res) {
+      return ctrl.getExtensions(req, res);
+    }
+  });
+
   // Return Wazuh Appsetup info
   server.route({
     method: 'GET',

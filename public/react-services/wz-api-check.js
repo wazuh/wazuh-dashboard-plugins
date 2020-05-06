@@ -16,12 +16,15 @@ import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 
 export class ApiCheck {
-  static async checkStored(data) {
+  static async checkStored(data, idChanged = false) {
     try {
       const wazuhConfig = new WazuhConfig();
       const configuration = wazuhConfig.getConfig();
       const timeout = configuration ? configuration.timeout : 20000;
       const payload = { id: data };
+      if (idChanged) {
+        payload.idChanged = data;
+      }
 
       const url = chrome.addBasePath('/api/check-stored-api');
       const options = {

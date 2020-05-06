@@ -14,7 +14,7 @@ import { uiModules } from 'ui/modules';
 import { GroupsController } from './groups';
 import { ManagementController } from './management';
 import { ClusterController } from './monitoring';
-import { WelcomeWrapper } from './components/welcome-wrapper';
+import { ManagementWelcomeWrapper } from '../../components/common/welcome/management-welcome-wrapper';
 import WzManagement from './components/management/management-provider';
 import WzManagementConfiguration from './components/management/configuration/configuration-main';
 
@@ -24,6 +24,6 @@ app
   .controller('managementController', ManagementController)
   .controller('groupsPreviewController', GroupsController)
   .controller('clusterController', ClusterController)
-  .value('WelcomeWrapper', WelcomeWrapper)
+  .value('ManagementWelcomeWrapper', ManagementWelcomeWrapper)
   .value('WzManagement', WzManagement)
   .value('WzManagementConfiguration', WzManagementConfiguration);

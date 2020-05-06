@@ -14,55 +14,86 @@ import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import {
   updateCurrentApi,
-  updateShowMenu
+  updateShowMenu,
+  updateExtensions
 } from '../redux/actions/appStateActions';
+import { GenericRequest } from '../react-services/generic-request';
+import { WazuhConfig } from './wazuh-config';
 
 export class AppState {
+
+  static getCachedExtensions = (id) => {
+    const extensions = ((store.getState() || {}).appStateReducers || {}).extensions;
+    if(Object.keys(extensions).length && extensions[id]){
+      return extensions[id];
+    }
+    return false;
+  }
+
+
   /**
    * Returns if the extension 'id' is enabled
    * @param {id} id
    */
-  static getExtensions(id) {
+  static getExtensions = async id => {
     try {
-      const extensions = Cookies.get('currentExtensions')
-        ? decodeURI(Cookies.get('currentExtensions'))
-        : false;
-      const parsedExtensions = extensions ? JSON.parse(extensions) : false;
-      return parsedExtensions ? parsedExtensions[id] : false;
+      const cachedExtensions = this.getCachedExtensions(id);
+      if(cachedExtensions){
+        return cachedExtensions;
+      }else{
+        const data = await GenericRequest.request('GET', `/api/extensions/${id}`);
+
+        const extensions = data.data.extensions;
+        if (Object.keys(extensions).length) {
+          AppState.setExtensions(id, extensions);
+          return extensions;
+        } else {
+          const wazuhConfig = new WazuhConfig();
+          const config = wazuhConfig.getConfig();
+          const extensions = {
+            audit: config['extensions.audit'],
+            pci: config['extensions.pci'],
+            gdpr: config['extensions.gdpr'],
+            hipaa: config['extensions.hipaa'],
+            nist: config['extensions.nist'],
+            oscap: config['extensions.oscap'],
+            ciscat: config['extensions.ciscat'],
+            aws: config['extensions.aws'],
+            virustotal: config['extensions.virustotal'],
+            osquery: config['extensions.osquery'],
+            mitre: config['extensions.mitre'],
+            docker: config['extensions.docker']
+          };
+          AppState.setExtensions(id, extensions);
+          return extensions;
+        }
+      }
     } catch (err) {
       console.log('Error get extensions');
       console.log(err);
       throw err;
     }
-  }
+  };
 
   /**
    *  Sets a new value for the cookie 'currentExtensions' object
    * @param {*} id
    * @param {*} extensions
    */
-  static setExtensions(id, extensions) {
+  static setExtensions = async (id, extensions) => {
     try {
-      const decodedExtensions = Cookies.get('currentExtensions')
-        ? decodeURI(Cookies.get('currentExtensions'))
-        : false;
-      const current = decodedExtensions ? JSON.parse(decodedExtensions) : {};
-      current[id] = extensions;
-      const exp = new Date();
-      exp.setDate(exp.getDate() + 365);
-      if (extensions) {
-        const encodedExtensions = encodeURI(JSON.stringify(current));
-        Cookies.set('currentExtensions', encodedExtensions, {
-          expires: exp,
-          path: window.location.pathname
-        });
-      }
+      await GenericRequest.request('POST', '/api/extensions', {
+        id,
+        extensions
+      });
+      const updateExtension = updateExtensions(id,extensions);
+      store.dispatch(updateExtension);
     } catch (err) {
       console.log('Error set extensions');
       console.log(err);
       throw err;
     }
-  }
+  };
 
   /**
    * Cluster setters and getters

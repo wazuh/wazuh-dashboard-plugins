@@ -19,7 +19,6 @@ import {
   EuiButtonEmpty,
   EuiCallOut,
   EuiLoadingSpinner,
-  EuiToolTip,
   EuiFormRow
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
@@ -35,7 +34,7 @@ import { toastNotifications } from 'ui/notify';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import chrome from 'ui/chrome';
-import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumbWrapper';
+import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -58,6 +57,7 @@ class WzMenu extends Component {
     this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
     this.indexPatterns = npStart.plugins.data.indexPatterns;
+    this.isLoading = false;
   }
 
   async componentDidMount() {
@@ -152,15 +152,8 @@ class WzMenu extends Component {
       const list = await PatternHandler.getPatternList();
       if (!list) return;
 
-      // Get the configuration to check if pattern selector is enabled
-      const config = this.wazuhConfig.getConfig();
-      AppState.setPatternSelector(config['ip.selector']);
-
       // Abort if we have disabled the pattern selector
       if (!AppState.getPatternSelector()) return;
-
-      // Show the pattern selector
-      this.setState({ showSelector: true });
 
       let filtered = false;
       // If there is no current pattern, fetch it
@@ -189,6 +182,7 @@ class WzMenu extends Component {
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
     }
+    this.isLoading = false;
   }
 
   changePattern = event => {
@@ -239,6 +233,7 @@ class WzMenu extends Component {
       AppState.setCurrentAPI(
         JSON.stringify({ name: apiData[0].cluster_info.manager, id: apiId })
       );
+      this.switchMenuOpened();
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
       }
@@ -493,7 +488,7 @@ class WzMenu extends Component {
                 </EuiFormRow>
               )}
             {!this.state.currentAPI && <span> No API </span>}
-            {this.state.showSelector &&
+            {AppState.getPatternSelector() &&
               this.state.theresPattern &&
               this.state.patternList &&
               this.state.patternList.length > 1 &&
@@ -518,7 +513,7 @@ class WzMenu extends Component {
 
     const logotype_url = chrome.addBasePath('/plugins/wazuh/img/logotype.svg');
     const mainButton = (
-      <button onClick={() => this.switchMenuOpened()}>
+      <button className="eui" onClick={() => this.switchMenuOpened()}>
         <EuiFlexGroup
           direction="row"
           responsive={false}

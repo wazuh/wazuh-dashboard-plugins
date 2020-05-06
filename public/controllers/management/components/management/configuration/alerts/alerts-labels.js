@@ -103,7 +103,7 @@ class WzConfigurationAlertsLabels extends Component {
           <WzConfigurationSettingsTabSelector
             title="Defined labels"
             currentConfig={currentConfig}
-            minusHeight={agent.id === '000' ? 340 : 350}
+            minusHeight={agent.id === '000' ? 320 : 355}
             helpLinks={helpLinks}
           >
             <EuiBasicTable
