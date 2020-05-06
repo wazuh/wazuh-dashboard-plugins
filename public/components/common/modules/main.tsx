@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -71,7 +72,8 @@ export class MainModule extends Component {
         truncate: false,
       },
       {
-        text: TabDescription[this.props.section].title,
+        text: '',
+        className: 'wz-global-breadcrumb-popover'
       },
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
@@ -105,59 +107,21 @@ export class MainModule extends Component {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
-          <EuiTitle size="s">
-            <h1>
-              <EuiToolTip position="right" content={this.props.agent.status}>
-                <EuiHealth color={this.color(this.props.agent.status)}></EuiHealth>
-              </EuiToolTip>
-              <span>
+          <span className="wz-module-header-agent-title-btn" style={{ display: 'inline-flex' }}>
+            <EuiTitle size="s">
+              <h1>
                 <span
-                  style={{ cursor: 'pointer' }}
                   onClick={() => {
                     window.location.href = `#/agents?agent=${this.props.agent.id}`;
                     this.router.reload();
-                  }}>{this.props.agent.name} ({this.props.agent.id})&nbsp;&nbsp;
-              </span>
-                <EuiPopover
-                  button={
-                    <EuiButtonIcon style={{ marginTop: -6, padding: 0 }} iconSize="l" iconType="iInCircle" color='primary'
-                      onClick={() => this.setState({ showAgentInfo: !this.state.showAgentInfo })}></EuiButtonIcon>
-                  }
-                  isOpen={this.state.showAgentInfo}
-                  closePopover={() => this.setState({ showAgentInfo: false })}
-                  repositionOnScroll={true}
-                  anchorPosition="downCenter">
-                  <div>
-                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props} isVertical={true}></AgentInfo>
-                  </div>
-                </EuiPopover>
-              </span>
-            </h1>
-          </EuiTitle>
-        </EuiFlexItem>
-        <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
-          <EuiPopover
-            button={
-              <div className="wz-module-header-agent-title-btn"
-                onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
-                <EuiTitle size="s">
-                  <h1>
-                    <span>{TabDescription[this.props.section].title}&nbsp;&nbsp;</span>
-                    <EuiIcon size="m" type="arrowDown" color='subdued' />
-                  </h1>
-                </EuiTitle>
-              </div>
-            }
-            isOpen={this.state.switchModule}
-            closePopover={() => this.setState({ switchModule: false })}
-            repositionOnScroll={true}
-            anchorPosition="downLeft">
-            <WzReduxProvider>
-              <div style={{ maxWidth: 650 }}>
-                <Overview isAgent={this.props.agent} closePopover={() => this.setState({ switchModule: false })}></Overview>
-              </div>
-            </WzReduxProvider>
-          </EuiPopover>
+                  }}>
+                  <EuiIcon size="m" type="arrowLeft" color='primary' />
+                  <span>&nbsp;{this.props.agent.name} ({this.props.agent.id})&nbsp;&nbsp;</span>
+                </span>
+              </h1>
+            </EuiTitle>
+            <EuiHealth style={{ paddingTop: 6 }} color={this.color(this.props.agent.status)}>{this.props.agent.status}</EuiHealth>
+          </span>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -166,7 +130,7 @@ export class MainModule extends Component {
   renderTabs() {
     const { selectView } = this.state;
     return (
-      <EuiFlexItem>
+      <EuiFlexItem style={{ marginTop: 0 }}>
         <EuiTabs display="condensed">
           {this.tabs.map((tab, index) =>
             <EuiTab
@@ -191,7 +155,7 @@ export class MainModule extends Component {
   renderReportButton() {
     return (
       (this.props.disabledReport &&
-        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
           <EuiToolTip position="top" content="No results match for this search criteria.">
             <EuiButton
               iconType="document"
@@ -204,7 +168,7 @@ export class MainModule extends Component {
         </EuiFlexItem>
 
         || (
-          <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
+          <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
             <EuiButton
               iconType="document"
               isLoading={this.state.loadingReport}
@@ -217,7 +181,7 @@ export class MainModule extends Component {
 
   renderDashboardButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
+      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
         <EuiButton
           fill={this.state.selectView === 'dashboard'}
           iconType="visLine"
@@ -230,7 +194,7 @@ export class MainModule extends Component {
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 4 }}>
+      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
         <EuiButton
           fill={this.state.selectView === 'settings'}
           iconType="wrench"
@@ -259,6 +223,33 @@ export class MainModule extends Component {
     }
   }
 
+  createBreadcrumbPopover() {
+    const container = document.getElementsByClassName('wz-global-breadcrumb-popover');
+    if (container.length)
+      return ReactDOM.createPortal(
+        <Fragment>
+          <EuiPopover
+            button={
+              <span onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}>
+                <span>{TabDescription[this.props.section].title}&nbsp;&nbsp;</span>
+                <EuiIcon size="m" type="arrowDown" color='subdued' />
+              </span>
+            }
+            isOpen={this.state.switchModule}
+            closePopover={() => this.setState({ switchModule: false })}
+            repositionOnScroll={true}
+            anchorPosition="downLeft">
+            <WzReduxProvider>
+              <div style={{ maxWidth: 650 }}>
+                <Overview isAgent={this.props.agent} closePopover={() => this.setState({ switchModule: false })}></Overview>
+              </div>
+            </WzReduxProvider>
+          </EuiPopover>
+        </Fragment>,
+        container[0]
+      );
+  }
+
   render() {
     const { agent, section } = this.props;
     const { selectView } = this.state;
@@ -279,18 +270,23 @@ export class MainModule extends Component {
             {(this.tabs && this.tabs.length) &&
               <div className='wz-module-header-nav-wrapper'>
                 <div className='wz-module-header-nav'>
-                  <EuiFlexGroup>
-                    {this.renderTabs()}
-                    {(selectView === 'dashboard') &&
-                      this.renderReportButton()
-                    }
-                    {(this.buttons || []).includes('dashboard') &&
-                      this.renderDashboardButton()
-                    }
-                    {(this.buttons || []).includes('settings') &&
-                      this.renderSettingsButton()
-                    }
-                  </EuiFlexGroup>
+                  <div className="wz-welcome-page-agent-info">
+                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                  </div>
+                  <div className="wz-welcome-page-agent-tabs">
+                    <EuiFlexGroup>
+                      {this.renderTabs()}
+                      {(selectView === 'dashboard') &&
+                        this.renderReportButton()
+                      }
+                      {(this.buttons || []).includes('dashboard') &&
+                        this.renderDashboardButton()
+                      }
+                      {(this.buttons || []).includes('settings') &&
+                        this.renderSettingsButton()
+                      }
+                    </EuiFlexGroup>
+                  </div>
                 </div>
               </div>
             }
@@ -327,6 +323,12 @@ export class MainModule extends Component {
             iconType="alert">
           </EuiCallOut>
         }
+
+        {this.props.section && (
+          <Fragment>
+            {this.createBreadcrumbPopover()}
+          </Fragment>
+        )}
       </div>
     );
   }
