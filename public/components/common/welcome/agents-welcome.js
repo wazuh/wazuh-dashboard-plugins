@@ -24,8 +24,8 @@ import {
   EuiTitle,
   EuiHealth,
   EuiPage,
-  EuiButton,
-  EuiToolTip
+  EuiTabs,
+  EuiTab
 } from '@elastic/eui';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -51,16 +51,14 @@ export class AgentsWelcome extends Component {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
-          <EuiTitle size="s">
-            <h1>
-              <EuiToolTip position="right" content={this.props.agent.status}>
-                <EuiHealth
-                  color={this.color(this.props.agent.status)}
-                ></EuiHealth>
-              </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id})
-            </h1>
-          </EuiTitle>
+          <span style={{ display: 'inline-flex' }}>
+            <EuiTitle size="s">
+              <h1>
+                <span>{this.props.agent.name} ({this.props.agent.id})&nbsp;&nbsp;</span>
+              </h1>
+            </EuiTitle>
+            <EuiHealth style={{ paddingTop: 6 }} color={this.color(this.props.agent.status)}>{this.props.agent.status}</EuiHealth>
+          </span>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -86,13 +84,48 @@ export class AgentsWelcome extends Component {
     const title = this.renderTitle();
     return (
       <div className="wz-module">
-        <div className="wz-module-header-agent-wrapper">
-          <div className="wz-module-header-agent">{title}</div>
-        </div>
-        <div className="wz-module-body wz-module-body-main">
-          <div className="wz-welcome-page-agent-info">
-            <AgentInfo agent={this.props.agent} {...this.props}></AgentInfo>
+        <div className='wz-module-header-agent-wrapper'>
+          <div className='wz-module-header-agent'>
+            {title}
           </div>
+        </div>
+        <div>
+          <div className='wz-module-header-nav-wrapper'>
+            <div className='wz-module-header-nav'>
+              <div className="wz-welcome-page-agent-info">
+                <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+              </div>
+              <div className="wz-welcome-page-agent-tabs">
+                <EuiFlexGroup>
+                  <EuiFlexItem style={{ marginTop: 0, minHeight: 52 }}>
+                    <EuiTabs display="condensed">
+                      <EuiTab
+                        onClick={() => this.props.switchTab('syscollector')}
+                        isSelected={true}
+                        key={0} >
+                        <span>Modules</span>
+                      </EuiTab>
+                      <EuiTab
+                        onClick={() => this.props.switchTab('syscollector')}
+                        isSelected={false}
+                        key={1} >
+                        <span>Inventory data</span>
+                      </EuiTab>
+                      <EuiTab
+                        onClick={() => this.props.switchTab('configuration')}
+                        isSelected={false}
+                        key={2} >
+                        <span>Configuration</span>
+                      </EuiTab>
+                    </EuiTabs>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="wz-module-body">
+          <EuiSpacer size="s" />
           <EuiPage className="wz-welcome-page">
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -158,7 +191,7 @@ export class AgentsWelcome extends Component {
                       <EuiFlexGrid columns={2}>
                         {!(
                           UnsupportedComponents[
-                            this.props.agent.agentPlatform
+                          this.props.agent.agentPlatform
                           ] || UnsupportedComponents['other']
                         ).includes('vuls') &&
                           this.buildTabCard('vuls', 'securityApp')}
@@ -201,17 +234,17 @@ export class AgentsWelcome extends Component {
                         this.props.extensions.gdpr ||
                         this.props.extensions.hipaa ||
                         this.props.extensions.nist) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                        </EuiFlexGrid>
-                      )}
+                          <EuiFlexGrid columns={2}>
+                            {this.props.extensions.pci &&
+                              this.buildTabCard('pci', 'visTagCloud')}
+                            {this.props.extensions.nist &&
+                              this.buildTabCard('nist', 'apmApp')}
+                            {this.props.extensions.gdpr &&
+                              this.buildTabCard('gdpr', 'visBarVertical')}
+                            {this.props.extensions.hipaa &&
+                              this.buildTabCard('hipaa', 'emsApp')}
+                          </EuiFlexGrid>
+                        )}
                     </EuiPanel>
                   </EuiFlexItem>
                 </EuiFlexGroup>
