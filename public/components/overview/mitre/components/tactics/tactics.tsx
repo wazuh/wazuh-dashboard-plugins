@@ -24,7 +24,8 @@ import {
 export class Tactics extends Component {
   _isMount = false;
   state: {
-    tacticsList: Array<any>
+    tacticsList: Array<any>,
+    selectedItems: object
   }
 
   props: any;
@@ -32,30 +33,69 @@ export class Tactics extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tacticsList: []
+      tacticsList: [],
+      selectedItems: {}
     }
   }
 
+  componentDidMount(){
+  }
+
   facetClicked(id){
-    alert(id);
+    const { selectedItems } = this.state;
+    selectedItems[id] = selectedItems[id] ? false : true;
+    this.setState({selectedItems});
   }
 
 
   getTacticsList(){
     const tacticsIds = Object.keys(this.props.tacticsObject);
-    const tacticsList = {};
+    const tacticsList:Array<any> = [];
     tacticsIds.map( item => {
-      tacticsList[item] = 
+      tacticsList.push(
       {
         id: item,
         label: item,
         quantity: 0,  // TODO: count is initialized to 0
         onClick: (id) => this.facetClicked(id),
-      }
+      });
     });
-    //this.setState({tacticsList});
-    console.log(tacticsList)
+
+    this.checkAllChecked(tacticsList);
+
+    return (
+      <>
+        {tacticsList.map(facet => {
+          let iconNode;
+
+          return (
+            <EuiFacetButton
+              key={facet.id}
+              id={`${facet.id}`}
+              quantity={facet.quantity}
+              isSelected={this.state.selectedItems[facet.id]}
+              icon={iconNode}
+              onClick={
+                facet.onClick ? () => facet.onClick(facet.id) : undefined
+              }>
+              {facet.label}
+            </EuiFacetButton>
+          );
+        })}
+      </>
+    );
     
+  }
+
+  checkAllChecked(tacticList){
+
+    tacticList.map( item => {
+      if(!this.state.selectedItems[item.id])
+        console.log("false")
+        return;
+    });
+
+    console.log("true")
   }
 
   render() {
@@ -71,7 +111,11 @@ export class Tactics extends Component {
           <EuiFlexItem grow={false}>botton
           </EuiFlexItem>
         </EuiFlexGroup>
-        {this.getTacticsList()}
+        
+        <EuiFacetGroup style={{ }}>
+          {this.getTacticsList()}
+        </EuiFacetGroup>
+
       </div>
     )
   }

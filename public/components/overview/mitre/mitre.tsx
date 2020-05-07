@@ -88,14 +88,16 @@ export class Mitre extends Component {
     return (
       <EuiPage>
         <EuiPanel paddingSize="none">
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false} style={{width: "15%"}}>
-              <Tactics tacticsObject={this.state.tacticsObject} />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <Techniques selectedTactics={this.state.selectedTactics} tacticsObject={this.state.tacticsObject} />
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          {Object.keys(this.state.tacticsObject).length && 
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false} style={{width: "15%"}}>
+                <Tactics tacticsObject={this.state.tacticsObject} />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <Techniques selectedTactics={this.state.selectedTactics} tacticsObject={this.state.tacticsObject} />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          }
         </EuiPanel>
       </EuiPage>
     );
