@@ -9,12 +9,55 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import {
+  EuiTitle,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFacetButton,
+  EuiFacetGroup,
+  EuiIcon,
+  EuiAvatar,
+  EuiSpacer,
+} from '@elastic/eui'
 
 export class Tactics extends Component {
+  _isMount = false;
+  state: {
+    tacticsList: Array<any>
+  }
+
+  props: any;
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      tacticsList: []
+    }
+  }
+
+
+  getTacticsList(){
+    const tacticsList = Object.keys(this.props.tacticsObject);
+    this.setState({tacticsList})
+    
+  }
+
   render() {
     return (
-      <div>Tactics</div>
+      <div style={{backgroundColor: "gray", padding: 10}}>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiTitle size="m">
+              <h1>Tactics</h1>
+            </EuiTitle>
+          </EuiFlexItem>
+
+          <EuiFlexItem grow={false}>botton
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        {this.getTacticsList()}
+      </div>
     )
   }
 }
