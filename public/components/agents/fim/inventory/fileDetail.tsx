@@ -98,7 +98,7 @@ export class FileDetails extends Component {
         field: 'perm',
         name: 'Permissions',
         icon: 'lock',
-        link: true,
+        link: false,
       },
       {
         field: 'size',
@@ -252,7 +252,7 @@ export class FileDetails extends Component {
                       {value}
                       {
                         _.isEqual(this.state.hoverAddFilter, item) &&
-                        <EuiToolTip position="top" anchorClassName="detail-tooltip2" content={`Filter by ${item.field} is ${value} in inventory`} >
+                        <EuiToolTip position="top" anchorClassName="detail-tooltip" content={`Filter by ${item.field} is ${value} in inventory`} >
                           <EuiButtonIcon
                             onClick={() => {
                               this.addFilter(item.field, value);
