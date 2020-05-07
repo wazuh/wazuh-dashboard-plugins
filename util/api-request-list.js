@@ -634,6 +634,10 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/rules/tsc',
+        args: []
+      },
+      {
         name: '/syscheck/:agent_id',
         args: [
           {

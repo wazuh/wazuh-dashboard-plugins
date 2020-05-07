@@ -14,6 +14,7 @@ export const defaultExt = {
   gdpr: true,
   hipaa: true,
   nist: true,
+  tsc: true,
   audit: true,
   oscap: false,
   ciscat: false,

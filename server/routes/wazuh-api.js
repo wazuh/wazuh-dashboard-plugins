@@ -69,6 +69,15 @@ export function WazuhApiRoutes(server) {
     }
   });
 
+  // Return a TSC requirement description
+  server.route({
+    method: 'GET',
+    path: '/api/tsc/{requirement}',
+    handler(req, reply) {
+      return ctrl.getTSCRequirement(req, reply);
+    }
+  });
+
   // Return a HIPAA requirement description
   server.route({
     method: 'GET',

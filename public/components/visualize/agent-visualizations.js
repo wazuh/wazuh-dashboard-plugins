@@ -278,6 +278,54 @@ export const agentVisualizations = {
       }
     ]
   },
+  tsc: {
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top 5 rule groups',
+            id: 'Wazuh-App-Agents-TSC-Groups',
+            width: 33
+          },
+          {
+            title: 'Top 5 rules',
+            id: 'Wazuh-App-Agents-TSC-Rule',
+            width: 33
+          },
+          {
+            title: 'Top 5 TSC requirements',
+            id: 'Wazuh-App-Agents-TSC-Requirement',
+            width: 34
+          }
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'TSC Requirements',
+            id: 'Wazuh-App-Agents-TSC-Requirements',
+            width: 75
+          },
+          {
+            title: 'Rule level distribution',
+            id: 'Wazuh-App-Agents-TSC-Rule-level-distribution',
+            width: 25
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-TSC-Last-alerts'
+          }
+        ]
+      }
+    ]
+  },
   hipaa: {
     rows: [
       {

@@ -31,6 +31,7 @@ export class TabVisualizations {
       gdpr: 6,
       pci: 6,
       hipaa: 6,
+      tsc: 6,
       nist: 5,
       virustotal: 6,
       configuration: 0,
@@ -57,7 +58,8 @@ export class TabVisualizations {
       osquery: 6,
       sca: 8,
       docker: 5,
-      mitre: 6
+      mitre: 6,
+      tsc: 6
     };
 
     this.tabVisualizations = {};

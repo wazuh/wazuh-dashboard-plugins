@@ -16,6 +16,7 @@ import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
 import { nistRequirementsFile } from '../integration-files/nist-requirements';
+import { tscRequirementsFile } from '../integration-files/tsc-requirements';
 import { getPath } from '../../util/get-path';
 import { Monitoring } from '../monitoring';
 import { ErrorResponse } from './error-response';
@@ -698,6 +699,84 @@ export class WazuhApiCtrl {
       }
     } catch (error) {
       log('wazuh-api:getNistRequirement', error.message || error);
+      return ErrorResponse(error.message || error, 3010, 400, reply);
+    }
+  }
+
+  /**
+   * This get TSC requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
+  async getTSCRequirement(req, reply) {
+    try {
+      let tsc_description = '';
+
+      if (req.params.requirement === 'all') {
+        if (!req.headers.id) {
+          return tscRequirementsFile;
+        }
+
+        const apiId = req.headers.id;
+        const api = await this.manageHosts.getHostById(apiId);
+
+        if (!Object.keys(api).length) {
+          log(
+            'wazuh-api:getTSCRequirement',
+            'Unexpected error getting host credentials'
+          );
+          // Can not get credentials from wazuh-hosts
+          return ErrorResponse(
+            'Unexpected error getting host credentials',
+            3007,
+            400,
+            reply
+          );
+        }
+
+        const response = await needle(
+          'get',
+          `${api.url}:${api.port}/rules/tsc`,
+          {},
+          ApiHelper.buildOptionsObject(api)
+        );
+
+        if ((((response || {}).body || {}).data || {}).items) {
+          let TSCobject = {};
+          for (const item of response.body.data.items) {
+            if (typeof tscRequirementsFile[item] !== 'undefined')
+              TSCobject[item] = tscRequirementsFile[item];
+          }
+          return TSCobject;
+        } else {
+          log(
+            'wazuh-api:getTSCRequirement',
+            'An error occurred trying to parse TSC requirements'
+          );
+          return ErrorResponse(
+            'An error occurred trying to parse TSC requirements',
+            3009,
+            400,
+            reply
+          );
+        }
+      } else {
+        if (
+          typeof tscRequirementsFile[req.params.requirement] !== 'undefined'
+        ) {
+          tsc_description = tscRequirementsFile[req.params.requirement];
+        }
+
+        return {
+          tsc: {
+            requirement: req.params.requirement,
+            description: tsc_description
+          }
+        };
+      }
+    } catch (error) {
+      log('wazuh-api:getTSCRequirement', error.message || error);
       return ErrorResponse(error.message || error, 3010, 400, reply);
     }
   }
