@@ -29,7 +29,7 @@ export async function getIndexPattern() {
   return indexPattern;
 }
 
-export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs=null ) {
+export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs:any=null ) {
   const query = buildQuery(indexPattern, filterParams);
   const search:SearchParams = {
     index: indexPattern['id'],

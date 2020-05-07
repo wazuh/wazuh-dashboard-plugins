@@ -11,6 +11,7 @@
  */
 import React, { Component } from 'react'
 import { Tactics, Techniques } from './components'; 
+import { ModulesHelper } from '../../common/modules'
 import { 
   EuiPage,
   EuiPanel,
@@ -19,13 +20,17 @@ import {
 } from '@elastic/eui';
 import { ApiRequest } from '../../../react-services/api-request';
 import { toastNotifications } from 'ui/notify';
+import { IFilterParams, getElasticAlerts, getIndexPattern } from './lib';
 
 
 export class Mitre extends Component {
   _isMount = false;
+  indexPattern: any;
+  destroyWatcher: any;
   state: {
     tacticsObject: object,
     selectedTactics: Array<any>
+    filterParams: IFilterParams
   }
 
   props: any;
@@ -34,11 +39,35 @@ export class Mitre extends Component {
     super(props);
     this.state = {
       tacticsObject: {},
-      selectedTactics: []
+      selectedTactics: [],
+      filterParams: {
+        filters: [],
+        query: { language: 'kuery', query: '' },
+        time: {from: 'now/d', to: 'now/d'},
+      }
     }
   }
 
-  
+  async componentDidMount(){
+    this._isMount = true;
+    this.indexPattern = await getIndexPattern();
+    const scope = await ModulesHelper.getDiscoverScope();
+    this.destroyWatcher = scope.$watchCollection('fetchStatus',
+      () => {
+        const { filters, query } = scope.state;
+        const { time } = scope;
+        this._isMount && this.setState({ filterParams:{ filters, time, query } });
+      }
+    )
+    getElasticAlerts(this.indexPattern, this.state.filterParams).then(e => console.log(e))
+    await this.buildTacticsObject();
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
+
+  }
+
   showToast = (color, title, text, time) => {
     toastNotifications.add({
       color: color,
@@ -47,11 +76,6 @@ export class Mitre extends Component {
       toastLifeTimeMs: time
     });
   };
-
-
-  async componentDidMount(){
-    await this.buildTacticsObject();
-  }
 
 
   async buildTacticsObject(){
