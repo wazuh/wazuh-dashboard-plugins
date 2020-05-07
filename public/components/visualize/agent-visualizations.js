@@ -148,17 +148,17 @@ export const agentVisualizations = {
           {
             title: 'Top 5 rules',
             id: 'Wazuh-App-Agents-GCP-Top-5-rules',
-            width: 34
+            width: 50
           },
           {
             title: 'Top query events',
             id: 'Wazuh-App-Agents-GCP-Event-Query-Name',
-            width: 33
+            width: 25
           },
           {
-            title: 'Top 5 VM instances',
-            id: 'Wazuh-App-Agents-GCP-Top-5-vminstances',
-            width: 33
+            title: 'Top 5 instances',
+            id: 'Wazuh-App-Agents-GCP-Top-5-instances',
+            width: 25
           },
         ]
       },
@@ -166,14 +166,14 @@ export const agentVisualizations = {
         height: 300,
         vis: [
           {
+            title: 'Top project id by sourcetype',
+            id: 'Wazuh-App-Agents-GCP-Top-ProjectId-By-SourceType',
+            width: 25
+          },
+          {
             title: 'GCP alerts evolution',
             id: 'Wazuh-App-Agents-GCP-Events-Over-Time',
             width: 75
-          },
-          {
-            title: 'Top 5 resource type',
-            id: 'Wazuh-App-Agents-GCP-Top-5-resource-type',
-            width: 25
           },
         ]
       },
@@ -183,12 +183,12 @@ export const agentVisualizations = {
           {
             title: 'Auth answer count',
             id: 'Wazuh-App-Agents-GCP-authAnswer-Bar',
-            width: 75
+            width: 40
           },
           {
-            title: 'Top tag severities',
-            id: 'Wazuh-App-Agents-GCP-Tag-Severities',
-            width: 25
+            title: 'Resource type by project id',
+            id: 'Wazuh-App-Agents-GCP-Top-ResourceType-By-Project-Id',
+            width: 60
           },
         ]
       },

@@ -225,7 +225,7 @@ export const visualizations = {
         height: 250,
         vis: [
           {
-            title: 'VMinstances by response code',
+            title: 'Top instances by response code',
             id: 'Wazuh-App-Overview-GCP-Top-vmInstances-By-ResponseCode',
             width: 25
           },
@@ -235,7 +235,7 @@ export const visualizations = {
             width: 50
           },
           {
-            title: 'Top project id by sourcetpye',
+            title: 'Top project id by sourcetype',
             id: 'Wazuh-App-Overview-GCP-Top-ProjectId-By-SourceType',
             width: 25
           },
