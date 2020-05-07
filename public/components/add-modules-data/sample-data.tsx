@@ -52,7 +52,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
     this.categories = [
       {
         title: 'Sample security information',
-        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, authorization, ssh, web).',
+        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Google Cloud Platform, authorization, ssh, web).',
         image: '',
         categorySampleAlertsIndex: 'security'
       },
