@@ -24,8 +24,7 @@ import {
   EuiTitle,
   EuiHealth,
   EuiPage,
-  EuiTabs,
-  EuiTab
+  EuiButton,
 } from '@elastic/eui';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -96,28 +95,20 @@ export class AgentsWelcome extends Component {
                 <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
               </div>
               <div className="wz-welcome-page-agent-tabs">
-                <EuiFlexGroup>
-                  <EuiFlexItem style={{ marginTop: 0, minHeight: 52 }}>
-                    <EuiTabs display="condensed">
-                      <EuiTab
-                        onClick={() => this.props.switchTab('syscollector')}
-                        isSelected={true}
-                        key={0} >
-                        <span>Modules</span>
-                      </EuiTab>
-                      <EuiTab
-                        onClick={() => this.props.switchTab('syscollector')}
-                        isSelected={false}
-                        key={1} >
-                        <span>Inventory data</span>
-                      </EuiTab>
-                      <EuiTab
-                        onClick={() => this.props.switchTab('configuration')}
-                        isSelected={false}
-                        key={2} >
-                        <span>Configuration</span>
-                      </EuiTab>
-                    </EuiTabs>
+                <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
+                  <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
+                    <EuiButton
+                      onClick={() => this.props.switchTab('syscollector')}
+                      iconType="inspect">
+                      <span>Inventory data</span>
+                    </EuiButton>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
+                    <EuiButton
+                      onClick={() => this.props.switchTab('configuration')}
+                      iconType="gear" >
+                      <span>Configuration</span>
+                    </EuiButton>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </div>
