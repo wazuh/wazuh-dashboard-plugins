@@ -9,12 +9,45 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
+import {
+  EuiFacetButton,
+  EuiFlexGroup,
+  EuiFlexGrid,
+  EuiFlexItem
+} from '@elastic/eui';
 
 export class Techniques extends Component {
+  props!: {
+    tacticsObject: any
+  }
+	constructor(props) {
+    super(props);
+	}
+
+  renderFacet() {
+    const {tacticsObject} = this.props;
+    const tacticsToRender: Array<JSX.Element> = [];
+
+    Object.keys(tacticsObject).forEach((key, inx) => {
+      tacticsToRender.push(
+        <EuiFlexItem key={inx}>
+          <EuiFacetButton quantity={0}>{key}</EuiFacetButton>
+        </EuiFlexItem>
+      );
+    });
+    return (
+      <EuiFlexGrid columns={4}>
+        {tacticsToRender}
+      </EuiFlexGrid>
+    )
+  }
+
 	render() {
 		return (
-			<div>Techniques</div>
+			<Fragment>
+        {this.renderFacet()}
+      </Fragment>
 		)
 	}
 }
