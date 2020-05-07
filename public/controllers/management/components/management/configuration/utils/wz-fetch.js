@@ -304,9 +304,7 @@ export const restartCluster = async () => {
       const str = data.details.join();
       throw new Error(str);
     }
-    // this.performClusterRestart(); // TODO: convert AngularJS to React
     await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
-    // this.$rootScope.$broadcast('removeRestarting', {}); TODO: isRestarting: false?
     return { data: { data: 'Restarting cluster' } };
   } catch (error) {
     return Promise.reject(error);
@@ -491,4 +489,25 @@ export const checkAdminMode = async () => {
   } catch (error) {
     return Promise.error(error);
   }
+};
+
+/**
+ * Restart cluster or Manager
+ */
+export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
+  try{
+    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
+    const isCluster =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    
+    isCluster ? await restartCluster() : await restartManager();
+    // Dispatch a Redux action
+    updateWazuhNotReadyYet(
+      `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`
+    );
+    await makePing(updateWazuhNotReadyYet);
+    return { restarted: isCluster ? 'cluster' : 'manager'}
+  }catch (error){
+    return Promise.error(error);
+  };
 };

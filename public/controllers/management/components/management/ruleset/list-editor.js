@@ -40,6 +40,9 @@ import { toastNotifications } from 'ui/notify';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 
+import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
+import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -51,7 +54,8 @@ class WzListEditor extends Component {
       addingKey: '',
       addingValue: '',
       editingValue: '',
-      newListName: ''
+      newListName: '',
+      showWarningRestart: false
     };
 
     this.items = {};
@@ -243,6 +247,7 @@ class WzListEditor extends Component {
         const result = await this.rulesetHandler.getCdbList(`${path}/${name}`);
         const file = { name: name, content: result, path: path };
         this.props.updateListContent(file);
+        this.setState({ showWarningRestart: true });
         this.showToast(
           'success',
           'Success',
@@ -250,6 +255,7 @@ class WzListEditor extends Component {
           3000
         );
       } else {
+        this.setState({ showWarningRestart: true });
         this.showToast('success', 'Success', 'CBD List updated', 3000);
       }
     } catch (error) {
@@ -580,6 +586,16 @@ class WzListEditor extends Component {
                     this.state.items
                   )}
               </EuiFlexGroup>
+              {this.state.showWarningRestart && (
+                <Fragment>
+                  <EuiSpacer size='s'/>
+                  <WzRestartClusterManagerCallout
+                    onRestart={() => this.setState({showWarningRestart: true})}
+                    onRestarted={() => this.setState({showWarningRestart: false})}
+                    onRestartedError={() => this.setState({showWarningRestart: false})}
+                  />
+                </Fragment>
+              )}
               {/* CDB list table */}
               {this.renderAdd()}
               <EuiFlexGroup>
@@ -616,7 +632,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
-    updateListContent: content => dispatch(updateListContent(content))
+    updateListContent: content => dispatch(updateListContent(content)),
+    updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet))
   };
 };
 
