@@ -119,6 +119,15 @@ class WzRulesetSearchBar extends Component {
         const result = await wzReq('GET', '/rules/pci', {});
         return (((result || {}).data || {}).data || {}).items;
       }
+    },
+    {
+      label: 'tsc',
+      description: 'Filters the rules by TSC requirement',
+      values: async () => {
+        const wzReq = (...args) => WzRequest.apiReq(...args);
+        const result = await wzReq('GET', '/rules/tsc', {});
+        return (((result || {}).data || {}).data || {}).items;
+      }
     }
   ];
   rulesFiles = [

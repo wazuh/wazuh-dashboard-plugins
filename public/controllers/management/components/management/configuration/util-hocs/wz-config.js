@@ -15,7 +15,6 @@ import withLoading from './loading';
 import { getCurrentConfig } from '../utils/wz-fetch';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 
 /**
@@ -28,13 +27,12 @@ import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appState
  */
 
 const mapStateToProps = state => ({
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
+  refreshTime: state.configurationReducers.refreshTime
 });
 
 const mapDispatchToProps = dispatch => ({
-  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value)),
-  updateLoadingStatus: loadingStatus =>
-    dispatch(updateLoadingStatus(loadingStatus))
+  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value))
 });
 
 const withWzConfig = sections => WrappedComponent =>
@@ -51,13 +49,13 @@ const withWzConfig = sections => WrappedComponent =>
           props.clusterNodeSelected,
           props.updateWazuhNotReadyYet
         );
-        props.updateLoadingStatus(false);
         return { ...props, currentConfig };
       } catch (error) {
-        props.updateLoadingStatus(false);
         return { ...props, currentConfig: {}, error };
       }
-    })
+    },
+    (props, prevProps) => (props.agent.id === '000' && props.clusterNodeSelected && prevProps.clusterNodeSelected && props.clusterNodeSelected !== prevProps.clusterNodeSelected) || (props.refreshTime !== prevProps.refreshTime)
+    )
   )(WrappedComponent);
 
 export default withWzConfig;

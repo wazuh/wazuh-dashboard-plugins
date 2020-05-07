@@ -26,7 +26,8 @@ export default class EnableModules extends Component {
           modules: [
             { name: 'general', default: true, agent: false },
             { name: 'fim', default: true, agent: false },
-            { name: 'aws', default: false, agent: false }
+            { name: 'aws', default: false, agent: false },
+            { name: 'gcp', default: false, agent: false }
           ]
         },
         {
@@ -55,7 +56,8 @@ export default class EnableModules extends Component {
             { name: 'pci', default: true, agent: false },
             { name: 'nist', default: true, agent: false },
             { name: 'gdpr', default: false, agent: false },
-            { name: 'hipaa', default: false, agent: false }
+            { name: 'hipaa', default: false, agent: false },
+            { name: 'tsc', default: false, agent: false }
           ]
         }
       ]

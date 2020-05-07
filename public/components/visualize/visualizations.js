@@ -209,6 +209,50 @@ export const visualizations = {
       }
     ]
   },
+  gcp: {
+    rows: [
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Events over time by auth answer',
+            id: 'Wazuh-App-Overview-GCP-Alerts-Evolution-By-AuthAnswer',
+            width: 100
+          }
+        ]
+      },
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Top instances by response code',
+            id: 'Wazuh-App-Overview-GCP-Top-vmInstances-By-ResponseCode',
+            width: 25
+          },
+          {
+            title: 'Resource type by project id',
+            id: 'Wazuh-App-Overview-GCP-Top-ResourceType-By-Project-Id',
+            width: 50
+          },
+          {
+            title: 'Top project id by sourcetype',
+            id: 'Wazuh-App-Overview-GCP-Top-ProjectId-By-SourceType',
+            width: 25
+          },
+        ]
+      },
+      {
+        height: 450,
+        vis: [
+          {
+            title: 'Top 5 Map by source ip',
+            id: 'Wazuh-App-Overview-GCP-Map-By-SourceIp',
+            width: 100
+          },
+        ]
+      },
+    ]
+  },
   pci: {
     rows: [
       {
@@ -367,6 +411,61 @@ export const visualizations = {
           {
             title: 'Alerts summary',
             id: 'Wazuh-App-Overview-NIST-Alerts-summary'
+          }
+        ]
+      }
+    ]
+  },
+  tsc: {
+    rows: [
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'TSC requirements',
+            id: 'Wazuh-App-Overview-TSC-requirements',
+            width: 50
+          },
+          {
+            title: 'Top 10 agents by alerts number',
+            id: 'Wazuh-App-Overview-TSC-Agents',
+            width: 50
+          }
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-TSC-Requirements-over-time'
+          }
+        ]
+      },
+      {
+        height: 530,
+        vis: [
+          {
+            title: 'Last alerts',
+            id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap'
+          }
+        ]
+      },
+      {
+        height: 255,
+        vis: [
+          {
+            title: 'Requirements by agent',
+            id: 'Wazuh-App-Overview-TSC-Requirements-by-agent'
+          }
+        ]
+      },
+      {
+        height: 600,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-TSC-Alerts-summary'
           }
         ]
       }

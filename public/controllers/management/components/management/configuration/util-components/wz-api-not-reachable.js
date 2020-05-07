@@ -23,9 +23,8 @@ import {
   EuiButton
 } from '@elastic/eui';
 
-import { withWzToast } from '../util-providers/toast-p';
-import { updateLoadingStatus } from '../../../../../../redux/actions/configurationActions';
-import { compose } from 'redux';
+import { updateRefreshTime } from '../../../../../../redux/actions/configurationActions';
+import { toastNotifications } from 'ui/notify';
 import { connect } from 'react-redux';
 
 class WzWazuhAPINotReachable extends Component {
@@ -33,14 +32,14 @@ class WzWazuhAPINotReachable extends Component {
     super(props);
   }
   onClickRefresh = () => {
-    this.props.updateLoadingStatus(true);
-    setTimeout(() => {
-      this.props.updateLoadingStatus(false);
-    }, 1);
+    this.props.updateRefreshTime();
   };
+  addToast(toast){
+    toastNotifications.add(toast)
+  }
   componentDidMount() {
     if (this.props.error) {
-      this.props.addToast({
+      this.addToast({
         title: (
           <Fragment>
             <EuiIcon type="alert" />
@@ -74,14 +73,11 @@ class WzWazuhAPINotReachable extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  updateLoadingStatus: loadingStatus =>
-    dispatch(updateLoadingStatus(loadingStatus))
+  updateRefreshTime: () =>
+    dispatch(updateRefreshTime())
 });
 
-export default compose(
-  withWzToast,
-  connect(
+export default connect(
     null,
     mapDispatchToProps
-  )
 )(WzWazuhAPINotReachable);

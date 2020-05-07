@@ -29,7 +29,7 @@ import { TimeService } from '../../../react-services/time-service';
 export default class SettingsLogs extends Component {
   constructor(props) {
     super(props);
-    this.offset = 340;
+    this.offset = 275;
     this.state = {
       logs: [],
       refreshingEntries: false

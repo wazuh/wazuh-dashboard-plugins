@@ -165,6 +165,18 @@ export class FilterHandler {
     return result;
   }
 
+  tscQuery() {
+    const result = this.base();
+    result.meta.type = 'exists';
+    result.meta.value = 'exists';
+    result.meta.key = 'rule.tsc';
+    result.exists = {
+      field: 'rule.tsc'
+    };
+    delete result.query;
+    return result;
+  }
+
   mitreQuery() {
     const result = this.base();
     result.meta.type = 'exists';
