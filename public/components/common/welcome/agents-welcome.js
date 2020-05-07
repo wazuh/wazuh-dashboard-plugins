@@ -204,7 +204,8 @@ export class AgentsWelcome extends Component {
                       {(this.props.extensions.pci ||
                         this.props.extensions.gdpr ||
                         this.props.extensions.hipaa ||
-                        this.props.extensions.nist) && (
+                        this.props.extensions.nist ||
+                        this.props.extensions.tsc) && (
                         <EuiFlexGrid columns={2}>
                           {this.props.extensions.pci &&
                             this.buildTabCard('pci', 'visTagCloud')}
@@ -214,6 +215,8 @@ export class AgentsWelcome extends Component {
                             this.buildTabCard('gdpr', 'visBarVertical')}
                           {this.props.extensions.hipaa &&
                             this.buildTabCard('hipaa', 'emsApp')}
+                          {this.props.extensions.tsc &&
+                            this.buildTabCard('tsc', 'apmApp')}
                         </EuiFlexGrid>
                       )}
                     </EuiPanel>

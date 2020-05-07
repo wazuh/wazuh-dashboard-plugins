@@ -60,6 +60,11 @@ export const TabDescription = {
     description:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.'
   },
+  tsc: {
+    title: 'TSC',
+    description:
+      'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy'
+  },
   ciscat: {
     title: 'CIS-CAT',
     description:

@@ -23,6 +23,7 @@ export const TabNames = {
   gdpr: 'GDPR',
   hipaa: 'HIPAA',
   nist: 'NIST 800-53',
+  tsc: 'TSC',
   aws: 'Amazon AWS',
   virustotal: 'VirusTotal',
   configuration: 'Configuration',

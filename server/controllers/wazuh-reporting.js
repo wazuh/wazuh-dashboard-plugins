@@ -20,10 +20,12 @@ import { OverviewRequest } from '../reporting/overview-request';
 import { RootcheckRequest } from '../reporting/rootcheck-request';
 import { PciRequest } from '../reporting/pci-request';
 import { GdprRequest } from '../reporting/gdpr-request';
+import { TSCRequest } from '../reporting/tsc-request';
 import { AuditRequest } from '../reporting/audit-request';
 import { SyscheckRequest } from '../reporting/syscheck-request';
 import PCI from '../integration-files/pci-requirements-pdfmake';
 import GDPR from '../integration-files/gdpr-requirements-pdfmake';
+import TSC from '../integration-files/tsc-requirements-pdfmake';
 import PdfTable from '../reporting/generic-table';
 import { WazuhApiCtrl } from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
@@ -80,6 +82,7 @@ export class WazuhReportingCtrl {
     this.rootcheckRequest = new RootcheckRequest(this.server);
     this.pciRequest = new PciRequest(this.server);
     this.gdprRequest = new GdprRequest(this.server);
+    this.TSCRequest = new TSCRequest(this.server);
     this.auditRequest = new AuditRequest(this.server);
     this.syscheckRequest = new SyscheckRequest(this.server);
 
@@ -1149,6 +1152,56 @@ export class WazuhReportingCtrl {
         }
       }
 
+      if (['overview', 'agents'].includes(section) && tab === 'tsc') {
+        log(
+          'reporting:extendedInformation',
+          'Fetching top TSC requirements',
+          'debug'
+        );
+        const topTSCRequirements = await this.TSCRequest.topTSCRequirements(
+          from,
+          to,
+          filters,
+          pattern
+        );
+        this.dd.content.push({
+          text: 'Most common TSC requirements alerts found',
+          style: 'h2'
+        });
+        this.dd.content.push('\n');
+        for (const item of topTSCRequirements) {
+          const rules = await this.TSCRequest.getRulesByRequirement(
+            from,
+            to,
+            filters,
+            item,
+            pattern
+          );
+          this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
+          this.dd.content.push('\n');
+
+          if (TSC[item]) {
+            const content =
+              typeof TSC[item] === 'string'
+                ? { text: TSC[item], style: 'standard' }
+                : TSC[item];
+            this.dd.content.push(content);
+            this.dd.content.push('\n');
+          }
+
+          rules &&
+            rules.length &&
+            PdfTable(
+              this.dd,
+              rules,
+              ['Rule ID', 'Description'],
+              ['ruleId', 'ruleDescription'],
+              `Top rules for ${item} requirement`
+            );
+          this.dd.content.push('\n');
+        }
+      }
+
       if (['overview', 'agents'].includes(section) && tab === 'gdpr') {
         log(
           'reporting:extendedInformation',
@@ -1849,6 +1902,7 @@ export class WazuhReportingCtrl {
           this.overviewRequest.namespace = namespace;
           this.rootcheckRequest.namespace = namespace;
           this.pciRequest.namespace = namespace;
+          this.TSCRequest.namespace = namespace;
           this.gdprRequest.namespace = namespace;
           this.auditRequest.namespace = namespace;
           this.syscheckRequest.namespace = namespace;

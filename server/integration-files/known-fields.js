@@ -1807,6 +1807,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'rule.tsc',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'rule.gpg13',
     type: 'string',
     count: 0,
