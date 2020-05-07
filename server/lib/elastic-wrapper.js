@@ -391,6 +391,28 @@ export class ElasticWrapper {
     }
   }
 
+  async searchWazuhAlertsWithRequest(req, payload, namespace) {
+    try {
+      // TODO: Remember test with Kibana Spaces
+      // if (!payload) return Promise.reject(new Error('No valid payload given'));
+      // const pattern = payload.pattern;
+      // delete payload.pattern;
+      // const fullPattern = await this.getIndexPatternUsingGet(
+      //   pattern,
+      //   namespace
+      // );
+
+      // const title =
+      //   (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
+      //   false;
+
+      const data = await this.elasticRequest.callWithRequest(req, 'search', payload);
+
+      return data;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
   cleanCachedCredentials() {
     const now = new Date().getTime();
     for (const key in this.cachedCredentials) {
