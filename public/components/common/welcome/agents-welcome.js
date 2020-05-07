@@ -130,6 +130,7 @@ export class AgentsWelcome extends Component {
                       <EuiFlexGrid columns={2}>
                         {this.buildTabCard('general', 'dashboardApp')}
                         {this.buildTabCard('fim', 'filebeatApp')}
+                        {this.buildTabCard('gcp', 'logoGCPMono')}
                       </EuiFlexGrid>
                     </EuiPanel>
                   </EuiFlexItem>

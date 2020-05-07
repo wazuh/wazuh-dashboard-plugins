@@ -25,6 +25,7 @@ export const TabNames = {
   nist: 'NIST 800-53',
   tsc: 'TSC',
   aws: 'Amazon AWS',
+  gcp: 'Google Cloud Platform',
   virustotal: 'VirusTotal',
   configuration: 'Configuration',
   syscollector: 'Inventory data',

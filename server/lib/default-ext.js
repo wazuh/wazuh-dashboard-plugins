@@ -19,6 +19,7 @@ export const defaultExt = {
   oscap: false,
   ciscat: false,
   aws: false,
+  gcp: false,
   virustotal: false,
   osquery: false,
   mitre: false,

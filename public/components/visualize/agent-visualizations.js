@@ -140,6 +140,60 @@ export const agentVisualizations = {
       }
     ]
   },
+  gcp: {
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top 5 rules',
+            id: 'Wazuh-App-Agents-GCP-Top-5-rules',
+            width: 50
+          },
+          {
+            title: 'Top query events',
+            id: 'Wazuh-App-Agents-GCP-Event-Query-Name',
+            width: 25
+          },
+          {
+            title: 'Top 5 instances',
+            id: 'Wazuh-App-Agents-GCP-Top-5-instances',
+            width: 25
+          },
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top project id by sourcetype',
+            id: 'Wazuh-App-Agents-GCP-Top-ProjectId-By-SourceType',
+            width: 25
+          },
+          {
+            title: 'GCP alerts evolution',
+            id: 'Wazuh-App-Agents-GCP-Events-Over-Time',
+            width: 75
+          },
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Auth answer count',
+            id: 'Wazuh-App-Agents-GCP-authAnswer-Bar',
+            width: 40
+          },
+          {
+            title: 'Resource type by project id',
+            id: 'Wazuh-App-Agents-GCP-Top-ResourceType-By-Project-Id',
+            width: 60
+          },
+        ]
+      },
+    ]
+  },
   pci: {
     rows: [
       {

@@ -17,6 +17,7 @@ export const configEquivalences = {
   'extensions.ciscat':
     'Enable or disable the CIS-CAT tab on Overview and Agents.',
   'extensions.aws': 'Enable or disable the Amazon (AWS) tab on Overview.',
+  'extensions.gcp': 'Enable or disable the Google Cloud Platform tab on Overview.',
   'extensions.virustotal':
     'Enable or disable the VirusTotal tab on Overview and Agents.',
   'extensions.osquery':

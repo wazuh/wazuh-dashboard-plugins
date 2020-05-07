@@ -44,6 +44,7 @@ class WzMenuOverview extends Component {
       general: { id: 'general', text: 'Security Events' },
       fim: { id: 'fim', text: 'Integrity Monitoring' },
       aws: { id: 'aws', text: 'Amazon AWS' },
+      gcp: { id: 'gcp', text: 'Google Cloud Platform' },
       pm: { id: 'pm', text: 'Policy Monitoring' },
       sca: { id: 'sca', text: 'Security configuration assessment' },
       audit: { id: 'audit', text: 'System Auditing' },
@@ -119,7 +120,8 @@ class WzMenuOverview extends Component {
   render() {
     let securityInformationItems = [
       this.overviewSections.general,
-      this.overviewSections.fim
+      this.overviewSections.fim,
+      this.overviewSections.gcp
     ];
     let auditingItems = [
       this.overviewSections.pm,
@@ -134,7 +136,7 @@ class WzMenuOverview extends Component {
       this.overviewSections.mitre
     ];
     if (!this.props.isAgent) {
-      securityInformationItems.push(this.overviewSections.aws);
+      securityInformationItems.splice(2, 0, this.overviewSections.aws);
       threatDetectionItems.unshift(this.overviewSections.vuls);
     } else {
       auditingItems.splice(1, 0, this.overviewSections.sca);

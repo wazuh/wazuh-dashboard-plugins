@@ -58,6 +58,7 @@ export const initialWazuhConfig = `---
 #extensions.oscap     : false
 #extensions.ciscat    : false
 #extensions.aws       : false
+#extensions.gcp       : false
 #extensions.virustotal: false
 #extensions.osquery   : false
 #extensions.docker    : false
