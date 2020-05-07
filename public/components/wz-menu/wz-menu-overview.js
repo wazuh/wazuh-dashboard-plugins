@@ -42,6 +42,7 @@ class WzMenuOverview extends Component {
       general: { id: 'general', text: 'Security Events' },
       fim: { id: 'fim', text: 'Integrity Monitoring' },
       aws: { id: 'aws', text: 'Amazon AWS' },
+      gcp: { id: 'gcp', text: 'Google Cloud Platform' },
       pm: { id: 'pm', text: 'Policy Monitoring' },
       audit: { id: 'audit', text: 'System Auditing' },
       oscap: { id: 'oscap', text: 'OpenSCAP' },
@@ -114,7 +115,8 @@ class WzMenuOverview extends Component {
         items: this.createItems([
           this.overviewSections.general,
           this.overviewSections.fim,
-          this.overviewSections.aws
+          this.overviewSections.aws,
+          this.overviewSections.gcp
         ])
       })
     ];

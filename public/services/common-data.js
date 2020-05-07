@@ -35,7 +35,7 @@ export class CommonData {
     this.refreshInterval = { pause: true, value: 0 };
 
     this.overviewTabs = {
-      hostMonitoringTabs: ['general', 'fim', 'aws'],
+      hostMonitoringTabs: ['general', 'fim', 'aws', 'gcp'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc']
@@ -138,6 +138,7 @@ export class CommonData {
         nist: { group: 'nist' },
         tsc: { group: 'tsc' },
         aws: { group: 'amazon' },
+        gcp: { group: 'gcp' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },

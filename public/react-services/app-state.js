@@ -59,6 +59,7 @@ export class AppState {
             oscap: config['extensions.oscap'],
             ciscat: config['extensions.ciscat'],
             aws: config['extensions.aws'],
+            gcp: config['extensions.gcp'],
             virustotal: config['extensions.virustotal'],
             osquery: config['extensions.osquery'],
             mitre: config['extensions.mitre'],
