@@ -210,7 +210,7 @@ class KibanaVis extends Component {
             this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
               this.visHandler.handler.data$.subscribe(this.renderComplete());
             });
-          }, 100)
+          });
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
