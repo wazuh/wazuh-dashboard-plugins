@@ -36,10 +36,25 @@ export class Tactics extends Component {
     }
   }
 
+  facetClicked(id){
+    alert(id);
+  }
+
 
   getTacticsList(){
-    const tacticsList = Object.keys(this.props.tacticsObject);
-    this.setState({tacticsList})
+    const tacticsIds = Object.keys(this.props.tacticsObject);
+    const tacticsList = {};
+    tacticsIds.map( item => {
+      tacticsList[item] = 
+      {
+        id: item,
+        label: item,
+        quantity: 0,  // TODO: count is initialized to 0
+        onClick: (id) => this.facetClicked(id),
+      }
+    });
+    //this.setState({tacticsList});
+    console.log(tacticsList)
     
   }
 
