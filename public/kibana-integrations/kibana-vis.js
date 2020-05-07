@@ -111,7 +111,7 @@ class KibanaVis extends Component {
           data.value.visData &&
           data.value.visData.rows &&
           this.props.state[this.visID] !==
-            data.value.visData.rows['0']['col-0-1']
+          data.value.visData.rows['0']['col-0-1']
         )
           store.dispatch(
             this.updateMetric({
@@ -206,9 +206,11 @@ class KibanaVis extends Component {
             this.visualization,
             visInput
           );
-          this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
-            this.visHandler.handler.data$.subscribe(this.renderComplete);
-          });
+          setTimeout(() => {
+            this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
+              this.visHandler.handler.data$.subscribe(this.renderComplete());
+            });
+          }, 100)
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
@@ -262,10 +264,11 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
     try {
       this.visHandler.destroy();
-    } catch (error) {} // eslint-disable-line
+      this.visHandler = null;
+    } catch (error) { } // eslint-disable-line
   };
 
   renderComplete = async () => {
