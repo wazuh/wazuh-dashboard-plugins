@@ -511,19 +511,6 @@ export class AgentsController {
       } catch (error) { } // eslint-disable-line
     }
 
-    /*     if (tab === 'mitre') {
-          const result = await this.apiReq.request('GET', '/rules/mitre', {});
-          this.$scope.mitreIds = (((result || {}).data || {}).data || {}).items;
-    
-          this.$scope.mitreCardsSliderProps = {
-            items: this.$scope.mitreIds,
-            attacksCount: this.$scope.attacksCount,
-            reqTitle: 'MITRE',
-            wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-            addFilter: id => this.addMitrefilter(id),
-          };
-        } */
-
     try {
       this.$scope.showScaScan = false;
       if (tab === 'sca') {

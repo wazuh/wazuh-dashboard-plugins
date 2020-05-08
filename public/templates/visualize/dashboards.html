@@ -46,11 +46,13 @@
                 <!-- End Discover/Dashboard buttons section -->
             </div>
             <!-- End navigation section -->
-            <react-component name="Mitre"/>
 
             <!-- Discover search bar section -->
             <kbn-dis ng-show="octrl.tab && octrl.tab !== 'welcome'"></kbn-dis>
             <!-- End Discover search bar section -->
+            <div ng-if="octrl.tab &&  octrl.tab === 'mitre'">
+                <react-component name="Mitre" />
+            </div>
 
             <!-- Loading status section -->
             <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'"
