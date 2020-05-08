@@ -19,7 +19,9 @@ import {
   EuiFieldSearch,
   EuiSpacer
 } from '@elastic/eui';
-import {mitreTechniques} from '../../lib/index'
+import { mitreTechniques } from '../../lib/index'
+import { FlyoutTechnique } from './components/flyout-technique/';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 export class Techniques extends Component {
   props!: {
@@ -28,13 +30,20 @@ export class Techniques extends Component {
   }
   state: {
     searchValue: any,
+    isFlyoutVisible: Boolean,
+    currentTechniqueData: {},
+    currentTechnique: string
   }
 	constructor(props) {
     super(props);
     
     this.state = {
-      searchValue: ""
+      searchValue: "",
+      isFlyoutVisible: false,
+      currentTechniqueData: {},
+      currentTechnique: ''
     }
+    this.onChangeFlyout.bind(this);
 	}
 
   renderFacet() {
@@ -49,7 +58,8 @@ export class Techniques extends Component {
             tacticsToRender.push(
               <EuiFlexItem key={inx+"_"+idx} style={{border: "1px solid #8080804a", padding: "0 5px 0 5px"}}>
                 <EuiFacetButton
-                  quantity={0}>
+                  quantity={0}
+                  onClick={() => this.showFlyout(technique)}>
                     {mitreTechniques[technique].name}
                 </EuiFacetButton>
               </EuiFlexItem>
@@ -75,9 +85,22 @@ export class Techniques extends Component {
     this.setState({searchValue: e.target.value});
   }
 
-	render() {
-		return (
+  async showFlyout(techniqueData) {
+    console.log({techniqueData});
+    this.setState({isFlyoutVisible: true, currentTechnique: techniqueData });
+  }
 
+  closeFlyout() {
+    this.setState({ isFlyoutVisible: false, currentTechniqueData: {},  });
+  }
+
+  onChangeFlyout = (isFlyoutVisible: boolean) => {
+      this.setState({ isFlyoutVisible });
+  }
+
+	render() {
+    const { isFlyoutVisible, currentTechnique } = this.state;
+		return (
       <div style={{padding: 10}}>
         <EuiFlexGroup>
           <EuiFlexItem>
@@ -102,8 +125,13 @@ export class Techniques extends Component {
         <div>
           {this.renderFacet()}
         </div>
-
-      </div>
+        { isFlyoutVisible &&
+          <FlyoutTechnique
+            onChangeFlyout={this.onChangeFlyout}
+            currentTechniqueData={this.state.currentTechniqueData}
+            currentTechnique={currentTechnique} />
+        } 
+      </div>   
 		)
 	}
 }
