@@ -19,11 +19,11 @@ import {
 } from '@elastic/eui';
 
 class WzPopoverFilters extends Component {
-  filters: { 
-    rules: { label: string; value: string; }[]; 
-    decoders: { label: string; value: string; }[]; 
+  filters: {
+    rules: { label: string; value: string; }[];
+    decoders: { label: string; value: string; }[];
   };
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -32,14 +32,14 @@ class WzPopoverFilters extends Component {
     this.filters = {
       rules: [
         { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }, { label: 'Level', value: 'level' },
-        { label: 'Group', value: 'group' }, { label: 'PCI control', value: 'pci' }, { label: 'GDPR', value: 'gdpr' }, { label: 'HIPAA', value: 'hipaa' }, { label: 'NIST-800-53', value: 'nist-800-53' }
+        { label: 'Group', value: 'group' }, { label: 'PCI control', value: 'pci' }, { label: 'GDPR', value: 'gdpr' }, { label: 'HIPAA', value: 'hipaa' }, { label: 'NIST-800-53', value: 'nist-800-53' }, { label: 'TSC', value: 'tsc' }
       ],
       decoders: [
         { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }
       ]
     };
   }
-  
+
   onButtonClick() {
     this.setState({
       isPopoverOpen: !this.state['isPopoverOpen'],

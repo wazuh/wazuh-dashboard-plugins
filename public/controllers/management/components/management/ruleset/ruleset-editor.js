@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import { connect } from 'react-redux';
 import {
@@ -36,6 +36,8 @@ import RulesetHandler from './utils/ruleset-handler';
 import validateConfigAfterSent from './utils/valid-configuration';
 
 import { toastNotifications } from 'ui/notify';
+import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
+import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -61,9 +63,10 @@ class WzRulesetEditor extends Component {
       isSaving: false,
       error: false,
       inputValue: '',
+      showWarningRestart: false,
       content,
       name,
-      path
+      path,
     };
   }
 
@@ -112,6 +115,7 @@ class WzRulesetEditor extends Component {
       if (overwrite) {
         textSuccess = 'File successfully edited';
       }
+      this.setState({ showWarningRestart: true});
       this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
@@ -155,7 +159,8 @@ class WzRulesetEditor extends Component {
       addingRulesetFile,
       fileContent
     } = this.props.state;
-    const { name, content, path } = this.state;
+    const { wazuhNotReadyYet } = this.props;
+    const { name, content, path, showWarningRestart } = this.state;
     const isEditable = addingRulesetFile
       ? true
       : path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode;
@@ -238,13 +243,23 @@ class WzRulesetEditor extends Component {
                 )}
               </EuiFlexGroup>
               <EuiSpacer size="m" />
+              {this.state.showWarningRestart && (
+                <Fragment>
+                  <WzRestartClusterManagerCallout
+                    onRestart={() => this.setState({showWarningRestart: true})}
+                    onRestarted={() => this.setState({showWarningRestart: false})}
+                    onRestartedError={() => this.setState({showWarningRestart: false})}
+                  />
+                  <EuiSpacer size='s'/>
+                </Fragment>
+              )}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
                     <EuiFlexItem className="codeEditorWrapper">
                       <EuiCodeEditor
                         width="100%"
-                        height="calc(100vh - 175px)"
+                        height={`calc(100vh - ${showWarningRestart || wazuhNotReadyYet ? 250 : 175}px)`}
                         value={content}
                         onChange={newContent =>
                           this.setState({ content: newContent })
@@ -269,14 +284,16 @@ class WzRulesetEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
-    updateFileContent: content => dispatch(updateFileContent(content))
+    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet))
   };
 };
 

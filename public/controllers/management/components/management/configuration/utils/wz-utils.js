@@ -13,7 +13,8 @@
 import { UnsupportedComponents } from '../../../../../../utils/components-os-support';
 
 export const shouldShowComponent = (component, agent) => {
+  const platform = (agent.os &&  agent.os.uname && agent.os.uname.includes('Linux')) ? 'linux' : agent.os && agent.os.platform;
   return !(
-    UnsupportedComponents[agent.agentPlatform] || UnsupportedComponents['other']
+    UnsupportedComponents[platform] || UnsupportedComponents['other']
   ).includes(component);
 };

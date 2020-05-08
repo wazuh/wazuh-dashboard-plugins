@@ -39,6 +39,7 @@ class WzRulesetFilterBar extends Component {
         'gdpr',
         'pci',
         'gpg13',
+        'tsc',
         'group',
         'level',
         'path',

@@ -15,6 +15,7 @@ import { AgentsController } from './agents';
 import { RegisterAgent } from './components/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
 import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
+import { Mitre } from '../../components/overview'
 import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
 import { MainModule } from '../../components/common/modules/main';
@@ -28,5 +29,6 @@ app
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsWelcome', AgentsWelcome)
   .value('AgentsPreview', AgentsPreview)
+  .value('Mitre', Mitre)
   .value('AgentsTable', AgentsTable)
   .value('MainModule', MainModule);
