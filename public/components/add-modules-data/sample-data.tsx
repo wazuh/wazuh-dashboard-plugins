@@ -64,7 +64,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
       },
       {
         title: 'Sample threat detection and response',
-        description: 'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener).',
+        description: 'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener, MITRE).',
         image: '',
         categorySampleAlertsIndex: 'threat-detection'
       }
