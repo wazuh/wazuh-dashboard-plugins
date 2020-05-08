@@ -54,12 +54,11 @@ export class Mitre extends Component {
     const scope = await ModulesHelper.getDiscoverScope();
     this.destroyWatcher = scope.$watchCollection('fetchStatus',
       () => {
-        const { filters, query } = scope.state;
+        const { filters=[], query } = scope.state;
         const { time } = scope;
         this._isMount && this.setState({ filterParams:{ filters, time, query } });
       }
     )
-    getElasticAlerts(this.indexPattern, this.state.filterParams).then(e => console.log(e))
     await this.buildTacticsObject();
   }
 
@@ -83,20 +82,16 @@ export class Mitre extends Component {
       const data = await ApiRequest.request('GET', '/mitre', { select: "phase_name"});
       const result = (((data || {}).data || {}).data || {}).items;
       const tacticsObject = {};
-      if(result){
-        result.map( (item) => {
-          const currentTechnique = item.id;
-          const currentTactic = item.phase_name;
-          currentTactic.map( (tactic) => {
+      result && result.forEach(item => {
+          const {id, phase_name} = item;
+          phase_name.forEach( (tactic) => {
             if(!tacticsObject[tactic]){ 
               tacticsObject[tactic] = [];
             }
-            tacticsObject[tactic].push(currentTechnique);
+            tacticsObject[tactic].push(id);
           })
         });
-      }
-      this.setState({tacticsObject});
-
+      this._isMount && this.setState({tacticsObject});
     }catch(err){
       this.showToast(
         'danger',
@@ -109,16 +104,17 @@ export class Mitre extends Component {
 
 
   render() {
+    const { tacticsObject, selectedTactics, filterParams } = this.state;
     return (
       <EuiPage>
         <EuiPanel paddingSize="none">
-          {Object.keys(this.state.tacticsObject).length && 
+          {Object.keys(tacticsObject).length && 
             <EuiFlexGroup>
               <EuiFlexItem grow={false} style={{width: "15%"}}>
-                <Tactics tacticsObject={this.state.tacticsObject} />
+                <Tactics tacticsObject={tacticsObject} indexPattern={this.indexPattern} filterParams={filterParams} />
               </EuiFlexItem>
               <EuiFlexItem>
-                <Techniques selectedTactics={this.state.selectedTactics} tacticsObject={this.state.tacticsObject} />
+                <Techniques selectedTactics={selectedTactics} tacticsObject={tacticsObject} />
               </EuiFlexItem>
             </EuiFlexGroup>
           }

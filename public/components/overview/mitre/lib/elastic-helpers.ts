@@ -38,7 +38,7 @@ export async function getElasticAlerts(indexPattern, filterParams:IFilterParams,
       ...(aggs ? {aggs} : {})
     }
   }
-  const searchResponse: SearchResponse<Search> = await GenericRequest.request(
+  const searchResponse: Response = await GenericRequest.request(
     'POST',
     '/elastic/esAlerts',
     search

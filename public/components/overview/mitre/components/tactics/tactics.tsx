@@ -16,56 +16,108 @@ import {
   EuiFlexItem,
   EuiFacetButton,
   EuiFacetGroup,
-  EuiIcon,
-  EuiAvatar,
-  EuiSpacer,
 } from '@elastic/eui'
+import { IFilterParams, getElasticAlerts } from '../../lib';
 
 export class Tactics extends Component {
   _isMount = false;
   state: {
     tacticsList: Array<any>,
-    selectedItems: object
+    tacticsCount: { key: string, doc_count:number }[]
+    selectedItems: object,
   }
 
-  props: any;
+  props!: {
+    tacticsObject: object,
+    selectedTactics: Array<any>
+    filterParams: IFilterParams,
+    indexPattern: any,
+  };
 
   constructor(props) {
     super(props);
     this.state = {
       tacticsList: [],
-      selectedItems: {}
+      selectedItems: {},
+      tacticsCount: [],
     }
   }
 
-  componentDidMount(){
+  async componentDidMount(){
+    this._isMount = true;
+    await this.getTacticsCount();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { filterParams, indexPattern } = this.props;
+    const { tacticsCount, selectedItems } = this.state;
+    if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams))
+      return true;
+    if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern))
+      return true;
+    if (JSON.stringify(nextState.tacticsCount) !== JSON.stringify(tacticsCount))
+      return true;
+    if (JSON.stringify(nextState.selectedItems) !== JSON.stringify(selectedItems))
+      return true;
+    return false;
+  }
+
+  async componentDidUpdate() {
+    this.getTacticsCount();
+  }
+
+  async getTacticsCount() {
+    const {indexPattern, filterParams} = this.props;
+    if ( !indexPattern ) { return; }
+    const aggs = {
+      tactics: {
+        terms: {
+            field: "rule.mitre.tactics",
+            size: 1000,
+        }
+      }
+    }
+    
+    // TODO: use `status` and `statusText`  to show errors
+    // @ts-ignore
+    const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
+    const { buckets } = data.aggregations.tactics
+    this._isMount && this.setState({tacticsCount: buckets});
+  }
+
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   facetClicked(id){
-    const { selectedItems } = this.state;
-    selectedItems[id] = selectedItems[id] ? false : true;
+    const { selectedItems: oldSelected } = this.state;
+    const selectedItems = {
+      ...oldSelected,
+      [id]: !oldSelected[id]
+    }
     this.setState({selectedItems});
   }
 
 
   getTacticsList(){
+    const { tacticsCount } = this.state;
     const tacticsIds = Object.keys(this.props.tacticsObject);
-    const tacticsList:Array<any> = [];
-    tacticsIds.map( item => {
-      tacticsList.push(
-      {
+    const tacticsList:Array<any> = tacticsIds.map( item => {
+      const quantity = (tacticsCount.find(tactic => tactic.key === item) || {}).doc_count || 0;
+      return {
         id: item,
         label: item,
-        quantity: 0,  // TODO: count is initialized to 0
+        quantity,
         onClick: (id) => this.facetClicked(id),
-      });
-    });
-
+      }}
+    );
+    
     this.checkAllChecked(tacticsList);
 
     return (
       <>
-        {tacticsList.map(facet => {
+        {tacticsList.sort((a, b) => b.quantity - a.quantity).map(facet => {
           let iconNode;
 
           return (
