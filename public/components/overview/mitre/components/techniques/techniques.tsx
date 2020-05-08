@@ -54,7 +54,6 @@ export class Techniques extends Component {
     const { filterParams } = this.props;
     if ( JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams) )
       this.getTechniquesCount();
-    console.log(this.state.techniquesCount)
   }
 
   componentWillUnmount() {
