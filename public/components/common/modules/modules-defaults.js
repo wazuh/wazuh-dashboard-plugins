@@ -12,12 +12,12 @@
 export const ModulesDefaults = {
   general: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   fim: {
     init: 'inventory',
-    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting', 'settings']
   },
   sca: {
@@ -25,29 +25,34 @@ export const ModulesDefaults = {
     tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
     buttons: ['settings']
   },
+  mitre: {
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
+  },
   virustotal: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   pci: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   hipaa: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   nist: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   gdpr: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard'}, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   syscollector: {
