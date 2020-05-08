@@ -29,9 +29,9 @@ export class Mitre extends Component {
   destroyWatcher: any;
   state: {
     tacticsObject: object,
-    selectedTactics: Array<any>
+    selectedTactics: Object
     filterParams: IFilterParams
-  }
+  } 
 
   props: any;
 
@@ -39,7 +39,7 @@ export class Mitre extends Component {
     super(props);
     this.state = {
       tacticsObject: {},
-      selectedTactics: [],
+      selectedTactics: {},
       filterParams: {
         filters: [],
         query: { language: 'kuery', query: '' },
@@ -112,8 +112,8 @@ export class Mitre extends Component {
     return (
       <EuiPage>
         <EuiPanel paddingSize="none">
-          {Object.keys(tacticsObject).length && 
-            <EuiFlexGroup>
+          {!!Object.keys(tacticsObject).length && 
+            <EuiFlexGroup style={{maxHeight: 550}}>
               <EuiFlexItem grow={false} style={{width: "15%"}}>
                 <Tactics 
                   indexPattern={this.indexPattern}
