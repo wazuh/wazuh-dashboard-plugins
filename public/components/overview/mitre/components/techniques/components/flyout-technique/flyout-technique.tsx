@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, ReactMarkdown } from 'react';
+import React, { Component } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
@@ -25,8 +26,11 @@ import { WzRequest } from '../../../../../../../react-services/wz-request';
 export class FlyoutTechnique extends Component {
   _isMount = false;
   state: {
-    techniqueData: {}
+    techniqueData: {
+      [key:string]: any
+    }
   }
+
   props!: {
     currentTechniqueData: any
     currentTechnique: string
@@ -35,7 +39,9 @@ export class FlyoutTechnique extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      techniqueData: {}
+      techniqueData: {
+        description: ''
+      }
     }
   }
 
@@ -57,15 +63,13 @@ export class FlyoutTechnique extends Component {
       q: `id=${currentTechnique}`
     });
     const rawData = (((result || {}).data || {}).data || {}).items
-    console.log({rawData})
     !!rawData && this.formatTechniqueData(rawData[0]);
   }
 
   formatTechniqueData (rawData) {
     const { platform_name, phase_name} = rawData;
-    const { name, description, x_mitre_version: version , x_mitre_data_sources: dataSources} = rawData.json;
-    // const { } = rawData.json.
-    this.setState({techniqueData: { name, description, phase_name, platform_name, version, dataSources } })
+    const { name, description, x_mitre_version: version } = rawData.json;
+    this.setState({techniqueData: { name, description, phase_name, platform_name, version } })
   }
 
   getArrayFormatted(arrayText) {
@@ -101,17 +105,15 @@ export class FlyoutTechnique extends Component {
   renderBody() {
     const { currentTechnique } = this.props
     const { techniqueData } = this.state;
-    const link = `https://attack.mitre.org/techniques/${techniqueData.id}/`;
-
-    const formattedDescription = techniqueData.description ? (
-      <ReactMarkdown
-        className="wz-markdown-margin"
-        source={techniqueData.description}
-      />
-    ) : (
-      techniqueData.description
-    );
-
+    const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
+    const formattedDescription = techniqueData.description 
+      ? (
+        <ReactMarkdown
+          className="wz-markdown-margin"
+          source={techniqueData.description}
+        />
+      )
+      : techniqueData.description;
     const data = [
       {
         title: 'Id',
@@ -139,10 +141,10 @@ export class FlyoutTechnique extends Component {
         title: 'Version',
         description: techniqueData.version
       },
-      // {
-      //   title: 'Description',
-      //   description: formattedDescription
-      // }
+      {
+        title: 'Description',
+        description: formattedDescription
+      }
     ];
     return (
       <EuiFlyoutBody>
@@ -158,7 +160,7 @@ export class FlyoutTechnique extends Component {
             <p>
               More info:{' '}
               <EuiLink href={link} target="_blank">
-                {`MITRE ATT&CK - ${techniqueData.id}`}
+                {`MITRE ATT&CK - ${currentTechnique}`}
               </EuiLink>
             </p>
           </div>
