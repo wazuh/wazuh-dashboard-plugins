@@ -17,23 +17,32 @@ import {
   EuiFlexItem,
   EuiTitle,
   EuiFieldSearch,
-  EuiSpacer
+  EuiSpacer,
+  EuiToolTip
 } from '@elastic/eui';
-import { mitreTechniques } from '../../lib/index'
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
+import { ITactic } from '../../';
 
 export class Techniques extends Component {
+  _isMount = false;
+
   props!: {
-    tacticsObject: any,
+    tacticsObject: ITactic
     selectedTactics: any
+    indexPattern: any
+    filterParams: IFilterParams
   }
+
   state: {
+    techniquesCount: {key: string, doc_count: number}[]
     searchValue: any,
     isFlyoutVisible: Boolean,
     currentTechniqueData: {},
     currentTechnique: string
   }
+
 	constructor(props) {
     super(props);
     
@@ -41,38 +50,100 @@ export class Techniques extends Component {
       searchValue: "",
       isFlyoutVisible: false,
       currentTechniqueData: {},
+      techniquesCount: [],
       currentTechnique: ''
     }
     this.onChangeFlyout.bind(this);
 	}
+  
+  async componentDidMount(){
+    this._isMount = true;
+    await this.getTechniquesCount();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { filterParams } = this.props;
+    if ( JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams) )
+      this.getTechniquesCount();
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
+  }
+
+  async getTechniquesCount() {
+    try{
+      const {indexPattern, filterParams} = this.props;
+      if ( !indexPattern ) { return; }
+      const aggs = {
+        techniques: {
+          terms: {
+              field: "rule.mitre.id",
+              size: 1000,
+          }
+        }
+      }
+      
+      // TODO: use `status` and `statusText`  to show errors
+      // @ts-ignore
+      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
+      const { buckets } = data.aggregations.techniques;
+      this._isMount && this.setState({techniquesCount: buckets, loadingAlerts: false});
+        
+    } catch(err){
+      // this.showToast(
+      //   'danger',
+      //   'Error',
+      //   `Mitre alerts could not be fetched: ${err}`,
+      //   3000
+      // );
+      this._isMount && this.setState({loadingAlerts: false})
+    }
+  }
 
   renderFacet() {
-    const {tacticsObject} = this.props;
-    const tacticsToRender: Array<JSX.Element> = [];
+    const { tacticsObject } = this.props;
+    const { techniquesCount } = this.state;
+    const tacticsToRender: Array<any> = [];
 
     Object.keys(tacticsObject).forEach((key, inx) => {
       const currentTechniques = tacticsObject[key];
       if(this.props.selectedTactics[key]){
         currentTechniques.forEach( (technique,idx) => {
-          if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase())){
-            tacticsToRender.push(
-              <EuiFlexItem key={inx+"_"+idx} style={{border: "1px solid #8080804a", padding: "0 5px 0 5px"}}>
-                <EuiFacetButton
-                  quantity={0}
-                  onClick={() => this.showFlyout(technique)}>
-                    {mitreTechniques[technique].name}
-                </EuiFacetButton>
-              </EuiFlexItem>
-            );
+          if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) || mitreTechniques[technique].name.toLowerCase().includes(this.state.searchValue.toLowerCase()) ){
+            const quantity = (techniquesCount.find(item => item.key === technique) || {}).doc_count || 0;
+            tacticsToRender.push({
+              id: technique,
+              label: `${technique} - ${mitreTechniques[technique].name}`,
+              quantity
+            })
           }
         });
 
       }
     });
+
+    const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
+      const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
+
+      return(
+        <EuiFlexItem key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
+          <EuiToolTip delay="long" position="top" content={tooltipContent}>
+            <EuiFacetButton
+              style={{width: "100%", padding: "0 5px 0 5px"}}
+              quantity={item.quantity}
+              onClick={() => this.showFlyout(item.id)}>
+                {item.id} - {mitreTechniques[item.id].name}
+            </EuiFacetButton>
+        </EuiToolTip>
+        </EuiFlexItem>
+      );
+        
+    })
     if(tacticsToRender.length){
       return (
       <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "420px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
-        {tacticsToRender}
+        {tacticsToRenderOrdered}
       </EuiFlexGrid>
       )
     }else{

@@ -16,7 +16,14 @@ import {
   EuiFlexItem,
   EuiFacetButton,
   EuiFacetGroup,
-  EuiCheckbox
+  EuiCheckbox,
+  EuiPopover,
+  EuiButtonIcon,
+  EuiFormRow,
+  EuiButton,
+  EuiButtonEmpty,
+  EuiContextMenu,
+  EuiIcon
 } from '@elastic/eui'
 import { IFilterParams, getElasticAlerts } from '../../lib';
 import { toastNotifications } from 'ui/notify';
@@ -27,7 +34,8 @@ export class Tactics extends Component {
     tacticsList: Array<any>,
     tacticsCount: { key: string, doc_count:number }[],
     allSelected : boolean,
-    loadingAlerts: boolean
+    loadingAlerts: boolean,
+    isPopoverOpen: boolean
   }
 
   props!: {
@@ -44,7 +52,8 @@ export class Tactics extends Component {
       tacticsList: [],
       tacticsCount: [],
       allSelected: false,
-      loadingAlerts: true
+      loadingAlerts: true,
+      isPopoverOpen: false
     }
   }
 
@@ -111,7 +120,7 @@ export class Tactics extends Component {
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
       const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
-      const { buckets } = data.aggregations.tactics
+      const { buckets } = data.aggregations.tactics;
       this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false});
         
     } catch(err){
@@ -205,8 +214,47 @@ export class Tactics extends Component {
     onChangeSelectedTactics(selectedTactics);
   }
   
+  onGearButtonClick(){
+    this.setState({isPopoverOpen: !this.state.isPopoverOpen});
+  }
+  
+  closePopover(){
+    this.setState({isPopoverOpen: false});
+  }
+
+  selectAll(status){
+    const {selectedTactics, onChangeSelectedTactics} = this.props;
+    Object.keys(selectedTactics).map( item => {
+      selectedTactics[item] = status;
+    });
+    onChangeSelectedTactics(selectedTactics);
+  }
 
   render() {
+    const panels = [
+      {
+        id: 0,
+        title: 'Options',
+        items: [
+          {
+            name: 'Select all',
+            icon: <EuiIcon type="check" size="m" />,
+            onClick: () => {
+              this.closePopover();
+              this.selectAll(true);
+            },
+          },
+          {
+            name: 'Unselect all',
+            icon: <EuiIcon type="cross" size="m" />,
+            onClick: () => {
+              this.closePopover();
+              this.selectAll(false);
+            },
+          },
+        ]
+      }
+    ]
     return (
       <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px"}}>
         <EuiFlexGroup>
@@ -216,21 +264,17 @@ export class Tactics extends Component {
             </EuiTitle>
           </EuiFlexItem>
 
-          <EuiFlexItem grow={false} style={{marginTop:'25px', marginRight:4}}>{ this.state.allSelected
-                  ? 'Unselect All'
-                  : 'Select all' }</EuiFlexItem>
-          <EuiFlexItem grow={false} style={{marginTop:'25px', marginLeft:0}}>
-                <EuiCheckbox
-                  style={{ alignSelf: 'flex-end' }}
-                  id='selectTactics'
-                  checked={this.state.allSelected}
-                  onChange={() => {
-                    this.onCheckAllClick()
-                  }
-                  } />
-              </EuiFlexItem>
+          <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}> 
+            <EuiPopover
+              button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()}></EuiButtonIcon>)}
+              isOpen={this.state.isPopoverOpen}
+              panelPaddingSize="none"
+              withTitle
+              closePopover={() => this.closePopover()}>
+                <EuiContextMenu initialPanelId={0} panels={panels} />
+            </EuiPopover>
+          </EuiFlexItem>
         </EuiFlexGroup>
-        
         <EuiFacetGroup style={{ }}>
           {this.getTacticsList()}
         </EuiFacetGroup>
