@@ -19,6 +19,7 @@ import {
   EuiFieldSearch,
   EuiSpacer
 } from '@elastic/eui';
+import {mitreTechniques} from '../../lib/index'
 
 export class Techniques extends Component {
   props!: {
@@ -45,13 +46,11 @@ export class Techniques extends Component {
       if(this.props.selectedTactics[key]){
         currentTechniques.forEach( (technique,idx) => {
           if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase())){
-            console.log(technique);
-            console.log(this.state.searchValue)
             tacticsToRender.push(
               <EuiFlexItem key={inx+"_"+idx} style={{border: "1px solid #8080804a", padding: "0 5px 0 5px"}}>
                 <EuiFacetButton
                   quantity={0}>
-                    {technique}
+                    {mitreTechniques[technique].name}
                 </EuiFacetButton>
               </EuiFlexItem>
             );
