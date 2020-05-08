@@ -22,13 +22,17 @@ import { ApiRequest } from '../../../react-services/api-request';
 import { toastNotifications } from 'ui/notify';
 import { IFilterParams, getElasticAlerts, getIndexPattern } from './lib';
 
+export interface ITactic {
+  [key:string]: string[]
+}
+
 
 export class Mitre extends Component {
   _isMount = false;
   indexPattern: any;
   destroyWatcher: any;
   state: {
-    tacticsObject: object,
+    tacticsObject: ITactic,
     selectedTactics: Object
     filterParams: IFilterParams
   } 
@@ -121,7 +125,9 @@ export class Mitre extends Component {
                   {...this.state} />
               </EuiFlexItem>
               <EuiFlexItem>
-                <Techniques selectedTactics={selectedTactics} tacticsObject={tacticsObject} />
+                <Techniques
+                  indexPattern={this.indexPattern}
+                  {...this.state} />
               </EuiFlexItem>
             </EuiFlexGroup>
           }

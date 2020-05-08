@@ -19,26 +19,81 @@ import {
   EuiFieldSearch,
   EuiSpacer
 } from '@elastic/eui';
-import {mitreTechniques} from '../../lib/index'
+import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
+import { ITactic } from '../../';
 
 export class Techniques extends Component {
-  props!: {
-    tacticsObject: any,
-    selectedTactics: any
-  }
+  _isMount = false;
   state: {
-    searchValue: any,
+    searchValue: any
+    techniquesCount: {key: string, doc_count: number}[]
   }
+
+  props!: {
+    tacticsObject: ITactic
+    selectedTactics: any
+    indexPattern: any
+    filterParams: IFilterParams
+  }
+
 	constructor(props) {
     super(props);
     
     this.state = {
-      searchValue: ""
+      searchValue: "",
+      techniquesCount: [],
     }
-	}
+  }
+  
+  async componentDidMount(){
+    this._isMount = true;
+    await this.getTechniquesCount();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { filterParams } = this.props;
+    if ( JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams) )
+      this.getTechniquesCount();
+    console.log(this.state.techniquesCount)
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
+  }
+
+  async getTechniquesCount() {
+    try{
+      const {indexPattern, filterParams} = this.props;
+      if ( !indexPattern ) { return; }
+      const aggs = {
+        techniques: {
+          terms: {
+              field: "rule.mitre.id",
+              size: 1000,
+          }
+        }
+      }
+      
+      // TODO: use `status` and `statusText`  to show errors
+      // @ts-ignore
+      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
+      const { buckets } = data.aggregations.techniques;
+      this._isMount && this.setState({techniquesCount: buckets, loadingAlerts: false});
+        
+    } catch(err){
+      // this.showToast(
+      //   'danger',
+      //   'Error',
+      //   `Mitre alerts could not be fetched: ${err}`,
+      //   3000
+      // );
+      this._isMount && this.setState({loadingAlerts: false})
+    }
+  }
 
   renderFacet() {
-    const {tacticsObject} = this.props;
+    const { tacticsObject } = this.props;
+    const { techniquesCount } = this.state;
     const tacticsToRender: Array<JSX.Element> = [];
 
     Object.keys(tacticsObject).forEach((key, inx) => {
@@ -46,10 +101,11 @@ export class Techniques extends Component {
       if(this.props.selectedTactics[key]){
         currentTechniques.forEach( (technique,idx) => {
           if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase())){
+            const quantity = (techniquesCount.find(item => item.key === technique) || {}).doc_count || 0;
             tacticsToRender.push(
               <EuiFlexItem key={inx+"_"+idx} style={{border: "1px solid #8080804a", padding: "0 5px 0 5px"}}>
                 <EuiFacetButton
-                  quantity={0}>
+                  quantity={quantity}>
                     {mitreTechniques[technique].name}
                 </EuiFacetButton>
               </EuiFlexItem>

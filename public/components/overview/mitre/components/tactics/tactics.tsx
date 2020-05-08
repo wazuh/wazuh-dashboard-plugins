@@ -111,7 +111,7 @@ export class Tactics extends Component {
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
       const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
-      const { buckets } = data.aggregations.tactics
+      const { buckets } = data.aggregations.tactics;
       this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false});
         
     } catch(err){
