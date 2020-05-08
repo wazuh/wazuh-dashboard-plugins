@@ -17,7 +17,8 @@ import {
   EuiFlexItem,
   EuiTitle,
   EuiFieldSearch,
-  EuiSpacer
+  EuiSpacer,
+  EuiToolTip
 } from '@elastic/eui';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
@@ -93,31 +94,46 @@ export class Techniques extends Component {
   renderFacet() {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
-    const tacticsToRender: Array<JSX.Element> = [];
+    const tacticsToRender: Array<any> = [];
 
     Object.keys(tacticsObject).forEach((key, inx) => {
       const currentTechniques = tacticsObject[key];
       if(this.props.selectedTactics[key]){
         currentTechniques.forEach( (technique,idx) => {
-          if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase())){
+          if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) || mitreTechniques[technique].name.toLowerCase().includes(this.state.searchValue.toLowerCase()) ){
             const quantity = (techniquesCount.find(item => item.key === technique) || {}).doc_count || 0;
-            tacticsToRender.push(
-              <EuiFlexItem key={inx+"_"+idx} style={{border: "1px solid #8080804a", padding: "0 5px 0 5px"}}>
-                <EuiFacetButton
-                  quantity={quantity}>
-                    {mitreTechniques[technique].name}
-                </EuiFacetButton>
-              </EuiFlexItem>
-            );
+            tacticsToRender.push({
+              id: technique,
+              label: `${technique} - ${mitreTechniques[technique].name}`,
+              quantity
+            })
           }
         });
 
       }
     });
+
+    const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
+      const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
+
+      return(
+        <EuiFlexItem key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
+          <EuiToolTip delay="long" position="top" content={tooltipContent}>
+            <EuiFacetButton
+              style={{width: "100%", padding: "0 5px 0 5px"}}
+              quantity={item.quantity}
+              onClick={() => alert("open flyout of " + item.id)}>
+                {item.id} - {mitreTechniques[item.id].name}
+            </EuiFacetButton>
+        </EuiToolTip>
+        </EuiFlexItem>
+      );
+        
+    })
     if(tacticsToRender.length){
       return (
       <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "420px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
-        {tacticsToRender}
+        {tacticsToRenderOrdered}
       </EuiFlexGrid>
       )
     }else{
