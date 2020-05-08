@@ -111,6 +111,7 @@ export class WazuhApiCtrl {
         // Hide Wazuh API password
         const copied = { ...api };
         copied.secret = '****';
+        copied.password = '****';
 
         return {
           statusCode: 200,
