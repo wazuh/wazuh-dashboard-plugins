@@ -92,4 +92,13 @@ export function WazuhElasticRouter(server) {
       return ctrl.alerts(req, res);
     }
   });
+
+  // Fetch alerts directly from Elasticsearch with esQuery object
+  server.route({
+    method: 'POST',
+    path: '/elastic/esAlerts',
+    handler(req, res) {
+      return ctrl.esAlerts(req, res);
+    }
+  });
 }

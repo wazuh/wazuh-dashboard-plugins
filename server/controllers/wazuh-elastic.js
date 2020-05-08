@@ -760,4 +760,14 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 4010, 500, reply);
     }
   }
+
+  async esAlerts(req, reply) {
+    try {
+      const data = await this.wzWrapper.searchWazuhAlertsWithRequest(req, req.payload);
+      return data;
+    } catch (error) {
+      log('wazuh-elastic:esAlerts', error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, reply);
+    }
+  }
 }

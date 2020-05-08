@@ -586,6 +586,45 @@ export const agentVisualizations = {
       }
     ]
   },
+  mitre: {
+    rows: [
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Alerts evolution over time',
+            id: 'Wazuh-App-Agents-MITRE-Alerts-Evolution',
+            width: 70
+          },
+          {
+            title: 'Top tactics',
+            id: 'Wazuh-App-Agents-MITRE-Top-Tactics',
+            width: 30
+          }
+        ]
+      },
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Rule level by attack',
+            id: 'Wazuh-App-Agents-MITRE-Level-By-Attack',
+            width: 33
+          },
+          {
+            title: 'MITRE attacks by tactic',
+            id: 'Wazuh-App-Agents-MITRE-Attacks-By-Tactic',
+            width: 34
+          },
+          {
+            title: 'Rule level by tactic',
+            id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
+            width: 34
+          }
+        ]
+      },
+    ]
+  },
   docker: {
     rows: [
       {
