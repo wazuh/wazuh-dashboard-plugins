@@ -32,9 +32,9 @@ export class WazuhElasticCtrl {
     this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
     this.wzSampleAlertsCaterories = {
-      'security': [{ syscheck: true }, { aws: true }, { authentication: true }, { ssh: true }, { apache: true, alerts: 2000 }, { web: true }, { windows: { service_control_manager: true}, alerts: 1000}],
+      'security': [{ syscheck: true }, { aws: true }, { gcp: true }, { authentication: true }, { ssh: true }, { apache: true, alerts: 2000 }, { web: true }, { windows: { service_control_manager: true}, alerts: 1000}],
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
-      'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }]
+      'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
     this.wzSampleAlertsIndexPrefix = 'wazuh-alerts-3.x-';
     this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-3.x-sample-security, wazuh-alerts-3.x-sample-auditing-policy-monitoring, wazuh-alerts-3.x-threat-detection
@@ -929,6 +929,16 @@ export class WazuhElasticCtrl {
         `Error deleting sample alerts of ${sampleAlertsIndex} index`
       );
       return ErrorResponse(error.message || error, 1000, 500, reply);
+    }
+  }
+
+  async esAlerts(req, reply) {
+    try {
+      const data = await this.wzWrapper.searchWazuhAlertsWithRequest(req, req.payload);
+      return data;
+    } catch (error) {
+      log('wazuh-elastic:esAlerts', error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, reply);
     }
   }
 }

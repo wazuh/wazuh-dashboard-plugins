@@ -53,7 +53,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
     this.categories = [
       {
         title: 'Sample security information',
-        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, authorization, ssh, web).',
+        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Google Cloud Platform, authorization, ssh, web).',
         image: '',
         categorySampleAlertsIndex: 'security'
       },
@@ -65,7 +65,7 @@ class WzSampleData extends Component<IWzSampleDataProps> {
       },
       {
         title: 'Sample threat detection and response',
-        description: 'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener).',
+        description: 'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirustTotal, Osquery, Docker listener, MITRE).',
         image: '',
         categorySampleAlertsIndex: 'threat-detection'
       }

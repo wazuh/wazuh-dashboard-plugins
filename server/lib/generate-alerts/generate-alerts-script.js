@@ -19,6 +19,7 @@ import * as Authentication from './sample-data/authentication';
 import * as AWS from './sample-data/aws';
 import * as IntegrityMonitoring from './sample-data/integrity-monitoring';
 import * as CISCAT from './sample-data/ciscat';
+import * as GCP from './sample-data/gcp';
 import * as Docker from './sample-data/docker';
 import * as Mitre from './sample-data/mitre';
 import * as Osquery from './sample-data/osquery';
@@ -44,6 +45,7 @@ const ruleMaxFiredtimes = 10;
  * @param {boolean} params.aws - if true, set aws fields
  * @param {boolean} params.audit - if true, set System Auditing fields
  * @param {boolean} params.ciscat - if true, set CIS-CAT fields
+ * @param {boolean} params.gcp - if true, set GCP fields
  * @param {boolean} params.docker - if true, set Docker fields
  * @param {boolean} params.mitre - if true, set Mitre att&ck fields
  * @param {boolean} params.openscap - if true, set OpenSCAP fields
@@ -267,6 +269,38 @@ function generateAlert(params) {
         alert.GeoLocation = randomArrayItem(GeoLocation);
     }
 
+    if (params.gcp) {
+        alert.rule = randomArrayItem(GCP.arrayRules);
+        alert.data = {
+            insertId: "uk1zpe23xcj",
+            jsonPayload: {
+                authAnswer: GCP.arrayAuthAnswer[Math.floor(GCP.arrayAuthAnswer.length * Math.random())],
+                protocol: GCP.arrayProtocol[Math.floor(GCP.arrayProtocol.length * Math.random())],
+                queryName: GCP.arrayQueryName[Math.floor(GCP.arrayQueryName.length * Math.random())],
+                queryType: GCP.arrayQueryType[Math.floor(GCP.arrayQueryType.length * Math.random())],
+                responseCode: GCP.arrayResponseCode[Math.floor(GCP.arrayResponseCode.length * Math.random())],
+                sourceIP: GCP.arraySourceIP[Math.floor(GCP.arraySourceIP.length * Math.random())],
+                vmInstanceId: "4980113928800839680.000000",
+                vmInstanceName: "531339229531.instance-1"
+            },
+            logName: "projects/wazuh-dev/logs/dns.googleapis.com%2Fdns_queries",
+            receiveTimestamp: "2019-11-11T02:42:05.05853152Z",
+            resource: {
+                labels: {
+                location: GCP.arrayLocation[Math.floor(GCP.arrayLocation.length * Math.random())],
+                project_id: GCP.arrayProject[Math.floor(GCP.arrayProject.length * Math.random())],
+                source_type: GCP.arraySourceType[Math.floor(GCP.arraySourceType.length * Math.random())],
+                target_type: "external"
+                },
+                type: GCP.arrayType[Math.floor(GCP.arrayType.length * Math.random())],
+            },
+            severity: GCP.arraySeverity[Math.floor(GCP.arraySeverity.length * Math.random())],
+            timestamp: "2019-11-11T02:42:04.34921449Z"
+        }
+
+        alert.GeoLocation = randomArrayItem(GeoLocation);
+    }
+
     if (params.audit) {
         let dataAudit = randomArrayItem(Audit.dataAudit);
         alert.data = dataAudit.data;
@@ -300,11 +334,11 @@ function generateAlert(params) {
     }
 
     if (params.mitre) {
+        const dataMitre = randomArrayItem(Mitre.rule);
         alert.rule.mitre = {
-            id: randomUniqueValuesFromArray(Mitre.id, 3).sort(),
-            tactics: randomUniqueValuesFromArray(Mitre.tactics, 3).sort()
+            tactics: dataMitre.tactics,
+            id: dataMitre.id[Math.floor(dataMitre.id.length * Math.random())],
         }
-        //TODO: add info
     }
 
     if (params.openscap) {
