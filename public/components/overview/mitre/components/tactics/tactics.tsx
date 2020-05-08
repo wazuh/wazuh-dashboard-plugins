@@ -24,21 +24,20 @@ export class Tactics extends Component {
   state: {
     tacticsList: Array<any>,
     tacticsCount: { key: string, doc_count:number }[]
-    selectedItems: object,
   }
 
   props!: {
     tacticsObject: object,
     selectedTactics: Array<any>
-    filterParams: IFilterParams,
-    indexPattern: any,
+    filterParams: IFilterParams
+    indexPattern: any
+    onChangeSelectedTactics(selectedTactics): void
   };
 
   constructor(props) {
     super(props);
     this.state = {
       tacticsList: [],
-      selectedItems: {},
       tacticsCount: [],
     }
   }
@@ -49,21 +48,23 @@ export class Tactics extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { filterParams, indexPattern } = this.props;
-    const { tacticsCount, selectedItems } = this.state;
+    const { filterParams, indexPattern, selectedTactics } = this.props;
+    const { tacticsCount } = this.state;
     if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams))
       return true;
     if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern))
       return true;
     if (JSON.stringify(nextState.tacticsCount) !== JSON.stringify(tacticsCount))
       return true;
-    if (JSON.stringify(nextState.selectedItems) !== JSON.stringify(selectedItems))
+    if (JSON.stringify(nextState.selectedTactics) !== JSON.stringify(selectedTactics))
       return true;
     return false;
   }
 
-  async componentDidUpdate() {
-    this.getTacticsCount();
+  async componentDidUpdate(prevProps, prevState) {
+    const { tacticsCount } = this.state;
+    if (JSON.stringify(prevState.tacticsCount) !== JSON.stringify(tacticsCount))
+      this.getTacticsCount();
   }
 
   async getTacticsCount() {
@@ -91,17 +92,18 @@ export class Tactics extends Component {
   }
 
   facetClicked(id){
-    const { selectedItems: oldSelected } = this.state;
-    const selectedItems = {
+    const { selectedTactics: oldSelected, onChangeSelectedTactics } = this.props;
+    const selectedTactics = {
       ...oldSelected,
       [id]: !oldSelected[id]
     }
-    this.setState({selectedItems});
+    onChangeSelectedTactics(selectedTactics);
   }
 
 
   getTacticsList(){
     const { tacticsCount } = this.state;
+    const { selectedTactics } = this.props;
     const tacticsIds = Object.keys(this.props.tacticsObject);
     const tacticsList:Array<any> = tacticsIds.map( item => {
       const quantity = (tacticsCount.find(tactic => tactic.key === item) || {}).doc_count || 0;
@@ -113,36 +115,35 @@ export class Tactics extends Component {
       }}
     );
     
-    this.checkAllChecked(tacticsList);
+    // this.checkAllChecked(tacticsList);
 
     return (
       <>
-        {tacticsList.sort((a, b) => b.quantity - a.quantity).map(facet => {
-          let iconNode;
-
-          return (
-            <EuiFacetButton
-              key={facet.id}
-              id={`${facet.id}`}
-              quantity={facet.quantity}
-              isSelected={this.state.selectedItems[facet.id]}
-              icon={iconNode}
-              onClick={
-                facet.onClick ? () => facet.onClick(facet.id) : undefined
-              }>
-              {facet.label}
-            </EuiFacetButton>
-          );
-        })}
+      {tacticsList.sort((a, b) => b.quantity - a.quantity).map(facet => {
+        let iconNode;
+        return (
+          <EuiFacetButton
+            key={facet.id}
+            id={`${facet.id}`}
+            quantity={facet.quantity}
+            isSelected={selectedTactics[facet.id]}
+            icon={iconNode}
+            onClick={
+              facet.onClick ? () => facet.onClick(facet.id) : undefined
+            }>
+            {facet.label}
+          </EuiFacetButton>
+        );
+      })}
       </>
     );
     
   }
 
-  checkAllChecked(tacticList){
-
-    tacticList.map( item => {
-      if(!this.state.selectedItems[item.id])
+  checkAllChecked(tacticList: any[]){
+    const { selectedTactics } = this.props;
+    tacticList.forEach( item => {
+      if(!selectedTactics[item.id])
         console.log("false")
         return;
     });

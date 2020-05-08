@@ -46,6 +46,7 @@ export class Mitre extends Component {
         time: {from: 'now/d', to: 'now/d'},
       }
     }
+    this.onChangeSelectedTactics.bind(this);
   }
 
   async componentDidMount(){
@@ -102,6 +103,9 @@ export class Mitre extends Component {
     }
   }
 
+  onChangeSelectedTactics = (selectedTactics) => {
+    this.setState({selectedTactics});
+  }
 
   render() {
     const { tacticsObject, selectedTactics, filterParams } = this.state;
@@ -111,7 +115,10 @@ export class Mitre extends Component {
           {Object.keys(tacticsObject).length && 
             <EuiFlexGroup>
               <EuiFlexItem grow={false} style={{width: "15%"}}>
-                <Tactics tacticsObject={tacticsObject} indexPattern={this.indexPattern} filterParams={filterParams} />
+                <Tactics 
+                  indexPattern={this.indexPattern}
+                  onChangeSelectedTactics={this.onChangeSelectedTactics}
+                  {...this.state} />
               </EuiFlexItem>
               <EuiFlexItem>
                 <Techniques selectedTactics={selectedTactics} tacticsObject={tacticsObject} />
