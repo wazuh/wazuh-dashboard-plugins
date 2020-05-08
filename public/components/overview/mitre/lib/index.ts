@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Integrity monitoring components
+ * Wazuh app - Mitre alerts components
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { Events } from './events';
-export { Dashboard } from './dashboard';
-export { Loader } from './loader';
-export { Settings } from './settings';
-export { ModulesHelper } from './modules-helper.js';
+export { IFilterParams, getElasticAlerts, getIndexPattern } from './elastic-helpers';
+
+export { mitreTechniques } from './mitre_techniques';
