@@ -63,9 +63,9 @@ export class FlyoutTechnique extends Component {
 
   formatTechniqueData (rawData) {
     const { platform_name, phase_name} = rawData;
-    const { name, description, x_mitre_version: version } = rawData.json;
+    const { name, description, x_mitre_version: version , x_mitre_data_sources: dataSources} = rawData.json;
     // const { } = rawData.json.
-    this.setState({techniqueData: { name, description, phase_name, platform_name, version } })
+    this.setState({techniqueData: { name, description, phase_name, platform_name, version, dataSources } })
   }
 
   getArrayFormatted(arrayText) {
@@ -129,12 +129,12 @@ export class FlyoutTechnique extends Component {
           techniqueData.platform_name
         )
       },
-      // {
-      //   title: 'Data sources',
-      //   description: this.getArrayFormatted(
-      //     techniqueData.dataSources
-      //   )
-      // },
+      {
+        title: 'Data sources',
+        description: this.getArrayFormatted(
+          techniqueData.dataSources
+        )
+      },
       {
         title: 'Version',
         description: techniqueData.version
