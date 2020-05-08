@@ -62,8 +62,8 @@ export class Tactics extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    const { tacticsCount } = this.state;
-    if (JSON.stringify(prevState.tacticsCount) !== JSON.stringify(tacticsCount))
+    const { filterParams } = this.props;
+    if (JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams))
       this.getTacticsCount();
   }
 
