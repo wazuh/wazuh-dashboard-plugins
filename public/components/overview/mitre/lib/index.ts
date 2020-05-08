@@ -11,3 +11,5 @@
  */
 
 export { IFilterParams, getElasticAlerts, getIndexPattern } from './elastic-helpers';
+
+export { mitreTechniques } from './mitre_techniques';
