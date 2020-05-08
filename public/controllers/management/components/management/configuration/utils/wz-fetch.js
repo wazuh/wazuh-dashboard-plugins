@@ -514,3 +514,24 @@ export const checkAdminMode = async () => {
     return Promise.error(error);
   }
 };
+
+/**
+ * Restart cluster or Manager
+ */
+export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
+  try{
+    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
+    const isCluster =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    
+    isCluster ? await restartCluster() : await restartManager();
+    // Dispatch a Redux action
+    updateWazuhNotReadyYet(
+      `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`
+    );
+    await makePing(updateWazuhNotReadyYet);
+    return { restarted: isCluster ? 'cluster' : 'manager'}
+  }catch (error){
+    return Promise.error(error);
+  };
+};

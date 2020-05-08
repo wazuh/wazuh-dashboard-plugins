@@ -166,7 +166,6 @@ export class OverviewController {
     this.overviewModuleReady = false;
     this.visFactoryService.clear();
     this.tabVisualizations.setTab(newTab);
-
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();

@@ -273,8 +273,8 @@ export default class RulesetColumns {
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53'];
-    const buildBadge = (field) => {
+    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc'];
+    const buildBadge = field => {
       const idGenerator = () => {
         return (
           '_' +

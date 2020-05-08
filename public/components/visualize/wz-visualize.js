@@ -92,6 +92,15 @@ export class WzVisualize extends Component {
       });
     }
 
+    if (selectedTab === 'tsc') {
+      this.setState({
+        cardReqs: {
+          items: await this.commonData.getTSC(),
+          reqTitle: 'TSC Requirement'
+        }
+      });
+    }
+
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
       const result = ((data || {}).data || {}).data || false;

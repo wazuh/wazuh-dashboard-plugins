@@ -14,3 +14,4 @@ export { Events } from './events';
 export { Dashboard } from './dashboard';
 export { Loader } from './loader';
 export { Settings } from './settings';
+export { ModulesHelper } from './modules-helper.js';

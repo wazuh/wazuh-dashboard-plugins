@@ -53,10 +53,12 @@ export const initialWazuhConfig = `---
 #extensions.gdpr      : true
 #extensions.hipaa     : true
 #extensions.nist      : true
+#extensions.tsc       : true
 #extensions.audit     : true
 #extensions.oscap     : false
 #extensions.ciscat    : false
 #extensions.aws       : false
+#extensions.gcp       : false
 #extensions.virustotal: false
 #extensions.osquery   : false
 #extensions.docker    : false
