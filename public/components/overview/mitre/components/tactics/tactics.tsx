@@ -16,14 +16,18 @@ import {
   EuiFlexItem,
   EuiFacetButton,
   EuiFacetGroup,
+  EuiCheckbox
 } from '@elastic/eui'
 import { IFilterParams, getElasticAlerts } from '../../lib';
+import { toastNotifications } from 'ui/notify';
 
 export class Tactics extends Component {
   _isMount = false;
   state: {
     tacticsList: Array<any>,
-    tacticsCount: { key: string, doc_count:number }[]
+    tacticsCount: { key: string, doc_count:number }[],
+    allSelected : boolean,
+    loadingAlerts: boolean
   }
 
   props!: {
@@ -39,13 +43,27 @@ export class Tactics extends Component {
     this.state = {
       tacticsList: [],
       tacticsCount: [],
+      allSelected: false,
+      loadingAlerts: true
     }
   }
 
   async componentDidMount(){
     this._isMount = true;
+    this.initTactics(); // all tactics are checked on init
     await this.getTacticsCount();
   }
+
+  initTactics(){
+    const tacticsIds = Object.keys(this.props.tacticsObject);
+    const selectedTactics = {}
+     tacticsIds.forEach( item => {
+      selectedTactics[item] = true;
+    });
+    
+    this.props.onChangeSelectedTactics(selectedTactics);
+  }
+
 
   shouldComponentUpdate(nextProps, nextState) {
     const { filterParams, indexPattern, selectedTactics } = this.props;
@@ -67,23 +85,45 @@ export class Tactics extends Component {
       this.getTacticsCount();
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time
+    });
+  };
+
   async getTacticsCount() {
-    const {indexPattern, filterParams} = this.props;
-    if ( !indexPattern ) { return; }
-    const aggs = {
-      tactics: {
-        terms: {
-            field: "rule.mitre.tactics",
-            size: 1000,
+    this.setState({loadingAlerts: true});
+    try{
+      const {indexPattern, filterParams} = this.props;
+      if ( !indexPattern ) { return; }
+      const aggs = {
+        tactics: {
+          terms: {
+              field: "rule.mitre.tactics",
+              size: 1000,
+          }
         }
       }
+      
+      // TODO: use `status` and `statusText`  to show errors
+      // @ts-ignore
+      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
+      const { buckets } = data.aggregations.tactics
+      this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false});
+        
+    } catch(err){
+      this.showToast(
+        'danger',
+        'Error',
+        `Mitre alerts could not be fetched: ${err}`,
+        3000
+      );
+      this.setState({loadingAlerts: false})
     }
     
-    // TODO: use `status` and `statusText`  to show errors
-    // @ts-ignore
-    const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
-    const { buckets } = data.aggregations.tactics
-    this._isMount && this.setState({tacticsCount: buckets});
   }
 
 
@@ -115,7 +155,7 @@ export class Tactics extends Component {
       }}
     );
     
-    // this.checkAllChecked(tacticsList);
+    this.checkAllChecked(tacticsList);
 
     return (
       <>
@@ -127,6 +167,7 @@ export class Tactics extends Component {
             id={`${facet.id}`}
             quantity={facet.quantity}
             isSelected={selectedTactics[facet.id]}
+            isLoading={this.state.loadingAlerts}
             icon={iconNode}
             onClick={
               facet.onClick ? () => facet.onClick(facet.id) : undefined
@@ -142,14 +183,28 @@ export class Tactics extends Component {
 
   checkAllChecked(tacticList: any[]){
     const { selectedTactics } = this.props;
+    let allSelected = true;
     tacticList.forEach( item => {
       if(!selectedTactics[item.id])
-        console.log("false")
-        return;
+        allSelected = false;
     });
 
-    console.log("true")
+    if(allSelected !== this.state.allSelected){
+      this.setState({allSelected});
+    }
   }
+
+  onCheckAllClick(){
+    const allSelected = ! this.state.allSelected;
+    const {selectedTactics, onChangeSelectedTactics} = this.props;
+    Object.keys(selectedTactics).map( item => {
+      selectedTactics[item] = allSelected;
+    });
+    
+    this.setState({allSelected});
+    onChangeSelectedTactics(selectedTactics);
+  }
+  
 
   render() {
     return (
@@ -161,8 +216,19 @@ export class Tactics extends Component {
             </EuiTitle>
           </EuiFlexItem>
 
-          <EuiFlexItem grow={false}>botton
-          </EuiFlexItem>
+          <EuiFlexItem grow={false} style={{marginTop:'25px', marginRight:4}}>{ this.state.allSelected
+                  ? 'Unselect All'
+                  : 'Select all' }</EuiFlexItem>
+          <EuiFlexItem grow={false} style={{marginTop:'25px', marginLeft:0}}>
+                <EuiCheckbox
+                  style={{ alignSelf: 'flex-end' }}
+                  id='selectTactics'
+                  checked={this.state.allSelected}
+                  onChange={() => {
+                    this.onCheckAllClick()
+                  }
+                  } />
+              </EuiFlexItem>
         </EuiFlexGroup>
         
         <EuiFacetGroup style={{ }}>
