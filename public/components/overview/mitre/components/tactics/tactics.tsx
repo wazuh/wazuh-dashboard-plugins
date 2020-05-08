@@ -153,7 +153,7 @@ export class Tactics extends Component {
 
   render() {
     return (
-      <div style={{backgroundColor: "gray", padding: 10}}>
+      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px"}}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="m">
