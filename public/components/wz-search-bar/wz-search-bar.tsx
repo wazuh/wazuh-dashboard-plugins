@@ -39,8 +39,6 @@ export class WzSearchBar extends Component {
     filters: {}
     isPopoverOpen: boolean
   };
-  suggestHandler!: QHandler | ApiHandler | QTagsHandler;
-  inputRef!: HTMLImageElement;
   props!:{
     qSuggests: qSuggests[] | null
     apiSuggests: apiSuggests[] | null
@@ -53,6 +51,8 @@ export class WzSearchBar extends Component {
     initFilters?: {}
     noDeleteFiltersOnUpdateSuggests?: boolean
   };
+  suggestHandler!: QHandler | ApiHandler | QTagsHandler;
+  inputRef!: HTMLImageElement;
 
   constructor(props) {
     super(props);
@@ -69,44 +69,6 @@ export class WzSearchBar extends Component {
     }
   }
 
-  selectSearchFormat(props) {
-    const searchFormat = (props.defaultFormat)
-    ? props.defaultFormat
-    : (!!props.qSuggests)
-      ? '?Q'
-      : (props.apiSuggests)
-        ? 'API'
-        : '';
-
-    return searchFormat;
-  }
-
-  selectSuggestHandler(searchFormat):void {
-    const { noDeleteFiltersOnUpdateSuggests } = this.props;
-    const { filters } = this.state;
-    switch (searchFormat) {
-      case '?Q':
-        this.suggestHandler = new QHandler(this.props.qSuggests);
-        break;
-      case 'qTags':
-        this.suggestHandler = new QTagsHandler(this.props.qSuggests);
-        break;
-      case 'API':
-        this.suggestHandler = new ApiHandler(this.props.apiSuggests);
-        break;
-      default:
-        break;
-    }
-
-    this.setState({ 
-      isProcessing: true, 
-      suggestions: [], 
-      filters: noDeleteFiltersOnUpdateSuggests
-        ? filters
-        : {} 
-    });
-  }
-
   async componentDidMount() {
     this.props.onInputChange(this.state.filters);
     this.selectSuggestHandler(this.state.searchFormat);
@@ -114,17 +76,6 @@ export class WzSearchBar extends Component {
       const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
       this.setState({suggestions: suggestsItems});
     }
-  }
-
-  updateSuggestOnProps(qSuggestsPrev, apiSuggestsPrev) {
-    const { qSuggests, apiSuggests } = this.props;
-    const qSuggestsChanged = JSON.stringify(qSuggests) !== JSON.stringify(qSuggestsPrev);
-    const apiSuggestsChanged = JSON.stringify(apiSuggests) !== JSON.stringify(apiSuggestsPrev);
-    if (qSuggestsChanged || apiSuggestsChanged) {
-      return true;
-    }
-    return false;
-
   }
 
   shouldComponentUpdate(nextProps, nextState){
@@ -187,6 +138,55 @@ export class WzSearchBar extends Component {
         isProcessing: false,
       });
     }
+  }
+
+  selectSearchFormat(props) {
+    const searchFormat = (props.defaultFormat)
+    ? props.defaultFormat
+    : (!!props.qSuggests)
+      ? '?Q'
+      : (props.apiSuggests)
+        ? 'API'
+        : '';
+
+    return searchFormat;
+  }
+
+  selectSuggestHandler(searchFormat):void {
+    const { noDeleteFiltersOnUpdateSuggests } = this.props;
+    const { filters } = this.state;
+    switch (searchFormat) {
+      case '?Q':
+        this.suggestHandler = new QHandler(this.props.qSuggests);
+        break;
+      case 'qTags':
+        this.suggestHandler = new QTagsHandler(this.props.qSuggests);
+        break;
+      case 'API':
+        this.suggestHandler = new ApiHandler(this.props.apiSuggests);
+        break;
+      default:
+        break;
+    }
+
+    this.setState({ 
+      isProcessing: true, 
+      suggestions: [], 
+      filters: noDeleteFiltersOnUpdateSuggests
+        ? filters
+        : {} 
+    });
+  }
+
+  updateSuggestOnProps(qSuggestsPrev, apiSuggestsPrev) {
+    const { qSuggests, apiSuggests } = this.props;
+    const qSuggestsChanged = JSON.stringify(qSuggests) !== JSON.stringify(qSuggestsPrev);
+    const apiSuggestsChanged = JSON.stringify(apiSuggests) !== JSON.stringify(apiSuggestsPrev);
+    if (qSuggestsChanged || apiSuggestsChanged) {
+      return true;
+    }
+    return false;
+
   }
 
   isSearchEnabled() {
@@ -381,7 +381,8 @@ export class WzSearchBar extends Component {
       inputValue,
       isInvalid,
       filters,
-      isPopoverOpen
+      isPopoverOpen,
+      searchFormat
     } = this.state;
     const { placeholder, buttonOptions, qSuggests, onTimeChange } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
@@ -426,6 +427,7 @@ export class WzSearchBar extends Component {
             <WzSearchBadges
               filters={formatedFilter}
               onChange={this.onChangeBadge.bind(this)}
+              searchFormat={searchFormat}
               qSuggests={qSuggests} />
           </EuiFlexItem>
         </EuiFlexGroup>
