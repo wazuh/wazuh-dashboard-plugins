@@ -161,7 +161,7 @@ export class FlyoutTechnique extends Component {
             <EuiLoadingContent lines={3} />
           </div>
         )) || (
-          <div>
+          <div style={{marginBottom: 30}}>
             <EuiDescriptionList listItems={data} />
             <EuiSpacer />
             <p>

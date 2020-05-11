@@ -20,12 +20,15 @@ import {
   EuiSpacer,
   EuiToolTip,
   EuiSwitch,
-  EuiText
+  EuiPopover,
+  EuiText,
+  EuiContextMenu,
+  EuiIcon
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
-import { WzRequest } from '../../../../../react-services/wz-request';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 export class Techniques extends Component {
   _isMount = false;
@@ -43,7 +46,8 @@ export class Techniques extends Component {
     isFlyoutVisible: Boolean,
     currentTechniqueData: {},
     currentTechnique: string,
-    hideAlerts: boolean
+    hideAlerts: boolean,
+    actionsOpen: string
   }
 
 	constructor(props) {
@@ -55,7 +59,8 @@ export class Techniques extends Component {
       currentTechniqueData: {},
       techniquesCount: [],
       currentTechnique: '',
-      hideAlerts: false
+      hideAlerts: false,
+      actionsOpen: ""
     }
     this.onChangeFlyout.bind(this);
 	}
@@ -105,6 +110,41 @@ export class Techniques extends Component {
     }
   }
 
+  buildPanel(techniqueID){
+    return [
+      {
+        id: 0,
+        title: 'Actions',
+        items: [
+          {
+            name: 'Filter for value',
+            icon: <EuiIcon type="magnifyWithPlus" size="m" />,
+            onClick: () => {
+              this.closeActionsMenu();
+              this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
+            },
+          },
+          {
+            name: 'Filter out value',
+            icon: <EuiIcon type="magnifyWithMinus" size="m" />,
+            onClick: () => {
+              this.closeActionsMenu();
+              this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: true} );
+            },
+          },
+          {
+            name: 'View technique details',
+            icon: <EuiIcon type="filebeatApp" size="m" />,
+            onClick: () => {
+              this.closeActionsMenu();
+              this.showFlyout(techniqueID)
+            },
+          }
+        ],
+      }
+    ]
+  }
+
   renderFacet() {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
@@ -132,18 +172,32 @@ export class Techniques extends Component {
     });
 
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
-      const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
+      const tooltipContent = `Open actions of ${mitreTechniques[item.id].name} (${item.id})`;
 
       return(
         <EuiFlexItem key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
-          <EuiToolTip delay="long" position="top" content={tooltipContent}>
-            <EuiFacetButton
-              style={{width: "100%", padding: "0 5px 0 5px"}}
-              quantity={item.quantity}
-              onClick={() => this.showFlyout(item.id)}>
-                {item.id} - {mitreTechniques[item.id].name}
-            </EuiFacetButton>
-        </EuiToolTip>
+
+        <EuiPopover
+            id="techniqueActionsContextMenu"
+            anchorClassName="wz-width-100"
+            button={(
+              <EuiToolTip delay="long" position="top" content={tooltipContent} anchorClassName="wz-width-100" >
+                <EuiFacetButton
+                  style={{width: "100%", padding: "0 5px 0 5px"}}
+                  quantity={item.quantity}
+                  onClick={() => this.showActionsMenu(item.id)}>
+                    {item.id} - {mitreTechniques[item.id].name}
+                </EuiFacetButton>
+              </EuiToolTip>)
+              }
+            isOpen={this.state.actionsOpen === item.id}
+            closePopover={() => this.closeActionsMenu()}
+            panelPaddingSize="none"
+            style={{width: "100%"}}
+            withTitle
+            anchorPosition="downLeft">
+            <EuiContextMenu initialPanelId={0} panels={this.buildPanel(item.id)} />
+          </EuiPopover>
         </EuiFlexItem>
       );
         
@@ -156,12 +210,41 @@ export class Techniques extends Component {
       )
     }else{
       return <>No tactics have been selected.</>
-
     }
-    
   }
+ /**
+   * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
+   * @param filter 
+   */
+  addFilter(filter) {    
+    const { filterManager } = getServices();
+    const matchPhrase = {};
+    matchPhrase[filter.key] = filter.value;
+    const newFilter = {
+      "meta": {
+        "disabled": false,
+        "key": filter.key,
+        "params": { "query": filter.value },
+        "type": "phrase",
+        "negate": filter.negate || false,
+        "index": "wazuh-alerts-3.x-*"
+      },
+      "query": { "match_phrase": matchPhrase },
+      "$state": { "store": "appState" }
+    }
+    filterManager.addFilters([newFilter]);
+  }
+
   onSearchValueChange = e => {
     this.setState({searchValue: e.target.value});
+  }
+
+  async closeActionsMenu() {
+    this.setState({actionsOpen: false});
+  }
+
+  async showActionsMenu(techniqueData) {
+    this.setState({actionsOpen: techniqueData });
   }
 
   async showFlyout(techniqueData) {
