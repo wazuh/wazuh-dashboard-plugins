@@ -18,7 +18,9 @@ import {
   EuiTitle,
   EuiFieldSearch,
   EuiSpacer,
-  EuiToolTip
+  EuiToolTip,
+  EuiSwitch,
+  EuiText
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -40,7 +42,8 @@ export class Techniques extends Component {
     searchValue: any,
     isFlyoutVisible: Boolean,
     currentTechniqueData: {},
-    currentTechnique: string
+    currentTechnique: string,
+    hideAlerts: boolean
   }
 
 	constructor(props) {
@@ -51,7 +54,8 @@ export class Techniques extends Component {
       isFlyoutVisible: false,
       currentTechniqueData: {},
       techniquesCount: [],
-      currentTechnique: ''
+      currentTechnique: '',
+      hideAlerts: false
     }
     this.onChangeFlyout.bind(this);
 	}
@@ -112,11 +116,13 @@ export class Techniques extends Component {
         currentTechniques.forEach( (technique,idx) => {
           if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) || mitreTechniques[technique].name.toLowerCase().includes(this.state.searchValue.toLowerCase()) ){
             const quantity = (techniquesCount.find(item => item.key === technique) || {}).doc_count || 0;
-            tacticsToRender.push({
-              id: technique,
-              label: `${technique} - ${mitreTechniques[technique].name}`,
-              quantity
-            })
+            if(!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)){
+              tacticsToRender.push({
+                id: technique,
+                label: `${technique} - ${mitreTechniques[technique].name}`,
+                quantity
+              })
+            }
           }
         });
 
@@ -169,17 +175,35 @@ export class Techniques extends Component {
       this.setState({ isFlyoutVisible });
   }
 
+  hideAlerts(){
+    this.setState({hideAlerts: !this.state.hideAlerts})
+  }
+
 	render() {
     const { isFlyoutVisible, currentTechnique } = this.state;
 		return (
       <div style={{padding: 10}}>
         <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem grow={true}>
             <EuiTitle size="m">
               <h1>Techniques</h1>
             </EuiTitle>
           </EuiFlexItem>
 
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiText grow={false}>
+                    <span>Hide techniques with no alerts </span> &nbsp;
+                  <EuiSwitch
+                    label=""
+                    checked={this.state.hideAlerts}
+                    onChange={e => this.hideAlerts()}
+                  />
+                  </EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup> 
+          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="xs" />
 
