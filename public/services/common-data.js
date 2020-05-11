@@ -23,7 +23,7 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor($rootScope, $timeout, errorHandler, $location, globalState) {
+  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
@@ -32,6 +32,7 @@ export class CommonData {
     this.shareAgent = new ShareAgent();
     this.globalState = globalState;
     this.savedTimefilter = null;
+    this.$window = $window;
     this.refreshInterval = { pause: true, value: 0 };
 
     this.overviewTabs = {
@@ -180,7 +181,19 @@ export class CommonData {
           filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
         }
       }
+
+      const regex = new RegExp('addRuleFilter=' + '[^&]*');
+      const match = this.$window.location.href.match(regex);
+      if (match && match[0]) {
+        const id = match[0].split('=')[1];
+        let filter = filterHandler.ruleIdQuery(id);
+        filter.$state.isImplicit = false;
+        filters.push(filter);
+        this.$window.location.href = this.$window.location.href.replace(regex, '');
+      }
+
       if (agent) filters.push(filterHandler.agentQuery(agent));
+
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
@@ -384,12 +397,12 @@ export class CommonData {
     return target.hostMonitoringTabs.includes(tab)
       ? target.hostMonitoringTabs
       : target.systemAuditTabs.includes(tab)
-      ? target.systemAuditTabs
-      : target.securityTabs.includes(tab)
-      ? target.securityTabs
-      : target.complianceTabs.includes(tab)
-      ? target.complianceTabs
-      : false;
+        ? target.systemAuditTabs
+        : target.securityTabs.includes(tab)
+          ? target.securityTabs
+          : target.complianceTabs.includes(tab)
+            ? target.complianceTabs
+            : false;
   }
 
   getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {

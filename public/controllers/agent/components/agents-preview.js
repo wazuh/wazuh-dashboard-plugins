@@ -15,14 +15,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiPage,
-  EuiTitle,
+  EuiPanel,
   EuiFlexGroup,
   EuiFlexItem,
   EuiStat,
   EuiLoadingChart,
-  EuiSpacer,
-  EuiHorizontalRule,
-  EuiIcon
+  EuiSpacer
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
 import { AgentsTable } from './agents-table';
@@ -51,8 +49,8 @@ export class AgentsPreview extends Component {
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
-  groupBy = function (arr) {
-    return arr.reduce(function (prev, item) {
+  groupBy = function(arr) {
+    return arr.reduce(function(prev, item) {
       if (item in prev) prev[item]++;
       else prev[item] = 1;
       return prev;
@@ -112,7 +110,7 @@ export class AgentsPreview extends Component {
       }
       this._isMount &&
         this.setState({ platforms: platformsModel, loading: false });
-    } catch (error) { }
+    } catch (error) {}
   }
 
   render() {
@@ -121,14 +119,11 @@ export class AgentsPreview extends Component {
       <EuiPage>
         <EuiFlexItem>
           <EuiFlexGroup style={{ marginTop: 0 }}>
-            <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
-              <div
-                style={{ paddingBottom: 0, minHeight: 200, minWidth: 350 }}
+            <EuiFlexItem grow={false}>
+              <EuiPanel
+                betaBadgeLabel="Status"
+                style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}
               >
-                <EuiTitle size="xs">
-                  <h1 style={{ fontWeight: 400 }}><EuiIcon size="m" color="primary" type="node" />&nbsp;Status</h1>
-                </EuiTitle>
-                <EuiHorizontalRule margin='s' />
                 {this.state.loading && (
                   <EuiFlexItem>
                     <EuiLoadingChart
@@ -151,15 +146,11 @@ export class AgentsPreview extends Component {
                     )}
                   </EuiFlexGroup>
                 )}
-              </div>
+              </EuiPanel>
             </EuiFlexItem>
             {this.totalAgents > 0 && !this.state.loading && (
-              <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
-                <div style={{ paddingBottom: 0 }}>
-                  <EuiTitle size="xs">
-                    <h1 style={{ fontWeight: 400 }}><EuiIcon size="m" color="primary" type="heatmap" />&nbsp;Details</h1>
-                  </EuiTitle>
-                  <EuiHorizontalRule margin='s' />
+              <EuiFlexItem>
+                <EuiPanel betaBadgeLabel="Details" style={{ paddingBottom: 0 }}>
                   <EuiFlexGroup style={{ minWidth: 500 }}>
                     <EuiFlexItem grow={false}></EuiFlexItem>
                     <EuiFlexItem>
@@ -240,8 +231,8 @@ export class AgentsPreview extends Component {
                                 onClick={() =>
                                   this.mostActiveAgent.name
                                     ? this.props.tableProps.showAgent(
-                                      this.mostActiveAgent
-                                    )
+                                        this.mostActiveAgent
+                                      )
                                     : ''
                                 }
                               />
@@ -252,7 +243,7 @@ export class AgentsPreview extends Component {
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}></EuiFlexItem>
                   </EuiFlexGroup>
-                </div>
+                </EuiPanel>
               </EuiFlexItem>
             )}
           </EuiFlexGroup>

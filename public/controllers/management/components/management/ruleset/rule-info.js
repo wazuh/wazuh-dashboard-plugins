@@ -13,7 +13,8 @@ import {
   EuiInMemoryTable,
   EuiLink,
   EuiAccordion,
-  EuiFlexGrid
+  EuiFlexGrid,
+  EuiButtonEmpty
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -369,7 +370,7 @@ class WzRuleInfo extends Component {
           <EuiFlexItem>
             {/* Rule description name */}
             <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
+              <EuiFlexItem>
                 <EuiTitle>
                   <h2>
                     <EuiToolTip position="right" content="Back to rules">
@@ -384,6 +385,15 @@ class WzRuleInfo extends Component {
                     {description}
                   </h2>
                 </EuiTitle>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  iconType="popout"
+                  aria-label="popout">
+                  <a href={`#/overview?tab=general&tabView=panels&addRuleFilter=${id}`} target="blank">
+                    View alerts of this Rule
+                    </a>
+                </EuiButtonEmpty>
               </EuiFlexItem>
             </EuiFlexGroup>
             {/* Cards */}
