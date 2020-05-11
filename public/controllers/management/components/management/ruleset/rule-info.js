@@ -181,6 +181,7 @@ class WzRuleInfo extends Component {
    * Clean the existing filters and sets the new ones and back to the previous section
    */
   setNewFiltersAndBack(filters) {
+    window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
     const fil = filters.filters || filters;
     this.props.cleanFilters();
     this.props.updateFilters(fil);
@@ -196,7 +197,7 @@ class WzRuleInfo extends Component {
    */
   renderInfo(id, level, file, path, groups) {
     return (
-      <EuiFlexGroup>
+      <EuiFlexGrid columns={4}>
         <EuiFlexItem key="id" grow={1}>
           <b style={{ paddingBottom: 6 }}>ID</b>{id}
         </EuiFlexItem>
@@ -234,7 +235,7 @@ class WzRuleInfo extends Component {
           {this.renderGroups(groups)}
         </EuiFlexItem>
         <EuiSpacer size="s" />
-      </EuiFlexGroup>
+      </EuiFlexGrid>
     );
   }
 
@@ -247,12 +248,12 @@ class WzRuleInfo extends Component {
     const capitalize = str => str[0].toUpperCase() + str.slice(1);
     Object.keys(details).forEach((key) => {
       detailsToRender.push(
-        <EuiFlexItem key={key} grow={1}>
+        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
           <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : details[key]}
         </EuiFlexItem>
       );
     });
-    return <EuiFlexGrid columns={4} style={{ lineHeight: 'initial' }}>{detailsToRender}</EuiFlexGrid>;
+    return <EuiFlexGrid columns={4}>{detailsToRender}</EuiFlexGrid>;
   }
 
   /**
@@ -315,14 +316,14 @@ class WzRuleInfo extends Component {
       });
 
       listCompliance.push(
-        <EuiFlexItem key={key} grow={1}>
+        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
           <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences[key]}</b>
           <p>{values}</p>
           <EuiSpacer size="s" />
         </EuiFlexItem>
       );
     }
-    return <EuiFlexGroup>{listCompliance}</EuiFlexGroup>;
+    return <EuiFlexGrid columns={4}>{listCompliance}</EuiFlexGrid>;
   }
 
   /**
@@ -379,7 +380,10 @@ class WzRuleInfo extends Component {
                         color="primary"
                         iconSize="l"
                         iconType="arrowLeft"
-                        onClick={() => this.props.cleanInfo()}
+                        onClick={() => {
+                          window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
+                          this.props.cleanInfo();
+                        }}
                       />
                     </EuiToolTip>
                     {description}
@@ -400,7 +404,7 @@ class WzRuleInfo extends Component {
             <EuiPanel style={{ margin: '16px 0', padding: '16px 16px 0px 16px' }}>
               <EuiFlexGroup>
                 {/* General info */}
-                <EuiFlexItem style={{ marginBottom: 16 }}>
+                <EuiFlexItem style={{ marginBottom: 16, marginTop: 8 }}>
                   <EuiAccordion
                     id="Info"
                     buttonContent={
@@ -410,35 +414,15 @@ class WzRuleInfo extends Component {
                     }
                     paddingSize="none"
                     initialIsOpen={true}>
-                    <div className='flyout-row'>
+                    <div className='flyout-row details-row'>
                       {this.renderInfo(id, level, file, path, groups)}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
-              {/* Compliance */}
-              {Object.keys(compliance).length > 0 && (
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiAccordion
-                      id="Compliance"
-                      buttonContent={
-                        <EuiTitle size="s">
-                          <h3>Compliance</h3>
-                        </EuiTitle>
-                      }
-                      paddingSize="none"
-                      initialIsOpen={true}>
-                      <div className='flyout-row'>
-                        {this.renderCompliance(compliance)}
-                      </div>
-                    </EuiAccordion>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              )}
               {/* Details */}
               <EuiFlexGroup>
-                <EuiFlexItem>
+                <EuiFlexItem style={{ marginTop: 8 }}>
                   <EuiAccordion
                     id="Details"
                     buttonContent={
@@ -448,39 +432,61 @@ class WzRuleInfo extends Component {
                     }
                     paddingSize="none"
                     initialIsOpen={true}>
-                    <div className='flyout-row'>
+                    <div className='flyout-row details-row'>
                       {this.renderDetails(details)}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
-            </EuiPanel>
-            {/* Table */}
-            <EuiPanel paddingSize="m">
+              {/* Compliance */}
+              {Object.keys(compliance).length > 0 && (
+                <EuiFlexGroup>
+                  <EuiFlexItem style={{ marginTop: 8 }}>
+                    <EuiAccordion
+                      id="Compliance"
+                      buttonContent={
+                        <EuiTitle size="s">
+                          <h3>Compliance</h3>
+                        </EuiTitle>
+                      }
+                      paddingSize="none"
+                      initialIsOpen={true}>
+                      <div className='flyout-row details-row'>
+                        {this.renderCompliance(compliance)}
+                      </div>
+                    </EuiAccordion>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              )}
+              {/* Table */}
               <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
+                <EuiFlexItem style={{ marginTop: 8 }}>
+                  <EuiAccordion
+                    id="Related"
+                    buttonContent={
                       <EuiTitle size="s">
-                        <h5>Related rules</h5>
+                        <h3>Related rules</h3>
                       </EuiTitle>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiSpacer size="m" />
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiInMemoryTable
-                        itemId="id"
-                        items={rules}
-                        rowProps={onClickRow}
-                        columns={columns}
-                        pagination={true}
-                        loading={isLoading}
-                        sorting={true}
-                        message={false}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
+                    }
+                    paddingSize="none"
+                    initialIsOpen={true}>
+                    <div className='flyout-row related-rules-row'>
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <EuiInMemoryTable
+                            itemId="id"
+                            items={rules}
+                            rowProps={onClickRow}
+                            columns={columns}
+                            pagination={true}
+                            loading={isLoading}
+                            sorting={true}
+                            message={false}
+                          />
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </div>
+                  </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiPanel>
