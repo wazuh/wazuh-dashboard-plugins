@@ -55,12 +55,16 @@ export class QHandler extends BaseHandler {
     return this.buildSuggestFields(inputValue);
   }
 
-  buildSuggestFields(inputValue:string):suggestItem[] {
+  buildSuggestFields(inputValue:string): suggestItem[] {
     const { field } = this.getLastQuery(inputValue);
     const fields:suggestItem[] = this.qSuggests
     .filter((item) => this.filterSuggestFields(item, field))
     .map(this.mapSuggestFields);
-    return fields;
+    const fieldExists = fields.some(field => field.label === inputValue);
+    return [
+      ...(fieldExists ? this.buildSuggestOperators(inputValue) : []),
+      ...fields
+    ];
   }
 
   buildSuggestOperators(inputValue:string):suggestItem[] {
@@ -74,20 +78,18 @@ export class QHandler extends BaseHandler {
 
   async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
     const { values } = this.getCurrentField(inputValue);
-    const { value } = this.getLastQuery(inputValue);
+    const { value='', operator } = this.getLastQuery(inputValue);
     const rawSuggestions:string[] = typeof values === 'function'
       ? await values(value)
       : values;
-    //@ts-ignore
-    const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
-    const suggestions:suggestItem[] = [];
-
-    for (const value of filterSuggestions) {
-      const item:suggestItem = this.buildSuggestValue(value);
-      suggestions.push(item);
-    }
-
-    return suggestions;
+    const suggestions = rawSuggestions
+      .filter(item => this.filterSuggestValues(item, value))
+      .map(this.buildSuggestValue);
+    const isLike = operator === '~' && value;
+    const valueExists = rawSuggestions.some(sgtValue => sgtValue === value);
+    return [
+      ...((isLike || valueExists) ? this.buildSuggestConjuntions(inputValue) : []),
+      ...suggestions];
   }
 
   buildSuggestConjuntions(inputValue:string):suggestItem[] {
