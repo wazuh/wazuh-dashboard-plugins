@@ -540,9 +540,6 @@ function generateAlert(params) {
     if (params.nist_800_83 || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomIntervalInteger(params.random_probability_regulatory_compliance))) {
         alert.rule.nist_800_53 = [randomArrayItem(NIST_800_53)];
     }
-    if (params.tsc || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomIntervalInteger(params.random_probability_regulatory_compliance))) {
-        alert.rule.tsc = [randomArrayItem(tsc)];
-    }
 
     if (params.authentication) {
         alert.data = {
