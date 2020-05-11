@@ -12,7 +12,7 @@
 
 // General
 import { IPs, Users, Ports, Paths, Win_Hostnames, GeoLocation, Agents, randomElements, randomArrayItem } from './sample-data/common';
-import { PCI_DSS, GDPR, HIPAA, GPG13, NIST_800_53 } from './sample-data/regulatory-compliance';
+import { PCI_DSS, GDPR, HIPAA, GPG13, NIST_800_53, tsc } from './sample-data/regulatory-compliance';
 
 import * as Audit from './sample-data/audit';
 import * as Authentication from './sample-data/authentication';
@@ -540,6 +540,9 @@ function generateAlert(params) {
     if (params.nist_800_83 || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomIntervalInteger(params.random_probability_regulatory_compliance))) {
         alert.rule.nist_800_53 = [randomArrayItem(NIST_800_53)];
     }
+    if (params.tsc || params.regulatory_compliance || (params.random_probability_regulatory_compliance && randomIntervalInteger(params.random_probability_regulatory_compliance))) {
+        alert.rule.tsc = [randomArrayItem(tsc)];
+    }
 
     if (params.authentication) {
         alert.data = {
@@ -689,6 +692,7 @@ function generateAlert(params) {
             default: {}
         }
         alert.rule.firedtimes = randomIntervalInteger(2,15);
+        alert.rule.tsc = [randomArrayItem(tsc)];
     }
 
     if( params.ssh ){
