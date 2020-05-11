@@ -19,7 +19,8 @@ import {
   EuiFlyoutBody,
   EuiDescriptionList,
   EuiSpacer,
-  EuiLink
+  EuiLink,
+  EuiToolTip,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../react-services/wz-request';
 
@@ -103,7 +104,7 @@ export class FlyoutTechnique extends Component {
   }
   
   renderBody() {
-    const { currentTechnique } = this.props
+    const { currentTechnique } = this.props;
     const { techniqueData } = this.state;
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
     const formattedDescription = techniqueData.description 
@@ -116,8 +117,14 @@ export class FlyoutTechnique extends Component {
       : techniqueData.description;
     const data = [
       {
-        title: 'Id',
-        description: currentTechnique
+        title: 'ID',
+        description: ( <EuiToolTip
+          position="top"
+          content={"Open " + currentTechnique + " details in a new page"}>
+          <EuiLink href={link} external target="_blank">
+            {currentTechnique}
+          </EuiLink>
+        </EuiToolTip>)
       },
       {
         title: 'Tactic',
