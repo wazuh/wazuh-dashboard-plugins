@@ -109,14 +109,16 @@ export class Techniques extends Component {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
     const tacticsToRender: Array<any> = [];
+    const showTechniques = {};
 
     Object.keys(tacticsObject).forEach((key, inx) => {
       const currentTechniques = tacticsObject[key];
       if(this.props.selectedTactics[key]){
         currentTechniques.forEach( (technique,idx) => {
-          if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) || mitreTechniques[technique].name.toLowerCase().includes(this.state.searchValue.toLowerCase()) ){
+          if(!showTechniques[technique] && (technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) || mitreTechniques[technique].name.toLowerCase().includes(this.state.searchValue.toLowerCase()) )){
             const quantity = (techniquesCount.find(item => item.key === technique) || {}).doc_count || 0;
             if(!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)){
+              showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
                 label: `${technique} - ${mitreTechniques[technique].name}`,
@@ -163,7 +165,6 @@ export class Techniques extends Component {
   }
 
   async showFlyout(techniqueData) {
-    console.log({techniqueData});
     this.setState({isFlyoutVisible: true, currentTechnique: techniqueData });
   }
 
