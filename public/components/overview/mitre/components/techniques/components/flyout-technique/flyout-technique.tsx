@@ -87,7 +87,7 @@ export class FlyoutTechnique extends Component {
   renderHeader() {
     const { techniqueData } = this.state;
     return(
-      <EuiFlyoutHeader hasBorder>
+      <EuiFlyoutHeader hasBorder style={{padding:"12px 16px"}}>
         {(Object.keys(techniqueData).length === 0 && (
           <div>
             <EuiLoadingContent lines={1} />
