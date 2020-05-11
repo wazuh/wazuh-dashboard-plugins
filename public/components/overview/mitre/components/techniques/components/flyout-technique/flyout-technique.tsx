@@ -182,7 +182,7 @@ export class FlyoutTechnique extends Component {
     return(
         <EuiFlyout
           onClose={() => onChangeFlyout(false)}
-          maxWidth="35%"
+          maxWidth="50%"
           className="flyout-no-overlap"
           aria-labelledby="flyoutSmallTitle"
           > 
