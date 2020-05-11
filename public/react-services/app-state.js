@@ -57,6 +57,7 @@ export class AppState {
             gdpr: config['extensions.gdpr'],
             hipaa: config['extensions.hipaa'],
             nist: config['extensions.nist'],
+            tsc: config['extensions.tsc'],
             oscap: config['extensions.oscap'],
             ciscat: config['extensions.ciscat'],
             aws: config['extensions.aws'],

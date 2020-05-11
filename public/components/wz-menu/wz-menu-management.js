@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 
@@ -55,7 +55,7 @@ class WzMenuManagement extends Component {
     }
   }
 
-  componentDidMount() {}
+  componentDidMount() { }
 
   clickMenuItem = section => {
     this.props.closePopover();
@@ -104,6 +104,17 @@ class WzMenuManagement extends Component {
 
     return (
       <div className="WzManagementSideMenu">
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
+            <EuiButtonEmpty iconType="arrowRight"
+              onClick={() => {
+                this.props.closePopover();
+                window.location.href = '#/manager';
+              }}>
+              Go to Management welcome
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />
