@@ -14,7 +14,8 @@ const initialState = {
   currentAPI: '',
   showMenu: false,
   wazuhNotReadyYet: '',
-  currentTab: ''
+  currentTab: '',
+  extensions: {}
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -43,6 +44,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentTab: action.currentTab
+    };
+  }
+
+  if (action.type === 'UPDATE_EXTENSIONS') {
+    return {
+      ...state,
+      extensions: action.extensions
     };
   }
 

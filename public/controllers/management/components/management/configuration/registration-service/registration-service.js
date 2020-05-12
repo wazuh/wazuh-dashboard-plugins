@@ -91,7 +91,7 @@ class WzRegistrationService extends Component {
               title="Main settings"
               description="General settings applied to the registration service"
               currentConfig={currentConfig}
-              minusHeight={245}
+              minusHeight={260}
               helpLinks={helpLinks}
             >
               <WzConfigurationSettingsGroup

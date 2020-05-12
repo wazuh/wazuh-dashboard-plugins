@@ -255,7 +255,8 @@ export class StatesTable extends Component {
               closeFlyout={() => this.closeFlyout()}
               type='file'
               view='states'
-              {...this.props} />
+              showViewInEvents={true}
+              {...this.props } />
           </EuiOverlayMask>
         }
       </div>

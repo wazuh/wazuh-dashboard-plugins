@@ -25,6 +25,9 @@ import {
   EuiToolTip
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
+// @ts-ignore
+import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { ModulesHelper } from '../../../common/modules/modules-helper'
 
 export class FileDetails extends Component {
 
@@ -158,14 +161,29 @@ export class FileDetails extends Component {
       "query": { "match_phrase": { "syscheck.path": this.props.currentFile.file } },
       "$state": { "store": "appState" }
     }];
-    this.props.loadEventsWithFilters(filters);
+    this.props.onSelectedTabChanged('events');
+    this.checkFilterManager(filters);
+  }
+
+  async checkFilterManager(filters) {
+    const { filterManager } = getServices();
+    if (filterManager.filters && filterManager.filters.length) {
+      filterManager.addFilters([filters]);
+      const scope = await ModulesHelper.getDiscoverScope();
+      scope.updateQueryAndFetch({ query: null });
+    } else {
+      setTimeout(() => {
+        this.checkFilterManager(filters);
+      }, 200);
+    }
   }
 
   getDetails() {
+    const { view } = this.props
     const columns = this.props.type === 'file' ? this.details() : this.registryDetails();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
-      var link = item.link || false;
+      var link = (item.link && view !== 'events') || false;
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent.agentPlatform !== 'windows')){
         let className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
         className += item.field === 'perm' ? " detail-value-perm" : "";
@@ -173,18 +191,20 @@ export class FileDetails extends Component {
           <EuiFlexItem key={idx}>
             <EuiStat
               title={
-                  !link 
+                  !link
                   ? <EuiToolTip position="top" anchorClassName="detail-tooltip" content={value} delay="long">
                       <span className={className}>{value}</span>
                     </EuiToolTip> 
-                  : <EuiLink
-                      className={className}
-                      onClick={() => {
-                        this.props.onFilterSelect(`${item.field}=${value}`);
-                        this.props.closeFlyout();
-                      }} >
-                      {value}
-                    </EuiLink>
+                  : <EuiToolTip position="top" anchorClassName="detail-tooltip" content={`Filter by ${item.field} is ${value} in states`} >
+                        <EuiLink
+                          className={className}
+                          onClick={() => {
+                            this.props.onFilterSelect(`${item.field}=${value}`);
+                            this.props.closeFlyout();
+                          }} >
+                          {value}
+                        </EuiLink>
+                    </EuiToolTip>
               }
               description={
                 <span>
