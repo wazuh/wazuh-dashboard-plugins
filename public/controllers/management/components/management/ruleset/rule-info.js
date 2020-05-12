@@ -35,7 +35,8 @@ class WzRuleInfo extends Component {
       gpg13: 'GPG 13',
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53',
-      tsc: 'TSC'
+      tsc: 'TSC',
+      'mitre': 'MITRE'
     };
 
     this.rulesetHandler = RulesetHandler;
@@ -118,7 +119,8 @@ class WzRuleInfo extends Component {
       'hipaa',
       'nist-800-53',
       'pci',
-      'tsc'
+      'tsc',
+      'mitre'
     ];
     Object.keys(ruleInfo).forEach(key => {
       if (complianceKeys.includes(key) && ruleInfo[key].length)
@@ -129,7 +131,7 @@ class WzRuleInfo extends Component {
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc'];
+    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc','mitre'];
     const buildBadge = field => {
       const idGenerator = () => {
         return (
