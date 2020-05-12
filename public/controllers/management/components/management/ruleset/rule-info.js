@@ -56,7 +56,23 @@ class WzRuleInfo extends Component {
         name: 'Description',
         align: 'left',
         sortable: true,
-        width: '30%'
+        width: '30%',
+        render: (value, item) => {
+          const regex = /\$(.*?)\)/g;
+          let result = value.match(regex);
+          if(result !== null) {
+            for (const oldValue of result) {
+              let newValue = oldValue.replace('$(',`<strong style="color:#006BB4">`);
+              newValue = newValue.replace(')', ' </strong>');
+              value = value.replace(oldValue, newValue);
+            }
+          }
+          return (
+          <div>
+            <span dangerouslySetInnerHTML={{ __html: value}} />
+          </div>
+          );
+        }
       },
       {
         field: 'groups',
