@@ -190,15 +190,14 @@ export class GroupsController {
     try {
       const params = {
         limit: 500,
-        offset: !searchTerm ? this.availableAgents.offset : 0,
+        offset: !start ? this.availableAgents.offset : 0,
         select: ['id', 'name']
       };
-
+      
       if (searchTerm) {
         params.search = searchTerm;
-        this.availableAgents.offset = 0;
       }
-
+      
       const req = await this.apiReq.request('GET', '/agents/', params);
 
       this.totalAgents = req.data.data.totalItems;
@@ -214,8 +213,7 @@ export class GroupsController {
         .map(item => {
           return { key: item.id, value: item.name };
         });
-
-      if (searchTerm || start) {
+      if (start) {
         this.availableAgents.data = mapped;
       } else {
         this.availableAgents.data = this.availableAgents.data.concat(mapped);
@@ -227,7 +225,7 @@ export class GroupsController {
         }
         if (!this.availableAgents.loadedAll) {
           this.availableAgents.offset += 499;
-          await this.loadAllAgents();
+          await this.loadAllAgents(searchTerm);
         }
       }
     } catch (error) {
@@ -421,5 +419,37 @@ export class GroupsController {
     this.lookingGroup = true;
     await this.addMultipleAgents(status);
     this.load = false;
+  }
+
+  async reload(element, searchTerm, start, addOffset ){
+    if (element === 'left') {
+      if (!this.availableAgents.loadedAll) {
+        this.multipleSelectorLoading = true;
+        if (start) {
+          this.availableAgents.offset = 0;
+          this.selectedAgents.offset = 0;
+        } else {
+          this.availableAgents.offset += 500;
+        }
+        try {
+          await this.loadAllAgents(searchTerm, start);
+        } catch (error) {
+          this.errorHandler.handle(error, 'Error fetching all available agents');
+        }
+      }
+    } else {
+      if (!this.selectedAgents.loadedAll) {
+        this.multipleSelectorLoading = true;
+        this.selectedAgents.offset += addOffset + 1;
+        try {
+          await this.loadSelectedAgents(searchTerm);
+        } catch (error) {
+          this.errorHandler.handle(error, 'Error fetching all selected agents');
+        }
+      }
+    }
+
+    this.multipleSelectorLoading = false;
+    this.scope.$applyAsync();
   }
 }

@@ -74,8 +74,8 @@ app.directive('wzMultipleSelector', function() {
         if (pos >= max) {
           target.parentElement.parentElement.parentElement.className ===
           'wzMultipleSelectorLeft'
-            ? $scope.doReload('left')
-            : $scope.doReload('right');
+            ? $scope.doReload('left', $scope.availableFilter, false)
+            : $scope.doReload('right', $scope.selectedFilter, false);
         }
       };
     },

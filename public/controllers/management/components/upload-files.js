@@ -38,7 +38,7 @@ export class UploadFiles extends Component {
       uploadErrors: false,
       errorPopover: false
     };
-    this.maxSize = 5120000; // 5Mb
+    this.maxSize = 10485760; // 10Mb
   }
 
   onChange = files => {
@@ -320,7 +320,7 @@ export class UploadFiles extends Component {
           {this.checkOverSize() > 0 && (
             <Fragment>
               {this.renderWarning(
-                `The max size per file allowed is ${this.maxSize / 1024} Kb`
+                `The max size per file allowed is ${this.maxSize / (1024*1024)} MB`
               )}
             </Fragment>
           )}

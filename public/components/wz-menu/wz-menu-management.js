@@ -95,7 +95,7 @@ class WzMenuManagement extends Component {
         items: [
           this.createItem(this.managementSections.status),
           this.createItem(this.managementSections.cluster),
-          this.createItem(this.managementSections.statistics),
+          // this.createItem(this.managementSections.statistics),
           this.createItem(this.managementSections.logs),
           this.createItem(this.managementSections.reporting)
         ]
