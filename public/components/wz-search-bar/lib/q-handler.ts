@@ -55,14 +55,14 @@ export class QHandler extends BaseHandler {
     return this.buildSuggestFields(inputValue);
   }
 
-  buildSuggestFields(inputValue:string): suggestItem[] {
+  async buildSuggestFields(inputValue:string): suggestItem[] {
     const { field } = this.getLastQuery(inputValue);
     const fields:suggestItem[] = this.qSuggests
     .filter((item) => this.filterSuggestFields(item, field))
     .map(this.mapSuggestFields);
     const fieldExists = fields.some(field => field.label === inputValue);
     return [
-      ...(fieldExists ? this.buildSuggestOperators(inputValue) : []),
+      ...(fieldExists ? await this.buildSuggestOperators(inputValue) : []),
       ...fields
     ];
   }
@@ -94,8 +94,8 @@ export class QHandler extends BaseHandler {
 
   buildSuggestConjuntions(inputValue:string):suggestItem[] {
     const suggestions = [
-      {'label':',', 'description':'OR'},
-      {'label':';', 'description':'AND'}
+      {'label':' AND ', 'description':'Requires `both arguments` to be true'},
+      {'label':' OR ', 'description':'Requires `one or more arguments` to be true'}
     ].map((item) => {
       return {
         type: { iconType: 'kqlSelector', color: 'tint3' },

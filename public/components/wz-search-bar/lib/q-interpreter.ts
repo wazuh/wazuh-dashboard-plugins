@@ -14,13 +14,13 @@ export interface queryObject {
   field: string
   operator?: '=' | '!=' | '<' | '>' | '~'
   value?: string 
-  conjuntion?: ';' | ','
+  conjuntion?: ' and ' | ' or ' | ' AND ' | ' OR '
 }
 
 export class QInterpreter {
   query: string;
   queryObjects: queryObject[];
-  conjuntions = /,|;/;
+  conjuntions = / and | AND | or | OR /;
   operators = /=|!=|<|>|~/;
 
   constructor(query:string) {
