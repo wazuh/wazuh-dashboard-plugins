@@ -311,7 +311,7 @@ export class RowDetails extends Component {
           <EuiSpacer size='s'/>
           <EuiFlexGroup justifyContent='spaceAround'>
             <EuiFlexItem style={{marginBottom: '0'}}>
-              <EuiTitle size='s'><h3>Information</h3></EuiTitle>
+              <EuiTitle size='s' style={{fontWeight: 400}}><h3>Information</h3></EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ fontSize: 14, marginBottom: '0'}}>
               <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
@@ -364,7 +364,7 @@ export class RowDetails extends Component {
             
           </EuiFlexGrid>
           <EuiSpacer size='m'/>
-          <EuiTitle size='s'><h3>Details</h3></EuiTitle>
+          <EuiTitle size='s' style={{fontWeight: 400}}><h3>Details</h3></EuiTitle>
           <EuiFlexGrid columns={3}>
             {Object.keys(details).map(detail => (
               <EuiFlexItem key={`rule-detail-${detail}`}>
@@ -374,7 +374,7 @@ export class RowDetails extends Component {
             ))}
           </EuiFlexGrid>
           <EuiSpacer size='m'/>
-          <EuiTitle size='s'><h3>Compliance</h3></EuiTitle>
+          <EuiTitle size='s' style={{fontWeight: 400}}><h3>Compliance</h3></EuiTitle>
           <EuiFlexGrid columns={3}>
             {Object.keys(compliance).sort().map(complianceCategory => {
               return (
@@ -452,7 +452,7 @@ export class RowDetails extends Component {
       <div>
         {this.getTabs()}
         <EuiFlexGroup>
-          <EuiFlexItem style={{ padding: 0 }}>
+          <EuiFlexItem style={{ padding: "0px 16px" }}>
             {this.state.selectedTabId === 'table' && (
               this.getTable()
             )}
