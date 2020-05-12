@@ -186,17 +186,19 @@ class WzMenuOverview extends Component {
       <div className="WzManagementSideMenu">
         {Object.keys(this.state.extensions).length && (
           <div>
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
-                <EuiButtonEmpty iconType="arrowRight"
-                  onClick={() => {
-                    this.props.closePopover();
-                    window.location.href = '#/overview';
-                  }}>
-                  Go to Overview welcome
+            {!this.props.isAgent && (
+              <EuiFlexGroup>
+                <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
+                  <EuiButtonEmpty iconType="arrowRight"
+                    onClick={() => {
+                      this.props.closePopover();
+                      window.location.href = '#/overview';
+                    }}>
+                    Go to Overview welcome
                   </EuiButtonEmpty>
-              </EuiFlexItem>
-            </EuiFlexGroup>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            )}
             <EuiFlexGrid columns={2}>
               <EuiFlexItem>
                 <EuiSideNav

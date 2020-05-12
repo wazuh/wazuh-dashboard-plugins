@@ -215,6 +215,11 @@ class KibanaVis extends Component {
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
+
+          if (this.props.isMetric) {
+            this.callUpdateMetric();
+          }
+          
           this.rendered = true;
           this.$rootScope.rendered = 'true';
           this.visHandler.updateInput(visInput);
@@ -294,16 +299,6 @@ class KibanaVis extends Component {
       this.$rootScope.resultState = 'none';
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
-
-      const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
-      if (visTitle === 'Mitre attack count') {
-        //   $scope.$emit('sendVisDataRows', {
-        //     mitreRows: visHandler.dataLoader['visData'],
-        //   });
-      }
-      if (this.props.isMetric) {
-        this.callUpdateMetric();
-      }
       if (currentCompleted >= 100) {
         this.$rootScope.rendered = 'true';
         if (visId.includes('AWS-geo')) {
