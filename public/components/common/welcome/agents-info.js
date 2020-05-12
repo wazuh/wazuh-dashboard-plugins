@@ -27,8 +27,26 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
-  addTextPlatformRender(agent) {
+  getPlatformIcon(agent) {
+    let icon = false;
+    const os = (agent || {}).os;
 
+    if (((os || {}).uname || '').includes('Linux')) {
+      icon = 'linux';
+    } else if ((os || {}).platform === 'windows') {
+      icon = 'windows';
+    } else if ((os || {}).platform === 'darwin') {
+      icon = 'apple';
+    }
+
+    return <i
+      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+      aria-hidden="true"
+    ></i>
+  }
+
+
+  addTextPlatformRender(agent) {
     const checkField = field => {
       return field !== undefined ? field : '-';
     };
@@ -41,7 +59,8 @@ export class AgentInfo extends Component {
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontWeight: 300 }}>
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", margin: "0 auto", fontWeight: 300 }}>
+        {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
     )
@@ -56,7 +75,7 @@ export class AgentInfo extends Component {
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
             title={
-              item.description === 'Operating system' ? (
+              item.description === 'OS' ? (
                 this.addTextPlatformRender(this.props.agent)
               ) : (
                   <span
@@ -72,6 +91,7 @@ export class AgentInfo extends Component {
                 )
             }
             description={item.description}
+            textAlign="center"
             titleSize="xs"
           />
         </EuiFlexItem>
@@ -88,7 +108,7 @@ export class AgentInfo extends Component {
       { title: agent.version, description: 'Version' },
       {
         title: agent.name,
-        description: 'Operating system',
+        description: 'OS',
         style: { minWidth: 400 }
       },
       { title: agent.dateAdd, description: 'Registration date' },
