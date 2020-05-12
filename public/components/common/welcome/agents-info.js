@@ -15,9 +15,7 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiStat,
   EuiFlexItem,
-  EuiFlexGroup,
-  EuiToolTip,
-  EuiButton
+  EuiFlexGroup
 } from '@elastic/eui';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
@@ -29,20 +27,12 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
-  addIconPlatformRender(agent) {
-    let icon = false;
+  addTextPlatformRender(agent) {
+
     const checkField = field => {
       return field !== undefined ? field : '-';
     };
-    const os = (agent || {}).os;
 
-    if (((os || {}).uname || '').includes('Linux')) {
-      icon = 'linux';
-    } else if ((os || {}).platform === 'windows') {
-      icon = 'windows';
-    } else if ((os || {}).platform === 'darwin') {
-      icon = 'apple';
-    }
     const os_name =
       checkField(((agent || {}).os || {}).name) +
       ' ' +
@@ -51,11 +41,7 @@ export class AgentInfo extends Component {
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", margin: "0 auto", fontWeight: 300 }}>
-        <i
-          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-          aria-hidden="true"
-        ></i>
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontWeight: 300 }}>
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
     )
@@ -70,8 +56,8 @@ export class AgentInfo extends Component {
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
             title={
-              item.description === 'OS' ? (
-                this.addIconPlatformRender(this.props.agent)
+              item.description === 'Operating system' ? (
+                this.addTextPlatformRender(this.props.agent)
               ) : (
                   <span
                     style={{
@@ -86,7 +72,6 @@ export class AgentInfo extends Component {
                 )
             }
             description={item.description}
-            textAlign="center"
             titleSize="xs"
           />
         </EuiFlexItem>
@@ -103,7 +88,7 @@ export class AgentInfo extends Component {
       { title: agent.version, description: 'Version' },
       {
         title: agent.name,
-        description: 'OS',
+        description: 'Operating system',
         style: { minWidth: 400 }
       },
       { title: agent.dateAdd, description: 'Registration date' },

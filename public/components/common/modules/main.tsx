@@ -24,7 +24,8 @@ import {
   EuiTabs,
   EuiIcon,
   EuiPopover,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiButtonEmpty
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -97,6 +98,37 @@ export class MainModule extends Component {
     }
   }
 
+
+  showAgentInfo() {
+    const elem = document.getElementsByClassName('wz-module-body-main')[0];
+    if (elem) {
+      if (!this.state.showAgentInfo) {
+        elem.classList.add("wz-module-body-main-double");
+      } else {
+        elem.classList.remove("wz-module-body-main-double");
+      }
+    }
+    this.setState({ showAgentInfo: !this.state.showAgentInfo });
+  }
+
+  getPlatformIcon(agent) {
+    let icon = false;
+    const os = (agent || {}).os;
+
+    if (((os || {}).uname || '').includes('Linux')) {
+      icon = 'linux';
+    } else if ((os || {}).platform === 'windows') {
+      icon = 'windows';
+    } else if ((os || {}).platform === 'darwin') {
+      icon = 'apple';
+    }
+
+    return <i
+      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+      aria-hidden="true"
+    ></i>
+  }
+
   color = (status, hex = false) => {
     if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
     else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
@@ -106,22 +138,33 @@ export class MainModule extends Component {
   renderTitle() {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
-          <span className="wz-module-header-agent-title-btn" style={{ display: 'inline-flex' }}>
-            <EuiTitle size="s">
-              <h1>
-                <span
-                  onClick={() => {
-                    window.location.href = `#/agents?agent=${this.props.agent.id}`;
-                    this.router.reload();
-                  }}>
-                  <EuiIcon size="m" type="arrowLeft" color='primary' />
-                  <span>&nbsp;{this.props.agent.name} ({this.props.agent.id})&nbsp;&nbsp;</span>
-                </span>
-              </h1>
-            </EuiTitle>
-            <EuiHealth style={{ paddingTop: 6 }} color={this.color(this.props.agent.status)}>{this.props.agent.status}</EuiHealth>
-          </span>
+        <EuiFlexItem className="wz-module-header-agent-title">
+          <EuiFlexGroup>
+            <EuiFlexItem grow={false}>
+              <span className="wz-module-header-agent-title-btn" style={{ display: 'inline-flex' }}>
+                <EuiTitle size="s">
+                  <h1>
+                    <span
+                      onClick={() => {
+                        window.location.href = `#/agents?agent=${this.props.agent.id}`;
+                        this.router.reload();
+                      }}>
+                      <EuiIcon size="m" type="arrowLeft" color='primary' />
+                      <span>&nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;{this.getPlatformIcon(this.props.agent)}&nbsp;&nbsp;&nbsp;
+                      </span>
+                    </span>
+                    <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
+                  </h1>
+                </EuiTitle>
+              </span>
+            </EuiFlexItem>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false}>
+              <EuiHealth style={{ paddingTop: 6 }} size="xl" color={this.color(this.props.agent.status)}>
+                {this.props.agent.status}
+              </EuiHealth>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -157,24 +200,24 @@ export class MainModule extends Component {
       (this.props.disabledReport &&
         <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
           <EuiToolTip position="top" content="No results match for this search criteria.">
-            <EuiButton
+            <EuiButtonEmpty
               iconType="document"
               isLoading={this.state.loadingReport}
               isDisabled={true}
               onClick={async () => this.startReport()}>
               Generate report
-              </EuiButton>
+              </EuiButtonEmpty>
           </EuiToolTip>
         </EuiFlexItem>
 
         || (
           <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
-            <EuiButton
+            <EuiButtonEmpty
               iconType="document"
               isLoading={this.state.loadingReport}
               onClick={async () => this.startReport()}>
               Generate report
-            </EuiButton>
+            </EuiButtonEmpty>
           </EuiFlexItem>))
     );
   }
@@ -194,13 +237,13 @@ export class MainModule extends Component {
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
-        <EuiButton
+      <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
+        <EuiButtonEmpty
           fill={this.state.selectView === 'settings'}
           iconType="wrench"
           onClick={() => this.onSelectedTabChanged('settings')}>
           Configuration
-          </EuiButton>
+          </EuiButtonEmpty>
       </EuiFlexItem>
     );
   }
@@ -259,7 +302,7 @@ export class MainModule extends Component {
       onSelectedTabChanged: (id) => this.onSelectedTabChanged(id)
     }
     return (
-      <div className='wz-module'>
+      <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
         <div className='wz-module-header-agent-wrapper'>
           <div className='wz-module-header-agent'>
             {title}
@@ -267,12 +310,17 @@ export class MainModule extends Component {
         </div>
         {(agent && agent.os) &&
           <Fragment>
-            {(this.tabs && this.tabs.length) &&
-              <div className='wz-module-header-nav-wrapper'>
-                <div className='wz-module-header-nav'>
-                  <div className="wz-welcome-page-agent-info">
+            <div className='wz-module-header-nav-wrapper'>
+              <div className={this.tabs && this.tabs.length && 'wz-module-header-nav'}>
+                {this.state.showAgentInfo &&
+                  <div className={
+                    !this.tabs || !this.tabs.length ?
+                      "wz-welcome-page-agent-info" :
+                      "wz-welcome-page-agent-info wz-welcome-page-agent-info-gray"}>
                     <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
                   </div>
+                }
+                {(this.tabs && this.tabs.length) &&
                   <div className="wz-welcome-page-agent-tabs">
                     <EuiFlexGroup>
                       {this.renderTabs()}
@@ -287,9 +335,9 @@ export class MainModule extends Component {
                       }
                     </EuiFlexGroup>
                   </div>
-                </div>
+                }
               </div>
-            }
+            </div>
             {!['syscollector', 'configuration'].includes(this.props.section) &&
               <div className='wz-module-body'>
                 {selectView === 'events' &&

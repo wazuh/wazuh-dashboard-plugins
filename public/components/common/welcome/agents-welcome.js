@@ -24,7 +24,7 @@ import {
   EuiTitle,
   EuiHealth,
   EuiPage,
-  EuiButton,
+  EuiButton
 } from '@elastic/eui';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -46,18 +46,45 @@ export class AgentsWelcome extends Component {
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
 
+  getPlatformIcon(agent) {
+    let icon = false;
+    const os = (agent || {}).os;
+
+    if (((os || {}).uname || '').includes('Linux')) {
+      icon = 'linux';
+    } else if ((os || {}).platform === 'windows') {
+      icon = 'windows';
+    } else if ((os || {}).platform === 'darwin') {
+      icon = 'apple';
+    }
+
+    return <i
+      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+      aria-hidden="true"
+    ></i>
+  }
+
   renderTitle() {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
-          <span style={{ display: 'inline-flex' }}>
-            <EuiTitle size="s">
-              <h1>
-                <span>{this.props.agent.name} ({this.props.agent.id})&nbsp;&nbsp;</span>
-              </h1>
-            </EuiTitle>
-            <EuiHealth style={{ paddingTop: 6 }} color={this.color(this.props.agent.status)}>{this.props.agent.status}</EuiHealth>
-          </span>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <span style={{ display: 'inline-flex' }}>
+                <EuiTitle size="s">
+                  <h1>
+                    <span>{this.props.agent.name}&nbsp;&nbsp;{this.getPlatformIcon(this.props.agent)}</span>
+                  </h1>
+                </EuiTitle>
+              </span>
+            </EuiFlexItem>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false}>
+              <EuiHealth style={{ paddingTop: 6 }} size="xl" color={this.color(this.props.agent.status)}>
+                {this.props.agent.status}
+              </EuiHealth>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -82,7 +109,7 @@ export class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     return (
-      <div className="wz-module">
+      <div className="wz-module wz-module-welcome">
         <div className='wz-module-header-agent-wrapper'>
           <div className='wz-module-header-agent'>
             {title}
@@ -94,30 +121,30 @@ export class AgentsWelcome extends Component {
               <div className="wz-welcome-page-agent-info">
                 <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
               </div>
-              <div className="wz-welcome-page-agent-tabs">
-                <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
-                  <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
-                    <EuiButton
-                      onClick={() => this.props.switchTab('syscollector')}
-                      iconType="inspect">
-                      <span>Inventory data</span>
-                    </EuiButton>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
-                    <EuiButton
-                      onClick={() => this.props.switchTab('configuration')}
-                      iconType="gear" >
-                      <span>Configuration</span>
-                    </EuiButton>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </div>
             </div>
           </div>
         </div>
         <div className="wz-module-body">
+          <EuiPage>
+            <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
+              <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
+                <EuiButton
+                  onClick={() => this.props.switchTab('syscollector')}
+                  iconType="inspect">
+                  <span>Inventory data</span>
+                </EuiButton>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
+                <EuiButton
+                  onClick={() => this.props.switchTab('configuration')}
+                  iconType="gear" >
+                  <span>Configuration</span>
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPage>
           <EuiSpacer size="s" />
-          <EuiPage className="wz-welcome-page">
+          <EuiPage>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup>
@@ -227,19 +254,19 @@ export class AgentsWelcome extends Component {
                         this.props.extensions.hipaa ||
                         this.props.extensions.nist ||
                         this.props.extensions.tsc) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                          {this.props.extensions.tsc &&
-                            this.buildTabCard('tsc', 'apmApp')}
-                        </EuiFlexGrid>
-                      )}
+                          <EuiFlexGrid columns={2}>
+                            {this.props.extensions.pci &&
+                              this.buildTabCard('pci', 'visTagCloud')}
+                            {this.props.extensions.nist &&
+                              this.buildTabCard('nist', 'apmApp')}
+                            {this.props.extensions.gdpr &&
+                              this.buildTabCard('gdpr', 'visBarVertical')}
+                            {this.props.extensions.hipaa &&
+                              this.buildTabCard('hipaa', 'emsApp')}
+                            {this.props.extensions.tsc &&
+                              this.buildTabCard('tsc', 'apmApp')}
+                          </EuiFlexGrid>
+                        )}
                     </EuiPanel>
                   </EuiFlexItem>
                 </EuiFlexGroup>
