@@ -83,9 +83,9 @@ export class MainModule extends Component {
     this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
-      this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
-      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
-      this.loadSection((ModulesDefaults[this.props.section] || {}).init || 'dashboard');
+      this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'events', name: 'Events' }];
+      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['dashboard', 'reporting', 'settings'];
+      this.onSelectedTabChanged((ModulesDefaults[this.props.section] || {}).init || 'events');
     }
   }
 
