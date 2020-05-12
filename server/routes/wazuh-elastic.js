@@ -92,7 +92,38 @@ export function WazuhElasticRouter(server) {
       return ctrl.alerts(req, res);
     }
   });
-
+  // Check if there is some sample alerts index
+  server.route({
+    method: 'GET',
+    path: '/elastic/samplealerts',
+    handler(req, res) {
+      return ctrl.haveSampleAlerts(req, res);
+    }
+  });
+  // Check if there is sample alerts index created of category
+  server.route({
+    method: 'GET',
+    path: '/elastic/samplealerts/{category}',
+    handler(req, res) {
+      return ctrl.haveSampleAlertsOfCategory(req, res);
+    }
+  });
+  // Create sample alert index
+  server.route({
+    method: 'POST',
+    path: '/elastic/samplealerts/{category}',
+    handler(req, res) {
+      return ctrl.createSampleAlerts(req, res);
+    }
+  });
+  // Delete sample alert index by category
+  server.route({
+    method: 'DELETE',
+    path: '/elastic/samplealerts/{category}',
+    handler(req, res) {
+      return ctrl.deleteSampleAlerts(req, res);
+    }
+  });
   // Fetch alerts directly from Elasticsearch with esQuery object
   server.route({
     method: 'POST',

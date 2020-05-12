@@ -111,14 +111,22 @@ class KibanaVis extends Component {
           data.value.visData &&
           data.value.visData.rows &&
           this.props.state[this.visID] !==
-          data.value.visData.rows['0']['col-0-1']
-        )
+            data.value.visData.rows['0']['col-0-1']
+        ) {
           store.dispatch(
             this.updateMetric({
               name: this.visID,
               value: data.value.visData.rows['0']['col-0-1']
             })
           );
+        }
+        // This check if data.value.visData.tables exists and dispatch that value as stat
+        // FIXME: this is correct?
+        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && data.value.visData.tables['0'] && data.value.visData.tables['0'].rows && data.value.visData.tables['0'].rows['0'] && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']){
+          store.dispatch(
+            this.updateMetric({ name: this.visID, value: data.value.visData.tables['0'].rows['0']['col-0-2'] })
+          );
+        }
       }
     } catch (error) {
       this.showToast('danger', 'Error', error.message || error, 4000);

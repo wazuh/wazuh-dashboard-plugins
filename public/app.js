@@ -71,6 +71,11 @@ import './controllers';
 import './factories';
 import './directives';
 
+// Imports to update adminMode when app starts
+import { checkAdminMode } from './controllers/management/components/management/configuration/utils/wz-fetch';
+import store from './redux/store';
+import { updateAdminMode } from './redux/actions/appStateActions';
+
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
 
@@ -104,5 +109,13 @@ app.run([
       .setRootController(() => require('./app'));
     changeWazuhNavLogo();
     app.$injector = _$injector;
+
+    // Set adminMode in Redux when app starts.
+    // It prevents the first rendering, which depends on adminMode, from blinking due to a request to the app backend
+    checkAdminMode()
+      .then(adminMode => {
+        store.dispatch(updateAdminMode(adminMode))
+      })
+      .catch(() => {/* Do nothing if it fails */})
   }
 ]);

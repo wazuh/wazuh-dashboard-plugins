@@ -80,11 +80,14 @@ class WzRulesetTable extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    const sectionChanged = prevProps.state.section !== this.props.state.section;
+    const { isProcessing, section, showingFiles, filters, } = this.props.state;
+    
+    const processingChange = prevProps.state.isProcessing !== isProcessing;
+    const sectionChanged = prevProps.state.section !== section;
     const showingFilesChanged =
-      prevProps.state.showingFiles !== this.props.state.showingFiles;
-    const filtersChanged = prevProps.state.filters !== this.props.state.filters;
-    if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
+      prevProps.state.showingFiles !== showingFiles;
+    const filtersChanged = prevProps.state.filters !== filters;
+    if ((this._isMounted && processingChange && isProcessing ) || sectionChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
           pageSize: this.state.pageSize,
