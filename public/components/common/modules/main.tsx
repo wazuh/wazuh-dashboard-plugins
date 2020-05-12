@@ -109,24 +109,6 @@ export class MainModule extends Component {
     this.setState({ showAgentInfo: !this.state.showAgentInfo });
   }
 
-  getPlatformIcon(agent) {
-    let icon = false;
-    const os = (agent || {}).os;
-
-    if (((os || {}).uname || '').includes('Linux')) {
-      icon = 'linux';
-    } else if ((os || {}).platform === 'windows') {
-      icon = 'windows';
-    } else if ((os || {}).platform === 'darwin') {
-      icon = 'apple';
-    }
-
-    return <i
-      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-      aria-hidden="true"
-    ></i>
-  }
-
   color = (status, hex = false) => {
     if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
     else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
@@ -138,9 +120,10 @@ export class MainModule extends Component {
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
           <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <span className="wz-module-header-agent-title-btn" style={{ display: 'inline-flex' }}>
-                <EuiTitle size="s">
+            <EuiFlexItem />
+            <EuiFlexItem grow={false} className="wz-module-header-agent-title-badge">
+              <span style={{ display: 'inline-flex', paddingLeft: 16 }}>
+                <EuiTitle size="s" className="wz-module-header-agent-title-btn">
                   <h1>
                     <span
                       onClick={() => {
@@ -148,20 +131,20 @@ export class MainModule extends Component {
                         this.router.reload();
                       }}>
                       <EuiIcon size="m" type="arrowLeft" color='primary' />
-                      <span>&nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;{this.getPlatformIcon(this.props.agent)}&nbsp;&nbsp;&nbsp;
+                      <span>&nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
                       </span>
                     </span>
-                    <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
                   </h1>
                 </EuiTitle>
+                <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
+                  {this.props.agent.status}
+                </EuiHealth>
               </span>
             </EuiFlexItem>
-            <EuiFlexItem />
-            <EuiFlexItem grow={false}>
-              <EuiHealth style={{ paddingTop: 6 }} size="xl" color={this.color(this.props.agent.status)}>
-                {this.props.agent.status}
-              </EuiHealth>
+            <EuiFlexItem grow={false} style={{margin: '16px 0'}} className="wz-module-header-agent-title-btn">
+              <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
             </EuiFlexItem>
+            <EuiFlexItem />
           </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>

@@ -46,44 +46,25 @@ export class AgentsWelcome extends Component {
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
 
-  getPlatformIcon(agent) {
-    let icon = false;
-    const os = (agent || {}).os;
-
-    if (((os || {}).uname || '').includes('Linux')) {
-      icon = 'linux';
-    } else if ((os || {}).platform === 'windows') {
-      icon = 'windows';
-    } else if ((os || {}).platform === 'darwin') {
-      icon = 'apple';
-    }
-
-    return <i
-      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-      aria-hidden="true"
-    ></i>
-  }
-
   renderTitle() {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
           <EuiFlexGroup>
-            <EuiFlexItem>
-              <span style={{ display: 'inline-flex' }}>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false} className="wz-module-header-agent-title-badge">
+              <span style={{ display: 'inline-flex', paddingLeft: 16 }}>
                 <EuiTitle size="s">
                   <h1>
-                    <span>{this.props.agent.name}&nbsp;&nbsp;{this.getPlatformIcon(this.props.agent)}</span>
+                    <span>{this.props.agent.name}&nbsp;&nbsp;&nbsp;</span>
                   </h1>
                 </EuiTitle>
+                <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
+                  {this.props.agent.status}
+                </EuiHealth>
               </span>
             </EuiFlexItem>
             <EuiFlexItem />
-            <EuiFlexItem grow={false}>
-              <EuiHealth style={{ paddingTop: 6 }} size="xl" color={this.color(this.props.agent.status)}>
-                {this.props.agent.status}
-              </EuiHealth>
-            </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
