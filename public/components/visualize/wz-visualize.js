@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
@@ -20,7 +20,9 @@ import {
   EuiPanel,
   EuiFlexItem,
   EuiButtonIcon,
-  EuiDescriptionList
+  EuiDescriptionList,
+  EuiCallOut,
+  EuiLink
 } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card';
 import AlertsStats from '../../controllers/overview/components/alerts-stats';
@@ -28,6 +30,7 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
+import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -39,6 +42,8 @@ export class WzVisualize extends Component {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
       cardReqs: {},
+      thereAreSampleAlerts: false,
+      adminMode: false,
       metricItems:
         this.props.selectedTab !== 'welcome'
           ? this.getMetricItems(this.props.selectedTab)
@@ -132,6 +137,19 @@ export class WzVisualize extends Component {
         ];
       }
     }
+
+    // Check if there is sample alerts installed
+    try{
+      this.setState({
+        thereAreSampleAlerts: (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled
+      });
+    }catch(error){}
+
+    // Check adminMode
+    try{
+      const adminMode = await checkAdminMode();
+      this.setState({ adminMode });
+    }catch(error){}
   }
 
   async componentDidUpdate() {
@@ -276,6 +294,17 @@ export class WzVisualize extends Component {
               })}
             </div>
           )}
+
+        {/* Sample alerts Callout */}
+        {this.state.thereAreSampleAlerts && (
+          <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{margin: '0 8px'}}>
+            <p>The data displayed may contain sample alerts. {this.state.adminMode && (
+              <Fragment>
+                Go <EuiLink href='#/manager/sample_data?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
+              </Fragment>
+            )}</p>
+          </EuiCallOut>
+        )}
 
         {/* Metrics of Dashboard */}
         {selectedTab &&

@@ -13,6 +13,8 @@ import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
+import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { updateAdminMode } from '../../redux/actions/appStateActions';
 
 class WzMenuManagement extends Component {
   constructor(props) {
@@ -36,7 +38,8 @@ class WzMenuManagement extends Component {
       cluster: { id: 'monitoring', text: 'Cluster' },
       logs: { id: 'logs', text: 'Logs' },
       reporting: { id: 'reporting', text: 'Reporting' },
-      statistics: { id: 'statistics', text: 'Statistics' }
+      statistics: { id: 'statistics', text: 'Statistics' },
+      sample_data: { id: 'sample_data', text: 'Sample Data' },
     };
 
     this.paths = {
@@ -55,7 +58,14 @@ class WzMenuManagement extends Component {
     }
   }
 
-  componentDidMount() {}
+  async componentDidMount() {
+    try{
+      const adminMode = await checkAdminMode();
+      if(this.props.adminMode !== adminMode){
+        this.props.updateAdminMode(adminMode);
+      };
+    }catch(error){}
+  }
 
   clickMenuItem = section => {
     this.props.closePopover();
@@ -83,8 +93,9 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.decoders),
           this.createItem(this.managementSections.lists),
           this.createItem(this.managementSections.groups),
-          this.createItem(this.managementSections.configuration)
-        ]
+          this.createItem(this.managementSections.configuration),
+          ...(this.props.adminMode ? [this.createItem(this.managementSections.sample_data)] : [])
+        ],
       })
     ];
 
@@ -119,11 +130,18 @@ class WzMenuManagement extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    adminMode: state.appStateReducers.adminMode
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
   };
 };
 
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(WzMenuManagement);

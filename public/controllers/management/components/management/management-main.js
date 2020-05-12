@@ -24,6 +24,7 @@ import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
 // import { GroupsTable } from './groups/groups-table';
 // import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
+import WzAddModulesData from '../../../../components/add-modules-data/add-modules-data-main';
 import { connect } from 'react-redux';
 
 class WzManagementMain extends Component {
@@ -49,13 +50,13 @@ class WzManagementMain extends Component {
           <div>
             {(section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
-              (section === 'reporting' && <WzReporting />) ||
-              (section === 'statistics' && <WzStatistics />) ||
-              (section === 'logs' && <WzLogs />) ||
-              (section === 'configuration' && (
-                <WzConfiguration {...this.props.configurationProps} />
-              )) ||
-              (ruleset.includes(section) && <WzRuleset />)}
+              (section === 'reporting' && <WzReporting />) || 
+              (section === 'statistics' && <WzStatistics />) || 
+              (section === 'logs' && <WzLogs />) || 
+              (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
+              (section === 'sample_data' && <WzAddModulesData />) ||
+              (ruleset.includes(section) && <WzRuleset />)
+            }
           </div>
         </EuiFlexItem>
       </EuiFlexGroup>
