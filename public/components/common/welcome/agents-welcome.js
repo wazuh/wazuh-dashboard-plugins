@@ -150,8 +150,63 @@ export class AgentsWelcome extends Component {
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPage>
-          <EuiSpacer size="s" />
-          <EuiPage>
+          <EuiPage style={{ paddingTop: 0 }}>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFlexGroup direction="column">
+                  <EuiFlexItem>
+                    <EuiPanel paddingSize="m">
+                      <EuiTitle size="s">
+                        <h1>Groups it belongs to</h1>
+                      </EuiTitle>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <EuiPanel paddingSize="m">
+                          <EuiTitle size="s">
+                            <h1>Most common groups</h1>
+                          </EuiTitle>
+                        </EuiPanel>
+                      </EuiFlexItem>
+                      <EuiFlexItem>
+                        <EuiPanel paddingSize="m">
+                          <EuiTitle size="s">
+                            <h1>Top requirements</h1>
+                          </EuiTitle>
+                        </EuiPanel>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiPanel paddingSize="m">
+                      <EuiTitle size="s">
+                        <h1>Event count evolution</h1>
+                      </EuiTitle>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiFlexGroup direction="column">
+                  <EuiFlexItem>
+                    <EuiPanel paddingSize="m">
+                      <EuiTitle size="s">
+                        <h1>Last Integrity monitoring events</h1>
+                      </EuiTitle>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiPanel paddingSize="m">
+                      <EuiTitle size="s">
+                        <h1>Last SCA scans</h1>
+                      </EuiTitle>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
             {/* <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup>
