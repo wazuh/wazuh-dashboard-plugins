@@ -139,7 +139,7 @@ class WzRuleInfo extends Component {
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc','mitre'];
+    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc', 'mitre'];
     const buildBadge = field => {
       const idGenerator = () => {
         return (
@@ -395,10 +395,10 @@ class WzRuleInfo extends Component {
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   iconType="popout"
-                  aria-label="popout">
-                  <a href={`#/overview?tab=general&tabView=panels&addRuleFilter=${id}`} target="blank">
-                    View alerts of this Rule
-                    </a>
+                  aria-label="popout"
+                  href={`#/overview?tab=general&tabView=panels&addRuleFilter=${id}`}
+                  target="blank">
+                  View alerts of this Rule
                 </EuiButtonEmpty>
               </EuiFlexItem>
             </EuiFlexGroup>

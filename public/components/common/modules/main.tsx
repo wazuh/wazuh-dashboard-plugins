@@ -19,12 +19,10 @@ import {
   EuiHealth,
   EuiTitle,
   EuiToolTip,
-  EuiButton,
   EuiTab,
   EuiTabs,
   EuiIcon,
   EuiPopover,
-  EuiButtonIcon,
   EuiButtonEmpty
 } from '@elastic/eui';
 import '../../common/modules/module.less';
@@ -198,7 +196,7 @@ export class MainModule extends Component {
   renderReportButton() {
     return (
       (this.props.disabledReport &&
-        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
+        <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
           <EuiToolTip position="top" content="No results match for this search criteria.">
             <EuiButtonEmpty
               iconType="document"
@@ -211,7 +209,7 @@ export class MainModule extends Component {
         </EuiFlexItem>
 
         || (
-          <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
+          <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
             <EuiButtonEmpty
               iconType="document"
               isLoading={this.state.loadingReport}
@@ -224,13 +222,14 @@ export class MainModule extends Component {
 
   renderDashboardButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
-        <EuiButton
+      <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
+        <EuiButtonEmpty
           fill={this.state.selectView === 'dashboard'}
           iconType="visLine"
-          onClick={() => this.onSelectedTabChanged('dashboard')}>
+          href="#/overview"
+          target="blank">
           Dashboard
-          </EuiButton>
+          </EuiButtonEmpty>
       </EuiFlexItem>
     );
   }
@@ -254,10 +253,9 @@ export class MainModule extends Component {
 
   onSelectedTabChanged(id) {
     if (id !== this.state.selectView) {
-      if (id === 'events' || id === 'dashboard') {
+      if (id === 'events') {
         window.location.href = window.location.href.replace(
-          new RegExp("tabView=" + "[^\&]*"),
-          `tabView=${id === 'events' ? 'discover' : 'panels'}`);
+          new RegExp("tabView=" + "[^\&]*"), 'tabView=discover');
         this.afterLoad = id;
         this.loadSection('loader');
       } else {
