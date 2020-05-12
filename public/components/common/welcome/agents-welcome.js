@@ -20,7 +20,7 @@ import {
   EuiFlexGroup,
   EuiSpacer,
   EuiFlexGrid,
-  EuiCallOut,
+  EuiButtonEmpty,
   EuiTitle,
   EuiHealth,
   EuiPage,
@@ -155,33 +155,44 @@ export class AgentsWelcome extends Component {
               <EuiFlexItem>
                 <EuiFlexGroup direction="column">
                   <EuiFlexItem>
-                    <EuiPanel paddingSize="m">
-                      <EuiTitle size="s">
+                    <EuiPanel paddingSize="m" style={{ height: 86 }}>
+                      <EuiTitle size="xs">
                         <h1>Groups it belongs to</h1>
                       </EuiTitle>
+                      <div>
+                        {this.props.agent.group.map((group, key) => (
+                          <EuiButtonEmpty
+                            style={{ marginLeft: -8 }}
+                            key={`agent-group-${key}`}
+                            onClick={() => this.props.goGroups(this.props.agent, key)}
+                          >
+                            {group}
+                          </EuiButtonEmpty>
+                        ))}
+                      </div>
                     </EuiPanel>
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiFlexGroup>
-                      <EuiFlexItem>
-                        <EuiPanel paddingSize="m">
-                          <EuiTitle size="s">
+                      <EuiFlexItem style={{ marginTop: 0 }}>
+                        <EuiPanel paddingSize="m" style={{ height: 'calc(50vh - 178px)' }}>
+                          <EuiTitle size="xs">
                             <h1>Most common groups</h1>
                           </EuiTitle>
                         </EuiPanel>
                       </EuiFlexItem>
-                      <EuiFlexItem>
+                      <EuiFlexItem style={{ marginTop: 0 }}>
                         <EuiPanel paddingSize="m">
-                          <EuiTitle size="s">
+                          <EuiTitle size="xs">
                             <h1>Top requirements</h1>
                           </EuiTitle>
                         </EuiPanel>
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlexItem>
-                  <EuiFlexItem>
-                    <EuiPanel paddingSize="m">
-                      <EuiTitle size="s">
+                  <EuiFlexItem style={{ marginTop: 0 }}>
+                    <EuiPanel paddingSize="m" style={{ height: 'calc(50vh - 178px)' }}>
+                      <EuiTitle size="xs">
                         <h1>Event count evolution</h1>
                       </EuiTitle>
                     </EuiPanel>
@@ -192,14 +203,14 @@ export class AgentsWelcome extends Component {
                 <EuiFlexGroup direction="column">
                   <EuiFlexItem>
                     <EuiPanel paddingSize="m">
-                      <EuiTitle size="s">
+                      <EuiTitle size="xs">
                         <h1>Last Integrity monitoring events</h1>
                       </EuiTitle>
                     </EuiPanel>
                   </EuiFlexItem>
-                  <EuiFlexItem>
+                  <EuiFlexItem style={{ marginTop: 0 }}>
                     <EuiPanel paddingSize="m">
-                      <EuiTitle size="s">
+                      <EuiTitle size="xs">
                         <h1>Last SCA scans</h1>
                       </EuiTitle>
                     </EuiPanel>
