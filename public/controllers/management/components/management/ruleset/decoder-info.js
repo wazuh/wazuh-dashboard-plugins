@@ -109,7 +109,7 @@ class WzDecoderInfo extends Component {
    */
   renderInfo(position, file, path) {
     return (
-      <EuiFlexGrid columns={3}>
+      <EuiFlexGrid columns={4}>
         <EuiFlexItem key="position">
           <b style={{ paddingBottom: 6 }}>Position</b>{position}
         </EuiFlexItem>
@@ -156,7 +156,7 @@ class WzDecoderInfo extends Component {
         content = <span className="subdued-color">{details[key]}</span>;
       }
       detailsToRender.push(
-        <EuiFlexItem key={`decoder-detail-${key}`} grow={3}>
+        <EuiFlexItem key={`decoder-detail-${key}`} grow={3} style={{ maxWidth: 'calc(25% - 24px)' }}>
           <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b><div>{content}</div>
         </EuiFlexItem>
       );
@@ -179,7 +179,7 @@ class WzDecoderInfo extends Component {
           key={`decoder-info-color-order-${i}`}
           style={{ color: colors[i] }}
         >
-          {valuesArray[i]}
+          {valuesArray[i].startsWith(" ") ? valuesArray[i] : ` ${valuesArray[i]}`}
         </span>
       );
       result.push(coloredString);
@@ -267,7 +267,6 @@ class WzDecoderInfo extends Component {
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size="m" />
             {/* Cards */}
             <EuiPanel style={{ margin: '16px 0', padding: '16px 16px 0px 16px' }}>
               <EuiFlexGroup>
@@ -305,10 +304,10 @@ class WzDecoderInfo extends Component {
                   </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
-            {/* Table */}
+              {/* Table */}
               <EuiFlexGroup>
                 <EuiFlexItem style={{ marginTop: 8 }}>
-                <EuiAccordion
+                  <EuiAccordion
                     id="Related"
                     buttonContent={
                       <EuiTitle size="s">
