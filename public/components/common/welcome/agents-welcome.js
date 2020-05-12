@@ -24,11 +24,14 @@ import {
   EuiTitle,
   EuiHealth,
   EuiPage,
-  EuiButton
+  EuiButton,
+  EuiPopover
 } from '@elastic/eui';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import Overview from '../../wz-menu/wz-menu-overview';
 import './welcome.less';
 
 export class AgentsWelcome extends Component {
@@ -109,6 +112,29 @@ export class AgentsWelcome extends Component {
           <EuiPage>
             <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
               <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
+                <EuiPopover
+                  button={
+                    <EuiButton
+                      onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}
+                      iconType="apps">
+                      <span>Navigation&nbsp;<EuiIcon type='arrowDown'></EuiIcon></span>
+                    </EuiButton>
+                  }
+                  isOpen={this.state.switchModule}
+                  closePopover={() => this.setState({ switchModule: false })}
+                  repositionOnScroll={true}
+                  anchorPosition="downLeft">
+                  <WzReduxProvider>
+                    <div style={{ maxWidth: 650 }}>
+                      <Overview
+                        isAgent={this.props.agent}
+                        closePopover={() => this.setState({ switchModule: false })}
+                        switchTab={(module) => this.props.switchTab(module)}></Overview>
+                    </div>
+                  </WzReduxProvider>
+                </EuiPopover>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
                 <EuiButton
                   onClick={() => this.props.switchTab('syscollector')}
                   iconType="inspect">
@@ -126,7 +152,7 @@ export class AgentsWelcome extends Component {
           </EuiPage>
           <EuiSpacer size="s" />
           <EuiPage>
-            <EuiFlexGroup>
+            {/* <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup>
                   <EuiFlexItem>
@@ -203,7 +229,6 @@ export class AgentsWelcome extends Component {
                           this.buildTabCard('docker', 'logoDocker')}
                         {this.props.extensions.mitre &&
                           this.buildTabCard('mitre', 'spacesApp')}{' '}
-                        {/* TODO- Change "spacesApp" icon*/}
                       </EuiFlexGrid>
                     </EuiPanel>
                   </EuiFlexItem>
@@ -252,7 +277,7 @@ export class AgentsWelcome extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
-            </EuiFlexGroup>
+            </EuiFlexGroup> */}
           </EuiPage>
         </div>
       </div>

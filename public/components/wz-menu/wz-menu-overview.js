@@ -86,8 +86,12 @@ class WzMenuOverview extends Component {
         window.location.href = `#/overview/?tab=${section}`;
         store.dispatch(updateCurrentTab(section));
       } else {
-        window.location.href = `#/agents?agent=${this.props.isAgent.id}&tab=${section}`;
-        this.router.reload();
+        if (!this.props.switchTab) {
+          window.location.href = `#/agents?agent=${this.props.isAgent.id}&tab=${section}`;
+          this.router.reload();
+        } else {
+          this.props.switchTab(section);
+        }
       }
     }
   };
