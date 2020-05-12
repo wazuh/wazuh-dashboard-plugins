@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
@@ -20,7 +20,8 @@ import {
   EuiPanel,
   EuiFlexItem,
   EuiButtonIcon,
-  EuiDescriptionList
+  EuiDescriptionList,
+  EuiCallOut
 } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card';
 import AlertsStats from '../../controllers/overview/components/alerts-stats';
@@ -202,14 +203,14 @@ export class WzVisualize extends Component {
                 {(vis.id !== 'Wazuh-App-Overview-General-Agents-status' ||
                   (vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
                     this.monitoringEnabled)) && (
-                  <WzReduxProvider>
-                    <KibanaVis
-                      visID={vis.id}
-                      tab={selectedTab}
-                      {...this.props}
-                    ></KibanaVis>
-                  </WzReduxProvider>
-                )}
+                    <WzReduxProvider>
+                      <KibanaVis
+                        visID={vis.id}
+                        tab={selectedTab}
+                        {...this.props}
+                      ></KibanaVis>
+                    </WzReduxProvider>
+                  )}
                 {vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
                   !this.monitoringEnabled && (
                     <EuiPage style={{ background: 'transparent' }}>
@@ -254,71 +255,78 @@ export class WzVisualize extends Component {
     };
 
     return (
-      <EuiFlexItem>
-        {selectedTab &&
-          selectedTab !== 'welcome' &&
-          this.visualizations[selectedTab] &&
-          this.visualizations[selectedTab].metrics && (
-            <div className="wz-no-display">
-              {this.visualizations[selectedTab].metrics.map((vis, i) => {
-                return (
-                  <div key={i}>
-                    <WzReduxProvider>
-                      <KibanaVis
-                        visID={vis.id}
-                        tab={selectedTab}
-                        isMetric={true}
-                        {...this.props}
-                      ></KibanaVis>
-                    </WzReduxProvider>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-        {/* Metrics of Dashboard */}
-        {selectedTab &&
-          selectedTab !== 'welcome' &&
-          this.visualizations[selectedTab] &&
-          this.visualizations[selectedTab].metrics &&
-          this.state.metricItems && (
-            <div className="md-padding-top-10">
-              <WzReduxProvider>
-                <AlertsStats {...this.state.metricItems} tab={selectedTab} />
-              </WzReduxProvider>
-            </div>
-          )}
-
+      <Fragment>
         {/* Cards for Regulatory Compliance Dashboards */}
         {cardReqs && cardReqs.items && (
           <div style={{ padding: '10px 12px 8px' }}>
             <RequirementCard {...cardReqs} />
           </div>
         )}
-
-        {selectedTab &&
-          selectedTab !== 'welcome' &&
-          this.visualizations[selectedTab] &&
-          this.visualizations[selectedTab].rows.map((row, i) => {
-            return (
-              <EuiFlexGroup
-                key={i}
-                style={{
-                  height: row.height + 'px',
-                  margin: 0,
-                  maxWidth: '100%'
-                }}
-              >
-                {row.vis.map((vis, n) => {
-                  return !vis.hasRows
-                    ? renderVisualizations(vis)
-                    : renderVisualizationRow(vis.rows, vis.width, n);
+        {this.props.resultState === 'none' && (
+          <div className="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8">
+            <EuiCallOut title="There are no results for selected time range. Try another
+                    one." color="warning" iconType='help'></EuiCallOut>
+          </div>
+        )}
+        <EuiFlexItem className={this.props.resultState === 'none' && 'no-opacity' || ''}>
+          {selectedTab &&
+            selectedTab !== 'welcome' &&
+            this.visualizations[selectedTab] &&
+            this.visualizations[selectedTab].metrics && (
+              <div className="wz-no-display">
+                {this.visualizations[selectedTab].metrics.map((vis, i) => {
+                  return (
+                    <div key={i}>
+                      <WzReduxProvider>
+                        <KibanaVis
+                          visID={vis.id}
+                          tab={selectedTab}
+                          isMetric={true}
+                          {...this.props}
+                        ></KibanaVis>
+                      </WzReduxProvider>
+                    </div>
+                  );
                 })}
-              </EuiFlexGroup>
-            );
-          })}
-      </EuiFlexItem>
+              </div>
+            )}
+
+          {/* Metrics of Dashboard */}
+          {selectedTab &&
+            selectedTab !== 'welcome' &&
+            this.visualizations[selectedTab] &&
+            this.visualizations[selectedTab].metrics &&
+            this.state.metricItems && (
+              <div className="md-padding-top-10">
+                <WzReduxProvider>
+                  <AlertsStats {...this.state.metricItems} tab={selectedTab} />
+                </WzReduxProvider>
+              </div>
+            )}
+
+          {selectedTab &&
+            selectedTab !== 'welcome' &&
+            this.visualizations[selectedTab] &&
+            this.visualizations[selectedTab].rows.map((row, i) => {
+              return (
+                <EuiFlexGroup
+                  key={i}
+                  style={{
+                    height: row.height + 'px',
+                    margin: 0,
+                    maxWidth: '100%'
+                  }}
+                >
+                  {row.vis.map((vis, n) => {
+                    return !vis.hasRows
+                      ? renderVisualizations(vis)
+                      : renderVisualizationRow(vis.rows, vis.width, n);
+                  })}
+                </EuiFlexGroup>
+              );
+            })}
+        </EuiFlexItem>
+      </Fragment>
     );
   }
 }

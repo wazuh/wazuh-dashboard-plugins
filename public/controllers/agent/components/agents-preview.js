@@ -149,7 +149,7 @@ export class AgentsPreview extends Component {
               </EuiPanel>
             </EuiFlexItem>
             {this.totalAgents > 0 && !this.state.loading && (
-              <EuiFlexItem grow={false}>
+              <EuiFlexItem>
                 <EuiPanel betaBadgeLabel="Details" style={{ paddingBottom: 0 }}>
                   <EuiFlexGroup style={{ minWidth: 500 }}>
                     <EuiFlexItem grow={false}></EuiFlexItem>
