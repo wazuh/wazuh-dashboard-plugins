@@ -10,6 +10,11 @@
             </div>
         </div>
     </div>
+
+    <div ng-if="tab === 'mitre' && showModuleDashboard  && !showModuleEvents">
+        <react-component name="Mitre" />
+    </div>
+
     <!-- Loading status section -->
     <div ng-if="tabView === 'panels' && showModuleDashboard && !rendered && resultState !== 'none'"
         class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
