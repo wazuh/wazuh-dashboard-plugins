@@ -336,6 +336,23 @@ class WzRuleInfo extends Component {
     this.setState({ currentRuleId: ruleId });
   }
 
+  /**
+   * Update style for title with elements $()
+   * @param {string} value 
+   */
+  updateStyleTitle(value) {
+    const regex = /\$(.*?)\)/g;
+    let result = value.match(regex);
+    if(result !== null) {
+      for (const oldValue of result) {
+        let newValue = oldValue.replace('$(',`<span style="color:#006BB4">`);
+        newValue = newValue.replace(')', ' </span>');
+        value = value.replace(oldValue, newValue);
+      }
+    }
+    return value;
+  }
+
   render() {
     const { ruleInfo, isLoading } = this.props.state;
     const currentRuleId =
@@ -388,7 +405,7 @@ class WzRuleInfo extends Component {
                         }}
                       />
                     </EuiToolTip>
-                    {description}
+                    {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description)}} />}
                   </h2>
                 </EuiTitle>
               </EuiFlexItem>
