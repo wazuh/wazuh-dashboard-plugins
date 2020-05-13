@@ -153,6 +153,7 @@ export class WzVisualize extends Component {
   }
 
   async componentDidUpdate() {
+    this.visualizations = this.props.isAgent && this.props.isAgent.length ? agentVisualizations : visualizations;
     const { selectedTab } = this.state;
     if (selectedTab !== this.props.selectedTab) {
       this.setState({
@@ -186,6 +187,7 @@ export class WzVisualize extends Component {
   };
 
   render() {
+    this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = vis => {
       return (
