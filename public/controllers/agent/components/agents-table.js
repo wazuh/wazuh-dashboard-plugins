@@ -104,6 +104,7 @@ export class AgentsTable extends Component {
   };
 
   async componentDidMount() {
+    this._isMount = true;
     await this.getItems();
     const filterStatus = this.filterBarModelStatus();
     const filterGroups = await this.filterBarModelGroups();

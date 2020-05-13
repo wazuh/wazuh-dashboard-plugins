@@ -28,7 +28,7 @@ export class FlyoutDetail extends Component {
     fileName: string
     agentId: string
     type: string
-    view: 'states' | 'events'
+    view: 'inventory' | 'events'
     closeFlyout(): void
   }
 
@@ -58,6 +58,10 @@ export class FlyoutDetail extends Component {
     } catch (err) {
       this.setState({ error: `Data could not be fetched for ${this.props.fileName}` })
     }
+  }
+
+  componentWillUnmount() {
+    window.location.href = window.location.href.replace(new RegExp("&file=" + "[^\&]*", 'g'), "");
   }
 
   render() {

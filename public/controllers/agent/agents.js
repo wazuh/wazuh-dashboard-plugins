@@ -512,21 +512,8 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
-
-    /*     if (tab === 'mitre') {
-          const result = await this.apiReq.request('GET', '/rules/mitre', {});
-          this.$scope.mitreIds = (((result || {}).data || {}).data || {}).items;
-    
-          this.$scope.mitreCardsSliderProps = {
-            items: this.$scope.mitreIds,
-            attacksCount: this.$scope.attacksCount,
-            reqTitle: 'MITRE',
-            wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-            addFilter: id => this.addMitrefilter(id),
-          };
-        } */
 
     try {
       this.$scope.showScaScan = false;
@@ -542,7 +529,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -584,11 +571,6 @@ export class AgentsController {
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
-      this.$scope.currentAgentsSectionProps = {
-        switchTab: (tab, force) => this.$scope.switchTab(tab, force),
-        currentTab: this.$scope.tab,
-        agent: this.$scope.agent
-      };
       this.$scope.$applyAsync();
     } catch (error) {
       return Promise.reject(error);
@@ -818,6 +800,7 @@ export class AgentsController {
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
+      if (!this.$scope.agent) return;
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
@@ -897,6 +880,7 @@ export class AgentsController {
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
+      goGroups: (agent, group) => this.goGroups(agent, group),
       setExtensions: (api, extensions) => {
         AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;

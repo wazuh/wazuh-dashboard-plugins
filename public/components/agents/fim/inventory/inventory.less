@@ -7,10 +7,13 @@
     mask-image: unset;
 }
 
-.details-row{
-    background: #fcfdfe;
+.flyout-row{
     padding: 16px;
     border-top: 1px solid #d3dae6;
+}
+
+.details-row{
+    background: #fcfdfe;
 }
 
 .detail-icon{
@@ -27,23 +30,29 @@
 .detail-value{
     font-size: 14px;
     font-weight: 300;
+    cursor: default;
+    margin-left: 36px;
+    float: left;
     white-space: break-spaces;
+}
+
+.buttonAddFilter{
+    min-height: 0;
 }
 
 .detail-value-checksum{
     font-size: 13px!important;
+    display: inline-flex;
 }
 
 .detail-value-perm{
     word-break: break-word;
-    max-height: 40px !important;
     display: inline-block;
     overflow: hidden;
 }
 
 .detail-tooltip {
-    margin-left: 36px;
-    float: left;
+    float: right;
 }
 
 .euiAccordion {
@@ -64,14 +73,29 @@
     height: unset!important;
 }
 
-.euiAccordion__childWrapper .euiToolTipAnchor{
-    display: block!important;
+.euiAccordion__childWrapper .flyout-row:not(.related-rules-row) .euiToolTipAnchor{
+    //display: block!important;
 }
 
 .euiAccordion__button {
     padding: 0px 0px 8px 0;
 }
 
+.events-accordion{
+    border-bottom: none!important;
+}
+
 .view-in-events-btn{
     height: 30px;
+}
+
+.module-discover-table .euiTableRow-isExpandedRow .euiTableCellContent{
+    animation: none!important;
+}
+
+/* This resets to the original value of "display" style for EuiTooltip used in ".euiAccordion__childWrapper .euiToolTipAnchor" definition,
+    which is defined above in this same file as block!important.
+*/
+.rule_reset_display_anchor .euiToolTipAnchor{
+    display: inline-block !important;
 }

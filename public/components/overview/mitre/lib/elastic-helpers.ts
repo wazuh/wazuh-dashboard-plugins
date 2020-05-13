@@ -31,6 +31,14 @@ export async function getIndexPattern() {
 
 export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs:any=null ) {
   const query = buildQuery(indexPattern, filterParams);
+  const filters = ((query || {}).bool || {}).filter;
+  if(filters && Array.isArray(filters)){
+    filters.forEach(item => {
+      if(item.range && item.range.timestamp && item.range.timestamp.mode){ //range filters can contain a "mode" field that causes an error in an Elasticsearch request
+        delete item.range.timestamp["mode"];
+      }
+    });
+  }
   const search:SearchParams = {
     index: indexPattern['id'],
     body: {

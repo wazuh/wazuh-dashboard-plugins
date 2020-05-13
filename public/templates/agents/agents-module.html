@@ -1,7 +1,7 @@
 <div ng-if="tab !== 'welcome' && agent">
     <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
     <div ng-if='!loadingDashboard'>
-        <div ng-if='showModuleDashboard || showModuleEvents'>
+        <div ng-show='showModuleDashboard || showModuleEvents'>
             <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
                 <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
             </div>
@@ -47,8 +47,15 @@
             <div class="euiSpacer euiSpacer--l"></div>
         </div>
     </div>
+    <!-- No results section -->
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+    ng-if="tab !== 'welcome'" ng-show="resultState === 'none' && tabView === 'panels' && showModuleDashboard">
+    <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+        one.'}" />
+    </div>
+
     <!-- End report status section -->
-    <div ng-if="tab && tab!=='welcome'">
+    <div ng-if="tab && tab!=='welcome'" ng-show="resultState !== 'none'">
         <div ng-class="{'no-opacity': !moduleDiscoverReady}">
             <react-component ng-show='showModuleDashboard' name="WzVisualize"
                 props="{selectedTab: tab, isAgent: true}" />

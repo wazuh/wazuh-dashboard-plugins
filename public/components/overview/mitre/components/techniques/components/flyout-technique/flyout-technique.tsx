@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, ReactMarkdown } from 'react';
+import React, { Component } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
@@ -18,15 +19,19 @@ import {
   EuiFlyoutBody,
   EuiDescriptionList,
   EuiSpacer,
-  EuiLink
+  EuiLink,
+  EuiToolTip,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../react-services/wz-request';
 
 export class FlyoutTechnique extends Component {
   _isMount = false;
   state: {
-    techniqueData: {}
+    techniqueData: {
+      [key:string]: any
+    }
   }
+
   props!: {
     currentTechniqueData: any
     currentTechnique: string
@@ -35,7 +40,9 @@ export class FlyoutTechnique extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      techniqueData: {}
+      techniqueData: {
+        description: ''
+      }
     }
   }
 
@@ -57,14 +64,12 @@ export class FlyoutTechnique extends Component {
       q: `id=${currentTechnique}`
     });
     const rawData = (((result || {}).data || {}).data || {}).items
-    console.log({rawData})
     !!rawData && this.formatTechniqueData(rawData[0]);
   }
 
   formatTechniqueData (rawData) {
     const { platform_name, phase_name} = rawData;
     const { name, description, x_mitre_version: version } = rawData.json;
-    // const { } = rawData.json.
     this.setState({techniqueData: { name, description, phase_name, platform_name, version } })
   }
 
@@ -82,7 +87,7 @@ export class FlyoutTechnique extends Component {
   renderHeader() {
     const { techniqueData } = this.state;
     return(
-      <EuiFlyoutHeader hasBorder>
+      <EuiFlyoutHeader hasBorder style={{padding:"12px 16px"}}>
         {(Object.keys(techniqueData).length === 0 && (
           <div>
             <EuiLoadingContent lines={1} />
@@ -99,23 +104,27 @@ export class FlyoutTechnique extends Component {
   }
   
   renderBody() {
-    const { currentTechnique } = this.props
+    const { currentTechnique } = this.props;
     const { techniqueData } = this.state;
-    const link = `https://attack.mitre.org/techniques/${techniqueData.id}/`;
-
-    const formattedDescription = techniqueData.description ? (
-      <ReactMarkdown
-        className="wz-markdown-margin"
-        source={techniqueData.description}
-      />
-    ) : (
-      techniqueData.description
-    );
-
+    const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
+    const formattedDescription = techniqueData.description 
+      ? (
+        <ReactMarkdown
+          className="wz-markdown-margin"
+          source={techniqueData.description}
+        />
+      )
+      : techniqueData.description;
     const data = [
       {
-        title: 'Id',
-        description: currentTechnique
+        title: 'ID',
+        description: ( <EuiToolTip
+          position="top"
+          content={"Open " + currentTechnique + " details in a new page"}>
+          <EuiLink href={link} external target="_blank">
+            {currentTechnique}
+          </EuiLink>
+        </EuiToolTip>)
       },
       {
         title: 'Tactic',
@@ -129,20 +138,20 @@ export class FlyoutTechnique extends Component {
           techniqueData.platform_name
         )
       },
-      // {
-      //   title: 'Data sources',
-      //   description: this.getArrayFormatted(
-      //     techniqueData.dataSources
-      //   )
-      // },
+      {
+        title: 'Data sources',
+        description: this.getArrayFormatted(
+          techniqueData.dataSources
+        )
+      },
       {
         title: 'Version',
         description: techniqueData.version
       },
-      // {
-      //   title: 'Description',
-      //   description: formattedDescription
-      // }
+      {
+        title: 'Description',
+        description: formattedDescription
+      }
     ];
     return (
       <EuiFlyoutBody>
@@ -152,13 +161,13 @@ export class FlyoutTechnique extends Component {
             <EuiLoadingContent lines={3} />
           </div>
         )) || (
-          <div>
+          <div style={{marginBottom: 30}}>
             <EuiDescriptionList listItems={data} />
             <EuiSpacer />
             <p>
               More info:{' '}
               <EuiLink href={link} target="_blank">
-                {`MITRE ATT&CK - ${techniqueData.id}`}
+                {`MITRE ATT&CK - ${currentTechnique}`}
               </EuiLink>
             </p>
           </div>
@@ -173,7 +182,7 @@ export class FlyoutTechnique extends Component {
     return(
         <EuiFlyout
           onClose={() => onChangeFlyout(false)}
-          maxWidth="35%"
+          maxWidth="50%"
           className="flyout-no-overlap"
           aria-labelledby="flyoutSmallTitle"
           > 

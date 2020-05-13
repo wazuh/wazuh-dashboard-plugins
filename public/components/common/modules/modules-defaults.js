@@ -11,31 +11,53 @@
  */
 export const ModulesDefaults = {
   general: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
     buttons: ['dashboard', 'reporting']
   },
   fim: {
-    init: 'states',
-    tabs: [{ id: 'states', name: 'States' }, { id: 'events', name: 'Events' }],
+    init: 'inventory',
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
     buttons: ['dashboard', 'reporting', 'settings']
   },
+  gcp: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
+    buttons: ['dashboard', 'reporting']
+  },
   sca: {
-    init: 'states',
-    tabs: [{ id: 'states', name: 'States' }, { id: 'events', name: 'Events' }],
-    buttons: ['settings']
+    init: 'inventory',
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
+    buttons: ['dashboard', 'settings']
+  },
+  mitre: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
+    buttons: ['dashboard', 'reporting']
   },
   virustotal: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
     buttons: ['dashboard', 'reporting']
   },
   pci: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
     buttons: ['dashboard', 'reporting']
   },
   hipaa: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
     buttons: ['dashboard', 'reporting']
   },
   nist: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
     buttons: ['dashboard', 'reporting']
   },
   gdpr: {
+    init: 'events',
+    tabs: [{ id: 'events', name: 'Events' }],
     buttons: ['dashboard', 'reporting']
   },
   syscollector: {

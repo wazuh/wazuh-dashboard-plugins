@@ -16,12 +16,12 @@ import {
   EuiStat,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiToolTip,
   EuiButton
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import { ActionAgents } from '../../../react-services/action-agents';
 import { AgentsTable } from '../../../controllers/agent/components/agents-table';
+
+import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -38,11 +38,8 @@ export class AgentInfo extends Component {
     });
   }
 
-  addIconPlatformRender(agent) {
+  getPlatformIcon(agent) {
     let icon = false;
-    const checkField = field => {
-      return field !== undefined ? field : '-';
-    };
     const os = (agent || {}).os;
 
     if (((os || {}).uname || '').includes('Linux')) {
@@ -52,25 +49,32 @@ export class AgentInfo extends Component {
     } else if ((os || {}).platform === 'darwin') {
       icon = 'apple';
     }
+
+    return <i
+      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+      aria-hidden="true"
+    ></i>
+  }
+
+
+  addTextPlatformRender(agent) {
+    const checkField = field => {
+      return field !== undefined ? field : '-';
+    };
+
     const os_name =
       checkField(((agent || {}).os || {}).name) +
       ' ' +
       checkField(((agent || {}).os || {}).version);
 
+    const osName = os_name === '- -' ? '-' : os_name;
+
     return (
-      <EuiToolTip position="bottom" content={os_name === '- -' ? '-' : os_name}>
-        <span
-          className="euiTableCellContent__text euiTableCellContent--truncateText"
-          style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}
-        >
-          <i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden="true"
-          ></i>
-          {os_name === '- -' ? '-' : ' ' + os_name}
-        </span>
-      </EuiToolTip>
-    );
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", margin: "0 auto", fontWeight: 300 }}>
+        {this.getPlatformIcon(this.props.agent)}
+        {' '}{osName}
+      </WzTextWithTooltipIfTruncated>
+    )
   }
 
   buildStats(items) {
@@ -83,18 +87,19 @@ export class AgentInfo extends Component {
           <EuiStat
             title={
               item.description === 'OS' ? (
-                this.addIconPlatformRender(this.props.agent)
+                this.addTextPlatformRender(this.props.agent)
               ) : (
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    maxWidth: 250,
-                    margin: '0 auto'
-                  }}
-                >
-                  {checkField(item.title)}
-                </span>
-              )
+                  <span
+                    style={{
+                      overflow: 'hidden',
+                      maxWidth: "250px",
+                      margin: '0 auto',
+                      fontWeight: 300
+                    }}
+                  >
+                    {checkField(item.title)}
+                  </span>
+                )
             }
             description={item.description}
             textAlign="center"
@@ -104,36 +109,6 @@ export class AgentInfo extends Component {
       );
     });
     return stats;
-  }
-
-  onClickRestartAgent = () => {
-    const { agent } = this.props;
-    ActionAgents.restartAgent(agent.id);
-  };
-
-  onClickUpgradeAgent = () => {
-    const { agent } = this.props;
-    ActionAgents.upgradeAgent(agent.id);
-  };
-
-  renderUpgradeButton() {
-    const { managerVersion } = this.state;
-    const { agent } = this.props;
-    let outDated = ActionAgents.compareVersions(managerVersion, agent.version);
-
-    if (outDated === true) return;
-
-    return (
-      <EuiFlexItem grow={false}>
-        <EuiButton
-          color="secondary"
-          iconType="sortUp"
-          onClick={this.onClickUpgradeAgent}
-        >
-          Upgrade
-        </EuiButton>
-      </EuiFlexItem>
-    );
   }
 
   render() {
@@ -150,51 +125,11 @@ export class AgentInfo extends Component {
       { title: agent.dateAdd, description: 'Registration date' },
       { title: agent.lastKeepAlive, description: 'Last keep alive' }
     ]);
-    const upgradeButton = this.renderUpgradeButton();
 
     return (
       <Fragment>
         <EuiFlexGroup className="wz-welcome-page-agent-info-details">
           {stats}
-        </EuiFlexGroup>
-        <EuiFlexGroup
-          className="wz-welcome-page-agent-info-actions"
-          justifyContent="spaceBetween"
-        >
-          <EuiFlexItem grow={true}>
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-                <EuiButton
-                  onClick={() => this.props.switchTab('syscollector')}
-                  iconType="inspect"
-                >
-                  Inventory data
-                </EuiButton>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  onClick={() => this.props.switchTab('configuration')}
-                  iconType="gear"
-                >
-                  Configuration
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-          <EuiFlexItem grow={true}>
-            <EuiFlexGroup justifyContent="flexEnd">
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  color="primary"
-                  iconType="refresh"
-                  onClick={this.onClickRestartAgent}
-                >
-                  Restart
-                </EuiButton>
-              </EuiFlexItem>
-              {upgradeButton}
-            </EuiFlexGroup>
-          </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
     );

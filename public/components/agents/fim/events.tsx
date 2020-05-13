@@ -11,7 +11,7 @@
  */
 
 import React, { Component } from 'react';
-import { FlyoutDetail } from './states/flyout';
+import { FlyoutDetail } from './inventory/flyout';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
 
@@ -29,7 +29,7 @@ export class EventsFim extends Component {
   }
   modulesHelper: ModulesHelper;
   fetchWatch!: any;
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -47,20 +47,20 @@ export class EventsFim extends Component {
     const scope = await this.modulesHelper.getDiscoverScope();
     this.fetchWatch = scope.$watchCollection('fetchStatus',
       () => {
-        const {fetchStatus} = this.state;
-        if (fetchStatus !== scope.fetchStatus){
+        const { fetchStatus } = this.state;
+        if (fetchStatus !== scope.fetchStatus) {
           const rows = scope.fetchStatus === 'complete' ? scope.rows.length : 0;
-          this._isMount && this.setState({fetchStatus: scope.fetchStatus, rows})
+          this._isMount && this.setState({ fetchStatus: scope.fetchStatus, rows })
         }
       });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const {fetchStatus, isFlyoutVisible, rows} = this.state;
-    if (nextState.isFlyoutVisible !== isFlyoutVisible ){
+    const { fetchStatus, isFlyoutVisible, rows } = this.state;
+    if (nextState.isFlyoutVisible !== isFlyoutVisible) {
       return true;
     }
-    if (nextState.fetchStatus !== fetchStatus){
+    if (nextState.fetchStatus !== fetchStatus) {
       return true;
     }
     if (nextState.rows !== rows) {
@@ -70,8 +70,8 @@ export class EventsFim extends Component {
   }
 
   componentDidUpdate() {
-    const {fetchStatus, rows} = this.state;
-    if(fetchStatus === 'complete' && rows){
+    const { fetchStatus, rows } = this.state;
+    if (fetchStatus === 'complete' && rows) {
       this.getRowsField();
     }
   }
@@ -81,64 +81,75 @@ export class EventsFim extends Component {
     if (this.fetchWatch) this.fetchWatch();
   }
 
-  getRowsField = async (retries = 0) => {
+  getRowsField = async (query = '') => {
     const indices: number[] = [];
     const { rows } = this.state;
     if (!rows) {
-      this.setState({elements:[]})
+      this.setState({ elements: [] })
       return;
     }
     if (!document)
       this.getRowsField();
-    const cols = document.querySelectorAll(`.kbn-table thead th`);
-    if (!(cols || []).length) {
-      setTimeout(this.getRowsField, 10);
-    }
-    cols.forEach((col, idx) => {
-      if (['syscheck.path', 'rule.id'].includes(col.textContent || '')) {
-        indices.push(idx + 1);
+    if (!query) {
+      const cols = document.querySelectorAll(`.kbn-table thead th`);
+      if (!(cols || []).length) {
+        setTimeout(this.getRowsField, 100);
       }
-    });
-    let query = '';
-    indices.forEach((position, idx) => {
-      query += `.kbn-table tbody tr td:nth-child(${position}) div`
-      if (idx !== indices.length - 1) {
-        query += ', ';
-      }
-    });
-    if (query){
-      const elements = document.querySelectorAll(query);
-      elements.forEach((element, idx) => {
-        const text = element.textContent;
-        if (idx % 2){
-          element.childNodes.forEach(child => {
-            if (child.nodeName === 'SPAN'){
-              const link = document.createElement('a')
-              link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
-              link.setAttribute('target', '_blank')
-              link.setAttribute('style', 'minWidth: 55, display: "block"');
-              link.textContent = text
-              child.replaceWith(link)
-            }
-          })
-        } else {
-          element.childNodes.forEach(child => {
-            if (child.nodeName === 'SPAN'){
-              const link = document.createElement('a')
-              link.onclick = () => this.showFlyout(text);
-              link.textContent = text
-              child.replaceWith(link);
-            }
-          })
+      cols.forEach((col, idx) => {
+        if (['syscheck.path', 'rule.id'].includes(col.textContent || '')) {
+          indices.push(idx + 1);
         }
-      })
-      retries++;
-      retries <= 5 && setTimeout(() => this.getRowsField(retries), 100);
+      });
+      indices.forEach((position, idx) => {
+        query += `.kbn-table tbody tr td:nth-child(${position}) div`
+        if (idx !== indices.length - 1) {
+          query += ', ';
+        }
+      });
+    }
+    if (query) {
+      var interval = setInterval(() => {
+        const elements = document.querySelectorAll(query);
+        if (!(elements || []).length) {
+          clearInterval(interval);
+          setTimeout(() => { this.getRowsField(query) }, 100);
+        }
+        let isClearable = true;
+        elements.forEach((element, idx) => {
+          const text = element.textContent;
+          if (idx % 2) {
+            element.childNodes.forEach(child => {
+              if (child.nodeName === 'SPAN') {
+                const link = document.createElement('a')
+                link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
+                link.setAttribute('target', '_blank')
+                link.setAttribute('style', 'minWidth: 55, display: "block"');
+                link.textContent = text;
+                child.replaceWith(link);
+                isClearable = false;
+              }
+            })
+          } else {
+            element.childNodes.forEach(child => {
+              if (child.nodeName === 'SPAN') {
+                const link = document.createElement('a')
+                link.onclick = () => this.showFlyout(text);
+                link.textContent = text;
+                child.replaceWith(link);
+                isClearable = false;
+              }
+            })
+          }
+        })
+        if (isClearable)
+          clearInterval(interval);
+      }, 500);
     }
   }
 
   showFlyout(file) {
-    if (file !== " - ") {
+    if (file !== " - " && !window.location.href.includes('&file=')) {
+      window.location.href = window.location.href += `&file=${file}`;
       //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
       this.setState({ isFlyoutVisible: true, currentFile: file });
     }
@@ -151,16 +162,16 @@ export class EventsFim extends Component {
   render() {
     return (
       this.state.isFlyoutVisible &&
-      <EuiOverlayMask 
-      // @ts-ignore
-        onClick={(e:Event) => {e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+      <EuiOverlayMask
+        // @ts-ignore
+        onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
         <FlyoutDetail
           fileName={this.state.currentFile}
           agentId={this.props.agent.id}
           closeFlyout={() => this.closeFlyout()}
           type='file'
           view='events'
-          {...this.props}/>
+          {...this.props} />
       </EuiOverlayMask>
     )
   }

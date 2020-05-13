@@ -1244,12 +1244,21 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
   position: absolute;
 }
 
-.flyout-no-overlap {
-  margin-top: 50px;
-}
+// TODO: Check this in agents and overview
+// .flyout-no-overlap {
+//   margin-top: 50px;
+// }
 
 .wz-markdown-margin > p {
   margin-top: 5px;
+}
+
+.wz-markdown-margin > ul {
+  list-style: disc;
+}
+
+.wz-markdown-margin > ul > li {
+  margin-left: 25px;
 }
 
 .AgentsTable__soBadge{
@@ -1347,7 +1356,7 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
 }
 
 div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
-  max-height: 350px;
+  max-height: 400px;
   overflow-y: scroll;
 }
 
@@ -1378,4 +1387,14 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
 
 .kbnDis-no-padding .globalQueryBar:not(:empty) {
   padding: 0px 0px 16px 0px!important;
+}
+
+.euiCodeBlock.euiCodeBlock-isFullScreen{
+  border: 1px solid #D3DAE6;
+  border-radius: 4px;
+  margin: 22px;
+}
+
+.euiCodeBlock.euiCodeBlock-isFullScreen .euiCodeBlock__controls{
+  padding-right: 16px;
 }

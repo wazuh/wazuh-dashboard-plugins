@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { States } from './index';
+import { Inventory } from './index';
 
 export class MainSca extends Component {
   tabs = [
-    { id: 'states', name: 'States' },
+    { id: 'inventory', name: 'Inventory' },
     { id: 'events', name: 'Events' },
   ]
 
@@ -18,7 +18,7 @@ export class MainSca extends Component {
     if (selectView) {
       return (
         <div>
-          {selectView === 'states' && <States {...this.props} />}
+          {selectView === 'inventory' && <Inventory {...this.props} />}
         </div>
       );
     } else {

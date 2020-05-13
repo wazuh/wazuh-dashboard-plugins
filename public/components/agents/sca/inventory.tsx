@@ -25,7 +25,7 @@ import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 
-export class States extends Component {
+export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);

@@ -370,7 +370,7 @@ md-divider.md-default-theme, md-divider {
   background: #1d1e24!important;
 }
 
-.wz-welcome-page-agent-info-details {
+.wz-welcome-page-agent-info .wz-welcome-page-agent-info-details{
   background: #1a1b20!important;
   border-bottom: 1px solid #343741!important;
 }
