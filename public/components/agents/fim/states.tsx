@@ -115,23 +115,7 @@ export class States extends Component {
     window.localStorage.setItem(`wazuh-${section}-${selectView}-${(this.state || {}).selectedTabId || 'files'}-${agent['id']}`, JSON.stringify(filters))
   }
 
-  parseQFilter(q) {
-    if (q) {
-      return {
-        q: q.replace(
-          / and | AND | or | OR /gi, 
-          (arg) => {return (/ and | AND /.test(arg)) ? ';' : ','})
-      }
-    }
-    return {}
-  }
-
-  onFiltersChange(rawFilters) {
-    rawFilters.q && rawFilters.q.replace(/ and | AND | or | OR /gi, (arg) => {return (arg.toLocaleLowerCase() === ' and ') ? ';' : ','});
-    const filters = {
-      ...rawFilters,
-      ...(this.parseQFilter(rawFilters.q))
-    }
+  onFiltersChange(filters) {
     this.setStoreFilters(filters);
     this.setState({ filters });
   }

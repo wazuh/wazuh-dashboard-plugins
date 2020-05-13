@@ -94,8 +94,8 @@ export class QHandler extends BaseHandler {
 
   buildSuggestConjuntions(inputValue:string):suggestItem[] {
     const suggestions = [
-      {'label':' AND ', 'description':'Requires `both arguments` to be true'},
-      {'label':' OR ', 'description':'Requires `one or more arguments` to be true'}
+      {'label':'AND ', 'description':'Requires `both arguments` to be true'},
+      {'label':'OR ', 'description':'Requires `one or more arguments` to be true'}
     ].map((item) => {
       return {
         type: { iconType: 'kqlSelector', color: 'tint3' },
@@ -140,15 +140,15 @@ export class QHandler extends BaseHandler {
     const qInterpreter = new QInterpreter(inputValue);
     switch (item.type.iconType) {
       case'kqlField':
-        qInterpreter.setlastQuery(item.label);
+        qInterpreter.setlastQuery(item.label, 'field');
         this.inputStage = 'operators';
         break;
       case'kqlOperand':
-        qInterpreter.setlastQuery(item.label);
+        qInterpreter.setlastQuery(item.label, 'operator');
         this.inputStage = 'values';
         break;
       case'kqlValue':
-        qInterpreter.setlastQuery(item.label);
+        qInterpreter.setlastQuery(item.label, 'value');
         filters['q'] = qInterpreter.toString();
         this.inputStage = 'conjuntions';
         break;
