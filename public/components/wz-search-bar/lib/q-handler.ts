@@ -55,14 +55,16 @@ export class QHandler extends BaseHandler {
     return this.buildSuggestFields(inputValue);
   }
 
-  async buildSuggestFields(inputValue:string): suggestItem[] {
+  buildSuggestFields(inputValue:string): suggestItem[] {
     const { field } = this.getLastQuery(inputValue);
     const fields:suggestItem[] = this.qSuggests
     .filter((item) => this.filterSuggestFields(item, field))
     .map(this.mapSuggestFields);
-    const fieldExists = fields.some(field => field.label === inputValue);
+    const fieldExists = fields.some(item => item.label === field);
+  
+    console.log({inputValue, fieldExists})
     return [
-      ...(fieldExists ? await this.buildSuggestOperators(inputValue) : []),
+      ...(fieldExists ? this.buildSuggestOperators(inputValue) : []),
       ...fields
     ];
   }
@@ -167,14 +169,12 @@ export class QHandler extends BaseHandler {
     isInvalid: boolean, filters: object
   } {
     const filters = {...currentFilters};
-    const { field, value=false } = this.getLastQuery(inputValue);
+    const { field, conjuntion, operator } = this.getLastQuery(inputValue);
     let isInvalid = false;
 
-    if (inputValue.length === 0) {
-      delete filters['q'];
-    }
-
-    if (value !== false) {
+    if ( !!conjuntion && !field) {
+      this.inputStage = !operator ? 'fields' : 'values';
+    } else if ( !!operator ) {
       const fieldExist = this.qSuggests.find(item => item.label === field);
       if (fieldExist) {
         this.inputStage = 'values',
@@ -182,9 +182,11 @@ export class QHandler extends BaseHandler {
       } else {
         isInvalid = true;
       }
-    } else {
+    }
+
+    if (inputValue.length === 0) {
+      delete filters['q'];
       this.inputStage = 'fields';
-      isInvalid = false;
     }
     return { isInvalid, filters };
   }
