@@ -55,7 +55,7 @@ export class Inventory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: [],
+      filters: {},
       syscheck: [],
       selectedTabId: 'files',
       totalItemsFile: 0,
@@ -116,8 +116,6 @@ export class Inventory extends Component {
     const { section, selectView, agent } = this.props;
     window.localStorage.setItem(`wazuh-${section}-${selectView}-${(this.state || {}).selectedTabId || 'files'}-${agent['id']}`, JSON.stringify(filters))
   }
-
-
 
   onFiltersChange(filters) {
     this.setStoreFilters(filters);
