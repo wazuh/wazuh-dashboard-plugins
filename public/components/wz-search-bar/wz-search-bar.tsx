@@ -186,7 +186,6 @@ export class WzSearchBar extends Component {
       return true;
     }
     return false;
-
   }
 
   isSearchEnabled() {
