@@ -53,7 +53,6 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = new WazuhConfig();
-    this.showingMitreTable = false;
     this.visFactoryService = VisFactoryHandler;
     this.rawVisualizations = new RawVisualizations();
   }
@@ -182,15 +181,6 @@ export class OverviewController {
 
   }
 
- 
-
-  /**
-   * Show/hide MITRE table
-   */
-  switchMitreTab() {
-    this.showingMitreTable = !this.showingMitreTable;
-  }
-
   // Switch subtab
   async switchSubtab(subtab) {
     try {
@@ -245,8 +235,6 @@ export class OverviewController {
     this.tabVisualizations.setTab(newTab);
     this.agentsSelectionProps.tab = newTab;
     this.visualizeProps.selectedTab = newTab;
-
-    this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.expandedVis = false;
@@ -262,25 +250,7 @@ export class OverviewController {
         await this.getSummary();
       }
 
-      if (newTab === 'mitre') {
-        const result = await this.apiReq.request('GET', '/rules/mitre', {});
-        this.$scope.mitreIds = (((result || {}).data || {}).data || {}).items;
-
-        this.mitreCardsSliderProps = {
-          items: this.$scope.mitreIds,
-          attacksCount: this.$scope.attacksCount,
-          reqTitle: 'MITRE',
-          wzReq: (method, path, body) =>
-            this.apiReq.request(method, path, body),
-          addFilter: id => this.addMitrefilter(id)
-        };
-
-        this.mitreTableProps = {
-          wzReq: (method, path, body) =>
-            this.apiReq.request(method, path, body),
-          attacksCount: this.$scope.attacksCount
-        };
-      }
+      
 
       if (this.tab === newTab && !force) return;
 
