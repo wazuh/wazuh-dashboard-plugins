@@ -14,7 +14,4 @@ export { Events } from './events';
 export { Dashboard } from './dashboard';
 export { Loader } from './loader';
 export { Settings } from './settings';
-<<<<<<< HEAD
-=======
 export { ModulesHelper } from './modules-helper.js';
->>>>>>> 3.13-7.6
