@@ -229,7 +229,6 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
-    if(!this.initialFilter) this.updateSelectedAgents(false);
     this.overviewModuleReady = false;
     this.visFactoryService.clear();
     this.tabVisualizations.setTab(newTab);
@@ -258,6 +257,7 @@ export class OverviewController {
       if (force === 'nav') force = false;
       this.$location.search('tab', newTab);
       this.tab = newTab;
+      if(!this.initialFilter) this.updateSelectedAgents(false);
       await this.switchSubtab('panels', true);
       this.overviewModuleReady = true;
     } catch (error) {
