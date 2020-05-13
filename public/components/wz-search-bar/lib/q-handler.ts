@@ -30,16 +30,18 @@ export class QHandler extends BaseHandler {
     '~': 'Like',
   }
   qSuggests: qSuggests[];
-
+  inputValue: string;
   constructor(qSuggests) {
     super();
     this.qSuggests = qSuggests;
     this.inputStage = 'fields';
+    this.inputValue = '';
   }
 
   //#region Build suggests elements
 
   async buildSuggestItems(inputValue:string):Promise<suggestItem[]> {
+    this.inputValue = inputValue;
     this.isSearch = false;
     if (this.inputStage === 'fields' || inputValue === ''){
       const qInterpreter = new QInterpreter(inputValue);
@@ -88,6 +90,9 @@ export class QHandler extends BaseHandler {
       .map(this.buildSuggestValue);
     const isLike = operator === '~' && value;
     const valueExists = rawSuggestions.some(sgtValue => sgtValue === value);
+    if (this.inputValue !== inputValue || this.inputStage !== 'values') {
+      throw "Incorrect suggestions";
+    }
     return [
       ...((isLike || valueExists) ? this.buildSuggestConjuntions(inputValue) : []),
       ...suggestions];
@@ -181,6 +186,8 @@ export class QHandler extends BaseHandler {
       } else {
         isInvalid = true;
       }
+    } else {
+      this.inputStage = 'fields'
     }
 
     if (inputValue.length === 0) {

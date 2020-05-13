@@ -123,9 +123,15 @@ export class WzSearchBar extends Component {
     if (isInvalid) {
       this.buildSuggestInvalid();
     } else {
-      const suggestsItems = !!searchFormat ?
+      let suggestsItems;
+      try {
+        suggestsItems = !!searchFormat ?
         [...await this.suggestHandler.buildSuggestItems(inputValue)]
         : [];
+      } catch (error) {
+        suggestsItems = this.state.suggestions;
+      }
+      
 
       if (this.isSearchEnabled()) {
         const suggestSearch = this.buildSuggestFieldsSearch();
