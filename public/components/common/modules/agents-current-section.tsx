@@ -42,8 +42,8 @@ class WzCurrentAgentsSection extends Component {
             window.location.href = `#/agents?agent=${this.props.agent.id}`;
             this.router.reload();
           },
-          className: 'wz-global-breadcrumb-btn',
-          truncate: true,
+          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+          truncate: false,
         },
         { text: TabDescription[this.props.currentTab].title },
       ];

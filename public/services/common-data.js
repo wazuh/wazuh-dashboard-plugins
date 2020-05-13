@@ -23,7 +23,7 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor($rootScope, $timeout, errorHandler, $location, globalState) {
+  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
@@ -32,20 +32,21 @@ export class CommonData {
     this.shareAgent = new ShareAgent();
     this.globalState = globalState;
     this.savedTimefilter = null;
+    this.$window = $window;
     this.refreshInterval = { pause: true, value: 0 };
 
     this.overviewTabs = {
-      hostMonitoringTabs: ['general', 'fim', 'aws'],
+      hostMonitoringTabs: ['general', 'fim', 'aws', 'gcp'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
-      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc']
     };
 
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
-      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist', 'tsc']
     };
   }
 
@@ -136,7 +137,9 @@ export class CommonData {
         gdpr: { group: 'gdpr' },
         hipaa: { group: 'hipaa' },
         nist: { group: 'nist' },
+        tsc: { group: 'tsc' },
         aws: { group: 'amazon' },
+        gcp: { group: 'gcp' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },
@@ -167,6 +170,9 @@ export class CommonData {
         } else if (tab === 'nist') {
           this.removeDuplicateExists('rule.nist_800_53');
           filters.push(filterHandler.nistQuery());
+        } else if (tab === 'tsc') {
+          this.removeDuplicateExists('rule.tsc');
+          filters.push(filterHandler.tscQuery());
         } else if (tab === 'mitre') {
           this.removeDuplicateExists('rule.mitre.id');
           filters.push(filterHandler.mitreQuery());
@@ -175,7 +181,19 @@ export class CommonData {
           filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
         }
       }
+
+      const regex = new RegExp('addRuleFilter=' + '[^&]*');
+      const match = this.$window.location.href.match(regex);
+      if (match && match[0]) {
+        const id = match[0].split('=')[1];
+        let filter = filterHandler.ruleIdQuery(id);
+        filter.$state.isImplicit = false;
+        filters.push(filter);
+        this.$window.location.href = this.$window.location.href.replace(regex, '');
+      }
+
       if (agent) filters.push(filterHandler.agentQuery(agent));
+
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
@@ -250,6 +268,23 @@ export class CommonData {
         nistTabs.push({ title: key, content: data.data[key] });
       }
       return nistTabs;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * GET TSC
+   */
+  async getTSC() {
+    try {
+      const tscTabs = [];
+      const data = await this.genericReq.request('GET', '/api/tsc/all');
+      if (!data.data) return [];
+      for (const key in data.data) {
+        tscTabs.push({ title: key, content: data.data[key] });
+      }
+      return tscTabs;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -362,12 +397,12 @@ export class CommonData {
     return target.hostMonitoringTabs.includes(tab)
       ? target.hostMonitoringTabs
       : target.systemAuditTabs.includes(tab)
-      ? target.systemAuditTabs
-      : target.securityTabs.includes(tab)
-      ? target.securityTabs
-      : target.complianceTabs.includes(tab)
-      ? target.complianceTabs
-      : false;
+        ? target.systemAuditTabs
+        : target.securityTabs.includes(tab)
+          ? target.securityTabs
+          : target.complianceTabs.includes(tab)
+            ? target.complianceTabs
+            : false;
   }
 
   getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {

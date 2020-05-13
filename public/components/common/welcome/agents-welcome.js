@@ -20,16 +20,18 @@ import {
   EuiFlexGroup,
   EuiSpacer,
   EuiFlexGrid,
-  EuiCallOut,
+  EuiButtonEmpty,
   EuiTitle,
   EuiHealth,
   EuiPage,
   EuiButton,
-  EuiToolTip
+  EuiPopover
 } from '@elastic/eui';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import Overview from '../../wz-menu/wz-menu-overview';
 import './welcome.less';
 
 export class AgentsWelcome extends Component {
@@ -41,30 +43,32 @@ export class AgentsWelcome extends Component {
     };
   }
 
-  color = status => {
-    if (status.toLowerCase() === 'active') {
-      return 'success';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
-      return 'subdued';
-    }
-  };
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
 
   renderTitle() {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
-          <EuiTitle size="s">
-            <h1>
-              <EuiToolTip position="right" content={this.props.agent.status}>
-                <EuiHealth
-                  color={this.color(this.props.agent.status)}
-                ></EuiHealth>
-              </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id})
-            </h1>
-          </EuiTitle>
+          <EuiFlexGroup>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false} className="wz-module-header-agent-title-badge">
+              <span style={{ display: 'inline-flex', paddingLeft: 16 }}>
+                <EuiTitle size="s">
+                  <h1>
+                    <span>{this.props.agent.name}&nbsp;&nbsp;&nbsp;</span>
+                  </h1>
+                </EuiTitle>
+                <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
+                  {this.props.agent.status}
+                </EuiHealth>
+              </span>
+            </EuiFlexItem>
+            <EuiFlexItem />
+          </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -89,16 +93,132 @@ export class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     return (
-      <div className="wz-module">
-        <div className="wz-module-header-agent-wrapper">
-          <div className="wz-module-header-agent">{title}</div>
-        </div>
-        <div className="wz-module-body wz-module-body-main">
-          <div className="wz-welcome-page-agent-info">
-            <AgentInfo agent={this.props.agent} {...this.props}></AgentInfo>
+      <div className="wz-module wz-module-welcome">
+        <div className='wz-module-header-agent-wrapper'>
+          <div className='wz-module-header-agent'>
+            {title}
           </div>
-          <EuiPage className="wz-welcome-page">
+        </div>
+        <div>
+          <div className='wz-module-header-nav-wrapper'>
+            <div className='wz-module-header-nav'>
+              <div className="wz-welcome-page-agent-info">
+                <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="wz-module-body">
+          <EuiPage>
+            <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
+              <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
+                <EuiPopover
+                  button={
+                    <EuiButton
+                      onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}
+                      iconType="apps">
+                      <span>Navigation&nbsp;<EuiIcon type='arrowDown'></EuiIcon></span>
+                    </EuiButton>
+                  }
+                  isOpen={this.state.switchModule}
+                  closePopover={() => this.setState({ switchModule: false })}
+                  repositionOnScroll={true}
+                  anchorPosition="downLeft">
+                  <WzReduxProvider>
+                    <div style={{ maxWidth: 650 }}>
+                      <Overview
+                        isAgent={this.props.agent}
+                        closePopover={() => this.setState({ switchModule: false })}
+                        switchTab={(module) => this.props.switchTab(module)}></Overview>
+                    </div>
+                  </WzReduxProvider>
+                </EuiPopover>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
+                <EuiButton
+                  onClick={() => this.props.switchTab('syscollector')}
+                  iconType="inspect">
+                  <span>Inventory data</span>
+                </EuiButton>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
+                <EuiButton
+                  onClick={() => this.props.switchTab('configuration')}
+                  iconType="gear" >
+                  <span>Configuration</span>
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPage>
+          <EuiPage style={{ paddingTop: 0 }}>
             <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFlexGroup direction="column">
+                  <EuiFlexItem>
+                    <EuiPanel paddingSize="m" style={{ height: 86 }}>
+                      <EuiTitle size="xs">
+                        <h1>Groups it belongs to</h1>
+                      </EuiTitle>
+                      <div>
+                        {this.props.agent.group.map((group, key) => (
+                          <EuiButtonEmpty
+                            style={{ marginLeft: -8 }}
+                            key={`agent-group-${key}`}
+                            onClick={() => this.props.goGroups(this.props.agent, key)}
+                          >
+                            {group}
+                          </EuiButtonEmpty>
+                        ))}
+                      </div>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiFlexGroup>
+                      <EuiFlexItem style={{ marginTop: 0 }}>
+                        <EuiPanel paddingSize="m" style={{ height: 'calc(50vh - 178px)' }}>
+                          <EuiTitle size="xs">
+                            <h1>Most common groups</h1>
+                          </EuiTitle>
+                        </EuiPanel>
+                      </EuiFlexItem>
+                      <EuiFlexItem style={{ marginTop: 0 }}>
+                        <EuiPanel paddingSize="m">
+                          <EuiTitle size="xs">
+                            <h1>Top requirements</h1>
+                          </EuiTitle>
+                        </EuiPanel>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                  <EuiFlexItem style={{ marginTop: 0 }}>
+                    <EuiPanel paddingSize="m" style={{ height: 'calc(50vh - 178px)' }}>
+                      <EuiTitle size="xs">
+                        <h1>Event count evolution</h1>
+                      </EuiTitle>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiFlexGroup direction="column">
+                  <EuiFlexItem>
+                    <EuiPanel paddingSize="m">
+                      <EuiTitle size="xs">
+                        <h1>Last Integrity monitoring events</h1>
+                      </EuiTitle>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                  <EuiFlexItem style={{ marginTop: 0 }}>
+                    <EuiPanel paddingSize="m">
+                      <EuiTitle size="xs">
+                        <h1>Last SCA scans</h1>
+                      </EuiTitle>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            {/* <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup>
                   <EuiFlexItem>
@@ -110,6 +230,7 @@ export class AgentsWelcome extends Component {
                       <EuiFlexGrid columns={2}>
                         {this.buildTabCard('general', 'dashboardApp')}
                         {this.buildTabCard('fim', 'filebeatApp')}
+                        {this.buildTabCard('gcp', 'logoGCPMono')}
                       </EuiFlexGrid>
                     </EuiPanel>
                   </EuiFlexItem>
@@ -162,7 +283,7 @@ export class AgentsWelcome extends Component {
                       <EuiFlexGrid columns={2}>
                         {!(
                           UnsupportedComponents[
-                            this.props.agent.agentPlatform
+                          this.props.agent.agentPlatform
                           ] || UnsupportedComponents['other']
                         ).includes('vuls') &&
                           this.buildTabCard('vuls', 'securityApp')}
@@ -174,7 +295,6 @@ export class AgentsWelcome extends Component {
                           this.buildTabCard('docker', 'logoDocker')}
                         {this.props.extensions.mitre &&
                           this.buildTabCard('mitre', 'spacesApp')}{' '}
-                        {/* TODO- Change "spacesApp" icon*/}
                       </EuiFlexGrid>
                     </EuiPanel>
                   </EuiFlexItem>
@@ -204,23 +324,26 @@ export class AgentsWelcome extends Component {
                       {(this.props.extensions.pci ||
                         this.props.extensions.gdpr ||
                         this.props.extensions.hipaa ||
-                        this.props.extensions.nist) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                        </EuiFlexGrid>
-                      )}
+                        this.props.extensions.nist ||
+                        this.props.extensions.tsc) && (
+                          <EuiFlexGrid columns={2}>
+                            {this.props.extensions.pci &&
+                              this.buildTabCard('pci', 'visTagCloud')}
+                            {this.props.extensions.nist &&
+                              this.buildTabCard('nist', 'apmApp')}
+                            {this.props.extensions.gdpr &&
+                              this.buildTabCard('gdpr', 'visBarVertical')}
+                            {this.props.extensions.hipaa &&
+                              this.buildTabCard('hipaa', 'emsApp')}
+                            {this.props.extensions.tsc &&
+                              this.buildTabCard('tsc', 'apmApp')}
+                          </EuiFlexGrid>
+                        )}
                     </EuiPanel>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
-            </EuiFlexGroup>
+            </EuiFlexGroup> */}
           </EuiPage>
         </div>
       </div>

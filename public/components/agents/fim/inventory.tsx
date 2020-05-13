@@ -32,15 +32,15 @@ import {
   EuiButtonEmpty
 } from '@elastic/eui';
 import {
-  StatesTable,
+  InventoryTable,
   FilterBar,
   RegistryTable
-} from './states/';
+} from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 
-export class States extends Component {
+export class Inventory extends Component {
   _isMount = false;
   state: {
     filters: {},
@@ -48,6 +48,7 @@ export class States extends Component {
     totalItemsFile: number,
     totalItemsRegistry: number,
     isLoading: Boolean
+    syscheck: []
   }
   props: any;
 
@@ -55,6 +56,7 @@ export class States extends Component {
     super(props);
     this.state = {
       filters: {},
+      syscheck: [],
       selectedTabId: 'files',
       totalItemsFile: 0,
       totalItemsRegistry: 0,
@@ -66,10 +68,10 @@ export class States extends Component {
   async componentDidMount() {
     this._isMount = true;
     const { agentPlatform } = this.props.agent;
-    const totalItemsFile = await this.getItemNumber('file');
+    const {totalItemsFile, syscheck} = await this.getItemNumber('file');
     const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
     if (this._isMount){
-      this.setState({ totalItemsFile, totalItemsRegistry, isLoading: false });
+      this.setState({ totalItemsFile, totalItemsRegistry, syscheck, isLoading: false });
     }
   }
 
@@ -126,15 +128,22 @@ export class States extends Component {
 
   async getItemNumber(type: 'file' | 'registry') {
     const agentID = this.props.agent.id;
-    const totalItemsFile = await WzRequest.apiReq(
+    const response = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
       {
-        limit: '1',
-        type
+        limit: type === 'file' ? '15' : '1',
+        type,
+        ...(type === 'file' && {sort: '+file'})
       }
     );
-    return ((totalItemsFile.data || {}).data || {}).totalItems || 0;
+    if (type === 'file') {
+      return {
+        totalItemsFile: ((response.data || {}).data || {}).totalItems || 0,
+        syscheck: ((response.data || {}).data || {}).items || [],
+      }
+    }
+    return ((response.data || {}).data || {}).totalItems || 0;
   }
 
   renderTabs() {
@@ -219,7 +228,7 @@ export class States extends Component {
   }
 
   renderTable() {
-    const { filters, selectedTabId } = this.state;
+    const { filters, syscheck, selectedTabId } = this.state;
     return (
       <div>
         <FilterBar
@@ -228,9 +237,10 @@ export class States extends Component {
           selectView={selectedTabId}
           agent={this.props.agent} />
         {selectedTabId === 'files' &&
-          <StatesTable
+          <InventoryTable
             {...this.props}
             filters={filters}
+            items={syscheck}
             onFilterSelect={this.onFilterSelect} />
         }
         {selectedTabId === 'registry' &&
@@ -276,7 +286,7 @@ export class States extends Component {
     </EuiPage>);
   }
 
-  loadingStates() {
+  loadingInventory() {
     return <EuiPage>
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -289,7 +299,7 @@ export class States extends Component {
   render() {
     const { totalItemsFile, totalItemsRegistry, isLoading } = this.state;
     if (isLoading) {
-      return this.loadingStates()
+      return this.loadingInventory()
     }
     const table = this.renderTable();
     const tabs = this.renderTabs()

@@ -1,15 +1,31 @@
 import React, { Component, Fragment } from 'react';
 import { Pie } from "../../d3/pie";
 import {
-  EuiFlexItem, EuiFlexGroup, EuiPanel, EuiPage, EuiBasicTable, EuiInMemoryTable, EuiSpacer, EuiText, EuiProgress,
-  EuiTitle, EuiButton, EuiButtonIcon, EuiStat, EuiHealth, EuiDescriptionList, EuiButtonEmpty, EuiToolTip, EuiCallOut
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiPanel,
+  EuiPage,
+  EuiBasicTable,
+  EuiInMemoryTable,
+  EuiSpacer,
+  EuiText,
+  EuiProgress,
+  EuiTitle,
+  EuiButton,
+  EuiButtonIcon,
+  EuiStat,
+  EuiHealth,
+  EuiDescriptionList,
+  EuiButtonEmpty,
+  EuiToolTip,
+  EuiCallOut
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 
-export class States extends Component {
+export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
@@ -26,13 +42,13 @@ export class States extends Component {
       {
         field: 'description',
         name: 'Description',
-        truncateText: true,
+        truncateText: true
       },
       {
         field: 'end_scan',
         name: 'Last scan',
         dataType: 'date',
-        render: value => this.offsetTimestamp('', value),
+        render: value => this.offsetTimestamp('', value)
       },
       {
         field: 'pass',
@@ -69,21 +85,38 @@ export class States extends Component {
         field: 'title',
         name: 'Title',
         sortable: true,
-        truncateText: true,
+        truncateText: true
       },
       {
         name: 'Target',
         truncateText: true,
         render: item => (
           <div>
-            {item.file ? <span><b>File:</b> {item.file}</span>
-              : item.directory ? <span><b>Directory:</b> {item.directory}</span>
-                : item.process ? <span><b>Process: </b> {item.process}</span>
-                  : item.command ? <span><b>Command: </b> {item.command}</span>
-                    : item.registry ? <span><b>Registry: </b> {item.registry}</span>
-                      : '-'}
+            {item.file ? (
+              <span>
+                <b>File:</b> {item.file}
+              </span>
+            ) : item.directory ? (
+              <span>
+                <b>Directory:</b> {item.directory}
+              </span>
+            ) : item.process ? (
+              <span>
+                <b>Process: </b> {item.process}
+              </span>
+            ) : item.command ? (
+              <span>
+                <b>Command: </b> {item.command}
+              </span>
+            ) : item.registry ? (
+              <span>
+                <b>Registry: </b> {item.registry}
+              </span>
+            ) : (
+              '-'
+            )}
           </div>
-        ),
+        )
       },
       {
         field: 'result',
@@ -100,11 +133,17 @@ export class States extends Component {
         render: item => (
           <EuiButtonIcon
             onClick={() => this.toggleDetails(item)}
-            aria-label={this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'}
-            iconType={this.state.itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
+            aria-label={
+              this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
+            }
+            iconType={
+              this.state.itemIdToExpandedRowMap[item.id]
+                ? 'arrowUp'
+                : 'arrowDown'
+            }
           />
-        ),
-      },
+        )
+      }
     ];
   }
 
@@ -126,7 +165,7 @@ export class States extends Component {
   }
 
   addHealthResultRender(result) {
-    const color = (result) => {
+    const color = result => {
       if (result.toLowerCase() === 'passed') {
         return 'success';
       } else if (result.toLowerCase() === 'failed') {
@@ -147,19 +186,26 @@ export class States extends Component {
     try {
       this._isMount && this.setState({ loading: true });
       this.lookingPolicy = false;
-      const policies = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}`, {});
+      const policies = await this.wzReq.apiReq(
+        'GET',
+        `/sca/${this.state.agent.id}`,
+        {}
+      );
       this.policies = (((policies || {}).data || {}).data || {}).items || [];
       const models = [];
       for (let i = 0; i < this.policies.length; i++) {
         models.push({
-          name: this.policies[i].name, status:
-            [
-              { id: 'pass', label: "Pass", value: this.policies[i].pass },
-              { id: 'fail', label: "Fail", value: this.policies[i].fail },
-              { id: 'invalid', label: "Not applicable", value: this.policies[i].invalid },
-            ]
-        }
-        )
+          name: this.policies[i].name,
+          status: [
+            { id: 'pass', label: 'Pass', value: this.policies[i].pass },
+            { id: 'fail', label: 'Fail', value: this.policies[i].fail },
+            {
+              id: 'invalid',
+              label: 'Not applicable',
+              value: this.policies[i].invalid
+            }
+          ]
+        });
       }
       this._isMount && this.setState({ data: models, loading: false });
     } catch (error) {
@@ -170,7 +216,11 @@ export class States extends Component {
   async loadScaPolicy(policy) {
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
-      const checks = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}/checks/${policy.policy_id}`, {});
+      const checks = await this.wzReq.apiReq(
+        'GET',
+        `/sca/${this.state.agent.id}/checks/${policy.policy_id}`,
+        {}
+      );
       this.checks = (((checks || {}).data || {}).data || {}).items || [];
     }
     this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
@@ -182,14 +232,14 @@ export class States extends Component {
     if (item.compliance.length) {
       item.complianceText = '';
       item.compliance.forEach(x => {
-        item.complianceText += `${x.key}: ${x.value}\n`
-      })
+        item.complianceText += `${x.key}: ${x.value}\n`;
+      });
     }
     if (item.rules.length) {
       item.rulesText = '';
       item.rules.forEach(x => {
-        item.rulesText += `${x.rule}\n`
-      })
+        item.rulesText += `${x.rule}\n`;
+      });
     }
 
     if (itemIdToExpandedRowMap[item.id]) {
@@ -201,23 +251,23 @@ export class States extends Component {
       const listItems = [
         {
           title: 'Check not applicable due to:',
-          description: item.reason,
+          description: item.reason
         },
         {
           title: 'Rationale',
-          description: item.rationale,
+          description: item.rationale
         },
         {
           title: 'Remediation',
-          description: item.remediation,
+          description: item.remediation
         },
         {
           title: 'Description',
-          description: item.description,
+          description: item.description
         },
         {
           title: (item.directory || '').includes(',') ? 'Paths' : 'Path',
-          description: item.directory,
+          description: item.directory
         },
         {
           title: checks,
@@ -225,10 +275,12 @@ export class States extends Component {
         },
         {
           title: 'Compliance',
-          description: item.complianceText,
+          description: item.complianceText
         }
       ];
-      const itemsToShow = listItems.filter(x => { return x.description });
+      const itemsToShow = listItems.filter(x => {
+        return x.description;
+      });
       itemIdToExpandedRowMap[item.id] = (
         <EuiDescriptionList listItems={itemsToShow} />
       );
@@ -261,21 +313,21 @@ export class States extends Component {
       return {
         'data-test-subj': `sca-row-${idx}`,
         className: 'customRowClass',
-        onClick: () => this.loadScaPolicy(item),
+        onClick: () => this.loadScaPolicy(item)
       };
     };
     const getChecksRowProps = (item, idx) => {
       return {
         'data-test-subj': `sca-check-row-${idx}`,
         className: 'customRowClass',
-        onClick: () => this.toggleDetails(item),
+        onClick: () => this.toggleDetails(item)
       };
     };
     const pagination = {
       pageIndex: this.state.pageIndex,
       pageSize: 10,
       totalItemCount: (this.checks || []).length,
-      pageSizeOptions: [10, 25, 50, 100],
+      pageSizeOptions: [10, 25, 50, 100]
     };
 
     const search = {
@@ -287,8 +339,8 @@ export class States extends Component {
     const sorting = {
       sort: {
         field: 'id',
-        direction: 'asc',
-      },
+        direction: 'asc'
+      }
     };
 
     return (

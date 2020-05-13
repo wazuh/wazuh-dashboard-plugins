@@ -112,13 +112,21 @@ class KibanaVis extends Component {
           data.value.visData.rows &&
           this.props.state[this.visID] !==
             data.value.visData.rows['0']['col-0-1']
-        )
+        ) {
           store.dispatch(
             this.updateMetric({
               name: this.visID,
               value: data.value.visData.rows['0']['col-0-1']
             })
           );
+        }
+        // This check if data.value.visData.tables exists and dispatch that value as stat
+        // FIXME: this is correct?
+        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && data.value.visData.tables['0'] && data.value.visData.tables['0'].rows && data.value.visData.tables['0'].rows['0'] && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']){
+          store.dispatch(
+            this.updateMetric({ name: this.visID, value: data.value.visData.tables['0'].rows['0']['col-0-2'] })
+          );
+        }
       }
     } catch (error) {
       this.showToast('danger', 'Error', error.message || error, 4000);
@@ -206,13 +214,20 @@ class KibanaVis extends Component {
             this.visualization,
             visInput
           );
-          this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
-            this.visHandler.handler.data$.subscribe(this.renderComplete);
+          setTimeout(() => {
+            this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
+              this.visHandler.handler.data$.subscribe(this.renderComplete());
+            });
           });
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
+
+          if (this.props.isMetric) {
+            this.callUpdateMetric();
+          }
+          
           this.rendered = true;
           this.$rootScope.rendered = 'true';
           this.visHandler.updateInput(visInput);
@@ -262,10 +277,11 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
     try {
       this.visHandler.destroy();
-    } catch (error) {} // eslint-disable-line
+      this.visHandler = null;
+    } catch (error) { } // eslint-disable-line
   };
 
   renderComplete = async () => {
@@ -291,16 +307,6 @@ class KibanaVis extends Component {
       this.$rootScope.resultState = 'none';
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
-
-      const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
-      if (visTitle === 'Mitre attack count') {
-        //   $scope.$emit('sendVisDataRows', {
-        //     mitreRows: visHandler.dataLoader['visData'],
-        //   });
-      }
-      if (this.props.isMetric) {
-        this.callUpdateMetric();
-      }
       if (currentCompleted >= 100) {
         this.$rootScope.rendered = 'true';
         if (visId.includes('AWS-geo')) {

@@ -40,10 +40,12 @@ import { ApiCheck } from '../react-services/wz-api-check';
 import { AppState } from '../react-services/app-state';
 
 const assignPreviousLocation = ($rootScope, $location) => {
-  const path = $location.path();
+  const path = $location.path();	
+  const params = $location.search();
   // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
   if (!path.includes('/health-check')) {
     $rootScope.previousLocation = path;
+    $rootScope.previousParams = params;
   }
 };
 
@@ -130,6 +132,9 @@ function clearRuleId(commonData) {
 function enableWzMenu($rootScope, $location) {
   const location = $location.path();
   $rootScope.hideWzMenu = location.includes('/health-check');
+  if(!$rootScope.hideWzMenu){
+    AppState.setWzMenu();
+  }
 }
 
 //Routes
@@ -139,7 +144,7 @@ routes
     template: healthCheckTemplate,
     resolve: { apiCount, wzConfig, ip }
   })
-  .when('/agents/:id?/:tab?/:view?', {
+  .when('/agents/:agent?/:tab?/:tabView?', {
     template: agentsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
@@ -164,15 +169,15 @@ routes
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
   .when('/discover/context/:pattern?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {

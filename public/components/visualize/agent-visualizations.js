@@ -140,6 +140,60 @@ export const agentVisualizations = {
       }
     ]
   },
+  gcp: {
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top 5 rules',
+            id: 'Wazuh-App-Agents-GCP-Top-5-rules',
+            width: 50
+          },
+          {
+            title: 'Top query events',
+            id: 'Wazuh-App-Agents-GCP-Event-Query-Name',
+            width: 25
+          },
+          {
+            title: 'Top 5 instances',
+            id: 'Wazuh-App-Agents-GCP-Top-5-instances',
+            width: 25
+          },
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top project id by sourcetype',
+            id: 'Wazuh-App-Agents-GCP-Top-ProjectId-By-SourceType',
+            width: 25
+          },
+          {
+            title: 'GCP alerts evolution',
+            id: 'Wazuh-App-Agents-GCP-Events-Over-Time',
+            width: 75
+          },
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Auth answer count',
+            id: 'Wazuh-App-Agents-GCP-authAnswer-Bar',
+            width: 40
+          },
+          {
+            title: 'Resource type by project id',
+            id: 'Wazuh-App-Agents-GCP-Top-ResourceType-By-Project-Id',
+            width: 60
+          },
+        ]
+      },
+    ]
+  },
   pci: {
     rows: [
       {
@@ -273,6 +327,54 @@ export const agentVisualizations = {
           {
             title: 'Alerts summary',
             id: 'Wazuh-App-Agents-NIST-Last-alerts'
+          }
+        ]
+      }
+    ]
+  },
+  tsc: {
+    rows: [
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top 5 rule groups',
+            id: 'Wazuh-App-Agents-TSC-Groups',
+            width: 33
+          },
+          {
+            title: 'Top 5 rules',
+            id: 'Wazuh-App-Agents-TSC-Rule',
+            width: 33
+          },
+          {
+            title: 'Top 5 TSC requirements',
+            id: 'Wazuh-App-Agents-TSC-Requirement',
+            width: 34
+          }
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'TSC Requirements',
+            id: 'Wazuh-App-Agents-TSC-Requirements',
+            width: 75
+          },
+          {
+            title: 'Rule level distribution',
+            id: 'Wazuh-App-Agents-TSC-Rule-level-distribution',
+            width: 25
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-TSC-Last-alerts'
           }
         ]
       }
@@ -484,6 +586,45 @@ export const agentVisualizations = {
       }
     ]
   },
+  mitre: {
+    rows: [
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Alerts evolution over time',
+            id: 'Wazuh-App-Agents-MITRE-Alerts-Evolution',
+            width: 70
+          },
+          {
+            title: 'Top tactics',
+            id: 'Wazuh-App-Agents-MITRE-Top-Tactics',
+            width: 30
+          }
+        ]
+      },
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Rule level by attack',
+            id: 'Wazuh-App-Agents-MITRE-Level-By-Attack',
+            width: 33
+          },
+          {
+            title: 'MITRE attacks by tactic',
+            id: 'Wazuh-App-Agents-MITRE-Attacks-By-Tactic',
+            width: 34
+          },
+          {
+            title: 'Rule level by tactic',
+            id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
+            width: 34
+          }
+        ]
+      },
+    ]
+  },
   docker: {
     rows: [
       {
@@ -637,14 +778,14 @@ export const agentVisualizations = {
         description: 'Last fails',
         color: 'primary'
       },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark',
-        description: 'Last unknown',
-        color: 'secondary'
-      },
+      // {
+      //   id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark',
+      //   description: 'Last scan benchmark',
+      //   color: 'secondary'
+      // },
       {
         id: 'Wazuh-app-Agents-CISCAT-last-scan-unknown',
-        description: 'Last scan benchmark',
+        description: 'Last unknown',
         color: 'subdued'
       }
     ],

@@ -209,6 +209,50 @@ export const visualizations = {
       }
     ]
   },
+  gcp: {
+    rows: [
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Events over time by auth answer',
+            id: 'Wazuh-App-Overview-GCP-Alerts-Evolution-By-AuthAnswer',
+            width: 100
+          }
+        ]
+      },
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Top instances by response code',
+            id: 'Wazuh-App-Overview-GCP-Top-vmInstances-By-ResponseCode',
+            width: 25
+          },
+          {
+            title: 'Resource type by project id',
+            id: 'Wazuh-App-Overview-GCP-Top-ResourceType-By-Project-Id',
+            width: 50
+          },
+          {
+            title: 'Top project id by sourcetype',
+            id: 'Wazuh-App-Overview-GCP-Top-ProjectId-By-SourceType',
+            width: 25
+          },
+        ]
+      },
+      {
+        height: 450,
+        vis: [
+          {
+            title: 'Top 5 Map by source ip',
+            id: 'Wazuh-App-Overview-GCP-Map-By-SourceIp',
+            width: 100
+          },
+        ]
+      },
+    ]
+  },
   pci: {
     rows: [
       {
@@ -367,6 +411,61 @@ export const visualizations = {
           {
             title: 'Alerts summary',
             id: 'Wazuh-App-Overview-NIST-Alerts-summary'
+          }
+        ]
+      }
+    ]
+  },
+  tsc: {
+    rows: [
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'TSC requirements',
+            id: 'Wazuh-App-Overview-TSC-requirements',
+            width: 50
+          },
+          {
+            title: 'Top 10 agents by alerts number',
+            id: 'Wazuh-App-Overview-TSC-Agents',
+            width: 50
+          }
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-TSC-Requirements-over-time'
+          }
+        ]
+      },
+      {
+        height: 530,
+        vis: [
+          {
+            title: 'Last alerts',
+            id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap'
+          }
+        ]
+      },
+      {
+        height: 255,
+        vis: [
+          {
+            title: 'Requirements by agent',
+            id: 'Wazuh-App-Overview-TSC-Requirements-by-agent'
+          }
+        ]
+      },
+      {
+        height: 600,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-TSC-Alerts-summary'
           }
         ]
       }
@@ -561,8 +660,8 @@ export const visualizations = {
         height: 550,
         vis: [
           {
-            title: 'Top 10 agents with positive scans',
-            id: 'Wazuh-App-Overview-Virustotal-Positives-Heatmap'
+            title: 'Alerts evolution by agents',
+            id: 'Wazuh-App-Overview-Virustotal-Alerts-Evolution'
           }
         ]
       },
@@ -639,6 +738,45 @@ export const visualizations = {
           }
         ]
       }
+    ]
+  },
+  mitre: {
+    rows: [
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Alerts evolution over time',
+            id: 'Wazuh-App-Overview-MITRE-Alerts-Evolution',
+            width: 75
+          },
+          {
+            title: 'Top tactics',
+            id: 'Wazuh-App-Overview-MITRE-Top-Tactics',
+            width: 25
+          }
+        ]
+      },
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Attacks by tactic',
+            id: 'Wazuh-App-Overview-MITRE-Attacks-By-Tactic',
+            width: 33
+          },
+          {
+            title: 'Top tactics by agent',
+            id: 'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent',
+            width: 34
+          },
+          {
+            title: 'Mitre tactics by agent',
+            id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
+            width: 33
+          }
+        ]
+      },
     ]
   },
   docker: {
@@ -794,14 +932,14 @@ export const visualizations = {
         description: 'Last fails',
         color: 'primary'
       },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark',
-        description: 'Last unknown',
-        color: 'secondary'
-      },
+      // {
+      //   id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark',
+      //   description: 'Last scan benchmark',
+      //   color: 'secondary'
+      // },
       {
         id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown',
-        description: 'Last scan benchmark',
+        description: 'Last unknown',
         color: 'subdued'
       }
     ],
