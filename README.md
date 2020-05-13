@@ -32,8 +32,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 - Wazuh HIDS 3.12.3
 - Wazuh RESTful API 3.12.3
-- Kibana 6.8.8
-- Elasticsearch 6.8.8
+- Kibana 6.8.9
+- Elasticsearch 6.8.9
 
 ## Installation
 
@@ -41,7 +41,7 @@ Install the app
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.8.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.9.zip
 ```
 
 Restart Kibana
@@ -107,7 +107,7 @@ Install the app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.8.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.9.zip
 ```
 
 Update configuration file permissions.
@@ -138,6 +138,7 @@ service kibana restart
 | :---------------: | :------------: | :-------------------------------------------------------------- |
 |       3.12.3      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.2.zip> |
 |       3.12.3      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.1.zip> |
+|       3.12.3      |      6.8.9     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.9.zip> |
 |       3.12.3      |      6.8.8     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.8.zip> |
 |       3.12.2      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.2.zip> |
 |       3.12.2      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.1.zip> |
