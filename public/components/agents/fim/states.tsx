@@ -54,7 +54,7 @@ export class States extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: [],
+      filters: {},
       selectedTabId: 'files',
       totalItemsFile: 0,
       totalItemsRegistry: 0,

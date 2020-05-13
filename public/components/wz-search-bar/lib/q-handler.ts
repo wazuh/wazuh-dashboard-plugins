@@ -62,7 +62,6 @@ export class QHandler extends BaseHandler {
     .map(this.mapSuggestFields);
     const fieldExists = fields.some(item => item.label === field);
   
-    console.log({inputValue, fieldExists})
     return [
       ...(fieldExists ? this.buildSuggestOperators(inputValue) : []),
       ...fields
