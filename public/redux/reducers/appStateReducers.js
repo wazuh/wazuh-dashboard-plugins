@@ -15,7 +15,8 @@ const initialState = {
   showMenu: false,
   wazuhNotReadyYet: '',
   currentTab: '',
-  extensions: {}
+  extensions: {},
+  adminMode: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -25,7 +26,7 @@ const appStateReducers = (state = initialState, action) => {
       currentAPI: action.currentAPI
     };
   }
-
+  
   if (action.type === 'SHOW_MENU') {
     return {
       ...state,
@@ -51,6 +52,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       extensions: action.extensions
+    };
+  }
+
+  if (action.type === 'UPDATE_ADMIN_MODE') {
+    return {
+      ...state,
+      adminMode: action.adminMode
     };
   }
 

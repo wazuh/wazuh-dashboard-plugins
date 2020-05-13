@@ -19,12 +19,11 @@ import {
   EuiHealth,
   EuiTitle,
   EuiToolTip,
-  EuiButton,
   EuiTab,
   EuiTabs,
   EuiIcon,
   EuiPopover,
-  EuiButtonIcon
+  EuiButtonEmpty
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -84,9 +83,9 @@ export class MainModule extends Component {
     this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
-      this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
-      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
-      this.loadSection((ModulesDefaults[this.props.section] || {}).init || 'dashboard');
+      this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'events', name: 'Events' }];
+      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['dashboard', 'reporting', 'settings'];
+      this.onSelectedTabChanged((ModulesDefaults[this.props.section] || {}).init || 'events');
     }
   }
 
@@ -95,6 +94,19 @@ export class MainModule extends Component {
     if (filterManager.filters && filterManager.filters.length) {
       filterManager.removeAll();
     }
+  }
+
+
+  showAgentInfo() {
+    const elem = document.getElementsByClassName('wz-module-body-main')[0];
+    if (elem) {
+      if (!this.state.showAgentInfo) {
+        elem.classList.add("wz-module-body-main-double");
+      } else {
+        elem.classList.remove("wz-module-body-main-double");
+      }
+    }
+    this.setState({ showAgentInfo: !this.state.showAgentInfo });
   }
 
   color = (status, hex = false) => {
@@ -106,22 +118,34 @@ export class MainModule extends Component {
   renderTitle() {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-agent-title" grow={false}>
-          <span className="wz-module-header-agent-title-btn" style={{ display: 'inline-flex' }}>
-            <EuiTitle size="s">
-              <h1>
-                <span
-                  onClick={() => {
-                    window.location.href = `#/agents?agent=${this.props.agent.id}`;
-                    this.router.reload();
-                  }}>
-                  <EuiIcon size="m" type="arrowLeft" color='primary' />
-                  <span>&nbsp;{this.props.agent.name} ({this.props.agent.id})&nbsp;&nbsp;</span>
-                </span>
-              </h1>
-            </EuiTitle>
-            <EuiHealth style={{ paddingTop: 6 }} color={this.color(this.props.agent.status)}>{this.props.agent.status}</EuiHealth>
-          </span>
+        <EuiFlexItem className="wz-module-header-agent-title">
+          <EuiFlexGroup>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false} className="wz-module-header-agent-title-badge">
+              <span style={{ display: 'inline-flex', paddingLeft: 16 }}>
+                <EuiTitle size="s" className="wz-module-header-agent-title-btn">
+                  <h1>
+                    <span
+                      onClick={() => {
+                        window.location.href = `#/agents?agent=${this.props.agent.id}`;
+                        this.router.reload();
+                      }}>
+                      <EuiIcon size="m" type="arrowLeft" color='primary' />
+                      <span>&nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
+                      </span>
+                    </span>
+                  </h1>
+                </EuiTitle>
+                <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
+                  {this.props.agent.status}
+                </EuiHealth>
+              </span>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false} style={{margin: '16px 0'}} className="wz-module-header-agent-title-btn">
+              <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
+            </EuiFlexItem>
+            <EuiFlexItem />
+          </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -155,52 +179,53 @@ export class MainModule extends Component {
   renderReportButton() {
     return (
       (this.props.disabledReport &&
-        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
+        <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
           <EuiToolTip position="top" content="No results match for this search criteria.">
-            <EuiButton
+            <EuiButtonEmpty
               iconType="document"
               isLoading={this.state.loadingReport}
               isDisabled={true}
               onClick={async () => this.startReport()}>
               Generate report
-              </EuiButton>
+              </EuiButtonEmpty>
           </EuiToolTip>
         </EuiFlexItem>
 
         || (
-          <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
-            <EuiButton
+          <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
+            <EuiButtonEmpty
               iconType="document"
               isLoading={this.state.loadingReport}
               onClick={async () => this.startReport()}>
               Generate report
-            </EuiButton>
+            </EuiButtonEmpty>
           </EuiFlexItem>))
     );
   }
 
   renderDashboardButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
-        <EuiButton
+      <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
+        <EuiButtonEmpty
           fill={this.state.selectView === 'dashboard'}
           iconType="visLine"
-          onClick={() => this.onSelectedTabChanged('dashboard')}>
+          href="#/overview"
+          target="blank">
           Dashboard
-          </EuiButton>
+          </EuiButtonEmpty>
       </EuiFlexItem>
     );
   }
 
   renderSettingsButton() {
     return (
-      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
-        <EuiButton
+      <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
+        <EuiButtonEmpty
           fill={this.state.selectView === 'settings'}
           iconType="wrench"
           onClick={() => this.onSelectedTabChanged('settings')}>
           Configuration
-          </EuiButton>
+          </EuiButtonEmpty>
       </EuiFlexItem>
     );
   }
@@ -211,10 +236,9 @@ export class MainModule extends Component {
 
   onSelectedTabChanged(id) {
     if (id !== this.state.selectView) {
-      if (id === 'events' || id === 'dashboard') {
+      if (id === 'events') {
         window.location.href = window.location.href.replace(
-          new RegExp("tabView=" + "[^\&]*"),
-          `tabView=${id === 'events' ? 'discover' : 'panels'}`);
+          new RegExp("tabView=" + "[^\&]*"), 'tabView=discover');
         this.afterLoad = id;
         this.loadSection('loader');
       } else {
@@ -259,7 +283,7 @@ export class MainModule extends Component {
       onSelectedTabChanged: (id) => this.onSelectedTabChanged(id)
     }
     return (
-      <div className='wz-module'>
+      <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
         <div className='wz-module-header-agent-wrapper'>
           <div className='wz-module-header-agent'>
             {title}
@@ -267,12 +291,17 @@ export class MainModule extends Component {
         </div>
         {(agent && agent.os) &&
           <Fragment>
-            {(this.tabs && this.tabs.length) &&
-              <div className='wz-module-header-nav-wrapper'>
-                <div className='wz-module-header-nav'>
-                  <div className="wz-welcome-page-agent-info">
+            <div className='wz-module-header-nav-wrapper'>
+              <div className={this.tabs && this.tabs.length && 'wz-module-header-nav'}>
+                {this.state.showAgentInfo &&
+                  <div className={
+                    !this.tabs || !this.tabs.length ?
+                      "wz-welcome-page-agent-info" :
+                      "wz-welcome-page-agent-info wz-welcome-page-agent-info-gray"}>
                     <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
                   </div>
+                }
+                {(this.tabs && this.tabs.length) &&
                   <div className="wz-welcome-page-agent-tabs">
                     <EuiFlexGroup>
                       {this.renderTabs()}
@@ -287,9 +316,9 @@ export class MainModule extends Component {
                       }
                     </EuiFlexGroup>
                   </div>
-                </div>
+                }
               </div>
-            }
+            </div>
             {!['syscollector', 'configuration'].includes(this.props.section) &&
               <div className='wz-module-body'>
                 {selectView === 'events' &&

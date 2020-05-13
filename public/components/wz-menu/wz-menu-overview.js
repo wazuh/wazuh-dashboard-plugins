@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGrid, EuiSideNav, EuiIcon } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
@@ -86,8 +86,12 @@ class WzMenuOverview extends Component {
         window.location.href = `#/overview/?tab=${section}`;
         store.dispatch(updateCurrentTab(section));
       } else {
-        window.location.href = `#/agents?agent=${this.props.isAgent.id}&tab=${section}`;
-        this.router.reload();
+        if (!this.props.switchTab) {
+          window.location.href = `#/agents?agent=${this.props.isAgent.id}&tab=${section}`;
+          this.router.reload();
+        } else {
+          this.props.switchTab(section);
+        }
       }
     }
   };
@@ -185,29 +189,44 @@ class WzMenuOverview extends Component {
     return (
       <div className="WzManagementSideMenu">
         {Object.keys(this.state.extensions).length && (
-          <EuiFlexGrid columns={2}>
-            <EuiFlexItem>
-              <EuiSideNav
-                items={securityInformation}
-                style={{ padding: '4px 12px' }}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiSideNav
-                items={threatDetection}
-                style={{ padding: '4px 12px' }}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiSideNav
-                items={regulatoryCompliance}
-                style={{ padding: '4px 12px' }}
-              />
-            </EuiFlexItem>
-          </EuiFlexGrid>
+          <div>
+            {!this.props.isAgent && (
+              <EuiFlexGroup>
+                <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
+                  <EuiButtonEmpty iconType="arrowRight"
+                    onClick={() => {
+                      this.props.closePopover();
+                      window.location.href = '#/overview';
+                    }}>
+                    Go to Overview welcome
+                  </EuiButtonEmpty>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            )}
+            <EuiFlexGrid columns={2}>
+              <EuiFlexItem>
+                <EuiSideNav
+                  items={securityInformation}
+                  style={{ padding: '4px 12px' }}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiSideNav
+                  items={threatDetection}
+                  style={{ padding: '4px 12px' }}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiSideNav
+                  items={regulatoryCompliance}
+                  style={{ padding: '4px 12px' }}
+                />
+              </EuiFlexItem>
+            </EuiFlexGrid>
+          </div>
         ) || (<div style={{ width: 300 }}></div>
           )}
       </div>

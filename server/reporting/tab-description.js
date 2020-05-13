@@ -78,7 +78,7 @@ export const TabDescription = {
   gcp: {
     title: 'Google Cloud Platform',
     description:
-      'Security events related to your Google Cloud PLatform services, collected directly via GCP API.' // TODO GCP
+      'Security events related to your Google Cloud Platform services, collected directly via GCP API.' // TODO GCP
   },
   virustotal: {
     title: 'VirusTotal',

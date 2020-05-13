@@ -35,7 +35,8 @@ export class Tactics extends Component {
     tacticsCount: { key: string, doc_count:number }[],
     allSelected : boolean,
     loadingAlerts: boolean,
-    isPopoverOpen: boolean
+    isPopoverOpen: boolean,
+    firstTime: boolean
   }
 
   props!: {
@@ -53,21 +54,34 @@ export class Tactics extends Component {
       tacticsCount: [],
       allSelected: false,
       loadingAlerts: true,
-      isPopoverOpen: false
+      isPopoverOpen: false,
+      firstTime: true
     }
   }
 
   async componentDidMount(){
     this._isMount = true;
-    this.initTactics(); // all tactics are checked on init
-    await this.getTacticsCount();
+    await this.getTacticsCount(true);
   }
 
-  initTactics(){
+  initTactics(buckets){
     const tacticsIds = Object.keys(this.props.tacticsObject);
     const selectedTactics = {}
-     tacticsIds.forEach( item => {
-      selectedTactics[item] = true;
+    let isMax = {};
+     tacticsIds.forEach( (item,id) => {
+       if(buckets.length){ 
+         const max_doc = buckets[0].doc_count;
+         if(!Object.keys(isMax).length){
+           buckets.forEach( bucket => {
+            if(bucket.doc_count === max_doc){
+              isMax[bucket.key] = true;
+            }
+           })
+         }
+        selectedTactics[item] =  isMax[item] ? true : false; //if results are found, only the first tactic is selected
+       }else{
+        selectedTactics[item] = true;
+       }
     });
     
     this.props.onChangeSelectedTactics(selectedTactics);
@@ -91,7 +105,7 @@ export class Tactics extends Component {
   async componentDidUpdate(prevProps, prevState) {
     const { filterParams } = this.props;
     if (JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams))
-      this.getTacticsCount();
+      this.getTacticsCount(this.state.firstTime);
   }
 
   showToast = (color, title, text, time) => {
@@ -103,7 +117,7 @@ export class Tactics extends Component {
     });
   };
 
-  async getTacticsCount() {
+  async getTacticsCount(firstTime=false) {
     this.setState({loadingAlerts: true});
     try{
       const {indexPattern, filterParams} = this.props;
@@ -121,7 +135,10 @@ export class Tactics extends Component {
       // @ts-ignore
       const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
       const { buckets } = data.aggregations.tactics;
-      this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false});
+      if(firstTime){
+       this.initTactics(buckets); // top tactics are checked on component mount
+      }
+      this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false, firstTime:false});
         
     } catch(err){
       this.showToast(

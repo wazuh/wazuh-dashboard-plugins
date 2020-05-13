@@ -11,18 +11,20 @@
 }
 
 .wz-module-header-agent, .wz-module-header-nav{
-    border-bottom: 1px solid #D3DAE6;
     background:white;
-    padding: 16px;
 }
 
 .wz-module-header-agent{
     height: 50px;
+    padding: 16px;
+}
+
+.wz-module-header-agent .euiHealth svg{
+    width: 16px;
+    height: 24px;
 }
 
 .wz-module-header-nav{
-    margin-top: 11px;
-    padding: 0px 16px;
     min-height: 55px;
 }
 
@@ -38,16 +40,22 @@
     margin: 6px 12px!important;
 }
 
+.wz-module-header-agent-title-badge{
+    border: 1px solid #d3dae6;
+    padding: 0 100px;
+    border-radius: 100px;
+}
+
 .wz-module-header-agent-title-btn{
     cursor: pointer;
 }
 
-.wz-module-header-agent-title-btn:hover h1{
+.wz-module-header-agent-title-btn > span:hover{
     color: #006BB4;
 }
 
 .wz-module-header-agent h1{    
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .wz-module-header-agent h1 b{    
@@ -55,7 +63,8 @@
 }
 
 .wz-module-header-nav-wrapper{
-    margin-top: 50px;
+    margin-top: 49px;
+    border-bottom: 1px solid #d3dae6;
 }
 
 .wz-module-header-nav .euiTabs{
@@ -64,11 +73,19 @@
 
 .wz-module-header-nav .euiTab__content{
     font-size: 16px!important;
-    font-weight: 100;
+    font-weight: 400;
 }
 
 .wz-module-body {
-    padding-top: 170px;
+    padding-top: 105px;
+}
+
+.wz-module.wz-module-welcome .wz-module-body{
+    padding-top: 109px !important;
+}
+
+.wz-module.wz-module-showing-agent .wz-module-body{
+    padding-top: 160px !important;
 }
 
 .flyout-body .globalQueryBar{
@@ -78,6 +95,11 @@
 .wz-module-body-main {
     padding-top: 50px!important;
 }
+
+.wz-module-body-main-double {
+    padding-top: 102px!important;
+}
+
 
 discover-app-w .sidebar-container {
     background-color: transparent!important;

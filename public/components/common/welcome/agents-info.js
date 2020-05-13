@@ -15,9 +15,7 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiStat,
   EuiFlexItem,
-  EuiFlexGroup,
-  EuiToolTip,
-  EuiButton
+  EuiFlexGroup
 } from '@elastic/eui';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
@@ -29,11 +27,8 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
-  addIconPlatformRender(agent) {
+  getPlatformIcon(agent) {
     let icon = false;
-    const checkField = field => {
-      return field !== undefined ? field : '-';
-    };
     const os = (agent || {}).os;
 
     if (((os || {}).uname || '').includes('Linux')) {
@@ -43,6 +38,19 @@ export class AgentInfo extends Component {
     } else if ((os || {}).platform === 'darwin') {
       icon = 'apple';
     }
+
+    return <i
+      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+      aria-hidden="true"
+    ></i>
+  }
+
+
+  addTextPlatformRender(agent) {
+    const checkField = field => {
+      return field !== undefined ? field : '-';
+    };
+
     const os_name =
       checkField(((agent || {}).os || {}).name) +
       ' ' +
@@ -52,10 +60,7 @@ export class AgentInfo extends Component {
 
     return (
       <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", margin: "0 auto", fontWeight: 300 }}>
-        <i
-          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-          aria-hidden="true"
-        ></i>
+        {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
     )
@@ -71,7 +76,7 @@ export class AgentInfo extends Component {
           <EuiStat
             title={
               item.description === 'OS' ? (
-                this.addIconPlatformRender(this.props.agent)
+                this.addTextPlatformRender(this.props.agent)
               ) : (
                   <span
                     style={{

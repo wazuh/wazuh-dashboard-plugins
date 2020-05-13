@@ -830,6 +830,7 @@ export class AgentsController {
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
+      goGroups: (agent, group) => this.goGroups(agent, group),
       setExtensions: (api, extensions) => {
         AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;

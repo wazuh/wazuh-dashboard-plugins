@@ -19,7 +19,8 @@ import {
   EuiFlyoutBody,
   EuiDescriptionList,
   EuiSpacer,
-  EuiLink
+  EuiLink,
+  EuiToolTip,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../react-services/wz-request';
 
@@ -86,7 +87,7 @@ export class FlyoutTechnique extends Component {
   renderHeader() {
     const { techniqueData } = this.state;
     return(
-      <EuiFlyoutHeader hasBorder>
+      <EuiFlyoutHeader hasBorder style={{padding:"12px 16px"}}>
         {(Object.keys(techniqueData).length === 0 && (
           <div>
             <EuiLoadingContent lines={1} />
@@ -103,7 +104,7 @@ export class FlyoutTechnique extends Component {
   }
   
   renderBody() {
-    const { currentTechnique } = this.props
+    const { currentTechnique } = this.props;
     const { techniqueData } = this.state;
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
     const formattedDescription = techniqueData.description 
@@ -116,8 +117,14 @@ export class FlyoutTechnique extends Component {
       : techniqueData.description;
     const data = [
       {
-        title: 'Id',
-        description: currentTechnique
+        title: 'ID',
+        description: ( <EuiToolTip
+          position="top"
+          content={"Open " + currentTechnique + " details in a new page"}>
+          <EuiLink href={link} external target="_blank">
+            {currentTechnique}
+          </EuiLink>
+        </EuiToolTip>)
       },
       {
         title: 'Tactic',
@@ -154,7 +161,7 @@ export class FlyoutTechnique extends Component {
             <EuiLoadingContent lines={3} />
           </div>
         )) || (
-          <div>
+          <div style={{marginBottom: 30}}>
             <EuiDescriptionList listItems={data} />
             <EuiSpacer />
             <p>
@@ -175,7 +182,7 @@ export class FlyoutTechnique extends Component {
     return(
         <EuiFlyout
           onClose={() => onChangeFlyout(false)}
-          maxWidth="35%"
+          maxWidth="50%"
           className="flyout-no-overlap"
           aria-labelledby="flyoutSmallTitle"
           > 

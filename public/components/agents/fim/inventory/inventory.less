@@ -73,8 +73,8 @@
     height: unset!important;
 }
 
-.euiAccordion__childWrapper .euiToolTipAnchor{
-    display: block!important;
+.euiAccordion__childWrapper .flyout-row:not(.related-rules-row) .euiToolTipAnchor{
+    //display: block!important;
 }
 
 .euiAccordion__button {
@@ -87,6 +87,10 @@
 
 .view-in-events-btn{
     height: 30px;
+}
+
+.module-discover-table .euiTableRow-isExpandedRow .euiTableCellContent{
+    animation: none!important;
 }
 
 /* This resets to the original value of "display" style for EuiTooltip used in ".euiAccordion__childWrapper .euiToolTipAnchor" definition,

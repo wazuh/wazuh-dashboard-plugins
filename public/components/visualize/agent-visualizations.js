@@ -778,14 +778,14 @@ export const agentVisualizations = {
         description: 'Last fails',
         color: 'primary'
       },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark',
-        description: 'Last unknown',
-        color: 'secondary'
-      },
+      // {
+      //   id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark',
+      //   description: 'Last scan benchmark',
+      //   color: 'secondary'
+      // },
       {
         id: 'Wazuh-app-Agents-CISCAT-last-scan-unknown',
-        description: 'Last scan benchmark',
+        description: 'Last unknown',
         color: 'subdued'
       }
     ],
