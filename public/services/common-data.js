@@ -193,7 +193,6 @@ export class CommonData {
       }
 
       if (agent) filters.push(filterHandler.agentQuery(agent));
-
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
