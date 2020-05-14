@@ -14,8 +14,7 @@ import { npSetup } from 'ui/new_platform';
 import { AppState } from '../../../../react-services/app-state';
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { Query, esFilters, TimeRange, esQuery } from '../../../../../../../src/plugins/data/common';
-import { SearchParams, SearchResponse, } from 'elasticsearch';
-import { Search } from 'history';
+import { SearchParams, } from 'elasticsearch';
 
 export interface IFilterParams {
   filters: esFilters.Filter[]
