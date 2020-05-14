@@ -660,8 +660,8 @@ export const visualizations = {
         height: 550,
         vis: [
           {
-            title: 'Top 10 agents with positive scans',
-            id: 'Wazuh-App-Overview-Virustotal-Positives-Heatmap'
+            title: 'Alerts evolution by agents',
+            id: 'Wazuh-App-Overview-Virustotal-Alerts-Evolution'
           }
         ]
       },
@@ -932,14 +932,14 @@ export const visualizations = {
         description: 'Last fails',
         color: 'primary'
       },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark',
-        description: 'Last unknown',
-        color: 'secondary'
-      },
+      // {
+      //   id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark',
+      //   description: 'Last scan benchmark',
+      //   color: 'secondary'
+      // },
       {
         id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown',
-        description: 'Last scan benchmark',
+        description: 'Last unknown',
         color: 'subdued'
       }
     ],

@@ -55,6 +55,7 @@ class WzGroupsTable extends Component {
 
   async componentDidUpdate() {
     if (this.props.state.isProcessing && this._isMounted) {
+      this.props.updateIsProcessing(false);
       await this.getItems();
     }
   }
