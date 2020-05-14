@@ -27,6 +27,7 @@ import {
   EuiButton,
   EuiPopover
 } from '@elastic/eui';
+import { FimEventsTable } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
@@ -41,8 +42,10 @@ export class AgentsWelcome extends Component {
     super(props);
 
     this.state = {
-      extensions: this.props.extensions
+      extensions: this.props.extensions,
     };
+
+    this.onTimeChange.bind(this);
   }
 
   color = (status, hex = false) => {
@@ -92,7 +95,13 @@ export class AgentsWelcome extends Component {
     );
   }
 
+  onTimeChange = (datePicker) => {
+    const {start:from, end:to} = datePicker;
+    this.setState({datePicker: {from, to}});
+  }
+
   render() {
+    console.log("from date picker", this.state.datePicker)
     const title = this.renderTitle();
     return (
       <div className="wz-module wz-module-welcome">
@@ -206,17 +215,11 @@ export class AgentsWelcome extends Component {
                   <EuiFlexItem>
                     <EuiFlexGroup justifyContent='flexEnd'>
                       <EuiFlexItem grow={false}>
-                        <WzDatePicker />
+                        <WzDatePicker onTimeChange={() => {}} />
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlexItem>
-                  <EuiFlexItem>
-                    <EuiPanel paddingSize="m">
-                      <EuiTitle size="xs">
-                        <h1>Last Integrity monitoring events</h1>
-                      </EuiTitle>
-                    </EuiPanel>
-                  </EuiFlexItem>
+                  <FimEventsTable agentId={this.props.agent.id} />
                   <EuiFlexItem style={{ marginTop: 0 }}>
                     <EuiPanel paddingSize="m">
                       <EuiTitle size="xs">
