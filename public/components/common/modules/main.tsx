@@ -204,13 +204,12 @@ export class MainModule extends Component {
   }
 
   renderDashboardButton() {
-    const href = `#/overview?tab=${this.props.section}&agentId=${this.props.agent.id}`
     return (
       <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
         <EuiButtonEmpty
           fill={this.state.selectView === 'dashboard'}
           iconType="visLine"
-          href={href}
+          href="#/overview"
           target="blank">
           Dashboard
           </EuiButtonEmpty>

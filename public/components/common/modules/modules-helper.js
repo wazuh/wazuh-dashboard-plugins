@@ -59,9 +59,9 @@ export class ModulesHelper {
     for (let i = 0; i < filters.length; i++) {
       let found = false;
       (implicitFilters || []).forEach(x => {
-        const objKey = x.query && x.query.match ? Object.keys(x.query.match)[0] : x.meta.key;
+        const objKey = x.query ? Object.keys(x.query.match)[0] : x.meta.key;
         const key = `filter-key-${objKey}`;
-        const value = x.query && x.query.match
+        const value = x.query
           ? `filter-value-${x.query.match[objKey].query}`
           : `filter-value-${x.meta.value}`;
         const data = filters[i].attributes[3];

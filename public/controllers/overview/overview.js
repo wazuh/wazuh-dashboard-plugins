@@ -19,8 +19,6 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { updateCurrentTab } from '../../redux/actions/appStateActions';
-import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
-import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
 
 export class OverviewController {
@@ -53,15 +51,13 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = new WazuhConfig();
-    this.visFactoryService = VisFactoryHandler;
-    this.rawVisualizations = new RawVisualizations();
+    this.showingMitreTable = false;
   }
 
   /**
    * On controller loads
    */
   async $onInit() {
-    this.rawVisualizations.setType("");
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -100,45 +96,9 @@ export class OverviewController {
       currentTab: this.tab
     };
 
-    //check if we need to load an agent filter
-    const agent = this.$location.search().agentId;
-    if(agent){
-      this.$location.search('agentId', null);
-      this.initialFilter = agent;
-    }
-
-
-    this.agentsSelectionProps = {
-      switchDiscover: tab => {
-        this.switchSubtab(tab);
-      },
-      tab: this.tab,
-      initialFilter: this.initialFilter,
-      subtab: this.subtab,
-      setAgent: async agentList => {
-        this.updateSelectedAgents(agentList)
-      },
-    };
-
-    this.visualizeProps = {
-      selectedTab: this.tab,
-      isAgent: this.isAgent,
-      updateRootScope: (prop, value) => {
-        this.$rootScope[prop] = value;
-        this.$rootScope.$applyAsync();
-      }
-    }
-
-
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
-
-    this.$scope.getVisualizeProps = (resultState) =>{
-      return {...this.visualizeProps, resultState};
-    }
-
-    
   }
 
   /**
@@ -150,35 +110,11 @@ export class OverviewController {
     return item && Array.isArray(array) && array.includes(item);
   }
 
-  async updateSelectedAgents(agentList){
-    if(this.initialFilter){
-      this.initialFilter= false;
-      this.agentsSelectionProps.initialFilter = false;
-    }
-    this.isAgent = agentList ? agentList[0] : false;
-    this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
-
-    if(agentList && agentList.length ){ // && this.rawVisualizations.getType() !== 'agents'){
-      this.$rootScope.resultState = "Fetching dashboard data...";
-      await this.visFactoryService.buildAgentsVisualizations(
-        this.filterHandler,
-        this.tab,
-        null,
-        agentList,
-        this.tabView === 'discover'
-      ); 
-    }else if(!agentList ){ //&& this.rawVisualizations.getType() !== 'general'){
-      this.$rootScope.resultState = "Fetching dashboard data...";
-      await this.visFactoryService.buildOverviewVisualizations(
-        this.filterHandler,
-        this.tab,
-        null, //not needed
-        this.tabView === 'discover'
-      );
-    }
-    this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
-    this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
-
+  /**
+   * Show/hide MITRE table
+   */
+  switchMitreTab() {
+    this.showingMitreTable = !this.showingMitreTable;
   }
 
   // Switch subtab
@@ -200,9 +136,8 @@ export class OverviewController {
           this.filterHandler,
           this.tab,
           subtab,
-          this.tabView === 'discover'
+          this.tabView === 'discover' && this.tab === previousTab
         );
-         this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {
         this.$scope.$emit('changeTabView', {
           tabView: subtab,
@@ -213,7 +148,6 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    this.agentsSelectionProps.subtab = subtab;
     this.$scope.$applyAsync();
     return;
   }
@@ -232,8 +166,7 @@ export class OverviewController {
     this.overviewModuleReady = false;
     this.visFactoryService.clear();
     this.tabVisualizations.setTab(newTab);
-    this.agentsSelectionProps.tab = newTab;
-    this.visualizeProps.selectedTab = newTab;
+    this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.expandedVis = false;
@@ -249,7 +182,25 @@ export class OverviewController {
         await this.getSummary();
       }
 
-      
+      if (newTab === 'mitre') {
+        const result = await this.apiReq.request('GET', '/rules/mitre', {});
+        this.$scope.mitreIds = (((result || {}).data || {}).data || {}).items;
+
+        this.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: 'MITRE',
+          wzReq: (method, path, body) =>
+            this.apiReq.request(method, path, body),
+          addFilter: id => this.addMitrefilter(id)
+        };
+
+        this.mitreTableProps = {
+          wzReq: (method, path, body) =>
+            this.apiReq.request(method, path, body),
+          attacksCount: this.$scope.attacksCount
+        };
+      }
 
       if (this.tab === newTab && !force) return;
 
@@ -257,7 +208,6 @@ export class OverviewController {
       if (force === 'nav') force = false;
       this.$location.search('tab', newTab);
       this.tab = newTab;
-      if(!this.initialFilter) this.updateSelectedAgents(false);
       await this.switchSubtab('panels', true);
       this.overviewModuleReady = true;
     } catch (error) {
@@ -341,6 +291,19 @@ export class OverviewController {
           this.$scope.attacksCount[rows[i]['col-0-2']] = rows[i]['col-1-1'];
         }
 
+        this.mitreTableProps = {
+          wzReq: (method, path, body) =>
+            this.apiReq.request(method, path, body),
+          attacksCount: this.$scope.attacksCount
+        };
+        this.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: 'MITRE',
+          wzReq: (method, path, body) =>
+            this.apiReq.request(method, path, body),
+          addFilter: id => this.addMitrefilter(id)
+        };
       });
     } catch (error) {
       this.errorHandler.handle(error.message || error);

@@ -69,6 +69,21 @@ export const agentVisualizations = {
             width: 34
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-General-Alerts-summary',
+            width: 60
+          },
+          {
+            title: 'Groups summary',
+            id: 'Wazuh-App-Agents-General-Groups-summary',
+            width: 40
+          }
+        ]
       }
     ]
   },
@@ -111,6 +126,15 @@ export const agentVisualizations = {
             title: 'Files deleted',
             id: 'Wazuh-App-Agents-FIM-Files-deleted',
             width: 34
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-FIM-Alerts-summary'
           }
         ]
       }
@@ -206,6 +230,15 @@ export const agentVisualizations = {
             width: 25
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-PCI-Last-alerts'
+          }
+        ]
       }
     ]
   },
@@ -245,6 +278,15 @@ export const agentVisualizations = {
             width: 25
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-GDPR-Last-alerts'
+          }
+        ]
       }
     ]
   },
@@ -276,6 +318,15 @@ export const agentVisualizations = {
           {
             title: 'Requirements over time',
             id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime'
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-NIST-Last-alerts'
           }
         ]
       }
@@ -317,6 +368,15 @@ export const agentVisualizations = {
             width: 25
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-TSC-Last-alerts'
+          }
+        ]
       }
     ]
   },
@@ -354,6 +414,15 @@ export const agentVisualizations = {
             title: 'Most common alerts',
             id: 'Wazuh-App-Agents-HIPAA-Most-Common',
             width: 25
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-HIPAA-Last-alerts'
           }
         ]
       }
@@ -415,6 +484,15 @@ export const agentVisualizations = {
             title: 'Commonly affected packages',
             id: 'Wazuh-App-Agents-vuls-Commonly-affected-packages',
             width: 34
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alert summary',
+            id: 'Wazuh-App-Agents-vuls-Alert-summary'
           }
         ]
       }
@@ -496,6 +574,15 @@ export const agentVisualizations = {
             width: 75
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-Osquery-Alerts-summary'
+          }
+        ]
       }
     ]
   },
@@ -568,6 +655,15 @@ export const agentVisualizations = {
             id: 'Wazuh-App-Agents-Docker-Actions-over-time'
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-Docker-Events-summary'
+          }
+        ]
       }
     ]
   },
@@ -638,6 +734,15 @@ export const agentVisualizations = {
             width: 50
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-OSCAP-Last-alerts'
+          }
+        ]
       }
     ]
   },
@@ -699,6 +804,15 @@ export const agentVisualizations = {
             width: 40
           }
         ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-app-Agents-CISCAT-alerts-summary'
+          }
+        ]
       }
     ]
   },
@@ -725,6 +839,15 @@ export const agentVisualizations = {
           {
             title: 'Events per control type evolution',
             id: 'Wazuh-App-Agents-PM-Events-per-agent-evolution'
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-PM-Alerts-summary'
           }
         ]
       }
@@ -780,6 +903,15 @@ export const agentVisualizations = {
           {
             title: 'Alerts over time',
             id: 'Wazuh-App-Agents-Audit-Alerts-over-time'
+          }
+        ]
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-Audit-Last-alerts'
           }
         ]
       }

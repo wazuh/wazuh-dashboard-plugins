@@ -40,7 +40,7 @@ export async function getElasticAlerts(indexPattern, filterParams:IFilterParams,
     });
   }
   const search:SearchParams = {
-    index: indexPattern['title'],
+    index: indexPattern['id'],
     body: {
       query,
       ...(aggs ? {aggs} : {})
