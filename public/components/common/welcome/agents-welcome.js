@@ -49,7 +49,7 @@ export class AgentsWelcome extends Component {
       lastScans: [],
       isLoading: true,
       sortField: 'start_scan',
-      sortDirection: 'asc',
+      sortDirection: 'desc',
     };
   }
 
@@ -179,7 +179,7 @@ export class AgentsWelcome extends Component {
         field: 'score',
         name: 'Score',
         sortable: true,
-        width: '65px'
+        width: '90px'
       },
     ];
   }
