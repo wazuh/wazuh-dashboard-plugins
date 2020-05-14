@@ -20,7 +20,7 @@ export class TabVisualizations {
     }
 
     this.agents = {
-      welcome: 0,
+      welcome: 8,
       general: 11,
       fim: 7,
       gcp: 7,
