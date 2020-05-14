@@ -30,22 +30,20 @@ export class QHandler extends BaseHandler {
     '~': 'Like',
   }
   qSuggests: qSuggests[];
-  inputValue: string;
+
   constructor(qSuggests) {
     super();
     this.qSuggests = qSuggests;
     this.inputStage = 'fields';
-    this.inputValue = '';
   }
 
   //#region Build suggests elements
 
   async buildSuggestItems(inputValue:string):Promise<suggestItem[]> {
-    this.inputValue = inputValue;
     this.isSearch = false;
     if (this.inputStage === 'fields' || inputValue === ''){
       const qInterpreter = new QInterpreter(inputValue);
-      this.isSearch = qInterpreter.qNumber() <= 1;
+      this.isSearch = qInterpreter.qNumber() <= 0;
       return this.buildSuggestFields(inputValue);
     } else if (this.inputStage === 'operators') {
       return this.buildSuggestOperators(inputValue);
@@ -57,17 +55,12 @@ export class QHandler extends BaseHandler {
     return this.buildSuggestFields(inputValue);
   }
 
-  buildSuggestFields(inputValue:string): suggestItem[] {
+  buildSuggestFields(inputValue:string):suggestItem[] {
     const { field } = this.getLastQuery(inputValue);
     const fields:suggestItem[] = this.qSuggests
     .filter((item) => this.filterSuggestFields(item, field))
     .map(this.mapSuggestFields);
-    const fieldExists = fields.some(item => item.label === field);
-  
-    return [
-      ...(fieldExists ? this.buildSuggestOperators(inputValue) : []),
-      ...fields
-    ];
+    return fields;
   }
 
   buildSuggestOperators(inputValue:string):suggestItem[] {
@@ -81,27 +74,26 @@ export class QHandler extends BaseHandler {
 
   async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
     const { values } = this.getCurrentField(inputValue);
-    const { value='', operator } = this.getLastQuery(inputValue);
+    const { value } = this.getLastQuery(inputValue);
     const rawSuggestions:string[] = typeof values === 'function'
       ? await values(value)
       : values;
-    const suggestions = rawSuggestions
-      .filter(item => this.filterSuggestValues(item, value))
-      .map(this.buildSuggestValue);
-    const isLike = operator === '~' && value;
-    const valueExists = rawSuggestions.some(sgtValue => sgtValue === value);
-    if (this.inputValue !== inputValue || this.inputStage !== 'values') {
-      throw "Incorrect suggestions";
+    //@ts-ignore
+    const filterSuggestions = rawSuggestions.filter(item => this.filterSuggestValues(item, value));
+    const suggestions:suggestItem[] = [];
+
+    for (const value of filterSuggestions) {
+      const item:suggestItem = this.buildSuggestValue(value);
+      suggestions.push(item);
     }
-    return [
-      ...((isLike || valueExists) ? this.buildSuggestConjuntions(inputValue) : []),
-      ...suggestions];
+
+    return suggestions;
   }
 
   buildSuggestConjuntions(inputValue:string):suggestItem[] {
     const suggestions = [
-      {'label':'AND ', 'description':'Requires `both arguments` to be true'},
-      {'label':'OR ', 'description':'Requires `one or more arguments` to be true'}
+      {'label':',', 'description':'OR'},
+      {'label':';', 'description':'AND'}
     ].map((item) => {
       return {
         type: { iconType: 'kqlSelector', color: 'tint3' },
@@ -146,15 +138,15 @@ export class QHandler extends BaseHandler {
     const qInterpreter = new QInterpreter(inputValue);
     switch (item.type.iconType) {
       case'kqlField':
-        qInterpreter.setlastQuery(item.label, 'field');
+        qInterpreter.setlastQuery(item.label);
         this.inputStage = 'operators';
         break;
       case'kqlOperand':
-        qInterpreter.setlastQuery(item.label, 'operator');
+        qInterpreter.setlastQuery(item.label);
         this.inputStage = 'values';
         break;
       case'kqlValue':
-        qInterpreter.setlastQuery(item.label, 'value');
+        qInterpreter.setlastQuery(item.label);
         filters['q'] = qInterpreter.toString();
         this.inputStage = 'conjuntions';
         break;
@@ -173,12 +165,14 @@ export class QHandler extends BaseHandler {
     isInvalid: boolean, filters: object
   } {
     const filters = {...currentFilters};
-    const { field, conjuntion, operator } = this.getLastQuery(inputValue);
+    const { field, value=false } = this.getLastQuery(inputValue);
     let isInvalid = false;
 
-    if ( !!conjuntion && !field) {
-      this.inputStage = !operator ? 'fields' : 'values';
-    } else if ( !!operator ) {
+    if (inputValue.length === 0) {
+      delete filters['q'];
+    }
+
+    if (value !== false) {
       const fieldExist = this.qSuggests.find(item => item.label === field);
       if (fieldExist) {
         this.inputStage = 'values',
@@ -187,12 +181,8 @@ export class QHandler extends BaseHandler {
         isInvalid = true;
       }
     } else {
-      this.inputStage = 'fields'
-    }
-
-    if (inputValue.length === 0) {
-      delete filters['q'];
       this.inputStage = 'fields';
+      isInvalid = false;
     }
     return { isInvalid, filters };
   }

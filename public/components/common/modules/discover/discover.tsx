@@ -118,11 +118,8 @@ export class Discover extends Component {
       "rule.description": "Rule description",
       "rule.level": "Rule level"
     }
-
-    this.hideCreateCustomLabel.bind(this);
     this.onQuerySubmit.bind(this);
     this.onFiltersUpdated.bind(this);
-    this.hideCreateCustomLabel()
   }
 
   showToast = (color, title, time) => {
@@ -170,20 +167,6 @@ export class Discover extends Component {
       }
     })
     this.indexPattern.fields = fields;
-  }
-
-  hideCreateCustomLabel = () => {
-    try {
-      const button = document.querySelector(".wz-discover #addFilterPopover > div > button > span > span") ;
-      if ( !button ) return setTimeout(this.hideCreateCustomLabel, 100);
-      const findAndHide = () => {
-        const switcher = document.querySelector("#filterEditorCustomLabelSwitch")
-        if ( !switcher ) return setTimeout(findAndHide, 100);
-        console.log(switcher.parentElement);
-        switcher.parentElement.style.display = "none"
-      }
-      button.onclick = findAndHide;
-    } catch (error) { }
   }
 
   filtersAsArray(filters) {
