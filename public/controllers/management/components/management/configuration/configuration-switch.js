@@ -132,9 +132,11 @@ class WzConfigurationSwitch extends Component {
       // If manager/cluster require agent platform info to filter sections in overview. It isn't coming from props for Management/Configuration
       try{
         this.setState({ loadingOverview: true });
-        const masterNodeInfo = await WzRequest.apiReq('GET', '/agents/000', {});
+        
+        const masterNodeInfo = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=000'}});
+
         this.setState({
-          masterNodeInfo: masterNodeInfo.data.data
+          masterNodeInfo: masterNodeInfo.data.affected_items[0]
         });
         this.setState({ loadingOverview: false });
       }catch(error){
