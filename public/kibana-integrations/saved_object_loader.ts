@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SavedObject } from 'ui/saved_objects/types';
 import { ChromeStart, SavedObjectsClientContract, SavedObjectsFindOptions } from 'kibana/public';
-import { StringUtils } from 'ui/saved_objects/helpers/string_utils';
+import { SavedObject } from '../../../../src/plugins/saved_objects/public/types';
+import { StringUtils } from '../../../../src/plugins/saved_objects/public/saved_object/helpers/string_utils';
 
 /**
  * The SavedObjectLoader class provides some convenience functions
@@ -62,7 +62,7 @@ export class SavedObjectLoader {
    * @param id
    * @returns {Promise<SavedObject>}
    */
-  get(id: string, raw: any) {
+  async get(id: string) {
     const instance = new this.Class(id);
 
     instance.init = _.once(() => {
@@ -158,7 +158,7 @@ export class SavedObjectLoader {
    */
   findAll(search: string = '', size: number = 100, fields?: string[]) {
     return this.savedObjectsClient
-      .find({
+      .find<Record<string, unknown>>({
         type: this.lowercaseType,
         search: search ? `${search}*` : undefined,
         perPage: size,

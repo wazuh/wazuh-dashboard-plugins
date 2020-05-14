@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
@@ -51,8 +50,6 @@ export class HealthCheck {
     this.wazuhConfig = new WazuhConfig();
     this.$window = $window;
     this.results = [];
-
-    this.savedObjectsClient = Private(SavedObjectsClientProvider);
 
     this.checks = {
       api: true,

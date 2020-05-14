@@ -34,7 +34,6 @@ import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
-import { npStart } from 'ui/new_platform';
 import { WzMisc } from '../factories/misc';
 import { ApiCheck } from '../react-services/wz-api-check';
 import { AppState } from '../react-services/app-state';
@@ -53,7 +52,6 @@ function ip($q, $rootScope, $window, $location, Private, errorHandler) {
   const wzMisc = new WzMisc();
   assignPreviousLocation($rootScope, $location);
   return getIp(
-    npStart.plugins.data.indexPatterns,
     $q,
     $window,
     $location,

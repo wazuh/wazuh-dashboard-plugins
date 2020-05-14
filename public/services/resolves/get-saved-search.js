@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { healthCheck } from './health-check';
-import { recentlyAccessed } from 'plugins/kibana/home/np_ready/components/recently_accessed';
+import { recentlyAccessed } from '../../../../../src/core/public/chrome/recently_accessed';
 export function getSavedSearch(
   redirectWhenMissing,
   $location,
