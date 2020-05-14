@@ -25,12 +25,15 @@ import {
   EuiHealth,
   EuiPage,
   EuiButton,
-  EuiPopover
+  EuiPopover,
+  EuiBasicTable
 } from '@elastic/eui';
 import { FimEventsTable } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
+import { ActionAgents } from '../../../react-services/action-agents';
+import { WzRequest } from '../../../react-services/wz-request';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import Overview from '../../wz-menu/wz-menu-overview';
 import './welcome.less';
@@ -38,14 +41,33 @@ import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker'
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 
 export class AgentsWelcome extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
 
     this.state = {
       extensions: this.props.extensions,
+      lastScans: [],
+      isLoading: true,
+      sortField: 'start_scan',
+      sortDirection: 'desc',
     };
 
     this.onTimeChange.bind(this);
+  }
+
+  async componentDidMount() {
+    this._isMount = true;
+    this.getScans(this.props.agent.id);
+  }
+
+  async getScans(idAgent) {
+    const scans = await WzRequest.apiReq('GET', `/sca/${idAgent}`, this.buildFilter());
+    this._isMount &&
+      this.setState({
+        lastScans: (((scans.data || {}).data || {}).items || {}),
+        isLoading: false,
+      });
   }
 
   color = (status, hex = false) => {
@@ -94,6 +116,137 @@ export class AgentsWelcome extends Component {
       </EuiFlexItem>
     );
   }
+  onClickRestartAgent = () => {
+    const { agent } = this.props;
+    ActionAgents.restartAgent(agent.id);
+  };
+
+  onClickUpgradeAgent = () => {
+    const { agent } = this.props;
+    ActionAgents.upgradeAgent(agent.id);
+  };
+
+  renderUpgradeButton() {
+    const { managerVersion } = this.state;
+    const { agent } = this.props;
+    let outDated = ActionAgents.compareVersions(managerVersion, agent.version);
+
+    if (outDated === true) return;
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          color="secondary"
+          iconType="sortUp"
+          onClick={this.onClickUpgradeAgent}
+        >
+          Upgrade
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  columns() {
+    return [
+      {
+        field: 'start_scan',
+        name: 'Time',
+        sortable: true,
+        width: '200px'
+      },
+      {
+        field: 'name',
+        name: 'Policy',
+        sortable: true,
+        truncateText: true,
+      },
+      {
+        field: 'pass',
+        name: 'Pass',
+        sortable: true,
+        width: '65px'
+      },
+      {
+        field: 'fail',
+        name: 'Fail',
+        sortable: true,
+        width: '65px'
+      },
+      {
+        field: 'invalid',
+        name: 'Not applicable',
+        sortable: true,
+        width: '100px'
+      },
+      {
+        field: 'score',
+        name: 'Score',
+        sortable: true,
+        width: '90px'
+      },
+    ];
+  }
+
+  onTableChange = ({ sort = {} }) => {
+    const { field: sortField, direction: sortDirection } = sort;
+    this.setState({
+      sortField,
+      sortDirection,
+    });
+  };
+
+  buildSortFilter() {
+    const { sortField, sortDirection } = this.state;
+
+    const field = (sortField === 'start_scan') ? '' : sortField;
+    const direction = (sortDirection === 'asc') ? '+' : '-';
+
+    return direction + field;
+  }
+
+  buildFilter() {
+    const { filters } = this.props;
+
+    const filter = {
+      ...filters,
+      limit: 5,
+      sort: this.buildSortFilter(),
+    };
+
+    return filter;
+  }
+
+  renderScaTable() {
+    const columns = this.columns();
+    const {
+      lastScans,
+      isLoading,
+      sortField,
+      sortDirection,
+    } = this.state;
+    const sorting = {
+      sort: {
+        field: sortField,
+        direction: sortDirection
+      }
+    };
+
+    return (
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <EuiBasicTable
+            items={lastScans}
+            columns={columns}
+            loading={isLoading}
+            sorting={sorting}
+            onChange={this.onTableChange}
+            itemId="policy_id"
+            noItemsMessage="No scans found"
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    )
+  }
 
   onTimeChange = (datePicker) => {
     const {start:from, end:to} = datePicker;
@@ -103,6 +256,9 @@ export class AgentsWelcome extends Component {
   render() {
     console.log("from date picker", this.state.datePicker)
     const title = this.renderTitle();
+    const upgradeButton = this.renderUpgradeButton();
+    const scaTable = this.renderScaTable();
+
     return (
       <div className="wz-module wz-module-welcome">
         <div className='wz-module-header-agent-wrapper'>
@@ -158,6 +314,20 @@ export class AgentsWelcome extends Component {
                   iconType="gear" >
                   <span>Configuration</span>
                 </EuiButton>
+              </EuiFlexItem>
+              <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
+                <EuiFlexGroup justifyContent="flexEnd">
+                  <EuiFlexItem grow={false}>
+                    <EuiButton
+                      color="primary"
+                      iconType="refresh"
+                      onClick={this.onClickRestartAgent}
+                    >
+                      Restart
+                    </EuiButton>
+                  </EuiFlexItem>
+                  {upgradeButton}
+                </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPage>
@@ -225,6 +395,7 @@ export class AgentsWelcome extends Component {
                       <EuiTitle size="xs">
                         <h1>Last SCA scans</h1>
                       </EuiTitle>
+                      {scaTable}
                     </EuiPanel>
                   </EuiFlexItem>
                 </EuiFlexGroup>

@@ -21,6 +21,8 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { WzRequest } from '../../react-services/wz-request';
+import { toastNotifications } from 'ui/notify';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
@@ -372,6 +374,8 @@ export class AgentsController {
     };
 
     this.$scope.goDiscover = () => this.goDiscover();
+    this.$scope.onClickUpgrade = () => this.onClickUpgrade();
+    this.$scope.onClickRestart = () => this.onClickRestart();
 
     this.$scope.$on('$routeChangeStart', () => {
       return AppState.removeSessionStorageItem('configSubTab');
@@ -647,12 +651,58 @@ export class AgentsController {
     }
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time
+    });
+  };
+
   goDiscover() {
     this.targetLocation = {
       tab: 'general',
       subTab: 'discover'
     };
     return this.switchTab('general');
+  }
+
+  onClickUpgrade() {
+    try {
+      WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/upgrade`, {})
+        .then(() => {
+          this.showToast('success', 'The agent is being upgrade.', '', 5000);
+        })
+        .catch(() => {
+          this.showToast('warning', 'This agent is already upgrade.', '', 5000);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  onClickRestart() {
+    try {
+      WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/restart`, {})
+        .then(() => {
+          this.showToast('success', 'Agent restarted.', '', 5000);
+        })
+        .catch(() => {
+          this.showToast('warning', 'Error restarting agent.', '', 5000);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  checkStatusAgent() {
+    console.log(this.$scope.agent.status);
+    if (this.$scope.agent.status !== 'Active') {
+      return false;
+    } else if (this.$scope.agent.status === 'Active') {
+      return true;
+    }
   }
 
   // Agent data

@@ -15,8 +15,11 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiStat,
   EuiFlexItem,
-  EuiFlexGroup
+  EuiFlexGroup,
+  EuiButton
 } from '@elastic/eui';
+import { WzRequest } from '../../../react-services/wz-request';
+import { AgentsTable } from '../../../controllers/agent/components/agents-table';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 
@@ -25,6 +28,14 @@ export class AgentInfo extends Component {
     super(props);
 
     this.state = {};
+  }
+
+  async componentDidMount() {
+    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+
+    this.setState({
+      managerVersion: ((managerVersion || {}).data || {}).data || {}
+    });
   }
 
   getPlatformIcon(agent) {
@@ -114,6 +125,7 @@ export class AgentInfo extends Component {
       { title: agent.dateAdd, description: 'Registration date' },
       { title: agent.lastKeepAlive, description: 'Last keep alive' }
     ]);
+
     return (
       <Fragment>
         <EuiFlexGroup className="wz-welcome-page-agent-info-details">

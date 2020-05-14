@@ -138,12 +138,12 @@ export class FlyoutTechnique extends Component {
           techniqueData.platform_name
         )
       },
-      // {
-      //   title: 'Data sources',
-      //   description: this.getArrayFormatted(
-      //     techniqueData.dataSources
-      //   )
-      // },
+      {
+        title: 'Data sources',
+        description: this.getArrayFormatted(
+          techniqueData.dataSources
+        )
+      },
       {
         title: 'Version',
         description: techniqueData.version
