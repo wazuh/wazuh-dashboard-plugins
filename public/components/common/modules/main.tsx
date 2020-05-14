@@ -23,6 +23,7 @@ import {
   EuiTabs,
   EuiIcon,
   EuiPopover,
+  EuiButton,
   EuiButtonEmpty
 } from '@elastic/eui';
 import '../../common/modules/module.less';
@@ -83,9 +84,9 @@ export class MainModule extends Component {
     this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
-      this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'events', name: 'Events' }];
-      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['dashboard', 'reporting', 'settings'];
-      this.onSelectedTabChanged((ModulesDefaults[this.props.section] || {}).init || 'events');
+      this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
+      this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
+      this.loadSection((ModulesDefaults[this.props.section] || {}).init || 'dashboard');
     }
   }
 
@@ -204,16 +205,14 @@ export class MainModule extends Component {
   }
 
   renderDashboardButton() {
-    const href = `#/overview?tab=${this.props.section}&agentId=${this.props.agent.id}`
     return (
-      <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
-        <EuiButtonEmpty
+      <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
+        <EuiButton
           fill={this.state.selectView === 'dashboard'}
           iconType="visLine"
-          href={href}
-          target="blank">
+          onClick={() => this.onSelectedTabChanged('dashboard')}>
           Dashboard
-          </EuiButtonEmpty>
+          </EuiButton>
       </EuiFlexItem>
     );
   }
