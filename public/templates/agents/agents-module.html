@@ -1,4 +1,4 @@
-<div ng-if="tab !== 'welcome' && agent">
+<div ng-if="agent">
     <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
     <div ng-if='!loadingDashboard'>
         <div ng-show='showModuleDashboard || showModuleEvents'>

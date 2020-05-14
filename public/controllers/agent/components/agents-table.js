@@ -1044,7 +1044,7 @@ export class AgentsTable extends Component {
 
     const selection = {
       selectable: agent => agent.id,
-      onSelectionChange: this.onSelectionChange
+      /* onSelectionChange: this.onSelectionChange */
     };
 
     return (
@@ -1059,8 +1059,8 @@ export class AgentsTable extends Component {
             loading={isLoading}
             rowProps={getRowProps}
             cellProps={getCellProps}
-            isSelectable={true}
-            selection={selection}
+/*             isSelectable={false}
+            selection={selection} */
             noItemsMessage="No agents found"
             {...(pagination && { pagination })}
           />

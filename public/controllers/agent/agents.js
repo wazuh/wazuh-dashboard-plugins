@@ -808,6 +808,9 @@ export class AgentsController {
         );
 
       this.loadWelcomeCardsProps();
+      this.$scope.getWelcomeCardsProps = (resultState) => {
+        return {...this.$scope.welcomeCardsProps, resultState }
+      }
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;

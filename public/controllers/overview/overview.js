@@ -164,7 +164,7 @@ export class OverviewController {
         this.filterHandler,
         this.tab,
         null,
-        agentList,
+        false,
         this.tabView === 'discover'
       ); 
     }else if(!agentList ){ //&& this.rawVisualizations.getType() !== 'general'){
