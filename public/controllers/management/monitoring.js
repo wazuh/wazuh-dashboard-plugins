@@ -14,6 +14,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
@@ -195,7 +196,7 @@ export function ClusterController(
 
       $scope.$applyAsync();
     } catch (error) {
-      errorHandler.handle(error, 'Cluster');
+      ErrorHandler.handle(error, 'Cluster');
     }
   });
 
@@ -216,10 +217,10 @@ export function ClusterController(
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters);
     } catch (error) {
-      errorHandler.handle(
+      ErrorHandler.handle(
         'An error occurred while creating custom filters for visualizations',
         'Cluster',
-        true
+        { warning: true }
       );
     }
   };
@@ -291,7 +292,7 @@ export function ClusterController(
       return;
     } catch (error) {
       $scope.loading = false;
-      errorHandler.handle(error, 'Cluster');
+      ErrorHandler.handle(error, 'Cluster');
     }
   };
 

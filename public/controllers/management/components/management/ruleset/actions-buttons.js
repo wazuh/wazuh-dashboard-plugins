@@ -25,6 +25,7 @@ import {
 } from '../../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { ErrorHandler } from '../../../../../react-services/error-handler';
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
@@ -105,13 +106,13 @@ class WzRulesetActionButtons extends Component {
         }
       }
       if (errors) throw results;
-      //this.errorHandler.info('Upload successful');
+      //ErrorHandler.info('Upload successful');
       return;
     } catch (error) {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
       console.error('Errors uploading several files ', error);
       //TODO handle the erros
-      //this.errorHandler.handle('Files cannot be uploaded');
+      //ErrorHandler.handle('Files cannot be uploaded');
     }
   }
 

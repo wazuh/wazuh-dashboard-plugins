@@ -25,6 +25,7 @@ import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { TimeService } from '../../react-services/time-service';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
@@ -251,13 +252,13 @@ export class AgentsController {
         if (failed) {
           throw new Error(result.failed_ids[0].error.message);
         } else if (result) {
-          this.errorHandler.info(result.msg);
+          ErrorHandler.info(result.msg);
         } else {
           throw new Error('Unexpected error upgrading agent');
         }
         this.$scope.restartingAgent = false;
       } catch (error) {
-        this.errorHandler.handle(error);
+        ErrorHandler.handle(error);
         this.$scope.restartingAgent = false;
       }
       this.$scope.$applyAsync();
@@ -270,7 +271,7 @@ export class AgentsController {
     try {
       this.$scope.getAgent();
     } catch (e) {
-      this.errorHandler.handle(
+      ErrorHandler.handle(
         'Unexpected exception loading controller',
         'Agents'
       );
@@ -303,7 +304,7 @@ export class AgentsController {
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
-        this.errorHandler.handle(error, 'Set configuration path');
+        ErrorHandler.handle(error, 'Set configuration path');
       }
       this.configurationHandler.switchConfigTab(
         configurationTab,
@@ -346,7 +347,7 @@ export class AgentsController {
               false
             );
           } catch (error) {
-            this.errorHandler.handle(error, 'Get configuration path');
+            ErrorHandler.handle(error, 'Get configuration path');
           }
         } else {
           const configWodle = this.$location.search().configWodle;
@@ -424,13 +425,13 @@ export class AgentsController {
           );
           this.$scope.addingGroupToAgent = false;
           this.$scope.editGroup = false;
-          this.errorHandler.info(`Group ${group} has been added.`);
+          ErrorHandler.info(`Group ${group} has been added.`);
           this.$scope.$applyAsync();
         })
         .catch(error => {
           this.$scope.editGroup = false;
           this.$scope.addingGroupToAgent = false;
-          this.errorHandler.handle(
+          ErrorHandler.handle(
             error.message || error,
             'Error adding group to agent'
           );
@@ -473,7 +474,7 @@ export class AgentsController {
       this.$scope.tabView = subtab;
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Agents');
+      ErrorHandler.handle(error, 'Agents');
       return;
     }
   }
@@ -800,7 +801,7 @@ export class AgentsController {
           this.$scope.emptyAgent = 'Wazuh API timeout.';
         }
       }
-      this.errorHandler.handle(error, 'Agents');
+      ErrorHandler.handle(error, 'Agents');
       if (
         error &&
         typeof error === 'string' &&
@@ -894,7 +895,7 @@ export class AgentsController {
    */
   async downloadCsv(path, fileName, filters = []) {
     try {
-      this.errorHandler.info(
+      ErrorHandler.info(
         'Your download should begin automatically...',
         'CSV'
       );
@@ -904,7 +905,7 @@ export class AgentsController {
 
       FileSaver.saveAs(blob, fileName);
     } catch (error) {
-      this.errorHandler.handle(error, 'Download CSV');
+      ErrorHandler.handle(error, 'Download CSV');
     }
     return;
   }
@@ -940,12 +941,10 @@ export class AgentsController {
         `/rootcheck/${this.$scope.agent.id}`,
         {}
       );
-      this.errorHandler.info(
-        `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`,
-        ''
-      );
+      ErrorHandler.info(
+        `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`);
     } catch (error) {
-      this.errorHandler.handle(error);
+      ErrorHandler.handle(error);
     }
     return;
   }
@@ -957,12 +956,12 @@ export class AgentsController {
         throw new Error('Agent is not active');
       }
       await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
-      this.errorHandler.info(
+      ErrorHandler.info(
         `FIM scan launched successfully on agent ${this.$scope.agent.id}`,
         ''
       );
     } catch (error) {
-      this.errorHandler.handle(error);
+      ErrorHandler.handle(error);
     }
     return;
   }

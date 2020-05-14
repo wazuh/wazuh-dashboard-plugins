@@ -14,6 +14,7 @@ import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiCheck } from '../../react-services/wz-api-check';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export function settingsWizard(
   $location,
@@ -33,10 +34,10 @@ export function settingsWizard(
       let fromWazuhHosts = false;
       if (parseInt(data.data.error) === 2) {
         !disableErrors &&
-          errorHandler.handle(
+          ErrorHandler.handle(
             'Please set up Wazuh API credentials.',
-            false,
-            true
+            '',
+            { warning: true }
           );
       } else if (
         JSON.stringify(data).includes('socket hang up') ||
@@ -46,7 +47,7 @@ export function settingsWizard(
         wzMisc.setApiIsDown(true);
       } else {
         fromWazuhHosts = true;
-        wzMisc.setBlankScr(errorHandler.handle(data));
+        wzMisc.setBlankScr(ErrorHandler.handle(data));
         AppState.removeCurrentAPI();
       }
 
@@ -64,7 +65,7 @@ export function settingsWizard(
           ((data || {}).data || {}).message === '401 Unauthorized'
         ) {
           !disableErrors &&
-            errorHandler.handle(
+            ErrorHandler.handle(
               'Wrong Wazuh API credentials, please add a new API and/or modify the existing one'
             );
           if (!$location.path().includes('/settings')) {
@@ -136,7 +137,7 @@ export function settingsWizard(
 
     const setUpCredentials = (msg, redirect = false) => {
       const comeFromWizard = wzMisc.getWizard();
-      !comeFromWizard && errorHandler.handle(msg, false, true);
+      !comeFromWizard && ErrorHandler.handle(msg, '', { warning: true });
       wzMisc.setWizard(true);
       if (redirect) {
         AppState.setCurrentAPI(redirect);
@@ -222,7 +223,7 @@ export function settingsWizard(
             deferred.resolve();
           })
           .catch(error => {
-            !disableErrors && errorHandler.handle(error);
+            !disableErrors && ErrorHandler.handle(error);
             wzMisc.setWizard(true);
             if (!$location.path().includes('/settings')) {
               $location.search('_a', null);
@@ -267,6 +268,6 @@ export function settingsWizard(
     AppState.setWzMenu();
     return deferred.promise;
   } catch (error) {
-    !disableErrors && errorHandler.handle(error);
+    !disableErrors && ErrorHandler.handle(error);
   }
 }

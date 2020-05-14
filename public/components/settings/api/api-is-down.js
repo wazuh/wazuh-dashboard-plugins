@@ -77,8 +77,8 @@ export class ApiIsDown extends Component {
         } catch (error) {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code;
-          const downReason =
-            ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason = typeof error === 'string' ? error :
+          (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
         }

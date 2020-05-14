@@ -19,6 +19,7 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ApiRequest } from '../../react-services/api-request';
 import { SavedObject } from '../../react-services/saved-objects';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';
 
 export class HealthCheck {
@@ -88,7 +89,7 @@ export class HealthCheck {
    */
   handleError(error) {
     this.errors.push(
-      this.errorHandler.handle(error, 'Health Check', false, true)
+      ErrorHandler.handle(error, 'Health Check', { silent: true })
     );
   }
 
@@ -205,7 +206,7 @@ export class HealthCheck {
             this.results[i].status = 'Error';
           }
         } else if (data.data.error || data.data.data.apiIsDown) {
-          this.errors.push('Error connecting to the API.');
+          this.errors.push(data.data.data.apiIsDown ? 'Wazuh API is down' : 'Error connecting to the API.');
           this.results[i].status = 'Error';
         } else {
           this.processedChecks++;
@@ -222,11 +223,20 @@ export class HealthCheck {
               '/api/setup'
             );
             if (!setupData.data.data['app-version'] || !apiVersion) {
-              this.errorHandler.handle(
-                'Error fetching app version or API version',
+              const errorMessage = 'Error fetching app version';
+              ErrorHandler.handle(
+                errorMessage,
                 'Health Check'
               );
-              this.errors.push('Error fetching version');
+              this.errors.push(errorMessage);
+            }
+            if (!apiVersion) {
+              const errorMessage = 'Error fetching Wazuh API version';
+              ErrorHandler.handle(
+                errorMessage,
+                'Health Check'
+              );
+              this.errors.push(errorMessage);
             }
             const apiSplit = apiVersion.split('v')[1].split('.');
             const appSplit = setupData.data.data['app-version'].split('.');

@@ -1,6 +1,3 @@
-import { AppState } from '../../react-services/app-state';
-import { WzMisc } from '../../factories/misc';
-
 /*
  * Wazuh app - Blank screen controller
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -12,6 +9,11 @@ import { WzMisc } from '../../factories/misc';
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { AppState } from '../../react-services/app-state';
+import { ErrorHandler } from '../../react-services/error-handler';
+import { WzMisc } from '../../factories/misc';
+
 export class BlankScreenController {
   /**
    * Class constructor
@@ -36,7 +38,7 @@ export class BlankScreenController {
     if (catchedError) {
       let parsed = null;
       try {
-        parsed = this.errorHandler.handle(catchedError, '', false, true);
+        parsed = ErrorHandler.handle(catchedError, '',  { silent: true });
       } catch (error) {} // eslint-disable-line
       this.errorToShow = parsed || catchedError;
       this.$scope.$applyAsync();

@@ -17,6 +17,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { updateCurrentTab } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
@@ -146,7 +147,7 @@ export class OverviewController {
       }
       this.tabView = subtab;
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
     }
     this.$scope.$applyAsync();
     return;
@@ -211,7 +212,7 @@ export class OverviewController {
       await this.switchSubtab('panels', true);
       this.overviewModuleReady = true;
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
     }
     this.$scope.$applyAsync();
     return;
@@ -306,7 +307,7 @@ export class OverviewController {
         };
       });
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
     }
     this.$scope.$applyAsync();
     return;

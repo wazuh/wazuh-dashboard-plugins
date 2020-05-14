@@ -15,6 +15,7 @@ import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { SavedObject } from '../../react-services/saved-objects';
 import { PatternHandler } from '../../react-services/pattern-handler';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export function getIp(
   indexPatterns,
@@ -74,7 +75,7 @@ export function getIp(
     } catch (error) {
       deferred.reject(error);
       wzMisc.setBlankScr(
-        errorHandler.handle(error, 'Elasticsearch', false, true)
+        ErrorHandler.handle(error, 'Elasticsearch', { silent: true })
       );
       $location.path('/blank-screen');
     }
