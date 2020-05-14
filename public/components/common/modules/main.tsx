@@ -205,6 +205,7 @@ export class MainModule extends Component {
   }
 
   renderDashboardButton() {
+    const href = `#/overview?tab=${this.props.section}&agentId=${this.props.agent.id}`
     return (
       <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 6, marginBottom: 18 }}>
         <EuiButton
