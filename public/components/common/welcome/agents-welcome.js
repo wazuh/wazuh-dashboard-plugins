@@ -51,6 +51,7 @@ export class AgentsWelcome extends Component {
       isLoading: true,
       sortField: 'start_scan',
       sortDirection: 'desc',
+      actionAgents: true // Hide actions agents
     };
 
     this.onTimeChange.bind(this);
@@ -132,7 +133,6 @@ export class AgentsWelcome extends Component {
     let outDated = ActionAgents.compareVersions(managerVersion, agent.version);
 
     if (outDated === true) return;
-
     return (
       <EuiFlexItem grow={false}>
         <EuiButton
@@ -315,6 +315,7 @@ export class AgentsWelcome extends Component {
                   <span>Configuration</span>
                 </EuiButton>
               </EuiFlexItem>
+              {this.state.hideActions === false &&
               <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
                 <EuiFlexGroup justifyContent="flexEnd">
                   <EuiFlexItem grow={false}>
@@ -329,6 +330,7 @@ export class AgentsWelcome extends Component {
                   {upgradeButton}
                 </EuiFlexGroup>
               </EuiFlexItem>
+              }
             </EuiFlexGroup>
           </EuiPage>
           <EuiPage style={{ paddingTop: 0 }}>
