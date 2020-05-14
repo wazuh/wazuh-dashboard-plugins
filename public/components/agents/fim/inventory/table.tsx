@@ -126,9 +126,10 @@ export class InventoryTable extends Component {
   buildFilter() {
     const { pageIndex, pageSize } = this.state;
     const { filters } = this.props;
-
+    const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
     const filter = {
       ...filters,
+      ...(filters.q ? {q: filters.q.replace(/ and | or /gi, parseConjuntions) } : {} ),
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),

@@ -36,6 +36,8 @@ import { WzRequest } from '../../../react-services/wz-request';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import Overview from '../../wz-menu/wz-menu-overview';
 import './welcome.less';
+import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
+import KibanaVis from '../../../kibana-integrations/kibana-vis';
 
 export class AgentsWelcome extends Component {
   _isMount = false;
@@ -371,6 +373,13 @@ export class AgentsWelcome extends Component {
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiFlexGroup direction="column">
+                  <EuiFlexItem>
+                    <EuiFlexGroup justifyContent='flexEnd'>
+                      <EuiFlexItem grow={false}>
+                        <WzDatePicker />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiPanel paddingSize="m">
                       <EuiTitle size="xs">

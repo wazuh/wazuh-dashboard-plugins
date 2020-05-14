@@ -69,7 +69,7 @@ export class FilterBar extends Component {
             onInputChange={onFiltersChange}
             qSuggests={this.suggestions[selectView]}
             apiSuggests={null}
-            defaultFormat='qTags'
+            defaultFormat='?Q'
             placeholder='Add filter or search' />
         </EuiFlexItem>
       </EuiFlexGroup>
