@@ -127,6 +127,7 @@ export class CommonData {
     try {
       const tabFilters = {
         general: { group: '' },
+        welcome: { group: '' },
         fim: { group: 'syscheck' },
         pm: { group: 'rootcheck' },
         vuls: { group: 'vulnerability-detector' },
@@ -157,7 +158,7 @@ export class CommonData {
         )
       );
 
-      if (tab !== 'general') {
+      if (tab !== 'general' && tab !== 'welcome') {
         if (tab === 'pci') {
           this.removeDuplicateExists('rule.pci_dss');
           filters.push(filterHandler.pciQuery());
