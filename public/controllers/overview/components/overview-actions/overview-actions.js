@@ -332,12 +332,12 @@ export class OverviewActions extends Component {
                 </EuiKeyPadMenuItem>
               </div>
             )}
-            {this.state.subtab === 'panels' && (
+{/*             {this.state.subtab === 'panels' && (
               <EuiKeyPadMenuItem isDisabled label="Report">
                 <EuiIcon type="reportingApp" color="primary" size="m" />
               </EuiKeyPadMenuItem>
-            )}
-            <EuiKeyPadMenuItem
+            )} */}
+{/*             <EuiKeyPadMenuItem
               label={this.state.subtab === 'discover' ? 'Dashboard' : 'Discover'}
               onClick={() =>
                 this.props.switchDiscover(this.state.subtab === 'discover' ? 'panels' : 'discover')
@@ -348,7 +348,7 @@ export class OverviewActions extends Component {
                 color="primary"
                 size="m"
               />
-            </EuiKeyPadMenuItem>
+            </EuiKeyPadMenuItem> */}
           </EuiKeyPadMenu>
         </EuiFlexItem>
         {modal}

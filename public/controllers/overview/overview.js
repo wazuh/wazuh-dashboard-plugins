@@ -89,6 +89,15 @@ export class OverviewController {
 
     this.init();
 
+    this.$scope.getMainProps = (resultState) => {
+      return {
+        section: this.tab, 
+        disabledReport: resultState !== 'ready',
+        agentsSelectionProps: this.agentsSelectionProps,
+        switchSubTab: (subtab) => this.switchSubtab(subtab)
+      }
+    }
+
     this.welcomeCardsProps = {
       api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
@@ -164,7 +173,7 @@ export class OverviewController {
         this.filterHandler,
         this.tab,
         null,
-        agentList,
+        false,
         this.tabView === 'discover'
       ); 
     }else if(!agentList ){ //&& this.rawVisualizations.getType() !== 'general'){
