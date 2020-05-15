@@ -8,7 +8,8 @@
             <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
                 <react-component ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
                     name="MainModule"
-                    props="{false, section: octrl.tab, disabledReport: octrl.resultState !== 'ready', agentsSelectionProps: octrl.agentsSelectionProps}" />
+                    props="getMainProps(resultState)" />
+                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper" props="octrl.currentOverviewSectionProps" />
                 <div ng-if='!loadingDashboard'>
                     <div ng-show='showModuleDashboard || showModuleEvents'>
                         <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
