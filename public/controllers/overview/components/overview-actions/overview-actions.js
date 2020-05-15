@@ -22,6 +22,7 @@ import {
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiModalBody,
+  EuiButtonEmpty
 } from '@elastic/eui';
 import './agents-selector.less';
 import { AgentSelectionTable } from './agents-selection-table';
@@ -164,6 +165,7 @@ export class OverviewActions extends Component {
   removeAgentsFilter(shouldUpdate = true) {
     //this.props.buildOverview();
     if(shouldUpdate){
+      this.closeAgentModal();
       this.props.setAgent(false);
       this.setState({isAgent: false});
       this.props.setAgent(false);
@@ -299,57 +301,25 @@ export class OverviewActions extends Component {
       );
     }
     return (
-      <div style={{marginBottom: 8}}>
+      <div >
         <EuiFlexItem>
-          <EuiKeyPadMenu className="VisualizeTopMenu">
             {!this.state.isAgent && (
-              <EuiKeyPadMenuItem label="Agents" onClick={() => this.showAgentModal()}>
-                <EuiIcon type="watchesApp" color="primary" size="m" />
-              </EuiKeyPadMenuItem>
+              <EuiButtonEmpty
+                iconType="user"
+                isLoading={this.state.loadingReport}
+                onClick={() => this.showAgentModal()}>
+                Filter by agent
+                </EuiButtonEmpty>
+           
             )}
             {this.state.isAgent && (
-              <div className="TopMenuAgent">
-                <EuiKeyPadMenuItem
-                  label="Filter by agents"
-                  onClick={() => this.showAgentModal()}
-                  betaBadgeLabel="Filter by agents"
-                  betaBadgeTooltipContent={`Click here to filter by agents.`}
-                  betaBadgeIconType="merge"
-                >
-                  <EuiIcon type="watchesApp" color="primary" size="m" />
-                </EuiKeyPadMenuItem>
-                <EuiKeyPadMenuItem
-                  label="Remove agents"
-                  onClick={() => {
-                    this.setState({ isAgent: false });
-                    this.removeAgentsFilter();
-                  }}
-                  betaBadgeLabel="Remove all agents"
-                  betaBadgeTooltipContent={`Click here to remove all applied agents filters.`}
-                  betaBadgeIconType="cross"
-                >
-                  <EuiIcon type="watchesApp" color="primary" size="m" />
-                </EuiKeyPadMenuItem>
-              </div>
+              <EuiButtonEmpty
+                iconType="user"
+                isLoading={this.state.loadingReport}
+                onClick={() => this.showAgentModal()}>
+                Filtered by {this.state.isAgent.length || ''} {this.state.isAgent.length > 1 ? ' agents' : 'agent'} 
+                </EuiButtonEmpty>
             )}
-{/*             {this.state.subtab === 'panels' && (
-              <EuiKeyPadMenuItem isDisabled label="Report">
-                <EuiIcon type="reportingApp" color="primary" size="m" />
-              </EuiKeyPadMenuItem>
-            )} */}
-{/*             <EuiKeyPadMenuItem
-              label={this.state.subtab === 'discover' ? 'Dashboard' : 'Discover'}
-              onClick={() =>
-                this.props.switchDiscover(this.state.subtab === 'discover' ? 'panels' : 'discover')
-              }
-            >
-              <EuiIcon
-                type={this.state.subtab === 'discover' ? 'visualizeApp' : 'discoverApp'}
-                color="primary"
-                size="m"
-              />
-            </EuiKeyPadMenuItem> */}
-          </EuiKeyPadMenu>
         </EuiFlexItem>
         {modal}
       </div>

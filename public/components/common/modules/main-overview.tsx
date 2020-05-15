@@ -110,7 +110,7 @@ export class MainModuleOverview extends Component {
                 <div className="wz-welcome-page-agent-tabs">
                   <EuiFlexGroup>
                     {this.props.renderTabs()}
-                    <EuiFlexItem grow={false}>
+                    <EuiFlexItem grow={false} style={{marginTop: 6}}>
                       <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
                     </EuiFlexItem>
                     {(selectView === 'dashboard') &&
