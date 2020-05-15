@@ -1,7 +1,9 @@
 <div ng-if="agent">
-    <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
+    <div ng-if="tab !== 'welcome'">
+        <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
+    </div>
     <div ng-if='!loadingDashboard'>
-        <div ng-show='showModuleDashboard || showModuleEvents'>
+        <div ng-show='(showModuleDashboard || showModuleEvents) && showModuleDashboard !== "welcome"'>
             <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
                 <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
             </div>

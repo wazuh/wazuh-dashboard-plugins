@@ -16,10 +16,9 @@ import {
   EuiStat,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiButton
+  EuiHealth
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import { AgentsTable } from '../../../controllers/agent/components/agents-table';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 
@@ -70,10 +69,25 @@ export class AgentInfo extends Component {
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", margin: "0 auto", fontWeight: 300 }}>
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
         {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
+    )
+  }
+
+
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
+
+  addHealthRender(agent) {
+    return (
+      <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
+        {this.props.agent.status}
+      </EuiHealth>
     )
   }
 
@@ -88,21 +102,22 @@ export class AgentInfo extends Component {
             title={
               item.description === 'OS' ? (
                 this.addTextPlatformRender(this.props.agent)
+              ) : item.description === 'Status' ? (
+                this.addHealthRender(this.props.agent)
               ) : (
-                  <span
-                    style={{
-                      overflow: 'hidden',
-                      maxWidth: "250px",
-                      margin: '0 auto',
-                      fontWeight: 300
-                    }}
-                  >
-                    {checkField(item.title)}
-                  </span>
-                )
+                    <span
+                      style={{
+                        overflow: 'hidden',
+                        maxWidth: "250px",
+                        margin: '0 auto',
+                        fontSize: 12
+                      }}
+                    >
+                      {checkField(item.title)}
+                    </span>
+                  )
             }
             description={item.description}
-            textAlign="center"
             titleSize="xs"
           />
         </EuiFlexItem>
@@ -115,6 +130,7 @@ export class AgentInfo extends Component {
     const { agent } = this.props;
     const stats = this.buildStats([
       { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
+      { title: agent.status, description: 'Status', style: { maxWidth: 200 } },
       { title: agent.ip, description: 'IP' },
       { title: agent.version, description: 'Version' },
       {
