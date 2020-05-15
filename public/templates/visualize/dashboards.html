@@ -91,7 +91,7 @@
                 </div>
             </div>
             <!-- End report status section -->
-            <div ng-if="octrl.tab && octrl.tab!=='welcome'" ng-show="resultState !== 'none'">
+            <div ng-if="octrl.tab && octrl.tab!=='welcome'" ng-show="octrl.tabView === 'panels' && (resultState === 'ready' || resultState === 'none')"
                 <div ng-class="{'no-opacity': !moduleDiscoverReady}">
                     <react-component ng-show='showModuleDashboard' name="WzVisualize"
                     props="getVisualizeProps(resultState)" />
