@@ -24,7 +24,7 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiHealth,
-  EuiHorizonatalRule,
+  EuiHorizontalRule,
   EuiPage,
   EuiButton,
   EuiPopover,
@@ -110,14 +110,17 @@ export class AgentsWelcome extends Component {
                 closePopover={() => this.setState({ switchModule: false })}
                 repositionOnScroll={true}
                 anchorPosition="downLeft">
-                <WzReduxProvider>
-                  <div style={{ maxWidth: 650 }}>
-                    <Overview
-                      isAgent={this.props.agent}
-                      closePopover={() => this.setState({ switchModule: false })}
-                      switchTab={(module) => this.props.switchTab(module)}></Overview>
-                  </div>
-                  <EuiHorizonatalRule></EuiHorizonatalRule>
+                <div>
+                  <WzReduxProvider>
+                    <div style={{ maxWidth: 650 }}>
+                      <Overview
+                        isAgent={this.props.agent}
+                        closePopover={() => this.setState({ switchModule: false })}
+                        switchTab={(module) => this.props.switchTab(module)}></Overview>
+                    </div>
+                  </WzReduxProvider>
+                  <EuiHorizontalRule margin="s" />
+                  <EuiSpacer size='m' />
                   <EuiFlexGroup>
                     <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
                       <EuiButton
@@ -134,7 +137,7 @@ export class AgentsWelcome extends Component {
                       </EuiButton>
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                </WzReduxProvider>
+                </div>
               </EuiPopover>
             </EuiFlexItem>
             <EuiFlexItem />
@@ -244,11 +247,11 @@ export class AgentsWelcome extends Component {
         <div>
           <div className='wz-module-header-nav-wrapper'>
             <div className='wz-module-header-nav'>
-              <EuiPanel paddingSize='s' className="wz-welcome-page-agent-info">
-                <div className="monSummaryStatusNoWrap">
+              <div style={{ margin: '0 16px' }}>
+                <EuiPanel paddingSize='s' className="wz-welcome-page-agent-info">
                   <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
-                </div>
-              </EuiPanel>
+                </EuiPanel>
+              </div>
             </div>
           </div>
         </div>
@@ -447,7 +450,7 @@ export class AgentsWelcome extends Component {
                     </EuiFlexGroup>
                   </EuiFlexItem>
                   <FimEventsTable agentId={this.props.agent.id} />
-                  <ScaScan agentId={this.props.agent.id}/>
+                  <ScaScan agentId={this.props.agent.id} />
                 </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>

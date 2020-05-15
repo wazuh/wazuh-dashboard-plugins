@@ -77,7 +77,7 @@ export class MainModule extends Component {
     }
     return (
       <EuiFlexItem style={{ marginTop: 0 }}>
-        <EuiTabs display="condensed">
+        <EuiTabs>
           {this.tabs.map((tab, index) =>{
             if(!tab.onlyAgent || (tab.onlyAgent && this.props.agent)){
               return <EuiTab

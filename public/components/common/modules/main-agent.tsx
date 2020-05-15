@@ -16,11 +16,13 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiCallOut,
-  EuiHealth,
+  EuiHorizontalRule,
+  EuiSpacer,
   EuiTitle,
   EuiIcon,
   EuiPopover,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiButton
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -118,9 +120,8 @@ export class MainModuleAgent extends Component {
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
           <EuiFlexGroup>
-            <EuiFlexItem />
-            <EuiFlexItem grow={false} className="wz-module-header-agent-title-badge">
-              <span style={{ display: 'inline-flex', paddingLeft: 16 }}>
+            <EuiFlexItem grow={false}>
+              <span style={{ display: 'inline-flex' }}>
                 <EuiTitle size="s" className="wz-module-header-agent-title-btn">
                   <h1>
                     <span
@@ -128,21 +129,66 @@ export class MainModuleAgent extends Component {
                         window.location.href = `#/agents?agent=${this.props.agent.id}`;
                         this.router.reload();
                       }}>
-                      <EuiIcon size="m" type="arrowLeft" color='primary' />
+                      {/* <EuiIcon size="m" type="arrowLeft" color='primary' /> */}
                       <span>&nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
                       </span>
                     </span>
                   </h1>
                 </EuiTitle>
-                <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
+                {/*                 <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
                   {this.props.agent.status}
-                </EuiHealth>
+                </EuiHealth> */}
               </span>
             </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ margin: '16px 0' }} className="wz-module-header-agent-title-btn">
+            {/*             <EuiFlexItem grow={false} style={{ margin: '16px 0' }} className="wz-module-header-agent-title-btn">
               <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
+            </EuiFlexItem> */}
+            <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+              {this.props.section && (
+                <Fragment>
+                  <EuiPopover
+                    button={
+                      <EuiButtonEmpty
+                        onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}
+                        iconType="apps">
+                        <span>Navigation&nbsp;<EuiIcon type='arrowDown'></EuiIcon></span>
+                      </EuiButtonEmpty>
+                    }
+                    isOpen={this.state.switchModule}
+                    closePopover={() => this.setState({ switchModule: false })}
+                    repositionOnScroll={true}
+                    anchorPosition="downLeft">
+                    <div>
+                      <WzReduxProvider>
+                        <div style={{ maxWidth: 650 }}>
+                          <Overview isAgent={this.props.agent} closePopover={() => this.setState({ switchModule: false })}></Overview>
+                        </div>
+                      </WzReduxProvider>
+                      <EuiHorizontalRule margin="s" />
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup>
+                        <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
+                          <EuiButton
+                            onClick={() => this.props.switchTab('syscollector')}
+                            iconType="inspect">
+                            <span>Inventory data</span>
+                          </EuiButton>
+                        </EuiFlexItem>
+                        <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
+                          <EuiButton
+                            onClick={() => this.props.switchTab('configuration')}
+                            iconType="gear" >
+                            <span>Configuration</span>
+                          </EuiButton>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </div>
+                  </EuiPopover>
+                </Fragment>
+              )}
             </EuiFlexItem>
             <EuiFlexItem />
+
           </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -160,33 +206,6 @@ export class MainModuleAgent extends Component {
           </EuiButtonEmpty>
       </EuiFlexItem>
     );
-  }
-
-  createBreadcrumbPopover() {
-    const container = document.getElementsByClassName('wz-global-breadcrumb-popover');
-    if (container.length)
-      return ReactDOM.createPortal(
-        <Fragment>
-          <EuiPopover
-            button={
-              <span onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}>
-                <span>{TabDescription[this.props.section].title}&nbsp;&nbsp;</span>
-                <EuiIcon size="m" type="arrowDown" color='subdued' />
-              </span>
-            }
-            isOpen={this.state.switchModule}
-            closePopover={() => this.setState({ switchModule: false })}
-            repositionOnScroll={true}
-            anchorPosition="downLeft">
-            <WzReduxProvider>
-              <div style={{ maxWidth: 650 }}>
-                <Overview isAgent={this.props.agent} closePopover={() => this.setState({ switchModule: false })}></Overview>
-              </div>
-            </WzReduxProvider>
-          </EuiPopover>
-        </Fragment>,
-        container[0]
-      );
   }
 
   render() {
@@ -262,12 +281,6 @@ export class MainModuleAgent extends Component {
             iconType="alert">
           </EuiCallOut>
         }
-
-        {this.props.section && (
-          <Fragment>
-            {this.createBreadcrumbPopover()}
-          </Fragment>
-        )}
       </div>
     );
   }

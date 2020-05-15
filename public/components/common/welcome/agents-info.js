@@ -69,7 +69,7 @@ export class AgentInfo extends Component {
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", margin: "0 auto", fontSize: 12 }}>
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
         {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
