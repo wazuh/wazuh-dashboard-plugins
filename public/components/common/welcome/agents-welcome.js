@@ -24,7 +24,7 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiHealth,
-  EuiButtonIcon,
+  EuiHorizonatalRule,
   EuiPage,
   EuiButton,
   EuiPopover,
@@ -80,7 +80,7 @@ export class AgentsWelcome extends Component {
       });
   }
 
-  async componentDidMount(){
+  async componentDidMount() {
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
     tabVisualizations.setTab('welcome');
@@ -96,29 +96,59 @@ export class AgentsWelcome extends Component {
     );
   }
 
-  color = (status, hex = false) => {
-    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
-    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
-    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
-  }
-
   renderTitle() {
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
           <EuiFlexGroup>
-            <EuiFlexItem />
-            <EuiFlexItem grow={false} className="wz-module-header-agent-title-badge">
-              <span style={{ display: 'inline-flex', paddingLeft: 16 }}>
+            <EuiFlexItem grow={false}>
+              <span style={{ display: 'inline-flex' }}>
                 <EuiTitle size="s">
                   <h1>
-                    <span>{this.props.agent.name}&nbsp;&nbsp;&nbsp;</span>
+                    <span>{this.props.agent.name}</span>
                   </h1>
                 </EuiTitle>
-                <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
-                  {this.props.agent.status}
-                </EuiHealth>
               </span>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+              <EuiPopover
+                button={
+                  <EuiButtonEmpty
+                    onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}
+                    iconType="apps">
+                    <span>Navigation&nbsp;<EuiIcon type='arrowDown'></EuiIcon></span>
+                  </EuiButtonEmpty>
+                }
+                isOpen={this.state.switchModule}
+                closePopover={() => this.setState({ switchModule: false })}
+                repositionOnScroll={true}
+                anchorPosition="downLeft">
+                <WzReduxProvider>
+                  <div style={{ maxWidth: 650 }}>
+                    <Overview
+                      isAgent={this.props.agent}
+                      closePopover={() => this.setState({ switchModule: false })}
+                      switchTab={(module) => this.props.switchTab(module)}></Overview>
+                  </div>
+                  <EuiHorizonatalRule></EuiHorizonatalRule>
+                  <EuiFlexGroup>
+                    <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
+                      <EuiButton
+                        onClick={() => this.props.switchTab('syscollector')}
+                        iconType="inspect">
+                        <span>Inventory data</span>
+                      </EuiButton>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
+                      <EuiButton
+                        onClick={() => this.props.switchTab('configuration')}
+                        iconType="gear" >
+                        <span>Configuration</span>
+                      </EuiButton>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </WzReduxProvider>
+              </EuiPopover>
             </EuiFlexItem>
             <EuiFlexItem />
           </EuiFlexGroup>
@@ -274,11 +304,11 @@ export class AgentsWelcome extends Component {
   }
 
   onTimeChange = (datePicker) => {
-    const {start:from, end:to} = datePicker;
-    this.setState({datePicker: {from, to}});
+    const { start: from, end: to } = datePicker;
+    this.setState({ datePicker: { from, to } });
   }
 
-  getOptions(){
+  getOptions() {
     return [
       { value: 'pci', text: 'PCI DSS' },
       { value: 'gdpr', text: 'GDPR' },
@@ -289,27 +319,27 @@ export class AgentsWelcome extends Component {
     ];
   }
 
-  setSelectValue(e){
-    this.setState({selectedRequirement: e.target.value});
+  setSelectValue(e) {
+    this.setState({ selectedRequirement: e.target.value });
   }
 
-   getRequirementVis(){
-    if(this.state.selectedRequirement === 'pci'){
+  getRequirementVis() {
+    if (this.state.selectedRequirement === 'pci') {
       return 'Wazuh-App-Agents-Welcome-Top-PCI';
     }
-    if(this.state.selectedRequirement === 'gdpr'){
+    if (this.state.selectedRequirement === 'gdpr') {
       return 'Wazuh-App-Agents-Welcome-Top-GDPR';
     }
-    if(this.state.selectedRequirement === 'hipaa'){
+    if (this.state.selectedRequirement === 'hipaa') {
       return 'Wazuh-App-Agents-Welcome-Top-HIPAA';
     }
-    if(this.state.selectedRequirement === 'nist'){
+    if (this.state.selectedRequirement === 'nist') {
       return 'Wazuh-App-Agents-Welcome-Top-NIST-800-53';
     }
-    if(this.state.selectedRequirement === 'gpg13'){
+    if (this.state.selectedRequirement === 'gpg13') {
       return 'Wazuh-App-Agents-Welcome-Top-GPG-13';
     }
-    if(this.state.selectedRequirement === 'tsc'){
+    if (this.state.selectedRequirement === 'tsc') {
       return 'Wazuh-App-Agents-Welcome-Top-TSC';
     }
     return 'Wazuh-App-Agents-Welcome-Top-PCI'
@@ -331,67 +361,32 @@ export class AgentsWelcome extends Component {
         <div>
           <div className='wz-module-header-nav-wrapper'>
             <div className='wz-module-header-nav'>
-              <div className="wz-welcome-page-agent-info">
-                <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
-              </div>
+              <EuiPanel paddingSize='s' className="wz-welcome-page-agent-info">
+                <div className="monSummaryStatusNoWrap">
+                  <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                </div>
+              </EuiPanel>
             </div>
           </div>
         </div>
         <div className="wz-module-body">
           <EuiPage>
             <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
-              <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
-                <EuiPopover
-                  button={
-                    <EuiButton
-                      onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}
-                      iconType="apps">
-                      <span>Navigation&nbsp;<EuiIcon type='arrowDown'></EuiIcon></span>
-                    </EuiButton>
-                  }
-                  isOpen={this.state.switchModule}
-                  closePopover={() => this.setState({ switchModule: false })}
-                  repositionOnScroll={true}
-                  anchorPosition="downLeft">
-                  <WzReduxProvider>
-                    <div style={{ maxWidth: 650 }}>
-                      <Overview
-                        isAgent={this.props.agent}
-                        closePopover={() => this.setState({ switchModule: false })}
-                        switchTab={(module) => this.props.switchTab(module)}></Overview>
-                    </div>
-                  </WzReduxProvider>
-                </EuiPopover>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
-                <EuiButton
-                  onClick={() => this.props.switchTab('syscollector')}
-                  iconType="inspect">
-                  <span>Inventory data</span>
-                </EuiButton>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
-                <EuiButton
-                  onClick={() => this.props.switchTab('configuration')}
-                  iconType="gear" >
-                  <span>Configuration</span>
-                </EuiButton>
-              </EuiFlexItem>
               {this.state.hideActions === false &&
-              <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
-                <EuiFlexGroup justifyContent="flexEnd">
-                  <EuiFlexItem grow={false}>
-                    <EuiButton
-                      color="primary"
-                      iconType="refresh"
-                      onClick={this.onClickRestartAgent}
-                    >
-                      Restart
+                <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
+                  <EuiFlexGroup justifyContent="flexEnd">
+                    <EuiFlexItem grow={false}>
+                      <EuiButton
+                        color="primary"
+                        iconType="refresh"
+                        onClick={this.onClickRestartAgent}
+                      >
+                        Restart
                     </EuiButton>
-                  </EuiFlexItem>
-                  {upgradeButton}
-                </EuiFlexGroup>
-              </EuiFlexItem>
+                    </EuiFlexItem>
+                    {upgradeButton}
+                  </EuiFlexGroup>
+                </EuiFlexItem>
               }
             </EuiFlexGroup>
           </EuiPage>
@@ -418,20 +413,20 @@ export class AgentsWelcome extends Component {
                   <EuiFlexItem>
                     <EuiFlexGroup>
 
-                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Most-Common-Groups'} style={{height: 300}}>
+                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Most-Common-Groups'} style={{ height: 300 }}>
                         <EuiPanel paddingSize="none">
                           <EuiFlexItem>
                             <EuiFlexGroup
                               style={{ padding: '12px 12px 0px' }}
                               className="embPanel__header"
                             >
-                             
-                             <h2 className="embPanel__title wz-headline-title">
+
+                              <h2 className="embPanel__title wz-headline-title">
                                 <EuiText size="xs"><h2>Most common groups</h2></EuiText>
                               </h2>
                             </EuiFlexGroup>
                             <EuiSpacer size="s" />
-                            <div style={{height: this.props.resultState === 'loading' ? 0 : 280}}>
+                            <div style={{ height: this.props.resultState === 'loading' ? 0 : 280 }}>
                               <WzReduxProvider>
                                 <KibanaVis
                                   visID={'Wazuh-App-Agents-Welcome-Most-Common-Groups'}
@@ -439,7 +434,7 @@ export class AgentsWelcome extends Component {
                                 ></KibanaVis>
                               </WzReduxProvider>
                             </div>
-                            <div style={{ display: this.props.resultState === 'loading'  ? 'block' : 'none', textAlign: "center", paddingTop: 100}}>                        
+                            <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', textAlign: "center", paddingTop: 100 }}>
                               <EuiLoadingChart size="xl" />
                             </div>
                           </EuiFlexItem>
@@ -447,7 +442,7 @@ export class AgentsWelcome extends Component {
                       </EuiFlexItem>
 
 
-                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Top-PCI'} style={{height: 300}}>
+                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Top-PCI'} style={{ height: 300 }}>
                         <EuiPanel paddingSize="none">
                           <EuiFlexItem>
                             <EuiFlexGroup
@@ -457,22 +452,22 @@ export class AgentsWelcome extends Component {
                               <h2 className="embPanel__title wz-headline-title">
                                 <EuiText size="xs"><h2>Compliance</h2></EuiText>
                               </h2>
-                              <div style={{width: "auto", paddingTop: 6, paddingRight: 12}}>
-                              <EuiSelect
-                                compressed={true}
-                                id="requirementSelect"
-                                options={this.getOptions()}
-                                value={this.state.selectedRequirement}
-                                onChange={e => this.setSelectValue(e)}
-                                aria-label="Select requirement"
-                              />
+                              <div style={{ width: "auto", paddingTop: 6, paddingRight: 12 }}>
+                                <EuiSelect
+                                  compressed={true}
+                                  id="requirementSelect"
+                                  options={this.getOptions()}
+                                  value={this.state.selectedRequirement}
+                                  onChange={e => this.setSelectValue(e)}
+                                  aria-label="Select requirement"
+                                />
 
                               </div>
                             </EuiFlexGroup>
                             <EuiSpacer size="s" />
 
-                            <div style={{height: this.props.resultState === 'loading' ? 0 : 280}}>
-                              <div  style={{height: this.state.selectedRequirement === 'pci' ? 280 : 0}}>
+                            <div style={{ height: this.props.resultState === 'loading' ? 0 : 280 }}>
+                              <div style={{ height: this.state.selectedRequirement === 'pci' ? 280 : 0 }}>
                                 <WzReduxProvider>
                                   <KibanaVis
                                     visID={'Wazuh-App-Agents-Welcome-Top-PCI'}
@@ -480,7 +475,7 @@ export class AgentsWelcome extends Component {
                                   ></KibanaVis>
                                 </WzReduxProvider>
                               </div>
-                              <div  style={{height: this.state.selectedRequirement === 'gdpr' ? 280 : 0}}>
+                              <div style={{ height: this.state.selectedRequirement === 'gdpr' ? 280 : 0 }}>
                                 <WzReduxProvider>
                                   <KibanaVis
                                     visID={'Wazuh-App-Agents-Welcome-Top-GDPR'}
@@ -488,7 +483,7 @@ export class AgentsWelcome extends Component {
                                   ></KibanaVis>
                                 </WzReduxProvider>
                               </div>
-                              <div  style={{height: this.state.selectedRequirement === 'nist' ? 280 : 0}}>
+                              <div style={{ height: this.state.selectedRequirement === 'nist' ? 280 : 0 }}>
                                 <WzReduxProvider>
                                   <KibanaVis
                                     visID={'Wazuh-App-Agents-Welcome-Top-NIST-800-53'}
@@ -496,7 +491,7 @@ export class AgentsWelcome extends Component {
                                   ></KibanaVis>
                                 </WzReduxProvider>
                               </div>
-                              <div  style={{height: this.state.selectedRequirement === 'tsc' ? 280 : 0}}>
+                              <div style={{ height: this.state.selectedRequirement === 'tsc' ? 280 : 0 }}>
                                 <WzReduxProvider>
                                   <KibanaVis
                                     visID={'Wazuh-App-Agents-Welcome-Top-TSC'}
@@ -504,7 +499,7 @@ export class AgentsWelcome extends Component {
                                   ></KibanaVis>
                                 </WzReduxProvider>
                               </div>
-                              <div  style={{height: this.state.selectedRequirement === 'gpg13' ? 280 : 0}}>
+                              <div style={{ height: this.state.selectedRequirement === 'gpg13' ? 280 : 0 }}>
                                 <WzReduxProvider>
                                   <KibanaVis
                                     visID={'Wazuh-App-Agents-Welcome-Top-GPG-13'}
@@ -512,7 +507,7 @@ export class AgentsWelcome extends Component {
                                   ></KibanaVis>
                                 </WzReduxProvider>
                               </div>
-                              <div  style={{height: this.state.selectedRequirement === 'hipaa' ? 280 : 0}}>
+                              <div style={{ height: this.state.selectedRequirement === 'hipaa' ? 280 : 0 }}>
                                 <WzReduxProvider>
                                   <KibanaVis
                                     visID={'Wazuh-App-Agents-Welcome-Top-HIPAA'}
@@ -521,7 +516,7 @@ export class AgentsWelcome extends Component {
                                 </WzReduxProvider>
                               </div>
                             </div>
-                            <div style={{ display: this.props.resultState === 'loading'  ? 'block' : 'none', alignSelf: "center", paddingTop: 100}}>                        
+                            <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', alignSelf: "center", paddingTop: 100 }}>
                               <EuiLoadingChart size="xl" />
                             </div>
                           </EuiFlexItem>
@@ -531,40 +526,40 @@ export class AgentsWelcome extends Component {
 
                     </EuiFlexGroup>
                   </EuiFlexItem>
-                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} style={{height: 300}}>
-                        <EuiPanel paddingSize="none">
-                          <EuiFlexItem>
-                            <EuiFlexGroup
-                              style={{ padding: '12px 12px 0px' }}
-                              className="embPanel__header"
-                            >
-                              <h2 className="embPanel__title wz-headline-title">
-                                <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
-                              </h2>
-                            </EuiFlexGroup>
-                            <EuiSpacer size="s" />
-                            <div style={{ height: this.props.resultState !== 'loading'  ? '280px' : 0 }}>
-                              <WzReduxProvider>
-                                <KibanaVis
-                                  visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                                  tab={'welcome'}
-                                ></KibanaVis>
-                              </WzReduxProvider>
-                            </div>
-                            <div style={{ display: this.props.resultState === 'loading'  ? 'block' : 'none', alignSelf: "center", paddingTop: 100}}>                        
-                              <EuiLoadingChart size="xl" />
-                            </div>
-                          </EuiFlexItem>
-                        </EuiPanel>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} style={{ height: 300 }}>
+                    <EuiPanel paddingSize="none">
+                      <EuiFlexItem>
+                        <EuiFlexGroup
+                          style={{ padding: '12px 12px 0px' }}
+                          className="embPanel__header"
+                        >
+                          <h2 className="embPanel__title wz-headline-title">
+                            <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
+                          </h2>
+                        </EuiFlexGroup>
+                        <EuiSpacer size="s" />
+                        <div style={{ height: this.props.resultState !== 'loading' ? '280px' : 0 }}>
+                          <WzReduxProvider>
+                            <KibanaVis
+                              visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                              tab={'welcome'}
+                            ></KibanaVis>
+                          </WzReduxProvider>
+                        </div>
+                        <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', alignSelf: "center", paddingTop: 100 }}>
+                          <EuiLoadingChart size="xl" />
+                        </div>
                       </EuiFlexItem>
+                    </EuiPanel>
+                  </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiFlexGroup direction="column">
-                  <EuiFlexItem style={{maxHeight: 86}}>
+                  <EuiFlexItem style={{ maxHeight: 86 }}>
                     <EuiFlexGroup justifyContent='flexEnd'>
                       <EuiFlexItem grow={false}>
-                        <WzDatePicker onTimeChange={() => {}} />
+                        <WzDatePicker onTimeChange={() => { }} />
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlexItem>

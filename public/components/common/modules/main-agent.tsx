@@ -47,29 +47,45 @@ export class MainModuleAgent extends Component {
     };
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    console.log(nextProps.section)
+    if (nextProps.section !== this.props.section) {
+      this.setGlobalBreadcrumb();
+    }
+  }
+
   setGlobalBreadcrumb() {
-    let breadcrumb = [
-      {
-        text: '',
-      },
-      {
-        text: 'Agents',
-        href: "#/agents-preview"
-      },
-      {
-        text: `${this.props.agent.name} (${this.props.agent.id})`,
-        onClick: () => {
-          window.location.href = `#/agents?agent=${this.props.agent.id}`;
-          this.router.reload();
+    let breadcrumb;
+    if (this.props.section === 'welcome') {
+      breadcrumb = [
+        { text: '' },
+        { text: 'Agents', href: '#/agents-preview' },
+        { text: this.props.agent.id }
+      ];
+    } else {
+      breadcrumb = [
+        {
+          text: '',
         },
-        className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-        truncate: false,
-      },
-      {
-        text: '',
-        className: 'wz-global-breadcrumb-popover'
-      },
-    ];
+        {
+          text: 'Agents',
+          href: "#/agents-preview"
+        },
+        {
+          text: this.props.agent.id,
+          onClick: () => {
+            window.location.href = `#/agents?agent=${this.props.agent.id}`;
+            this.router.reload();
+          },
+          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+          truncate: false,
+        },
+        {
+          text: '',
+          className: 'wz-global-breadcrumb-popover'
+        },
+      ];
+    }
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
