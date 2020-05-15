@@ -18,7 +18,7 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
-  EuiTitle,
+  EuiText,
 } from '@elastic/eui'
 // @ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
@@ -29,10 +29,8 @@ export function FimEventsTable({ agentId }) {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="m">
-        <EuiTitle size="xs">
-          <h1>FIM: Recent events</h1>
-        </EuiTitle>
-        <EuiSpacer size="l" />
+        <EuiText size="xs"><h2>FIM: Recent events</h2></EuiText>
+        <EuiSpacer size="s" />
         <FimTable agentId={agentId} />
       </EuiPanel>
     </EuiFlexItem>

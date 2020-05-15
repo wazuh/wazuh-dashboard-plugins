@@ -777,12 +777,6 @@ export class AgentsController {
 
       // Agent
       this.$scope.agent = agentInfo;
-      const breadcrumb = [
-        { text: '' },
-        { text: 'Agents', href: '/app/wazuh#/agents-preview' },
-        { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` }
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
       if (!this.$scope.agent) return;
       if (agentInfo && this.$scope.agent.os) {
