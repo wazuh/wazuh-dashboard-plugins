@@ -305,7 +305,7 @@ export class OverviewActions extends Component {
         <EuiFlexItem>
             {!this.state.isAgent && (
               <EuiButtonEmpty
-                iconType="user"
+                iconType="watchesApp"
                 isLoading={this.state.loadingReport}
                 onClick={() => this.showAgentModal()}>
                 Filter by agent
@@ -314,7 +314,7 @@ export class OverviewActions extends Component {
             )}
             {this.state.isAgent && (
               <EuiButtonEmpty
-                iconType="user"
+                iconType="watchesApp"
                 isLoading={this.state.loadingReport}
                 onClick={() => this.showAgentModal()}>
                 Filtered by {this.state.isAgent.length || ''} {this.state.isAgent.length > 1 ? ' agents' : 'agent'} 
