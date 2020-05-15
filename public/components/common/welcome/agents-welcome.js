@@ -28,7 +28,6 @@ import {
   EuiPage,
   EuiButton,
   EuiPopover,
-  EuiBasicTable,
   EuiSelect,
   EuiLoadingChart
 } from '@elastic/eui';
@@ -62,7 +61,6 @@ export class AgentsWelcome extends Component {
       selectedRequirement: 'pci'
     };
 
-    this.onTimeChange.bind(this);
   }
 
   async componentDidMount() {
@@ -203,7 +201,6 @@ export class AgentsWelcome extends Component {
   }
 
   render() {
-    console.log("from date picker", this.state.datePicker)
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
 

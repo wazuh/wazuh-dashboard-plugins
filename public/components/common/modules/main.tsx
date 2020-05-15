@@ -148,6 +148,7 @@ export class MainModule extends Component {
   onSelectedTabChanged(id) {
     if (id !== this.state.selectView) {
       if (id === 'events' || id === 'dashboard') {
+        if(this.props.switchSubTab) this.props.switchSubTab(id === 'events' ? 'discover' : 'panels')
         window.location.href = window.location.href.replace(
           new RegExp("tabView=" + "[^\&]*"),
           `tabView=${id === 'events' ? 'discover' : 'panels'}`);

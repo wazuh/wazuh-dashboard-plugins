@@ -49,19 +49,25 @@ export class MainModuleOverview extends Component {
   }
 
   setGlobalBreadcrumb() {
-    let breadcrumb = [
-      {
-        text: '',
-      },
-      {
-        text: 'Overview',
-        href: "#/overview"
-      },
-      {
-        text: /* TabDescription[this.props.section].title */'aaa'
-      },
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    if(TabDescription[this.props.currentTab]){
+      let breadcrumb = [
+        {
+          text: '',
+        },
+        {
+          text: 'Overview',
+          href: "#/overview"
+        },
+        {
+          text: TabDescription[this.props.section].title 
+        },
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    }
+  }
+
+  componentDidUpdate(){
+    this.setGlobalBreadcrumb();
   }
 
   async componentDidMount() {
