@@ -9,17 +9,23 @@
  *
  * Find more information about this on the LICENSE file.
  */
+// @ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+// @ts-ignore
 import { npSetup } from 'ui/new_platform';
 import { AppState } from '../../../../react-services/app-state';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { Query, esFilters, TimeRange, esQuery } from '../../../../../../../src/plugins/data/common';
-import { SearchParams, } from 'elasticsearch';
+import { Query, esFilters, TimeRange, esQuery, } from '../../../../../../../src/plugins/data/common';
+import { SearchParams, SearchResponse } from 'elasticsearch';
 
 export interface IFilterParams {
   filters: esFilters.Filter[]
   query: Query
   time: TimeRange
+}
+
+interface IWzResponse extends Response {
+  data: SearchResponse<any>
 }
 
 export async function getIndexPattern() {
@@ -28,7 +34,7 @@ export async function getIndexPattern() {
   return indexPattern;
 }
 
-export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs:any=null ) {
+export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs:any=null, kargs={}) {
   const query = buildQuery(indexPattern, filterParams);
   const filters = ((query || {}).bool || {}).filter;
   if(filters && Array.isArray(filters)){
@@ -42,10 +48,11 @@ export async function getElasticAlerts(indexPattern, filterParams:IFilterParams,
     index: indexPattern['title'],
     body: {
       query,
-      ...(aggs ? {aggs} : {})
+      ...(aggs ? {aggs} : {}),
+      ...kargs
     }
   }
-  const searchResponse: Response = await GenericRequest.request(
+  const searchResponse: IWzResponse = await GenericRequest.request(
     'POST',
     '/elastic/esAlerts',
     search
