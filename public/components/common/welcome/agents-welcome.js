@@ -28,16 +28,14 @@ import {
   EuiPage,
   EuiButton,
   EuiPopover,
-  EuiBasicTable,
   EuiSelect,
   EuiLoadingChart
 } from '@elastic/eui';
-import { FimEventsTable } from './components';
+import { FimEventsTable, ScaScan } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../../utils/components-os-support';
 import { ActionAgents } from '../../../react-services/action-agents';
-import { WzRequest } from '../../../react-services/wz-request';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import Overview from '../../wz-menu/wz-menu-overview';
 import './welcome.less';
@@ -67,16 +65,6 @@ export class AgentsWelcome extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    this.getScans(this.props.agent.id);
-  }
-
-  async getScans(idAgent) {
-    const scans = await WzRequest.apiReq('GET', `/sca/${idAgent}`, this.buildFilter());
-    this._isMount &&
-      this.setState({
-        lastScans: (((scans.data || {}).data || {}).items || {}),
-        isLoading: false,
-      });
   }
 
   async componentDidMount(){
@@ -170,106 +158,9 @@ export class AgentsWelcome extends Component {
     );
   }
 
-  columns() {
-    return [
-      {
-        field: 'start_scan',
-        name: 'Time',
-        sortable: true,
-        width: '200px'
-      },
-      {
-        field: 'name',
-        name: 'Policy',
-        sortable: true,
-        truncateText: true,
-      },
-      {
-        field: 'pass',
-        name: 'Pass',
-        sortable: true,
-        width: '65px'
-      },
-      {
-        field: 'fail',
-        name: 'Fail',
-        sortable: true,
-        width: '65px'
-      },
-      {
-        field: 'invalid',
-        name: 'Not applicable',
-        sortable: true,
-        width: '100px'
-      },
-      {
-        field: 'score',
-        name: 'Score',
-        sortable: true,
-        width: '90px'
-      },
-    ];
-  }
-
-  onTableChange = ({ sort = {} }) => {
-    const { field: sortField, direction: sortDirection } = sort;
-    this.setState({
-      sortField,
-      sortDirection,
-    });
-  };
-
-  buildSortFilter() {
-    const { sortField, sortDirection } = this.state;
-
-    const field = (sortField === 'start_scan') ? '' : sortField;
-    const direction = (sortDirection === 'asc') ? '+' : '-';
-
-    return direction + field;
-  }
-
-  buildFilter() {
-    const { filters } = this.props;
-
-    const filter = {
-      ...filters,
-      limit: 5,
-      sort: this.buildSortFilter(),
-    };
-
-    return filter;
-  }
-
-  renderScaTable() {
-    const columns = this.columns();
-    const {
-      lastScans,
-      isLoading,
-      sortField,
-      sortDirection,
-    } = this.state;
-    const sorting = {
-      sort: {
-        field: sortField,
-        direction: sortDirection
-      }
-    };
-
-    return (
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiBasicTable
-            items={lastScans}
-            columns={columns}
-            loading={isLoading}
-            sorting={sorting}
-            onChange={this.onTableChange}
-            itemId="policy_id"
-            noItemsMessage="No scans found"
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    )
+  onTimeChange = (datePicker) => {
+    const {start:from, end:to} = datePicker;
+    this.setState({datePicker: {from, to}});
   }
 
   getOptions(){
@@ -312,7 +203,6 @@ export class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
-    const scaTable = this.renderScaTable();
 
     return (
       <div className="wz-module wz-module-welcome">
@@ -562,12 +452,7 @@ export class AgentsWelcome extends Component {
                     </EuiFlexGroup>
                   </EuiFlexItem>
                   <FimEventsTable agentId={this.props.agent.id} />
-                  <EuiFlexItem style={{ marginTop: 0 }}>
-                    <EuiPanel paddingSize="m">
-                      <EuiText size="xs"><h2>Last SCA scans</h2></EuiText>
-                      {scaTable}
-                    </EuiPanel>
-                  </EuiFlexItem>
+                  <ScaScan agentId={this.props.agent.id}/>
                 </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
