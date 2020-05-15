@@ -54,7 +54,6 @@ export class AgentsWelcome extends Component {
       actionAgents: true // Hide actions agents
     };
 
-    this.onTimeChange.bind(this);
   }
 
   async componentDidMount() {
@@ -248,13 +247,7 @@ export class AgentsWelcome extends Component {
     )
   }
 
-  onTimeChange = (datePicker) => {
-    const {start:from, end:to} = datePicker;
-    this.setState({datePicker: {from, to}});
-  }
-
   render() {
-    console.log("from date picker", this.state.datePicker)
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
     const scaTable = this.renderScaTable();
