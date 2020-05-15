@@ -14,16 +14,16 @@
 
 import React, { useState, useEffect } from 'react'
 import {
-  EuiFlexGroup,
+  EuiBasicTable,
   EuiFlexItem,
   EuiPanel,
+  EuiSpacer,
   EuiTitle,
-  EuiBasicTable,
 } from '@elastic/eui'
 // @ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getFimAlerts } from './lib';
-import { TimeService } from '../../../../../react-services/time-service'
+import { TimeService } from '../../../../../react-services/time-service';
 
 export function FimEventsTable({ agentId }) {
   return (
@@ -32,10 +32,11 @@ export function FimEventsTable({ agentId }) {
         <EuiTitle size="xs">
           <h1>FIM: Recent events</h1>
         </EuiTitle>
+        <EuiSpacer size="l" />
         <FimTable agentId={agentId} />
       </EuiPanel>
     </EuiFlexItem>
-  )
+  );
 }
 
 export function useTimeFilter () {
