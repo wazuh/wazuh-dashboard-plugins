@@ -58,6 +58,7 @@ class WzRuleInfo extends Component {
         sortable: true,
         width: '30%',
         render: (value, item) => {
+          if(value === undefined) return '';
           const regex = /\$(.*?)\)/g;
           let result = value.match(regex);
           if(result !== null) {
@@ -357,6 +358,7 @@ class WzRuleInfo extends Component {
    * @param {string} value 
    */
   updateStyleTitle(value) {
+    if(value === undefined) return '';
     const regex = /\$(.*?)\)/g;
     let result = value.match(regex);
     if(result !== null) {

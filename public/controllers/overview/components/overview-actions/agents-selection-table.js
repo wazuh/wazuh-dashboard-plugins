@@ -20,7 +20,12 @@ import {
   EuiTableRowCell,
   EuiTableRowCellCheckbox,
   EuiTableSortMobile,
+  EuiKeyPadMenu,
+  EuiKeyPadMenuItem,
   EuiTableHeaderMobile,
+  EuiButtonIcon,
+  EuiIcon,
+  EuiPopover
 } from '@elastic/eui';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -469,13 +474,25 @@ export class AgentSelectionTable extends Component {
     })
   }
 
+  unselectAgents(){
+    this.setState({itemIdToSelectedMap: {}});
+  }
+
   getSelectedCount(){
     return this.getSelectedItems().length;
   }
 
   newSearch(){
-    this.props.removeAgentsFilter(false);
-    this.props.updateAgentSearch(this.getSelectedItems());
+    if(this.areAnyRowsSelected()){
+      this.props.removeAgentsFilter(false);
+      this.props.updateAgentSearch(this.getSelectedItems());
+    }else{
+      this.props.removeAgentsFilter(true);      
+    }
+  }
+
+  showContextMenu(id){
+    this.setState({contextMenuId: id})
   }
 
   render() {
@@ -490,21 +507,27 @@ export class AgentSelectionTable extends Component {
     };
     let optionalActionButtons;
 
-    if (this.areAnyRowsSelected() > 0 && this.items.length) {
+    if (this.items.length) {
       optionalActionButtons = (
-        <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => this.newSearch()} color="primary">
-      Filter by {this.getSelectedCount() <= 3 && (`selected agents: ${this.getSelectedItems()}`) || ("selected agents (" + this.getSelectedCount() +")")}
-          </EuiButton>
-        </EuiFlexItem>
+
+        <EuiFlexGroup gutterSize="m">
+          <EuiFlexItem grow={false}>
+            <EuiButton onClick={() => this.unselectAgents()} color="danger" isDisabled={!this.areAnyRowsSelected()}>
+              Unselect all agents
+            </EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton onClick={() => this.newSearch()} color="primary">
+              Apply
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
 
     return (
       <div>
         <EuiFlexGroup gutterSize="m">
-          {optionalActionButtons}
-
           <EuiFlexItem>
             <EuiFieldSearch
               value={this.state.currentSearch}
@@ -514,6 +537,9 @@ export class AgentSelectionTable extends Component {
             />
           </EuiFlexItem>
         </EuiFlexGroup>
+        <EuiSpacer size="m" />
+
+          {optionalActionButtons}   
 
         <EuiSpacer size="m" />
 
