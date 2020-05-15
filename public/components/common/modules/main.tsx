@@ -48,7 +48,8 @@ export class MainModule extends Component {
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
       this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
       this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
-      this.loadSection((ModulesDefaults[this.props.section] || {}).init || 'dashboard');
+      const init = (ModulesDefaults[this.props.section] || {}).init || 'dashboard';
+      this.loadSection(this.canBeInit(init) ? init : 'dashboard');
     }
   }
 
@@ -59,6 +60,16 @@ export class MainModule extends Component {
     }
   }
 
+  canBeInit(tab){ //checks if the init table can be set
+    let canInit = false;
+    this.tabs.forEach(element => {
+      if(element.id === tab && (!element.onlyAgent || (element.onlyAgent && this.props.agent))){
+        canInit = true;
+      }
+     });
+    return canInit;
+  }
+
   renderTabs(agent = false) {
     const { selectView } = this.state;
     if(!agent){
@@ -67,14 +78,17 @@ export class MainModule extends Component {
     return (
       <EuiFlexItem style={{ marginTop: 0 }}>
         <EuiTabs display="condensed">
-          {this.tabs.map((tab, index) =>
-            <EuiTab
-              onClick={() => this.onSelectedTabChanged(tab.id)}
-              isSelected={selectView === tab.id}
-              key={index}
-            >
-              {tab.name}
-            </EuiTab>
+          {this.tabs.map((tab, index) =>{
+            if(!tab.onlyAgent || (tab.onlyAgent && this.props.agent)){
+              return <EuiTab
+                onClick={() => this.onSelectedTabChanged(tab.id)}
+                isSelected={selectView === tab.id}
+                key={index}
+              >
+                {tab.name}
+              </EuiTab>
+            }
+          }
           )}
         </EuiTabs>
       </EuiFlexItem>
