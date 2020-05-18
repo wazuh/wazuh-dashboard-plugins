@@ -15,12 +15,9 @@ import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiCallOut,
-  EuiHealth,
+  EuiButtonIcon,
   EuiTitle,
-  EuiIcon,
   EuiPopover,
-  EuiButtonEmpty
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -39,13 +36,12 @@ export class MainModuleOverview extends Component {
     this.state = {
       selectView: false,
       loadingReport: false,
-      switchModule: false,
-      showAgentInfo: false
+      isDescPopoverOpen: false,
     };
   }
 
   setGlobalBreadcrumb() {
-    if(TabDescription[this.props.currentTab]){
+    if (TabDescription[this.props.currentTab]) {
       let breadcrumb = [
         {
           text: '',
@@ -55,14 +51,14 @@ export class MainModuleOverview extends Component {
           href: "#/overview"
         },
         {
-          text: TabDescription[this.props.section].title 
+          text: TabDescription[this.props.section].title
         },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     }
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
     this.setGlobalBreadcrumb();
   }
 
@@ -78,8 +74,27 @@ export class MainModuleOverview extends Component {
         <EuiFlexItem className="wz-module-header-agent-title">
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <span>
-                {TabDescription[this.props.section].title}
+              <span style={{ display: 'inline-flex' }}>
+                <EuiTitle size="s">
+                  <h1>
+                    <span>&nbsp;{TabDescription[this.props.section].title}&nbsp;&nbsp;</span>
+                  </h1>
+                </EuiTitle>
+                <EuiPopover
+                  button={
+                    <EuiButtonIcon
+                      iconType="iInCircle"
+                      style={{marginTop: 3}}
+                      color='primary'
+                      onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}>
+                    </EuiButtonIcon>
+                  }
+                  isOpen={this.state.isDescPopoverOpen}
+                  closePopover={() => { this.setState({ isDescPopoverOpen: false }) }}>
+                  <div style={{ width: '300px' }}>
+                    {TabDescription[this.props.section].description}
+                  </div>
+                </EuiPopover>
               </span>
             </EuiFlexItem>
             <EuiFlexItem />
@@ -106,7 +121,7 @@ export class MainModuleOverview extends Component {
                 <div className="wz-welcome-page-agent-tabs">
                   <EuiFlexGroup>
                     {this.props.renderTabs()}
-                    <EuiFlexItem grow={false} style={{marginTop: 6}}>
+                    <EuiFlexItem grow={false} style={{ marginTop: 6 }}>
                       <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
                     </EuiFlexItem>
                     {(selectView === 'dashboard') &&
@@ -139,7 +154,7 @@ export class MainModuleOverview extends Component {
 
 
           {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-          {section === 'mitre' && selectView==='inventory' && <MainMitre {...this.props} />}
+          {section === 'mitre' && selectView === 'inventory' && <MainMitre {...this.props} />}
           {/* -------------------------------------------------------------------------- */}
         </Fragment>
       </div>
