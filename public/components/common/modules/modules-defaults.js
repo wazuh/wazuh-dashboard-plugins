@@ -31,8 +31,8 @@ export const ModulesDefaults = {
     buttons: ['settings']
   },
   mitre: {
-    init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    init: 'inventory',
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   virustotal: {

@@ -36,6 +36,7 @@ import { AgentInfo } from '../../common/welcome/agents-info';
 import Overview from '../../wz-menu/wz-menu-overview';
 import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
+import { MainMitre } from '../modules/main-mitre';
 
 export class MainModuleAgent extends Component {
   constructor(props) {
@@ -268,6 +269,7 @@ export class MainModuleAgent extends Component {
                 {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
                 {section === 'fim' && <MainFim {...this.props} />}
                 {section === 'sca' && <MainSca {...this.props} />}
+                {section === 'mitre' && selectView==='inventory' && <MainMitre {...this.props} />}
                 {/* -------------------------------------------------------------------------- */}
               </div>
             }

@@ -30,11 +30,7 @@ import { ReportingService } from '../../../react-services/reporting';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import { OverviewActions } from '../../../controllers/overview/components/overview-actions/overview-actions';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
-import { AgentInfo } from '../../common/welcome/agents-info';
-import Overview from '../../wz-menu/wz-menu-overview';
-import { MainFim } from '../../agents/fim';
-import { MainSca } from '../../agents/sca';
+import { MainMitre } from './main-mitre';
 
 export class MainModuleOverview extends Component {
   constructor(props) {
@@ -140,6 +136,11 @@ export class MainModuleOverview extends Component {
               <Settings {...this.props} />
             }
           </div>
+
+
+          {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
+          {section === 'mitre' && selectView==='inventory' && <MainMitre {...this.props} />}
+          {/* -------------------------------------------------------------------------- */}
         </Fragment>
       </div>
     );
