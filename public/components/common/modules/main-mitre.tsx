@@ -10,37 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { Component } from 'react';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import { ModulesHelper } from './modules-helper'
+import React, { Component } from 'react';
+import { Mitre } from '../../../components/overview/mitre/mitre';
 
 export class MainMitre extends Component {
   constructor(props) {
     super(props);
-    this.modulesHelper = ModulesHelper;
   }
 
-  async componentDidMount() {
-    document.body.scrollTop = 0; // For Safari
-    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    const app = getAngularModule('app/wazuh');
-    this.$rootScope = app.$injector.get('$rootScope');
-    this.$rootScope.showModuleDashboard = false;
-    this.$rootScope.showMitre = true;
-    this.$rootScope.$applyAsync();
-    await this.modulesHelper.getDiscoverScope();
-    this.$rootScope.moduleDiscoverReady = true;
-    this.$rootScope.$applyAsync();
-  }
 
-  componentWillUnmount() {
-    this.$rootScope.showModuleDashboard = false;
-    this.$rootScope.moduleDiscoverReady = false;
-    this.$rootScope.showMitre = false;
-    this.$rootScope.$applyAsync();
-  }
 
   render() {
-    return false;
+    return <Mitre {...this.props}/>;
   }
 }
