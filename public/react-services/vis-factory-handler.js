@@ -104,8 +104,9 @@ export class VisFactoryHandler {
               )
             : false;
         data && rawVisualizations.assignItems(data.data.raw);
-        if(!fromDiscover)
-          commonData.assignFilters(filterHandler, tab);
+        if(!fromDiscover){
+          commonData.assignFilters(filterHandler, tab, id);
+        }
         store.dispatch(updateVis({ update: true }));
         return;
       } catch (error) {

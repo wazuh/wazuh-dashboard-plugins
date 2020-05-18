@@ -23,7 +23,8 @@ import {
   EuiPopover,
   EuiText,
   EuiContextMenu,
-  EuiIcon
+  EuiIcon,
+  EuiButtonIcon
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
@@ -172,23 +173,41 @@ export class Techniques extends Component {
     });
 
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
-      const tooltipContent = `Open actions of ${mitreTechniques[item.id].name} (${item.id})`;
+      const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
 
       return(
-        <EuiFlexItem key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
+        <EuiFlexItem 
+        onMouseEnter={() => this.setState({ hover: item.id })}
+        onMouseLeave={() => this.setState({ hover: "" })}
+        key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
 
         <EuiPopover
             id="techniqueActionsContextMenu"
             anchorClassName="wz-width-100"
             button={(
-              <EuiToolTip delay="long" position="top" content={tooltipContent} anchorClassName="wz-width-100" >
                 <EuiFacetButton
-                  style={{width: "100%", padding: "0 5px 0 5px"}}
+                  style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px"}}
                   quantity={item.quantity}
-                  onClick={() => this.showActionsMenu(item.id)}>
-                    {item.id} - {mitreTechniques[item.id].name}
+                  onClick={() => this.showFlyout(item.id)}>
+                  <EuiToolTip position="top" content={tooltipContent} >
+                    <span>
+                      {item.id} - {mitreTechniques[item.id].name}
+                    </span>
+                  </EuiToolTip>
+
+                  {this.state.hover === item.id &&
+                    <span style={{float: "right"}}>
+                      <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
+                          <EuiIcon onClick={(e) => {this.openDashboard(item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
+                      </EuiToolTip> &nbsp;
+                      <EuiToolTip position="top" content={"Inspect " + item.id + " in Events"} >
+                        <EuiIcon onClick={(e) => {this.openDiscover(item.id);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
+                      </EuiToolTip>
+
+                    </span>
+                  }
                 </EuiFacetButton>
-              </EuiToolTip>)
+              )
               }
             isOpen={this.state.actionsOpen === item.id}
             closePopover={() => this.closeActionsMenu()}
@@ -212,7 +231,20 @@ export class Techniques extends Component {
       return <>No tactics have been selected.</>
     }
   }
- /**
+
+  openDiscover(techniqueID){
+    this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
+    this.props.onSelectedTabChanged('events');
+
+  }
+
+
+  openDashboard(techniqueID){
+    this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
+    this.props.onSelectedTabChanged('dashboard');
+  }
+
+ /** 
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
    * @param filter 
    */

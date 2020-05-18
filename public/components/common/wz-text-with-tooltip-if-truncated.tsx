@@ -74,8 +74,6 @@ export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithT
             overflow: "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
-            // maxWidth: "250px",
-            // margin: "0 auto",
             ...this.props.elementStyle
           }}
       >

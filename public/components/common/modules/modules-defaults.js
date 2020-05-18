@@ -11,54 +11,54 @@
  */
 export const ModulesDefaults = {
   general: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   fim: {
     init: 'inventory',
-    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting', 'settings']
+    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: true }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting', 'settings']
   },
   gcp: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   sca: {
     init: 'inventory',
     tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'settings']
+    buttons: ['settings']
   },
   mitre: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'inventory',
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   virustotal: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   pci: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   hipaa: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   nist: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   gdpr: {
-    init: 'events',
-    tabs: [{ id: 'events', name: 'Events' }],
-    buttons: ['dashboard', 'reporting']
+    init: 'dashboard',
+    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
   },
   syscollector: {
     notModule: true

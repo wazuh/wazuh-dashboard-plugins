@@ -29,7 +29,6 @@ import {
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
-import { OverviewActions } from '../controllers/overview/components/overview-actions/overview-actions';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -49,5 +48,4 @@ app
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer', EuiSpacer)
   .value('SyscheckTable', SyscheckTable)
-  .value('OverviewActions', OverviewActions)
   .value('EuiSpacer', EuiSpacer);

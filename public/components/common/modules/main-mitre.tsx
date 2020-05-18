@@ -10,8 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { Events } from './events';
-export { Dashboard } from './dashboard';
-export { Loader } from './loader';
-export { Settings } from './settings';
-export { ModulesHelper } from './modules-helper.js';
+import React, { Component } from 'react';
+import { Mitre } from '../../../components/overview/mitre/mitre';
+
+export class MainMitre extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+
+
+  render() {
+    return <Mitre {...this.props}/>;
+  }
+}
