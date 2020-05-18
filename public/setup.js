@@ -14,7 +14,6 @@ setAngularModule(app);
 // Set up services needed for discover
 const services = buildServices(
   npStart.core,
-  npStart.plugins,
-  //plugin.docViewsRegistry
+  npStart.plugins
 );
 setServices(services);

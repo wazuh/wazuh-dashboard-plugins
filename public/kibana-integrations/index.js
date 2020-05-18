@@ -10,6 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import './kibana-visualization';
-import './kibana-discover';
+/* import './kibana-discover'; */
 import './saved_visualizations';
 import './wz-top-nav';

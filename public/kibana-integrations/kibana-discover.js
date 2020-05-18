@@ -104,8 +104,7 @@ const wazuhApp = getAngularModule('app/wazuh');
 app.run(async (globalState, $rootScope) => {
   const services = await buildServices(
     npStart.core,
-    npStart.plugins,
-    pluginInstance.docViewsRegistry
+    npStart.plugins
   );
   setServices(services);
   const { timefilter } = getServices();
@@ -144,6 +143,16 @@ function discoverController(
   $scope.indexPattern = resolveIndexPatternLoading();
   //used for functional testing
   $scope.fetchCounter = 0;
+
+  //WAZUH
+  wazuhApp.discoverScope = $scope;
+  (async () => {
+    const services = await buildServices(
+      npStart.core,
+      npStart.plugins
+    );
+    setServices(services);
+  })();
 
   const getTimeField = () => {
     return isDefaultType($scope.indexPattern) ? $scope.indexPattern.timeFieldName : undefined;

@@ -90,7 +90,6 @@ function savedSearch(
   $location,
   $window,
   $rootScope,
-  savedSearches,
   $route
 ) {
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
@@ -100,7 +99,6 @@ function savedSearch(
     redirectWhenMissing,
     $location,
     $window,
-    savedSearches,
     $route
   );
 }
