@@ -240,7 +240,7 @@ export class AgentsWelcome extends Component {
     return (
       <div className="wz-module wz-module-welcome">
         <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent'>
+          <div className='wz-module-header-agent wz-module-header-agent-main'>
             {title}
           </div>
         </div>
@@ -256,7 +256,7 @@ export class AgentsWelcome extends Component {
           </div>
         </div>
         <div className="wz-module-body">
-          <EuiPage>
+{/*           <EuiPage>
             <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
               {this.state.hideActions === false &&
                 <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
@@ -275,8 +275,8 @@ export class AgentsWelcome extends Component {
                 </EuiFlexItem>
               }
             </EuiFlexGroup>
-          </EuiPage>
-          <EuiPage style={{ paddingTop: 0 }}>
+          </EuiPage> */}
+          <EuiPage>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup direction="column">
