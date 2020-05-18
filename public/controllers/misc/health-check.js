@@ -101,7 +101,8 @@ export class HealthCheck {
       let patternTitle = '';
       if (this.checks.pattern) {
         const i = this.results.map(item => item.id).indexOf(2);
-        var patternData = await SavedObject.existsIndexPattern(patternId);
+        let patternData = await SavedObject.existsIndexPattern(patternId);
+        if(!patternData) patternData = {};  
         patternTitle = patternData.title;
         if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList();
@@ -153,7 +154,7 @@ export class HealthCheck {
         for (var i = 0; i < hosts.length; i++) {
           try {
             const API = await ApiCheck.checkApi(hosts[i]);
-            if (API && API.data && API.data.status === 'enabled') {
+            if (API && API.data) {
               return hosts[i].id;
             }
           } catch (err) {}
