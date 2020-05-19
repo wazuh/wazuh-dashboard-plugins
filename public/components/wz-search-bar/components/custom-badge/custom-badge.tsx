@@ -12,7 +12,7 @@
 
 import React, {useState, useEffect} from 'react'
 import { ContextMenu } from '../';
-import { QInterpreter } from '../../lib/q-interpreter';
+import { QInterpreter, queryObject } from '../../lib/q-interpreter';
 import { EuiBadge } from '@elastic/eui';
 
 export interface ICustomBadges {
@@ -22,7 +22,7 @@ export interface ICustomBadges {
 }
 
 export function CustomBadge(props) {
-  const {badge, index, filters, onChangeCustomBadges, customBadges } = props;
+  const {badge, index, onChangeCustomBadges, customBadges, qSuggests } = props;
   const qInterpreter = new QInterpreter(badge.value);
   const [ filter, setFilter ] = useState(qInterpreter.lastQuery());
   useEffect(() => {
@@ -42,9 +42,10 @@ export function CustomBadge(props) {
       iconOnClick={() => deleteBadge(props)}>
       <ContextMenu qFilter={filter} index={index} qInterpreter={qInterpreter}
         deleteFilter={() => deleteBadge(props)}
-        changeConjuntion={() => {}}
-        updateFilters={() => {}}
-        qSuggest={() => []} />
+        changeConjuntion={() => changeConjution(filter, setFilter)}
+        invertOperator={() => invertOperator(filter, setFilter)}
+        updateFilters={(args) => setFilter(args)}
+        qSuggest={qSuggests.find(item => item.label === filter.field)} />
     </EuiBadge>
   )
 }
@@ -58,6 +59,30 @@ function addOrRemoveConjuntion(filter, setFilter, props) {
     (index || filters['q']) &&
     setFilter({...filter, conjuntion: ' AND '});
   }
+}
+
+function changeConjution(filter: queryObject, setFilter) {
+  const newFilter:queryObject = {
+    ...filter, 
+    conjuntion: filter.conjuntion === ' AND ' ? ' OR ' : ' AND ',
+  }
+  setFilter(newFilter);
+}
+
+function invertOperator(filter: queryObject, setFilter) {
+  let newOperator;
+  switch (filter.operator) {
+    case '!=': newOperator = '='; break;
+    case '=': newOperator = '!='; break;
+    case '<': newOperator = '>'; break;
+    case '>': newOperator = '<'; break;
+    case '~': newOperator = '~'; break;
+  }
+  const newFilter: queryObject = {
+    ...filter,
+    operator: newOperator
+  }
+  setFilter(newFilter);
 }
 
 function deleteBadge(props) {

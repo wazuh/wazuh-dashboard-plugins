@@ -66,6 +66,7 @@ export class Inventory extends Component {
       customBadges: [],
     }
     this.onFilterSelect.bind(this);
+    this.onChangeCustomBadges.bind(this);
   }
 
   async componentDidMount() {
@@ -125,7 +126,7 @@ export class Inventory extends Component {
     this.setState({ filters });
   }
 
-  onChangeCustomBadges(customBadges: ICustomBadges[]) {
+  onChangeCustomBadges = (customBadges: ICustomBadges[]) => {
     this.setState({customBadges});
   }
 
@@ -244,7 +245,7 @@ export class Inventory extends Component {
           selectView={selectedTabId}
           agent={this.props.agent}
           customBadges={customBadges}
-          onChangeCustomBadges={this.onChangeCustomBadges.bind(this)}
+          onChangeCustomBadges={this.onChangeCustomBadges}
            />
         {selectedTabId === 'files' &&
           <InventoryTable
@@ -252,14 +253,16 @@ export class Inventory extends Component {
             filters={filters}
             customBadges={customBadges}
             items={syscheck}
-            onFilterSelect={this.onFilterSelect} />
+            onFilterSelect={this.onFilterSelect}
+            onChangeCustomBadges={this.onChangeCustomBadges} />
         }
         {selectedTabId === 'registry' &&
           <RegistryTable
             {...this.props}
             customBadges={customBadges}
             filters={filters}
-            onFilterSelect={this.onFilterSelect} />
+            onFilterSelect={this.onFilterSelect}
+            onChangeCustomBadges={this.onChangeCustomBadges} />
         }
       </div>
     )

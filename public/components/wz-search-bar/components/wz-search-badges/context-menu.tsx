@@ -95,24 +95,26 @@ const panelTree = (props) => {
       },
     ]
   }
-  operator !== '~' && panels.items.unshift(operatorItem(invertOperator))
-  !!conjuntion && panels.items.unshift(conjuntionItem(changeConjuntion))
+  operator !== '~' && panels.items.unshift(operatorItem(props))
+  !!conjuntion && panels.items.unshift(conjuntionItem(props))
   return panels;
 }
 
-const operatorItem = (invertOperator) => {
+const operatorItem = (props) => {
+  const { invertOperator, setIsOpen } = props;
   return {
     name: 'Invert operator',
     icon: 'kqlOperand',
-    onClick: invertOperator
+    onClick: (...args) => {invertOperator(...args); setIsOpen(false)}
   }
 }
 
-const conjuntionItem = (changeConjuntion) => {
+const conjuntionItem = (props) => {
+  const { changeConjuntion, setIsOpen } = props;
   return {
     name: 'Change conjuntion',
     icon: 'kqlSelector',
-    onClick: changeConjuntion
+    onClick: (...args) => {changeConjuntion(...args); setIsOpen(false)}
   }
 }
 
@@ -141,7 +143,7 @@ function EditFilterSaveButton(query: any, operator: any, value: any, conjuntion:
             const newFilter = { field: query.field, operator, value };
             conjuntion && (newFilter['conjuntion'] = conjuntion);
             props.qInterpreter.editByIndex(props.index, newFilter);
-            props.updateFilters();
+            props.updateFilters(newFilter);
             props.setIsOpen(false);
           }}>
             Save
@@ -201,12 +203,12 @@ function EditFilterOperator(operator, setOperator) {
   </EuiFormRow>;
 }
 
-function EditFilterConjuntion(conjuntion, setConjuntion): React.ReactNode {
+function EditFilterConjuntion(conjuntion: string, setConjuntion): React.ReactNode {
   return <EuiFormRow label="Conjuntion">
     <EuiButtonGroup options={[
-      { id: `conjuntion;`, label: "AND" },
-      { id: `conjuntion,`, label: "OR" },
-    ]} idSelected={`conjuntion${conjuntion}`} onChange={() => setConjuntion(conjuntion === ' AND '  ? ' OR ' : ' AND ')} />
+      { id: `conjuntion-AND`, label: "AND" },
+      { id: `conjuntion-OR`, label: "OR" },
+    ]} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(conjuntion === ' AND '  ? ' OR ' : ' AND ')} />
   </EuiFormRow>;
 }
 
