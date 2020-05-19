@@ -434,22 +434,24 @@ export class WzSearchBar extends Component {
           }
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <WzSearchBadges
-              filters={formatedFilter}
-              onChange={this.onChangeBadge.bind(this)}
-              searchFormat={searchFormat}
-              qSuggests={qSuggests} />
-          </EuiFlexItem>
+          { !!formatedFilter.length &&
+            <EuiFlexItem grow={false}>
+              <WzSearchBadges
+                filters={formatedFilter}
+                onChange={this.onChangeBadge.bind(this)}
+                searchFormat={searchFormat}
+                qSuggests={qSuggests} />
+            </EuiFlexItem>
+          }
           <EuiFlexItem grow={false}>
             {(customBadges || []).map((badge, idx) => 
               <CustomBadge 
-                key={idx}
-                badge={badge}
-                index={idx}
-                filters={filters}
-                {...this.props} />
-            )}
+              key={idx}
+              badge={badge}
+              index={idx}
+              filters={filters}
+              {...this.props} />
+              )}
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
