@@ -80,7 +80,7 @@ export class ScaScan extends Component {
 
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
-    if (isLoading) return;
+    if (isLoading || lastScan == []) return;
     return(
       <Fragment>
         <EuiText size="xs">

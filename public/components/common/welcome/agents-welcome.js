@@ -65,29 +65,25 @@ export class AgentsWelcome extends Component {
   }
 
   setGlobalBreadcrumb() {
-      const breadcrumb = [
-        { text: '' },
-        {
-          text: 'Agents',
-          href: "#/agents-preview"
-        },
-        {
-          text: `${this.props.agent.name} (${this.props.agent.id})`,
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false,
-        }
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    
-  }
-
-  componentDidUpdate(){
-    this.setGlobalBreadcrumb()
+    const breadcrumb = [
+      { text: '' },
+      {
+        text: 'Agents',
+        href: "#/agents-preview"
+      },
+      {
+        text: `${this.props.agent.name} (${this.props.agent.id})`,
+        className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+        truncate: false,
+      }
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
 
   async componentDidMount() {
     this._isMount = true;
+    this.setGlobalBreadcrumb();
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
     tabVisualizations.setTab('welcome');
@@ -326,16 +322,15 @@ export class AgentsWelcome extends Component {
                               style={{ padding: '12px 12px 0px' }}
                               className="embPanel__header"
                             >
-
                               <h2 className="embPanel__title wz-headline-title">
-                                <EuiText size="xs"><h2>Most common groups</h2></EuiText>
+                                <EuiText size="xs"><h2>MITRE top tactics</h2></EuiText>
                               </h2>
                             </EuiFlexGroup>
                             <EuiSpacer size="s" />
                             <div style={{ height: this.props.resultState === 'loading' ? 0 : 280 }}>
                               <WzReduxProvider>
                                 <KibanaVis
-                                  visID={'Wazuh-App-Agents-Welcome-Most-Common-Groups'}
+                                  visID={'Wazuh-App-Agents-Welcome-Top-Tactics-Mitre'}
                                   tab={'welcome'}
                                 ></KibanaVis>
                               </WzReduxProvider>

@@ -39,16 +39,18 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
+import { ICustomBadges } from '../../wz-search-bar/components';
 
 export class Inventory extends Component {
   _isMount = false;
   state: {
-    filters: {},
-    selectedTabId: 'files' | 'registry',
-    totalItemsFile: number,
-    totalItemsRegistry: number,
+    filters: {}
+    selectedTabId: 'files' | 'registry'
+    totalItemsFile: number
+    totalItemsRegistry: number
     isLoading: Boolean
     syscheck: []
+    customBadges: ICustomBadges[]
   }
   props: any;
 
@@ -60,9 +62,11 @@ export class Inventory extends Component {
       selectedTabId: 'files',
       totalItemsFile: 0,
       totalItemsRegistry: 0,
-      isLoading: true
+      isLoading: true,
+      customBadges: [],
     }
     this.onFilterSelect.bind(this);
+    this.onChangeCustomBadges.bind(this);
   }
 
   async componentDidMount() {
@@ -120,6 +124,10 @@ export class Inventory extends Component {
   onFiltersChange(filters) {
     this.setStoreFilters(filters);
     this.setState({ filters });
+  }
+
+  onChangeCustomBadges = (customBadges: ICustomBadges[]) => {
+    this.setState({customBadges});
   }
 
   onSelectedTabChanged = id => {
@@ -228,26 +236,33 @@ export class Inventory extends Component {
   }
 
   renderTable() {
-    const { filters, syscheck, selectedTabId } = this.state;
+    const { filters, syscheck, selectedTabId, customBadges } = this.state;
     return (
       <div>
         <FilterBar
           filters={filters}
           onFiltersChange={this.onFiltersChange.bind(this)}
           selectView={selectedTabId}
-          agent={this.props.agent} />
+          agent={this.props.agent}
+          customBadges={customBadges}
+          onChangeCustomBadges={this.onChangeCustomBadges}
+           />
         {selectedTabId === 'files' &&
           <InventoryTable
             {...this.props}
             filters={filters}
+            customBadges={customBadges}
             items={syscheck}
-            onFilterSelect={this.onFilterSelect} />
+            onFilterSelect={this.onFilterSelect}
+            onChangeCustomBadges={this.onChangeCustomBadges} />
         }
         {selectedTabId === 'registry' &&
           <RegistryTable
             {...this.props}
+            customBadges={customBadges}
             filters={filters}
-            onFilterSelect={this.onFilterSelect} />
+            onFilterSelect={this.onFilterSelect}
+            onChangeCustomBadges={this.onChangeCustomBadges} />
         }
       </div>
     )

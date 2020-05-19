@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Integrity monitoring components
+ * Wazuh app - MITRE event component
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,19 +11,18 @@
  */
 
 import React, { Component } from 'react';
-import { FlyoutDetail } from './inventory/flyout';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
+import {FlyoutTechnique} from '../../overview/mitre/components/techniques/components/flyout-technique'
 
 
-export class EventsFim extends Component {
+export class EventsMitre extends Component {
   _isMount = false;
   state: {
     isFlyoutVisible: Boolean,
-    currentFile: string,
+    currentTechnique: string,
     fetchStatus: 'loading' | 'complete',
-    rows: number,
-    rowsList: Array<any>
+    rows: number
   };
   props!: {
     [key: string]: any
@@ -35,10 +34,9 @@ export class EventsFim extends Component {
     super(props);
     this.state = {
       isFlyoutVisible: false,
-      currentFile: '',
+      currentTechnique: '',
       fetchStatus: 'loading',
-      rows: 0,
-      rowsList: []
+      rows: 0
     };
     this.modulesHelper = ModulesHelper;
     this.getRowsField.bind(this);
@@ -52,8 +50,7 @@ export class EventsFim extends Component {
         const { fetchStatus } = this.state;
         if (fetchStatus !== scope.fetchStatus) {
           const rows = scope.fetchStatus === 'complete' ? scope.rows.length : 0;
-          const rowsList = scope.fetchStatus === 'complete' ? scope.rows : [];
-          this._isMount && this.setState({ fetchStatus: scope.fetchStatus, rows , rowsList})
+          this._isMount && this.setState({ fetchStatus: scope.fetchStatus, rows })
         }
       });
   }
@@ -99,7 +96,7 @@ export class EventsFim extends Component {
         setTimeout(this.getRowsField, 100);
       }
       cols.forEach((col, idx) => {
-        if (['syscheck.path', 'rule.id'].includes(col.textContent || '')) {
+        if (['rule.mitre.id', 'rule.id'].includes(col.textContent || '')) {
           indices.push(idx + 1);
         }
       });
@@ -121,7 +118,7 @@ export class EventsFim extends Component {
         elements.forEach((element, idx) => {
           const text = element.textContent;
           if (idx % 2) {
-            element.childNodes.forEach( (child) => {
+            element.childNodes.forEach(child => {
               if (child.nodeName === 'SPAN') {
                 const link = document.createElement('a')
                 link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
@@ -133,13 +130,22 @@ export class EventsFim extends Component {
               }
             })
           } else {
-            element.childNodes.forEach((child) => {
+            element.childNodes.forEach(child => {
               if (child.nodeName === 'SPAN') {
-                const link = document.createElement('a')
-                const agentId = ((((this.state.rowsList || [])[idx/2] || {})._source || {}).agent || {}).id || 0;
-                link.onclick = () => this.showFlyout(text,agentId);
-                link.textContent = text;
-                child.replaceWith(link);
+                const formattedText = text.replace(/\s/g, ''); // remove spaces
+                const splitText = formattedText.split(",");
+                const divLink = document.createElement('div');
+                divLink.setAttribute('style', 'min-width: 120px;');
+                splitText.forEach((item,idx) => {
+                  const link = document.createElement('a')
+                  link.onclick = () => this.showFlyout(item);
+                  if(idx !== splitText.length-1)
+                    link.textContent = item + ", ";
+                  else
+                    link.textContent = item;
+                  divLink.appendChild(link)
+                })
+                child.replaceWith(divLink);
                 isClearable = false;
               }
             })
@@ -151,31 +157,30 @@ export class EventsFim extends Component {
     }
   }
 
-  showFlyout(file, agentId) {
-    if (file !== " - " && !window.location.href.includes('&file=')) {
-      window.location.href = window.location.href += `&file=${file}`;
-      //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-      this.setState({ isFlyoutVisible: true, currentFile: file, currentAgent:agentId });
-    }
+  showFlyout(techniqueId) {
+    this.setState({ isFlyoutVisible: true, currentTechnique: techniqueId });
   }
 
   closeFlyout() {
-    this.setState({ isFlyoutVisible: false, currentFile: false });
+    this.setState({ isFlyoutVisible: false, currentTechnique: false });
   }
+
+  onChangeFlyout = (isFlyoutVisible: boolean) => {
+    this.setState({ isFlyoutVisible });
+}
 
   render() {
     return (
       this.state.isFlyoutVisible &&
-      <EuiOverlayMask 
+      <EuiOverlayMask
         // @ts-ignore
         onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
-        <FlyoutDetail
-          fileName={this.state.currentFile}
-          agentId={this.state.currentAgent}
-          closeFlyout={() => this.closeFlyout()}
-          type='file'
-          view='events'
-          {...this.props} />
+        
+        
+        <FlyoutTechnique
+            onChangeFlyout={this.onChangeFlyout}
+            currentTechnique={this.state.currentTechnique} />
+        
       </EuiOverlayMask>
     )
   }
