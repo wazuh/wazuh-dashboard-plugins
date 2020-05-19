@@ -86,6 +86,7 @@ export class MainModuleOverview extends Component {
                       iconType="iInCircle"
                       style={{marginTop: 3}}
                       color='primary'
+                      aria-label='Open/close'
                       onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}>
                     </EuiButtonIcon>
                   }

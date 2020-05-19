@@ -84,10 +84,16 @@ export class AgentInfo extends Component {
   }
 
   addHealthRender(agent) {
+    // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
     return (
-      <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
-        {this.props.agent.status}
-      </EuiHealth>
+      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: 3, fontSize: '12px'}}>
+        <span className="euiFlexItem euiFlexItem--flexGrowZero">
+          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(this.props.agent.status)}`} focusable="false" role="img" aria-hidden="true">
+            <circle cx="8" cy="8" r="4"></circle>
+          </svg>
+        </span>
+        <span className="euiFlexItem euiFlexItem--flexGrowZero">{this.props.agent.status}</span>
+      </span>
     )
   }
 
