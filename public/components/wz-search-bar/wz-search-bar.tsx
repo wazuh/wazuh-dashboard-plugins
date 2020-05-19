@@ -19,6 +19,7 @@ import { QHandler, qSuggests } from './lib/q-handler';
 import { QTagsHandler } from './lib/q-tags-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
 import { WzSearchButtons, filterButton } from './wz-search-buttons';
+import { CustomBadge, ICustomBadges } from './components';
 
 export interface suggestItem {
   type: {iconType: string, color: string }
@@ -42,14 +43,16 @@ export class WzSearchBar extends Component {
   props!:{
     qSuggests: qSuggests[] | null
     apiSuggests: apiSuggests[] | null
-    onInputChange: Function
-    onTimeChange?(props:OnTimeChangeProps): void
     buttonOptions?: filterButton[]
     searchDisable?: boolean
     defaultFormat?: 'API' | '?Q' | 'qTags'
     placeholder?: string
     initFilters?: {}
     noDeleteFiltersOnUpdateSuggests?: boolean
+    customBadges?: ICustomBadges[]
+    onInputChange: Function
+    onTimeChange?(props:OnTimeChangeProps): void
+    onChangeCustomBadges?(customBadges: ICustomBadges[]): void 
   };
   suggestHandler!: QHandler | ApiHandler | QTagsHandler;
   inputRef!: HTMLImageElement;
@@ -86,6 +89,9 @@ export class WzSearchBar extends Component {
       return true;
     }
     if (JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
+      return true;
+    }
+    if (JSON.stringify(this.props.customBadges) !== JSON.stringify(nextProps.customBadges)){
       return true;
     }
     if (nextState.isPopoverOpen !== this.state.isPopoverOpen){
@@ -389,7 +395,7 @@ export class WzSearchBar extends Component {
       isPopoverOpen,
       searchFormat
     } = this.state;
-    const { placeholder, buttonOptions, qSuggests, onTimeChange } = this.props;
+    const { placeholder, buttonOptions, qSuggests, onTimeChange, customBadges } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     !!onTimeChange && import('./src/style/wz-date-picker.less');
@@ -434,6 +440,16 @@ export class WzSearchBar extends Component {
               onChange={this.onChangeBadge.bind(this)}
               searchFormat={searchFormat}
               qSuggests={qSuggests} />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            {(customBadges || []).map((badge, idx) => 
+              <CustomBadge 
+                key={idx}
+                badge={badge}
+                index={idx}
+                filters={filters}
+                {...this.props} />
+            )}
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>

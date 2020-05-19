@@ -28,7 +28,6 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
-const conjuntions = { ';': 'AND ', ',': 'OR ' }
 const operators = {
   '=': ' is ',
   '!=': ' is not ',
@@ -42,7 +41,7 @@ export function ContextMenu(props) {
   const panels = flattenPanelTree(panelTree({...props, setIsOpen}));
   const { conjuntion = false, field, value, operator } = props.qFilter;
   const button = (<EuiButtonEmpty color='text' size="xs" onClick={() => setIsOpen(!isOpen)}>
-    <strong>{conjuntion && conjuntions[conjuntion]}</strong> {field} {operators[operator]} {value}
+    <strong>{conjuntion && conjuntion}</strong> {field} {operators[operator]} {value}
   </EuiButtonEmpty>)
   return (
     <EuiPopover
@@ -207,7 +206,7 @@ function EditFilterConjuntion(conjuntion, setConjuntion): React.ReactNode {
     <EuiButtonGroup options={[
       { id: `conjuntion;`, label: "AND" },
       { id: `conjuntion,`, label: "OR" },
-    ]} idSelected={`conjuntion${conjuntion}`} onChange={() => setConjuntion(conjuntion === ';' ? ',' : ';')} />
+    ]} idSelected={`conjuntion${conjuntion}`} onChange={() => setConjuntion(conjuntion === ' AND '  ? ' OR ' : ' AND ')} />
   </EuiFormRow>;
 }
 
