@@ -227,7 +227,7 @@ export class Techniques extends Component {
     })
     if(tacticsToRender.length){
       return (
-      <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "420px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
+      <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "400px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
         {tacticsToRenderOrdered}
       </EuiFlexGrid>
       )

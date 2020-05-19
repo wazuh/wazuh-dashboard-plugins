@@ -65,29 +65,25 @@ export class AgentsWelcome extends Component {
   }
 
   setGlobalBreadcrumb() {
-      const breadcrumb = [
-        { text: '' },
-        {
-          text: 'Agents',
-          href: "#/agents-preview"
-        },
-        {
-          text: `${this.props.agent.name} (${this.props.agent.id})`,
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false,
-        }
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    
-  }
-
-  componentDidUpdate(){
-    this.setGlobalBreadcrumb()
+    const breadcrumb = [
+      { text: '' },
+      {
+        text: 'Agents',
+        href: "#/agents-preview"
+      },
+      {
+        text: `${this.props.agent.name} (${this.props.agent.id})`,
+        className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+        truncate: false,
+      }
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
 
   async componentDidMount() {
     this._isMount = true;
+    this.setGlobalBreadcrumb();
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
     tabVisualizations.setTab('welcome');
