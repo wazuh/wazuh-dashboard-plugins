@@ -9,17 +9,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
 export default [
   {
-    _id: "Wazuh-App-Agents-Welcome-Most-Common-Groups",
+    _id: "Wazuh-App-Agents-Welcome-Top-Tactics-Mitre",
     _type: "visualization",
     _source: {
-      title: "Top 5 most common groups",
+      title: "Top Tactics by agent",
       visState:
-        '{"title":"most common groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":false,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"label":"Count","aggType":"count"},"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing","parsedUrl":{"origin":"http://172.16.1.2:5601","pathname":"/app/kibana","basePath":""}}},"params":{},"label":"rule.groups: Descending","aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Group"}}]}',
+        '{"title":"Top Tactics by agent","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":0,"format":{"id":"number"},"params":{},"label":"Count","aggType":"count"}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.mitre.tactics.keyword","orderBy":"1","order":"desc","size":10,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON:
-        '{"vis":{"params":{"sort":{"columnIndex":2,"direction":"desc"}}}}',
+        '{}',
       description: "",
       version: 1,
       kibanaSavedObjectMeta: {
