@@ -51,7 +51,6 @@ export class MainModuleAgent extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    console.log(nextProps.section)
     if (nextProps.section !== this.props.section) {
       this.setGlobalBreadcrumb();
     }

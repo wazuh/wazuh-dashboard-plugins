@@ -62,7 +62,7 @@ export class AgentsTable extends Component {
     this.downloadCsv.bind(this);
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const managerVersion = await WzRequest.apiReq('GET', '/version', {});
     const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
     const agentActive = await WzRequest.apiReq('GET', '/agents', {
