@@ -34,7 +34,8 @@ import {
 import { FimEventsTable, ScaScan } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { UnsupportedComponents } from '../../../utils/components-os-support';
+import store from '../../../redux/store';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { ActionAgents } from '../../../react-services/action-agents';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import Overview from '../../wz-menu/wz-menu-overview';
@@ -63,11 +64,30 @@ export class AgentsWelcome extends Component {
 
   }
 
-  async componentDidMount() {
-    this._isMount = true;
+  setGlobalBreadcrumb() {
+      const breadcrumb = [
+        { text: '' },
+        {
+          text: 'Agents',
+          href: "#/agents-preview"
+        },
+        {
+          text: `${this.props.agent.name} (${this.props.agent.id})`,
+          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+          truncate: false,
+        }
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    
   }
 
+  componentDidUpdate(){
+    this.setGlobalBreadcrumb()
+  }
+
+
   async componentDidMount() {
+    this._isMount = true;
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
     tabVisualizations.setTab('welcome');

@@ -84,7 +84,7 @@ export class MainModuleAgent extends Component {
           truncate: false,
         },
         {
-          text: '',
+          text: TabDescription[this.props.section].title,
           className: 'wz-global-breadcrumb-popover'
         },
       ];
