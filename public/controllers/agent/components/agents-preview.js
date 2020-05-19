@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiPage,
@@ -20,24 +20,48 @@ import {
   EuiFlexItem,
   EuiStat,
   EuiLoadingChart,
-  EuiSpacer
+  EuiSpacer,
+  EuiText
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
 import { AgentsTable } from './agents-table';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
+import KibanaVis from '../../../kibana-integrations/kibana-vis';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
+import { AppState } from '../../../react-services/app-state';
+import { FilterHandler } from '../../../utils/filter-handler';
+import { TabVisualizations } from '../../../factories/tab-visualizations';
+import { WazuhConfig } from './../../../react-services/wazuh-config.js'
 
 export class AgentsPreview extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: false };
+    this.state = { data: [], loading: false, showAgentsEvolutionVisualization: false };
+    this.wazuhConfig = new WazuhConfig();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._isMount = true;
     this.setGlobalBreadcrumb();
     this.getSummary();
+    if( this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'] ){
+      this.setState({ showAgentsEvolutionVisualization: true });
+      const tabVisualizations = new TabVisualizations();
+      tabVisualizations.removeAll();
+      tabVisualizations.setTab('general');
+      tabVisualizations.assign({
+        general: 1
+      });
+      const filterHandler = new FilterHandler(AppState.getCurrentPattern());
+      await VisFactoryHandler.buildOverviewVisualizations(
+        filterHandler,
+        'general',
+        null
+      );
+    }
   }
 
   componentWillUnmount() {
@@ -119,45 +143,42 @@ export class AgentsPreview extends Component {
       <EuiPage>
         <EuiFlexItem>
           <EuiFlexGroup style={{ marginTop: 0 }}>
+            {this.state.loading && (
+              <EuiFlexItem>
+                <EuiLoadingChart
+                  style={{ margin: '60px auto' }}
+                  size="xl"
+                />
+              </EuiFlexItem>
+            ) || (
+            <Fragment>
             <EuiFlexItem grow={false}>
               <EuiPanel
                 betaBadgeLabel="Status"
                 style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}
               >
-                {this.state.loading && (
-                  <EuiFlexItem>
-                    <EuiLoadingChart
-                      style={{ margin: '45px auto' }}
-                      size="xl"
-                    />
-                  </EuiFlexItem>
-                )}
-                {!this.state.loading && (
-                  <EuiFlexGroup>
-                    {this.totalAgents > 0 && (
-                      <EuiFlexItem style={{ alignItems: 'center' }}>
-                        <Pie
-                          width={300}
-                          height={150}
-                          data={this.state.data}
-                          colors={colors}
-                        />
-                      </EuiFlexItem>
-                    )}
-                  </EuiFlexGroup>
-                )}
+                <EuiFlexGroup>
+                  {this.totalAgents > 0 && (
+                    <EuiFlexItem style={{ alignItems: 'center' }}>
+                      <Pie
+                        width={300}
+                        height={150}
+                        data={this.state.data}
+                        colors={colors}
+                      />
+                    </EuiFlexItem>
+                  )}
+                </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>
-            {this.totalAgents > 0 && !this.state.loading && (
+            {this.totalAgents > 0 && (
               <EuiFlexItem>
-                <EuiPanel betaBadgeLabel="Details" style={{ paddingBottom: 0 }}>
-                  <EuiFlexGroup style={{ minWidth: 500 }}>
-                    <EuiFlexItem grow={false}></EuiFlexItem>
+                <EuiPanel betaBadgeLabel="Details">  
+                  <EuiFlexGroup>
                     <EuiFlexItem>
                       {this.summary && (
-                        <EuiFlexItem style={{ padding: '12px 0px' }}>
-                          <EuiFlexGroup>
-                            <EuiFlexItem>
+                        <EuiFlexGroup style={{ padding: '12px 0px' }}>
+                          <EuiFlexItem>
                               <EuiStat
                                 title={this.state.data[0].value}
                                 titleSize={'s'}
@@ -192,57 +213,76 @@ export class AgentsPreview extends Component {
                                 style={{ whiteSpace: 'nowrap' }}
                               />
                             </EuiFlexItem>
-                          </EuiFlexGroup>
-                        </EuiFlexItem>
-                      )}
-                      <EuiFlexItem>
-                        <EuiFlexGroup style={{ marginTop: 0 }}>
-                          {this.lastAgent && (
-                            <EuiFlexItem>
-                              <EuiStat
-                                className="euiStatLink"
-                                title={this.lastAgent.name}
-                                titleSize="s"
-                                description="Last registered agent"
-                                titleColor="primary"
-                                style={{
-                                  paddingBottom: 12,
-                                  whiteSpace: 'nowrap'
-                                }}
-                                onClick={() =>
-                                  this.props.tableProps.showAgent(
-                                    this.lastAgent
-                                  )
-                                }
-                              />
-                            </EuiFlexItem>
-                          )}
-                          {this.mostActiveAgent && (
-                            <EuiFlexItem>
-                              <EuiStat
-                                className={
-                                  this.mostActiveAgent.name ? 'euiStatLink' : ''
-                                }
-                                title={this.mostActiveAgent.name || '-'}
-                                style={{ whiteSpace: 'nowrap' }}
-                                titleSize="s"
-                                description="Most active agent"
-                                titleColor="primary"
-                                onClick={() =>
-                                  this.mostActiveAgent.name
-                                    ? this.props.tableProps.showAgent(
-                                        this.mostActiveAgent
-                                      )
-                                    : ''
-                                }
-                              />
-                            </EuiFlexItem>
-                          )}
                         </EuiFlexGroup>
-                      </EuiFlexItem>
+                      )}
+                      <EuiFlexGroup style={{ marginTop: 0 }}>
+                        {this.lastAgent && (
+                          <EuiFlexItem>
+                            <EuiStat
+                              className="euiStatLink"
+                              title={this.lastAgent.name}
+                              titleSize="s"
+                              description="Last registered agent"
+                              titleColor="primary"
+                              style={{
+                                paddingBottom: 12,
+                                whiteSpace: 'nowrap'
+                              }}
+                              onClick={() =>
+                                this.props.tableProps.showAgent(
+                                  this.lastAgent
+                                )
+                              }
+                            />
+                          </EuiFlexItem>
+                        )}
+                        {this.mostActiveAgent && (
+                          <EuiFlexItem>
+                            <EuiStat
+                              className={
+                                this.mostActiveAgent.name ? 'euiStatLink' : ''
+                              }
+                              title={this.mostActiveAgent.name || '-'}
+                              style={{ whiteSpace: 'nowrap' }}
+                              titleSize="s"
+                              description="Most active agent"
+                              titleColor="primary"
+                              onClick={() =>
+                                this.mostActiveAgent.name
+                                  ? this.props.tableProps.showAgent(
+                                      this.mostActiveAgent
+                                    )
+                                  : ''
+                              }
+                            />
+                          </EuiFlexItem>
+                        )}
+                      </EuiFlexGroup>
                     </EuiFlexItem>
-                    <EuiFlexItem grow={false}></EuiFlexItem>
                   </EuiFlexGroup>
+                </EuiPanel>
+              </EuiFlexItem>
+            )}
+            </Fragment>
+            )}
+            {this.state.showAgentsEvolutionVisualization && (
+              <EuiFlexItem style={{ display: this.props.resultState === 'ready' && !this.state.loading ? 'block' : 'none', height: this.props.resultState === 'ready' && !this.state.loading ? '180px' : 0}}>
+                <EuiPanel paddingSize="none" betaBadgeLabel="Evolution">
+                  <EuiSpacer size="s" />
+                  <div style={{height: this.props.resultState === 'ready' ? '170px' : 0}}>
+                    <WzReduxProvider>
+                      <KibanaVis
+                        visID={'Wazuh-App-Overview-General-Agents-Evolution'}
+                        tab={'general'}
+                      />
+                    </WzReduxProvider>
+                  </div>
+                  {this.props.resultState === 'loading' &&
+                    (
+                    <div style={{ display: 'block', textAlign: "center", padding: 30}}>                        
+                      <EuiLoadingChart size="xl" />
+                    </div>
+                  ) }
                 </EuiPanel>
               </EuiFlexItem>
             )}
