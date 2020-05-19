@@ -145,7 +145,7 @@ export class AgentInfo extends Component {
         {
           title: agent.name,
           description: 'Operating system',
-          style: { minWidth: 200 }
+          style: { minWidth: 200, maxWidth: 200 }
         }
       ];
     } else {
