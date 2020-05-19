@@ -31,7 +31,8 @@ class WzCodeEditor extends Component {
       onChange,
       isReadOnly,
       height,
-      minusHeight
+      minusHeight,
+      setOptions
     } = this.props;
     return (
       <Fragment>
@@ -53,11 +54,9 @@ class WzCodeEditor extends Component {
             highlightActiveLine={false}
             onChange={onChange}
             isReadOnly={isReadOnly}
-            setOptions={{
-              fontSize: '14px',
-              // enableBasicAutocompletion: true,
+            setOptions={setOptions || {
+              fontSize: '16px',
               enableSnippets: true
-              // enableLiveAutocompletion: true,
             }}
             aria-label="Code Editor"
           />
