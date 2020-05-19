@@ -174,7 +174,7 @@ export class Techniques extends Component {
 
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
       const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
-
+      const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover=== item.id ? " wz-mitre-width" : " ");
       return(
         <EuiFlexItem 
         onMouseEnter={() => this.setState({ hover: item.id })}
@@ -189,8 +189,12 @@ export class Techniques extends Component {
                   style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px"}}
                   quantity={item.quantity}
                   onClick={() => this.showFlyout(item.id)}>
-                  <EuiToolTip position="top" content={tooltipContent} >
-                    <span>
+                  <EuiToolTip position="top" content={tooltipContent} anchorClassName={toolTipAnchorClass}>
+                    <span style={{
+                            display: "block",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis"}}>
                       {item.id} - {mitreTechniques[item.id].name}
                     </span>
                   </EuiToolTip>
