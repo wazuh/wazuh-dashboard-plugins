@@ -233,7 +233,7 @@ export class MainModuleAgent extends Component {
                     !this.props.tabs || !this.props.tabs.length ?
                       "wz-welcome-page-agent-info" :
                       "wz-welcome-page-agent-info wz-welcome-page-agent-info-gray"}>
-                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                    <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
                   </div>
                 }
                 {(this.props.tabs && this.props.tabs.length) &&

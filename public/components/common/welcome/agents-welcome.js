@@ -265,7 +265,7 @@ export class AgentsWelcome extends Component {
             <div className='wz-module-header-nav'>
               <div style={{ margin: '0 16px' }}>
                 <EuiPanel paddingSize='s' className="wz-welcome-page-agent-info">
-                  <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                  <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
                 </EuiPanel>
               </div>
             </div>

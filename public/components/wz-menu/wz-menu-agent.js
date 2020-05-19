@@ -9,15 +9,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiHorizontalRule, EuiSpacer, EuiButton } from '@elastic/eui';
+import React, { Component, Fragment } from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiHorizontalRule, EuiPanel, EuiButton, EuiSpacer } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
 import chrome from 'ui/chrome';
 import { updateCurrentTab } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
-import { UnsupportedComponents } from '../../utils/components-os-support';
+import { UnsupportedComponents } from './../../utils/components-os-support';
+import { AgentInfo } from './../common/welcome/agents-info';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -26,6 +27,8 @@ class WzMenuAgent extends Component {
     this.state = {
       extensions: []
     };
+
+    this.agent = false;
 
     this.agentSections = {
       securityInformation: {
@@ -70,11 +73,26 @@ class WzMenuAgent extends Component {
   }
 
   async componentDidMount() {
+
+    const dataAgent = await this.getAgentData(this.props.isAgent);
+    this.agent = dataAgent.data.data;
+
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
   }
+
+
+  async getAgentData(agentId) {
+    try {
+      const result = await WzRequest.apiReq('GET', '/agents/' + agentId, {});
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
 
   clickMenuItem = section => {
     this.props.closePopover();
@@ -138,9 +156,9 @@ class WzMenuAgent extends Component {
       threatDetectionItems.unshift(this.agentSections.vuls);
     } else {
       auditingItems.splice(1, 0, this.agentSections.sca);
-      // if (!(UnsupportedComponents[this.props.isAgent.agentPlatform] || UnsupportedComponents['other']).includes('vuls')) {
-      //   threatDetectionItems.unshift(this.agentSections.vuls);
-      // }
+      if (!(UnsupportedComponents[this.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls')) {
+        threatDetectionItems.unshift(this.agentSections.vuls);
+      }
     }
     const securityInformation = [
       this.createItem(this.agentSections.securityInformation, {
@@ -185,17 +203,24 @@ class WzMenuAgent extends Component {
         {Object.keys(this.state.extensions).length && (
           <div>
             {(
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
-                  <EuiButtonEmpty iconType="arrowRight"
-                    onClick={() => {
-                      this.props.closePopover();
-                      window.location.href = '#/agents-preview';
-                    }}>
-                    Go to Agent welcome
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-              </EuiFlexGroup>
+              <Fragment>
+                <EuiFlexGroup>
+                  <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
+                    <EuiButtonEmpty iconType="arrowRight"
+                      onClick={() => {
+                        this.props.closePopover();
+                        window.location.href = '#/agents-preview';
+                      }}>
+                      Go to Agent welcome
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='s' />
+                <EuiPanel paddingSize='s'>
+                  <AgentInfo agent={this.agent} isCondensed={true} hideActions={true} {...this.props}></AgentInfo>
+                </EuiPanel>
+                <EuiSpacer size='s' />
+              </Fragment>
             )}
             {this.props.isAgent && (
             <EuiFlexGrid columns={2}>

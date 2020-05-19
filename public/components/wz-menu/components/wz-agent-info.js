@@ -20,13 +20,22 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 
-import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
-
 export class AgentInfo extends Component {
   constructor(props) {
     super(props);
 
+    this.agent = {
+      id: '002',
+      status: 'Active',
+      ip: 'X.X.X.X',
+      version: 'Wazuh v3.12.3',
+      name: 'CentOS Linux 7.6'
+    };
+
     this.state = {};
+
+    this
+
   }
 
   async componentDidMount() {
@@ -55,28 +64,6 @@ export class AgentInfo extends Component {
     ></i>
   }
 
-
-  addTextPlatformRender(agent) {
-    const checkField = field => {
-      return field !== undefined ? field : '-';
-    };
-
-    const os_name =
-      checkField(((agent || {}).os || {}).name) +
-      ' ' +
-      checkField(((agent || {}).os || {}).version);
-
-    const osName = os_name === '- -' ? '-' : os_name;
-
-    return (
-      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
-        {this.getPlatformIcon(this.props.agent)}
-        {' '}{osName}
-      </WzTextWithTooltipIfTruncated>
-    )
-  }
-
-
   color = (status, hex = false) => {
     if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
     else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
@@ -88,11 +75,11 @@ export class AgentInfo extends Component {
     return (
       <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: 3, fontSize: '12px'}}>
         <span className="euiFlexItem euiFlexItem--flexGrowZero">
-          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(this.props.agent.status)}`} focusable="false" role="img" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(this.agent.status)}`} focusable="false" role="img" aria-hidden="true">
             <circle cx="8" cy="8" r="4"></circle>
           </svg>
         </span>
-        <span className="euiFlexItem euiFlexItem--flexGrowZero">{this.props.agent.status}</span>
+        <span className="euiFlexItem euiFlexItem--flexGrowZero">{this.agent.status}</span>
       </span>
     )
   }
@@ -107,9 +94,9 @@ export class AgentInfo extends Component {
           <EuiStat
             title={
               item.description === 'Operating system' ? (
-                this.addTextPlatformRender(this.props.agent)
+                'hola'
               ) : item.description === 'Status' ? (
-                this.addHealthRender(this.props.agent)
+                this.addHealthRender(this.agent)
               ) : (
                     <span
                       style={{
@@ -133,38 +120,16 @@ export class AgentInfo extends Component {
   }
 
   render() {
-    const { agent } = this.props;
-
-    let arrayStats;
-
-    if (this.props.isCondensed) {
-      arrayStats = [
-        { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
-        { title: agent.status, description: 'Status', style: { maxWidth: 200 } },
-        { title: agent.version, description: 'Version', style: { maxWidth: 200 } },
-        {
-          title: agent.name,
-          description: 'Operating system',
-          style: { minWidth: 200 }
-        }
-      ];
-    } else {
-      arrayStats = [
-        { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
-        { title: agent.status, description: 'Status', style: { maxWidth: 200 } },
-        { title: agent.ip, description: 'IP' },
-        { title: agent.version, description: 'Version' },
-        {
-          title: agent.name,
-          description: 'Operating system',
-          style: { minWidth: 300 }
-        },
-        { title: agent.dateAdd, description: 'Registration date' },
-        { title: agent.lastKeepAlive, description: 'Last keep alive' }
-      ];
-    }
-
-    const stats = this.buildStats(arrayStats);
+    const stats = this.buildStats([
+      { title: this.agent.id, description: 'ID', style: { maxWidth: 100 } },
+      { title: this.agent.status, description: 'Status', style: { maxWidth: 200 } },
+      { title: this.agent.version, description: 'Version' },
+      {
+        title: this.agent.name,
+        description: 'Operating system',
+        style: { minWidth: 300 }
+      }
+    ]);
 
     return (
       <Fragment>
