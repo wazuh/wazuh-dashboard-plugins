@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Simple description for each App tabs
+ * Wazuh app - React component for show search and filter
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,19 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const EventsSelectedFiles = {
-  fim: [
-    'syscheck.path',
-    'syscheck.event',
-    'rule.description',
-    'rule.level',
-    'rule.id'
-  ],
-  mitre: [
-    'rule.mitre.id',
-    'rule.mitre.tactics',
-    'rule.description',
-    'rule.level',
-    'rule.id'
-  ]
-};
+
+export { CustomBadge, ICustomBadges } from './custom-badge';
+export { ContextMenu } from './wz-search-badges';

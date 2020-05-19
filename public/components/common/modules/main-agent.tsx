@@ -51,7 +51,6 @@ export class MainModuleAgent extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    console.log(nextProps.section)
     if (nextProps.section !== this.props.section) {
       this.setGlobalBreadcrumb();
     }
@@ -84,7 +83,7 @@ export class MainModuleAgent extends Component {
           truncate: false,
         },
         {
-          text: '',
+          text: TabDescription[this.props.section].title,
           className: 'wz-global-breadcrumb-popover'
         },
       ];
@@ -170,14 +169,20 @@ export class MainModuleAgent extends Component {
                       <EuiFlexGroup>
                         <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
                           <EuiButton
-                            onClick={() => this.props.switchTab('syscollector')}
+                            onClick={() => {
+                              this.props.cardsProps.switchTab('syscollector');
+                              this.setState({ switchModule: false });
+                            }}
                             iconType="inspect">
                             <span>Inventory data</span>
                           </EuiButton>
                         </EuiFlexItem>
                         <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
                           <EuiButton
-                            onClick={() => this.props.switchTab('configuration')}
+                            onClick={() => {
+                              this.props.cardsProps.switchTab('configuration');
+                              this.setState({ switchModule: false });
+                            }}
                             iconType="gear" >
                             <span>Configuration</span>
                           </EuiButton>

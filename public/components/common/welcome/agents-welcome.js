@@ -34,7 +34,8 @@ import {
 import { FimEventsTable, ScaScan } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { UnsupportedComponents } from '../../../utils/components-os-support';
+import store from '../../../redux/store';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { ActionAgents } from '../../../react-services/action-agents';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import Overview from '../../wz-menu/wz-menu-overview';
@@ -63,11 +64,26 @@ export class AgentsWelcome extends Component {
 
   }
 
-  async componentDidMount() {
-    this._isMount = true;
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      {
+        text: 'Agents',
+        href: "#/agents-preview"
+      },
+      {
+        text: `${this.props.agent.name} (${this.props.agent.id})`,
+        className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+        truncate: false,
+      }
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
+
   async componentDidMount() {
+    this._isMount = true;
+    this.setGlobalBreadcrumb();
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
     tabVisualizations.setTab('welcome');
@@ -306,16 +322,15 @@ export class AgentsWelcome extends Component {
                               style={{ padding: '12px 12px 0px' }}
                               className="embPanel__header"
                             >
-
                               <h2 className="embPanel__title wz-headline-title">
-                                <EuiText size="xs"><h2>Most common groups</h2></EuiText>
+                                <EuiText size="xs"><h2>MITRE top tactics</h2></EuiText>
                               </h2>
                             </EuiFlexGroup>
                             <EuiSpacer size="s" />
                             <div style={{ height: this.props.resultState === 'loading' ? 0 : 280 }}>
                               <WzReduxProvider>
                                 <KibanaVis
-                                  visID={'Wazuh-App-Agents-Welcome-Most-Common-Groups'}
+                                  visID={'Wazuh-App-Agents-Welcome-Top-Tactics-Mitre'}
                                   tab={'welcome'}
                                 ></KibanaVis>
                               </WzReduxProvider>
@@ -450,7 +465,7 @@ export class AgentsWelcome extends Component {
                     </EuiFlexGroup>
                   </EuiFlexItem>
                   <FimEventsTable agentId={this.props.agent.id} />
-                  <ScaScan agentId={this.props.agent.id} />
+                  <ScaScan agentId={this.props.agent.id} switchTab={this.props.switchTab}/>
                 </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>

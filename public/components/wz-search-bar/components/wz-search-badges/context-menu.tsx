@@ -28,7 +28,6 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
-const conjuntions = { ';': 'AND ', ',': 'OR ' }
 const operators = {
   '=': ' is ',
   '!=': ' is not ',
@@ -42,7 +41,7 @@ export function ContextMenu(props) {
   const panels = flattenPanelTree(panelTree({...props, setIsOpen}));
   const { conjuntion = false, field, value, operator } = props.qFilter;
   const button = (<EuiButtonEmpty color='text' size="xs" onClick={() => setIsOpen(!isOpen)}>
-    <strong>{conjuntion && conjuntions[conjuntion]}</strong> {field} {operators[operator]} {value}
+    <strong>{conjuntion && conjuntion}</strong> {field} {operators[operator]} {value}
   </EuiButtonEmpty>)
   return (
     <EuiPopover
@@ -96,24 +95,26 @@ const panelTree = (props) => {
       },
     ]
   }
-  operator !== '~' && panels.items.unshift(operatorItem(invertOperator))
-  !!conjuntion && panels.items.unshift(conjuntionItem(changeConjuntion))
+  operator !== '~' && panels.items.unshift(operatorItem(props))
+  !!conjuntion && panels.items.unshift(conjuntionItem(props))
   return panels;
 }
 
-const operatorItem = (invertOperator) => {
+const operatorItem = (props) => {
+  const { invertOperator, setIsOpen } = props;
   return {
     name: 'Invert operator',
     icon: 'kqlOperand',
-    onClick: invertOperator
+    onClick: (...args) => {invertOperator(...args); setIsOpen(false)}
   }
 }
 
-const conjuntionItem = (changeConjuntion) => {
+const conjuntionItem = (props) => {
+  const { changeConjuntion, setIsOpen } = props;
   return {
     name: 'Change conjuntion',
     icon: 'kqlSelector',
-    onClick: changeConjuntion
+    onClick: (...args) => {changeConjuntion(...args); setIsOpen(false)}
   }
 }
 
@@ -142,7 +143,7 @@ function EditFilterSaveButton(query: any, operator: any, value: any, conjuntion:
             const newFilter = { field: query.field, operator, value };
             conjuntion && (newFilter['conjuntion'] = conjuntion);
             props.qInterpreter.editByIndex(props.index, newFilter);
-            props.updateFilters();
+            props.updateFilters(newFilter);
             props.setIsOpen(false);
           }}>
             Save
@@ -202,12 +203,11 @@ function EditFilterOperator(operator, setOperator) {
   </EuiFormRow>;
 }
 
-function EditFilterConjuntion(conjuntion, setConjuntion): React.ReactNode {
+function EditFilterConjuntion(conjuntion: string, setConjuntion): React.ReactNode {
   return <EuiFormRow label="Conjuntion">
     <EuiButtonGroup options={[
-      { id: `conjuntion;`, label: "AND" },
-      { id: `conjuntion,`, label: "OR" },
-    ]} idSelected={`conjuntion${conjuntion}`} onChange={() => setConjuntion(conjuntion === ';' ? ',' : ';')} />
+      { id: `conjuntion-AND`, label: "AND" },
+      { id: `conjuntion-OR`, label: "OR" },
+    ]} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(/and/gi.test(conjuntion) ? ' OR ' : ' AND ')} />
   </EuiFormRow>;
 }
-

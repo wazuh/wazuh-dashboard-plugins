@@ -28,6 +28,7 @@ import { Discover } from '../../../common/modules/discover'
 // @ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
+import { ICustomBadges } from '../../../wz-search-bar/components';
 
 export class FileDetails extends Component {
 
@@ -212,13 +213,17 @@ export class FileDetails extends Component {
   }
 
   addFilter(field, value) {
+    const {customBadges, onChangeCustomBadges} = this.props;
+    const newBadge:ICustomBadges = {field: 'q', value: ''}
     if (field === 'date' || field === 'mtime') {
       let value_max = new Date(value);
       value_max.setDate(new Date(value).getDate() + 1);
-      this.props.onFilterSelect(`${field}>${this.formatDate(value)};${field}<${this.formatDate(value_max)}`);
+      newBadge.value = `${field}>${this.formatDate(value)} AND ${field}<${this.formatDate(value_max)}`;
     } else {
-      this.props.onFilterSelect(`${field}=${field === 'size' ? this.props.currentFile[field] : value}`);
+      newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;
     }
+    !customBadges.some(item => (item.field === newBadge.field && item.value === newBadge.value)) 
+      && onChangeCustomBadges([...customBadges, newBadge]);
     this.props.closeFlyout();
   }
 
@@ -231,7 +236,7 @@ export class FileDetails extends Component {
         value = !isNaN(value) ? this.formatBytes(value) : 0;
       }
       var link = (item.link && view !== 'events') || false;
-      if (!item.onlyLinux || (item.onlyLinux && this.props.agent.agentPlatform !== 'windows')) {
+      if (!item.onlyLinux || (item.onlyLinux && this.props.agent && this.props.agent.agentPlatform !== 'windows')) {
         let className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
         className += item.field === 'perm' ? " detail-value-perm" : "";
         return (

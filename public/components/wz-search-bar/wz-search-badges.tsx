@@ -18,6 +18,9 @@ import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { ContextMenu } from './components/wz-search-badges';
 import { qSuggests } from '.';
 import './src/style/wz-search-badges.less'
+import { EuiText } from '@elastic/eui';
+import { EuiPopover } from '@elastic/eui';
+import { EuiButtonEmpty } from '@elastic/eui';
 
 
 interface iFilter { field:string, value:string }
@@ -64,9 +67,11 @@ export class WzSearchBadges extends Component {
         iconSide="right"
         iconOnClickAriaLabel="Remove"
         color="hollow"
-        className="globalFilterItem wz-search-badge"
+        className="wz-search-badge"
         iconOnClick={() => this.onDeleteFilter(filter)}>
-        {`${filter.field}:${filter.value}`}
+        <EuiButtonEmpty color='text' size="xs">
+          {`${filter.field}: ${filter.value}`}
+        </EuiButtonEmpty>
       </EuiBadge>
     );
   }

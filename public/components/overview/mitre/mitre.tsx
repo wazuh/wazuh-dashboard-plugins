@@ -102,7 +102,6 @@ export class Mitre extends Component {
 
 
   async componentDidMount(){
-    console.log(this.props)
     this._isMount = true;
     this.indexPattern = await getIndexPattern();
     await this.buildTacticsObject();

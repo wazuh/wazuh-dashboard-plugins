@@ -27,6 +27,7 @@
         <react-component name="RegisterAgent" props="ctrl.registerAgentsProps" />
     </div>
     <div ng-show="!ctrl.addingNewAgent">
-            <react-component name="AgentsPreview" props="{tableProps : ctrl.tableAgentsProps}" />
+        <kbn-dis ng-show="false"></kbn-dis>
+        <react-component name="AgentsPreview" props="{tableProps : ctrl.tableAgentsProps, resultState: resultState}" />
     </div>
 </div>

@@ -16,6 +16,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
+import { ICustomBadges } from '../../../wz-search-bar/components';
 
 export class FilterBar extends Component {
   suggestions: {[key:string]: qSuggests[]} = {
@@ -47,6 +48,8 @@ export class FilterBar extends Component {
     onFiltersChange: Function
     selectView: 'files' | 'registry'
     agent: {id: string, agentPlatform: string}
+    onChangeCustomBadges?(customBadges: ICustomBadges[]): void 
+    customBadges?: ICustomBadges[]
     filters: {}
   }
 
@@ -58,8 +61,7 @@ export class FilterBar extends Component {
   }
 
   render() {
-    const { onFiltersChange, selectView, filters } = this.props;
-
+    const { onFiltersChange, selectView, filters, onChangeCustomBadges, customBadges } = this.props;
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -70,7 +72,9 @@ export class FilterBar extends Component {
             qSuggests={this.suggestions[selectView]}
             apiSuggests={null}
             defaultFormat='?Q'
-            placeholder='Add filter or search' />
+            placeholder='Add filter or search'
+            customBadges={customBadges}
+            onChangeCustomBadges={onChangeCustomBadges} />
         </EuiFlexItem>
       </EuiFlexGroup>
     )

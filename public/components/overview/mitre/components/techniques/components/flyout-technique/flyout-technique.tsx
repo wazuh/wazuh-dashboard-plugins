@@ -28,8 +28,9 @@ export class FlyoutTechnique extends Component {
   _isMount = false;
   state: {
     techniqueData: {
-      [key:string]: any
+      [key:string]: any,
     }
+    loading: boolean
   }
 
   props!: {
@@ -42,7 +43,8 @@ export class FlyoutTechnique extends Component {
     this.state = {
       techniqueData: {
         description: ''
-      }
+      },
+      loading: false
     }
   }
 
@@ -59,18 +61,23 @@ export class FlyoutTechnique extends Component {
   }
 
   async getTechniqueData() {
-    const { currentTechnique } = this.props;
-    const result = await WzRequest.apiReq('GET', '/mitre', {
-      q: `id=${currentTechnique}`
-    });
-    const rawData = (((result || {}).data || {}).data || {}).items
-    !!rawData && this.formatTechniqueData(rawData[0]);
+    try{
+      this.setState({loading: true, techniqueData: {}});
+      const { currentTechnique } = this.props;
+      const result = await WzRequest.apiReq('GET', '/mitre', {
+        q: `id=${currentTechnique}`
+      });
+      const rawData = (((result || {}).data || {}).data || {}).items
+      !!rawData && this.formatTechniqueData(rawData[0]);
+    }catch(err){
+      this.setState({loading: false});
+    }
   }
 
   formatTechniqueData (rawData) {
     const { platform_name, phase_name} = rawData;
     const { name, description, x_mitre_version: version } = rawData.json;
-    this.setState({techniqueData: { name, description, phase_name, platform_name, version } })
+    this.setState({techniqueData: { name, description, phase_name, platform_name, version}, loading: false  })
   }
 
   getArrayFormatted(arrayText) {
@@ -176,6 +183,15 @@ export class FlyoutTechnique extends Component {
     );
   }
 
+  renderLoading(){
+    return (
+    <EuiFlyoutBody>
+          <EuiLoadingContent lines={2} />
+          <EuiLoadingContent lines={3} />
+    </EuiFlyoutBody>
+    )
+  }
+
   render() {
     const { techniqueData } = this.state;
     const { onChangeFlyout } = this.props;
@@ -190,8 +206,11 @@ export class FlyoutTechnique extends Component {
             this.renderHeader()
           }
           {
-            techniqueData &&
+            !!Object.keys(techniqueData).length &&
             this.renderBody()
+          }
+          { this.state.loading &&
+            this.renderLoading()
           }
         </EuiFlyout>
     );

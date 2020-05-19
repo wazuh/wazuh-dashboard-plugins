@@ -21,6 +21,7 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import './inventory.less';
+import { ICustomBadges } from '../../../wz-search-bar/components';
 
 export class InventoryTable extends Component {
   state: {
@@ -40,6 +41,7 @@ export class InventoryTable extends Component {
   props!: {
     filters: {},
     onFilterSelect(): void
+    customBadges: ICustomBadges[]
     agent: any,
     items: []
   }
@@ -92,8 +94,9 @@ export class InventoryTable extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+    const { filters, customBadges } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters) 
+     || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
       this.setState({ pageIndex: 0 }, this.getSyscheck)
     }
   }
@@ -125,18 +128,26 @@ export class InventoryTable extends Component {
 
   buildFilter() {
     const { pageIndex, pageSize } = this.state;
-    const { filters } = this.props;
-    const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
+    const { filters, } = this.props;
     const filter = {
       ...filters,
-      ...(filters.q ? {q: filters.q.replace(/ and | or /gi, parseConjuntions) } : {} ),
+      ...this.buildQFilter(),
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
       type: 'file'
     };
-
     return filter;
+  }
+
+  buildQFilter() {
+    const { filters, customBadges } = this.props;
+    const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
+    let qFilter = filters['q'] ? filters['q'] : '';
+    customBadges.forEach(
+      badge => badge.field === 'q' && (qFilter += badge.value) )
+    const q = qFilter.replace(/ and | or /gi, parseConjuntions)
+    return !!qFilter ? {q} : {}; 
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
