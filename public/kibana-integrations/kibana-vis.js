@@ -26,6 +26,9 @@ import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
+import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
+import { Vis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/types';
+import { convertToSerializedVis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/saved_visualizations/_saved_vis';
 import { toastNotifications } from 'ui/notify';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 
@@ -56,7 +59,11 @@ class KibanaVis extends Component {
       chrome: npStart.core.chrome,
       overlays: npStart.core.overlays
     };
-    this.savedObjectLoaderVisualize = createSavedVisLoader(services);
+    const servicesForVisualizations = {
+      ...services,
+      ...{ visualizationTypes: new TypesService().start() },
+    }
+    this.savedObjectLoaderVisualize = createSavedVisLoader(servicesForVisualizations);
     this.factory = null;
     this.visID = this.props.visID;
     this.tab = this.props.tab;
@@ -104,14 +111,14 @@ class KibanaVis extends Component {
   async callUpdateMetric() {
     try {
       if (this.visHandler) {
-        const data = await this.visHandler.handler.dataHandler.getData();
+        const data = await this.visHandler.handler.execution.getData();
         if (
           data &&
           data.value &&
           data.value.visData &&
           data.value.visData.rows &&
           this.props.state[this.visID] !==
-            data.value.visData.rows['0']['col-0-1']
+          data.value.visData.rows['0']['col-0-1']
         ) {
           store.dispatch(
             this.updateMetric({
@@ -122,7 +129,7 @@ class KibanaVis extends Component {
         }
         // This check if data.value.visData.tables exists and dispatch that value as stat
         // FIXME: this is correct?
-        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && data.value.visData.tables['0'] && data.value.visData.tables['0'].rows && data.value.visData.tables['0'].rows['0'] && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']){
+        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && data.value.visData.tables['0'] && data.value.visData.tables['0'].rows && data.value.visData.tables['0'].rows['0'] && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']) {
           store.dispatch(
             this.updateMetric({ name: this.visID, value: data.value.visData.tables['0'].rows['0']['col-0-2'] })
           );
@@ -209,15 +216,14 @@ class KibanaVis extends Component {
           this.visualization.searchSource.setField('source', false);
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
-
+          const vis = new Vis(this.visualization.visState.type, await convertToSerializedVis(this.visualization));
           this.visHandler = await this.factory.createFromObject(
-            this.visualization,
+            vis,
             visInput
           );
-          setTimeout(() => {
-            this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
-              this.visHandler.handler.data$.subscribe(this.renderComplete());
-            });
+          setTimeout(async () => {
+            await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
+            this.visHandler.handler.data$.subscribe(this.renderComplete());
           });
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
@@ -227,7 +233,7 @@ class KibanaVis extends Component {
           if (this.props.isMetric) {
             this.callUpdateMetric();
           }
-          
+
           this.rendered = true;
           this.$rootScope.rendered = 'true';
           this.visHandler.updateInput(visInput);

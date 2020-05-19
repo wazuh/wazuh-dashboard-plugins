@@ -57,6 +57,7 @@ import {
   getRequestInspectorStats,
   getResponseInspectorStats,
   getServices,
+  setServices,
   subscribeWithScope,
   tabifyAggResponse,
   getAngularModule,
@@ -65,22 +66,10 @@ import {
 ///WAZUH///
 import { buildServices } from 'plugins/kibana/discover/build_services';
 import { npStart } from 'ui/new_platform';
-import { pluginInstance } from 'plugins/kibana/discover/index';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
+import { start as visualizations } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/legacy';
 ///////////
-
-const {
-  core,
-  chrome,
-  data,
-  history,
-  filterManager,
-  timefilter,
-  toastNotifications,
-  uiSettings: config,
-  visualizations,
-} = getServices();
 
 import {
   esFilters,
@@ -101,14 +90,12 @@ const fetchStatuses = {
 
 const app = uiModules.get('app/discover', []);
 const wazuhApp = getAngularModule('app/wazuh');
-app.run(async (globalState, $rootScope) => {
+app.run(async () => {
   const services = await buildServices(
     npStart.core,
     npStart.plugins
   );
   setServices(services);
-  const { timefilter } = getServices();
-  registerTimefilterWithGlobalStateFactory(timefilter, globalState, $rootScope);
 });
 
 app.directive('discoverAppW', function () {
@@ -138,7 +125,7 @@ function discoverController(
   const subscriptions = new Subscription();
   const $fetchObservable = new Subject();
   let inspectorRequest;
-  const savedSearch = $route.current.locals.savedObjects.savedSearch;
+  const savedSearch = $route.current.locals.savedSearch;
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
   //used for functional testing
@@ -153,6 +140,20 @@ function discoverController(
     );
     setServices(services);
   })();
+
+  const {
+    core,
+    chrome,
+    data,
+    history,
+    filterManager,
+    timefilter,
+    toastNotifications,
+    uiSettings: config
+  } = getServices();
+
+  const wazuhConfig = new WazuhConfig();
+  const modulesHelper = ModulesHelper;
 
   const getTimeField = () => {
     return isDefaultType($scope.indexPattern) ? $scope.indexPattern.timeFieldName : undefined;
@@ -254,8 +255,8 @@ function discoverController(
       mode: 'absolute',
     });
     //WAZUH
-    $scope.updateQueryAndFetch({
-      query: $state.query
+    $scope.updateQuery({
+      query: $scope.state.query
     });
   };
   $scope.intervalOptions = search.aggs.intervalOptions;
@@ -451,7 +452,7 @@ function discoverController(
     sampleSize: config.get('discover:sampleSize'),
     timefield: getTimeField(),
     savedSearch: savedSearch,
-    indexPatternList: $route.current.locals.savedObjects.ip.list,
+    indexPatternList: $route.current.locals.ip.list,
   };
 
   const shouldSearchOnPageLoad = () => {
@@ -507,7 +508,7 @@ function discoverController(
                 ///////////////////////////////  WAZUH   ///////////////////////////////////
                 if (!filtersAreReady()) return;
                 discoverPendingUpdates.removeAll();
-                discoverPendingUpdates.addItem($state.query, [
+                discoverPendingUpdates.addItem($scope.state.query, [
                   ...$scope.filters,
                   ...buildFilters() // Hide '000' agent
                 ]);
@@ -516,7 +517,7 @@ function discoverController(
                 }
                 $scope.fetch();
                 ////////////////////////////////////////////////////////////////////////////
-                $state.save();
+                //$scope.state.save();
                 // Forcing a digest cycle
                 $rootScope.$applyAsync();
               });
@@ -569,7 +570,10 @@ function discoverController(
             const rowsEmpty = _.isEmpty(rows);
             if (rowsEmpty && fetchStatus === fetchStatuses.LOADING) return status.LOADING;
             else if (!rowsEmpty) return status.READY;
-            else return status.NO_RESULTS;
+            else {
+              // Wazuh. If there are hits but no rows, the it's also a READY status
+              return $scope.hits ? status.READY : status.NO_RESULTS;
+            }
           }
 
           return function () {
@@ -654,6 +658,11 @@ function discoverController(
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
       setAppState({ query });
+      // WAZUH  query from search bar
+      discoverPendingUpdates.removeAll();
+      discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);
+      $scope.fetch();
+      /////
       $fetchObservable.next();
     }
   };
@@ -808,8 +817,8 @@ function discoverController(
     const size = noHits ? 0 : $scope.opts.sampleSize;
     searchSource
       .setField('size', size) // Wazuh. Use custom size
-      .setField('sort', getSortForSearchSource($state.sort, indexPattern))
-      .setField('query', !$state.query ? null : $state.query)
+      .setField('sort', getSortForSearchSource($scope.state.sort, indexPattern))
+      .setField('query', !$scope.state.query ? null : $scope.state.query)
       .setField('filter', filterManager.filters);
 
     //Wazuh update the visualizations
@@ -933,7 +942,7 @@ function discoverController(
       loaded: loadedIndexPattern,
       stateVal,
       stateValFound,
-    } = $route.current.locals.savedObjects.ip;
+    } = $route.current.locals.ip;
 
     const ownIndexPattern = $scope.searchSource.getOwnField('index');
 
@@ -975,7 +984,6 @@ function discoverController(
     return loadedIndexPattern;
   }
 
-  addHelpMenuToAppChrome(chrome);///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -989,8 +997,8 @@ function discoverController(
   });
 
   $scope.loadFilters = async (wzCurrentFilters, tab) => {
-    const appState = getAppState();
-    if (!appState || !globalState) {
+    const appState = appStateContainer.getState();
+    if (!appState) {
       $timeout(100).then(() => {
         return loadFilters(wzCurrentFilters);
       });
@@ -999,7 +1007,8 @@ function discoverController(
         if (x.$state.isImplicit != false)
           x.$state.isImplicit = true
       });
-      const globalFilters = globalState.filters;
+      //const globalFilters = globalState.filters;
+      const globalFilters = [];
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
       }
@@ -1017,14 +1026,14 @@ function discoverController(
       $scope.$applyAsync();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.tab = parameters.tab;
-      delete (($state || {}).query || {}).update_Id;
+      delete (($scope.state || {}).query || {}).update_Id;
       evt.stopPropagation();
       if ($scope.tabView === 'discover') {
         $scope.rows = false;
         $scope.fetch();
       }
-      $scope.updateQueryAndFetch({
-        query: $state.query
+      $scope.updateQuery({
+        query: $scope.state.query
       });
       $scope.$applyAsync();
     }

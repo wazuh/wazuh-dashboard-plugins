@@ -20,6 +20,7 @@ import { ChromeStart, SavedObjectsClientContract, SavedObjectsFindOptions } from
 import { SavedObject } from '../../../../src/plugins/saved_objects/public/types';
 import { StringUtils } from '../../../../src/plugins/saved_objects/public/saved_object/helpers/string_utils';
 
+
 /**
  * The SavedObjectLoader class provides some convenience functions
  * to load and save one kind of saved objects (specified in the constructor).
@@ -62,7 +63,7 @@ export class SavedObjectLoader {
    * @param id
    * @returns {Promise<SavedObject>}
    */
-  async get(id: string) {
+  async get(id: string, raw: any) {
     const instance = new this.Class(id);
 
     instance.init = _.once(() => {
