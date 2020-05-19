@@ -38,15 +38,7 @@ export class ScaScan extends Component {
     lastScan: {
       [key: string]: any
     },
-    historyScans: {
-      [key: string]: any
-    },
     isLoading: Boolean,
-    showHistory: Boolean,
-    detailsOn: Boolean
-    detailsObj : {
-      [key: string]: any
-    },
   }
 
   constructor(props) {
@@ -54,10 +46,6 @@ export class ScaScan extends Component {
     this.state = {
       lastScan: {},
       isLoading: true,
-      showHistory: false,
-      historyScans: [],
-      detailsOn: false,
-      detailsObj: {}
     };
   }
 
@@ -72,15 +60,6 @@ export class ScaScan extends Component {
       this.setState({
         lastScan: (((scans.data || {}).data || {}).items || {})[0],
         isLoading: false,
-      });
-  }
-
-  async getHistoryScan(agentId: Number) {
-    const scans = await WzRequest.apiReq('GET', `/sca/${agentId}?sort=-end_scan`, {limit: 5});
-    this._isMount &&
-      this.setState({
-        historyScans: (((scans.data || {}).data || {}).items || {}),
-        showHistory: true,
       });
   }
 
@@ -100,44 +79,30 @@ export class ScaScan extends Component {
   }
 
   renderScanDetails() {
-    const { isLoading, showHistory, lastScan, detailsOn, detailsObj } = this.state;
-    if (isLoading || showHistory) return;
-    let data = detailsOn ? detailsObj : lastScan;
-    
+    const { isLoading, lastScan } = this.state;
+    if (isLoading) return;
     return(
       <Fragment>
         <EuiText size="xs">
-          <h2>
-          <EuiToolTip position="top" content="Scan history">
-            <EuiButtonIcon
-              color={'primary'}
-              onClick={() => this.getHistoryScan(this.props.agentId)}
-              iconType="sortLeft"
-              aria-label="History SCA scan"
-            />
-          </EuiToolTip>
-            {detailsOn ? `SCA: Scan details` : `SCA: Last scan`}
-          </h2>
+          <h2>SCA: Last scan</h2>
         </EuiText>
         <EuiSpacer size="s" />
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
-            {data.references === 'NULL' ?
-              <h3>{data.name}</h3> :
-              <EuiLink href={data.references} target="_blank">
-                <h3>{data.name}</h3>
-              </EuiLink>}
+              <EuiLink onClick={() => this.props.switchTab('sca')}>
+                <h3>{lastScan.name}</h3>
+              </EuiLink>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
-            <EuiBadge color="secondary">{data.policy_id}</EuiBadge>
+            <EuiBadge color="secondary">{lastScan.policy_id}</EuiBadge>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText>
-              <p>{data.description}</p>
+              <p>{lastScan.description}</p>
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -145,7 +110,7 @@ export class ScaScan extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiStat
-              title={data.pass}
+              title={lastScan.pass}
               textAlign="center"
               description="Pass"
               titleColor="secondary"
@@ -153,7 +118,7 @@ export class ScaScan extends Component {
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiStat
-              title={data.fail}
+              title={lastScan.fail}
               textAlign="center"
               description="Fail"
               titleColor="danger"
@@ -161,14 +126,14 @@ export class ScaScan extends Component {
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiStat
-              title={data.total_checks}
+              title={lastScan.total_checks}
               textAlign="center"
               description="Total checks"
             />
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiStat
-              title={`${data.score}%`}
+              title={`${lastScan.score}%`}
               textAlign="center"
               description="Score"
             />
@@ -178,7 +143,7 @@ export class ScaScan extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText textAlign="center">
-              <span>{`Start Scan: ${data.start_scan} - End Scan: ${data.end_scan}`}</span>
+              <span>{`Start Scan: ${lastScan.start_scan} - End Scan: ${lastScan.end_scan}`}</span>
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -186,124 +151,15 @@ export class ScaScan extends Component {
     )
   }
 
-  columns() {
-    return [
-      {
-        field: 'start_scan',
-        name: 'Data Scan',
-        sortable: true,
-        width: '65px'
-      },
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true,
-        truncateText: true,
-        width: '150px'
-      },
-      {
-        field: 'pass',
-        name: 'Pass',
-        sortable: true,
-        width: '20px'
-      },
-      {
-        field: 'fail',
-        name: 'Fail',
-        sortable: true,
-        width: '20px'
-      },
-      {
-        field: 'total_checks',
-        name: 'Total Checks',
-        sortable: true,
-        width: '30px'
-      },
-      {
-        field: 'score',
-        name: 'Score',
-        sortable: true,
-        width: '20px'
-      },
-    ]
-  }
-
-  renderHistoryScans() {
-    const { showHistory, historyScans } = this.state;
-    const columns = this.columns();
-
-    const getRowProps = item => {
-      const { hash_file } = item;
-      return {
-        'data-test-subj': `row-${hash_file}`,
-        className: 'customRowClass',
-        onClick: () => this.setState({
-          detailsObj: item,
-          detailsOn: true,
-          showHistory: false
-        }),
-      };
-    };
-  
-    const getCellProps = (item, column) => {
-      const { hash_file } = item;
-      const { field } = column;
-      return {
-        className: 'customCellClass',
-        'data-test-subj': `cell-${hash_file}-${field}`,
-        textOnly: true,
-      };
-    };
-
-    if(!showHistory) return;
-    return(
-      <Fragment>
-        <EuiText size="xs">
-          <h2>
-          <EuiToolTip position="top" content="Last Scan">
-            <EuiButtonIcon
-              color={'primary'}
-              onClick={() => {
-                this.getLastScan(this.props.agentId);
-                this.setState({
-                  showHistory: false,
-                  detailsOn: false 
-                });
-                }
-              }
-              iconType="sortLeft"
-              aria-label="Last scan"
-            />
-          </EuiToolTip>
-            SCA: Scan history
-          </h2>
-        </EuiText>
-        <EuiSpacer size="s" />
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-          <EuiBasicTable
-            items={historyScans}
-            itemId="start_scan"
-            columns={columns}
-            rowProps={getRowProps}
-            cellProps={getCellProps}
-          />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </Fragment>
-    );
-  }
 
   render() {
     const loading = this.renderLoadingStatus();
     const scaScan = this.renderScanDetails();
-    const historyScan = this.renderHistoryScans();
     return (
       <EuiFlexItem style={{ marginTop: 0 }}>
         <EuiPanel paddingSize="m">
           {loading}
           {scaScan}
-          {historyScan}
         </EuiPanel>
       </EuiFlexItem>
     )

@@ -470,7 +470,7 @@ export class AgentsWelcome extends Component {
                     </EuiFlexGroup>
                   </EuiFlexItem>
                   <FimEventsTable agentId={this.props.agent.id} />
-                  <ScaScan agentId={this.props.agent.id} />
+                  <ScaScan agentId={this.props.agent.id} switchTab={this.props.switchTab}/>
                 </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
