@@ -75,8 +75,8 @@ export const initialWazuhConfig = `---
 #
 # Defines if the user is allowed to change the selected
 # API directly from the Wazuh app top menu.
-# Default: false
-#api.selector: false
+# Default: truepi
+#api.selector: true
 #
 # --------------------------- Index pattern selector ---------------------------
 #

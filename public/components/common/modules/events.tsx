@@ -12,8 +12,9 @@
 
 import React, { Component, Fragment } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import { EventsSelectedFiles } from './events-selected-fields'
+import { EventsSelectedFiles } from './events-selected-fields';
 import { EventsFim } from '../../agents/fim/events';
+import { EventsMitre } from './mitre-events';
 import { ModulesHelper } from './modules-helper'
 export class Events extends Component {
   constructor(props) {
@@ -59,6 +60,7 @@ export class Events extends Component {
     return (
       <Fragment>
         {this.props.section === 'fim' && <EventsFim {...this.props}></EventsFim>}
+        {this.props.section === 'mitre' && <EventsMitre {...this.props}></EventsMitre>}
       </Fragment>
     )
   }

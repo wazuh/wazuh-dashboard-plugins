@@ -100,7 +100,7 @@ export class AgentInfo extends Component {
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
             title={
-              item.description === 'OS' ? (
+              item.description === 'Operating system' ? (
                 this.addTextPlatformRender(this.props.agent)
               ) : item.description === 'Status' ? (
                 this.addHealthRender(this.props.agent)
@@ -135,8 +135,8 @@ export class AgentInfo extends Component {
       { title: agent.version, description: 'Version' },
       {
         title: agent.name,
-        description: 'OS',
-        style: { minWidth: 400 }
+        description: 'Operating system',
+        style: { minWidth: 300 }
       },
       { title: agent.dateAdd, description: 'Registration date' },
       { title: agent.lastKeepAlive, description: 'Last keep alive' }

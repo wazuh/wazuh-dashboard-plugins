@@ -84,7 +84,7 @@ export class MainModuleAgent extends Component {
           truncate: false,
         },
         {
-          text: '',
+          text: TabDescription[this.props.section].title,
           className: 'wz-global-breadcrumb-popover'
         },
       ];
@@ -170,14 +170,20 @@ export class MainModuleAgent extends Component {
                       <EuiFlexGroup>
                         <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
                           <EuiButton
-                            onClick={() => this.props.switchTab('syscollector')}
+                            onClick={() => {
+                              this.props.cardsProps.switchTab('syscollector');
+                              this.setState({ switchModule: false });
+                            }}
                             iconType="inspect">
                             <span>Inventory data</span>
                           </EuiButton>
                         </EuiFlexItem>
                         <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
                           <EuiButton
-                            onClick={() => this.props.switchTab('configuration')}
+                            onClick={() => {
+                              this.props.cardsProps.switchTab('configuration');
+                              this.setState({ switchModule: false });
+                            }}
                             iconType="gear" >
                             <span>Configuration</span>
                           </EuiButton>
@@ -269,7 +275,7 @@ export class MainModuleAgent extends Component {
                 {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
                 {section === 'fim' && <MainFim {...this.props} />}
                 {section === 'sca' && <MainSca {...this.props} />}
-                {section === 'mitre' && selectView==='inventory' && <MainMitre {...this.props} />}
+                {section === 'mitre' && selectView==='inventory' && <MainMitre {...this.props} goToDiscover={(id) => this.props.onSelectedTabChanged(id)} />}
                 {/* -------------------------------------------------------------------------- */}
               </div>
             }

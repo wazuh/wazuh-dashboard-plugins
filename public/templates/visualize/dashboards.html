@@ -26,12 +26,8 @@
                 <!-- End Discover search bar section -->
             </div>
 
-            <div ng-if="octrl.tab === 'mitre' && showMitre">
-                <react-component name="Mitre" />
-            </div>
-
             <!-- Loading status section -->
-            <div ng-if="octrl.tab !== 'welcome' && !showMitre && octrl.tabView === 'panels' && !rendered && resultState !== 'none' || (resultState === 'loading' && octrl.tab !== 'welcome' && octrl.tabView === 'panels') "
+            <div ng-show="showModuleDashboard || showModuleEvents" ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none' || (resultState === 'loading' && octrl.tab !== 'welcome' && octrl.tabView === 'panels') "
                 class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
                 <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
                     <div class="euiSpacer euiSpacer--m"></div>

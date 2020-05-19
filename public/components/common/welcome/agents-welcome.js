@@ -34,7 +34,8 @@ import {
 import { FimEventsTable, ScaScan } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { UnsupportedComponents } from '../../../utils/components-os-support';
+import store from '../../../redux/store';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { ActionAgents } from '../../../react-services/action-agents';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import Overview from '../../wz-menu/wz-menu-overview';
@@ -63,11 +64,30 @@ export class AgentsWelcome extends Component {
 
   }
 
-  async componentDidMount() {
-    this._isMount = true;
+  setGlobalBreadcrumb() {
+      const breadcrumb = [
+        { text: '' },
+        {
+          text: 'Agents',
+          href: "#/agents-preview"
+        },
+        {
+          text: `${this.props.agent.name} (${this.props.agent.id})`,
+          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+          truncate: false,
+        }
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    
   }
 
+  componentDidUpdate(){
+    this.setGlobalBreadcrumb()
+  }
+
+
   async componentDidMount() {
+    this._isMount = true;
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
     tabVisualizations.setTab('welcome');
@@ -240,7 +260,7 @@ export class AgentsWelcome extends Component {
     return (
       <div className="wz-module wz-module-welcome">
         <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent'>
+          <div className='wz-module-header-agent wz-module-header-agent-main'>
             {title}
           </div>
         </div>
@@ -256,7 +276,7 @@ export class AgentsWelcome extends Component {
           </div>
         </div>
         <div className="wz-module-body">
-          <EuiPage>
+{/*           <EuiPage>
             <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
               {this.state.hideActions === false &&
                 <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
@@ -275,8 +295,8 @@ export class AgentsWelcome extends Component {
                 </EuiFlexItem>
               }
             </EuiFlexGroup>
-          </EuiPage>
-          <EuiPage style={{ paddingTop: 0 }}>
+          </EuiPage> */}
+          <EuiPage>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFlexGroup direction="column">
@@ -450,7 +470,7 @@ export class AgentsWelcome extends Component {
                     </EuiFlexGroup>
                   </EuiFlexItem>
                   <FimEventsTable agentId={this.props.agent.id} />
-                  <ScaScan agentId={this.props.agent.id} />
+                  <ScaScan agentId={this.props.agent.id} switchTab={this.props.switchTab}/>
                 </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>

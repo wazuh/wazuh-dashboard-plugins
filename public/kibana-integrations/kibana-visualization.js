@@ -97,8 +97,9 @@ app.directive('kbnVis', function() {
           const timeFilterSeconds = calculateTimeFilterSeconds(
             timefilter.getTime()
           );
-          const timeRange =
-            isAgentStatus && timeFilterSeconds < 900
+          const timeRange = $scope.visID === 'Wazuh-App-Overview-General-Agents-Evolution'
+              ? { from: 'now-7d', to: 'now', mode: 'quick' }
+              : isAgentStatus && timeFilterSeconds < 900
               ? { from: 'now-15m', to: 'now', mode: 'quick' }
               : timefilter.getTime();
           const filters = isAgentStatus ? [] : discoverList[1] || [];

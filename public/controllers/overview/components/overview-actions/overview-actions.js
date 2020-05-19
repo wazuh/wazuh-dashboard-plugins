@@ -67,7 +67,7 @@ export class OverviewActions extends Component {
     if (isAgentFilterIsOneOf.length) {
       result = [...isAgentFilterIsOneOf[0].meta.params];
     }
-    if(result.length)
+    if (result.length)
       this.updateAgentSearch(result);
   }
 
@@ -132,14 +132,14 @@ export class OverviewActions extends Component {
     const areAgentsFilter = this.state.filterManager.filters.filter(item => {
       return item.meta.key === 'agent.id';
     });
-    if(!areAgentsFilter.length){
+    if (!areAgentsFilter.length) {
       this.props.setAgent(false);
-      this.setState({isAgent: false});
+      this.setState({ isAgent: false });
     }
-    if(areAgentsFilter.length){
-      const agentsList = areAgentsFilter[0].meta.params.query ? [areAgentsFilter[0].meta.params.query] : areAgentsFilter[0].meta.params; 
+    if (areAgentsFilter.length) {
+      const agentsList = areAgentsFilter[0].meta.params.query ? [areAgentsFilter[0].meta.params.query] : areAgentsFilter[0].meta.params;
       this.props.setAgent(agentsList);
-    } 
+    }
 
     if (this.state.oldFilters) {
       // if oldFilters length is less than current filters, it means some filters have been added
@@ -164,10 +164,10 @@ export class OverviewActions extends Component {
 
   removeAgentsFilter(shouldUpdate = true) {
     //this.props.buildOverview();
-    if(shouldUpdate){
+    if (shouldUpdate) {
       this.closeAgentModal();
       this.props.setAgent(false);
-      this.setState({isAgent: false});
+      this.setState({ isAgent: false });
       this.props.setAgent(false);
     }
     const currentAppliedFilters = this.state.filterManager.filters;
@@ -181,9 +181,9 @@ export class OverviewActions extends Component {
 
   componentDidMount() {
     const { filterManager } = getServices();
-    
-    this.setState({  filterManager: filterManager }, () => {
-      if(this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])
+
+    this.setState({ filterManager: filterManager }, () => {
+      if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])
     });
   }
 
@@ -220,46 +220,48 @@ export class OverviewActions extends Component {
     }
   }
 
-  agentTableSearch(agentIdList){
+  agentTableSearch(agentIdList) {
     this.props.setAgent(agentIdList);
     this.closeAgentModal();
-    if(agentIdList && agentIdList.length){
-      if(agentIdList.length === 1){
+    if (agentIdList && agentIdList.length) {
+      if (agentIdList.length === 1) {
         const filter = {
           "meta": {
-            "alias":null,
-            "disabled":false,
-            "key":"agent.id",
-            "negate":false,
-            "params":{"query": agentIdList[0]},
-            "type":"phrase",
-            "index":"wazuh-alerts-3.x-*"
+            "alias": null,
+            "disabled": false,
+            "key": "agent.id",
+            "negate": false,
+            "params": { "query": agentIdList[0] },
+            "type": "phrase",
+            "index": "wazuh-alerts-3.x-*"
           },
-          "query": {"match":  {
-            'agent.id': {
-              query: agentIdList[0],
-              type: 'phrase'
+          "query": {
+            "match": {
+              'agent.id': {
+                query: agentIdList[0],
+                type: 'phrase'
+              }
             }
-          }},
-          "$state": {"store":"appState", "isImplicit": true}
+          },
+          "$state": { "store": "appState", "isImplicit": true }
         };
         this.state.filterManager.addFilters(filter);
-      }else if(agentIdList.length > 1){
-        const agentsListString = agentIdList.map(item => {return item.toString()})
-        const agentsListFormatted = agentIdList.map(item => {return { "match_phrase": {"agent.id": item.toString()}}})
+      } else if (agentIdList.length > 1) {
+        const agentsListString = agentIdList.map(item => { return item.toString() })
+        const agentsListFormatted = agentIdList.map(item => { return { "match_phrase": { "agent.id": item.toString() } } })
         const filter = {
           "meta": {
-            "alias":null,
-            "disabled":false,
-            "key":"agent.id",
-            "negate":false,
+            "alias": null,
+            "disabled": false,
+            "key": "agent.id",
+            "negate": false,
             "params": agentsListString,
             "value": agentIdList.toString(),
-            "type":"phrases",
-            "index":"wazuh-alerts-3.x-*"
+            "type": "phrases",
+            "index": "wazuh-alerts-3.x-*"
           },
-          "query":{"bool":{"minimum_should_match": 1, "should": agentsListFormatted}},
-          "$state": {"store":"appState", "isImplicit": true}
+          "query": { "bool": { "minimum_should_match": 1, "should": agentsListFormatted } },
+          "$state": { "store": "appState", "isImplicit": true }
         };
         this.state.filterManager.addFilters(filter);
       }
@@ -303,23 +305,26 @@ export class OverviewActions extends Component {
     return (
       <div >
         <EuiFlexItem>
-            {!this.state.isAgent && (
-              <EuiButtonEmpty
-                iconType="watchesApp"
-                isLoading={this.state.loadingReport}
-                onClick={() => this.showAgentModal()}>
-                Filter by agent
-                </EuiButtonEmpty>
-           
-            )}
-            {this.state.isAgent && (
-              <EuiButtonEmpty
-                iconType="watchesApp"
-                isLoading={this.state.loadingReport}
-                onClick={() => this.showAgentModal()}>
-                Filtered by {this.state.isAgent.length || ''} {this.state.isAgent.length > 1 ? ' agents' : 'agent'} 
-                </EuiButtonEmpty>
-            )}
+          {!this.state.isAgent && (
+           <span>
+            <EuiIcon type="watchesApp" color="primary" />
+            <EuiButtonEmpty
+              isLoading={this.state.loadingReport}
+              color='primary'
+              onClick={() => this.showAgentModal()}>
+              Filter by agent
+            </EuiButtonEmpty>
+           </span> 
+          )}
+          {this.state.isAgent && (
+            <EuiButtonEmpty
+              iconType="watchesApp"
+              color='primary'
+              isLoading={this.state.loadingReport}
+              onClick={() => this.showAgentModal()}>
+              Filtered by {this.state.isAgent.length || ''} {this.state.isAgent.length > 1 ? ' agents' : 'agent'}
+            </EuiButtonEmpty>
+          )}
         </EuiFlexItem>
         {modal}
       </div>

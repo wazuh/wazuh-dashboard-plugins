@@ -22,7 +22,10 @@ import {
   EuiBadge,
   EuiStat,
   EuiSpacer,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiButtonIcon,
+  EuiToolTip,
+  EuiBasicTable
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
@@ -35,7 +38,7 @@ export class ScaScan extends Component {
     lastScan: {
       [key: string]: any
     },
-    isLoading: Boolean
+    isLoading: Boolean,
   }
 
   constructor(props) {
@@ -52,7 +55,7 @@ export class ScaScan extends Component {
   }
 
   async getLastScan(agentId: Number) {
-    const scans = await WzRequest.apiReq('GET', `/sca/${agentId}`, {limit: 1});
+    const scans = await WzRequest.apiReq('GET', `/sca/${agentId}?sort=-end_scan`, {limit: 1});
     this._isMount &&
       this.setState({
         lastScan: (((scans.data || {}).data || {}).items || {})[0],
@@ -76,16 +79,18 @@ export class ScaScan extends Component {
   }
 
   renderScanDetails() {
-    const { isLoading ,lastScan } = this.state;
+    const { isLoading, lastScan } = this.state;
     if (isLoading) return;
     return(
       <Fragment>
-        <EuiText size="xs"><h2>Last SCA scans</h2></EuiText>
+        <EuiText size="xs">
+          <h2>SCA: Last scan</h2>
+        </EuiText>
         <EuiSpacer size="s" />
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
-              <EuiLink href={lastScan.references} target="_blank">
+              <EuiLink onClick={() => this.props.switchTab('sca')}>
                 <h3>{lastScan.name}</h3>
               </EuiLink>
             </EuiTitle>
@@ -146,14 +151,15 @@ export class ScaScan extends Component {
     )
   }
 
+
   render() {
     const loading = this.renderLoadingStatus();
     const scaScan = this.renderScanDetails();
     return (
       <EuiFlexItem style={{ marginTop: 0 }}>
         <EuiPanel paddingSize="m">
-        {loading}
-        {scaScan}
+          {loading}
+          {scaScan}
         </EuiPanel>
       </EuiFlexItem>
     )
