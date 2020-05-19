@@ -208,7 +208,6 @@ function EditFilterConjuntion(conjuntion: string, setConjuntion): React.ReactNod
     <EuiButtonGroup options={[
       { id: `conjuntion-AND`, label: "AND" },
       { id: `conjuntion-OR`, label: "OR" },
-    ]} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(conjuntion === ' AND '  ? ' OR ' : ' AND ')} />
+    ]} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(/and/gi.test(conjuntion) ? ' OR ' : ' AND ')} />
   </EuiFormRow>;
 }
-
