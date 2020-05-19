@@ -1,7 +1,5 @@
 /*
- * Wazuh app - React component building the welcome screen of an agent.
- * version, OS, registration date, last keep alive.
- *
+ * Wazuh app - Integrity monitoring components
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -12,5 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { FimEventsTable, useTimeFilter } from './fim_events_table';
-export { ScaScan } from './sca_scan';
+import React, { Component } from 'react';
+import { Mitre } from '../../../components/overview/mitre/mitre';
+
+export class MainMitre extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+
+
+  render() {
+    return <Mitre {...this.props}/>;
+  }
+}

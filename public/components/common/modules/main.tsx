@@ -48,7 +48,8 @@ export class MainModule extends Component {
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
       this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
       this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
-      this.loadSection((ModulesDefaults[this.props.section] || {}).init || 'dashboard');
+      const init = (ModulesDefaults[this.props.section] || {}).init || 'dashboard';
+      this.loadSection(this.canBeInit(init) ? init : 'dashboard');
     }
   }
 
@@ -59,22 +60,35 @@ export class MainModule extends Component {
     }
   }
 
+  canBeInit(tab){ //checks if the init table can be set
+    let canInit = false;
+    this.tabs.forEach(element => {
+      if(element.id === tab && (!element.onlyAgent || (element.onlyAgent && this.props.agent))){
+        canInit = true;
+      }
+     });
+    return canInit;
+  }
+
   renderTabs(agent = false) {
     const { selectView } = this.state;
     if(!agent){
 
     }
     return (
-      <EuiFlexItem style={{ marginTop: 0 }}>
-        <EuiTabs display="condensed">
-          {this.tabs.map((tab, index) =>
-            <EuiTab
-              onClick={() => this.onSelectedTabChanged(tab.id)}
-              isSelected={selectView === tab.id}
-              key={index}
-            >
-              {tab.name}
-            </EuiTab>
+      <EuiFlexItem style={{ margin: '0 8px 0 8px' }}>
+        <EuiTabs>
+          {this.tabs.map((tab, index) =>{
+            if(!tab.onlyAgent || (tab.onlyAgent && this.props.agent)){
+              return <EuiTab
+                onClick={() => this.onSelectedTabChanged(tab.id)}
+                isSelected={selectView === tab.id}
+                key={index}
+              >
+                {tab.name}
+              </EuiTab>
+            }
+          }
           )}
         </EuiTabs>
       </EuiFlexItem>
@@ -148,6 +162,7 @@ export class MainModule extends Component {
   onSelectedTabChanged(id) {
     if (id !== this.state.selectView) {
       if (id === 'events' || id === 'dashboard') {
+        if(this.props.switchSubTab) this.props.switchSubTab(id === 'events' ? 'discover' : 'panels')
         window.location.href = window.location.href.replace(
           new RegExp("tabView=" + "[^\&]*"),
           `tabView=${id === 'events' ? 'discover' : 'panels'}`);

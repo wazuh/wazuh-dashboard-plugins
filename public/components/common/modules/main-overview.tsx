@@ -15,12 +15,9 @@ import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiCallOut,
-  EuiHealth,
+  EuiButtonIcon,
   EuiTitle,
-  EuiIcon,
   EuiPopover,
-  EuiButtonEmpty
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -30,11 +27,7 @@ import { ReportingService } from '../../../react-services/reporting';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import { OverviewActions } from '../../../controllers/overview/components/overview-actions/overview-actions';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
-import { AgentInfo } from '../../common/welcome/agents-info';
-import Overview from '../../wz-menu/wz-menu-overview';
-import { MainFim } from '../../agents/fim';
-import { MainSca } from '../../agents/sca';
+import { MainMitre } from './main-mitre';
 
 export class MainModuleOverview extends Component {
   constructor(props) {
@@ -43,25 +36,30 @@ export class MainModuleOverview extends Component {
     this.state = {
       selectView: false,
       loadingReport: false,
-      switchModule: false,
-      showAgentInfo: false
+      isDescPopoverOpen: false,
     };
   }
 
   setGlobalBreadcrumb() {
-    let breadcrumb = [
-      {
-        text: '',
-      },
-      {
-        text: 'Overview',
-        href: "#/overview"
-      },
-      {
-        text: /* TabDescription[this.props.section].title */'aaa'
-      },
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    if (TabDescription[this.props.currentTab]) {
+      let breadcrumb = [
+        {
+          text: '',
+        },
+        {
+          text: 'Overview',
+          href: "#/overview"
+        },
+        {
+          text: TabDescription[this.props.section].title
+        },
+      ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    }
+  }
+
+  componentDidUpdate() {
+    this.setGlobalBreadcrumb();
   }
 
   async componentDidMount() {
@@ -76,8 +74,27 @@ export class MainModuleOverview extends Component {
         <EuiFlexItem className="wz-module-header-agent-title">
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <span>
-                {TabDescription[this.props.section].title}
+              <span style={{ display: 'inline-flex' }}>
+                <EuiTitle size="s">
+                  <h1>
+                    <span>&nbsp;{TabDescription[this.props.section].title}&nbsp;&nbsp;</span>
+                  </h1>
+                </EuiTitle>
+                <EuiPopover
+                  button={
+                    <EuiButtonIcon
+                      iconType="iInCircle"
+                      style={{marginTop: 3}}
+                      color='primary'
+                      onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}>
+                    </EuiButtonIcon>
+                  }
+                  isOpen={this.state.isDescPopoverOpen}
+                  closePopover={() => { this.setState({ isDescPopoverOpen: false }) }}>
+                  <div style={{ width: '300px' }}>
+                    {TabDescription[this.props.section].description}
+                  </div>
+                </EuiPopover>
               </span>
             </EuiFlexItem>
             <EuiFlexItem />
@@ -104,7 +121,7 @@ export class MainModuleOverview extends Component {
                 <div className="wz-welcome-page-agent-tabs">
                   <EuiFlexGroup>
                     {this.props.renderTabs()}
-                    <EuiFlexItem grow={false}>
+                    <EuiFlexItem grow={false} style={{ marginTop: 6 }}>
                       <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
                     </EuiFlexItem>
                     {(selectView === 'dashboard') &&
@@ -134,6 +151,11 @@ export class MainModuleOverview extends Component {
               <Settings {...this.props} />
             }
           </div>
+
+
+          {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
+          {section === 'mitre' && selectView === 'inventory' && <MainMitre {...this.props} />}
+          {/* -------------------------------------------------------------------------- */}
         </Fragment>
       </div>
     );

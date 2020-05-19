@@ -8,8 +8,12 @@ import {
   EuiText,
   EuiTitle
 } from '@elastic/eui';
+import {
+  updateAdminMode
+} from '../../../../../redux/actions/rulesetActions';
 
 import { connect } from 'react-redux';
+import checkAdminMode from './utils/check-admin-mode';
 
 // Wazuh components
 import WzRulesetTable from './ruleset-table';
@@ -27,6 +31,16 @@ class WzRulesetOverview extends Component {
       decoders: 'Decoders',
       lists: 'CDB lists'
     };
+  }
+
+  componentDidMount() {
+    this.setAdminMode();
+  }
+
+  async setAdminMode() {
+    //Set the admin mode
+    const admin = await checkAdminMode();
+    this.props.updateAdminMode(admin);
   }
 
   setGlobalBreadcrumb() {
@@ -86,4 +100,13 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(WzRulesetOverview);
+const mapDispatchToProps = dispatch => {
+  return {
+    updateAdminMode: status => dispatch(updateAdminMode(status)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+  )(WzRulesetOverview);

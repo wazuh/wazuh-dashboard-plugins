@@ -1,7 +1,9 @@
 <div ng-if="agent">
-    <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
+    <div ng-if="tab !== 'welcome'">
+        <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready', cardsProps: getWelcomeCardsProps(resultState)}" />
+    </div>
     <div ng-if='!loadingDashboard'>
-        <div ng-show='showModuleDashboard || showModuleEvents'>
+        <div ng-show='(showModuleDashboard || showModuleEvents || showMitre) && showModuleDashboard !== "welcome"'>
             <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
                 <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
             </div>
@@ -11,12 +13,12 @@
         </div>
     </div>
 
-    <div ng-if="tab === 'mitre' && showModuleDashboard  && !showModuleEvents">
+    <div ng-if="tab === 'mitre' && showMitre">
         <react-component name="Mitre" />
     </div>
 
     <!-- Loading status section -->
-    <div ng-if="tabView === 'panels' && showModuleDashboard && !rendered && resultState !== 'none'"
+    <div ng-if="tabView === 'panels' && !showMitre && showModuleDashboard && !rendered && resultState !== 'none'"
         class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
             <div class="euiSpacer euiSpacer--m"></div>
