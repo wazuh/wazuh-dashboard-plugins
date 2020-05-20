@@ -4,30 +4,26 @@
     </div>
     <div ng-show="!actrl.addingNewAgent">
         <div ng-controller="overviewController as octrl">
-            <!-- Navigation section -->
             <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
-                <react-component ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
-                    name="MainModule"
-                    props="getMainProps(resultState)" />
-                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper" props="octrl.currentOverviewSectionProps" />
+                <div ng-if="octrl.tab !== 'welcome'">
+                    <react-component ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
+                        name="MainModule" props="getMainProps(resultState)" />
+                </div>
+                <div>
+                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper"
+                        props="octrl.currentOverviewSectionProps" />
+                </div>
                 <div ng-if='!loadingDashboard'>
                     <div ng-show='showModuleDashboard || showModuleEvents'>
-                        <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
-                            <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
+                        <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+                            <kbn-dis></kbn-dis>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            <div ng-class="{'no-opacity': !moduleDiscoverReady}">
-                <!-- Discover search bar section -->
-                <kbn-dis ng-show="octrl.tab && octrl.tab !== 'welcome'"></kbn-dis>
-                <!-- End Discover search bar section -->
-            </div>
-
-            <!-- Loading status section -->
-            <div ng-show="showModuleDashboard || showModuleEvents" ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none' || (resultState === 'loading' && octrl.tab !== 'welcome' && octrl.tabView === 'panels') "
+            <div ng-show="showModuleDashboard || showModuleEvents"
+                ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none' || (resultState === 'loading' && octrl.tab !== 'welcome' && octrl.tabView === 'panels') "
                 class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
                 <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
                     <div class="euiSpacer euiSpacer--m"></div>
@@ -87,9 +83,10 @@
                 </div>
             </div>
             <!-- End report status section -->
-            <div ng-if="octrl.tab && octrl.tab!=='welcome'" ng-show="octrl.tabView === 'panels' && (resultState === 'ready' || resultState === 'none')">
+            <div ng-if="octrl.tab && octrl.tab!=='welcome'"
+                ng-show="octrl.tabView === 'panels' && (resultState === 'ready' || resultState === 'none')">
                 <div ng-class="{'no-opacity': !moduleDiscoverReady}">
                     <react-component ng-show='showModuleDashboard' name="WzVisualize"
-                    props="getVisualizeProps(resultState)" />
+                        props="getVisualizeProps(resultState)" />
                 </div>
             </div>

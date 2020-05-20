@@ -11,26 +11,21 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import ReactDOM from 'react-dom';
 import {
   EuiFlexItem,
   EuiToolTip,
   EuiTab,
   EuiTabs,
-  EuiIcon,
-  EuiPopover,
   EuiButton,
   EuiButtonEmpty
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { ReportingService } from '../../../react-services/reporting';
-import { TabDescription } from '../../../../server/reporting/tab-description';
 import { ModulesDefaults } from './modules-defaults';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
+import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview'
-import Overview from '../../wz-menu/wz-menu-overview';
 
 export class MainModule extends Component {
   constructor(props) {
@@ -45,6 +40,8 @@ export class MainModule extends Component {
   }
 
   async componentDidMount() {
+    const app = getAngularModule('app/wazuh');
+    this.$rootScope = app.$injector.get('$rootScope');
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
       this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
       this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
@@ -162,6 +159,7 @@ export class MainModule extends Component {
   onSelectedTabChanged(id) {
     if (id !== this.state.selectView) {
       if (id === 'events' || id === 'dashboard') {
+        this.$rootScope.moduleDiscoverReady = false;
         if(this.props.switchSubTab) this.props.switchSubTab(id === 'events' ? 'discover' : 'panels')
         window.location.href = window.location.href.replace(
           new RegExp("tabView=" + "[^\&]*"),
