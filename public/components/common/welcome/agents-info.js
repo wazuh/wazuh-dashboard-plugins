@@ -111,16 +111,9 @@ export class AgentInfo extends Component {
               ) : item.description === 'Status' ? (
                 this.addHealthRender(this.props.agent)
               ) : (
-                    <span
-                      style={{
-                        overflow: 'hidden',
-                        maxWidth: "250px",
-                        margin: '0 auto',
-                        fontSize: 12
-                      }}
-                    >
-                      {checkField(item.title)}
-                    </span>
+                  <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
+                    {checkField(item.title)}
+                  </WzTextWithTooltipIfTruncated>
                   )
             }
             description={item.description}
@@ -157,7 +150,7 @@ export class AgentInfo extends Component {
         {
           title: agent.name,
           description: 'Operating system',
-          style: { minWidth: 300 }
+          style: { }
         },
         { title: agent.dateAdd, description: 'Registration date' },
         { title: agent.lastKeepAlive, description: 'Last keep alive' }
