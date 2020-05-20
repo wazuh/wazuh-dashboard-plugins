@@ -24,6 +24,7 @@ import {
   EuiText,
   EuiContextMenu,
   EuiIcon,
+  EuiOverlayMask,
   EuiButtonIcon
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
@@ -341,10 +342,15 @@ export class Techniques extends Component {
           {this.renderFacet()}
         </div>
         { isFlyoutVisible &&
-          <FlyoutTechnique
-            onChangeFlyout={this.onChangeFlyout}
-            currentTechniqueData={this.state.currentTechniqueData}
-            currentTechnique={currentTechnique} />
+          <EuiOverlayMask
+            // @ts-ignore
+            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
+          
+            <FlyoutTechnique
+              onChangeFlyout={this.onChangeFlyout}
+              currentTechniqueData={this.state.currentTechniqueData}
+              currentTechnique={currentTechnique} />
+          </EuiOverlayMask>
         } 
       </div>   
 		)
