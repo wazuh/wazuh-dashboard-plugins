@@ -156,7 +156,7 @@ export class ScaScan extends Component {
     const loading = this.renderLoadingStatus();
     const scaScan = this.renderScanDetails();
     return (
-      <EuiFlexItem style={{ marginTop: 0 }}>
+      <EuiFlexItem>
         <EuiPanel paddingSize="m">
           {loading}
           {scaScan}
