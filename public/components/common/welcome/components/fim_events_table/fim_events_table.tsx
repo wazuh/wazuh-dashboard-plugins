@@ -29,9 +29,11 @@ export function FimEventsTable({ agentId }) {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize="m">
-        <EuiText size="xs"><h2>FIM: Recent events</h2></EuiText>
-        <EuiSpacer size="s" />
-        <FimTable agentId={agentId} />
+        <EuiFlexItem>
+          <EuiText size="xs"><h2>FIM: Recent events</h2></EuiText>
+          <EuiSpacer size="s" />
+          <FimTable agentId={agentId} />
+        </EuiFlexItem>
       </EuiPanel>
     </EuiFlexItem>
   );
