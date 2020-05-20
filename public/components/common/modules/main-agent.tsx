@@ -205,7 +205,7 @@ export class MainModuleAgent extends Component {
     return (
       <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
         <EuiButtonEmpty
-          fill={this.state.selectView === 'settings'}
+          fill={this.state.selectView === 'settings' || undefined}
           iconType="wrench"
           onClick={() => this.onSelectedTabChanged('settings')}>
           Configuration
