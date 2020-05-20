@@ -307,12 +307,11 @@ export class OverviewActions extends Component {
         <EuiFlexItem>
           {!this.state.isAgent && (
            <span>
-            <EuiIcon type="watchesApp" color="primary" />
             <EuiButtonEmpty
               isLoading={this.state.loadingReport}
               color='primary'
               onClick={() => this.showAgentModal()}>
-              Filter by agent
+                <EuiIcon type="watchesApp" color="primary" style={{marginBottom: 3}}/>&nbsp; Filter by agent
             </EuiButtonEmpty>
            </span> 
           )}
