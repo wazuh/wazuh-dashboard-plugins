@@ -791,7 +791,7 @@ export class AgentsTable extends Component {
               <EuiFlexItem>
                 {!!this.state.totalItems && (
                   <EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
-                    <h2>{this.state.totalItems} Agents</h2>
+                    <h2>Agents ({this.state.totalItems})</h2>
                   </EuiTitle>
                 )}
               </EuiFlexItem>
