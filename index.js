@@ -16,11 +16,12 @@ import { resolve } from 'path';
 
 export default function(kibana) {
   return new kibana.Plugin({
-    require: ['kibana', 'elasticsearch', 'visualizations'],
+    require: ['kibana', 'elasticsearch'],
     id: 'wazuh',
     name: 'wazuh',
     uiExports: {
       app: {
+        id: 'wazuh',
         title: 'Wazuh',
         description: 'Wazuh app for Kibana',
         icon: 'plugins/wazuh/img/icon.svg',
