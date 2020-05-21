@@ -323,7 +323,7 @@ export class AgentsWelcome extends Component {
                               className="embPanel__header"
                             >
                               <h2 className="embPanel__title wz-headline-title">
-                                <EuiText size="xs"><h2>MITRE top tactics</h2></EuiText>
+                                <EuiText size="xs"><h2>MITRE: Top tactics</h2></EuiText>
                               </h2>
                             </EuiFlexGroup>
                             <EuiSpacer size="s" />
