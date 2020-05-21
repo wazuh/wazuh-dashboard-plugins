@@ -49,7 +49,7 @@
             aria-invalid="false" wz-enter="ctrl.search(ctrl.custom_search)">
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
-                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" ></react-component>
             </span>
         </div>
 
@@ -64,11 +64,11 @@
         <button class="height-35 kuiButton  ng-scope wz-margin-left-8" ng-class="{'kuiButton--secondary': !ctrl.realtime, 'kuiButton--danger': ctrl.realtime}"
             ng-click="!ctrl.realtime ? ctrl.playRealtime() : ctrl.stopRealtime()" aria-label="Realtime button">
             <span ng-if="!ctrl.realtime">
-                <react-component name="EuiIcon" props="{type:'play'}" />
+                <react-component name="EuiIcon" props="{type:'play'}" ></react-component>
                 Play realtime
             </span>
             <span ng-if="ctrl.realtime">
-                <react-component name="EuiIcon" props="{type:'stop'}" />
+                <react-component name="EuiIcon" props="{type:'stop'}" ></react-component>
                 Stop realtime
             </span>
         </button>
@@ -88,7 +88,7 @@
     <div layout="row" class="md-padding layout-align-end" ng-if="XMLContent !== ''">
         <button type="button" ng-click="ctrl.downloadCsv()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
             <span class="euiButtonEmpty__content">
-                <react-component name="EuiIcon" props="{type:'importAction'}" />
+                <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                 <span class="euiButtonEmpty__text">Formatted</span>
             </span>
         </button>
@@ -96,7 +96,7 @@
     <!-- End Logs section -->
 
     <div layout="row" layout-padding ng-if="XMLContent === ''">
-        <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" />
+        <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" ></react-component>
     </div>
 
 </div>

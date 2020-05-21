@@ -7,7 +7,7 @@
             ng-show="editctrl.clusterStatus.data.data.enabled === 'yes' && editctrl.clusterStatus.data.data.running === 'yes' ">
             <div layout="row">
                 <span class="font-size-18">
-                    <react-component name="EuiIcon" props="{type:'gear', size:'l'}" /> Cluster configuration
+                    <react-component name="EuiIcon" props="{type:'gear', size:'l'}" ></react-component> Cluster configuration
                 </span>
             </div>
         </div>
@@ -17,7 +17,7 @@
             ng-show="editctrl.clusterStatus.data.data.enabled !== 'yes' || editctrl.clusterStatus.data.data.running !== 'yes' ">
             <div layout="row">
                 <span class="font-size-18">
-                    <react-component name="EuiIcon" props="{type:'gear', size:'l'}" /> Manager configuration
+                    <react-component name="EuiIcon" props="{type:'gear', size:'l'}" ></react-component> Manager configuration
                 </span>
             </div>
         </div>
@@ -54,9 +54,9 @@
                             ng-click="editctrl.saveConfiguration()"
                             class="kuiButton kuiButton--secondary height-35 wz-margin-left-8">
                             <span ng-show="!editctrl.xmlHasErrors">
-                                <react-component name="EuiIcon" ng-if="!editctrl.doingSaving" props="{type:'save'}" />
+                                <react-component name="EuiIcon" ng-if="!editctrl.doingSaving" props="{type:'save'}" ></react-component>
                                 <react-component name="EuiLoadingSpinner" ng-if="editctrl.doingSaving"
-                                    props="{size: 's'}" />
+                                    props="{size: 's'}"  ></react-component>
                                 Save
                             </span>
                             <span ng-show="editctrl.xmlHasErrors" class='btn-danger'><i aria-hidden='true'
@@ -67,9 +67,9 @@
                         <button ng-show="!showConfirmRestartNode && !restartBtn" class="btn wz-button"
                             ng-disabled="editctrl.isRestarting || editctrl.doingSaving || wazuhNotReadyYet"
                             ng-click="showConfirmRestartNode = true">
-                            <react-component name="EuiIcon" ng-if="!editctrl.isRestarting" props="{type:'refresh'}" />
+                            <react-component name="EuiIcon" ng-if="!editctrl.isRestarting" props="{type:'refresh'}" ></react-component>
                             <react-component name="EuiLoadingSpinner" ng-if="editctrl.isRestarting"
-                                props="{size: 's'}" />
+                                props="{size: 's'}"  ></react-component>
                             Restart {{editctrl.selectedNode}}
                         </button>
                         <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">
@@ -85,7 +85,7 @@
                                     ng-click="showConfirmRestartNode = false">Cancel</md-button>
                                 <md-button class="btn wz-button" type="button"
                                     ng-click="editctrl.restartNode(editctrl.selectedNode);showConfirmRestartNode = false">
-                                    <react-component name="EuiIcon" props="{type:'check'}" />
+                                    <react-component name="EuiIcon" props="{type:'check'}" ></react-component>
                                     Confirm</md-button>
                             </div>
                         </div>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="md-padding md-padding-top-10"
                     ng-if="!editctrl.fetchedXML && !editctrl.failedNode">
-                    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+                    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
                 </div>
 
                 <div class="md-padding md-padding-top-10"
@@ -102,14 +102,14 @@
                         <md-card flex="50" class="wz-md-card" flex>
                             <md-card-content class="wz-text-center">
                                 <span class="wz-headline-title">
-                                    <react-component name="EuiIcon" props="{type: 'alert'}" /> Wazuh manager not
+                                    <react-component name="EuiIcon" props="{type: 'alert'}" ></react-component> Wazuh manager not
                                     reachable.
                                 </span>
                                 <md-divider class="wz-margin-top-10"></md-divider>
                                 <div layout="row" class="wz-margin-top-10 layout-align-center-center">
                                     <button class="kuiButton kuiButton--secondary height-35"
                                         ng-click="editctrl.changeNode(true)">
-                                        <react-component name="EuiIcon" props="{type: 'refresh'}" /> Refresh
+                                        <react-component name="EuiIcon" props="{type: 'refresh'}" ></react-component> Refresh
                                     </button>
                                 </div>
                             </md-card-content>

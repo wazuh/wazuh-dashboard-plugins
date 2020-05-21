@@ -2,7 +2,7 @@
     class="">
 
     <div class="md-padding md-padding-top-16" ng-show="ctrl.load">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>
 
     <!-- Headline -->
@@ -50,7 +50,7 @@
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-show="ctrl.clusterError && !ctrl.load">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
+                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" ></react-component>
                 <span class="euiCallOutHeader__title">{{ctrl.clusterError}}</span>
             </div>
         </div>
@@ -98,7 +98,7 @@
                         color: 'accent'
                     }
                     ]            
-                }" />
+                }"  ></react-component>
     </div>
 
     <!-- End agents status section -->

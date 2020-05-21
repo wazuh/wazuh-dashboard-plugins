@@ -4,7 +4,7 @@
         <md-card flex="50" class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
                 <span class="wz-headline-title">
-                    <react-component name="EuiIcon" props="{type: 'help'}" /> Error fetching agents
+                    <react-component name="EuiIcon" props="{type: 'help'}" ></react-component> Error fetching agents
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10 layout-align-center-center">
@@ -14,7 +14,7 @@
                 </div>
                 <div layout="row" class="wz-margin-top-10 layout-align-center-center">
                     <button class="kuiButton kuiButton--secondary height-35" ng-click="ctrl.load()">
-                        <react-component name="EuiIcon" props="{type: 'refresh'}" /> Refresh
+                        <react-component name="EuiIcon" props="{type: 'refresh'}" ></react-component> Refresh
                     </button>
                 </div>
             </md-card-content>
@@ -24,13 +24,13 @@
 
 <div ng-if="!ctrl.init && !ctrl.loading && !ctrl.errorInit" layout="column" layout-align="start space-around">
     <div class="registerAgent" ng-show="ctrl.addingNewAgent">
-        <react-component name="RegisterAgent" props="ctrl.registerAgentsProps" />
+        <react-component name="RegisterAgent" props="ctrl.registerAgentsProps" ></react-component>
     </div>
     <div ng-show="!ctrl.addingNewAgent">
         <div class="md-padding euiFlexGroup--wrap layout-row">
             <div class="layout-column md-padding">
                 <span class="wz-headline-title">
-                    <react-component name="EuiIcon" props="{type:'node'}" /> Status
+                    <react-component name="EuiIcon" props="{type:'node'}" ></react-component> Status
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <canvas id="bar" ng-if="ctrl.lastAgent && ctrl.lastAgent.id"
@@ -46,13 +46,13 @@
                 <div layout="row" class="wz-margin-top-16 layout-align-center-center"
                     ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
                     <button class="kuiButton kuiButton--success" ng-click="ctrl.openRegistrationDocs()">
-                        <react-component name="EuiIcon" props="{type: 'help'}" /> How to
+                        <react-component name="EuiIcon" props="{type: 'help'}" ></react-component> How to
                     </button>
                 </div>
             </div>
             <div flex class="layout-column md-padding">
                 <span class="wz-headline-title">
-                    <react-component name="EuiIcon" props="{type:'visHeatmap'}" /> Details
+                    <react-component name="EuiIcon" props="{type:'visHeatmap'}" ></react-component> Details
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div
@@ -137,7 +137,7 @@
             </wz-tag-filter>
             <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;"
                 ng-click="ctrl.reloadList()">
-                <react-component name="EuiIcon" props="{type:'refresh'}" /> Refresh</md-button>
+                <react-component name="EuiIcon" props="{type:'refresh'}" ></react-component> Refresh</md-button>
         </div>
 
         <div layout="row">
@@ -145,7 +145,7 @@
                 <md-card-actions ng-if="adminMode" layout="row" layout-align="end center"
                     class="wz-card-actions wz-card-actions-top">
                     <a ng-click="ctrl.addNewAgent(true)">
-                        <react-component name="EuiIcon" props="{type:'plusInCircle'}" /> Add new agent </a>
+                        <react-component name="EuiIcon" props="{type:'plusInCircle'}" ></react-component> Add new agent </a>
                     <span flex></span>
                 </md-card-actions>
                 <md-card-content>
@@ -158,7 +158,7 @@
                         <button type="button" ng-click="ctrl.downloadCsv()"
                             class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                             <span class="euiButtonEmpty__content">
-                                <react-component name="EuiIcon" props="{type:'importAction'}" />
+                                <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                                 <span class="euiButtonEmpty__text">Formatted</span>
                             </span>
                         </button>

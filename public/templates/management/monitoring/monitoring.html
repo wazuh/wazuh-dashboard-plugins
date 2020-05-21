@@ -35,7 +35,7 @@
     <!-- Cluster enabled -->
     <div ng-show="isClusterEnabled && isClusterRunning" class="monitoring-discover">
         <div class="md-padding md-padding-top-16" ng-show="loading">
-            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
         </div>
 
         <!-- Navigation section -->
@@ -82,7 +82,7 @@
 
         <!-- Status and reports navigation bar -->
         <div ng-if="!loading" ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
-            <react-component name="Tabs" props="mctrl.managementTabsProps" />
+            <react-component name="Tabs" props="mctrl.managementTabsProps" ></react-component>
         </div>
         <!-- End status and reports navigation bar -->
 

@@ -5,7 +5,7 @@
                     <button type="submit"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--medium wz-margin-right-20"
                     ng-click="mctrl.setRulesTab(mctrl.globalRulesetTab)" tooltip="Go back" tooltip-placement="bottom">
-                    <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
+                    <react-component name="EuiIcon" props="{type:'arrowLeft'}" ></react-component>
                 </button>
                         <h1 class="euiTitle euiTitle--medium">Manage {{mctrl.globalRulesetTab}} files</h1>
                         <wz-kbn-switch class="md-primary wz-no-top-bottom-margin md-padding-h wz-margin-top-3" switch-model="mctrl.onlyLocalFiles"
@@ -14,22 +14,22 @@
 
                     <button ng-if="mctrl.adminMode" type="button" ng-click="filesctrl.addNewFile(mctrl.globalRulesetTab)" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                             <span class="euiButtonEmpty__content">
-                                <react-component name="EuiIcon" props="{type:'plusInCircle'}" />
+                                <react-component name="EuiIcon" props="{type:'plusInCircle'}" ></react-component>
                                 <span class="euiButtonEmpty__text">Add
                                         new {{mctrl.globalRulesetTab}} file</span>
                             </span>
                         </button>
-                <react-component ng-if="mctrl.adminMode" name="UploadFiles" props="mctrl.uploadFilesProps" class="wz-margin-left-10"/>
+                <react-component ng-if="mctrl.adminMode" name="UploadFiles" props="mctrl.uploadFilesProps" class="wz-margin-left-10"></react-component>
                 <button type="button" ng-click="filesctrl.refresh()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                     <span class="euiButtonEmpty__content">
-                        <react-component name="EuiIcon" props="{type:'refresh'}" />
+                        <react-component name="EuiIcon" props="{type:'refresh'}" ></react-component>
                         <span class="euiButtonEmpty__text">Refresh</span>
                     </span>
                 </button>
                 <!-- 
                 <button type="button" ng-click="mctrl.openLogtest()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                         <span class="euiButtonEmpty__content">
-                            <react-component name="EuiIcon" props="{type:'play'}" />
+                            <react-component name="EuiIcon" props="{type:'play'}" ></react-component>
                             <span class="euiButtonEmpty__text">Test your logs</span>
                         </span>
                     </button>    
@@ -97,7 +97,7 @@
                     ng-click='doSaveConfig(true,newFileName)'
                     class="kuiButton kuiButton--secondary height-35 wz-margin-left-8">
                     <span ng-show='!xmlHasErrors'>
-                        <react-component name="EuiIcon" props="{type: 'alert'}" /> Save file
+                        <react-component name="EuiIcon" props="{type: 'alert'}" ></react-component> Save file
                     </span>
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>

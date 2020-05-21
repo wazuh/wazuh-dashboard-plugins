@@ -4,7 +4,7 @@
 
         <!-- Loading ring -->
         <div class="md-padding md-padding-top-16" ng-show="load">
-            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
         </div>
 
         <!-- Headline -->
@@ -13,7 +13,7 @@
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups </span>
                 <span ng-if='adminMode' class="font-size-18 wz-text-link wz-margin-left-8" ng-click="switchAddingGroup()">
-                    <react-component ng-if="!addingGroup" name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
+                    <react-component ng-if="!addingGroup" name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" ></react-component>
                     <svg ng-if="addingGroup" class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
                         width="16" height="16" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M7.5 0C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882zM3.5 7h8a.5.5 0 1 1 0 1h-8a.5.5 0 0 1 0-1z">
@@ -43,7 +43,7 @@
 
             <!-- End group actions -->
             <div ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && groupsTabsProps" class="md-margin-h">
-                <react-component name="Tabs" props="groupsTabsProps" />
+                <react-component name="Tabs" props="groupsTabsProps" ></react-component>
             </div>
 
             <!-- XML editor for group agents -->
@@ -52,7 +52,7 @@
                     <span ng-click='closeEditingFile()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>Cancel</span>
                     <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='height-35 kuiButton kuiButton--secondary wz-margin-left-8'>
                         <span ng-show='!xmlHasErrors'>
-                            <react-component name="EuiIcon" props="{type: 'save'}" /> Save file
+                            <react-component name="EuiIcon" props="{type: 'save'}" ></react-component> Save file
                         </span>
                         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                             XML format error</span>
@@ -85,7 +85,7 @@
                         aria-invalid="false" wz-enter="search(custom_search)">
                     <div class="euiFormControlLayoutIcons wz-margin-left-16">
                         <span class="euiFormControlLayoutCustomIcon">
-                            <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                            <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" ></react-component>
                         </span>
                     </div>
 
@@ -100,13 +100,13 @@
                     <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='files'"
                         class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
                         ng-click="editGroupAgentConfig(currentGroup)" aria-label="Edit group configuration">
-                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" ></react-component>
                         Edit group configuration
                     </button>
                     <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='agents'"
                         class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
                         ng-click="addMultipleAgents(true)" aria-label="Add or remove agents">
-                        <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" ></react-component>
                         Add or remove agents
                     </button>
 
@@ -124,7 +124,7 @@
                         <div layout="row" layout-align="end center">
                             <button type="button" ng-click="downloadCsv('/agents/groups')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                                 <span class="euiButtonEmpty__content">
-                                    <react-component name="EuiIcon" props="{type:'importAction'}" />
+                                    <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                                     <span class="euiButtonEmpty__text">Formatted</span>
                                 </span>
                             </button>
@@ -137,8 +137,8 @@
                     <!-- Group agents table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
                         <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
-                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" ></react-component>
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" ></react-component>
                         </md-card-actions>
                         <div layout="row" ng-show="failedErrors" class="extraHeader">
                             <md-list>
@@ -162,7 +162,7 @@
                                 <button type="button" ng-click="downloadCsv('/agents/groups/' + currentGroup.name)"
                                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                                     <span class="euiButtonEmpty__content">
-                                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                                        <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                                         <span class="euiButtonEmpty__text">Formatted</span>
                                     </span>
                                 </button>
@@ -173,8 +173,8 @@
                     <!-- Group files table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
                         <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
-                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" ></react-component>
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" ></react-component>
                         </md-card-actions>
                         <md-card-content>
                             <div layout="row">
@@ -187,7 +187,7 @@
                                 <button type="button" ng-click="downloadCsv('/agents/groups/' + currentGroup.name + '/files')"
                                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                                     <span class="euiButtonEmpty__content">
-                                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                                        <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                                         <span class="euiButtonEmpty__text">Formatted</span>
                                     </span>
                                 </button>

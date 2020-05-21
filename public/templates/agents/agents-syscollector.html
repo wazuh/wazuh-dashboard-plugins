@@ -4,7 +4,7 @@
     ng-if="agent && agent.status !== 'Active'">
     <div flex class="euiCallOut euiCallOut--warning">
       <div class="euiCallOutHeader">
-        <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
+        <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" ></react-component>
         <span class="euiCallOutHeader__title">This agent has never connected.</span>
       </div>
     </div>
@@ -64,11 +64,11 @@
         <div class="euiPanel euiPanel--paddingLarge">
           <div class="euiPageContentBody">
             <span class="wz-headline-title">
-              <react-component name="EuiIcon" props="{type:'indexMapping'}" /> Network interfaces
+              <react-component name="EuiIcon" props="{type:'indexMapping'}" ></react-component> Network interfaces
             </span>
             <md-divider class="wz-margin-top-10"></md-divider>
 
-            <!--<react-component name="InventoryInterfacesTable" props="{items: syscollector.netiface.items}" />-->
+            <!--<react-component name="InventoryInterfacesTable" props="{items: syscollector.netiface.items}" ></react-component>-->
             <wz-table-eui flex path="'/syscollector/' + agent.id + '/netiface'" initial-sort-field="'name'"
               keys="['name','mac',{value:'state',isHealth: {success: 'up', danger: 'down'}},'mtu','type']">
             </wz-table-eui>
@@ -79,7 +79,7 @@
         <div class="euiPanel euiPanel--paddingLarge" ng-if="agent && agent.os && agent.os.platform !== 'darwin'">
           <div class="euiPageContentBody">
             <span class=" wz-headline-title">
-              <react-component name="EuiIcon" props="{type:'inputOutput'}" /> Network ports
+              <react-component name="EuiIcon" props="{type:'inputOutput'}" ></react-component> Network ports
             </span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
@@ -102,7 +102,7 @@
         <div class="euiPanel euiPanel--paddingLarge">
           <div class="euiPageContentBody">
             <span class="wz-headline-title">
-              <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" /> Network settings</span>
+              <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" ></react-component> Network settings</span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <wz-table-eui flex path="'/syscollector/' + agent.id + '/netaddr'"
               keys="['iface', 'address', 'netmask', 'proto', 'broadcast']" initial-sort-field="'iface'">
@@ -131,7 +131,7 @@
         <div class="euiPanel euiPanel--paddingLarge">
           <div class="euiPageContentBody">
             <span class="wz-headline-title">
-              <react-component name="EuiIcon" props="{type:'apps'}" /> Packages
+              <react-component name="EuiIcon" props="{type:'apps'}" ></react-component> Packages
             </span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <div layout="row"
@@ -168,7 +168,7 @@
               <button type="button" ng-click="downloadCsv('/syscollector/'+agent.id+'/packages', 'packages.csv')"
                 class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                 <span class="euiButtonEmpty__content">
-                  <react-component name="EuiIcon" props="{type:'importAction'}" />
+                  <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                   <span class="euiButtonEmpty__text">Formatted</span>
                 </span>
               </button>
@@ -187,7 +187,7 @@
         <div class="euiPanel euiPanel--paddingLarge">
           <div class="euiPageContentBody">
             <span class="wz-headline-title">
-              <react-component name="EuiIcon" props="{type:'console'}" /> Processes</span>
+              <react-component name="EuiIcon" props="{type:'console'}" ></react-component> Processes</span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <div layout="row"
               class="wz-margin-top-10 euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper">
@@ -218,7 +218,7 @@
               <button type="button" ng-click="downloadCsv('/syscollector/'+agent.id+'/processes', 'processes.csv')"
                 class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                 <span class="euiButtonEmpty__content">
-                  <react-component name="EuiIcon" props="{type:'importAction'}" />
+                  <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                   <span class="euiButtonEmpty__text">Formatted</span>
                 </span>
               </button>

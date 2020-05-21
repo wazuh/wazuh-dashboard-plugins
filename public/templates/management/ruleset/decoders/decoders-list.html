@@ -8,26 +8,26 @@
                             <span flex></span>
                             <button ng-if="adminMode" type="button" ng-click="mctrl.switchFilesSubTab('decoders')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                     <span class="euiButtonEmpty__content">
-                                        <react-component name="EuiIcon" props="{type:'folderOpen'}" />
+                                        <react-component name="EuiIcon" props="{type:'folderOpen'}" ></react-component>
                                         <span class="euiButtonEmpty__text">Manage decoders files</span>
                                     </span>
                                 </button>
                                 <button ng-if="adminMode" type="button" ng-click="mctrl.newFile()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                         <span class="euiButtonEmpty__content">
-                                            <react-component name="EuiIcon" props="{type:'plusInCircle'}" />
+                                            <react-component name="EuiIcon" props="{type:'plusInCircle'}" ></react-component>
                                             <span class="euiButtonEmpty__text">Add new decoder</span>
                                         </span>
                                     </button>
                                 <button type="button" ng-click="dctrl.downloadCsv()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                         <span class="euiButtonEmpty__content">
-                                            <react-component name="EuiIcon" props="{type:'exportAction'}" />
+                                            <react-component name="EuiIcon" props="{type:'exportAction'}" ></react-component>
                                             <span class="euiButtonEmpty__text">Export formatted</span>
                                         </span>
                                     </button>
                                     <!--
                                     <button type="button" ng-click="mctrl.openLogtest()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                         <span class="euiButtonEmpty__content">
-                                            <react-component name="EuiIcon" props="{type:'play'}" />
+                                            <react-component name="EuiIcon" props="{type:'play'}" ></react-component>
                                             <span class="euiButtonEmpty__text">Test your logs</span>
                                         </span>
                                     </button> 
@@ -41,7 +41,7 @@
         <wz-add-filter-chip id-input="search-input-rules" options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path', hide: dctrl.showingLocalDecoders}]" />
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
-                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" ></react-component>
             </span>
         </div>
         <button type="submit" aria-label="Search" class="euiButton euiButton--primary euiButton--fill wz-margin-left-8"

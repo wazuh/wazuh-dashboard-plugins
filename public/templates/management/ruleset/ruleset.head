@@ -2,7 +2,7 @@
 <div ng-if="!loading && !viewingDetail" flex layout="row">
 <div ng-class="mctrl.logtestOpened ? 'flex-70' : 'flex-100'">
 <div class="md-padding-h">
-    <react-component name="Tabs" props="mctrl.rulesetTabsProps" />
+    <react-component name="Tabs" props="mctrl.rulesetTabsProps" ></react-component>
 </div>
         <div layout="row" class="md-padding-h">
 <span flex></span>

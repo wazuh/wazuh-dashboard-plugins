@@ -12,10 +12,10 @@
     <!-- Commands & Active response navigation bar -->
     <div ng-if="(!agent || agent.id === '000') && configurationTabsProps" class="md-padding wz-padding-top-0"
         ng-init="buildProps([{id:'active-response', name: 'Active response'}, {id: 'commands', name: 'Commands'}])">
-        <react-component name="Tabs" props="configurationTabsProps" />
+        <react-component name="Tabs" props="configurationTabsProps" ></react-component>
     </div>
     <!-- End Commands & Active response navigation bar -->
 
     <div class="md-padding md-padding-top-16" ng-if="load">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>

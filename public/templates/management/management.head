@@ -64,5 +64,5 @@
 
     <div ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.statusReportsTabs) && mctrl.tab !== 'monitoring' && mctrl.tab !== 'welcome'" 
     class="md-padding-h" ng-show="mctrl.tab !== 'welcome'" >
-        <react-component name="Tabs" props="mctrl.managementTabsProps" />
+        <react-component name="Tabs" props="mctrl.managementTabsProps" ></react-component>
     </div>

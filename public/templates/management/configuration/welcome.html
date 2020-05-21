@@ -16,13 +16,13 @@
                 <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
                     <a ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'"
                         ng-click="mctrl.setConfigTab('editconfiguration', true)">
-                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" /> Edit configuration
+                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" ></react-component> Edit configuration
                     </a>
                     <span flex></span>
                     <react-component ng-if="agent && agent.id !== '000' && agent.status === 'Active'"
                         name="ExportConfiguration" ng-hide="reportBusy && reportStatus"
-                        props="{exportConfiguration, type: 'agent', agentPlatform: agent.agentPlatform}" />
-                    <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                        props="{exportConfiguration, type: 'agent', agentPlatform: agent.agentPlatform}" ></react-component>
+                    <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" ></react-component>
                 </md-card-actions>
                 <md-card-content>
                     <span class="font-size-16 wz-text-bold">Main configurations</span>
@@ -211,7 +211,7 @@
 
         <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
             <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp">
-                <react-component name="EuiIcon" props="{type:'questionInCircle'}" />
+                <react-component name="EuiIcon" props="{type:'questionInCircle'}" ></react-component>
             </span>
             <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>

@@ -3,7 +3,7 @@
     ng-show="resultState === 'none' && !loading && !showConfig && !showNodes">
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
-            <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
+            <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" ></react-component>
             <span class="euiCallOutHeader__title">There are no results for selected time range. Try another one.</span>
         </div>
     </div>
@@ -19,7 +19,7 @@
             <span class="wz-headline-title">Cluster alerts summary</span>
             <span flex></span>
             <span class="cursor-pointer" ng-click="expand(0)">
-                <react-component name="EuiIcon" props="{type:'expand'}" />
+                <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
             </span>
         </md-card-actions>
         <md-card-content class="wazuh-column">
@@ -31,7 +31,7 @@
             <span class="wz-headline-title">Alerts by node summary</span>
             <span flex></span>
             <span class="cursor-pointer" ng-click="expand(1)">
-                <react-component name="EuiIcon" props="{type:'expand'}" />
+                <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
             </span>
         </md-card-actions>
         <kbn-vis vis-id="'Wazuh-App-Cluster-monitoring-Overview'" id="Wazuh-App-Cluster-monitoring-Overview"></kbn-vis>

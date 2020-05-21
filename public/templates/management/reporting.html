@@ -1,8 +1,8 @@
 <div layout="column" layout-align="start stretch" ng-controller="reportingController as ctrl" ng-if="mctrl.tab === 'reporting'">
     <div ng-if="ctrl.loading" class="md-padding wz-margin-top-16">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>
     <div layout="row" layout-padding ng-if="!ctrl.loading && ctrl.reportingTableProps">
-        <react-component name="ReportingTable" props="ctrl.reportingTableProps" />
+        <react-component name="ReportingTable" props="ctrl.reportingTableProps" ></react-component>
     </div>
 </div>

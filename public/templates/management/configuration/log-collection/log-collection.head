@@ -13,10 +13,10 @@
     <!-- Log collection navigation bar -->
     <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
         ng-init="buildProps([{id:'localfile-logs', name: 'Logs'}, {id: 'localfile-commands', name: 'Commands'}, {id: 'socket', name: 'Sockets'}])">
-        <react-component name="Tabs" props="configurationTabsProps" />
+        <react-component name="Tabs" props="configurationTabsProps" ></react-component>
     </div>
     <!-- End Log collection navigation bar -->
 
     <div class="md-padding md-padding-top-16" ng-if="load">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>

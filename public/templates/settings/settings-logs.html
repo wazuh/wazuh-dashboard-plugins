@@ -2,19 +2,19 @@
     <!-- Headline -->
     <div layout="column" layout-padding>
         <span class="font-size-18">
-            <react-component name="EuiIcon" props="{type:'visTable'}" /> Wazuh Kibana plugin log
+            <react-component name="EuiIcon" props="{type:'visTable'}" ></react-component> Wazuh Kibana plugin log
             messages</span>
         <span class="md-subheader">Log file located at <span
                 class="wz-text-monospace">/usr/share/kibana/optimize/wazuh/logs/wazuhapp.log</span></span>
     </div>
 
     <div ng-if="ctrl.loadingLogs" class="md-padding wz-margin-top-16">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>
 
     <div layout="row" ng-show="!ctrl.loadingLogs">
         <md-button class="wz-report-refresh-btn" ng-click="ctrl.refreshLogs()">
-            <react-component name="EuiIcon" props="{type:'refresh'}" /> Refresh
+            <react-component name="EuiIcon" props="{type:'refresh'}" ></react-component> Refresh
         </md-button>
     </div>
 

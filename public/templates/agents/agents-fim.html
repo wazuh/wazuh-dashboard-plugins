@@ -19,7 +19,7 @@
                 <span class="wz-headline-title">Most active users</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(0)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                    <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
@@ -31,7 +31,7 @@
                 <span class="wz-headline-title">Actions</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(1)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                    <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
@@ -44,7 +44,7 @@
                 <span class="wz-headline-title">Events</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(2)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                    <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
@@ -60,7 +60,7 @@
                 <span class="wz-headline-title">Files added</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(3)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                    <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
@@ -72,7 +72,7 @@
                 <span class="wz-headline-title">Files modified</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(4)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                    <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
@@ -85,7 +85,7 @@
                 <span class="wz-headline-title">Files deleted</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(5)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                    <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
@@ -101,7 +101,7 @@
                 <span class="wz-headline-title">Alerts summary</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(6)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                    <react-component name="EuiIcon" props="{type:'expand'}" ></react-component>
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
@@ -128,7 +128,7 @@
         ng-if="showSyscheckFiles && (!agent || !agent.os)">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
+                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" ></react-component>
                 <span class="euiCallOutHeader__title">This agent has never connected.</span>
             </div>
         </div>
@@ -161,7 +161,7 @@
                     ng-click="downloadCsv('/syscheck/' + agent.id, 'fim-registry.csv', [{name:'type',value:'registry'}])"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                     <span class="euiButtonEmpty__content">
-                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                        <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                         <span class="euiButtonEmpty__text">Formatted</span>
                     </span>
                 </button>
@@ -195,7 +195,7 @@
                     ng-click="downloadCsv('/syscheck/' + agent.id, 'fim-files.csv', [{name:'type',value:'file'}])"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                     <span class="euiButtonEmpty__content">
-                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                        <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                         <span class="euiButtonEmpty__text">Formatted</span>
                     </span>
                 </button>
@@ -204,6 +204,6 @@
     </div>
 
     <div layout="row" class="wz-margin-10" ng-if="agent && agent.os && agent.os.platform !== 'windows'">
-        <react-component name="SyscheckTable" props="syscheckTableProps" />
+        <react-component name="SyscheckTable" props="syscheckTableProps" ></react-component>
     </div>
 </md-content>

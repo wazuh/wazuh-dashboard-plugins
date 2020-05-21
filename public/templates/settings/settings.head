@@ -1,8 +1,8 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="settingsController as ctrl">
     <div ng-if="ctrl.load" class="md-padding wz-margin-top-16">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>
 
     <div ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length" class="wz-margin-top-10 md-margin-h">
-        <react-component name="Tabs" props="ctrl.settingsTabsProps" />
+        <react-component name="Tabs" props="ctrl.settingsTabsProps" ></react-component>
     </div>

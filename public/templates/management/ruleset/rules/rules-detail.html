@@ -33,7 +33,7 @@
 
     <div layout="row" class="md-padding" ng-if="!editingFile && currentRule.file && currentRule.path === 'etc/rules' && adminMode">
         <button ng-click='editRulesConfig(currentRule)' class="height-35 kuiButton kuiButton--secondary">
-            <react-component name="EuiIcon" props="{type:'pencil'}" />
+            <react-component name="EuiIcon" props="{type:'pencil'}" ></react-component>
             Edit {{ currentRule.file }}
         </button>
     </div>
@@ -45,7 +45,7 @@
             <md-card flex class="wz-md-card" ng-if="currentRule.details">
                 <md-card-content>
                     <span class="wz-headline-title">
-                        <react-component name="EuiIcon" props="{type:'editorUnorderedList'}" /> Details
+                        <react-component name="EuiIcon" props="{type:'editorUnorderedList'}" ></react-component> Details
                     </span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-margin-top-10">
@@ -74,7 +74,7 @@
             <md-card flex class="wz-md-card" ng-if="currentRule.groups.length">
                 <md-card-content>
                     <span class="wz-margin-top-10 wz-headline-title">
-                        <react-component name="EuiIcon" props="{type:'kqlSelector'}" /> Groups
+                        <react-component name="EuiIcon" props="{type:'kqlSelector'}" ></react-component> Groups
                     </span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-margin-top-10">
@@ -95,7 +95,7 @@
             <md-card flex class="wz-md-card" ng-if="currentRule.pci.length || currentRule.gdpr.length || currentRule.hipaa.length ||currentRule.nist.length">
                 <md-card-content>
                     <span class="wz-margin-top-10 wz-headline-title">
-                        <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" /> Compliance
+                        <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" ></react-component> Compliance
                     </span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-margin-top-10" ng-if="currentRule.pci.length">

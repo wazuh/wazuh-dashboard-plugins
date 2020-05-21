@@ -47,7 +47,7 @@
                                 <button class="btn btn-primary btn-as-i" ng-disabled="!newKey"
                                     ng-click="addEntry(newKey, newValue);newKey = ''; newValue = ''"
                                     tooltip="Add new entry" tooltip-placement="right">
-                                    <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
+                                    <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" ></react-component>
                                 </button>
                             </td>
                         </tr>
@@ -64,7 +64,7 @@
                                     <span ng-show="(!editingKey || editingKey !== item[0]) && removingEntry !== item[0]"
                                         tooltip="Edit" ng-click="setEditingKey(item[0], item[1])"
                                         class="cursor-pointer">
-                                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
+                                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" ></react-component>
                                     </span>
                                     <span ng-show="editingKey === item[0] && !loadingChange" tooltip="Cancel"
                                         class="fa fa-fw fa-times cursor-pointer" ng-click="cancelEditingKey()"></span>
@@ -79,7 +79,7 @@
                                         ng-click="showConfirmRemoveEntry($event, item[0]); $event.stopPropagation()"
                                         class="cursor-pointer" tooltip="Remove this entry" tooltip-placement="left"
                                         aria-hidden="true">
-                                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
+                                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" ></react-component>
                                     </span>
 
                                     <div ng-if="removingEntry === item[0]" class="confirmEmbedBubble">
@@ -136,7 +136,7 @@
                 <button type="button" ng-click="downloadCsv('/lists',  currentList.name, currentList.path)"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small" id="btnDownload">
                     <span class="euiButtonEmpty__content">
-                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                        <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                         <span class="euiButtonEmpty__text">Formatted</span>
                     </span>
                 </button>

@@ -3,13 +3,13 @@
         ng-if="!loadSca && !load && (((agent || {}).status === 'Never connected') || !agent || !agent.os)">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
+                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" ></react-component>
                 <span class="euiCallOutHeader__title">This agent has never connected.</span>
             </div>
         </div>
     </div>
     <div ng-if="load || loadSca" class="md-padding wz-margin-top-16">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>
 
     <div layout="row" class="wz-margin-top-16"
@@ -18,12 +18,12 @@
         <md-card flex="50" class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
                 <span class="wz-headline-title">
-                    <react-component name="EuiIcon" props="{type: 'alert'}" /> No scans available.
+                    <react-component name="EuiIcon" props="{type: 'alert'}" ></react-component> No scans available.
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10 layout-align-center-center">
                     <button class="kuiButton kuiButton--secondary height-35" ng-click="switchTab('sca')">
-                        <react-component name="EuiIcon" props="{type: 'refresh'}" /> Refresh
+                        <react-component name="EuiIcon" props="{type: 'refresh'}" ></react-component> Refresh
                     </button>
                 </div>
             </md-card-content>
@@ -159,7 +159,7 @@
                     ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                     <span class="euiButtonEmpty__content">
-                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                        <react-component name="EuiIcon" props="{type:'importAction'}" ></react-component>
                         <span class="euiButtonEmpty__text">Formatted</span>
                     </span>
                 </button>

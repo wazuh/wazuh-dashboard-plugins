@@ -2,7 +2,7 @@
     <!-- Headline -->
     <div layout="column" layout-padding>
         <span class="font-size-18">
-            <react-component name="EuiIcon" props="{type:'wrench'}" /> Wazuh Kibana plugin
+            <react-component name="EuiIcon" props="{type:'wrench'}" ></react-component> Wazuh Kibana plugin
             configuration settings
         </span>
         <span class="md-subheader">Configuration file located at <span
@@ -67,7 +67,7 @@
                                     <div ng-hide="key === 'admin' || !ctrl.configuration['admin']">
                                         <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit"
                                             ng-click="ctrl.setEditingKey(key, value)" class="cursor-pointer">
-                                            <react-component name="EuiIcon" props="{type: 'pencil'}" />
+                                            <react-component name="EuiIcon" props="{type: 'pencil'}" ></react-component>
 
                                         </span>
                                         <span ng-show="ctrl.editingKey === key && !ctrl.loadingChange" tooltip="Cancel"

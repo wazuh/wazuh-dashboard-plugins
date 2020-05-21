@@ -26,12 +26,12 @@
     <!-- Integrity monitoring navigation bar -->
     <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
       ng-init="buildProps([{id:'fim-general', name: 'General'}, {id: 'fim-monitored', name: 'Monitored'}, {id: 'fim-ignored', name: 'Ignored'}, {id: 'fim-nodiff', name: 'No diff'}, {id: 'fim-whodata', name: 'Who-data', agent}, {id: 'fim-synchronization', name: 'Synchronization'}])">
-      <react-component name="Tabs" props="configurationTabsProps" />
+      <react-component name="Tabs" props="configurationTabsProps" ></react-component>
     </div>
     <!-- End Integrity monitoring navigation bar -->
 
     <div class="md-padding md-padding-top-16" ng-if="load">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>
 
     <!-- This section contains the main content and the right sidenav -->

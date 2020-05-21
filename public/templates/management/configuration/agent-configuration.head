@@ -1,6 +1,6 @@
 <div flex="auto" layout="column" ng-if="tab === 'configuration' && load">
     <div class="md-padding md-padding-top-16" ng-if="load">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
     </div>
 </div>
 
