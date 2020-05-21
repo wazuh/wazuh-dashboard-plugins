@@ -31,7 +31,7 @@ import {
   EuiSelect,
   EuiLoadingChart
 } from '@elastic/eui';
-import { FimEventsTable, ScaScan } from './components';
+import { FimEventsTable, ScaScan, MitreTopTactics } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import store from '../../../redux/store';
@@ -329,12 +329,13 @@ export class AgentsWelcome extends Component {
                         </EuiFlexGroup>
                         <EuiSpacer size="s" />
                         <div style={{ height: this.props.resultState === 'loading' ? 0 : 259 }}>
-                          <WzReduxProvider>
+{/*                           <WzReduxProvider>
                             <KibanaVis
                               visID={'Wazuh-App-Agents-Welcome-Top-Tactics-Mitre'}
                               tab={'welcome'}
                             ></KibanaVis>
-                          </WzReduxProvider>
+                          </WzReduxProvider> */}
+                          <MitreTopTactics />
                         </div>
                         <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', textAlign: "center", paddingTop: 100 }}>
                           <EuiLoadingChart size="xl" />
