@@ -84,9 +84,21 @@ export class ScaScan extends Component {
     return(
       <Fragment>
         <EuiText size="xs">
-          <h2>SCA: Last scan</h2>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <h2>SCA: Last scan</h2>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiToolTip position="top" content="Open SCA Scans">
+                <EuiButtonIcon 
+                  iconType="popout"
+                  color="primary"
+                  onClick={() => this.props.switchTab('sca')}
+                  aria-label="Open SCA Scans"/>
+              </EuiToolTip>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiText>
-        <EuiSpacer size="s" />
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
@@ -101,16 +113,17 @@ export class ScaScan extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiText>
+            <EuiText size={'s'}>
               <p>{lastScan.description}</p>
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size="xl" />
+        <EuiSpacer size="l" />
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiStat
               title={lastScan.pass}
+              titleSize="m"
               textAlign="center"
               description="Pass"
               titleColor="secondary"
@@ -119,6 +132,7 @@ export class ScaScan extends Component {
           <EuiFlexItem>
             <EuiStat
               title={lastScan.fail}
+              titleSize="m"
               textAlign="center"
               description="Fail"
               titleColor="danger"
@@ -127,6 +141,7 @@ export class ScaScan extends Component {
           <EuiFlexItem>
             <EuiStat
               title={lastScan.total_checks}
+              titleSize="m"
               textAlign="center"
               description="Total checks"
             />
@@ -134,6 +149,7 @@ export class ScaScan extends Component {
           <EuiFlexItem>
             <EuiStat
               title={`${lastScan.score}%`}
+              titleSize="m"
               textAlign="center"
               description="Score"
             />
@@ -156,7 +172,7 @@ export class ScaScan extends Component {
     const loading = this.renderLoadingStatus();
     const scaScan = this.renderScanDetails();
     return (
-      <EuiFlexItem style={{ marginTop: 0 }}>
+      <EuiFlexItem>
         <EuiPanel paddingSize="m">
           {loading}
           {scaScan}

@@ -191,8 +191,8 @@ export class MainModule extends Component {
       <Fragment>
         {agent &&
           <MainModuleAgent {...{ ...this.props, ...mainProps }}></MainModuleAgent>
-          ||
-          <MainModuleOverview {...{ ...this.props, ...mainProps }}></MainModuleOverview>
+          || ((this.props.section && this.props.section !== 'welcome') &&
+          <MainModuleOverview {...{ ...this.props, ...mainProps }}></MainModuleOverview>)
         }
       </Fragment>
     );

@@ -19,7 +19,8 @@ import {
   EuiButtonEmpty,
   EuiCallOut,
   EuiLoadingSpinner,
-  EuiFormRow
+  EuiFormRow,
+  EuiBadge
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
@@ -467,9 +468,11 @@ class WzMenu extends Component {
               <EuiIcon type="watchesApp" color="primary" size="m" />
               <span className="wz-menu-button-title ">Agents</span>
               <span className="flex"></span>
-              {this.state.isAgentPopoverOpen && (
-                <EuiIcon color="subdued" type="arrowRight" />
-              )}
+              {(this.isAgent && (
+                <EuiBadge color="secondary">
+                  {this.isAgent}
+                </EuiBadge>
+              ))}
             </EuiButtonEmpty>
 
             <EuiButtonEmpty

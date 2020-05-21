@@ -205,7 +205,7 @@ export class MainModuleAgent extends Component {
     return (
       <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
         <EuiButtonEmpty
-          fill={this.state.selectView === 'settings'}
+          fill={this.state.selectView === 'settings' || undefined}
           iconType="wrench"
           onClick={() => this.onSelectedTabChanged('settings')}>
           Configuration
@@ -233,7 +233,7 @@ export class MainModuleAgent extends Component {
                     !this.props.tabs || !this.props.tabs.length ?
                       "wz-welcome-page-agent-info" :
                       "wz-welcome-page-agent-info wz-welcome-page-agent-info-gray"}>
-                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                    <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
                   </div>
                 }
                 {(this.props.tabs && this.props.tabs.length) &&

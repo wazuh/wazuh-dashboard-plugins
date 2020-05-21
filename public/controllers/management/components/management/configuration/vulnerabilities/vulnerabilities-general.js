@@ -18,9 +18,10 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
+import { renderValueYesThenEnabled } from '../utils/utils';
 
 const mainSettings = [
-  { field: 'disabled', label: 'Vulnerability detector status' },
+  { field: 'enabled', label: 'Vulnerability detector status', render: renderValueYesThenEnabled },
   { field: 'interval', label: 'Interval between scan executions' },
   { field: 'run_on_start', label: 'Scan on start' },
   {

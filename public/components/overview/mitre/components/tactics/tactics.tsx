@@ -104,8 +104,9 @@ export class Tactics extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { filterParams } = this.props;
-    if (JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams))
+    if (JSON.stringify(this.state.prevFilters) !== JSON.stringify(filterParams)){
       this.getTacticsCount(this.state.firstTime);
+    }
   }
 
   showToast = (color, title, text, time) => {
@@ -118,7 +119,7 @@ export class Tactics extends Component {
   };
 
   async getTacticsCount(firstTime=false) {
-    this.setState({loadingAlerts: true});
+    this.setState({loadingAlerts: true, prevFilters: this.props.filterParams});
     try{
       const {indexPattern, filterParams} = this.props;
       if ( !indexPattern ) { return; }

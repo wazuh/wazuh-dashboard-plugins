@@ -4,22 +4,26 @@
     </div>
     <div ng-show="!actrl.addingNewAgent">
         <div ng-controller="overviewController as octrl">
+            <!-- Navigation section -->
             <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
-                <div ng-if="octrl.tab !== 'welcome'">
-                    <react-component ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
-                        name="MainModule" props="getMainProps(resultState)" />
-                </div>
-                <div>
-                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper"
-                        props="octrl.currentOverviewSectionProps" />
-                </div>
+                <react-component ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
+                    name="MainModule"
+                    props="getMainProps(resultState)" />
+                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper" props="octrl.currentOverviewSectionProps" />
                 <div ng-if='!loadingDashboard'>
                     <div ng-show='showModuleDashboard || showModuleEvents'>
-                        <div ng-class="{'no-opacity': !moduleDiscoverReady}">
-                            <kbn-dis></kbn-dis>
+                        <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
+                            <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
                         </div>
+
                     </div>
                 </div>
+            </div>
+
+            <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+                <!-- Discover search bar section -->
+                <kbn-dis ng-show="octrl.tab && octrl.tab !== 'welcome'"></kbn-dis>
+                <!-- End Discover search bar section -->
             </div>
 
             <div ng-show="showModuleDashboard || showModuleEvents"

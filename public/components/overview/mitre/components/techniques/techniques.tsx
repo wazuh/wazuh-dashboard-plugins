@@ -24,6 +24,7 @@ import {
   EuiText,
   EuiContextMenu,
   EuiIcon,
+  EuiOverlayMask,
   EuiButtonIcon
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
@@ -72,8 +73,8 @@ export class Techniques extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { filterParams } = this.props;
-    if ( JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams) )
+    const { filters } = this.props;
+    if ( JSON.stringify(prevProps.filters) !== JSON.stringify(filters) )
       this.getTechniquesCount();
   }
 
@@ -83,7 +84,7 @@ export class Techniques extends Component {
 
   async getTechniquesCount() {
     try{
-      const {indexPattern, filterParams} = this.props;
+      const {indexPattern, filters} = this.props;
       if ( !indexPattern ) { return; }
       const aggs = {
         techniques: {
@@ -96,7 +97,7 @@ export class Techniques extends Component {
       
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
-      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
+      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filters, aggs);
       const { buckets } = data.aggregations.techniques;
       this._isMount && this.setState({techniquesCount: buckets, loadingAlerts: false});
         
@@ -341,10 +342,17 @@ export class Techniques extends Component {
           {this.renderFacet()}
         </div>
         { isFlyoutVisible &&
-          <FlyoutTechnique
-            onChangeFlyout={this.onChangeFlyout}
-            currentTechniqueData={this.state.currentTechniqueData}
-            currentTechnique={currentTechnique} />
+          <EuiOverlayMask
+            // @ts-ignore
+            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
+          
+            <FlyoutTechnique
+              openDashboard={itemId => this.openDashboard(itemId)}
+              openDiscover={itemId => this.openDiscover(itemId)}
+              onChangeFlyout={this.onChangeFlyout}
+              currentTechniqueData={this.state.currentTechniqueData}
+              currentTechnique={currentTechnique} />
+          </EuiOverlayMask>
         } 
       </div>   
 		)
