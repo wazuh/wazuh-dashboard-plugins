@@ -88,7 +88,7 @@ app.directive('wzXmlFileEditor', function() {
           const text = $scope.xmlCodeBox.getValue();
           let xml = replaceIllegalXML(text);
           xml = xml.replace(/..xml.+\?>/, '');
-          xml = xml.replace(/\\</, '\ <');
+          xml = xml.replace(/\\</, ' <');
           xml = xml.replace(/\\</gm, '');
           xml = xml.replace(/<!--[\s\S\n]*?-->/gm, '');
           const xmlDoc = parser.parseFromString(
@@ -265,15 +265,15 @@ app.directive('wzXmlFileEditor', function() {
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg);
-            if(params.isNewFile) {
+            if (params.isNewFile) {
               $scope.$emit('editFile', {
                 file: {
                   file: params.rule.file,
                   path: 'etc/rules',
                   status: 'enabled',
-                  type: 'rule',
+                  type: 'rule'
                 },
-                path: 'etc/rules',
+                path: 'etc/rules'
               });
             }
           } else if (params.decoder) {
@@ -294,15 +294,15 @@ app.directive('wzXmlFileEditor', function() {
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg);
-            if(params.isNewFile) {
+            if (params.isNewFile) {
               $scope.$emit('editFile', {
                 file: {
                   file: params.decoder.file,
                   path: '/decoders/files',
                   status: 'enabled',
-                  type: 'decoder',
+                  type: 'decoder'
                 },
-                path: '/decoders/files',
+                path: '/decoders/files'
               });
             }
           } else if (params.node) {

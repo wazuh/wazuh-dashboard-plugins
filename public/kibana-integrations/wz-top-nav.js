@@ -67,7 +67,7 @@ export function createTopNavDirective() {
       };
 
       return linkFn;
-    },
+    }
   };
 }
 
@@ -111,7 +111,7 @@ export const createTopNavHelper = ({ TopNavMenu }) => reactDirective => {
     'showAutoRefreshOnly',
 
     // temporary flag to use the stateful components
-    'useDefaultBehaviors',
+    'useDefaultBehaviors'
   ]);
 };
 

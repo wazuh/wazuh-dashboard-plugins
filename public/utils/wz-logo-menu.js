@@ -20,8 +20,6 @@ export const changeWazuhNavLogo = () => {
       clearInterval(interval);
     }
     const url = chrome.addBasePath('/plugins/wazuh/img/logo.svg');
-    $('.euiBreadcrumbs').html(
-      `<img src="${url}" class="navBarLogo" alt="">`
-    );
+    $('.euiBreadcrumbs').html(`<img src="${url}" class="navBarLogo" alt="">`);
   }, 100);
 };

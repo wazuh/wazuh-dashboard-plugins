@@ -13,7 +13,7 @@
 import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
 import $ from 'jquery';
-import { npStart } from 'ui/new_platform'
+import { npStart } from 'ui/new_platform';
 const app = uiModules.get('app/wazuh', []);
 
 class WzMenu {
@@ -63,11 +63,17 @@ class WzMenu {
         if ($scope.showAPISelector) {
           const result = await genericReq.request('GET', '/hosts/apis', {});
           if (result.data) {
-            if ($scope.APIList && $scope.APIList.length && result.data.length !== $scope.APIList.length) {
+            if (
+              $scope.APIList &&
+              $scope.APIList.length &&
+              result.data.length !== $scope.APIList.length
+            ) {
               location.reload();
             }
             $scope.APIList = result.data;
-            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === $rootScope.currentAPIid);
+            $scope.currentSelectedAPI = $scope.APIList.find(
+              x => x.id === $rootScope.currentAPIid
+            );
           }
         }
 
@@ -106,9 +112,8 @@ class WzMenu {
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
         if (!$scope.menuNavItem) {
-          $scope.menuNavItem = appState
-            .getNavigation()
-            .currLocation || "".replace(/\//g, '');
+          $scope.menuNavItem =
+            appState.getNavigation().currLocation || ''.replace(/\//g, '');
         }
 
         if (appState.getCurrentAPI()) {
@@ -147,16 +152,18 @@ class WzMenu {
 
     const setCurrentApi = () => {
       if (appState.getCurrentAPI()) {
-        const apiId = $rootScope.currentAPIid ;
+        const apiId = $rootScope.currentAPIid;
         if ($scope.APIList && $scope.APIList.length) {
           if ($scope.updateFromEvent) {
-            $scope.currentSelectedAPI = $scope.APIList.find(x => x.id === apiId);
+            $scope.currentSelectedAPI = $scope.APIList.find(
+              x => x.id === apiId
+            );
             $scope.updateFromEvent = false;
           }
         }
         $scope.$applyAsync();
       }
-    }
+    };
 
     $scope.root.$on('currentAPIsetted', () => {
       $scope.updateFromEvent = true;
@@ -217,21 +224,23 @@ class WzMenu {
     });
 
     // Set default API
-    $scope.changeAPI = async (api) => {
+    $scope.changeAPI = async api => {
       if (appState.getCurrentAPI()) {
         const current = JSON.parse(appState.getCurrentAPI());
         if (api && current.id !== api.id) {
           $scope.currentSelectedAPI = false;
           $scope.$applyAsync();
-          if (!settings.apiEntries.length || settings.apiEntries.length !== $scope.APIList.length) {
+          if (
+            !settings.apiEntries.length ||
+            settings.apiEntries.length !== $scope.APIList.length
+          ) {
             await settings.getHosts();
           }
           await settings.setDefault($scope.APIList.find(x => x.id === api.id));
-          if (!location.href.includes('/wazuh-dev'))
-            $route.reload();
+          if (!location.href.includes('/wazuh-dev')) $route.reload();
         }
       }
-    }
+    };
   }
 }
 

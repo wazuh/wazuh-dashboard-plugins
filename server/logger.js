@@ -17,9 +17,9 @@ import { getConfiguration } from './lib/get-configuration';
 let allowed = false;
 let wazuhlogger = undefined;
 let wazuhPlainLogger = undefined;
-const logsBasePath = '../../../optimize/wazuh/logs'
-const plainLogFilePath = `${logsBasePath}/wazuhapp-plain.log`
-const rawLogFilePath = `${logsBasePath}/wazuhapp.log`
+const logsBasePath = '../../../optimize/wazuh/logs';
+const plainLogFilePath = `${logsBasePath}/wazuhapp-plain.log`;
+const rawLogFilePath = `${logsBasePath}/wazuhapp.log`;
 
 /**
  * Here we create the loggers
@@ -38,10 +38,7 @@ const initLogger = () => {
     format: winston.format.json(),
     transports: [
       new winston.transports.File({
-        filename: path.join(
-          __dirname,
-          rawLogFilePath
-        )
+        filename: path.join(__dirname, rawLogFilePath)
       })
     ]
   });
@@ -55,10 +52,7 @@ const initLogger = () => {
     format: winston.format.simple(),
     transports: [
       new winston.transports.File({
-        filename: path.join(
-          __dirname,
-          plainLogFilePath
-        )
+        filename: path.join(__dirname, plainLogFilePath)
       })
     ]
   });
@@ -72,7 +66,6 @@ const initLogger = () => {
  */
 const initDirectory = async () => {
   try {
-
     if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh'))) {
       fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh'));
     }
@@ -114,11 +107,7 @@ const getFilesizeInMegaBytes = filename => {
  */
 const checkFiles = () => {
   if (allowed) {
-    if (
-      getFilesizeInMegaBytes(
-        path.join(__dirname, rawLogFilePath)
-      ) >= 100
-    ) {
+    if (getFilesizeInMegaBytes(path.join(__dirname, rawLogFilePath)) >= 100) {
       fs.renameSync(
         path.join(__dirname, rawLogFilePath),
         path.join(
@@ -136,17 +125,10 @@ const checkFiles = () => {
         }) + '\n'
       );
     }
-    if (
-      getFilesizeInMegaBytes(
-        path.join(__dirname, plainLogFilePath)
-      ) >= 100
-    ) {
+    if (getFilesizeInMegaBytes(path.join(__dirname, plainLogFilePath)) >= 100) {
       fs.renameSync(
         path.join(__dirname, plainLogFilePath),
-        path.join(
-          __dirname,
-          `${plainLogFilePath}.${new Date().getTime()}.log`
-        )
+        path.join(__dirname, `${plainLogFilePath}.${new Date().getTime()}.log`)
       );
     }
   }

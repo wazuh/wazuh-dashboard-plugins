@@ -28,9 +28,12 @@ const needRestartFields = [
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml');
+    this.file = path.join(
+      __dirname,
+      '../../../../optimize/wazuh/config/wazuh.yml'
+    );
   }
-    /**
+  /**
    * Add or replace specific setting from wazuh.yml
    * @param {String} key The setting name.
    * @param {String} value New value for the setting.
@@ -51,7 +54,7 @@ export class UpdateConfigurationFile {
       throw error;
     }
   }
-    /**
+  /**
    * Updates wazuh.yml file. If it fails, it throws the error to the next function.
    * @param {Object} input
    */
@@ -64,7 +67,7 @@ export class UpdateConfigurationFile {
       const configuration = getConfiguration(true) || {};
       const adminUndefined = !Object.keys(configuration).includes('admin');
       const adminIsTrue = configuration.admin;
-      
+
       if (!adminUndefined && !adminIsTrue) {
         throw new Error('You are not authorized to update the configuration');
       }
@@ -76,7 +79,10 @@ export class UpdateConfigurationFile {
         'Updating configuration',
         'debug'
       );
-      return { needRestart: needRestartFields.includes(key), needWait: key === 'api.selector' };
+      return {
+        needRestart: needRestartFields.includes(key),
+        needWait: key === 'api.selector'
+      };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;

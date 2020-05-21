@@ -842,13 +842,10 @@ export class AgentsController {
         this.$scope.agent.agentPlatform = false;
       }
 
-
-
       this.$scope.syscheckTableProps = {
         wzReq: (method, path, body) => this.apiReq.request(method, path, body),
         agentId: this.$scope.agent.id
-      }
-    
+      };
 
       await this.$scope.switchTab(this.$scope.tab, true);
 

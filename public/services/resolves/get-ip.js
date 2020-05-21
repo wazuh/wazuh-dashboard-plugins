@@ -64,7 +64,9 @@ export function getIp(
         return;
       }
 
-      const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
+      const courierData = await npStart.plugins.data.indexPatterns.get(
+        currentPattern
+      );
 
       deferred.resolve({
         list: onlyWazuhAlerts,

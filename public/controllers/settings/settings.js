@@ -203,7 +203,7 @@ export class SettingsController {
         }
       }
       return numError;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   // Set default API
@@ -554,7 +554,9 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries = (this.apiTableProps || {}).apiEntries = (this.apiIsDownProps || {}).apiEntries = hosts;
+      this.apiEntries = (this.apiTableProps || {}).apiEntries = (
+        this.apiIsDownProps || {}
+      ).apiEntries = hosts;
       if (!hosts.length) {
         this.apiIsDown = false;
         this.addingApi = true;

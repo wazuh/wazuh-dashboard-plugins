@@ -76,7 +76,7 @@ const app = getAngularModule('app/wazuh');
 
 app.config([
   '$compileProvider',
-  function ($compileProvider) {
+  function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -85,12 +85,12 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function ($httpProvider) {
+  function($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function () {
+app.run(function() {
   chrome
     .setRootTemplate(
       `<div>
@@ -101,5 +101,3 @@ app.run(function () {
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
 });
-
-

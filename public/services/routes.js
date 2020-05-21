@@ -107,12 +107,7 @@ function savedSearch(
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
   assignPreviousLocation($rootScope, $location);
-  return getSavedSearch(
-    redirectWhenMissing,
-    $location,
-    $window,
-    $route
-  );
+  return getSavedSearch(redirectWhenMissing, $location, $window, $route);
 }
 
 function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
@@ -122,7 +117,7 @@ function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
-  if ($location.$$path !== "/visualize/create") {
+  if ($location.$$path !== '/visualize/create') {
     // Sets ?_a=(columns:!(_source),filters:!())
     $location.search('_a', '(columns:!(_source),filters:!())');
     // Removes ?_g
@@ -169,15 +164,15 @@ routes
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzConfig, wzKibana }
   })
   .when('/discover/context/:pattern?/:type?/:id?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzKibana }
   })
   .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {
@@ -197,4 +192,3 @@ routes
   .otherwise({
     redirectTo: '/overview'
   });
-  

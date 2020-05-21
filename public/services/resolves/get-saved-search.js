@@ -23,7 +23,7 @@ export function getSavedSearch(
     savedObjectsClient: npStart.core.savedObjects.client,
     indexPatterns: npStart.plugins.data.indexPatterns,
     chrome: npStart.core.chrome,
-    overlays: npStart.core.overlays,
+    overlays: npStart.core.overlays
   };
 
   const savedSearches = createSavedSearchesLoader(services);

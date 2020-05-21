@@ -261,7 +261,7 @@ export class HealthCheck {
 
       this.checksDone = true;
 
-      if(this.checks.fields){
+      if (this.checks.fields) {
         try {
           await this.genericReq.request('GET', '/elastic/known-fields/all', {});
           this.results[this.results.length - 1].status = 'Ready';

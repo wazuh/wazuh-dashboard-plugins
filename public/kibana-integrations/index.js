@@ -14,4 +14,4 @@ import './kibana-visualization';
 import './kibana-discover';
 import './saved_visualizations';
 import { loadWzTopNavDirectives } from './wz-top-nav';
-loadWzTopNavDirectives(npStart.plugins.navigation.ui); 
+loadWzTopNavDirectives(npStart.plugins.navigation.ui);

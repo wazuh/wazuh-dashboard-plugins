@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import $ from 'jquery';
-import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy'
+import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { npStart } from 'ui/new_platform';
@@ -22,7 +22,7 @@ import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
 let lockFields = false;
 
-app.directive('kbnVis', function () {
+app.directive('kbnVis', function() {
   return {
     restrict: 'E',
     scope: {
@@ -50,13 +50,15 @@ app.directive('kbnVis', function () {
         savedObjectsClient: npStart.core.savedObjects.client,
         indexPatterns: npStart.plugins.data.indexPatterns,
         chrome: npStart.core.chrome,
-        overlays: npStart.core.overlays,
+        overlays: npStart.core.overlays
       };
       const servicesForVisualizations = {
         ...services,
-        ...{ visualizationTypes: new TypesService().start() },
-      }
-      const savedObjectLoaderVisualize = createSavedVisLoader(servicesForVisualizations);
+        ...{ visualizationTypes: new TypesService().start() }
+      };
+      const savedObjectLoaderVisualize = createSavedVisLoader(
+        servicesForVisualizations
+      );
 
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
@@ -96,21 +98,23 @@ app.directive('kbnVis', function () {
       const myRender = async raw => {
         try {
           const discoverList = discoverPendingUpdates.getList();
-          const isAgentStatus = $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
+          const isAgentStatus =
+            $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
           const timeFilterSeconds = calculateTimeFilterSeconds(
             timefilter.getTime()
           );
-          const timeRange = isAgentStatus && timeFilterSeconds < 900
-            ? { from: 'now-15m', to: 'now', mode: 'quick' }
-            : timefilter.getTime();
+          const timeRange =
+            isAgentStatus && timeFilterSeconds < 900
+              ? { from: 'now-15m', to: 'now', mode: 'quick' }
+              : timefilter.getTime();
           const filters = isAgentStatus ? [] : discoverList[1] || [];
           const query = !isAgentStatus ? discoverList[0] : {};
 
           const visInput = {
             timeRange,
             filters,
-            query,
-          }
+            query
+          };
 
           if (!factory) {
             factory = embeddables.getEmbeddableFactory('visualization');
@@ -135,11 +139,11 @@ app.directive('kbnVis', function () {
               // Visualization doesn't need "hits"
               visualization.searchSource.setField('size', 0);
 
-              const vis = new Vis(visualization.visState.type, await convertToSerializedVis(visualization));
-              visHandler = await factory.createFromObject(
-                vis,
-                visInput
+              const vis = new Vis(
+                visualization.visState.type,
+                await convertToSerializedVis(visualization)
               );
+              visHandler = await factory.createFromObject(vis, visInput);
               await visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]);
               visHandler.handler.data$.subscribe(renderComplete());
               visHandlers.addItem(visHandler);
@@ -205,10 +209,10 @@ app.directive('kbnVis', function () {
       const destroyAll = () => {
         try {
           visualization.destroy();
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
         try {
           visHandler.destroy();
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       };
 
       $scope.$on('$destroy', () => {
@@ -241,15 +245,17 @@ app.directive('kbnVis', function () {
 
           $rootScope.loadingStatus = `Rendering visualizations... ${
             currentCompleted > 100 ? 100 : currentCompleted
-            } %`;
-         
+          } %`;
+
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';
 
             if ($scope.visID.includes('AWS-geo')) {
-              const canvas = $('.visChart.leaflet-container .leaflet-control-zoom-in');
-              setTimeout(function () {
+              const canvas = $(
+                '.visChart.leaflet-container .leaflet-control-zoom-in'
+              );
+              setTimeout(function() {
                 if (!mapClicked) {
                   mapClicked = true;
                   canvas[0].click();

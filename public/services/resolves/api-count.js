@@ -43,7 +43,6 @@ export function apiCount($q, genericReq, $location, appState, $http) {
 
 async function check(data, $http) {
   try {
-
     const headers = {
       headers: { 'Content-Type': 'application/json' },
       timeout: 20000
@@ -68,7 +67,7 @@ function tryToSetDefault(apis, appState, $http) {
     for (let idx in apis) {
       const api = apis[idx];
       try {
-        if(check(api, $http)){
+        if (check(api, $http)) {
           appState.setCurrentAPI(
             JSON.stringify({
               name: api.cluster_info.manager,

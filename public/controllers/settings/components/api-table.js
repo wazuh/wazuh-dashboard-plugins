@@ -183,19 +183,19 @@ export class ApiTable extends Component {
                 </EuiToolTip>
               </span>
             ) : (
-                  <span>
-                    <EuiHealth color="danger">Offline</EuiHealth>
-                    <EuiToolTip position="top" content={item.downReason}>
-                      <EuiButtonIcon
-                        color="primary"
-                        style={{ marginTop: '-12px' }}
-                        iconType="questionInCircle"
-                        aria-label="Info about the error"
-                        onClick={() => this.props.copyToClipBoard(item.downReason)}
-                      />
-                    </EuiToolTip>
-                  </span>
-                );
+              <span>
+                <EuiHealth color="danger">Offline</EuiHealth>
+                <EuiToolTip position="top" content={item.downReason}>
+                  <EuiButtonIcon
+                    color="primary"
+                    style={{ marginTop: '-12px' }}
+                    iconType="questionInCircle"
+                    aria-label="Info about the error"
+                    onClick={() => this.props.copyToClipBoard(item.downReason)}
+                  />
+                </EuiToolTip>
+              </span>
+            );
           } else {
             return (
               <span>
@@ -282,7 +282,8 @@ export class ApiTable extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can manage and configure the API entries. You can also check their connection and status.
+              From here you can manage and configure the API entries. You can
+              also check their connection and status.
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
