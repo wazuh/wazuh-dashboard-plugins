@@ -48,7 +48,7 @@ export class ModulesHelper {
   static activeNoImplicitsFilters() {
     const { filterManager } = getServices();
     const implicitFilters = filterManager.filters.filter(
-      x => x.$state.isImplicit
+      x => x.isImplicit
     );
     if (!(implicitFilters || []).length) {
       setTimeout(() => {

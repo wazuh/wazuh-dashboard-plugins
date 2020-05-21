@@ -36,7 +36,7 @@ import {
   TimeRange,
   Query,
   esFilters
-} from '../../../../../../src/plugins/data/common';
+} from '../../../../../../src/plugins/data/public';
 
 export interface ITactic {
   [key:string]: string[]

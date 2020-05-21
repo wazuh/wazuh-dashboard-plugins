@@ -243,7 +243,8 @@ export class OverviewActions extends Component {
               }
             }
           },
-          "$state": { "store": "appState", "isImplicit": true }
+          "$state": { "store": "appState" },
+          "isImplicit": true
         };
         this.state.filterManager.addFilters(filter);
       } else if (agentIdList.length > 1) {
@@ -261,7 +262,8 @@ export class OverviewActions extends Component {
             "index": "wazuh-alerts-3.x-*"
           },
           "query": { "bool": { "minimum_should_match": 1, "should": agentsListFormatted } },
-          "$state": { "store": "appState", "isImplicit": true }
+          "$state": { "store": "appState" }, 
+          "isImplicit": true
         };
         this.state.filterManager.addFilters(filter);
       }

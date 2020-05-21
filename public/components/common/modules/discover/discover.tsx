@@ -45,7 +45,7 @@ import {
   esFilters,
   esQuery,
   IFieldType
-} from '../../../../../../../src/plugins/data/common';
+} from '../../../../../../../src/plugins/data/public';
 
 export class Discover extends Component {
   _isMount!: boolean;

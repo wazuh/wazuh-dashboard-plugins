@@ -1004,10 +1004,11 @@ function discoverController(
       });
     } else {
       wzCurrentFilters.forEach(x => {
-        if (x.$state.isImplicit != false)
-          x.$state.isImplicit = true
+        if (x.isImplicit != false)
+          x.isImplicit = true
       });
-      //const globalFilters = globalState.filters;
+      //const globalState = wazuhApp.$injector.get('globalState');
+      //const globalFilters = (filterManager.filters || []).filter(x => x.$state.store === "globalState");
       const globalFilters = [];
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();

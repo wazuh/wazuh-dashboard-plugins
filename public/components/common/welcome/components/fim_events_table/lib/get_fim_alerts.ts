@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../overview/mitre/lib'
-import { esFilters } from '../../../../../../../../../src/plugins/data/common';
+import { esFilters } from '../../../../../../../../../src/plugins/data/public';
 import { AppState } from '../../../../../../react-services/app-state'
 
 
