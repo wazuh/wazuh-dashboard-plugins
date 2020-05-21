@@ -55,7 +55,7 @@ export default function(kibana) {
           name: 'Wazuh',
           navLinkId: featureId,
           icon: '/plugins/wazuh/img/icon.svg',
-          app: [featureId, 'kibana', 'elasticsearch'],
+          app: [featureId],
           catalogue: [],
           privileges: {
             all: {
