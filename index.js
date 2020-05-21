@@ -21,7 +21,6 @@ export default function(kibana) {
     name: 'wazuh',
     uiExports: {
       app: {
-        id: 'wazuh',
         title: 'Wazuh',
         description: 'Wazuh app for Kibana',
         icon: 'plugins/wazuh/img/icon.svg',
