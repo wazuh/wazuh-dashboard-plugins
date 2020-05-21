@@ -92,7 +92,7 @@ export default class EnableModules extends Component {
                   position: 'absolute',
                   top: 0
                 }}
-                checked={this.state.extensions[extension.name]}
+                checked={typeof this.state.extensions[extension.name] !== 'undefined' ? this.state.extensions[extension.name] : false}
                 onChange={() => this.toggleExtension(extension)}
               />
             )}
