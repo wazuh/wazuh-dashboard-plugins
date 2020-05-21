@@ -319,12 +319,8 @@ export class AgentsWelcome extends Component {
                 <EuiFlexGroup>
 
                   <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} style={{ height: 300 }}>
-                    <EuiPanel paddingSize="none">
-                      <EuiFlexItem>
-                        <EuiFlexGroup
-                          style={{ padding: '12px 12px 0px' }}
-                          className="embPanel__header"
-                        >
+                    <EuiPanel paddingSize="m">
+                        <EuiFlexGroup>
                           <h2 className="embPanel__title wz-headline-title">
                             <EuiText size="xs"><h2>MITRE</h2></EuiText>
                           </h2>
@@ -339,13 +335,11 @@ export class AgentsWelcome extends Component {
                           </EuiFlexItem>
                         </EuiFlexGroup>
                         <EuiSpacer size="s" />
-                        <div style={{ height: this.props.resultState === 'loading' ? 0 : 259 }}>
-                          <MitreTopTactics />
-                        </div>
-                        <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', textAlign: "center", paddingTop: 100 }}>
-                          <EuiLoadingChart size="xl" />
-                        </div>
-                      </EuiFlexItem>
+                        <EuiFlexGroup>
+                          <EuiFlexItem>
+                            <MitreTopTactics/>
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
                     </EuiPanel>
                   </EuiFlexItem>
 
