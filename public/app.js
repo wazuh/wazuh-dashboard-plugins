@@ -30,7 +30,7 @@ import 'angular-sanitize';
 // Require CSS
 import './less/loader';
 // Require lib to dashboards PDFs
-require ('./utils/dom-to-image.js');
+require('./utils/dom-to-image.js');
 
 // EUI React components wrapper
 import './components';
@@ -92,7 +92,12 @@ app.config([
 
 app.run(function () {
   chrome
-    .setRootTemplate('<wz-menu></wz-menu><div ng-view></div>')
+    .setRootTemplate(
+      `<div>
+        <wz-menu></wz-menu><div ng-view></div>
+         </div>
+         `
+    )
     .setRootController(() => require('./app'));
   changeWazuhNavLogo();
 });

@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { SavedObjectsClientProvider } from 'ui/saved_objects';
-
+import { npStart } from 'ui/new_platform';
 import chrome from 'ui/chrome';
 
 export class HealthCheck {
@@ -56,7 +55,7 @@ export class HealthCheck {
     this.$window = $window;
     this.results = [];
 
-    this.savedObjectsClient = Private(SavedObjectsClientProvider);
+    this.savedObjectsClient = npStart.core.savedObjects.client;
 
     this.checks = {
       api: true,

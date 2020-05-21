@@ -32,7 +32,6 @@ import overviewTemplate from '../templates/overview/overview.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
-import { npStart } from 'ui/new_platform';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -55,11 +54,9 @@ function ip(
 ) {
   assignPreviousLocation($rootScope, $location);
   return getIp(
-    npStart.plugins.data.indexPatterns,
     $q,
     $window,
     $location,
-    Private,
     appState,
     genericReq,
     errorHandler,
@@ -105,7 +102,6 @@ function savedSearch(
   $location,
   $window,
   $rootScope,
-  savedSearches,
   $route
 ) {
   const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
@@ -115,7 +111,6 @@ function savedSearch(
     redirectWhenMissing,
     $location,
     $window,
-    savedSearches,
     $route
   );
 }

@@ -15,7 +15,9 @@ import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
-
+import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
+import { Vis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/types';
+import { convertToSerializedVis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/saved_visualizations/_saved_vis';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
 let lockFields = false;
@@ -50,7 +52,11 @@ app.directive('kbnVis', function () {
         chrome: npStart.core.chrome,
         overlays: npStart.core.overlays,
       };
-      const savedObjectLoaderVisualize = createSavedVisLoader(services);
+      const servicesForVisualizations = {
+        ...services,
+        ...{ visualizationTypes: new TypesService().start() },
+      }
+      const savedObjectLoaderVisualize = createSavedVisLoader(servicesForVisualizations);
 
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
@@ -129,11 +135,13 @@ app.directive('kbnVis', function () {
               // Visualization doesn't need "hits"
               visualization.searchSource.setField('size', 0);
 
+              const vis = new Vis(visualization.visState.type, await convertToSerializedVis(visualization));
               visHandler = await factory.createFromObject(
-                visualization,
+                vis,
                 visInput
               );
-              visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]).then(renderComplete);
+              await visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]);
+              visHandler.handler.data$.subscribe(renderComplete());
               visHandlers.addItem(visHandler);
 
               setSearchSource(discoverList);
