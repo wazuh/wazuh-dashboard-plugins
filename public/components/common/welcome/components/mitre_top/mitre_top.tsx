@@ -12,7 +12,14 @@
  */
 
 import React, { Component, Fragment } from 'react';
-
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiListGroup,
+  EuiListGroupItem,
+  EuiText
+} from '@elastic/eui';
 import { IFilterParams, getElasticAlerts } from '../../../../../components/overview/mitre/lib';
 
 export class MitreTopTactics extends Component {
@@ -77,7 +84,24 @@ export class MitreTopTactics extends Component {
 
   render() {
     return (
-      <p>working</p>
+      <Fragment>
+        <EuiText size="xs">
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <h3>Top Tactics</h3>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiText>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiListGroup>
+              <EuiListGroupItem label="First item" />
+              <EuiListGroupItem label="Second item"/>
+              <EuiListGroupItem label="Third item" />
+            </EuiListGroup>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </Fragment>
     );
   }
 }

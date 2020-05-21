@@ -29,7 +29,9 @@ import {
   EuiButton,
   EuiPopover,
   EuiSelect,
-  EuiLoadingChart
+  EuiLoadingChart,
+  EuiToolTip,
+  EuiButtonIcon
 } from '@elastic/eui';
 import { FimEventsTable, ScaScan, MitreTopTactics } from './components';
 import { AgentInfo } from './agents-info';
@@ -316,7 +318,7 @@ export class AgentsWelcome extends Component {
               <EuiFlexItem> {/* Pie visualizations */}
                 <EuiFlexGroup>
 
-                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Most-Common-Groups'} style={{ height: 300 }}>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} style={{ height: 300 }}>
                     <EuiPanel paddingSize="none">
                       <EuiFlexItem>
                         <EuiFlexGroup
@@ -324,17 +326,20 @@ export class AgentsWelcome extends Component {
                           className="embPanel__header"
                         >
                           <h2 className="embPanel__title wz-headline-title">
-                            <EuiText size="xs"><h2>MITRE top tactics</h2></EuiText>
+                            <EuiText size="xs"><h2>MITRE</h2></EuiText>
                           </h2>
+                          <EuiFlexItem grow={false}>
+                            <EuiToolTip position="top" content="Open MITRE">
+                              <EuiButtonIcon 
+                                iconType="popout"
+                                color="primary"
+                                onClick={() => this.props.switchTab('mitre')}
+                                aria-label="Open MITRE"/>
+                            </EuiToolTip>
+                          </EuiFlexItem>
                         </EuiFlexGroup>
                         <EuiSpacer size="s" />
                         <div style={{ height: this.props.resultState === 'loading' ? 0 : 259 }}>
-{/*                           <WzReduxProvider>
-                            <KibanaVis
-                              visID={'Wazuh-App-Agents-Welcome-Top-Tactics-Mitre'}
-                              tab={'welcome'}
-                            ></KibanaVis>
-                          </WzReduxProvider> */}
                           <MitreTopTactics />
                         </div>
                         <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', textAlign: "center", paddingTop: 100 }}>
