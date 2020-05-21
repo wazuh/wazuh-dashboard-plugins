@@ -283,12 +283,12 @@ export class OverviewActions extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiModal
-            maxWidth="800px"
+            maxWidth="1000px"
             onClose={() => this.closeAgentModal()}
             initialFocus="[name=popswitch]"
           >
             <EuiModalHeader>
-              <EuiModalHeaderTitle>Filter dashboards by agent</EuiModalHeaderTitle>
+              <EuiModalHeaderTitle>Explore module by agent</EuiModalHeaderTitle>
             </EuiModalHeader>
 
             <EuiModalBody>
@@ -311,7 +311,7 @@ export class OverviewActions extends Component {
               isLoading={this.state.loadingReport}
               color='primary'
               onClick={() => this.showAgentModal()}>
-                <EuiIcon type="watchesApp" color="primary" style={{marginBottom: 3}}/>&nbsp; Filter by agent
+                <EuiIcon type="watchesApp" color="primary" style={{marginBottom: 3}}/>&nbsp; Explore by agent
             </EuiButtonEmpty>
            </span> 
           )}

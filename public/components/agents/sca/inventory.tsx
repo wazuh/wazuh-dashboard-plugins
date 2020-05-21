@@ -46,7 +46,7 @@ export class Inventory extends Component {
       },
       {
         field: 'end_scan',
-        name: 'Last scan',
+        name: 'End scan',
         dataType: 'date',
         render: value => this.offsetTimestamp('', value)
       },
@@ -457,7 +457,7 @@ export class Inventory extends Component {
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.end_scan} description="Last scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
+                    <EuiStat title={this.state.lookingPolicy.end_scan} description="End scan" titleColor="primary" titleSize="s" textAlign="center" style={{ padding: 5 }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size="m" />
