@@ -4,9 +4,6 @@
     </div>
     <div ng-if='!loadingDashboard'>
         <div ng-show='(showModuleDashboard || showModuleEvents || showMitre) && showModuleDashboard !== "welcome"'>
-            <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
-                <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
-            </div>
             <div ng-class="{'no-opacity': !moduleDiscoverReady}">
                 <kbn-dis></kbn-dis>
             </div>

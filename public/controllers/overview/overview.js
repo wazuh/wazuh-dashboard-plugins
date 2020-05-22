@@ -176,7 +176,7 @@ export class OverviewController {
         false,
         this.tabView === 'discover'
       ); 
-    }else if(!agentList ){ //&& this.rawVisualizations.getType() !== 'general'){
+    }else if(!agentList && this.tab !== 'welcome'){ //&& this.rawVisualizations.getType() !== 'general'){ // this.tab !== 'welcome' prevents to load visualization in Overview welcome
       this.$rootScope.resultState = "Fetching dashboard data...";
       await this.visFactoryService.buildOverviewVisualizations(
         this.filterHandler,

@@ -28,7 +28,6 @@ export class Events extends Component {
     const app = getAngularModule('app/wazuh');
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
-    this.$rootScope.$applyAsync();
     const scope = await this.modulesHelper.getDiscoverScope();
     this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();

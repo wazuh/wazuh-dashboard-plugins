@@ -26,7 +26,6 @@ export class Dashboard extends Component {
     const app = getAngularModule('app/wazuh');
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleDashboard = this.props.section;
-    this.$rootScope.$applyAsync();
     await this.modulesHelper.getDiscoverScope();
     this.$rootScope.moduleDiscoverReady = true;
     this.$rootScope.$applyAsync();

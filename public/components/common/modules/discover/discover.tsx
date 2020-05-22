@@ -46,6 +46,7 @@ import {
   esQuery,
   IFieldType
 } from '../../../../../../../src/plugins/data/common';
+import '../../../../components/agents/fim/inventory/inventory.less';
 
 export class Discover extends Component {
   _isMount!: boolean;
@@ -83,7 +84,9 @@ export class Discover extends Component {
     implicitFilters: object[],
     initialFilters: object[],
     type: any,
-    updateTotalHits: Function
+    updateTotalHits: Function,
+    includeFilters: string,
+    initialColumns: string[]
   }
   constructor(props) {
     super(props);
@@ -116,7 +119,9 @@ export class Discover extends Component {
       "syscheck.event": "Action",
       "rule.id": "Rule ID",
       "rule.description": "Rule description",
-      "rule.level": "Rule level"
+      "rule.level": "Rule level",
+      "rule.mitre.id": "Mitre technique",
+      "rule.mitre.tactics": "Mitre tactics",
     }
 
     this.hideCreateCustomLabel.bind(this);
@@ -136,7 +141,7 @@ export class Discover extends Component {
   async componentDidMount () {
     this._isMount = true;
     try {
-      this.setState({columns: ["icon", "timestamp", 'syscheck.event', 'rule.description', 'rule.level', 'rule.id']}) //initial columns
+      this.setState({columns: this.props.initialColumns}) //initial columns
       await this.getIndexPattern(); 
       this.getAlerts();
     } catch (err) {
@@ -165,7 +170,7 @@ export class Discover extends Component {
     Object.keys(this.indexPattern.fields).forEach(item => {
       if (isNaN(item)) { 
         fields.push(this.indexPattern.fields[item]);
-      } else if (this.indexPattern.fields[item].name.includes('syscheck')) {
+      } else if (!this.props.includeFilters || (this.props.includeFilters && this.indexPattern.fields[item].name.includes(this.props.includeFilters))) {
         fields.push(this.indexPattern.fields[item]);
       }
     })
@@ -240,7 +245,7 @@ export class Discover extends Component {
       const newFilters = this.buildFilter();
     try{
       if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading) {
-        this.setState({ isLoading: true })
+        this.setState({ isLoading: true, pageIndex:0 })
         const alerts = await GenericRequest.request(
           'POST',
           `/elastic/alerts`,

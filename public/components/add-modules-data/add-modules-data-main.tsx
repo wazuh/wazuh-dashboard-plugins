@@ -163,7 +163,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 					{/* Only sample data */}
 					<EuiFlexGroup>
 						<EuiFlexItem>
-							<EuiTitle size='l'><span>Sample data</span></EuiTitle>
+							<EuiTitle size='l'><span>Sample Data</span></EuiTitle>
 							<EuiText color='subdued'>Add sample data to modules.</EuiText>
 						</EuiFlexItem>
 					</EuiFlexGroup>

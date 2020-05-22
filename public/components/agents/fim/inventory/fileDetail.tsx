@@ -345,7 +345,7 @@ export class FileDetails extends Component {
           initialIsOpen={true}>
           <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
-              <Discover implicitFilters={implicitFilters} initialFilters={[]} type={type} updateTotalHits={(total) => this.updateTotalHits(total)}/>
+              <Discover initialColumns={["icon","timestamp", 'syscheck.event', 'rule.description', 'rule.level', 'rule.id']} includeFilters="syscheck" implicitFilters={implicitFilters} initialFilters={[]} type={type} updateTotalHits={(total) => this.updateTotalHits(total)}/>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiAccordion>
