@@ -334,10 +334,10 @@ export class AgentsWelcome extends Component {
                             </EuiToolTip>
                           </EuiFlexItem>
                         </EuiFlexGroup>
-                        <EuiSpacer size="s" />
+                        <EuiSpacer size="m" />
                         <EuiFlexGroup>
                           <EuiFlexItem>
-                            <MitreTopTactics/>
+                            <MitreTopTactics agentId={this.props.agent.id} />
                           </EuiFlexItem>
                         </EuiFlexGroup>
                     </EuiPanel>

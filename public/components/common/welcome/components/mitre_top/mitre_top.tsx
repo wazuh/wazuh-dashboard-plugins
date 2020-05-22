@@ -19,48 +19,43 @@ import {
   EuiFacetButton,
   EuiButtonIcon,
   EuiLoadingChart,
+  EuiOverlayMask
 } from '@elastic/eui';
 import { toastNotifications } from 'ui/notify';
 import { FlyoutTechnique } from '../../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../components/overview/mitre/lib';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-
+import { getMitreCount } from './lib';
 export class MitreTopTactics extends Component {
   _isMount = false;
 
   KibanaServices: { [key: string]: any };
-  filterManager: any;
   timefilter: any;
   indexPattern: any;
   props!: {
       [key: string]: any
   }
   state: {
+    alertsCount: { key: string, doc_count:number }[]
     isLoading: boolean,
-    tacticsCount: { key: string, doc_count:number }[],
-    techniquesCount: { key: string, doc_count:number }[],
+    time: any,
     filterParams: object,
-    selectedTactic: string,
+    selectedTactic: string | undefined,
     detailsOn: boolean,
     flyoutOn: boolean,
     selectedTechnique: string
   }
+  subscription: any;
 
   constructor(props) {
     super(props);
     this.KibanaServices = getServices();
-    this.filterManager = this.KibanaServices.filterManager;
     this.timefilter = this.KibanaServices.timefilter;
     this.state = {
+      alertsCount: [],
       isLoading: true,
-      tacticsCount: [],
-      techniquesCount: [],
-      filterParams: {
-        filters: [],
-        query: { language: 'kuery', query: '' },
-        time: this.timefilter.getTime(),
-      },
-      selectedTactic: "",
+      time: this.timefilter.getTime(),
+      selectedTactic: undefined,
       detailsOn: false,
       flyoutOn: false,
       selectedTechnique: ''
@@ -69,22 +64,34 @@ export class MitreTopTactics extends Component {
 
   async componentDidMount() {
     this._isMount = true;
+    this.subscription = this.timefilter.getTimeUpdate$().subscribe(
+      () => this._isMount && this.setState({time: this.timefilter.getTime(), isLoading: true}));
     this.indexPattern = await getIndexPattern();
-    await this.getTacticsCount();
+    getMitreCount(this.props.agentId, this.timefilter.getTime(), undefined)
+      .then(alertsCount => this.setState({alertsCount, isLoading: false}));
   }
 
+  async componentWillUnmount() {
+    this._isMount = false;
+    this.subscription = this.timefilter.getTimeUpdate$().unsubscribe();
+  }
+
+  shouldComponentUpdate(nextProp, nextState) {
+    const { selectedTactic, isLoading, alertsCount } = this.state;
+    if (nextState.selectedTactic !== selectedTactic ) 
+      return true;
+    if (!isLoading ) 
+      return true;
+    if (JSON.stringify(nextState.alertsCount) !== JSON.stringify(alertsCount))
+      return true;
+    return false;
+  }
+  
   async componentDidUpdate(){
-    if(this.state.selectedTactic && !this.state.techniquesCount.length){
-      await this.getTechniquesCount()
-    }
-    const time =  this.timefilter.getTime();
-    const { filterParams } = this.state;
-    if (JSON.stringify(this.state.filterParams.time) !== JSON.stringify(time)){
-      if(this.state.selectedTactic){
-        await this.updateFiltersAndGetTechniques();
-      }else{
-        await this.updateFiltersAndGetTactics();
-      }
+    const { selectedTactic, isLoading } = this.state;
+    if (isLoading) {
+      getMitreCount(this.props.agentId, this.timefilter.getTime(), selectedTactic)
+        .then(alertsCount => { this.setState({alertsCount, isLoading: false}) });
     }
   }
 
@@ -94,105 +101,6 @@ export class MitreTopTactics extends Component {
     }else{
       this.setState({selectedTactic: id}, () => this.updateFiltersAndGetTactics())
     }
-  }
-
-  async updateFiltersAndGetTechniques(){
-    const filterParams = {};
-    filterParams["time"] = this.timefilter.getTime();;
-    filterParams["query"] = this.state.filterParams["query"]; 
-    filterParams["filters"] = this.state.filterParams["filters"]; 
-    this.setState({filterParams}, async() => await this.getTechniquesCount())
-  }
-
-  async updateFiltersAndGetTactics(){
-    const filterParams = {};
-    filterParams["time"] = this.timefilter.getTime();;
-    filterParams["query"] = this.state.filterParams["query"]; 
-    filterParams["filters"] = this.state.filterParams["filters"]; 
-    this.setState({filterParams}, async() => await this.getTacticsCount())
-  }
-
-  async getTechniquesCount() {
-    try{
-      const {filterParams} = this.state;
-      const indexPattern = this.indexPattern;
-      if ( !indexPattern ) { return; }
-      const aggs = {
-        techniques: {
-          terms: {
-              field: "rule.mitre.id",
-              size: 1000,
-          }
-        }
-      }
-      const tmpFilterParams = {};
-      tmpFilterParams["time"] = this.timefilter.getTime();;
-      tmpFilterParams["query"] = this.state.filterParams["query"]; 
-      tmpFilterParams["filters"] = this.state.filterParams["filters"]; 
-
-      const tacticFilter = {
-        "meta": {
-          "disabled": false,
-          "key": "rule.mitre.tactics",
-          "params": { "query": this.state.selectedTactic},
-          "type": "phrase",
-          "index": "wazuh-alerts-3.x-*"
-        },
-        "query": { "match_phrase": { "rule.mitre.tactics": this.state.selectedTactic  } },
-        "$state": { "store": "appState" }
-      };
-      tmpFilterParams["filters"].push(tacticFilter);
-      
-      // TODO: use `status` and `statusText`  to show errors
-      // @ts-ignore
-      const {data, status, statusText } = await getElasticAlerts(indexPattern, tmpFilterParams, aggs);
-      const { buckets } = data.aggregations.techniques;
-      this._isMount && this.setState({techniquesCount: buckets, loadingAlerts: false});
-        
-    } catch(err){
-      this.showToast(
-        'danger',
-        'Error',
-        `Mitre alerts could not be fetched: ${err}`,
-        3000
-      );
-      this._isMount && this.setState({loadingAlerts: false})
-    }
-  }
-
-  async getTacticsCount(firstTime=false) {
-    this.setState({loadingAlerts: true, prevFilters: this.state.filterParams});
-    try{
-      const {filterParams} = this.state;
-      const indexPattern = this.indexPattern;
-      if ( !indexPattern ) { return; }
-      const aggs = {
-        tactics: {
-          terms: {
-              field: "rule.mitre.tactics",
-              size: 5,
-          }
-        }
-      }
-      
-      // TODO: use `status` and `statusText`  to show errors
-      // @ts-ignore
-      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
-      const { buckets } = data.aggregations.tactics;
-      if(firstTime){
-       this.initTactics(buckets); // top tactics are checked on component mount
-      }
-      this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false, firstTime: false, isLoading: false});
-    } catch(err){
-       this.showToast(
-        'danger',
-        'Error',
-        `Mitre alerts could not be fetched: ${err}`,
-        3000
-      );
-      this.setState({loadingAlerts: false})
-    }
-    
   }
   
   showToast(color: string, title: string = '', text: string = '', time: number = 3000){
@@ -215,8 +123,7 @@ export class MitreTopTactics extends Component {
   }
 
   renderTacticsTop() {
-    const { tacticsCount, detailsOn, isLoading } = this.state;
-    if (detailsOn || isLoading) return;
+    const { alertsCount } = this.state;
     return (
       <Fragment>
         <EuiText size="xs">
@@ -228,14 +135,14 @@ export class MitreTopTactics extends Component {
         </EuiText>
         <EuiFlexGroup>
           <EuiFlexItem>
-            {tacticsCount.map((tactic) => (
+            {alertsCount.map((tactic) => (
               <EuiFacetButton
                 key={tactic.key}
                 quantity={tactic.doc_count}
                 onClick={() => {
-                  this.selecTactic(`${tactic.key}`);
                   this.setState({
-                      detailsOn: true
+                      selectedTactic: tactic.key,
+                      isLoading: true,
                     });
                   }
                 }
@@ -250,20 +157,21 @@ export class MitreTopTactics extends Component {
   }
 
   renderTechniques() {
-    const { selectedTactic, techniquesCount, detailsOn, isLoading } = this.state;
-    if (!detailsOn || isLoading) return;
+    const { selectedTactic, alertsCount, detailsOn, isLoading, flyoutOn } = this.state;
+    if (isLoading) return;
     return (
-      <Fragment>
+      <Fragment>  
         <EuiText size="xs">
           <EuiFlexGroup>
-           <EuiFlexItem grow={false}>
+           <EuiFlexItem grow={false} style={{margin: 0, padding: '12px 0px 0px 10px'}}>
             <EuiButtonIcon
               size={'s'}
               color={'primary'}
               onClick={() => {
-                this.selecTactic(false);
                 this.setState({
-                    detailsOn: false,
+                    selectedTactic: undefined,
+                    isLoading: true,
+                    flyoutOn: false
                   });
                 }
               }
@@ -271,14 +179,14 @@ export class MitreTopTactics extends Component {
               aria-label="Back Top Tactics"
             />
             </EuiFlexItem>
-            <EuiFlexItem>
+            <EuiFlexItem style={{margin: 0, padding: '12px 0px 0px 10px'}}>
               <h3>{selectedTactic}</h3>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiText>
         <EuiFlexGroup>
           <EuiFlexItem>
-            {techniquesCount.splice(0,5).map((tactic) => (
+            {alertsCount.map((tactic) => (
               <EuiFacetButton
                 key={tactic.key}
                 quantity={tactic.doc_count}
@@ -293,8 +201,12 @@ export class MitreTopTactics extends Component {
     );
   }
 
-  onChangeFlyout = (flyoutOn = this.state.flyoutOn) => {
+  onChangeFlyout = (flyoutOn ) => {
     this.setState({ flyoutOn });
+  }
+
+  closeFlyout() {
+    this.setState({ flyoutOn: false });
   }
 
   showFlyout(tactic) {
@@ -305,22 +217,20 @@ export class MitreTopTactics extends Component {
   }
 
   render() {
-    const { flyoutOn, selectedTechnique } = this.state;
+    const { flyoutOn, selectedTactic, selectedTechnique } = this.state;
     const tacticsTop = this.renderTacticsTop();
-    const tacticsDetail = this.renderTechniques();
+    const tecniquesTop = this.renderTechniques();
     const loading = this.renderLoadingStatus();
-    
-    console.log(this.state)
     return (
       <Fragment>
-        {tacticsTop}
-        {tacticsDetail}
+        {!selectedTactic ? tacticsTop : tecniquesTop}
         {loading}
-        {flyoutOn && 
+        {flyoutOn &&
+        <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
           <FlyoutTechnique 
             onChangeFlyout={this.onChangeFlyout}
             currentTechnique={selectedTechnique}/>
-        }
+        </EuiOverlayMask>}
       </Fragment>
     )
   }
