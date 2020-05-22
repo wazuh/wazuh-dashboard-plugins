@@ -38,7 +38,7 @@
         ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
         <input placeholder="Filter decoders..." ng-model="dctrl.custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem ng-empty ng-pristine ng-touched ng-valid"
             aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)" id="search-input-rules">
-        <wz-add-filter-chip id-input="search-input-rules" options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path', hide: dctrl.showingLocalDecoders}]" />
+        <wz-add-filter-chip id-input="search-input-rules" options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path', hide: dctrl.showingLocalDecoders}]"></wz-add-filter-chip>
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
                 <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" ></react-component>
