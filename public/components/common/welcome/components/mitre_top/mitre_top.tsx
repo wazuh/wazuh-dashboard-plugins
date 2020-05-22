@@ -18,9 +18,10 @@ import {
   EuiText,
   EuiFacetButton,
   EuiButtonIcon,
-  EuiLoadingChart
+  EuiLoadingChart,
 } from '@elastic/eui';
 import { toastNotifications } from 'ui/notify';
+import { FlyoutTechnique } from '../../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../components/overview/mitre/lib';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 
@@ -40,7 +41,9 @@ export class MitreTopTactics extends Component {
     techniquesCount: { key: string, doc_count:number }[],
     filterParams: object,
     selectedTactic: string,
-    detailsOn: boolean
+    detailsOn: boolean,
+    flyoutOn: boolean,
+    selectedTechnique: string
   }
 
   constructor(props) {
@@ -59,6 +62,8 @@ export class MitreTopTactics extends Component {
       },
       selectedTactic: "",
       detailsOn: false,
+      flyoutOn: false,
+      selectedTechnique: ''
     };
   }
 
@@ -216,7 +221,7 @@ export class MitreTopTactics extends Component {
       <Fragment>
         <EuiText size="xs">
           <EuiFlexGroup>
-            <EuiFlexItem>
+            <EuiFlexItem style={{margin: 0, padding: '12px 0px 0px 10px'}}>
               <h3>Top Tactics</h3>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -230,8 +235,8 @@ export class MitreTopTactics extends Component {
                 onClick={() => {
                   this.selecTactic(`${tactic.key}`);
                   this.setState({
-                    detailsOn: true
-                  })
+                      detailsOn: true
+                    });
                   }
                 }
               >
@@ -257,7 +262,9 @@ export class MitreTopTactics extends Component {
               color={'primary'}
               onClick={() => {
                 this.selecTactic(false);
-                this.setState({detailsOn: false});
+                this.setState({
+                    detailsOn: false,
+                  });
                 }
               }
               iconType="sortLeft"
@@ -275,6 +282,7 @@ export class MitreTopTactics extends Component {
               <EuiFacetButton
                 key={tactic.key}
                 quantity={tactic.doc_count}
+                onClick={() => this.showFlyout(tactic.key)}
               >
                 {tactic.key}
               </EuiFacetButton>
@@ -285,15 +293,34 @@ export class MitreTopTactics extends Component {
     );
   }
 
+  onChangeFlyout = (flyoutOn = this.state.flyoutOn) => {
+    this.setState({ flyoutOn });
+  }
+
+  showFlyout(tactic) {
+    this.setState({
+      selectedTechnique: tactic,
+      flyoutOn: true
+    })
+  }
+
   render() {
+    const { flyoutOn, selectedTechnique } = this.state;
     const tacticsTop = this.renderTacticsTop();
     const tacticsDetail = this.renderTechniques();
-    const loading = this.renderLoadingStatus()
+    const loading = this.renderLoadingStatus();
+    
+    console.log(this.state)
     return (
       <Fragment>
         {tacticsTop}
         {tacticsDetail}
         {loading}
+        {flyoutOn && 
+          <FlyoutTechnique 
+            onChangeFlyout={this.onChangeFlyout}
+            currentTechnique={selectedTechnique}/>
+        }
       </Fragment>
     )
   }
