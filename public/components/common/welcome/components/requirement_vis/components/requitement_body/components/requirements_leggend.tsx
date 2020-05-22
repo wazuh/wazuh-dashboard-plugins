@@ -12,6 +12,20 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { FimEventsTable, useTimeFilter } from './fim_events_table';
-export { ScaScan } from './sca_scan';
-export { RequirementVis } from './requirement_vis';
+import React from "react";
+import { EuiIcon } from "@elastic/eui";
+import { EuiFlexGroup, EuiListGroup } from "@elastic/eui";
+
+export function Requirements_leggend({ data, colors }) {
+  const list = data.map((item, idx) => ({
+    label: `${item.key} (${item.doc_count})`,
+    icon: <EuiIcon type="dot" color={colors[idx]} />,
+    href: '#',
+    color: 'text'
+  }));
+  return (
+    <EuiFlexGroup>
+      <EuiListGroup listItems={list} color='text' />
+    </EuiFlexGroup>
+  );
+}

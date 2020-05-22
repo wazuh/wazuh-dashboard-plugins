@@ -30,7 +30,7 @@ function createFilters(agentId, indexPattern) {
   return filters.map(buildFilter);
 }
 
-function getWazuhFilter() {
+export function getWazuhFilter() {
   const clusterInfo = AppState.getClusterInfo();
   const wazuhFilter = {
     name: clusterInfo.status === 'enabled' ? 'cluster.name' : 'manager.name',

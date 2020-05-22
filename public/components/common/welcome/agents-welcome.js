@@ -31,7 +31,7 @@ import {
   EuiSelect,
   EuiLoadingChart
 } from '@elastic/eui';
-import { FimEventsTable, ScaScan } from './components';
+import { FimEventsTable, ScaScan, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import store from '../../../redux/store';
@@ -343,87 +343,12 @@ export class AgentsWelcome extends Component {
                     </EuiPanel>
                   </EuiFlexItem>
 
-
-                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Top-PCI'} style={{ height: 300 }}>
-                    <EuiPanel paddingSize="none">
-                      <EuiFlexItem>
-                        <EuiFlexGroup
-                          style={{ padding: '12px 12px 0px' }}
-                          className="embPanel__header"
-                        >
-                          <h2 className="embPanel__title wz-headline-title">
-                            <EuiText size="xs"><h2>Compliance</h2></EuiText>
-                          </h2>
-                          <div style={{ width: "auto", paddingTop: 6, paddingRight: 12 }}>
-                            <EuiSelect
-                              compressed={true}
-                              id="requirementSelect"
-                              options={this.getOptions()}
-                              value={this.state.selectedRequirement}
-                              onChange={e => this.setSelectValue(e)}
-                              aria-label="Select requirement"
-                            />
-
-                          </div>
-                        </EuiFlexGroup>
-                        <EuiSpacer size="s" />
-                        <div style={{ height: this.props.resultState === 'loading' ? 0 : 259 }}>
-                          <div style={{ height: this.state.selectedRequirement === 'pci' ? 259 : 0 }}>
-                            <WzReduxProvider>
-                              <KibanaVis
-                                visID={'Wazuh-App-Agents-Welcome-Top-PCI'}
-                                tab={'welcome'}
-                              ></KibanaVis>
-                            </WzReduxProvider>
-                          </div>
-                          <div style={{ height: this.state.selectedRequirement === 'gdpr' ? 259 : 0 }}>
-                            <WzReduxProvider>
-                              <KibanaVis
-                                visID={'Wazuh-App-Agents-Welcome-Top-GDPR'}
-                                tab={'welcome'}
-                              ></KibanaVis>
-                            </WzReduxProvider>
-                          </div>
-                          <div style={{ height: this.state.selectedRequirement === 'nist' ? 259 : 0 }}>
-                            <WzReduxProvider>
-                              <KibanaVis
-                                visID={'Wazuh-App-Agents-Welcome-Top-NIST-800-53'}
-                                tab={'welcome'}
-                              ></KibanaVis>
-                            </WzReduxProvider>
-                          </div>
-                          <div style={{ height: this.state.selectedRequirement === 'tsc' ? 259 : 0 }}>
-                            <WzReduxProvider>
-                              <KibanaVis
-                                visID={'Wazuh-App-Agents-Welcome-Top-TSC'}
-                                tab={'welcome'}
-                              ></KibanaVis>
-                            </WzReduxProvider>
-                          </div>
-                          <div style={{ height: this.state.selectedRequirement === 'gpg13' ? 259 : 0 }}>
-                            <WzReduxProvider>
-                              <KibanaVis
-                                visID={'Wazuh-App-Agents-Welcome-Top-GPG-13'}
-                                tab={'welcome'}
-                              ></KibanaVis>
-                            </WzReduxProvider>
-                          </div>
-                          <div style={{ height: this.state.selectedRequirement === 'hipaa' ? 259 : 0 }}>
-                            <WzReduxProvider>
-                              <KibanaVis
-                                visID={'Wazuh-App-Agents-Welcome-Top-HIPAA'}
-                                tab={'welcome'}
-                              ></KibanaVis>
-                            </WzReduxProvider>
-                          </div>
-                        </div>
-                        <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', alignSelf: "center", paddingTop: 100 }}>
-                          <EuiLoadingChart size="xl" />
-                        </div>
-                      </EuiFlexItem>
-                    </EuiPanel>
-                  </EuiFlexItem>
-
+                  <RequirementVis
+                    agent={this.props.agent}
+                    width={200}
+                    height={200}
+                    innerRadius={70}
+                    outerRadius={100} />
 
                 </EuiFlexGroup>
               </EuiFlexItem>
@@ -454,7 +379,6 @@ export class AgentsWelcome extends Component {
                   </EuiFlexItem>
                 </EuiPanel>
               </EuiFlexItem>
-              
               <EuiFlexItem>
                 <EuiFlexGroup direction="column">
                   <ScaScan agentId={this.props.agent.id} switchTab={this.props.switchTab} />
