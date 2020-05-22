@@ -1,4 +1,21 @@
-.euiNavDrawerGroup__item .euiListGroupItem__icon.euiImage {
+.euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
+  left: -2px;
   max-width: 18px;
-  left: -1px;
+}
+
+.euiNavDrawerGroup__item .euiListGroupItem__button .euiImage img{
+  height: 20px;
+  width: 20px;
+}
+
+.euiNavDrawer:not(.euiNavDrawer-isExpanded) .euiNavDrawerGroup__item .euiListGroupItem__button .euiListGroupItem__label {
+  display: none;
+}
+
+.euiNavDrawer:not(.euiNavDrawer-isExpanded) .euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
+  margin-right: 0!important;
+}
+
+.euiNavDrawer .euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
+  margin-right: 10px;
 }

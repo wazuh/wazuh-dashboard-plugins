@@ -257,7 +257,7 @@ function discoverController(
     //WAZUH
     $scope.updateQuery({
       query: $scope.state.query
-    });
+    }, false);
   };
   $scope.intervalOptions = search.aggs.intervalOptions;
   $scope.minimumVisibleRows = 50;
@@ -286,7 +286,6 @@ function discoverController(
     stopSyncingQueryAppStateWithStateContainer();
     unlistenHistoryBasePath();
     //WAZUH 
-    //filterStateManager.destroy();
     if (tabListener) tabListener();
     delete wazuhApp.discoverScope;
   });
@@ -1035,7 +1034,7 @@ function discoverController(
       }
       $scope.updateQuery({
         query: $scope.state.query
-      });
+      }, false);
       $scope.$applyAsync();
     }
   );
