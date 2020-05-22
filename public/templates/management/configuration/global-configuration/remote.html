@@ -2,8 +2,12 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'remote'" class="d-height">
 
     <!-- No configuration section -->
-    <wz-no-config flex error="currentConfig['request-remote']" ng-if="currentConfig['request-remote'] && isString(currentConfig['request-remote'])"></wz-no-config>
-    <wz-no-config flex error="'not-present'" ng-if="currentConfig['request-remote'] && !isString(currentConfig['request-remote']) && !currentConfig['request-remote'].remote"></wz-no-config>
+    <wz-no-config flex error="currentConfig['request-remote']"
+        ng-if="currentConfig['request-remote'] && isString(currentConfig['request-remote'])">
+    </wz-no-config>
+    <wz-no-config flex error="'not-present'"
+        ng-if="currentConfig['request-remote'] && !isString(currentConfig['request-remote']) && !currentConfig['request-remote'].remote">
+    </wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -71,7 +75,7 @@
         </md-card>
         <!-- End main card with all the settings -->
 
-        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
+        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent"></wz-config-viewer>
 
     </div>
     <!-- End main content section -->

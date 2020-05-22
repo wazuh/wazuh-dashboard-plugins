@@ -3,12 +3,14 @@
 
     <!-- No configuration section -->
     <wz-no-config flex error="currentConfig['csyslog-csyslog']"
-        ng-if="currentConfig['csyslog-csyslog'] && isString(currentConfig['csyslog-csyslog'])"></wz-no-config>
+        ng-if="currentConfig['csyslog-csyslog'] && isString(currentConfig['csyslog-csyslog'])">
+    </wz-no-config>
     <wz-no-config flex error="'not-present'"
         ng-if="currentConfig['csyslog-csyslog'] && !isString(currentConfig['csyslog-csyslog']) && (!currentConfig['csyslog-csyslog'].syslog_output || !currentConfig['csyslog-csyslog'].syslog_output.length)">
     </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
-        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['csyslog-csyslog'])" />
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['csyslog-csyslog'])">
+    </wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -69,7 +71,7 @@
         <!-- End main card with all the settings -->
 
         <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
-            xmlcontent="XMLContent" />
+            xmlcontent="XMLContent"></wz-config-viewer>
 
     </div>
     <!-- End main content section -->

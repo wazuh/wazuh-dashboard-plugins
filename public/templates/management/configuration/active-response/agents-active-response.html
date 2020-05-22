@@ -2,10 +2,15 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'active-response'" class="d-height">
 
     <!-- No configuration section -->
-    <wz-no-config flex error="currentConfig['com-active-response']" ng-if="currentConfig['com-active-response'] && isString(currentConfig['com-active-response'])"></wz-no-config>
-    <wz-no-config flex error="'not-present'" ng-if="currentConfig['com-active-response'] && !isString(currentConfig['com-active-response']) && !currentConfig['com-active-response']['active-response']"></wz-no-config>
+    <wz-no-config flex error="currentConfig['com-active-response']"
+        ng-if="currentConfig['com-active-response'] && isString(currentConfig['com-active-response'])">
+    </wz-no-config>
+    <wz-no-config flex error="'not-present'"
+        ng-if="currentConfig['com-active-response'] && !isString(currentConfig['com-active-response']) && !currentConfig['com-active-response']['active-response']">
+    </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
-    ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['com-active-response'])" />
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['com-active-response'])">
+    </wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->

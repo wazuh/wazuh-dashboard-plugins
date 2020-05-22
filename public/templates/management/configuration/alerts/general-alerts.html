@@ -3,12 +3,14 @@
 
     <!-- No configuration section -->
     <wz-no-config flex error="currentConfig['analysis-alerts']"
-        ng-if="currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts'])"></wz-no-config>
+        ng-if="currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts'])">
+    </wz-no-config>
     <wz-no-config flex error="'not-present'"
         ng-if="currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts">
     </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
-        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-alerts'])" />
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-alerts'])">
+    </wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -54,7 +56,7 @@
         <!-- End main card with all the settings -->
 
         <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
-            xmlcontent="XMLContent" />
+            xmlcontent="XMLContent"></wz-config-viewer>
 
     </div>
     <!-- End main content section -->
