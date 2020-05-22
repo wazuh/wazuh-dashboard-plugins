@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React component information about last SCA scan.
- *
+ * Wazuh app - React component information about MITRE top tactics. *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
