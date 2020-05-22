@@ -295,22 +295,26 @@ export class AgentsWelcome extends Component {
           <EuiPage>
             <EuiFlexGrid columns={2}>
               <EuiFlexItem> {/* Groups */}
-                <EuiPanel paddingSize="m" style={{ height: 86 }}>
-                  <EuiText size="xs"><h2>Groups it belongs to</h2></EuiText>
-                  <div>
-                    {this.props.agent.group.map((group, key) => (
-                      <EuiButtonEmpty
-                        style={{ marginLeft: -8 }}
-                        key={`agent-group-${key}`}
-                        onClick={() => this.props.goGroups(this.props.agent, key)}
-                      >
-                        {group}
-                      </EuiButtonEmpty>
-                    ))}
-                  </div>
+                <EuiPanel paddingSize="m" style={{ padding: '6px 8px 0 8px' }}>
+                  <span style={{ display: 'inline-flex', height: 0 }}>
+                    <EuiText size="xs" style={{ height: 0 }}>
+                      <h2 style={{ fontSize: '16px!important', fontWeight: 400 }}>Groups</h2>
+                    </EuiText>
+                    <div>
+                      {this.props.agent.group.map((group, key) => (
+                        <EuiButtonEmpty
+                          style={{ marginLeft: 8, marginTop: -6 }}
+                          key={`agent-group-${key}`}
+                          onClick={() => this.props.goGroups(this.props.agent, key)}
+                        >
+                          {group}
+                        </EuiButtonEmpty>
+                      ))}
+                    </div>
+                  </span>
                 </EuiPanel>
               </EuiFlexItem>
-              <EuiFlexItem> {/* DatePicker */}
+              <EuiFlexItem style={{ alignItems: 'flex-end' }}> {/* DatePicker */}
                 <WzDatePicker onTimeChange={() => { }} />
               </EuiFlexItem>
               <EuiFlexItem> {/* Pie visualizations */}
