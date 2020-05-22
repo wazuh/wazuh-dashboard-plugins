@@ -11,7 +11,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-export { FimEventsTable, useTimeFilter } from './fim_events_table';
-export { ScaScan } from './sca_scan';
-export { RequirementVis } from './requirement_vis';
+export { RequirementsHead } from './requirement_head';
+export { RequirementsBody } from './requitement_body';
