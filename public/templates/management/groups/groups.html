@@ -155,7 +155,8 @@
                         <md-card-content>
                             <div layout="row">
                                 <wz-table flex custom-columns="true" path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                                    allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'" />
+                                    allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'">
+                                </wz-table>
                             </div>
                             <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents'">
                                 <span flex></span>

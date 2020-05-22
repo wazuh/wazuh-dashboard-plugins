@@ -45,7 +45,7 @@
                 <div class="euiFormControlLayoutIcons wz-margin-left-16">
                     <span class="euiFormControlLayoutCustomIcon">
                         <react-component name="EuiIcon"
-                            props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                            props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}"></react-component>
                     </span>
                 </div>
     
@@ -58,15 +58,19 @@
 
                 <wz-table ng-if="mctrl.globalRulesetTab === 'rules' && mctrl.onlyLocalFiles" flex path="'/rules/files'"
                     implicit-filter="[{name: 'path', value: 'etc/rules'}]" keys="[{value: 'file', width: '25%'}]"
-                    allow-click="true" row-sizes="[16,13,11]" implicit-sort="'path'" />
+                    allow-click="true" row-sizes="[16,13,11]" implicit-sort="'path'">
+                </wz-table>
                 <wz-table ng-if="mctrl.globalRulesetTab === 'rules' && !mctrl.onlyLocalFiles" flex path="'/rules/files'"
-                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" />
+                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]">
+                </wz-table>
                 <wz-table ng-if="mctrl.globalRulesetTab === 'decoders' && mctrl.onlyLocalFiles" flex
                     path="'/decoders/files'" implicit-filter="[{name: 'path', value: 'etc/decoders'}]"
-                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]"  implicit-sort="'path'" />
+                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]"  implicit-sort="'path'">
+                </wz-table>
                 <wz-table ng-if="mctrl.globalRulesetTab === 'decoders' && !mctrl.onlyLocalFiles" flex
                     path="'/decoders/files'" keys="[{value: 'file', width: '25%'}]" allow-click="true"
-                    row-sizes="[16,13,11]" implicit-sort="'file'" />
+                    row-sizes="[16,13,11]" implicit-sort="'file'">
+                </wz-table>
         </div>
     </div>
 </div>
@@ -117,7 +121,7 @@
         </div>
         <div ng-show="editorReadOnly && XMLContent">
             <div layout="row" class="wz-padding-bottom-0">
-                <wz-config-viewer flex xmlcontent="XMLContent" hide-header="true" no-local="currentFile.file" />
+                <wz-config-viewer flex xmlcontent="XMLContent" hide-header="true" no-local="currentFile.file"></wz-config-viewer>
             </div>
         </div>
     </div>

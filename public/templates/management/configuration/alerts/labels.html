@@ -9,7 +9,8 @@
         ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && !hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)">
     </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
-        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])" />
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])">
+    </wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -58,7 +59,7 @@
         <!-- End main card with all the settings -->
 
         <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
-            xmlcontent="XMLContent" />
+            xmlcontent="XMLContent"></wz-config-viewer>
 
     </div>
     <!-- End main content section -->

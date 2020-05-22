@@ -1,8 +1,10 @@
 <!-- No configuration section -->
 <wz-no-config flex error="'not-present'"
-    ng-if="configurationSubTab === 'amazon-services' && currentConfig && currentConfig['aws-s3'] && !currentConfig['aws-s3'].services" />
+    ng-if="configurationSubTab === 'amazon-services' && currentConfig && currentConfig['aws-s3'] && !currentConfig['aws-s3'].services">
+</wz-no-config>
 <wz-no-config flex error="'Wazuh not ready yet'"
-    ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['aws-s3']) && configurationSubTab === 'amazon-services'" />
+    ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['aws-s3']) && configurationSubTab === 'amazon-services'">
+</wz-no-config>
 <!-- End no configuration section -->
 
 <!-- Buckets card -->

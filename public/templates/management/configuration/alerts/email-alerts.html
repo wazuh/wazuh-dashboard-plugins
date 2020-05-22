@@ -3,12 +3,14 @@
 
     <!-- No configuration section -->
     <wz-no-config flex error="currentConfig['mail-alerts']"
-        ng-if="currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts'])"></wz-no-config>
+        ng-if="currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts'])">
+    </wz-no-config>
     <wz-no-config flex error="'not-present'"
         ng-if="currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && (!currentConfig['mail-alerts'].email_alerts || !currentConfig['mail-alerts'].email_alerts.length)">
     </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
-        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['mail-alerts'])" />
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['mail-alerts'])">
+    </wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -87,7 +89,7 @@
         <!-- End main card with all the settings -->
 
         <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
-            xmlcontent="XMLContent" />
+            xmlcontent="XMLContent"></wz-config-viewer>
 
     </div>
     <!-- End main content section -->

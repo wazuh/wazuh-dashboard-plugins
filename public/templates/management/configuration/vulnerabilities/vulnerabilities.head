@@ -4,8 +4,8 @@
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Vulnerabilities</span>
-            <span ng-if="currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
-            <span ng-if="(currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].disabled === 'yes') || (currentConfig && !currentConfig['vulnerability-detector'])" class="wz-agent-status-indicator small red">Disabled</span>
+            <span ng-if="currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].enabled === 'yes'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="(currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].enabled === 'no') || (currentConfig && !currentConfig['vulnerability-detector'])" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Discover what applications are affected by well-known vulnerabilities</span>
     </div>

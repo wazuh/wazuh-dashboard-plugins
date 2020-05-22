@@ -1,9 +1,9 @@
 <!-- This section contains the main content and the right sidenav -->
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'global'">
-
     <!-- No configuration section -->
     <wz-no-config flex error="currentConfig['analysis-global']"
-        ng-if="currentConfig['analysis-global'] && isString(currentConfig['analysis-global'])"></wz-no-config>
+        ng-if="currentConfig['analysis-global'] && isString(currentConfig['analysis-global'])">
+    </wz-no-config>
     <wz-no-config flex error="currentConfig['com-logging']"
         ng-if="agent && agent.id !== '000' && currentConfig['com-logging'] && isString(currentConfig['com-logging'])">
     </wz-no-config>
@@ -11,9 +11,9 @@
         ng-if="currentConfig['analysis-global'] && !isString(currentConfig['analysis-global']) && !currentConfig['analysis-global'].global">
     </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
-        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-global'])" />
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-global'])">
+    </wz-no-config>
     <!-- End no configuration section -->
-
     <!-- This section is the main content -->
     <div flex layout="column"
         ng-if="(currentConfig['analysis-global'] && currentConfig['analysis-global'].global) || (currentConfig['com-logging'] && currentConfig['com-logging'].logging)">
@@ -169,7 +169,7 @@
         <!-- End main card with all the settings -->
 
         <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
-            xmlcontent="XMLContent" />
+            xmlcontent="XMLContent"></wz-config-viewer>
 
     </div>
     <!-- End main content section -->

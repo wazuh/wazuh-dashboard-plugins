@@ -2,10 +2,15 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'active-response'" class="d-height">
 
     <!-- No configuration section -->
-    <wz-no-config flex error="currentConfig['analysis-active_response']" ng-if="currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response'])"></wz-no-config>
-    <wz-no-config flex error="'not-present'" ng-if="currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && !currentConfig['analysis-active_response']['active-response'].length"></wz-no-config>
+    <wz-no-config flex error="currentConfig['analysis-active_response']"
+        ng-if="currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response'])">
+    </wz-no-config>
+    <wz-no-config flex error="'not-present'"
+        ng-if="currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && !currentConfig['analysis-active_response']['active-response'].length">
+    </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
-    ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-active_response'])" />
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-active_response'])">
+    </wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->

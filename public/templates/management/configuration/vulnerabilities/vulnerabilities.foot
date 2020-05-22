@@ -1,4 +1,4 @@
-        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
+        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent"></wz-config-viewer>
 
     </div>
     <!-- End main content section -->

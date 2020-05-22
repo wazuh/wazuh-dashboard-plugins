@@ -9,9 +9,11 @@
 
         <!-- No configuration section -->
         <wz-no-config flex error="currentConfig['com-cluster']"
-            ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])"></wz-no-config>
+            ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])">
+        </wz-no-config>
         <wz-no-config flex error="'Wazuh not ready yet'"
-            ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['com-cluster'])" />
+            ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['com-cluster'])">
+        </wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
@@ -65,7 +67,7 @@
             <!-- End main card with all the settings -->
 
             <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
-                xmlcontent="XMLContent" />
+                xmlcontent="XMLContent"></wz-config-viewer>
 
         </div>
         <!-- End main content section -->

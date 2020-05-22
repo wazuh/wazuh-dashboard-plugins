@@ -38,7 +38,8 @@
                     chart-data="[ctrl.summary.agentsCountActive,ctrl.summary.agentsCountDisconnected,ctrl.summary.agentsCountNeverConnected]"
                     chart-labels="['Active','Disconnected', 'Never connected']"
                     chart-colors="['#57C17B', '#BC52BC', '#9E3533']"
-                    chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
+                    chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" >
+                </canvas>
                 <div layout="row" class="wz-margin-top-16 layout-align-center-center"
                     ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
                     There are no agents yet.

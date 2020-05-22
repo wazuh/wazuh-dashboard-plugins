@@ -46,7 +46,8 @@
         <!-- Agent status section -->
         <div ng-if="agent.status">
             <react-component name="EuiHealth"
-                props="{color: agent.status === 'Active' ? 'success' : 'danger', children: agent.status}" />
+                props="{color: agent.status === 'Active' ? 'success' : 'danger', children: agent.status}" >
+            </react-component>
         </div>
         <!-- End agent status section -->
         <!-- Separator -->
