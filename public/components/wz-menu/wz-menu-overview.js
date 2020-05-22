@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiPanel, EuiStat, EuiButton} from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
@@ -121,6 +121,13 @@ class WzMenuOverview extends Component {
     };
   };
 
+
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
+
   render() {
     let securityInformationItems = [
       this.overviewSections.general,
@@ -131,7 +138,8 @@ class WzMenuOverview extends Component {
       this.overviewSections.pm,
       this.overviewSections.audit,
       this.overviewSections.oscap,
-      this.overviewSections.ciscat
+      this.overviewSections.ciscat,
+      this.overviewSections.sca
     ];
     let threatDetectionItems = [
       this.overviewSections.virustotal,
@@ -143,7 +151,6 @@ class WzMenuOverview extends Component {
       securityInformationItems.splice(2, 0, this.overviewSections.aws);
       threatDetectionItems.unshift(this.overviewSections.vuls);
     } else {
-      auditingItems.splice(1, 0, this.overviewSections.sca);
       if (!(UnsupportedComponents[this.props.isAgent.agentPlatform] || UnsupportedComponents['other']).includes('vuls')) {
         threatDetectionItems.unshift(this.overviewSections.vuls);
       }
@@ -185,6 +192,22 @@ class WzMenuOverview extends Component {
         ])
       })
     ];
+    
+    const addHealthRender = (agent) => {
+      // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
+      return (
+        <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: 3, fontSize: '12px'}}>
+          <span className="euiFlexItem euiFlexItem--flexGrowZero">
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(agent.status)}`} focusable="false" role="img" aria-hidden="true">
+              <circle cx="8" cy="8" r="4"></circle>
+            </svg>
+          </span>
+          <span className="euiFlexItem euiFlexItem--flexGrowZero">{agent.status}</span>
+        </span>
+      )
+    }
+
+    const agentData = store.getState().appStateReducers.currentAgentData
 
     return (
       <div className="WzManagementSideMenu">
@@ -198,8 +221,50 @@ class WzMenuOverview extends Component {
                       this.props.closePopover();
                       window.location.href = '#/overview';
                     }}>
-                    Go to Overview welcome
+                    Go to Modules welcome
                   </EuiButtonEmpty>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            )}
+            
+            {!!Object.keys(agentData).length && (
+              <EuiFlexGroup>
+                <EuiFlexItem  style={{ marginLeft: 16 }}>
+                  
+                <EuiPanel paddingSize='s'>
+                  
+                  <EuiFlexGroup className="wz-welcome-page-agent-info-details">
+
+                  <EuiFlexItem key={agentData.id}>
+                      <EuiStat
+                        title={agentData.id
+                        }
+                        description={"Agent"}
+                        titleSize="xs"
+                      />
+                    </EuiFlexItem>
+                    <EuiFlexItem key={agentData.status}>
+                      <EuiStat
+                        title={addHealthRender(agentData)
+                        }
+                        description={"Status"}
+                        titleSize="xs"
+                      />
+                    </EuiFlexItem>
+
+
+                    <EuiFlexItem key={"button_1"}>
+                      <EuiButton href={`#/overview?tab=general`} color="primary">
+                        View agent {agentData.id} events
+                      </EuiButton>
+                    </EuiFlexItem>
+                    <EuiFlexItem key={"button_2"}>
+                      <EuiButton onClick={() => alert("todo")} color="danger">
+                        Remove agent {agentData.id} selection
+                      </EuiButton>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiPanel>
                 </EuiFlexItem>
               </EuiFlexGroup>
             )}

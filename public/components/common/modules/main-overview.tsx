@@ -27,6 +27,7 @@ import { ReportingService } from '../../../react-services/reporting';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import { OverviewActions } from '../../../controllers/overview/components/overview-actions/overview-actions';
+import { MainFim } from '../../agents/fim';
 import { MainMitre } from './main-mitre';
 
 export class MainModuleOverview extends Component {
@@ -47,7 +48,7 @@ export class MainModuleOverview extends Component {
           text: '',
         },
         {
-          text: 'Overview',
+          text: 'Modules',
           href: "#/overview"
         },
         {
@@ -155,6 +156,7 @@ export class MainModuleOverview extends Component {
 
 
           {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
+          {section === 'fim' && <MainFim {...this.props} />}
           {section === 'mitre' && selectView === 'inventory' && <MainMitre {...this.props} />}
           {/* -------------------------------------------------------------------------- */}
         </Fragment>

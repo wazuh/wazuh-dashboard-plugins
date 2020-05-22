@@ -16,8 +16,8 @@ export const ModulesDefaults = {
     buttons: ['reporting']
   },
   fim: {
-    init: 'inventory',
-    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: true }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Inventory', onlyAgent: false }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting', 'settings']
   },
   gcp: {
