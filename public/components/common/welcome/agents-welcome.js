@@ -322,7 +322,7 @@ export class AgentsWelcome extends Component {
               <EuiFlexItem> {/* Pie visualizations */}
                 <EuiFlexGroup>
 
-                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} style={{ height: 300 }}>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} >
                     <EuiPanel paddingSize="m">
                         <EuiFlexGroup>
                           <h2 className="embPanel__title wz-headline-title">

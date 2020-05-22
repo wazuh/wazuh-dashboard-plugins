@@ -39,7 +39,7 @@ export function RequirementsBody(props) {
     })
   }, [requirement, timeFilter]);
   if (loading) return (
-    <div style={{ textAlign: "center", paddingTop: 100 }}>
+    <div style={{ textAlign: "center", paddingTop: 100, height: 238}}>
       <EuiLoadingChart size="xl" />
     </div>
   )
