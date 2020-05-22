@@ -14,18 +14,24 @@
 
 import React from "react";
 import { EuiIcon } from "@elastic/eui";
-import { EuiFlexGroup, EuiListGroup } from "@elastic/eui";
+import { EuiListGroup } from "@elastic/eui";
+import './requirements_leggend.less';
 
 export function Requirements_leggend({ data, colors }) {
   const list = data.map((item, idx) => ({
     label: `${item.key} (${item.doc_count})`,
-    icon: <EuiIcon type="dot" color={colors[idx]} />,
+    icon: <EuiIcon type="dot" size='l' color={colors[idx]} />,
     href: '#',
-    color: 'text'
+    size: 'xs',
+    color: 'text',
+    style: {color: 'black'},
   }));
   return (
-    <EuiFlexGroup>
-      <EuiListGroup listItems={list} color='text' />
-    </EuiFlexGroup>
+    <EuiListGroup 
+      className="wz-list-group"
+      listItems={list}
+      color='text'
+      wrapText={true}
+      flush />
   );
 }
