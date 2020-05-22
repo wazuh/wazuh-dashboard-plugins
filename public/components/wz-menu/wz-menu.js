@@ -430,8 +430,14 @@ class WzMenu extends Component {
               onClick={this.onClickOverviewButton.bind(this)}
             >
               <EuiIcon type="visualizeApp" color="primary" size="m" />
-              <span className="wz-menu-button-title ">Overview</span>
+              <span className="wz-menu-button-title ">Modules</span>
               <span className="flex"></span>
+              <span className="flex"></span>
+              {(store.getState().appStateReducers.currentAgentId && (
+                <EuiBadge color="secondary">
+                  {store.getState().appStateReducers.currentAgentId}
+                </EuiBadge>
+              ))}
               {this.state.isOverviewPopoverOpen && (
                 <EuiIcon color="subdued" type="arrowRight" />
               )}

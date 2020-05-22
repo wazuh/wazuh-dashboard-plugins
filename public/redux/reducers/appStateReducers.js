@@ -16,7 +16,9 @@ const initialState = {
   wazuhNotReadyYet: '',
   currentTab: '',
   extensions: {},
-  adminMode: false
+  adminMode: false,
+  currentAgentId: false, // TODO, add the full agent data not only the id
+  currentAgentData: {}
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -61,6 +63,21 @@ const appStateReducers = (state = initialState, action) => {
       adminMode: action.adminMode
     };
   }
+
+  if (action.type === 'UPDATE_SELECTED_AGENT') {
+    return {
+      ...state,
+      currentAgentId: action.currentAgentId
+    };
+  }
+
+  if (action.type === 'UPDATE_SELECTED_AGENT_DATA') {
+    return {
+      ...state,
+      currentAgentData: action.currentAgentData
+    };
+  }
+
 
   return state;
 };

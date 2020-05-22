@@ -11,6 +11,7 @@
  */
 import React, { Component } from 'react';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import  store  from '../../../../redux/store';
 
 import {
   EuiFlexItem,
@@ -180,10 +181,12 @@ export class OverviewActions extends Component {
   }
 
   componentDidMount() {
+    const agentId = store.getState().appStateReducers.currentAgentId ;
     const { filterManager } = getServices();
 
     this.setState({ filterManager: filterManager }, () => {
       if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])
+      if(agentId) this.agentTableSearch([agentId])
     });
   }
 
@@ -221,6 +224,7 @@ export class OverviewActions extends Component {
   }
 
   agentTableSearch(agentIdList) {
+    console.log("age", agentIdList)
     this.props.setAgent(agentIdList);
     this.closeAgentModal();
     if (agentIdList && agentIdList.length) {
@@ -321,7 +325,7 @@ export class OverviewActions extends Component {
               color='primary'
               isLoading={this.state.loadingReport}
               onClick={() => this.showAgentModal()}>
-              Filtered by {this.state.isAgent.length || ''} {this.state.isAgent.length > 1 ? ' agents' : 'agent'}
+              Exploring agent {this.state.isAgent[0]} events
             </EuiButtonEmpty>
           )}
         </EuiFlexItem>

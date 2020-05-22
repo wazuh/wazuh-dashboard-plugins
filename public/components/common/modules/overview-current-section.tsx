@@ -31,7 +31,7 @@ class WzCurrentOverviewSection extends Component {
     if(TabDescription[this.props.currentTab]){
       const breadcrumb = [
         { text: '' },
-        { text: 'Overview', href: '/app/wazuh#/overview' },
+        { text: 'Modules', href: '/app/wazuh#/overview' },
         { text: TabDescription[this.props.currentTab].title},
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
