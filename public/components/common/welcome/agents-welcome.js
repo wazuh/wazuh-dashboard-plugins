@@ -29,9 +29,11 @@ import {
   EuiButton,
   EuiPopover,
   EuiSelect,
-  EuiLoadingChart
+  EuiLoadingChart,
+  EuiToolTip,
+  EuiButtonIcon
 } from '@elastic/eui';
-import { FimEventsTable, ScaScan, RequirementVis } from './components';
+import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import store from '../../../redux/store';
@@ -320,30 +322,28 @@ export class AgentsWelcome extends Component {
               <EuiFlexItem> {/* Pie visualizations */}
                 <EuiFlexGroup>
 
-                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Most-Common-Groups'} style={{ height: 300 }}>
-                    <EuiPanel paddingSize="none">
-                      <EuiFlexItem>
-                        <EuiFlexGroup
-                          style={{ padding: '12px 12px 0px' }}
-                          className="embPanel__header"
-                        >
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} style={{ height: 300 }}>
+                    <EuiPanel paddingSize="m">
+                        <EuiFlexGroup>
                           <h2 className="embPanel__title wz-headline-title">
-                            <EuiText size="xs"><h2>MITRE top tactics</h2></EuiText>
+                            <EuiText size="xs"><h2>MITRE</h2></EuiText>
                           </h2>
+                          <EuiFlexItem grow={false}>
+                            <EuiToolTip position="top" content="Open MITRE">
+                              <EuiButtonIcon 
+                                iconType="popout"
+                                color="primary"
+                                onClick={() => this.props.switchTab('mitre')}
+                                aria-label="Open MITRE"/>
+                            </EuiToolTip>
+                          </EuiFlexItem>
                         </EuiFlexGroup>
-                        <EuiSpacer size="s" />
-                        <div style={{ height: this.props.resultState === 'loading' ? 0 : 259 }}>
-                          <WzReduxProvider>
-                            <KibanaVis
-                              visID={'Wazuh-App-Agents-Welcome-Top-Tactics-Mitre'}
-                              tab={'welcome'}
-                            ></KibanaVis>
-                          </WzReduxProvider>
-                        </div>
-                        <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', textAlign: "center", paddingTop: 100 }}>
-                          <EuiLoadingChart size="xl" />
-                        </div>
-                      </EuiFlexItem>
+                        <EuiSpacer size="m" />
+                        <EuiFlexGroup>
+                          <EuiFlexItem>
+                            <MitreTopTactics agentId={this.props.agent.id} />
+                          </EuiFlexItem>
+                        </EuiFlexGroup>
                     </EuiPanel>
                   </EuiFlexItem>
 
