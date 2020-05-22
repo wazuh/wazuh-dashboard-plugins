@@ -14,19 +14,21 @@
 
 import React, { useRef, useEffect } from "react";
 import * as d3 from 'd3';
+import { useChartDimensions } from './hooks';
 
 
 export const RequirementsDonnut = props => {
-  const pieRef: null | any = useRef(null);
+  const pieRef: null | any = useRef();
   const cache = useRef(props.data);
+  const [ref, dms] = useChartDimensions({}, pieRef);
   const createPie = d3
     .pie()
     .value(d => d.doc_count)
     .sort(null);
   const createArc = d3
     .arc()
-    .innerRadius(70)
-    .outerRadius(100)
+    .innerRadius((dms.width * 0.8)/2 )
+    .outerRadius(dms.width/2)
     .padAngle(0.015);
   const colors = props.colors;
   const format = d3.format(".2f");
@@ -50,7 +52,6 @@ export const RequirementsDonnut = props => {
 
     const arcTween = (d, i) => {
       const interpolator = d3.interpolate(prevData[i], d);
-
       return t => createArc(interpolator(t));
     };
 
@@ -61,16 +62,19 @@ export const RequirementsDonnut = props => {
       .attrTween("d", arcTween);
     cache.current = props.data;
   },
-    [props.data]
+    [props.data, dms]
   );
-
+  
 
 
   return (
-    <svg width={props.width} height={props.height}>
+    <svg width={dms.width} height={dms.width}>
       <g
         ref={pieRef}
-        transform={`translate(${props.outerRadius} ${props.outerRadius})`}
+        transform={`translate(${[
+          dms.width / 2,
+          dms.width / 2
+        ].join(",")})`}
       />
     </svg>
   );

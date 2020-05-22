@@ -31,7 +31,6 @@ export function Requirements_leggend({ data, colors }) {
       className="wz-list-group"
       listItems={list}
       color='text'
-      wrapText={true}
       flush />
   );
 }
