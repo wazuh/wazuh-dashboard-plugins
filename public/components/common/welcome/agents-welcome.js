@@ -133,8 +133,7 @@ export class AgentsWelcome extends Component {
                     <div style={{ maxWidth: 650 }}>
                       <Overview
                         isAgent={this.props.agent}
-                        closePopover={() => this.setState({ switchModule: false })}
-                        switchTab={(module) => this.props.switchTab(module)}></Overview>
+                        closePopover={() => this.setState({ switchModule: false })}></Overview>
                     </div>
                   </WzReduxProvider>
                   <EuiHorizontalRule margin="s" />

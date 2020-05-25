@@ -387,14 +387,9 @@ class WzMenu extends Component {
   }
 
   onClickAgentButton() {
-    this.isAgent = this.getAgentUrl();
-    this.setMenuItem('agents');
-    if(this.isAgent) {
-      this.agentPopoverToggle();
-    } else {
-      this.setState({ menuOpened: false });
-      window.location.href = '#/agents-preview';
-    }
+    this.setState({ menuOpened: false });
+    window.location.href = '#/agents-preview';
+    
   }
 
   switchMenuOpened = () => {
@@ -402,11 +397,7 @@ class WzMenu extends Component {
       this.managementPopoverToggle();
     } else {
       this.isAgent = this.getAgentUrl();
-      if(this.isAgent) {
-        this.agentPopoverToggle();
-      } else {
-        this.overviewPopoverToggle();
-      }
+      this.overviewPopoverToggle();
     }
     this.setState({ menuOpened: !this.state.menuOpened }, async () => {
       if (this.state.menuOpened) await this.loadApiList();
@@ -433,9 +424,9 @@ class WzMenu extends Component {
               <span className="wz-menu-button-title ">Modules</span>
               <span className="flex"></span>
               <span className="flex"></span>
-              {(store.getState().appStateReducers.currentAgentId && (
+              {(store.getState().appStateReducers.currentAgentData.id && (
                 <EuiBadge color="secondary">
-                  {store.getState().appStateReducers.currentAgentId}
+                  {store.getState().appStateReducers.currentAgentData.id}
                 </EuiBadge>
               ))}
               {this.state.isOverviewPopoverOpen && (
@@ -474,11 +465,6 @@ class WzMenu extends Component {
               <EuiIcon type="watchesApp" color="primary" size="m" />
               <span className="wz-menu-button-title ">Agents</span>
               <span className="flex"></span>
-              {(this.isAgent && (
-                <EuiBadge color="secondary">
-                  {this.isAgent}
-                </EuiBadge>
-              ))}
             </EuiButtonEmpty>
 
             <EuiButtonEmpty

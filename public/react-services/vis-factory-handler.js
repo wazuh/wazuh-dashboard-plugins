@@ -65,11 +65,14 @@ export class VisFactoryHandler {
   
       try {
         const currentPattern = AppState.getCurrentPattern();
-        const data = await GenericRequest.request(
-          'GET',
-          `/elastic/visualizations/overview-${tab}/${currentPattern}`
-        );
-        rawVisualizations.assignItems(data.data.raw);
+        const data =
+          tab !== 'sca'
+            ? await GenericRequest.request(
+                'GET',
+                `/elastic/visualizations/overview-${tab}/${currentPattern}`
+              )
+            : false;
+        data && rawVisualizations.assignItems(data.data.raw);
         if(!fromDiscover)
           commonData.assignFilters(filterHandler, tab);
         store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
