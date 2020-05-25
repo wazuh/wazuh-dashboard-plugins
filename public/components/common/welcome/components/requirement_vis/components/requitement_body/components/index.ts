@@ -14,3 +14,4 @@
 
 export { RequirementsDonnut } from './requirements_donnut';
 export { Requirements_leggend } from './requirements_leggend';
+export { NoAlertsMessage } from './no_alerts_message';
