@@ -20,11 +20,10 @@ export function NoAlertsMessage({ requirement }) {
   return (
     <EuiEmptyPrompt
       iconType="stats"
-      title={<h4>You dont have {formatedRequirement} alerts for this time range</h4>}
+      title={<h4>No results</h4>}
       body={
         <p>
-          You have no alerts related to {formatedRequirement} in this time range.
-          Modify the time range to view data, if it exists.
+          No {formatedRequirement} results were found in the selected time range.
           </p>
       }
     />
