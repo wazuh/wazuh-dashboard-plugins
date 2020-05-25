@@ -110,11 +110,11 @@ export class AgentsWelcome extends Component {
   }
 
   updateMenuAgents() {
-    this.setState({menuAgent: window.localStorage.getItem('menuAgent') ? JSON.parse(window.localStorage.getItem('menuAgent')) : {}});
+    this.setState({ menuAgent: window.localStorage.getItem('menuAgent') ? JSON.parse(window.localStorage.getItem('menuAgent')) : {} });
   }
 
   renderTitle() {
-    const menuAgent = [...Object.keys(this.state.menuAgent).map((item) => {return this.state.menuAgent[item]})];
+    const menuAgent = [...Object.keys(this.state.menuAgent).map((item) => { return this.state.menuAgent[item] })];
 
     return (
       <EuiFlexGroup>
@@ -191,9 +191,10 @@ export class AgentsWelcome extends Component {
                     <div style={{ maxWidth: 700 }}>
                       <MenuAgent
                         isAgent={this.props.agent}
-                        updateMenuAgents={()=>this.updateMenuAgents()}
+                        updateMenuAgents={() => this.updateMenuAgents()}
                         closePopover={() => {
-                          this.setState({ switchModule: false })}
+                          this.setState({ switchModule: false })
+                        }
                         }
                         switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
                     </div>
@@ -393,7 +394,12 @@ export class AgentsWelcome extends Component {
                               <EuiButtonIcon
                                 iconType="popout"
                                 color="primary"
-                                onClick={() => this.props.switchTab('mitre')}
+                                onClick={() => {
+                                  window.location.href = `#/overview?tab=mitre`;
+                                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                                  this.router.reload();
+                                }
+                                }
                                 aria-label="Open MITRE" />
                             </EuiToolTip>
                           </EuiFlexItem>
@@ -446,7 +452,7 @@ export class AgentsWelcome extends Component {
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiFlexGroup direction="column">
-                  <ScaScan agentId={this.props.agent.id} switchTab={this.props.switchTab} />
+                  <ScaScan switchTab={this.props.switchTab} {...this.props} />
                 </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGrid>
