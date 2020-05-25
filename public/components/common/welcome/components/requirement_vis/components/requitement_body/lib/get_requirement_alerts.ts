@@ -15,13 +15,12 @@
 import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../../../overview/mitre/lib';
 import { getWazuhFilter } from '../../../../fim_events_table';
 import { esFilters } from '../../../../../../../../../../../src/plugins/data/common';
-import { indexPatterns } from '../../../../../../../../../../../src/plugins/data/server';
 
 export async function getRequirementAlerts(agentId, time, requirement) {
   const indexPattern = await getIndexPattern();
   const filters = [
     ...createFilters(agentId, indexPattern),
-    createExistsFilter(requirement, indexPatterns),
+    createExistsFilter(requirement, indexPattern),
   ]
   const filterParams: IFilterParams = {
     filters,

@@ -54,7 +54,7 @@ export function RequirementsBody(props) {
           <RequirementsDonnut data={data} colors={colors} {...props} />
         </EuiFlexItem>
         <EuiFlexItem>
-          <Requirements_leggend data={data} colors={colors} />
+          <Requirements_leggend data={data} colors={colors} requirement={requirement} />
         </EuiFlexItem>
       </EuiFlexGroup>
     </Fragment>
