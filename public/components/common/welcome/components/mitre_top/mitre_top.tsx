@@ -73,7 +73,7 @@ export class MitreTopTactics extends Component {
 
   async componentWillUnmount() {
     this._isMount = false;
-    this.subscription = this.timefilter.getTimeUpdate$().unsubscribe();
+    this.subscription.unsubscribe();
   }
 
   shouldComponentUpdate(nextProp, nextState) {
