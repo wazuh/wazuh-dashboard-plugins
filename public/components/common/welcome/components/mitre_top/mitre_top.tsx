@@ -19,11 +19,11 @@ import {
   EuiFacetButton,
   EuiButtonIcon,
   EuiLoadingChart,
-  EuiOverlayMask
+  EuiOverlayMask,
+  EuiEmptyPrompt,
 } from '@elastic/eui';
-import { toastNotifications } from 'ui/notify';
 import { FlyoutTechnique } from '../../../../../components/overview/mitre/components/techniques/components/flyout-technique';
-import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../components/overview/mitre/lib';
+import { getIndexPattern } from '../../../../../components/overview/mitre/lib';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getMitreCount } from './lib';
 export class MitreTopTactics extends Component {
@@ -73,7 +73,7 @@ export class MitreTopTactics extends Component {
 
   async componentWillUnmount() {
     this._isMount = false;
-    this.subscription = this.timefilter.getTimeUpdate$().unsubscribe();
+    this.subscription.unsubscribe();
   }
 
   shouldComponentUpdate(nextProp, nextState) {
@@ -95,23 +95,6 @@ export class MitreTopTactics extends Component {
     }
   }
 
-  selecTactic(id){
-    if(id){
-      this.setState({selectedTactic: id})
-    }else{
-      this.setState({selectedTactic: id}, () => this.updateFiltersAndGetTactics())
-    }
-  }
-  
-  showToast(color: string, title: string = '', text: string = '', time: number = 3000){
-    toastNotifications.add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
-    });
-  };
-
   renderLoadingStatus() {
     const { isLoading } = this.state;
     if(!isLoading) return
@@ -123,7 +106,8 @@ export class MitreTopTactics extends Component {
   }
 
   renderTacticsTop() {
-    const { alertsCount } = this.state;
+    const { alertsCount, isLoading } = this.state;
+    if (isLoading || alertsCount.length === 0) return;
     return (
       <Fragment>
         <EuiText size="xs">
@@ -157,13 +141,13 @@ export class MitreTopTactics extends Component {
   }
 
   renderTechniques() {
-    const { selectedTactic, alertsCount, detailsOn, isLoading, flyoutOn } = this.state;
+    const { selectedTactic, alertsCount, isLoading } = this.state;
     if (isLoading) return;
     return (
       <Fragment>  
         <EuiText size="xs">
           <EuiFlexGroup>
-           <EuiFlexItem grow={false} style={{margin: 0, padding: '12px 0px 0px 10px'}}>
+           <EuiFlexItem grow={false} >
             <EuiButtonIcon
               size={'s'}
               color={'primary'}
@@ -179,7 +163,7 @@ export class MitreTopTactics extends Component {
               aria-label="Back Top Tactics"
             />
             </EuiFlexItem>
-            <EuiFlexItem style={{margin: 0, padding: '12px 0px 0px 10px'}}>
+            <EuiFlexItem >
               <h3>{selectedTactic}</h3>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -201,6 +185,25 @@ export class MitreTopTactics extends Component {
     );
   }
 
+  renderEmptyPrompt() {
+    const { isLoading } = this.state;
+    if (isLoading) return;
+    return(
+      <EuiEmptyPrompt
+      iconType="stats"
+      title={<h4>You dont have tactics for this time range</h4>}
+      body={
+        <Fragment>
+          <p>
+          You have no alerts related to tactics in this time range. 
+          Modify the time range to view data, if it exists.
+          </p>
+        </Fragment>
+      }
+      />
+    )
+  }
+
   onChangeFlyout = (flyoutOn ) => {
     this.setState({ flyoutOn });
   }
@@ -217,14 +220,16 @@ export class MitreTopTactics extends Component {
   }
 
   render() {
-    const { flyoutOn, selectedTactic, selectedTechnique } = this.state;
+    const { flyoutOn, selectedTactic, selectedTechnique, alertsCount } = this.state;
     const tacticsTop = this.renderTacticsTop();
     const tecniquesTop = this.renderTechniques();
     const loading = this.renderLoadingStatus();
+    const emptyPrompt = this.renderEmptyPrompt();
     return (
       <Fragment>
+        {loading}        
         {!selectedTactic ? tacticsTop : tecniquesTop}
-        {loading}
+        {alertsCount.length === 0 && emptyPrompt}
         {flyoutOn &&
         <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
           <FlyoutTechnique 

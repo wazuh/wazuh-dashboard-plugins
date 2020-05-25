@@ -323,7 +323,7 @@ export class AgentsWelcome extends Component {
                 <EuiFlexGroup>
 
                   <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} >
-                    <EuiPanel paddingSize="m">
+                    <EuiPanel paddingSize="m" height={{height: 300}}>
                         <EuiFlexGroup>
                           <h2 className="embPanel__title wz-headline-title">
                             <EuiText size="xs"><h2>MITRE</h2></EuiText>

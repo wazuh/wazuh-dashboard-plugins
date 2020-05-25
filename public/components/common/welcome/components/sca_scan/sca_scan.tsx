@@ -22,10 +22,10 @@ import {
   EuiBadge,
   EuiStat,
   EuiSpacer,
-  EuiLoadingSpinner,
+  EuiLoadingChart,
   EuiButtonIcon,
   EuiToolTip,
-  EuiBasicTable
+  EuiEmptyPrompt
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
@@ -71,7 +71,9 @@ export class ScaScan extends Component {
       return(
         <EuiFlexGroup justifyContent="center" alignItems="center">
           <EuiFlexItem grow={false}>
-            <EuiLoadingSpinner size="xl" />
+          <div style={{ display: 'block' , textAlign: "center", paddingTop: 100 }}>
+            <EuiLoadingChart size="xl" />
+          </div>
           </EuiFlexItem>
         </EuiFlexGroup>
       )
@@ -80,25 +82,9 @@ export class ScaScan extends Component {
 
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
-    if (isLoading || lastScan == []) return;
+    if (isLoading || lastScan === undefined) return;
     return(
       <Fragment>
-        <EuiText size="xs">
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <h2>SCA: Last scan</h2>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiToolTip position="top" content="Open SCA Scans">
-                <EuiButtonIcon 
-                  iconType="popout"
-                  color="primary"
-                  onClick={() => this.props.switchTab('sca')}
-                  aria-label="Open SCA Scans"/>
-              </EuiToolTip>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiText>
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
@@ -168,12 +154,51 @@ export class ScaScan extends Component {
   }
 
 
+  renderEmptyPrompt() {
+    const { isLoading } = this.state;
+    if (isLoading) return;
+    return(
+      <Fragment>
+        <EuiEmptyPrompt
+          iconType="visVega"
+          title={<h4>You dont have SCA scans in this agent.</h4>}
+          body={
+            <Fragment>
+              <p>
+                Check your agent settings to generate scans.
+              </p>
+            </Fragment>
+          }
+          />
+      </Fragment>
+    )
+  }
+
   render() {
+    const { lastScan } = this.state;
     const loading = this.renderLoadingStatus();
     const scaScan = this.renderScanDetails();
+    const emptyPrompt = this.renderEmptyPrompt();
     return (
       <EuiFlexItem>
         <EuiPanel paddingSize="m">
+          <EuiText size="xs">
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <h2>SCA: Last scan</h2>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiToolTip position="top" content="Open SCA Scans">
+                  <EuiButtonIcon 
+                    iconType="popout"
+                    color="primary"
+                    onClick={() => this.props.switchTab('sca')}
+                    aria-label="Open SCA Scans"/>
+                </EuiToolTip>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiText>
+          {lastScan === undefined && emptyPrompt}
           {loading}
           {scaScan}
         </EuiPanel>
