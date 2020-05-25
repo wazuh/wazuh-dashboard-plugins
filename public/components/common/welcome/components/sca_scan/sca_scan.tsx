@@ -28,6 +28,7 @@ import {
   EuiEmptyPrompt,
   EuiIcon
 } from '@elastic/eui';
+import chrome from 'ui/chrome';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 export class ScaScan extends Component {
@@ -52,11 +53,13 @@ export class ScaScan extends Component {
 
   async componentDidMount() {
     this._isMount = true;
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
     this.getLastScan(this.props.agentId);
   }
 
   async getLastScan(agentId: Number) {
-    const scans = await WzRequest.apiReq('GET', `/sca/${agentId}?sort=-end_scan`, {limit: 1});
+    const scans = await WzRequest.apiReq('GET', `/sca/${agentId}?sort=-end_scan`, { limit: 1 });
     this._isMount &&
       this.setState({
         lastScan: (((scans.data || {}).data || {}).items || {})[0],
@@ -73,30 +76,34 @@ export class ScaScan extends Component {
 
   renderLoadingStatus() {
     const { isLoading } = this.state;
-    if (!isLoading) {  
-     return;
-		} else {
-      return(
+    if (!isLoading) {
+      return;
+    } else {
+      return (
         <EuiFlexGroup justifyContent="center" alignItems="center">
           <EuiFlexItem grow={false}>
-          <div style={{ display: 'block' , textAlign: "center", paddingTop: 100 }}>
-            <EuiLoadingChart size="xl" />
-          </div>
+            <div style={{ display: 'block', textAlign: "center", paddingTop: 100 }}>
+              <EuiLoadingChart size="xl" />
+            </div>
           </EuiFlexItem>
         </EuiFlexGroup>
       )
-		}
+    }
   }
 
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
     if (isLoading || lastScan === undefined) return;
-    return(
+    return (
       <Fragment>
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
-              <EuiLink onClick={() => this.props.switchTab('sca')}>
+              <EuiLink onClick={() => {
+                window.location.href = `#/agents?agent=${this.props.agentId}&tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                this.router.reload();
+                }
+              }>
                 <h3>{lastScan.name}</h3>
               </EuiLink>
             </EuiTitle>
@@ -170,7 +177,7 @@ export class ScaScan extends Component {
   renderEmptyPrompt() {
     const { isLoading } = this.state;
     if (isLoading) return;
-    return(
+    return (
       <Fragment>
         <EuiEmptyPrompt
           iconType="visVega"
@@ -182,7 +189,7 @@ export class ScaScan extends Component {
               </p>
             </Fragment>
           }
-          />
+        />
       </Fragment>
     )
   }
@@ -202,11 +209,11 @@ export class ScaScan extends Component {
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiToolTip position="top" content="Open SCA Scans">
-                  <EuiButtonIcon 
+                  <EuiButtonIcon
                     iconType="popout"
                     color="primary"
                     onClick={() => this.props.switchTab('sca')}
-                    aria-label="Open SCA Scans"/>
+                    aria-label="Open SCA Scans" />
                 </EuiToolTip>
               </EuiFlexItem>
             </EuiFlexGroup>

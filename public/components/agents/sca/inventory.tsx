@@ -113,8 +113,8 @@ export class Inventory extends Component {
                 <b>Registry: </b> {item.registry}
               </span>
             ) : (
-              '-'
-            )}
+                        '-'
+                      )}
           </div>
         )
       },
@@ -149,7 +149,21 @@ export class Inventory extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    this.initialize();
+    await this.initialize();
+    const regex = new RegExp('redirectPolicy=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0]) {
+      this.setState({ loading: true });
+      const id = match[0].split('=')[1];
+      const policy = await this.wzReq.apiReq(
+        'GET',
+        `/sca/${this.state.agent.id}`,
+        { "q": "policy_id=" + id }
+      );
+      await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
+      window.location.href = window.location.href.replace(new RegExp('redirectPolicy=' + '[^&]*'), '');
+      this.setState({ loading: false });
+    }
   }
 
   componentWillUnmount() {
@@ -399,7 +413,7 @@ export class Inventory extends Component {
                       onClick={() => this.loadScaPolicy(false)}
                       iconType="arrowLeft"
                       aria-label="Back to policies"
-                      {...{iconSize:'l'}}
+                      {...{ iconSize: 'l' }}
                     />
                   </EuiFlexItem>
                   <EuiFlexItem>

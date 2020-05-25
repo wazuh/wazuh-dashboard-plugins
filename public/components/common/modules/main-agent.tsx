@@ -74,7 +74,7 @@ export class MainModuleAgent extends Component {
           href: "#/agents-preview"
         },
         {
-          text: this.props.agent.id,
+          text: `${this.props.agent.name} (${this.props.agent.id})`,
           onClick: () => {
             window.location.href = `#/agents?agent=${this.props.agent.id}`;
             this.router.reload();
