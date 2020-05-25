@@ -323,27 +323,31 @@ export class AgentsWelcome extends Component {
                 <EuiFlexGroup>
 
                   <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} >
-                    <EuiPanel paddingSize="m" height={{height: 300}}>
+                    <EuiPanel paddingSize="s" height={{ height: 300 }}>
+                      <EuiFlexItem>
                         <EuiFlexGroup>
-                          <h2 className="embPanel__title wz-headline-title">
-                            <EuiText size="xs"><h2>MITRE</h2></EuiText>
-                          </h2>
-                          <EuiFlexItem grow={false}>
+                          <EuiFlexItem>
+                            <h2 className="embPanel__title wz-headline-title">
+                              <EuiText size="xs"><h2>MITRE</h2></EuiText>
+                            </h2>
+                          </EuiFlexItem>
+                          <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
                             <EuiToolTip position="top" content="Open MITRE">
-                              <EuiButtonIcon 
+                              <EuiButtonIcon
                                 iconType="popout"
                                 color="primary"
                                 onClick={() => this.props.switchTab('mitre')}
-                                aria-label="Open MITRE"/>
+                                aria-label="Open MITRE" />
                             </EuiToolTip>
                           </EuiFlexItem>
                         </EuiFlexGroup>
-                        <EuiSpacer size="m" />
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <MitreTopTactics agentId={this.props.agent.id} />
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
+                      </EuiFlexItem>
+                      <EuiSpacer size="m" />
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <MitreTopTactics agentId={this.props.agent.id} />
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
                     </EuiPanel>
                   </EuiFlexItem>
 

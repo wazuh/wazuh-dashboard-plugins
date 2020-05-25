@@ -24,7 +24,7 @@ export function RequirementVis(props) {
   const [requirement, setRequirement] = useState('pci_dss');
   return (
     <EuiFlexItem>
-      <EuiPanel>
+      <EuiPanel paddingSize="s">
         <EuiFlexItem>
           <RequirementsHead requirement={requirement} setRequirement={setRequirement} />
           <EuiSpacer size="m" />
