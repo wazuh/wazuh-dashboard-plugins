@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for server initialization
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ export function initApp(server) {
 
   log('init:initApp', `Waiting for Kibana migration jobs`, 'debug');
   server.kibanaMigrator
-    .runMigrations()
+    .awaitMigration()
     .then(() => {
       log(
         'init:initApp',

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to check discover
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { healthCheck } from './health-check';
-import { recentlyAccessed } from 'plugins/kibana/home/np_ready/components/recently_accessed';
+import { recentlyAccessed } from 'ui/persisted_log';
 export function getSavedSearch(
   redirectWhenMissing,
   $location,

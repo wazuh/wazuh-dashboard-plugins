@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
   "version": "3.12.3",
-  "revision": "0874",
-  "code": "0874-0",
+  "revision": "0544",
+  "code": "0544-0",
   "kibana": {
-    "version": "7.6.2"
+    "version": "7.3.1"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -24,27 +24,12 @@
     "url": "https://github.com/wazuh/wazuh-kibana-app/issues"
   },
   "homepage": "https://www.wazuh.com/",
-  "scripts": {
-    "preinstall": "node ../../preinstall_check",
-    "pretty": "prettier --single-quote \"{,!(node_modules)/**/}*.js\" --write",
-    "tslint": "tslint -c .tslint.yml server/**/*.ts server/**/*.tsx public/**/*.ts public/**/*.tsx",
-    "lint": "eslint . --ext .js -c .eslintrc.json --color",
-    "kbn": "node ../../scripts/kbn",
-    "es": "node ../../scripts/es",
-    "start": "plugin-helpers start",
-    "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
-    "build": "plugin-helpers build",
-    "test": "_mocha test/**/*",
-    "test:ui:runner": "node ../../scripts/functional_test_runner.js",
-    "test:server": "plugin-helpers test:server",
-    "test:browser": "plugin-helpers test:browser"
-  },
   "dependencies": {
     "angular-animate": "1.7.8",
     "angular-chart.js": "1.1.1",
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
-    "babel-polyfill": "^6.13.0",
+    "dom-to-image": "^2.6.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
@@ -55,21 +40,15 @@
     "querystring-browser": "1.0.4",
     "simple-tail": "^1.1.0",
     "timsort": "^0.3.0",
-    "winston": "3.0.0"
+    "winston": "3.0.0",
+    "babel-polyfill": "^6.13.0"
   },
-  "devDependencies": {
-    "@elastic/plugin-helpers": "^7.1.8",
-    "babel-eslint": "^8.2.6",
-    "chai": "^4.1.2",
-    "eslint": "^5.10.0",
-    "eslint-plugin-async-await": "^0.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-react": "^7.13.0",
-    "mocha": "^5.2.0",
-    "prettier": "^1.14.2",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.1",
-    "typescript-eslint-parser": "^18.0.0"
+  "build": {
+    "git": {
+      "count": "1",
+      "sha": "00b2360",
+      "date": "Thu, 5 Sep 2019 21:03:16 -0600"
+    },
+    "date": "Thu Sep 19 2019 03:45:28 GMT+0000 (UTC)"
   }
 }

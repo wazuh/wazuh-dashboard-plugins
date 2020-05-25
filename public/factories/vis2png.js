@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Fetch png from visualization div
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,14 +38,13 @@ export class Vis2PNG {
           const tmpNode = this.htmlObject[currentValue];
           try {
             const tmpResult = await domtoimage.toPng(tmpNode[0]);
-            if (tmpResult === 'data:,') return;
             this.rawArray.push({
               element: tmpResult,
               width: tmpNode.width(),
               height: tmpNode.height(),
               id: currentValue
             });
-          } catch (error) { } // eslint-disable-line
+          } catch (error) {} // eslint-disable-line
           currentCompleted++;
           this.$rootScope.reportStatus = `Generating report...${Math.round(
             (currentCompleted / len) * 100

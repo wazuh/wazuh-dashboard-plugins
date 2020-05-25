@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Visualizations, Discover, filters
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,5 +11,5 @@
  */
 import './kibana-visualization';
 import './kibana-discover';
-import './saved_visualizations';
-import './wz-top-nav';
+import './saved-visualizations';
+import './search-bar/search-bar-directive';

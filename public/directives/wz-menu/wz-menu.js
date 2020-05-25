@@ -13,7 +13,6 @@
 import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
 import $ from 'jquery';
-import { npStart } from 'ui/new_platform'
 const app = uiModules.get('app/wazuh', []);
 
 class WzMenu {
@@ -31,13 +30,13 @@ class WzMenu {
     appState,
     genericReq,
     patternHandler,
+    indexPatterns,
     errorHandler,
     wazuhConfig,
     $controller,
     $route
   ) {
     const settings = $controller('settingsController', { $scope });
-    const indexPatterns = npStart.plugins.data.indexPatterns;
     $scope.showSelector = appState.getPatternSelector();
     $scope.showAPISelector = appState.getAPISelector();
     $scope.root = $rootScope;

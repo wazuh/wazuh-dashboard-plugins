@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Kibana plugin definition
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +14,11 @@
 import { initApp } from './init';
 import { resolve } from 'path';
 
-export default function (kibana) {
-  return new kibana.Plugin({
-    require: ['kibana', 'elasticsearch'],
+export default kibana =>
+  new kibana.Plugin({
     id: 'wazuh',
     name: 'wazuh',
+    require: ['kibana', 'elasticsearch'],
     uiExports: {
       app: {
         id: 'wazuh',
@@ -37,50 +37,20 @@ export default function (kibana) {
         });
       }
     },
-
-    config(Joi) {
-      return Joi.object({
-        enabled: Joi.boolean().default(true),
-      }).default();
-    },
-
-    init(server, options) { // eslint-disable-line no-unused-vars
+    init(server, options) {
+      // Kibana spaces locker
       const xpackMainPlugin = server.plugins.xpack_main;
-      if (xpackMainPlugin) {
-        const featureId = 'wazuh';
 
+      if (xpackMainPlugin) {
         xpackMainPlugin.registerFeature({
-          id: featureId,
+          id: 'wazuh',
           name: 'Wazuh',
-          navLinkId: featureId,
-          icon: '/plugins/wazuh/img/icon.svg',
-          app: [featureId, 'kibana', 'elasticsearch'],
-          catalogue: [],
-          privileges: {
-            all: {
-              app: [featureId],
-              api: [],
-              savedObject: {
-                all: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
-              },
-              ui: ['save', 'show'],
-            },
-            read: {
-              app: [featureId],
-              api: [],
-              savedObject: {
-                all: [],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
-              },
-              ui: ['show'],
-            },
-          },
+          app: ['wazuh', 'kibana', 'elasticsearch'],
+          navLinkId: 'wazuh',
+          privileges: {}
         });
       }
 
-      // Add server routes and initialize the plugin here
-      initApp(server, options);
+      return initApp(server, options);
     }
   });
-}

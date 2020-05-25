@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Factory to store visualizations handlers
  *
- * Copyright (C) 2015-2020 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ export class VisHandlers {
    * Get all applied filters
    * @param {*} syscollector
    */
-  async getAppliedFilters(syscollector) {
+  getAppliedFilters(syscollector) {
     const appliedFilters = {};
 
     if (syscollector) {
@@ -56,32 +56,31 @@ export class VisHandlers {
     }
 
     // Check raw response from all rendered tables
-    let tables = this.list.filter(item => (((item || {}).vis || {})._state || {}).type === 'table');
-    for (let i = 0; i < tables.length; i++) {
-      const columns = [];
-      const title = tables[i].vis._state.title || tables[i].dataLoader.previousVisState.title || 'Table';
-      const item = await tables[i].handler.dataHandler.getData();
-      for (const table of item.value.visData.tables) {
-        columns.push(...table.columns.map(t => t.name));
-      }
-
-      tables[i] = !!(((((item || {}).value || {}).visData || {}).tables || [])[0] || {}).rows
-        ? {
-          rows: item.value.visData.tables[0].rows.map(x => { return Object.values(x) }),
-          title,
-          columns
+    const tables = this.list
+      .filter(item => (((item || {}).vis || {})._state || {}).type === 'table')
+      .map(item => {
+        const columns = [];
+        for (const table of item.dataLoader.visData.tables) {
+          columns.push(...table.columns.map(t => t.name));
         }
-        : false;
-    }
+
+        return !!(((item || {}).vis || {}).searchSource || {}).rawResponse
+          ? {
+              rawResponse: item.vis.searchSource.rawResponse,
+              title: item.vis.title || 'Table',
+              columns
+            }
+          : false;
+      });
 
     if (this.list && this.list.length) {
-      const visualization = this.list[0];
+      const visualization = this.list[0].vis;
+      // Parse applied filters for the first visualization
+      const filters = visualization.API.queryFilter.getFilters();
 
       // Parse current time range
-      const { from, to } = visualization.input.timeRange;
-      const { query } = visualization.input.query;
-      // Parse applied filters for the first visualization
-      const filters = visualization.input.filters;
+      const { from, to } = visualization.API.timeFilter.getTime();
+      const { query } = visualization.searchSource._fields.query;
 
       Object.assign(appliedFilters, {
         filters,
@@ -93,7 +92,7 @@ export class VisHandlers {
         tables
       });
     }
-    
+
     return appliedFilters;
   }
 
@@ -106,8 +105,6 @@ export class VisHandlers {
         item &&
         item.vis &&
         item.vis.title !== 'Agents status' &&
-        ((item.dataLoader || {}).previousVisState || {}).title !==
-        'Agents status' &&
         item.vis.searchSource &&
         item.vis.searchSource.rawResponse &&
         item.vis.searchSource.rawResponse.hits &&
