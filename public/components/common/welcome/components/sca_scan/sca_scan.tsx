@@ -25,7 +25,8 @@ import {
   EuiLoadingChart,
   EuiButtonIcon,
   EuiToolTip,
-  EuiEmptyPrompt
+  EuiEmptyPrompt,
+  EuiIcon
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
@@ -63,6 +64,13 @@ export class ScaScan extends Component {
       });
   }
 
+  durationScan() {
+    const { lastScan }  = this.state
+    let startScan = lastScan.start_scan;
+    let endScan = lastScan.end_scan;
+    console.log(new Date(startScan));
+  }
+
   renderLoadingStatus() {
     const { isLoading } = this.state;
     if (!isLoading) {  
@@ -95,6 +103,11 @@ export class ScaScan extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiBadge color="secondary">{lastScan.policy_id}</EuiBadge>
+          </EuiFlexItem>
+          <EuiFlexItem grow={true}>
+            <EuiText>
+              <EuiIcon type="clock" /> Duration: {this.durationScan()}
+            </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
