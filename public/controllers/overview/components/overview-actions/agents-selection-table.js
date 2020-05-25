@@ -30,8 +30,9 @@ import {
 
 import { WzRequest } from '../../../../react-services/wz-request';
 import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eui/lib/services';
-import { updateCurrentAgent, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
+import chrome from 'ui/chrome';
 
 
 export class AgentSelectionTable extends Component {
@@ -129,12 +130,11 @@ export class AgentSelectionTable extends Component {
   };
 
   async componentDidMount() {
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
     const tmpSelectedAgents = {};
-    console.log(store.getState())
-    console.log(store.getState().appStateReducers)
-    console.log(store.getState().appStateReducers.currentAgentId)
-    if(!store.getState().appStateReducers.currentAgentId){
-      tmpSelectedAgents[store.getState().appStateReducers.currentAgentId] = true;
+    if(!store.getState().appStateReducers.currentAgentData.id){
+      tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;
     }
     this.setState({itemIdToSelectedMap: this.props.selectedAgents});
     await this.getItems();
@@ -486,7 +486,6 @@ export class AgentSelectionTable extends Component {
   unselectAgents(){
     this.setState({itemIdToSelectedMap: {}});
     this.props.removeAgentsFilter(true);      
-    store.dispatch(updateCurrentAgent(false));
     store.dispatch(updateCurrentAgentData({}));
   }
 
@@ -495,20 +494,17 @@ export class AgentSelectionTable extends Component {
   }
 
   async newSearch(){
-    console.log("newwwwww")
     if(this.areAnyRowsSelected()){
       this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch(this.getSelectedItems());
-      store.dispatch(updateCurrentAgent(this.getSelectedItems()[0]));
       const data = await this.wzReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
-      console.log("selected agent", formattedData)
       store.dispatch(updateCurrentAgentData(formattedData));
     }else{
       this.props.removeAgentsFilter(true);      
-      store.dispatch(updateCurrentAgent(false));
       store.dispatch(updateCurrentAgentData({}));
     }
+   // this.router.reload();
   }
 
   showContextMenu(id){
@@ -532,7 +528,7 @@ export class AgentSelectionTable extends Component {
 
         <EuiFlexGroup gutterSize="m">
           <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => {this.unselectAgents();}} color="danger" isDisabled={!store.getState().appStateReducers.currentAgentId}>
+          <EuiButton onClick={() => {this.unselectAgents();}} color="danger" isDisabled={!store.getState().appStateReducers.currentAgentData.id}>
               Remove selected agents
             </EuiButton>
           </EuiFlexItem>

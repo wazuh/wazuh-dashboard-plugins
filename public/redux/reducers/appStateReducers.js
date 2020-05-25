@@ -17,8 +17,8 @@ const initialState = {
   currentTab: '',
   extensions: {},
   adminMode: false,
-  currentAgentId: false, // TODO, add the full agent data not only the id
-  currentAgentData: {}
+  currentAgentData: {},
+  showExploreAgentModal: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -64,19 +64,21 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-  if (action.type === 'UPDATE_SELECTED_AGENT') {
-    return {
-      ...state,
-      currentAgentId: action.currentAgentId
-    };
-  }
-
   if (action.type === 'UPDATE_SELECTED_AGENT_DATA') {
     return {
       ...state,
       currentAgentData: action.currentAgentData
     };
   }
+
+
+  if (action.type === 'SHOW_EXPLORE_AGENT_MODAL') {
+    return {
+      ...state,
+      showExploreAgentModal: action.showExploreAgentModal
+    };
+  }
+
 
 
   return state;

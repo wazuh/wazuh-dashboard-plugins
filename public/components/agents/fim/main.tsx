@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Inventory } from './index';
 import '../../common/modules/module.less';
 import  store  from '../../../redux/store';
+import { showExploreAgentModal } from '../../../redux/actions/appStateActions';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
 
 
@@ -12,9 +13,17 @@ export class MainFim extends Component {
   }
 
   componentDidUpdate(){
-    if(store.getState().appStateReducers.currentAgentId !== this.state.currentAgentId){
-      this.setState({currentAgentId: store.getState().appStateReducers.currentAgentId, agentData: {os: {"platform": "linux"}, agentPlatform: "linux", id: store.getState().appStateReducers.currentAgentId }  })
+    if(store.getState().appStateReducers.currentAgentData.id !== this.state.currentAgentId){
+      if(this.props.selectView === 'inventory' && this.state.currentAgentId){
+        this.setState({currentAgentId: false})
+      }else{
+        this.setState({currentAgentId: store.getState().appStateReducers.currentAgentData.id, agentData: {os: {"platform": "linux"}, agentPlatform: "linux", id: store.getState().appStateReducers.currentAgentData.id }  });
+      }
     }
+  }
+
+  showExploreAgentModal(){
+    store.dispatch(showExploreAgentModal(true));
   }
 
   render() {
@@ -38,19 +47,18 @@ export class MainFim extends Component {
           {selectView === 'inventory' && (
             !this.state.currentAgentId && !this.props.agent &&
             (<EuiEmptyPrompt
-              iconType="editorStrike"
-              title={<h2>You need to select an agent</h2>}
+              iconType="watchesApp"
+              title={<h2>No agent is selected</h2>}
               body={
                 <Fragment>
                   <p>
-                    bla bla
+                    You need to select an agent to see Integrity Monitoring inventory.
                   </p>
-                  <p>bla bla</p>
                 </Fragment>
               }
               actions={
-                <EuiButton color="primary" fill>
-                  Select an agent
+                <EuiButton color="primary" fill onClick={() => this.showExploreAgentModal()}>
+                  Select agent
                 </EuiButton>
               }
             />)) 
