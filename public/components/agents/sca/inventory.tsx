@@ -18,7 +18,8 @@ import {
   EuiDescriptionList,
   EuiButtonEmpty,
   EuiToolTip,
-  EuiCallOut
+  EuiCallOut,
+  EuiPopover
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
@@ -356,7 +357,13 @@ export class Inventory extends Component {
         direction: 'asc'
       }
     };
-
+    const buttonPopover = (
+      <EuiButtonEmpty
+        iconType="iInCircle"
+        aria-label="Help"
+        onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}>
+      </EuiButtonEmpty>
+    );
     return (
       <Fragment>
         <div>
@@ -429,12 +436,19 @@ export class Inventory extends Component {
                       size="s">
                       <h2>{this.state.lookingPolicy.name}&nbsp;
                         <EuiToolTip position="right" content="Show policy checksum">
-                          <EuiButtonEmpty
-                            iconType="iInCircle"
-                            aria-label="Help"
-                            onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}>
-                            More info
-                          </EuiButtonEmpty>
+                          <EuiPopover
+                            button={buttonPopover}
+                            isOpen={this.state.showMoreInfo}
+                            closePopover={() => this.setState({showMoreInfo: false})}>
+                            <EuiFlexItem style={{width: 700}}>
+                              <EuiSpacer size="s" />
+                              <EuiText>
+                                <b>Policy description:</b> {this.state.lookingPolicy.description}
+                                  <br></br>
+                                <b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}
+                              </EuiText>
+                            </EuiFlexItem>
+                          </EuiPopover>
                         </EuiToolTip>
                       </h2>
                     </EuiTitle>
@@ -452,18 +466,6 @@ export class Inventory extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
-                {(this.state.showMoreInfo &&
-                  <div>
-                    <EuiSpacer size="s" />
-                    <EuiText>
-                      <pre>
-                        <code><b>Policy description:</b> {this.state.lookingPolicy.description}</code>
-                        <br></br>
-                        <code><b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}</code>
-                      </pre>
-                    </EuiText>
-                  </div>
-                )}
                 <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
