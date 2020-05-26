@@ -506,11 +506,11 @@ export class AgentSelectionTable extends Component {
 
   async newSearch(){
     if(this.areAnyRowsSelected()){
-      this.props.removeAgentsFilter(false);
-      this.props.updateAgentSearch(this.getSelectedItems());
       const data = await this.wzReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
+      this.props.removeAgentsFilter(false);
+      this.props.updateAgentSearch(this.getSelectedItems());
     }else{
       this.props.removeAgentsFilter(true);      
       store.dispatch(updateCurrentAgentData({}));
