@@ -463,8 +463,8 @@ export class AgentsWelcome extends Component {
           <EuiPage>
             <EuiFlexGrid columns={2}>
               <EuiFlexItem />
-              <EuiFlexItem style={{ alignItems: 'flex-end' }}> {/* DatePicker */}
-                <WzDatePicker onTimeChange={() => { }} />
+              <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 6, marginBottom: 0 }}> {/* DatePicker */}
+                <WzDatePicker condensed={true} onTimeChange={() => { }} />
               </EuiFlexItem>
               <EuiFlexItem> {/* Pie visualizations */}
                 <EuiFlexGroup>
@@ -514,18 +514,17 @@ export class AgentsWelcome extends Component {
               </EuiFlexItem>
               <FimEventsTable agent={this.props.agent} router={this.router} />
               <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
-                <EuiPanel paddingSize="none">
+                <EuiPanel paddingSize="s" >
                   <EuiFlexItem>
-                    <EuiFlexGroup
-                      style={{ padding: '12px 12px 0px' }}
-                      className="embPanel__header"
-                    >
-                      <h2 className="embPanel__title wz-headline-title">
-                        <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
-                      </h2>
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <h2 className="embPanel__title wz-headline-title">
+                          <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
+                        </h2>
+                      </EuiFlexItem>
                     </EuiFlexGroup>
                     <EuiSpacer size="s" />
-                    <div style={{ height: this.props.resultState !== 'loading' ? '280px' : 0 }}>
+                    <div style={{ height: this.props.resultState !== 'loading' ? '225px' : 0 }}>
                       <WzReduxProvider>
                         <KibanaVis
                           visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
