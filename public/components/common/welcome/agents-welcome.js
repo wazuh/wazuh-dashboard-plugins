@@ -186,7 +186,7 @@ export class AgentsWelcome extends Component {
                 isOpen={this.state.switchModule}
                 closePopover={() => this.setState({ switchModule: false })}
                 repositionOnScroll={false}
-                anchorPosition="downLeft">
+                anchorPosition="downCenter">
                 <div>
                   <WzReduxProvider>
                     <div style={{ maxWidth: 700 }}>
@@ -428,7 +428,7 @@ export class AgentsWelcome extends Component {
 
                 </EuiFlexGroup>
               </EuiFlexItem>
-              <FimEventsTable agentId={this.props.agent.id} />
+              <FimEventsTable agent={this.props.agent} router={this.router} />
               <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
                 <EuiPanel paddingSize="none">
                   <EuiFlexItem>

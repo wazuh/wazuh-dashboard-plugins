@@ -27,13 +27,13 @@ import { ICustomBadges } from '../../../wz-search-bar/components';
 export class RegistryTable extends Component {
   state: {
     syscheck: [],
-    pageIndex: number,
-    pageSize: number,
-    totalItems: number,
-    sortField: string,
+    pageIndex: number
+    pageSize: number
+    totalItems: number
+    sortField: string
     isFlyoutVisible: Boolean
-    sortDirection: Direction,
-    isLoading: boolean,
+    sortDirection: Direction
+    isLoading: boolean
     currentFile: {
       file: string
     }
@@ -42,6 +42,7 @@ export class RegistryTable extends Component {
   props!: {
     filters: {}
     customBadges: ICustomBadges[]
+    totalItems: number
   }
 
   constructor(props) {
@@ -66,6 +67,7 @@ export class RegistryTable extends Component {
     await this.getSyscheck();
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
+    this.setState({totalItems: this.props.totalItems});
     if (match && match[0]) {
       const file = match[0].split('=')[1];
       this.showFlyout(decodeURIComponent(file), true);
