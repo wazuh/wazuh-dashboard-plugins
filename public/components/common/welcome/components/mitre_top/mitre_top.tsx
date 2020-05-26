@@ -191,12 +191,11 @@ export class MitreTopTactics extends Component {
     return(
       <EuiEmptyPrompt
       iconType="stats"
-      title={<h4>You dont have tactics for this time range</h4>}
+      title={<h4>No results</h4>}
       body={
         <Fragment>
           <p>
-          You have no alerts related to tactics in this time range. 
-          Modify the time range to view data, if it exists.
+          No Mitre results were found in the selected time range.
           </p>
         </Fragment>
       }
