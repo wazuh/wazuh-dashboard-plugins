@@ -25,8 +25,10 @@ import {
   EuiLoadingChart,
   EuiButtonIcon,
   EuiToolTip,
-  EuiEmptyPrompt
+  EuiEmptyPrompt,
+  EuiIcon
 } from '@elastic/eui';
+import moment from 'moment-timezone';
 import chrome from 'ui/chrome';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
@@ -68,6 +70,14 @@ export class ScaScan extends Component {
       });
   }
 
+  durationScan() {
+    const { lastScan }  = this.state
+    let diff = moment(new Date(lastScan.start_scan),"DD/MM/YYYY HH:mm:ss").diff(moment(new Date(lastScan.end_scan),"DD/MM/YYYY HH:mm:ss"));
+    let duration = moment.duration(diff);
+    let auxDuration = Math.floor(duration.asHours()) + moment.utc(diff).format(":mm:ss");
+    return auxDuration === '0:00:00' ? '< 1s' : auxDuration;
+  }
+
   renderLoadingStatus() {
     const { isLoading } = this.state;
     if (!isLoading) {
@@ -94,10 +104,10 @@ export class ScaScan extends Component {
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
               <EuiLink onClick={() => {
-                window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
-                store.dispatch(updateCurrentAgentData(this.props.agent));
-                this.router.reload();
-              }
+                  window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                  this.router.reload();
+                }
               }>
                 <h3>{lastScan.name}</h3>
               </EuiLink>
@@ -151,11 +161,16 @@ export class ScaScan extends Component {
             />
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size="xxl" />
+        <EuiSpacer size={'l'}/>
         <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiText textAlign="center">
-              <span>{`Start Scan: ${lastScan.start_scan} - End Scan: ${lastScan.end_scan}`}</span>
+          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
+            <EuiText>
+              <EuiIcon type="calendar" color={'primary'}/> End Scan: {lastScan.end_scan}
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
+            <EuiText>
+              <EuiIcon type="clock" color={'primary'}/> Duration: {this.durationScan()}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
