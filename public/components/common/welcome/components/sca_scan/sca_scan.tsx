@@ -28,6 +28,8 @@ import {
   EuiEmptyPrompt
 } from '@elastic/eui';
 import chrome from 'ui/chrome';
+import store from '../../../../../redux/store';
+import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 export class ScaScan extends Component {
@@ -54,7 +56,7 @@ export class ScaScan extends Component {
     this._isMount = true;
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
-    this.getLastScan(this.props.agentId);
+    this.getLastScan(this.props.agent.id);
   }
 
   async getLastScan(agentId: Number) {
@@ -92,9 +94,10 @@ export class ScaScan extends Component {
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
               <EuiLink onClick={() => {
-                window.location.href = `#/agents?agent=${this.props.agentId}&tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                store.dispatch(updateCurrentAgentData(this.props.agent));
                 this.router.reload();
-                }
+              }
               }>
                 <h3>{lastScan.name}</h3>
               </EuiLink>
@@ -199,7 +202,12 @@ export class ScaScan extends Component {
                   <EuiButtonIcon
                     iconType="popout"
                     color="primary"
-                    onClick={() => this.props.switchTab('sca')}
+                    onClick={() => {
+                      window.location.href = `#/overview?tab=sca`;
+                      store.dispatch(updateCurrentAgentData(this.props.agent));
+                      this.router.reload();
+                    }
+                    }
                     aria-label="Open SCA Scans" />
                 </EuiToolTip>
               </EuiFlexItem>
