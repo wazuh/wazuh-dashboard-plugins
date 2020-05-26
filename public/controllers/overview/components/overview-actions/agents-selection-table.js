@@ -140,6 +140,17 @@ export class AgentSelectionTable extends Component {
     await this.getItems();
   }
 
+  getArrayFormatted(arrayText) {
+    try {
+      const stringText = arrayText.toString();
+      const splitString = stringText.split(',');
+      const resultString = splitString.join(', ');
+      return resultString;
+    } catch (err) {
+      return arrayText;
+    }
+  }
+
   async getItems() {
     try{
       this.setState({isLoading: true});
@@ -154,7 +165,7 @@ export class AgentSelectionTable extends Component {
           version: item.version || '-',
           os: (item.os || {}).name || '-',
           status: item.status,
-          group: item.group || '-',
+          group: this.getArrayFormatted(item.group) || '-',
         };
       });
       this.items = formattedData;
