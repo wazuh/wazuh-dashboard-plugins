@@ -454,7 +454,7 @@ export class AgentsWelcome extends Component {
 
                 </EuiFlexGroup>
               </EuiFlexItem>
-              <FimEventsTable agentId={this.props.agent.id} />
+              <FimEventsTable agent={this.props.agent} router={this.router} />
               <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
                 <EuiPanel paddingSize="none">
                   <EuiFlexItem>
