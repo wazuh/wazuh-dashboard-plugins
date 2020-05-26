@@ -136,7 +136,7 @@ class WzMenuAgent extends Component {
           {item.text}
         </EuiFlexItem>
         {
-          this.state.hoverAddFilter === item.id && !item.isTitle &&
+          this.state.hoverAddFilter === item.id && !item.isTitle && !item.default && (Object.keys(this.menuAgent).length < 3 || item.isPin) &&
             <EuiFlexItem grow={false}>
               <EuiIcon
               onClick={() => {

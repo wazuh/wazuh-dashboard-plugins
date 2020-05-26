@@ -186,7 +186,7 @@ export class AgentsWelcome extends Component {
                 isOpen={this.state.switchModule}
                 closePopover={() => this.setState({ switchModule: false })}
                 repositionOnScroll={false}
-                anchorPosition="downLeft">
+                anchorPosition="downCenter">
                 <div>
                   <WzReduxProvider>
                     <div style={{ maxWidth: 700 }}>
