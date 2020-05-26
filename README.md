@@ -41,7 +41,7 @@ Install the app
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.2.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.3.1.zip
 ```
 
 It is recommended to increase the heap size of Kibana to ensure the plugin installation:
@@ -114,7 +114,7 @@ Install the app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.2.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.3.1.zip
 ```
 
 Update configuration file permissions.
@@ -152,6 +152,7 @@ service kibana restart
 | :---------------: | :------------: | :-------------------------------------------------------------- |
 |       3.12.3      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.2.zip> |
 |       3.12.3      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.1.zip> |
+|       3.12.3      |      7.3.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.3.1.zip> |
 |       3.12.3      |      6.8.8     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.8.zip> |
 |       3.12.2      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.2.zip> |
 |       3.12.2      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.1.zip> |
