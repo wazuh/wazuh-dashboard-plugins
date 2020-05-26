@@ -27,7 +27,7 @@ export class ClusterDisabled extends Component {
                 {!this.props.enabled && (
                   <p>
                     Visit the documentation on{' '}
-                    <a href="https://documentation.wazuh.com/3.11/user-manual/configuring-cluster/index.html">
+                    <a href="https://documentation.wazuh.com/current/user-manual/configuring-cluster/index.html">
                       this link
                     </a>{' '}
                     to learn about how to enable it.

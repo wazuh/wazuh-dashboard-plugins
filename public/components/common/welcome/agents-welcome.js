@@ -11,7 +11,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiCard,
   EuiIcon,
@@ -31,7 +31,8 @@ import {
   EuiSelect,
   EuiLoadingChart,
   EuiToolTip,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiEmptyPrompt
 } from '@elastic/eui';
 import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
@@ -312,6 +313,29 @@ export class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
+    if(this.props.agent.status === 'Never connected'){
+      return (
+      <EuiEmptyPrompt
+        iconType="securitySignalDetected"
+        style={{marginTop: 20}}
+        title={<h2>Agent has never connected.</h2>}
+        body={
+          <Fragment>
+            <p>
+              The agent has been registered but has not yet connected to the manager.
+            </p>
+            <a href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html" target="_blank">
+            https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html
+            </a>
+          </Fragment>
+        }
+        actions={
+          <EuiButton href='#/agents-preview?' color="primary" fill>
+            Back
+          </EuiButton>
+        }
+      />)
+    }
 
     return (
       <div className="wz-module wz-module-welcome">
