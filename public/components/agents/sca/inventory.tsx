@@ -18,7 +18,8 @@ import {
   EuiDescriptionList,
   EuiButtonEmpty,
   EuiToolTip,
-  EuiCallOut
+  EuiCallOut,
+  EuiPopover
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
@@ -113,8 +114,8 @@ export class Inventory extends Component {
                 <b>Registry: </b> {item.registry}
               </span>
             ) : (
-              '-'
-            )}
+                        '-'
+                      )}
           </div>
         )
       },
@@ -149,7 +150,21 @@ export class Inventory extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    this.initialize();
+    await this.initialize();
+    const regex = new RegExp('redirectPolicy=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    if (match && match[0]) {
+      this.setState({ loading: true });
+      const id = match[0].split('=')[1];
+      const policy = await this.wzReq.apiReq(
+        'GET',
+        `/sca/${this.state.agent.id}`,
+        { "q": "policy_id=" + id }
+      );
+      await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
+      window.location.href = window.location.href.replace(new RegExp('redirectPolicy=' + '[^&]*'), '');
+      this.setState({ loading: false });
+    }
   }
 
   componentWillUnmount() {
@@ -342,7 +357,13 @@ export class Inventory extends Component {
         direction: 'asc'
       }
     };
-
+    const buttonPopover = (
+      <EuiButtonEmpty
+        iconType="iInCircle"
+        aria-label="Help"
+        onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}>
+      </EuiButtonEmpty>
+    );
     return (
       <Fragment>
         <div>
@@ -359,6 +380,14 @@ export class Inventory extends Component {
               <EuiButton color="primary" onClick={() => this.initialize()}>
                 Refresh
            </EuiButton>
+            </EuiCallOut>
+          )}
+
+          {((this.state.agent && (this.state.agent || {}).status === 'Never connected' && !this.state.loading) &&
+            <EuiCallOut title="Agent has never connected" style={{width: "100%"}} iconType="iInCircle">
+              <EuiButton color="primary" onClick={() => this.initialize()}>
+                  Refresh
+              </EuiButton>
             </EuiCallOut>
           )}
           {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
@@ -399,7 +428,7 @@ export class Inventory extends Component {
                       onClick={() => this.loadScaPolicy(false)}
                       iconType="arrowLeft"
                       aria-label="Back to policies"
-                      {...{iconSize:'l'}}
+                      {...{ iconSize: 'l' }}
                     />
                   </EuiFlexItem>
                   <EuiFlexItem>
@@ -407,12 +436,19 @@ export class Inventory extends Component {
                       size="s">
                       <h2>{this.state.lookingPolicy.name}&nbsp;
                         <EuiToolTip position="right" content="Show policy checksum">
-                          <EuiButtonEmpty
-                            iconType="iInCircle"
-                            aria-label="Help"
-                            onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}>
-                            More info
-                          </EuiButtonEmpty>
+                          <EuiPopover
+                            button={buttonPopover}
+                            isOpen={this.state.showMoreInfo}
+                            closePopover={() => this.setState({showMoreInfo: false})}>
+                            <EuiFlexItem style={{width: 700}}>
+                              <EuiSpacer size="s" />
+                              <EuiText>
+                                <b>Policy description:</b> {this.state.lookingPolicy.description}
+                                  <br></br>
+                                <b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}
+                              </EuiText>
+                            </EuiFlexItem>
+                          </EuiPopover>
                         </EuiToolTip>
                       </h2>
                     </EuiTitle>
@@ -430,18 +466,6 @@ export class Inventory extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
-                {(this.state.showMoreInfo &&
-                  <div>
-                    <EuiSpacer size="s" />
-                    <EuiText>
-                      <pre>
-                        <code><b>Policy description:</b> {this.state.lookingPolicy.description}</code>
-                        <br></br>
-                        <code><b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}</code>
-                      </pre>
-                    </EuiText>
-                  </div>
-                )}
                 <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>

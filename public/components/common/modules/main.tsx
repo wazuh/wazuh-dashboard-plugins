@@ -57,26 +57,26 @@ export class MainModule extends Component {
     }
   }
 
-  canBeInit(tab){ //checks if the init table can be set
+  canBeInit(tab) { //checks if the init table can be set
     let canInit = false;
     this.tabs.forEach(element => {
-      if(element.id === tab && (!element.onlyAgent || (element.onlyAgent && this.props.agent))){
+      if (element.id === tab && (!element.onlyAgent || (element.onlyAgent && this.props.agent))) {
         canInit = true;
       }
-     });
+    });
     return canInit;
   }
 
   renderTabs(agent = false) {
     const { selectView } = this.state;
-    if(!agent){
+    if (!agent) {
 
     }
     return (
       <EuiFlexItem style={{ margin: '0 8px 0 8px' }}>
         <EuiTabs>
-          {this.tabs.map((tab, index) =>{
-            if(!tab.onlyAgent || (tab.onlyAgent && this.props.agent)){
+          {this.tabs.map((tab, index) => {
+            if (!tab.onlyAgent || (tab.onlyAgent && this.props.agent)) {
               return <EuiTab
                 onClick={() => this.onSelectedTabChanged(tab.id)}
                 isSelected={selectView === tab.id}
@@ -94,7 +94,8 @@ export class MainModule extends Component {
 
   async startReport() {
     this.setState({ loadingReport: true });
-    await this.reportingService.startVis2Png(this.props.section, this.props.agent.id);
+    const agent = (this.props.agent || {}).id || false;
+    await this.reportingService.startVis2Png(this.props.section, agent);
     this.setState({ loadingReport: false });
   }
 
@@ -160,7 +161,7 @@ export class MainModule extends Component {
     if (id !== this.state.selectView) {
       if (id === 'events' || id === 'dashboard') {
         this.$rootScope.moduleDiscoverReady = false;
-        if(this.props.switchSubTab) this.props.switchSubTab(id === 'events' ? 'discover' : 'panels')
+        if (this.props.switchSubTab) this.props.switchSubTab(id === 'events' ? 'discover' : 'panels')
         window.location.href = window.location.href.replace(
           new RegExp("tabView=" + "[^\&]*"),
           `tabView=${id === 'events' ? 'discover' : 'panels'}`);
@@ -192,7 +193,7 @@ export class MainModule extends Component {
         {agent &&
           <MainModuleAgent {...{ ...this.props, ...mainProps }}></MainModuleAgent>
           || ((this.props.section && this.props.section !== 'welcome') &&
-          <MainModuleOverview {...{ ...this.props, ...mainProps }}></MainModuleOverview>)
+            <MainModuleOverview {...{ ...this.props, ...mainProps }}></MainModuleOverview>)
         }
       </Fragment>
     );

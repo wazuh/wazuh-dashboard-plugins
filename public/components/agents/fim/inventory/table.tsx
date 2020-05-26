@@ -25,25 +25,26 @@ import { ICustomBadges } from '../../../wz-search-bar/components';
 
 export class InventoryTable extends Component {
   state: {
-    syscheck: [],
-    pageIndex: number,
-    pageSize: number,
-    totalItems: number,
-    sortField: string,
+    syscheck: []
+    pageIndex: number
+    pageSize: number
+    totalItems: number
+    sortField: string
     isFlyoutVisible: Boolean
-    sortDirection: Direction,
-    isLoading: boolean,
+    sortDirection: Direction
+    isLoading: boolean
     currentFile: {
       file: string
     }
   };
 
   props!: {
-    filters: {},
+    filters: {}
     onFilterSelect(): void
     customBadges: ICustomBadges[]
-    agent: any,
+    agent: any
     items: []
+    totalItems: number
   }
 
   constructor(props) {
@@ -67,6 +68,7 @@ export class InventoryTable extends Component {
   async componentDidMount() {
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
+    this.setState({totalItems: this.props.totalItems});
     if (match && match[0]) {
       const file = match[0].split('=')[1];
       this.showFlyout(decodeURIComponent(file), true);

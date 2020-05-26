@@ -15,7 +15,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
 import chrome from 'ui/chrome';
-import { updateCurrentTab } from '../../redux/actions/appStateActions';
+import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
 import { UnsupportedComponents } from '../../utils/components-os-support';
 
@@ -87,7 +87,8 @@ class WzMenuOverview extends Component {
         store.dispatch(updateCurrentTab(section));
       } else {
         if (!this.props.switchTab) {
-          window.location.href = `#/agents?agent=${this.props.isAgent.id}&tab=${section}`;
+          store.dispatch(updateCurrentAgentData(this.props.isAgent)); 
+          window.location.href = `#/overview/?tab=${section}`;
           this.router.reload();
         } else {
           this.props.switchTab(section);
@@ -128,6 +129,11 @@ class WzMenuOverview extends Component {
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
 
+  removeSelectedAgent(){
+    store.dispatch(updateCurrentAgentData({})); 
+    this.router.reload();
+  }
+
   render() {
     let securityInformationItems = [
       this.overviewSections.general,
@@ -147,14 +153,16 @@ class WzMenuOverview extends Component {
       this.overviewSections.docker,
       this.overviewSections.mitre
     ];
-    if (!this.props.isAgent) {
+    const agent = store.getState().appStateReducers.currentAgentData;
+    if (!agent) {
       securityInformationItems.splice(2, 0, this.overviewSections.aws);
       threatDetectionItems.unshift(this.overviewSections.vuls);
     } else {
-      if (!(UnsupportedComponents[this.props.isAgent.agentPlatform] || UnsupportedComponents['other']).includes('vuls')) {
+      if (!(UnsupportedComponents[agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') || !agent.agentPlatform) {
         threatDetectionItems.unshift(this.overviewSections.vuls);
       }
     }
+
     const securityInformation = [
       this.createItem(this.overviewSections.securityInformation, {
         disabled: true,
@@ -213,7 +221,7 @@ class WzMenuOverview extends Component {
       <div className="WzManagementSideMenu">
         {Object.keys(this.state.extensions).length && (
           <div>
-            {!this.props.isAgent && (
+            {(
               <EuiFlexGroup>
                 <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
                   <EuiButtonEmpty iconType="arrowRight"
@@ -253,13 +261,13 @@ class WzMenuOverview extends Component {
                     </EuiFlexItem>
 
 
-                    <EuiFlexItem key={"button_1"}>
-                      <EuiButton href={`#/overview?tab=general`} color="primary">
+                    <EuiFlexItem key={"view_events_button"}>
+                      <EuiButton onClick={() => this.props.closePopover()} href={`#/agents?agent=${agentData.id}&tab=welcome`} color="primary">
                         View agent {agentData.id} events
                       </EuiButton>
                     </EuiFlexItem>
-                    <EuiFlexItem key={"button_2"}>
-                      <EuiButton onClick={() => alert("todo")} color="danger">
+                    <EuiFlexItem key={"remove_agent_button"}>
+                      <EuiButton onClick={() => {this.props.closePopover();this.removeSelectedAgent()}} color="danger">
                         Remove agent {agentData.id} selection
                       </EuiButton>
                     </EuiFlexItem>

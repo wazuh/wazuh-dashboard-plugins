@@ -74,7 +74,7 @@ export class MainModuleAgent extends Component {
           href: "#/agents-preview"
         },
         {
-          text: this.props.agent.id,
+          text: `${this.props.agent.name} (${this.props.agent.id})`,
           onClick: () => {
             window.location.href = `#/agents?agent=${this.props.agent.id}`;
             this.router.reload();
@@ -144,7 +144,7 @@ export class MainModuleAgent extends Component {
               <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
             </EuiFlexItem> */}
             <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-              {this.props.section && (
+              {/* {this.props.section && (
                 <Fragment>
                   <EuiPopover
                     button={
@@ -191,7 +191,7 @@ export class MainModuleAgent extends Component {
                     </div>
                   </EuiPopover>
                 </Fragment>
-              )}
+              )} */}
             </EuiFlexItem>
             <EuiFlexItem />
 
