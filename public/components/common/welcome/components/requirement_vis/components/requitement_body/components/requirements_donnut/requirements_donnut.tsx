@@ -27,8 +27,8 @@ export const RequirementsDonnut = props => {
     .sort(null);
   const createArc = d3
     .arc()
-    .innerRadius((dms.width * 0.8)/2 )
-    .outerRadius(dms.width/2)
+    .innerRadius((dms.width * 0.75) / 2)
+    .outerRadius(dms.width * 0.95 / 2)
     .padAngle(0.015);
   const colors = props.colors;
   const format = d3.format(".2f");
@@ -64,7 +64,7 @@ export const RequirementsDonnut = props => {
   },
     [props.data, dms]
   );
-  
+
 
 
   return (

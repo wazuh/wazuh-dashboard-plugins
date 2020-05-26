@@ -144,7 +144,7 @@ export class MainModuleAgent extends Component {
               <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
             </EuiFlexItem> */}
             <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-              {this.props.section && (
+              {/* {this.props.section && (
                 <Fragment>
                   <EuiPopover
                     button={
@@ -191,7 +191,7 @@ export class MainModuleAgent extends Component {
                     </div>
                   </EuiPopover>
                 </Fragment>
-              )}
+              )} */}
             </EuiFlexItem>
             <EuiFlexItem />
 

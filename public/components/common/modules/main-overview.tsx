@@ -26,9 +26,12 @@ import chrome from 'ui/chrome';
 import { ReportingService } from '../../../react-services/reporting';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
-import { OverviewActions } from '../../../controllers/overview/components/overview-actions/overview-actions';
+import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { MainFim } from '../../agents/fim';
+
+import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
 
 export class MainModuleOverview extends Component {
   constructor(props) {
@@ -124,7 +127,9 @@ export class MainModuleOverview extends Component {
                   <EuiFlexGroup>
                     {this.props.renderTabs()}
                     <EuiFlexItem grow={false} style={{ marginTop: 6 }}>
-                      <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
+                      <WzReduxProvider>
+                        <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
+                      </WzReduxProvider>
                     </EuiFlexItem>
                     {(selectView === 'dashboard') &&
                       this.props.renderReportButton()
@@ -157,6 +162,8 @@ export class MainModuleOverview extends Component {
 
           {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
           {section === 'fim' && <MainFim {...this.props} />}
+          {section === 'sca' && <MainSca {...this.props} />}
+          
           {section === 'mitre' && selectView === 'inventory' && <MainMitre {...this.props} />}
           {/* -------------------------------------------------------------------------- */}
         </Fragment>

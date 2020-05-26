@@ -12,6 +12,9 @@
 import React, { Component } from 'react';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import  store  from '../../../../redux/store';
+import { connect } from 'react-redux';
+import { showExploreAgentModal } from '../../../../redux/actions/appStateActions';
+
 
 import {
   EuiFlexItem,
@@ -27,7 +30,7 @@ import {
 } from '@elastic/eui';
 import './agents-selector.less';
 import { AgentSelectionTable } from './agents-selection-table';
-export class OverviewActions extends Component {
+class OverviewActions extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -181,7 +184,7 @@ export class OverviewActions extends Component {
   }
 
   componentDidMount() {
-    const agentId = store.getState().appStateReducers.currentAgentId ;
+    const agentId = store.getState().appStateReducers.currentAgentData.id ;
     const { filterManager } = getServices();
 
     this.setState({ filterManager: filterManager }, () => {
@@ -209,6 +212,7 @@ export class OverviewActions extends Component {
 
   closeAgentModal() {
     this.setState({ isAgentModalVisible: false });
+    store.dispatch(showExploreAgentModal(false))
   }
 
   showAgentModal() {
@@ -224,7 +228,6 @@ export class OverviewActions extends Component {
   }
 
   agentTableSearch(agentIdList) {
-    console.log("age", agentIdList)
     this.props.setAgent(agentIdList);
     this.closeAgentModal();
     if (agentIdList && agentIdList.length) {
@@ -283,7 +286,7 @@ export class OverviewActions extends Component {
   render() {
     let modal;
 
-    if (this.state.isAgentModalVisible) {
+    if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
         <EuiOverlayMask>
           <EuiModal
@@ -307,7 +310,7 @@ export class OverviewActions extends Component {
       );
     }
     return (
-      <div >
+      <div>
         <EuiFlexItem>
           {!this.state.isAgent && (
            <span>
@@ -334,3 +337,11 @@ export class OverviewActions extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    state: state.appStateReducers,
+  };
+};
+
+export default connect(mapStateToProps, null)(OverviewActions);
