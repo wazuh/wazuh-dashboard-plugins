@@ -361,7 +361,7 @@ export class AgentsWelcome extends Component {
                       <h2 style={{ fontSize: '16px!important', fontWeight: 400 }}>Groups</h2>
                     </EuiText>
                     <div>
-                      {this.props.agent.group.map((group, key) => (
+                      {this.props.agent && this.props.agent.group && this.props.agent.group.map((group, key) => (
                         <EuiButtonEmpty
                           style={{ marginLeft: 8, marginTop: -6 }}
                           key={`agent-group-${key}`}
@@ -370,6 +370,13 @@ export class AgentsWelcome extends Component {
                           {group}
                         </EuiButtonEmpty>
                       ))}
+                      {this.props.agent && !this.props.agent.group && (
+                        <div 
+                        style={{ marginLeft: 16, marginTop: 7 }}>
+                          {this.props.agent.status === 'Never connected' && "This agent has never connected." || "No groups are found for this agent."}
+                        </div>
+                      )}
+
                     </div>
                   </span>
                 </EuiPanel>
