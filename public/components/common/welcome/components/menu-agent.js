@@ -15,7 +15,7 @@ import { WzRequest } from './../../../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from './../../../../redux/store';
 import chrome from 'ui/chrome';
-import { updateCurrentTab } from './../../../../redux/actions/appStateActions';
+import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import { AppState } from './../../../../react-services/app-state';
 import { UnsupportedComponents } from './../../../../utils/components-os-support';
 import { toastNotifications } from 'ui/notify';
@@ -80,10 +80,6 @@ class WzMenuAgent extends Component {
     // You don't have to do this check first, but it can help prevent an unneeded render
   }
 
-  updateFavs() {
-    this.agentSections.general.isPin = !this.agentSections.general.isPin;
-  }
-
   async componentDidMount() {
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
@@ -98,20 +94,8 @@ class WzMenuAgent extends Component {
     if (currentTab !== section) {
       // do not redirect if we already are in that tab
       window.location.href = `#/overview/?tab=${section}`;
-      // #/agents?agent=${this.props.isAgent.id}&tab=${section}`
+      store.dispatch(updateCurrentAgentData(this.props.isAgent));
       this.router.reload();
-      // if (!this.props.isAgent) {
-      //   window.location.href = `#/overview/?tab=${section}`;
-      //   store.dispatch(updateCurrentTab(section));
-      // } else {
-      //   if (!this.props.switchTab) {
-      //     window.location.href = `#/overview/?tab=${section}`;
-      //     // #/agents?agent=${this.props.isAgent.id}&tab=${section}`
-      //     this.router.reload();
-      //   } else {
-      //     this.props.switchTab(section);
-      //   }
-      // }
     }
   };
 
@@ -185,7 +169,6 @@ class WzMenuAgent extends Component {
   };
 
   render() {
-    this.updateFavs();
     let securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
