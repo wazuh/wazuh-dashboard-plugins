@@ -28,6 +28,7 @@ import {
   EuiEmptyPrompt,
   EuiIcon
 } from '@elastic/eui';
+import moment from 'moment-timezone';
 import chrome from 'ui/chrome';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
@@ -48,20 +49,7 @@ export class ScaScan extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      lastScan: {
-        "fail": 34,
-        "total_checks": 64,
-        "pass": 30,
-        "policy_id": "cis_rhel7",
-        "references": "https://www.cisecurity.org/cis-benchmarks/",
-        "invalid": 0,
-        "start_scan": "2020-05-25 06:34:34",
-        "hash_file": "7f9e47fed248837fb214611cba0995b7877c1e916127c1242cb18982447ffe32",
-        "end_scan": "2020-05-25 01:34:34",
-        "score": 46,
-        "description": "This document provides prescriptive guidance for establishing a secure configuration posture for Red Hat Enterprise Linux 7 systems running on x86 and x64 platforms. This document was tested against Red Hat Enterprise Linux 7.4.",
-        "name": "CIS Benchmark for Red Hat Enterprise Linux 7"
-      },
+      lastScan: {},
       isLoading: true,
     };
   }
@@ -77,46 +65,17 @@ export class ScaScan extends Component {
     const scans = await WzRequest.apiReq('GET', `/sca/${agentId}?sort=-end_scan`, { limit: 1 });
     this._isMount &&
       this.setState({
-        /* lastScan: (((scans.data || {}).data || {}).items || {})[0], */
+        lastScan: (((scans.data || {}).data || {}).items || {})[0],
         isLoading: false,
       });
   }
 
   durationScan() {
     const { lastScan }  = this.state
-    
-    // asignar la fecha en milisegundos
-    let startScan = new Date(lastScan.start_scan).getTime();
-    let endScan = new Date(lastScan.end_scan).getTime();
-    console.log({startScan, endScan})
-
-    // asignar el valor de las unidades en milisegundos
-    var msecPerMinute = 1000 * 60;
-    var msecPerHour = msecPerMinute * 60;
-    var msecPerDay = msecPerHour * 24;
-
-    // Obtener la diferencia en milisegundos
-    var interval = startScan - endScan;
-
-    // Calcular cuentos días contiene el intervalo. Substraer cuantos días
-    //tiene el intervalo para determinar el sobrante
-    var days = Math.floor(interval / msecPerDay );
-    interval = interval - (days * msecPerDay );
-
-    // Calcular las horas , minutos y segundos
-    var hours = Math.floor(interval / msecPerHour );
-    interval = interval - (hours * msecPerHour );
-
-    var minutes = Math.floor(interval / msecPerMinute );
-    interval = interval - (minutes * msecPerMinute );
-
-    var seconds = Math.floor(interval / 1000 );
-
-    // Mostrar el resultado.
-    /* return(days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds."); */
-    return(`${hours}:${minutes}:${seconds}`)
-
-    //Output: 164 días, 23 horas, 0 minutos, 0 segundos.
+    let diff = moment(new Date(lastScan.start_scan),"DD/MM/YYYY HH:mm:ss").diff(moment(new Date(lastScan.end_scan),"DD/MM/YYYY HH:mm:ss"));
+    let duration = moment.duration(diff);
+    let auxDuration = Math.floor(duration.asHours()) + moment.utc(diff).format(":mm:ss");
+    return auxDuration === '0:00:00' ? '< 1s' : auxDuration;
   }
 
   renderLoadingStatus() {
@@ -145,10 +104,10 @@ export class ScaScan extends Component {
           <EuiFlexItem grow={false}>
             <EuiTitle size="s">
               <EuiLink onClick={() => {
-                window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
-                store.dispatch(updateCurrentAgentData(this.props.agent));
-                this.router.reload();
-              }
+                  window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                  this.router.reload();
+                }
               }>
                 <h3>{lastScan.name}</h3>
               </EuiLink>
@@ -156,11 +115,6 @@ export class ScaScan extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiBadge color="secondary">{lastScan.policy_id}</EuiBadge>
-          </EuiFlexItem>
-          <EuiFlexItem grow={true}>
-            <EuiText>
-              <EuiIcon type="clock" /> Duration: {this.durationScan()}
-            </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -207,11 +161,16 @@ export class ScaScan extends Component {
             />
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size="xxl" />
+        <EuiSpacer size={'l'}/>
         <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiText textAlign="center">
-              <span>{`Start Scan: ${lastScan.start_scan} - End Scan: ${lastScan.end_scan}`}</span>
+          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
+            <EuiText>
+              <EuiIcon type="calendar" color={'primary'}/> End Scan: {lastScan.end_scan}
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
+            <EuiText>
+              <EuiIcon type="clock" color={'primary'}/> Duration: {this.durationScan()}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
