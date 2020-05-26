@@ -313,28 +313,28 @@ export class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
-    if(this.props.agent.status === 'Never connected'){
+    if (this.props.agent.status === 'Never connected') {
       return (
-      <EuiEmptyPrompt
-        iconType="securitySignalDetected"
-        style={{marginTop: 20}}
-        title={<h2>Agent has never connected.</h2>}
-        body={
-          <Fragment>
-            <p>
-              The agent has been registered but has not yet connected to the manager.
+        <EuiEmptyPrompt
+          iconType="securitySignalDetected"
+          style={{ marginTop: 20 }}
+          title={<h2>Agent has never connected.</h2>}
+          body={
+            <Fragment>
+              <p>
+                The agent has been registered but has not yet connected to the manager.
             </p>
-            <a href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html" target="_blank">
-            https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html
+              <a href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html" target="_blank">
+                https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html
             </a>
-          </Fragment>
-        }
-        actions={
-          <EuiButton href='#/agents-preview?' color="primary" fill>
-            Back
+            </Fragment>
+          }
+          actions={
+            <EuiButton href='#/agents-preview?' color="primary" fill>
+              Back
           </EuiButton>
-        }
-      />)
+          }
+        />)
     }
 
     return (
@@ -378,33 +378,7 @@ export class AgentsWelcome extends Component {
           </EuiPage> */}
           <EuiPage>
             <EuiFlexGrid columns={2}>
-              <EuiFlexItem> {/* Groups */}
-                <EuiPanel paddingSize="m" style={{ padding: '6px 8px 0 8px' }}>
-                  <span style={{ display: 'inline-flex', height: 0 }}>
-                    <EuiText size="xs" style={{ height: 0 }}>
-                      <h2 style={{ fontSize: '16px!important', fontWeight: 400 }}>Groups</h2>
-                    </EuiText>
-                    <div>
-                      {this.props.agent && this.props.agent.group && this.props.agent.group.map((group, key) => (
-                        <EuiButtonEmpty
-                          style={{ marginLeft: 8, marginTop: -6 }}
-                          key={`agent-group-${key}`}
-                          onClick={() => this.props.goGroups(this.props.agent, key)}
-                        >
-                          {group}
-                        </EuiButtonEmpty>
-                      ))}
-                      {this.props.agent && !this.props.agent.group && (
-                        <div 
-                        style={{ marginLeft: 16, marginTop: 7 }}>
-                          {this.props.agent.status === 'Never connected' && "This agent has never connected." || "No groups are found for this agent."}
-                        </div>
-                      )}
-
-                    </div>
-                  </span>
-                </EuiPanel>
-              </EuiFlexItem>
+              <EuiFlexItem />
               <EuiFlexItem style={{ alignItems: 'flex-end' }}> {/* DatePicker */}
                 <WzDatePicker onTimeChange={() => { }} />
               </EuiFlexItem>
