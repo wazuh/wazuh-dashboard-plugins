@@ -208,7 +208,7 @@ class WzMenuAgent extends Component {
       threatDetectionItems.unshift(this.agentSections.vuls);
     } else {
       auditingItems.splice(1, 0, this.agentSections.sca);
-      if (!(UnsupportedComponents[this.props.isAgent.agentPlatform] || UnsupportedComponents['other']).includes('vuls')) {
+      if (!(UnsupportedComponents[this.props.isAgent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') || !this.props.isAgent.agentPlatform) {
         threatDetectionItems.unshift(this.agentSections.vuls);
       }
     }
