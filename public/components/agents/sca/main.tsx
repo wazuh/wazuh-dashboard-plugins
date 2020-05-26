@@ -20,7 +20,6 @@ export class MainSca extends Component {
   componentDidUpdate(){
     if(store.getState().appStateReducers.currentAgentData.id !== this.state.currentAgentId){
       if(this.props.selectView === 'inventory' && this.state.currentAgentId){
-        console.log("eooo")
         this.setState({currentAgentId: false})
       }else{
         this.setState({currentAgentId: store.getState().appStateReducers.currentAgentData.id, agentData:  store.getState().appStateReducers.currentAgentData }  );

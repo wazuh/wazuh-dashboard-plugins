@@ -169,10 +169,10 @@ class OverviewActions extends Component {
   removeAgentsFilter(shouldUpdate = true) {
     //this.props.buildOverview();
     if (shouldUpdate) {
-      this.closeAgentModal();
       this.props.setAgent(false);
       this.setState({ isAgent: false });
       this.props.setAgent(false);
+      this.closeAgentModal();
     }
     const currentAppliedFilters = this.state.filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {
@@ -212,7 +212,7 @@ class OverviewActions extends Component {
 
   closeAgentModal() {
     this.setState({ isAgentModalVisible: false });
-    store.dispatch(showExploreAgentModal(false))
+    store.dispatch(showExploreAgentModal(false));
   }
 
   showAgentModal() {
@@ -229,7 +229,6 @@ class OverviewActions extends Component {
 
   agentTableSearch(agentIdList) {
     this.props.setAgent(agentIdList);
-    this.closeAgentModal();
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
         const filter = {
@@ -274,7 +273,7 @@ class OverviewActions extends Component {
       }
     }
 
-    this.setState({ isAgent: agentIdList });
+    this.setState({ isAgent: agentIdList }, () => this.closeAgentModal());
   }
 
   getSelectedAgents() {

@@ -153,8 +153,15 @@ class WzMenuOverview extends Component {
       this.overviewSections.docker,
       this.overviewSections.mitre
     ];
-
-    threatDetectionItems.unshift(this.overviewSections.vuls);
+    const agent = store.getState().appStateReducers.currentAgentData;
+    if (!agent) {
+      securityInformationItems.splice(2, 0, this.overviewSections.aws);
+      threatDetectionItems.unshift(this.overviewSections.vuls);
+    } else {
+      if (!(UnsupportedComponents[agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') || !agent.agentPlatform) {
+        threatDetectionItems.unshift(this.overviewSections.vuls);
+      }
+    }
 
     const securityInformation = [
       this.createItem(this.overviewSections.securityInformation, {

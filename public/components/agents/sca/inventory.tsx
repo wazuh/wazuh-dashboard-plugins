@@ -375,6 +375,14 @@ export class Inventory extends Component {
            </EuiButton>
             </EuiCallOut>
           )}
+
+          {((this.state.agent && (this.state.agent || {}).status === 'Never connected' && !this.state.loading) &&
+            <EuiCallOut title="Agent has never connected" style={{width: "100%"}} iconType="iInCircle">
+              <EuiButton color="primary" onClick={() => this.initialize()}>
+                  Refresh
+              </EuiButton>
+            </EuiCallOut>
+          )}
           {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
             <div>
               {((this.state.data || []).length &&
