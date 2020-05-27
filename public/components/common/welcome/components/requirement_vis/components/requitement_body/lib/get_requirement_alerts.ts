@@ -14,7 +14,8 @@
 
 import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../../../overview/mitre/lib';
 import { getWazuhFilter } from '../../../../fim_events_table';
-import { esFilters } from '../../../../../../../../../../../src/plugins/data/common';
+import { buildFilter } from '../../../../../../../../../../../src/plugins/data/common';
+import { esFilters } from '../../../../../../../../../../../src/plugins/data/public';
 
 export async function getRequirementAlerts(agentId, time, requirement) {
   const indexPattern = await getIndexPattern();
@@ -44,7 +45,7 @@ export async function getRequirementAlerts(agentId, time, requirement) {
 }
 
 function createFilters(agentId, indexPattern) {
-  const buildFilter = filter => esFilters.buildFilter(
+  const filter = filter => buildFilter(
     indexPattern, { name: filter.name, type: 'string' },
     esFilters.FILTERS.PHRASE, false, false, filter.value,
     null, esFilters.FilterStateStore.APP_STATE);
@@ -53,7 +54,7 @@ function createFilters(agentId, indexPattern) {
     wazuhFilter,
     { name: 'agent.id', value: agentId },
   ];
-  return filters.map(buildFilter);
+  return filters.map(filter);
 }
 
 

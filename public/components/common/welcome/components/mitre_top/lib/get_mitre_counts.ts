@@ -11,22 +11,24 @@
  * Find more information about this on the LICENSE file.
  */
 import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../overview/mitre/lib'
-import { esFilters } from '../../../../../../../../../src/plugins/data/common';
+import { buildFilter } from '../../../../../../../../../src/plugins/data/common';
+import { esFilters } from '../../../../../../../../../src/plugins/data/public';
+
 import { AppState } from '../../../../../../react-services/app-state'
 
 
-function createFilters(indexPattern, agentId, tactic:string | undefined ) {
-  const buildFilter = filter => esFilters.buildFilter(
-    indexPattern, {name: filter.name, type: 'string'}, 
-    esFilters.FILTERS.PHRASE, false, false, filter.value, 
+function createFilters(indexPattern, agentId, tactic: string | undefined) {
+  const filter = filter => buildFilter(
+    indexPattern, { name: filter.name, type: 'string' },
+    esFilters.FILTERS.PHRASE, false, false, filter.value,
     null, esFilters.FilterStateStore.APP_STATE);
   const wazuhFilter = getWazuhFilter();
   const filters = [
     wazuhFilter,
     { name: 'agent.id', value: agentId },
-    ...(tactic ? [{name: 'rule.mitre.tactics', value: tactic}]: []),
+    ...(tactic ? [{ name: 'rule.mitre.tactics', value: tactic }] : []),
   ]
-  return filters.map(buildFilter);
+  return filters.map(filter);
 }
 
 function createExistsFilter(indexPattern) {
@@ -42,7 +44,7 @@ function getWazuhFilter() {
   return wazuhFilter;
 }
 
-export async function getMitreCount(agentId, time, tactic:string | undefined) {
+export async function getMitreCount(agentId, time, tactic: string | undefined) {
   const indexPattern = await getIndexPattern();
   const filterParams: IFilterParams = {
     filters: [
@@ -53,13 +55,13 @@ export async function getMitreCount(agentId, time, tactic:string | undefined) {
     time
   }
   const args = {
-      tactics: {
-        terms: {
-            field: `rule.mitre.${tactic ? 'id' : 'tactics' }`,
-            size: 5,
-        }
+    tactics: {
+      terms: {
+        field: `rule.mitre.${tactic ? 'id' : 'tactics'}`,
+        size: 5,
       }
+    }
   }
-  const response = await getElasticAlerts(indexPattern, filterParams, args, {size:0});
+  const response = await getElasticAlerts(indexPattern, filterParams, args, { size: 0 });
   return ((((response || {}).data || {}).aggregations || {}).tactics || {}).buckets || [];
 }

@@ -12,12 +12,14 @@
  * Find more information about this on the LICENSE file.
  */
 import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../overview/mitre/lib'
+import { buildFilter } from '../../../../../../../../../src/plugins/data/common';
 import { esFilters } from '../../../../../../../../../src/plugins/data/public';
+
 import { AppState } from '../../../../../../react-services/app-state'
 
 
 function createFilters(agentId, indexPattern) {
-  const buildFilter = filter => esFilters.buildFilter(
+  const filter = filter => buildFilter(
     indexPattern, {name: filter.name, type: 'string'}, 
     esFilters.FILTERS.PHRASE, false, false, filter.value, 
     null, esFilters.FilterStateStore.APP_STATE);
@@ -27,7 +29,7 @@ function createFilters(agentId, indexPattern) {
     { name: 'agent.id', value: agentId },
     { name: 'rule.groups', value: 'syscheck' },
   ]
-  return filters.map(buildFilter);
+  return filters.map(filter);
 }
 
 export function getWazuhFilter() {

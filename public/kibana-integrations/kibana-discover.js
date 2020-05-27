@@ -133,6 +133,7 @@ function discoverController(
 
   //WAZUH
   wazuhApp.discoverScope = $scope;
+  wazuhApp.globalFilters = { tab: $location.search().tab };
   (async () => {
     const services = await buildServices(
       npStart.core,
@@ -257,7 +258,7 @@ function discoverController(
     //WAZUH
     $scope.updateQuery({
       query: $scope.state.query
-    });
+    }, false);
   };
   $scope.intervalOptions = search.aggs.intervalOptions;
   $scope.minimumVisibleRows = 50;
@@ -503,7 +504,13 @@ function discoverController(
                 }
                 return [];
               };
-
+              ///////////////////////////////  WAZUH   ///////////////////////////////////
+              if (wazuhApp.globalFilters && wazuhApp.globalFilters.tab === $location.search().tab) {
+                wazuhApp.globalFilters = {
+                  tab: $location.search().tab,
+                  filters: (filterManager.filters || []).filter(x => x.$state.store === "globalState")
+                };
+              }
               $scope.updateDataSource().then(function () {
                 ///////////////////////////////  WAZUH   ///////////////////////////////////
                 if (!filtersAreReady()) return;
@@ -1007,9 +1014,8 @@ function discoverController(
         if (x.isImplicit != false)
           x.isImplicit = true
       });
-      //const globalState = wazuhApp.$injector.get('globalState');
-      //const globalFilters = (filterManager.filters || []).filter(x => x.$state.store === "globalState");
-      const globalFilters = [];
+      wazuhApp.globalFilters.tab = tab;
+      const globalFilters = wazuhApp.globalFilters.filters || [];
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
       }
@@ -1035,7 +1041,7 @@ function discoverController(
       }
       $scope.updateQuery({
         query: $scope.state.query
-      });
+      }, false);
       $scope.$applyAsync();
     }
   );

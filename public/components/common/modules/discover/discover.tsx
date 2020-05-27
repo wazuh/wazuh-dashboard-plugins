@@ -43,9 +43,10 @@ import {
   TimeRange,
   Query,
   esFilters,
-  esQuery,
+  getEsQueryConfig,
+  buildEsQuery,
   IFieldType
-} from '../../../../../../../src/plugins/data/public';
+} from '../../../../../../../src/plugins/data/common';
 import '../../../../components/agents/fim/inventory/inventory.less';
 
 export class Discover extends Component {
@@ -224,11 +225,11 @@ export class Discover extends Component {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
     const { searchBarFilters, query } = this.state;
     const elasticQuery =
-      esQuery.buildEsQuery(
+      buildEsQuery(
         undefined,
         query,
         searchBarFilters,
-        esQuery.getEsQueryConfig(npSetup.core.uiSettings)
+        getEsQueryConfig(npSetup.core.uiSettings)
       );
     const pattern = AppState.getCurrentPattern();
     const { filters, sortField, sortDirection } = this.state;
