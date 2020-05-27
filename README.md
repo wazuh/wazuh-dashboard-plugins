@@ -153,6 +153,7 @@ service kibana restart
 |       3.12.3      |      7.7.0     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.7.0.zip> |
 |       3.12.3      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.2.zip> |
 |       3.12.3      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.1.zip> |
+|       3.12.3      |      7.3.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.3.1.zip> |
 |       3.12.3      |      6.8.8     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_6.8.8.zip> |
 |       3.12.2      |      7.6.2     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.2.zip> |
 |       3.12.2      |      7.6.1     | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.2_7.6.1.zip> |
