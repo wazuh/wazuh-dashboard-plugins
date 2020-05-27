@@ -501,7 +501,7 @@ class WzListEditor extends Component {
       <Fragment>
         <EuiFlexItem grow={false}>
           <EuiTitle>
-            <h2>
+            <span style={{ fontSize: '22px' }}>
               <EuiToolTip position="right" content={'Back to lists'}>
                 <EuiButtonIcon
                   aria-label="Back"
@@ -512,7 +512,7 @@ class WzListEditor extends Component {
                 />
               </EuiToolTip>
               {name}
-            </h2>
+            </span>
           </EuiTitle>
         </EuiFlexItem>
         <EuiFlexItem style={{ marginLeft: '-5px !important' }}>

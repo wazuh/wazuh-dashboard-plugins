@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
+// @ts-ignore
+import chrome from 'ui/chrome';
 import React, { Component, Fragment } from 'react';
 import {
   EuiAccordion,
@@ -29,6 +30,11 @@ import { Discover } from '../../../common/modules/discover'
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
+import { esFilters, IIndexPattern } from '../../../../../../../src/plugins/data/common';
+import { getIndexPattern } from '../../../overview/mitre/lib';
+import store from '../../../../redux/store';
+import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import rison from 'rison-node';
 
 export class FileDetails extends Component {
 
@@ -41,7 +47,7 @@ export class FileDetails extends Component {
     [key: string]: any
   }
   userSvg = <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="euiIcon euiIcon--large euiIcon euiIcon--primary euiIcon-isLoaded detail-icon" focusable="false" role="img" aria-hidden="true"><path fill-rule="evenodd" d="M5.482 4.344a2 2 0 10-2.963 0c-.08.042-.156.087-.23.136-.457.305-.75.704-.933 1.073A3.457 3.457 0 001 6.978V9a1 1 0 001 1h2.5a3.69 3.69 0 01.684-.962L5.171 9H2V7s0-2 2-2c1.007 0 1.507.507 1.755 1.01.225-.254.493-.47.793-.636a2.717 2.717 0 00-1.066-1.03zM4 4a1 1 0 100-2 1 1 0 000 2zm10 6h-2.5a3.684 3.684 0 00-.684-.962L10.829 9H14V7s0-2-2-2c-1.007 0-1.507.507-1.755 1.01a3.012 3.012 0 00-.793-.636 2.716 2.716 0 011.066-1.03 2 2 0 112.963 0c.08.042.156.087.23.136.457.305.75.704.933 1.073A3.453 3.453 0 0115 6.944V9a1 1 0 01-1 1zm-2-6a1 1 0 100-2 1 1 0 000 2z"></path><path fill-rule="evenodd" d="M10 8c0 .517-.196.989-.518 1.344a2.755 2.755 0 011.163 1.21A3.453 3.453 0 0111 11.977V14a1 1 0 01-1 1H6a1 1 0 01-1-1v-2.022a2.005 2.005 0 01.006-.135 3.456 3.456 0 01.35-1.29 2.755 2.755 0 011.162-1.21A2 2 0 1110 8zm-4 4v2h4v-2s0-2-2-2-2 2-2 2zm3-4a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
-
+  indexPattern!: IIndexPattern
   constructor(props) {
     super(props);
 
@@ -52,6 +58,9 @@ export class FileDetails extends Component {
     this.viewInEvents.bind(this)
   }
 
+  componentDidMount() {
+    getIndexPattern().then(idxPtn => this.indexPattern = idxPtn);
+  }
 
   details() {
     return [
@@ -162,19 +171,27 @@ export class FileDetails extends Component {
   }
 
   viewInEvents = () => {
+    const { file } = this.props.currentFile;
+    const { view, agent } = this.props;
     const filters = [{
-      "meta": {
-        "disabled": false,
-        "key": "syscheck.path",
-        "params": { "query": this.props.currentFile.file },
-        "type": "phrase",
-        "index": "wazuh-alerts-3.x-*"
-      },
-      "query": { "match_phrase": { "syscheck.path": this.props.currentFile.file } },
+      ...esFilters.buildPhraseFilter(
+        {name: 'syscheck.path', type: 'text'},
+        file, this.indexPattern),
       "$state": { "store": "appState" }
     }];
-    this.props.onSelectedTabChanged('events');
-    this.checkFilterManager(filters);
+    if (view === 'inventory') {
+      this.props.onSelectedTabChanged('events');
+      this.checkFilterManager(filters);
+    } else if (view === 'extern') {
+      store.dispatch(updateCurrentAgentData(agent));
+      chrome.dangerouslyGetActiveInjector().then(injector => {
+        const route = injector.get('$route');
+        const params = { _w: rison.encode({filters}), tab: 'fim' };
+        const paramsEncoded = Object.entries(params).map(e => e.join('=')).join('&');
+        window.location.href = `#/overview?${paramsEncoded}`;
+        route.reload();
+      });
+    }
   }
 
   async checkFilterManager(filters) {
@@ -235,7 +252,7 @@ export class FileDetails extends Component {
       if (item.field === 'size') {
         value = !isNaN(value) ? this.formatBytes(value) : 0;
       }
-      var link = (item.link && view !== 'events') || false;
+      var link = (item.link && !['events', 'extern'].includes(view)) || false;
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && this.props.agent.agentPlatform !== 'windows')) {
         let className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
         className += item.field === 'perm' ? " detail-value-perm" : "";
@@ -300,7 +317,10 @@ export class FileDetails extends Component {
   }
 
   render() {
-    const { fileName, type, showViewInEvents, implicitFilters } = this.props;
+    const { fileName, type, implicitFilters, view } = this.props;
+    const inspectButtonText = view === 'extern' 
+      ? 'Inspect in FIM'
+      : 'Inspect in Events';
     return (
       <Fragment>
         <EuiAccordion
@@ -324,16 +344,16 @@ export class FileDetails extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>
-                Recent events{this.props.view !== 'events' && (
+                Recent events{view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <EuiToolTip
                       position="top"
-                      content="Inspect in Events">
+                      content={inspectButtonText}>
                       <EuiIcon
                         className='euiButtonIcon euiButtonIcon--primary'
                         onClick={this.viewInEvents}
                         type="popout"
-                        aria-label="Inspect in Events"
+                        aria-label={inspectButtonText}
                       />
                     </EuiToolTip>
                   </span>

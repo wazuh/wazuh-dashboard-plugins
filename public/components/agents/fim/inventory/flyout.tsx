@@ -24,11 +24,18 @@ import { FileDetails } from './fileDetail';
 import { AppState } from '../../../../react-services/app-state';
 
 export class FlyoutDetail extends Component {
+  state: {
+    currentFile: boolean | {[key:string]: string}
+    clusterFilter: {}
+    isLoading: boolean
+    error: boolean
+    type: 'file' | 'registry'
+  }
+
   props!: {
     fileName: string
     agentId: string
-    type: string
-    view: 'inventory' | 'events'
+    view: 'inventory' | 'events' | 'extern'
     closeFlyout(): void
   }
 
@@ -38,7 +45,8 @@ export class FlyoutDetail extends Component {
       currentFile: false,
       clusterFilter: {},
       isLoading: true,
-      error: false
+      error: false,
+      type: 'file'
     }
   }
 
@@ -54,7 +62,7 @@ export class FlyoutDetail extends Component {
       if (!currentFile) {
         throw (false);
       }
-      this.setState({ currentFile, isLoading: false });
+      this.setState({ currentFile, type: currentFile.type, isLoading: false });
     } catch (err) {
       this.setState({ error: `Data could not be fetched for ${this.props.fileName}` })
     }
@@ -65,6 +73,7 @@ export class FlyoutDetail extends Component {
   }
 
   render() {
+    const { type } = this.state;
     return (
       <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.props.fileName} maxWidth="70%">
         <EuiFlyoutHeader hasBorder className="flyout-header" >
@@ -83,6 +92,7 @@ export class FlyoutDetail extends Component {
           <EuiFlyoutBody className="flyout-body" >
             <FileDetails
               currentFile={this.state.currentFile}
+              type={type}
               {...this.props}
               implicitFilters={[{ 'rule.groups': "syscheck" },
               { 'syscheck.path': this.state.currentFile.file },

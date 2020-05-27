@@ -51,11 +51,14 @@ import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import chrome from 'ui/chrome';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
+import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 
 export class AgentsWelcome extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
+
+    this.offset = 275;
 
     this.state = {
       extensions: this.props.extensions,
@@ -65,12 +68,35 @@ export class AgentsWelcome extends Component {
       sortDirection: 'desc',
       actionAgents: true, // Hide actions agents
       selectedRequirement: 'pci',
-      menuAgent: {}
+      menuAgent: {},
+      maxModules: 3,
     };
 
-    this.fav = true;
-
   }
+
+  updateWidth = () => {
+
+    let menuSize = (window.innerWidth - this.offset);
+    let maxModules = 3;
+    if(menuSize > 1250) {
+      maxModules = 3;
+    } else {
+      if(menuSize > 1100 ) {
+        maxModules = 2;
+      } else {
+        if(menuSize > 900) {
+          maxModules = 1;
+        } else {
+          maxModules = 0;
+          if(menuSize < 750) {
+            maxModules = null;
+          }
+        }
+      }
+    }
+
+    this.setState({maxModules: maxModules});
+  };
 
   setGlobalBreadcrumb() {
     const breadcrumb = [
@@ -92,6 +118,7 @@ export class AgentsWelcome extends Component {
   async componentDidMount() {
     this._isMount = true;
     this.updateMenuAgents();
+    this.updateWidth();
     this.setGlobalBreadcrumb();
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
@@ -108,120 +135,170 @@ export class AgentsWelcome extends Component {
     );
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
+    window.addEventListener('resize', this.updateWidth); //eslint-disable-line
   }
 
   updateMenuAgents() {
     this.setState({ menuAgent: window.localStorage.getItem('menuAgent') ? JSON.parse(window.localStorage.getItem('menuAgent')) : {} });
   }
 
-  renderTitle() {
+  renderModules() {
     const menuAgent = [...Object.keys(this.state.menuAgent).map((item) => { return this.state.menuAgent[item] })];
 
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-agent-title">
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <span style={{ display: 'inline-flex' }}>
-                <EuiTitle size="s">
-                  <h1>
-                    <span>{this.props.agent.name}</span>
-                  </h1>
-                </EuiTitle>
-              </span>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-              <EuiButtonEmpty
-                onClick={() => {
-                  window.location.href = `#/overview/?tab=general`;
-                  store.dispatch(updateCurrentAgentData(this.props.agent));
-                  this.router.reload();
-                }} style={{ cursor: 'pointer' }}>
-                <span>Security events&nbsp;</span>
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-              <EuiButtonEmpty
-                onClick={() => {
-                  window.location.href = `#/overview/?tab=fim`;
-                  store.dispatch(updateCurrentAgentData(this.props.agent));
-                  this.router.reload();
-                }} style={{ cursor: 'pointer' }}>
-                <span>Integrity monitoring&nbsp;</span>
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-              <EuiButtonEmpty
-                onClick={() => {
-                  window.location.href = `#/overview/?tab=sca`;
-                  store.dispatch(updateCurrentAgentData(this.props.agent));
-                  this.router.reload();
-                }} style={{ cursor: 'pointer' }}>
-                <span>SCA&nbsp;</span>
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            {
-              menuAgent.map((menuAgent, i) => (
-                <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-                  <EuiButtonEmpty
-                    onClick={() => {
-                      window.location.href = `#/overview/?tab=${menuAgent.id}`;
-                      store.dispatch(updateCurrentAgentData(this.props.agent));
-                      this.router.reload();
-                    }} style={{ cursor: 'pointer' }}>
-                    <span>{menuAgent.text}&nbsp;</span>
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-              ))}
-            <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-              <EuiPopover
-                button={
-                  <EuiButtonEmpty
-                    iconSide="right"
-                    iconType="arrowDown"
-                    onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
-                    More...
-                  </EuiButtonEmpty>
-                }
-                isOpen={this.state.switchModule}
-                closePopover={() => this.setState({ switchModule: false })}
-                repositionOnScroll={false}
-                anchorPosition="downCenter">
-                <div>
-                  <WzReduxProvider>
-                    <div style={{ maxWidth: 700 }}>
-                      <MenuAgent
-                        isAgent={this.props.agent}
-                        updateMenuAgents={() => this.updateMenuAgents()}
-                        closePopover={() => {
-                          this.setState({ switchModule: false })
-                        }
-                        }
-                        switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
-                    </div>
-                  </WzReduxProvider>
-                </div>
-              </EuiPopover>
-            </EuiFlexItem>
-            <EuiFlexItem></EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-              <EuiButtonEmpty
-                iconType="inspect"
-                onClick={() => this.props.switchTab('syscollector')}>
-                Inventory data
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-              <EuiButtonEmpty
-                iconType="gear"
-                onClick={() => this.props.switchTab('configuration')}>
-                Configuration
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+      <Fragment>
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+          <EuiButtonEmpty
+            onClick={() => {
+              window.location.href = `#/overview/?tab=general`;
+              store.dispatch(updateCurrentAgentData(this.props.agent));
+              this.router.reload();
+            }} style={{ cursor: 'pointer' }}>
+            <span>Security events&nbsp;</span>
+          </EuiButtonEmpty>
         </EuiFlexItem>
-      </EuiFlexGroup>
-    );
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+          <EuiButtonEmpty
+            onClick={() => {
+              window.location.href = `#/overview/?tab=fim`;
+              store.dispatch(updateCurrentAgentData(this.props.agent));
+              this.router.reload();
+            }} style={{ cursor: 'pointer' }}>
+            <span>Integrity monitoring&nbsp;</span>
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+          <EuiButtonEmpty
+            onClick={() => {
+              window.location.href = `#/overview/?tab=sca`;
+              store.dispatch(updateCurrentAgentData(this.props.agent));
+              this.router.reload();
+            }} style={{ cursor: 'pointer' }}>
+            <span>SCA&nbsp;</span>
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        {
+          menuAgent.map((menuAgent, i) => {
+            if(i < this.state.maxModules) {
+            return (
+            <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+              <EuiButtonEmpty
+                onClick={() => {
+                  window.location.href = `#/overview/?tab=${menuAgent.id}`;
+                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                  this.router.reload();
+                }} style={{ cursor: 'pointer' }}>
+                <span>{menuAgent.text}&nbsp;</span>
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            )}
+          }
+          )}
+        <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+          <EuiPopover
+            button={
+              <EuiButtonEmpty
+                iconSide="right"
+                iconType="arrowDown"
+                onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
+                More...
+              </EuiButtonEmpty>
+            }
+            isOpen={this.state.switchModule}
+            closePopover={() => this.setState({ switchModule: false })}
+            repositionOnScroll={false}
+            anchorPosition="downCenter">
+            <div>
+              <WzReduxProvider>
+                <div style={{ maxWidth: 700 }}>
+                  <MenuAgent
+                    isAgent={this.props.agent}
+                    updateMenuAgents={() => this.updateMenuAgents()}
+                    closePopover={() => {
+                      this.setState({ switchModule: false })
+                    }
+                    }
+                    switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
+                </div>
+              </WzReduxProvider>
+            </div>
+          </EuiPopover>
+        </EuiFlexItem>
+      </Fragment>
+    )
+  }
+
+  renderTitle() {
+
+      return (
+        <EuiFlexGroup>
+          <EuiFlexItem className="wz-module-header-agent-title">
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <span style={{ display: 'inline-flex' }}>
+                  <EuiTitle size="s">
+                    <h1>
+                      <WzTextWithTooltipIfTruncated position='top' elementStyle={{ maxWidth: "150px"}}>
+                        {this.props.agent.name}
+                      </WzTextWithTooltipIfTruncated>
+                    </h1>
+                  </EuiTitle>
+                </span>
+              </EuiFlexItem>
+              {
+                (this.state.maxModules !== null && 
+                this.renderModules()) ||
+                <EuiFlexItem style={{ marginTop: 7 }}>
+                  <EuiPopover
+                    button={
+                      <EuiButtonEmpty
+                        iconSide="right"
+                        iconType="arrowDown"
+                        onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
+                        Modules
+                      </EuiButtonEmpty>
+                    }
+                    isOpen={this.state.switchModule}
+                    closePopover={() => this.setState({ switchModule: false })}
+                    repositionOnScroll={false}
+                    anchorPosition="downCenter">
+                    <div>
+                      <WzReduxProvider>
+                        <div style={{ maxWidth: 700 }}>
+                          <MenuAgent
+                            isAgent={this.props.agent}
+                            updateMenuAgents={() => this.updateMenuAgents()}
+                            closePopover={() => {
+                              this.setState({ switchModule: false })
+                            }
+                            }
+                            switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
+                        </div>
+                      </WzReduxProvider>
+                    </div>
+                  </EuiPopover>
+                </EuiFlexItem>
+              }
+              <EuiFlexItem></EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  iconType="inspect"
+                  onClick={() => this.props.switchTab('syscollector')}>
+                  Inventory data
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  iconType="gear"
+                  onClick={() => this.props.switchTab('configuration')}>
+                  Configuration
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      );
+
   }
 
   buildTabCard(tab, icon) {
@@ -379,8 +456,8 @@ export class AgentsWelcome extends Component {
           <EuiPage>
             <EuiFlexGrid columns={2}>
               <EuiFlexItem />
-              <EuiFlexItem style={{ alignItems: 'flex-end' }}> {/* DatePicker */}
-                <WzDatePicker onTimeChange={() => { }} />
+              <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 6, marginBottom: 0 }}> {/* DatePicker */}
+                <WzDatePicker condensed={true} onTimeChange={() => { }} />
               </EuiFlexItem>
               <EuiFlexItem> {/* Pie visualizations */}
                 <EuiFlexGroup>
@@ -430,18 +507,17 @@ export class AgentsWelcome extends Component {
               </EuiFlexItem>
               <FimEventsTable agent={this.props.agent} router={this.router} />
               <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
-                <EuiPanel paddingSize="none">
+                <EuiPanel paddingSize="s" >
                   <EuiFlexItem>
-                    <EuiFlexGroup
-                      style={{ padding: '12px 12px 0px' }}
-                      className="embPanel__header"
-                    >
-                      <h2 className="embPanel__title wz-headline-title">
-                        <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
-                      </h2>
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <h2 className="embPanel__title wz-headline-title">
+                          <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
+                        </h2>
+                      </EuiFlexItem>
                     </EuiFlexGroup>
                     <EuiSpacer size="s" />
-                    <div style={{ height: this.props.resultState !== 'loading' ? '280px' : 0 }}>
+                    <div style={{ height: this.props.resultState !== 'loading' ? '225px' : 0 }}>
                       <WzReduxProvider>
                         <KibanaVis
                           visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}

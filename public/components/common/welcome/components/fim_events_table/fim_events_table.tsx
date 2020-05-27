@@ -50,7 +50,7 @@ export function FimEventsTable({ agent, router }) {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size="s" />
-          <FimTable agentId={(agent || {}).id} />
+          <FimTable agent={agent} />
         </EuiFlexItem>
       </EuiPanel>
     </EuiFlexItem>
@@ -68,13 +68,13 @@ export function useTimeFilter() {
   return timeFilter;
 }
 
-function FimTable({ agentId }) {
+function FimTable({ agent }) {
   const [fimAlerts, setFimAlerts] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState('');
   const [sort, setSort] = useState({ field: '_source.timestamp', direction: 'desc' });
   const timeFilter = useTimeFilter();
-  useEffect(() => { getFimAlerts(agentId, timeFilter, sort).then(setFimAlerts) }, [timeFilter, sort]);
+  useEffect(() => { getFimAlerts(agent.id, timeFilter, sort).then(setFimAlerts) }, [timeFilter, sort]);
   return (
     <Fragment>
       <EuiBasicTable
@@ -86,11 +86,11 @@ function FimTable({ agentId }) {
         itemId="fim-alerts"
         noItemsMessage="No recent events" />
       {isOpen && <FlyoutDetail
-        agentId={agentId}
+        agentId={agent.id}
         closeFlyout={() => setIsOpen(false)}
         fileName={file}
-        type='file'
-        view='events' />}
+        view='extern'
+        {...{agent}} />}
     </Fragment>
   );
 }

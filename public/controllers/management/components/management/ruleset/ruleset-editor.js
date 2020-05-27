@@ -218,7 +218,7 @@ class WzRulesetEditor extends Component {
                     </EuiFlexGroup>
                   )) || (
                     <EuiTitle>
-                      <h2>
+                      <span style={{ fontSize: '22px' }}>
                         <EuiToolTip
                           position="right"
                           content={`Back to ${section}`}
@@ -232,7 +232,7 @@ class WzRulesetEditor extends Component {
                           />
                         </EuiToolTip>
                         {nameForSaving}
-                      </h2>
+                      </span>
                     </EuiTitle>
                   )}
                 </EuiFlexItem>
