@@ -84,7 +84,7 @@ const mainSettings = [
   { field: 'database', label: 'Database type' }
 ];
 
-const mainSettingsFroAgentOrManager = agent =>
+const mainSettingsOfAgentOrManager = agent =>
   agent.id === '000'
     ? mainSettings
     : mainSettings.filter(setting => setting.when !== 'manager');
@@ -106,7 +106,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
         >
           <WzSettingsGroup
             config={currentConfig['syscheck-syscheck'].syscheck}
-            items={mainSettingsFroAgentOrManager(agent)}
+            items={mainSettingsOfAgentOrManager(agent)}
           />
         </WzConfigurationSettingsTabSelector>
       </Fragment>
