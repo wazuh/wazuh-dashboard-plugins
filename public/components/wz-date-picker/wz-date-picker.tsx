@@ -14,13 +14,10 @@ import React, { Fragment, Component } from 'react';
 import {
   EuiSuperDatePicker,
   OnTimeChangeProps,
-  EuiPopover,
-  EuiButtonEmpty,
-  EuiFlexGroup,
-  EuiFlexItem
 } from '@elastic/eui';
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { CondensedPicker } from './components';
 
 interface IDiscoverTime { from: string, to: string };
 
@@ -46,12 +43,11 @@ export class WzDatePicker extends Component {
 
   state: {
     datePicker: OnTimeChangeProps,
-    showTimeRanges: boolean,
-    selectedTimeRange: any
   };
 
   props!: {
     onTimeChange(props: OnTimeChangeProps): void
+    condensed: boolean
   };
 
   constructor(props) {
@@ -64,14 +60,11 @@ export class WzDatePicker extends Component {
         end: to,
         isQuickSelection: true,
         isInvalid: false,
-        showTimeRanges: false,
-        selectedTimeRange: {}
       },
     }
   }
 
   componentDidMount() {
-    this.setState({ selectedTimeRange: this.commonDurationRanges[6] });
   }
 
   onTimeChange = (datePicker: OnTimeChangeProps) => {
@@ -81,62 +74,19 @@ export class WzDatePicker extends Component {
     this.props.onTimeChange(datePicker);
   }
 
-  setSelectedTimeRange(timerange) {
-    const obj = {
-      end: timerange.end,
-      isInvalid: false,
-      isQuickSelection: true,
-      start: timerange.start
-    }
-    this.onTimeChange(obj);
-    this.setState({ selectedTimeRange: timerange, showTimeRanges: false })
-  }
-
   render() {
     const { datePicker } = this.state;
     const recentlyUsedRanges = this.timefilter._history.history.items.map(
       item => ({ start: item.from, end: item.to })
     );
-    return (
-      <Fragment>
-        {!this.props.condensed &&
-          <EuiSuperDatePicker
-            commonlyUsedRanges={this.commonDurationRanges}
-            recentlyUsedRanges={recentlyUsedRanges}
-            onTimeChange={this.onTimeChange}
-            {...datePicker} />
-          ||
-          <EuiPopover
-            button={
-              this.state.selectedTimeRange &&
-              <EuiButtonEmpty
-                size="xs"
-                onClick={() => this.setState({ showTimeRanges: true })}
-                iconType="arrowDown"
-                iconSide="right">
-                {this.state.selectedTimeRange.label}
-              </EuiButtonEmpty>
-            }
-            isOpen={this.state.showTimeRanges}
-            closePopover={() => this.setState({ showTimeRanges: false })}>
-            <div style={{ width: '200px' }}>
-              {this.commonDurationRanges.map(x => {
-                return (
-                  <EuiFlexGroup gutterSize="s" alignItems="center">
-                    <EuiFlexItem grow={false}>
-                      <EuiButtonEmpty
-                        size="s"
-                        onClick={() => this.setSelectedTimeRange(x)}>
-                        <span>{x.label}</span>
-                      </EuiButtonEmpty>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )
-              })}
-            </div>
-          </EuiPopover>
-        }
-      </Fragment>
-    )
+    return !this.props.condensed
+      ? <EuiSuperDatePicker
+        commonlyUsedRanges={this.commonDurationRanges}
+        recentlyUsedRanges={recentlyUsedRanges}
+        onTimeChange={this.onTimeChange}
+        {...datePicker} />
+      : <CondensedPicker
+        onTimeChange={this.onTimeChange}
+        ranges={this.commonDurationRanges} />
   }
 }
