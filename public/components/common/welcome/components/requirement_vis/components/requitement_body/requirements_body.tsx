@@ -29,13 +29,13 @@ import {
 } from './components';
 
 export function RequirementsBody(props) {
-  const { requirement } = props;
+  const { requirement, agent } = props;
   const colors = euiPaletteColorBlind();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([])
   const timeFilter = useTimeFilter();
   useEffect(() => {
-    const { id } = props.agent;
+    const { id } = agent;
     setLoading(true);
     getRequirementAlerts(id, timeFilter, requirement).then(e => {
       setData(e.alerts_count);
@@ -58,7 +58,7 @@ export function RequirementsBody(props) {
           <RequirementsDonnut data={data} colors={colors} {...props} />
         </EuiFlexItem>
         <EuiFlexItem>
-          <Requirements_leggend data={data} colors={colors} requirement={requirement} />
+          <Requirements_leggend data={data} colors={colors} requirement={requirement} agent={agent} />
         </EuiFlexItem>
       </EuiFlexGroup>
     </Fragment>

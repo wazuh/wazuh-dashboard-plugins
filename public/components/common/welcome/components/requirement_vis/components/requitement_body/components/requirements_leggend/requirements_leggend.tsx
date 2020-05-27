@@ -18,16 +18,17 @@ import React from "react";
 import { EuiIcon } from "@elastic/eui";
 import { EuiListGroup } from "@elastic/eui";
 import './requirements_leggend.less';
-import { ModulesHelper } from '../../../../../../../../common/modules/modules-helper'
 import rison from 'rison-node';
 import { esFilters } from '../../../../../../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../../../../../overview/mitre/lib';
+import store from '../../../../../../../../../redux/store';
+import { updateCurrentAgentData } from '../../../../../../../../../redux/actions/appStateActions';
 
-export function Requirements_leggend({ data, colors, requirement }) {
+export function Requirements_leggend({ data, colors, requirement, agent }) {
   const list = data.map((item, idx) => ({
     label: `${item.key} (${item.doc_count})`,
     icon: <EuiIcon type="dot" size='l' color={colors[idx]} />,
-    onClick: () => (requirement === 'gpg13' ? undefined : goToDashboardWithFilter(requirement, item)),
+    onClick: () => (requirement === 'gpg13' ? undefined : goToDashboardWithFilter(requirement, item, agent)),
     size: 'xs',
     color: 'text',
   }));
@@ -41,31 +42,24 @@ export function Requirements_leggend({ data, colors, requirement }) {
   );
 }
 
-const goToDashboardWithFilter = (requirement, item) => {
-  ModulesHelper.getDiscoverScope().then(() => {
-    chrome.dangerouslyGetActiveInjector().then(injector => {
-      const route = injector.get('$route');
-      const { params: old_params } = route.current;
-      getIndexPattern().then(indexPattern => {
-        const _w = {
-          filters: [
-            {
-              ...esFilters.buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, item.key, indexPattern),
-              "$state": { "isImplicit": false, "store": "appState" },
-            }
-          ]
-        };
-        const params = {
-          ...old_params,
-          tab: tabEquivalence[requirement],
-          tabView: 'panels',
-          _w: rison.encode(_w)
-        };
-        const url = Object.entries(params).map(e => e.join('=')).join('&');
-        window.location.href = `#/agents?${url}`;
-        route.reload();
-      });
-    })
+const goToDashboardWithFilter = (requirement, item, agent) => {
+  store.dispatch(updateCurrentAgentData(agent));
+  chrome.dangerouslyGetActiveInjector().then(injector => {
+    const route = injector.get('$route');
+    getIndexPattern().then(indexPattern => {
+      const filters = [{
+        ...esFilters.buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, item.key, indexPattern),
+        "$state": { "isImplicit": false, "store": "appState" },
+      }]
+      const _w = { filters };
+      const params = {
+        tab: tabEquivalence[requirement],
+        _w: rison.encode(_w)
+      };
+      const url = Object.entries(params).map(e => e.join('=')).join('&');
+      window.location.href = `#/overview?${url}`;
+      route.reload();
+    });
   })
 }
 
