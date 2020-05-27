@@ -18,15 +18,17 @@ import {
   EuiIcon,
   EuiButtonEmpty,
   EuiCallOut,
+  EuiToolTip,
   EuiLoadingSpinner,
   EuiFormRow,
-  EuiBadge
+  EuiBadge,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
+import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import Management from './wz-menu-management';
 import Overview from './wz-menu-overview';
@@ -36,6 +38,8 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import chrome from 'ui/chrome';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
+import { AppNavigate } from '../../react-services/app-navigate';
+import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -376,7 +380,39 @@ class WzMenu extends Component {
     });
   };
 
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
+   
+  addHealthRender(agent) {
+    // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
+    return (
+      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: "14px", fontSize: '12px'}}>
+        <EuiToolTip position="top" content={agent.status}>
+          <span className="euiFlexItem euiFlexItem--flexGrowZero">
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(agent.status)}`} focusable="false" role="img" aria-hidden="true">
+              <circle cx="8" cy="8" r="4"></circle>
+            </svg>
+          </span>
+        </EuiToolTip>
+        <span className="euiFlexItem euiFlexItem--flexGrowZero">
+          <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "400px", fontSize: 12 }}>
+            {agent.name}
+          </WzTextWithTooltipIfTruncated>
+      </span>
+      </span>
+    )
+  }
+
+  removeSelectedAgent(){
+    store.dispatch(updateCurrentAgentData({}));
+    this.router.reload();
+  }
+
   render() {
+    const currentAgent = store.getState().appStateReducers.currentAgentData;
     const menu = (
       <div className="wz-menu-wrapper">
         <div className="wz-menu-left-side">
@@ -396,11 +432,6 @@ class WzMenu extends Component {
               <span className="wz-menu-button-title ">Overview</span>
               <span className="flex"></span>
               <span className="flex"></span>
-              {(store.getState().appStateReducers.currentAgentData.id && (
-                <EuiBadge color="secondary">
-                  {store.getState().appStateReducers.currentAgentData.id}
-                </EuiBadge>
-              ))}
               {this.state.isOverviewPopoverOpen && (
                 <EuiIcon color="subdued" type="arrowRight" />
               )}
@@ -506,11 +537,53 @@ class WzMenu extends Component {
               this.buildPatternSelector()}
           </div>
         </div>
+        
         <div className="wz-menu-right-side">
           {this.state.isManagementPopoverOpen && (
             <Management
               closePopover={() => this.setState({ menuOpened: false })}
             ></Management>
+          )}
+          
+          {this.state.isOverviewPopoverOpen && currentAgent.id && (
+            <EuiFlexGroup style={{backgroundColor: "rgb(245, 247, 250)", borderBottom: "1px solid #80808033", marginLeft: 0, marginRight: 0}}>
+               <EuiFlexItem grow={false} style={{margin: "24px 0 0 24px"}}>
+                <EuiBadge color="secondary">
+                  {currentAgent.id}
+                </EuiBadge>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                {this.addHealthRender(currentAgent)}
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{margin: "14px 0 0 0"}}>
+                <EuiToolTip position="top" content={"Open Agent summary"}>
+                  <EuiButtonEmpty
+                    color="primary"
+                    onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": currentAgent.id  } ); this.setState({ menuOpened: false })}}>
+                    <EuiIcon type="visualizeApp" color="primary" size="m" />
+                  </EuiButtonEmpty> 
+                </EuiToolTip>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{margin: "14px 0 0 0"}}>
+                <EuiToolTip position="top" content={"Change selected agent"}>
+                  <EuiButtonEmpty
+                    color="primary"
+                    onClick={() => alert("jeje")}>
+                    <EuiIcon type="pencil" color="primary" size="m" />
+                  </EuiButtonEmpty>  
+                </EuiToolTip>         
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{margin: "14px 24px 0 0"}}>
+                <EuiToolTip position="top" content={"Unselect agent"}>
+                  <EuiButtonEmpty
+                    color="text"
+                    onClick={() => this.removeSelectedAgent()}>
+                    <EuiIcon type="cross" color="danger" size="m" />
+                  </EuiButtonEmpty> 
+                </EuiToolTip>                  
+              </EuiFlexItem>
+              
+            </EuiFlexGroup>
           )}
 
           {this.state.isOverviewPopoverOpen && (
