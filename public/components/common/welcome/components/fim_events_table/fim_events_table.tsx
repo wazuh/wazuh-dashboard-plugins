@@ -89,8 +89,7 @@ function FimTable({ agentId }) {
         agentId={agentId}
         closeFlyout={() => setIsOpen(false)}
         fileName={file}
-        type='file'
-        view='events' />}
+        view='extern' />}
     </Fragment>
   );
 }
