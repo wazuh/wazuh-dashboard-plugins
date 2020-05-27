@@ -69,34 +69,33 @@ export class AgentsWelcome extends Component {
       actionAgents: true, // Hide actions agents
       selectedRequirement: 'pci',
       menuAgent: {},
-      menuSize: (window.innerWidth - this.offset),
-      maxSections: 3,
+      maxModules: 3,
     };
 
   }
 
   updateWidth = () => {
-    this.setState({menuSize: (window.innerWidth - this.offset)});
 
-    let maxSections = 3;
-    if(this.state.menuSize > 1250) {
-      maxSections = 3;
+    let menuSize = (window.innerWidth - this.offset);
+    let maxModules = 3;
+    if(menuSize > 1250) {
+      maxModules = 3;
     } else {
-      if(this.state.menuSize > 1100 ) {
-        maxSections = 2;
+      if(menuSize > 1100 ) {
+        maxModules = 2;
       } else {
-        if(this.state.menuSize > 900) {
-          maxSections = 1;
+        if(menuSize > 900) {
+          maxModules = 1;
         } else {
-          maxSections = 0;
-          if(this.state.menuSize < 700) {
-            maxSections = false;
+          maxModules = 0;
+          if(menuSize < 750) {
+            maxModules = null;
           }
         }
       }
     }
 
-    this.setState({maxSections: maxSections});
+    this.setState({maxModules: maxModules});
   };
 
   setGlobalBreadcrumb() {
@@ -119,6 +118,7 @@ export class AgentsWelcome extends Component {
   async componentDidMount() {
     this._isMount = true;
     this.updateMenuAgents();
+    this.updateWidth();
     this.setGlobalBreadcrumb();
     const tabVisualizations = new TabVisualizations();
     tabVisualizations.removeAll();
@@ -142,11 +142,94 @@ export class AgentsWelcome extends Component {
     this.setState({ menuAgent: window.localStorage.getItem('menuAgent') ? JSON.parse(window.localStorage.getItem('menuAgent')) : {} });
   }
 
-  renderTitle() {
+  renderModules() {
     const menuAgent = [...Object.keys(this.state.menuAgent).map((item) => { return this.state.menuAgent[item] })];
 
+    return (
+      <Fragment>
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+          <EuiButtonEmpty
+            onClick={() => {
+              window.location.href = `#/overview/?tab=general`;
+              store.dispatch(updateCurrentAgentData(this.props.agent));
+              this.router.reload();
+            }} style={{ cursor: 'pointer' }}>
+            <span>Security events&nbsp;</span>
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+          <EuiButtonEmpty
+            onClick={() => {
+              window.location.href = `#/overview/?tab=fim`;
+              store.dispatch(updateCurrentAgentData(this.props.agent));
+              this.router.reload();
+            }} style={{ cursor: 'pointer' }}>
+            <span>Integrity monitoring&nbsp;</span>
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+          <EuiButtonEmpty
+            onClick={() => {
+              window.location.href = `#/overview/?tab=sca`;
+              store.dispatch(updateCurrentAgentData(this.props.agent));
+              this.router.reload();
+            }} style={{ cursor: 'pointer' }}>
+            <span>SCA&nbsp;</span>
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+        {
+          menuAgent.map((menuAgent, i) => {
+            if(i < this.state.maxModules) {
+            return (
+            <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+              <EuiButtonEmpty
+                onClick={() => {
+                  window.location.href = `#/overview/?tab=${menuAgent.id}`;
+                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                  this.router.reload();
+                }} style={{ cursor: 'pointer' }}>
+                <span>{menuAgent.text}&nbsp;</span>
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            )}
+          }
+          )}
+        <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+          <EuiPopover
+            button={
+              <EuiButtonEmpty
+                iconSide="right"
+                iconType="arrowDown"
+                onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
+                More...
+              </EuiButtonEmpty>
+            }
+            isOpen={this.state.switchModule}
+            closePopover={() => this.setState({ switchModule: false })}
+            repositionOnScroll={false}
+            anchorPosition="downCenter">
+            <div>
+              <WzReduxProvider>
+                <div style={{ maxWidth: 700 }}>
+                  <MenuAgent
+                    isAgent={this.props.agent}
+                    updateMenuAgents={() => this.updateMenuAgents()}
+                    closePopover={() => {
+                      this.setState({ switchModule: false })
+                    }
+                    }
+                    switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
+                </div>
+              </WzReduxProvider>
+            </div>
+          </EuiPopover>
+        </EuiFlexItem>
+      </Fragment>
+    )
+  }
 
-    if( this.state.maxSections !== false) {
+  renderTitle() {
+
       return (
         <EuiFlexGroup>
           <EuiFlexItem className="wz-module-header-agent-title">
@@ -162,82 +245,40 @@ export class AgentsWelcome extends Component {
                   </EuiTitle>
                 </span>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-                <EuiButtonEmpty
-                  onClick={() => {
-                    window.location.href = `#/overview/?tab=general`;
-                    store.dispatch(updateCurrentAgentData(this.props.agent));
-                    this.router.reload();
-                  }} style={{ cursor: 'pointer' }}>
-                  <span>Security events&nbsp;</span>
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-                <EuiButtonEmpty
-                  onClick={() => {
-                    window.location.href = `#/overview/?tab=fim`;
-                    store.dispatch(updateCurrentAgentData(this.props.agent));
-                    this.router.reload();
-                  }} style={{ cursor: 'pointer' }}>
-                  <span>Integrity monitoring&nbsp;</span>
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-                <EuiButtonEmpty
-                  onClick={() => {
-                    window.location.href = `#/overview/?tab=sca`;
-                    store.dispatch(updateCurrentAgentData(this.props.agent));
-                    this.router.reload();
-                  }} style={{ cursor: 'pointer' }}>
-                  <span>SCA&nbsp;</span>
-                </EuiButtonEmpty>
-              </EuiFlexItem>
               {
-                menuAgent.map((menuAgent, i) => {
-                  if(i < this.state.maxSections) {
-                  return (<EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-                    <EuiButtonEmpty
-                      onClick={() => {
-                        window.location.href = `#/overview/?tab=${menuAgent.id}`;
-                        store.dispatch(updateCurrentAgentData(this.props.agent));
-                        this.router.reload();
-                      }} style={{ cursor: 'pointer' }}>
-                      <span>{menuAgent.text}&nbsp;</span>
-                    </EuiButtonEmpty>
-                  </EuiFlexItem>)
-                  }
-                }
-                )}
-              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiPopover
-                  button={
-                    <EuiButtonEmpty
-                      iconSide="right"
-                      iconType="arrowDown"
-                      onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
-                      More...
-                    </EuiButtonEmpty>
-                  }
-                  isOpen={this.state.switchModule}
-                  closePopover={() => this.setState({ switchModule: false })}
-                  repositionOnScroll={false}
-                  anchorPosition="downCenter">
-                  <div>
-                    <WzReduxProvider>
-                      <div style={{ maxWidth: 700 }}>
-                        <MenuAgent
-                          isAgent={this.props.agent}
-                          updateMenuAgents={() => this.updateMenuAgents()}
-                          closePopover={() => {
-                            this.setState({ switchModule: false })
-                          }
-                          }
-                          switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
-                      </div>
-                    </WzReduxProvider>
-                  </div>
-                </EuiPopover>
-              </EuiFlexItem>
+                (this.state.maxModules !== null && 
+                this.renderModules()) ||
+                <EuiFlexItem style={{ marginTop: 7 }}>
+                  <EuiPopover
+                    button={
+                      <EuiButtonEmpty
+                        iconSide="right"
+                        iconType="arrowDown"
+                        onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
+                        Modules
+                      </EuiButtonEmpty>
+                    }
+                    isOpen={this.state.switchModule}
+                    closePopover={() => this.setState({ switchModule: false })}
+                    repositionOnScroll={false}
+                    anchorPosition="downCenter">
+                    <div>
+                      <WzReduxProvider>
+                        <div style={{ maxWidth: 700 }}>
+                          <MenuAgent
+                            isAgent={this.props.agent}
+                            updateMenuAgents={() => this.updateMenuAgents()}
+                            closePopover={() => {
+                              this.setState({ switchModule: false })
+                            }
+                            }
+                            switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
+                        </div>
+                      </WzReduxProvider>
+                    </div>
+                  </EuiPopover>
+                </EuiFlexItem>
+              }
               <EuiFlexItem></EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
@@ -257,55 +298,7 @@ export class AgentsWelcome extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
       );
-    } else {
-      return (
-        <EuiFlexGroup>
-          <EuiFlexItem className="wz-module-header-agent-title">
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <span style={{ display: 'inline-flex' }}>
-                  <EuiTitle size="s">
-                    <h1>
-                      <span>{this.props.agent.name}</span>
-                    </h1>
-                  </EuiTitle>
-                </span>
-              </EuiFlexItem>
-              <EuiFlexItem style={{ marginTop: 7 }}>
-                <EuiPopover
-                  button={
-                    <EuiButtonEmpty
-                      iconSide="right"
-                      iconType="arrowDown"
-                      onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
-                      Modules
-                    </EuiButtonEmpty>
-                  }
-                  isOpen={this.state.switchModule}
-                  closePopover={() => this.setState({ switchModule: false })}
-                  repositionOnScroll={false}
-                  anchorPosition="downCenter">
-                  <div>
-                    <WzReduxProvider>
-                      <div style={{ maxWidth: 700 }}>
-                        <MenuAgent
-                          isAgent={this.props.agent}
-                          updateMenuAgents={() => this.updateMenuAgents()}
-                          closePopover={() => {
-                            this.setState({ switchModule: false })
-                          }
-                          }
-                          switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
-                      </div>
-                    </WzReduxProvider>
-                  </div>
-                </EuiPopover>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )
-    }
+
   }
 
   buildTabCard(tab, icon) {
