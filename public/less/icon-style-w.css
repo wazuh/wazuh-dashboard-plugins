@@ -1,14 +1,23 @@
-.euiNavDrawerGroup__item .euiListGroupItem__icon.euiImage {
+.euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
   filter: invert(100%);
   max-width: 18px;
   left: -1px;
   margin: 0;
 }
 
-.euiNavDrawerGroup__item .euiToolTipAnchor {
-  height: 32px;
+.euiNavDrawerGroup__item .euiListGroupItem__button .euiImage img{
+  height: 18px;
+  width: 18px;
 }
 
-.euiNavDrawerGroup__item .euiListGroupItem__button {
-  padding: 6px 8px;
+.euiNavDrawer:not(.euiNavDrawer-isExpanded) .euiNavDrawerGroup__item .euiListGroupItem__button .euiListGroupItem__label {
+  display: none;
+}
+
+.euiNavDrawer:not(.euiNavDrawer-isExpanded) .euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
+  margin-right: 0!important;
+}
+
+.euiNavDrawer .euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
+  margin-right: 10px;
 }
