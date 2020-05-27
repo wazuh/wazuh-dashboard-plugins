@@ -79,17 +79,17 @@ export class AgentsWelcome extends Component {
     this.setState({menuSize: (window.innerWidth - this.offset)});
 
     let maxSections = 3;
-    if(this.state.menuSize > 1200) {
+    if(this.state.menuSize > 1250) {
       maxSections = 3;
     } else {
-      if(this.state.menuSize > 1050 ) {
+      if(this.state.menuSize > 1100 ) {
         maxSections = 2;
       } else {
-        if(this.state.menuSize > 850) {
+        if(this.state.menuSize > 900) {
           maxSections = 1;
         } else {
           maxSections = 0;
-          if(this.state.menuSize < 750) {
+          if(this.state.menuSize < 700) {
             maxSections = false;
           }
         }
