@@ -18,8 +18,9 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
-import { updateCurrentTab } from '../../redux/actions/appStateActions';
+import { updateCurrentTab, updateCurrentAgentData} from '../../redux/actions/appStateActions';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
+import { WzRequest } from '../../react-services/wz-request';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
 
@@ -41,9 +42,11 @@ export class OverviewController {
     errorHandler,
     commonData,
     reportingService,
-    visFactoryService
+    visFactoryService,
+    $route
   ) {
     this.$scope = $scope;
+    this.$route = $route;
     this.$location = $location;
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
@@ -55,6 +58,7 @@ export class OverviewController {
     this.wazuhConfig = new WazuhConfig();
     this.visFactoryService = VisFactoryHandler;
     this.rawVisualizations = new RawVisualizations();
+    this.wzReq = (...args) => WzRequest.apiReq(...args);
   }
 
   /**
@@ -109,12 +113,6 @@ export class OverviewController {
       currentTab: this.tab
     };
 
-    //check if we need to load an agent filter
-    const agent = this.$location.search().agentId;
-    if(agent){
-      this.$location.search('agentId', null);
-      this.initialFilter = agent;
-    }
 
 
     this.agentsSelectionProps = {
@@ -147,6 +145,15 @@ export class OverviewController {
       return {...this.visualizeProps, resultState};
     }
 
+    //check if we need to load an agent filter
+    const agent = this.$location.search().agentId;
+    if(agent){
+      const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
+      const formattedData = data.data.data.items[0];
+      store.dispatch(updateCurrentAgentData(formattedData));
+      //this.$route.reload();
+      //this.$location.search('agentId', null);
+    }
     
   }
 

@@ -207,6 +207,23 @@ export class CommonData {
     }
   }
 
+  removeParam(key, sourceURL) {
+    var rtn = sourceURL.split("?")[0],
+        param,
+        params_arr = [],
+        queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+    if (queryString !== "") {
+        params_arr = queryString.split("&");
+        for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+            param = params_arr[i].split("=")[0];
+            if (param === key) {
+                params_arr.splice(i, 1);
+            }
+        }
+        rtn = rtn + "?" + params_arr.join("&");
+    }
+    return rtn;
+}
   /**
     Find the `_w` parameter in the url and return a list of filters if it exists
    */
@@ -214,6 +231,7 @@ export class CommonData {
     const { _w } = this.$route.current.params;
     if (!_w) return [];
     const { filters } = rison.decode(_w);
+    window.location.href = this.removeParam('_w', window.location.href)
     return filters || [];
   }
 
