@@ -45,7 +45,6 @@ export class AppNavigate {
     e.persist(); // needed to access this event asynchronously
     getIndexPattern().then(indexPattern => {
       const urlParams = {};
-      urlParams["tab"] = section;
 
       if(Object.keys(params).length){
         Object.keys(params).forEach(key => {
@@ -58,7 +57,7 @@ export class AppNavigate {
       }
       const url = Object.entries(urlParams).map(e => e.join('=')).join('&');
       const currentUrl = window.location.href.split("#/")[0];
-      const newUrl = currentUrl+ "#/overview?" + url;
+      const newUrl = currentUrl+ `#/${section}?` + url;
 
       if (e && (e.which == 2 || e.button == 1 )) { // middlebutton clicked
         var win = window.open(newUrl, '_blank');

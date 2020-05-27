@@ -147,10 +147,10 @@ export class OverviewController {
 
     //check if we need to load an agent filter
     const agent = this.$location.search().agentId;
-    if(agent){
-      const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
-      const formattedData = data.data.data.items[0];
-      store.dispatch(updateCurrentAgentData(formattedData));
+    if(agent && store.getState().appStateReducers.currentAgentData.id !== agent){
+        const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
+        const formattedData = data.data.data.items[0];
+        store.dispatch(updateCurrentAgentData(formattedData));
       //this.$route.reload();
       //this.$location.search('agentId', null);
     }
