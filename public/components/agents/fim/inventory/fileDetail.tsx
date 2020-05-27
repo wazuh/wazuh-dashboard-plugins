@@ -31,8 +31,10 @@ import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import { esFilters, IIndexPattern } from '../../../../../../../src/plugins/data/common';
-import { getIndexPattern } from '../../../overview/mitre/lib'
-import rison from 'rison-node'
+import { getIndexPattern } from '../../../overview/mitre/lib';
+import store from '../../../../redux/store';
+import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import rison from 'rison-node';
 
 export class FileDetails extends Component {
 
@@ -170,7 +172,7 @@ export class FileDetails extends Component {
 
   viewInEvents = () => {
     const { file } = this.props.currentFile;
-    const { view } = this.props;
+    const { view, agent } = this.props;
     const filters = [{
       ...esFilters.buildPhraseFilter(
         {name: 'syscheck.path', type: 'text'},
@@ -181,6 +183,7 @@ export class FileDetails extends Component {
       this.props.onSelectedTabChanged('events');
       this.checkFilterManager(filters);
     } else if (view === 'extern') {
+      store.dispatch(updateCurrentAgentData(agent));
       chrome.dangerouslyGetActiveInjector().then(injector => {
         const route = injector.get('$route');
         const params = { _w: rison.encode({filters}), tab: 'fim' };
