@@ -20,7 +20,7 @@ import {
 } from '@elastic/eui';
 import {
   prettyDuration
-} from '@elastic/eui/lib/components/date_picker/super_date_picker/pretty_duration'
+} from '../../../../../../node_modules/@elastic/eui/lib/components/date_picker/super_date_picker/pretty_duration'
 import { TimeService } from '../../../react-services/time-service'
 
 export function CondensedPicker({ ranges, onTimeChange }) {
