@@ -150,7 +150,7 @@ class WzGroupsEditor extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>
+                    <span style={{ fontSize: '22px' }}>
                       <EuiToolTip position="right" content={`Back to groups`}>
                         <EuiButtonIcon
                           aria-label="Back"
@@ -160,8 +160,8 @@ class WzGroupsEditor extends Component {
                           onClick={() => this.props.cleanFileContent()}
                         />
                       </EuiToolTip>
-                      <b>{name}</b> of <b>{groupName}</b> group
-                    </h2>
+                      {name} <span style={{ color: 'grey'}}>of</span> {groupName} <span style={{ color: 'grey'}}>group</span>
+                    </span>
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem />
