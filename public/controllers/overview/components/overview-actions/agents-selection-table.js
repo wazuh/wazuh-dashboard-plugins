@@ -30,6 +30,10 @@ import {
 
 import { WzRequest } from '../../../../react-services/wz-request';
 import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eui/lib/services';
+import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import  store  from '../../../../redux/store';
+import chrome from 'ui/chrome';
+
 
 export class AgentSelectionTable extends Component {
   constructor(props) {
@@ -126,8 +130,25 @@ export class AgentSelectionTable extends Component {
   };
 
   async componentDidMount() {
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
+    const tmpSelectedAgents = {};
+    if(!store.getState().appStateReducers.currentAgentData.id){
+      tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;
+    }
     this.setState({itemIdToSelectedMap: this.props.selectedAgents});
     await this.getItems();
+  }
+
+  getArrayFormatted(arrayText) {
+    try {
+      const stringText = arrayText.toString();
+      const splitString = stringText.split(',');
+      const resultString = splitString.join(', ');
+      return resultString;
+    } catch (err) {
+      return arrayText;
+    }
   }
 
   async getItems() {
@@ -144,7 +165,7 @@ export class AgentSelectionTable extends Component {
           version: item.version || '-',
           os: (item.os || {}).name || '-',
           status: item.status,
-          group: item.group || '-',
+          group: this.getArrayFormatted(item.group) || '-',
         };
       });
       this.items = formattedData;
@@ -214,7 +235,6 @@ export class AgentSelectionTable extends Component {
   toggleItem = itemId => {
     this.setState(previousState => {
       const newItemIdToSelectedMap = {
-        ...previousState.itemIdToSelectedMap,
         [itemId]: !previousState.itemIdToSelectedMap[itemId],
       };
 
@@ -476,19 +496,26 @@ export class AgentSelectionTable extends Component {
 
   unselectAgents(){
     this.setState({itemIdToSelectedMap: {}});
+    this.props.removeAgentsFilter(true);      
+    store.dispatch(updateCurrentAgentData({}));
   }
 
   getSelectedCount(){
     return this.getSelectedItems().length;
   }
 
-  newSearch(){
+  async newSearch(){
     if(this.areAnyRowsSelected()){
+      const data = await this.wzReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
+      const formattedData = data.data.data.items[0] //TODO: do it correctly
+      store.dispatch(updateCurrentAgentData(formattedData));
       this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch(this.getSelectedItems());
     }else{
       this.props.removeAgentsFilter(true);      
+      store.dispatch(updateCurrentAgentData({}));
     }
+   // this.router.reload();
   }
 
   showContextMenu(id){
@@ -512,12 +539,12 @@ export class AgentSelectionTable extends Component {
 
         <EuiFlexGroup gutterSize="m">
           <EuiFlexItem grow={false}>
-            <EuiButton onClick={() => this.unselectAgents()} color="danger" isDisabled={!this.areAnyRowsSelected()}>
-              Unselect all agents
+          <EuiButton onClick={() => {this.unselectAgents();}} color="danger" isDisabled={!store.getState().appStateReducers.currentAgentData.id}>
+              Remove selected agents
             </EuiButton>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton onClick={() => this.newSearch()} color="primary">
+            <EuiButton onClick={async() => await this.newSearch()} color="primary">
               Apply
             </EuiButton>
           </EuiFlexItem>

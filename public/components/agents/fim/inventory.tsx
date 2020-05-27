@@ -236,7 +236,7 @@ export class Inventory extends Component {
   }
 
   renderTable() {
-    const { filters, syscheck, selectedTabId, customBadges } = this.state;
+    const { filters, syscheck, selectedTabId, customBadges, totalItemsRegistry, totalItemsFile } = this.state;
     return (
       <div>
         <FilterBar
@@ -254,6 +254,7 @@ export class Inventory extends Component {
             customBadges={customBadges}
             items={syscheck}
             onFilterSelect={this.onFilterSelect}
+            totalItems={totalItemsFile}
             onChangeCustomBadges={this.onChangeCustomBadges} />
         }
         {selectedTabId === 'registry' &&
@@ -262,6 +263,7 @@ export class Inventory extends Component {
             customBadges={customBadges}
             filters={filters}
             onFilterSelect={this.onFilterSelect}
+            totalItems={totalItemsRegistry}
             onChangeCustomBadges={this.onChangeCustomBadges} />
         }
       </div>

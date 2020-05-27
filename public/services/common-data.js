@@ -13,6 +13,7 @@ import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
 import { ShareAgent } from '../factories/share-agent';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
+import rison from 'rison-node';
 
 export class CommonData {
   /**
@@ -23,7 +24,7 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window) {
+  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window, $route) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
@@ -33,8 +34,8 @@ export class CommonData {
     this.globalState = globalState;
     this.savedTimefilter = null;
     this.$window = $window;
+    this.$route = $route;
     this.refreshInterval = { pause: true, value: 0 };
-
     this.overviewTabs = {
       hostMonitoringTabs: ['general', 'fim', 'aws', 'gcp'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
@@ -194,6 +195,7 @@ export class CommonData {
       }
 
       if (agent) filters.push(filterHandler.agentQuery(agent));
+      filters.push(...this.addWazuhParamFilters());
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
@@ -203,6 +205,16 @@ export class CommonData {
         true
       );
     }
+  }
+
+  /**
+    Find the `_w` parameter in the url and return a list of filters if it exists
+   */
+  addWazuhParamFilters() {
+    const { _w } = this.$route.current.params;
+    if (!_w) return [];
+    const { filters } = rison.decode(_w);
+    return filters || [];
   }
 
   /**

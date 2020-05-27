@@ -15,7 +15,7 @@ export default {
   name: 'VirusTotal',
   description: 'Configuration options of the VirusTotal integration.',
   category: 'Threat detection and response',
-  documentation_link: 'https://documentation.wazuh.com/3.10/user-manual/reference/ossec-conf/integration.html',
+  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html',
   icon: 'securityApp',
   avaliable_for_manager: true,
   steps: [

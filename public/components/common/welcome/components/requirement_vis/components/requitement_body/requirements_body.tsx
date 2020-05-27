@@ -13,6 +13,8 @@
  */
 
 import React, { useEffect, useState, Fragment } from 'react'
+import { useTimeFilter } from '../../../';
+import { getRequirementAlerts } from './lib';
 import {
   euiPaletteColorBlind,
   EuiFlexGroup,
@@ -20,18 +22,20 @@ import {
   EuiSpacer,
   EuiLoadingChart,
 } from '@elastic/eui';
-import { useTimeFilter } from '../../../';
-import { getRequirementAlerts } from './lib';
-import { Requirements_leggend, RequirementsDonnut } from './components';
+import {
+  Requirements_leggend,
+  RequirementsDonnut,
+  NoAlertsMessage
+} from './components';
 
 export function RequirementsBody(props) {
-  const { requirement } = props;
+  const { requirement, agent } = props;
   const colors = euiPaletteColorBlind();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([])
   const timeFilter = useTimeFilter();
   useEffect(() => {
-    const { id } = props.agent;
+    const { id } = agent;
     setLoading(true);
     getRequirementAlerts(id, timeFilter, requirement).then(e => {
       setData(e.alerts_count);
@@ -39,11 +43,11 @@ export function RequirementsBody(props) {
     })
   }, [requirement, timeFilter]);
   if (loading) return (
-    <div style={{ textAlign: "center", paddingTop: 100 }}>
+    <div style={{ textAlign: "center", paddingTop: 100, height: 238}}>
       <EuiLoadingChart size="xl" />
     </div>
   )
-  if (!data.length) return (<div>No data!</div>);
+  if (!data.length) return (<NoAlertsMessage requirement={requirement} />);
   return (
     <Fragment>
       <EuiFlexItem>
@@ -54,7 +58,7 @@ export function RequirementsBody(props) {
           <RequirementsDonnut data={data} colors={colors} {...props} />
         </EuiFlexItem>
         <EuiFlexItem>
-          <Requirements_leggend data={data} colors={colors} />
+          <Requirements_leggend data={data} colors={colors} requirement={requirement} agent={agent} />
         </EuiFlexItem>
       </EuiFlexGroup>
     </Fragment>

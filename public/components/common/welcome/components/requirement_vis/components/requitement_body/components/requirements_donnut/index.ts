@@ -12,7 +12,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { FimEventsTable, useTimeFilter } from './fim_events_table';
-export { ScaScan } from './sca_scan';
-export { MitreTopTactics } from './mitre_top';
-export { RequirementVis } from './requirement_vis';
+export { RequirementsDonnut } from './requirements_donnut';

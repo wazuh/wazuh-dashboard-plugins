@@ -11,23 +11,6 @@
  */
 export default [
   {
-    _id: "Wazuh-App-Agents-Welcome-Top-Tactics-Mitre",
-    _type: "visualization",
-    _source: {
-      title: "Top Tactics by agent",
-      visState:
-        '{"title":"Top Tactics by agent","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":0,"format":{"id":"number"},"params":{},"label":"Count","aggType":"count"}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.mitre.tactics.keyword","orderBy":"1","order":"desc","size":10,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON:
-        '{}',
-      description: "",
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}',
-      },
-    },
-  },
-  {
     _id: "Wazuh-App-Agents-Welcome-Top-PCI",
     _type: "visualization",
     _source: {

@@ -16,7 +16,9 @@ const initialState = {
   wazuhNotReadyYet: '',
   currentTab: '',
   extensions: {},
-  adminMode: false
+  adminMode: false,
+  currentAgentData: {},
+  showExploreAgentModal: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -61,6 +63,23 @@ const appStateReducers = (state = initialState, action) => {
       adminMode: action.adminMode
     };
   }
+
+  if (action.type === 'UPDATE_SELECTED_AGENT_DATA') {
+    return {
+      ...state,
+      currentAgentData: action.currentAgentData
+    };
+  }
+
+
+  if (action.type === 'SHOW_EXPLORE_AGENT_MODAL') {
+    return {
+      ...state,
+      showExploreAgentModal: action.showExploreAgentModal
+    };
+  }
+
+
 
   return state;
 };

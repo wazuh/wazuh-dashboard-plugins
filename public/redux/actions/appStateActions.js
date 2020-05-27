@@ -79,3 +79,27 @@ export const updateAdminMode = adminMode => {
   };
 };
 
+
+/**
+ * Updates currentAgentData in the appState store
+ * @param extensions
+ */
+export const updateCurrentAgentData = (data) => {
+  return {
+    type: 'UPDATE_SELECTED_AGENT_DATA',
+    currentAgentData: data
+  };
+};
+
+
+
+/**
+ * Updates currentAgentData in the appState store
+ * @param extensions
+ */
+export const showExploreAgentModal = (shouldShow) => {
+  return {
+    type: 'SHOW_EXPLORE_AGENT_MODAL',
+    showExploreAgentModal: shouldShow
+  };
+};

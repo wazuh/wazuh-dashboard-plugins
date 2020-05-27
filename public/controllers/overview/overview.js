@@ -342,6 +342,7 @@ export class OverviewController {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
       store.dispatch(updateCurrentTab(this.tab));
+      store.dispatch(updateCurrentTab(this.tab));
 
       this.$scope.$on('sendVisDataRows', (ev, param) => {
         const rows = (param || {}).mitreRows.tables[0].rows;

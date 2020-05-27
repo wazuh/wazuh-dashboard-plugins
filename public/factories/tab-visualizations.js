@@ -58,7 +58,7 @@ export class TabVisualizations {
       gcp: 5,
       virustotal: 5,
       osquery: 6,
-      sca: 8,
+      sca: 0,
       docker: 5,
       mitre: 6,
       tsc: 6

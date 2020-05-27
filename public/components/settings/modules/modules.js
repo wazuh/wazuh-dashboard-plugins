@@ -34,7 +34,7 @@ export default class EnableModules extends Component {
           title: 'Auditing and Policy Monitoring',
           modules: [
             { name: 'pm', default: true, agent: false },
-            { name: 'sca', default: true, agent: true },
+            { name: 'sca', default: true, agent: false },
             { name: 'audit', default: false, agent: false },
             { name: 'oscap', default: false, agent: false },
             { name: 'ciscat', default: false, agent: false }
