@@ -221,7 +221,7 @@ class WzMenuOverview extends Component {
       <div className="WzManagementSideMenu">
         {Object.keys(this.state.extensions).length && (
           <div>
-            {(
+            {!agentData.id && (
               <EuiFlexGroup>
                 <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
                   <EuiButtonEmpty iconType="arrowRight"
@@ -231,48 +231,6 @@ class WzMenuOverview extends Component {
                     }}>
                     Go to Modules welcome
                   </EuiButtonEmpty>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            )}
-            
-            {!!Object.keys(agentData).length && (
-              <EuiFlexGroup>
-                <EuiFlexItem  style={{ marginLeft: 16 }}>
-                  
-                <EuiPanel paddingSize='s'>
-                  
-                  <EuiFlexGroup className="wz-welcome-page-agent-info-details">
-
-                  <EuiFlexItem key={agentData.id}>
-                      <EuiStat
-                        title={agentData.id
-                        }
-                        description={"Agent"}
-                        titleSize="xs"
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem key={agentData.status}>
-                      <EuiStat
-                        title={addHealthRender(agentData)
-                        }
-                        description={"Status"}
-                        titleSize="xs"
-                      />
-                    </EuiFlexItem>
-
-
-                    <EuiFlexItem key={"view_events_button"}>
-                      <EuiButton onClick={() => this.props.closePopover()} href={`#/agents?agent=${agentData.id}&tab=welcome`} color="primary">
-                        View agent {agentData.id} events
-                      </EuiButton>
-                    </EuiFlexItem>
-                    <EuiFlexItem key={"remove_agent_button"}>
-                      <EuiButton onClick={() => {this.props.closePopover();this.removeSelectedAgent()}} color="danger">
-                        Remove agent {agentData.id} selection
-                      </EuiButton>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
                 </EuiFlexItem>
               </EuiFlexGroup>
             )}
