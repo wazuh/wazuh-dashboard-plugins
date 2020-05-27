@@ -30,7 +30,7 @@ import { Discover } from '../../../common/modules/discover'
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
-import { esFilters, IIndexPattern } from '../../../../../../../src/plugins/data/common';
+import { esFilters, IIndexPattern } from '../../../../../../../src/plugins/data/public';
 import { getIndexPattern } from '../../../overview/mitre/lib';
 import store from '../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
