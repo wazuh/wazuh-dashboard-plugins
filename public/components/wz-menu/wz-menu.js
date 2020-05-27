@@ -568,7 +568,7 @@ class WzMenu extends Component {
                 <EuiToolTip position="top" content={"Change selected agent"}>
                   <EuiButtonEmpty
                     color="primary"
-                    onClick={() => alert("jeje")}>
+                    onClick={() => alert("TODO: edit selected agent")}>
                     <EuiIcon type="pencil" color="primary" size="m" />
                   </EuiButtonEmpty>  
                 </EuiToolTip>         
