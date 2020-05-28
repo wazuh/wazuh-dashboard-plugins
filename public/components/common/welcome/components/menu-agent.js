@@ -186,6 +186,10 @@ class WzMenuAgent extends Component {
       this.agentSections.docker,
       this.agentSections.mitre
     ];
+
+    securityInformationItems.splice(2, 0, this.overviewSections.aws);
+    threatDetectionItems.unshift(this.overviewSections.vuls);
+    /*  DO NOT HIDE ANY SECTION EVEN IF IT'S NOT COMPATIBLE WITH THE CURRENT AGENT
     if (!this.props.isAgent) {
       securityInformationItems.splice(2, 0, this.agentSections.aws);
       threatDetectionItems.unshift(this.agentSections.vuls);
@@ -195,6 +199,8 @@ class WzMenuAgent extends Component {
         threatDetectionItems.unshift(this.agentSections.vuls);
       }
     }
+    */
+
     const securityInformation = [
       this.createItem(this.agentSections.securityInformation, {
         disabled: true,
