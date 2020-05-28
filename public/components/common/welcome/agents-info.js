@@ -100,18 +100,19 @@ export class AgentInfo extends Component {
   addGroupsRender(agent) {
     // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
     return (
-      <div>
+      <span>
         {
           agent.group.map((group, key) => (
             <EuiBadge
               color={'hollow'}
               key={`agent-group-${key}`}
+              onClickAriaLabel={`agent-group-${group}`}
               onClick={() => this.props.goGroups(this.props.agent, key)}>
               {group}
             </EuiBadge>
           ))
         }
-      </div>
+      </span>
     )
   }
 
