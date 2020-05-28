@@ -1408,3 +1408,16 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 .globalFilterGroup__wrapper{
   max-height: 40px;
 }
+
+.agent-selection-table-loading::before{
+  position: absolute;
+  content: '';
+  margin-left: 24px;
+  width: 100%;
+  height: 2px;
+  background-color: #006BB4;
+  -webkit-animation: euiBasicTableLoading 1000ms linear;
+  animation: euiBasicTableLoading 1000ms linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}

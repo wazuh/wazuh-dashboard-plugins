@@ -589,7 +589,7 @@ export class AgentSelectionTable extends Component {
             <EuiTableBody className={this.state.isLoading ? 'agent-selection-table-loading' : ''}>
               <EuiTableRow key={0}>
                 <EuiTableRowCell colSpan="10" isMobileFullWidth={true} align="center">
-                  No results found
+                  {this.state.isLoading ? 'Loading agents' : 'No results found'}
                 </EuiTableRowCell>
               </EuiTableRow>
             </EuiTableBody>
