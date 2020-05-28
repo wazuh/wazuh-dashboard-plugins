@@ -70,7 +70,7 @@ const ruleMaxFiredtimes = 10;
  */
 function generateAlert(params) {
     let alert = {
-        _sampledata: true,
+        ["@sampledata"]: true,
         timestamp: "2020-01-27T11:08:47.777+0000",
         rule: {
             level: 3,
