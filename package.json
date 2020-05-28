@@ -4,7 +4,7 @@
   "revision": "0870",
   "code": "0870-0",
   "kibana": {
-    "version": "7.6.2"
+    "version": "7.6.1"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -42,11 +42,10 @@
   "dependencies": {
     "angular-animate": "1.7.8",
     "angular-chart.js": "1.1.1",
-    "d3": "^5.12.0",
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
     "axios": "^0.19.0",
-    "babel-polyfill": "^6.13.0",
+    "d3": "^5.12.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
@@ -55,15 +54,15 @@
     "pdfmake": "^0.1.37",
     "pug-loader": "^2.4.0",
     "querystring-browser": "1.0.4",
-    "react-redux": "^7.1.1",
     "react-codemirror": "^1.0.0",
+    "react-redux": "^7.1.1",
+    "read-last-lines": "^1.7.2",
     "redux": "^4.0.4",
-    "simple-tail": "^1.1.0",
     "timsort": "^0.3.0",
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "@elastic/plugin-helpers": "^7.1.8",
+    "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",
     "eslint": "^5.10.0",
