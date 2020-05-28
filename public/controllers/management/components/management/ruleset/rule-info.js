@@ -410,7 +410,7 @@ class WzRuleInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle>
-                  <h2>
+                  <span style={{ fontSize: '22px' }}>
                     <EuiToolTip position="right" content="Back to rules">
                       <EuiButtonIcon
                         aria-label="Back"
@@ -424,7 +424,7 @@ class WzRuleInfo extends Component {
                       />
                     </EuiToolTip>
                     {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description)}} />}
-                  </h2>
+                  </span>
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
