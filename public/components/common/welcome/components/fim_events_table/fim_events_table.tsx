@@ -22,6 +22,7 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
+  EuiOverlayMask
 } from '@elastic/eui'
 // @ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
@@ -85,12 +86,18 @@ function FimTable({ agent }) {
         onChange={(e) => setSort(e.sort)}
         itemId="fim-alerts"
         noItemsMessage="No recent events" />
-      {isOpen && <FlyoutDetail
-        agentId={agent.id}
-        closeFlyout={() => setIsOpen(false)}
-        fileName={file}
-        view='extern'
-        {...{agent}} />}
+        {isOpen && (
+          <EuiOverlayMask
+            onClick={(e: Event) => e.target.className === 'euiOverlayMask' && setIsOpen(false)}
+          >
+            <FlyoutDetail
+            agentId={agent.id}
+            closeFlyout={() => setIsOpen(false)}
+            fileName={file}
+            view='extern'
+            {...{agent}} />
+          </EuiOverlayMask>
+        )}
     </Fragment>
   );
 }
