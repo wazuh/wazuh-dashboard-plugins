@@ -116,9 +116,6 @@ export class OverviewController {
 
 
     this.agentsSelectionProps = {
-      switchDiscover: tab => {
-        this.switchSubtab(tab);
-      },
       tab: this.tab,
       initialFilter: this.initialFilter,
       subtab: this.subtab,

@@ -28,7 +28,7 @@ import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
-import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
+import { updateCurrentAgentData, showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import Management from './wz-menu-management';
 import Overview from './wz-menu-overview';
@@ -411,6 +411,12 @@ class WzMenu extends Component {
     this.router.reload();
   }
 
+  getBadgeColor(agentStatus){
+    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
+    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
+    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
+  }
+
   render() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     const menu = (
@@ -429,7 +435,7 @@ class WzMenu extends Component {
               onClick={this.onClickOverviewButton.bind(this)}
             >
               <EuiIcon type="visualizeApp" color="primary" size="m" />
-              <span className="wz-menu-button-title ">Overview</span>
+              <span className="wz-menu-button-title ">Modules</span>
               <span className="flex"></span>
               <span className="flex"></span>
               {this.state.isOverviewPopoverOpen && (
@@ -546,16 +552,18 @@ class WzMenu extends Component {
           )}
           
           {this.state.isOverviewPopoverOpen && currentAgent.id && (
-            <EuiFlexGroup style={{backgroundColor: "rgb(245, 247, 250)", borderBottom: "1px solid #80808033", marginLeft: 0, marginRight: 0}}>
-               <EuiFlexItem grow={false} style={{margin: "24px 0 0 24px"}}>
-                <EuiBadge color="secondary">
+            <EuiFlexGroup style={{backgroundColor: "rgb(245, 247, 250)", borderBottom: "1px solid #80808033", marginLeft: 0, marginRight: 0, height: 66}}>
+               {/*
+               <EuiFlexItem grow={false} style={{margin: "30px 0 0 24px"}}>
+                <EuiBadge color={this.getBadgeColor(currentAgent.status)}>
                   {currentAgent.id}
                 </EuiBadge>
               </EuiFlexItem>
+              */}
               <EuiFlexItem>
                 {this.addHealthRender(currentAgent)}
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{margin: "14px 0 0 0"}}>
+              <EuiFlexItem grow={false} style={{margin: "18px 0 0 0"}}>
                 <EuiToolTip position="top" content={"Open Agent summary"}>
                   <EuiButtonEmpty
                     color="primary"
@@ -564,16 +572,16 @@ class WzMenu extends Component {
                   </EuiButtonEmpty> 
                 </EuiToolTip>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{margin: "14px 0 0 0"}}>
+              <EuiFlexItem grow={false} style={{margin: "18px 0 0 0"}}>
                 <EuiToolTip position="top" content={"Change selected agent"}>
                   <EuiButtonEmpty
                     color="primary"
-                    onClick={() => alert("TODO: edit selected agent")}>
+                    onClick={() => {store.dispatch(showExploreAgentModalGlobal({}));this.setState({ menuOpened: false }) }}>
                     <EuiIcon type="pencil" color="primary" size="m" />
                   </EuiButtonEmpty>  
                 </EuiToolTip>         
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{margin: "14px 24px 0 0"}}>
+              <EuiFlexItem grow={false} style={{margin: "18px 24px 0 0"}}>
                 <EuiToolTip position="top" content={"Unselect agent"}>
                   <EuiButtonEmpty
                     color="text"

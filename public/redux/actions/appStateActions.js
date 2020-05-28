@@ -92,14 +92,25 @@ export const updateCurrentAgentData = (data) => {
 };
 
 
-
 /**
- * Updates currentAgentData in the appState store
+ * Updates showExploreAgentModal in the appState store
  * @param extensions
  */
 export const showExploreAgentModal = (shouldShow) => {
   return {
     type: 'SHOW_EXPLORE_AGENT_MODAL',
     showExploreAgentModal: shouldShow
+  };
+};
+
+
+/**
+ * Updates showExploreAgentModalGlobal in the appState store
+ * @param extensions
+ */
+export const showExploreAgentModalGlobal = (shouldShow) => {
+  return {
+    type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
+    showExploreAgentModalGlobal: shouldShow
   };
 };

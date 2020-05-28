@@ -12,13 +12,16 @@
  */
 import React, { Component } from 'react';
 import {
-  EuiTitle
+  EuiTitle,
+  EuiBadge,
+  EuiToolTip
 } from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
 import { TabDescription } from '../../../../server/reporting/tab-description';
+import { AppNavigate } from '../../../react-services/app-navigate'
 
 class WzCurrentOverviewSection extends Component {
   constructor(props) {
@@ -27,14 +30,45 @@ class WzCurrentOverviewSection extends Component {
     };
   }
 
+
+  getBadgeColor(agentStatus){
+    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
+    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
+    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
+  }
+
   setGlobalBreadcrumb() {
+    const currentAgent = store.getState().appStateReducers.currentAgentData;
+
     if(TabDescription[this.props.currentTab]){
-      const breadcrumb = [
+      const breadcrumb = currentAgent.id ? [
         { text: '' },
         { text: 'Modules', href: '/app/wazuh#/overview' },
+        {
+          text: (
+          <a style={{marginRight: 0}}  className="euiLink euiLink--subdued euiBreadcrumb">
+          <EuiToolTip  position="top" content={"View agent summary"}>
+            <EuiBadge
+              id="breadcrumbNoTitle"
+              onMouseDown={(ev) =>  {ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": currentAgent.id  } )}}
+              color={this.getBadgeColor(currentAgent.status)}>
+              <span style={{cursor:"pointer"}}>{currentAgent.id}</span>
+            </EuiBadge>
+          </EuiToolTip>
+          </a> )
+        },
+        
+        { text: TabDescription[this.props.currentTab].title},
+      ] :
+      [
+        { text: '' },
+        { text: 'Modules', href: '/app/wazuh#/overview' },
+        
+        
         { text: TabDescription[this.props.currentTab].title},
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+      $('#breadcrumbNoTitle').attr("title","");
     }
   }
 
