@@ -248,10 +248,6 @@ md-divider.md-default-theme, md-divider {
   border: 1px solid #343741;
 }
 
-.euiFlexGroup .euiFlexGroup:hover {
-  background: #1D1E24;
-}
-
 .wz-dev-box .CodeMirror {
   border: 1px solid #343741 !important;
 }
