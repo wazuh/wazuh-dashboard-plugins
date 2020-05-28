@@ -110,32 +110,34 @@ export class MitreTopTactics extends Component {
     if (isLoading || alertsCount.length === 0) return;
     return (
       <Fragment>
-        <EuiText size="xs">
+        <div className="wz-agents-mitre">
+          <EuiText size="xs">
+            <EuiFlexGroup>
+              <EuiFlexItem style={{margin: 0, padding: '12px 0px 0px 10px'}}>
+                <h3>Top Tactics</h3>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiText>
           <EuiFlexGroup>
-            <EuiFlexItem style={{margin: 0, padding: '12px 0px 0px 10px'}}>
-              <h3>Top Tactics</h3>
+            <EuiFlexItem>
+              {alertsCount.map((tactic) => (
+                <EuiFacetButton
+                  key={tactic.key}
+                  quantity={tactic.doc_count}
+                  onClick={() => {
+                    this.setState({
+                        selectedTactic: tactic.key,
+                        isLoading: true,
+                      });
+                    }
+                  }
+                >
+                  {tactic.key}
+                </EuiFacetButton>
+              ))}
             </EuiFlexItem>
           </EuiFlexGroup>
-        </EuiText>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            {alertsCount.map((tactic) => (
-              <EuiFacetButton
-                key={tactic.key}
-                quantity={tactic.doc_count}
-                onClick={() => {
-                  this.setState({
-                      selectedTactic: tactic.key,
-                      isLoading: true,
-                    });
-                  }
-                }
-              >
-                {tactic.key}
-              </EuiFacetButton>
-            ))}
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        </div>
       </Fragment>
     );
   }
