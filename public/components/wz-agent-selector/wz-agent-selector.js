@@ -38,11 +38,6 @@ class WzAgentSelector extends Component {
     this.router = $injector.get('$route');
   }
 
-  componentDidUpdate(){
-    console.log(this.props)
-  }
-
-
   closeAgentModal(){
     store.dispatch(showExploreAgentModalGlobal(false));
   }
