@@ -16,7 +16,8 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiBasicTable,
-  Direction,
+  EuiOverlayMask,
+  Direction
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -231,15 +232,19 @@ export class RegistryTable extends Component {
     return (
       <div>
         {registryTable}
-        {this.state.isFlyoutVisible &&
-          <FlyoutDetail
+        {this.state.isFlyoutVisible && (
+          <EuiOverlayMask
+            onClick={(e: Event) => e.target.className === 'euiOverlayMask' && this.closeFlyout()}
+          >
+            <FlyoutDetail
             fileName={this.state.currentFile.file}
             agentId={this.props.agent.id}
             closeFlyout={() => this.closeFlyout()}
             type='registry'
             view='inventory'
             {...this.props} />
-        }
+          </EuiOverlayMask>
+        )}
       </div>
     )
   }

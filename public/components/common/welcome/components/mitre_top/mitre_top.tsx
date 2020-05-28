@@ -232,6 +232,8 @@ export class MitreTopTactics extends Component {
         {flyoutOn &&
         <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
           <FlyoutTechnique 
+            implicitFilters={[ {"agent.id": this.props.agentId} ] }
+            agentId={this.props.agentId}
             onChangeFlyout={this.onChangeFlyout}
             currentTechnique={selectedTechnique}/>
         </EuiOverlayMask>}

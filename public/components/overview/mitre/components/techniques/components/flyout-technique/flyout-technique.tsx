@@ -28,6 +28,7 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../react-services/wz-request';
 import { AppState } from '../../../../../../../react-services/app-state';
+import { AppNavigate } from '../../../../../../../react-services/app-navigate';
 import { Discover } from '../../../../../../common/modules/discover';
 
 export class FlyoutTechnique extends Component {
@@ -127,6 +128,10 @@ export class FlyoutTechnique extends Component {
     const { currentTechnique } = this.props;
     const { techniqueData } = this.state;
     const implicitFilters=[{ 'rule.mitre.id': currentTechnique}, this.clusterFilter ];
+    if(this.props.implicitFilters){
+      this.props.implicitFilters.forEach( item => 
+        implicitFilters.push(item))
+    }
 
 
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
@@ -219,13 +224,24 @@ export class FlyoutTechnique extends Component {
               <EuiTitle size="s">
                 <h3>
                   Recent events{this.props.view !== 'events' && (
-                    <span style={{ marginLeft: 16 }}>    
-                      <EuiToolTip position="top" content={"Show " + currentTechnique+ " in Dashboard"} >
-                          <EuiIcon onClick={(e) => {this.props.openDashboard(currentTechnique);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
-                      </EuiToolTip> &nbsp;
-                      <EuiToolTip position="top" content={"Inspect " + currentTechnique + " in Events"} >
-                        <EuiIcon onClick={(e) => {this.props.openDiscover(currentTechnique);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
-                      </EuiToolTip>
+                    <span style={{ marginLeft: 16 }}> 
+                    {!this.props.agentId && (
+                      <span>
+                        <EuiToolTip position="top" content={"Show " + currentTechnique+ " in Dashboard"} >
+                            <EuiIcon onClick={(e) => {this.props.openDashboard(currentTechnique);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
+                        </EuiToolTip> &nbsp;
+                        <EuiToolTip position="top" content={"Inspect " + currentTechnique + " in Events"} >
+                          <EuiIcon onClick={(e) => {this.props.openDiscover(currentTechnique);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
+                        </EuiToolTip>
+                      </span>
+                    ) || (
+                      <span>
+                        <EuiToolTip position="top" content={"Show " + currentTechnique+ " in dashboard"} >
+                            <EuiIcon onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'overview', {"tab": "mitre", "agentId": this.props.agentId, filters: {"rule.mitre.id": currentTechnique}  } )}} color="primary" type="visualizeApp"></EuiIcon>
+                        </EuiToolTip> &nbsp;
+                      </span>
+                    )
+                    }  
                     </span>
                   )}
                 </h3>
