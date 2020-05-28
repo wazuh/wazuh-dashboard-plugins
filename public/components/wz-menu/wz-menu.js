@@ -28,7 +28,7 @@ import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
-import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
+import { updateCurrentAgentData, showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import Management from './wz-menu-management';
 import Overview from './wz-menu-overview';
@@ -429,7 +429,7 @@ class WzMenu extends Component {
               onClick={this.onClickOverviewButton.bind(this)}
             >
               <EuiIcon type="visualizeApp" color="primary" size="m" />
-              <span className="wz-menu-button-title ">Overview</span>
+              <span className="wz-menu-button-title ">Modules</span>
               <span className="flex"></span>
               <span className="flex"></span>
               {this.state.isOverviewPopoverOpen && (
@@ -568,7 +568,7 @@ class WzMenu extends Component {
                 <EuiToolTip position="top" content={"Change selected agent"}>
                   <EuiButtonEmpty
                     color="primary"
-                    onClick={() => alert("TODO: edit selected agent")}>
+                    onClick={() => {store.dispatch(showExploreAgentModalGlobal({}));this.setState({ menuOpened: false }) }}>
                     <EuiIcon type="pencil" color="primary" size="m" />
                   </EuiButtonEmpty>  
                 </EuiToolTip>         

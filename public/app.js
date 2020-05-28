@@ -103,6 +103,7 @@ app.run([
         `
     <react-component name="WzMenuWrapper" props="" />
     <div class="wazuhNotReadyYet"></div>
+    <react-component name="WzAgentSelectorWrapper" props="" />
     <div ng-view class="mainView"></div>
   `
       )
