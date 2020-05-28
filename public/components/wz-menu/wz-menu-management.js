@@ -122,7 +122,7 @@ class WzMenuManagement extends Component {
                 this.props.closePopover();
                 window.location.href = '#/manager';
               }}>
-              Go to Management welcome
+              Go to the Management welcome page
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
