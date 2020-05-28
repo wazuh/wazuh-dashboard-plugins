@@ -33,12 +33,7 @@ export class Events extends Component {
     this.$rootScope.$applyAsync();
     const fields = EventsSelectedFiles[this.props.section];
     if (fields) {
-      scope.state.columns = [];
-      fields.forEach(field => {
-        if (!scope.state.columns.includes(field)) {
-          scope.addColumn(field);
-        }
-      });
+      scope.state.columns = fields;
     }
     this.fetchWatch = scope.$watchCollection('fetchStatus',
       () => {
