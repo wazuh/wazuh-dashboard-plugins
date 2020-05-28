@@ -100,7 +100,8 @@ export class Inventory extends Component {
         disabled: false,
       },
     ]
-    this.props.agent.os.platform === 'windows' ? auxTabs.push(
+    const platform = (this.props.agent.os || {}).platform || "other";
+     platform  === 'windows' ? auxTabs.push(
       {
         id: 'registry',
         name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
