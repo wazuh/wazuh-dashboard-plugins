@@ -18,7 +18,8 @@ const initialState = {
   extensions: {},
   adminMode: false,
   currentAgentData: {},
-  showExploreAgentModal: false
+  showExploreAgentModal: false,
+  showExploreAgentModalGlobal: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -76,6 +77,14 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       showExploreAgentModal: action.showExploreAgentModal
+    };
+  }
+
+
+  if (action.type === 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL') {
+    return {
+      ...state,
+      showExploreAgentModalGlobal: action.showExploreAgentModalGlobal
     };
   }
 
