@@ -18,12 +18,14 @@ import {
   EuiButtonIcon,
   EuiTitle,
   EuiPopover,
+  EuiBadge
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
 import { ReportingService } from '../../../react-services/reporting';
+import { AppNavigate } from '../../../react-services/app-navigate';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
 import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
@@ -44,14 +46,26 @@ export class MainModuleOverview extends Component {
     };
   }
 
+  getBadgeColor(agentStatus){
+    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
+    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
+    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
+  }
+
   setGlobalBreadcrumb() {
+    const currentAgent = store.getState().appStateReducers.currentAgentData;
     if (TabDescription[this.props.currentTab]) {
       let breadcrumb = [
         {
           text: '',
         },
         {
-          text: 'Modules',
+          text: currentAgent.id ? (<span>Modules
+            <EuiBadge
+            onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": currentAgent.id  } )}}
+            color={this.getBadgeColor(currentAgent.status)}>
+          {currentAgent.id}
+        </EuiBadge></span> ) : 'Modules',
           href: "#/overview"
         },
         {
