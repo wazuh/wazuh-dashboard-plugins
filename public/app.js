@@ -100,10 +100,12 @@ app.run([
   function (_$injector) {
     chrome
       .setRootTemplate(
-        `<react-component name="WzMenuWrapper" props="" />
+        `<div>
         <div class="wazuhNotReadyYet"></div>
-        <react-component name="WzAgentSelectorWrapper" props="" />
         <div ng-view class="mainView"></div>
+        <react-component name="WzMenuWrapper" props=""></react-component>
+        <react-component name="WzAgentSelectorWrapper" props=""></react-component>
+       </div>
         `
       )
       .setRootController(() => require('./app'));
