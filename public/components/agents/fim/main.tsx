@@ -17,7 +17,7 @@ export class MainFim extends Component {
       if(this.props.selectView === 'inventory' && this.state.currentAgentId){
         this.setState({currentAgentId: false})
       }else{
-        this.setState({currentAgentId: store.getState().appStateReducers.currentAgentData.id, agentData: {os: {"platform": "linux"}, agentPlatform: "linux", id: store.getState().appStateReducers.currentAgentData.id }  });
+        this.setState({currentAgentId: store.getState().appStateReducers.currentAgentData.id, agentData: {...store.getState().appStateReducers.currentAgentData, agentPlatform: store.getState().appStateReducers.currentAgentData.os.platform} });
       }
     }
   }

@@ -229,7 +229,7 @@ class WzMenuOverview extends Component {
                       this.props.closePopover();
                       window.location.href = '#/overview';
                     }}>
-                    Go to Modules welcome
+                    Go to the Modules welcome page
                   </EuiButtonEmpty>
                 </EuiFlexItem>
               </EuiFlexGroup>
