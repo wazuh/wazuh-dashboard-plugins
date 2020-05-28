@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.13.0 - Kibana v7.6.1 - Revision 857
+
+### Added
+
+- Fixed error: only one instance of babel-polyfill is allowed [#2236](https://github.com/wazuh/wazuh-kibana-app/issues/2236)
+
 
 ## Wazuh v3.11.4 - Kibana v7.6.1 - Revision 858
 
