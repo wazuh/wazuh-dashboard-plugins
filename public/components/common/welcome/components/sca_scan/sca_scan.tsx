@@ -165,7 +165,7 @@ export class ScaScan extends Component {
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiText>
-              <EuiIcon type="calendar" color={'primary'}/> End Scan: {lastScan.end_scan}
+              <EuiIcon type="calendar" color={'primary'}/> Start time: {lastScan.start_scan}
             </EuiText>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
