@@ -119,6 +119,7 @@ export class AgentsWelcome extends Component {
 
   async componentDidMount() {
     this._isMount = true;
+    store.dispatch(updateCurrentAgentData(this.props.agent));
     this.updateMenuAgents();
     this.updateWidth();
     this.setGlobalBreadcrumb();
@@ -153,7 +154,6 @@ export class AgentsWelcome extends Component {
           <EuiButtonEmpty
             onClick={() => {
               window.location.href = `#/overview/?tab=general`;
-              store.dispatch(updateCurrentAgentData(this.props.agent));
               this.router.reload();
             }} style={{ cursor: 'pointer' }}>
             <span>Security events&nbsp;</span>
@@ -163,7 +163,6 @@ export class AgentsWelcome extends Component {
           <EuiButtonEmpty
             onClick={() => {
               window.location.href = `#/overview/?tab=fim`;
-              store.dispatch(updateCurrentAgentData(this.props.agent));
               this.router.reload();
             }} style={{ cursor: 'pointer' }}>
             <span>Integrity monitoring&nbsp;</span>
@@ -173,7 +172,6 @@ export class AgentsWelcome extends Component {
           <EuiButtonEmpty
             onClick={() => {
               window.location.href = `#/overview/?tab=sca`;
-              store.dispatch(updateCurrentAgentData(this.props.agent));
               this.router.reload();
             }} style={{ cursor: 'pointer' }}>
             <span>SCA&nbsp;</span>
@@ -187,7 +185,6 @@ export class AgentsWelcome extends Component {
               <EuiButtonEmpty
                 onClick={() => {
                   window.location.href = `#/overview/?tab=${menuAgent.id}`;
-                  store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                 }} style={{ cursor: 'pointer' }}>
                 <span>{menuAgent.text}&nbsp;</span>
@@ -407,7 +404,6 @@ export class AgentsWelcome extends Component {
                     color="primary"
                     onClick={() => {
                       window.location.href = `#/overview?tab=mitre`;
-                      store.dispatch(updateCurrentAgentData(this.props.agent));
                       this.router.reload();
                     }
                     }
