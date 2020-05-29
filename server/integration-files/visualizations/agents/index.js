@@ -27,6 +27,7 @@ import vuls from './agents-vuls';
 import osquery from './agents-osquery';
 import docker from './agents-docker';
 import welcome from './agents-welcome';
+import aws from './agents-aws';
 
 export {
   audit,
@@ -46,5 +47,6 @@ export {
   osquery,
   mitre,
   docker,
-  welcome
+  welcome,
+  aws
 };
