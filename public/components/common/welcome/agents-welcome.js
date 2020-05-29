@@ -467,7 +467,7 @@ export class AgentsWelcome extends Component {
     )
   }
 
-  renderSca(){
+  renderSCALastScan(){
     return (
       <EuiFlexGroup direction="column">
         <ScaScan switchTab={this.props.switchTab} {...this.props} />
@@ -570,7 +570,7 @@ export class AgentsWelcome extends Component {
                 <EuiSpacer size='m'/>
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    {this.renderSca()}
+                    {this.renderSCALastScan()}
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </Fragment>
@@ -593,7 +593,7 @@ export class AgentsWelcome extends Component {
                     {this.renderEventCountVisualization()}
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    {this.renderSca()}
+                    {this.renderSCALastScan()}
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </Fragment>
