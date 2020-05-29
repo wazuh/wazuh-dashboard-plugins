@@ -110,7 +110,7 @@ export class MainModuleOverview extends Component {
                   }
                   isOpen={this.state.isDescPopoverOpen}
                   closePopover={() => { this.setState({ isDescPopoverOpen: false }) }}>
-                  <div style={{ width: '300px' }}>
+                  <div style={{ width: 'auto' }}>
                     {TabDescription[this.props.section].description}
                   </div>
                 </EuiPopover>
