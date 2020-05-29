@@ -1011,8 +1011,8 @@ function discoverController(
       });
     } else {
       wzCurrentFilters.forEach(x => {
-        if (x.isImplicit != false)
-          x.isImplicit = true
+        if (x.$state.isImplicit != false)
+          x.$state.isImplicit = true
       });
       wazuhApp.globalFilters.tab = tab;
       const globalFilters = wazuhApp.globalFilters.filters || [];

@@ -189,7 +189,7 @@ export class CommonData {
       if (match && match[0]) {
         const id = match[0].split('=')[1];
         let filter = filterHandler.ruleIdQuery(id);
-        filter.isImplicit = false;
+        filter.$state.isImplicit = false;
         filters.push(filter);
         this.$window.location.href = this.$window.location.href.replace(regex, '');
       }
