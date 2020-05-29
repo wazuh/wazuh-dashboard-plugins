@@ -32,7 +32,8 @@ import {
   EuiLoadingChart,
   EuiToolTip,
   EuiButtonIcon,
-  EuiEmptyPrompt
+  EuiEmptyPrompt,
+  EuiPageBody
 } from '@elastic/eui';
 import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
@@ -70,6 +71,7 @@ export class AgentsWelcome extends Component {
       selectedRequirement: 'pci',
       menuAgent: {},
       maxModules: 3,
+      widthWindow: window.innerWidth
     };
 
   }
@@ -95,7 +97,7 @@ export class AgentsWelcome extends Component {
       }
     }
 
-    this.setState({maxModules: maxModules});
+    this.setState({maxModules: maxModules, widthWindow: window.innerWidth});
   };
 
   setGlobalBreadcrumb() {
@@ -387,6 +389,92 @@ export class AgentsWelcome extends Component {
     return 'Wazuh-App-Agents-Welcome-Top-PCI'
   }
 
+  renderMitrePanel(){
+    return (
+      <Fragment>
+        <EuiPanel paddingSize="s" height={{ height: 300 }}>
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <h2 className="embPanel__title wz-headline-title">
+                  <EuiText size="xs"><h2>MITRE</h2></EuiText>
+                </h2>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
+                <EuiToolTip position="top" content="Open MITRE">
+                  <EuiButtonIcon
+                    iconType="popout"
+                    color="primary"
+                    onClick={() => {
+                      window.location.href = `#/overview?tab=mitre`;
+                      store.dispatch(updateCurrentAgentData(this.props.agent));
+                      this.router.reload();
+                    }
+                    }
+                    aria-label="Open MITRE" />
+                </EuiToolTip>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiSpacer size="m" />
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <MitreTopTactics agentId={this.props.agent.id} />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPanel>
+      </Fragment>
+
+    )
+  }
+
+  renderCompliancePanel(){
+    return (
+      <RequirementVis
+        agent={this.props.agent}
+        width={200}
+        height={200}
+        innerRadius={70}
+        outerRadius={100} />
+    )
+  }
+
+  renderEventCountVisualization(){
+    return (
+      <EuiPanel paddingSize="s" >
+        <EuiFlexItem>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <h2 className="embPanel__title wz-headline-title">
+                <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
+              </h2>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size="s" />
+          <div style={{ height: this.props.resultState !== 'loading' ? '225px' : 0 }}>
+            <WzReduxProvider>
+              <KibanaVis
+                visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                tab={'welcome'}
+              ></KibanaVis>
+            </WzReduxProvider>
+          </div>
+          <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', alignSelf: "center", paddingTop: 100 }}>
+            <EuiLoadingChart size="xl" />
+          </div>
+        </EuiFlexItem>
+      </EuiPanel>
+    )
+  }
+
+  renderSca(){
+    return (
+      <EuiFlexGroup direction="column">
+        <ScaScan switchTab={this.props.switchTab} {...this.props} />
+      </EuiFlexGroup>
+    )
+  }
+
   render() {
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
@@ -454,89 +542,63 @@ export class AgentsWelcome extends Component {
             </EuiFlexGroup>
           </EuiPage> */}
           <EuiPage>
-            <EuiFlexGrid columns={2}>
-              <EuiFlexItem />
-              <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 6, marginBottom: 0 }}> {/* DatePicker */}
-                <WzDatePicker condensed={true} onTimeChange={() => { }} />
-              </EuiFlexItem>
-              <EuiFlexItem> {/* Pie visualizations */}
-                <EuiFlexGroup>
-
+            <EuiPageBody component="div">
+              <EuiFlexGroup>
+                <EuiFlexItem />
+                <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 6, marginBottom: 10 }}> {/* DatePicker */}
+                  <WzDatePicker condensed={true} onTimeChange={() => { }} />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            {this.state.widthWindow < 1150 && (
+              <Fragment>
+                <EuiFlexGrid columns={2}>
                   <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} >
-                    <EuiPanel paddingSize="s" height={{ height: 300 }}>
-                      <EuiFlexItem>
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <h2 className="embPanel__title wz-headline-title">
-                              <EuiText size="xs"><h2>MITRE</h2></EuiText>
-                            </h2>
-                          </EuiFlexItem>
-                          <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                            <EuiToolTip position="top" content="Open MITRE">
-                              <EuiButtonIcon
-                                iconType="popout"
-                                color="primary"
-                                onClick={() => {
-                                  window.location.href = `#/overview?tab=mitre`;
-                                  store.dispatch(updateCurrentAgentData(this.props.agent));
-                                  this.router.reload();
-                                }
-                                }
-                                aria-label="Open MITRE" />
-                            </EuiToolTip>
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      </EuiFlexItem>
-                      <EuiSpacer size="m" />
-                      <EuiFlexGroup>
-                        <EuiFlexItem>
-                          <MitreTopTactics agentId={this.props.agent.id} />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </EuiPanel>
+                    {this.renderMitrePanel()}
                   </EuiFlexItem>
-
-                  <RequirementVis
-                    agent={this.props.agent}
-                    width={200}
-                    height={200}
-                    innerRadius={70}
-                    outerRadius={100} />
-
+                  {this.renderCompliancePanel()}
+                </EuiFlexGrid>
+                <EuiSpacer size='m'/>
+                <EuiFlexGroup>
+                  <FimEventsTable agent={this.props.agent} router={this.router} />
                 </EuiFlexGroup>
-              </EuiFlexItem>
-              <FimEventsTable agent={this.props.agent} router={this.router} />
-              <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
-                <EuiPanel paddingSize="s" >
+                <EuiSpacer size='m'/>
+                <EuiFlexGroup>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
+                    {this.renderEventCountVisualization()}
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='m'/>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    {this.renderSca()}
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </Fragment>
+            ) || (
+              <Fragment>
+                <EuiFlexGrid columns={2}>
                   <EuiFlexItem>
                     <EuiFlexGroup>
-                      <EuiFlexItem>
-                        <h2 className="embPanel__title wz-headline-title">
-                          <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
-                        </h2>
+                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} >
+                        {this.renderMitrePanel()}
                       </EuiFlexItem>
+                      {this.renderCompliancePanel()}
                     </EuiFlexGroup>
-                    <EuiSpacer size="s" />
-                    <div style={{ height: this.props.resultState !== 'loading' ? '225px' : 0 }}>
-                      <WzReduxProvider>
-                        <KibanaVis
-                          visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                          tab={'welcome'}
-                        ></KibanaVis>
-                      </WzReduxProvider>
-                    </div>
-                    <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', alignSelf: "center", paddingTop: 100 }}>
-                      <EuiLoadingChart size="xl" />
-                    </div>
                   </EuiFlexItem>
-                </EuiPanel>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiFlexGroup direction="column">
-                  <ScaScan switchTab={this.props.switchTab} {...this.props} />
+                  <FimEventsTable agent={this.props.agent} router={this.router} />
+                </EuiFlexGrid>
+                <EuiSpacer size="l" />
+                <EuiFlexGroup>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
+                    {this.renderEventCountVisualization()}
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    {this.renderSca()}
+                  </EuiFlexItem>
                 </EuiFlexGroup>
-              </EuiFlexItem>
-            </EuiFlexGrid>
+              </Fragment>
+            )}
+            </EuiPageBody>
           </EuiPage>
         </div>
       </div>
