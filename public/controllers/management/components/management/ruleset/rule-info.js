@@ -258,6 +258,24 @@ class WzRuleInfo extends Component {
     );
   }
 
+  getFormattedDetails(value){
+
+    if(Array.isArray(value) && value[0].type){
+      let link = "";
+      let name = "";
+
+      value.forEach(item => {
+        if(item.type === 'cve')
+          name = item.name;
+        if(item.type === 'link')
+          link = <a href={item.name} target="_blank">{item.name}</a>
+      })
+      return <span>{name}: {link}</span>
+    }else{
+      return value;
+    }
+  }
+
   /**
    * Render a list with the details
    * @param {Array} details
@@ -268,7 +286,7 @@ class WzRuleInfo extends Component {
     Object.keys(details).forEach((key) => {
       detailsToRender.push(
         <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : details[key]}
+          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
         </EuiFlexItem>
       );
     });
