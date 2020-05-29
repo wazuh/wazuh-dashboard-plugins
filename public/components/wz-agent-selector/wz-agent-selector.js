@@ -65,14 +65,14 @@ class WzAgentSelector extends Component {
 
     if (this.props.state.showExploreAgentModalGlobal) {
       modal = (
-        <EuiOverlayMask>
+        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
           <EuiModal
             maxWidth="1000px"
             onClose={() => this.closeAgentModal()}
             initialFocus="[name=popswitch]"
           >
             <EuiModalHeader>
-              <EuiModalHeaderTitle>Explore module by agent</EuiModalHeaderTitle>
+              <EuiModalHeaderTitle>Pin agent</EuiModalHeaderTitle>
             </EuiModalHeader>
 
             <EuiModalBody>
