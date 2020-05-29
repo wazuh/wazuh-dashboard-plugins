@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import {
   EuiBadge,
@@ -25,7 +25,9 @@ import {
   EuiTableHeaderMobile,
   EuiButtonIcon,
   EuiIcon,
-  EuiPopover
+  EuiPopover,
+  EuiText,
+  EuiToolTip
 } from '@elastic/eui';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -54,12 +56,12 @@ export class AgentSelectionTable extends Component {
     this.wzReq = (...args) => WzRequest.apiReq(...args);
 
     this.columns = [
-      {
-        id: 'checkbox',
-        isCheckbox: true,
-        textOnly: false,
-        width: '32px',
-      },
+      // {
+      //   id: 'checkbox',
+      //   isCheckbox: true,
+      //   textOnly: false,
+      //   width: '32px',
+      // },
       {
         id: 'id',
         label: 'ID',
@@ -176,19 +178,29 @@ export class AgentSelectionTable extends Component {
     }
   }
 
-  addHealthStatusRender(status) {
-    const color = status => {
-      if (status.toLowerCase() === 'active') {
-        return 'success';
-      } else if (status.toLowerCase() === 'disconnected') {
-        return 'danger';
-      } else if (status.toLowerCase() === 'never connected') {
-        return 'subdued';
-      }
-    };
+  agentStatusColor(status){
+    if (status.toLowerCase() === 'active') {
+      return 'success';
+    } else if (status.toLowerCase() === 'disconnected') {
+      return 'danger';
+    } else if (status.toLowerCase() === 'never connected') {
+      return 'subdued';
+    }
+  }
 
+  agentStatusBadgeColor(status){
+    if (status.toLowerCase() === 'active') {
+      return 'secondary';
+    } else if (status.toLowerCase() === 'disconnected') {
+      return 'danger';
+    } else if (status.toLowerCase() === 'never connected') {
+      return 'default';
+    }
+  }
+
+  addHealthStatusRender(status) {
     return (
-      <EuiHealth color={color(status)} style={{ whiteSpace: 'no-wrap' }}>
+      <EuiHealth color={this.agentStatusColor(status)} style={{ whiteSpace: 'no-wrap' }}>
         {status}
       </EuiHealth>
     );
@@ -342,7 +354,6 @@ export class AgentSelectionTable extends Component {
       if (column.isCheckbox) {
         headers.push(
           <EuiTableHeaderCellCheckbox key={column.id} width={column.width}>
-            {this.renderSelectAll()}
           </EuiTableHeaderCellCheckbox>
         );
       } else {
@@ -413,7 +424,7 @@ export class AgentSelectionTable extends Component {
           key={item.id}
           isSelected={this.isItemSelected(item.id)}
           isSelectable={true}
-          onClick={() => this.toggleItem(item.id)}
+          onClick={async () => await this.selectAgentAndApply(item.id)}
           hasActions={true}
         >
           {cells}
@@ -518,6 +529,19 @@ export class AgentSelectionTable extends Component {
    // this.router.reload();
   }
 
+  async selectAgentAndApply(agentID){
+    try{
+      const data = await this.wzReq('GET', '/agents', {"q" : "id="+agentID } );
+      const formattedData = data.data.data.items[0] //TODO: do it correctly
+      store.dispatch(updateCurrentAgentData(formattedData));
+      this.props.removeAgentsFilter(false);
+      this.props.updateAgentSearch([agentID]);
+    }catch(error){
+      this.props.removeAgentsFilter(true);      
+      store.dispatch(updateCurrentAgentData({}));
+    }
+  }
+
   showContextMenu(id){
     this.setState({contextMenuId: id})
   }
@@ -532,26 +556,21 @@ export class AgentSelectionTable extends Component {
           ? this.state.totalItems / this.state.itemsPerPage
           : parseInt(this.state.totalItems / this.state.itemsPerPage) + 1,
     };
-    let optionalActionButtons;
+    // let optionalActionButtons;
 
-    if (this.items.length) {
-      optionalActionButtons = (
+    // if (this.items.length) {
+    //   optionalActionButtons = (
 
-        <EuiFlexGroup gutterSize="m">
-          <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => {this.unselectAgents();}} color="danger" isDisabled={!store.getState().appStateReducers.currentAgentData.id}>
-              Remove selected agents
-            </EuiButton>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton onClick={async() => await this.newSearch()} color="primary">
-              Apply
-            </EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      );
-    }
-
+    //     <EuiFlexGroup gutterSize="m">
+    //       <EuiFlexItem grow={false}>
+    //         <EuiButton onClick={async() => await this.newSearch()} color="primary">
+    //           Apply
+    //         </EuiButton>
+    //       </EuiFlexItem>
+    //     </EuiFlexGroup>
+    //   );
+    // }
+    const selectedAgent = store.getState().appStateReducers.currentAgentData;
     return (
       <div>
         <EuiFlexGroup gutterSize="m">
@@ -560,19 +579,76 @@ export class AgentSelectionTable extends Component {
               value={this.state.currentSearch}
               onChange={this.onSearchFieldChange}
               fullWidth
-              placeholder="Search..."
+              placeholder="Search agent..."
             />
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="m" />
+        {selectedAgent && Object.keys(selectedAgent).length > 0 && (
+          <Fragment>
+            <EuiFlexGroup responsive={false} justifyContent="flexEnd">
+              {/* Unpin button - agent name (agent id) */}
+              {/* <EuiFlexItem grow={false} style={{margin: "10px 0 0 10px"}}>
+                <EuiToolTip position="top" content={`Unpin ${selectedAgent.name} agent`}>
+                  <EuiButtonIcon
+                    color='danger'
+                    onClick={() => this.unselectAgents()}
+                    iconType="pinFilled"
+                    aria-label="unpin agent"
+                  />
+                </EuiToolTip> 
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{marginLeft: 4}}>
+                <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
+                  {selectedAgent.name} ({selectedAgent.id})
+                </EuiHealth>
+              </EuiFlexItem> */}
 
-          {optionalActionButtons}   
+              {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
+              <EuiFlexItem grow={false} style={{marginRight: 0}}>
+                <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
+                  {selectedAgent.name} ({selectedAgent.id})
+                </EuiHealth>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{marginTop: 10, marginLeft: 4}}>
+                <EuiToolTip position="top" content={`Unpin ${selectedAgent.name} agent`}>
+                  <EuiButtonIcon
+                    color='danger'
+                    onClick={() => this.unselectAgents()}
+                    iconType="pinFilled"
+                    aria-label="unpin agent"
+                  />
+                </EuiToolTip> 
+              </EuiFlexItem>
 
-        <EuiSpacer size="m" />
+              {/* Badge */}
+              {/* <EuiFlexItem grow={false}>
+                <EuiBadge
+                  color={this.agentStatusBadgeColor(selectedAgent.status)}
+                  // title={undefined}
+                  iconType="pinFilled"
+                  iconSide="right"
+                  iconOnClick={() => this.unselectAgents()}
+                  iconOnClickAriaLabel={`Unpin ${selectedAgent.name} agent`}
+                >{selectedAgent.name} ({selectedAgent.id})</EuiBadge>
+              </EuiFlexItem> */}
+              
+              {/* <EuiFlexItem grow={false}>
+                <EuiButton
+                  onClick={() => this.unselectAgents()} color="danger"
+                  iconType='pinFilled'
+                >
+                    Unpin {selectedAgent.name}
+                </EuiButton>
+              </EuiFlexItem> */}
+            </EuiFlexGroup>
+            <EuiSpacer size="m" />
+          </Fragment>
+        )}
 
         <EuiTableHeaderMobile>
           <EuiFlexGroup responsive={false} justifyContent="spaceBetween" alignItems="baseline">
-            <EuiFlexItem grow={false}>{this.renderSelectAll(true)}</EuiFlexItem>
+            <EuiFlexItem grow={false}></EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiTableSortMobile items={this.getTableMobileSortItems()} />
             </EuiFlexItem>
