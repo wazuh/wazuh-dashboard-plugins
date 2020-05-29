@@ -552,7 +552,7 @@ class WzMenu extends Component {
           )}
           
           {this.state.isOverviewPopoverOpen && currentAgent.id && (
-            <EuiFlexGroup style={{backgroundColor: "rgb(245, 247, 250)", borderBottom: "1px solid #80808033", marginLeft: 0, marginRight: 0, height: 66}}>
+            <EuiFlexGroup className="wz-menu-agent-info" style={{borderBottom: "1px solid #80808033", marginLeft: 0, marginRight: 0, height: 66}}>
                {/*
                <EuiFlexItem grow={false} style={{margin: "30px 0 0 24px"}}>
                 <EuiBadge color={this.getBadgeColor(currentAgent.status)}>
@@ -564,7 +564,7 @@ class WzMenu extends Component {
                 {this.addHealthRender(currentAgent)}
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{margin: "18px 0 0 0"}}>
-                <EuiToolTip position="top" content={"Open Agent summary"}>
+                <EuiToolTip position="top" content={`Open ${currentAgent.name} summary`}>
                   <EuiButtonEmpty
                     color="primary"
                     onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": currentAgent.id  } ); this.setState({ menuOpened: false })}}>
@@ -586,7 +586,7 @@ class WzMenu extends Component {
                   <EuiButtonEmpty
                     color="text"
                     onClick={() => this.removeSelectedAgent()}>
-                    <EuiIcon type="cross" color="danger" size="m" />
+                    <EuiIcon type="pinFilled" color="danger" size="m" />
                   </EuiButtonEmpty> 
                 </EuiToolTip>                  
               </EuiFlexItem>
