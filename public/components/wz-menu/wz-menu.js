@@ -40,6 +40,7 @@ import chrome from 'ui/chrome';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -408,7 +409,14 @@ class WzMenu extends Component {
 
   removeSelectedAgent(){
     store.dispatch(updateCurrentAgentData({}));
-    this.router.reload();
+    const { filterManager } = getServices();
+    const currentAppliedFilters = filterManager.filters;
+    const agentFilters = currentAppliedFilters.filter(x => {
+      return x.meta.key === 'agent.id';
+    });
+    agentFilters.map(x => {
+      filterManager.removeFilter(x);
+    });
   }
 
   getBadgeColor(agentStatus){
@@ -585,7 +593,7 @@ class WzMenu extends Component {
                 <EuiToolTip position="top" content={"Unpin agent"}>
                   <EuiButtonEmpty
                     color="text"
-                    onClick={() => this.removeSelectedAgent()}>
+                    onClick={() => {this.removeSelectedAgent();this.setState({ menuOpened: false })}}>
                     <EuiIcon type="pinFilled" color="danger" size="m" />
                   </EuiButtonEmpty> 
                 </EuiToolTip>                  
