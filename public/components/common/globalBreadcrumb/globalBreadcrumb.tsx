@@ -23,7 +23,6 @@ class WzGlobalBreadcrumb extends Component {
   }
   render() {
     const container = document.getElementsByClassName('euiBreadcrumbs');
-    console.log('breadrender',this.props)
     return (
       <div>
         {!!this.props.state.breadcrumb.length && (
