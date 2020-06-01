@@ -33,6 +33,29 @@ import { CommonData } from '../../services/common-data';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 export class WzVisualize extends Component {
+  cardReqs = {
+    'pci': {
+      items: async () => await this.commonData.getPCI(),
+      reqTitle: 'PCI DSS Requirement'
+    },
+    'gdpr': {
+      items: async () => await this.commonData.getGDPR(),
+      reqTitle: 'GDPR Requirement'
+    },
+    'hipaa': {
+      items: async () => await this.commonData.getHIPAA(),
+      reqTitle: 'HIPAA Requirement'
+    },
+    'nist': {
+      items: async () => await this.commonData.getNIST(),
+      reqTitle: 'NIST 800-53 Requirement'
+    },
+    'tsc': {
+      items: async () => await this.commonData.getTSC(),
+      reqTitle: 'TSC Requirement'
+    }
+  }
+
   constructor(props) {
     super(props);
     this.visualizations = this.props.isAgent
@@ -62,49 +85,11 @@ export class WzVisualize extends Component {
   async componentDidMount() {
     this.agentsStatus = false;
     const { selectedTab } = this.state;
-    if (selectedTab === 'pci') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getPCI(),
-          reqTitle: 'PCI DSS Requirement'
-        }
-      });
+    const cardReqs = Object.keys(this.cardReqs).includes(selectedTab) && {
+      items: await this.cardReqs[selectedTab].items(),
+      reqTitle: this.cardReqs[selectedTab].reqTitle,
     }
-    if (selectedTab === 'gdpr') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getGDPR(),
-          reqTitle: 'GDPR Requirement'
-        }
-      });
-    }
-
-    if (selectedTab === 'hipaa') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getHIPAA(),
-          reqTitle: 'HIPAA Requirement'
-        }
-      });
-    }
-
-    if (selectedTab === 'nist') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getNIST(),
-          reqTitle: 'NIST 800-53 Requirement'
-        }
-      });
-    }
-
-    if (selectedTab === 'tsc') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getTSC(),
-          reqTitle: 'TSC Requirement'
-        }
-      });
-    }
+    this.setState({ cardReqs })
 
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
@@ -139,28 +124,33 @@ export class WzVisualize extends Component {
     }
 
     // Check if there is sample alerts installed
-    try{
+    try {
       this.setState({
         thereAreSampleAlerts: (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled
       });
-    }catch(error){}
+    } catch (error) { }
 
     // Check adminMode
-    try{
+    try {
       const adminMode = await checkAdminMode();
       this.setState({ adminMode });
-    }catch(error){}
+    } catch (error) { }
   }
 
   async componentDidUpdate() {
     this.visualizations = this.props.isAgent && this.props.isAgent.length ? agentVisualizations : visualizations;
-    const { selectedTab } = this.state;
-    if (selectedTab !== this.props.selectedTab) {
+    const { selectedTab } = this.props;
+    if (selectedTab !== this.state.selectedTab) {
+      const cardReqs = Object.keys(this.cardReqs).includes(selectedTab) && {
+        items: await this.cardReqs[selectedTab].items(),
+        reqTitle: this.cardReqs[selectedTab].reqTitle,
+      }
       this.setState({
-        selectedTab: this.props.selectedTab,
+        cardReqs,
+        selectedTab: selectedTab,
         metricItems:
-          this.props.selectedTab !== 'welcome'
-            ? this.getMetricItems(this.props.selectedTab)
+          selectedTab !== 'welcome'
+            ? this.getMetricItems(selectedTab)
             : []
       });
     }
@@ -309,10 +299,10 @@ export class WzVisualize extends Component {
                 })}
               </div>
             )}
-  
+
           {/* Sample alerts Callout */}
           {this.state.thereAreSampleAlerts && (
-            <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{margin: '0 8px'}}>
+            <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px' }}>
               <p>The data displayed may contain sample alerts. {this.state.adminMode && (
                 <Fragment>
                   Go <EuiLink href='#/manager/sample_data?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
@@ -320,7 +310,7 @@ export class WzVisualize extends Component {
               )}</p>
             </EuiCallOut>
           )}
-  
+
           {/* Metrics of Dashboard */}
           {selectedTab &&
             selectedTab !== 'welcome' &&
