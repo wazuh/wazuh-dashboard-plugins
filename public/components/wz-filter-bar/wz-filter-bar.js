@@ -49,6 +49,12 @@ export class WzFilterBar extends Component {
   };
 
   componentDidUpdate(prevProps) {
+    if(JSON.stringify(this.state.selectedOptions) !== JSON.stringify(this.props.selectedOptions))
+    this.setState({
+      isProcessing: true,
+      selectedOptions: this.props.selectedOptions
+    });
+    
     const { model } = this.props;
     if (JSON.stringify(prevProps.model) !== JSON.stringify(model)) {
       const { selectedOptions } = this.state;
