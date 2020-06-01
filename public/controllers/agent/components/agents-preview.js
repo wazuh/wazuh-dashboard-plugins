@@ -146,8 +146,8 @@ export class AgentsPreview extends Component {
     const colors = ['#017D73', '#bd271e', '#69707D'];
     return (
       <EuiPage>
-        <EuiFlexItem>
-          <EuiFlexGroup style={{ marginTop: 0 }}>
+        <EuiFlexItem >
+          <EuiFlexGroup style={{ marginTop: 0 }} className="agents-evolution-visualization-group">
             {this.state.loading && (
               <EuiFlexItem>
                 <EuiLoadingChart
@@ -157,7 +157,7 @@ export class AgentsPreview extends Component {
               </EuiFlexItem>
             ) || (
             <Fragment>
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem className="agents-status-pie" grow={false}>
               <EuiPanel
                 betaBadgeLabel="Status"
                 style={{ paddingBottom: 0, minHeight: 168, minWidth: 350 }}
@@ -177,7 +177,7 @@ export class AgentsPreview extends Component {
               </EuiPanel>
             </EuiFlexItem>
             {this.totalAgents > 0 && (
-              <EuiFlexItem>
+              <EuiFlexItem >
                 <EuiPanel betaBadgeLabel="Details">  
                   <EuiFlexGroup>
                     <EuiFlexItem>
@@ -319,7 +319,7 @@ export class AgentsPreview extends Component {
             </Fragment>
             )}
             {this.state.showAgentsEvolutionVisualization && (
-              <EuiFlexItem style={{ display: this.props.resultState === 'ready' && !this.state.loading ? 'block' : 'none', height: this.props.resultState === 'ready' && !this.state.loading ? '180px' : 0}}>
+              <EuiFlexItem grow={false} className="agents-evolution-visualization" style={{ display: this.props.resultState === 'ready' && !this.state.loading ? 'block' : 'none', height: this.props.resultState === 'ready' && !this.state.loading ? '180px' : 0}}>
                 <EuiPanel paddingSize="none" betaBadgeLabel="Evolution">
                   <EuiSpacer size="s" />
                   <div style={{height: this.props.resultState === 'ready' ? '170px' : 0}}>
