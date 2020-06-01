@@ -193,6 +193,13 @@ class OverviewActions extends Component {
     });
   }
 
+  componentDidUpdate(){
+    const agent = store.getState().appStateReducers.currentAgentData;
+    if(this.state.isAgent && !agent.id){
+      this.setState({isAgent: false})
+    }
+  }
+
   componentWillUnmount() {
     //this.state.filterUpdateSubscriber.unsubscribe();
   }
