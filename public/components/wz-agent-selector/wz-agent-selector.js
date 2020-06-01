@@ -23,6 +23,7 @@ import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions
 import store from '../../redux/store';
 import { AgentSelectionTable } from '../../controllers/overview/components/overview-actions/agents-selection-table';
 import chrome from 'ui/chrome';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 class WzAgentSelector extends Component {
   constructor(props) {
@@ -48,8 +49,15 @@ class WzAgentSelector extends Component {
   }
 
   removeAgentsFilter(shouldUpdate){
+    const { filterManager } = getServices();
+    const currentAppliedFilters = filterManager.filters;
+    const agentFilters = currentAppliedFilters.filter(x => {
+      return x.meta.key === 'agent.id';
+    });
+    agentFilters.map(x => {
+      filterManager.removeFilter(x);
+    });
     this.closeAgentModal();
-    this.router.reload();
   }
 
   getSelectedAgents(){

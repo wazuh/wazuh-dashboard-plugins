@@ -267,7 +267,7 @@ export class AgentsTable extends Component {
     return (
       <div>
         <EuiToolTip
-          content="Open Overview panel for this agent"
+          content="Open summary panel for this agent"
           position="left"
         >
           <EuiButtonIcon
@@ -277,7 +277,7 @@ export class AgentsTable extends Component {
             }}
             iconType="eye"
             color={'primary'}
-            aria-label="Open Overview panel for this agent"
+            aria-label="Open summary panel for this agent"
           />
         </EuiToolTip>
         &nbsp;
