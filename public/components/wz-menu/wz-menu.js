@@ -570,7 +570,7 @@ class WzMenu extends Component {
                 </EuiToolTip>         
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{margin: "18px 24px 0 0"}}>
-                <EuiToolTip position="top" content={"Unselect agent"}>
+                <EuiToolTip position="top" content={"Unpin agent"}>
                   <EuiButtonEmpty
                     color="text"
                     onClick={() => this.removeSelectedAgent()}>

@@ -18,7 +18,8 @@ import {
   EuiButtonIcon,
   EuiTitle,
   EuiPopover,
-  EuiBadge
+  EuiBadge,
+  EuiPopoverTitle
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -105,12 +106,14 @@ export class MainModuleOverview extends Component {
                       style={{marginTop: 3}}
                       color='primary'
                       aria-label='Open/close'
-                      onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}>
-                    </EuiButtonIcon>
+                      onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}
+                    />
                   }
+                  anchorPosition="rightUp"
                   isOpen={this.state.isDescPopoverOpen}
                   closePopover={() => { this.setState({ isDescPopoverOpen: false }) }}>
-                  <div style={{ width: 'auto' }}>
+                  <EuiPopoverTitle>Module description</EuiPopoverTitle>
+                  <div style={{ width: '400px' }}>
                     {TabDescription[this.props.section].description}
                   </div>
                 </EuiPopover>

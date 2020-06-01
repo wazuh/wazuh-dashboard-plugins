@@ -30,6 +30,8 @@ import {
 } from '@elastic/eui';
 import './agents-selector.less';
 import { AgentSelectionTable } from './agents-selection-table';
+import { EuiToolTip } from '@elastic/eui';
+import { EuiBadge } from '@elastic/eui';
 class OverviewActions extends Component {
   constructor(props) {
     super(props);
@@ -184,7 +186,7 @@ class OverviewActions extends Component {
   }
 
   componentDidMount() {
-    const agentId = store.getState().appStateReducers.currentAgentData.id ;
+    const agentId = store.getState().appStateReducers.currentAgentData.id;
     const { filterManager } = getServices();
 
     this.setState({ filterManager: filterManager }, () => {
@@ -287,14 +289,14 @@ class OverviewActions extends Component {
 
     if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask>
+        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
           <EuiModal
             maxWidth="1000px"
             onClose={() => this.closeAgentModal()}
             initialFocus="[name=popswitch]"
           >
             <EuiModalHeader>
-              <EuiModalHeaderTitle>Explore module by agent</EuiModalHeaderTitle>
+              <EuiModalHeaderTitle>Pin agent</EuiModalHeaderTitle>
             </EuiModalHeader>
 
             <EuiModalBody>
@@ -308,27 +310,38 @@ class OverviewActions extends Component {
         </EuiOverlayMask>
       );
     }
+    const agent = store.getState().appStateReducers.currentAgentData;
+    console.log({agent});
     return (
       <div>
         <EuiFlexItem>
           {!this.state.isAgent && (
-           <span>
+           <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
             <EuiButtonEmpty
               isLoading={this.state.loadingReport}
               color='primary'
               onClick={() => this.showAgentModal()}>
-                <EuiIcon type="watchesApp" color="primary" style={{marginBottom: 3}}/>&nbsp; Explore by agent
+                <EuiIcon type="watchesApp" color="primary" style={{marginBottom: 3}}/>&nbsp; Explore agent
             </EuiButtonEmpty>
-           </span> 
+           </EuiToolTip> 
           )}
           {this.state.isAgent && (
-            <EuiButtonEmpty
-              iconType="watchesApp"
-              color='primary'
-              isLoading={this.state.loadingReport}
-              onClick={() => this.showAgentModal()}>
-              Exploring agent {this.state.isAgent[0]} events
-            </EuiButtonEmpty>
+
+            <EuiBadge 
+              className="wz-explore-agent"
+              iconType='pinFilled'
+              iconOnClick={this.removeAgentsFilter.bind(this)}
+              iconSide="right"
+              color="hollow" >
+              <EuiToolTip position='bottom' content='Change agent selected' >
+                <EuiButtonEmpty
+                  about=""
+                  isLoading={this.state.loadingReport}
+                  onClick={() => this.showAgentModal()}>
+                  {agent.name} ({agent.id})
+                </EuiButtonEmpty>
+              </EuiToolTip>
+            </EuiBadge>
           )}
         </EuiFlexItem>
         {modal}
