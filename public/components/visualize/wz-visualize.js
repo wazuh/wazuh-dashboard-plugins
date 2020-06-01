@@ -33,7 +33,6 @@ import { CommonData } from '../../services/common-data';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 export class WzVisualize extends Component {
-  _isMount = false;
   constructor(props) {
     super(props);
     this.visualizations = this.props.isAgent
@@ -60,59 +59,7 @@ export class WzVisualize extends Component {
     ];
   }
 
-  async getCards(selectedTab) {
-    if (!this._isMount) return;
-    if (selectedTab === 'pci') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getPCI(),
-          reqTitle: 'PCI DSS Requirement'
-        }
-      });
-    }
-    if (selectedTab === 'gdpr') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getGDPR(),
-          reqTitle: 'GDPR Requirement'
-        }
-      });
-    }
-
-    if (selectedTab === 'hipaa') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getHIPAA(),
-          reqTitle: 'HIPAA Requirement'
-        }
-      });
-    }
-
-    if (selectedTab === 'nist') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getNIST(),
-          reqTitle: 'NIST 800-53 Requirement'
-        }
-      });
-    }
-
-    if (selectedTab === 'tsc') {
-      this.setState({
-        cardReqs: {
-          items: await this.commonData.getTSC(),
-          reqTitle: 'TSC Requirement'
-        }
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    this._isMount = false;
-  }
-
   async componentDidMount() {
-    this._isMount = true;
     this.agentsStatus = false;
     const { selectedTab } = this.state;
     if (selectedTab === 'pci') {
@@ -215,7 +162,7 @@ export class WzVisualize extends Component {
           this.props.selectedTab !== 'welcome'
             ? this.getMetricItems(this.props.selectedTab)
             : []
-      }, this.getCards(selectedTab));
+      });
     }
   }
 
@@ -239,20 +186,9 @@ export class WzVisualize extends Component {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
-  renderCards() {
-    const { cardReqs } = this.state;
-    if(cardReqs && cardReqs.items) {
-      return(
-        <div style={{ padding: '10px 12px 8px' }}>
-          <RequirementCard {...cardReqs} />
-        </div>
-      )
-    }
-  }
-
   render() {
     this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
-    const { selectedTab } = this.state;
+    const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = vis => {
       return (
         <EuiFlexItem
@@ -340,7 +276,11 @@ export class WzVisualize extends Component {
     return (
       <Fragment>
         {/* Cards for Regulatory Compliance Dashboards */}
-        {this.renderCards()}
+        {cardReqs && cardReqs.items && (
+          <div style={{ padding: '10px 12px 8px' }}>
+            <RequirementCard {...cardReqs} />
+          </div>
+        )}
         {this.props.resultState === 'none' && (
           <div className="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8">
             <EuiCallOut title="There are no results for selected time range. Try another
