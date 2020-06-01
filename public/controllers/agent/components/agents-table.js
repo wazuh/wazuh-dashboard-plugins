@@ -133,6 +133,13 @@ export class AgentsTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
+    if(this.props.filters && this.props.filters.length){
+      this.setState({selectedOptions: this.props.filters, 
+        q:`${this.props.filters[0].group}=${ this.props.filters[0].label_}`,
+        isProcessing: true,
+        isLoading: false});
+      this.props.removeFilters()
+    }
     if (this.state.isProcessing) {
       const { q, search } = this.state;
       const { q: prevQ, search: prevSearch } = prevState;

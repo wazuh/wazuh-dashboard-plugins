@@ -73,15 +73,7 @@ export class MainModuleAgent extends Component {
           text: 'Agents',
           href: "#/agents-preview"
         },
-        {
-          text: `${this.props.agent.name} (${this.props.agent.id})`,
-          onClick: () => {
-            window.location.href = `#/agents?agent=${this.props.agent.id}`;
-            this.router.reload();
-          },
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false,
-        },
+        { agent: this.props.agent },
         {
           text: TabDescription[this.props.section].title,
           className: 'wz-global-breadcrumb-popover'
@@ -89,6 +81,7 @@ export class MainModuleAgent extends Component {
       ];
     }
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    $('#breadcrumbNoTitle').attr("title","");
   }
 
   async componentDidMount() {
