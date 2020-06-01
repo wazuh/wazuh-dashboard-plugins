@@ -18,6 +18,7 @@ import { WzAgentSelectorWrapper } from '../components/wz-agent-selector/wz-agent
 import { WzBlankScreen } from '../components/wz-blank-screen/wz-blank-screen';
 import { ClusterDisabled } from '../components/management/cluster/cluster-disabled';
 import { ClusterTimelions } from '../components/management/cluster/cluster-timelions';
+import { KibanaVisWrapper } from '../components/management/cluster/cluster-visualization';
 
 const app = uiModules.get('app/wazuh', []);
 app.value('WzFilterBar', WzFilterBar);
@@ -27,3 +28,4 @@ app.value('WzAgentSelectorWrapper', WzAgentSelectorWrapper);
 app.value('WzBlankScreen', WzBlankScreen);
 app.value('ClusterDisabled', ClusterDisabled);
 app.value('ClusterTimelions', ClusterTimelions);
+app.value('KibanaVisualization', KibanaVisWrapper);

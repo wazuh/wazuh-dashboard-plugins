@@ -18,8 +18,7 @@
                 <span
                     class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">{{ currentNode.name }}
                     alerts summary</span>
-                <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-monitoring-Overview-Node'"
-                    id="Wazuh-App-Cluster-monitoring-Overview-Node"></kbn-vis>
+                    <react-component style="height: 100%;"name="KibanaVisualization" props="{visId: 'Wazuh-App-Cluster-monitoring-Overview-Node', tab: 'monitoring'}"></react-component>
             </md-card-content>
         </div>
     </div>
