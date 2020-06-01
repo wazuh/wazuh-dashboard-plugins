@@ -311,7 +311,6 @@ class OverviewActions extends Component {
       );
     }
     const agent = store.getState().appStateReducers.currentAgentData;
-    console.log({agent});
     return (
       <div>
         <EuiFlexItem>
