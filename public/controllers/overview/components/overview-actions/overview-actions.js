@@ -332,7 +332,7 @@ class OverviewActions extends Component {
               </div>
               <EuiToolTip position='bottom' content='Change agent selected' >
                 <EuiButtonEmpty
-                  about=""
+                  style={{background: 'rgba(0, 107, 180, 0.1)'}}
                   isLoading={this.state.loadingReport}
                   onClick={() => this.showAgentModal()}>
                   {agent.name} ({agent.id})
