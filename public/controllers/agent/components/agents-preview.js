@@ -166,6 +166,16 @@ export class AgentsPreview extends Component {
                   {this.totalAgents > 0 && (
                     <EuiFlexItem style={{ alignItems: 'center' }}>
                       <Pie
+                        legendAction={(status) => this.setState({agentTableFilters: 
+                          [
+                            {
+                              className: 'wzFilterBarOperator',
+                              group: 'status',
+                              label: 'status:' + status,
+                              label_: status,
+                              type: 'AND'
+                            }
+                          ]})}
                         width={300}
                         height={150}
                         data={this.state.data}

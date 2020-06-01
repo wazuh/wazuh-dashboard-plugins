@@ -72,9 +72,17 @@ export class Pie extends Component {
                 fill={colors[i]}
                 stroke={colors[i]}
               ></rect>
+              {this.props.legendAction && 
+                    <text onClick={() => {this.props.legendAction(d.data.label)}} x="15" y="10" style={{ fontSize: 12, cursor: "pointer" }}>
+                      <title>Filter {d.data.label.toLowerCase()} agents</title> 
+                      {d.data.label}
+                    </text>
+              || 
+
               <text x="15" y="10" style={{ fontSize: 12 }}>
                 {d.data.label}
               </text>
+                }
             </g>
           ))}
         </g>
