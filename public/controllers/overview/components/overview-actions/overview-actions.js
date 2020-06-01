@@ -13,7 +13,7 @@ import React, { Component } from 'react';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import store from '../../../../redux/store';
 import { connect } from 'react-redux';
-import { showExploreAgentModal } from '../../../../redux/actions/appStateActions';
+import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 
 
 import {
@@ -342,7 +342,10 @@ class OverviewActions extends Component {
                 <EuiButtonIcon
                   className="wz-unpin-agent"
                   iconType='pinFilled'
-                  onClick={this.removeAgentsFilter.bind(this)}
+                  onClick={() => {
+                    this.removeAgentsFilter();
+                    store.dispatch(updateCurrentAgentData({}));
+                  }}
                   aria-label='Unpin agent' />
               </EuiToolTip>
             </div>
