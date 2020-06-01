@@ -17,8 +17,6 @@ import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBread
 import store from '../../../../../redux/store';
 import chrome from 'ui/chrome';
 
-import {} from '@elastic/eui';
-
 class WzConfigurationMain extends Component {
   constructor(props) {
     super(props);
@@ -39,19 +37,12 @@ class WzConfigurationMain extends Component {
           text: 'Agents',
           href: '#/agents-preview'
         },
-        {
-          text: `${this.props.agent.name} (${this.props.agent.id})`,
-          onClick: () => {
-            window.location.href = `#/agents?agent=${this.props.agent.id}`;
-            this.router.reload();
-          },
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false
-        },
+        { agent: this.props.agent },
         { text: 'Configuration' }
       ];
     }
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    $('#breadcrumbNoTitle').attr("title","");
   }
 
   async componentDidMount() {

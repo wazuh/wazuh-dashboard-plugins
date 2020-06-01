@@ -44,20 +44,7 @@ class WzCurrentOverviewSection extends Component {
       const breadcrumb = currentAgent.id ? [
         { text: '' },
         { text: 'Modules', href: '/app/wazuh#/overview' },
-        {
-          text: (
-          <a style={{marginRight: 0}}  className="euiLink euiLink--subdued euiBreadcrumb">
-          <EuiToolTip  position="top" content={"View agent summary"}>
-            <EuiBadge
-              id="breadcrumbNoTitle"
-              onMouseDown={(ev) =>  {ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": currentAgent.id  } )}}
-              color={this.getBadgeColor(currentAgent.status)}>
-              <span style={{cursor:"pointer"}}>{currentAgent.id}</span>
-            </EuiBadge>
-          </EuiToolTip>
-          </a> )
-        },
-        
+        { agent: currentAgent },
         { text: TabDescription[this.props.currentTab].title},
       ] :
       [

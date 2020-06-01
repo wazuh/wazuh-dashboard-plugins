@@ -39,7 +39,7 @@ class WzMenuManagement extends Component {
       logs: { id: 'logs', text: 'Logs' },
       reporting: { id: 'reporting', text: 'Reporting' },
       statistics: { id: 'statistics', text: 'Statistics' },
-      sample_data: { id: 'sample_data', text: 'Sample Data' },
+      sample_data: { id: 'sample_data', text: 'Sample data' },
     };
 
     this.paths = {

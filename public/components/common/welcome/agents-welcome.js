@@ -108,7 +108,7 @@ export class AgentsWelcome extends Component {
         href: "#/agents-preview"
       },
       {
-        text: `${this.props.agent.name} (${this.props.agent.id})`,
+        text: `${this.props.agent.name}`,
         className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
         truncate: false,
       }
