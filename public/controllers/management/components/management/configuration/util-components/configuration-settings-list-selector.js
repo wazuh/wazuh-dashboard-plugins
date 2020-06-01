@@ -12,6 +12,8 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import chrome from 'ui/chrome';
+const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
 
 import {
   EuiFlexGroup,
@@ -41,7 +43,7 @@ class WzConfigurationSettingsListSelector extends Component {
         <EuiSpacer size="m" />
         <EuiFlexGroup alignItems="flexStart">
           <EuiFlexItem grow={false} style={{ maxWidth: 25, minWidth: 250 }}>
-            <EuiPanel style={{ background: '#fafbfd' }}>
+            <EuiPanel style={{ background: IS_DARK_THEME ? '#1a1b20' : '#fafbfd' }}>
               <ul>
                 {items.map((item, key) => (
                   <li key={`${keyList}-${key}`}>

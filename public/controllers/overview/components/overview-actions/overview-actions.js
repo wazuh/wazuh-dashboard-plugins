@@ -11,27 +11,25 @@
  */
 import React, { Component } from 'react';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-import  store  from '../../../../redux/store';
+import store from '../../../../redux/store';
 import { connect } from 'react-redux';
-import { showExploreAgentModal } from '../../../../redux/actions/appStateActions';
+import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 
 
 import {
   EuiFlexItem,
-  EuiKeyPadMenu,
-  EuiKeyPadMenuItem,
+  EuiButtonIcon,
   EuiIcon,
   EuiOverlayMask,
   EuiModal,
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiModalBody,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiToolTip,
 } from '@elastic/eui';
 import './agents-selector.less';
 import { AgentSelectionTable } from './agents-selection-table';
-import { EuiToolTip } from '@elastic/eui';
-import { EuiBadge } from '@elastic/eui';
 class OverviewActions extends Component {
   constructor(props) {
     super(props);
@@ -191,7 +189,7 @@ class OverviewActions extends Component {
 
     this.setState({ filterManager: filterManager }, () => {
       if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])
-      if(agentId) this.agentTableSearch([agentId])
+      if (agentId) this.agentTableSearch([agentId])
     });
   }
 
@@ -316,32 +314,42 @@ class OverviewActions extends Component {
       <div>
         <EuiFlexItem>
           {!this.state.isAgent && (
-           <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
-            <EuiButtonEmpty
-              isLoading={this.state.loadingReport}
-              color='primary'
-              onClick={() => this.showAgentModal()}>
-                <EuiIcon type="watchesApp" color="primary" style={{marginBottom: 3}}/>&nbsp; Explore agent
+            <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
+              <EuiButtonEmpty
+                isLoading={this.state.loadingReport}
+                color='primary'
+                onClick={() => this.showAgentModal()}>
+                <EuiIcon type="watchesApp" color="primary" style={{ marginBottom: 3 }} />&nbsp; Explore agent
             </EuiButtonEmpty>
-           </EuiToolTip> 
+            </EuiToolTip>
           )}
           {this.state.isAgent && (
-
-            <EuiBadge 
-              className="wz-explore-agent"
-              iconType='pinFilled'
-              iconOnClick={this.removeAgentsFilter.bind(this)}
-              iconSide="right"
-              color="hollow" >
+            <div style={{ display: "inline-flex" }}>
+              <div className="euiButtonEmpty euiButtonEmpty__text"
+                style={{ textDecoration: 'none', cursor: 'default' }}>
+                <span className="euiButtonEmpty__content">
+                  Selected agent:
+                  </span>
+              </div>
               <EuiToolTip position='bottom' content='Change agent selected' >
                 <EuiButtonEmpty
-                  about=""
+                  style={{background: 'rgba(0, 107, 180, 0.1)'}}
                   isLoading={this.state.loadingReport}
                   onClick={() => this.showAgentModal()}>
                   {agent.name} ({agent.id})
-                </EuiButtonEmpty>
+                  </EuiButtonEmpty>
               </EuiToolTip>
-            </EuiBadge>
+              <EuiToolTip position='bottom' content='Unpin agent'>
+                <EuiButtonIcon
+                  className="wz-unpin-agent"
+                  iconType='pinFilled'
+                  onClick={() => {
+                    this.removeAgentsFilter();
+                    store.dispatch(updateCurrentAgentData({}));
+                  }}
+                  aria-label='Unpin agent' />
+              </EuiToolTip>
+            </div>
           )}
         </EuiFlexItem>
         {modal}

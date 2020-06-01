@@ -21,7 +21,6 @@ import {
 } from '@elastic/eui';
 
 export class RequirementCard extends Component {
-  _isMount = false;
   constructor(props) {
     super(props);
     this.state = {
@@ -35,17 +34,9 @@ export class RequirementCard extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.items && this._isMount) {
+    if (nextProps.items) {
       this.buildSlider();
     }
-  }
-
-  componentDidMount() {
-    this._isMount = true;
-  }
-
-  componentWillUnmount() {
-    this._isMount = false;
   }
 
   buildSlider() {

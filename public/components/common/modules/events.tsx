@@ -20,6 +20,7 @@ export class Events extends Component {
   constructor(props) {
     super(props);
     this.modulesHelper = ModulesHelper;
+    this.isMount = true;
   }
 
   async componentDidMount() {
@@ -29,26 +30,24 @@ export class Events extends Component {
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
     const scope = await this.modulesHelper.getDiscoverScope();
-    this.$rootScope.moduleDiscoverReady = true;
-    this.$rootScope.$applyAsync();
-    const fields = EventsSelectedFiles[this.props.section];
-    if (fields) {
-      scope.state.columns = [];
-      fields.forEach(field => {
-        if (!scope.state.columns.includes(field)) {
-          scope.addColumn(field);
-        }
-      });
+    if(this.isMount){
+      this.$rootScope.moduleDiscoverReady = true;
+      this.$rootScope.$applyAsync();
+      const fields = EventsSelectedFiles[this.props.section];
+      if (fields) {
+        scope.state.columns = fields;
+      }
+      this.fetchWatch = scope.$watchCollection('fetchStatus',
+        () => {
+          if (scope.fetchStatus === 'complete') {
+            setTimeout(() => { this.modulesHelper.cleanAvailableFields() }, 1000);
+          }
+        });
     }
-    this.fetchWatch = scope.$watchCollection('fetchStatus',
-      () => {
-        if (scope.fetchStatus === 'complete') {
-          setTimeout(() => { this.modulesHelper.cleanAvailableFields() }, 1000);
-        }
-      });
   }
 
   componentWillUnmount() {
+    this.isMount = false;
     if (this.fetchWatch) this.fetchWatch();
     this.$rootScope.showModuleEvents = false;
     this.$rootScope.moduleDiscoverReady = false;

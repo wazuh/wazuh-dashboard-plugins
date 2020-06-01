@@ -37,11 +37,11 @@ export class MainModule extends Component {
       switchModule: false,
       showAgentInfo: false
     };
+    const app = getAngularModule('app/wazuh');
+    this.$rootScope = app.$injector.get('$rootScope');
   }
 
   async componentDidMount() {
-    const app = getAngularModule('app/wazuh');
-    this.$rootScope = app.$injector.get('$rootScope');
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
       this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
       this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
