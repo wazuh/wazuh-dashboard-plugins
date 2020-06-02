@@ -66,7 +66,7 @@ class AlertsStats extends Component {
       return (
         <EuiFlexItem key={`${item.description}${title}`}>
           <EuiStat
-            title={<span className={index !== 0 ? 'cursor-pointer' : 'cursor-default' }>{title}</span>}
+            title={<span className={index !== 0 && this.props.tab === 'general' ? 'cursor-pointer' : 'cursor-default' }>{title}</span>}
             description={item.description}
             titleColor={item.color || 'primary'}
             textAlign="center"

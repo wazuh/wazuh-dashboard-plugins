@@ -493,21 +493,20 @@ function generateAlert(params) {
     }
 
     if (params.vulnerabilities) {
-        alert.rule.groups.push("vulnerability-detector");
-        alert.rule.gdpr = ['IV_35.7.d'];
-        alert.rule.pci_dss = ['11.2.1', '11.2.3'];
-        alert.data.vulnerability = {};
-        alert.data.vulnerability.package = {};
-
-        alert.data.vulnerability.package.name = randomArrayItem(Vulnerability.packageName);
-        alert.data.vulnerability.cwe_reference = randomArrayItem(Vulnerability.cweReference);
         const dataVulnerability = randomArrayItem(Vulnerability.data);
-        alert.data.vulnerability.severity = dataVulnerability.severity;
-        alert.data.vulnerability.state = dataVulnerability.state;
-        alert.data.vulnerability.cve = dataVulnerability.cve;
-        alert.data.vulnerability.title = dataVulnerability.title;
-        alert.rule.description = dataVulnerability.title;
-        alert.data.vulnerability.reference = dataVulnerability.reference;
+        alert.rule = {
+            ...dataVulnerability.rule,
+            mail: false,
+            groups: ['vulnerability-detector'],
+            gdpr: ['IV_35.7.d'],
+            pci_dss: ['11.2.1', '11.2.3'],
+            tsc: ["CC7.1","CC7.2"]
+        };
+        alert.location = 'vulnerability-detector';
+        alert.decoder = { name: 'json' };
+        alert.data = {
+            ...dataVulnerability.data
+        };
     }
     
     if (params.osquery) {
