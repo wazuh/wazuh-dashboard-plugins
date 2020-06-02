@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { esFilters } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
-import '../../../../public/less/common.less'
+import '../../../../public/less/loader'
 
 
 class AlertsStats extends Component {
