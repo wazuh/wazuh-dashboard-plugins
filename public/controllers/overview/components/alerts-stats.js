@@ -15,13 +15,18 @@ import { visualizations } from '../../../components/visualize/visualizations';
 import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import { connect } from 'react-redux';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { esFilters } from '../../../../../../src/plugins/data/common';
+import { getIndexPattern } from '../../../../public/components/overview/mitre/lib/elastic-helpers.ts';
+
+
 
 class AlertsStats extends Component {
   constructor(props) {
     super(props);
     this.visualizations = visualizations;
     this.state = {
-      items: []
+      items: [],
     };
   }
 
@@ -36,9 +41,28 @@ class AlertsStats extends Component {
     });
   }
 
+  async componentDidMount() {
+    const indexPattern = await getIndexPattern();
+    this.setState({indexPattern: indexPattern})
+  }
+
   buildStats() {
     const stats = (this.state.items || []).map(item => {
       const title = typeof item.value !== 'undefined' ? item.value : '-';
+      let auxFunction;
+      switch(item.description) {
+        case 'Level 12 or above alerts':
+            auxFunction = () => this.filterLevel()
+          break;
+        case 'Authentication failure':
+            auxFunction = () => this.filterAuthenticationFailure()
+          break;
+        case 'Authentication success':
+          auxFunction = () => this.filterAuthenticationSuccess()
+          break;
+        default:
+          auxFunction = () => {}
+      }
       return (
         <EuiFlexItem key={`${item.description}${title}`}>
           <EuiStat
@@ -46,11 +70,57 @@ class AlertsStats extends Component {
             description={item.description}
             titleColor={item.color || 'primary'}
             textAlign="center"
+            onClick={() => item.value !== '-' && auxFunction()}
           />
         </EuiFlexItem>
       );
     });
     return stats;
+  }
+
+  addFilter(filter) {    
+    const { filterManager } = getServices();
+    const matchPhrase = {};
+    matchPhrase[filter.key] = filter.value;
+    const newFilter = {
+      "meta": {
+        "disabled": false,
+        "key": filter.key,
+        "params": { "query": filter.value },
+        "type": "phrase",
+        "negate": filter.negate || false,
+        "index": "wazuh-alerts-3.x-*"
+      },
+      "query": { "match_phrase": matchPhrase },
+      "$state": { "store": "appState" }
+    }
+    filterManager.addFilters([newFilter]);
+  }
+
+  filterLevel() {
+    const { indexPattern } = this.state;
+    const { filterManager } = getServices();
+    const valuesArray = {gte: 12, lt: null};
+    const filters = {
+      ...esFilters.buildRangeFilter({ name: "rule.level", type: "integer" }, valuesArray, indexPattern),
+      "$state": { "store": "appState" }
+    }
+    filterManager.addFilters(filters);
+  }
+
+  filterAuthenticationFailure() {
+    const { indexPattern } = this.state;
+    const { filterManager } = getServices();
+    const valuesArray = ["win_authentication_failed", "authentication_failed", "authentication_failures"];
+    const filters = {
+      ...esFilters.buildPhrasesFilter({ name: "rule.groups", type: "string" }, valuesArray, indexPattern),
+      "$state": { "store": "appState" }
+    }
+    filterManager.addFilters(filters);
+  }
+
+  filterAuthenticationSuccess() {
+    this.addFilter({key: 'rule.groups', value: "authentication_success", negate: false} );
   }
 
   render() {

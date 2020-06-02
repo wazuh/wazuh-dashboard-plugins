@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiPanel, EuiStat, EuiButton} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiPanel, EuiStat, EuiButton, EuiToolTip } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
@@ -229,12 +229,12 @@ class WzMenuOverview extends Component {
             {!agentData.id && (
               <EuiFlexGroup>
                 <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
-                  <EuiButtonEmpty iconType="arrowRight"
+                  <EuiButtonEmpty iconType="apps"
                     onClick={() => {
                       this.props.closePopover();
                       window.location.href = '#/overview';
                     }}>
-                    Go to the Modules welcome page
+                    Modules directory
                   </EuiButtonEmpty>
                 </EuiFlexItem>
               </EuiFlexGroup>

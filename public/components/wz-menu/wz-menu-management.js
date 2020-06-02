@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty } from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
@@ -117,13 +117,13 @@ class WzMenuManagement extends Component {
       <div className="WzManagementSideMenu">
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
-            <EuiButtonEmpty iconType="arrowRight"
-              onClick={() => {
-                this.props.closePopover();
-                window.location.href = '#/manager';
-              }}>
-              Go to the Management welcome page
-            </EuiButtonEmpty>
+              <EuiButtonEmpty iconType="apps"
+                onClick={() => {
+                  this.props.closePopover();
+                  window.location.href = '#/manager';
+                }}>
+                Management
+              </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup responsive={false}>
