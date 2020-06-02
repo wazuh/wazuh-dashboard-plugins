@@ -111,7 +111,7 @@ class WzGroupsActionButtons extends Component {
 
   onChangeNewGroupName = e => {
     this.setState({
-      newGroupName: e.target.value
+      newGroupName: e.target.value.split(" ").join("")
     });
   };
 
@@ -139,7 +139,7 @@ class WzGroupsActionButtons extends Component {
 
   async createGroup() {
     try {
-      if (this.state.newGroupName !== '') {
+      if (this.isOkNameGroup(this.state.newGroupName)) {
         this.props.updateLoadingStatus(true);
         await this.groupsHandler.saveGroup(this.state.newGroupName);
         this.showToast(
@@ -199,6 +199,10 @@ class WzGroupsActionButtons extends Component {
     });
   };
 
+  isOkNameGroup = (name) => {
+    return (name !== '' && name.trim().length > 0); 
+  }
+
   render() {
     const { adminMode } = this.props.state;
 
@@ -257,7 +261,7 @@ class WzGroupsActionButtons extends Component {
                 <EuiFlexItem>
                   <EuiButton
                     iconType="save"
-                    isDisabled={this.state.newGroupName == ''}
+                    isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
                     fill
                     onClick={async () => {
                       await this.createGroup();
