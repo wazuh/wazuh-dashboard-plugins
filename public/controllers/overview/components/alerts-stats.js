@@ -17,9 +17,8 @@ import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { esFilters } from '../../../../../../src/plugins/data/common';
-import { getIndexPattern } from '../../../../public/components/overview/mitre/lib/elastic-helpers.ts';
+import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
 import '../../../../public/less/common.less'
-
 
 
 class AlertsStats extends Component {
