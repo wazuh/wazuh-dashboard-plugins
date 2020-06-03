@@ -31,6 +31,9 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { VisHandlers } from '../../factories/vis-handlers';
+
+const visHandler = new VisHandlers();
 
 export class WzVisualize extends Component {
   cardReqs = {
@@ -138,7 +141,7 @@ export class WzVisualize extends Component {
     } catch (error) { }
   }
 
-  async componentDidUpdate() {
+  async componentDidUpdate(prevProps) {
     this.visualizations = this.props.isAgent && this.props.isAgent.length ? agentVisualizations : visualizations;
     const { selectedTab } = this.props;
     if (selectedTab !== this.state.selectedTab) {
@@ -154,6 +157,10 @@ export class WzVisualize extends Component {
             ? this.getMetricItems(selectedTab)
             : []
       });
+    }
+    // when it changes no selected agent to selected or inverse, remove previous visualizations VisHanderls
+    if((!prevProps.isAgent && this.props.isAgent) || (prevProps.isAgent && !this.props.isAgent)){
+      visHandler.removeAll();
     }
   }
 
@@ -178,6 +185,7 @@ export class WzVisualize extends Component {
   };
 
   render() {
+    console.log('WzVisualize Render', this.props)
     this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = vis => {

@@ -25,7 +25,8 @@ import { ModulesDefaults } from './modules-defaults';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { MainModuleAgent } from './main-agent'
-import { MainModuleOverview } from './main-overview'
+import { MainModuleOverview } from './main-overview';
+import store from '../../../redux/store';
 
 export class MainModule extends Component {
   constructor(props) {
@@ -94,7 +95,7 @@ export class MainModule extends Component {
 
   async startReport() {
     this.setState({ loadingReport: true });
-    const agent = (this.props.agent || {}).id || false;
+    const agent = (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
     await this.reportingService.startVis2Png(this.props.section, agent);
     this.setState({ loadingReport: false });
   }
