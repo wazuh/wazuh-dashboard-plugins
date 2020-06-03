@@ -198,7 +198,7 @@ class WzGroupsActionButtonsAgents extends Component {
   };
 
   render() {
-    const { adminMode } = this.props.state;
+    const { adminMode } = this.props;
 
     // Add new group button
     const manageAgentsButton = (
@@ -259,7 +259,8 @@ class WzGroupsActionButtonsAgents extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 
