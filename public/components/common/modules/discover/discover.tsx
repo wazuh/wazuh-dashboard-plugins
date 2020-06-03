@@ -42,7 +42,7 @@ import {
   IIndexPattern,
   TimeRange,
   Query,
-  esFilters,
+  buildPhraseFilter,
   getEsQueryConfig,
   buildEsQuery,
   IFieldType
@@ -74,7 +74,6 @@ export class Discover extends Component {
     itemIdToExpandedRowMap: any,
     dateRange: TimeRange,
     query: Query,
-    searchBarFilters: esFilters.Filter[],
     elasticQuery: object
     filters: [],
     columns: string[],
@@ -388,7 +387,7 @@ export class Discover extends Component {
     const valuesArray = Array.isArray(value) ? [...value] : [value];
     const filters = this.state.searchBarFilters;
     valuesArray.map((item) => {
-      const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
+      const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
       formattedFilter.meta.negate = true;
 
       filters.push(formattedFilter);
@@ -408,7 +407,7 @@ export class Discover extends Component {
     const valuesArray = Array.isArray(value) ? [...value] : [value];
     const filters = this.state.searchBarFilters;
     valuesArray.map((item) => {
-      const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
+      const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
 
       filters.push(formattedFilter);
     })
@@ -423,7 +422,7 @@ export class Discover extends Component {
     this.setState({ dateRange, query });
   }
 
-  onFiltersUpdated = (filters: esFilters.Filter[]) => {
+  onFiltersUpdated = (filters: []) => {
     this.filterManager.setFilters(filters);
     this.setState({ searchBarFilters: filters });
   }

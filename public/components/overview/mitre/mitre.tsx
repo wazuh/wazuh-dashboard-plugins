@@ -34,8 +34,7 @@ import DateMatch from '@elastic/datemath';
 
 import {
   TimeRange,
-  Query,
-  esFilters
+  Query
 } from '../../../../../../src/plugins/data/common';
 
 export interface ITactic {
@@ -61,7 +60,7 @@ export class Mitre extends Component {
     selectedTactics: Object,
     filterParams: IFilterParams,
     query: Query,
-    searchBarFilters: esFilters.Filter[],
+    searchBarFilters: [],
   } 
 
   props: any;
@@ -99,7 +98,7 @@ export class Mitre extends Component {
     this.setState({ dateRange, query, filterParams });
   }
 
-  onFiltersUpdated = (filters: esFilters.Filter[]) => {
+  onFiltersUpdated = (filters: []) => {
     this.filterManager.setFilters(filters);
     const filterParams = {};
     filterParams["time"] = this.state.filterParams["time"];

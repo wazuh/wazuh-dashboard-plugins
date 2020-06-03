@@ -14,7 +14,7 @@ import Cookies from '../utils/js-cookie';
 import store from '../redux/store';
 import {} from '../redux/actions/appStateActions';
 import { getIndexPattern } from '../components/overview/mitre/lib';
-import { esFilters } from '../../../../src/plugins/data/common';
+import { buildPhraseFilter } from '../../../../src/plugins/data/common';
 import rison from 'rison-node';
 
 
@@ -33,7 +33,7 @@ export class AppNavigate {
       Object.keys(filters).forEach(currentFilter => {
         filtersArray.push(
           {
-            ...esFilters.buildPhraseFilter({ name: currentFilter, type: 'text' }, filters[currentFilter], indexPattern),
+            ...buildPhraseFilter({ name: currentFilter, type: 'text' }, filters[currentFilter], indexPattern),
             "$state": { "isImplicit": false, "store": "appState" },
           }
         )
