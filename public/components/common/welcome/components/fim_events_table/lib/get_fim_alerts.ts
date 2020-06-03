@@ -12,17 +12,19 @@
  * Find more information about this on the LICENSE file.
  */
 import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../overview/mitre/lib'
-import { buildFilter } from '../../../../../../../../../src/plugins/data/common';
-import { esFilters } from '../../../../../../../../../src/plugins/data/public';
+import { buildPhraseFilter } from '../../../../../../../../../src/plugins/data/common';
 
 import { AppState } from '../../../../../../react-services/app-state'
 
 
 function createFilters(agentId, indexPattern) {
-  const filter = filter => buildFilter(
-    indexPattern, {name: filter.name, type: 'string'}, 
-    esFilters.FILTERS.PHRASE, false, false, filter.value, 
-    null, esFilters.FilterStateStore.APP_STATE);
+  const filter = filter => {return {
+    ...buildPhraseFilter(
+      {name: filter.name, type: 'text'},
+      filter.value, indexPattern),
+    "$state": { "store": "appState" }
+  }
+}
   const wazuhFilter = getWazuhFilter();
   const filters = [
     wazuhFilter,

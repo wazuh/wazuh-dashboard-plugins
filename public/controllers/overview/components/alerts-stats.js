@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-import { esFilters } from '../../../../../../src/plugins/data/common';
+import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib/elastic-helpers.ts';
 
 
@@ -102,7 +102,7 @@ class AlertsStats extends Component {
     const { filterManager } = getServices();
     const valuesArray = {gte: 12, lt: null};
     const filters = {
-      ...esFilters.buildRangeFilter({ name: "rule.level", type: "integer" }, valuesArray, indexPattern),
+      ...buildRangeFilter({ name: "rule.level", type: "integer" }, valuesArray, indexPattern),
       "$state": { "store": "appState" }
     }
     filterManager.addFilters(filters);
@@ -113,7 +113,7 @@ class AlertsStats extends Component {
     const { filterManager } = getServices();
     const valuesArray = ["win_authentication_failed", "authentication_failed", "authentication_failures"];
     const filters = {
-      ...esFilters.buildPhrasesFilter({ name: "rule.groups", type: "string" }, valuesArray, indexPattern),
+      ...buildPhrasesFilter({ name: "rule.groups", type: "string" }, valuesArray, indexPattern),
       "$state": { "store": "appState" }
     }
     filterManager.addFilters(filters);

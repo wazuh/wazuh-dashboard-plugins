@@ -30,7 +30,7 @@ import { Discover } from '../../../common/modules/discover'
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
-import { esFilters, IIndexPattern } from '../../../../../../../src/plugins/data/public';
+import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/public';
 import { getIndexPattern } from '../../../overview/mitre/lib';
 import store from '../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
@@ -174,7 +174,7 @@ export class FileDetails extends Component {
     const { file } = this.props.currentFile;
     const { view, agent } = this.props;
     const filters = [{
-      ...esFilters.buildPhraseFilter(
+      ...buildPhraseFilter(
         {name: 'syscheck.path', type: 'text'},
         file, this.indexPattern),
       "$state": { "store": "appState" }

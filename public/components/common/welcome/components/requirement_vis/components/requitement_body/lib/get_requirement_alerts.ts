@@ -14,8 +14,7 @@
 
 import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../../../overview/mitre/lib';
 import { getWazuhFilter } from '../../../../fim_events_table';
-import { buildFilter } from '../../../../../../../../../../../src/plugins/data/common';
-import { esFilters } from '../../../../../../../../../../../src/plugins/data/public';
+import { buildPhraseFilter, buildExistsFilter } from '../../../../../../../../../../../src/plugins/data/common';
 
 export async function getRequirementAlerts(agentId, time, requirement) {
   const indexPattern = await getIndexPattern();
@@ -45,10 +44,13 @@ export async function getRequirementAlerts(agentId, time, requirement) {
 }
 
 function createFilters(agentId, indexPattern) {
-  const filter = filter => buildFilter(
-    indexPattern, { name: filter.name, type: 'string' },
-    esFilters.FILTERS.PHRASE, false, false, filter.value,
-    null, esFilters.FilterStateStore.APP_STATE);
+  const filter = filter => {return {
+    ...buildPhraseFilter(
+      {name: filter.name, type: 'text'},
+      filter.value, indexPattern),
+    "$state": { "store": "appState" }
+  }
+}
   const wazuhFilter = getWazuhFilter();
   const filters = [
     wazuhFilter,
@@ -59,5 +61,5 @@ function createFilters(agentId, indexPattern) {
 
 
 function createExistsFilter(requirement, indexPattern) {
-  return esFilters.buildExistsFilter({ name: `rule.${requirement}`, type: 'nested' }, indexPattern)
+  return buildExistsFilter({ name: `rule.${requirement}`, type: 'nested' }, indexPattern)
 }

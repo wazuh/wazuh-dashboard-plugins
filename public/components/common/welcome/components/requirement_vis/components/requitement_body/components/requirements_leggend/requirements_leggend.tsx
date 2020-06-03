@@ -19,7 +19,7 @@ import { EuiIcon } from "@elastic/eui";
 import { EuiListGroup } from "@elastic/eui";
 import './requirements_leggend.less';
 import rison from 'rison-node';
-import { esFilters } from '../../../../../../../../../../../../src/plugins/data/common';
+import { buildPhraseFilter } from '../../../../../../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../../../../../overview/mitre/lib';
 import store from '../../../../../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../../../../../redux/actions/appStateActions';
@@ -48,7 +48,7 @@ const goToDashboardWithFilter = (requirement, item, agent) => {
     const route = injector.get('$route');
     getIndexPattern().then(indexPattern => {
       const filters = [{
-        ...esFilters.buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, item.key, indexPattern),
+        ...buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, item.key, indexPattern),
         "$state": { "isImplicit": false, "store": "appState" },
       }]
       const _w = { filters };
