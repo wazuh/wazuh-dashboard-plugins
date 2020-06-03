@@ -93,22 +93,22 @@ export class WazuhReportingCtrl {
         h1: {
           fontSize: 22,
           monslight: true,
-          color: '#1ea5c8'
+          color: '#00a9e5'
         },
         h2: {
           fontSize: 18,
           monslight: true,
-          color: '#1ea5c8'
+          color: '#00a9e5'
         },
         h3: {
           fontSize: 16,
           monslight: true,
-          color: '#1ea5c8'
+          color: '#00a9e5'
         },
         h4: {
           fontSize: 14,
           monslight: true,
-          color: '#1ea5c8'
+          color: '#00a9e5'
         },
         standard: {
           color: '#333'
@@ -133,7 +133,7 @@ export class WazuhReportingCtrl {
             text: 'info@wazuh.com\nhttps://wazuh.com',
             alignment: 'right',
             margin: [0, 0, 40, 0],
-            color: '#1EA5C8'
+            color: '#00a9e5'
           }
         ]
       },
@@ -143,14 +143,14 @@ export class WazuhReportingCtrl {
           columns: [
             {
               text: 'Copyright © 2019 Wazuh, Inc.',
-              color: '#1EA5C8',
+              color: '#00a9e5',
               margin: [40, 40, 0, 0]
             },
             {
               text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
               alignment: 'right',
               margin: [0, 40, 40, 0],
-              color: '#1EA5C8'
+              color: '#00a9e5'
             }
           ]
         };
@@ -234,8 +234,8 @@ export class WazuhReportingCtrl {
             body: full_body
           },
           layout: {
-            fillColor: i => (i === 0 ? '#78C8DE' : null),
-            hLineColor: () => '#78C8DE',
+            fillColor: i => (i === 0 ? '#00a9e5' : null),
+            hLineColor: () => '#00a9e5',
             hLineWidth: () => 1,
             vLineWidth: () => 0
           }
@@ -272,7 +272,7 @@ export class WazuhReportingCtrl {
           this.dd.content.push({
             text:
               'RT: Real time | WD: Who-data | Per.: Permission | MT: Modification time | SL: Symbolic link | RL: Recursion level',
-            style: { fontSize: 8, color: '#78C8DE' },
+            style: { fontSize: 8, color: '#00a9e5' },
             margin: [0, 0, 0, 5]
           });
         }
@@ -331,8 +331,8 @@ export class WazuhReportingCtrl {
               body: full_body
             },
             layout: {
-              fillColor: i => (i === 0 ? '#78C8DE' : null),
-              hLineColor: () => '#78C8DE',
+              fillColor: i => (i === 0 ? '#00a9e5' : null),
+              hLineColor: () => '#00a9e5',
               hLineWidth: () => 1,
               vLineWidth: () => 0
             }
@@ -397,10 +397,10 @@ export class WazuhReportingCtrl {
             {
               columns: [
                 {
-                  image: clockIconRaw,
+                  svg: clockIconRaw,
                   width: 10,
                   height: 10,
-                  margin: [40, 4, 0, 0]
+                  margin: [40, 5, 0, 0]
                 },
                 {
                   text: str || '-',
@@ -414,10 +414,10 @@ export class WazuhReportingCtrl {
             {
               columns: [
                 {
-                  image: filterIconRaw,
+                  svg: filterIconRaw,
                   width: 10,
                   height: 10,
-                  margin: [40, 4, 0, 0]
+                  margin: [40, 6, 0, 0]
                 },
                 {
                   text: filters || '-',
@@ -431,7 +431,7 @@ export class WazuhReportingCtrl {
       },
       margin: [-40, 0, -40, 0],
       layout: {
-        fillColor: () => '#78C8DE',
+        fillColor: () => '#00a9e5',
         hLineWidth: () => 0,
         vLineWidth: () => 0
       }
@@ -1710,7 +1710,7 @@ export class WazuhReportingCtrl {
             customul.push({
               ul: critical.references.map(item => ({
                 text: item,
-                color: '#1EA5C8'
+                color: ''
               }))
             });
           }

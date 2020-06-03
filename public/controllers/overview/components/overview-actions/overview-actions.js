@@ -331,12 +331,6 @@ class OverviewActions extends Component {
           )}
           {this.state.isAgent && (
             <div style={{ display: "inline-flex" }}>
-              <div className="euiButtonEmpty euiButtonEmpty__text"
-                style={{ textDecoration: 'none', cursor: 'default' }}>
-                <span className="euiButtonEmpty__content">
-                  Selected agent:
-                  </span>
-              </div>
               <EuiToolTip position='bottom' content='Change agent selected' >
                 <EuiButtonEmpty
                   style={{background: 'rgba(0, 107, 180, 0.1)'}}
