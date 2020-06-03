@@ -5,7 +5,6 @@ import GroupsHandler from './groups-handler';
 export default class GroupsColums {
   constructor(tableProps) {
     this.tableProps = tableProps;
-    this.adminMode = this.tableProps.state.adminMode;
     this.groupsHandler = GroupsHandler;
 
     this.buildColumns = () => {
@@ -35,7 +34,7 @@ export default class GroupsColums {
         render: item => {
           return (
             <div>
-              {(this.adminMode && (
+              {(this.tableProps.adminMode && (
                 <div>
                   <EuiToolTip
                     position="top"

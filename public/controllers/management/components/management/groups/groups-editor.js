@@ -45,7 +45,7 @@ class WzGroupsEditor extends Component {
       enableLiveAutocompletion: true
     };
     this.groupsHandler = GroupsHandler;
-    const { fileContent, adminMode } = this.props.state;
+    const { fileContent } = this.props.state;
 
     const { name, content, isEditable, groupName } = fileContent;
 
@@ -55,7 +55,6 @@ class WzGroupsEditor extends Component {
       content,
       name,
       isEditable,
-      adminMode,
       groupName: groupName
     };
   }
@@ -83,7 +82,7 @@ class WzGroupsEditor extends Component {
    * @param {String} name
    */
   async save(name) {
-    const { adminMode } = this.props.state;
+    const { adminMode } = this.props;
 
     if (!this._isMounted || !adminMode) {
       return;
@@ -127,7 +126,8 @@ class WzGroupsEditor extends Component {
   };
 
   render() {
-    const { name, content, isEditable, groupName, adminMode } = this.state;
+    const { name, content, isEditable, groupName } = this.state;
+    const { adminMode } = this.props;
 
     const saveButton = (
       <EuiButton
@@ -212,7 +212,8 @@ class WzGroupsEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 
