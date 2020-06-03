@@ -99,7 +99,7 @@ export class InventoryTable extends Component {
     const { filters, customBadges } = this.props;
     if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters) 
      || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
-      this.setState({ pageIndex: 0 }, this.getSyscheck)
+      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck)
     }
   }
 
