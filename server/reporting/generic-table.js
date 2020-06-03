@@ -93,8 +93,8 @@ export default (document, items, columns, keys, title, givenRows = false) => {
       body: fullBody
     },
     layout: {
-      fillColor: i => (i === 0 ? '#78C8DE' : null),
-      hLineColor: () => '#78C8DE',
+      fillColor: i => (i === 0 ? '#00a9e5' : null),
+      hLineColor: () => '#00a9e5',
       hLineWidth: () => 1,
       vLineWidth: () => 0
     }
