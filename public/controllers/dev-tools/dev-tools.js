@@ -56,7 +56,7 @@ export class DevToolsController {
     ) {
       AppState.setWzMenu();
     }
-    const breadcrumb = [{ text: '' }, { text: 'Dev Tools' }];
+    const breadcrumb = [{ text: '' }, { text: 'Dev Tools',  navigation: `#/wazuh-dev` }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     $(this.$document[0]).keydown(e => {
       if (!this.multipleKeyPressed.includes(e.which)) {

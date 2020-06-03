@@ -38,7 +38,8 @@ class WzConfigurationMain extends Component {
           href: '#/agents-preview'
         },
         { agent: this.props.agent },
-        { text: 'Configuration' }
+        { text: 'Configuration',
+          navigation: `#/agents/?tab=configuration&agent=${this.props.agent}` }
       ];
     }
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));

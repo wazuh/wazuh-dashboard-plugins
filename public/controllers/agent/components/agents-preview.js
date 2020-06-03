@@ -70,7 +70,7 @@ export class AgentsPreview extends Component {
   }
 
   setGlobalBreadcrumb() {
-    const breadcrumb = [{ text: '' }, { text: 'Agents' }];
+    const breadcrumb = [{ text: '' }, { text: 'Agents',  navigation: `#/agents-preview/` }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 

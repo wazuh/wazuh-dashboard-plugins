@@ -45,7 +45,7 @@ class WzCurrentAgentsSection extends Component {
           className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
           truncate: false,
         },
-        { text: TabDescription[this.props.currentTab].title },
+        { text: TabDescription[this.props.currentTab].title, navigation: `#/agents/?tab=${this.props.currentTab}` },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     }

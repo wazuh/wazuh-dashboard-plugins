@@ -41,7 +41,7 @@ export class OverviewWelcome extends Component {
   }
 
   setGlobalBreadcrumb() {
-    const breadcrumb = [{ text: '' }, { text: 'Modules' }];
+    const breadcrumb = [{ text: '' }, { text: 'Modules', navigation: `#/overview` }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 

@@ -27,7 +27,7 @@ class WzReporting extends Component {
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Reporting' }
+      { text: 'Reporting',  navigation: `#/manager/?tab=reporting`}
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }

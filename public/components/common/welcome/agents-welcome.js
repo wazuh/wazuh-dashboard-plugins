@@ -111,6 +111,7 @@ export class AgentsWelcome extends Component {
         text: `${this.props.agent.name}`,
         className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
         truncate: false,
+        navigation: `#/agents/?tab=welcome&agent=${this.props.agent.id}`
       }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));

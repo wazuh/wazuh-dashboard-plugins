@@ -62,7 +62,7 @@ export class MainModuleAgent extends Component {
       breadcrumb = [
         { text: '' },
         { text: 'Agents', href: '#/agents-preview' },
-        { text: this.props.agent.id }
+        { text: this.props.agent.id, navigation: `#/agents/?tab=welcome&agent=${this.props.agent.id}`}
       ];
     } else {
       breadcrumb = [
@@ -76,7 +76,8 @@ export class MainModuleAgent extends Component {
         { agent: this.props.agent },
         {
           text: TabDescription[this.props.section].title,
-          className: 'wz-global-breadcrumb-popover'
+          className: 'wz-global-breadcrumb-popover',
+          navigation: `#/agents/?tab=${this.props.section}`
         },
       ];
     }

@@ -34,7 +34,7 @@ class WzGroups extends Component {
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Groups' }
+      { text: 'Groups',  navigation: `#/manager/?tab=groups` }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
