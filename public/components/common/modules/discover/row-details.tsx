@@ -304,7 +304,14 @@ export class RowDetails extends Component {
     return (
       <EuiFlexGrid columns={4}>
         <EuiFlexItem key="id" grow={1}>
-          <b style={{ paddingBottom: 6 }}>ID</b>{id}
+          <b style={{ paddingBottom: 6 }}>ID</b>
+          <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
+            <EuiLink
+              onClick={async () => this.props.addFilter({ 'rule.id': id })}
+            >
+              {id}
+            </EuiLink>
+          </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key="level" grow={1}>
           <b style={{ paddingBottom: 6 }}>Level</b>
@@ -317,24 +324,10 @@ export class RowDetails extends Component {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key="file" grow={1}>
-          <b style={{ paddingBottom: 6 }}>File</b>
-          <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink
-              onClick={async () => this.props.addFilter({ file: file })}
-            >
-              {file}
-            </EuiLink>
-          </EuiToolTip>
+          <b style={{ paddingBottom: 6 }}>File</b>{file}
         </EuiFlexItem>
         <EuiFlexItem key="path" grow={1}>
-          <b style={{ paddingBottom: 6 }}>Path</b>
-          <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink
-              onClick={async () => this.props.addFilter({ path: path })}
-            >
-              {path}
-            </EuiLink>
-          </EuiToolTip>
+          <b style={{ paddingBottom: 6 }}>Path</b>{path}
         </EuiFlexItem>
         <EuiFlexItem key="Groups" grow={1}><b style={{ paddingBottom: 6 }}>Groups</b>
           {this.renderGroups(groups)}
@@ -350,7 +343,7 @@ export class RowDetails extends Component {
       listGroups.push(
         <span key={group}>
           <EuiLink
-            onClick={async () => this.props.addFilter({ group: group })}
+            onClick={async () => this.props.addFilter({ 'rule.groups': group })}
           >
             <EuiToolTip
               position="top"
