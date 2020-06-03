@@ -730,17 +730,20 @@ export class AgentsTable extends Component {
         field: 'name',
         name: 'Name',
         sortable: true,
+        width: '250px',
         truncateText: true
       },
       {
         field: 'ip',
         name: 'IP',
+        width: '90px',
         truncateText: true,
         sortable: true
       },
       {
         field: 'group',
         name: 'Group(s)',
+        width: '200px',
         truncateText: true,
         sortable: true
       },
@@ -748,13 +751,14 @@ export class AgentsTable extends Component {
         field: 'os_name',
         name: 'OS',
         sortable: true,
+        width: '200px',
         truncateText: true,
         render: this.addIconPlatformRender
       },
       {
         field: 'version',
         name: 'Version',
-        width: '100px',
+        width: '80px',
         truncateText: true,
         sortable: true
         /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
@@ -762,12 +766,14 @@ export class AgentsTable extends Component {
       {
         field: 'dateAdd',
         name: 'Registration date',
+        width: '150px',
         truncateText: true,
         sortable: true
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
+        width: '150px',
         truncateText: true,
         sortable: true
       },
@@ -776,11 +782,12 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
+        width: '150px',
         render: this.addHealthStatusRender
       },
       {
         align: 'right',
-        width: '100px',
+        width: '80px',
         field: 'actions',
         name: 'Actions',
         render: agent => this.actionButtonsRender(agent)
