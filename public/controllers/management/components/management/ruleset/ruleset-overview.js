@@ -10,7 +10,7 @@ import {
 } from '@elastic/eui';
 import {
   updateAdminMode
-} from '../../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/appStateActions';
 
 import { connect } from 'react-redux';
 import checkAdminMode from './utils/check-admin-mode';
