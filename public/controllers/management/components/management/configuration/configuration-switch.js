@@ -52,8 +52,10 @@ import { clusterNodes, checkAdminMode, clusterReq } from './utils/wz-fetch';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
-  updateAdminMode
 } from '../../../../../redux/actions/configurationActions';
+import {
+  updateAdminMode
+} from '../../../../../redux/actions/appStateActions';
 import { connect } from 'react-redux';
 
 import {
