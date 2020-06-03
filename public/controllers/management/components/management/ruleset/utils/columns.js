@@ -7,7 +7,6 @@ export default class RulesetColumns {
   constructor(tableProps) {
     this.tableProps = tableProps;
     this.rulesetHandler = RulesetHandler;
-    this.adminMode = this.tableProps.state.adminMode;
 
     this.buildColumns = () => {
       this.columns = {
@@ -281,7 +280,7 @@ export default class RulesetColumns {
         ]
       };
       // If the admin mode is enabled the action column in CDB lists is shown
-      if (this.adminMode) {
+      if (this.tableProps.adminMode) {
         this.columns.lists[2] = {
           name: 'Actions',
           align: 'left',

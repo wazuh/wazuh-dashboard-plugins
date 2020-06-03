@@ -526,7 +526,8 @@ class WzListEditor extends Component {
 
   //isDisabled={nameForSaving.length <= 4}
   render() {
-    const { listInfo, isLoading, error, adminMode } = this.props.state;
+    const { listInfo, isLoading, error } = this.props.state;
+    const { adminMode } = this.props;
     const { name, path } = listInfo;
 
     const message = isLoading ? false : 'No results...';
@@ -625,7 +626,8 @@ class WzListEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

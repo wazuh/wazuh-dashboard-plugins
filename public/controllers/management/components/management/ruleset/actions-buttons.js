@@ -155,7 +155,8 @@ class WzRulesetActionButtons extends Component {
   }
 
   render() {
-    const { section, showingFiles, adminMode } = this.props.state;
+    const { section, showingFiles } = this.props.state;
+    const { adminMode } = this.props;
 
     // Export button
     const exportButton = (
@@ -254,7 +255,8 @@ class WzRulesetActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 
