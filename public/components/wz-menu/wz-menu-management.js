@@ -15,6 +15,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { updateAdminMode } from '../../redux/actions/appStateActions';
+import { AppNavigate } from '../../react-services/app-navigate'
 
 class WzMenuManagement extends Component {
   constructor(props) {
@@ -67,9 +68,9 @@ class WzMenuManagement extends Component {
     }catch(error){}
   }
 
-  clickMenuItem = section => {
+  clickMenuItem = (ev,section) => {
     this.props.closePopover();
-    window.location.href = `#/manager/${section}?tab=${section}`;
+    AppNavigate.navigateToModule(ev, 'manager', {tab: section} )
   };
 
   createItem = (item, data = {}) => {
@@ -79,7 +80,8 @@ class WzMenuManagement extends Component {
       id: item.id,
       name: item.text,
       isSelected: this.props.state.section === item.id,
-      onClick: () => this.clickMenuItem(item.id)
+      onClick: () => {},
+      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
 

@@ -35,6 +35,7 @@ import { CheckUpgrade } from './checkUpgrade';
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
+import { AppNavigate } from '../../../react-services/app-navigate';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -1019,8 +1020,8 @@ export class AgentsTable extends Component {
 
     const getCellProps = item => {
       return {
-        onClick: () => this.props.clickAction(item)
-      };
+        onMouseDown: (ev) =>  {AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
+      }
     };
 
     const {

@@ -17,6 +17,7 @@ import store from '../../redux/store';
 import chrome from 'ui/chrome';
 import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
+import { AppNavigate } from '../../react-services/app-navigate';
 import { UnsupportedComponents } from '../../utils/components-os-support';
 
 class WzMenuOverview extends Component {
@@ -76,20 +77,21 @@ class WzMenuOverview extends Component {
     this.router = $injector.get('$route');
   }
 
-  clickMenuItem = section => {
+  clickMenuItem = (ev, section) => {
     this.props.closePopover();
+    const params = { tab : section};
+    if(store.getState().appStateReducers.currentAgentData)
+      params["agentId"] = store.getState().appStateReducers.currentAgentData.id
     const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
       .currentTab;
     if (currentTab !== section) {
       // do not redirect if we already are in that tab
       if (!this.props.isAgent) {
-        window.location.href = `#/overview/?tab=${section}`;
-        store.dispatch(updateCurrentTab(section));
+        AppNavigate.navigateToModule(ev, 'overview', params )
       } else {
         if (!this.props.switchTab) {
           store.dispatch(updateCurrentAgentData(this.props.isAgent)); 
-          window.location.href = `#/overview/?tab=${section}`;
-          this.router.reload();
+          AppNavigate.navigateToModule(ev, 'overview', params )
         } else {
           this.props.switchTab(section);
         }
@@ -118,7 +120,8 @@ class WzMenuOverview extends Component {
       id: item.id,
       name: item.text,
       isSelected: currentTab === item.id,
-      onClick: () => this.clickMenuItem(item.id)
+      onClick:() => {},
+      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
 
