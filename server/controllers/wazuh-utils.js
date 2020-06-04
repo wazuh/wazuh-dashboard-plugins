@@ -13,7 +13,7 @@
 // Require some libraries
 import { ErrorResponse } from './error-response';
 import { getConfiguration } from '../lib/get-configuration';
-import simpleTail from 'simple-tail';
+import { read } from 'read-last-lines';
 import path from 'path';
 import { UpdateConfigurationFile } from '../lib/update-configuration';
 const updateConfigurationFile = new UpdateConfigurationFile();
@@ -71,14 +71,15 @@ export class WazuhUtilsCtrl {
    */
   async getAppLogs(req, reply) {
     try {
-      const lastLogs = await simpleTail(
+      const lastLogs = await read(
         path.join(__dirname, '../../../../optimize/wazuh/logs/wazuhapp.log'),
         50
       );
-      return lastLogs && Array.isArray(lastLogs)
+      const spliterLog = lastLogs.split('\n');
+      return spliterLog && Array.isArray(spliterLog)
         ? {
             error: 0,
-            lastLogs: lastLogs.filter(
+            lastLogs: spliterLog.filter(
               item => typeof item === 'string' && item.length
             )
           }
