@@ -143,7 +143,7 @@ export class MainModuleOverview extends Component {
                 <div className="wz-welcome-page-agent-tabs">
                   <EuiFlexGroup>
                     {this.props.renderTabs()}
-                    <EuiFlexItem grow={false} style={{ marginTop: 6 }}>
+                    <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
                       <WzReduxProvider>
                         <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
                       </WzReduxProvider>

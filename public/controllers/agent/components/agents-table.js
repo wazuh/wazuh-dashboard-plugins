@@ -36,6 +36,7 @@ import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
+import { AgentGroupTruncate } from '../../../components/common/util';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -247,7 +248,7 @@ export class AgentsTable extends Component {
       return date !== undefined ? timeService(date) : '-';
     };
     const agentVersion =
-      agent.version !== undefined ? agent.version.split(' ')[1] : '.';
+      agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
     return {
       id: agent.id,
@@ -322,7 +323,7 @@ export class AgentsTable extends Component {
           className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
           aria-hidden="true"
         ></i>{' '}
-        {os_name === '--' ? '-' : os_name}
+        {os_name === '- -' ? '-' : os_name}
       </span>
     );
   }
@@ -731,31 +732,36 @@ export class AgentsTable extends Component {
         field: 'name',
         name: 'Name',
         sortable: true,
+        width: '250px',
         truncateText: true
       },
       {
         field: 'ip',
         name: 'IP',
+        width: '90px',
         truncateText: true,
         sortable: true
       },
       {
         field: 'group',
         name: 'Group(s)',
+        width: '200px',
         truncateText: true,
-        sortable: true
+        sortable: true,
+        render: groups => groups !== '-' ? this.renderGroups(groups) : '-'
       },
       {
         field: 'os_name',
         name: 'OS',
         sortable: true,
+        width: '200px',
         truncateText: true,
         render: this.addIconPlatformRender
       },
       {
         field: 'version',
         name: 'Version',
-        width: '100px',
+        width: '80px',
         truncateText: true,
         sortable: true
         /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
@@ -763,12 +769,14 @@ export class AgentsTable extends Component {
       {
         field: 'dateAdd',
         name: 'Registration date',
+        width: '150px',
         truncateText: true,
         sortable: true
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
+        width: '150px',
         truncateText: true,
         sortable: true
       },
@@ -777,11 +785,12 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
+        width: '150px',
         render: this.addHealthStatusRender
       },
       {
         align: 'right',
-        width: '100px',
+        width: '80px',
         field: 'actions',
         name: 'Actions',
         render: agent => this.actionButtonsRender(agent)
@@ -904,7 +913,7 @@ export class AgentsTable extends Component {
         return {
           label: platform,
           group: 'osplatform',
-          query: `os.name=${platform}`
+          query: `os.platform=${platform}`
         };
       });
     return {
@@ -1075,6 +1084,12 @@ export class AgentsTable extends Component {
         </EuiFlexItem>
       </EuiFlexGroup>
     );
+  }
+
+  renderGroups(groups) {
+    return(
+      <AgentGroupTruncate groups={groups} length={25} label={'more'}/> 
+    )
   }
 
   render() {

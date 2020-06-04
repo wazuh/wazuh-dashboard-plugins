@@ -79,6 +79,7 @@ const columns = [
     name: 'Update from year',
     render: renderValueOrNoValue
   },
+  { field: 'download_timeout', name: 'Download timeout', render: renderValueOrNoValue },
   { field: 'path', name: 'Path', render: renderValueOrNoValue },
   { field: 'url', name: 'URL', render: renderValueOrNoValue },
   { field: 'url_attrs', name: 'URL attributes', render: renderUrlAttr },

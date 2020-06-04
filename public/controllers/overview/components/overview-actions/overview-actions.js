@@ -296,12 +296,12 @@ class OverviewActions extends Component {
       modal = (
         <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
           <EuiModal
-            maxWidth="1000px"
+            className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}
             initialFocus="[name=popswitch]"
           >
             <EuiModalHeader>
-              <EuiModalHeaderTitle>Pin agent</EuiModalHeaderTitle>
+              <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
             </EuiModalHeader>
 
             <EuiModalBody>
@@ -331,12 +331,6 @@ class OverviewActions extends Component {
           )}
           {this.state.isAgent && (
             <div style={{ display: "inline-flex" }}>
-              <div className="euiButtonEmpty euiButtonEmpty__text"
-                style={{ textDecoration: 'none', cursor: 'default' }}>
-                <span className="euiButtonEmpty__content">
-                  Selected agent:
-                  </span>
-              </div>
               <EuiToolTip position='bottom' content='Change agent selected' >
                 <EuiButtonEmpty
                   style={{background: 'rgba(0, 107, 180, 0.1)'}}

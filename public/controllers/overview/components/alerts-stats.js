@@ -17,8 +17,9 @@ import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
-import { getIndexPattern } from '../../../../public/components/overview/mitre/lib/elastic-helpers.ts';
-
+import { esFilters } from '../../../../../../src/plugins/data/common';
+import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
+import '../../../../public/less/loader';
 
 
 class AlertsStats extends Component {
@@ -47,7 +48,7 @@ class AlertsStats extends Component {
   }
 
   buildStats() {
-    const stats = (this.state.items || []).map(item => {
+    const stats = (this.state.items || []).map((item, index) => {
       const title = typeof item.value !== 'undefined' ? item.value : '-';
       let auxFunction;
       switch(item.description) {
@@ -66,7 +67,7 @@ class AlertsStats extends Component {
       return (
         <EuiFlexItem key={`${item.description}${title}`}>
           <EuiStat
-            title={title}
+            title={<span className={index !== 0 && this.props.tab === 'general' ? 'cursor-pointer' : 'cursor-default' }>{title}</span>}
             description={item.description}
             titleColor={item.color || 'primary'}
             textAlign="center"

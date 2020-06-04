@@ -1834,6 +1834,24 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'rule.mitre.id',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'rule.mitre.tactics',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'rule.id',
     type: 'string',
     count: 0,
