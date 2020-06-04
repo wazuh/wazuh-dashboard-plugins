@@ -35,7 +35,8 @@ import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eu
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
 import chrome from 'ui/chrome';
-import { WzFilterBar } from '../../../../components/wz-filter-bar/wz-filter-bar'
+import { WzFilterBar } from '../../../../components/wz-filter-bar/wz-filter-bar';
+import { AgentGroupTruncate } from '../../../../components/common/util/agent-group-truncate/agent_group_truncate'
 
 
 const checkField = field => {
@@ -93,10 +94,12 @@ export class AgentSelectionTable extends Component {
           show: false,
         },
         isSortable: true,
+        render: this.renderGroups
       },
       {
         id: 'version',
         label: 'Version',
+        width: '80px',
         alignment: LEFT_ALIGNMENT,
         mobileOptions: {
           show: true,
@@ -183,10 +186,10 @@ export class AgentSelectionTable extends Component {
         return {
           id: item.id,
           name: item.name,
-          version: item.version || '-',
+          version: item.version !== undefined ? item.version.split(' ')[1] : '-',
           os: item.os || '-',
           status: item.status,
-          group: this.getArrayFormatted(item.group) || '-',
+          group: item.group || '-',
         };
       });
   
@@ -594,6 +597,12 @@ export class AgentSelectionTable extends Component {
     );
   }
 
+  renderGroups(groups){
+    return Array.isArray(groups) ? (
+      <AgentGroupTruncate groups={groups} length={25} label={'more'}/>
+    ) : groups
+  }
+  
   filterBarModelStatus() {
     return {
       label: 'Status',
