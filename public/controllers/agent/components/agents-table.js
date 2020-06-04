@@ -747,7 +747,7 @@ export class AgentsTable extends Component {
         width: '200px',
         truncateText: true,
         sortable: true,
-        render: (groups) => this.renderGroups(groups)
+        render: groups => groups !== '-' ? this.renderGroups(groups) : '-'
       },
       {
         field: 'os_name',
