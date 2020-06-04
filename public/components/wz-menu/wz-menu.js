@@ -31,6 +31,7 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import { updateCurrentAgentData, showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import Management from './wz-menu-management';
+import MenuSettings from './wz-menu-settings';
 import Overview from './wz-menu-overview';
 import { npStart } from 'ui/new_platform';
 import { toastNotifications } from 'ui/notify';
@@ -338,12 +339,25 @@ class WzMenu extends Component {
     this.setState({ currentMenuTab: item });
   }
 
+  settingsPopoverToggle() {
+    if (!this.state.isSettingsPopoverOpen) {
+      this.setState(state => {
+        return { isSettingsPopoverOpen: true, currentMenuTab: 'settings', isOverviewPopoverOpen: false , isManagementPopoverOpen: false };
+      });
+    }
+  }
+
   managementPopoverToggle() {
     if (!this.state.isManagementPopoverOpen) {
       this.setState(state => {
-        return { isManagementPopoverOpen: true, currentMenuTab: 'manager', isOverviewPopoverOpen: false };
+        return { isManagementPopoverOpen: true, currentMenuTab: 'manager', isOverviewPopoverOpen: false,  isSettingsPopoverOpen: false };
       });
     }
+  }
+
+  onClickSettingsButton() {
+    this.setMenuItem('settings');
+    this.settingsPopoverToggle();
   }
 
   onClickManagementButton() {
@@ -354,7 +368,7 @@ class WzMenu extends Component {
   overviewPopoverToggle() {
     if (!this.state.isOverviewPopoverOpen) {
       this.setState(state => {
-        return { isOverviewPopoverOpen: true, currentMenuTab: 'overview', isManagementPopoverOpen: false };
+        return { isOverviewPopoverOpen: true, currentMenuTab: 'overview', isManagementPopoverOpen: false,  isSettingsPopoverOpen: false};
       });
     }
   }
@@ -370,11 +384,19 @@ class WzMenu extends Component {
     
   }
 
+  closeAllPopover(){
+    this.setState({ isOverviewPopoverOpen: false, isManagementPopoverOpen: false, isSettingsPopoverOpen: false, })
+  }
+
   switchMenuOpened = () => {
     if (!this.state.menuOpened && this.state.currentMenuTab === 'manager') {
       this.managementPopoverToggle();
-    } else {
+    } else if(this.state.currentMenuTab === 'overview') {
       this.overviewPopoverToggle();
+    } else if(this.state.currentMenuTab === 'settings') {
+      this.settingsPopoverToggle();
+    }else{
+      this.closeAllPopover()
     }
     this.setState({ menuOpened: !this.state.menuOpened, hover: this.state.currentMenuTab }, async () => {
       if (this.state.menuOpened) await this.loadApiList();
@@ -435,7 +457,7 @@ class WzMenu extends Component {
             onMouseEnter={() => { this.setState({hover: "overview"}) }}
               className={
                 'wz-menu-button ' +
-                (this.state.isOverviewPopoverOpen
+                (this.state.currentMenuTab === "overview"
                   ? 'wz-menu-active'
                   : '')
               }
@@ -453,11 +475,11 @@ class WzMenu extends Component {
 
             <EuiButtonEmpty
             onMouseEnter={() => { this.setState({hover: "manager"}) }}
-              className={
-                'wz-menu-button ' +
-                (this.state.isManagementPopoverOpen
-                  ? 'wz-menu-active'
-                  : '')
+            className={
+              'wz-menu-button ' +
+              (this.state.currentMenuTab === "manager"
+                ? 'wz-menu-active'
+                : '')
               }
               color="text"
               onClick={this.onClickManagementButton.bind(this)}
@@ -472,7 +494,10 @@ class WzMenu extends Component {
 
             <EuiButtonEmpty
               className={
-                'wz-menu-button '}
+                'wz-menu-button ' +
+                (this.state.currentMenuTab === "agents-preview"
+                  ? 'wz-menu-active'
+                  : '')}
               color="text"
               href="#/agents-preview"
               onClick={() => {
@@ -486,7 +511,10 @@ class WzMenu extends Component {
 
             <EuiButtonEmpty
               className={
-                'wz-menu-button '}
+                'wz-menu-button ' +
+                (this.state.currentMenuTab === "wazuh-dev"
+                  ? 'wz-menu-active'
+                  : '')}
               color="text"
               href="#/wazuh-dev"
               onClick={() => {
@@ -500,18 +528,21 @@ class WzMenu extends Component {
 
             <EuiButtonEmpty
               className={
-                'wz-menu-button '}
+                'wz-menu-button ' +
+                (this.state.currentMenuTab === "settings"
+                  ? 'wz-menu-active'
+                  : '')}
               style={{ marginTop: 50, marginBottom: 16 }}
-              href="#/settings"
               color="text"
               aria-label="Settings"
-              onClick={() => {
-                this.setMenuItem('settings');
-                this.setState({ menuOpened: false });
-              }}
+              onClick={this.onClickSettingsButton.bind(this)}
             >
               <EuiIcon type="advancedSettingsApp" color="primary" size="m" />
               <span className="wz-menu-button-title ">App settings</span>
+              <span className="flex"></span>
+              {/*this.state.hover === 'manager' */ this.state.isSettingsPopoverOpen && (
+                <EuiIcon color="subdued" type="arrowRight" />
+              )}
             </EuiButtonEmpty>
           </div>
           <div className="wz-menu-selectors">
@@ -545,6 +576,13 @@ class WzMenu extends Component {
             <Management
               closePopover={() => this.setState({ menuOpened: false })}
             ></Management>
+          )}
+
+          {/*this.state.hover === 'settings'*/ this.state.isSettingsPopoverOpen && (
+            <MenuSettings
+              currentMenuTab={this.state.currentMenuTab}
+              closePopover={() => this.setState({ menuOpened: false })}
+            ></MenuSettings>
           )}
           
           {/*this.state.hover === 'overview' */this.state.isOverviewPopoverOpen && currentAgent.id && (
