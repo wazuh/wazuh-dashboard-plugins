@@ -185,7 +185,6 @@ export class WzVisualize extends Component {
   };
 
   render() {
-    console.log('WzVisualize Render', this.props)
     this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = vis => {
