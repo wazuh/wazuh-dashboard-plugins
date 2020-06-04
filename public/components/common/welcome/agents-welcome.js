@@ -222,7 +222,7 @@ export class AgentsWelcome extends Component {
             anchorPosition="downCenter">
             <div>
               <WzReduxProvider>
-                <div style={{ maxWidth: 700 }}>
+                <div style={{ maxWidth: 730 }}>
                   <MenuAgent
                     isAgent={this.props.agent}
                     updateMenuAgents={() => this.updateMenuAgents()}
@@ -276,7 +276,7 @@ export class AgentsWelcome extends Component {
                     anchorPosition="downCenter">
                     <div>
                       <WzReduxProvider>
-                        <div style={{ maxWidth: 700 }}>
+                        <div style={{ maxWidth: 730 }}>
                           <MenuAgent
                             isAgent={this.props.agent}
                             updateMenuAgents={() => this.updateMenuAgents()}
