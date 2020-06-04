@@ -45,14 +45,14 @@ class WzCurrentOverviewSection extends Component {
         { text: '' },
         { text: 'Modules', href: '/app/wazuh#/overview' },
         { agent: currentAgent },
-        { text: TabDescription[this.props.currentTab].title, navigation: `#/overview?tab=${this.props.currentTab}`},
+        { text: TabDescription[this.props.currentTab].title},
       ] :
       [
         { text: '' },
         { text: 'Modules', href: '/app/wazuh#/overview' },
         
         
-        { text: TabDescription[this.props.currentTab].title, navigation: `#/overview?tab=${this.props.currentTab}`},
+        { text: TabDescription[this.props.currentTab].title},
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       $('#breadcrumbNoTitle').attr("title","");

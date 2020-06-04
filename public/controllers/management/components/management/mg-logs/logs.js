@@ -58,7 +58,7 @@ export default class WzLogs extends Component {
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Logs',  navigation: `#/manager?tab=logs` }
+      { text: 'Logs' }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }

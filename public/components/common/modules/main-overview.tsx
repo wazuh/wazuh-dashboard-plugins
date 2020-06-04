@@ -70,7 +70,7 @@ export class MainModuleOverview extends Component {
           href: "#/overview"
         },
         {
-          text: TabDescription[this.props.section].title, navigation: `#/overview?tab=${this.props.section}`
+          text: TabDescription[this.props.section].title
         },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));

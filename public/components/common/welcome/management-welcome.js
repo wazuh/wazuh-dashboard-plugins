@@ -37,7 +37,7 @@ class ManagementWelcome extends Component {
   }
 
   setGlobalBreadcrumb() {
-    const breadcrumb = [{ text: '' }, { text: 'Management',  navigation: `#/manager/`}];
+    const breadcrumb = [{ text: '' }, { text: 'Management' }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 

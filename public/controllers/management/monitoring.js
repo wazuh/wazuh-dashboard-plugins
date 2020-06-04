@@ -231,7 +231,7 @@ export function ClusterController(
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Cluster',  navigation: `#/manager/?tab=monitoring`}
+      { text: 'Cluster' }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 

@@ -47,7 +47,7 @@ class WzRulesetOverview extends Component {
     const breadcrumb = [
       { text: '' },
       { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: this.sectionNames[this.props.state.section],  navigation: `#/manager/?tab=${this.props.state.section}`}
+      { text: this.sectionNames[this.props.state.section] }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }

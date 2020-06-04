@@ -59,7 +59,7 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'App Settings',  navigation: `#/settings`}];
+      const breadcrumb = [{ text: '' }, { text: 'App Settings' }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       this.admin = await checkAdminMode();
 
