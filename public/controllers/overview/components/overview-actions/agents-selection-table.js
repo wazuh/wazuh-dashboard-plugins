@@ -35,12 +35,20 @@ import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eu
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
 import chrome from 'ui/chrome';
+import { WzFilterBar } from '../../../../components/wz-filter-bar/wz-filter-bar'
 
+
+const checkField = field => {
+  return field !== undefined ? field : '-';
+};
 
 export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
 
+    // const selectedOptions = JSON.parse(
+    //   sessionStorage.getItem('agents_preview_selected_options')
+    // );
     this.state = {
       itemIdToSelectedMap: {},
       itemIdToOpenActionsPopoverMap: {},
@@ -51,17 +59,13 @@ export class AgentSelectionTable extends Component {
       isLoading: false,
       sortDirection: 'asc',
       sortField: 'id',
-      currentSearch: '',
+      agents: [],
+      selectedOptions: [],
+      q: '',
+      search: ''
     };
-    this.wzReq = (...args) => WzRequest.apiReq(...args);
 
     this.columns = [
-      // {
-      //   id: 'checkbox',
-      //   isCheckbox: true,
-      //   textOnly: false,
-      //   width: '32px',
-      // },
       {
         id: 'id',
         label: 'ID',
@@ -79,7 +83,7 @@ export class AgentSelectionTable extends Component {
         mobileOptions: {
           show: true,
         },
-        isSortable: true,
+        isSortable: true
       },
       {
         id: 'group',
@@ -106,6 +110,8 @@ export class AgentSelectionTable extends Component {
         mobileOptions: {
           show: false,
         },
+        isSortable: true,
+        render: os => this.addIconPlatformRender(os)
       },
       {
         id: 'status',
@@ -119,8 +125,6 @@ export class AgentSelectionTable extends Component {
         render: status => this.addHealthStatusRender(status),
       },
     ];
-
-    this.items = [];
   }
 
   onChangeItemsPerPage = async itemsPerPage => {
@@ -139,7 +143,23 @@ export class AgentSelectionTable extends Component {
       tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;
     }
     this.setState({itemIdToSelectedMap: this.props.selectedAgents});
-    await this.getItems();
+    try{
+      await this.getItems();
+      const filterStatus = this.filterBarModelStatus();
+      const filterGroups = await this.filterBarModelGroups();
+      const filterOs = await this.filterBarModelOs();
+      const filterVersion = await this.filterBarModelWazuhVersion();
+      const filterOsPlatform = await this.filterBarModelOsPlatform();
+      const filterNodes = await this.filterBarModelNodes();
+      this.setState({
+        filterStatus,
+        filterGroups,
+        filterOs,
+        filterVersion,
+        filterOsPlatform,
+        filterNodes
+      });
+    }catch(error){}
   }
 
   getArrayFormatted(arrayText) {
@@ -156,23 +176,21 @@ export class AgentSelectionTable extends Component {
   async getItems() {
     try{
       this.setState({isLoading: true});
-      const rawData = await this.wzReq('GET', '/agents', this.buildFilter());
+      const rawData = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
       const data = (((rawData || {}).data || {}).data || {}).items;
-  
       const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
       const formattedData = data.map((item, id) => {
         return {
           id: item.id,
           name: item.name,
           version: item.version || '-',
-          os: (item.os || {}).name || '-',
+          os: item.os || '-',
           status: item.status,
           group: this.getArrayFormatted(item.group) || '-',
         };
       });
-      this.items = formattedData;
   
-      this.setState({ totalItems, isLoading: false });
+      this.setState({ agents: formattedData, totalItems, isLoading: false });
     }catch(err){
       this.setState({ isLoading: false });
     }
@@ -207,17 +225,16 @@ export class AgentSelectionTable extends Component {
   }
 
   buildFilter() {
-    const { itemsPerPage, pageIndex } = this.state;
+    const { itemsPerPage, pageIndex, search, q } = this.state;
     const filter = {
-      q: "id!=000",
+      q: `id!=000${q ? `;${q}` : ''}`,
       offset: pageIndex * itemsPerPage,
       limit: pageIndex * itemsPerPage + itemsPerPage,
       ...this.buildSortFilter(),
     };
-    if (this.state.currentSearch) {
-      filter['search'] = this.state.currentSearch;
+    if (search) {
+      filter['search'] = search;
     }
-
     return filter;
   }
 
@@ -259,7 +276,7 @@ export class AgentSelectionTable extends Component {
   toggleAll = () => {
     const allSelected = this.areAllItemsSelected();
     const newItemIdToSelectedMap = {};
-    this.items.forEach(item => (newItemIdToSelectedMap[item.id] = !allSelected));
+    this.state.agents.forEach(item => (newItemIdToSelectedMap[item.id] = !allSelected));
 
     this.setState({
       itemIdToSelectedMap: newItemIdToSelectedMap,
@@ -271,7 +288,7 @@ export class AgentSelectionTable extends Component {
   };
 
   areAllItemsSelected = () => {
-    const indexOfUnselectedItem = this.items.findIndex(item => !this.isItemSelected(item.id));
+    const indexOfUnselectedItem = this.state.agents.findIndex(item => !this.isItemSelected(item.id));
     return indexOfUnselectedItem === -1;
   };
 
@@ -317,7 +334,7 @@ export class AgentSelectionTable extends Component {
   };
 
   renderSelectAll = mobile => {
-    if (!this.state.isLoading && this.items.length) {
+    if (!this.state.isLoading && this.state.agents.length) {
       return (
         <EuiCheckbox
           id="selectAllCheckbox"
@@ -396,9 +413,7 @@ export class AgentSelectionTable extends Component {
         }
 
         if (column.render) {
-          if (column.id === 'status') {
-            child = column.render(item.status);
-          }
+          child = column.render(item[column.id]);
         } else {
           child = cell;
         }
@@ -438,10 +453,10 @@ export class AgentSelectionTable extends Component {
       let itemIndex = (this.state.pageIndex * this.state.itemsPerPage) % this.state.itemsPerPage;
       itemIndex <
         ((this.state.pageIndex * this.state.itemsPerPage) % this.state.itemsPerPage) +
-          this.state.itemsPerPage && this.items[itemIndex];
+          this.state.itemsPerPage && this.state.agents[itemIndex];
       itemIndex++
     ) {
-      const item = this.items[itemIndex];
+      const item = this.state.agents[itemIndex];
       rows.push(renderRow(item));
     }
 
@@ -451,7 +466,7 @@ export class AgentSelectionTable extends Component {
   renderFooterCells() {
     const footers = [];
 
-    const items = this.items;
+    const items = this.state.agents;
     const pagination = {
       pageIndex: this.state.pageIndex,
       pageSize: this.state.itemsPerPage,
@@ -492,12 +507,19 @@ export class AgentSelectionTable extends Component {
     return undefined;
   };
 
-  onSearchFieldChange = e => {
-    this.setState(
-      { currentSearch: e.target.value, pageIndex: 0 },
-      async () => await this.getItems()
-    );
-  };
+  async onQueryChange(result){
+    // sessionStorage.setItem(
+    //   'agents_preview_selected_options',
+    //   JSON.stringify(result.selectedOptions)
+    // );
+    this.setState({ isLoading: true, ...result}, async () => {
+      try{
+        await this.getItems()
+      }catch(error){
+        this.setState({ isLoading: false});
+      }
+    });
+  }
 
   getSelectedItems(){
     return Object.keys(this.state.itemIdToSelectedMap).filter(x => {
@@ -517,7 +539,7 @@ export class AgentSelectionTable extends Component {
 
   async newSearch(){
     if(this.areAnyRowsSelected()){
-      const data = await this.wzReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
+      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
       this.props.removeAgentsFilter(false);
@@ -531,7 +553,7 @@ export class AgentSelectionTable extends Component {
 
   async selectAgentAndApply(agentID){
     try{
-      const data = await this.wzReq('GET', '/agents', {"q" : "id="+agentID } );
+      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+agentID } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
       this.props.removeAgentsFilter(false);
@@ -546,6 +568,179 @@ export class AgentSelectionTable extends Component {
     this.setState({contextMenuId: id})
   }
 
+  addIconPlatformRender(os) {
+    if(typeof os === "string" ){ return os};
+    let icon = false;
+
+    if (((os || {}).uname || '').includes('Linux')) {
+      icon = 'linux';
+    } else if ((os || {}).platform === 'windows') {
+      icon = 'windows';
+    } else if ((os || {}).platform === 'darwin') {
+      icon = 'apple';
+    }
+    const os_name =
+      checkField((os || {}).name) +
+      ' ' +
+      checkField((os || {}).version);
+    return (
+      <span className="euiTableCellContent__text euiTableCellContent--truncateText">
+        <i
+          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+          aria-hidden="true"
+        ></i>{' '}
+        {os_name === '--' ? '-' : os_name}
+      </span>
+    );
+  }
+
+  filterBarModelStatus() {
+    return {
+      label: 'Status',
+      options: [
+        {
+          label: 'Active',
+          group: 'status'
+        },
+        {
+          label: 'Disconnected',
+          group: 'status'
+        },
+        {
+          label: 'Never connected',
+          group: 'status'
+        }
+      ]
+    };
+  }
+
+  async filterBarModelGroups() {
+    const rawGroups = await WzRequest.apiReq('GET', '/agents/groups', {});
+    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
+    const groups = itemsGroups
+      .filter(item => {
+        return item.count > 0;
+      })
+      .map(item => {
+        return { label: item.name, group: 'group' };
+      });
+    return {
+      label: 'Groups',
+      options: groups
+    };
+  }
+
+  async filterBarModelOs() {
+    const rawOs = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'os.name,os.version',
+        q: 'id!=000'
+      }
+    );
+    const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
+    const os = itemsOs
+      .filter(item => {
+        return Object.keys(item).includes('os');
+      })
+      .map(item => {
+        const { name, version } = item.os;
+        return {
+          label: `${name}-${version}`,
+          group: 'osname',
+          query: `os.name=${name};os.version=${version}`
+        };
+      });
+    return {
+      label: 'OS Name',
+      options: os
+    };
+  }
+
+  async filterBarModelOsPlatform() {
+    const rawOsPlatform = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'os.platform',
+        q: 'id!=000'
+      }
+    );
+    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {})
+      .items;
+    const osPlatform = itemsOsPlatform
+      .filter(item => {
+        return Object.keys(item).includes('os');
+      })
+      .map(item => {
+        const { platform } = item.os;
+        return {
+          label: platform,
+          group: 'osplatform',
+          query: `os.platform=${platform}`
+        };
+      });
+    return {
+      label: 'OS Platform',
+      options: osPlatform
+    };
+  }
+
+  async filterBarModelNodes() {
+    const rawNodes = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'node_name',
+        q: 'id!=000;node_name!=unknown'
+      }
+    );
+    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
+    const nodes = itemsNodes
+      .filter(item => {
+        return Object.keys(item).includes('node_name');
+      })
+      .map(item => {
+        const { node_name } = item;
+        return {
+          label: node_name,
+          group: 'nodename',
+          query: `node_name=${node_name}`
+        };
+      });
+    return {
+      label: 'Nodes',
+      options: nodes
+    };
+  }
+
+  async filterBarModelWazuhVersion() {
+    const rawVersions = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'version',
+        q: 'id!=000'
+      }
+    );
+    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
+    const versions = itemsVersions
+      .filter(item => {
+        return Object.keys(item).includes('version');
+      })
+      .map(item => {
+        return {
+          label: item.version,
+          group: 'version'
+        };
+      });
+    return {
+      label: 'Version',
+      options: versions
+    };
+  }
+
   render() {
     const pagination = {
       pageIndex: this.state.pageIndex,
@@ -558,7 +753,7 @@ export class AgentSelectionTable extends Component {
     };
     // let optionalActionButtons;
 
-    // if (this.items.length) {
+    // if (this.state.agents.length) {
     //   optionalActionButtons = (
 
     //     <EuiFlexGroup gutterSize="m">
@@ -571,15 +766,33 @@ export class AgentSelectionTable extends Component {
     //   );
     // }
     const selectedAgent = store.getState().appStateReducers.currentAgentData;
+
+    const {
+      filterStatus,
+      filterGroups,
+      filterOs,
+      filterVersion,
+      filterOsPlatform,
+      filterNodes,
+      selectedOptions
+    } = this.state;
+    const model = [
+      filterStatus || { label: 'Status', options: [] },
+      filterGroups || { label: 'Groups', options: [] },
+      filterOs || { label: 'OS Name', options: [] },
+      filterOsPlatform || { label: 'OS Platform', options: [] },
+      filterVersion || { label: 'Version', options: [] },
+      filterNodes || { label: 'Nodes', options: [] }
+    ];
+
     return (
       <div>
         <EuiFlexGroup gutterSize="m">
           <EuiFlexItem>
-            <EuiFieldSearch
-              value={this.state.currentSearch}
-              onChange={this.onSearchFieldChange}
-              fullWidth
-              placeholder="Search agent..."
+            <WzFilterBar
+              model={model}
+              clickAction={(e) => this.onQueryChange(e)}
+              selectedOptions={selectedOptions}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -611,7 +824,7 @@ export class AgentSelectionTable extends Component {
                 </EuiHealth>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{marginTop: 10, marginLeft: 4}}>
-                <EuiToolTip position="top" content={`Unpin ${selectedAgent.name} agent`}>
+                <EuiToolTip position='top' content='Unpin agent'>
                   <EuiButtonIcon
                     color='danger'
                     onClick={() => this.unselectAgents()}
@@ -657,7 +870,7 @@ export class AgentSelectionTable extends Component {
 
         <EuiTable>
           <EuiTableHeader>{this.renderHeaderCells()}</EuiTableHeader>
-          {(this.items.length && (
+          {(this.state.agents.length && (
             <EuiTableBody className={this.state.isLoading ? 'agent-selection-table-loading' : ''}>
               {this.renderRows()}
             </EuiTableBody>

@@ -247,7 +247,7 @@ export class AgentsTable extends Component {
       return date !== undefined ? timeService(date) : '-';
     };
     const agentVersion =
-      agent.version !== undefined ? agent.version.split(' ')[1] : '.';
+      agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
     return {
       id: agent.id,
@@ -322,7 +322,7 @@ export class AgentsTable extends Component {
           className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
           aria-hidden="true"
         ></i>{' '}
-        {os_name === '--' ? '-' : os_name}
+        {os_name === '- -' ? '-' : os_name}
       </span>
     );
   }
@@ -912,7 +912,7 @@ export class AgentsTable extends Component {
         return {
           label: platform,
           group: 'osplatform',
-          query: `os.name=${platform}`
+          query: `os.platform=${platform}`
         };
       });
     return {
