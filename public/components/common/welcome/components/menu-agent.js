@@ -52,12 +52,12 @@ class WzMenuAgent extends Component {
         text: 'Regulatory Compliance',
         isTitle: true
       },
-      general: { id: 'general', text: 'Security events', isPin: true, default: true },
-      fim: { id: 'fim', text: 'Integrity monitoring', isPin: true, default: true },
+      general: { id: 'general', text: 'Security events', isPin: this.menuAgent.general ? this.menuAgent.general : false },
+      fim: { id: 'fim', text: 'Integrity monitoring', isPin: this.menuAgent.fim ? this.menuAgent.fim : false },
       aws: { id: 'aws', text: 'Amazon AWS', isPin: this.menuAgent.aws ? this.menuAgent.aws : false },
       gcp: { id: 'gcp', text: 'Google Cloud Platform', isPin: this.menuAgent.gcp ? this.menuAgent.gcp : false },
       pm: { id: 'pm', text: 'Policy Monitoring', isPin: this.menuAgent.pm ? this.menuAgent.pm : false },
-      sca: { id: 'sca', text: 'Security configuration assessment', isPin: true, default: true },
+      sca: { id: 'sca', text: 'Security configuration assessment', isPin: this.menuAgent.sca ? this.menuAgent.sca : false },
       audit: { id: 'audit', text: 'System Auditing', isPin: this.menuAgent.audit ? this.menuAgent.audit : false },
       oscap: { id: 'oscap', text: 'OpenSCAP', isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false },
       ciscat: { id: 'ciscat', text: 'CIS-CAT', isPin: this.menuAgent.oscap ? this.menuAgent.oscap : false },
@@ -136,12 +136,14 @@ class WzMenuAgent extends Component {
           {item.text}
         </EuiFlexItem>
         {
-          this.state.hoverAddFilter === item.id && !item.isTitle && !item.default && (Object.keys(this.menuAgent).length < 3 || item.isPin) &&
+          this.state.hoverAddFilter === item.id && !item.isTitle && 
+          (Object.keys(this.menuAgent).length < 6 || item.isPin) &&
+          (Object.keys(this.menuAgent).length > 1 || !item.isPin) &&
             <EuiFlexItem grow={false}>
               <EuiIcon
               onClick={() => {
                 this.menuAgent = window.localStorage.getItem('menuAgent') ? JSON.parse(window.localStorage.getItem('menuAgent')) : {};
-                if(!item.isPin && Object.keys(this.menuAgent).length < 3) {
+                if(!item.isPin && Object.keys(this.menuAgent).length < 6) {
                   this.menuAgent[item.id] = item;
                   item.isPin = true;
                 } else if(this.menuAgent[item.id]){
@@ -157,7 +159,7 @@ class WzMenuAgent extends Component {
                 this.props.updateMenuAgents();
               }}
               color='primary'
-              type={this.menuAgent[item.id] || item.default ? 'pinFilled' : 'pin'}
+              type={this.menuAgent[item.id] ? 'pinFilled' : 'pin'}
               aria-label="Next"
               style={{ cursor: 'pointer' }}
               />
@@ -178,7 +180,8 @@ class WzMenuAgent extends Component {
       this.agentSections.pm,
       this.agentSections.audit,
       this.agentSections.oscap,
-      this.agentSections.ciscat
+      this.agentSections.ciscat,
+      this.agentSections.sca
     ];
     let threatDetectionItems = [
       this.agentSections.virustotal,

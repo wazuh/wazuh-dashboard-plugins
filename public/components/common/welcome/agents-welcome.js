@@ -70,7 +70,7 @@ export class AgentsWelcome extends Component {
       actionAgents: true, // Hide actions agents
       selectedRequirement: 'pci',
       menuAgent: {},
-      maxModules: 3,
+      maxModules: 6,
       widthWindow: window.innerWidth
     };
 
@@ -79,17 +79,17 @@ export class AgentsWelcome extends Component {
   updateWidth = () => {
 
     let menuSize = (window.innerWidth - this.offset);
-    let maxModules = 3;
+    let maxModules = 6;
     if(menuSize > 1250) {
-      maxModules = 3;
+      maxModules = 6;
     } else {
       if(menuSize > 1100 ) {
-        maxModules = 2;
+        maxModules = 5;
       } else {
         if(menuSize > 900) {
-          maxModules = 1;
+          maxModules = 4;
         } else {
-          maxModules = 0;
+          maxModules = 3;
           if(menuSize < 750) {
             maxModules = null;
           }
@@ -142,7 +142,47 @@ export class AgentsWelcome extends Component {
   }
 
   updateMenuAgents() {
-    this.setState({ menuAgent: window.localStorage.getItem('menuAgent') ? JSON.parse(window.localStorage.getItem('menuAgent')) : {} });
+    const defaultMenuAgents = {
+      general: { 
+        id: 'general', 
+        text: 'Security events', 
+        isPin: true, 
+      },
+      fim: { 
+        id: 'fim', 
+        text: 'Integrity monitoring', 
+        isPin: true, 
+      },
+      sca: { 
+        id: 'sca', 
+        text: 'SCA', 
+        isPin: true, 
+      },
+      audit: { 
+        id: 'audit', 
+        text: 'System Auditing', 
+        isPin: true,
+      },
+      vuls: { 
+        id: 'vuls', 
+        text: 'Vulnerabilities', 
+        isPin: true,
+      },
+      mitre: { 
+        id: 'mitre', 
+        text: 'MITRE ATT&CK', 
+        isPin: true, 
+      },
+    }
+
+    let menuAgent = JSON.parse(window.localStorage.getItem('menuAgent'));
+
+    if(!menuAgent) {
+      menuAgent = defaultMenuAgents;
+      window.localStorage.setItem('menuAgent', JSON.stringify(defaultMenuAgents));
+    }
+
+    this.setState({ menuAgent: menuAgent});
   }
 
   renderModules() {
@@ -150,33 +190,6 @@ export class AgentsWelcome extends Component {
 
     return (
       <Fragment>
-        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-          <EuiButtonEmpty
-            onClick={() => {
-              window.location.href = `#/overview/?tab=general`;
-              this.router.reload();
-            }} style={{ cursor: 'pointer' }}>
-            <span>Security events&nbsp;</span>
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-          <EuiButtonEmpty
-            onClick={() => {
-              window.location.href = `#/overview/?tab=fim`;
-              this.router.reload();
-            }} style={{ cursor: 'pointer' }}>
-            <span>Integrity monitoring&nbsp;</span>
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-          <EuiButtonEmpty
-            onClick={() => {
-              window.location.href = `#/overview/?tab=sca`;
-              this.router.reload();
-            }} style={{ cursor: 'pointer' }}>
-            <span>SCA&nbsp;</span>
-          </EuiButtonEmpty>
-        </EuiFlexItem>
         {
           menuAgent.map((menuAgent, i) => {
             if(i < this.state.maxModules) {
@@ -187,7 +200,7 @@ export class AgentsWelcome extends Component {
                   window.location.href = `#/overview/?tab=${menuAgent.id}`;
                   this.router.reload();
                 }} style={{ cursor: 'pointer' }}>
-                <span>{menuAgent.text}&nbsp;</span>
+                <span>{menuAgent.text !== 'Security configuration assessment' ? menuAgent.text : 'SCA'}&nbsp;</span>
               </EuiButtonEmpty>
             </EuiFlexItem>
             )}
