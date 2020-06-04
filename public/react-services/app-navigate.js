@@ -60,7 +60,7 @@ export class AppNavigate {
       const newUrl = currentUrl+ `#/${section}?` + url;
 
       if (e && (e.which == 2 || e.button == 1 )) { // middlebutton clicked
-         window.open(newUrl, '_blank');
+         window.open(newUrl, '_blank', "noreferrer");
       }else if(e.button == 0){ // left button clicked
         window.location.href = newUrl;
       }
