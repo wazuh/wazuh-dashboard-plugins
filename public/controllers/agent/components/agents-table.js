@@ -35,6 +35,7 @@ import { CheckUpgrade } from './checkUpgrade';
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
+import { AgentGroupTruncate } from '../../../components/common/util'
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -745,7 +746,8 @@ export class AgentsTable extends Component {
         name: 'Group(s)',
         width: '200px',
         truncateText: true,
-        sortable: true
+        sortable: true,
+        render: (groups) => this.renderGroups(groups)
       },
       {
         field: 'os_name',
@@ -1081,6 +1083,12 @@ export class AgentsTable extends Component {
         </EuiFlexItem>
       </EuiFlexGroup>
     );
+  }
+
+  renderGroups(groups) {
+    return(
+      <AgentGroupTruncate groups={groups} length={25} label={'more'}/> 
+    )
   }
 
   render() {
