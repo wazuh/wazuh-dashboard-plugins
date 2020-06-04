@@ -296,12 +296,12 @@ class OverviewActions extends Component {
       modal = (
         <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
           <EuiModal
-            maxWidth="1000px"
+            className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}
             initialFocus="[name=popswitch]"
           >
             <EuiModalHeader>
-              <EuiModalHeaderTitle>Pin agent</EuiModalHeaderTitle>
+              <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
             </EuiModalHeader>
 
             <EuiModalBody>
