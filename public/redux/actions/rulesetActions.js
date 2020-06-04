@@ -190,13 +190,6 @@ export const cleanFileContent = () => {
   };
 };
 
-export const updateAdminMode = status => {
-  return {
-    type: 'UPDATE_ADMIN_MODE',
-    status: status
-  };
-};
-
 export const updteAddingRulesetFile = content => {
   return {
     type: 'UPDATE_ADDING_RULESET_FILE',

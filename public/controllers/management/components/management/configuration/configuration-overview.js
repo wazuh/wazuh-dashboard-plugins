@@ -179,7 +179,7 @@ class WzConfigurationOverview extends Component {
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  adminMode: state.configurationReducers.adminMode
+  adminMode: state.appStateReducers.adminMode
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);

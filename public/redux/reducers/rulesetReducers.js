@@ -12,7 +12,6 @@
 
 const initialState = {
   addingRulesetFile: false,
-  adminMode: true,
   decoderInfo: false,
   error: false,
   fileContent: false,
@@ -59,8 +58,6 @@ const rulesetReducers = (state = initialState, action) => {
         addingRulesetFile: action.content,
         error: false
       });
-    case 'UPDATE_ADMIN_MODE':
-      return Object.assign({}, state, { adminMode: action.status });
     case 'UPDATE_DECODER_INFO':
       return Object.assign({}, state, {
         decoderInfo: action.info,
