@@ -155,10 +155,10 @@ class WzRulesetEditor extends Component {
   render() {
     const {
       section,
-      adminMode,
       addingRulesetFile,
       fileContent
     } = this.props.state;
+    const { adminMode } = this.props;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
     const isEditable = addingRulesetFile
@@ -285,7 +285,8 @@ class WzRulesetEditor extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

@@ -2,7 +2,6 @@ const initialState = {
   section: '',
   clusterNodes: false,
   clusterNodeSelected: false,
-  adminMode: false,
   refreshTime: false
 };
 
@@ -22,11 +21,6 @@ const configurationReducers = (state = initialState, action) => {
       return {
         ...state,
         clusterNodeSelected: action.clusterNodeSelected
-      };
-    case 'UPDATE_CONFIGURATION_ADMIN_MODE':
-      return {
-        ...state,
-        adminMode: action.adminMode
       };
     case 'UPDATE_CONFIGURATION_REFRESH_TIME':
       return {

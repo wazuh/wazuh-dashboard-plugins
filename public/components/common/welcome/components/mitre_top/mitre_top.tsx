@@ -41,7 +41,6 @@ export class MitreTopTactics extends Component {
     time: any,
     filterParams: object,
     selectedTactic: string | undefined,
-    detailsOn: boolean,
     flyoutOn: boolean,
     selectedTechnique: string
   }
@@ -56,7 +55,6 @@ export class MitreTopTactics extends Component {
       isLoading: true,
       time: this.timefilter.getTime(),
       selectedTactic: undefined,
-      detailsOn: false,
       flyoutOn: false,
       selectedTechnique: ''
     };
@@ -91,7 +89,12 @@ export class MitreTopTactics extends Component {
     const { selectedTactic, isLoading } = this.state;
     if (isLoading) {
       getMitreCount(this.props.agentId, this.timefilter.getTime(), selectedTactic)
-        .then(alertsCount => { this.setState({alertsCount, isLoading: false}) });
+        .then(alertsCount => { 
+          if (alertsCount.length === 0) {
+            this.setState({selectedTactic: undefined, isLoading: false})  
+          }
+          this.setState({alertsCount, isLoading: false})
+        });
     }
   }
 
@@ -229,7 +232,7 @@ export class MitreTopTactics extends Component {
     return (
       <Fragment>
         {loading}        
-        {!selectedTactic ? tacticsTop : tecniquesTop}
+        {!selectedTactic || alertsCount.length === 0 ? tacticsTop : tecniquesTop}
         {alertsCount.length === 0 && emptyPrompt}
         {flyoutOn &&
         <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >

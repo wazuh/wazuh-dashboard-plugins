@@ -11,7 +11,6 @@
  */
 
 const initialState = {
-  adminMode: true,
   filters: {},
   isLoading: false,
   isProcessing: false,
@@ -44,12 +43,6 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       isLoading: action.status
-    };
-  }
-  if (action.type === 'UPDATE_ADMIN_MODE') {
-    return {
-      ...state,
-      adminMode: action.status
     };
   }
   if (action.type === 'UPDATE_PAGE_INDEX') {

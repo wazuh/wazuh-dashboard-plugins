@@ -45,7 +45,8 @@ class WzAgentSelector extends Component {
 
   agentTableSearch(agentIdList){
     this.closeAgentModal();
-    this.router.reload();
+    if(window.location.hash.includes('#/overview'))
+      this.router.reload();
   }
 
   removeAgentsFilter(shouldUpdate){
