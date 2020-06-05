@@ -96,10 +96,8 @@ export class GenericRequest {
           if (!window.location.hash.includes('#/settings')) {
             window.location.href = '/app/wazuh#/health-check';
           }
-          return;
         }
       }
-
       return (((err || {}).response || {}).data || {}).message || false
         ? Promise.reject(err.response.data.message)
         : Promise.reject(err || 'Server did not respond');

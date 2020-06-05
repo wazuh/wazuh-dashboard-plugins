@@ -88,7 +88,7 @@ export class AddApi extends Component {
         blockClose: !close,
         enableClose: false,
         message:
-          (error.data || error).message ||
+          (error.data || error).message || error ||
           'Wazuh API not reachable, please review your configuration',
         fetchingData: false
       });

@@ -187,7 +187,7 @@ export class SettingsController {
         } catch (error) {
           const code = ((error || {}).data || {}).code;
           const downReason =
-            ((error || {}).data || {}).message || 'Wazuh is not reachable';
+            ((error || {}).data || {}).message || error || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
