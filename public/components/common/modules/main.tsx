@@ -27,6 +27,7 @@ import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview';
 import store from '../../../redux/store';
+import WzReduxProvider from '../../../redux/wz-redux-provider.js';
 
 export class MainModule extends Component {
   constructor(props) {
@@ -190,13 +191,13 @@ export class MainModule extends Component {
       onSelectedTabChanged: (id) => this.onSelectedTabChanged(id)
     }
     return (
-      <Fragment>
+      <WzReduxProvider>
         {agent &&
           <MainModuleAgent {...{ ...this.props, ...mainProps }}></MainModuleAgent>
           || ((this.props.section && this.props.section !== 'welcome') &&
             <MainModuleOverview {...{ ...this.props, ...mainProps }}></MainModuleOverview>)
         }
-      </Fragment>
+      </WzReduxProvider>
     );
   }
 }

@@ -1,39 +1,37 @@
 import React, { Component, Fragment } from 'react';
 import { Inventory } from './index';
 import '../../common/modules/module.less';
-import  store  from '../../../redux/store';
 import { showExploreAgentModal } from '../../../redux/actions/appStateActions';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
+import { connect } from 'react-redux';
 
+const mapStateToProps = state => ({
+  currentAgentData: state.appStateReducers.currentAgentData
+});
 
-export class MainFim extends Component {
+const mapDispatchToProps = dispatch => ({
+  showExploreAgentModal: show => dispatch(showExploreAgentModal(show))
+});
+
+export const MainFim = connect(mapStateToProps, mapDispatchToProps)(class MainFim extends Component {
+// export class MainFim extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
-  }
-
-  componentDidUpdate(){
-    if(store.getState().appStateReducers.currentAgentData.id !== this.state.currentAgentId){
-      if(this.props.selectView === 'inventory' && this.state.currentAgentId){
-        this.setState({currentAgentId: false})
-      }else{
-        this.setState({currentAgentId: store.getState().appStateReducers.currentAgentData.id, agentData: {...store.getState().appStateReducers.currentAgentData, agentPlatform: (store.getState().appStateReducers.currentAgentData.os || {}).platform || "other" } });
-      }
-    }
   }
 
   showExploreAgentModal(){
-    store.dispatch(showExploreAgentModal(true));
+    this.props.showExploreAgentModal(true);
   }
 
   render() {
     const { selectView } = this.props;
+    const existsCurrentAgent = this.props.currentAgentData && this.props.currentAgentData.id;
     if (selectView) {
       return (
         <div>
           {selectView === 'inventory' && (
-            this.state.currentAgentId &&
-            <Inventory {...this.props} agent={this.state.agentData}
+            existsCurrentAgent &&
+            <Inventory {...this.props} agent={this.props.currentAgentData}
             />)}
 
 
@@ -45,7 +43,7 @@ export class MainFim extends Component {
             
             
           {selectView === 'inventory' && (
-            !this.state.currentAgentId && !this.props.agent &&
+            !existsCurrentAgent && !this.props.agent &&
             (<EuiEmptyPrompt
               iconType="watchesApp"
               title={<h2>No agent is selected</h2>}
@@ -69,4 +67,4 @@ export class MainFim extends Component {
       return false;
     }
   }
-}
+});

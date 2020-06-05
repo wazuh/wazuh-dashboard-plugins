@@ -463,7 +463,7 @@ class WzMenu extends Component {
   }
   render() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
-    const thereAreSelectors = this.thereAreSelectors()
+    const thereAreSelectors = this.thereAreSelectors();
     const menu = (
       <div className="wz-menu-wrapper">
         <div className="wz-menu-left-side">
@@ -540,7 +540,7 @@ class WzMenu extends Component {
               <EuiIcon type="console" color="primary" size="m" />
               <span className="wz-menu-button-title ">Dev Tools</span>
             </EuiButtonEmpty>
-            {/* <EuiSpacer size="l"/> */}
+
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
