@@ -388,6 +388,10 @@ class WzMenu extends Component {
     this.setState({ isOverviewPopoverOpen: false, isManagementPopoverOpen: false, isSettingsPopoverOpen: false, })
   }
 
+  isAnyPopoverOpen(){
+    return this.state.isOverviewPopoverOpen || this.state.isManagementPopoverOpen || this.state.isSettingsPopoverOpen;
+  }
+
   switchMenuOpened = () => {
     if (!this.state.menuOpened && this.state.currentMenuTab === 'manager') {
       this.managementPopoverToggle();
@@ -408,6 +412,7 @@ class WzMenu extends Component {
     else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
+  
    
   addHealthRender(agent) {
     // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
@@ -457,7 +462,7 @@ class WzMenu extends Component {
             onMouseEnter={() => { this.setState({hover: "overview"}) }}
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === "overview"
+                (this.state.currentMenuTab === "overview" && !this.isAnyPopoverOpen() || (this.state.isOverviewPopoverOpen)
                   ? 'wz-menu-active'
                   : '')
               }
@@ -477,8 +482,8 @@ class WzMenu extends Component {
             onMouseEnter={() => { this.setState({hover: "manager"}) }}
             className={
               'wz-menu-button ' +
-              (this.state.currentMenuTab === "manager"
-                ? 'wz-menu-active'
+              (this.state.currentMenuTab === "manager" && !this.isAnyPopoverOpen() || (this.state.isManagementPopoverOpen)
+              ? 'wz-menu-active'
                 : '')
               }
               color="text"
@@ -495,7 +500,7 @@ class WzMenu extends Component {
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === "agents-preview"
+                (this.state.currentMenuTab === "agents-preview" && !this.isAnyPopoverOpen()
                   ? 'wz-menu-active'
                   : '')}
               color="text"
@@ -512,7 +517,7 @@ class WzMenu extends Component {
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === "wazuh-dev"
+                (this.state.currentMenuTab === "wazuh-dev" && !this.isAnyPopoverOpen()
                   ? 'wz-menu-active'
                   : '')}
               color="text"
@@ -529,7 +534,7 @@ class WzMenu extends Component {
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === "settings"
+                (this.state.currentMenuTab === "settings" && !this.isAnyPopoverOpen() || (this.state.isSettingsPopoverOpen)
                   ? 'wz-menu-active'
                   : '')}
               style={{ marginTop: 50, marginBottom: 16 }}
