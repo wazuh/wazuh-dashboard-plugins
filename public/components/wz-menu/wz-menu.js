@@ -22,6 +22,7 @@ import {
   EuiLoadingSpinner,
   EuiFormRow,
   EuiBadge,
+  EuiSpacer
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
@@ -452,12 +453,18 @@ class WzMenu extends Component {
     else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
   }
 
+  thereAreSelectors(){
+    return ((AppState.getAPISelector() && this.state.currentAPI && this.state.APIlist && this.state.APIlist.length > 1)
+    || (!this.state.currentAPI)
+    || (AppState.getPatternSelector() && this.state.theresPattern &&this.state.patternList &&this.state.patternList.length > 1))
+  }
   render() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
+    const thereAreSelectors = this.thereAreSelectors()
     const menu = (
       <div className="wz-menu-wrapper">
         <div className="wz-menu-left-side">
-          <div className="wz-menu-sections">
+          <div className="wz-menu-sections" style={!thereAreSelectors ? {height: "100%"}: {}}>
             <EuiButtonEmpty
             onMouseEnter={() => { this.setState({hover: "overview"}) }}
               className={
@@ -530,14 +537,14 @@ class WzMenu extends Component {
               <EuiIcon type="console" color="primary" size="m" />
               <span className="wz-menu-button-title ">Dev Tools</span>
             </EuiButtonEmpty>
-
+            {/* <EuiSpacer size="l"/> */}
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
                 (this.state.currentMenuTab === "settings" && !this.isAnyPopoverOpen() || (this.state.isSettingsPopoverOpen)
                   ? 'wz-menu-active'
                   : '')}
-              style={{ marginTop: 50, marginBottom: 16 }}
+              style={{ position: "absolute", bottom: thereAreSelectors ? 16 : 0, left: 0, marginBottom: thereAreSelectors ? 16 : 16}}
               color="text"
               aria-label="Settings"
               onClick={this.onClickSettingsButton.bind(this)}
@@ -550,30 +557,22 @@ class WzMenu extends Component {
               )}
             </EuiButtonEmpty>
           </div>
-          <div className="wz-menu-selectors">
-            {AppState.getAPISelector() &&
-              this.state.currentAPI &&
-              this.state.APIlist &&
-              this.state.APIlist.length > 1 &&
-              this.buildApiSelector()}
-            {(!AppState.getAPISelector() ||
-              (AppState.getAPISelector &&
-                this.state.APIlist &&
-                this.state.APIlist.length < 2)) &&
-              this.state.currentAPI && (
-                <EuiFormRow label="Selected API">
-                  <p className="wz-menu-selectors-api">
-                    {this.state.currentAPI}{' '}
-                  </p>
-                </EuiFormRow>
-              )}
-            {!this.state.currentAPI && <span> No API </span>}
-            {AppState.getPatternSelector() &&
-              this.state.theresPattern &&
-              this.state.patternList &&
-              this.state.patternList.length > 1 &&
-              this.buildPatternSelector()}
-          </div>
+          
+          {thereAreSelectors && (
+              <div className="wz-menu-selectors">
+                {AppState.getAPISelector() &&
+                  this.state.currentAPI &&
+                  this.state.APIlist &&
+                  this.state.APIlist.length > 1 &&
+                  this.buildApiSelector()}
+                {!this.state.currentAPI && <span> No API </span>}
+                {AppState.getPatternSelector() &&
+                  this.state.theresPattern &&
+                  this.state.patternList &&
+                  this.state.patternList.length > 1 &&
+                  this.buildPatternSelector()}
+              </div>
+            )}
         </div>
         
         <div className="wz-menu-right-side">
