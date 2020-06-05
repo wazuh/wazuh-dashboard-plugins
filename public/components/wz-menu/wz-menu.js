@@ -198,7 +198,10 @@ class WzMenu extends Component {
       if (!AppState.getPatternSelector()) return;
       PatternHandler.changePattern(event.target.value);
       this.setState({ currentSelectedPattern: event.target.value });
-      this.router.reload();
+      if (this.state.currentMenuTab !== 'wazuh-dev') {
+        this.router.reload();
+      }
+      this.switchMenuOpened();
     } catch (error) {
       this.showToast('danger', 'Error', error, 4000);
     }
