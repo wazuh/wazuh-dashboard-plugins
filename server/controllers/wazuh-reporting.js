@@ -1709,8 +1709,9 @@ export class WazuhReportingCtrl {
             customul.push({ text: critical.package, style: 'standard' });
             customul.push({
               ul: critical.references.map(item => ({
-                text: item,
-                color: ''
+                text: item.substring(0,80) + '...',
+                link: item,
+                color: '#1EA5C8',
               }))
             });
           }
