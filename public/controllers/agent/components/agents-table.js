@@ -266,7 +266,7 @@ export class AgentsTable extends Component {
   }
 
   actionButtonsRender(agent) {
-    return (
+    return agent.status !== 'Never connected' ? (
       <div>
         <EuiToolTip
           content="Open summary panel for this agent"
@@ -295,7 +295,7 @@ export class AgentsTable extends Component {
           />
         </EuiToolTip>
       </div>
-    );
+    ) : null;
   }
 
   addIconPlatformRender(agent) {
@@ -1023,13 +1023,19 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => {}
+        onClick: item.status !== 'Never connected' ? () => {} : undefined
       };
     };
 
     const getCellProps = item => {
+      console.log('item', item)
       return {
-        onMouseDown: (ev) =>  {AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
+        onMouseDown: (ev) =>  {
+          if(item.status !== 'Never connected'){
+            AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } );
+            ev.stopPropagation();
+          }
+        }
       }
     };
 
