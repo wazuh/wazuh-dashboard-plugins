@@ -726,26 +726,26 @@ export class AgentsTable extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '65px'
+        width: '5%'
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
-        width: '250px',
+        width: '20%',
         truncateText: true
       },
       {
         field: 'ip',
         name: 'IP',
-        width: '90px',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
       {
         field: 'group',
         name: 'Group(s)',
-        width: '200px',
+        width: '20%',
         truncateText: true,
         sortable: true,
         render: groups => groups !== '-' ? this.renderGroups(groups) : '-'
@@ -754,14 +754,14 @@ export class AgentsTable extends Component {
         field: 'os_name',
         name: 'OS',
         sortable: true,
-        width: '200px',
+        width: '10%',
         truncateText: true,
         render: this.addIconPlatformRender
       },
       {
         field: 'version',
         name: 'Version',
-        width: '80px',
+        width: '5%',
         truncateText: true,
         sortable: true
         /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
@@ -769,14 +769,14 @@ export class AgentsTable extends Component {
       {
         field: 'dateAdd',
         name: 'Registration date',
-        width: '150px',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
-        width: '150px',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
@@ -785,12 +785,12 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
-        width: '150px',
+        width: '10%',
         render: this.addHealthStatusRender
       },
       {
         align: 'right',
-        width: '80px',
+        width: '5%',
         field: 'actions',
         name: 'Actions',
         render: agent => this.actionButtonsRender(agent)
