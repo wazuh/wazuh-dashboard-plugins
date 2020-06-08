@@ -134,7 +134,6 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by MITRE requirement',
       values: async () => {
         const result = await WzRequest.apiReq('GET', '/mitre', {});
-        console.log('mitre',result)
         return (((result || {}).data || {}).data || {}).items.map(item => item.id);
       }
     }
