@@ -151,6 +151,7 @@ export class OverviewController {
       //this.$route.reload();
       //this.$location.search('agentId', null);
     }
+    setTimeout(() => { this.$location.search('agentId', null); }, 1);
     
   }
 

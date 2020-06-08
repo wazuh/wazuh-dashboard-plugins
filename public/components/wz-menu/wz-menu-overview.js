@@ -80,7 +80,7 @@ class WzMenuOverview extends Component {
   clickMenuItem = (ev, section) => {
     this.props.closePopover();
     const params = { tab : section};
-    if(store.getState().appStateReducers.currentAgentData)
+    if(store.getState().appStateReducers.currentAgentData.id)
       params["agentId"] = store.getState().appStateReducers.currentAgentData.id
     const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
       .currentTab;
