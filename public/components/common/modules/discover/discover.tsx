@@ -247,7 +247,10 @@ export class Discover extends Component {
       const newFilters = this.buildFilter();
     try{
       if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading) {
-        this.setState({ isLoading: true, pageIndex:0 })
+        if(newFilters.offset === this.state.requestFilters.offset) // we only reset pageIndex to 0 if the requestFilters has changed but the offset is the same
+          this.setState({ isLoading: true, pageIndex:0 });
+        else
+          this.setState({ isLoading: true});
         const alerts = await GenericRequest.request(
           'POST',
           `/elastic/alerts`,
