@@ -45,6 +45,8 @@ import WzViewSelector, {
   WzViewSelectorSwitch
 } from './util-components/view-selector';
 import WzLoading from './util-components/loading';
+import { withRenderIfOrWrapped } from './util-hocs/render-if';
+import { WzAgentNeverConnectedPrompt } from './configuration-no-agent';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 
@@ -57,6 +59,7 @@ import {
   updateAdminMode
 } from '../../../../../redux/actions/appStateActions';
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import {
   EuiPage,
@@ -94,6 +97,7 @@ class WzConfigurationSwitch extends Component {
     });
   };
   async componentDidMount() {
+    console.log('ghisadsa',this.props)
     // Check admin mode
     try {
       const adminMode = await checkAdminMode();
@@ -409,7 +413,9 @@ const mapDispatchToProps = dispatch => ({
   updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzConfigurationSwitch);
+export default compose(
+  withRenderIfOrWrapped((props) => props.agent.status === 'Never connected', WzAgentNeverConnectedPrompt),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+))(WzConfigurationSwitch);
