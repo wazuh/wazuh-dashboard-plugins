@@ -60,6 +60,11 @@ export const TabDescription = {
     description:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.'
   },
+  tsc: {
+    title: 'TSC',
+    description:
+      'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy'
+  },
   ciscat: {
     title: 'CIS-CAT',
     description:
@@ -69,6 +74,11 @@ export const TabDescription = {
     title: 'Amazon AWS',
     description:
       'Security events related to your Amazon AWS services, collected directly via AWS API.'
+  },
+  gcp: {
+    title: 'Google Cloud Platform',
+    description:
+      'Security events related to your Google Cloud Platform services, collected directly via GCP API.' // TODO GCP
   },
   virustotal: {
     title: 'VirusTotal',

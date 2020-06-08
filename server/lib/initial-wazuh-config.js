@@ -53,10 +53,12 @@ export const initialWazuhConfig = `---
 #extensions.gdpr      : true
 #extensions.hipaa     : true
 #extensions.nist      : true
+#extensions.tsc       : true
 #extensions.audit     : true
 #extensions.oscap     : false
 #extensions.ciscat    : false
 #extensions.aws       : false
+#extensions.gcp       : false
 #extensions.virustotal: false
 #extensions.osquery   : false
 #extensions.docker    : false
@@ -73,8 +75,8 @@ export const initialWazuhConfig = `---
 #
 # Defines if the user is allowed to change the selected
 # API directly from the Wazuh app top menu.
-# Default: false
-#api.selector: false
+# Default: truepi
+#api.selector: true
 #
 # --------------------------- Index pattern selector ---------------------------
 #
@@ -139,7 +141,7 @@ export const initialWazuhConfig = `---
 #     url: http(s)://<url>
 #     port: <port>
 #     user: <user>
-#     password: <password> 
+#     password: <password>
 
 hosts:
   - default:

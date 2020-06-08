@@ -11,6 +11,7 @@
  */
 import audit from './overview-audit';
 import aws from './overview-aws';
+import gcp from './overview-gcp';
 import fim from './overview-fim';
 import general from './overview-general';
 import oscap from './overview-oscap';
@@ -19,6 +20,7 @@ import pci from './overview-pci';
 import gdpr from './overview-gdpr';
 import hipaa from './overview-hipaa';
 import nist from './overview-nist';
+import tsc from './overview-tsc';
 import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import vuls from './overview-vuls';
@@ -29,6 +31,7 @@ import docker from './overview-docker';
 export {
   audit,
   aws,
+  gcp,
   fim,
   general,
   oscap,
@@ -37,6 +40,7 @@ export {
   gdpr,
   hipaa,
   nist,
+  tsc,
   pm,
   virustotal,
   vuls,

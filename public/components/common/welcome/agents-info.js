@@ -16,9 +16,11 @@ import {
   EuiStat,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiToolTip,
-  EuiButton
+  EuiHealth
 } from '@elastic/eui';
+import { WzRequest } from '../../../react-services/wz-request';
+
+import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -27,11 +29,16 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
-  addIconPlatformRender(agent) {
+  async componentDidMount() {
+    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+
+    this.setState({
+      managerVersion: ((managerVersion || {}).data || {}).data || {}
+    });
+  }
+
+  getPlatformIcon(agent) {
     let icon = false;
-    const checkField = field => {
-      return field !== undefined ? field : '-';
-    };
     const os = (agent || {}).os;
 
     if (((os || {}).uname || '').includes('Linux')) {
@@ -41,25 +48,53 @@ export class AgentInfo extends Component {
     } else if ((os || {}).platform === 'darwin') {
       icon = 'apple';
     }
+
+    return <i
+      className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+      aria-hidden="true"
+    ></i>
+  }
+
+
+  addTextPlatformRender(agent) {
+    const checkField = field => {
+      return field !== undefined ? field : '-';
+    };
+
     const os_name =
       checkField(((agent || {}).os || {}).name) +
       ' ' +
       checkField(((agent || {}).os || {}).version);
 
+    const osName = os_name === '- -' ? '-' : os_name;
+
     return (
-      <EuiToolTip position="bottom" content={os_name === '- -' ? '-' : os_name}>
-        <span
-          className="euiTableCellContent__text euiTableCellContent--truncateText"
-          style={{ overflow: 'hidden', maxWidth: 250, margin: '0 auto' }}
-        >
-          <i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden="true"
-          ></i>
-          {os_name === '- -' ? '-' : ' ' + os_name}
+      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
+        {this.getPlatformIcon(this.props.agent)}
+        {' '}{osName}
+      </WzTextWithTooltipIfTruncated>
+    )
+  }
+
+
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
+
+  addHealthRender(agent) {
+    // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
+    return (
+      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: 3, fontSize: '12px'}}>
+        <span className="euiFlexItem euiFlexItem--flexGrowZero">
+          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(this.props.agent.status)}`} focusable="false" role="img" aria-hidden="true">
+            <circle cx="8" cy="8" r="4"></circle>
+          </svg>
         </span>
-      </EuiToolTip>
-    );
+        <span className="euiFlexItem euiFlexItem--flexGrowZero">{this.props.agent.status}</span>
+      </span>
+    )
   }
 
   buildStats(items) {
@@ -71,22 +106,24 @@ export class AgentInfo extends Component {
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
             title={
-              item.description === 'OS' ? (
-                this.addIconPlatformRender(this.props.agent)
+              item.description === 'Operating system' ? (
+                this.addTextPlatformRender(this.props.agent)
+              ) : item.description === 'Status' ? (
+                this.addHealthRender(this.props.agent)
               ) : (
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    maxWidth: 250,
-                    margin: '0 auto'
-                  }}
-                >
-                  {checkField(item.title)}
-                </span>
-              )
+                    <span
+                      style={{
+                        overflow: 'hidden',
+                        maxWidth: "250px",
+                        margin: '0 auto',
+                        fontSize: 12
+                      }}
+                    >
+                      {checkField(item.title)}
+                    </span>
+                  )
             }
             description={item.description}
-            textAlign="center"
             titleSize="xs"
           />
         </EuiFlexItem>
@@ -99,38 +136,22 @@ export class AgentInfo extends Component {
     const { agent } = this.props;
     const stats = this.buildStats([
       { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
+      { title: agent.status, description: 'Status', style: { maxWidth: 200 } },
       { title: agent.ip, description: 'IP' },
       { title: agent.version, description: 'Version' },
       {
         title: agent.name,
-        description: 'OS',
-        style: { minWidth: 400 }
+        description: 'Operating system',
+        style: { minWidth: 300 }
       },
       { title: agent.dateAdd, description: 'Registration date' },
       { title: agent.lastKeepAlive, description: 'Last keep alive' }
     ]);
+
     return (
       <Fragment>
         <EuiFlexGroup className="wz-welcome-page-agent-info-details">
           {stats}
-        </EuiFlexGroup>
-        <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
-          <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-            <EuiButton
-              onClick={() => this.props.switchTab('syscollector')}
-              iconType="inspect"
-            >
-              Inventory data
-            </EuiButton>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton
-              onClick={() => this.props.switchTab('configuration')}
-              iconType="gear"
-            >
-              Configuration
-            </EuiButton>
-          </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
     );

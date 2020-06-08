@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
@@ -20,7 +20,9 @@ import {
   EuiPanel,
   EuiFlexItem,
   EuiButtonIcon,
-  EuiDescriptionList
+  EuiDescriptionList,
+  EuiCallOut,
+  EuiLink
 } from '@elastic/eui';
 import { RequirementCard } from '../../controllers/overview/components/requirement-card';
 import AlertsStats from '../../controllers/overview/components/alerts-stats';
@@ -28,6 +30,7 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
+import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 export class WzVisualize extends Component {
   constructor(props) {
@@ -39,6 +42,8 @@ export class WzVisualize extends Component {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
       cardReqs: {},
+      thereAreSampleAlerts: false,
+      adminMode: false,
       metricItems:
         this.props.selectedTab !== 'welcome'
           ? this.getMetricItems(this.props.selectedTab)
@@ -92,6 +97,15 @@ export class WzVisualize extends Component {
       });
     }
 
+    if (selectedTab === 'tsc') {
+      this.setState({
+        cardReqs: {
+          items: await this.commonData.getTSC(),
+          reqTitle: 'TSC Requirement'
+        }
+      });
+    }
+
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
       const result = ((data || {}).data || {}).data || false;
@@ -123,9 +137,23 @@ export class WzVisualize extends Component {
         ];
       }
     }
+
+    // Check if there is sample alerts installed
+    try{
+      this.setState({
+        thereAreSampleAlerts: (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled
+      });
+    }catch(error){}
+
+    // Check adminMode
+    try{
+      const adminMode = await checkAdminMode();
+      this.setState({ adminMode });
+    }catch(error){}
   }
 
   async componentDidUpdate() {
+    this.visualizations = this.props.isAgent && this.props.isAgent.length ? agentVisualizations : visualizations;
     const { selectedTab } = this.state;
     if (selectedTab !== this.props.selectedTab) {
       this.setState({
@@ -159,6 +187,7 @@ export class WzVisualize extends Component {
   };
 
   render() {
+    this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = vis => {
       return (
@@ -193,14 +222,14 @@ export class WzVisualize extends Component {
                 {(vis.id !== 'Wazuh-App-Overview-General-Agents-status' ||
                   (vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
                     this.monitoringEnabled)) && (
-                  <WzReduxProvider>
-                    <KibanaVis
-                      visID={vis.id}
-                      tab={selectedTab}
-                      {...this.props}
-                    ></KibanaVis>
-                  </WzReduxProvider>
-                )}
+                    <WzReduxProvider>
+                      <KibanaVis
+                        visID={vis.id}
+                        tab={selectedTab}
+                        {...this.props}
+                      ></KibanaVis>
+                    </WzReduxProvider>
+                  )}
                 {vis.id === 'Wazuh-App-Overview-General-Agents-status' &&
                   !this.monitoringEnabled && (
                     <EuiPage style={{ background: 'transparent' }}>
@@ -245,71 +274,88 @@ export class WzVisualize extends Component {
     };
 
     return (
-      <EuiFlexItem>
-        {selectedTab &&
-          selectedTab !== 'welcome' &&
-          this.visualizations[selectedTab] &&
-          this.visualizations[selectedTab].metrics && (
-            <div className="wz-no-display">
-              {this.visualizations[selectedTab].metrics.map((vis, i) => {
-                return (
-                  <div key={i}>
-                    <WzReduxProvider>
-                      <KibanaVis
-                        visID={vis.id}
-                        tab={selectedTab}
-                        isMetric={true}
-                        {...this.props}
-                      ></KibanaVis>
-                    </WzReduxProvider>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-        {/* Metrics of Dashboard */}
-        {selectedTab &&
-          selectedTab !== 'welcome' &&
-          this.visualizations[selectedTab] &&
-          this.visualizations[selectedTab].metrics &&
-          this.state.metricItems && (
-            <div className="md-padding-top-10">
-              <WzReduxProvider>
-                <AlertsStats {...this.state.metricItems} tab={selectedTab} />
-              </WzReduxProvider>
-            </div>
-          )}
-
+      <Fragment>
         {/* Cards for Regulatory Compliance Dashboards */}
         {cardReqs && cardReqs.items && (
           <div style={{ padding: '10px 12px 8px' }}>
             <RequirementCard {...cardReqs} />
           </div>
         )}
-
-        {selectedTab &&
-          selectedTab !== 'welcome' &&
-          this.visualizations[selectedTab] &&
-          this.visualizations[selectedTab].rows.map((row, i) => {
-            return (
-              <EuiFlexGroup
-                key={i}
-                style={{
-                  height: row.height + 'px',
-                  margin: 0,
-                  maxWidth: '100%'
-                }}
-              >
-                {row.vis.map((vis, n) => {
-                  return !vis.hasRows
-                    ? renderVisualizations(vis)
-                    : renderVisualizationRow(vis.rows, vis.width, n);
+        {this.props.resultState === 'none' && (
+          <div className="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8">
+            <EuiCallOut title="There are no results for selected time range. Try another
+                    one." color="warning" iconType='help'></EuiCallOut>
+          </div>
+        )}
+        <EuiFlexItem className={this.props.resultState === 'none' && 'no-opacity' || ''}>
+          {selectedTab &&
+            selectedTab !== 'welcome' &&
+            this.visualizations[selectedTab] &&
+            this.visualizations[selectedTab].metrics && (
+              <div className="wz-no-display">
+                {this.visualizations[selectedTab].metrics.map((vis, i) => {
+                  return (
+                    <div key={i}>
+                      <WzReduxProvider>
+                        <KibanaVis
+                          visID={vis.id}
+                          tab={selectedTab}
+                          isMetric={true}
+                          {...this.props}
+                        ></KibanaVis>
+                      </WzReduxProvider>
+                    </div>
+                  );
                 })}
-              </EuiFlexGroup>
-            );
-          })}
-      </EuiFlexItem>
+              </div>
+            )}
+  
+          {/* Sample alerts Callout */}
+          {this.state.thereAreSampleAlerts && (
+            <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{margin: '0 8px'}}>
+              <p>The data displayed may contain sample alerts. {this.state.adminMode && (
+                <Fragment>
+                  Go <EuiLink href='#/manager/sample_data?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
+                </Fragment>
+              )}</p>
+            </EuiCallOut>
+          )}
+  
+          {/* Metrics of Dashboard */}
+          {selectedTab &&
+            selectedTab !== 'welcome' &&
+            this.visualizations[selectedTab] &&
+            this.visualizations[selectedTab].metrics &&
+            this.state.metricItems && (
+              <div className="md-padding-top-10">
+                <WzReduxProvider>
+                  <AlertsStats {...this.state.metricItems} tab={selectedTab} />
+                </WzReduxProvider>
+              </div>
+            )}
+          {selectedTab &&
+            selectedTab !== 'welcome' &&
+            this.visualizations[selectedTab] &&
+            this.visualizations[selectedTab].rows.map((row, i) => {
+              return (
+                <EuiFlexGroup
+                  key={i}
+                  style={{
+                    height: row.height + 'px',
+                    margin: 0,
+                    maxWidth: '100%'
+                  }}
+                >
+                  {row.vis.map((vis, n) => {
+                    return !vis.hasRows
+                      ? renderVisualizations(vis)
+                      : renderVisualizationRow(vis.rows, vis.width, n);
+                  })}
+                </EuiFlexGroup>
+              );
+            })}
+        </EuiFlexItem>
+      </Fragment>
     );
   }
 }

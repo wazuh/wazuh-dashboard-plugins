@@ -18,6 +18,9 @@ import { QInterpreter, queryObject } from './lib/q-interpreter';
 import { ContextMenu } from './components/wz-search-badges';
 import { qSuggests } from '.';
 import './src/style/wz-search-badges.less'
+import { EuiText } from '@elastic/eui';
+import { EuiPopover } from '@elastic/eui';
+import { EuiButtonEmpty } from '@elastic/eui';
 
 
 interface iFilter { field:string, value:string }
@@ -31,10 +34,13 @@ export class WzSearchBadges extends Component {
   props!: {
     filters: iFilter[]
     onChange: Function
-    qSuggests: qSuggests[]
+    qSuggests: qSuggests[] | null
+    searchFormat: 'API' | '?Q' | 'qTags'
   }
+  
   constructor(props) {
     super(props);
+    this.buildBadge.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -49,8 +55,11 @@ export class WzSearchBadges extends Component {
     return '_' + Math.random().toString(36).substr(2, 9)
   }
 
-  buildBadge(filter:iFilter, index:number) {
-    if (filter.field === 'q') { return this.buildQBadges(filter); }
+  buildBadge = (filter:iFilter, index:number) => {
+    const { searchFormat } = this.props;
+    if (filter.field === 'q') {
+      return searchFormat !== '?Q' ? this.buildQBadges(filter) : null;
+    }
     return (
       <EuiBadge
         key={index}
@@ -58,9 +67,11 @@ export class WzSearchBadges extends Component {
         iconSide="right"
         iconOnClickAriaLabel="Remove"
         color="hollow"
-        className="globalFilterItem wz-search-badge"
+        className="wz-search-badge"
         iconOnClick={() => this.onDeleteFilter(filter)}>
-        {`${filter.field}:${filter.value}`}
+        <EuiButtonEmpty color='text' size="xs">
+          {`${filter.field}: ${filter.value}`}
+        </EuiButtonEmpty>
       </EuiBadge>
     );
   }
@@ -166,7 +177,7 @@ export class WzSearchBadges extends Component {
 
   render() {
     const { filters } = this.props;
-    const badges = filters.map((item, index) => this.buildBadge(item, index))
+    const badges = filters.map(this.buildBadge)
     return (
       <div
         data-testid="search-badges" >

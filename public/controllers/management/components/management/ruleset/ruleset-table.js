@@ -73,7 +73,6 @@ class WzRulesetTable extends Component {
             parseInt(id)
           );
           this.props.updateRuleInfo(info);
-          window.location.href = window.location.href.replace(regex, '');
         }
         this.setState({ isRedirect: false });
       }
@@ -81,11 +80,15 @@ class WzRulesetTable extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    const sectionChanged = prevProps.state.section !== this.props.state.section;
+    const { isProcessing, section, showingFiles, filters, } = this.props.state;
+    
+    const processingChange = prevProps.state.isProcessing !== isProcessing ||
+    (prevProps.state.isProcessing && isProcessing);
+    const sectionChanged = prevProps.state.section !== section;
     const showingFilesChanged =
-      prevProps.state.showingFiles !== this.props.state.showingFiles;
-    const filtersChanged = prevProps.state.filters !== this.props.state.filters;
-    if ((this.props.state.isProcessing && this._isMounted) || sectionChanged) {
+      prevProps.state.showingFiles !== showingFiles;
+    const filtersChanged = prevProps.state.filters !== filters;
+    if ((this._isMounted && processingChange && isProcessing ) || sectionChanged || filtersChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
           pageSize: this.state.pageSize,
@@ -205,11 +208,11 @@ class WzRulesetTable extends Component {
     };
     const sorting = !!sortField
       ? {
-          sort: {
-            field: sortField,
-            direction: sortDirection
-          }
+        sort: {
+          field: sortField,
+          direction: sortDirection
         }
+      }
       : {};
 
     if (!error) {
@@ -227,6 +230,7 @@ class WzRulesetTable extends Component {
                 item.file,
                 id
               );
+              window.location.href = `${window.location.href}&redirectRule=${id}`;
               this.props.updateRuleInfo(result);
             } else if (section === 'decoders') {
               const result = await this.rulesetHandler.getDecoderInformation(
@@ -280,7 +284,7 @@ class WzRulesetTable extends Component {
               >
                 <p>This items will be removed</p>
                 <div>
-                  {itemList.map(function(item, i) {
+                  {itemList.map(function (item, i) {
                     return <li key={i}>{item.file ? item.file : item.name}</li>;
                   })}
                 </div>

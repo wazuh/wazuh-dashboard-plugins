@@ -29,6 +29,7 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store';
 import Management from './wz-menu-management';
 import Overview from './wz-menu-overview';
+import Agent from './wz-menu-agent';
 import { npStart } from 'ui/new_platform';
 import { toastNotifications } from 'ui/notify';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -51,18 +52,35 @@ class WzMenu extends Component {
       patternList: [],
       currentSelectedPattern: '',
       isManagementPopoverOpen: false,
-      isOverviewPopoverOpen: false
+      isOverviewPopoverOpen: false,
+      isAgentPopoverOpen: false
     };
     this.store = store;
     this.genericReq = GenericRequest;
     this.wazuhConfig = new WazuhConfig();
     this.indexPatterns = npStart.plugins.data.indexPatterns;
     this.isLoading = false;
+    this.isAgent = false;
   }
 
   async componentDidMount() {
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
+  }
+
+  getAgentUrl = () => {
+    const currentWindowLocation = window.location.hash.split('?');
+    if(currentWindowLocation[1]) {
+      let agentsUrl = currentWindowLocation[1].split('&').reduce( (result, item) => {
+        var parts = item.split('=');
+        result[parts[0]] = parts[1];
+        return result;
+      }, {});
+
+    return agentsUrl['agent'] ? agentsUrl['agent'] : false; 
+    } else {
+      return false;
+    }
   }
 
   showToast = (color, title, text, time) => {
@@ -86,7 +104,7 @@ class WzMenu extends Component {
       currentWindowLocation.match(/#\/agents-preview/) ||
       currentWindowLocation.match(/#\/agents/)
     ) {
-      return 'agents-preview';
+      return 'agents';
     }
     if (currentWindowLocation.match(/#\/settings/)) {
       return 'settings';
@@ -141,7 +159,8 @@ class WzMenu extends Component {
       this.setState({
         showMenu: true,
         isOverviewPopoverOpen: false,
-        isManagementPopoverOpen: false
+        isManagementPopoverOpen: false,
+        isAgentPopoverOpen: false
       });
 
       const currentTab = this.getCurrentTab();
@@ -224,14 +243,12 @@ class WzMenu extends Component {
         return item.id === apiId;
       });
 
-      if (!apiData[0].cluster_info) {
-        //if apis have been modified we have to refresh the wazuhregistry
-        this.updateClusterInfoInRegistry(apiId, clusterInfo);
-        apiData[0].cluster_info = clusterInfo;
-      }
+      this.updateClusterInfoInRegistry(apiId, clusterInfo);
+      apiData[0].cluster_info = clusterInfo;
 
+      AppState.setClusterInfo(apiData[0].cluster_info);
       AppState.setCurrentAPI(
-        JSON.stringify({ name: apiData[0].cluster_info.manager, id: apiId })
+        JSON.stringify({ name: apiData[0].manager, id: apiId })
       );
       this.switchMenuOpened();
       if (this.state.currentMenuTab !== 'wazuh-dev') {
@@ -337,7 +354,7 @@ class WzMenu extends Component {
   managementPopoverToggle() {
     if (!this.state.isManagementPopoverOpen) {
       this.setState(state => {
-        return { isManagementPopoverOpen: true, isOverviewPopoverOpen: false };
+        return { isManagementPopoverOpen: true, isOverviewPopoverOpen: false, isAgentPopoverOpen: false };
       });
     }
   }
@@ -350,7 +367,15 @@ class WzMenu extends Component {
   overviewPopoverToggle() {
     if (!this.state.isOverviewPopoverOpen) {
       this.setState(state => {
-        return { isOverviewPopoverOpen: true, isManagementPopoverOpen: false };
+        return { isOverviewPopoverOpen: true, isManagementPopoverOpen: false, isAgentPopoverOpen: false };
+      });
+    }
+  }
+  
+  agentPopoverToggle() {
+    if (!this.state.isAgentPopoverOpen) {
+      this.setState(state => {
+        return { isOverviewPopoverOpen: false, isManagementPopoverOpen: false, isAgentPopoverOpen: true };
       });
     }
   }
@@ -360,11 +385,27 @@ class WzMenu extends Component {
     this.overviewPopoverToggle();
   }
 
+  onClickAgentButton() {
+    this.isAgent = this.getAgentUrl();
+    this.setMenuItem('agents');
+    if(this.isAgent) {
+      this.agentPopoverToggle();
+    } else {
+      this.setState({ menuOpened: false });
+      window.location.href = '#/agents-preview';
+    }
+  }
+
   switchMenuOpened = () => {
     if (!this.state.menuOpened && this.state.currentMenuTab === 'manager') {
       this.managementPopoverToggle();
     } else {
-      this.overviewPopoverToggle();
+      this.isAgent = this.getAgentUrl();
+      if(this.isAgent) {
+        this.agentPopoverToggle();
+      } else {
+        this.overviewPopoverToggle();
+      }
     }
     this.setState({ menuOpened: !this.state.menuOpened }, async () => {
       if (this.state.menuOpened) await this.loadApiList();
@@ -416,20 +457,19 @@ class WzMenu extends Component {
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === 'agents-preview' ||
-                this.state.currentMenuTab === 'agents'
+                (this.state.currentMenuTab === 'agents'
                   ? 'wz-menu-active'
                   : '')
               }
               color="text"
-              href="#/agents-preview"
-              onClick={() => {
-                this.setMenuItem('agents-preview');
-                this.setState({ menuOpened: false });
-              }}
+              onClick={this.onClickAgentButton.bind(this)}
             >
               <EuiIcon type="watchesApp" color="primary" size="m" />
               <span className="wz-menu-button-title ">Agents</span>
+              <span className="flex"></span>
+              {this.state.isAgentPopoverOpen && (
+                <EuiIcon color="subdued" type="arrowRight" />
+              )}
             </EuiButtonEmpty>
 
             <EuiButtonEmpty
@@ -506,6 +546,13 @@ class WzMenu extends Component {
             <Overview
               closePopover={() => this.setState({ menuOpened: false })}
             ></Overview>
+          )}
+
+          {this.state.isAgentPopoverOpen && this.isAgent && (
+            <Agent
+              isAgent={this.isAgent}
+              closePopover={() => this.setState({ menuOpened: false })}
+            ></Agent>
           )}
         </div>
       </div>

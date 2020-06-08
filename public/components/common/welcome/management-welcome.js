@@ -24,8 +24,10 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import store from '../../../redux/store';
 
 import { updateManagementSection } from '../../../redux/actions/managementActions';
+import { updateAdminMode } from '../../../redux/actions/appStateActions';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { connect } from 'react-redux';
+import { checkAdminMode } from '../../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 class ManagementWelcome extends Component {
   constructor(props) {
@@ -39,8 +41,14 @@ class ManagementWelcome extends Component {
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setGlobalBreadcrumb();
+    try{
+      const adminMode = await checkAdminMode();
+      if(this.props.adminMode !== adminMode){
+        this.props.updateAdminMode(adminMode);
+      };
+    }catch(error){}
   }
 
   switchSection(section) {
@@ -137,7 +145,18 @@ class ManagementWelcome extends Component {
                       description="Manage your Wazuh cluster configuration."
                     />
                   </EuiFlexItem>
-                  <EuiFlexItem />
+                  {this.props.adminMode ? (
+                    <EuiFlexItem>
+                      <EuiCard
+                        layout="horizontal"
+                        className='homSynopsis__card'
+                        icon={<EuiIcon size="xl" type="devToolsApp" color='primary' />}
+                        title="Sample data"
+                        onClick={() => this.switchSection('sample_data')}
+                        description="Add sample data to modules."
+                      />
+                    </EuiFlexItem>
+                  ) : (<EuiFlexItem/>)}
                 </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>
@@ -213,14 +232,22 @@ class ManagementWelcome extends Component {
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    adminMode: state.appStateReducers.adminMode
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   return {
     updateManagementSection: section =>
-      dispatch(updateManagementSection(section))
+      dispatch(updateManagementSection(section)),
+    updateAdminMode: adminMode =>
+      dispatch(updateAdminMode(adminMode))
   };
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(ManagementWelcome);

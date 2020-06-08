@@ -3,58 +3,30 @@
         <react-component name="RegisterAgent" props="actrl.registerAgentsProps" />
     </div>
     <div ng-show="!actrl.addingNewAgent">
-        <div flex="auto" layout="column" ng-cloak ng-controller="overviewController as octrl">
-            <!-- Navigation section -->
-            <div layout="row" ng-show="octrl.tab && octrl.tab !== 'welcome'" layout-align="start center"
-                style="padding: 10px 0px 2px 4px">
-                <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-                <div ng-show="octrl.tab !== 'welcome'" style="padding-left: 5px">
-                    <react-component flex name="WzCurrentOverviewSectionWrapper"
+        <div ng-controller="overviewController as octrl">
+            <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
+                <div ng-if="octrl.tab !== 'welcome'">
+                    <react-component ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
+                        name="MainModule" props="getMainProps(resultState)" />
+                </div>
+                <div>
+                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper"
                         props="octrl.currentOverviewSectionProps" />
                 </div>
-                <!-- End breadcrumbs -->
-
-                <!-- Separator -->
-                <span flex></span>
-                <!-- End separator -->
-
-                <!-- Reporting button section -->
-                <div ng-if="octrl.tab &&  octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
-                    <!-- Report button -->
-                    <button class="kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
-                        tooltip-placement="bottom"
-                        ng-class="{'euiButtonEmpty--disabled': !rendered || loading || resultState !== 'ready'}"
-                        ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="octrl.startVis2Png()"
-                        aria-label="Generate report button">
-                        <i class="fa fa-fw fa-print" aria-hidden="true"></i>
-                    </button>
+                <div ng-if='!loadingDashboard'>
+                    <div ng-show='showModuleDashboard || showModuleEvents'>
+                        <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+                            <kbn-dis></kbn-dis>
+                        </div>
+                    </div>
                 </div>
-                <!-- End Reporting buttons section -->
-
-                <!-- Discover/Dashboard buttons section -->
-                <div ng-if="octrl.tab &&  octrl.tab !== 'welcome'" class="wz-margin-right-8">
-                    <!-- Dashboard button -->
-                    <button class="kuiButton kuiButton--secondary small"
-                        ng-click="octrl.tabView === 'discover' ? octrl.switchSubtab('panels') : octrl.switchSubtab('discover')"
-                        aria-label="Dashboard button">
-                        <span ng-if="octrl.tabView === 'discover'"><i class="fa fa-fw fa-th" aria-hidden="true"></i>
-                            Dashboard</span>
-                        <span ng-if="octrl.tabView === 'panels'"><i class="fa fa-fw fa-compass" aria-hidden="true"></i>
-                            Discover</span>
-                    </button>
-                </div>
-                <!-- End Discover/Dashboard buttons section -->
             </div>
-            <!-- End navigation section -->
 
-            <!-- Discover search bar section -->
-            <kbn-dis ng-show="octrl.tab && octrl.tab !== 'welcome'"></kbn-dis>
-            <!-- End Discover search bar section -->
-
-            <!-- Loading status section -->
-            <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'"
+            <div ng-show="showModuleDashboard || showModuleEvents"
+                ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none' || (resultState === 'loading' && octrl.tab !== 'welcome' && octrl.tabView === 'panels') "
                 class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
                 <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+                    <div class="euiSpacer euiSpacer--m"></div>
                     <span class="euiLoadingChart euiLoadingChart--large">
                         <span class="euiLoadingChart__bar"></span>
                         <span class="euiLoadingChart__bar"></span>
@@ -65,13 +37,12 @@
                     <div class="percentage">{{loadingStatus}}</div>
                 </div>
             </div>
-
             <!-- End loading status section -->
-
             <!-- Report status section -->
-            <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
-                ng-if="reportBusy && reportStatus">
+            <div ng-if="reportBusy && reportStatus && showModuleDashboard"
+                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
                 <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+                    <div class="euiSpacer euiSpacer--m"></div>
                     <span class="euiLoadingChart euiLoadingChart--large">
                         <span class="euiLoadingChart__bar"></span>
                         <span class="euiLoadingChart__bar"></span>
@@ -83,13 +54,11 @@
                     <div class="euiSpacer euiSpacer--l"></div>
                 </div>
             </div>
-            <!-- End report status section -->
-
             <!-- No results section -->
-            <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
-                ng-if="octrl.tab !== 'welcome'" ng-show="resultState === 'none' && octrl.tabView === 'panels'">
-                <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
-                    one.'}" />
+            <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="tab !== 'welcome'"
+                ng-show="resultState === 'none' && tabView === 'panels' && showModuleDashboard">
+                <react-component flex name="EuiCallOut"
+                    props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />
             </div>
 
             <div ng-if="actrl.hasAgents === false"
@@ -113,9 +82,11 @@
                     </a>
                 </div>
             </div>
-            <!-- No results section -->
-
-            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels'"
-                ng-if="octrl.overviewModuleReady">
-                <react-component name="WzVisualize" props="{selectedTab: octrl.tab}" />
+            <!-- End report status section -->
+            <div ng-if="octrl.tab && octrl.tab!=='welcome'"
+                ng-show="octrl.tabView === 'panels' && (resultState === 'ready' || resultState === 'none')">
+                <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+                    <react-component ng-show='showModuleDashboard' name="WzVisualize"
+                        props="getVisualizeProps(resultState)" />
+                </div>
             </div>

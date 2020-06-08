@@ -19,6 +19,7 @@ import { QHandler, qSuggests } from './lib/q-handler';
 import { QTagsHandler } from './lib/q-tags-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
 import { WzSearchButtons, filterButton } from './wz-search-buttons';
+import { CustomBadge, ICustomBadges } from './components';
 
 export interface suggestItem {
   type: {iconType: string, color: string }
@@ -39,20 +40,22 @@ export class WzSearchBar extends Component {
     filters: {}
     isPopoverOpen: boolean
   };
-  suggestHandler!: QHandler | ApiHandler | QTagsHandler;
-  inputRef!: HTMLImageElement;
   props!:{
     qSuggests: qSuggests[] | null
     apiSuggests: apiSuggests[] | null
-    onInputChange: Function
-    onTimeChange?(props:OnTimeChangeProps): void
     buttonOptions?: filterButton[]
     searchDisable?: boolean
     defaultFormat?: 'API' | '?Q' | 'qTags'
     placeholder?: string
     initFilters?: {}
     noDeleteFiltersOnUpdateSuggests?: boolean
+    customBadges?: ICustomBadges[]
+    onInputChange: Function
+    onTimeChange?(props:OnTimeChangeProps): void
+    onChangeCustomBadges?(customBadges: ICustomBadges[]): void 
   };
+  suggestHandler!: QHandler | ApiHandler | QTagsHandler;
+  inputRef!: HTMLImageElement;
 
   constructor(props) {
     super(props);
@@ -66,6 +69,86 @@ export class WzSearchBar extends Component {
       status: 'unchanged',
       filters: props.initFilters || {},
       isPopoverOpen: false,
+    }
+  }
+
+  async componentDidMount() {
+    this.props.onInputChange(this.state.filters);
+    this.selectSuggestHandler(this.state.searchFormat);
+    if(this.state.searchFormat) {
+      const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
+      this.setState({suggestions: suggestsItems});
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
+      return true;
+    }
+    if (nextState.isProcessing) {
+      return true;
+    }
+    if (JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
+      return true;
+    }
+    if (JSON.stringify(this.props.customBadges) !== JSON.stringify(nextProps.customBadges)){
+      return true;
+    }
+    if (nextState.isPopoverOpen !== this.state.isPopoverOpen){
+      return true;
+    }
+    if (nextState.status !== this.state.status) {
+      return true;
+    }
+    if (this.updateSuggestOnProps(nextProps.qSuggests, nextProps.apiSuggests)){
+      return true;
+    }
+    if (JSON.stringify(this.state.suggestions) !== JSON.stringify(nextState.suggestions)){
+      return true;
+    }
+    return false;
+  }
+
+  async componentDidUpdate(prevProps) {
+    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(prevProps.initFilters)){
+      this.setState({filters: this.props.initFilters});
+    }
+
+    if (this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests)) {
+      this.selectSuggestHandler(this.state.searchFormat);
+    }
+    if (JSON.stringify(prevProps.initFilters) !== JSON.stringify(this.props.initFilters)){
+      this.setState({
+        filters: this.props.initFilters,
+        isProcessing: true
+      })
+    }
+
+    if (!this.state.isProcessing) { return;}
+    const { inputValue, isInvalid, searchFormat } = this.state;
+    if (isInvalid) {
+      this.buildSuggestInvalid();
+    } else {
+      let suggestsItems;
+      try {
+        suggestsItems = !!searchFormat ?
+        [...await this.suggestHandler.buildSuggestItems(inputValue)]
+        : [];
+      } catch (error) {
+        suggestsItems = this.state.suggestions;
+      }
+      
+
+      if (this.isSearchEnabled()) {
+        const suggestSearch = this.buildSuggestFieldsSearch();
+        suggestSearch && suggestsItems.unshift(suggestSearch);
+      }
+
+      await this.setState({
+        status: 'unchanged',
+        suggestions: suggestsItems,
+        isProcessing: false,
+      });
     }
   }
 
@@ -107,15 +190,6 @@ export class WzSearchBar extends Component {
     });
   }
 
-  async componentDidMount() {
-    this.props.onInputChange(this.state.filters);
-    this.selectSuggestHandler(this.state.searchFormat);
-    if(this.state.searchFormat) {
-      const suggestsItems = [...await this.suggestHandler.buildSuggestItems('')];
-      this.setState({suggestions: suggestsItems});
-    }
-  }
-
   updateSuggestOnProps(qSuggestsPrev, apiSuggestsPrev) {
     const { qSuggests, apiSuggests } = this.props;
     const qSuggestsChanged = JSON.stringify(qSuggests) !== JSON.stringify(qSuggestsPrev);
@@ -124,69 +198,6 @@ export class WzSearchBar extends Component {
       return true;
     }
     return false;
-
-  }
-
-  shouldComponentUpdate(nextProps, nextState){
-    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
-      return true;
-    }
-    if (nextState.isProcessing) {
-      return true;
-    }
-    if (JSON.stringify(this.props.initFilters) !== JSON.stringify(nextProps.initFilters)){
-      return true;
-    }
-    if (nextState.isPopoverOpen !== this.state.isPopoverOpen){
-      return true;
-    }
-    if (nextState.status !== this.state.status) {
-      return true;
-    }
-    if (this.updateSuggestOnProps(nextProps.qSuggests, nextProps.apiSuggests)){
-      return true;
-    }
-    if (JSON.stringify(this.state.suggestions) !== JSON.stringify(nextState.suggestions)){
-      return true;
-    }
-    return false;
-  }
-
-  async componentDidUpdate(prevProps) {
-    if(JSON.stringify(this.props.initFilters) !== JSON.stringify(prevProps.initFilters)){
-      this.setState({filters: this.props.initFilters});
-    }
-
-    if (this.updateSuggestOnProps(prevProps.qSuggests, prevProps.apiSuggests)) {
-      this.selectSuggestHandler(this.state.searchFormat);
-    }
-    if (JSON.stringify(prevProps.initFilters) !== JSON.stringify(this.props.initFilters)){
-      this.setState({
-        filters: this.props.initFilters,
-        isProcessing: true
-      })
-    }
-
-    if (!this.state.isProcessing) { return;}
-    const { inputValue, isInvalid, searchFormat } = this.state;
-    if (isInvalid) {
-      this.buildSuggestInvalid();
-    } else {
-      const suggestsItems = !!searchFormat ?
-        [...await this.suggestHandler.buildSuggestItems(inputValue)]
-        : [];
-
-      if (this.isSearchEnabled()) {
-        const suggestSearch = this.buildSuggestFieldsSearch();
-        suggestSearch && suggestsItems.unshift(suggestSearch);
-      }
-
-      await this.setState({
-        status: 'unchanged',
-        suggestions: suggestsItems,
-        isProcessing: false,
-      });
-    }
   }
 
   isSearchEnabled() {
@@ -381,9 +392,10 @@ export class WzSearchBar extends Component {
       inputValue,
       isInvalid,
       filters,
-      isPopoverOpen
+      isPopoverOpen,
+      searchFormat
     } = this.state;
-    const { placeholder, buttonOptions, qSuggests, onTimeChange } = this.props;
+    const { placeholder, buttonOptions, qSuggests, onTimeChange, customBadges } = this.props;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     !!onTimeChange && import('./src/style/wz-date-picker.less');
@@ -422,11 +434,26 @@ export class WzSearchBar extends Component {
           }
         </EuiFlexGroup>
         <EuiFlexGroup>
+          { (!!formatedFilter.length && !filters['q']) &&
+            <EuiFlexItem grow={false} style={{marginRight: "-8px"}}>
+              <WzSearchBadges
+                filters={formatedFilter}
+                onChange={this.onChangeBadge.bind(this)}
+                searchFormat={searchFormat}
+                qSuggests={qSuggests} />
+            </EuiFlexItem>
+          }
           <EuiFlexItem grow={false}>
-            <WzSearchBadges
-              filters={formatedFilter}
-              onChange={this.onChangeBadge.bind(this)}
-              qSuggests={qSuggests} />
+          <div>
+              {(customBadges || []).map((badge, idx) => 
+                <CustomBadge 
+                key={idx}
+                badge={badge}
+                index={idx}
+                filters={filters}
+                {...this.props} />
+              )}
+            </div>
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>

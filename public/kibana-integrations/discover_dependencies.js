@@ -12,6 +12,7 @@ import { createDocViewerDirective } from 'plugins/kibana/discover/np_ready/angul
 import { createFieldSearchDirective } from 'plugins/kibana/discover/np_ready/components/field_chooser/discover_field_search_directive';
 import { createIndexPatternSelectDirective } from 'plugins/kibana/discover/np_ready/components/field_chooser/discover_index_pattern_directive';
 import { createStringFieldProgressBarDirective } from 'plugins/kibana/discover/np_ready/components/field_chooser/string_progress_bar';
+import { FieldNameDirectiveProvider } from 'plugins/kibana/discover/np_ready/angular/directives/field_name';
 import { createFieldChooserDirective } from 'plugins/kibana/discover/np_ready/components/field_chooser/field_chooser';
 import { createDiscoverFieldDirective } from 'plugins/kibana/discover/np_ready/components/field_chooser/discover_field';
 
@@ -26,6 +27,7 @@ app
   .directive('toolBarPagerButtons', createToolBarPagerButtonsDirective)
   .directive('kbnInfiniteScroll', createInfiniteScrollDirective)
   .directive('docViewer', createDocViewerDirective)
+  .directive('fieldName', FieldNameDirectiveProvider)
   .directive('discoverFieldSearch', createFieldSearchDirective)
   .directive('discoverIndexPatternSelect', createIndexPatternSelectDirective)
   .directive('stringFieldProgressBar', createStringFieldProgressBarDirective)

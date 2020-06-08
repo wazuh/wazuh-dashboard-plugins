@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
@@ -51,8 +50,6 @@ export class HealthCheck {
     this.wazuhConfig = new WazuhConfig();
     this.$window = $window;
     this.results = [];
-
-    this.savedObjectsClient = Private(SavedObjectsClientProvider);
 
     this.checks = {
       api: true,
@@ -101,7 +98,8 @@ export class HealthCheck {
       let patternTitle = '';
       if (this.checks.pattern) {
         const i = this.results.map(item => item.id).indexOf(2);
-        var patternData = await SavedObject.existsIndexPattern(patternId);
+        let patternData = await SavedObject.existsIndexPattern(patternId);
+        if(!patternData) patternData = {};  
         patternTitle = patternData.title;
         if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList();
@@ -153,7 +151,7 @@ export class HealthCheck {
         for (var i = 0; i < hosts.length; i++) {
           try {
             const API = await ApiCheck.checkApi(hosts[i]);
-            if (API && API.data && API.data.status === 'enabled') {
+            if (API && API.data) {
               return hosts[i].id;
             }
           } catch (err) {}
@@ -324,8 +322,11 @@ export class HealthCheck {
 
       if (!this.errors || !this.errors.length) {
         await this.$timeout(300);
+        const params = this.$rootScope.previousParams || {};
+        var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+        const url = 'wazuh#' + (this.$rootScope.previousLocation || '') + '?' + queryString;
         this.$window.location.assign(
-          chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
+          chrome.addBasePath(url)
         );
         return;
       }

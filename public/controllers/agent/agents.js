@@ -21,6 +21,8 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
+import { WzRequest } from '../../react-services/wz-request';
+import { toastNotifications } from 'ui/notify';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
@@ -120,22 +122,6 @@ export class AgentsController {
       timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
     }
-
-    this.$scope.$on('sendVisDataRows', (ev, param) => {
-      const rows = (param || {}).mitreRows.tables[0].rows;
-      this.$scope.attacksCount = {};
-      for (var i in rows) {
-        this.$scope.attacksCount[rows[i]['col-0-2']] = rows[i]['col-1-1'];
-      }
-
-      this.$scope.mitreCardsSliderProps = {
-        items: this.$scope.mitreIds,
-        attacksCount: this.$scope.attacksCount,
-        reqTitle: 'MITRE',
-        wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-        addFilter: id => this.addMitrefilter(id)
-      };
-    });
 
     this.$scope.TabDescription = TabDescription;
 
@@ -388,6 +374,8 @@ export class AgentsController {
     };
 
     this.$scope.goDiscover = () => this.goDiscover();
+    this.$scope.onClickUpgrade = () => this.onClickUpgrade();
+    this.$scope.onClickRestart = () => this.onClickRestart();
 
     this.$scope.$on('$routeChangeStart', () => {
       return AppState.removeSessionStorageItem('configSubTab');
@@ -508,21 +496,8 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
-
-    /*     if (tab === 'mitre') {
-          const result = await this.apiReq.request('GET', '/rules/mitre', {});
-          this.$scope.mitreIds = (((result || {}).data || {}).data || {}).items;
-    
-          this.$scope.mitreCardsSliderProps = {
-            items: this.$scope.mitreIds,
-            attacksCount: this.$scope.attacksCount,
-            reqTitle: 'MITRE',
-            wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-            addFilter: id => this.addMitrefilter(id),
-          };
-        } */
 
     try {
       this.$scope.showScaScan = false;
@@ -538,7 +513,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -580,11 +555,6 @@ export class AgentsController {
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
-      this.$scope.currentAgentsSectionProps = {
-        switchTab: (tab, force) => this.$scope.switchTab(tab, force),
-        currentTab: this.$scope.tab,
-        agent: this.$scope.agent
-      };
       this.$scope.$applyAsync();
     } catch (error) {
       return Promise.reject(error);
@@ -681,12 +651,58 @@ export class AgentsController {
     }
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time
+    });
+  };
+
   goDiscover() {
     this.targetLocation = {
       tab: 'general',
       subTab: 'discover'
     };
     return this.switchTab('general');
+  }
+
+  onClickUpgrade() {
+    try {
+      WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/upgrade`, {})
+        .then(() => {
+          this.showToast('success', 'The agent is being upgrade.', '', 5000);
+        })
+        .catch(() => {
+          this.showToast('warning', 'This agent is already upgrade.', '', 5000);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  onClickRestart() {
+    try {
+      WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/restart`, {})
+        .then(() => {
+          this.showToast('success', 'Agent restarted.', '', 5000);
+        })
+        .catch(() => {
+          this.showToast('warning', 'Error restarting agent.', '', 5000);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  checkStatusAgent() {
+    console.log(this.$scope.agent.status);
+    if (this.$scope.agent.status !== 'Active') {
+      return false;
+    } else if (this.$scope.agent.status === 'Active') {
+      return true;
+    }
   }
 
   // Agent data
@@ -761,13 +777,8 @@ export class AgentsController {
 
       // Agent
       this.$scope.agent = agentInfo;
-      const breadcrumb = [
-        { text: '' },
-        { text: 'Agents', href: '/app/wazuh#/agents-preview' },
-        { text: `${this.$scope.agent.name} (${this.$scope.agent.id})` }
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
+      if (!this.$scope.agent) return;
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
@@ -791,6 +802,9 @@ export class AgentsController {
         );
 
       this.loadWelcomeCardsProps();
+      this.$scope.getWelcomeCardsProps = (resultState) => {
+        return {...this.$scope.welcomeCardsProps, resultState }
+      }
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;
@@ -847,6 +861,7 @@ export class AgentsController {
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
+      goGroups: (agent, group) => this.goGroups(agent, group),
       setExtensions: (api, extensions) => {
         AppState.setExtensions(api, extensions);
         this.$scope.extensions = extensions;
