@@ -1028,7 +1028,6 @@ export class AgentsTable extends Component {
     };
 
     const getCellProps = item => {
-      console.log('item', item)
       return {
         onMouseDown: (ev) =>  {
           if(item.status !== 'Never connected'){
