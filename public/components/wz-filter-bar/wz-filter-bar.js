@@ -34,6 +34,7 @@ export class WzFilterBar extends Component {
         label: 'OR'
       }
     ];
+    this.refComboBox = React.createRef();
   }
 
   onOperatorClick = (ev, option) => {
@@ -107,6 +108,7 @@ export class WzFilterBar extends Component {
       }
       this.buildQuery();
       this.setState({ isProcessing: false });
+      this.refComboBox.current.closeList();
     }
   }
 
@@ -289,6 +291,7 @@ export class WzFilterBar extends Component {
         onChange={this.onChange}
         fullWidth={true}
         onCreateOption={this.onCreateOption}
+        ref={this.refComboBox}
       />
     );
   }
