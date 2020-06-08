@@ -54,7 +54,7 @@ renderGroups(groups) {
     })
   }
     return (
-      <Fragment>
+      <div style={{display: 'inline'}}>
         {auxGroups}
         {auxIndex > 0 && 
           <EuiToolTip
@@ -66,7 +66,7 @@ renderGroups(groups) {
             </EuiLink>
           </EuiToolTip>
         }
-      </Fragment>
+      </div>
     );
   }
 

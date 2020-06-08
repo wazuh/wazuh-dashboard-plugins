@@ -351,7 +351,6 @@ export class AgentsPreview extends Component {
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
-          <div>
             <AgentsTable
               filters={this.state.agentTableFilters}
               removeFilters={() => this.removeFilters()}
@@ -362,7 +361,6 @@ export class AgentsPreview extends Component {
               timeService={this.props.tableProps.timeService}
               reload={() => this.getSummary()}
             />
-          </div>
         </EuiFlexItem>
       </EuiPage>
     );
