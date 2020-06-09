@@ -1,6 +1,6 @@
 <div ng-controller="agentsPreviewController as actrl">
     <div ng-init="actrl.addNewAgent(false)" ng-show="actrl.addingNewAgent">
-        <react-component name="RegisterAgent" props="actrl.registerAgentsProps" />
+        <react-component name="RegisterAgent" props="actrl.registerAgentsProps" ></react-component>
     </div>
     <div ng-show="!actrl.addingNewAgent">
         <div ng-controller="overviewController as octrl">
@@ -8,8 +8,8 @@
             <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
                 <react-component ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
                     name="MainModule"
-                    props="getMainProps(resultState)" />
-                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper" props="octrl.currentOverviewSectionProps" />
+                    props="getMainProps(resultState)" ></react-component>
+                    <react-component style="visibility: hidden;" flex name="WzCurrentOverviewSectionWrapper" props="octrl.currentOverviewSectionProps" ></react-component>
                 <div ng-if='!loadingDashboard'>
                     <div ng-show='showModuleDashboard || showModuleEvents'>
                         <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
@@ -62,7 +62,7 @@
             <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="tab !== 'welcome'"
                 ng-show="resultState === 'none' && tabView === 'panels' && showModuleDashboard">
                 <react-component flex name="EuiCallOut"
-                    props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />
+                    props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" ></react-component>
             </div>
 
             <div ng-if="actrl.hasAgents === false"
@@ -91,6 +91,6 @@
                 ng-show="octrl.tabView === 'panels' && (resultState === 'ready' || resultState === 'none')">
                 <div ng-class="{'no-opacity': !moduleDiscoverReady}">
                     <react-component ng-show='showModuleDashboard' name="WzVisualize"
-                        props="getVisualizeProps(resultState)" />
+                        props="getVisualizeProps(resultState)" ></react-component>
                 </div>
             </div>

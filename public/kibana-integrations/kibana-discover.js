@@ -287,7 +287,6 @@ function discoverController(
     stopSyncingQueryAppStateWithStateContainer();
     unlistenHistoryBasePath();
     //WAZUH 
-    //filterStateManager.destroy();
     if (tabListener) tabListener();
     delete wazuhApp.discoverScope;
   });
