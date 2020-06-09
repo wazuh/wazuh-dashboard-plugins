@@ -97,7 +97,6 @@ class WzConfigurationSwitch extends Component {
     });
   };
   async componentDidMount() {
-    console.log('ghisadsa',this.props)
     // Check admin mode
     try {
       const adminMode = await checkAdminMode();

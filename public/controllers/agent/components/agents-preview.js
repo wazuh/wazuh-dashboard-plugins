@@ -22,6 +22,7 @@ import {
   EuiLoadingChart,
   EuiSpacer,
   EuiText,
+  EuiEmptyPrompt,
   EuiToolTip
 } from '@elastic/eui';
 import { Pie } from '../../../components/d3/pie';
@@ -34,7 +35,9 @@ import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
-import { WazuhConfig } from './../../../react-services/wazuh-config.js'
+import { WazuhConfig } from './../../../react-services/wazuh-config.js';
+import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
+
 
 export class AgentsPreview extends Component {
   _isMount = false;
@@ -329,25 +332,41 @@ export class AgentsPreview extends Component {
             </Fragment>
             )}
             {this.state.showAgentsEvolutionVisualization && (
-              <EuiFlexItem grow={false} className="agents-evolution-visualization" style={{ display: this.props.resultState === 'ready' && !this.state.loading ? 'block' : 'none', height: this.props.resultState === 'ready' && !this.state.loading ? '180px' : 0}}>
-                <EuiPanel paddingSize="none" betaBadgeLabel="Evolution">
-                  <EuiSpacer size="s" />
-                  <div style={{height: this.props.resultState === 'ready' ? '170px' : 0}}>
-                    <WzReduxProvider>
-                      <KibanaVis
-                        visID={'Wazuh-App-Overview-General-Agents-Evolution'}
-                        tab={'general'}
-                      />
-                    </WzReduxProvider>
-                  </div>
-                  {this.props.resultState === 'loading' &&
-                    (
-                    <div style={{ display: 'block', textAlign: "center", padding: 30}}>                        
-                      <EuiLoadingChart size="xl" />
+              <EuiFlexItem grow={false} className="agents-evolution-visualization" style={{ display: !this.state.loading ? 'block' : 'none', height: !this.state.loading ? '182px' : 0}}>
+                <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ display: this.props.resultState === 'ready' ? 'block' : 'none'}}>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                    <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
+                      <WzReduxProvider>
+                        <KibanaVis
+                          visID={'Wazuh-App-Overview-General-Agents-Evolution'}
+                          tab={'general'}
+                        />
+                      </WzReduxProvider>
                     </div>
-                  ) }
+                    {this.props.resultState === 'loading' &&
+                      (
+                      <div style={{ display: 'block', textAlign: "center", padding: 30}}>                        
+                        <EuiLoadingChart size="xl" />
+                      </div>
+                    ) }
+                      
+                    </EuiFlexItem>
+                  </EuiFlexGroup>                  
+                </EuiPanel>
+                <EuiPanel paddingSize="none" betaBadgeLabel="Evolution" style={{ height: 180,  display: this.props.resultState === 'none' ? 'block' : 'none'}}>
+                  <EuiEmptyPrompt
+                    className="wz-padding-21"
+                    iconType="alert"
+                    titleSize="xs"
+                    title={<h3>No results found in the selected time range</h3>}
+                    actions={
+                      <WzDatePicker condensed={true} onTimeChange={() => { }} />
+                    }
+                  />
                 </EuiPanel>
               </EuiFlexItem>
+              
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
