@@ -136,6 +136,8 @@ service kibana restart
  
 | Wazuh app | Kibana | Open Distro | Package                                                         |
 | :-------: | :----: | :---------: | :-------------------------------------------------------------- |
+|   3.13.0  |  7.7.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.7.1.zip> |
+|   3.13.0  |  7.7.0 |    1.8.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.7.0.zip> |
 |   3.12.3  |  7.7.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.7.1.zip> |
 |   3.12.3  |  7.7.0 |    1.8.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.7.0.zip> |
 |   3.12.3  |  7.6.2 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.6.2.zip> |
@@ -217,51 +219,6 @@ service kibana restart
 |   3.8.2   |  6.5.4 |0.7.0 - 0.7.1| <https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.5.4.zip>  |
 |   3.8.1   |  6.5.4 |0.7.0 - 0.7.1| <https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.1_6.5.4.zip>  |
 |   3.8.0   |  6.5.4 |0.7.0 - 0.7.1| <https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.0_6.5.4.zip>  |
-|   3.7.2   |  6.5.4 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.4.zip>  |
-|   3.7.2   |  6.5.3 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.3.zip>  |
-|   3.7.1   |  6.5.3 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.1_6.5.3.zip>  |
-|   3.7.1   |  6.5.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.1_6.5.2.zip>  |
-|   3.7.1   |  6.5.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.1_6.5.1.zip>  |
-|   3.7.0   |  6.5.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.5.1.zip>  |
-|   3.7.0   |  6.5.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.5.0.zip>  |
-|   3.7.0   |  6.4.3 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.4.3.zip>  |
-|   3.7.0   |  6.4.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.4.2.zip>  |
-|   3.6.1   |  6.4.3 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.3.zip>  |
-|   3.6.1   |  6.4.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.2.zip>  |
-|   3.6.1   |  6.4.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.1.zip>  |
-|   3.6.1   |  6.4.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.0.zip>  |
-|   3.6.1   |  6.3.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.3.2.zip>  |
-|   3.6.0   |  6.4.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.0_6.4.0.zip>  |
-|   3.6.0   |  6.3.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.0_6.3.2.zip>  |
-|   3.5.0   |  6.4.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.5.0_6.4.0.zip>  |
-|   3.5.0   |  6.3.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.5.0_6.3.2.zip>  |
-|   3.4.0   |  6.3.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.4.0_6.3.2.zip>  |
-|   3.4.0   |  6.3.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.4.0_6.3.1.zip>  |
-|   3.3.1   |  6.3.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.3.1_6.3.1.zip>  |
-|   3.3.1   |  6.3.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.3.1_6.3.0.zip>  |
-|   3.3.0   |  6.3.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.3.0_6.3.0.zip>  |
-|   3.3.1   |  6.2.4 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.3.1_6.2.4.zip>  |
-|   3.3.0   |  6.2.4 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.3.0_6.2.4.zip>  |
-|   3.2.4   |  6.2.4 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.4_6.2.4.zip>  |
-|   3.2.3   |  6.2.4 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.3_6.2.4.zip>  |
-|   3.2.2   |  6.2.4 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.2_6.2.4.zip>  |
-|   3.2.1   |  6.2.4 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.1_6.2.4.zip>  |
-|   3.2.1   |  6.2.3 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.1_6.2.3.zip>  |
-|   3.2.1   |  6.2.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.1_6.2.2.zip>  |
-|   3.2.0   |  6.2.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.2.2.zip>  |
-|   3.2.0   |  6.2.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.2.1.zip>  |
-|   3.2.0   |  6.2.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.2.0.zip>  |
-|   3.2.0   |  6.1.3 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.3.zip>  |
-|   3.2.0   |  6.1.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.2.zip>  |
-|   3.2.0   |  6.1.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.1.zip>  |
-|   3.2.0   |  6.1.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.0.zip>  |
-|   3.1.0   |  6.1.3 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.3.zip>  |
-|   3.1.0   |  6.1.2 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.2.zip>  |
-|   3.1.0   |  6.1.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.1.zip>  |
-|   3.1.0   |  6.1.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.0.zip>  |
-|   3.0.0   |  6.1.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.1.0.zip>  |
-|   3.0.0   |  6.0.1 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.1.zip>  |
-|   3.0.0   |  6.0.0 |             |<https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.0.zip>  |
 
 
 ## Contribute
