@@ -217,6 +217,7 @@ export class FlyoutTechnique extends Component {
 
         <EuiSpacer size='s' />
           <EuiAccordion
+            style={{textDecoration: 'none'}}
             id={"recent_events"}
             className='events-accordion'
             extraAction={<div style={{marginBottom: 5}}><strong>{this.state.totalHits || 0}</strong> hits</div>}
@@ -227,9 +228,9 @@ export class FlyoutTechnique extends Component {
                     <span style={{ marginLeft: 16 }}> 
                     {!this.props.agentId && (
                       <span>
-                        <EuiToolTip position="top" content={"Show " + currentTechnique+ " in Dashboard"} >
-                            <EuiIcon onClick={(e) => {this.props.openDashboard(currentTechnique);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
-                        </EuiToolTip> &nbsp;
+                        <EuiToolTip position="top" content={"Show " + currentTechnique+ " in Dashboard"}>
+                            <EuiIcon onClick={(e) => {this.props.openDashboard(currentTechnique);e.stopPropagation()}} color="primary" type="visualizeApp" style={{marginRight: '10px'}}></EuiIcon>
+                        </EuiToolTip>
                         <EuiToolTip position="top" content={"Inspect " + currentTechnique + " in Events"} >
                           <EuiIcon onClick={(e) => {this.props.openDiscover(currentTechnique);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
                         </EuiToolTip>
@@ -238,7 +239,7 @@ export class FlyoutTechnique extends Component {
                       <span>
                         <EuiToolTip position="top" content={"Show " + currentTechnique+ " in dashboard"} >
                             <EuiIcon onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'overview', {"tab": "mitre", "agentId": this.props.agentId, filters: {"rule.mitre.id": currentTechnique}  } )}} color="primary" type="visualizeApp"></EuiIcon>
-                        </EuiToolTip> &nbsp;
+                        </EuiToolTip>
                       </span>
                     )
                     }  
