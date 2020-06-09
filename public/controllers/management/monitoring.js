@@ -228,12 +228,6 @@ export function ClusterController(
    * This set some required settings at init
    */
   const load = async () => {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Cluster' }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
     try {
       visHandlers.removeAll();
@@ -307,6 +301,12 @@ export function ClusterController(
 
   $scope.expandArray = [false, false];
 
+  const breadcrumb = [
+    { text: '' },
+    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Cluster' }
+  ];
+  store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   if (clusterEnabled) load();
 
   //listeners
