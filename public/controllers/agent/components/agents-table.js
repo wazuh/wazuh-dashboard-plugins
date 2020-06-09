@@ -266,8 +266,9 @@ export class AgentsTable extends Component {
   }
 
   actionButtonsRender(agent) {
-    return agent.status !== 'Never connected' ? (
-      <div>
+    console.log(agent)
+    return (
+      <div className={'icon-box-action'}>
         <EuiToolTip
           content="Open summary panel for this agent"
           position="left"
@@ -283,19 +284,21 @@ export class AgentsTable extends Component {
           />
         </EuiToolTip>
         &nbsp;
-        <EuiToolTip content="Open configuration for this agent" position="left">
-          <EuiButtonIcon
-            onClick={ev => {
-              ev.stopPropagation();
-              this.props.clickAction(agent, 'configuration');
-            }}
-            color={'primary'}
-            iconType="wrench"
-            aria-label="Open configuration for this agent"
-          />
-        </EuiToolTip>
+        {agent.status !== 'Never connected' && 
+          <EuiToolTip content="Open configuration for this agent" position="left">
+            <EuiButtonIcon
+              onClick={ev => {
+                ev.stopPropagation();
+                this.props.clickAction(agent, 'configuration');
+              }}
+              color={'primary'}
+              iconType="wrench"
+              aria-label="Open configuration for this agent"
+            />
+          </EuiToolTip>
+        }
       </div>
-    ) : null;
+    );
   }
 
   addIconPlatformRender(agent) {
@@ -339,7 +342,7 @@ export class AgentsTable extends Component {
       }
     };
 
-    return <EuiHealth color={color(status)}>{status}</EuiHealth>;
+    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status}</span></EuiHealth>;
   }
 
   reloadAgent = () => {
@@ -726,7 +729,7 @@ export class AgentsTable extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '5%'
+        width: '10%'
       },
       {
         field: 'name',
@@ -1023,18 +1026,14 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: item.status !== 'Never connected' ? () => {} : undefined
+        onClick: () => {}
       };
     };
 
     const getCellProps = item => {
       return {
-        onMouseDown: (ev) =>  {
-          if(item.status !== 'Never connected'){
-            AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } );
-            ev.stopPropagation();
-          }
-        }
+        onMouseDown: (ev) => {
+          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
       }
     };
 
