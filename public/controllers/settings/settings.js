@@ -126,6 +126,7 @@ export class SettingsController {
       { id: 'about', name: 'About' }
     ];
     if (this.admin) {
+      tabs.splice(1, 0, { id: 'sample_data', name: 'Sample data' });
       tabs.splice(1, 0, { id: 'modules', name: 'Modules' });
     }
     this.settingsTabsProps = {

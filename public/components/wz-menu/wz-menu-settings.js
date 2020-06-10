@@ -33,6 +33,7 @@ class WzMenuSettings extends Component {
       configuration: { id: 'configuration', text: 'Configuration' },
       logs: { id: 'logs', text: 'Logs' },
       about: { id: 'about', text: 'About' },
+      sample_data: { id: 'sample_data', text: 'Sample Data' },
     };
 
 
@@ -88,6 +89,7 @@ class WzMenuSettings extends Component {
           this.createItem(this.settingsSections.configuration),
           this.createItem(this.settingsSections.logs),
           this.createItem(this.settingsSections.about),
+          this.createItem(this.settingsSections.sample_data),
         ],
       })
     ];
