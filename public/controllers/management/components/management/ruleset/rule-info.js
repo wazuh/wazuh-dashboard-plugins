@@ -29,6 +29,8 @@ import {
   cleanFilters
 } from '../../../../../redux/actions/rulesetActions';
 
+import WzTextWithTooltipTruncated from '../../../../../components/common/wz-text-with-tooltip-if-truncated';
+
 class WzRuleInfo extends Component {
   constructor(props) {
     super(props);
@@ -272,7 +274,11 @@ class WzRuleInfo extends Component {
       })
       return <span>{name}: {link}</span>
     }else{
-      return value;
+      return (
+        <WzTextWithTooltipTruncated position='top'>
+          {value}
+        </WzTextWithTooltipTruncated>
+      );
     }
   }
 
@@ -283,7 +289,8 @@ class WzRuleInfo extends Component {
   renderDetails(details) {
     const detailsToRender = [];
     const capitalize = str => str[0].toUpperCase() + str.slice(1);
-    Object.keys(details).forEach((key) => {
+    // Exclude group key of details
+    Object.keys(details).filter(key => key !== 'group').forEach((key) => {
       detailsToRender.push(
         <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
           <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}

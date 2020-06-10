@@ -34,6 +34,7 @@ import {
 import './discover.less';
 import { EuiFlexItem } from '@elastic/eui';
 import { ApiRequest } from '../../../../react-services/api-request';
+import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
@@ -365,13 +366,36 @@ export class RowDetails extends Component {
     );
   }
 
+  getFormattedDetails(value){
+
+    if(Array.isArray(value) && value[0].type){
+      let link = "";
+      let name = "";
+
+      value.forEach(item => {
+        if(item.type === 'cve')
+          name = item.name;
+        if(item.type === 'link')
+          link = <a href={item.name} target="_blank">{item.name}</a>
+      })
+      return <span>{name}: {link}</span>
+    }else{
+      return (
+        <WzTextWithTooltipTruncated position='top'>
+          {value}
+        </WzTextWithTooltipTruncated>
+      );
+    }
+  }
+
   renderDetails(details) {
     const detailsToRender: any = [];
     const capitalize = str => str[0].toUpperCase() + str.slice(1);
-    Object.keys(details).forEach((key) => {
+    // Exclude group key of details
+    Object.keys(details).filter(key => key !== 'group').forEach((key) => {
       detailsToRender.push(
         <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : details[key]}
+          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
         </EuiFlexItem>
       );
     });
