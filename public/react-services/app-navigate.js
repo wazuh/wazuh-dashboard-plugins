@@ -21,12 +21,19 @@ import rison from 'rison-node';
 export class AppNavigate {
 
 
-  static getUrlParameter(name) {
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    var results = regex.exec(location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-  };
+  static getUrlParameter(sParam) {
+    var sPageURL = window.location.hash.split('?')[1],
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
 
   static buildFilter_w(filters, indexPattern){
     const filtersArray = [];
@@ -41,8 +48,14 @@ export class AppNavigate {
     return rison.encode({ filters: filtersArray});
   }
 
-  static navigateToModule(e, section, params) {
+  static navigateToModule(e, section, params, navigateMethod=false) {
     e.persist(); // needed to access this event asynchronously
+    if(e.button == 0){ // left button clicked
+      if(navigateMethod){
+        navigateMethod();
+        return;
+      }
+    }
     getIndexPattern().then(indexPattern => {
       const urlParams = {};
 
@@ -62,7 +75,11 @@ export class AppNavigate {
       if (e && (e.which == 2 || e.button == 1 )) { // middlebutton clicked
          window.open(newUrl, '_blank', "noreferrer");
       }else if(e.button == 0){ // left button clicked
-        window.location.href = newUrl;
+        if(navigateMethod){
+          navigateMethod()
+        }else{
+          window.location.href = newUrl;
+        }
       }
     })
   }

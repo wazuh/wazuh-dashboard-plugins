@@ -42,22 +42,27 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   hipaa: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   nist: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   gdpr: {
     init: 'dashboard',
-    tabs: [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
+    buttons: ['reporting']
+  },
+  tsc: {
+    init: 'dashboard',
+    tabs: [{ id: 'inventory', name: 'Inventory' }, { id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }],
     buttons: ['reporting']
   },
   syscollector: {
