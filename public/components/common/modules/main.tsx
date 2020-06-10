@@ -21,6 +21,7 @@ import {
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { ReportingService } from '../../../react-services/reporting';
+import { AppNavigate } from '../../../react-services/app-navigate';
 import { ModulesDefaults } from './modules-defaults';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
@@ -47,8 +48,6 @@ export class MainModule extends Component {
     if (!(ModulesDefaults[this.props.section] || {}).notModule) {
       this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [{ id: 'dashboard', name: 'Dashboard' }, { id: 'events', name: 'Events' }];
       this.buttons = (ModulesDefaults[this.props.section] || {}).buttons || ['reporting', 'settings'];
-      const init = (ModulesDefaults[this.props.section] || {}).init || 'dashboard';
-      this.loadSection(this.canBeInit(init) ? init : 'dashboard');
     }
   }
 
@@ -161,16 +160,16 @@ export class MainModule extends Component {
 
   onSelectedTabChanged(id) {
     if (id !== this.state.selectView) {
-      if (id === 'events' || id === 'dashboard') {
+      if (id === 'events' || id === 'dashboard' || id === 'inventory') {
         this.$rootScope.moduleDiscoverReady = false;
-        if (this.props.switchSubTab) this.props.switchSubTab(id === 'events' ? 'discover' : 'panels')
+        if (this.props.switchSubTab) this.props.switchSubTab(id === 'events' ? 'discover' : id === 'inventory' ? 'inventory' : 'panels')
         window.location.href = window.location.href.replace(
           new RegExp("tabView=" + "[^\&]*"),
-          `tabView=${id === 'events' ? 'discover' : 'panels'}`);
+          `tabView=${id === 'events' ? 'discover' : id === 'inventory' ? 'inventory' : 'panels'}`);
         this.afterLoad = id;
         this.loadSection('loader');
       } else {
-        this.loadSection(id);
+        this.loadSection(id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id);
       }
     }
   }

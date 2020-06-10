@@ -233,14 +233,13 @@ export class Techniques extends Component {
       </EuiFlexGrid>
       )
     }else{
-      return <>No tactics have been selected.</>
+      return <>No results.</>
     }
   }
 
   openDiscover(techniqueID){
     this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
     this.props.onSelectedTabChanged('events');
-
   }
 
 
