@@ -209,12 +209,12 @@ export class OverviewController {
       };
 
       this.tabView = this.commonData.checkTabViewLocation();
-      if (subtab === 'panels' && this.tab !== 'welcome') {
+      if ( this.tab !== 'welcome') {
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
           this.tab,
           subtab,
-          this.tabView === 'discover'
+          false
         );
          this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {
@@ -272,7 +272,12 @@ export class OverviewController {
       this.$location.search('tab', newTab);
       this.tab = newTab;
       if(!this.initialFilter) this.updateSelectedAgents(false);
-      await this.switchSubtab('panels', true);
+      const tabView = this.$location.search().tabView;
+      if(tabView){
+        await this.switchSubtab(tabView, true);
+      }else{
+        await this.switchSubtab('panels', true);
+      }
       this.overviewModuleReady = true;
     } catch (error) {
       this.errorHandler.handle(error.message || error);
