@@ -73,7 +73,8 @@ export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithT
         ref={this.reference}
         style={{
             display: "block",
-            overflowX: "hidden",
+            overflow: "hidden",
+            paddingBottom: "3px",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             ...this.props.elementStyle
