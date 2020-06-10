@@ -25,7 +25,7 @@ export abstract class BaseHandler {
     return [];
   };
 
-  async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
+  async buildSuggestValues(inputValue:string, value:string=''):Promise<suggestItem[]> {
     return [];
   }
 

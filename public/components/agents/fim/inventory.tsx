@@ -44,7 +44,7 @@ import { ICustomBadges } from '../../wz-search-bar/components';
 export class Inventory extends Component {
   _isMount = false;
   state: {
-    filters: {}
+    filters: []
     selectedTabId: 'files' | 'registry'
     totalItemsFile: number
     totalItemsRegistry: number
@@ -57,7 +57,7 @@ export class Inventory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: {},
+      filters: [],
       syscheck: [],
       selectedTabId: 'files',
       totalItemsFile: 0,

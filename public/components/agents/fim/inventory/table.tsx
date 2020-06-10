@@ -39,7 +39,7 @@ export class InventoryTable extends Component {
   };
 
   props!: {
-    filters: {}
+    filters: []
     onFilterSelect(): void
     customBadges: ICustomBadges[]
     agent: any
@@ -130,10 +130,8 @@ export class InventoryTable extends Component {
 
   buildFilter() {
     const { pageIndex, pageSize } = this.state;
-    const { filters, } = this.props;
     const filter = {
-      ...filters,
-      ...this.buildQFilter(),
+      ...this.buildFilters(),
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
@@ -142,6 +140,22 @@ export class InventoryTable extends Component {
     return filter;
   }
 
+  buildFilters() {
+    const {filters} = this.props;
+    const filterObj = filters.reduce((acc, filter) =>{
+      const {field, value} = filter;
+      return {
+        ...acc,
+        ...(field !== 'q' 
+          ? {[field]: value}
+          : {[field]: `${acc[field] && `${acc[field]} and `}${value}`}),
+      };
+    }, {})
+    return filterObj;
+  }
+
+
+  // TODO: delete this
   buildQFilter() {
     const { filters, customBadges } = this.props;
     const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 

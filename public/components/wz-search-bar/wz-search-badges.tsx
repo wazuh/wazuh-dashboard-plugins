@@ -21,9 +21,11 @@ import './src/style/wz-search-badges.less'
 import { EuiText } from '@elastic/eui';
 import { EuiPopover } from '@elastic/eui';
 import { EuiButtonEmpty } from '@elastic/eui';
+import { EuiFlexGroup } from '@elastic/eui';
+import { EuiFlexItem } from '@elastic/eui';
 
 
-interface iFilter { field:string, value:string }
+interface iFilter { field: string, value: string }
 
 export interface Props {
   filters: iFilter[]
@@ -37,7 +39,7 @@ export class WzSearchBadges extends Component {
     qSuggests: qSuggests[] | null
     searchFormat: 'API' | '?Q' | 'qTags'
   }
-  
+
   constructor(props) {
     super(props);
     this.buildBadge.bind(this);
@@ -50,36 +52,37 @@ export class WzSearchBadges extends Component {
     return false;
   }
 
-  
+
   idGenerator() {
     return '_' + Math.random().toString(36).substr(2, 9)
   }
 
-  buildBadge = (filter:iFilter, index:number) => {
+  buildBadge = (filter: iFilter, index: number) => {
     const { searchFormat } = this.props;
-    if (filter.field === 'q') {
-      return searchFormat !== '?Q' ? this.buildQBadges(filter) : null;
-    }
+    // if (filter.field === 'q') {
+    //   return searchFormat !== '?Q' ? this.buildQBadges(filter) : null;
+    // }
     return (
-      <EuiBadge
-        key={index}
-        iconType="cross"
-        iconSide="right"
-        iconOnClickAriaLabel="Remove"
-        color="hollow"
-        className="wz-search-badge"
-        iconOnClick={() => this.onDeleteFilter(filter)}>
-        <EuiButtonEmpty color='text' size="xs">
-          {`${filter.field}: ${filter.value}`}
-        </EuiButtonEmpty>
-      </EuiBadge>
+      <EuiFlexItem>
+        <EuiBadge
+          key={index}
+          iconType="cross"
+          iconSide="right"
+          iconOnClickAriaLabel="Remove"
+          color="hollow"
+          iconOnClick={() => this.onDeleteFilter(filter)}>
+          <EuiButtonEmpty color='text' size="xs">
+            {`${filter.field}: ${filter.value}`}
+          </EuiButtonEmpty>
+        </EuiBadge>
+      </EuiFlexItem>
     );
   }
 
 
-  buildQBadges(filter:iFilter) {
+  buildQBadges(filter: iFilter) {
     const qInterpreter = new QInterpreter(filter.value);
-    const qBadges = qInterpreter.queryObjects.map((qFilter,index) => (
+    const qBadges = qInterpreter.queryObjects.map((qFilter, index) => (
       this.buildQBadge(qInterpreter, index, qFilter)
     ));
     return qBadges;
@@ -89,20 +92,20 @@ export class WzSearchBadges extends Component {
 
   private buildQBadge(qInterpreter, index, qFilter): JSX.Element {
     const { qSuggests } = this.props;
-    return <EuiBadge className="wz-search-badge" key={index} iconType="cross" 
-      iconSide="right" color="hollow" iconOnClickAriaLabel="Remove" 
-      iconOnClick={() => {this.deleteFilter(qInterpreter, index);} }>
-        <ContextMenu qFilter={qFilter} index={index} qInterpreter={qInterpreter} 
-        deleteFilter={() => this.deleteFilter(qInterpreter, index)} 
+    return <EuiBadge className="wz-search-badge" key={index} iconType="cross"
+      iconSide="right" color="hollow" iconOnClickAriaLabel="Remove"
+      iconOnClick={() => { this.deleteFilter(qInterpreter, index); }}>
+      <ContextMenu qFilter={qFilter} index={index} qInterpreter={qInterpreter}
+        deleteFilter={() => this.deleteFilter(qInterpreter, index)}
         changeConjuntion={() => this.changeConjuntion(qInterpreter, index)}
         invertOperator={() => this.invertOperator(qInterpreter, index)}
         updateFilters={() => this.updateFilters(qInterpreter)}
         qSuggest={qSuggests.find(item => item.label === qFilter.field)}
-        />
+      />
     </EuiBadge>;
   }
 
-  private updateFilters(qInterpreter:QInterpreter) {
+  private updateFilters(qInterpreter: QInterpreter) {
     const filters = {
       ...this.filtersToObject(),
       q: qInterpreter.toString(),
@@ -124,9 +127,9 @@ export class WzSearchBadges extends Component {
     }
   }
 
-  private changeConjuntion(qInterpreter: QInterpreter, index: number){
+  private changeConjuntion(qInterpreter: QInterpreter, index: number) {
     const oldQuery = qInterpreter.getQuery(index)
-    const newQuery:queryObject = { 
+    const newQuery: queryObject = {
       ...oldQuery,
       conjuntion: oldQuery.conjuntion === ';' ? ',' : ';',
     };
@@ -138,7 +141,7 @@ export class WzSearchBadges extends Component {
     this.props.onChange(filters);
   }
 
-  private invertOperator(qInterpreter: QInterpreter, index: number){
+  private invertOperator(qInterpreter: QInterpreter, index: number) {
     const oldQuery = qInterpreter.getQuery(index)
     let newOperator = '=';
     switch (oldQuery.operator) {
@@ -148,7 +151,7 @@ export class WzSearchBadges extends Component {
       case '>': newOperator = '<'; break;
       case '~': newOperator = '~'; break;
     }
-    const newQuery:queryObject = { 
+    const newQuery: queryObject = {
       ...oldQuery,
       //@ts-ignore
       operator: newOperator,
@@ -178,11 +181,14 @@ export class WzSearchBadges extends Component {
   render() {
     const { filters } = this.props;
     const badges = filters.map(this.buildBadge)
-    return (
-      <div
+    return ( 
+      
+      <EuiFlexItem grow={false}
         data-testid="search-badges" >
+        <EuiFlexGroup>
         {badges}
-      </div>
+        </EuiFlexGroup>
+      </EuiFlexItem>
     );
   }
 }
