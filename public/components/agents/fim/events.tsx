@@ -31,7 +31,6 @@ export class EventsFim extends Component {
   }
   modulesHelper: ModulesHelper;
   fetchWatch!: any;
-  fetchLimit!: any;
 
   constructor(props) {
     super(props);

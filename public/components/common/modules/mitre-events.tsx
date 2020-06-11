@@ -13,7 +13,7 @@
 import React, { Component } from 'react';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
-import {FlyoutTechnique} from '../../overview/mitre/components/techniques/components/flyout-technique'
+import { FlyoutTechnique } from '../../overview/mitre/components/techniques/components/flyout-technique'
 import { AppNavigate } from '../../../react-services/app-navigate';
 
 
@@ -23,7 +23,8 @@ export class EventsMitre extends Component {
     isFlyoutVisible: Boolean,
     currentTechnique: string,
     fetchStatus: 'loading' | 'complete',
-    rows: number
+    rows: number,
+    rowsLimit: number,
   };
   props!: {
     [key: string]: any
@@ -37,7 +38,8 @@ export class EventsMitre extends Component {
       isFlyoutVisible: false,
       currentTechnique: '',
       fetchStatus: 'loading',
-      rows: 0
+      rows: 0,
+      rowsLimit: 0
     };
     this.modulesHelper = ModulesHelper;
     this.getRowsField.bind(this);
@@ -54,6 +56,13 @@ export class EventsMitre extends Component {
           this._isMount && this.setState({ fetchStatus: scope.fetchStatus, rows })
         }
       });
+    setInterval(() => {
+      const elements = document.querySelectorAll('.kbnDocTable__row');
+      if ((elements || []).length != this.state.rowsLimit) {
+        this._isMount && this.setState({ rowsLimit: (elements || []).length })
+        this.getRowsField();
+      }
+    }, 1000);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -137,10 +146,10 @@ export class EventsMitre extends Component {
                 const splitText = formattedText.split(",");
                 const divLink = document.createElement('div');
                 divLink.setAttribute('style', 'min-width: 120px;');
-                splitText.forEach((item,idx) => {
+                splitText.forEach((item, idx) => {
                   const link = document.createElement('a')
                   link.onclick = () => this.showFlyout(item);
-                  if(idx !== splitText.length-1)
+                  if (idx !== splitText.length - 1)
                     link.textContent = item + ", ";
                   else
                     link.textContent = item;
@@ -170,12 +179,12 @@ export class EventsMitre extends Component {
     this.setState({ isFlyoutVisible });
   }
 
-  openDiscover(e,techniqueID){
-    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "discover", filters:{ 'rule.mitre.id': techniqueID} })
+  openDiscover(e, techniqueID) {
+    AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "discover", filters: { 'rule.mitre.id': techniqueID } })
   }
 
-  openDashboard(e,techniqueID){
-    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "dashboard", filters :{ 'rule.mitre.id': techniqueID}  } )
+  openDashboard(e, techniqueID) {
+    AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "dashboard", filters: { 'rule.mitre.id': techniqueID } })
   }
 
 
@@ -185,14 +194,14 @@ export class EventsMitre extends Component {
       <EuiOverlayMask
         // @ts-ignore
         onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
-        
-        
+
+
         <FlyoutTechnique
-            openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
-            openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
-            onChangeFlyout={this.onChangeFlyout}
-            currentTechnique={this.state.currentTechnique} />
-        
+          openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+          openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+          onChangeFlyout={this.onChangeFlyout}
+          currentTechnique={this.state.currentTechnique} />
+
       </EuiOverlayMask>
     )
   }
