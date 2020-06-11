@@ -13,15 +13,13 @@ import React, { Component, useEffect, KeyboardEvent, useState } from 'react';
 import { EuiSuggest } from '../eui-suggest';
 import { WzDatePicker } from '../wz-date-picker';
 import { WzSearchFormatSelector } from './wz-search-format-selector';
-import { WzSearchBadges } from './wz-search-badges';
 import { EuiFlexGroup, EuiFlexItem, OnTimeChangeProps } from '@elastic/eui';
 import { QHandler, qSuggests } from './lib/q-handler';
 import { QTagsHandler } from './lib/q-tags-handler';
 import { ApiHandler, apiSuggests } from './lib/api-handler';
 import { WzSearchButtons, filterButton } from './wz-search-buttons';
-import { CustomBadge, ICustomBadges } from './components';
+import { CustomBadge, ICustomBadges, WzSearchBadges } from './components';
 import { SuggestHandler } from './lib';
-import { EuiBadge } from '@elastic/eui';
 
 export interface suggestItem {
   type: {iconType: string, color: string }
@@ -49,10 +47,7 @@ export function WzSearchBar(props: IWzSearchBarProps) {
   return (
     <EuiSuggest
       status={status}
-      prepend={props.filters.map((e, idx) => 
-        <EuiFlexItem grow={false}>
-          <EuiBadge key={idx} color='hollow' iconType="cross" iconSide="right">{e.field}: {e.value}</EuiBadge>
-        </EuiFlexItem>)}
+      prepend={<WzSearchBadges filters={props.filters} onFiltersChange={props.onFiltersChange} />}
       value={inputValue}
       onKeyPress={event => handler.onKeyPress(inputValue, event)}
       onItemClick={(item) => handler.onItemClick(item, inputValue)}
@@ -462,7 +457,6 @@ export class WzSearchBarOld extends Component {
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     const searchFormatSelector = this.renderFormatSelector();
     !!onTimeChange && import('./src/style/wz-date-picker.less');
-    console.log({customBadges});
     return (
       <div>
         <EuiFlexGroup>

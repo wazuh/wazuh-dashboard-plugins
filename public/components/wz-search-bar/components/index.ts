@@ -11,4 +11,4 @@
  */
 
 export { CustomBadge, ICustomBadges } from './custom-badge';
-export { ContextMenu } from './wz-search-badges';
+export { ContextMenu, WzSearchBadges } from './wz-search-badges';

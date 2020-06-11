@@ -132,7 +132,7 @@ export class QInterpreter {
     let query = '';
     for (const qObject of this.queryObjects) {
       const { conjuntion='', field, operator='', value=''} = qObject;
-      query += conjuntion + field + operator + value;
+      query += (!!conjuntion ? ` ${conjuntion}` : '') + field + operator + value;
     }
     this.query = query;
     return query

@@ -247,10 +247,10 @@ export class SuggestHandler extends BaseHandler {
   }
 
   onKeyPress(inputValue, event) {
-    if (event.key !== 'Enter') return;
+    if (event.key !== 'Enter' || !inputValue ) return;
     const { inputStage, searchType } = this;
     if (searchType === 'search') {
-      this.createParamFilter(inputValue, 'search');
+      this.createParamFilter('search', inputValue);
     }
     if (inputStage !== 'value') return;
     if (searchType === 'params') {
