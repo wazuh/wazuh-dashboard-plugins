@@ -22,6 +22,7 @@ import {
   EuiFlexGroup
 } from '@elastic/eui';
 import { DynamicHeight } from '../../../utils/dynamic-height';
+import 'brace/theme/textmate';
 
 export class TestConfiguration extends Component {
   constructor(props) {
@@ -74,7 +75,7 @@ export class TestConfiguration extends Component {
             )}
             <div className="codeEditorWrapper">
               <EuiCodeEditor
-                theme="XML"
+                theme="textmate"
                 width="100%"
                 value={this.state.configuration}
                 height="720px"

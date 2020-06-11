@@ -33,6 +33,7 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { toastNotifications } from 'ui/notify';
+import 'brace/theme/textmate';
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -176,6 +177,7 @@ class WzGroupsEditor extends Component {
                     <EuiFlexItem className="codeEditorWrapper">
                       {(isEditable && (
                         <EuiCodeEditor
+                          theme="textmate"
                           width="100%"
                           height="calc(100vh - 175px)"
                           value={content}

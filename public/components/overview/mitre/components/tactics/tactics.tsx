@@ -278,7 +278,7 @@ export class Tactics extends Component {
       }
     ]
     return (
-      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px"}}>
+      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px", height: "100%"}}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="m">
