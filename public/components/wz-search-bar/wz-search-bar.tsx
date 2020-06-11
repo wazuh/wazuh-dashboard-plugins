@@ -45,42 +45,45 @@ export interface IWzSearchBarProps {
 export function WzSearchBar(props: IWzSearchBarProps) {
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [suggestsItems, handler] = useSuggestHandler(props, inputValue, setInputValue);
+  const [suggestsItems, handler, status, isInvalid] = useSuggestHandler(props, inputValue, setInputValue);
   return (
     <EuiSuggest
-    // status={status}
-    prepend={props.filters.map((e, idx) => 
-      <EuiFlexItem grow={false}>
-        <EuiBadge key={idx} color='hollow' iconType="cross" iconSide="right">{e.field}: {e.value}</EuiBadge>
-      </EuiFlexItem>)}
-    value={inputValue}
-    onKeyPress={event => handler.onKeyPress(inputValue, event)}
-    onItemClick={(item) => handler.onItemClick(item, inputValue)}
-    isPopoverOpen={isOpen}
-    onClosePopover={() => setIsOpen(false)}
-    onPopoverFocus={() => setIsOpen(true)}
-    suggestions={suggestsItems}
-    onInputChange={setInputValue}
-    // isInvalid={isInvalid}
-    placeholder={props.placeholder}
-  />)
+      status={status}
+      prepend={props.filters.map((e, idx) => 
+        <EuiFlexItem grow={false}>
+          <EuiBadge key={idx} color='hollow' iconType="cross" iconSide="right">{e.field}: {e.value}</EuiBadge>
+        </EuiFlexItem>)}
+      value={inputValue}
+      onKeyPress={event => handler.onKeyPress(inputValue, event)}
+      onItemClick={(item) => handler.onItemClick(item, inputValue)}
+      isPopoverOpen={isOpen}
+      onClosePopover={() => setIsOpen(false)}
+      onPopoverFocus={() => setIsOpen(true)}
+      suggestions={suggestsItems}
+      onInputChange={setInputValue}
+      isInvalid={isInvalid}
+      placeholder={props.placeholder} />
+  )
 }
 
-function useSuggestHandler(props: IWzSearchBarProps, inputValue, setInputValue): [suggestItem[], SuggestHandler] {
+function useSuggestHandler(props: IWzSearchBarProps, inputValue, setInputValue):
+[suggestItem[], SuggestHandler, string, boolean] {
   const [handler, setHandler] = useState<undefined | SuggestHandler>();
   const [suggestsItems, setSuggestItems] = useState<suggestItem[]>([]);
+  const [status, setStatus] = useState<'unchanged'|'loading'>('unchanged');
+  const [isInvalid, setInvalid] = useState(false);
 
   useEffect(() => {
-    setHandler(new SuggestHandler(props, setInputValue))
+    setHandler(new SuggestHandler({...props, status, setStatus, setInvalid}, setInputValue))
   }, [props.suggestions]);
 
   useEffect(() => {
     handler && handler.buildSuggestItems(inputValue)
       .then(setSuggestItems)
-      .catch();
+      .catch((e)=>{});
   }, [inputValue, handler]);
 
-  return [suggestsItems, handler];
+  return [suggestsItems, handler, status, isInvalid];
 }
 
 export class WzSearchBarOld extends Component {

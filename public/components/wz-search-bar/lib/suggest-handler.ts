@@ -21,6 +21,7 @@ export class SuggestHandler extends BaseHandler {
   props: IWzSearchBarProps;
   setInputValue: Function;
   lastCall: number;
+  status: 'unchanged' | 'loading' = 'unchanged';
   operators = {
     '=': 'Equal',
     '!=': 'Not equal',
@@ -78,16 +79,16 @@ export class SuggestHandler extends BaseHandler {
   findItem = (queryElement, key) => this.suggestItems.find(item => item[key] === queryElement);
 
   checkQuery = async (query:queryObject) => {
-    const { inputStage, searchType, lastCall } = this;
+    const { inputStage, lastCall } = this;
     const { field='', value='' } = query;
     const suggestions = [
       ...this.buildSuggestSearch(field),
+      ...(value && inputStage === 'value' ? this.buildSuggestApply() : []),
       ...(value && inputStage === 'value' ? this.buildSuggestConjuntions(field) : [] ),
       ...((this.someItem(field, 'label') && inputStage !== 'value') ? this.buildSuggestOperator(field) : []),
       ...(inputStage === 'field' ? this.buildSuggestFields(field) : []),
       ...(inputStage === 'value' ? await this.buildSuggestValues(field, value) : [])
     ]
-    console.log({ lastCall, newCalls: this.lastCall })
     if ( lastCall === this.lastCall){
       this.lastCall++;
       return suggestions;
@@ -99,7 +100,6 @@ export class SuggestHandler extends BaseHandler {
   public buildSuggestItems = async (inputValue: string) => 
     this.combine(this.checkQuery, this.checkStage, this.checkType)(inputValue);
 
-
   buildSuggestSearch(inputValue): suggestItem[] {
     const {searchDisable} = this.props;
     if (!searchDisable && this.searchType === 'search'){
@@ -110,6 +110,14 @@ export class SuggestHandler extends BaseHandler {
       }]
     }
     return []
+  }
+
+  buildSuggestApply(): suggestItem[] {
+    return [{
+      label: 'Apply filter',
+      type: { iconType: 'kqlFunction', color: 'tint5' },
+      description: 'Click here or press "Enter" to apply the filter',
+    }]
   }
 
   buildSuggestFields(inputValue: string) {
@@ -138,13 +146,14 @@ export class SuggestHandler extends BaseHandler {
   async buildSuggestValues(field:string, value:string) {
     const item = this.findItem(field, 'label');
     const rawSuggestions:string[] = (item && typeof item.values === 'function')
-      ? await item.values(value) 
+      ? await this.getFunctionValues(item, value)
       : (item || {}).values;
     const suggestions = rawSuggestions.map(this.buildSuggestValue);
     return suggestions;
   }
 
   buildSuggestConjuntions(inputValue:string):suggestItem[] {
+    if (this.searchType !== 'q') return [];
     const suggestions = [
       {'label':'AND ', 'description':'Requires `both arguments` to be true'},
       {'label':'OR ', 'description':'Requires `one or more arguments` to be true'}
@@ -158,36 +167,99 @@ export class SuggestHandler extends BaseHandler {
     return suggestions;
   }
 
+  async getFunctionValues(item, value) {
+    const {setStatus} = this.props;
+    this.status = 'loading'
+    setStatus('loading');
+    const values = await item.values(value)
+    this.status = 'unchanged'
+    setStatus('unchanged');
+    return values;
+  }
+
+  createParamFilter(field, value) {
+    const filters = [...this.props.filters];
+    const idx = filters.findIndex(filter => filter.field === field );
+      idx !== -1
+      ? filters[idx].value = value 
+      : filters.push({field: field, value});
+      this.props.onFiltersChange(filters);
+      this.setInputValue('');
+  }
+
+  createQFilter(inputValue) {
+    const qInterpreter = new QInterpreter(inputValue);
+    const value = qInterpreter.toString();
+    const filters = [
+      ...this.props.filters,
+      {field: 'q', value}
+    ];
+    this.props.onFiltersChange(filters);
+    this.setInputValue('');
+
+  }
+
   onItemClick(item, inputValue) {
     const {filters: oldFilters, onFiltersChange} = this.props;
     const filters = [...oldFilters];
+    if (this.status === 'loading') return;
     switch (item.type.iconType) {
       case 'search':
-        this.inputStage = 'field'
-        const idx = filters.findIndex(filter => filter.field === 'search' );
-        idx !== -1 
-          ? filters[idx].value = item.label 
-          : filters.push({field: 'search', value: item.label});
-        onFiltersChange(filters);
+        this.createParamFilter('search', item.label);
         break;
       case 'kqlField':
         this.searchType = (this.suggestItems.find(e => e.label === item.label) || {type:'params'}).type;
-        this.inputStage = this.searchType === 'params' ? 'value' : 'operator';
-        this.setInputValue(`${item.label}${this.searchType === 'params' ? ':' : '' }`);
+        if (this.searchType === 'params') {
+          this.setInputValue(`${item.label}:`);
+        } else {
+          const qInterpreter = new QInterpreter(inputValue);
+          qInterpreter.setlastQuery(item.label, 'field');
+          this.setInputValue(qInterpreter.toString());
+        }
         break;
       case 'kqlOperand':
         this.setInputValue(`${inputValue}${item.label}`);
-        this.inputStage = 'value';
         break;
-      default:
+      case 'kqlValue':
+        if(this.searchType === 'params') {
+          const { 0:field } = inputValue.split(':');
+          this.createParamFilter(field, item.label);
+        } else {
+          const qInterpreter = new QInterpreter(inputValue);
+          qInterpreter.setlastQuery(item.label, 'value');
+          this.setInputValue(qInterpreter.toString());
+        }
+        break;
+      case 'kqlSelector':
+        const qInterpreter = new QInterpreter(inputValue);
+        qInterpreter.addNewQuery(item.label);
+        this.setInputValue(qInterpreter.toString());
+        break;
+      case 'kqlFunction':
+        if (this.searchType === 'q') {
+          this.createQFilter(inputValue);
+        } else if (this.searchType === 'params') {
+          const { 0:field, 1:value } = inputValue.split(':');
+          this.createParamFilter(field, value);
+        }
         break;
     }
     return {inputValue: item.label, filters: oldFilters}
   }
 
   onKeyPress(inputValue, event) {
-    if (event.key !== 'Enter'){
-      return;
+    if (event.key !== 'Enter') return;
+    const { inputStage, searchType } = this;
+    if (searchType === 'search') {
+      this.createParamFilter(inputValue, 'search');
+    }
+    if (inputStage !== 'value') return;
+    if (searchType === 'params') {
+      const {0: field, 1:value} = inputValue.split(':');
+      this.createParamFilter(field, value);
+    }
+    if (searchType === 'q') {
+      this.createQFilter(inputValue);
     }
   }
 }
