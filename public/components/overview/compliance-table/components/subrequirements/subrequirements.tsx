@@ -153,7 +153,7 @@ export class ComplianceSubrequirements extends Component {
         <EuiFlexItem 
         onMouseEnter={() => this.setState({ hover: item.id })}
         onMouseLeave={() => this.setState({ hover: "" })}
-        key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
+        key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)", maxHeight: 41}}>
 
         <EuiPopover
             id="techniqueActionsContextMenu"

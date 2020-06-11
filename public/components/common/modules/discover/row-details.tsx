@@ -394,7 +394,7 @@ export class RowDetails extends Component {
     // Exclude group key of details
     Object.keys(details).filter(key => key !== 'group').forEach((key) => {
       detailsToRender.push(
-        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)', maxHeight: 41}}>
           <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
         </EuiFlexItem>
       );
