@@ -17,6 +17,7 @@ import {
   updateFileContent
 } from '../../../../../redux/actions/rulesetActions';
 
+import 'brace/theme/textmate';
 // Eui components
 import {
   EuiPage,
@@ -258,6 +259,7 @@ class WzRulesetEditor extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem className="codeEditorWrapper">
                       <EuiCodeEditor
+                        theme="textmate"
                         width="100%"
                         height={`calc(100vh - ${showWarningRestart || wazuhNotReadyYet ? 250 : 175}px)`}
                         value={content}
