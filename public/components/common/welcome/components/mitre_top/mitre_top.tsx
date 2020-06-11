@@ -26,6 +26,8 @@ import { FlyoutTechnique } from '../../../../../components/overview/mitre/compon
 import { getIndexPattern } from '../../../../../components/overview/mitre/lib';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getMitreCount } from './lib';
+import { AppNavigate } from '../../../../../react-services/app-navigate';
+
 export class MitreTopTactics extends Component {
   _isMount = false;
 
@@ -223,6 +225,14 @@ export class MitreTopTactics extends Component {
     })
   }
 
+  openDiscover(e,techniqueID){
+    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "discover", filters:{ 'rule.mitre.id': techniqueID} })
+  }
+
+  openDashboard(e,techniqueID){
+    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "dashboard", filters :{ 'rule.mitre.id': techniqueID}  } )
+  }
+
   render() {
     const { flyoutOn, selectedTactic, selectedTechnique, alertsCount } = this.state;
     const tacticsTop = this.renderTacticsTop();
@@ -237,6 +247,8 @@ export class MitreTopTactics extends Component {
         {flyoutOn &&
         <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
           <FlyoutTechnique 
+            openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
+            openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
             implicitFilters={[ {"agent.id": this.props.agentId} ] }
             agentId={this.props.agentId}
             onChangeFlyout={this.onChangeFlyout}
