@@ -14,6 +14,7 @@ import React, { Component } from 'react';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 import { EuiOverlayMask } from '@elastic/eui';
 import {FlyoutTechnique} from '../../overview/mitre/components/techniques/components/flyout-technique'
+import { AppNavigate } from '../../../react-services/app-navigate';
 
 
 export class EventsMitre extends Component {
@@ -167,7 +168,16 @@ export class EventsMitre extends Component {
 
   onChangeFlyout = (isFlyoutVisible: boolean) => {
     this.setState({ isFlyoutVisible });
-}
+  }
+
+  openDiscover(e,techniqueID){
+    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "discover", filters:{ 'rule.mitre.id': techniqueID} })
+  }
+
+  openDashboard(e,techniqueID){
+    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "dashboard", filters :{ 'rule.mitre.id': techniqueID}  } )
+  }
+
 
   render() {
     return (
@@ -178,6 +188,8 @@ export class EventsMitre extends Component {
         
         
         <FlyoutTechnique
+            openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
+            openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
             onChangeFlyout={this.onChangeFlyout}
             currentTechnique={this.state.currentTechnique} />
         

@@ -237,13 +237,13 @@ export class Techniques extends Component {
     }
   }
 
-  openDiscover(techniqueID){
+  openDiscover(e,techniqueID){
     this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
     this.props.onSelectedTabChanged('events');
   }
 
 
-  openDashboard(techniqueID){
+  openDashboard(e,techniqueID){
     this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
     this.props.onSelectedTabChanged('dashboard');
   }
@@ -346,8 +346,8 @@ export class Techniques extends Component {
             onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
           
             <FlyoutTechnique
-              openDashboard={itemId => this.openDashboard(itemId)}
-              openDiscover={itemId => this.openDiscover(itemId)}
+              openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
+              openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
               onChangeFlyout={this.onChangeFlyout}
               currentTechniqueData={this.state.currentTechniqueData}
               currentTechnique={currentTechnique} />
