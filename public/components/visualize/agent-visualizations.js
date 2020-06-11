@@ -54,7 +54,7 @@ export const agentVisualizations = {
         height: 300,
         vis: [
           {
-            title: 'Top 5 agents',
+            title: 'Top 5 alerts',
             id: 'Wazuh-App-Agents-General-Top-5-alerts',
             width: 33
           },
