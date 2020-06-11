@@ -266,7 +266,6 @@ export class AgentsTable extends Component {
   }
 
   actionButtonsRender(agent) {
-    console.log(agent)
     return (
       <div className={'icon-box-action'}>
         <EuiToolTip
