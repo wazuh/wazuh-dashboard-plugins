@@ -15,3 +15,4 @@ export { queryObject, IConjuntions, IOperator, QInterpreter } from './q-interpre
 export { qSuggests, } from './q-handler';
 export { SuggestHandler } from './suggest-handler';
 export { IWzSuggestItem } from '../wz-search-bar';
+export { filtersToObject, IFilter} from './filters-to-object';

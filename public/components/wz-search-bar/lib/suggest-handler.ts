@@ -18,6 +18,7 @@ export class SuggestHandler extends BaseHandler {
   suggestItems: IWzSuggestItem[];
   inputStage: 'field' | 'operator' | 'value' | 'conjuntion';
   searchType: 'search' | 'q' | 'params';
+  filters: {field: string, value: string| number}[];
   props: IWzSearchBarProps;
   setInputValue: Function;
   lastCall: number;
@@ -34,6 +35,7 @@ export class SuggestHandler extends BaseHandler {
   constructor(props, setInputValue ) {
     super();
     this.props = props;
+    this.filters = props.filters;
     this.inputStage = 'field';
     this.setInputValue = setInputValue;
     this.suggestItems = props.suggestions;
@@ -178,7 +180,7 @@ export class SuggestHandler extends BaseHandler {
   }
 
   createParamFilter(field, value) {
-    const filters = [...this.props.filters];
+    const filters = [...this.filters];
     const idx = filters.findIndex(filter => filter.field === field );
       idx !== -1
       ? filters[idx].value = value 
@@ -191,7 +193,7 @@ export class SuggestHandler extends BaseHandler {
     const qInterpreter = new QInterpreter(inputValue);
     const value = qInterpreter.toString();
     const filters = [
-      ...this.props.filters,
+      ...this.filters,
       {field: 'q', value}
     ];
     this.props.onFiltersChange(filters);
@@ -200,8 +202,6 @@ export class SuggestHandler extends BaseHandler {
   }
 
   onItemClick(item, inputValue) {
-    const {filters: oldFilters, onFiltersChange} = this.props;
-    const filters = [...oldFilters];
     if (this.status === 'loading') return;
     switch (item.type.iconType) {
       case 'search':
@@ -244,7 +244,6 @@ export class SuggestHandler extends BaseHandler {
         }
         break;
     }
-    return {inputValue: item.label, filters: oldFilters}
   }
 
   onKeyPress(inputValue, event) {

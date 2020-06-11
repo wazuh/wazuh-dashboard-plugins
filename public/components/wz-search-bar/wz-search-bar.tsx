@@ -83,6 +83,10 @@ function useSuggestHandler(props: IWzSearchBarProps, inputValue, setInputValue):
       .catch((e)=>{});
   }, [inputValue, handler]);
 
+  useEffect(() => {
+    handler && (handler.filters = props.filters);
+  }, [props.filters])
+
   return [suggestsItems, handler, status, isInvalid];
 }
 

@@ -22,6 +22,7 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import './inventory.less';
 import { ICustomBadges } from '../../../wz-search-bar/components';
+import { filtersToObject } from '../../../wz-search-bar';
 
 export class InventoryTable extends Component {
   state: {
@@ -130,40 +131,15 @@ export class InventoryTable extends Component {
 
   buildFilter() {
     const { pageIndex, pageSize } = this.state;
+    const filters = filtersToObject(this.props.filters);
     const filter = {
-      ...this.buildFilters(),
+      ...filters,
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
       type: 'file'
     };
     return filter;
-  }
-
-  buildFilters() {
-    const {filters} = this.props;
-    const filterObj = filters.reduce((acc, filter) =>{
-      const {field, value} = filter;
-      return {
-        ...acc,
-        ...(field !== 'q' 
-          ? {[field]: value}
-          : {[field]: `${acc[field] && `${acc[field]} and `}${value}`}),
-      };
-    }, {})
-    return filterObj;
-  }
-
-
-  // TODO: delete this
-  buildQFilter() {
-    const { filters, customBadges } = this.props;
-    const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
-    let qFilter = filters['q'] ? filters['q'] : '';
-    customBadges.forEach(
-      badge => badge.field === 'q' && (qFilter += badge.value) )
-    const q = qFilter.replace(/ and | or /gi, parseConjuntions)
-    return !!qFilter ? {q} : {}; 
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
