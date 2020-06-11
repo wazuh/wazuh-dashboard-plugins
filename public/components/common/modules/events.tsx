@@ -36,6 +36,7 @@ export class Events extends Component {
       const fields = EventsSelectedFiles[this.props.section];
       if (fields) {
         scope.state.columns = fields;
+        scope.addColumn(false);
       }
       this.fetchWatch = scope.$watchCollection('fetchStatus',
         () => {

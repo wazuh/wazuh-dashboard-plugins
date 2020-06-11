@@ -180,7 +180,7 @@ export class Techniques extends Component {
         <EuiFlexItem 
         onMouseEnter={() => this.setState({ hover: item.id })}
         onMouseLeave={() => this.setState({ hover: "" })}
-        key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
+        key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)", maxHeight: 41}}>
 
         <EuiPopover
             id="techniqueActionsContextMenu"
@@ -203,10 +203,10 @@ export class Techniques extends Component {
                   {this.state.hover === item.id &&
                     <span style={{float: "right"}}>
                       <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
-                          <EuiIcon onClick={(e) => {this.openDashboard(item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
+                          <EuiIcon onClick={(e) => {this.openDashboard(e,item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
                       </EuiToolTip> &nbsp;
                       <EuiToolTip position="top" content={"Inspect " + item.id + " in Events"} >
-                        <EuiIcon onClick={(e) => {this.openDiscover(item.id);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
+                        <EuiIcon onClick={(e) => {this.openDiscover(e,item.id);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
                       </EuiToolTip>
 
                     </span>
@@ -228,7 +228,7 @@ export class Techniques extends Component {
     })
     if(tacticsToRender.length){
       return (
-      <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "400px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
+      <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
         {tacticsToRenderOrdered}
       </EuiFlexGrid>
       )
@@ -237,13 +237,13 @@ export class Techniques extends Component {
     }
   }
 
-  openDiscover(techniqueID){
+  openDiscover(e,techniqueID){
     this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
     this.props.onSelectedTabChanged('events');
   }
 
 
-  openDashboard(techniqueID){
+  openDashboard(e,techniqueID){
     this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
     this.props.onSelectedTabChanged('dashboard');
   }
@@ -346,8 +346,8 @@ export class Techniques extends Component {
             onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
           
             <FlyoutTechnique
-              openDashboard={itemId => this.openDashboard(itemId)}
-              openDiscover={itemId => this.openDiscover(itemId)}
+              openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
+              openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
               onChangeFlyout={this.onChangeFlyout}
               currentTechniqueData={this.state.currentTechniqueData}
               currentTechnique={currentTechnique} />

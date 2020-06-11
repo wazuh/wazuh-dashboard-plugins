@@ -67,7 +67,7 @@ export class Tactics extends Component {
   initTactics(buckets){
     const tacticsIds = Object.keys(this.props.tacticsObject);
     const selectedTactics = {}
-    let isMax = {};
+    /*let isMax = {};
      tacticsIds.forEach( (item,id) => {
        if(buckets.length){ 
          const max_doc = buckets[0].doc_count;
@@ -82,8 +82,12 @@ export class Tactics extends Component {
        }else{
         selectedTactics[item] = true;
        }
+    });*/
+    tacticsIds.forEach( (item,id) => {
+      selectedTactics[item] = true;
     });
-    
+
+
     this.props.onChangeSelectedTactics(selectedTactics);
   }
 
@@ -274,7 +278,7 @@ export class Tactics extends Component {
       }
     ]
     return (
-      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px"}}>
+      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px", height: "100%"}}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="m">
