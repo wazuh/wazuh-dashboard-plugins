@@ -136,7 +136,7 @@ export class ComplianceSubrequirements extends Component {
               showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
-                label: `${technique} - `,
+                label: `${technique} - ${this.props.descriptions[technique]}`,
                 quantity
               })
             }
@@ -147,7 +147,7 @@ export class ComplianceSubrequirements extends Component {
     });
 
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
-      const tooltipContent = `View details of  (${item.id})`;
+      const tooltipContent = this.props.descriptions[item.id];
       const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover=== item.id ? " wz-mitre-width" : " ");
       return(
         <EuiFlexItem 
@@ -169,7 +169,7 @@ export class ComplianceSubrequirements extends Component {
                             overflow: "hidden",
                             whiteSpace: "nowrap",
                             textOverflow: "ellipsis"}}>
-                      {item.id} - 
+                      {item.id} - {this.props.descriptions[item.id]}
                     </span>
                   </EuiToolTip>
 
