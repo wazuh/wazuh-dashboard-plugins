@@ -337,8 +337,8 @@ export class WzVisualize extends Component {
               return (
                 <EuiFlexGroup
                   key={i}
-                  className={row.hide && 'ng-hide'}
                   style={{
+                    display: row.hide && 'none',
                     height: row.height || 0 + 'px',
                     margin: 0,
                     maxWidth: '100%'
