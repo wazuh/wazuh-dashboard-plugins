@@ -10,7 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import ReactMarkdown from 'react-markdown';
+import MarkdownIt from 'markdown-it';
+import $ from 'jquery';
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  breaks: true,
+  typographer: true
+});
+
 import {
   EuiFlyout,
   EuiFlyoutHeader,
@@ -51,27 +60,53 @@ export class FlyoutTechnique extends Component {
     super(props);
     this.state = {
       techniqueData: {
-        description: ''
+        // description: ''
       },
       loading: false
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._isMount = true;
     const isCluster = (AppState.getClusterInfo() || {}).status === "enabled";
       const clusterFilter = isCluster
         ? { "cluster.name": AppState.getClusterInfo().cluster }
         : { "manager.name": AppState.getClusterInfo().manager };
     this.clusterFilter = clusterFilter ;
-    this.getTechniqueData();
-
+    await this.getTechniqueData();
+    this.addListenersToCitations();
   }
 
-  componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps) {
     const { currentTechnique } = this.props;
-    if (prevProps.currentTechnique !== currentTechnique )
-      this.getTechniqueData();
+    if (prevProps.currentTechnique !== currentTechnique ){
+      await this.getTechniqueData();
+    }
+    this.addListenersToCitations();
+  }
+
+  componentWillUnmount(){
+    // remove listeners of citations if these exist
+    if(this.state.techniqueData && this.state.techniqueData.replaced_external_references && this.state.techniqueData.replaced_external_references.length > 0){
+      this.state.techniqueData.replaced_external_references.forEach(reference => {
+        $(`.technique-reference-${reference.index}`).each(function(){
+          $(this).off();
+        });
+      })
+    }
+  }
+
+  addListenersToCitations(){
+    if(this.state.techniqueData && this.state.techniqueData.replaced_external_references && this.state.techniqueData.replaced_external_references.length > 0){
+      this.state.techniqueData.replaced_external_references.forEach(reference => {
+        $(`.technique-reference-citation-${reference.index}`).each(function(){
+          $(this).off();
+          $(this).click(() => {
+            $(`.euiFlyoutBody__overflow`).scrollTop($(`#technique-reference-${reference.index}`).position().top);
+          });
+        })
+      })
+    }
   }
 
   async getTechniqueData() {
@@ -90,8 +125,23 @@ export class FlyoutTechnique extends Component {
 
   formatTechniqueData (rawData) {
     const { platform_name, phase_name} = rawData;
-    const { name, description, x_mitre_version: version, x_mitre_data_sources } = rawData.json;
-    this.setState({techniqueData: { name, description, phase_name, platform_name, version, x_mitre_data_sources}, loading: false  })
+    const { name, description, x_mitre_version: version, x_mitre_data_sources, external_references } = rawData.json;
+
+    const replaced_external_references = [];
+    let index_replaced_external_references = 0;
+    let last_citation_string = '';
+    const descriptionWithCitations = external_references.reduce((accum, reference) => {
+      return accum
+      .replace(new RegExp(`\\(Citation: ${reference.source_name}\\)`,'g'), (token) => {
+        if(last_citation_string !== token){
+          index_replaced_external_references++;
+          replaced_external_references.push({...reference, index: index_replaced_external_references});
+          last_citation_string = token;
+        }
+        return `<a style="vertical-align: super;" rel="noreferrer" class="euiLink euiLink--primary technique-reference-citation-${index_replaced_external_references}">[${String(index_replaced_external_references)}]</a>`;
+      })
+    }, description);
+    this.setState({techniqueData: { name, description: descriptionWithCitations, phase_name, platform_name, version, x_mitre_data_sources, external_references, replaced_external_references }, loading: false  })
   }
 
   getArrayFormatted(arrayText) {
@@ -133,14 +183,13 @@ export class FlyoutTechnique extends Component {
         implicitFilters.push(item))
     }
 
-
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
     const formattedDescription = techniqueData.description 
       ? (
-        <ReactMarkdown
-          className="wz-markdown-margin"
-          source={techniqueData.description}
-        />
+        <div
+          className="wz-markdown-margin wz-markdown-wapper"
+          dangerouslySetInnerHTML={{__html: md.render(techniqueData.description)}}>
+        </div>
       )
       : techniqueData.description;
     const data = [
@@ -179,8 +228,29 @@ export class FlyoutTechnique extends Component {
       {
         title: 'Description',
         description: formattedDescription
-      }
+      },
+      
     ];
+    if(techniqueData && techniqueData.replaced_external_references && techniqueData.replaced_external_references.length > 0){
+      data.push({
+        title: 'References',
+        description: (
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              {techniqueData.replaced_external_references.map((external_reference, external_reference_index) => (
+                <div key={`external_reference-${external_reference.index}`} id={`technique-reference-${external_reference.index}`}>
+                  <span>{external_reference.index}. </span>
+                  <EuiLink href={external_reference.url} target='_blank'>
+                    {external_reference.source_name}
+                  </EuiLink>
+                </div>
+              )
+              )}
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        )
+      })
+    }
     return (
       <EuiFlyoutBody className="flyout-body" >
         <EuiAccordion
@@ -217,6 +287,7 @@ export class FlyoutTechnique extends Component {
 
         <EuiSpacer size='s' />
           <EuiAccordion
+            style={{textDecoration: 'none'}}
             id={"recent_events"}
             className='events-accordion'
             extraAction={<div style={{marginBottom: 5}}><strong>{this.state.totalHits || 0}</strong> hits</div>}
@@ -225,23 +296,14 @@ export class FlyoutTechnique extends Component {
                 <h3>
                   Recent events{this.props.view !== 'events' && (
                     <span style={{ marginLeft: 16 }}> 
-                    {!this.props.agentId && (
                       <span>
-                        <EuiToolTip position="top" content={"Show " + currentTechnique+ " in Dashboard"} >
-                            <EuiIcon onClick={(e) => {this.props.openDashboard(currentTechnique);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
-                        </EuiToolTip> &nbsp;
-                        <EuiToolTip position="top" content={"Inspect " + currentTechnique + " in Events"} >
-                          <EuiIcon onClick={(e) => {this.props.openDiscover(currentTechnique);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
+                        <EuiToolTip position="top" content={"Show " + currentTechnique+ " in Dashboard"}>
+                            <EuiIcon onMouseDown={(e) => {this.props.openDashboard(e,currentTechnique);e.stopPropagation()}} color="primary" type="visualizeApp" style={{marginRight: '10px'}}></EuiIcon>
                         </EuiToolTip>
-                      </span>
-                    ) || (
-                      <span>
-                        <EuiToolTip position="top" content={"Show " + currentTechnique+ " in dashboard"} >
-                            <EuiIcon onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'overview', {"tab": "mitre", "agentId": this.props.agentId, filters: {"rule.mitre.id": currentTechnique}  } )}} color="primary" type="visualizeApp"></EuiIcon>
-                        </EuiToolTip> &nbsp;
-                      </span>
-                    )
-                    }  
+                        <EuiToolTip position="top" content={"Inspect " + currentTechnique + " in Events"} >
+                          <EuiIcon onMouseDown={(e) => {this.props.openDiscover(e,currentTechnique);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
+                        </EuiToolTip>
+                      </span> 
                     </span>
                   )}
                 </h3>

@@ -256,7 +256,7 @@ export class WzVisualize extends Component {
               <EuiFlexGroup
                 key={j}
                 style={{
-                  height: visRow.height + 'px',
+                  height: visRow.height || 0 + 'px',
                   marginBottom: visRow.noMargin ? '' : '4px'
                 }}
               >
@@ -312,7 +312,7 @@ export class WzVisualize extends Component {
             <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px' }}>
               <p>The data displayed may contain sample alerts. {this.state.adminMode && (
                 <Fragment>
-                  Go <EuiLink href='#/manager/sample_data?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
+                  Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
                 </Fragment>
               )}</p>
             </EuiCallOut>
@@ -338,7 +338,8 @@ export class WzVisualize extends Component {
                 <EuiFlexGroup
                   key={i}
                   style={{
-                    height: row.height + 'px',
+                    display: row.hide && 'none',
+                    height: row.height || 0 + 'px',
                     margin: 0,
                     maxWidth: '100%'
                   }}

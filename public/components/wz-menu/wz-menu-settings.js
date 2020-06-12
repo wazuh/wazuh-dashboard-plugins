@@ -25,17 +25,6 @@ class WzMenuSettings extends Component {
       // TODO: Fix the selected section
       selectedItemName: null
     };
-
-    this.settingsSections = {
-      settings: { id: 'settings', text: 'Settings' },
-      api: { id: 'api', text: 'API configuration' },
-      modules: { id: 'modules', text: 'Modules' },
-      configuration: { id: 'configuration', text: 'Configuration' },
-      logs: { id: 'logs', text: 'Logs' },
-      about: { id: 'about', text: 'About' },
-    };
-
-
     this.wzReq = WzRequest;
   }
 
@@ -53,6 +42,40 @@ class WzMenuSettings extends Component {
         this.props.updateAdminMode(adminMode);
       };
     }catch(error){}
+  }
+
+  avaibleSettings() {
+    const {adminMode} = this.props;
+    let auxSettings = {
+      settings: { id: 'settings', text: 'Settings' },
+      api: { id: 'api', text: 'API configuration' },
+      modules: { id: 'modules', text: 'Modules' },
+      sample_data: { id: 'sample_data', text: 'Sample Data' },
+      configuration: { id: 'configuration', text: 'Configuration' },
+      logs: { id: 'logs', text: 'Logs' },
+      about: { id: 'about', text: 'About' },
+    };
+    if (!adminMode) {
+      delete auxSettings.modules;
+      delete auxSettings.sample_data;
+    }
+    return(auxSettings);
+  }
+
+  avaibleRenderSettings() {
+    const {adminMode} = this.props;
+    const avaibleSettings = this.avaibleSettings()
+    let auxItems = [
+      this.createItem(avaibleSettings.api),
+      this.createItem(avaibleSettings.configuration),
+      this.createItem(avaibleSettings.logs),
+      this.createItem(avaibleSettings.about),
+    ]
+    if (adminMode) {
+      auxItems.splice(1, 0, this.createItem(avaibleSettings.sample_data));
+      auxItems.splice(1, 0, this.createItem(avaibleSettings.modules));
+    }
+    return(auxItems);
   }
 
   clickMenuItem = async(ev,section) => {
@@ -78,17 +101,13 @@ class WzMenuSettings extends Component {
   };
 
   render() {
+    const avaibleSettings = this.avaibleSettings()
+    const renderSettings = this.avaibleRenderSettings()
     const sideNavAdmin = [
-      this.createItem(this.settingsSections.settings, {
+      this.createItem(avaibleSettings.settings, {
         disabled: true,
         icon: <EuiIcon type="gear" color="primary" />,
-        items: [
-          this.createItem(this.settingsSections.api),
-          this.createItem(this.settingsSections.modules),
-          this.createItem(this.settingsSections.configuration),
-          this.createItem(this.settingsSections.logs),
-          this.createItem(this.settingsSections.about),
-        ],
+        items: renderSettings
       })
     ];
 

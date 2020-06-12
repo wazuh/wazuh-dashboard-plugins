@@ -118,10 +118,10 @@ export class Discover extends Component {
     this.nameEquivalences = {
       "syscheck.event": "Action",
       "rule.id": "Rule ID",
-      "rule.description": "Rule description",
-      "rule.level": "Rule level",
-      "rule.mitre.id": "Mitre technique",
-      "rule.mitre.tactics": "Mitre tactics",
+      "rule.description": "Description",
+      "rule.level": "Level",
+      "rule.mitre.id": "Technique(s)",
+      "rule.mitre.tactics": "Tactic(s)",
     }
 
     this.hideCreateCustomLabel.bind(this);

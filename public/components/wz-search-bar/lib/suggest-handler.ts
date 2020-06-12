@@ -93,7 +93,7 @@ export class SuggestHandler extends BaseHandler {
       const { field = '', value = '', operator } = query;
       if ((operator && !this.someItem(field, 'label'))) throw {error: 'Invalid field', message: `The field '${field}' is not valid`};
       //@ts-ignore
-      if (operator && ((searchType === 'params' && typeof operator !== ':') || (searchType === 'q' && operator === ':')))
+      if (operator && ((searchType === 'params' && operator !== ':') || (searchType === 'q' && operator === ':')))
         throw {error: 'Invalid operator', message: `The operator '${operator}' is not valid`};
       const suggestions = [
         ...this.buildSuggestSearch(field),

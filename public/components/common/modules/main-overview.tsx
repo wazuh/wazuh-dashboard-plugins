@@ -35,6 +35,7 @@ import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
+import { ComplianceTable } from '../../overview/compliance-table';
 
 export class MainModuleOverview extends Component {
   constructor(props) {
@@ -82,6 +83,16 @@ export class MainModuleOverview extends Component {
   }
 
   async componentDidMount() {
+    const tabView = AppNavigate.getUrlParameter('tabView');
+    const tab = AppNavigate.getUrlParameter('tab');
+    if(tabView && tabView !== this.props.selectView){
+      if(tabView === 'panels' && tab=== 'sca' ){ // SCA initial tab is inventory
+        this.props.onSelectedTabChanged('inventory');
+      }else{
+        this.props.onSelectedTabChanged(tabView);
+      }
+    }
+    
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
@@ -182,6 +193,7 @@ export class MainModuleOverview extends Component {
           {section === 'sca' && <MainSca {...this.props} />}
           
           {section === 'mitre' && selectView === 'inventory' && <MainMitre {...this.props} />}
+          {(section === 'pci' || section === 'gdpr' || section === 'hipaa'|| section === 'nist' || section === 'tsc' )&& selectView === 'inventory' && <ComplianceTable {...this.props} goToDiscover={(id) => this.props.onSelectedTabChanged(id)} />}
           {/* -------------------------------------------------------------------------- */}
         </Fragment>
       </div>

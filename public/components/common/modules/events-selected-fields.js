@@ -38,10 +38,9 @@ export const EventsSelectedFiles = {
   ],
   aws: [
     'data.aws.source',
-    'data.aws.type',
-    'data.aws.severity',
-    'data.aws.region',
-    'data.aws.description',
+    'rule.description',
+    'rule.level',
+    'rule.id',
   ],
   gcp: [
     'data.jsonPayload.vmInstanceName',
@@ -86,12 +85,10 @@ export const EventsSelectedFiles = {
     'data.cis.result',
   ],
   vuls: [
+    'agent.name',
+    'data.vulnerability.package.name',
     'data.vulnerability.cve',
-    'data.vulnerability.cwe_reference',
-    'data.vulnerability.reference',
-    'data.vulnerability.severity',
-    'data.cis.unknown',
-    'data.vulnerability.state',
+    'data.vulnerability.severity'
   ],
   virustotal: [
     'data.virustotal.source.file',
@@ -107,16 +104,11 @@ export const EventsSelectedFiles = {
     'data.osquery.subquery',
   ],
   docker: [
-    'data.docker.Actor.Attributes.name',
     'data.docker.from',
     'data.docker.Type',
     'data.docker.Action',
-  ],
-  docker: [
-    'data.docker.Actor.Attributes.name',
-    'data.docker.from',
-    'data.docker.Type',
-    'data.docker.Action',
+    'rule.description',
+    'rule.level',
   ],
   pci: [
     'rule.pci_dss',

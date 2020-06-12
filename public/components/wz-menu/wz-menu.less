@@ -93,9 +93,26 @@ wz-menu {
     position: fixed;
     top: 56px !important;
     left: 48px !important;
-    z-index: 11!important;
     border-radius: 0px 0px 4px 0px;
     max-height: unset!important;
+    border-right: none!important;
+}
+
+.wz-menu-popover-over .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after {
+    border-bottom: 12px solid #fafbfd!important;
+}
+
+.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after, 
+.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:before {
+    display: none;
+}
+
+.wz-menu-popover.wz-menu-popover-over{
+    z-index: 11!important;
+}
+
+.wz-menu-popover.wz-menu-popover-under{
+    z-index: 8!important;
 }
 
 @media only screen and (max-width: 767px){

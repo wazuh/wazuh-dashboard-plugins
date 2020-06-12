@@ -36,7 +36,7 @@ class WzGlobalBreadcrumb extends Component {
               breadcrumbs={this.props.state.breadcrumb.map(breadcrumb => breadcrumb.agent ? {
                 text: (
                   <a 
-                    style={{marginRight: 0, height: 18.6 }}
+                    style={{marginRight: 0, height: 16 }}
                     className="euiLink euiLink--subdued euiBreadcrumb "
                     onClick={(ev) =>  {ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": breadcrumb.agent.id  } ); this.router.reload();}}
                     id="breadcrumbNoTitle"

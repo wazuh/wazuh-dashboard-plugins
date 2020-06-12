@@ -663,7 +663,15 @@ function discoverController(
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
-      setAppState({ query });
+      let q = { ...query };
+      if (query && typeof query === 'object') {
+        /// Wazuh 7.7.x          
+        if ($scope.tabView !== 'discover') {
+          q.update_Id = new Date().getTime().toString();
+        }
+        ///
+      }
+      setAppState({ query: q });
       // WAZUH  query from search bar
       discoverPendingUpdates.removeAll();
       discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);
@@ -1032,7 +1040,6 @@ function discoverController(
       $scope.$applyAsync();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.tab = parameters.tab;
-      delete (($scope.state || {}).query || {}).update_Id;
       evt.stopPropagation();
       if ($scope.tabView === 'discover') {
         $scope.rows = false;

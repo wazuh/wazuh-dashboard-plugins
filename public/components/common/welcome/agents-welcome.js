@@ -197,7 +197,7 @@ export class AgentsWelcome extends Component {
             <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
               <EuiButtonEmpty
                 onClick={() => {
-                  window.location.href = `#/overview/?tab=${menuAgent.id}`;
+                  window.location.href = `#/overview/?tab=${menuAgent.id}&tabView=${menuAgent.text === 'Security configuration assessment' ? 'inventory' : 'panels'}`;
                   this.router.reload();
                 }} style={{ cursor: 'pointer' }}>
                 <span>{menuAgent.text !== 'Security configuration assessment' ? menuAgent.text : 'SCA'}&nbsp;</span>

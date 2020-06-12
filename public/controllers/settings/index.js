@@ -20,10 +20,12 @@ import { ApiIsDown } from '../../components/settings/api/api-is-down';
 import EnableModules from '../../components/settings/modules/modules';
 import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
 import SettingsLogs from '../../components/settings/settings-logs/logs';
+import {WzSampleDataWrapper} from '../../components/add-modules-data/WzSampleDataWrapper'
 
 app
   .controller('settingsController', SettingsController)
   .value('EnableModules', EnableModules)
+  .value('WzSampleDataWrapper', WzSampleDataWrapper)
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsLogs', SettingsLogs)
   .value('ApiTable', ApiTable)

@@ -81,7 +81,10 @@ class WzMenuOverview extends Component {
     this.props.closePopover();
     const params = { tab : section};
     if(store.getState().appStateReducers.currentAgentData.id)
-      params["agentId"] = store.getState().appStateReducers.currentAgentData.id
+      params["agentId"] = store.getState().appStateReducers.currentAgentData.id;
+    if(section === "sca"){ // SCA initial tab is inventory
+      params["tabView"] = "inventory"
+    }
     const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
       .currentTab;
     if (currentTab !== section) {

@@ -35,7 +35,7 @@ export default class EnableModules extends Component {
           modules: [
             { name: 'pm', default: true, agent: false },
             { name: 'sca', default: true, agent: false },
-            { name: 'audit', default: false, agent: false },
+            { name: 'audit', default: true, agent: false },
             { name: 'oscap', default: false, agent: false },
             { name: 'ciscat', default: false, agent: false }
           ]
@@ -47,7 +47,7 @@ export default class EnableModules extends Component {
             { name: 'virustotal', default: false, agent: false },
             { name: 'osquery', default: false, agent: false },
             { name: 'docker', default: false, agent: false },
-            { name: 'mitre', default: false, agent: false },
+            { name: 'mitre', default: true, agent: false },
           ]
         },
         {

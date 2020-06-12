@@ -154,7 +154,7 @@ export class AgentsPreview extends Component {
             {this.state.loading && (
               <EuiFlexItem>
                 <EuiLoadingChart
-                  style={{ margin: '60px auto' }}
+                  style={{ margin: '75px auto' }}
                   size="xl"
                 />
               </EuiFlexItem>

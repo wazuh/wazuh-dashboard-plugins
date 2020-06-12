@@ -31,8 +31,9 @@ import { FlyoutTechnique } from './components/flyout-technique/';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 
-export class Techniques extends Component {
+export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
 
   props!: {
@@ -147,6 +148,16 @@ export class Techniques extends Component {
     ]
   }
 
+  techniqueColumnsResponsive(){
+    if(this.props && this.props.windowSize){
+      return this.props.windowSize.width < 930 ? 2
+      : this.props.windowSize.width < 1200 ? 3
+      : 4;
+    }else{
+      return 4;
+    }
+  }
+
   renderFacet() {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
@@ -180,7 +191,7 @@ export class Techniques extends Component {
         <EuiFlexItem 
         onMouseEnter={() => this.setState({ hover: item.id })}
         onMouseLeave={() => this.setState({ hover: "" })}
-        key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
+        key={idx} style={{border: "1px solid #8080804a", maxHeight: 41}}>
 
         <EuiPopover
             id="techniqueActionsContextMenu"
@@ -203,10 +214,10 @@ export class Techniques extends Component {
                   {this.state.hover === item.id &&
                     <span style={{float: "right"}}>
                       <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
-                          <EuiIcon onClick={(e) => {this.openDashboard(item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
+                          <EuiIcon onClick={(e) => {this.openDashboard(e,item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
                       </EuiToolTip> &nbsp;
                       <EuiToolTip position="top" content={"Inspect " + item.id + " in Events"} >
-                        <EuiIcon onClick={(e) => {this.openDiscover(item.id);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
+                        <EuiIcon onClick={(e) => {this.openDiscover(e,item.id);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
                       </EuiToolTip>
 
                     </span>
@@ -228,23 +239,22 @@ export class Techniques extends Component {
     })
     if(tacticsToRender.length){
       return (
-      <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "400px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
+      <EuiFlexGrid columns={this.techniqueColumnsResponsive()} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
         {tacticsToRenderOrdered}
       </EuiFlexGrid>
       )
     }else{
-      return <>No tactics have been selected.</>
+      return <>No results.</>
     }
   }
 
-  openDiscover(techniqueID){
+  openDiscover(e,techniqueID){
     this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
     this.props.onSelectedTabChanged('events');
-
   }
 
 
-  openDashboard(techniqueID){
+  openDashboard(e,techniqueID){
     this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
     this.props.onSelectedTabChanged('dashboard');
   }
@@ -347,8 +357,8 @@ export class Techniques extends Component {
             onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
           
             <FlyoutTechnique
-              openDashboard={itemId => this.openDashboard(itemId)}
-              openDiscover={itemId => this.openDiscover(itemId)}
+              openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
+              openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
               onChangeFlyout={this.onChangeFlyout}
               currentTechniqueData={this.state.currentTechniqueData}
               currentTechnique={currentTechnique} />
@@ -357,4 +367,4 @@ export class Techniques extends Component {
       </div>   
 		)
 	}
-}
+})
