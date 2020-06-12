@@ -370,7 +370,7 @@ export const visualizations = {
     ],
     rows: [
       {
-        height: 300,
+        height: 400,
         vis: [
           {
             title: 'Alerts severity over time',
