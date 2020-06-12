@@ -71,7 +71,7 @@ export class Inventory extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const { agentPlatform } = this.props.agent;
+    const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
     const {totalItemsFile, syscheck} = await this.getItemNumber('file');
     const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
     if (this._isMount){
