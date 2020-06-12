@@ -58,7 +58,7 @@ export class EventsFim extends Component {
           this._isMount && this.setState({ fetchStatus: scope.fetchStatus, rows, rowsList })
         }
       });
-    setInterval(() => {
+      this.getRowsInterval = setInterval(() => {
       const elements = document.querySelectorAll('.kbnDocTable__row');
       if ((elements || []).length != this.state.rowsLimit) {
         this._isMount && this.setState({ rowsLimit: (elements || []).length })
@@ -90,6 +90,7 @@ export class EventsFim extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
+    clearInterval(this.getRowsInterval);
     if (this.fetchWatch) this.fetchWatch();
   }
 
@@ -134,8 +135,9 @@ export class EventsFim extends Component {
               if (child.nodeName === 'SPAN') {
                 const link = document.createElement('a')
                 link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
-                link.setAttribute('target', '_blank')
-                link.setAttribute('style', 'minWidth: 55, display: "block"');
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noreferrer');
+                link.setAttribute('style', 'min-width: 75px; display: block;');
                 link.textContent = text;
                 child.replaceWith(link);
                 isClearable = false;
