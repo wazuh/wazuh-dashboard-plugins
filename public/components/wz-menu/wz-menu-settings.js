@@ -72,8 +72,8 @@ class WzMenuSettings extends Component {
       this.createItem(avaibleSettings.about),
     ]
     if (adminMode) {
-      auxItems.splice(1, 0, this.createItem(avaibleSettings.modules));
       auxItems.splice(1, 0, this.createItem(avaibleSettings.sample_data));
+      auxItems.splice(1, 0, this.createItem(avaibleSettings.modules));
     }
     return(auxItems);
   }
