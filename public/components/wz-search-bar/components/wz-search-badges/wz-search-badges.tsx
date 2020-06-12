@@ -14,22 +14,22 @@ import { EuiBadge } from '@elastic/eui';
 import './wz-search-badges.less';
 
 export function WzSearchBadges({ filters, onFiltersChange }) {
-  const removeFilter = (key) => {filters.splice(key, 1);onFiltersChange(filters)};
-  const badges = filters.map((filter, key) => badge({filter, key, removeFilter}) );
-  console.log({badges});
+  const removeFilter = (key) => { filters.splice(key, 1); onFiltersChange(filters) };
+  const badges = filters.map((filter, key) => badge({ filter, key, removeFilter }));
   return badges;
 }
 
-function badge({filter, key, removeFilter}) {
+function badge({ filter, key, removeFilter }) {
   return (
     <EuiBadge key={key}
       className='wz-search-badge'
       color='hollow'
       iconType='cross'
       iconSide='right'
+      onFocus={e => e.stopPropagation()}
       iconOnClick={() => removeFilter(key)}
       iconOnClickAriaLabel={'Remove filter'} >
-      {filter.field !== 'q' ? `${filter.field}:` : '' } {filter.value}
+      {filter.field !== 'q' ? `${filter.field}:` : ''} {filter.value}
     </EuiBadge>
   )
 }

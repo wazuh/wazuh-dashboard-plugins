@@ -24,7 +24,6 @@ const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ',');
 
 export function filtersToObject(filters: IFilter[]) {
   return filters.reduce((acc, filter) => {
-    console.log({filter})
     const {field, value} = filter;
     if (field === 'q') {
       return {
