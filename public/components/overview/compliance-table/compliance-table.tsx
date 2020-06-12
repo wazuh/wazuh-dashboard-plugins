@@ -50,6 +50,7 @@ export class ComplianceTable extends Component {
     query: object,
     searchBarFilters: [],
     complianceObject: object,
+    descriptions: object,
     selectedRequirements: object,
   } 
 
@@ -62,6 +63,7 @@ export class ComplianceTable extends Component {
     this.timefilter = this.KibanaServices.timefilter;
     this.state = {
       complianceObject: {},
+      descriptions: {},
       selectedRequirements: {},
       filterParams: {
         filters: [],
@@ -88,8 +90,10 @@ export class ComplianceTable extends Component {
   buildComplianceObject(){
     try{
       let complianceRequirements = {};
+      let descriptions = {};
       let selectedRequirements = {}; // all enabled by default
       if(this.props.section === 'pci'){
+        descriptions = pciRequirementsFile;
         Object.keys(pciRequirementsFile).forEach(item => {
           const currentRequirement = item.split(".")[0];
           if(complianceRequirements[currentRequirement]){
@@ -102,6 +106,7 @@ export class ComplianceTable extends Component {
         }); //forEach
       }
       if(this.props.section === 'gdpr'){
+        descriptions = gdprRequirementsFile;
         Object.keys(gdprRequirementsFile).forEach(item => {
           const currentRequirement = item.split("_")[0];
           if(complianceRequirements[currentRequirement]){
@@ -115,6 +120,7 @@ export class ComplianceTable extends Component {
       }
 
       if(this.props.section === 'hipaa'){
+        descriptions = hipaaRequirementsFile;
         Object.keys(hipaaRequirementsFile).forEach(item => {
           const currentRequirement = item.split(".")[0] +"."+item.split(".")[1]+"."+item.split(".")[2];
           if(complianceRequirements[currentRequirement]){
@@ -128,6 +134,7 @@ export class ComplianceTable extends Component {
       }
 
       if(this.props.section === 'nist'){
+        descriptions = nistRequirementsFile;
         Object.keys(nistRequirementsFile).forEach(item => {
           const currentRequirement = item.split(".")[0];
           if(complianceRequirements[currentRequirement]){
@@ -140,6 +147,7 @@ export class ComplianceTable extends Component {
         }); //forEach        
       }
       if(this.props.section === 'tsc'){
+        descriptions = tscRequirementsFile;
         Object.keys(tscRequirementsFile).forEach(item => {
           const currentRequirement = item.split(".")[0];
           if(complianceRequirements[currentRequirement]){
@@ -152,7 +160,7 @@ export class ComplianceTable extends Component {
         }); //forEach        
       }
 
-      this._isMount && this.setState({complianceObject: complianceRequirements, selectedRequirements}, () => this.getRequirementsCount());
+      this._isMount && this.setState({complianceObject: complianceRequirements, selectedRequirements, descriptions}, () => this.getRequirementsCount());
     }catch(err){
       // TODO ADD showToast
       /*this.showToast(

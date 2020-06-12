@@ -85,11 +85,10 @@ export const EventsSelectedFiles = {
     'data.cis.result',
   ],
   vuls: [
+    'agent.name',
     'data.vulnerability.package.name',
-    'data.vulnerability.state',
-    'data.vulnerability.severity',
     'data.vulnerability.cve',
-    'data.vulnerability.cwe_reference',
+    'data.vulnerability.severity'
   ],
   virustotal: [
     'data.virustotal.source.file',

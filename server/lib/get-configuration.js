@@ -25,6 +25,12 @@ export function getConfiguration(isUpdating = false) {
       );
       const raw = fs.readFileSync(customPath, { encoding: 'utf-8' });
       const file = yml.load(raw);
+
+      for (const host of file.hosts) {
+        Object.keys(host).forEach((k) => {
+          host[k].password = '*****';
+        });
+      }
       cachedConfiguration = { ...file };
       lastAssign = now;
     }

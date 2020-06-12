@@ -253,7 +253,8 @@ export class FileDetails extends Component {
         value = !isNaN(value) ? this.formatBytes(value) : 0;
       }
       var link = (item.link && !['events', 'extern'].includes(view)) || false;
-      if (!item.onlyLinux || (item.onlyLinux && this.props.agent && this.props.agent.agentPlatform !== 'windows')) {
+      const agentPlatform = ((this.props.agent || {}).os || {}).platform;
+      if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
         let className = item.checksum ? "detail-value detail-value-checksum" : "detail-value";
         className += item.field === 'perm' ? " detail-value-perm" : "";
         return (
