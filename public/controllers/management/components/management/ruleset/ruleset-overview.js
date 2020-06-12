@@ -22,6 +22,7 @@ import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
 import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../../../redux/store';
+import { WzRulesetTotalItems } from './ruleset-total-items';
 
 class WzRulesetOverview extends Component {
   constructor(props) {
@@ -69,7 +70,7 @@ class WzRulesetOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiTitle>
-                <h2>{this.sectionNames[section]}</h2>
+                <h2>{this.sectionNames[section]} <WzRulesetTotalItems section={section}/></h2>
               </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem></EuiFlexItem>
