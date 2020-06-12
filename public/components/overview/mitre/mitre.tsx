@@ -230,7 +230,7 @@ export class Mitre extends Component {
             <EuiPanel paddingSize="none">
               {!!Object.keys(tacticsObject).length && this.state.filterParams.time.from !== "init" && 
                 <EuiFlexGroup >
-                  <EuiFlexItem grow={false} style={{width: "15%",height: "calc(100vh - 280px)",overflowX: "hidden"}}>
+                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 280px)",overflowX: "hidden"}}>
                     <Tactics 
                       indexPattern={this.indexPattern}
                       onChangeSelectedTactics={this.onChangeSelectedTactics}
