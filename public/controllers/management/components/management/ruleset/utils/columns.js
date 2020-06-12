@@ -28,8 +28,12 @@ export default class RulesetColumns {
               if(value === undefined) return '';
               const regex = /\$(.*?)\)/g;
               let result = value.match(regex);
+              let haveTooltip = false;
+              let toolTipDescription = [];
               if(result !== null) {
+                haveTooltip = true;
                 for (const oldValue of result) {
+                  toolTipDescription.push(oldValue);
                   let newValue = oldValue.replace('$(',`<strong style="color:#006BB4">`);
                   newValue = newValue.replace(')', ' </strong>');
                   value = value.replace(oldValue, newValue);
@@ -37,7 +41,12 @@ export default class RulesetColumns {
               }
               return (
               <div>
-                <span dangerouslySetInnerHTML={{ __html: value}} />
+                {haveTooltip === false ? 
+                <span dangerouslySetInnerHTML={{ __html: value}} /> :
+                <EuiToolTip position="bottom" content={toolTipDescription.join()}>
+                  <span dangerouslySetInnerHTML={{ __html: value}} />
+                </EuiToolTip>
+                }
               </div>
               );
             }

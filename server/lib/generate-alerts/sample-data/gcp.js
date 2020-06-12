@@ -11,7 +11,7 @@
  */
 
 // GCP
-export const arrayAuthAnswer = [true, false];
+export const arrayAuthAnswer = ["true", "false"];
 export const arrayProtocol = ['UDP', 'TCP'];
 export const arrayQueryName = ['185.5.205.124.in-addr.arpa.', '98.72.244.104.in-addr.arpa.', 'mirrors.advancedhosters.com.', '41.212.95.203.in-addr.arpa', '41.212.95.203.in-addr.arpa.'];
 export const arrayQueryType = ['PTR', 'PTR', 'PTR', 'PTR', 'PTR', 'A'];
