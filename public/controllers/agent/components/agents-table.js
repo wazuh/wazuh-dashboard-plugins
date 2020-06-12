@@ -728,13 +728,13 @@ export class AgentsTable extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '10%'
+        width: '6%'
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
-        width: '20%',
+        width: '15%',
         truncateText: true
       },
       {
@@ -756,7 +756,7 @@ export class AgentsTable extends Component {
         field: 'os_name',
         name: 'OS',
         sortable: true,
-        width: '10%',
+        width: '15%',
         truncateText: true,
         render: this.addIconPlatformRender
       },
@@ -787,7 +787,7 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
-        width: '10%',
+        width: '15%',
         render: this.addHealthStatusRender
       },
       {
