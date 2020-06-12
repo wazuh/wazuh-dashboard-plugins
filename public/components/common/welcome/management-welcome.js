@@ -145,6 +145,7 @@ class ManagementWelcome extends Component {
                       description="Manage your Wazuh cluster configuration."
                     />
                   </EuiFlexItem>
+                  <EuiFlexItem />
                 </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>
