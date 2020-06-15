@@ -13,6 +13,7 @@
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { npStart } from 'ui/new_platform';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export function getIp(
   $q,
@@ -71,7 +72,7 @@ export function getIp(
     } catch (error) {
       deferred.reject(error);
       wzMisc.setBlankScr(
-        errorHandler.handle(error, 'Elasticsearch', false, true)
+        ErrorHandler.handle(error, 'Elasticsearch', { silent: true })
       );
       $location.path('/blank-screen');
     }

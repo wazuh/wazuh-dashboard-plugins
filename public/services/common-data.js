@@ -11,6 +11,7 @@
  */
 import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
+import { ErrorHandler } from '../react-services/error-handler';
 import { ShareAgent } from '../factories/share-agent';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 import rison from 'rison-node';
@@ -199,10 +200,10 @@ export class CommonData {
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
-      this.errorHandler.handle(
+      ErrorHandler.handle(
         'An error occurred while creating custom filters for visualizations',
         agent ? 'Agents' : 'Overview',
-        true
+        { warning: true }
       );
     }
   }

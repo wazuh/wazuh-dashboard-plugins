@@ -27,6 +27,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
+import { ErrorHandler } from '../../react-services/error-handler';
 import RulesetHandler from '../../controllers/management/components/management/ruleset/utils/ruleset-handler';
 
 const app = uiModules.get('app/wazuh', []);
@@ -263,8 +264,8 @@ app.directive('wzTable', function() {
           }
         } catch (error) {
           realTime = false;
-          $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
-          errorHandler.handle(error.message || error);
+          $scope.error = ErrorHandler.handle(error.message || error, '', { silent: true });
+          ErrorHandler.handle(error.message || error);
         }
         return;
       };
@@ -424,9 +425,9 @@ app.directive('wzTable', function() {
         try {
           const group = instance.path.split('/').pop();
           const data = await GroupHandler.removeAgentFromGroup(group, agent);
-          errorHandler.info(((data || {}).data || {}).data);
+          ErrorHandler.info(((data || {}).data || {}).data);
         } catch (error) {
-          errorHandler.handle(error.message || error);
+          ErrorHandler.handle(error.message || error);
         }
         $scope.removingAgent = null;
         return init();
@@ -435,9 +436,9 @@ app.directive('wzTable', function() {
       $scope.confirmRemoveGroup = async group => {
         try {
           await groupHandler.removeGroup(group);
-          errorHandler.info(`Group ${group} has been removed`);
+          ErrorHandler.info(`Group ${group} has been removed`);
         } catch (error) {
-          errorHandler.handle(error.message || error);
+          ErrorHandler.handle(error.message || error);
         }
         $scope.removingGroup = null;
         return init();
@@ -446,9 +447,9 @@ app.directive('wzTable', function() {
       $scope.confirmRemoveFile = async (file, type) => {
         try {
           await rulesetHandler.deleteFile(file, type);
-          errorHandler.info(`File ${file.file || file.name} has been deleted`);
+          ErrorHandler.info(`File ${file.file || file.name} has been deleted`);
         } catch (error) {
-          errorHandler.handle(error.message || error);
+          ErrorHandler.handle(error.message || error);
         }
         $scope.removingFile = null;
         return init();
