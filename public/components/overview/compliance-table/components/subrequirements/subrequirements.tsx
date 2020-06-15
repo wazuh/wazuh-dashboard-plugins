@@ -275,6 +275,7 @@ export class ComplianceSubrequirements extends Component {
           <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
             <RequirementFlyout
               currentRequirement={this.state.selectedRequirement}
+              onChangeFlyout={this.onChangeFlyout}
               description={this.props.descriptions[this.state.selectedRequirement]}
               getRequirementKey={() => { return this.getRequirementKey() }}
               openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
