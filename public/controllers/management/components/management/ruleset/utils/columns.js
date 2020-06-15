@@ -29,11 +29,11 @@ export default class RulesetColumns {
               const regex = /\$(.*?)\)/g;
               let result = value.match(regex);
               let haveTooltip = false;
-              let toolTipDescription = [];
+              let toolTipDescription = false;
               if(result !== null) {
                 haveTooltip = true;
+                toolTipDescription = value;
                 for (const oldValue of result) {
-                  toolTipDescription.push(oldValue);
                   let newValue = oldValue.replace('$(',`<strong style="color:#006BB4">`);
                   newValue = newValue.replace(')', ' </strong>');
                   value = value.replace(oldValue, newValue);
@@ -43,7 +43,7 @@ export default class RulesetColumns {
               <div>
                 {haveTooltip === false ? 
                 <span dangerouslySetInnerHTML={{ __html: value}} /> :
-                <EuiToolTip position="bottom" content={toolTipDescription.join()}>
+                <EuiToolTip position="bottom" content={toolTipDescription}>
                   <span dangerouslySetInnerHTML={{ __html: value}} />
                 </EuiToolTip>
                 }

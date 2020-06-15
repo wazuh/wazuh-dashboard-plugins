@@ -10,5 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { CustomBadge, ICustomBadges } from './custom-badge';
-export { ContextMenu, WzSearchBadges } from './wz-search-badges';
+export { BaseHandler } from './base-handler';
+export { queryObject, IConjuntions, IOperator, QInterpreter } from './q-interpreter';
+export { qSuggests, } from './q-handler';
+export { SuggestHandler } from './suggest-handler';
+export { IWzSuggestItem } from '../wz-search-bar';
+export { filtersToObject, IFilter} from './filters-to-object';
