@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import {
   EuiBadge,
@@ -25,16 +25,31 @@ import {
   EuiTableHeaderMobile,
   EuiButtonIcon,
   EuiIcon,
-  EuiPopover
+  EuiPopover,
+  EuiText,
+  EuiToolTip
 } from '@elastic/eui';
 
 import { WzRequest } from '../../../../react-services/wz-request';
 import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eui/lib/services';
+import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import  store  from '../../../../redux/store';
+import chrome from 'ui/chrome';
+import { WzFilterBar } from '../../../../components/wz-filter-bar/wz-filter-bar';
+import { AgentGroupTruncate } from '../../../../components/common/util/agent-group-truncate/agent_group_truncate'
+
+
+const checkField = field => {
+  return field !== undefined ? field : '-';
+};
 
 export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
 
+    // const selectedOptions = JSON.parse(
+    //   sessionStorage.getItem('agents_preview_selected_options')
+    // );
     this.state = {
       itemIdToSelectedMap: {},
       itemIdToOpenActionsPopoverMap: {},
@@ -45,17 +60,13 @@ export class AgentSelectionTable extends Component {
       isLoading: false,
       sortDirection: 'asc',
       sortField: 'id',
-      currentSearch: '',
+      agents: [],
+      selectedOptions: [],
+      q: '',
+      search: ''
     };
-    this.wzReq = (...args) => WzRequest.apiReq(...args);
 
     this.columns = [
-      {
-        id: 'checkbox',
-        isCheckbox: true,
-        textOnly: false,
-        width: '32px',
-      },
       {
         id: 'id',
         label: 'ID',
@@ -73,7 +84,7 @@ export class AgentSelectionTable extends Component {
         mobileOptions: {
           show: true,
         },
-        isSortable: true,
+        isSortable: true
       },
       {
         id: 'group',
@@ -83,10 +94,12 @@ export class AgentSelectionTable extends Component {
           show: false,
         },
         isSortable: true,
+        render: this.renderGroups
       },
       {
         id: 'version',
         label: 'Version',
+        width: '80px',
         alignment: LEFT_ALIGNMENT,
         mobileOptions: {
           show: true,
@@ -100,6 +113,8 @@ export class AgentSelectionTable extends Component {
         mobileOptions: {
           show: false,
         },
+        isSortable: true,
+        render: os => this.addIconPlatformRender(os)
       },
       {
         id: 'status',
@@ -113,8 +128,6 @@ export class AgentSelectionTable extends Component {
         render: status => this.addHealthStatusRender(status),
       },
     ];
-
-    this.items = [];
   }
 
   onChangeItemsPerPage = async itemsPerPage => {
@@ -126,65 +139,105 @@ export class AgentSelectionTable extends Component {
   };
 
   async componentDidMount() {
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
+    const tmpSelectedAgents = {};
+    if(!store.getState().appStateReducers.currentAgentData.id){
+      tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;
+    }
     this.setState({itemIdToSelectedMap: this.props.selectedAgents});
-    await this.getItems();
+    try{
+      await this.getItems();
+      const filterStatus = this.filterBarModelStatus();
+      const filterGroups = await this.filterBarModelGroups();
+      const filterOs = await this.filterBarModelOs();
+      const filterVersion = await this.filterBarModelWazuhVersion();
+      const filterOsPlatform = await this.filterBarModelOsPlatform();
+      const filterNodes = await this.filterBarModelNodes();
+      this.setState({
+        filterStatus,
+        filterGroups,
+        filterOs,
+        filterVersion,
+        filterOsPlatform,
+        filterNodes
+      });
+    }catch(error){}
+  }
+
+  getArrayFormatted(arrayText) {
+    try {
+      const stringText = arrayText.toString();
+      const splitString = stringText.split(',');
+      const resultString = splitString.join(', ');
+      return resultString;
+    } catch (err) {
+      return arrayText;
+    }
   }
 
   async getItems() {
     try{
       this.setState({isLoading: true});
-      const rawData = await this.wzReq('GET', '/agents', this.buildFilter());
+      const rawData = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
       const data = (((rawData || {}).data || {}).data || {}).items;
-  
       const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
       const formattedData = data.map((item, id) => {
         return {
           id: item.id,
           name: item.name,
-          version: item.version || '-',
-          os: (item.os || {}).name || '-',
+          version: item.version !== undefined ? item.version.split(' ')[1] : '-',
+          os: item.os || '-',
           status: item.status,
           group: item.group || '-',
         };
       });
-      this.items = formattedData;
   
-      this.setState({ totalItems, isLoading: false });
+      this.setState({ agents: formattedData, totalItems, isLoading: false });
     }catch(err){
       this.setState({ isLoading: false });
     }
   }
 
-  addHealthStatusRender(status) {
-    const color = status => {
-      if (status.toLowerCase() === 'active') {
-        return 'success';
-      } else if (status.toLowerCase() === 'disconnected') {
-        return 'danger';
-      } else if (status.toLowerCase() === 'never connected') {
-        return 'subdued';
-      }
-    };
+  agentStatusColor(status){
+    if (status.toLowerCase() === 'active') {
+      return 'success';
+    } else if (status.toLowerCase() === 'disconnected') {
+      return 'danger';
+    } else if (status.toLowerCase() === 'never connected') {
+      return 'subdued';
+    }
+  }
 
+  agentStatusBadgeColor(status){
+    if (status.toLowerCase() === 'active') {
+      return 'secondary';
+    } else if (status.toLowerCase() === 'disconnected') {
+      return 'danger';
+    } else if (status.toLowerCase() === 'never connected') {
+      return 'default';
+    }
+  }
+
+  addHealthStatusRender(status) {
     return (
-      <EuiHealth color={color(status)} style={{ whiteSpace: 'no-wrap' }}>
+      <EuiHealth color={this.agentStatusColor(status)} style={{ whiteSpace: 'no-wrap' }}>
         {status}
       </EuiHealth>
     );
   }
 
   buildFilter() {
-    const { itemsPerPage, pageIndex } = this.state;
+    const { itemsPerPage, pageIndex, search, q } = this.state;
     const filter = {
-      q: "id!=000",
+      q: `id!=000${q ? `;${q}` : ''}`,
       offset: pageIndex * itemsPerPage,
       limit: pageIndex * itemsPerPage + itemsPerPage,
       ...this.buildSortFilter(),
     };
-    if (this.state.currentSearch) {
-      filter['search'] = this.state.currentSearch;
+    if (search) {
+      filter['search'] = search;
     }
-
     return filter;
   }
 
@@ -214,7 +267,6 @@ export class AgentSelectionTable extends Component {
   toggleItem = itemId => {
     this.setState(previousState => {
       const newItemIdToSelectedMap = {
-        ...previousState.itemIdToSelectedMap,
         [itemId]: !previousState.itemIdToSelectedMap[itemId],
       };
 
@@ -227,7 +279,7 @@ export class AgentSelectionTable extends Component {
   toggleAll = () => {
     const allSelected = this.areAllItemsSelected();
     const newItemIdToSelectedMap = {};
-    this.items.forEach(item => (newItemIdToSelectedMap[item.id] = !allSelected));
+    this.state.agents.forEach(item => (newItemIdToSelectedMap[item.id] = !allSelected));
 
     this.setState({
       itemIdToSelectedMap: newItemIdToSelectedMap,
@@ -239,7 +291,7 @@ export class AgentSelectionTable extends Component {
   };
 
   areAllItemsSelected = () => {
-    const indexOfUnselectedItem = this.items.findIndex(item => !this.isItemSelected(item.id));
+    const indexOfUnselectedItem = this.state.agents.findIndex(item => !this.isItemSelected(item.id));
     return indexOfUnselectedItem === -1;
   };
 
@@ -285,7 +337,7 @@ export class AgentSelectionTable extends Component {
   };
 
   renderSelectAll = mobile => {
-    if (!this.state.isLoading && this.items.length) {
+    if (!this.state.isLoading && this.state.agents.length) {
       return (
         <EuiCheckbox
           id="selectAllCheckbox"
@@ -322,7 +374,6 @@ export class AgentSelectionTable extends Component {
       if (column.isCheckbox) {
         headers.push(
           <EuiTableHeaderCellCheckbox key={column.id} width={column.width}>
-            {this.renderSelectAll()}
           </EuiTableHeaderCellCheckbox>
         );
       } else {
@@ -365,9 +416,7 @@ export class AgentSelectionTable extends Component {
         }
 
         if (column.render) {
-          if (column.id === 'status') {
-            child = column.render(item.status);
-          }
+          child = column.render(item[column.id]);
         } else {
           child = cell;
         }
@@ -393,7 +442,7 @@ export class AgentSelectionTable extends Component {
           key={item.id}
           isSelected={this.isItemSelected(item.id)}
           isSelectable={true}
-          onClick={() => this.toggleItem(item.id)}
+          onClick={async () => await this.selectAgentAndApply(item.id)}
           hasActions={true}
         >
           {cells}
@@ -407,10 +456,10 @@ export class AgentSelectionTable extends Component {
       let itemIndex = (this.state.pageIndex * this.state.itemsPerPage) % this.state.itemsPerPage;
       itemIndex <
         ((this.state.pageIndex * this.state.itemsPerPage) % this.state.itemsPerPage) +
-          this.state.itemsPerPage && this.items[itemIndex];
+          this.state.itemsPerPage && this.state.agents[itemIndex];
       itemIndex++
     ) {
-      const item = this.items[itemIndex];
+      const item = this.state.agents[itemIndex];
       rows.push(renderRow(item));
     }
 
@@ -420,7 +469,7 @@ export class AgentSelectionTable extends Component {
   renderFooterCells() {
     const footers = [];
 
-    const items = this.items;
+    const items = this.state.agents;
     const pagination = {
       pageIndex: this.state.pageIndex,
       pageSize: this.state.itemsPerPage,
@@ -461,12 +510,19 @@ export class AgentSelectionTable extends Component {
     return undefined;
   };
 
-  onSearchFieldChange = e => {
-    this.setState(
-      { currentSearch: e.target.value, pageIndex: 0 },
-      async () => await this.getItems()
-    );
-  };
+  async onQueryChange(result){
+    // sessionStorage.setItem(
+    //   'agents_preview_selected_options',
+    //   JSON.stringify(result.selectedOptions)
+    // );
+    this.setState({ isLoading: true, ...result}, async () => {
+      try{
+        await this.getItems()
+      }catch(error){
+        this.setState({ isLoading: false});
+      }
+    });
+  }
 
   getSelectedItems(){
     return Object.keys(this.state.itemIdToSelectedMap).filter(x => {
@@ -476,23 +532,222 @@ export class AgentSelectionTable extends Component {
 
   unselectAgents(){
     this.setState({itemIdToSelectedMap: {}});
+    this.props.removeAgentsFilter(true);      
+    store.dispatch(updateCurrentAgentData({}));
   }
 
   getSelectedCount(){
     return this.getSelectedItems().length;
   }
 
-  newSearch(){
+  async newSearch(){
     if(this.areAnyRowsSelected()){
+      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
+      const formattedData = data.data.data.items[0] //TODO: do it correctly
+      store.dispatch(updateCurrentAgentData(formattedData));
       this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch(this.getSelectedItems());
     }else{
       this.props.removeAgentsFilter(true);      
+      store.dispatch(updateCurrentAgentData({}));
+    }
+   // this.router.reload();
+  }
+
+  async selectAgentAndApply(agentID){
+    try{
+      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+agentID } );
+      const formattedData = data.data.data.items[0] //TODO: do it correctly
+      store.dispatch(updateCurrentAgentData(formattedData));
+      this.props.removeAgentsFilter(false);
+      this.props.updateAgentSearch([agentID]);
+    }catch(error){
+      this.props.removeAgentsFilter(true);      
+      store.dispatch(updateCurrentAgentData({}));
     }
   }
 
   showContextMenu(id){
     this.setState({contextMenuId: id})
+  }
+
+  addIconPlatformRender(os) {
+    if(typeof os === "string" ){ return os};
+    let icon = false;
+
+    if (((os || {}).uname || '').includes('Linux')) {
+      icon = 'linux';
+    } else if ((os || {}).platform === 'windows') {
+      icon = 'windows';
+    } else if ((os || {}).platform === 'darwin') {
+      icon = 'apple';
+    }
+    const os_name =
+      checkField((os || {}).name) +
+      ' ' +
+      checkField((os || {}).version);
+    return (
+      <span className="euiTableCellContent__text euiTableCellContent--truncateText">
+        <i
+          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+          aria-hidden="true"
+        ></i>{' '}
+        {os_name === '--' ? '-' : os_name}
+      </span>
+    );
+  }
+
+  renderGroups(groups){
+    return Array.isArray(groups) ? (
+      <AgentGroupTruncate groups={groups} length={25} label={'more'}/>
+    ) : groups
+  }
+  
+  filterBarModelStatus() {
+    return {
+      label: 'Status',
+      options: [
+        {
+          label: 'Active',
+          group: 'status'
+        },
+        {
+          label: 'Disconnected',
+          group: 'status'
+        },
+        {
+          label: 'Never connected',
+          group: 'status'
+        }
+      ]
+    };
+  }
+
+  async filterBarModelGroups() {
+    const rawGroups = await WzRequest.apiReq('GET', '/agents/groups', {});
+    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
+    const groups = itemsGroups
+      .filter(item => {
+        return item.count > 0;
+      })
+      .map(item => {
+        return { label: item.name, group: 'group' };
+      });
+    return {
+      label: 'Groups',
+      options: groups
+    };
+  }
+
+  async filterBarModelOs() {
+    const rawOs = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'os.name,os.version',
+        q: 'id!=000'
+      }
+    );
+    const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
+    const os = itemsOs
+      .filter(item => {
+        return Object.keys(item).includes('os');
+      })
+      .map(item => {
+        const { name, version } = item.os;
+        return {
+          label: `${name}-${version}`,
+          group: 'osname',
+          query: `os.name=${name};os.version=${version}`
+        };
+      });
+    return {
+      label: 'OS Name',
+      options: os
+    };
+  }
+
+  async filterBarModelOsPlatform() {
+    const rawOsPlatform = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'os.platform',
+        q: 'id!=000'
+      }
+    );
+    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {})
+      .items;
+    const osPlatform = itemsOsPlatform
+      .filter(item => {
+        return Object.keys(item).includes('os');
+      })
+      .map(item => {
+        const { platform } = item.os;
+        return {
+          label: platform,
+          group: 'osplatform',
+          query: `os.platform=${platform}`
+        };
+      });
+    return {
+      label: 'OS Platform',
+      options: osPlatform
+    };
+  }
+
+  async filterBarModelNodes() {
+    const rawNodes = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'node_name',
+        q: 'id!=000;node_name!=unknown'
+      }
+    );
+    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
+    const nodes = itemsNodes
+      .filter(item => {
+        return Object.keys(item).includes('node_name');
+      })
+      .map(item => {
+        const { node_name } = item;
+        return {
+          label: node_name,
+          group: 'nodename',
+          query: `node_name=${node_name}`
+        };
+      });
+    return {
+      label: 'Nodes',
+      options: nodes
+    };
+  }
+
+  async filterBarModelWazuhVersion() {
+    const rawVersions = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        fields: 'version',
+        q: 'id!=000'
+      }
+    );
+    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
+    const versions = itemsVersions
+      .filter(item => {
+        return Object.keys(item).includes('version');
+      })
+      .map(item => {
+        return {
+          label: item.version,
+          group: 'version'
+        };
+      });
+    return {
+      label: 'Version',
+      options: versions
+    };
   }
 
   render() {
@@ -505,47 +760,117 @@ export class AgentSelectionTable extends Component {
           ? this.state.totalItems / this.state.itemsPerPage
           : parseInt(this.state.totalItems / this.state.itemsPerPage) + 1,
     };
-    let optionalActionButtons;
+    // let optionalActionButtons;
 
-    if (this.items.length) {
-      optionalActionButtons = (
+    // if (this.state.agents.length) {
+    //   optionalActionButtons = (
 
-        <EuiFlexGroup gutterSize="m">
-          <EuiFlexItem grow={false}>
-            <EuiButton onClick={() => this.unselectAgents()} color="danger" isDisabled={!this.areAnyRowsSelected()}>
-              Unselect all agents
-            </EuiButton>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton onClick={() => this.newSearch()} color="primary">
-              Apply
-            </EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      );
-    }
+    //     <EuiFlexGroup gutterSize="m">
+    //       <EuiFlexItem grow={false}>
+    //         <EuiButton onClick={async() => await this.newSearch()} color="primary">
+    //           Apply
+    //         </EuiButton>
+    //       </EuiFlexItem>
+    //     </EuiFlexGroup>
+    //   );
+    // }
+    const selectedAgent = store.getState().appStateReducers.currentAgentData;
+
+    const {
+      filterStatus,
+      filterGroups,
+      filterOs,
+      filterVersion,
+      filterOsPlatform,
+      filterNodes,
+      selectedOptions
+    } = this.state;
+    const model = [
+      filterStatus || { label: 'Status', options: [] },
+      filterGroups || { label: 'Groups', options: [] },
+      filterOs || { label: 'OS Name', options: [] },
+      filterOsPlatform || { label: 'OS Platform', options: [] },
+      filterVersion || { label: 'Version', options: [] },
+      filterNodes || { label: 'Nodes', options: [] }
+    ];
 
     return (
       <div>
         <EuiFlexGroup gutterSize="m">
           <EuiFlexItem>
-            <EuiFieldSearch
-              value={this.state.currentSearch}
-              onChange={this.onSearchFieldChange}
-              fullWidth
-              placeholder="Search..."
+            <WzFilterBar
+              model={model}
+              clickAction={(e) => this.onQueryChange(e)}
+              selectedOptions={selectedOptions}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="m" />
+        {selectedAgent && Object.keys(selectedAgent).length > 0 && (
+          <Fragment>
+            <EuiFlexGroup responsive={false} justifyContent="flexEnd">
+              {/* Unpin button - agent name (agent id) */}
+              {/* <EuiFlexItem grow={false} style={{margin: "10px 0 0 10px"}}>
+                <EuiToolTip position="top" content={`Unpin ${selectedAgent.name} agent`}>
+                  <EuiButtonIcon
+                    color='danger'
+                    onClick={() => this.unselectAgents()}
+                    iconType="pinFilled"
+                    aria-label="unpin agent"
+                  />
+                </EuiToolTip> 
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{marginLeft: 4}}>
+                <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
+                  {selectedAgent.name} ({selectedAgent.id})
+                </EuiHealth>
+              </EuiFlexItem> */}
 
-          {optionalActionButtons}   
+              {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
+              <EuiFlexItem grow={false} style={{marginRight: 0}}>
+                <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
+                  {selectedAgent.name} ({selectedAgent.id})
+                </EuiHealth>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{marginTop: 10, marginLeft: 4}}>
+                <EuiToolTip position='top' content='Unpin agent'>
+                  <EuiButtonIcon
+                    color='danger'
+                    onClick={() => this.unselectAgents()}
+                    iconType="pinFilled"
+                    aria-label="unpin agent"
+                  />
+                </EuiToolTip> 
+              </EuiFlexItem>
 
-        <EuiSpacer size="m" />
+              {/* Badge */}
+              {/* <EuiFlexItem grow={false}>
+                <EuiBadge
+                  color={this.agentStatusBadgeColor(selectedAgent.status)}
+                  // title={undefined}
+                  iconType="pinFilled"
+                  iconSide="right"
+                  iconOnClick={() => this.unselectAgents()}
+                  iconOnClickAriaLabel={`Unpin ${selectedAgent.name} agent`}
+                >{selectedAgent.name} ({selectedAgent.id})</EuiBadge>
+              </EuiFlexItem> */}
+              
+              {/* <EuiFlexItem grow={false}>
+                <EuiButton
+                  onClick={() => this.unselectAgents()} color="danger"
+                  iconType='pinFilled'
+                >
+                    Unpin {selectedAgent.name}
+                </EuiButton>
+              </EuiFlexItem> */}
+            </EuiFlexGroup>
+            <EuiSpacer size="m" />
+          </Fragment>
+        )}
 
         <EuiTableHeaderMobile>
           <EuiFlexGroup responsive={false} justifyContent="spaceBetween" alignItems="baseline">
-            <EuiFlexItem grow={false}>{this.renderSelectAll(true)}</EuiFlexItem>
+            <EuiFlexItem grow={false}></EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiTableSortMobile items={this.getTableMobileSortItems()} />
             </EuiFlexItem>
@@ -554,7 +879,7 @@ export class AgentSelectionTable extends Component {
 
         <EuiTable>
           <EuiTableHeader>{this.renderHeaderCells()}</EuiTableHeader>
-          {(this.items.length && (
+          {(this.state.agents.length && (
             <EuiTableBody className={this.state.isLoading ? 'agent-selection-table-loading' : ''}>
               {this.renderRows()}
             </EuiTableBody>
@@ -562,7 +887,7 @@ export class AgentSelectionTable extends Component {
             <EuiTableBody className={this.state.isLoading ? 'agent-selection-table-loading' : ''}>
               <EuiTableRow key={0}>
                 <EuiTableRowCell colSpan="10" isMobileFullWidth={true} align="center">
-                  No results found
+                  {this.state.isLoading ? 'Loading agents' : 'No results found'}
                 </EuiTableRowCell>
               </EuiTableRow>
             </EuiTableBody>

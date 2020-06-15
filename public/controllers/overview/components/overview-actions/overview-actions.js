@@ -11,22 +11,26 @@
  */
 import React, { Component } from 'react';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+import store from '../../../../redux/store';
+import { connect } from 'react-redux';
+import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+
 
 import {
   EuiFlexItem,
-  EuiKeyPadMenu,
-  EuiKeyPadMenuItem,
+  EuiButtonIcon,
   EuiIcon,
   EuiOverlayMask,
   EuiModal,
   EuiModalHeader,
   EuiModalHeaderTitle,
   EuiModalBody,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiToolTip,
 } from '@elastic/eui';
 import './agents-selector.less';
 import { AgentSelectionTable } from './agents-selection-table';
-export class OverviewActions extends Component {
+class OverviewActions extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -165,10 +169,10 @@ export class OverviewActions extends Component {
   removeAgentsFilter(shouldUpdate = true) {
     //this.props.buildOverview();
     if (shouldUpdate) {
-      this.closeAgentModal();
       this.props.setAgent(false);
       this.setState({ isAgent: false });
       this.props.setAgent(false);
+      this.closeAgentModal();
     }
     const currentAppliedFilters = this.state.filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {
@@ -180,11 +184,20 @@ export class OverviewActions extends Component {
   }
 
   componentDidMount() {
+    const agentId = store.getState().appStateReducers.currentAgentData.id;
     const { filterManager } = getServices();
 
     this.setState({ filterManager: filterManager }, () => {
       if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter])
+      if (agentId) this.agentTableSearch([agentId])
     });
+  }
+
+  componentDidUpdate(){
+    const agent = store.getState().appStateReducers.currentAgentData;
+    if(this.state.isAgent && !agent.id){
+      this.setState({isAgent: false})
+    }
   }
 
   componentWillUnmount() {
@@ -206,6 +219,7 @@ export class OverviewActions extends Component {
 
   closeAgentModal() {
     this.setState({ isAgentModalVisible: false });
+    store.dispatch(showExploreAgentModal(false));
   }
 
   showAgentModal() {
@@ -222,7 +236,6 @@ export class OverviewActions extends Component {
 
   agentTableSearch(agentIdList) {
     this.props.setAgent(agentIdList);
-    this.closeAgentModal();
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
         const filter = {
@@ -243,8 +256,7 @@ export class OverviewActions extends Component {
               }
             }
           },
-          "$state": { "store": "appState" },
-          "isImplicit": true
+          "$state": { "store": "appState", "isImplicit": true},
         };
         this.state.filterManager.addFilters(filter);
       } else if (agentIdList.length > 1) {
@@ -262,14 +274,13 @@ export class OverviewActions extends Component {
             "index": "wazuh-alerts-3.x-*"
           },
           "query": { "bool": { "minimum_should_match": 1, "should": agentsListFormatted } },
-          "$state": { "store": "appState" }, 
-          "isImplicit": true
+          "$state": { "store": "appState", "isImplicit": true }
         };
         this.state.filterManager.addFilters(filter);
       }
     }
 
-    this.setState({ isAgent: agentIdList });
+    this.setState({ isAgent: agentIdList }, () => this.closeAgentModal());
   }
 
   getSelectedAgents() {
@@ -281,16 +292,16 @@ export class OverviewActions extends Component {
   render() {
     let modal;
 
-    if (this.state.isAgentModalVisible) {
+    if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask>
+        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
           <EuiModal
-            maxWidth="800px"
+            className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}
             initialFocus="[name=popswitch]"
           >
             <EuiModalHeader>
-              <EuiModalHeaderTitle>Filter dashboards by agent</EuiModalHeaderTitle>
+              <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
             </EuiModalHeader>
 
             <EuiModalBody>
@@ -304,28 +315,41 @@ export class OverviewActions extends Component {
         </EuiOverlayMask>
       );
     }
+    const agent = store.getState().appStateReducers.currentAgentData;
     return (
-      <div >
+      <div>
         <EuiFlexItem>
           {!this.state.isAgent && (
-           <span>
-            <EuiIcon type="watchesApp" color="primary" />
-            <EuiButtonEmpty
-              isLoading={this.state.loadingReport}
-              color='primary'
-              onClick={() => this.showAgentModal()}>
-              Filter by agent
+            <EuiToolTip position='bottom' content='Select an agent to explore its modules' >
+              <EuiButtonEmpty
+                isLoading={this.state.loadingReport}
+                color='primary'
+                onClick={() => this.showAgentModal()}>
+                <EuiIcon type="watchesApp" color="primary" style={{ marginBottom: 3 }} />&nbsp; Explore agent
             </EuiButtonEmpty>
-           </span> 
+            </EuiToolTip>
           )}
           {this.state.isAgent && (
-            <EuiButtonEmpty
-              iconType="watchesApp"
-              color='primary'
-              isLoading={this.state.loadingReport}
-              onClick={() => this.showAgentModal()}>
-              Filtered by {this.state.isAgent.length || ''} {this.state.isAgent.length > 1 ? ' agents' : 'agent'}
-            </EuiButtonEmpty>
+            <div style={{ display: "inline-flex" }}>
+              <EuiToolTip position='bottom' content='Change agent selected' >
+                <EuiButtonEmpty
+                  style={{background: 'rgba(0, 107, 180, 0.1)'}}
+                  isLoading={this.state.loadingReport}
+                  onClick={() => this.showAgentModal()}>
+                  {agent.name} ({agent.id})
+                  </EuiButtonEmpty>
+              </EuiToolTip>
+              <EuiToolTip position='bottom' content='Unpin agent'>
+                <EuiButtonIcon
+                  className="wz-unpin-agent"
+                  iconType='pinFilled'
+                  onClick={() => {
+                    this.removeAgentsFilter();
+                    store.dispatch(updateCurrentAgentData({}));
+                  }}
+                  aria-label='Unpin agent' />
+              </EuiToolTip>
+            </div>
           )}
         </EuiFlexItem>
         {modal}
@@ -333,3 +357,11 @@ export class OverviewActions extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    state: state.appStateReducers,
+  };
+};
+
+export default connect(mapStateToProps, null)(OverviewActions);

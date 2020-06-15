@@ -35,6 +35,8 @@ import { CheckUpgrade } from './checkUpgrade';
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
+import { AppNavigate } from '../../../react-services/app-navigate';
+import { AgentGroupTruncate } from '../../../components/common/util';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -133,6 +135,13 @@ export class AgentsTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
+    if(this.props.filters && this.props.filters.length){
+      this.setState({selectedOptions: this.props.filters, 
+        q:`${this.props.filters[0].group}=${ this.props.filters[0].label_}`,
+        isProcessing: true,
+        isLoading: false});
+      this.props.removeFilters()
+    }
     if (this.state.isProcessing) {
       const { q, search } = this.state;
       const { q: prevQ, search: prevSearch } = prevState;
@@ -239,7 +248,7 @@ export class AgentsTable extends Component {
       return date !== undefined ? timeService(date) : '-';
     };
     const agentVersion =
-      agent.version !== undefined ? agent.version.split(' ')[1] : '.';
+      agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
     return {
       id: agent.id,
@@ -258,9 +267,9 @@ export class AgentsTable extends Component {
 
   actionButtonsRender(agent) {
     return (
-      <div>
+      <div className={'icon-box-action'}>
         <EuiToolTip
-          content="Open Overview panel for this agent"
+          content="Open summary panel for this agent"
           position="left"
         >
           <EuiButtonIcon
@@ -270,21 +279,23 @@ export class AgentsTable extends Component {
             }}
             iconType="eye"
             color={'primary'}
-            aria-label="Open Overview panel for this agent"
+            aria-label="Open summary panel for this agent"
           />
         </EuiToolTip>
         &nbsp;
-        <EuiToolTip content="Open configuration for this agent" position="left">
-          <EuiButtonIcon
-            onClick={ev => {
-              ev.stopPropagation();
-              this.props.clickAction(agent, 'configuration');
-            }}
-            color={'primary'}
-            iconType="wrench"
-            aria-label="Open configuration for this agent"
-          />
-        </EuiToolTip>
+        {agent.status !== 'Never connected' && 
+          <EuiToolTip content="Open configuration for this agent" position="left">
+            <EuiButtonIcon
+              onClick={ev => {
+                ev.stopPropagation();
+                this.props.clickAction(agent, 'configuration');
+              }}
+              color={'primary'}
+              iconType="wrench"
+              aria-label="Open configuration for this agent"
+            />
+          </EuiToolTip>
+        }
       </div>
     );
   }
@@ -314,7 +325,7 @@ export class AgentsTable extends Component {
           className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
           aria-hidden="true"
         ></i>{' '}
-        {os_name === '--' ? '-' : os_name}
+        {os_name === '- -' ? '-' : os_name}
       </span>
     );
   }
@@ -330,7 +341,7 @@ export class AgentsTable extends Component {
       }
     };
 
-    return <EuiHealth color={color(status)}>{status}</EuiHealth>;
+    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status}</span></EuiHealth>;
   }
 
   reloadAgent = () => {
@@ -717,37 +728,42 @@ export class AgentsTable extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '65px'
+        width: '6%'
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
+        width: '15%',
         truncateText: true
       },
       {
         field: 'ip',
         name: 'IP',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
       {
         field: 'group',
         name: 'Group(s)',
+        width: '20%',
         truncateText: true,
-        sortable: true
+        sortable: true,
+        render: groups => groups !== '-' ? this.renderGroups(groups) : '-'
       },
       {
         field: 'os_name',
         name: 'OS',
         sortable: true,
+        width: '15%',
         truncateText: true,
         render: this.addIconPlatformRender
       },
       {
         field: 'version',
         name: 'Version',
-        width: '100px',
+        width: '5%',
         truncateText: true,
         sortable: true
         /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
@@ -755,12 +771,14 @@ export class AgentsTable extends Component {
       {
         field: 'dateAdd',
         name: 'Registration date',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
@@ -769,11 +787,12 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
+        width: '15%',
         render: this.addHealthStatusRender
       },
       {
         align: 'right',
-        width: '100px',
+        width: '5%',
         field: 'actions',
         name: 'Actions',
         render: agent => this.actionButtonsRender(agent)
@@ -791,7 +810,7 @@ export class AgentsTable extends Component {
               <EuiFlexItem>
                 {!!this.state.totalItems && (
                   <EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
-                    <h2>{this.state.totalItems} Agents</h2>
+                    <h2>Agents ({this.state.totalItems})</h2>
                   </EuiTitle>
                 )}
               </EuiFlexItem>
@@ -896,7 +915,7 @@ export class AgentsTable extends Component {
         return {
           label: platform,
           group: 'osplatform',
-          query: `os.name=${platform}`
+          query: `os.platform=${platform}`
         };
       });
     return {
@@ -1012,8 +1031,9 @@ export class AgentsTable extends Component {
 
     const getCellProps = item => {
       return {
-        onClick: () => this.props.clickAction(item)
-      };
+        onMouseDown: (ev) => {
+          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
+      }
     };
 
     const {
@@ -1067,6 +1087,12 @@ export class AgentsTable extends Component {
         </EuiFlexItem>
       </EuiFlexGroup>
     );
+  }
+
+  renderGroups(groups) {
+    return(
+      <AgentGroupTruncate groups={groups} length={25} label={'more'}/> 
+    )
   }
 
   render() {

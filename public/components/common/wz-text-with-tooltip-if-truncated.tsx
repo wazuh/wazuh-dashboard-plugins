@@ -52,7 +52,9 @@ export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithT
       clone.style.visibility = "hidden";
       clone.style.maxWidth = "none";
       // Insert clone in DOM appending as sibling of reference to measure both
-      reference.parentNode.appendChild(clone);
+      // reference.parentNode.appendChild(clone);
+      // Insert clone in DOM as body child
+      document.body.appendChild(clone);
       // Compare widths
       if (reference.offsetWidth < clone.offsetWidth) {
         // Set withTooltip to true to render truncated element with a tooltip
@@ -72,6 +74,7 @@ export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithT
         style={{
             display: "block",
             overflow: "hidden",
+            paddingBottom: "3px",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             ...this.props.elementStyle

@@ -33,6 +33,7 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { toastNotifications } from 'ui/notify';
+import 'brace/theme/textmate';
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -45,7 +46,7 @@ class WzGroupsEditor extends Component {
       enableLiveAutocompletion: true
     };
     this.groupsHandler = GroupsHandler;
-    const { fileContent, adminMode } = this.props.state;
+    const { fileContent } = this.props.state;
 
     const { name, content, isEditable, groupName } = fileContent;
 
@@ -55,7 +56,6 @@ class WzGroupsEditor extends Component {
       content,
       name,
       isEditable,
-      adminMode,
       groupName: groupName
     };
   }
@@ -83,7 +83,7 @@ class WzGroupsEditor extends Component {
    * @param {String} name
    */
   async save(name) {
-    const { adminMode } = this.props.state;
+    const { adminMode } = this.props;
 
     if (!this._isMounted || !adminMode) {
       return;
@@ -127,7 +127,8 @@ class WzGroupsEditor extends Component {
   };
 
   render() {
-    const { name, content, isEditable, groupName, adminMode } = this.state;
+    const { name, content, isEditable, groupName } = this.state;
+    const { adminMode } = this.props;
 
     const saveButton = (
       <EuiButton
@@ -150,7 +151,7 @@ class WzGroupsEditor extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>
+                    <span style={{ fontSize: '22px' }}>
                       <EuiToolTip position="right" content={`Back to groups`}>
                         <EuiButtonIcon
                           aria-label="Back"
@@ -160,8 +161,8 @@ class WzGroupsEditor extends Component {
                           onClick={() => this.props.cleanFileContent()}
                         />
                       </EuiToolTip>
-                      <b>{name}</b> of <b>{groupName}</b> group
-                    </h2>
+                      {name} <span style={{ color: 'grey'}}>of</span> {groupName} <span style={{ color: 'grey'}}>group</span>
+                    </span>
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem />
@@ -176,6 +177,7 @@ class WzGroupsEditor extends Component {
                     <EuiFlexItem className="codeEditorWrapper">
                       {(isEditable && (
                         <EuiCodeEditor
+                          theme="textmate"
                           width="100%"
                           height="calc(100vh - 175px)"
                           value={content}
@@ -212,7 +214,8 @@ class WzGroupsEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

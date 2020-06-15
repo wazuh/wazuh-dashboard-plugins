@@ -25,7 +25,7 @@ export abstract class BaseHandler {
     return [];
   };
 
-  async buildSuggestValues(inputValue:string):Promise<suggestItem[]> {
+  async buildSuggestValues(inputValue:string, value:string=''):Promise<suggestItem[]> {
     return [];
   }
 
@@ -51,17 +51,13 @@ export abstract class BaseHandler {
     return true;
   }
 
-  onItemClick(item:suggestItem, inputValue:string, filters:object):{
-    inputValue:string, filters:object
-  } { return {inputValue, filters}; }
+  onItemClick(item:suggestItem, inputValue:string, filters:object):void {}
 
   onInputChange(inputValue:string, currentFilters:object):{
     isInvalid: boolean, filters: object
   } { return {isInvalid:true, filters:{}} }
 
-  onKeyPress(inputValue:string, currentFilters:object):{
-    inputValue:string, filters: object
-  } { return {inputValue, filters: {}}; }
+  onKeyPress(inputValue:string, currentFilters:object):void {}
 
   mapSuggestFields(item): suggestItem {
     const suggestItem = {

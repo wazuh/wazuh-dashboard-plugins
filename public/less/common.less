@@ -421,7 +421,9 @@ md-content.md-default-theme, md-content{
 .wz-border-0 {
   border: 0px;
 }
-
+.table{
+  margin: 0 !important;
+}
 .wz-md-tab .md-tab,
 .wz-md-tab .md-active {
   color: black !important;
@@ -1360,6 +1362,12 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
   overflow-y: scroll;
 }
 
+div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu-popover {
+  overflow-y: unset;
+  padding-right: 0;
+}
+
+
 .euiSuggestItem .euiSuggestItem__label {
   flex-basis: 25%;
   min-width: 25%;
@@ -1397,4 +1405,99 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
 
 .euiCodeBlock.euiCodeBlock-isFullScreen .euiCodeBlock__controls{
   padding-right: 16px;
+}
+
+.globalFilterGroup__wrapper{
+  max-height: 100px;
+  height: auto!important;
+}
+
+.agent-selection-table-loading::before{
+  position: absolute;
+  content: '';
+  margin-left: 24px;
+  width: 100%;
+  height: 2px;
+  background-color: #006BB4;
+  -webkit-animation: euiBasicTableLoading 1000ms linear;
+  animation: euiBasicTableLoading 1000ms linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+.wz-menu-agent-info {
+  background-color: #fafbfd;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  border-bottom: 1px solid #d3dae6;
+  height: 54px;
+  margin-top: 0px;
+}
+
+.wz-select-agent-modal {
+  max-width: 60vw;
+}
+
+.wz-markdown-wapper code {
+  color: #1c2226;
+  background-color: #e6e6e6;
+  border-radius: 3px;
+  font-family: courier, monospace;
+  padding: 0 3px;
+}
+
+@media (max-width: 1300px) {
+  .wz-select-agent-modal {
+    max-width: 80vw;
+  }
+}
+
+@media (min-width: 1600px) {
+  .agents-evolution-visualization{
+    width: 35vw;
+  }
+}
+
+@media (max-width: 1599px) {
+  .agents-evolution-visualization{
+    width: 30vw;
+  }
+}
+
+
+@media (max-width: 1439px) {
+  .agents-evolution-visualization{
+    width: 25vw;
+  }
+}
+
+@media only screen and (max-width: 1200px){
+  .agents-evolution-visualization-group{
+    flex-wrap: wrap;
+  }
+  .agents-evolution-visualization{
+    width: 92vw;
+  }
+  .agents-status-pie{
+    flex-grow: 1 !important;
+  }
+}
+
+.chrHeaderWrapper--navIsLocked ~ .app-wrapper .wz-module-header-agent-wrapper {
+  padding-left: 240px;
+}
+
+.chrHeaderWrapper--navIsLocked ~ .app-wrapper .wz-module-header-nav-wrapper {
+  padding-left: 240px;
+}
+
+.icon-box-action {
+  display: flex;
+}
+
+@media only screen and (max-width: 1200px) {
+  .hide-agent-status {
+    display: none;
+  }
 }

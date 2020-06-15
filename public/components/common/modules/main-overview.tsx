@@ -18,16 +18,24 @@ import {
   EuiButtonIcon,
   EuiTitle,
   EuiPopover,
+  EuiBadge,
+  EuiPopoverTitle
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
 import { ReportingService } from '../../../react-services/reporting';
+import { AppNavigate } from '../../../react-services/app-navigate';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
-import { OverviewActions } from '../../../controllers/overview/components/overview-actions/overview-actions';
+import OverviewActions from '../../../controllers/overview/components/overview-actions/overview-actions';
+import { MainFim } from '../../agents/fim';
+
+import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import { ComplianceTable } from '../../overview/compliance-table';
 
 export class MainModuleOverview extends Component {
   constructor(props) {
@@ -40,14 +48,26 @@ export class MainModuleOverview extends Component {
     };
   }
 
+  getBadgeColor(agentStatus){
+    if (agentStatus.toLowerCase() === 'active') { return 'secondary'; }
+    else if (agentStatus.toLowerCase() === 'disconnected') { return '#BD271E'; }
+    else if (agentStatus.toLowerCase() === 'never connected') { return 'default'; }
+  }
+
   setGlobalBreadcrumb() {
+    const currentAgent = store.getState().appStateReducers.currentAgentData;
     if (TabDescription[this.props.currentTab]) {
       let breadcrumb = [
         {
           text: '',
         },
         {
-          text: 'Overview',
+          text: currentAgent.id ? (<span>Modules
+            <EuiBadge
+            onMouseDown={(ev) =>  {AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": currentAgent.id  } )}}
+            color={this.getBadgeColor(currentAgent.status)}>
+          {currentAgent.id}
+        </EuiBadge></span> ) : 'Modules',
           href: "#/overview"
         },
         {
@@ -63,6 +83,16 @@ export class MainModuleOverview extends Component {
   }
 
   async componentDidMount() {
+    const tabView = AppNavigate.getUrlParameter('tabView');
+    const tab = AppNavigate.getUrlParameter('tab');
+    if(tabView && tabView !== this.props.selectView){
+      if(tabView === 'panels' && tab=== 'sca' ){ // SCA initial tab is inventory
+        this.props.onSelectedTabChanged('inventory');
+      }else{
+        this.props.onSelectedTabChanged(tabView);
+      }
+    }
+    
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
     this.setGlobalBreadcrumb();
@@ -87,12 +117,14 @@ export class MainModuleOverview extends Component {
                       style={{marginTop: 3}}
                       color='primary'
                       aria-label='Open/close'
-                      onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}>
-                    </EuiButtonIcon>
+                      onClick={() => { this.setState({ isDescPopoverOpen: !this.state.isDescPopoverOpen }) }}
+                    />
                   }
+                  anchorPosition="rightUp"
                   isOpen={this.state.isDescPopoverOpen}
                   closePopover={() => { this.setState({ isDescPopoverOpen: false }) }}>
-                  <div style={{ width: '300px' }}>
+                  <EuiPopoverTitle>Module description</EuiPopoverTitle>
+                  <div style={{ width: '400px' }}>
                     {TabDescription[this.props.section].description}
                   </div>
                 </EuiPopover>
@@ -122,8 +154,10 @@ export class MainModuleOverview extends Component {
                 <div className="wz-welcome-page-agent-tabs">
                   <EuiFlexGroup>
                     {this.props.renderTabs()}
-                    <EuiFlexItem grow={false} style={{ marginTop: 6 }}>
-                      <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
+                    <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
+                      <WzReduxProvider>
+                        <OverviewActions {...{ ...this.props, ...this.props.agentsSelectionProps }} />
+                      </WzReduxProvider>
                     </EuiFlexItem>
                     {(selectView === 'dashboard') &&
                       this.props.renderReportButton()
@@ -155,7 +189,11 @@ export class MainModuleOverview extends Component {
 
 
           {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
+          {section === 'fim' && <MainFim {...this.props} />}
+          {section === 'sca' && <MainSca {...this.props} />}
+          
           {section === 'mitre' && selectView === 'inventory' && <MainMitre {...this.props} />}
+          {(section === 'pci' || section === 'gdpr' || section === 'hipaa'|| section === 'nist' || section === 'tsc' )&& selectView === 'inventory' && <ComplianceTable {...this.props} goToDiscover={(id) => this.props.onSelectedTabChanged(id)} />}
           {/* -------------------------------------------------------------------------- */}
         </Fragment>
       </div>

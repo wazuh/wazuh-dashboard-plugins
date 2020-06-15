@@ -73,15 +73,7 @@ export class MainModuleAgent extends Component {
           text: 'Agents',
           href: "#/agents-preview"
         },
-        {
-          text: this.props.agent.id,
-          onClick: () => {
-            window.location.href = `#/agents?agent=${this.props.agent.id}`;
-            this.router.reload();
-          },
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false,
-        },
+        { agent: this.props.agent },
         {
           text: TabDescription[this.props.section].title,
           className: 'wz-global-breadcrumb-popover'
@@ -89,6 +81,7 @@ export class MainModuleAgent extends Component {
       ];
     }
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    $('#breadcrumbNoTitle').attr("title","");
   }
 
   async componentDidMount() {
@@ -144,7 +137,7 @@ export class MainModuleAgent extends Component {
               <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
             </EuiFlexItem> */}
             <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-              {this.props.section && (
+              {/* {this.props.section && (
                 <Fragment>
                   <EuiPopover
                     button={
@@ -191,7 +184,7 @@ export class MainModuleAgent extends Component {
                     </div>
                   </EuiPopover>
                 </Fragment>
-              )}
+              )} */}
             </EuiFlexItem>
             <EuiFlexItem />
 
@@ -205,7 +198,7 @@ export class MainModuleAgent extends Component {
     return (
       <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
         <EuiButtonEmpty
-          fill={this.state.selectView === 'settings'}
+          fill={this.state.selectView === 'settings' || undefined}
           iconType="wrench"
           onClick={() => this.onSelectedTabChanged('settings')}>
           Configuration
@@ -233,7 +226,7 @@ export class MainModuleAgent extends Component {
                     !this.props.tabs || !this.props.tabs.length ?
                       "wz-welcome-page-agent-info" :
                       "wz-welcome-page-agent-info wz-welcome-page-agent-info-gray"}>
-                    <AgentInfo agent={this.props.agent} hideActions={true} {...this.props}></AgentInfo>
+                    <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
                   </div>
                 }
                 {(this.props.tabs && this.props.tabs.length) &&

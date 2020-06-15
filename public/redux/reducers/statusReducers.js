@@ -11,7 +11,6 @@
  */
 
 const initialState = {
-  adminMode: true,
   isLoading: false,
   listNodes: [],
   selectedNode: null,
@@ -27,12 +26,6 @@ const statusReducers = (state = initialState, action) => {
     return {
       ...state,
       isLoading: action.status
-    };
-  }
-  if (action.type === 'UPDATE_ADMIN_MODE') {
-    return {
-      ...state,
-      adminMode: action.status
     };
   }
   if (action.type === 'UPDATE_LIST_NODES') {

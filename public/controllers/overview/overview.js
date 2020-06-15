@@ -18,8 +18,9 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { TabVisualizations } from '../../factories/tab-visualizations';
-import { updateCurrentTab } from '../../redux/actions/appStateActions';
+import { updateCurrentTab, updateCurrentAgentData} from '../../redux/actions/appStateActions';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
+import { WzRequest } from '../../react-services/wz-request';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
 
@@ -41,9 +42,11 @@ export class OverviewController {
     errorHandler,
     commonData,
     reportingService,
-    visFactoryService
+    visFactoryService,
+    $route
   ) {
     this.$scope = $scope;
+    this.$route = $route;
     this.$location = $location;
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
@@ -55,6 +58,7 @@ export class OverviewController {
     this.wazuhConfig = new WazuhConfig();
     this.visFactoryService = VisFactoryHandler;
     this.rawVisualizations = new RawVisualizations();
+    this.wzReq = (...args) => WzRequest.apiReq(...args);
   }
 
   /**
@@ -109,18 +113,9 @@ export class OverviewController {
       currentTab: this.tab
     };
 
-    //check if we need to load an agent filter
-    const agent = this.$location.search().agentId;
-    if(agent){
-      this.$location.search('agentId', null);
-      this.initialFilter = agent;
-    }
 
 
     this.agentsSelectionProps = {
-      switchDiscover: tab => {
-        this.switchSubtab(tab);
-      },
       tab: this.tab,
       initialFilter: this.initialFilter,
       subtab: this.subtab,
@@ -147,6 +142,16 @@ export class OverviewController {
       return {...this.visualizeProps, resultState};
     }
 
+    //check if we need to load an agent filter
+    const agent = this.$location.search().agentId;
+    if(agent && store.getState().appStateReducers.currentAgentData.id !== agent){
+        const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
+        const formattedData = data.data.data.items[0];
+        store.dispatch(updateCurrentAgentData(formattedData));
+      //this.$route.reload();
+      //this.$location.search('agentId', null);
+    }
+    setTimeout(() => { this.$location.search('agentId', null); }, 1);
     
   }
 
@@ -176,7 +181,7 @@ export class OverviewController {
         false,
         this.tabView === 'discover'
       ); 
-    }else if(!agentList ){ //&& this.rawVisualizations.getType() !== 'general'){
+    }else if(!agentList && this.tab !== 'welcome'){ //&& this.rawVisualizations.getType() !== 'general'){ // this.tab !== 'welcome' prevents to load visualization in Overview welcome
       this.$rootScope.resultState = "Fetching dashboard data...";
       await this.visFactoryService.buildOverviewVisualizations(
         this.filterHandler,
@@ -204,12 +209,12 @@ export class OverviewController {
       };
 
       this.tabView = this.commonData.checkTabViewLocation();
-      if (subtab === 'panels' && this.tab !== 'welcome') {
+      if ( this.tab !== 'welcome') {
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
           this.tab,
           subtab,
-          this.tabView === 'discover'
+          false
         );
          this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {
@@ -267,7 +272,12 @@ export class OverviewController {
       this.$location.search('tab', newTab);
       this.tab = newTab;
       if(!this.initialFilter) this.updateSelectedAgents(false);
-      await this.switchSubtab('panels', true);
+      const tabView = this.$location.search().tabView;
+      if(tabView){
+        await this.switchSubtab(tabView, true);
+      }else{
+        await this.switchSubtab('panels', true);
+      }
       this.overviewModuleReady = true;
     } catch (error) {
       this.errorHandler.handle(error.message || error);
@@ -341,6 +351,7 @@ export class OverviewController {
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
+      store.dispatch(updateCurrentTab(this.tab));
       store.dispatch(updateCurrentTab(this.tab));
 
       this.$scope.$on('sendVisDataRows', (ev, param) => {

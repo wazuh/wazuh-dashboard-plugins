@@ -44,7 +44,7 @@ import { ICustomBadges } from '../../wz-search-bar/components';
 export class Inventory extends Component {
   _isMount = false;
   state: {
-    filters: {}
+    filters: []
     selectedTabId: 'files' | 'registry'
     totalItemsFile: number
     totalItemsRegistry: number
@@ -57,7 +57,7 @@ export class Inventory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: {},
+      filters: [],
       syscheck: [],
       selectedTabId: 'files',
       totalItemsFile: 0,
@@ -71,7 +71,7 @@ export class Inventory extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const { agentPlatform } = this.props.agent;
+    const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
     const {totalItemsFile, syscheck} = await this.getItemNumber('file');
     const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
     if (this._isMount){
@@ -100,7 +100,8 @@ export class Inventory extends Component {
         disabled: false,
       },
     ]
-    this.props.agent.os.platform === 'windows' ? auxTabs.push(
+    const platform = (this.props.agent.os || {}).platform || "other";
+     platform  === 'windows' ? auxTabs.push(
       {
         id: 'registry',
         name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
@@ -236,7 +237,7 @@ export class Inventory extends Component {
   }
 
   renderTable() {
-    const { filters, syscheck, selectedTabId, customBadges } = this.state;
+    const { filters, syscheck, selectedTabId, customBadges, totalItemsRegistry, totalItemsFile } = this.state;
     return (
       <div>
         <FilterBar
@@ -254,6 +255,7 @@ export class Inventory extends Component {
             customBadges={customBadges}
             items={syscheck}
             onFilterSelect={this.onFilterSelect}
+            totalItems={totalItemsFile}
             onChangeCustomBadges={this.onChangeCustomBadges} />
         }
         {selectedTabId === 'registry' &&
@@ -262,6 +264,7 @@ export class Inventory extends Component {
             customBadges={customBadges}
             filters={filters}
             onFilterSelect={this.onFilterSelect}
+            totalItems={totalItemsRegistry}
             onChangeCustomBadges={this.onChangeCustomBadges} />
         }
       </div>

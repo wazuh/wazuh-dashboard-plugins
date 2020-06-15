@@ -34,9 +34,8 @@ import DateMatch from '@elastic/datemath';
 
 import {
   TimeRange,
-  Query,
-  esFilters
-} from '../../../../../../src/plugins/data/public';
+  Query
+} from '../../../../../../src/plugins/data/common';
 
 export interface ITactic {
   [key:string]: string[]
@@ -61,7 +60,7 @@ export class Mitre extends Component {
     selectedTactics: Object,
     filterParams: IFilterParams,
     query: Query,
-    searchBarFilters: esFilters.Filter[],
+    searchBarFilters: [],
   } 
 
   props: any;
@@ -77,7 +76,7 @@ export class Mitre extends Component {
       filterParams: {
         filters: [],
         query: { language: 'kuery', query: '' },
-        time: {from: 'now/d', to: 'now/d'},
+        time: {from: 'init', to: 'init'},
       },
       dateRange: this.timefilter.getTime(),
       query: { language: "kuery", query: "" },
@@ -92,13 +91,23 @@ export class Mitre extends Component {
   onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
     const { dateRange, query } = payload;
     this.timefilter.setTime(dateRange);
-    this.setState({ dateRange, query });
+    const filterParams = {};
+    filterParams["time"] = dateRange;
+    filterParams["query"] = query; 
+    filterParams["filters"] = this.state.filterParams["filters"]; 
+    this.setState({ dateRange, query, filterParams });
   }
 
-  onFiltersUpdated = (filters: esFilters.Filter[]) => {
+  onFiltersUpdated = (filters: []) => {
     this.filterManager.setFilters(filters);
-    this.setState({ searchBarFilters: filters });
+    const filterParams = {};
+    filterParams["time"] = this.state.filterParams["time"];
+    filterParams["query"] = this.state.filterParams["query"];
+    filterParams["filters"] =  filters; 
+    this.setState({ searchBarFilters: filters, filterParams });
   }
+
+
 
 
   async componentDidMount(){
@@ -124,6 +133,14 @@ export class Mitre extends Component {
 
   getSearchBar() {
     const { filterManager, KibanaServices } = this;
+    if (JSON.stringify(filterManager.filters) !== JSON.stringify(this.state.filterParams.filters || JSON.stringify(this.state.dateRange) !== JSON.stringify(this.state.filterParams.time))){
+      const filterParams = {};
+      filterParams["filters"] = filterManager.filters
+      filterParams["query"] = this.state.filterParams.query
+      filterParams["time"] = this.state.dateRange
+      this.setState({filterParams})
+    }
+
     const storage = {
       ...window.localStorage,
       get: (key) => JSON.parse(window.localStorage.getItem(key) || '{}'),
@@ -205,24 +222,25 @@ export class Mitre extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {this.getSearchBar()}
-            
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer />
+
         <EuiFlexGroup style={{margin: 8}}>
           <EuiFlexItem>
             <EuiPanel paddingSize="none">
-              {!!Object.keys(tacticsObject).length && 
-                <EuiFlexGroup style={{maxHeight: 550}}>
-                  <EuiFlexItem grow={false} style={{width: "15%"}}>
+              {!!Object.keys(tacticsObject).length && this.state.filterParams.time.from !== "init" && 
+                <EuiFlexGroup >
+                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 280px)",overflowX: "hidden"}}>
                     <Tactics 
                       indexPattern={this.indexPattern}
                       onChangeSelectedTactics={this.onChangeSelectedTactics}
+                      filters={this.state.filterParams}
                       {...this.state} />
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <Techniques
                       indexPattern={this.indexPattern}
+                      filters={this.state.filterParams}
                       onSelectedTabChanged={(id) => this.props.onSelectedTabChanged(id)}
                       {...this.state} />
                   </EuiFlexItem>

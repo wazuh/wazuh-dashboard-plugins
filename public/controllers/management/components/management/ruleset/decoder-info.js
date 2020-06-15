@@ -252,7 +252,7 @@ class WzDecoderInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiTitle>
-                  <h2>
+                  <span style={{ fontSize: '22px' }}>
                     <EuiToolTip position="right" content="Back to decoders">
                       <EuiButtonIcon
                         aria-label="Back"
@@ -263,7 +263,7 @@ class WzDecoderInfo extends Component {
                       />
                     </EuiToolTip>
                     {name}
-                  </h2>
+                  </span>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>

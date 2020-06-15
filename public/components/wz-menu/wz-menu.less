@@ -42,7 +42,7 @@ wz-menu {
 
 .wz-menu-left-side{
     width: 200px;
-    background: #f5f7fa;
+    background: #fafbfd;
     padding: 16px;
     border-right: 1px solid #d3dae6;
 }
@@ -66,7 +66,8 @@ wz-menu {
 .wz-menu-sections {
     margin: -16px;
     padding: 16px 0;
-    background: #fafbfd;
+    position: relative;
+    min-height: 300px;
 }
 
 .wz-menu-selectors {
@@ -79,8 +80,8 @@ wz-menu {
 }
 
 .wz-menu-right-side{
-    padding: 16px;
-    max-width: 650px;
+    padding: 0;
+    max-width: 700px;
 }
 
 .navBarLogo {
@@ -92,9 +93,26 @@ wz-menu {
     position: fixed;
     top: 56px !important;
     left: 48px !important;
-    z-index: 8!important;
     border-radius: 0px 0px 4px 0px;
     max-height: unset!important;
+    border-right: none!important;
+}
+
+.wz-menu-popover-over .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after {
+    border-bottom: 12px solid #fafbfd!important;
+}
+
+.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after, 
+.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:before {
+    display: none;
+}
+
+.wz-menu-popover.wz-menu-popover-over{
+    z-index: 11!important;
+}
+
+.wz-menu-popover.wz-menu-popover-under{
+    z-index: 8!important;
 }
 
 @media only screen and (max-width: 767px){
@@ -189,7 +207,7 @@ wz-menu {
     background-color: #e7eaf1!important;
 }
 .wz-menu-button:not([disabled]):hover {
-    background-color: #e7eaf1;
+    background-color: #f5f7fa;
     text-decoration: none;
 }
 
@@ -228,6 +246,10 @@ wz-menu {
     width: 16px !important;
     height: 16px !important;
     margin-right: 6px;
+}
+
+.WzManagementSideMenu{
+    padding: 16px;
 }
 
 .WzManagementSideMenu span {

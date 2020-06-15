@@ -161,10 +161,10 @@ class WzStatusActionButtons extends Component {
       isLoading,
       listNodes,
       selectedNode,
-      adminMode,
       clusterEnabled,
       isRestarting
     } = this.props.state;
+    const { adminMode } = this.props;
 
     let options = this.transforToOptions(listNodes);
 
@@ -235,7 +235,8 @@ class WzStatusActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

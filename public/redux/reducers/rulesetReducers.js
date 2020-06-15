@@ -12,11 +12,10 @@
 
 const initialState = {
   addingRulesetFile: false,
-  adminMode: true,
   decoderInfo: false,
   error: false,
   fileContent: false,
-  filters: {},
+  filters: [],
   isLoading: false,
   isProcessing: false,
   itemList: [],
@@ -37,7 +36,7 @@ const rulesetReducers = (state = initialState, action) => {
     case 'CLEAN_CONTENT':
       return Object.assign({}, state, { fileContent: false, error: false });
     case 'CLEAN_FILTERS':
-      return Object.assign({}, state, { filters: {} });
+      return Object.assign({}, state, { filters: [] });
     case 'CLEAN_INFO':
       return Object.assign({}, state, {
         decoderInfo: false,
@@ -59,8 +58,6 @@ const rulesetReducers = (state = initialState, action) => {
         addingRulesetFile: action.content,
         error: false
       });
-    case 'UPDATE_ADMIN_MODE':
-      return Object.assign({}, state, { adminMode: action.status });
     case 'UPDATE_DECODER_INFO':
       return Object.assign({}, state, {
         decoderInfo: action.info,

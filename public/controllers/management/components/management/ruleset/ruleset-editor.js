@@ -17,6 +17,7 @@ import {
   updateFileContent
 } from '../../../../../redux/actions/rulesetActions';
 
+import 'brace/theme/textmate';
 // Eui components
 import {
   EuiPage,
@@ -155,10 +156,10 @@ class WzRulesetEditor extends Component {
   render() {
     const {
       section,
-      adminMode,
       addingRulesetFile,
       fileContent
     } = this.props.state;
+    const { adminMode } = this.props;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
     const isEditable = addingRulesetFile
@@ -218,7 +219,7 @@ class WzRulesetEditor extends Component {
                     </EuiFlexGroup>
                   )) || (
                     <EuiTitle>
-                      <h2>
+                      <span style={{ fontSize: '22px' }}>
                         <EuiToolTip
                           position="right"
                           content={`Back to ${section}`}
@@ -232,7 +233,7 @@ class WzRulesetEditor extends Component {
                           />
                         </EuiToolTip>
                         {nameForSaving}
-                      </h2>
+                      </span>
                     </EuiTitle>
                   )}
                 </EuiFlexItem>
@@ -258,6 +259,7 @@ class WzRulesetEditor extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem className="codeEditorWrapper">
                       <EuiCodeEditor
+                        theme="textmate"
                         width="100%"
                         height={`calc(100vh - ${showWarningRestart || wazuhNotReadyYet ? 250 : 175}px)`}
                         value={content}
@@ -285,7 +287,8 @@ class WzRulesetEditor extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

@@ -15,11 +15,11 @@ import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { npSetup } from 'ui/new_platform';
 import { AppState } from '../../../../react-services/app-state';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { Query, esFilters, TimeRange, esQuery, } from '../../../../../../../src/plugins/data/public';
+import { Query, TimeRange, buildRangeFilter, buildEsQuery, getEsQueryConfig } from '../../../../../../../src/plugins/data/common';
 import { SearchParams, SearchResponse } from 'elasticsearch';
 
 export interface IFilterParams {
-  filters: esFilters.Filter[]
+  filters: []
   query: Query
   time: TimeRange
 }
@@ -62,15 +62,15 @@ export async function getElasticAlerts(indexPattern, filterParams:IFilterParams,
 
 function buildQuery(indexPattern, filterParams:IFilterParams) {
   const { filters, query, time } = filterParams;
-  const timeFilter = esFilters.buildRangeFilter(
+  const timeFilter = buildRangeFilter(
     {name: 'timestamp', type: 'date'}, 
     time,
     indexPattern
   );
-  return esQuery.buildEsQuery(
+  return buildEsQuery(
     undefined,
     query,
     [...filters, timeFilter],
-    esQuery.getEsQueryConfig(npSetup.core.uiSettings) 
+    getEsQueryConfig(npSetup.core.uiSettings) 
   );
 }

@@ -13,6 +13,7 @@ import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
 import { ShareAgent } from '../factories/share-agent';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
+import rison from 'rison-node';
 
 export class CommonData {
   /**
@@ -23,7 +24,7 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window) {
+  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window, $route) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
@@ -33,8 +34,8 @@ export class CommonData {
     this.globalState = globalState;
     this.savedTimefilter = null;
     this.$window = $window;
+    this.$route = $route;
     this.refreshInterval = { pause: true, value: 0 };
-
     this.overviewTabs = {
       hostMonitoringTabs: ['general', 'fim', 'aws', 'gcp'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
@@ -188,12 +189,13 @@ export class CommonData {
       if (match && match[0]) {
         const id = match[0].split('=')[1];
         let filter = filterHandler.ruleIdQuery(id);
-        filter.isImplicit = false;
+        filter.$state.isImplicit = false;
         filters.push(filter);
         this.$window.location.href = this.$window.location.href.replace(regex, '');
       }
 
       if (agent) filters.push(filterHandler.agentQuery(agent));
+      filters.push(...this.addWazuhParamFilters());
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
@@ -203,6 +205,34 @@ export class CommonData {
         true
       );
     }
+  }
+
+  removeParam(key, sourceURL) {
+    var rtn = sourceURL.split("?")[0],
+        param,
+        params_arr = [],
+        queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+    if (queryString !== "") {
+        params_arr = queryString.split("&");
+        for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+            param = params_arr[i].split("=")[0];
+            if (param === key) {
+                params_arr.splice(i, 1);
+            }
+        }
+        rtn = rtn + "?" + params_arr.join("&");
+    }
+    return rtn;
+}
+  /**
+    Find the `_w` parameter in the url and return a list of filters if it exists
+   */
+  addWazuhParamFilters() {
+    const { _w } = this.$route.current.params;
+    if (!_w) return [];
+    const { filters } = rison.decode(_w);
+    window.location.href = this.removeParam('_w', window.location.href)
+    return filters || [];
   }
 
   /**

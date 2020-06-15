@@ -16,7 +16,8 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiBasicTable,
-  Direction,
+  EuiOverlayMask,
+  Direction
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -27,13 +28,13 @@ import { ICustomBadges } from '../../../wz-search-bar/components';
 export class RegistryTable extends Component {
   state: {
     syscheck: [],
-    pageIndex: number,
-    pageSize: number,
-    totalItems: number,
-    sortField: string,
+    pageIndex: number
+    pageSize: number
+    totalItems: number
+    sortField: string
     isFlyoutVisible: Boolean
-    sortDirection: Direction,
-    isLoading: boolean,
+    sortDirection: Direction
+    isLoading: boolean
     currentFile: {
       file: string
     }
@@ -42,6 +43,7 @@ export class RegistryTable extends Component {
   props!: {
     filters: {}
     customBadges: ICustomBadges[]
+    totalItems: number
   }
 
   constructor(props) {
@@ -66,6 +68,7 @@ export class RegistryTable extends Component {
     await this.getSyscheck();
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
+    this.setState({totalItems: this.props.totalItems});
     if (match && match[0]) {
       const file = match[0].split('=')[1];
       this.showFlyout(decodeURIComponent(file), true);
@@ -229,15 +232,19 @@ export class RegistryTable extends Component {
     return (
       <div>
         {registryTable}
-        {this.state.isFlyoutVisible &&
-          <FlyoutDetail
+        {this.state.isFlyoutVisible && (
+          <EuiOverlayMask
+            onClick={(e: Event) => e.target.className === 'euiOverlayMask' && this.closeFlyout()}
+          >
+            <FlyoutDetail
             fileName={this.state.currentFile.file}
             agentId={this.props.agent.id}
             closeFlyout={() => this.closeFlyout()}
             type='registry'
             view='inventory'
             {...this.props} />
-        }
+          </EuiOverlayMask>
+        )}
       </div>
     )
   }

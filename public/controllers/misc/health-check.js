@@ -101,6 +101,15 @@ export class HealthCheck {
         let patternData = await SavedObject.existsIndexPattern(patternId);
         if(!patternData) patternData = {};  
         patternTitle = patternData.title;
+        /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-3.x-*.
+           Currently is not possible to change that index pattern as it has always been created on our backend.
+           This extra check checks if the index pattern exists for the current logged in user
+           in case it doesn't exist, the index pattern is automatically created. This is necessary to make it work with Opendistro multinenancy
+           as every index pattern is stored in its current tenant .kibana-tenant-XX index. 
+           */
+          try{
+              await SavedObject.existsMonitoringIndexPattern('wazuh-monitoring-3.x-*'); //this checks if it exists, if not it automatically creates the index pattern
+          }catch(err){}
         if (!patternData.status) {
           const patternList = await PatternHandler.getPatternList();
           if (patternList.length) {

@@ -42,10 +42,12 @@ import {
   IIndexPattern,
   TimeRange,
   Query,
-  esFilters,
-  esQuery,
+  buildPhraseFilter,
+  getEsQueryConfig,
+  buildEsQuery,
   IFieldType
-} from '../../../../../../../src/plugins/data/public';
+} from '../../../../../../../src/plugins/data/common';
+import '../../../../components/agents/fim/inventory/inventory.less';
 
 export class Discover extends Component {
   _isMount!: boolean;
@@ -72,7 +74,6 @@ export class Discover extends Component {
     itemIdToExpandedRowMap: any,
     dateRange: TimeRange,
     query: Query,
-    searchBarFilters: esFilters.Filter[],
     elasticQuery: object
     filters: [],
     columns: string[],
@@ -83,7 +84,9 @@ export class Discover extends Component {
     implicitFilters: object[],
     initialFilters: object[],
     type: any,
-    updateTotalHits: Function
+    updateTotalHits: Function,
+    includeFilters: string,
+    initialColumns: string[]
   }
   constructor(props) {
     super(props);
@@ -115,8 +118,10 @@ export class Discover extends Component {
     this.nameEquivalences = {
       "syscheck.event": "Action",
       "rule.id": "Rule ID",
-      "rule.description": "Rule description",
-      "rule.level": "Rule level"
+      "rule.description": "Description",
+      "rule.level": "Level",
+      "rule.mitre.id": "Technique(s)",
+      "rule.mitre.tactics": "Tactic(s)",
     }
 
     this.hideCreateCustomLabel.bind(this);
@@ -136,7 +141,7 @@ export class Discover extends Component {
   async componentDidMount () {
     this._isMount = true;
     try {
-      this.setState({columns: ["icon", "timestamp", 'syscheck.event', 'rule.description', 'rule.level', 'rule.id']}) //initial columns
+      this.setState({columns: this.props.initialColumns}) //initial columns
       await this.getIndexPattern(); 
       this.getAlerts();
     } catch (err) {
@@ -165,7 +170,9 @@ export class Discover extends Component {
     Object.keys(this.indexPattern.fields).forEach(item => {
       if (isNaN(item)) { 
         fields.push(this.indexPattern.fields[item]);
-      } else if (this.indexPattern.fields[item].name.includes('syscheck')) {
+      } else if(this.props.includeFilters && this.indexPattern.fields[item].name.includes(this.props.includeFilters)){
+        fields.unshift(this.indexPattern.fields[item]);
+      }else {
         fields.push(this.indexPattern.fields[item]);
       }
     })
@@ -219,11 +226,11 @@ export class Discover extends Component {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
     const { searchBarFilters, query } = this.state;
     const elasticQuery =
-      esQuery.buildEsQuery(
+      buildEsQuery(
         undefined,
         query,
         searchBarFilters,
-        esQuery.getEsQueryConfig(npSetup.core.uiSettings)
+        getEsQueryConfig(npSetup.core.uiSettings)
       );
     const pattern = AppState.getCurrentPattern();
     const { filters, sortField, sortDirection } = this.state;
@@ -240,7 +247,10 @@ export class Discover extends Component {
       const newFilters = this.buildFilter();
     try{
       if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters) && !this.state.isLoading) {
-        this.setState({ isLoading: true })
+        if(newFilters.offset === this.state.requestFilters.offset) // we only reset pageIndex to 0 if the requestFilters has changed but the offset is the same
+          this.setState({ isLoading: true, pageIndex:0 });
+        else
+          this.setState({ isLoading: true});
         const alerts = await GenericRequest.request(
           'POST',
           `/elastic/alerts`,
@@ -382,7 +392,7 @@ export class Discover extends Component {
     const valuesArray = Array.isArray(value) ? [...value] : [value];
     const filters = this.state.searchBarFilters;
     valuesArray.map((item) => {
-      const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
+      const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
       formattedFilter.meta.negate = true;
 
       filters.push(formattedFilter);
@@ -402,7 +412,7 @@ export class Discover extends Component {
     const valuesArray = Array.isArray(value) ? [...value] : [value];
     const filters = this.state.searchBarFilters;
     valuesArray.map((item) => {
-      const formattedFilter = esFilters.buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
+      const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
 
       filters.push(formattedFilter);
     })
@@ -417,7 +427,7 @@ export class Discover extends Component {
     this.setState({ dateRange, query });
   }
 
-  onFiltersUpdated = (filters: esFilters.Filter[]) => {
+  onFiltersUpdated = (filters: []) => {
     this.filterManager.setFilters(filters);
     this.setState({ searchBarFilters: filters });
   }

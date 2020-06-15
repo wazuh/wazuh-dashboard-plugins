@@ -29,6 +29,8 @@ import {
   cleanFilters
 } from '../../../../../redux/actions/rulesetActions';
 
+import WzTextWithTooltipTruncated from '../../../../../components/common/wz-text-with-tooltip-if-truncated';
+
 class WzRuleInfo extends Component {
   constructor(props) {
     super(props);
@@ -258,6 +260,28 @@ class WzRuleInfo extends Component {
     );
   }
 
+  getFormattedDetails(value){
+
+    if(Array.isArray(value) && value[0].type){
+      let link = "";
+      let name = "";
+
+      value.forEach(item => {
+        if(item.type === 'cve')
+          name = item.name;
+        if(item.type === 'link')
+          link = <a href={item.name} target="_blank">{item.name}</a>
+      })
+      return <span>{name}: {link}</span>
+    }else{
+      return (
+        <WzTextWithTooltipTruncated position='top'>
+          {value}
+        </WzTextWithTooltipTruncated>
+      );
+    }
+  }
+
   /**
    * Render a list with the details
    * @param {Array} details
@@ -265,10 +289,11 @@ class WzRuleInfo extends Component {
   renderDetails(details) {
     const detailsToRender = [];
     const capitalize = str => str[0].toUpperCase() + str.slice(1);
-    Object.keys(details).forEach((key) => {
+    // Exclude group key of details
+    Object.keys(details).filter(key => key !== 'group').forEach((key) => {
       detailsToRender.push(
         <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : details[key]}
+          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
         </EuiFlexItem>
       );
     });
@@ -410,7 +435,7 @@ class WzRuleInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle>
-                  <h2>
+                  <span style={{ fontSize: '22px' }}>
                     <EuiToolTip position="right" content="Back to rules">
                       <EuiButtonIcon
                         aria-label="Back"
@@ -424,7 +449,7 @@ class WzRuleInfo extends Component {
                       />
                     </EuiToolTip>
                     {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description)}} />}
-                  </h2>
+                  </span>
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>

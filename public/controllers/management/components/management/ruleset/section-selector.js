@@ -18,10 +18,13 @@ import {
   updateLoadingStatus,
   toggleShowFiles,
   cleanFilters,
-  updateAdminMode,
   updateError,
   updateIsProcessing
 } from '../../../../redux/actions/rulesetActions';
+
+import {
+  updateAdminMode
+} from '../../../../redux/actions/appStateActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
 import checkAdminMode from './utils/check-admin-mode';

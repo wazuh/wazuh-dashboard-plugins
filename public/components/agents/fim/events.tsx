@@ -23,6 +23,7 @@ export class EventsFim extends Component {
     currentFile: string,
     fetchStatus: 'loading' | 'complete',
     rows: number,
+    rowsLimit: number,
     rowsList: Array<any>
   };
   props!: {
@@ -38,6 +39,7 @@ export class EventsFim extends Component {
       currentFile: '',
       fetchStatus: 'loading',
       rows: 0,
+      rowsLimit: 0,
       rowsList: []
     };
     this.modulesHelper = ModulesHelper;
@@ -53,9 +55,16 @@ export class EventsFim extends Component {
         if (fetchStatus !== scope.fetchStatus) {
           const rows = scope.fetchStatus === 'complete' ? scope.rows.length : 0;
           const rowsList = scope.fetchStatus === 'complete' ? scope.rows : [];
-          this._isMount && this.setState({ fetchStatus: scope.fetchStatus, rows , rowsList})
+          this._isMount && this.setState({ fetchStatus: scope.fetchStatus, rows, rowsList })
         }
       });
+      this.getRowsInterval = setInterval(() => {
+      const elements = document.querySelectorAll('.kbnDocTable__row');
+      if ((elements || []).length != this.state.rowsLimit) {
+        this._isMount && this.setState({ rowsLimit: (elements || []).length })
+        this.getRowsField();
+      }
+    }, 1000);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -81,6 +90,7 @@ export class EventsFim extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
+    clearInterval(this.getRowsInterval);
     if (this.fetchWatch) this.fetchWatch();
   }
 
@@ -121,12 +131,13 @@ export class EventsFim extends Component {
         elements.forEach((element, idx) => {
           const text = element.textContent;
           if (idx % 2) {
-            element.childNodes.forEach( (child) => {
+            element.childNodes.forEach((child) => {
               if (child.nodeName === 'SPAN') {
                 const link = document.createElement('a')
                 link.setAttribute('href', `#/manager/rules?tab=rules&redirectRule=${text}`)
-                link.setAttribute('target', '_blank')
-                link.setAttribute('style', 'minWidth: 55, display: "block"');
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noreferrer');
+                link.setAttribute('style', 'min-width: 75px; display: block;');
                 link.textContent = text;
                 child.replaceWith(link);
                 isClearable = false;
@@ -136,8 +147,8 @@ export class EventsFim extends Component {
             element.childNodes.forEach((child) => {
               if (child.nodeName === 'SPAN') {
                 const link = document.createElement('a')
-                const agentId = ((((this.state.rowsList || [])[idx/2] || {})._source || {}).agent || {}).id || 0;
-                link.onclick = () => this.showFlyout(text,agentId);
+                const agentId = ((((this.state.rowsList || [])[idx / 2] || {})._source || {}).agent || {}).id || 0;
+                link.onclick = () => this.showFlyout(text, agentId);
                 link.textContent = text;
                 child.replaceWith(link);
                 isClearable = false;
@@ -155,7 +166,7 @@ export class EventsFim extends Component {
     if (file !== " - " && !window.location.href.includes('&file=')) {
       window.location.href = window.location.href += `&file=${file}`;
       //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-      this.setState({ isFlyoutVisible: true, currentFile: file, currentAgent:agentId });
+      this.setState({ isFlyoutVisible: true, currentFile: file, currentAgent: agentId });
     }
   }
 
@@ -166,7 +177,7 @@ export class EventsFim extends Component {
   render() {
     return (
       this.state.isFlyoutVisible &&
-      <EuiOverlayMask 
+      <EuiOverlayMask
         // @ts-ignore
         onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
         <FlyoutDetail

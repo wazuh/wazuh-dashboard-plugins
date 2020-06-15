@@ -71,7 +71,7 @@ export class ApiTable extends Component {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code;
           const downReason =
-            ((error || {}).data || {}).message || 'Wazuh is not reachable';
+            ((error || {}).data || {}).message || error || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
         }
@@ -110,7 +110,7 @@ export class ApiTable extends Component {
       } catch (error) {
         const code = ((error || {}).data || {}).code;
         const downReason =
-          ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          ((error || {}).data || {}).message || error || 'Wazuh is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
         entries[idx].status = { status, downReason };
       }

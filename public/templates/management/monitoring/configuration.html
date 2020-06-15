@@ -18,8 +18,7 @@
                 ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered}">
                 <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Top 5
                     nodes</span>
-                <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-monitoring-Overview-Node-Pie'"
-                    id="Wazuh-App-Cluster-monitoring-Overview-Node-Pie"></kbn-vis>
+                    <react-component style="height: 100%;"name="KibanaVisualization" props="{visId: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie', tab: 'monitoring'}"></react-component>
                 <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered">There are no results for selected
                     time
                     range. Try another one.</span>

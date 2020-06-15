@@ -126,6 +126,7 @@ export class SettingsController {
       { id: 'about', name: 'About' }
     ];
     if (this.admin) {
+      tabs.splice(1, 0, { id: 'sample_data', name: 'Sample data' });
       tabs.splice(1, 0, { id: 'modules', name: 'Modules' });
     }
     this.settingsTabsProps = {
@@ -187,7 +188,7 @@ export class SettingsController {
         } catch (error) {
           const code = ((error || {}).data || {}).code;
           const downReason =
-            ((error || {}).data || {}).message || 'Wazuh is not reachable';
+            ((error || {}).data || {}).message || error || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;

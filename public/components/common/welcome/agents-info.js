@@ -16,7 +16,7 @@ import {
   EuiStat,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiHealth
+  EuiBadge
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 
@@ -86,13 +86,32 @@ export class AgentInfo extends Component {
   addHealthRender(agent) {
     // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
     return (
-      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: 3, fontSize: '12px'}}>
+      <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ fontSize: '12px' }}>
         <span className="euiFlexItem euiFlexItem--flexGrowZero">
           <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(this.props.agent.status)}`} focusable="false" role="img" aria-hidden="true">
             <circle cx="8" cy="8" r="4"></circle>
           </svg>
         </span>
         <span className="euiFlexItem euiFlexItem--flexGrowZero">{this.props.agent.status}</span>
+      </span>
+    )
+  }
+
+  addGroupsRender(agent) {
+    // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
+    return (
+      <span>
+        {
+          agent.group.map((group, key) => (
+            <EuiBadge
+              color={'hollow'}
+              key={`agent-group-${key}`}
+              onClickAriaLabel={`agent-group-${group}`}
+              onClick={() => this.props.goGroups(this.props.agent, key)}>
+              {group}
+            </EuiBadge>
+          ))
+        }
       </span>
     )
   }
@@ -106,22 +125,17 @@ export class AgentInfo extends Component {
         <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
             title={
-              item.description === 'Operating system' ? (
+              item.description === 'Groups' ? (
+                this.addGroupsRender(this.props.agent)
+              ) : item.description === 'Operating system' ? (
                 this.addTextPlatformRender(this.props.agent)
               ) : item.description === 'Status' ? (
                 this.addHealthRender(this.props.agent)
               ) : (
-                    <span
-                      style={{
-                        overflow: 'hidden',
-                        maxWidth: "250px",
-                        margin: '0 auto',
-                        fontSize: 12
-                      }}
-                    >
-                      {checkField(item.title)}
-                    </span>
-                  )
+                      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
+                        {checkField(item.title)}
+                      </WzTextWithTooltipIfTruncated>
+                    )
             }
             description={item.description}
             titleSize="xs"
@@ -134,19 +148,38 @@ export class AgentInfo extends Component {
 
   render() {
     const { agent } = this.props;
-    const stats = this.buildStats([
-      { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
-      { title: agent.status, description: 'Status', style: { maxWidth: 200 } },
-      { title: agent.ip, description: 'IP' },
-      { title: agent.version, description: 'Version' },
-      {
-        title: agent.name,
-        description: 'Operating system',
-        style: { minWidth: 300 }
-      },
-      { title: agent.dateAdd, description: 'Registration date' },
-      { title: agent.lastKeepAlive, description: 'Last keep alive' }
-    ]);
+
+    let arrayStats;
+
+    if (this.props.isCondensed) {
+      arrayStats = [
+        { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
+        { title: agent.status, description: 'Status', style: { maxWidth: 150 } },
+        { title: agent.version, description: 'Version', style: { maxWidth: 150 } },
+        {
+          title: agent.name,
+          description: 'Operating system',
+          style: { minWidth: 200, maxWidth: 200 }
+        }
+      ];
+    } else {
+      arrayStats = [
+        { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
+        { title: agent.status, description: 'Status', style: { maxWidth: 150 } },
+        { title: agent.ip, description: 'IP', style: { maxWidth: 100 } },
+        { title: agent.version, description: 'Version', style: { maxWidth: 150 } },
+        { title: agent.group, description: 'Groups' },
+        {
+          title: agent.name,
+          description: 'Operating system',
+          style: {}
+        },
+        { title: agent.dateAdd, description: 'Registration date', style: { maxWidth: 150 } },
+        { title: agent.lastKeepAlive, description: 'Last keep alive', style: { maxWidth: 150 } },
+      ];
+    }
+
+    const stats = this.buildStats(arrayStats);
 
     return (
       <Fragment>

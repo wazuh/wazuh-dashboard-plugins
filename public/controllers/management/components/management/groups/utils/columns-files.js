@@ -6,7 +6,6 @@ import beautifier from '../../../../../../utils/json-beautifier';
 export default class GroupsFilesColumns {
   constructor(tableProps) {
     this.tableProps = tableProps;
-    this.adminMode = this.tableProps.state.adminMode;
 
     const { itemDetail } = this.tableProps.state;
     this.groupsHandler = GroupsHandler;

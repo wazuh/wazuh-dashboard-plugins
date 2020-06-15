@@ -31,13 +31,6 @@ export const updateClusterNodeSelected = clusterNodeSelected => {
   };
 };
 
-export const updateAdminMode = adminMode => {
-  return {
-    type: 'UPDATE_CONFIGURATION_ADMIN_MODE',
-    adminMode
-  };
-};
-
 export const updateRefreshTime = () => {
   return {
     type: 'UPDATE_CONFIGURATION_REFRESH_TIME'

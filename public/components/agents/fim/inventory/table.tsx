@@ -22,28 +22,30 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import './inventory.less';
 import { ICustomBadges } from '../../../wz-search-bar/components';
+import { filtersToObject } from '../../../wz-search-bar';
 
 export class InventoryTable extends Component {
   state: {
-    syscheck: [],
-    pageIndex: number,
-    pageSize: number,
-    totalItems: number,
-    sortField: string,
+    syscheck: []
+    pageIndex: number
+    pageSize: number
+    totalItems: number
+    sortField: string
     isFlyoutVisible: Boolean
-    sortDirection: Direction,
-    isLoading: boolean,
+    sortDirection: Direction
+    isLoading: boolean
     currentFile: {
       file: string
     }
   };
 
   props!: {
-    filters: {},
+    filters: []
     onFilterSelect(): void
     customBadges: ICustomBadges[]
-    agent: any,
+    agent: any
     items: []
+    totalItems: number
   }
 
   constructor(props) {
@@ -67,6 +69,7 @@ export class InventoryTable extends Component {
   async componentDidMount() {
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
+    this.setState({totalItems: this.props.totalItems});
     if (match && match[0]) {
       const file = match[0].split('=')[1];
       this.showFlyout(decodeURIComponent(file), true);
@@ -97,7 +100,7 @@ export class InventoryTable extends Component {
     const { filters, customBadges } = this.props;
     if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters) 
      || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
-      this.setState({ pageIndex: 0 }, this.getSyscheck)
+      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck)
     }
   }
 
@@ -128,26 +131,15 @@ export class InventoryTable extends Component {
 
   buildFilter() {
     const { pageIndex, pageSize } = this.state;
-    const { filters, } = this.props;
+    const filters = filtersToObject(this.props.filters);
     const filter = {
       ...filters,
-      ...this.buildQFilter(),
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
       type: 'file'
     };
     return filter;
-  }
-
-  buildQFilter() {
-    const { filters, customBadges } = this.props;
-    const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
-    let qFilter = filters['q'] ? filters['q'] : '';
-    customBadges.forEach(
-      badge => badge.field === 'q' && (qFilter += badge.value) )
-    const q = qFilter.replace(/ and | or /gi, parseConjuntions)
-    return !!qFilter ? {q} : {}; 
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {

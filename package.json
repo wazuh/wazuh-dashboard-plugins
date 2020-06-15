@@ -4,7 +4,7 @@
   "revision": "0870",
   "code": "0870-0",
   "kibana": {
-    "version": "7.7.1"
+    "version": "7.7.0"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -62,7 +62,7 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "@elastic/plugin-helpers": "^7.1.8",
+    "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",
     "eslint": "^5.10.0",

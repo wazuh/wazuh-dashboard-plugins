@@ -133,6 +133,7 @@ function discoverController(
 
   //WAZUH
   wazuhApp.discoverScope = $scope;
+  wazuhApp.globalFilters = { tab: $location.search().tab };
   (async () => {
     const services = await buildServices(
       npStart.core,
@@ -502,7 +503,13 @@ function discoverController(
                 }
                 return [];
               };
-
+              ///////////////////////////////  WAZUH   ///////////////////////////////////
+              if (wazuhApp.globalFilters && wazuhApp.globalFilters.tab === $location.search().tab) {
+                wazuhApp.globalFilters = {
+                  tab: $location.search().tab,
+                  filters: (filterManager.filters || []).filter(x => x.$state.store === "globalState")
+                };
+              }
               $scope.updateDataSource().then(function () {
                 ///////////////////////////////  WAZUH   ///////////////////////////////////
                 if (!filtersAreReady()) return;
@@ -656,7 +663,15 @@ function discoverController(
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
-      setAppState({ query });
+      let q = { ...query };
+      if (query && typeof query === 'object') {
+        /// Wazuh 7.7.x          
+        if ($scope.tabView !== 'discover') {
+          q.update_Id = new Date().getTime().toString();
+        }
+        ///
+      }
+      setAppState({ query: q });
       // WAZUH  query from search bar
       discoverPendingUpdates.removeAll();
       discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);
@@ -1003,12 +1018,11 @@ function discoverController(
       });
     } else {
       wzCurrentFilters.forEach(x => {
-        if (x.isImplicit != false)
-          x.isImplicit = true
+        if (x.$state.isImplicit != false)
+          x.$state.isImplicit = true
       });
-      //const globalState = wazuhApp.$injector.get('globalState');
-      //const globalFilters = (filterManager.filters || []).filter(x => x.$state.store === "globalState");
-      const globalFilters = [];
+      wazuhApp.globalFilters.tab = tab;
+      const globalFilters = wazuhApp.globalFilters.filters || [];
       if (tab && $scope.tab !== tab) {
         filterManager.removeAll();
       }
@@ -1026,7 +1040,6 @@ function discoverController(
       $scope.$applyAsync();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.tab = parameters.tab;
-      delete (($scope.state || {}).query || {}).update_Id;
       evt.stopPropagation();
       if ($scope.tabView === 'discover') {
         $scope.rows = false;

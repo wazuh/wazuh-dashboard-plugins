@@ -15,7 +15,7 @@ import { suggestItem } from '../wz-search-bar';
 
 export interface apiSuggests {
     label: string
-    description: string
+    description?: string
     values?: [] | Function | undefined
     multiValue?: boolean
     range?: boolean

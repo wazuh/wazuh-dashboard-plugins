@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { WzSearchBar, qSuggests } from '../../../../components/wz-search-bar'
+import { WzSearchBar } from '../../../../components/wz-search-bar'
 import { getFilterValues } from './lib';
 import {
   EuiFlexGroup,
@@ -19,24 +19,25 @@ import {
 import { ICustomBadges } from '../../../wz-search-bar/components';
 
 export class FilterBar extends Component {
-  suggestions: {[key:string]: qSuggests[]} = {
+  // TODO: Change the type
+  suggestions: {[key:string]: any[]} = {
     files: [
-      {label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'file'})},
-      ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value, this.props.agent.id)}]: []),
-      {label: 'mtime', description:"Date the file was modified", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('mtime', value, this.props.agent.id)},
-      {label: 'date', description:"Date of registration of the event", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('date', value, this.props.agent.id)},
-      {label: 'uname', description:"Owner of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uname', value, this.props.agent.id)},
-      {label: 'uid', description:"Id of the onwner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uid', value, this.props.agent.id)},
-      ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'gname', description:"Name of the group owner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('gname', value, this.props.agent.id)}]: []),
-      ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'gid', description:"Id of the group owner", operators:['=','!=', '~'], values: async (value) => getFilterValues('gid', value, this.props.agent.id)}]: []),
-      {label: 'md5', description:"md5 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('md5', value, this.props.agent.id)},
-      {label: 'sha1', description:"sha1 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha1', value, this.props.agent.id)},
-      {label: 'sha256', description:"sha256 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha256', value, this.props.agent.id)},
-      ...(this.props.agent.agentPlatform !== 'windows' ? [{label: 'inode', description:"Inode of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('inode', value, this.props.agent.id)}]: []),
-      {label: 'size', description:"Size of the file in Bytes", values: value => !!value ? [value] : [0]}, // TODO: Adapt code to return and array with description
+      {type: 'q', label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'file'})},
+      ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value, this.props.agent.id)}]: []),
+      {type: 'q', label: 'mtime', description:"Date the file was modified", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('mtime', value, this.props.agent.id)},
+      {type: 'q', label: 'date', description:"Date of registration of the event", operators:['=','!=', '>', '<'], values: async (value) => getFilterValues('date', value, this.props.agent.id)},
+      {type: 'q', label: 'uname', description:"Owner of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uname', value, this.props.agent.id)},
+      {type: 'q', label: 'uid', description:"Id of the onwner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('uid', value, this.props.agent.id)},
+      ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'gname', description:"Name of the group owner file", operators:['=','!=', '~'], values: async (value) => getFilterValues('gname', value, this.props.agent.id)}]: []),
+      ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'gid', description:"Id of the group owner", operators:['=','!=', '~'], values: async (value) => getFilterValues('gid', value, this.props.agent.id)}]: []),
+      {type: 'q', label: 'md5', description:"md5 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('md5', value, this.props.agent.id)},
+      {type: 'q', label: 'sha1', description:"sha1 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha1', value, this.props.agent.id)},
+      {type: 'q', label: 'sha256', description:"sha256 hash", operators:['=','!=', '~'], values: async (value) => getFilterValues('sha256', value, this.props.agent.id)},
+      ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'inode', description:"Inode of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('inode', value, this.props.agent.id)}]: []),
+      {type: 'q', label: 'size', description:"Size of the file in Bytes", values: value => !!value ? [value] : [0]}, // TODO: Adapt code to return and array with description
     ],
     registry: [
-      {label: 'file', description:"Name of the registry", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'registry'})},
+      {type: 'q', label: 'file', description:"Name of the registry", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'registry'})},
     ]
   }
 
@@ -50,7 +51,7 @@ export class FilterBar extends Component {
     agent: {id: string, agentPlatform: string}
     onChangeCustomBadges?(customBadges: ICustomBadges[]): void 
     customBadges?: ICustomBadges[]
-    filters: {}
+    filters: {}[]
   }
 
   constructor(props) {
@@ -67,9 +68,9 @@ export class FilterBar extends Component {
         <EuiFlexItem>
           <WzSearchBar
             noDeleteFiltersOnUpdateSuggests
-            initFilters={filters}
-            onInputChange={onFiltersChange}
-            qSuggests={this.suggestions[selectView]}
+            filters={filters}
+            onFiltersChange={onFiltersChange}
+            suggestions={this.suggestions[selectView]}
             apiSuggests={null}
             defaultFormat='?Q'
             placeholder='Add filter or search'

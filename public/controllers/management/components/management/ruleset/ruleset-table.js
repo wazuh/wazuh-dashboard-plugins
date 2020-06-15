@@ -34,6 +34,7 @@ import {
 
 import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { filtersToObject } from '../../../../../components/wz-search-bar';
 
 class WzRulesetTable extends Component {
   _isMounted = false;
@@ -155,7 +156,7 @@ class WzRulesetTable extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       ...this.buildSortFilter(),
-      ...filters
+      ...filtersToObject(filters)
     };
 
     return filter;
@@ -325,7 +326,8 @@ class WzRulesetTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

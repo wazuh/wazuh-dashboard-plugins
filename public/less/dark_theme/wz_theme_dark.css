@@ -248,10 +248,6 @@ md-divider.md-default-theme, md-divider {
   border: 1px solid #343741;
 }
 
-.euiFlexGroup .euiFlexGroup:hover {
-  background: #1D1E24;
-}
-
 .wz-dev-box .CodeMirror {
   border: 1px solid #343741 !important;
 }
@@ -349,10 +345,11 @@ md-divider.md-default-theme, md-divider {
 
 .wz-menu-left-side {
   border-right: 1px solid #343741!important;
+  background-color: #1a1b20!important;
 }
 
 .wz-menu-sections {
-  background: #1a1b20!important;
+  /* background: #1a1b20!important; */
 }
 
 .wz-menu-selectors {
@@ -403,4 +400,26 @@ md-divider.md-default-theme, md-divider {
 
 svg .legend text {
   fill: white;
+}
+
+/* welcome-agent */
+
+.wz-welcome-page-agent-tabs{
+  padding: 12px 16px 1px 10px;
+  min-height: 54px;
+  border-bottom: 1px solid #343741;
+  background-color: #1d1e24;
+}
+
+.wz-module-welcome .euiPanel--paddingSmall {
+  padding: 8px;
+  overflow: hidden;
+}
+
+.wz-agents-mitre .euiFlexGroup--directionRow {
+  overflow: hidden;
+}
+
+.wz-menu-agent-info {
+  background-color: #1a1b20;
 }

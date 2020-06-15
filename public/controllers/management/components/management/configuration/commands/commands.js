@@ -57,7 +57,7 @@ class WzConfigurationCommands extends Component {
     const { currentConfig } = this.props;
     const items =
       this.wodleConfig && this.wodleConfig.length
-        ? settingsListBuilder(this.wodleConfig.map(item => item.command), 'tag')
+        ? settingsListBuilder(this.wodleConfig.map(item => item.command), ['tag','command'])
         : false;
     return (
       <Fragment>

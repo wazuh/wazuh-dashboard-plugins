@@ -21,13 +21,6 @@ export const updateLoadingStatus = loading => {
   };
 };
 
-export const updateAdminMode = status => {
-  return {
-    type: 'UPDATE_ADMIN_MODE',
-    status: status
-  };
-};
-
 export const updateListNodes = listNodes => {
   return {
     type: 'UPDATE_LIST_NODES',

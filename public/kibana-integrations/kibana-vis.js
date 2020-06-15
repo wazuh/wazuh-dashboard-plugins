@@ -186,8 +186,8 @@ class KibanaVis extends Component {
       const timeRange = this.visID === 'Wazuh-App-Overview-General-Agents-Evolution'
         ? { from: 'now-7d', to: 'now', mode: 'quick' }
         : isAgentStatus && timeFilterSeconds < 900
-        ? { from: 'now-15m', to: 'now', mode: 'quick' }
-        : timefilter.getTime();
+          ? { from: 'now-15m', to: 'now', mode: 'quick' }
+          : timefilter.getTime();
       const filters = isAgentStatus ? [] : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
 
@@ -222,10 +222,11 @@ class KibanaVis extends Component {
             vis,
             visInput
           );
-          setTimeout(async () => {
-            await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
-            this.visHandler.handler.data$.subscribe(this.renderComplete());
-          });
+          if (this.visHandler)
+            setTimeout(async () => {
+              await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
+              this.visHandler.handler.data$.subscribe(this.renderComplete());
+            });
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {

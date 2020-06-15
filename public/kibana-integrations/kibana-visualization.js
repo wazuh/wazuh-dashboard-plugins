@@ -10,13 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import $ from 'jquery';
-import { uiModules } from 'ui/modules';
 import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
-
+import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { GenericRequest } from '../react-services/generic-request';
 import { TabVisualizations } from '../factories/tab-visualizations';
@@ -52,7 +51,11 @@ app.directive('kbnVis', function() {
         chrome: npStart.core.chrome,
         overlays: npStart.core.overlays
       };
-      const savedObjectLoaderVisualize = createSavedVisLoader(services);
+      const servicesForVisualizations = {
+        ...services,
+        ...{ visualizationTypes: new TypesService().start() },
+      }
+      const savedObjectLoaderVisualize = createSavedVisLoader(servicesForVisualizations);
 
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
@@ -138,9 +141,8 @@ app.directive('kbnVis', function() {
                 visualization,
                 visInput
               );
-              visHandler
-                .render($(`[id='${$scope.visID}']`)[0])
-                .then(renderComplete);
+              await visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]);
+              visHandler.handler.data$.subscribe(renderComplete());
               visHandlers.addItem(visHandler);
 
               setSearchSource(discoverList);
