@@ -25,16 +25,21 @@ import {
   EuiContextMenu,
   EuiIcon,
   EuiOverlayMask,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiCallOut,
+  EuiProgress
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
+  timerDelaySearch: ReturnType<typeof setTimeout> | undefined;
+  delaySearchTime: number = 400; // delay time in search bar techniques to do the request. This prevents you from making a request with every change in the search term and wait this time instead after last change
 
   props!: {
     tacticsObject: ITactic
@@ -50,7 +55,9 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     currentTechniqueData: {},
     currentTechnique: string,
     hideAlerts: boolean,
-    actionsOpen: string
+    actionsOpen: string,
+    filteredTechniques: boolean | [string]
+    isSearching: boolean
   }
 
 	constructor(props) {
@@ -63,7 +70,9 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       techniquesCount: [],
       currentTechnique: '',
       hideAlerts: false,
-      actionsOpen: ""
+      actionsOpen: "",
+      filteredTechniques: false,
+      isSearching: false
     }
     this.onChangeFlyout.bind(this);
 	}
@@ -81,6 +90,9 @@ export const Techniques = withWindowSize(class Techniques extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
+    if(this.timerDelaySearch){
+      clearTimeout(this.timerDelaySearch);
+    };
   }
 
   async getTechniquesCount() {
@@ -95,7 +107,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
           }
         }
       }
-      
+      this._isMount && this.setState({loadingAlerts: true});
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
       const {data, status, statusText, } = await getElasticAlerts(indexPattern, filters, aggs);
@@ -161,28 +173,23 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   renderFacet() {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
-    const tacticsToRender: Array<any> = [];
-    const showTechniques = {};
-
-    Object.keys(tacticsObject).forEach((key, inx) => {
-      const currentTechniques = tacticsObject[key];
-      if(this.props.selectedTactics[key]){
-        currentTechniques.forEach( (technique,idx) => {
-          if(!showTechniques[technique] && (technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) || mitreTechniques[technique].name.toLowerCase().includes(this.state.searchValue.toLowerCase()) )){
-            const quantity = (techniquesCount.find(item => item.key === technique) || {}).doc_count || 0;
-            if(!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)){
-              showTechniques[technique] = true;
-              tacticsToRender.push({
-                id: technique,
-                label: `${technique} - ${mitreTechniques[technique].name}`,
-                quantity
-              })
-            }
-          }
-        });
-
-      }
-    });
+    let tacticsToRender: Array<any> = [];
+    const currentTechniques = Object.keys(tacticsObject).map(tacticsKey => ({tactic: tacticsKey, techniques: tacticsObject[tacticsKey]}))
+      .filter(tactic => this.props.selectedTactics[tactic.tactic])
+      .map(tactic => tactic.techniques)
+      .flat()
+      .filter((techniqueID, index, array) => array.indexOf(techniqueID) === index);
+    
+    tacticsToRender = currentTechniques
+      .filter(techniqueID => this.state.filteredTechniques ? this.state.filteredTechniques.includes(techniqueID) : techniqueID)
+      .map(techniqueID => {
+        return {
+          id: techniqueID,
+          label: `${techniqueID} - ${mitreTechniques[techniqueID].name}`,
+          quantity: (techniquesCount.find(item => item.key === techniqueID) || {}).doc_count || 0
+        }
+      })
+      .filter(technique => this.state.hideAlerts ? technique.quantity !== 0 : true);
 
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
       const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
@@ -237,6 +244,14 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       );
         
     })
+    if(this.state.isSearching || this.state.loadingAlerts){
+      return (
+        <Fragment>
+          <EuiSpacer />
+          <EuiProgress size="xs" color="primary" />
+        </Fragment>
+      )
+    }
     if(tacticsToRender.length){
       return (
       <EuiFlexGrid columns={this.techniqueColumnsResponsive()} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
@@ -244,7 +259,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       </EuiFlexGrid>
       )
     }else{
-      return <>No results.</>
+      return <EuiCallOut title='There are no results.' iconType='help' color='warning'></EuiCallOut>
     }
   }
 
@@ -282,8 +297,38 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     filterManager.addFilters([newFilter]);
   }
 
-  onSearchValueChange = e => {
-    this.setState({searchValue: e.target.value});
+  onSearchValueChange = async e => {
+    const searchValue = e.target.value;
+    
+    if(this.timerDelaySearch){
+      clearTimeout(this.timerDelaySearch);
+    };
+    
+    if(searchValue){
+      this.setState({searchValue});
+    }else{
+      this._isMount && this.setState({ searchValue, filteredTechniques: false, isSearching: false });
+      return;
+    }
+
+    this.timerDelaySearch = setTimeout(async () => {
+      try{
+        if(searchValue){
+          this._isMount && this.setState({isSearching: true});
+          const response = await WzRequest.apiReq('GET', '/mitre', {
+            select: "id",
+            search: searchValue,
+            limit: 500
+          });
+          const filteredTechniques = ((((response || {}).data || {}).data).items || []).map(item => item.id);
+          this._isMount && this.setState({ filteredTechniques, isSearching: false });
+        }else{
+          this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+        }
+      }catch(error){
+        this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+      }
+    }, this.delaySearchTime); // delay time in search bar techniques to do the request. This prevents you from making a request with every change in the search term and wait this time instead after last change
   }
 
   async closeActionsMenu() {
@@ -340,10 +385,11 @@ export const Techniques = withWindowSize(class Techniques extends Component {
 
         <EuiFieldSearch
           fullWidth={true}
-          placeholder="Filter techniques"
+          placeholder="Filter techniques of selected tactic/s"
           value={this.state.searchValue}
           onChange={e => this.onSearchValueChange(e)}
           isClearable={true}
+          isLoading={this.state.isSearching}
           aria-label="Use aria labels when no actual label is in use"
         />
         <EuiSpacer size="s" />
