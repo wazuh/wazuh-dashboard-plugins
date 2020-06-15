@@ -51,7 +51,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -110,7 +110,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -158,7 +158,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -206,7 +206,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -248,7 +248,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -303,7 +303,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 600,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -351,7 +351,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -481,7 +481,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -523,7 +523,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -590,7 +590,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -628,7 +628,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -665,7 +665,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',
@@ -713,7 +713,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 570,
+        hide: true,
         vis: [
           {
             title: 'Alerts summary',

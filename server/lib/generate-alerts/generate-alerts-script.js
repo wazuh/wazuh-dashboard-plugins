@@ -271,7 +271,8 @@ function generateAlert(params) {
 
     if (params.gcp) {
         alert.rule = randomArrayItem(GCP.arrayRules);
-        alert.data = {
+        alert.data.integration = 'gcp';
+        alert.data.gcp = {
             insertId: "uk1zpe23xcj",
             jsonPayload: {
                 authAnswer: GCP.arrayAuthAnswer[Math.floor(GCP.arrayAuthAnswer.length * Math.random())],

@@ -43,11 +43,11 @@ export const EventsSelectedFiles = {
     'rule.id',
   ],
   gcp: [
-    'data.jsonPayload.vmInstanceName',
-    'data.resource.labels.location',
-    'data.resource.labels.project_id',
-    'data.resource.type',
-    'data.severity',
+    'data.gcp.jsonPayload.vmInstanceName',
+    'data.gcp.resource.labels.location',
+    'data.gcp.resource.labels.project_id',
+    'data.gcp.resource.type',
+    'data.gcp.severity',
   ],
   pm: [
     'data.title',
