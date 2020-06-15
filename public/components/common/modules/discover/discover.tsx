@@ -122,6 +122,11 @@ export class Discover extends Component {
       "rule.level": "Level",
       "rule.mitre.id": "Technique(s)",
       "rule.mitre.tactics": "Tactic(s)",
+      "rule.pci_dss": "PCI DSS",
+      "rule.gdpr": "GDPR",
+      "rule.nist_800_53": "NIST 800-53",
+      "rule.tsc": "TSC",
+      "rule.hipaa": "HIPAA",
     }
 
     this.hideCreateCustomLabel.bind(this);
@@ -510,7 +515,7 @@ export class Discover extends Component {
       totalItemCount: this.state.total,
       pageSizeOptions: [10, 25, 50],
     };
-    const noResultsText = `No results match for this ${this.props.type === 'file' ? 'file' : 'registry'} and search criteria`
+    const noResultsText = `No results match for this search criteria`
     return (
       <div
         className='wz-discover hide-filter-controll' >

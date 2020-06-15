@@ -10,8 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react'
-import { 
-
+import {
   EuiPanel,
   EuiFlexGroup,
   EuiFlexItem,
@@ -45,6 +44,8 @@ export class ComplianceTable extends Component {
   filterManager: FilterManager;
   indexPattern: any;
   state: {
+    selectedRequirement: string,
+    flyoutOn: boolean,
     dateRange: object,
     filterParams: object,
     query: object,
@@ -52,7 +53,7 @@ export class ComplianceTable extends Component {
     complianceObject: object,
     descriptions: object,
     selectedRequirements: object,
-  } 
+  }
 
   props: any;
 
@@ -62,13 +63,15 @@ export class ComplianceTable extends Component {
     this.filterManager = this.KibanaServices.filterManager;
     this.timefilter = this.KibanaServices.timefilter;
     this.state = {
+      selectedRequirement: "",
+      flyoutOn: true,
       complianceObject: {},
       descriptions: {},
       selectedRequirements: {},
       filterParams: {
         filters: [],
         query: { language: 'kuery', query: '' },
-        time: {from: 'init', to: 'init'},
+        time: { from: 'init', to: 'init' },
       },
       dateRange: this.timefilter.getTime(),
       query: { language: "kuery", query: "" },
@@ -86,32 +89,32 @@ export class ComplianceTable extends Component {
     this.buildComplianceObject();
   }
 
-  
-  buildComplianceObject(){
-    try{
+
+  buildComplianceObject() {
+    try {
       let complianceRequirements = {};
       let descriptions = {};
       let selectedRequirements = {}; // all enabled by default
-      if(this.props.section === 'pci'){
+      if (this.props.section === 'pci') {
         descriptions = pciRequirementsFile;
         Object.keys(pciRequirementsFile).forEach(item => {
           const currentRequirement = item.split(".")[0];
-          if(complianceRequirements[currentRequirement]){
+          if (complianceRequirements[currentRequirement]) {
             complianceRequirements[currentRequirement].push(item);
-          }else{
+          } else {
             selectedRequirements[currentRequirement] = true;
             complianceRequirements[currentRequirement] = [];
             complianceRequirements[currentRequirement].push(item);
           }
         }); //forEach
       }
-      if(this.props.section === 'gdpr'){
+      if (this.props.section === 'gdpr') {
         descriptions = gdprRequirementsFile;
         Object.keys(gdprRequirementsFile).forEach(item => {
           const currentRequirement = item.split("_")[0];
-          if(complianceRequirements[currentRequirement]){
+          if (complianceRequirements[currentRequirement]) {
             complianceRequirements[currentRequirement].push(item);
-          }else{
+          } else {
             selectedRequirements[currentRequirement] = true;
             complianceRequirements[currentRequirement] = [];
             complianceRequirements[currentRequirement].push(item);
@@ -119,13 +122,13 @@ export class ComplianceTable extends Component {
         }); //forEach        
       }
 
-      if(this.props.section === 'hipaa'){
+      if (this.props.section === 'hipaa') {
         descriptions = hipaaRequirementsFile;
         Object.keys(hipaaRequirementsFile).forEach(item => {
-          const currentRequirement = item.split(".")[0] +"."+item.split(".")[1]+"."+item.split(".")[2];
-          if(complianceRequirements[currentRequirement]){
+          const currentRequirement = item.split(".")[0] + "." + item.split(".")[1] + "." + item.split(".")[2];
+          if (complianceRequirements[currentRequirement]) {
             complianceRequirements[currentRequirement].push(item);
-          }else{
+          } else {
             selectedRequirements[currentRequirement] = true;
             complianceRequirements[currentRequirement] = [];
             complianceRequirements[currentRequirement].push(item);
@@ -133,26 +136,26 @@ export class ComplianceTable extends Component {
         }); //forEach        
       }
 
-      if(this.props.section === 'nist'){
+      if (this.props.section === 'nist') {
         descriptions = nistRequirementsFile;
         Object.keys(nistRequirementsFile).forEach(item => {
           const currentRequirement = item.split(".")[0];
-          if(complianceRequirements[currentRequirement]){
+          if (complianceRequirements[currentRequirement]) {
             complianceRequirements[currentRequirement].push(item);
-          }else{
+          } else {
             selectedRequirements[currentRequirement] = true;
             complianceRequirements[currentRequirement] = [];
             complianceRequirements[currentRequirement].push(item);
           }
         }); //forEach        
       }
-      if(this.props.section === 'tsc'){
+      if (this.props.section === 'tsc') {
         descriptions = tscRequirementsFile;
         Object.keys(tscRequirementsFile).forEach(item => {
           const currentRequirement = item.split(".")[0];
-          if(complianceRequirements[currentRequirement]){
+          if (complianceRequirements[currentRequirement]) {
             complianceRequirements[currentRequirement].push(item);
-          }else{
+          } else {
             selectedRequirements[currentRequirement] = true;
             complianceRequirements[currentRequirement] = [];
             complianceRequirements[currentRequirement].push(item);
@@ -160,8 +163,8 @@ export class ComplianceTable extends Component {
         }); //forEach        
       }
 
-      this._isMount && this.setState({complianceObject: complianceRequirements, selectedRequirements, descriptions}, () => this.getRequirementsCount());
-    }catch(err){
+      this._isMount && this.setState({ complianceObject: complianceRequirements, selectedRequirements, descriptions }, () => this.getRequirementsCount());
+    } catch (err) {
       // TODO ADD showToast
       /*this.showToast(
         'danger',
@@ -173,7 +176,7 @@ export class ComplianceTable extends Component {
   }
 
   onChangeSelectedRequirements = (selectedRequirements) => {
-    this.setState({selectedRequirements});
+    this.setState({ selectedRequirements });
   }
 
   onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
@@ -181,8 +184,8 @@ export class ComplianceTable extends Component {
     this.timefilter.setTime(dateRange);
     const filterParams = {};
     filterParams["time"] = dateRange;
-    filterParams["query"] = query; 
-    filterParams["filters"] = this.state.filterParams["filters"]; 
+    filterParams["query"] = query;
+    filterParams["filters"] = this.state.filterParams["filters"];
     this.setState({ dateRange, query, filterParams });
   }
 
@@ -191,20 +194,20 @@ export class ComplianceTable extends Component {
     const filterParams = {};
     filterParams["time"] = this.state.filterParams["time"];
     filterParams["query"] = this.state.filterParams["query"];
-    filterParams["filters"] =  filters; 
+    filterParams["filters"] = filters;
     this.setState({ searchBarFilters: filters, filterParams });
   }
 
 
 
-  getSearchBar(){
+  getSearchBar() {
     const { filterManager, KibanaServices } = this;
-    if (JSON.stringify(filterManager.filters) !== JSON.stringify(this.state.filterParams.filters || JSON.stringify(this.state.dateRange) !== JSON.stringify(this.state.filterParams.time))){
+    if (JSON.stringify(filterManager.filters) !== JSON.stringify(this.state.filterParams.filters || JSON.stringify(this.state.dateRange) !== JSON.stringify(this.state.filterParams.time))) {
       const filterParams = {};
       filterParams["filters"] = filterManager.filters
       filterParams["query"] = this.state.filterParams.query
       filterParams["time"] = this.state.dateRange
-      this.setState({filterParams})
+      this.setState({ filterParams })
     }
 
     const storage = {
@@ -228,13 +231,13 @@ export class ComplianceTable extends Component {
     const { dateRange, query, searchBarFilters } = this.state;
     return (
       <KibanaContextProvider services={{
-          ...KibanaServices,
-          appName: "wazuhMitre",
-          data,
-          storage,
-          http,
-          savedObjects
-        }} >
+        ...KibanaServices,
+        appName: "wazuhMitre",
+        data,
+        storage,
+        http,
+        savedObjects
+      }} >
         <I18nProvider>
           <SearchBar
             indexPatterns={[this.indexPattern]}
@@ -253,55 +256,71 @@ export class ComplianceTable extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { filterParams } = this.state;
-    if (JSON.stringify(this.state.prevFilters) !== JSON.stringify(filterParams)){
+    if (JSON.stringify(this.state.prevFilters) !== JSON.stringify(filterParams)) {
       this.getRequirementsCount();
     }
   }
 
   async getRequirementsCount() {
-    this.setState({loadingAlerts: true, prevFilters: this.state.filterParams});
-    try{
-      const { filterParams} = this.state;
-      if ( !this.indexPattern ) { return; }
+    this.setState({ loadingAlerts: true, prevFilters: this.state.filterParams });
+    try {
+      const { filterParams } = this.state;
+      if (!this.indexPattern) { return; }
       let fieldAgg = "";
-      if(this.props.section === "pci")
+      if (this.props.section === "pci")
         fieldAgg = "rule.pci_dss";
-      if(this.props.section === "gdpr")
+      if (this.props.section === "gdpr")
         fieldAgg = "rule.gdpr";
-      if(this.props.section === "hipaa")
+      if (this.props.section === "hipaa")
         fieldAgg = "rule.hipaa";
-      if(this.props.section === "nist")
-        fieldAgg = "rule.nist_800_53"; 
-      if(this.props.section === "tsc")
-        fieldAgg = "rule.tsc"; 
+      if (this.props.section === "nist")
+        fieldAgg = "rule.nist_800_53";
+      if (this.props.section === "tsc")
+        fieldAgg = "rule.tsc";
       const aggs = {
         tactics: {
           terms: {
-              field: fieldAgg, 
-              size: 100,
+            field: fieldAgg,
+            size: 100,
           }
         }
       }
-      
+
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
-      const {data, status, statusText, } = await getElasticAlerts(this.indexPattern, filterParams, aggs);
+      const { data, status, statusText, } = await getElasticAlerts(this.indexPattern, filterParams, aggs);
       const { buckets } = data.aggregations.tactics;
       /*if(firstTime){
        this.initTactics(buckets); // top tactics are checked on component mount
       }*/
-      this._isMount && this.setState({requirementsCount: buckets, loadingAlerts: false, firstTime:false});
-        
-    } catch(err){
-   /*   this.showToast(
-        'danger',
-        'Error',
-        `Mitre alerts could not be fetched: ${err}`,
-        3000
-      );*/
-      this.setState({loadingAlerts: false})
+      this._isMount && this.setState({ requirementsCount: buckets, loadingAlerts: false, firstTime: false });
+
+    } catch (err) {
+      /*   this.showToast(
+           'danger',
+           'Error',
+           `Mitre alerts could not be fetched: ${err}`,
+           3000
+         );*/
+      this.setState({ loadingAlerts: false })
     }
-    
+
+  }
+
+
+  onChangeFlyout = (flyoutOn) => {
+    this.setState({ flyoutOn });
+  }
+
+  closeFlyout() {
+    this.setState({ flyoutOn: false });
+  }
+
+  showFlyout(requirement) {
+    this.setState({
+      selectedRequirement: requirement,
+      flyoutOn: true
+    })
   }
 
 
@@ -315,33 +334,33 @@ export class ComplianceTable extends Component {
         </EuiFlexItem>
       </EuiFlexGroup>
 
-      <EuiFlexGroup style={{margin: 8}}>
+      <EuiFlexGroup style={{ margin: 8 }}>
         <EuiFlexItem>
           <EuiPanel paddingSize="none">
-              {!!Object.keys(complianceObject).length && this.state.filterParams.time.from !== "init" && 
-                <EuiFlexGroup style={{maxHeight: 390}}>
-                  <EuiFlexItem grow={false} style={{width: "15%"}}>
-                    <ComplianceRequirements 
-                      indexPattern={this.indexPattern}
-                      section={this.props.section}
-                      onChangeSelectedRequirements={this.onChangeSelectedRequirements}
-                      {...this.state} />
-                  </EuiFlexItem>
-                  <EuiFlexItem>
-                    <ComplianceSubrequirements
-                      indexPattern={this.indexPattern}
-                      filters={this.state.filterParams}
-                      section={this.props.section}
-                      onSelectedTabChanged={(id) => this.props.onSelectedTabChanged(id)}
-                      {...this.state} />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              }
+            {!!Object.keys(complianceObject).length && this.state.filterParams.time.from !== "init" &&
+              <EuiFlexGroup>
+                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, maxHeight: "calc(100vh - 300px)",overflowX: "hidden"}}>
+                  <ComplianceRequirements
+                    indexPattern={this.indexPattern}
+                    section={this.props.section}
+                    onChangeSelectedRequirements={this.onChangeSelectedRequirements}
+                    {...this.state} />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <ComplianceSubrequirements
+                    indexPattern={this.indexPattern}
+                    filters={this.state.filterParams}
+                    section={this.props.section}
+                    onSelectedTabChanged={(id) => this.props.onSelectedTabChanged(id)}
+                    {...this.state} />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            }
           </EuiPanel>
-          
+
         </EuiFlexItem>
       </EuiFlexGroup>
-     
+
     </div>
     )
   }
