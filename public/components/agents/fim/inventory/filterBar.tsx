@@ -10,17 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { WzSearchBar } from '../../../../components/wz-search-bar'
 import { getFilterValues } from './lib';
+import { WzSearchBar, IFilter, suggestItem, IWzSuggestItem } from '../../../../components/wz-search-bar'
+import { ICustomBadges } from '../../../wz-search-bar/components';
 import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import { ICustomBadges } from '../../../wz-search-bar/components';
 
 export class FilterBar extends Component {
   // TODO: Change the type
-  suggestions: {[key:string]: any[]} = {
+  suggestions: {[key:string]: IWzSuggestItem[]} = {
     files: [
       {type: 'q', label: 'file', description:"Name of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('file', value, this.props.agent.id, {type:'file'})},
       ...(((this.props.agent || {}).os || {}).platform !== 'windows' ? [{type: 'q', label: 'perm', description:"Permisions of the file", operators:['=','!=', '~'], values: async (value) => getFilterValues('perm', value, this.props.agent.id)}]: []),
@@ -41,28 +41,17 @@ export class FilterBar extends Component {
     ]
   }
 
-  state: {
-    filterBar: {}
-  }
-
   props!:{
-    onFiltersChange: Function
+    onFiltersChange(filters:IFilter[]): void
     selectView: 'files' | 'registry'
     agent: {id: string, agentPlatform: string}
     onChangeCustomBadges?(customBadges: ICustomBadges[]): void 
     customBadges?: ICustomBadges[]
-    filters: {}[]
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      filterBar: {}
-    }
+    filters: IFilter[]
   }
 
   render() {
-    const { onFiltersChange, selectView, filters, onChangeCustomBadges, customBadges } = this.props;
+    const { onFiltersChange, selectView, filters} = this.props;
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -71,11 +60,7 @@ export class FilterBar extends Component {
             filters={filters}
             onFiltersChange={onFiltersChange}
             suggestions={this.suggestions[selectView]}
-            apiSuggests={null}
-            defaultFormat='?Q'
-            placeholder='Add filter or search'
-            customBadges={customBadges}
-            onChangeCustomBadges={onChangeCustomBadges} />
+            placeholder='Add filter or search' />
         </EuiFlexItem>
       </EuiFlexGroup>
     )

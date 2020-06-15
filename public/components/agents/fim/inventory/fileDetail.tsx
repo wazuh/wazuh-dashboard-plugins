@@ -230,7 +230,7 @@ export class FileDetails extends Component {
   }
 
   addFilter(field, value) {
-    const {customBadges, onChangeCustomBadges} = this.props;
+    const {filters, onFiltersChange} = this.props;
     const newBadge:ICustomBadges = {field: 'q', value: ''}
     if (field === 'date' || field === 'mtime') {
       let value_max = new Date(value);
@@ -239,8 +239,8 @@ export class FileDetails extends Component {
     } else {
       newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;
     }
-    !customBadges.some(item => (item.field === newBadge.field && item.value === newBadge.value)) 
-      && onChangeCustomBadges([...customBadges, newBadge]);
+    !filters.some(item => (item.field === newBadge.field && item.value === newBadge.value)) 
+      && onFiltersChange([...filters, newBadge]);
     this.props.closeFlyout();
   }
 
