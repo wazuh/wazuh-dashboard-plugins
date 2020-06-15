@@ -12,6 +12,7 @@
 import React, { Component, Fragment } from 'react';
 // Eui components
 import { EuiFlexItem, EuiButtonEmpty, EuiGlobalToastList } from '@elastic/eui';
+import { toastNotifications } from 'ui/notify';
 
 import { connect } from 'react-redux';
 
@@ -49,6 +50,14 @@ class WzRulesetActionButtons extends Component {
     this.refreshTimeoutId = null;
   }
 
+  showToast(title, text, color){
+    toastNotifications.add({
+      title,
+      text,
+      color,
+      toastLifeTimeMs: 3000
+    });
+  }
   /**
    * Generates a CSV
    */
@@ -62,7 +71,7 @@ class WzRulesetActionButtons extends Component {
       })); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
       await this.exportCsv(`/${section}`, mapFilters, section);
     } catch (error) {
-      console.error('Error exporting as CSV ', error);
+      this.showToast('Error exporting as CSV', error.message || error, 'danger');
     }
     this.setState({ generatingCsv: false });
   }
