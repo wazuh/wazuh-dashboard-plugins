@@ -257,10 +257,10 @@ export class Discover extends Component {
           this.setState({ isLoading: true, pageIndex:0 });
         else
           this.setState({ isLoading: true});
-          let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
-          if(store.getState().appStateReducers.currentAgentData.id){
-            filtersReq.push({"agent.id": store.getState().appStateReducers.currentAgentData.id})
-          } 
+        let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
+        if(store.getState().appStateReducers.currentAgentData.id){
+          filtersReq.push({"agent.id": store.getState().appStateReducers.currentAgentData.id})
+        } 
 
         const alerts = await GenericRequest.request(
           'POST',
