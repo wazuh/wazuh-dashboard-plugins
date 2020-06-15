@@ -1323,7 +1323,7 @@ export class WazuhApiCtrl {
       ) {
         throw new Error('No results');
       } else {
-        throw new Error('An error occurred fetching data from the Wazuh API');
+        throw new Error(`An error occurred fetching data from the Wazuh API${output && output.body && output.body.message ? `: ${output.body.message}` : ''}`);
       }
     } catch (error) {
       log('wazuh-api:csv', error.message || error);

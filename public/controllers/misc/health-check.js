@@ -168,7 +168,7 @@ export class HealthCheck {
         }
       }
     } catch (err) {}
-    throw new Error('Error connecting to the API.');
+    throw new Error("No API available to connect.");
   }
 
   /**
@@ -213,7 +213,7 @@ export class HealthCheck {
             this.results[i].status = 'Error';
           }
         } else if (data.data.error || data.data.data.apiIsDown) {
-          this.errors.push(data.data.data.apiIsDown ? 'Wazuh API is down' : 'Error connecting to the API.');
+          this.errors.push(data.data.data.apiIsDown ? 'Wazuh API is down.' : `Error connecting to the API.${data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''}`);
           this.results[i].status = 'Error';
         } else {
           this.processedChecks++;
@@ -229,7 +229,7 @@ export class HealthCheck {
               'GET',
               '/api/setup'
             );
-            if (!setupData.data.data['app-version'] || !apiVersion) {
+            if (!setupData.data.data['app-version']) {
               const errorMessage = 'Error fetching app version';
               ErrorHandler.handle(
                 errorMessage,
