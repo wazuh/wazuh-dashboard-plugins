@@ -24,6 +24,7 @@ import { npSetup } from 'ui/new_platform';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import DateMatch from '@elastic/datemath';
 import { toastNotifications } from 'ui/notify';
+import store from '../../../../redux/store'
 
 import {
   EuiBasicTable,
@@ -256,12 +257,17 @@ export class Discover extends Component {
           this.setState({ isLoading: true, pageIndex:0 });
         else
           this.setState({ isLoading: true});
+          let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
+          if(store.getState().appStateReducers.currentAgentData.id){
+            filtersReq.push({"agent.id": store.getState().appStateReducers.currentAgentData.id})
+          } 
+
         const alerts = await GenericRequest.request(
           'POST',
           `/elastic/alerts`,
           {
             ...newFilters,
-            filters: [...newFilters['filters'], ...this.props.implicitFilters]
+            filters: filtersReq
           }
         );
         if (this._isMount) {
