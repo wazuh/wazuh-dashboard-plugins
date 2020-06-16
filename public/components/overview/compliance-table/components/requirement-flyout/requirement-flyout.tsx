@@ -28,7 +28,8 @@ import {
     EuiSpacer
 } from '@elastic/eui';
 import { Discover } from '../../../../common/modules/discover';
-import { AppState } from '../../../../../react-services/app-state'
+import { AppState } from '../../../../../react-services/app-state';
+import { requirementGoal } from '../../requirement-goal';
 
 
 
@@ -89,6 +90,8 @@ export class RequirementFlyout extends Component {
             this.props.implicitFilters.forEach(item =>
                 implicitFilters.push(item))
         }
+        //Goal for PCI
+        const currentReq = this.props.currentRequirement.split(".")[0];
 
         return (
             <EuiFlyoutBody className="flyout-body" >
@@ -103,6 +106,19 @@ export class RequirementFlyout extends Component {
                     initialIsOpen={true}>
                     <div className='flyout-row details-row'>
                         <EuiSpacer size="xs" />
+                        {requirementGoal[currentReq] && <EuiFlexGroup style={{marginBottom: 10}}>
+                            <EuiFlexItem grow={false}>
+                                <EuiIcon size="l" type={"bullseye"} color='primary' style={{marginTop: 8}} />
+                            </EuiFlexItem>
+                            <EuiFlexItem style={{marginLeft: 2}} grow={true}>
+                                <EuiText style={{marginLeft: 8, fontSize: 14}}>
+                                    <p style={{fontWeight: 500, marginBottom: 2}}>Goals</p>
+                                    
+                                    <p>{requirementGoal[currentReq]}</p>
+                                </EuiText>
+                            </EuiFlexItem>
+                        </EuiFlexGroup>}
+
                         <EuiFlexGroup>
                             <EuiFlexItem grow={false}>
                                 <EuiIcon size="l" type={"filebeatApp"} color='primary' style={{marginTop: 8}} />
