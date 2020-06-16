@@ -21,8 +21,7 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import './inventory.less';
-import { ICustomBadges } from '../../../wz-search-bar/components';
-import { filtersToObject } from '../../../wz-search-bar';
+import { filtersToObject, IFilter } from '../../../wz-search-bar';
 
 export class InventoryTable extends Component {
   state: {
@@ -40,9 +39,7 @@ export class InventoryTable extends Component {
   };
 
   props!: {
-    filters: []
-    onFilterSelect(): void
-    customBadges: ICustomBadges[]
+    filters: IFilter[]
     agent: any
     items: []
     totalItems: number
@@ -96,11 +93,10 @@ export class InventoryTable extends Component {
     this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
-  componentDidUpdate(prevProps) {
-    const { filters, customBadges } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters) 
-     || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
-      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck)
+  async componentDidUpdate(prevProps) {
+    const { filters } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck);
     }
   }
 
