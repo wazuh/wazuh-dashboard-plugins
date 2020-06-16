@@ -11,7 +11,7 @@
  */
 import React, { Component } from 'react';
 import { getFilterValues } from './lib';
-import { WzSearchBar, IFilter, suggestItem, IWzSuggestItem } from '../../../../components/wz-search-bar'
+import { WzSearchBar, IFilter, IWzSuggestItem } from '../../../../components/wz-search-bar'
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import {
   EuiFlexGroup,
