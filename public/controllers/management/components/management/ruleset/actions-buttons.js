@@ -104,7 +104,6 @@ class WzRulesetActionButtons extends Component {
             error: 0
           });
         } catch (error) {
-          console.error('ERROR FILE ONLY ONE ', error);
           errors = true;
           results.push({
             index: idx,
@@ -119,7 +118,6 @@ class WzRulesetActionButtons extends Component {
       return;
     } catch (error) {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
-      console.error('Errors uploading several files ', error);
       //TODO handle the erros
       //ErrorHandler.handle('Files cannot be uploaded');
     }
@@ -136,9 +134,7 @@ class WzRulesetActionButtons extends Component {
       this.props.updateIsProcessing(true);
       this.props.updatePageIndex(0);
       this.props.updateLoadingStatus(false);
-    } catch (error) {
-      console.error('error toggling ', error);
-    }
+    } catch (error) {};
   }
 
   /**
