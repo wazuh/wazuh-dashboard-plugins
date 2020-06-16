@@ -32,6 +32,7 @@ import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../overview/mitre/lib';
+import moment from 'moment-timezone';
 import store from '../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import rison from 'rison-node';
@@ -215,27 +216,12 @@ export class FileDetails extends Component {
 
   formatBytes(a, b = 2) { if (0 === a) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024)); return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d] }
 
-  formatDate(date) {
-    var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2)
-      month = '0' + month;
-    if (day.length < 2)
-      day = '0' + day;
-
-    return [year, month, day].join('-');
-  }
-
   addFilter(field, value) {
     const {filters, onFiltersChange} = this.props;
     const newBadge:ICustomBadges = {field: 'q', value: ''}
     if (field === 'date' || field === 'mtime') {
-      let value_max = new Date(value);
-      value_max.setDate(new Date(value).getDate() + 1);
-      newBadge.value = `${field}>${this.formatDate(value)} AND ${field}<${this.formatDate(value_max)}`;
+      let value_max = moment(value).add(1, 'day');
+      newBadge.value = `${field}>${moment(value).format('YYYY-MM-DD')} AND ${field}<${value_max.format('YYYY-MM-DD')}`;
     } else {
       newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;
     }
