@@ -15,9 +15,10 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFacetButton,
-  EuiFacetGroup
+  EuiFacetGroup,
+  EuiToolTip
 } from '@elastic/eui';
-
+import { requirementsName } from '../../requirement-name';
 
 export class ComplianceRequirements extends Component {
   _isMount = false;
@@ -67,6 +68,7 @@ export class ComplianceRequirements extends Component {
       <>
       {requirementList.sort((a, b) => b.quantity - a.quantity).map(facet => {
         let iconNode;
+        const name = requirementsName[facet.label] || `Requirement ${facet.label}`;
         return (
           <EuiFacetButton
             key={"Requirement " + facet.id}
@@ -78,7 +80,18 @@ export class ComplianceRequirements extends Component {
             onClick={
               facet.onClick ? () => facet.onClick(facet.id) : undefined
             }>
-            Requirement {facet.label}
+
+                <EuiToolTip position="top" content={name} anchorClassName="wz-display-inline-grid" >
+                  <span style={{
+                    display: "block",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis"
+                  }}>
+                    Requirement {facet.label}
+                  </span>
+                </EuiToolTip>
+            
           </EuiFacetButton>
         );
       })}
