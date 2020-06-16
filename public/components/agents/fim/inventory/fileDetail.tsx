@@ -30,11 +30,12 @@ import { Discover } from '../../../common/modules/discover'
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
-import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/public';
+import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../overview/mitre/lib';
 import store from '../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import rison from 'rison-node';
+import { AppNavigate } from '../../../../react-services/app-navigate';
 
 export class FileDetails extends Component {
 
@@ -170,28 +171,27 @@ export class FileDetails extends Component {
     ]
   }
 
-  viewInEvents = () => {
+  viewInEvents = (ev) => {
     const { file } = this.props.currentFile;
-    const { view, agent } = this.props;
+    if(this.props.view === 'extern'){
+      AppNavigate.navigateToModule(ev, 'overview', {"tab": "fim", "tabView": "events", filters: {"syscheck.path": file}  });
+    }else{
+      AppNavigate.navigateToModule(ev, 'overview', {"tab": "fim", "tabView": "events", filters: {"syscheck.path": file}  }, () => this.openEventCurrentWindow()  )
+    }
+  }
+  
+  openEventCurrentWindow(){
+    const { file } = this.props.currentFile;
     const filters = [{
       ...buildPhraseFilter(
         {name: 'syscheck.path', type: 'text'},
         file, this.indexPattern),
       "$state": { "store": "appState" }
     }];
-    if (view === 'inventory') {
-      this.props.onSelectedTabChanged('events');
-      this.checkFilterManager(filters);
-    } else if (view === 'extern') {
-      store.dispatch(updateCurrentAgentData(agent));
-      chrome.dangerouslyGetActiveInjector().then(injector => {
-        const route = injector.get('$route');
-        const params = { _w: rison.encode({filters}), tab: 'fim' };
-        const paramsEncoded = Object.entries(params).map(e => e.join('=')).join('&');
-        window.location.href = `#/overview?${paramsEncoded}`;
-        route.reload();
-      });
-    }
+
+    this.props.onSelectedTabChanged('events');
+    this.checkFilterManager(filters);
+
   }
 
   async checkFilterManager(filters) {
@@ -352,7 +352,7 @@ export class FileDetails extends Component {
                       content={inspectButtonText}>
                       <EuiIcon
                         className='euiButtonIcon euiButtonIcon--primary'
-                        onClick={this.viewInEvents}
+                        onMouseDown={(ev) => this.viewInEvents(ev)}
                         type="popout"
                         aria-label={inspectButtonText}
                       />
