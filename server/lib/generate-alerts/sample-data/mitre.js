@@ -12,7 +12,7 @@
 
 // Mitre
 export const rule = [{
-    "tactics": "Command and Control",
+    "tactic": "Command and Control",
     "id": [
       "T1001",
       "T1008",
@@ -39,7 +39,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Exfiltration",
+    "tactic": "Exfiltration",
     "id": [
       "T1002",
       "T1011",
@@ -54,7 +54,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Credential Access",
+    "tactic": "Credential Access",
     "id": [
       "T1003",
       "T1040",
@@ -82,7 +82,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Persistence",
+    "tactic": "Persistence",
     "id": [
       "T1004",
       "T1013",
@@ -150,7 +150,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Collection",
+    "tactic": "Collection",
     "id": [
       "T1005",
       "T1025",
@@ -169,7 +169,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Defense Evasion",
+    "tactic": "Defense Evasion",
     "id": [
       "T1006",
       "T1009",
@@ -247,7 +247,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Discovery",
+    "tactic": "Discovery",
     "id": [
       "T1007",
       "T1010",
@@ -277,7 +277,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Privilege Escalation",
+    "tactic": "Privilege Escalation",
     "id": [
       "T1013",
       "T1015",
@@ -314,7 +314,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Lateral Movement",
+    "tactic": "Lateral Movement",
     "id": [
       "T1017",
       "T1021",
@@ -339,7 +339,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Execution",
+    "tactic": "Execution",
     "id": [
       "T1028",
       "T1035",
@@ -378,7 +378,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Initial Access",
+    "tactic": "Initial Access",
     "id": [
       "T1078",
       "T1091",
@@ -394,7 +394,7 @@ export const rule = [{
     ]
   },
   {
-    "tactics": "Impact",
+    "tactic": "Impact",
     "id": [
       "T1485",
       "T1486",

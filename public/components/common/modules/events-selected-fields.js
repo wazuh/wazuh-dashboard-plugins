@@ -19,7 +19,7 @@ export const EventsSelectedFiles = {
   ],
   mitre: [
     'rule.mitre.id',
-    'rule.mitre.tactics',
+    'rule.mitre.tactic',
     'rule.description',
     'rule.level',
     'rule.id'

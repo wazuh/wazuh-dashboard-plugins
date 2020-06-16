@@ -121,7 +121,7 @@ export class Discover extends Component {
       "rule.description": "Description",
       "rule.level": "Level",
       "rule.mitre.id": "Technique(s)",
-      "rule.mitre.tactics": "Tactic(s)",
+      "rule.mitre.tactic": "Tactic(s)",
     }
 
     this.hideCreateCustomLabel.bind(this);
