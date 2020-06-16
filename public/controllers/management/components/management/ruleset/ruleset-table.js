@@ -127,6 +127,7 @@ class WzRulesetTable extends Component {
 
     const { items = [], totalItems = 0 } =
       ((rawItems || {}).data || {}).data || {};
+    this.props.updateTotalItems(totalItems);
     this.setState({
       items,
       totalItems,
