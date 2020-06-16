@@ -156,6 +156,7 @@ export class HealthCheck {
     try {
       const response = await GenericRequest.request('GET', '/hosts/apis');
       const hosts = response.data;
+      const errors = [];
 
       if (hosts.length) {
         for (var i = 0; i < hosts.length; i++) {
@@ -164,11 +165,18 @@ export class HealthCheck {
             if (API && API.data) {
               return hosts[i].id;
             }
-          } catch (err) {}
+          } catch (err) {
+            errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
+          }
+        }
+        if(errors.length){
+          errors.forEach(error => this.errors.push(error));
+          return Promise.reject('No API available to connect.');
         }
       }
-    } catch (err) {}
-    throw new Error("No API available to connect.");
+    } catch (err) {
+      return Promise.reject(`Error connecting to API: ${err}`);
+    }
   }
 
   /**
@@ -182,8 +190,12 @@ export class HealthCheck {
         try {
           data = await ApiCheck.checkStored(currentApi.id);
         } catch (err) {
-          const newApi = await this.trySetDefault();
-          data = await ApiCheck.checkStored(newApi, true);
+          try{
+            const newApi = await this.trySetDefault();
+            data = await ApiCheck.checkStored(newApi, true);
+          }catch(err2){
+            throw err2
+          };
         }
 
         if (((data || {}).data || {}).idChanged) {
