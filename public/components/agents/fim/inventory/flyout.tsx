@@ -63,9 +63,8 @@ export class FlyoutDetail extends Component {
         const match = window.location.href.match(regex);
         if (match && match[0]) {
           const file = match[0].split('=')[1];
-          const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: file });
+          const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {q: `file=${file}`});
           currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
-          console.log(currentFile);
         }
       } else {
         currentFile = this.props.item;
@@ -75,7 +74,7 @@ export class FlyoutDetail extends Component {
       }
       this.setState({ currentFile, type: currentFile.type, isLoading: false });
     } catch (err) {
-      this.setState({ error: `Data could not be fetched for ${this.props.fileName}` })
+      this.setState({ error: `Data could not be fetched for ${this.props.fileName}`, currentFile: {file: this.props.fileName} })
     }
   }
 
