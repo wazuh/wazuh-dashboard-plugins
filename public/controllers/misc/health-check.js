@@ -242,21 +242,11 @@ export class HealthCheck {
               '/api/setup'
             );
             if (!setupData.data.data['app-version']) {
-              const errorMessage = 'Error fetching app version';
-              ErrorHandler.handle(
-                errorMessage,
-                'Health Check'
-              );
-              this.errors.push(errorMessage);
-            }
+              this.errors.push('Error fetching app version');
+            };
             if (!apiVersion) {
-              const errorMessage = 'Error fetching Wazuh API version';
-              ErrorHandler.handle(
-                errorMessage,
-                'Health Check'
-              );
-              this.errors.push(errorMessage);
-            }
+              this.errors.push('Error fetching Wazuh API version');
+            };
             const apiSplit = apiVersion.split('v')[1].split('.');
             const appSplit = setupData.data.data['app-version'].split('.');
 
