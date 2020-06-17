@@ -11,7 +11,7 @@
  */
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
-import { WzRequest } from '../react-services/wz-request';
+import { WzRequest } from './wz-request';
 
 const delay = time => new Promise(res => setTimeout(res,time));
 let busy = false;
@@ -31,9 +31,6 @@ export class CheckDaemonsStatus {
         if (isValid) {
           const updateNotReadyYet = updateWazuhNotReadyYet(false);
           store.dispatch(updateNotReadyYet);
-
-          // this.$rootScope.wazuhNotReadyYet = false;
-          // this.$rootScope.$applyAsync();
           break;
         }
       }
@@ -43,8 +40,6 @@ export class CheckDaemonsStatus {
       }
     } catch (error) {
       store.dispatch(updateWazuhNotReadyYet('Wazuh could not be recovered.'));
-      // this.$rootScope.wazuhNotReadyYet = 'Wazuh could not be recovered.';
-      // this.$rootScope.$applyAsync();
     }
     busy = false;
   }

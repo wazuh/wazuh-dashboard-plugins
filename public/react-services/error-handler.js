@@ -13,7 +13,7 @@ import { toastNotifications } from 'ui/notify';
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
-import { CheckDaemonsStatus } from './check-demons-status';
+import { CheckDaemonsStatus } from './check-daemons-status';
 
 const wzMisc = new WzMisc();
 let history = [];
