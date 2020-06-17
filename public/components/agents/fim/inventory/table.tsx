@@ -26,6 +26,7 @@ import { filtersToObject, IFilter } from '../../../wz-search-bar';
 export class InventoryTable extends Component {
   state: {
     syscheck: []
+    error?: string
     pageIndex: number
     pageSize: number
     totalItems: number
@@ -104,19 +105,23 @@ export class InventoryTable extends Component {
 
   async getSyscheck() {
     const agentID = this.props.agent.id;
-
-    const syscheck = await WzRequest.apiReq(
+    try {
+      const syscheck = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
       this.buildFilter()
-    );
-
-    this.setState({
-      syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
-      totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
-      isLoading: false
-    });
-  }
+      );
+      
+      this.setState({
+        syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
+        totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
+        isLoading: false,
+        error: undefined
+      });
+    } catch (error) {
+      this.setState({error, isLoading: false})
+    }
+}
 
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
@@ -223,7 +228,7 @@ export class InventoryTable extends Component {
       };
     };
 
-    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading } = this.state;
+    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading, error } = this.state;
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
@@ -243,6 +248,7 @@ export class InventoryTable extends Component {
         <EuiFlexItem>
           <EuiBasicTable
             items={syscheck}
+            error={error}
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}
