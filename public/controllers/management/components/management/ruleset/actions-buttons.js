@@ -12,6 +12,7 @@
 import React, { Component, Fragment } from 'react';
 // Eui components
 import { EuiFlexItem, EuiButtonEmpty, EuiGlobalToastList } from '@elastic/eui';
+import { toastNotifications } from 'ui/notify';
 
 import { connect } from 'react-redux';
 
@@ -25,6 +26,7 @@ import {
 } from '../../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { ErrorHandler } from '../../../../../react-services/error-handler';
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
@@ -48,6 +50,14 @@ class WzRulesetActionButtons extends Component {
     this.refreshTimeoutId = null;
   }
 
+  showToast(title, text, color){
+    toastNotifications.add({
+      title,
+      text,
+      color,
+      toastLifeTimeMs: 3000
+    });
+  }
   /**
    * Generates a CSV
    */
@@ -61,7 +71,7 @@ class WzRulesetActionButtons extends Component {
       })); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
       await this.exportCsv(`/${section}`, mapFilters, section);
     } catch (error) {
-      console.error('Error exporting as CSV ', error);
+      this.showToast('Error exporting as CSV', error.message || error, 'danger');
     }
     this.setState({ generatingCsv: false });
   }
@@ -94,7 +104,6 @@ class WzRulesetActionButtons extends Component {
             error: 0
           });
         } catch (error) {
-          console.error('ERROR FILE ONLY ONE ', error);
           errors = true;
           results.push({
             index: idx,
@@ -105,13 +114,12 @@ class WzRulesetActionButtons extends Component {
         }
       }
       if (errors) throw results;
-      //this.errorHandler.info('Upload successful');
+      //ErrorHandler.info('Upload successful');
       return;
     } catch (error) {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
-      console.error('Errors uploading several files ', error);
       //TODO handle the erros
-      //this.errorHandler.handle('Files cannot be uploaded');
+      //ErrorHandler.handle('Files cannot be uploaded');
     }
   }
 
@@ -126,9 +134,7 @@ class WzRulesetActionButtons extends Component {
       this.props.updateIsProcessing(true);
       this.props.updatePageIndex(0);
       this.props.updateLoadingStatus(false);
-    } catch (error) {
-      console.error('error toggling ', error);
-    }
+    } catch (error) {};
   }
 
   /**

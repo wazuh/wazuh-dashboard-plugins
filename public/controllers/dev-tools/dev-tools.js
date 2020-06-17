@@ -22,6 +22,7 @@ import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { ApiRequest } from '../../react-services/api-request';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export class DevToolsController {
   /**
@@ -608,7 +609,7 @@ export class DevToolsController {
           'Wazuh API is not reachable. Reason: timeout.'
         );
       } else {
-        const parsedError = this.errorHandler.handle(error, null, null, true);
+        const parsedError = ErrorHandler.handle(error, '', { silent: true });
         if (typeof parsedError === 'string') {
           return this.apiOutputBox.setValue(error);
         } else if (error && error.data && typeof error.data === 'object') {
@@ -628,7 +629,7 @@ export class DevToolsController {
       });
       FileSaver.saveAs(blob, 'export.json');
     } catch (error) {
-      this.errorHandler.handle(error, 'Export JSON');
+      ErrorHandler.handle(error, 'Export JSON');
     }
   }
 }
