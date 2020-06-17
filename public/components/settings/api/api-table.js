@@ -112,7 +112,7 @@ export class ApiTable extends Component {
         const downReason = typeof error === 'string' ? error :
         (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
-        entries[idx].status = { status, downReason };
+        entries[idx].status = { status, downReason }; 
       }
       this.setState({
         apiEntries: entries
