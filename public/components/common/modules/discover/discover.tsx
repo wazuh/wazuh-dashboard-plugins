@@ -326,6 +326,7 @@ export class Discover extends Component {
         return  {
           field: 'timestamp',
           name: 'Time',
+          width: '160px',
           sortable: true,
           render: time => {
             const date = time.split('.')[0];
@@ -333,8 +334,26 @@ export class Discover extends Component {
           },
         }
       }
+      let width = false;
+      const arrayCompilance = ["rule.pci_dss", "rule.gdpr", "rule.nist_800_53", "rule.tsc", "rule.hipaa"];
 
-      return {
+      if(item === 'rule.level') {
+        width = '75px';
+      }
+      if(item === 'rule.id') {
+        width = '90px';
+      }
+      if(item === 'rule.description' && this.state.columns.indexOf('syscheck.event') === -1) {
+        width = '30%';
+      }
+      if(item === 'syscheck.event') {
+        width = '100px';
+      }
+      if(arrayCompilance.indexOf(item) !== -1) {
+        width = '150px';
+      }
+
+      let column = {
         field: item,
         name: (<span 
           onMouseEnter={() => { this.setState({hover: item}) }}
@@ -353,7 +372,11 @@ export class Discover extends Component {
         sortable: true
       }
 
+      if (width) {
+        column.width = width;
+      }
 
+      return column;
     })
     return columns;
   }
