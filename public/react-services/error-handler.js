@@ -98,7 +98,7 @@ export class ErrorHandler {
   }
 
   /**
-   * Fires a green toast (success toast) using given message
+   * Fires a yellow toast (warning toast) using given message
    * @param {string} message The message to be shown
    * @param {string} location Usually means the file where this method was called
    */
