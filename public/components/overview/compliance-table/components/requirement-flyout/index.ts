@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Compliance table component
+ * Wazuh app - Compliance flyout component
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,4 +9,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { ComplianceRequirements } from './requirements';
+export { ComplianceRequirements } from './requirement-flyout';
