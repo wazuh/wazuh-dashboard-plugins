@@ -545,7 +545,7 @@ export class AgentSelectionTable extends Component {
       const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.removeAgentsFilter(false);
+     // this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch(this.getSelectedItems());
     }else{
       this.props.removeAgentsFilter(true);      
@@ -559,7 +559,7 @@ export class AgentSelectionTable extends Component {
       const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+agentID } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.removeAgentsFilter(false);
+      //this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch([agentID]);
     }catch(error){
       this.props.removeAgentsFilter(true);      

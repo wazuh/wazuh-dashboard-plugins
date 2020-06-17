@@ -32,6 +32,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { VisHandlers } from '../../factories/vis-handlers';
+import { RawVisualizations } from '../../factories/raw-visualizations';
 
 const visHandler = new VisHandlers();
 
@@ -76,6 +77,7 @@ export class WzVisualize extends Component {
           : []
     };
     this.metricValues = false;
+    this.rawVisualizations = new RawVisualizations();
     this.wzReq = WzRequest;
     const wazuhConfig = new WazuhConfig();
     this.commonData = new CommonData();
@@ -184,7 +186,7 @@ export class WzVisualize extends Component {
   };
 
   render() {
-    this.visualizations = this.props.isAgent ? agentVisualizations : visualizations;
+    this.visualizations = this.rawVisualizations.getType() !== 'general' ? agentVisualizations : visualizations;
     const { selectedTab, cardReqs } = this.state;
     const renderVisualizations = vis => {
       return (

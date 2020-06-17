@@ -166,21 +166,30 @@ class OverviewActions extends Component {
     this.setState({ oldFilters: this.state.filterManager.filters });
   }
 
-  removeAgentsFilter(shouldUpdate = true) {
-    //this.props.buildOverview();
+  async removeAgentsFilter(shouldUpdate = true) {
+
+    await this.props.setAgent(false);
+    const currentAppliedFilters = this.state.filterManager.filters;
+    const agentFilters = currentAppliedFilters.filter(x => {
+      return x.meta.key !== 'agent.id';
+    });
+    this.state.filterManager.setFilters(agentFilters);
+   /* //this.props.buildOverview();
     if (shouldUpdate) {
       this.props.setAgent(false);
       this.setState({ isAgent: false });
       this.props.setAgent(false);
       this.closeAgentModal();
     }
+    /*
     const currentAppliedFilters = this.state.filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {
-      return x.meta.key === 'agent.id';
+      return x.meta.key !== 'agent.id';
     });
-    agentFilters.map(x => {
+    return agentFilters;
+    /*agentFilters.map(x => {
       this.state.filterManager.removeFilter(x);
-    });
+    });*/
   }
 
   componentDidMount() {
@@ -235,9 +244,12 @@ class OverviewActions extends Component {
   }
 
   agentTableSearch(agentIdList) {
-    this.props.setAgent(agentIdList);
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
+        const currentAppliedFilters = this.state.filterManager.filters;
+        const agentFilters = currentAppliedFilters.filter(x => {
+          return x.meta.key !== 'agent.id';
+        });
         const filter = {
           "meta": {
             "alias": null,
@@ -258,25 +270,9 @@ class OverviewActions extends Component {
           },
           "$state": { "store": "appState", "isImplicit": true},
         };
-        this.state.filterManager.addFilters(filter);
-      } else if (agentIdList.length > 1) {
-        const agentsListString = agentIdList.map(item => { return item.toString() })
-        const agentsListFormatted = agentIdList.map(item => { return { "match_phrase": { "agent.id": item.toString() } } })
-        const filter = {
-          "meta": {
-            "alias": null,
-            "disabled": false,
-            "key": "agent.id",
-            "negate": false,
-            "params": agentsListString,
-            "value": agentIdList.toString(),
-            "type": "phrases",
-            "index": "wazuh-alerts-3.x-*"
-          },
-          "query": { "bool": { "minimum_should_match": 1, "should": agentsListFormatted } },
-          "$state": { "store": "appState", "isImplicit": true }
-        };
-        this.state.filterManager.addFilters(filter);
+        agentFilters.push(filter);
+        this.state.filterManager.setFilters(agentFilters);
+        this.props.setAgent(agentIdList);
       }
     }
 
