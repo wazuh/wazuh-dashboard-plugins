@@ -345,15 +345,14 @@ md-divider.md-default-theme, md-divider {
 
 .wz-menu-left-side {
   border-right: 1px solid #343741!important;
-  background-color: #1a1b20!important;
+  background: #1d1e24!important;
 }
 
 .wz-menu-sections {
-  /* background: #1a1b20!important; */
+  background: #1a1b20;
 }
 
 .wz-menu-selectors {
-  background: #1d1e24!important;
   border-top: 1px solid #343741!important;
 }
 
