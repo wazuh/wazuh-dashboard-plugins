@@ -36,7 +36,8 @@ export class InventoryTable extends Component {
     isLoading: boolean
     currentFile: {
       file: string
-    }
+    },
+    syscheckItem: {}
   };
 
   props!: {
@@ -62,7 +63,8 @@ export class InventoryTable extends Component {
       isFlyoutVisible: false,
       currentFile: {
         file: ""
-      }
+      },
+      syscheckItem: {}
     }
   }
 
@@ -80,7 +82,7 @@ export class InventoryTable extends Component {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
 
-  async showFlyout(file, redirect = false) {
+  async showFlyout(file, item, redirect = false) {
     let fileData = false;
     if (!redirect) {
       fileData = this.state.syscheck.filter(item => {
@@ -93,7 +95,7 @@ export class InventoryTable extends Component {
     if (!redirect)
       window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item }));
   }
 
   componentDidUpdate(prevProps) {
@@ -221,7 +223,7 @@ export class InventoryTable extends Component {
       const { file } = item;
       return {
         'data-test-subj': `row-${file}`,
-        onClick: () => this.showFlyout(file),
+        onClick: () => this.showFlyout(file, item),
       };
     };
 
@@ -268,8 +270,9 @@ export class InventoryTable extends Component {
           <EuiOverlayMask
             onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
             <FlyoutDetail
-              fileName={this.state.currentFile.file}
+              fileName={this.state.currentFile}
               agentId={this.props.agent.id}
+              item={this.state.syscheckItem}
               closeFlyout={() => this.closeFlyout()}
               type='file'
               view='inventory'
