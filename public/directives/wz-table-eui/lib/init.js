@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ErrorHandler} from '../../../react-services/error-handler';
+
 export async function initTable(
   $scope,
   fetch,
@@ -27,13 +29,12 @@ export async function initTable(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = errorHandler.handle(
+    $scope.error = ErrorHandler.handle(
       error.message || error,
-      false,
-      false,
-      true
+      '',
+      { silent: true }
     );
-    errorHandler.handle(error.message || error);
+    ErrorHandler.handle(error.message || error);
   }
   $scope.$applyAsync();
   return;

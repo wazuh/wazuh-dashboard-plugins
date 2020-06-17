@@ -18,6 +18,7 @@ import { createSavedVisLoader } from './saved_visualizations';
 import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { GenericRequest } from '../react-services/generic-request';
+import { ErrorHandler } from '../react-services/error-handler';
 import { TabVisualizations } from '../factories/tab-visualizations';
 const app = getAngularModule('app/wazuh');
 let lockFields = false;
@@ -88,7 +89,7 @@ app.directive('kbnVis', function() {
             }
           }
         } catch (error) {
-          errorHandler.handle(error, 'Visualize - setSearchSource');
+          ErrorHandler.handle(error, 'Visualize - setSearchSource');
         }
       };
 
@@ -175,9 +176,9 @@ app.directive('kbnVis', function() {
                 lockFields = false;
               } catch (error) {
                 lockFields = false;
-                console.log(error.message || error);
-                errorHandler.handle(
-                  'An error occurred fetching new index pattern fields.'
+                ErrorHandler.handle(
+                  error,
+                  'Error fetching new index pattern fields'
                 );
               }
             }
@@ -185,7 +186,7 @@ app.directive('kbnVis', function() {
             renderInProgress = false;
             return myRender(raw);
           } else {
-            errorHandler.handle(error, 'Visualize');
+            ErrorHandler.handle(error, 'Visualize');
           }
         }
         return;
