@@ -541,7 +541,7 @@ export class Discover extends Component {
     const pagination = {
       pageIndex: this.state.pageIndex,
       pageSize: this.state.pageSize,
-      totalItemCount: this.state.total,
+      totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
       pageSizeOptions: [10, 25, 50],
     };
     const noResultsText = `No results match for this search criteria`
