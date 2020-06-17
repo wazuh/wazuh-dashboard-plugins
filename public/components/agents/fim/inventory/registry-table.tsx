@@ -23,7 +23,7 @@ import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import { ICustomBadges } from '../../../wz-search-bar/components';
+import { filtersToObject } from '../../../wz-search-bar';
 
 export class RegistryTable extends Component {
   state: {
@@ -42,8 +42,7 @@ export class RegistryTable extends Component {
   };
 
   props!: {
-    filters: {}
-    customBadges: ICustomBadges[]
+    filters: []
     totalItems: number
   }
 
@@ -78,10 +77,9 @@ export class RegistryTable extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { filters, customBadges } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)
-      || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
-      this.setState({ pageIndex: 0 }, this.getSyscheck)
+    const { filters } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck)
     }
   }
 
@@ -106,7 +104,6 @@ export class RegistryTable extends Component {
   }
 
   async getSyscheck() {
-    const { filters } = this.props;
     const agentID = this.props.agent.id;
 
     const syscheck = await WzRequest.apiReq(
@@ -133,10 +130,10 @@ export class RegistryTable extends Component {
 
   buildFilter() {
     const { pageIndex, pageSize } = this.state;
-    const { filters } = this.props;
+    const filters = filtersToObject(this.props.filters);
+
     const filter = {
       ...filters,
-      ...this.buildQFilter(),
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
@@ -144,16 +141,6 @@ export class RegistryTable extends Component {
     };
 
     return filter;
-  }
-
-  buildQFilter() {
-    const { filters, customBadges } = this.props;
-    const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
-    let qFilter = filters['q'] ? filters['q'] : '';
-    customBadges.forEach(
-      badge => badge.field === 'q' && (qFilter += badge.value) )
-    const q = qFilter.replace(/ and | or /gi, parseConjuntions)
-    return !!qFilter ? {q} : {}; 
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {

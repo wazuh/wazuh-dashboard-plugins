@@ -65,8 +65,7 @@ export class Inventory extends Component {
       isLoading: true,
       customBadges: [],
     }
-    this.onFilterSelect.bind(this);
-    this.onChangeCustomBadges.bind(this);
+    this.onFiltersChange.bind(this);
   }
 
   async componentDidMount() {
@@ -122,13 +121,9 @@ export class Inventory extends Component {
     window.localStorage.setItem(`wazuh-${section}-${selectView}-${(this.state || {}).selectedTabId || 'files'}-${agent['id']}`, JSON.stringify(filters))
   }
 
-  onFiltersChange(filters) {
-    this.setStoreFilters(filters);
+  onFiltersChange = (filters) => {
+    // this.setStoreFilters(filters);
     this.setState({ filters });
-  }
-
-  onChangeCustomBadges = (customBadges: ICustomBadges[]) => {
-    this.setState({customBadges});
   }
 
   onSelectedTabChanged = id => {
@@ -201,16 +196,6 @@ export class Inventory extends Component {
     }
   }
 
-  onFilterSelect = (filter) => {
-    const { filters: oldFilter } = this.state;
-    const filters = {
-      ...oldFilter,
-      q: !!oldFilter['q'] ? `${oldFilter['q']};${filter}` : filter
-    };
-    this.setStoreFilters(filters);
-    this.setState({ filters });
-  }
-
   showToast = (color, title, time) => {
     toastNotifications.add({
       color: color,
@@ -242,30 +227,23 @@ export class Inventory extends Component {
       <div>
         <FilterBar
           filters={filters}
-          onFiltersChange={this.onFiltersChange.bind(this)}
+          onFiltersChange={this.onFiltersChange}
           selectView={selectedTabId}
-          agent={this.props.agent}
-          customBadges={customBadges}
-          onChangeCustomBadges={this.onChangeCustomBadges}
-           />
+          agent={this.props.agent} />
         {selectedTabId === 'files' &&
           <InventoryTable
             {...this.props}
             filters={filters}
-            customBadges={customBadges}
             items={syscheck}
-            onFilterSelect={this.onFilterSelect}
             totalItems={totalItemsFile}
-            onChangeCustomBadges={this.onChangeCustomBadges} />
+            onFiltersChange={this.onFiltersChange} />
         }
         {selectedTabId === 'registry' &&
           <RegistryTable
             {...this.props}
-            customBadges={customBadges}
             filters={filters}
-            onFilterSelect={this.onFilterSelect}
             totalItems={totalItemsRegistry}
-            onChangeCustomBadges={this.onChangeCustomBadges} />
+            onFiltersChange={this.onFiltersChange} />
         }
       </div>
     )
