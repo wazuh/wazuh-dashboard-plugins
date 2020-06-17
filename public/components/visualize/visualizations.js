@@ -12,28 +12,6 @@
 
 export const visualizations = {
   general: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Overview-General-Metric-alerts',
-        description: 'Total',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Overview-General-Level-12-alerts',
-        description: 'Level 12 or above alerts',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Overview-General-Authentication-failure',
-        description: 'Authentication failure',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Overview-General-Authentication-success',
-        description: 'Authentication success',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 360,
@@ -539,28 +517,6 @@ export const visualizations = {
     ]
   },
   vuls: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Overview-vuls-Metric-Critical-severity',
-        description: 'Critical severity alerts',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Overview-vuls-Metric-High-severity',
-        description: 'High severity alerts',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Overview-vuls-Metric-Medium-severity',
-        description: 'Medium severity alerts',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-App-Overview-vuls-Metric-Low-severity',
-        description: 'Low severity alerts',
-        color: 'subdued'
-      }
-    ],
     rows: [
       {
         height: 270,
@@ -614,23 +570,6 @@ export const visualizations = {
     ]
   },
   virustotal: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Overview-Virustotal-Total-Malicious',
-        description: 'Total malicious',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Overview-Virustotal-Total-Positives',
-        description: 'Total positives',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Overview-Virustotal-Total',
-        description: 'Total',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 360,
@@ -677,13 +616,6 @@ export const visualizations = {
     ]
   },
   osquery: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Overview-Osquery-Agents-reporting',
-        description: 'Agents reporting Osquery events',
-        color: 'primary'
-      }
-    ],
     rows: [
       {
         height: 300,
@@ -813,23 +745,6 @@ export const visualizations = {
     ]
   },
   oscap: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Overview-OSCAP-Last-score',
-        description: 'Last score',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Overview-OSCAP-Highest-score',
-        description: 'Highest score',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Overview-OSCAP-Lowest-score',
-        description: 'Lowest score',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 215,
@@ -892,48 +807,6 @@ export const visualizations = {
     ]
   },
   ciscat: {
-    metrics: [
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-error',
-        description: 'Last not checked',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-fail',
-        description: 'Last pass',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-not-checked',
-        description: 'Last scan score',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-pass',
-        description: 'Last scan date',
-        color: 'subdued'
-      },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-score',
-        description: 'Last errors',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-timestamp',
-        description: 'Last fails',
-        color: 'primary'
-      },
-      // {
-      //   id: 'Wazuh-app-Overview-CISCAT-last-scan-benchmark',
-      //   description: 'Last scan benchmark',
-      //   color: 'secondary'
-      // },
-      {
-        id: 'Wazuh-app-Overview-CISCAT-last-scan-unknown',
-        description: 'Last unknown',
-        color: 'subdued'
-      }
-    ],
     rows: [
       {
         height: 320,
