@@ -225,7 +225,7 @@ class WzListEditor extends Component {
         this.showToast(
           'warning',
           'Invalid name',
-          'Please insert a valid name',
+          'CDB list name cannot be empty',
           3000
         );
         return;

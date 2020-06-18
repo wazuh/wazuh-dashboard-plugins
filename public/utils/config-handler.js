@@ -14,6 +14,7 @@ import XMLBeautifier from './xml-beautifier';
 import { queryConfig } from '../services/query-config';
 import { objectWithoutProperties } from './remove-hash-key.js';
 import { ApiRequest } from '../react-services/api-request';
+import { ErrorHandler } from '../react-services/error-handler';
 
 export class ConfigurationHandler {
   constructor(errorHandler) {
@@ -111,7 +112,7 @@ export class ConfigurationHandler {
       $scope.load = false;
       $scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
       $scope.load = false;
     }
     return;
@@ -159,7 +160,7 @@ export class ConfigurationHandler {
       $scope.load = false;
       $scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
       $scope.load = false;
     }
     return;

@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ErrorHandler } from "../../../react-services/error-handler";
+
 export async function nextPage(currentPage, $scope, errorHandler, fetch, last) {
   try {
     $scope.error = false;
@@ -42,8 +44,8 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch, last) {
     }
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
-    errorHandler.handle(error.message || error);
+    $scope.error = ErrorHandler.handle(error.message || error, '', { silent: true });
+    ErrorHandler.handle(error.message || error);
   }
   return;
 }

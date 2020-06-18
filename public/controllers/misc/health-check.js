@@ -18,6 +18,7 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ApiRequest } from '../../react-services/api-request';
 import { SavedObject } from '../../react-services/saved-objects';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';
 
 export class HealthCheck {
@@ -85,7 +86,7 @@ export class HealthCheck {
    */
   handleError(error) {
     this.errors.push(
-      this.errorHandler.handle(error, 'Health Check', false, true)
+      ErrorHandler.handle(error, 'Health Check', { silent: true })
     );
   }
 
@@ -155,6 +156,7 @@ export class HealthCheck {
     try {
       const response = await GenericRequest.request('GET', '/hosts/apis');
       const hosts = response.data;
+      const errors = [];
 
       if (hosts.length) {
         for (var i = 0; i < hosts.length; i++) {
@@ -163,11 +165,18 @@ export class HealthCheck {
             if (API && API.data) {
               return hosts[i].id;
             }
-          } catch (err) {}
+          } catch (err) {
+            errors.push(`Could not connect to API with id: ${hosts[i].id}: ${err.message || err}`);
+          }
+        }
+        if(errors.length){
+          errors.forEach(error => this.errors.push(error));
+          return Promise.reject('No API available to connect.');
         }
       }
-    } catch (err) {}
-    throw new Error('Error connecting to the API.');
+    } catch (err) {
+      return Promise.reject(`Error connecting to API: ${err}`);
+    }
   }
 
   /**
@@ -181,8 +190,12 @@ export class HealthCheck {
         try {
           data = await ApiCheck.checkStored(currentApi.id);
         } catch (err) {
-          const newApi = await this.trySetDefault();
-          data = await ApiCheck.checkStored(newApi, true);
+          try{
+            const newApi = await this.trySetDefault();
+            data = await ApiCheck.checkStored(newApi, true);
+          }catch(err2){
+            throw err2
+          };
         }
 
         if (((data || {}).data || {}).idChanged) {
@@ -212,7 +225,7 @@ export class HealthCheck {
             this.results[i].status = 'Error';
           }
         } else if (data.data.error || data.data.data.apiIsDown) {
-          this.errors.push('Error connecting to the API.');
+          this.errors.push(data.data.data.apiIsDown ? 'Wazuh API is down.' : `Error connecting to the API.${data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''}`);
           this.results[i].status = 'Error';
         } else {
           this.processedChecks++;
@@ -228,13 +241,12 @@ export class HealthCheck {
               'GET',
               '/api/setup'
             );
-            if (!setupData.data.data['app-version'] || !apiVersion) {
-              this.errorHandler.handle(
-                'Error fetching app version or API version',
-                'Health Check'
-              );
-              this.errors.push('Error fetching version');
-            }
+            if (!setupData.data.data['app-version']) {
+              this.errors.push('Error fetching app version');
+            };
+            if (!apiVersion) {
+              this.errors.push('Error fetching Wazuh API version');
+            };
             const apiSplit = apiVersion.split('v')[1].split('.');
             const appSplit = setupData.data.data['app-version'].split('.');
 

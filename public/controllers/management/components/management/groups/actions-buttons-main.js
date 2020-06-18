@@ -213,7 +213,7 @@ class WzGroupsActionButtons extends Component {
         iconType="plusInCircle"
         onClick={() => this.togglePopover()}
       >
-        Add new groups
+        Add new group
       </EuiButtonEmpty>
     );
 

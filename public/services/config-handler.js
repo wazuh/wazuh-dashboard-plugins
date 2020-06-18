@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { ApiRequest } from '../react-services/api-request';
+import { ErrorHandler } from '../react-services/error-handler';
 
 export class ConfigHandler {
   constructor($rootScope, errorHandler) {
@@ -59,7 +60,7 @@ export class ConfigHandler {
       this.$rootScope.$broadcast('removeRestarting', {});
     } catch (error) {
       this.$rootScope.$broadcast('removeRestarting', {});
-      this.errorHandler.handle(error, 'Error restarting cluster');
+      ErrorHandler.handle(error, 'Error restarting cluster');
     }
   }
 
