@@ -81,6 +81,7 @@ export class InventoryTable extends Component {
   }
 
   async showFlyout(file, item, redirect = false) {
+    window.location.href = window.location.href.replace(new RegExp("&file=" + "[^\&]*", 'g'), "");
     let fileData = false;
     if (!redirect) {
       fileData = this.state.syscheck.filter(item => {
@@ -161,7 +162,7 @@ export class InventoryTable extends Component {
 
   columns() {
     let width;
-    this.props.agent.os.platform === 'windows' ? width = '60px' : width = '80px';
+    (((this.props.agent || {}).os || {}).platform || false) === 'windows' ? width = '60px' : width = '80px';
     return [
       {
         field: 'file',

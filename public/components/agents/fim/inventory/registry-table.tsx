@@ -89,6 +89,7 @@ export class RegistryTable extends Component {
   }
 
   async showFlyout(file, item, redirect = false) {
+    window.location.href = window.location.href.replace(new RegExp("&file=" + "[^\&]*", 'g'), "");
     let fileData = false;
     if (!redirect) {
       fileData = this.state.syscheck.filter(item => {
