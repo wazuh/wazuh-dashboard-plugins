@@ -184,7 +184,6 @@ export class OverviewController {
       this.oldFilteredTab = this.tab;
     }else if(!agentList && this.tab !== 'welcome'){ //&& this.rawVisualizations.getType() !== 'general'){ // this.tab !== 'welcome' prevents to load visualization in Overview welcome
       //this.$rootScope.resultState = "Fetching dashboard data...";
-      console.log("ow")
       if(!store.getState().appStateReducers.currentAgentData.id){
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
