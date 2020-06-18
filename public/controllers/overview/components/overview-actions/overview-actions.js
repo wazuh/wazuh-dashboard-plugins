@@ -340,8 +340,8 @@ class OverviewActions extends Component {
                   className="wz-unpin-agent"
                   iconType='pinFilled'
                   onClick={() => {
-                    this.removeAgentsFilter();
                     store.dispatch(updateCurrentAgentData({}));
+                    this.removeAgentsFilter();
                   }}
                   aria-label='Unpin agent' />
               </EuiToolTip>

@@ -548,8 +548,8 @@ export class AgentSelectionTable extends Component {
      // this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch(this.getSelectedItems());
     }else{
-      this.props.removeAgentsFilter(true);      
       store.dispatch(updateCurrentAgentData({}));
+      this.props.removeAgentsFilter(true);      
     }
    // this.router.reload();
   }
@@ -562,8 +562,8 @@ export class AgentSelectionTable extends Component {
       //this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch([agentID]);
     }catch(error){
-      this.props.removeAgentsFilter(true);      
       store.dispatch(updateCurrentAgentData({}));
+      this.props.removeAgentsFilter(true);      
     }
   }
 

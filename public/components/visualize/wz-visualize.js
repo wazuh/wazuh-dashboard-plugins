@@ -321,7 +321,7 @@ export class WzVisualize extends Component {
             </EuiCallOut>
           )}
 
-          <Metrics section={selectedTab} />
+          <Metrics section={selectedTab} /> 
             
           {selectedTab &&
             selectedTab !== 'welcome' &&

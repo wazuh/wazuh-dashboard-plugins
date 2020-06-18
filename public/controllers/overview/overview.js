@@ -172,28 +172,33 @@ export class OverviewController {
     }
     this.isAgent = agentList ? agentList[0] : false;
     this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
-
     if(agentList && agentList.length ){ // && this.rawVisualizations.getType() !== 'agents'){
       //this.$rootScope.resultState = "Fetching dashboard data...";
       await this.visFactoryService.buildAgentsVisualizations(
         this.filterHandler,
         this.tab,
-        null,
+        this.tabView,
         false,
-        this.tabView === 'discover'
-      ); 
+        (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+        ); 
+      this.oldFilteredTab = this.tab;
     }else if(!agentList && this.tab !== 'welcome'){ //&& this.rawVisualizations.getType() !== 'general'){ // this.tab !== 'welcome' prevents to load visualization in Overview welcome
       //this.$rootScope.resultState = "Fetching dashboard data...";
-      await this.visFactoryService.buildOverviewVisualizations(
-        this.filterHandler,
-        this.tab,
-        null, //not needed
-        this.tabView === 'discover'
-      );
+      console.log("ow")
+      if(!store.getState().appStateReducers.currentAgentData.id){
+        await this.visFactoryService.buildOverviewVisualizations(
+          this.filterHandler,
+          this.tab,
+          this.tabView, 
+          (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
+        );
+        this.oldFilteredTab = this.tab;
+      }
     }
 
     this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
     this.$rootScope.$applyAsync();
+    //this.$scope.$applyAsync();
     
     //update dashboard visualizations depending if its an agent or not
     //this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
@@ -203,6 +208,7 @@ export class OverviewController {
   // Switch subtab
   async switchSubtab(subtab) {
     try {
+      this.oldFilteredTab="";
       this.tabVisualizations.clearDeadVis();
       this.$location.search('tabView', subtab);
       const previousTab = this.currentOverviewSectionProps.currentTab;
@@ -215,12 +221,13 @@ export class OverviewController {
 
       this.tabView = this.commonData.checkTabViewLocation();
       if ( this.tab !== 'welcome') {
-        await this.visFactoryService.buildOverviewVisualizations(
-          this.filterHandler,
-          this.tab,
-          subtab,
-          false
-        );
+        if(!store.getState().appStateReducers.currentAgentData.id || subtab === 'inventory')
+          await this.visFactoryService.buildOverviewVisualizations(
+            this.filterHandler,
+            this.tab,
+            subtab,
+            false
+          );
          this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {
         this.$scope.$emit('changeTabView', {
@@ -356,7 +363,7 @@ export class OverviewController {
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
-      store.dispatch(updateCurrentTab(this.tab));
+      //store.dispatch(updateCurrentTab(this.tab));
       store.dispatch(updateCurrentTab(this.tab));
 
       this.$scope.$on('sendVisDataRows', (ev, param) => {
