@@ -15,23 +15,28 @@ import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from './modules-helper'
 
 export class Dashboard extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
     this.modulesHelper = ModulesHelper;
   }
 
   async componentDidMount() {
+    this._isMount = true;
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
     const app = getAngularModule('app/wazuh');
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleDashboard = this.props.section;
     await this.modulesHelper.getDiscoverScope();
-    this.$rootScope.moduleDiscoverReady = true;
-    this.$rootScope.$applyAsync();
+    if (this._isMount) {
+      this.$rootScope.moduleDiscoverReady = true;
+      this.$rootScope.$applyAsync();
+    }
   }
 
   componentWillUnmount() {
+    this._isMount = false;
     this.$rootScope.showModuleDashboard = false;
     this.$rootScope.moduleDiscoverReady = false;
     this.$rootScope.$applyAsync();

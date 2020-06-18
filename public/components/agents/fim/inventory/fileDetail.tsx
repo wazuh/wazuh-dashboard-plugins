@@ -30,11 +30,13 @@ import { Discover } from '../../../common/modules/discover'
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
-import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/public';
+import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../overview/mitre/lib';
+import moment from 'moment-timezone';
 import store from '../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import rison from 'rison-node';
+import { AppNavigate } from '../../../../react-services/app-navigate';
 
 export class FileDetails extends Component {
 
@@ -170,28 +172,27 @@ export class FileDetails extends Component {
     ]
   }
 
-  viewInEvents = () => {
+  viewInEvents = (ev) => {
     const { file } = this.props.currentFile;
-    const { view, agent } = this.props;
+    if(this.props.view === 'extern'){
+      AppNavigate.navigateToModule(ev, 'overview', {"tab": "fim", "tabView": "events", filters: {"syscheck.path": file}  });
+    }else{
+      AppNavigate.navigateToModule(ev, 'overview', {"tab": "fim", "tabView": "events", filters: {"syscheck.path": file}  }, () => this.openEventCurrentWindow()  )
+    }
+  }
+  
+  openEventCurrentWindow(){
+    const { file } = this.props.currentFile;
     const filters = [{
       ...buildPhraseFilter(
         {name: 'syscheck.path', type: 'text'},
         file, this.indexPattern),
       "$state": { "store": "appState" }
     }];
-    if (view === 'inventory') {
-      this.props.onSelectedTabChanged('events');
-      this.checkFilterManager(filters);
-    } else if (view === 'extern') {
-      store.dispatch(updateCurrentAgentData(agent));
-      chrome.dangerouslyGetActiveInjector().then(injector => {
-        const route = injector.get('$route');
-        const params = { _w: rison.encode({filters}), tab: 'fim' };
-        const paramsEncoded = Object.entries(params).map(e => e.join('=')).join('&');
-        window.location.href = `#/overview?${paramsEncoded}`;
-        route.reload();
-      });
-    }
+
+    this.props.onSelectedTabChanged('events');
+    this.checkFilterManager(filters);
+
   }
 
   async checkFilterManager(filters) {
@@ -215,32 +216,17 @@ export class FileDetails extends Component {
 
   formatBytes(a, b = 2) { if (0 === a) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024)); return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d] }
 
-  formatDate(date) {
-    var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2)
-      month = '0' + month;
-    if (day.length < 2)
-      day = '0' + day;
-
-    return [year, month, day].join('-');
-  }
-
   addFilter(field, value) {
-    const {customBadges, onChangeCustomBadges} = this.props;
+    const {filters, onFiltersChange} = this.props;
     const newBadge:ICustomBadges = {field: 'q', value: ''}
     if (field === 'date' || field === 'mtime') {
-      let value_max = new Date(value);
-      value_max.setDate(new Date(value).getDate() + 1);
-      newBadge.value = `${field}>${this.formatDate(value)} AND ${field}<${this.formatDate(value_max)}`;
+      let value_max = moment(value).add(1, 'day');
+      newBadge.value = `${field}>${moment(value).format('YYYY-MM-DD')} AND ${field}<${value_max.format('YYYY-MM-DD')}`;
     } else {
       newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;
     }
-    !customBadges.some(item => (item.field === newBadge.field && item.value === newBadge.value)) 
-      && onChangeCustomBadges([...customBadges, newBadge]);
+    !filters.some(item => (item.field === newBadge.field && item.value === newBadge.value)) 
+      && onFiltersChange([...filters, newBadge]);
     this.props.closeFlyout();
   }
 
@@ -352,7 +338,7 @@ export class FileDetails extends Component {
                       content={inspectButtonText}>
                       <EuiIcon
                         className='euiButtonIcon euiButtonIcon--primary'
-                        onClick={this.viewInEvents}
+                        onMouseDown={(ev) => this.viewInEvents(ev)}
                         type="popout"
                         aria-label={inspectButtonText}
                       />

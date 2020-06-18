@@ -244,8 +244,8 @@ export class Inventory extends Component {
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
 
-    if (item.compliance.length) {
-      item.complianceText = '';
+    item.complianceText = '';
+    if (item.compliance && item.compliance.length) {
       item.compliance.forEach(x => {
         item.complianceText += `${x.key}: ${x.value}\n`;
       });
@@ -270,15 +270,15 @@ export class Inventory extends Component {
         },
         {
           title: 'Rationale',
-          description: item.rationale
+          description: item.rationale || '-'
         },
         {
           title: 'Remediation',
-          description: item.remediation
+          description: item.remediation || '-'
         },
         {
           title: 'Description',
-          description: item.description
+          description: item.description || '-'
         },
         {
           title: (item.directory || '').includes(',') ? 'Paths' : 'Path',

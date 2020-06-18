@@ -216,6 +216,7 @@ export class SuggestHandler extends BaseHandler {
 
   createQFilter(inputValue) {
     const qInterpreter = new QInterpreter(inputValue);
+    if (qInterpreter.queryObjects.some(q => !q.value)) return;
     const value = qInterpreter.toString();
     const filters = [
       ...this.filters,
@@ -285,7 +286,7 @@ export class SuggestHandler extends BaseHandler {
     if (inputStage !== 'value') return;
     if (searchType === 'params') {
       const { 0: field, 1: value } = inputValue.split(':');
-      this.createParamFilter(field, value);
+      if (!!value) this.createParamFilter(field, value);
     }
     if (searchType === 'q') {
       this.createQFilter(inputValue);

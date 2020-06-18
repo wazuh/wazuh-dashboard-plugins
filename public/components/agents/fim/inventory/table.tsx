@@ -21,12 +21,12 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import './inventory.less';
-import { ICustomBadges } from '../../../wz-search-bar/components';
-import { filtersToObject } from '../../../wz-search-bar';
+import { filtersToObject, IFilter } from '../../../wz-search-bar';
 
 export class InventoryTable extends Component {
   state: {
     syscheck: []
+    error?: string
     pageIndex: number
     pageSize: number
     totalItems: number
@@ -40,9 +40,7 @@ export class InventoryTable extends Component {
   };
 
   props!: {
-    filters: []
-    onFilterSelect(): void
-    customBadges: ICustomBadges[]
+    filters: IFilter[]
     agent: any
     items: []
     totalItems: number
@@ -96,29 +94,32 @@ export class InventoryTable extends Component {
     this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
   }
 
-  componentDidUpdate(prevProps) {
-    const { filters, customBadges } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters) 
-     || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
-      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck)
+  async componentDidUpdate(prevProps) {
+    const { filters } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck);
     }
   }
 
   async getSyscheck() {
     const agentID = this.props.agent.id;
-
-    const syscheck = await WzRequest.apiReq(
+    try {
+      const syscheck = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
       this.buildFilter()
-    );
-
-    this.setState({
-      syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
-      totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
-      isLoading: false
-    });
-  }
+      );
+      
+      this.setState({
+        syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
+        totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
+        isLoading: false,
+        error: undefined
+      });
+    } catch (error) {
+      this.setState({error, isLoading: false})
+    }
+}
 
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
@@ -225,7 +226,7 @@ export class InventoryTable extends Component {
       };
     };
 
-    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading } = this.state;
+    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading, error } = this.state;
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
@@ -245,6 +246,7 @@ export class InventoryTable extends Component {
         <EuiFlexItem>
           <EuiBasicTable
             items={syscheck}
+            error={error}
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}

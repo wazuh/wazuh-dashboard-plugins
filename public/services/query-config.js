@@ -16,6 +16,9 @@
  * @param {Array<object>} sections Array that includes sections to be fetched
  * @param {object} apiReq API request service reference
  */
+
+import { ErrorHandler } from '../react-services/error-handler';
+
 export async function queryConfig(
   agentId,
   sections,
@@ -56,11 +59,10 @@ export async function queryConfig(
         const partialResult = await apiReq.request('GET', url, {});
         result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
-        result[`${component}-${configuration}`] = errorHandler.handle(
+        result[`${component}-${configuration}`] = ErrorHandler.handle(
           error,
           'Fetch configuration',
-          false,
-          true
+          { silent: true }
         );
       }
     }

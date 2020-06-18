@@ -71,8 +71,10 @@ export class ScaScan extends Component {
   }
 
   durationScan() {
-    const { lastScan }  = this.state
-    let diff = moment(new Date(lastScan.start_scan),"DD/MM/YYYY HH:mm:ss").diff(moment(new Date(lastScan.end_scan),"DD/MM/YYYY HH:mm:ss"));
+    const { lastScan }  = this.state;
+    const start_scan = moment(lastScan.start_scan);
+    const end_scan = moment(lastScan.end_scan);
+    let diff = start_scan.diff(end_scan);
     let duration = moment.duration(diff);
     let auxDuration = Math.floor(duration.asHours()) + moment.utc(diff).format(":mm:ss");
     return auxDuration === '0:00:00' ? '< 1s' : auxDuration;

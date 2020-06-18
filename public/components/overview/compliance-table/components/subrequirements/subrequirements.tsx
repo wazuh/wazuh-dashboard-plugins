@@ -28,6 +28,7 @@ import {
 } from '@elastic/eui';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
+import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
 
 
 export class ComplianceSubrequirements extends Component {
@@ -46,19 +47,19 @@ export class ComplianceSubrequirements extends Component {
     }
   }
 
-  hideAlerts(){
-    this.setState({hideAlerts: !this.state.hideAlerts})
+  hideAlerts() {
+    this.setState({ hideAlerts: !this.state.hideAlerts })
   }
 
   onSearchValueChange = e => {
-    this.setState({searchValue: e.target.value});
+    this.setState({ searchValue: e.target.value });
   }
 
-   /** 
-   * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
-   * @param filter 
-   */
-  addFilter(filter) {    
+  /** 
+  * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
+  * @param filter 
+  */
+  addFilter(filter) {
     const { filterManager } = getServices();
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
@@ -76,47 +77,46 @@ export class ComplianceSubrequirements extends Component {
     }
     filterManager.addFilters([newFilter]);
   }
-  
-  getRequirementKey(){
-    //TODO all other requirements
-    if(this.props.section === 'pci'){
+
+  getRequirementKey() {
+    if (this.props.section === 'pci') {
       return 'rule.pci_dss';
     }
-    if(this.props.section === 'gdpr'){
+    if (this.props.section === 'gdpr') {
       return 'rule.gdpr';
     }
-    if(this.props.section === 'nist'){
+    if (this.props.section === 'nist') {
       return 'rule.nist_800_53';
     }
-    if(this.props.section === 'hipaa'){
+    if (this.props.section === 'hipaa') {
       return 'rule.hipaa';
     }
-    if(this.props.section === 'tsc'){
+    if (this.props.section === 'tsc') {
       return 'rule.tsc';
     }
     return "pci_dss"
   }
 
-  openDashboardCurrentWindow(requirementId){
-    this.addFilter({key: this.getRequirementKey(), value: requirementId, negate: false} );
+  openDashboardCurrentWindow(requirementId) {
+    this.addFilter({ key: this.getRequirementKey(), value: requirementId, negate: false });
     this.props.onSelectedTabChanged('dashboard');
   }
 
-  openDiscoverCurrentWindow(requirementId){
-    this.addFilter({key: this.getRequirementKey(), value: requirementId, negate: false} );
+  openDiscoverCurrentWindow(requirementId) {
+    this.addFilter({ key: this.getRequirementKey(), value: requirementId, negate: false });
     this.props.onSelectedTabChanged('events');
   }
 
-  openDiscover(e,requirementId){
-    const filters ={};
+  openDiscover(e, requirementId) {
+    const filters = {};
     filters[this.getRequirementKey()] = requirementId;
-    AppNavigate.navigateToModule(e, 'overview', {"tab": this.props.section, "tabView": "discover", filters,  }, () => this.openDiscoverCurrentWindow(requirementId) )
+    AppNavigate.navigateToModule(e, 'overview', { "tab": this.props.section, "tabView": "discover", filters, }, () => this.openDiscoverCurrentWindow(requirementId))
   }
 
-  openDashboard(e, requirementId){
-    const filters ={};
+  openDashboard(e, requirementId) {
+    const filters = {};
     filters[this.getRequirementKey()] = requirementId;
-    AppNavigate.navigateToModule(e, 'overview', {"tab": this.props.section, "tabView": "panels", filters  }, () => this.openDashboardCurrentWindow(requirementId)  )
+    AppNavigate.navigateToModule(e, 'overview', { "tab": this.props.section, "tabView": "panels", filters }, () => this.openDashboardCurrentWindow(requirementId))
   }
 
 
@@ -128,11 +128,11 @@ export class ComplianceSubrequirements extends Component {
 
     Object.keys(complianceObject).forEach((key, inx) => {
       const currentTechniques = complianceObject[key];
-      if(this.props.selectedRequirements[key]){   
-        currentTechniques.forEach( (technique,idx) => {
-          if(!showTechniques[technique] && (technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) )){
+      if (this.props.selectedRequirements[key]) {
+        currentTechniques.forEach((technique, idx) => {
+          if (!showTechniques[technique] && ((technique.toLowerCase().includes(this.state.searchValue.toLowerCase())) || this.props.descriptions[technique].toLowerCase().includes(this.state.searchValue.toLowerCase() ) )) {
             const quantity = (requirementsCount.find(item => item.key === technique) || {}).doc_count || 0;
-            if(!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)){
+            if (!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)) {
               showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
@@ -146,73 +146,92 @@ export class ComplianceSubrequirements extends Component {
       }
     });
 
-    const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
-      const tooltipContent = this.props.descriptions[item.id];
-      const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover=== item.id ? " wz-mitre-width" : " ");
-      return(
-        <EuiFlexItem 
-        onMouseEnter={() => this.setState({ hover: item.id })}
-        onMouseLeave={() => this.setState({ hover: "" })}
-        key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)", maxHeight: 41}}>
+    const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map((item, idx) => {
+      const tooltipContent = `View details of ${item.id}`
+      const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover === item.id ? " wz-mitre-width" : " ");
+      return (
+        <EuiFlexItem
+          onMouseEnter={() => this.setState({ hover: item.id })}
+          onMouseLeave={() => this.setState({ hover: "" })}
+          key={idx} style={{ border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)", maxHeight: 41 }}>
 
-        <EuiPopover
+          <EuiPopover
             id="techniqueActionsContextMenu"
             anchorClassName="wz-width-100"
             button={(
-                <EuiFacetButton
-                  style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px"}}
-                  quantity={item.quantity}
-                  onClick={() => {/*this.showFlyout(item.id)*/}}>
-                  <EuiToolTip position="top" content={tooltipContent} anchorClassName={toolTipAnchorClass}>
-                    <span style={{
-                            display: "block",
-                            overflow: "hidden",
-                            whiteSpace: "nowrap",
-                            textOverflow: "ellipsis"}}>
-                      {item.id} - {this.props.descriptions[item.id]}
-                    </span>
-                  </EuiToolTip>
+              <EuiFacetButton
+                style={{ width: "100%", padding: "0 5px 0 5px", lineHeight: "40px" }}
+                quantity={item.quantity}
+                onClick={() => { this.showFlyout(item.id) }}>
+                <EuiToolTip position="top" content={tooltipContent} anchorClassName={toolTipAnchorClass}>
+                  <span style={{
+                    display: "block",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis"
+                  }}>
+                    {item.id} - {this.props.descriptions[item.id]}
+                  </span>
+                </EuiToolTip>
 
-                  {this.state.hover === item.id &&
-                    <span style={{float: "right"}}>
-                      <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
-                          <EuiIcon onMouseDown={(e) => {this.openDashboard(e,item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
-                      </EuiToolTip> &nbsp;
+                {this.state.hover === item.id &&
+                  <span style={{ float: "right" }}>
+                    <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
+                      <EuiIcon onMouseDown={(e) => { this.openDashboard(e, item.id); e.stopPropagation() }} color="primary" type="visualizeApp"></EuiIcon>
+                    </EuiToolTip> &nbsp;
                       <EuiToolTip position="top" content={"Inspect " + item.id + " in Events"} >
-                        <EuiIcon onMouseDown={(e) => {this.openDiscover(e,item.id);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
-                      </EuiToolTip>
+                      <EuiIcon onMouseDown={(e) => { this.openDiscover(e, item.id); e.stopPropagation() }} color="primary" type="discoverApp"></EuiIcon>
+                    </EuiToolTip>
 
-                    </span>
-                  }
-                </EuiFacetButton>
-              )
-              }
+                  </span>
+                }
+              </EuiFacetButton>
+            )
+            }
             isOpen={this.state.actionsOpen === item.id}
-            closePopover={() => {}}
+            closePopover={() => { }}
             panelPaddingSize="none"
-            style={{width: "100%"}}
+            style={{ width: "100%" }}
             withTitle
             anchorPosition="downLeft">xxx
           </EuiPopover>
         </EuiFlexItem>
       );
-        
+
     })
-    if(tacticsToRender.length){
+    if (tacticsToRender.length) {
       return (
-      <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "254px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
-        {tacticsToRenderOrdered}
-      </EuiFlexGrid>
+        <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10 }}>
+          {tacticsToRenderOrdered}
+        </EuiFlexGrid>
       )
-    }else{
+    } else {
       return <>No results.</>
     }
   }
 
 
+  onChangeFlyout = (flyoutOn) => {
+    this.setState({ flyoutOn });
+  }
+
+  closeFlyout() {
+    this.setState({ flyoutOn: false });
+  }
+
+  showFlyout(requirement) {
+    this.setState({
+      selectedRequirement: requirement,
+      flyoutOn: true
+    })
+  }
+
+
+
+
   render() {
     return (
-      <div style={{padding: 10}}>
+      <div style={{ padding: 10 }}>
         <EuiFlexGroup>
           <EuiFlexItem grow={true}>
             <EuiTitle size="m">
@@ -224,15 +243,15 @@ export class ComplianceSubrequirements extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiText grow={false}>
-                    <span>Hide requirements with no alerts </span> &nbsp;
+                  <span>Hide requirements with no alerts </span> &nbsp;
                   <EuiSwitch
                     label=""
                     checked={this.state.hideAlerts}
                     onChange={e => this.hideAlerts()}
                   />
-                  </EuiText>
+                </EuiText>
               </EuiFlexItem>
-            </EuiFlexGroup> 
+            </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="xs" />
@@ -250,20 +269,19 @@ export class ComplianceSubrequirements extends Component {
         <div>
           {this.props.requirementsCount && this.renderFacet()}
         </div>
-        {/* isFlyoutVisible &&
-          <EuiOverlayMask
-            // @ts-ignore
-            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
-          
-            <FlyoutTechnique
-              openDashboard={itemId => this.openDashboard(itemId)}
-              openDiscover={itemId => this.openDiscover(itemId)}
+
+        {this.state.flyoutOn &&
+          <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+            <RequirementFlyout
+              currentRequirement={this.state.selectedRequirement}
               onChangeFlyout={this.onChangeFlyout}
-              currentTechniqueData={this.state.currentTechniqueData}
-              currentTechnique={currentTechnique} />
-          </EuiOverlayMask>
-        */} 
-      </div>   
+              description={this.props.descriptions[this.state.selectedRequirement]}
+              getRequirementKey={() => { return this.getRequirementKey() }}
+              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+            />
+          </EuiOverlayMask>}
+      </div>
     )
   }
 }

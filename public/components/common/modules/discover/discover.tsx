@@ -24,6 +24,7 @@ import { npSetup } from 'ui/new_platform';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import DateMatch from '@elastic/datemath';
 import { toastNotifications } from 'ui/notify';
+import store from '../../../../redux/store'
 
 import {
   EuiBasicTable,
@@ -122,6 +123,11 @@ export class Discover extends Component {
       "rule.level": "Level",
       "rule.mitre.id": "Technique(s)",
       "rule.mitre.tactic": "Tactic(s)",
+      "rule.pci_dss": "PCI DSS",
+      "rule.gdpr": "GDPR",
+      "rule.nist_800_53": "NIST 800-53",
+      "rule.tsc": "TSC",
+      "rule.hipaa": "HIPAA",
     }
 
     this.hideCreateCustomLabel.bind(this);
@@ -251,12 +257,17 @@ export class Discover extends Component {
           this.setState({ isLoading: true, pageIndex:0 });
         else
           this.setState({ isLoading: true});
+        let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
+        if(store.getState().appStateReducers.currentAgentData.id){
+          filtersReq.push({"agent.id": store.getState().appStateReducers.currentAgentData.id})
+        } 
+
         const alerts = await GenericRequest.request(
           'POST',
           `/elastic/alerts`,
           {
             ...newFilters,
-            filters: [...newFilters['filters'], ...this.props.implicitFilters]
+            filters: filtersReq
           }
         );
         if (this._isMount) {
@@ -315,6 +326,7 @@ export class Discover extends Component {
         return  {
           field: 'timestamp',
           name: 'Time',
+          width: '160px',
           sortable: true,
           render: time => {
             const date = time.split('.')[0];
@@ -322,8 +334,26 @@ export class Discover extends Component {
           },
         }
       }
+      let width = false;
+      const arrayCompilance = ["rule.pci_dss", "rule.gdpr", "rule.nist_800_53", "rule.tsc", "rule.hipaa"];
 
-      return {
+      if(item === 'rule.level') {
+        width = '75px';
+      }
+      if(item === 'rule.id') {
+        width = '90px';
+      }
+      if(item === 'rule.description' && this.state.columns.indexOf('syscheck.event') === -1) {
+        width = '30%';
+      }
+      if(item === 'syscheck.event') {
+        width = '100px';
+      }
+      if(arrayCompilance.indexOf(item) !== -1) {
+        width = '150px';
+      }
+
+      let column = {
         field: item,
         name: (<span 
           onMouseEnter={() => { this.setState({hover: item}) }}
@@ -342,7 +372,11 @@ export class Discover extends Component {
         sortable: true
       }
 
+      if (width) {
+        column.width = width;
+      }
 
+      return column;
     })
     return columns;
   }
@@ -507,10 +541,10 @@ export class Discover extends Component {
     const pagination = {
       pageIndex: this.state.pageIndex,
       pageSize: this.state.pageSize,
-      totalItemCount: this.state.total,
+      totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
       pageSizeOptions: [10, 25, 50],
     };
-    const noResultsText = `No results match for this ${this.props.type === 'file' ? 'file' : 'registry'} and search criteria`
+    const noResultsText = `No results match for this search criteria`
     return (
       <div
         className='wz-discover hide-filter-controll' >

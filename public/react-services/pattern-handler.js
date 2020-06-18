@@ -37,6 +37,7 @@ export class PatternHandler {
           toastNotifications.add({
             color: 'error',
             title: 'Error creating the index pattern.',
+            text: err.message || err,
             toastLifeTimeMs: 3000
           });
           AppState.removeCurrentPattern();

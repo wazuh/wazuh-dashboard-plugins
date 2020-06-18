@@ -13,6 +13,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { GroupHandler } from '../../react-services/group-handler';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export class GroupsController {
   constructor($scope, $location, errorHandler, reportingService) {
@@ -71,7 +72,7 @@ export class GroupsController {
 
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Groups');
+      ErrorHandler.handle(error, 'Groups');
     }
   }
 
@@ -181,7 +182,7 @@ export class GroupsController {
         this.selectedAgents.loadedAll = true;
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'Error fetching group agents');
+      ErrorHandler.handle(error, 'Error fetching group agents');
     }
     this.selectedAgents.loaded = true;
   }
@@ -229,7 +230,7 @@ export class GroupsController {
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'Error fetching all available agents');
+      ErrorHandler.handle(error, 'Error fetching all available agents');
     }
   }
 
@@ -259,7 +260,7 @@ export class GroupsController {
         this.multipleSelectorLoading = false;
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'Error adding agents');
+      ErrorHandler.handle(error, 'Error adding agents');
     }
     this.scope.$applyAsync();
     return;
@@ -349,20 +350,20 @@ export class GroupsController {
           message: ((item || {}).error || {}).message
         }));
         this.failedErrors = this.groupBy(failedErrors, 'message') || false;
-        this.errorHandler.info(
+        ErrorHandler.info(
           `Group has been updated but an error has occurred with ${failedIds.length} agents`,
           '',
-          true
+          { warning: true }
         );
       } else {
-        this.errorHandler.info('Group has been updated');
+        ErrorHandler.info('Group has been updated');
       }
       // this.addMultipleAgents(false);
       this.multipleSelectorLoading = false;
       this.cancelButton();
     } catch (err) {
       this.multipleSelectorLoading = false;
-      this.errorHandler.handle(err, 'Error applying changes');
+      ErrorHandler.handle(err, 'Error applying changes');
     }
     this.scope.$applyAsync();
     return;

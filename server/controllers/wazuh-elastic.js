@@ -759,6 +759,7 @@ export class WazuhElasticCtrl {
       }
       payload.sort.push(sort);
       payload.size = size;
+      payload.track_total_hits = true;
       payload.from = req.payload.offset || 0;
       const spaces = this._server.plugins.spaces;
       const namespace = spaces && spaces.getSpaceId(req);

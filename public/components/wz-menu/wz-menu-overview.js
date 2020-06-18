@@ -234,7 +234,7 @@ class WzMenuOverview extends Component {
           <div>
             {!agentData.id && (
               <EuiFlexGroup>
-                <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
+                <EuiFlexItem grow={false} style={{ marginLeft: 14 }}>
                   <EuiButtonEmpty iconType="apps"
                     onClick={() => {
                       this.props.closePopover();

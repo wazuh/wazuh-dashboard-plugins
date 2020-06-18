@@ -127,6 +127,7 @@ class WzRulesetTable extends Component {
 
     const { items = [], totalItems = 0 } =
       ((rawItems || {}).data || {}).data || {};
+    this.props.updateTotalItems(totalItems);
     this.setState({
       items,
       totalItems,
@@ -283,7 +284,7 @@ class WzRulesetTable extends Component {
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
               >
-                <p>This items will be removed</p>
+                <p>These items will be removed</p>
                 <div>
                   {itemList.map(function (item, i) {
                     return <li key={i}>{item.file ? item.file : item.name}</li>;

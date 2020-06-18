@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { ErrorHandler} from '../../../react-services/error-handler';
+
 export async function searchData(
   term,
   removeFilters,
@@ -28,8 +31,8 @@ export async function searchData(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
-    errorHandler.handle(error.message || error);
+    $scope.error = ErrorHandler.handle(error.message || error, '', { silent: true });
+    ErrorHandler.handle(error.message || error);
   }
   $scope.$applyAsync();
   return;
@@ -59,8 +62,8 @@ export async function filterData(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
-    errorHandler.handle(error.message || error);
+    $scope.error = ErrorHandler.handle(error.message || error, '', { silent: true});
+    ErrorHandler.handle(error.message || error);
   }
   $scope.$applyAsync();
   return;
@@ -90,8 +93,8 @@ export async function queryData(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
-    errorHandler.handle(error.message || error);
+    $scope.error = ErrorHandler.handle(error.message || error, '', { silent: true });
+    ErrorHandler.handle(error.message || error);
   }
   $scope.$applyAsync();
   return;

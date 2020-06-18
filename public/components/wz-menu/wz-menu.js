@@ -21,8 +21,7 @@ import {
   EuiToolTip,
   EuiLoadingSpinner,
   EuiFormRow,
-  EuiBadge,
-  EuiSpacer
+  EuiSelect
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
@@ -254,24 +253,17 @@ class WzMenu extends Component {
   buildPatternSelector() {
     return (
       <EuiFormRow label="Selected index pattern">
-        <select
-          className="wz-menu-select"
+        <EuiSelect
+          id="selectIndexPattern"
+          options={
+            this.state.patternList.map((item) => {
+              return { value: item.id, text: item.title }
+            })
+          }
           value={this.state.currentSelectedPattern}
           onChange={this.changePattern}
           aria-label="Index pattern selector"
-        >
-          {this.state.patternList.map((item, idx) => {
-            return (
-              <option
-                className="wz-menu-select-option"
-                key={idx}
-                value={item.id}
-              >
-                {item.title}
-              </option>
-            );
-          })}
-        </select>
+        />
       </EuiFormRow>
     );
   }
@@ -279,24 +271,17 @@ class WzMenu extends Component {
   buildApiSelector() {
     return (
       <EuiFormRow label="Selected API">
-        <select
-          className="wz-menu-select"
+        <EuiSelect
+          id="selectAPI"
+          options={
+            this.state.APIlist.map((item) => {
+              return { value: item.id, text: item.id }
+            })
+          }
           value={this.state.currentAPI}
           onChange={this.changeAPI}
           aria-label="API selector"
-        >
-          {this.state.APIlist.map((item, idx) => {
-            return (
-              <option
-                className="wz-menu-select-option"
-                key={idx}
-                value={item.id}
-              >
-                {item.id}
-              </option>
-            );
-          })}
-        </select>
+        />
       </EuiFormRow>
     );
   }

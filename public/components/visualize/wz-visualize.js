@@ -32,6 +32,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { VisHandlers } from '../../factories/vis-handlers';
+import { Metrics } from '../overview/metrics/metrics'
 
 const visHandler = new VisHandlers();
 
@@ -318,18 +319,8 @@ export class WzVisualize extends Component {
             </EuiCallOut>
           )}
 
-          {/* Metrics of Dashboard */}
-          {selectedTab &&
-            selectedTab !== 'welcome' &&
-            this.visualizations[selectedTab] &&
-            this.visualizations[selectedTab].metrics &&
-            this.state.metricItems && (
-              <div className="md-padding-top-10">
-                <WzReduxProvider>
-                  <AlertsStats {...this.state.metricItems} tab={selectedTab} />
-                </WzReduxProvider>
-              </div>
-            )}
+          <Metrics section={selectedTab} />
+            
           {selectedTab &&
             selectedTab !== 'welcome' &&
             this.visualizations[selectedTab] &&

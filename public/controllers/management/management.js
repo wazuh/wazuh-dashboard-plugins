@@ -13,6 +13,7 @@ import { TabNames } from '../../utils/tab-names';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { ShareAgent } from '../../factories/share-agent';
 import RulesetHandler from './components/management/ruleset/utils/ruleset-handler';
 
@@ -232,11 +233,11 @@ export class ManagementController {
       await this.configHandler.restartManager();
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      this.errorHandler.info('Restarting manager.');
+      ErrorHandler.info('Restarting manager.');
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      this.errorHandler.handle(
+      ErrorHandler.handle(
         error.message || error,
         'Error restarting manager'
       );
@@ -250,13 +251,13 @@ export class ManagementController {
       await this.configHandler.restartCluster();
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      this.errorHandler.info(
+      ErrorHandler.info(
         'Restarting cluster, it will take up to 30 seconds.'
       );
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      this.errorHandler.handle(
+      ErrorHandler.handle(
         error.message || error,
         'Error restarting cluster'
       );
@@ -490,11 +491,11 @@ export class ManagementController {
         }
       }
       if (this.errors) throw this.results;
-      this.errorHandler.info('Upload successful');
+      ErrorHandler.info('Upload successful');
       return;
     } catch (error) {
       if (Array.isArray(error) && error.length) return Promise.reject(error);
-      this.errorHandler.handle('Files cannot be uploaded');
+      ErrorHandler.handle('Files cannot be uploaded');
     }
   }
 }
