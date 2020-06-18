@@ -12,12 +12,6 @@
 
 export const visualizations = {
   general: {
-    metrics: [
-      { id: 'Wazuh-App-Agents-General-Metric-alerts' },
-      { id: 'Wazuh-App-Agents-General-Level-12-alerts' },
-      { id: 'Wazuh-App-Agents-General-Authentication-failure' },
-      { id: 'Wazuh-App-Agents-General-Authentication-success' }
-    ],
     rows: [
       {
         height: 400,
@@ -362,12 +356,6 @@ export const visualizations = {
     ]
   },
   vuls: {
-    metrics: [
-      { id: 'Wazuh-App-Agents-vuls-Metric-Critical-severity' },
-      { id: 'Wazuh-App-Agents-vuls-Metric-High-severity' },
-      { id: 'Wazuh-App-Agents-vuls-Metric-Medium-severity' },
-      { id: 'Wazuh-App-Agents-vuls-Metric-Low-severity' }
-    ],
     rows: [
       {
         height: 400,
@@ -416,11 +404,6 @@ export const visualizations = {
     ]
   },
   virustotal: {
-    metrics: [
-      { id: 'Wazuh-App-Agents-Virustotal-Total-Malicious' },
-      { id: 'Wazuh-App-Agents-Virustotal-Total-Positives' },
-      { id: 'Wazuh-App-Agents-Virustotal-Total' }
-    ],
     rows: [
       {
         height: 250,
@@ -534,11 +517,6 @@ export const visualizations = {
     ]
   },
   oscap: {
-    metrics: [
-      { id: 'Wazuh-App-Agents-OSCAP-Last-score' },
-      { id: 'Wazuh-App-Agents-OSCAP-Higher-score-metric' },
-      { id: 'Wazuh-App-Agents-OSCAP-Lower-score-metric' }
-    ],
     rows: [
       {
         height: 230,
@@ -601,16 +579,6 @@ export const visualizations = {
     ]
   },
   ciscat: {
-    metrics: [
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-error' },
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-fail' },
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-not-checked' },
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-pass' },
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-score' },
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-timestamp' },
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark' },
-      { id: 'Wazuh-app-Agents-CISCAT-last-scan-unknown' }
-    ],
     rows: [
       {
         height: 320,
@@ -676,12 +644,6 @@ export const visualizations = {
     ]
   },
   audit: {
-    metrics: [
-      { id: 'Wazuh-App-Agents-Audit-New-files-metric' },
-      { id: 'Wazuh-App-Agents-Audit-Read-files-metric' },
-      { id: 'Wazuh-App-Agents-Audit-Modified-files-metric' },
-      { id: 'Wazuh-App-Agents-Audit-Removed-files-metric' }
-    ],
     rows: [
       {
         height: 250,

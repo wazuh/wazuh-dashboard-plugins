@@ -1843,7 +1843,16 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'rule.mitre.tactics',
+    name: 'rule.mitre.tactic',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'rule.mitre.technique',
     type: 'string',
     count: 0,
     scripted: false,

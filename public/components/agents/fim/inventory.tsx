@@ -52,6 +52,7 @@ export class Inventory extends Component {
     syscheck: []
     customBadges: ICustomBadges[]
   }
+
   props: any;
 
   constructor(props) {
@@ -70,6 +71,20 @@ export class Inventory extends Component {
 
   async componentDidMount() {
     this._isMount = true;
+    await this.loadAgent();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
+      this.setState({isLoading: true}, this.loadAgent)
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
+  }
+
+  async loadAgent() {
     const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
     const {totalItemsFile, syscheck} = await this.getItemNumber('file');
     const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
@@ -86,10 +101,6 @@ export class Inventory extends Component {
   //     this.setState({ filters });
   //   }
   // }
-
-  componentWillUnmount() {
-    this._isMount = false;
-  }
 
   tabs() {
     let auxTabs = [

@@ -313,7 +313,7 @@ export class FlyoutTechnique extends Component {
             initialIsOpen={true}>
           <EuiFlexGroup className="flyout-row">
             <EuiFlexItem>
-              <Discover initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactics', 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)}/>
+              <Discover initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.level', 'rule.id', 'rule.description']} implicitFilters={implicitFilters} initialFilters={[]} updateTotalHits={(total) => this.updateTotalHits(total)}/>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiAccordion>
@@ -341,7 +341,6 @@ export class FlyoutTechnique extends Component {
     return(
         <EuiFlyout
           onClose={() => onChangeFlyout(false)}
-          maxWidth="60%"
           size="l"
           className="flyout-no-overlap"
           aria-labelledby="flyoutSmallTitle"

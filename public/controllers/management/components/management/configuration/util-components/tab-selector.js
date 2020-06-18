@@ -29,13 +29,13 @@ class WzTabSelector extends Component {
   render() {
     const { selectedTab } = this.state;
     const { children, container, spacer } = this.props;
-    const activeTabContent = children.find(
+    const activeTabContent = children.filter(child => child).find(
       child => child.props.label === selectedTab
     );
     return (
       <Fragment>
         <EuiTabs>
-          {children.map(child => {
+          {children.filter(child => child).map(child => {
             const { label } = child.props;
             return (
               <EuiTab
