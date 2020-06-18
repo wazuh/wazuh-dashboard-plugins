@@ -79,7 +79,6 @@ export class ComplianceSubrequirements extends Component {
   }
 
   getRequirementKey() {
-    //TODO all other requirements
     if (this.props.section === 'pci') {
       return 'rule.pci_dss';
     }
@@ -131,7 +130,7 @@ export class ComplianceSubrequirements extends Component {
       const currentTechniques = complianceObject[key];
       if (this.props.selectedRequirements[key]) {
         currentTechniques.forEach((technique, idx) => {
-          if (!showTechniques[technique] && (technique.toLowerCase().includes(this.state.searchValue.toLowerCase()))) {
+          if (!showTechniques[technique] && ((technique.toLowerCase().includes(this.state.searchValue.toLowerCase())) || this.props.descriptions[technique].toLowerCase().includes(this.state.searchValue.toLowerCase() ) )) {
             const quantity = (requirementsCount.find(item => item.key === technique) || {}).doc_count || 0;
             if (!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)) {
               showTechniques[technique] = true;
