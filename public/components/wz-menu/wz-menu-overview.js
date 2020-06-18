@@ -154,10 +154,10 @@ class WzMenuOverview extends Component {
       this.overviewSections.sca
     ];
     let threatDetectionItems = [
-      this.overviewSections.mitre,
       this.overviewSections.virustotal,
       this.overviewSections.osquery,
       this.overviewSections.docker,
+      this.overviewSections.mitre
     ];
     securityInformationItems.splice(2, 0, this.overviewSections.aws);
     threatDetectionItems.unshift(this.overviewSections.vuls);
