@@ -335,10 +335,56 @@ function generateAlert(params) {
     }
 
     if (params.mitre) {
-        const dataMitre = randomArrayItem(Mitre.rule);
+        alert.rule.groups.push(randomArrayItem(Mitre.arrayGroups));
+        alert.rule.description = randomArrayItem(Mitre.arrayRuleDescription);
+        alert.location = randomArrayItem(Mitre.arrayLocation);
+
+        let dataMitre = randomArrayItem(Mitre.rule);
+        let ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+
+        let arrayTactics = [];
+        arrayTactics.push(dataMitre.tactic);
+        let arrayId = [];
+        arrayId.push(ruleMitre.id);
+        let arrayTechniques = [];
+        arrayTechniques.push(ruleMitre.technique);
+
+        if (Math.random() <= 0.3) {
+            ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+            if(arrayId.indexOf(dataMitre.id === -1)) {
+                arrayId.push(ruleMitre.id);
+                arrayTechniques.push(ruleMitre.technique);
+            }
+        }
+
         alert.rule.mitre = {
-            tactics: dataMitre.tactics,
-            id: dataMitre.id[Math.floor(dataMitre.id.length * Math.random())],
+            tactic: arrayTactics,
+            id: arrayId,
+            technique: arrayTechniques
+        }
+
+        if (Math.random() <= 0.5) {
+            arrayTactics = [];
+            arrayId = [];
+            arrayTechniques = [];
+
+            dataMitre = randomArrayItem(Mitre.rule);
+            ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+
+            arrayTactics.push(dataMitre.tactic);
+            arrayId.push(ruleMitre.id);
+            arrayTechniques.push(ruleMitre.technique);
+
+            if (Math.random() <= 0.2) {
+                ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+                if(arrayId.indexOf(dataMitre.id === -1)) {
+                    arrayId.push(ruleMitre.id);
+                    arrayTechniques.push(ruleMitre.technique);
+                }
+            }
+            alert.rule.mitre.tactic.concat(arrayTactics);
+            alert.rule.mitre.id.concat(arrayId);
+            alert.rule.mitre.technique.concat(arrayTechniques);
         }
     }
 
