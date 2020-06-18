@@ -22,6 +22,6 @@ export const defaultExt = {
   gcp: false,
   virustotal: false,
   osquery: false,
-  mitre: false,
+  mitre: true,
   docker: false
 };
