@@ -65,11 +65,11 @@ class WzRulesetActionButtons extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      const mapFilters = Object.keys(filters).map(key => ({
-        name: key,
-        value: filters[key]
+      const mapFilters = filters.map(filter => ({
+        name: filter.field,
+        value: filter.value
       })); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
-      await this.exportCsv(`/${section}`, mapFilters, section);
+      await this.exportCsv(`/${section}${this.props.state.showingFiles ? '/files' : ''}`, mapFilters, section);
     } catch (error) {
       this.showToast('Error exporting as CSV', error.message || error, 'danger');
     }
