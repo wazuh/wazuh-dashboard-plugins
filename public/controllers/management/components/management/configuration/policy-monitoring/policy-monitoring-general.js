@@ -43,9 +43,9 @@ const allSettings = [
   { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
   { field: 'rootkit_files', label: 'Rootkit files database path' },
   { field: 'rootkit_trojans', label: 'Rootkit trojans database path' },
-  { field: 'windows_audit', label: 'Rootkit trojans database path' },
-  { field: 'windows_apps', label: 'Rootkit trojans database path' },
-  { field: 'windows_malware', label: 'Rootkit trojans database path' }
+  { field: 'windows_audit', label: 'Windows audit definition file path' },
+  { field: 'windows_apps', label: 'Windows application definition file path' },
+  { field: 'windows_malware', label: 'Windows malware definitions file path' }
 ];
 
 class WzConfigurationPolicyMonitoringGeneral extends Component {

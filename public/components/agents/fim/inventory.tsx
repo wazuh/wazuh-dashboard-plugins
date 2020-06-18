@@ -316,7 +316,7 @@ export class Inventory extends Component {
       : (<EuiPage>
         <EuiPanel>
           {tabs}
-          <EuiSpacer size={this.props.agent.os.platform === 'windows' ? 's' : 'm'} />
+          <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
           {table}
         </EuiPanel>
       </EuiPage>)

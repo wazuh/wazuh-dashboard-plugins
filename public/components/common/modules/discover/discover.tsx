@@ -122,7 +122,7 @@ export class Discover extends Component {
       "rule.description": "Description",
       "rule.level": "Level",
       "rule.mitre.id": "Technique(s)",
-      "rule.mitre.tactics": "Tactic(s)",
+      "rule.mitre.tactic": "Tactic(s)",
       "rule.pci_dss": "PCI DSS",
       "rule.gdpr": "GDPR",
       "rule.nist_800_53": "NIST 800-53",
