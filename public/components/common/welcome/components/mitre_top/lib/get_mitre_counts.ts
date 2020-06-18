@@ -28,7 +28,7 @@ function createFilters(indexPattern, agentId, tactic: string | undefined) {
   const filters = [
     wazuhFilter,
     { name: 'agent.id', value: agentId },
-    ...(tactic ? [{ name: 'rule.mitre.tactics', value: tactic }] : []),
+    ...(tactic ? [{ name: 'rule.mitre.tactic', value: tactic }] : []),
   ]
   return filters.map(filter);
 }
@@ -59,7 +59,7 @@ export async function getMitreCount(agentId, time, tactic: string | undefined) {
   const args = {
     tactics: {
       terms: {
-        field: `rule.mitre.${tactic ? 'id' : 'tactics'}`,
+        field: `rule.mitre.${tactic ? 'id' : 'tactic'}`,
         size: 5,
       }
     }
