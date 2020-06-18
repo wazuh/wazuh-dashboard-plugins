@@ -132,7 +132,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
         currentConfig['syscheck-syscheck'] &&
         currentConfig['syscheck-syscheck'].syscheck &&
         (currentConfig['syscheck-syscheck'].syscheck.directories &&
-        !currentConfig['syscheck-syscheck'].syscheck.directories.length &&
+        !currentConfig['syscheck-syscheck'].syscheck.directories.length  &&
         ((currentConfig['syscheck-syscheck'].syscheck.registry &&
         !currentConfig['syscheck-syscheck'].syscheck.registry.length) || !currentConfig['syscheck-syscheck'].syscheck.registry)) ? (
           <WzNoConfig error="not-present" help={helpLinks} />
@@ -141,7 +141,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
         currentConfig['syscheck-syscheck'] &&
         currentConfig['syscheck-syscheck'].syscheck &&
         currentConfig['syscheck-syscheck'].syscheck.directories &&
-        currentConfig['syscheck-syscheck'].syscheck.directories.length ? (
+        currentConfig['syscheck-syscheck'].syscheck.directories.length > 0 ? (
           <WzConfigurationSettingsTabSelector
             title="Monitored directories"
             description="These directories are included on the integrity scan"
@@ -153,6 +153,23 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
               items={items}
               settings={mainSettings}
             />
+            {((agent || {}).os || {}).platform === 'windows' &&
+              currentConfig &&
+              currentConfig['syscheck-syscheck'] &&
+              currentConfig['syscheck-syscheck'].syscheck &&
+              currentConfig['syscheck-syscheck'].syscheck.registry && (
+                <Fragment>
+                  <EuiSpacer />
+                  <WzConfigurationSettingsHeader
+                    title="Monitored registry entries"
+                    description="A list of registry entries that will be monitored"
+                  />
+                  <EuiBasicTable
+                    items={currentConfig['syscheck-syscheck'].syscheck.registry}
+                    columns={columnsAgentWin}
+                  />
+                </Fragment>
+            )}
           </WzConfigurationSettingsTabSelector>
         ) : null}
         {((agent || {}).os || {}).platform === 'windows' &&
@@ -166,35 +183,22 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
           currentConfig &&
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
-          currentConfig['syscheck-syscheck'].syscheck.registry && (
-              <Fragment>
-                {currentConfig['syscheck-syscheck'].syscheck.directories && currentConfig['syscheck-syscheck'].syscheck.directories.length && (
-                  <Fragment>
-                    <EuiSpacer />
-                    <WzConfigurationSettingsHeader
-                      title="Monitored registry entries"
-                      description="A list of registry entries that will be monitored"
-                    />
-                    <EuiBasicTable
-                      items={currentConfig['syscheck-syscheck'].syscheck.registry}
-                      columns={columnsAgentWin}
-                    />
-                  </Fragment>
-                ) || (
-                  <WzConfigurationSettingsTabSelector
-                    title="Monitored registry entries"
-                    description="A list of registry entries that will be monitored"
-                    currentConfig={currentConfig}
-                    minusHeight={this.props.agent.id === '000' ? 320 : 415}
-                    helpLinks={helpLinks}
-                  >
-                    <EuiBasicTable
-                      items={currentConfig['syscheck-syscheck'].syscheck.registry}
-                      columns={columnsAgentWin}
-                    />
-                  </WzConfigurationSettingsTabSelector>
-                )}
-              </Fragment>
+          currentConfig['syscheck-syscheck'].syscheck.registry &&
+          currentConfig['syscheck-syscheck'].syscheck.registry.length > 0 &&
+          ((currentConfig['syscheck-syscheck'].syscheck.directories && !currentConfig['syscheck-syscheck'].syscheck.directories.length)
+            || !currentConfig['syscheck-syscheck'].syscheck.directories) && (
+              <WzConfigurationSettingsTabSelector
+                title="Monitored registry entries"
+                description="A list of registry entries that will be monitored"
+                currentConfig={currentConfig}
+                minusHeight={this.props.agent.id === '000' ? 320 : 415}
+                helpLinks={helpLinks}
+              >
+                <EuiBasicTable
+                  items={currentConfig['syscheck-syscheck'].syscheck.registry}
+                  columns={columnsAgentWin}
+                />
+              </WzConfigurationSettingsTabSelector>
           )}
       </Fragment>
     );
