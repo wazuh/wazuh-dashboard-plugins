@@ -203,9 +203,8 @@ class WzRuleInfo extends Component {
    */
   setNewFiltersAndBack(filters) {
     window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
-    const fil = filters.filters || filters;
     this.props.cleanFilters();
-    this.props.updateFilters(fil);
+    this.props.updateFilters(filters);
     this.props.cleanInfo();
   }
 
@@ -226,7 +225,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>Level</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ level: level })}
+              onClick={async () => this.setNewFiltersAndBack([{field:'level', value: level}])}
             >
               {level}
             </EuiLink>
@@ -236,7 +235,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ file: file })}
+              onClick={async () => this.setNewFiltersAndBack([{field:'file', value: file}])}
             >
               {file}
             </EuiLink>
@@ -246,7 +245,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ path: path })}
+              onClick={async () => this.setNewFiltersAndBack([{field:'path', value: path}])}
             >
               {path}
             </EuiLink>
@@ -310,7 +309,7 @@ class WzRuleInfo extends Component {
       listGroups.push(
         <span key={group}>
           <EuiLink
-            onClick={async () => this.setNewFiltersAndBack({ group: group })}
+            onClick={async () => this.setNewFiltersAndBack([{field: 'group', value: group}])}
           >
             <EuiToolTip
               position="top"
@@ -343,12 +342,10 @@ class WzRuleInfo extends Component {
       const key = keys[i];
 
       const values = compliance[key].map((element, index) => {
-        const filters = {};
-        filters[key] = element;
         return (
           <span key={element}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ filters })}
+              onClick={async () => this.setNewFiltersAndBack([{field: key, value: element}])}
             >
               <EuiToolTip position="top" content="Filter by this compliance">
                 <span>{element}</span>
