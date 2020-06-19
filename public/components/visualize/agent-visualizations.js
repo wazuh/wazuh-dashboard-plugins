@@ -404,23 +404,38 @@ export const agentVisualizations = {
         ]
       },
       {
-        height: 270,
+        height: 330,
         vis: [
           {
             title: 'Most common CVEs',
             id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
-            width: 33
+            width: 25
           },
+          {
+            title: 'Alerts evolution: Commonly affected packages',
+            id: 'Wazuh-App-Agents-vuls-evolution-affected-packages',
+            width: 50
+          },
+          {
+            title: 'Most common CWEs',
+            id: 'Wazuh-App-Agents-vuls-Most-common-CWEs',
+            width: 25
+          }
+        ]
+      },
+      {
+        height: 330,
+        vis: [
           {
             title: 'Severity distribution',
             id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
-            width: 33
+            width: 25
           },
           {
-            title: 'Commonly affected packages',
-            id: 'Wazuh-App-Agents-vuls-Commonly-affected-packages',
-            width: 34
-          }
+            title: 'Top affected packages by CVEs',
+            id: 'Wazuh-App-Agents-vuls-packages-CVEs',
+            width: 75
+          },
         ]
       }
     ]
