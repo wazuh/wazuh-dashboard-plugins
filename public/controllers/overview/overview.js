@@ -148,11 +148,12 @@ export class OverviewController {
     if(agent && store.getState().appStateReducers.currentAgentData.id !== agent){
         const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
         const formattedData = data.data.data.items[0];
+        this.visualizeProps["isAgent"] = agent;
         store.dispatch(updateCurrentAgentData(formattedData));
       //this.$route.reload();
       //this.$location.search('agentId', null);
     }
-    setTimeout(() => { this.$location.search('agentId', null); }, 1);
+    //setTimeout(() => { this.$location.search('agentId', null); }, 1);
     
   }
 
@@ -191,6 +192,7 @@ export class OverviewController {
         this.tabView === 'discover'
       );
     }
+    setTimeout(() => {  this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null) }, 1);
     this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
     this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
 

@@ -57,14 +57,27 @@ export class FlyoutDetail extends Component {
         ? { "cluster.name": AppState.getClusterInfo().cluster }
         : { "manager.name": AppState.getClusterInfo().manager };
       this.setState({ clusterFilter });
-      const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, { file: this.props.fileName });
-      const currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
+      let currentFile;
+      if (typeof this.props.item === "boolean" && typeof this.props.fileName !== undefined) {
+        const regex = new RegExp('file=' + '[^&]*');
+        const match = window.location.href.match(regex);
+        if (match && match[0]) {
+          const file = decodeURIComponent(match[0].split('=')[1]);
+          const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {q: `file=${file}`});
+          currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
+        }
+      } else if(this.props.item){
+        currentFile = this.props.item;
+      }else{
+        const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {q: `file=${this.props.fileName}`});
+        currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
+      }
       if (!currentFile) {
         throw (false);
       }
       this.setState({ currentFile, type: currentFile.type, isLoading: false });
     } catch (err) {
-      this.setState({ error: `Data could not be fetched for ${this.props.fileName}` })
+      this.setState({ error: `Data could not be fetched for ${this.props.fileName}`, currentFile: {file: this.props.fileName} })
     }
   }
 
@@ -75,10 +88,10 @@ export class FlyoutDetail extends Component {
   render() {
     const { type } = this.state;
     return (
-      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.props.fileName} maxWidth="70%">
+      <EuiFlyout onClose={() => this.props.closeFlyout()} size="l" aria-labelledby={this.state.currentFile.file} maxWidth="70%">
         <EuiFlyoutHeader hasBorder className="flyout-header" >
           <EuiTitle size="s">
-            <h2 id={this.props.fileName}>{this.props.fileName}</h2>
+            <h2 id={this.state.currentFile.file }>{this.state.currentFile.file }</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
