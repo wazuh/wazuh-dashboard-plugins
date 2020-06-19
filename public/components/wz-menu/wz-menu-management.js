@@ -59,17 +59,17 @@ class WzMenuManagement extends Component {
   }
 
   async componentDidMount() {
-    try{
+    try {
       const adminMode = await checkAdminMode();
-      if(this.props.adminMode !== adminMode){
+      if (this.props.adminMode !== adminMode) {
         this.props.updateAdminMode(adminMode);
       };
-    }catch(error){}
+    } catch (error) { }
   }
 
-  clickMenuItem = (ev,section) => {
+  clickMenuItem = (ev, section) => {
     this.props.closePopover();
-    AppNavigate.navigateToModule(ev, 'manager', {tab: section} )
+    AppNavigate.navigateToModule(ev, 'manager', { tab: section })
   };
 
   createItem = (item, data = {}) => {
@@ -79,7 +79,7 @@ class WzMenuManagement extends Component {
       id: item.id,
       name: item.text,
       isSelected: this.props.state.section === item.id,
-      onClick: () => {},
+      onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
@@ -116,13 +116,13 @@ class WzMenuManagement extends Component {
     return (
       <div className="WzManagementSideMenu">
         <EuiFlexGroup>
-          <EuiFlexItem grow={false} style={{ marginLeft: 16 }}>
-              <EuiButtonEmpty iconType="apps"
-                onClick={() => {
-                  this.props.closePopover();
-                  window.location.href = '#/manager';
-                }}>
-                Management
+          <EuiFlexItem grow={false} style={{ marginLeft: 14 }}>
+            <EuiButtonEmpty iconType="apps"
+              onClick={() => {
+                this.props.closePopover();
+                window.location.href = '#/manager';
+              }}>
+              Management directory
               </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>

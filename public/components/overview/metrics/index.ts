@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Default extensions
+ * Wazuh app - Metric alerts component
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,18 +9,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const defaultExt = {
-  pci: true,
-  gdpr: true,
-  hipaa: true,
-  nist: true,
-  tsc: true,
-  audit: true,
-  oscap: false,
-  ciscat: false,
-  aws: false,
-  gcp: false,
-  virustotal: false,
-  osquery: false,
-  docker: false
-};
+
+export { Metrics } from './metrics';

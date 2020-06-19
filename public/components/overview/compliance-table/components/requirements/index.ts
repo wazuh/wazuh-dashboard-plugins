@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Mitre alerts components
+ * Wazuh app - Compliance table component
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

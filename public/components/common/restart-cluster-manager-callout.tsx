@@ -71,8 +71,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
     }catch(error){
       this.setState({ warningRestarting: false });
       this.props.onRestartedError();
-      this.showToast('danger', 'Error', error || error.message);
-
+      this.showToast('danger', 'Error', error.message || error );
     }
   };
   async componentDidMount(){

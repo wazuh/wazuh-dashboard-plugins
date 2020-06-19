@@ -23,11 +23,12 @@ import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import { ICustomBadges } from '../../../wz-search-bar/components';
+import { filtersToObject } from '../../../wz-search-bar';
 
 export class RegistryTable extends Component {
   state: {
     syscheck: [],
+    error?: string
     pageIndex: number
     pageSize: number
     totalItems: number
@@ -37,12 +38,12 @@ export class RegistryTable extends Component {
     isLoading: boolean
     currentFile: {
       file: string
-    }
+    },
+    syscheckItem: {}
   };
 
   props!: {
-    filters: {}
-    customBadges: ICustomBadges[]
+    filters: []
     totalItems: number
   }
 
@@ -60,7 +61,8 @@ export class RegistryTable extends Component {
       isFlyoutVisible: false,
       currentFile: {
         file: ""
-      }
+      },
+      syscheckItem: {}
     }
   }
 
@@ -76,10 +78,9 @@ export class RegistryTable extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { filters, customBadges } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)
-      || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
-      this.setState({ pageIndex: 0 }, this.getSyscheck)
+    const { filters } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck)
     }
   }
 
@@ -87,7 +88,8 @@ export class RegistryTable extends Component {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
 
-  async showFlyout(file, redirect = false) {
+  async showFlyout(file, item, redirect = false) {
+    window.location.href = window.location.href.replace(new RegExp("&file=" + "[^\&]*", 'g'), "");
     let fileData = false;
     if (!redirect) {
       fileData = this.state.syscheck.filter(item => {
@@ -100,24 +102,27 @@ export class RegistryTable extends Component {
     if (!redirect)
       window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item}));
   }
 
   async getSyscheck() {
-    const { filters } = this.props;
     const agentID = this.props.agent.id;
+    try {
+      const syscheck = await WzRequest.apiReq(
+        'GET',
+        `/syscheck/${agentID}`,
+        this.buildFilter()
+      );
 
-    const syscheck = await WzRequest.apiReq(
-      'GET',
-      `/syscheck/${agentID}`,
-      this.buildFilter()
-    );
-
-    this.setState({
-      syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
-      totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
-      isLoading: false
-    });
+      this.setState({
+        syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
+        totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
+        isLoading: false,
+        error: undefined,
+      });
+    } catch (error) {
+      this.setState({error, isLoading: false})
+    }
   }
 
   buildSortFilter() {
@@ -131,10 +136,10 @@ export class RegistryTable extends Component {
 
   buildFilter() {
     const { pageIndex, pageSize } = this.state;
-    const { filters } = this.props;
+    const filters = filtersToObject(this.props.filters);
+
     const filter = {
       ...filters,
-      ...this.buildQFilter(),
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
@@ -142,16 +147,6 @@ export class RegistryTable extends Component {
     };
 
     return filter;
-  }
-
-  buildQFilter() {
-    const { filters, customBadges } = this.props;
-    const parseConjuntions =  (arg) => ((/ and /gi.test(arg)) ? ';': ','); 
-    let qFilter = filters['q'] ? filters['q'] : '';
-    customBadges.forEach(
-      badge => badge.field === 'q' && (qFilter += badge.value) )
-    const q = qFilter.replace(/ and | or /gi, parseConjuntions)
-    return !!qFilter ? {q} : {}; 
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -189,11 +184,11 @@ export class RegistryTable extends Component {
       const { file } = item;
       return {
         'data-test-subj': `row-${file}`,
-        onClick: () => this.showFlyout(file),
+        onClick: () => this.showFlyout(file, item),
       };
     };
 
-    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading } = this.state;
+    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading, error } = this.state;
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
@@ -213,6 +208,7 @@ export class RegistryTable extends Component {
         <EuiFlexItem>
           <EuiBasicTable
             items={syscheck}
+            error={error}
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}
@@ -239,6 +235,7 @@ export class RegistryTable extends Component {
             <FlyoutDetail
             fileName={this.state.currentFile.file}
             agentId={this.props.agent.id}
+            item={this.state.syscheckItem}
             closeFlyout={() => this.closeFlyout()}
             type='registry'
             view='inventory'

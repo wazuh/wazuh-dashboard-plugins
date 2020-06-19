@@ -16,12 +16,9 @@ import {
   EuiFlexItem,
   EuiFacetButton,
   EuiFacetGroup,
-  EuiCheckbox,
   EuiPopover,
   EuiButtonIcon,
-  EuiFormRow,
-  EuiButton,
-  EuiButtonEmpty,
+  EuiLoadingSpinner,
   EuiContextMenu,
   EuiIcon
 } from '@elastic/eui'
@@ -61,10 +58,9 @@ export class Tactics extends Component {
 
   async componentDidMount(){
     this._isMount = true;
-    await this.getTacticsCount(true);
   }
 
-  initTactics(buckets){
+  initTactics(){
     const tacticsIds = Object.keys(this.props.tacticsObject);
     const selectedTactics = {}
     /*let isMax = {};
@@ -93,8 +89,12 @@ export class Tactics extends Component {
 
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { filterParams, indexPattern, selectedTactics } = this.props;
-    const { tacticsCount } = this.state;
+    const { filterParams, indexPattern, selectedTactics, isLoading } = this.props;
+    const { tacticsCount, loadingAlerts } = this.state;
+    if (nextState.loadingAlerts !== loadingAlerts)
+      return true;
+    if (nextProps.isLoading !== isLoading) 
+      return true;
     if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams))
       return true;
     if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern))
@@ -106,9 +106,9 @@ export class Tactics extends Component {
     return false;
   }
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { filterParams } = this.props;
-    if (JSON.stringify(this.state.prevFilters) !== JSON.stringify(filterParams)){
+  async componentDidUpdate(prevProps) {
+    const { isLoading, tacticsObject } = this.props;
+    if (JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) || isLoading !== prevProps.isLoading){
       this.getTacticsCount(this.state.firstTime);
     }
   }
@@ -122,15 +122,16 @@ export class Tactics extends Component {
     });
   };
 
-  async getTacticsCount(firstTime=false) {
-    this.setState({loadingAlerts: true, prevFilters: this.props.filterParams});
+  async getTacticsCount() {
+    this.setState({loadingAlerts: true});
+    const { firstTime } = this.state;
     try{
       const {indexPattern, filterParams} = this.props;
       if ( !indexPattern ) { return; }
       const aggs = {
         tactics: {
           terms: {
-              field: "rule.mitre.tactics",
+              field: "rule.mitre.tactic",
               size: 1000,
           }
         }
@@ -138,10 +139,10 @@ export class Tactics extends Component {
       
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
-      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
+      const { data } = await getElasticAlerts(indexPattern, filterParams, aggs);
       const { buckets } = data.aggregations.tactics;
       if(firstTime){
-       this.initTactics(buckets); // top tactics are checked on component mount
+        this.initTactics(buckets); // top tactics are checked on component mount
       }
       this._isMount && this.setState({tacticsCount: buckets, loadingAlerts: false, firstTime:false});
         
@@ -186,8 +187,6 @@ export class Tactics extends Component {
       }}
     );
     
-    this.checkAllChecked(tacticsList);
-
     return (
       <>
       {tacticsList.sort((a, b) => b.quantity - a.quantity).map(facet => {
@@ -297,10 +296,12 @@ export class Tactics extends Component {
             </EuiPopover>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFacetGroup style={{ }}>
-          {this.getTacticsList()}
-        </EuiFacetGroup>
-
+        { this.props.isLoading
+          ? <EuiFlexItem style={{  alignItems: 'center', marginTop: 50 }} ><EuiLoadingSpinner size="xl" /></EuiFlexItem>
+          : <EuiFacetGroup style={{ }}>
+              {this.getTacticsList()}
+            </EuiFacetGroup>
+        }
       </div>
     )
   }

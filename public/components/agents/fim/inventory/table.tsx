@@ -21,12 +21,12 @@ import {
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import './inventory.less';
-import { ICustomBadges } from '../../../wz-search-bar/components';
-import { filtersToObject } from '../../../wz-search-bar';
+import { filtersToObject, IFilter } from '../../../wz-search-bar';
 
 export class InventoryTable extends Component {
   state: {
     syscheck: []
+    error?: string
     pageIndex: number
     pageSize: number
     totalItems: number
@@ -36,13 +36,12 @@ export class InventoryTable extends Component {
     isLoading: boolean
     currentFile: {
       file: string
-    }
+    },
+    syscheckItem: {}
   };
 
   props!: {
-    filters: []
-    onFilterSelect(): void
-    customBadges: ICustomBadges[]
+    filters: IFilter[]
     agent: any
     items: []
     totalItems: number
@@ -62,7 +61,8 @@ export class InventoryTable extends Component {
       isFlyoutVisible: false,
       currentFile: {
         file: ""
-      }
+      },
+      syscheckItem: {}
     }
   }
 
@@ -80,7 +80,8 @@ export class InventoryTable extends Component {
     this.setState({ isFlyoutVisible: false, currentFile: {} });
   }
 
-  async showFlyout(file, redirect = false) {
+  async showFlyout(file, item, redirect = false) {
+    window.location.href = window.location.href.replace(new RegExp("&file=" + "[^\&]*", 'g'), "");
     let fileData = false;
     if (!redirect) {
       fileData = this.state.syscheck.filter(item => {
@@ -93,32 +94,35 @@ export class InventoryTable extends Component {
     if (!redirect)
       window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: fileData[0] }));
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item }));
   }
 
-  componentDidUpdate(prevProps) {
-    const { filters, customBadges } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters) 
-     || JSON.stringify(customBadges) !== JSON.stringify(prevProps.customBadges)) {
-      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck)
+  async componentDidUpdate(prevProps) {
+    const { filters } = this.props;
+    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
+      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck);
     }
   }
 
   async getSyscheck() {
     const agentID = this.props.agent.id;
-
-    const syscheck = await WzRequest.apiReq(
+    try {
+      const syscheck = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
       this.buildFilter()
-    );
-
-    this.setState({
-      syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
-      totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
-      isLoading: false
-    });
-  }
+      );
+      
+      this.setState({
+        syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
+        totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
+        isLoading: false,
+        error: undefined
+      });
+    } catch (error) {
+      this.setState({error, isLoading: false})
+    }
+}
 
   buildSortFilter() {
     const { sortField, sortDirection } = this.state;
@@ -158,7 +162,7 @@ export class InventoryTable extends Component {
 
   columns() {
     let width;
-    this.props.agent.os.platform === 'windows' ? width = '60px' : width = '80px';
+    (((this.props.agent || {}).os || {}).platform || false) === 'windows' ? width = '60px' : width = '80px';
     return [
       {
         field: 'file',
@@ -221,11 +225,11 @@ export class InventoryTable extends Component {
       const { file } = item;
       return {
         'data-test-subj': `row-${file}`,
-        onClick: () => this.showFlyout(file),
+        onClick: () => this.showFlyout(file, item),
       };
     };
 
-    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading } = this.state;
+    const { syscheck, pageIndex, pageSize, totalItems, sortField, sortDirection, isLoading, error } = this.state;
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
@@ -245,6 +249,7 @@ export class InventoryTable extends Component {
         <EuiFlexItem>
           <EuiBasicTable
             items={syscheck}
+            error={error}
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}
@@ -268,8 +273,9 @@ export class InventoryTable extends Component {
           <EuiOverlayMask
             onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
             <FlyoutDetail
-              fileName={this.state.currentFile.file}
+              fileName={this.state.currentFile}
               agentId={this.props.agent.id}
+              item={this.state.syscheckItem}
               closeFlyout={() => this.closeFlyout()}
               type='file'
               view='inventory'

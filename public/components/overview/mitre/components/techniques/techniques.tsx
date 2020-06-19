@@ -25,9 +25,8 @@ import {
   EuiContextMenu,
   EuiIcon,
   EuiOverlayMask,
-  EuiButtonIcon,
   EuiCallOut,
-  EuiProgress
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
@@ -79,12 +78,24 @@ export const Techniques = withWindowSize(class Techniques extends Component {
   
   async componentDidMount(){
     this._isMount = true;
-    await this.getTechniquesCount();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { filterParams, indexPattern, selectedTactics, isLoading } = this.props;
+    if (nextProps.isLoading !== isLoading) 
+      return true;
+    if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams))
+      return true;
+    if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern))
+      return true;
+    if (JSON.stringify(nextState.selectedTactics) !== JSON.stringify(selectedTactics))
+      return true;
+    return false;
   }
 
   componentDidUpdate(prevProps) {
-    const { filters } = this.props;
-    if ( JSON.stringify(prevProps.filters) !== JSON.stringify(filters) )
+    const { isLoading, tacticsObject, filters } = this.props;
+    if ( JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) || (isLoading !== prevProps.isLoading))
       this.getTechniquesCount();
   }
 
@@ -244,12 +255,11 @@ export const Techniques = withWindowSize(class Techniques extends Component {
       );
         
     })
-    if(this.state.isSearching || this.state.loadingAlerts){
+    if(this.state.isSearching || this.state.loadingAlerts || this.props.isLoading){
       return (
-        <Fragment>
-          <EuiSpacer />
-          <EuiProgress size="xs" color="primary" />
-        </Fragment>
+        <EuiFlexItem style={{ height: "calc(100vh - 410px)", alignItems: 'center' }} >
+          <EuiLoadingSpinner size='xl' style={{ margin: 0, position: 'absolute', top: '50%', transform: 'translateY(-50%)' }} />
+        </EuiFlexItem>
       )
     }
     if(tacticsToRender.length){

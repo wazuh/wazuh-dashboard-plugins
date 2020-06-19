@@ -12,32 +12,6 @@
 
 export const agentVisualizations = {
   general: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-General-Metric-alerts',
-        description: 'Total',
-        value: 'totalAlerts',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-General-Level-12-alerts',
-        description: 'Level 12 or above alerts',
-        value: 'level12',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Agents-General-Authentication-failure',
-        description: 'Authentication failure',
-        value: 'authFailure',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Agents-General-Authentication-success',
-        description: 'Authentication success',
-        value: 'authSuccess',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 400,
@@ -413,28 +387,6 @@ export const agentVisualizations = {
     ]
   },
   vuls: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-Critical-severity',
-        description: 'Critical severity alerts',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-High-severity',
-        description: 'High severity alerts',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-Medium-severity',
-        description: 'Medium severity alerts',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-Low-severity',
-        description: 'Low severity alerts',
-        color: 'subdued'
-      }
-    ],
     rows: [
       {
         height: 400,
@@ -494,23 +446,6 @@ export const agentVisualizations = {
     ]
   },
   virustotal: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-Virustotal-Total-Malicious',
-        description: 'Total malicious',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Agents-Virustotal-Total-Positives',
-        description: 'Total positives',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-Virustotal-Total',
-        description: 'Total',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 250,
@@ -645,23 +580,6 @@ export const agentVisualizations = {
     ]
   },
   oscap: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-OSCAP-Last-score',
-        description: 'Last score',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Agents-OSCAP-Higher-score-metric',
-        description: 'Highest score',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-OSCAP-Lower-score-metric',
-        description: 'Lowest score',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 230,
@@ -715,48 +633,6 @@ export const agentVisualizations = {
     ]
   },
   ciscat: {
-    metrics: [
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-error',
-        description: 'Last not checked',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-fail',
-        description: 'Last pass',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-not-checked',
-        description: 'Last scan score',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-pass',
-        description: 'Last scan date',
-        color: 'subdued'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-score',
-        description: 'Last errors',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-timestamp',
-        description: 'Last fails',
-        color: 'primary'
-      },
-      // {
-      //   id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark',
-      //   description: 'Last scan benchmark',
-      //   color: 'secondary'
-      // },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-unknown',
-        description: 'Last unknown',
-        color: 'subdued'
-      }
-    ],
     rows: [
       {
         height: 320,
@@ -804,28 +680,6 @@ export const agentVisualizations = {
     ]
   },
   audit: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-Audit-New-files-metric',
-        description: 'New files',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-Audit-Read-files-metric',
-        description: 'Read files',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-App-Agents-Audit-Modified-files-metric',
-        description: 'Modified files',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Agents-Audit-Removed-files-metric',
-        description: 'Removed files',
-        color: 'danger'
-      }
-    ],
     rows: [
       {
         height: 250,

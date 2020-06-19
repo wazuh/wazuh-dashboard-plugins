@@ -44,10 +44,10 @@ export default class EnableModules extends Component {
           title: 'Threat Detection and Response',
           modules: [
             { name: 'vuls', default: true, agent: false },
+            { name: 'mitre', default: true, agent: false },
             { name: 'virustotal', default: false, agent: false },
             { name: 'osquery', default: false, agent: false },
             { name: 'docker', default: false, agent: false },
-            { name: 'mitre', default: true, agent: false },
           ]
         },
         {

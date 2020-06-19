@@ -17,6 +17,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { updateCurrentTab, updateCurrentAgentData} from '../../redux/actions/appStateActions';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
@@ -147,11 +148,13 @@ export class OverviewController {
     if(agent && store.getState().appStateReducers.currentAgentData.id !== agent){
         const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
         const formattedData = data.data.data.items[0];
+        this.visualizeProps["isAgent"] = agent;
         store.dispatch(updateCurrentAgentData(formattedData));
+        this.$location.search('agentId', String(agent));
       //this.$route.reload();
       //this.$location.search('agentId', null);
     }
-    setTimeout(() => { this.$location.search('agentId', null); }, 1);
+    //setTimeout(() => { this.$location.search('agentId', null); }, 1);
     
   }
 
@@ -190,6 +193,7 @@ export class OverviewController {
         this.tabView === 'discover'
       );
     }
+    setTimeout(() => {  this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null) }, 1);
     this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
     this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
 
@@ -225,7 +229,7 @@ export class OverviewController {
       }
       this.tabView = subtab;
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
     }
     this.agentsSelectionProps.subtab = subtab;
     this.$scope.$applyAsync();
@@ -280,7 +284,7 @@ export class OverviewController {
       }
       this.overviewModuleReady = true;
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
     }
     this.$scope.$applyAsync();
     return;
@@ -363,7 +367,7 @@ export class OverviewController {
 
       });
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
     }
     this.$scope.$applyAsync();
     return;

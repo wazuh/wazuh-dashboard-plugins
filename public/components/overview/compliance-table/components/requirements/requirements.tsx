@@ -15,9 +15,10 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFacetButton,
-  EuiFacetGroup
+  EuiFacetGroup,
+  EuiToolTip
 } from '@elastic/eui';
-
+import { requirementsName } from '../../requirement-name';
 
 export class ComplianceRequirements extends Component {
   _isMount = false;
@@ -67,18 +68,30 @@ export class ComplianceRequirements extends Component {
       <>
       {requirementList.sort((a, b) => b.quantity - a.quantity).map(facet => {
         let iconNode;
+        const name = requirementsName[facet.label] || `Requirement ${facet.label}`;
         return (
           <EuiFacetButton
             key={"Requirement " + facet.id}
             id={`Requirement ${facet.id}`}
             quantity={facet.quantity}
             isSelected={this.props.selectedRequirements[facet.id]}
-            isLoading={this.state.loadingAlerts}
+            isLoading={this.props.loadingAlerts}
             icon={iconNode}
             onClick={
               facet.onClick ? () => facet.onClick(facet.id) : undefined
             }>
-            Requirement {facet.label}
+
+                <EuiToolTip position="top" content={name} anchorClassName="wz-display-inline-grid" >
+                  <span style={{
+                    display: "block",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis"
+                  }}>
+                    Requirement {facet.label}
+                  </span>
+                </EuiToolTip>
+            
           </EuiFacetButton>
         );
       })}
@@ -109,7 +122,7 @@ export class ComplianceRequirements extends Component {
       sectionStyle["height"] = 350;
     }
     return (
-      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px", minHeight: 300,  ...sectionStyle}}>
+      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px", minHeight: 300,  height: "100%"}}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="m">
