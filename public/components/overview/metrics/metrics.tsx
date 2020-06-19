@@ -36,12 +36,10 @@ export class Metrics extends Component {
   filterManager: FilterManager;
   indexPattern: any;
   state: {
+    resultState: string,
     results: object,
     loading: boolean,
-    dateRange: object,
     filterParams: object,
-    query: object,
-    searchBarFilters: [],
   } 
   metricsList: object;
 
@@ -53,6 +51,7 @@ export class Metrics extends Component {
     this.filterManager = this.KibanaServices.filterManager;
     this.timefilter = this.KibanaServices.timefilter;
     this.state = {
+      resultState: "",
       results: {},
       loading: true,
       filterParams: {
@@ -61,6 +60,7 @@ export class Metrics extends Component {
         time: {from: 'init', to: 'init'},
       },
     }
+    this.stats = <></>;
 
     this.metricsList = {
       general: [
@@ -125,10 +125,8 @@ export class Metrics extends Component {
 
   buildMetric(){
     if(!this.metricsList[this.props.section] || !this._isMount) return <></>;
-
     const newFilters = this.filterManager.filters;
     const newTime = this.timefilter.getTime();
-    if(JSON.stringify(this.state.filterParams.filters) !== JSON.stringify(newFilters) || JSON.stringify(newTime) !== JSON.stringify(this.state.filterParams.time)  ){
       const filterParams = {};
       filterParams["time"] = this.timefilter.getTime(); 
       filterParams["query"] = this.state.filterParams.query; 
@@ -242,9 +240,21 @@ export class Metrics extends Component {
         });
         this.setState({results: newResults, loading:false})
       });
+    
+  }
 
- 
+  componentDidUpdate(){
+    if(!this.state.loading && this.props.resultState === 'ready' && this.state.resultState === 'loading'){
+      this.setState({loading:true, resultState: this.props.resultState}, () => {
+        this.stats = this.buildMetric();
+      }); 
+    }else if(this.props.resultState !== this.state.resultState){
+      this.setState({resultState: this.props.resultState});
     }
+  }
+
+
+  buildStatsComp(){
     const { section } = this.props;
     if(this.metricsList[section]){
       return this.metricsList[section].map((item,idx) => {
@@ -264,10 +274,8 @@ export class Metrics extends Component {
     }
   }
 
-
-
   render() {
-    const stats = this.buildMetric();
+    const stats = this.buildStatsComp();
     return (     
       <EuiFlexGroup>
           <EuiFlexItem />
