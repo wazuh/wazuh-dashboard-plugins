@@ -11,26 +11,21 @@
  */
 import React, { Component } from 'react'
 import { Tactics, Techniques } from './components'; 
-import { ModulesHelper } from '../../common/modules'
 import { 
-  EuiPage,
   EuiPanel,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiSpacer
 } from '@elastic/eui';
 import { ApiRequest } from '../../../react-services/api-request';
 import { toastNotifications } from 'ui/notify';
-import { IFilterParams, getElasticAlerts, getIndexPattern } from './lib';
+import { IFilterParams, getIndexPattern } from './lib';
 
 import { SearchBar, FilterManager } from '../../../../../../src/plugins/data/public/';
 import { KibanaContextProvider } from '../../../../../../src/plugins/kibana_react/public/context';
 import { I18nProvider } from '@kbn/i18n/react';
 //@ts-ignore
-import { npSetup } from 'ui/new_platform';
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-import DateMatch from '@elastic/datemath';
 
 import {
   TimeRange,
@@ -61,6 +56,7 @@ export class Mitre extends Component {
     filterParams: IFilterParams,
     query: Query,
     searchBarFilters: [],
+    isLoading: boolean
   } 
 
   props: any;
@@ -73,10 +69,11 @@ export class Mitre extends Component {
     this.state = {
       tacticsObject: {},
       selectedTactics: {},
+      isLoading: true,
       filterParams: {
-        filters: [],
+        filters: this.filterManager.filters || [],
         query: { language: 'kuery', query: '' },
-        time: {from: 'init', to: 'init'},
+        time: this.timefilter._time,
       },
       dateRange: this.timefilter.getTime(),
       query: { language: "kuery", query: "" },
@@ -95,7 +92,7 @@ export class Mitre extends Component {
     filterParams["time"] = dateRange;
     filterParams["query"] = query; 
     filterParams["filters"] = this.state.filterParams["filters"]; 
-    this.setState({ dateRange, query, filterParams });
+    this.setState({ dateRange, query, filterParams, isLoading: true }, () => this.setState({isLoading:false}));
   }
 
   onFiltersUpdated = (filters: []) => {
@@ -133,13 +130,6 @@ export class Mitre extends Component {
 
   getSearchBar() {
     const { filterManager, KibanaServices } = this;
-    if (JSON.stringify(filterManager.filters) !== JSON.stringify(this.state.filterParams.filters || JSON.stringify(this.state.dateRange) !== JSON.stringify(this.state.filterParams.time))){
-      const filterParams = {};
-      filterParams["filters"] = filterManager.filters
-      filterParams["query"] = this.state.filterParams.query
-      filterParams["time"] = this.state.dateRange
-      this.setState({filterParams})
-    }
 
     const storage = {
       ...window.localStorage,
@@ -159,7 +149,7 @@ export class Mitre extends Component {
         ...KibanaServices.data.query,
       }
     }
-    const { dateRange, query, searchBarFilters } = this.state;
+    const { dateRange, query, isLoading } = this.state;
     return (
       <KibanaContextProvider services={{
           ...KibanaServices,
@@ -178,13 +168,13 @@ export class Mitre extends Component {
             onQuerySubmit={this.onQuerySubmit}
             onFiltersUpdated={this.onFiltersUpdated}
             query={query}
+            isLoading={isLoading}
             timeHistory={this.timefilter._history}
             {...{ appName: 'wazuhMitre' }} />
         </I18nProvider>
       </KibanaContextProvider>
     );
   }
-
 
   async buildTacticsObject(){
     try{
@@ -200,7 +190,7 @@ export class Mitre extends Component {
             tacticsObject[tactic].push(id);
           })
         });
-      this._isMount && this.setState({tacticsObject});
+      this._isMount && this.setState({tacticsObject, isLoading: false});
     }catch(err){
       this.showToast(
         'danger',
@@ -216,7 +206,6 @@ export class Mitre extends Component {
   }
 
   render() {
-    const { tacticsObject, selectedTactics, filterParams } = this.state;
     return (
       <div>
         <EuiFlexGroup>
@@ -228,7 +217,6 @@ export class Mitre extends Component {
         <EuiFlexGroup style={{margin: 8}}>
           <EuiFlexItem>
             <EuiPanel paddingSize="none">
-              {!!Object.keys(tacticsObject).length && this.state.filterParams.time.from !== "init" && 
                 <EuiFlexGroup >
                   <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, height: "calc(100vh - 280px)",overflowX: "hidden"}}>
                     <Tactics 
@@ -238,14 +226,13 @@ export class Mitre extends Component {
                       {...this.state} />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <Techniques
+                      <Techniques
                       indexPattern={this.indexPattern}
                       filters={this.state.filterParams}
                       onSelectedTabChanged={(id) => this.props.onSelectedTabChanged(id)}
-                      {...this.state} />
+                      {...this.state} /> 
                   </EuiFlexItem>
                 </EuiFlexGroup>
-              }
             </EuiPanel>
             
           </EuiFlexItem>

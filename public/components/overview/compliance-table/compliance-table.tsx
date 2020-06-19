@@ -31,7 +31,6 @@ import { nistRequirementsFile } from '../../../../server/integration-files/nist-
 import { tscRequirementsFile } from '../../../../server/integration-files/tsc-requirements';
 
 
-
 export class ComplianceTable extends Component {
   _isMount = false;
   timefilter: {
@@ -52,6 +51,7 @@ export class ComplianceTable extends Component {
     searchBarFilters: [],
     complianceObject: object,
     descriptions: object,
+    loadingAlerts: boolean
     selectedRequirements: object,
   }
 
@@ -67,6 +67,7 @@ export class ComplianceTable extends Component {
       flyoutOn: true,
       complianceObject: {},
       descriptions: {},
+      loadingAlerts: true,
       selectedRequirements: {},
       filterParams: {
         filters: [],
@@ -186,7 +187,7 @@ export class ComplianceTable extends Component {
     filterParams["time"] = dateRange;
     filterParams["query"] = query;
     filterParams["filters"] = this.state.filterParams["filters"];
-    this.setState({ dateRange, query, filterParams });
+    this.setState({ dateRange, query, filterParams, loadingAlerts: true });
   }
 
   onFiltersUpdated = (filters: []) => {
@@ -228,7 +229,7 @@ export class ComplianceTable extends Component {
         ...KibanaServices.data.query,
       }
     }
-    const { dateRange, query, searchBarFilters } = this.state;
+    const { dateRange, query, loadingAlerts } = this.state;
     return (
       <KibanaContextProvider services={{
         ...KibanaServices,
@@ -247,6 +248,7 @@ export class ComplianceTable extends Component {
             onQuerySubmit={this.onQuerySubmit}
             onFiltersUpdated={this.onFiltersUpdated}
             query={query}
+            isLoading={loadingAlerts}
             timeHistory={this.timefilter._history}
             {...{ appName: 'wazuhCompliance' }} />
         </I18nProvider>
@@ -254,15 +256,14 @@ export class ComplianceTable extends Component {
     );
   }
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { filterParams } = this.state;
-    if (JSON.stringify(this.state.prevFilters) !== JSON.stringify(filterParams)) {
+  async componentDidUpdate(prevProps) {
+    const { filterParams, loadingAlerts } = this.state;
+    if (JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams) && loadingAlerts) {
       this.getRequirementsCount();
     }
   }
 
   async getRequirementsCount() {
-    this.setState({ loadingAlerts: true, prevFilters: this.state.filterParams });
     try {
       const { filterParams } = this.state;
       if (!this.indexPattern) { return; }
@@ -326,7 +327,7 @@ export class ComplianceTable extends Component {
 
 
   render() {
-    const { complianceObject, selectedRequirements, filterParams } = this.state;
+    const { complianceObject } = this.state;
     return (<div>
       <EuiFlexGroup>
         <EuiFlexItem>
