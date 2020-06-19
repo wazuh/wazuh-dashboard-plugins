@@ -150,6 +150,7 @@ export class OverviewController {
         const formattedData = data.data.data.items[0];
         this.visualizeProps["isAgent"] = agent;
         store.dispatch(updateCurrentAgentData(formattedData));
+        this.$location.search('agentId', String(agent));
       //this.$route.reload();
       //this.$location.search('agentId', null);
     }
