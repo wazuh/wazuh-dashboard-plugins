@@ -149,8 +149,6 @@ export class OverviewController {
         const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
         const formattedData = data.data.data.items[0];
         store.dispatch(updateCurrentAgentData(formattedData));
-      //this.$route.reload();
-      //this.$location.search('agentId', null);
     }
     setTimeout(() => { this.$location.search('agentId', null); }, 1);
     
@@ -172,8 +170,7 @@ export class OverviewController {
     }
     this.isAgent = agentList ? agentList[0] : false;
     this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
-    if(agentList && agentList.length ){ // && this.rawVisualizations.getType() !== 'agents'){
-      //this.$rootScope.resultState = "Fetching dashboard data...";
+    if(agentList && agentList.length ){
       await this.visFactoryService.buildAgentsVisualizations(
         this.filterHandler,
         this.tab,
@@ -182,9 +179,7 @@ export class OverviewController {
         (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
         ); 
       this.oldFilteredTab = this.tab;
-    }else if(!agentList && this.tab !== 'welcome'){ //&& this.rawVisualizations.getType() !== 'general'){ // this.tab !== 'welcome' prevents to load visualization in Overview welcome
-      //this.$rootScope.resultState = "Fetching dashboard data...";
-      console.log("ow")
+    }else if(!agentList && this.tab !== 'welcome'){ 
       if(!store.getState().appStateReducers.currentAgentData.id){
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
@@ -198,10 +193,6 @@ export class OverviewController {
 
     this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
     this.$rootScope.$applyAsync();
-    //this.$scope.$applyAsync();
-    
-    //update dashboard visualizations depending if its an agent or not
-    //this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
 
   }
 
@@ -363,7 +354,6 @@ export class OverviewController {
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
-      //store.dispatch(updateCurrentTab(this.tab));
       store.dispatch(updateCurrentTab(this.tab));
 
       this.$scope.$on('sendVisDataRows', (ev, param) => {
