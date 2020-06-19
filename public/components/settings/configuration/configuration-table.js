@@ -10,7 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiBasicTable, EuiCallOut } from '@elastic/eui';
+import {
+  EuiBasicTable,
+  EuiCallOut,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiButton
+} from '@elastic/eui';
 
 import ConfigurationHandler from './utils/configuration-handler';
 import { toastNotifications } from 'ui/notify';
@@ -98,6 +104,16 @@ export class WzConfigurationTable extends Component {
           'You must restart Kibana for the changes to take effect',
           3000
         );
+      } else if (response.needReload) {
+        toastNotifications.add({
+          color: 'success',
+          title: 'This settings require you to reload the page to take effect.',
+          text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+            <EuiFlexItem grow={false}>
+              <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        })
       } else {
         this.showToast(
           'success',
@@ -152,7 +168,6 @@ export class WzConfigurationTable extends Component {
     }
   }
 
-  onTableChange = () => {};
 
   render() {
     const { isLoading, error } = this.state;
@@ -172,7 +187,6 @@ export class WzConfigurationTable extends Component {
             itemId="id"
             items={items}
             columns={columns}
-            onChange={this.onTableChange}
             loading={isLoading}
             message={message}
           />
