@@ -23,6 +23,10 @@ html {
   color: white;
 }
 
+.wz-global-breadcrumb .euiToolTipAnchor {
+  color: #98A2B3!important;
+}
+
 .app-wrapper-panel {
   background-color: #1a1b20;
 }
