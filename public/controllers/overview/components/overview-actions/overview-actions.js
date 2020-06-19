@@ -40,147 +40,14 @@ class OverviewActions extends Component {
     };
   }
 
-  /**
-   * Compares the new applied filters with the previous filters to detect if any filter has been added.
-   * If a 'agent.id' filter has been added, we update the parent component with this information.
-   */
-  agentsFilterAdded() {
-    let result = [];
-    const addedFilters = this.state.filterManager.filters.filter(item => {
-      // get the filters that have been added
-      return !this.state.oldFilters.some(oldItem => {
-        return JSON.stringify(oldItem.query) === JSON.stringify(item.query);
-      });
-    });
-    const isAgentFilter = addedFilters.filter(item => {
-      // we are only interested in 'agent.id' filters
-      return item.meta.key === 'agent.id';
-    });
-    const isAgentFilterIs = isAgentFilter.filter(item => {
-      // 'agent.id is X' filter
-      return item.meta.type === 'phrase' && !item.meta.negate;
-    });
-    if (isAgentFilterIs.length) {
-      result = [isAgentFilterIs[0].meta.params.query];
-    }
+  async removeAgentsFilter(shouldUpdate = true) {
 
-    const isAgentFilterIsOneOf = isAgentFilter.filter(item => {
-      // agent.id is one of [X,Y,Z]
-      return item.meta.type === 'phrases' && !item.meta.negate;
-    });
-    if (isAgentFilterIsOneOf.length) {
-      result = [...isAgentFilterIsOneOf[0].meta.params];
-    }
-    if (result.length)
-      this.updateAgentSearch(result);
-  }
-
-  /**
-   * Compares the new applied filters with the previous filters to detect if any filter has been removed.
-   * If a 'agent.id' filter has been removed, we update the parent component.
-   */
-  agentsFilterRemoved() {
-    // get the filters that have been removed
-    const removedFilters = this.state.oldFilters.filter(item => {
-      return !this.state.filterManager.filters.some(oldItem => {
-        return JSON.stringify(oldItem.query) === JSON.stringify(item.query);
-      });
-    });
-
-    const isAgentFilter = removedFilters.filter(item => {
-      return item.meta.key === 'agent.id';
-    });
-    if (isAgentFilter.length) {
-      //this.removeAgentsFilter();
-      //this.props.setAgent(false);
-      //this.setState({ isAgent: false });
-    }
-  }
-
-  /**
-   * Compares the new applied filters with the previous filters to detect if any filter has been modified.
-   * If a 'agent.id' filter  has been modified, we update the parent component.
-   */
-  agentsFilterModified() {
-    const modifiedFilters = this.state.filterManager.filters.filter(item => {
-      // get the filters that have been added
-      return this.state.oldFilters.some(oldItem => {
-        return (
-          oldItem.meta.key === 'agent.id' &&
-          item.meta.key === 'agent.id' &&
-          JSON.stringify(oldItem.query) !== JSON.stringify(item.query)
-        );
-      });
-    });
-    const result = [];
-
-    const isAgentFilterIs = modifiedFilters.filter(item => {
-      // 'agent.id is X' filter
-      return item.meta.type === 'phrase' && !item.meta.negate;
-    });
-    if (isAgentFilterIs.length) {
-      result = [isAgentFilterIs[0].meta.params.query];
-    }
-
-    const isAgentFilterIsOneOf = modifiedFilters.filter(item => {
-      // agent.id is one of [X,Y,Z]
-      return item.meta.type === 'phrases' && !item.meta.negate;
-    });
-    if (isAgentFilterIsOneOf.length) {
-      result = [...isAgentFilterIsOneOf[0].meta.params];
-    }
-    if (result.length) this.updateAgentSearch(result);
-  }
-
-  onFilterUpdate() {
-    const areAgentsFilter = this.state.filterManager.filters.filter(item => {
-      return item.meta.key === 'agent.id';
-    });
-    if (!areAgentsFilter.length) {
-      this.props.setAgent(false);
-      this.setState({ isAgent: false });
-    }
-    if (areAgentsFilter.length) {
-      const agentsList = areAgentsFilter[0].meta.params.query ? [areAgentsFilter[0].meta.params.query] : areAgentsFilter[0].meta.params;
-      this.props.setAgent(agentsList);
-    }
-
-    if (this.state.oldFilters) {
-      // if oldFilters length is less than current filters, it means some filters have been added
-      if (this.state.oldFilters.length < this.state.filterManager.filters.length) {
-        this.agentsFilterAdded();
-      }
-
-      // if oldFilters length is higher than current filters, it means some filters have been removed
-      if (this.state.oldFilters.length > this.state.filterManager.filters.length) {
-        this.agentsFilterRemoved();
-      }
-
-      //if oldFilters length is the same as the current filters length, updated a filter?
-      if (this.state.oldFilters.length === this.state.filterManager.filters.length) {
-        //this.agentsFilterModified();
-        // TODO handle modified
-        //alert("filter modified")
-      }
-    }
-    this.setState({ oldFilters: this.state.filterManager.filters });
-  }
-
-  removeAgentsFilter(shouldUpdate = true) {
-    //this.props.buildOverview();
-    if (shouldUpdate) {
-      this.props.setAgent(false);
-      this.setState({ isAgent: false });
-      this.props.setAgent(false);
-      this.closeAgentModal();
-    }
+    await this.props.setAgent(false);
     const currentAppliedFilters = this.state.filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {
-      return x.meta.key === 'agent.id';
+      return x.meta.key !== 'agent.id';
     });
-    agentFilters.map(x => {
-      this.state.filterManager.removeFilter(x);
-    });
+    this.state.filterManager.setFilters(agentFilters);
   }
 
   componentDidMount() {
@@ -200,10 +67,6 @@ class OverviewActions extends Component {
     }else if(agent.id && this.state.isAgent !== agent.id){
       this.setState({isAgent: agent.id})
     }
-  }
-
-  componentWillUnmount() {
-    //this.state.filterUpdateSubscriber.unsubscribe();
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -229,17 +92,18 @@ class OverviewActions extends Component {
   }
 
   updateAgentSearch(agentsIdList) {
-    //this.closeAgentModal();
     if (agentsIdList) {
-      //this.props.setAgent(agentsIdList);
       this.setState({ isAgent: agentsIdList });
     }
   }
 
   agentTableSearch(agentIdList) {
-    this.props.setAgent(agentIdList);
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
+        const currentAppliedFilters = this.state.filterManager.filters;
+        const agentFilters = currentAppliedFilters.filter(x => {
+          return x.meta.key !== 'agent.id';
+        });
         const filter = {
           "meta": {
             "alias": null,
@@ -260,25 +124,9 @@ class OverviewActions extends Component {
           },
           "$state": { "store": "appState", "isImplicit": true},
         };
-        this.state.filterManager.addFilters(filter);
-      } else if (agentIdList.length > 1) {
-        const agentsListString = agentIdList.map(item => { return item.toString() })
-        const agentsListFormatted = agentIdList.map(item => { return { "match_phrase": { "agent.id": item.toString() } } })
-        const filter = {
-          "meta": {
-            "alias": null,
-            "disabled": false,
-            "key": "agent.id",
-            "negate": false,
-            "params": agentsListString,
-            "value": agentIdList.toString(),
-            "type": "phrases",
-            "index": "wazuh-alerts-3.x-*"
-          },
-          "query": { "bool": { "minimum_should_match": 1, "should": agentsListFormatted } },
-          "$state": { "store": "appState", "isImplicit": true }
-        };
-        this.state.filterManager.addFilters(filter);
+        agentFilters.push(filter);
+        this.state.filterManager.setFilters(agentFilters);
+        this.props.setAgent(agentIdList);
       }
     }
 
@@ -346,8 +194,8 @@ class OverviewActions extends Component {
                   className="wz-unpin-agent"
                   iconType='pinFilled'
                   onClick={() => {
-                    this.removeAgentsFilter();
                     store.dispatch(updateCurrentAgentData({}));
+                    this.removeAgentsFilter();
                   }}
                   aria-label='Unpin agent' />
               </EuiToolTip>

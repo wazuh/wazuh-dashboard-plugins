@@ -86,8 +86,15 @@ export class ComplianceTable extends Component {
 
   async componentDidMount() {
     this._isMount = true;
+    this.filtersSubscriber = this.filterManager.updated$.subscribe(() => {
+      this.onFiltersUpdated(this.filterManager.filters)
+    });
     this.indexPattern = await getIndexPattern();
     this.buildComplianceObject();
+  }
+
+  componentWillUnmount(){
+    this.filtersSubscriber.unsubscribe();
   }
 
 

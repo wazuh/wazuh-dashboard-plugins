@@ -109,13 +109,16 @@ export class Mitre extends Component {
 
   async componentDidMount(){
     this._isMount = true;
+    this.filtersSubscriber = this.filterManager.updated$.subscribe(() => {
+      this.onFiltersUpdated(this.filterManager.filters)
+    });
     this.indexPattern = await getIndexPattern();
     await this.buildTacticsObject();
   }
 
   componentWillUnmount() {
     this._isMount = false;
-
+    this.filtersSubscriber.unsubscribe();
   }
 
   showToast = (color, title, text, time) => {

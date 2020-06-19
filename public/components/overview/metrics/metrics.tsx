@@ -133,7 +133,7 @@ export class Metrics extends Component {
       filterParams["time"] = this.timefilter.getTime(); 
       filterParams["query"] = this.state.filterParams.query; 
       filterParams["filters"] = this.filterManager.filters; 
-      this.setState({filterParams, loading: true})
+      this.setState({filterParams, loading: true, results:{}})
       
       const result = this.metricsList[this.props.section].map(async(item)=> {
         let filters = [];

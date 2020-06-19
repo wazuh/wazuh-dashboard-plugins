@@ -545,13 +545,11 @@ export class AgentSelectionTable extends Component {
       const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch(this.getSelectedItems());
     }else{
-      this.props.removeAgentsFilter(true);      
       store.dispatch(updateCurrentAgentData({}));
+      this.props.removeAgentsFilter(true);      
     }
-   // this.router.reload();
   }
 
   async selectAgentAndApply(agentID){
@@ -559,11 +557,10 @@ export class AgentSelectionTable extends Component {
       const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+agentID } );
       const formattedData = data.data.data.items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.removeAgentsFilter(false);
       this.props.updateAgentSearch([agentID]);
     }catch(error){
-      this.props.removeAgentsFilter(true);      
       store.dispatch(updateCurrentAgentData({}));
+      this.props.removeAgentsFilter(true);      
     }
   }
 
@@ -760,20 +757,6 @@ export class AgentSelectionTable extends Component {
           ? this.state.totalItems / this.state.itemsPerPage
           : parseInt(this.state.totalItems / this.state.itemsPerPage) + 1,
     };
-    // let optionalActionButtons;
-
-    // if (this.state.agents.length) {
-    //   optionalActionButtons = (
-
-    //     <EuiFlexGroup gutterSize="m">
-    //       <EuiFlexItem grow={false}>
-    //         <EuiButton onClick={async() => await this.newSearch()} color="primary">
-    //           Apply
-    //         </EuiButton>
-    //       </EuiFlexItem>
-    //     </EuiFlexGroup>
-    //   );
-    // }
     const selectedAgent = store.getState().appStateReducers.currentAgentData;
 
     const {
@@ -809,23 +792,6 @@ export class AgentSelectionTable extends Component {
         {selectedAgent && Object.keys(selectedAgent).length > 0 && (
           <Fragment>
             <EuiFlexGroup responsive={false} justifyContent="flexEnd">
-              {/* Unpin button - agent name (agent id) */}
-              {/* <EuiFlexItem grow={false} style={{margin: "10px 0 0 10px"}}>
-                <EuiToolTip position="top" content={`Unpin ${selectedAgent.name} agent`}>
-                  <EuiButtonIcon
-                    color='danger'
-                    onClick={() => this.unselectAgents()}
-                    iconType="pinFilled"
-                    aria-label="unpin agent"
-                  />
-                </EuiToolTip> 
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{marginLeft: 4}}>
-                <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
-                  {selectedAgent.name} ({selectedAgent.id})
-                </EuiHealth>
-              </EuiFlexItem> */}
-
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
               <EuiFlexItem grow={false} style={{marginRight: 0}}>
                 <EuiHealth color={this.agentStatusColor(selectedAgent.status)} style={{ whiteSpace: 'no-wrap' }}>
@@ -842,27 +808,6 @@ export class AgentSelectionTable extends Component {
                   />
                 </EuiToolTip> 
               </EuiFlexItem>
-
-              {/* Badge */}
-              {/* <EuiFlexItem grow={false}>
-                <EuiBadge
-                  color={this.agentStatusBadgeColor(selectedAgent.status)}
-                  // title={undefined}
-                  iconType="pinFilled"
-                  iconSide="right"
-                  iconOnClick={() => this.unselectAgents()}
-                  iconOnClickAriaLabel={`Unpin ${selectedAgent.name} agent`}
-                >{selectedAgent.name} ({selectedAgent.id})</EuiBadge>
-              </EuiFlexItem> */}
-              
-              {/* <EuiFlexItem grow={false}>
-                <EuiButton
-                  onClick={() => this.unselectAgents()} color="danger"
-                  iconType='pinFilled'
-                >
-                    Unpin {selectedAgent.name}
-                </EuiButton>
-              </EuiFlexItem> */}
             </EuiFlexGroup>
             <EuiSpacer size="m" />
           </Fragment>
