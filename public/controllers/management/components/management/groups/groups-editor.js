@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import { connect } from 'react-redux';
 import { cleanFileContent } from '../../../../../redux/actions/groupsActions';
@@ -34,6 +34,7 @@ import GroupsHandler from './utils/groups-handler';
 
 import { toastNotifications } from 'ui/notify';
 import 'brace/theme/textmate';
+import { validateXML } from '../configuration/utils/xml';
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -130,15 +131,16 @@ class WzGroupsEditor extends Component {
     const { name, content, isEditable, groupName } = this.state;
     const { adminMode } = this.props;
 
+    const xmlError = validateXML(content);
     const saveButton = (
       <EuiButton
         fill
-        iconType="save"
+        iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}
-        isDisabled={name.length <= 4}
+        isDisabled={name.length <= 4 || (isEditable && xmlError ? true : false)}
         onClick={() => this.save(name)}
       >
-        Save
+        {(isEditable && xmlError) ? 'XML format error' : 'Save'}
       </EuiButton>
     );
 
@@ -171,6 +173,12 @@ class WzGroupsEditor extends Component {
                 )}
               </EuiFlexGroup>
               <EuiSpacer size="m" />
+              {xmlError && (
+                <Fragment>
+                  <span style={{ color: 'red' }}> {xmlError}</span>
+                  <EuiSpacer size='s'/>
+                </Fragment>
+              )}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
@@ -179,7 +187,7 @@ class WzGroupsEditor extends Component {
                         <EuiCodeEditor
                           theme="textmate"
                           width="100%"
-                          height="calc(100vh - 175px)"
+                          height={`calc(100vh - ${(xmlError ? 195 : 175)}px)`}
                           value={content}
                           onChange={newContent =>
                             this.setState({ content: newContent })
