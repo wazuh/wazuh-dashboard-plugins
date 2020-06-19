@@ -75,7 +75,7 @@ export class ComplianceRequirements extends Component {
             id={`Requirement ${facet.id}`}
             quantity={facet.quantity}
             isSelected={this.props.selectedRequirements[facet.id]}
-            isLoading={this.state.loadingAlerts}
+            isLoading={this.props.loadingAlerts}
             icon={iconNode}
             onClick={
               facet.onClick ? () => facet.onClick(facet.id) : undefined
