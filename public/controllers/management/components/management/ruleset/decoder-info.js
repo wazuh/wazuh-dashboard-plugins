@@ -95,9 +95,8 @@ class WzDecoderInfo extends Component {
    * Clean the existing filters and sets the new ones and back to the previous section
    */
   setNewFiltersAndBack(filters) {
-    const fil = filters.filters || filters;
     this.props.cleanFilters();
-    this.props.updateFilters(fil);
+    this.props.updateFilters(filters);
     this.props.cleanInfo();
   }
 
@@ -117,7 +116,7 @@ class WzDecoderInfo extends Component {
           <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ file: file })}
+              onClick={async () => this.setNewFiltersAndBack([{field: 'file', value: file}])}
             >
               {file}
             </EuiLink>
@@ -127,7 +126,7 @@ class WzDecoderInfo extends Component {
           <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ path: path })}
+              onClick={async () => this.setNewFiltersAndBack([{field: 'path', value: path}])}
             >
               {path}
             </EuiLink>

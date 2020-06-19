@@ -19,7 +19,7 @@ export const reverseLoockupError = {
     "description": "sshd: Reverse lookup error (bad ISP or attack).",
     "groups": ["syslog","sshd"],
     "mitre": {
-      "tactics": ["Lateral Movement"],
+      "tactic": ["Lateral Movement"],
       "id": ["T1021"]
     },
     "id": "5702",
@@ -54,7 +54,8 @@ export const possibleAttackServer = {
     description: "sshd: Possible attack on the ssh server (or version gathering).",
     groups: ["syslog","sshd","recon"],
     mitre: {
-      tactics: ["Lateral Movement"],
+      tactic: ["Lateral Movement"],
+      technique: ["Brute Force","Remove Services"],
       id: ["T1021"]
     },
     id: "5701",
@@ -74,7 +75,8 @@ export const possibleBreakinAttempt = {
     description: "sshd: Possible breakin attempt (high number of reverse lookup errors).",
     groups: ["syslog","sshd"],
     mitre: {
-      tactics: ["Lateral Movement"],
+      tactic: ["Lateral Movement"],
+      technique: ["Brute Force","Remove Services"],
       id: ["T1021"]
     },
     id: "5703",

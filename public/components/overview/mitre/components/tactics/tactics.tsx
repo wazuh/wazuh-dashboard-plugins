@@ -130,7 +130,7 @@ export class Tactics extends Component {
       const aggs = {
         tactics: {
           terms: {
-              field: "rule.mitre.tactics",
+              field: "rule.mitre.tactic",
               size: 1000,
           }
         }

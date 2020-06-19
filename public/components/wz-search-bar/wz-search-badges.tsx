@@ -46,7 +46,7 @@ export class WzSearchBadges extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    if (nextProps.filters.lenght !== this.props.filters.length) {
+    if (nextProps.filters.length !== this.props.filters.length) {
       return true;
     }
     return false;

@@ -148,9 +148,10 @@ export class OverviewController {
     if(agent && store.getState().appStateReducers.currentAgentData.id !== agent){
         const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
         const formattedData = data.data.data.items[0];
+        this.visualizeProps["isAgent"] = agent;
         store.dispatch(updateCurrentAgentData(formattedData));
     }
-    setTimeout(() => { this.$location.search('agentId', null); }, 1);
+    //setTimeout(() => { this.$location.search('agentId', null); }, 1);
     
   }
 
@@ -190,6 +191,7 @@ export class OverviewController {
         this.oldFilteredTab = this.tab;
       }
     }
+    setTimeout(() => {  this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null) }, 1);
 
     this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
     this.$rootScope.$applyAsync();

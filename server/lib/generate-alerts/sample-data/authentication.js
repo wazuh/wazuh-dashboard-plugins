@@ -209,7 +209,8 @@ export const bruteForceTryingAccessSystem = {
     description: "sshd: brute force trying to get access to the system.",
     groups: ["syslog","sshd","authentication_failures"],
     mitre: {
-      tactics: ["Credential Access","Lateral Movement"],
+      tactic: ["Credential Access","Lateral Movement"],
+      technique: ["Brute Force","Remove Services"],
       id: ["T1110","T1021"]
     },
     id: "5712",
@@ -252,7 +253,8 @@ export const maximumAuthenticationAttemptsExceeded = {
     description: "Maximum authentication attempts exceeded.",
     groups: ["syslog","sshd","authentication_failed"],
     mitre: {
-      tactics: ["Credential Access","Lateral Movement"],
+      tactic: ["Credential Access","Lateral Movement"],
+      technique: ["Brute Force","Remove Services"],
       id: ["T1110","T1021"]
     },
     id: "5758",

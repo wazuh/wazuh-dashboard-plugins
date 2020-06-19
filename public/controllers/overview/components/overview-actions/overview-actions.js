@@ -64,6 +64,8 @@ class OverviewActions extends Component {
     const agent = store.getState().appStateReducers.currentAgentData;
     if(this.state.isAgent && !agent.id){
       this.setState({isAgent: false})
+    }else if(agent.id && this.state.isAgent !== agent.id){
+      this.setState({isAgent: agent.id})
     }
   }
 

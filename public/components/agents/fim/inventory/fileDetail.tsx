@@ -311,7 +311,7 @@ export class FileDetails extends Component {
     return (
       <Fragment>
         <EuiAccordion
-          id={fileName}
+          id={fileName === undefined ? Math.random().toString() : fileName}
           buttonContent={
             <EuiTitle size="s">
               <h3>Details</h3>
@@ -325,7 +325,7 @@ export class FileDetails extends Component {
         </EuiAccordion>
         <EuiSpacer size='s' />
         <EuiAccordion
-          id={fileName}
+          id={fileName === undefined ? Math.random().toString() : fileName}
           className='events-accordion'
           extraAction={<div style={{marginBottom: 5}}><strong>{this.state.totalHits || 0}</strong> hits</div>}
           buttonContent={
