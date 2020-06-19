@@ -53,6 +53,7 @@ import { TabVisualizations } from '../../../factories/tab-visualizations';
 import chrome from 'ui/chrome';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
+import { UnsupportedComponents } from './../../../utils/components-os-support';
 
 export class AgentsWelcome extends Component {
   _isMount = false;
@@ -74,6 +75,7 @@ export class AgentsWelcome extends Component {
       widthWindow: window.innerWidth
     };
 
+    this.platform = false;
   }
 
   updateWidth = () => {
@@ -139,6 +141,9 @@ export class AgentsWelcome extends Component {
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
     window.addEventListener('resize', this.updateWidth); //eslint-disable-line
+    if (Object.keys(this.props.agent).length) {
+      this.platform = ((this.props.agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((this.props.agent.os || {}).platform || false);
+    }
   }
 
   updateMenuAgents() {
@@ -185,6 +190,10 @@ export class AgentsWelcome extends Component {
     this.setState({ menuAgent: menuAgent});
   }
 
+  showModuleByPlatform(menu) {
+    return !this.platform ? false : !UnsupportedComponents[this.platform].includes(menu.id);
+  }
+
   renderModules() {
     const menuAgent = [...Object.keys(this.state.menuAgent).map((item) => { return this.state.menuAgent[item] })];
 
@@ -192,7 +201,7 @@ export class AgentsWelcome extends Component {
       <Fragment>
         {
           menuAgent.map((menuAgent, i) => {
-            if(i < this.state.maxModules) {
+            if(i < this.state.maxModules && this.showModuleByPlatform(menuAgent)) {
             return (
             <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
               <EuiButtonEmpty
