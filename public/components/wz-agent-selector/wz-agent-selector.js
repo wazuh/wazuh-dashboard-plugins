@@ -36,7 +36,7 @@ class WzAgentSelector extends Component {
 
   async componentDidMount() {
     const $injector = await chrome.dangerouslyGetActiveInjector();
-    this.router = $injector.get('$route');
+    this.location = $injector.get('$location');
   }
 
   closeAgentModal(){
@@ -44,9 +44,39 @@ class WzAgentSelector extends Component {
   }
 
   agentTableSearch(agentIdList){
+    this.location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null);
     this.closeAgentModal();
-    if(window.location.hash.includes('#/overview'))
-      this.router.reload();
+    const { filterManager } = getServices();
+    if (agentIdList && agentIdList.length) {
+      if (agentIdList.length === 1) {
+        const currentAppliedFilters = filterManager.filters;
+        const agentFilters = currentAppliedFilters.filter(x => {
+          return x.meta.key !== 'agent.id';
+        });
+        const filter = {
+          "meta": {
+            "alias": null,
+            "disabled": false,
+            "key": "agent.id",
+            "negate": false,
+            "params": { "query": agentIdList[0] },
+            "type": "phrase",
+            "index": "wazuh-alerts-3.x-*"
+          },
+          "query": {
+            "match": {
+              'agent.id': {
+                query: agentIdList[0],
+                type: 'phrase'
+              }
+            }
+          },
+          "$state": { "store": "appState", "isImplicit": true},
+        };
+        agentFilters.push(filter);
+        filterManager.setFilters(agentFilters);
+      }
+    }
   }
 
   removeAgentsFilter(shouldUpdate){
