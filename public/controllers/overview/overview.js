@@ -150,8 +150,8 @@ export class OverviewController {
         const formattedData = data.data.data.items[0];
         this.visualizeProps["isAgent"] = agent;
         store.dispatch(updateCurrentAgentData(formattedData));
+        this.$location.search('agentId', String(agent));
     }
-    //setTimeout(() => { this.$location.search('agentId', null); }, 1);
     
   }
 

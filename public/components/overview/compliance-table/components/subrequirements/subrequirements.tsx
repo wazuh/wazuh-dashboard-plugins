@@ -22,9 +22,9 @@ import {
   EuiSwitch,
   EuiPopover,
   EuiText,
-  EuiContextMenu,
   EuiIcon,
   EuiOverlayMask,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
@@ -130,7 +130,7 @@ export class ComplianceSubrequirements extends Component {
       const currentTechniques = complianceObject[key];
       if (this.props.selectedRequirements[key]) {
         currentTechniques.forEach((technique, idx) => {
-          if (!showTechniques[technique] && ((technique.toLowerCase().includes(this.state.searchValue.toLowerCase())) || this.props.descriptions[technique].toLowerCase().includes(this.state.searchValue.toLowerCase() ) )) {
+          if (!showTechniques[technique] && ((technique.toLowerCase().includes(this.state.searchValue.toLowerCase())) || this.props.descriptions[technique].toLowerCase().includes(this.state.searchValue.toLowerCase()))) {
             const quantity = (requirementsCount.find(item => item.key === technique) || {}).doc_count || 0;
             if (!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)) {
               showTechniques[technique] = true;
@@ -267,7 +267,12 @@ export class ComplianceSubrequirements extends Component {
         <EuiSpacer size="s" />
 
         <div>
-          {this.props.requirementsCount && this.renderFacet()}
+          {this.props.loadingAlerts
+            ? <EuiFlexItem style={{ height: "calc(100vh - 410px)", alignItems: 'center' }} >
+                <EuiLoadingSpinner size='xl' style={{ margin: 0, position: 'absolute', top: '50%', transform: 'translateY(-50%)' }} />
+              </EuiFlexItem>
+            : this.props.requirementsCount && this.renderFacet()
+          }
         </div>
 
         {this.state.flyoutOn &&

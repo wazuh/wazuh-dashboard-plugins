@@ -31,6 +31,7 @@ import { Vis } from '../../../../src/legacy/core_plugins/visualizations/public/n
 import { convertToSerializedVis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/saved_visualizations/_saved_vis';
 import { toastNotifications } from 'ui/notify';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { EuiLoadingChart } from '@elastic/eui';
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -335,13 +336,19 @@ class KibanaVis extends Component {
   };
 
   render() {
+    const height = this.props.resultState === 'loading' ? 0 : "100%"
     return (
       this.visID && (
-        <div
-          id={this.visID}
-          vis-id={this.visID}
-          style={{ height: '100%' }}
-        ></div>
+        <span>
+          <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', textAlign: "center", paddingTop: 100 }}>
+            <EuiLoadingChart size="xl" />
+          </div>
+          <div
+            id={this.visID}
+            vis-id={this.visID}
+            style={{ height }}
+          ></div>
+        </span>
       )
     );
   }
