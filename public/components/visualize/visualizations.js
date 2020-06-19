@@ -519,7 +519,7 @@ export const visualizations = {
   vuls: {
     rows: [
       {
-        height: 270,
+        height: 330,
         vis: [
           {
             title: 'Most affected agents',
@@ -534,22 +534,22 @@ export const visualizations = {
         ]
       },
       {
-        height: 380,
+        height: 330,
         vis: [
           {
-            title: 'Top CVEs',
-            id: 'Wazuh-App-Overview-vuls-top-CVEs',
-            width: 25
+            title: 'Most common CVEs',
+            id: 'Wazuh-App-Overview-vuls-Most-common-CVEs',
+            width: 30
           },
           {
-            title: 'Alerts evolution: Commonly affected packages',
+            title: 'TOP affected packages alerts Evolution',
             id: 'Wazuh-App-Overview-vuls-Vulnerability-evolution-affected-packages',
-            width: 50
+            width: 40
           },
           {
-            title: 'Top CWEs',
+            title: 'Most common CWEs',
             id: 'Wazuh-App-Overview-vuls-Most-common-CWEs',
-            width: 25
+            width: 30
           }
         ]
       },
