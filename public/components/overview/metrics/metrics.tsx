@@ -101,8 +101,8 @@ export class Metrics extends Component {
   }
 
   async componentDidMount() {
-    this._isMount = true;
     this.indexPattern = await getIndexPattern();
+    this._isMount = true;
     this.buildMetric();
   }
 
@@ -124,11 +124,11 @@ export class Metrics extends Component {
   }
 
   buildMetric(){
-    if(!this.metricsList[this.props.section]) return <></>;
+    if(!this.metricsList[this.props.section] || !this._isMount) return <></>;
 
     const newFilters = this.filterManager.filters;
     const newTime = this.timefilter.getTime();
-    if(JSON.stringify(this.state.filterParams.filters) !== JSON.stringify(newFilters) || JSON.stringify(newTime) !== JSON.stringify(this.state.filterParams.time) ){
+    if(JSON.stringify(this.state.filterParams.filters) !== JSON.stringify(newFilters) || JSON.stringify(newTime) !== JSON.stringify(this.state.filterParams.time)  ){
       const filterParams = {};
       filterParams["time"] = this.timefilter.getTime(); 
       filterParams["query"] = this.state.filterParams.query; 
