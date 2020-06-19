@@ -133,7 +133,10 @@ function discoverController(
 
   //WAZUH
   wazuhApp.discoverScope = $scope;
-  wazuhApp.globalFilters = { tab: $location.search().tab };
+  if (!wazuhApp.globalFilters) {
+    wazuhApp.globalFilters = {};
+  }
+
   (async () => {
     const services = await buildServices(
       npStart.core,
