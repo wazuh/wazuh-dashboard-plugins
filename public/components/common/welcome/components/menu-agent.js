@@ -178,31 +178,33 @@ class WzMenuAgent extends Component {
     ];
     let auditingItems = [
       this.agentSections.pm,
-      this.agentSections.audit,
-      this.agentSections.oscap,
       this.agentSections.ciscat,
       this.agentSections.sca
     ];
     let threatDetectionItems = [
       this.agentSections.virustotal,
       this.agentSections.osquery,
-      this.agentSections.docker,
       this.agentSections.mitre
     ];
 
-    securityInformationItems.splice(2, 0, this.agentSections.aws);
-    threatDetectionItems.unshift(this.agentSections.vuls);
-    /*  DO NOT HIDE ANY SECTION EVEN IF IT'S NOT COMPATIBLE WITH THE CURRENT AGENT
-    if (!this.props.isAgent) {
-      securityInformationItems.splice(2, 0, this.agentSections.aws);
-      threatDetectionItems.unshift(this.agentSections.vuls);
-    } else {
-      auditingItems.splice(1, 0, this.agentSections.sca);
-      if (!(UnsupportedComponents[this.props.isAgent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') || !this.props.isAgent.agentPlatform) {
-        threatDetectionItems.unshift(this.agentSections.vuls);
-      }
+    const agent = store.getState().appStateReducers.currentAgentData;
+
+    let platform = false;
+
+    if (Object.keys(agent).length) {
+      platform = ((agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((agent.os || {}).platform || false);
     }
-    */
+
+    if( !platform || !UnsupportedComponents[platform].includes('audit')) {
+      auditingItems.splice(1, 0, this.agentSections.audit);
+      auditingItems.splice(2, 0, this.agentSections.oscap);
+    }
+    if(!platform || !UnsupportedComponents[platform].includes('docker')) {
+      threatDetectionItems.splice(2, 0, this.agentSections.docker);
+    }
+    if(!platform || !UnsupportedComponents[platform].includes('vuls')) {
+      threatDetectionItems.unshift(this.agentSections.vuls);
+    }
 
     const securityInformation = [
       this.createItem(this.agentSections.securityInformation, {
