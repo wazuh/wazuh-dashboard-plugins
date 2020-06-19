@@ -299,29 +299,8 @@ export class WzVisualize extends Component {
           </div>
         )}
         <EuiFlexItem className={this.props.resultState === 'none' && 'no-opacity' || ''}>
-          {selectedTab &&
-            selectedTab !== 'welcome' &&
-            this.visualizations[selectedTab] &&
-            this.visualizations[selectedTab].metrics && (
-              <div className="wz-no-display">
-                {this.visualizations[selectedTab].metrics.map((vis, i) => {
-                  return (
-                    <div key={i}>
-                      <WzReduxProvider>
-                        <KibanaVis
-                          visID={vis.id}
-                          tab={selectedTab}
-                          isMetric={true}
-                          {...this.props}
-                        ></KibanaVis>
-                      </WzReduxProvider>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
 
-          <Metrics section={selectedTab} />
+        <Metrics section={selectedTab} resultState={this.props.resultState} /> 
 
           {selectedTab &&
             selectedTab !== 'welcome' &&
