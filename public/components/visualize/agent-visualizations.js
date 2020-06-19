@@ -404,7 +404,7 @@ export const agentVisualizations = {
         ]
       },
       {
-        height: 380,
+        height: 330,
         vis: [
           {
             title: 'Most common CVEs',
@@ -417,32 +417,27 @@ export const agentVisualizations = {
             width: 50
           },
           {
-            title: 'Top CWEs',
-            id: 'Wazuh-App-Agents-vuls-top-CWEs',
+            title: 'Most common CWEs',
+            id: 'Wazuh-App-Agents-vuls-Most-common-CWEs',
             width: 25
           }
         ]
+      },
+      {
+        height: 330,
+        vis: [
+          {
+            title: 'Severity distribution',
+            id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
+            width: 25
+          },
+          {
+            title: 'Top affected packages by CVEs',
+            id: 'Wazuh-App-Agents-vuls-packages-CVEs',
+            width: 75
+          },
+        ]
       }
-      // {
-      //   height: 270,
-      //   vis: [
-      //     {
-      //       title: 'Most common CVEs',
-      //       id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
-      //       width: 33
-      //     },
-      //     {
-      //       title: 'Severity distribution',
-      //       id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
-      //       width: 33
-      //     },
-      //     {
-      //       title: 'Commonly affected packages',
-      //       id: 'Wazuh-App-Agents-vuls-Commonly-affected-packages',
-      //       width: 34
-      //     }
-      //   ]
-      // }
     ]
   },
   virustotal: {
