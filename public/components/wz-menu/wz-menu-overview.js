@@ -144,36 +144,39 @@ class WzMenuOverview extends Component {
     let securityInformationItems = [
       this.overviewSections.general,
       this.overviewSections.fim,
+      this.overviewSections.aws,
       this.overviewSections.gcp
     ];
     let auditingItems = [
       this.overviewSections.pm,
-      this.overviewSections.audit,
-      this.overviewSections.oscap,
       this.overviewSections.ciscat,
       this.overviewSections.sca
     ];
     let threatDetectionItems = [
       this.overviewSections.virustotal,
       this.overviewSections.osquery,
-      this.overviewSections.docker,
       this.overviewSections.mitre
     ];
-    securityInformationItems.splice(2, 0, this.overviewSections.aws);
-    threatDetectionItems.unshift(this.overviewSections.vuls);
-
-    /*  DO NOT HIDE ANY SECTION EVEN IF IT'S NOT COMPATIBLE WITH THE CURRENT AGENT
 
     const agent = store.getState().appStateReducers.currentAgentData;
-    if (!agent.id) {
-      securityInformationItems.splice(2, 0, this.overviewSections.aws);
-      threatDetectionItems.unshift(this.overviewSections.vuls);
-    } else {
-      if (!(UnsupportedComponents[agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') || !agent.agentPlatform) {
-        threatDetectionItems.unshift(this.overviewSections.vuls);
-      }
-    }*/
 
+    let platform = false;
+
+    if (Object.keys(agent).length) {
+      platform = ((agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((agent.os || {}).platform || false);
+    }
+
+    if( !platform || !UnsupportedComponents[platform].includes('audit')) {
+      auditingItems.splice(1, 0, this.overviewSections.audit);
+      auditingItems.splice(2, 0, this.overviewSections.oscap);
+    }
+    if(!platform || !UnsupportedComponents[platform].includes('docker')) {
+      threatDetectionItems.splice(2, 0, this.overviewSections.docker);
+    }
+    if(!platform || !UnsupportedComponents[platform].includes('vuls')) {
+      threatDetectionItems.unshift(this.overviewSections.vuls);
+    }
+    
     const securityInformation = [
       this.createItem(this.overviewSections.securityInformation, {
         disabled: true,
