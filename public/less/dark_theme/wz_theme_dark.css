@@ -421,4 +421,5 @@ svg .legend text {
 
 .wz-menu-agent-info {
   background-color: #1a1b20;
+  border-bottom: 1px solid #343741!important;
 }

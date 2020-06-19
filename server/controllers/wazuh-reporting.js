@@ -142,7 +142,7 @@ export class WazuhReportingCtrl {
         return {
           columns: [
             {
-              text: 'Copyright © 2019 Wazuh, Inc.',
+              text: 'Copyright © 2020 Wazuh, Inc.',
               color: '#00a9e5',
               margin: [40, 40, 0, 0]
             },

@@ -161,7 +161,7 @@ export class WzVisualize extends Component {
       });
     }
     // when it changes no selected agent to selected or inverse, remove previous visualizations VisHanderls
-    if((!prevProps.isAgent && this.props.isAgent) || (prevProps.isAgent && !this.props.isAgent)){
+    if ((!prevProps.isAgent && this.props.isAgent) || (prevProps.isAgent && !this.props.isAgent)) {
       visHandler.removeAll();
     }
   }
@@ -275,6 +275,17 @@ export class WzVisualize extends Component {
 
     return (
       <Fragment>
+        {/* Sample alerts Callout */}
+        {this.state.thereAreSampleAlerts && (
+          <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px 16px 8px' }}>
+            <p>The data displayed may contain sample alerts. {this.state.adminMode && (
+              <Fragment>
+                Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
+              </Fragment>
+            )}</p>
+          </EuiCallOut>
+        )}
+
         {/* Cards for Regulatory Compliance Dashboards */}
         {cardReqs && cardReqs.items && (
           <div style={{ padding: '10px 12px 8px' }}>
@@ -310,19 +321,8 @@ export class WzVisualize extends Component {
               </div>
             )}
 
-          {/* Sample alerts Callout */}
-          {this.state.thereAreSampleAlerts && (
-            <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px' }}>
-              <p>The data displayed may contain sample alerts. {this.state.adminMode && (
-                <Fragment>
-                  Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
-                </Fragment>
-              )}</p>
-            </EuiCallOut>
-          )}
+          <Metrics section={selectedTab} />
 
-          <Metrics section={selectedTab} /> 
-            
           {selectedTab &&
             selectedTab !== 'welcome' &&
             this.visualizations[selectedTab] &&
