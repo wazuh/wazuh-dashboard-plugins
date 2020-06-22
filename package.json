@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
   "version": "3.13.0",
-  "revision": "0870",
-  "code": "0870-0",
+  "revision": "0880",
+  "code": "0880-0",
   "kibana": {
     "version": "7.7.0"
   },
@@ -62,7 +62,7 @@
     "winston": "3.0.0"
   },
   "devDependencies": {
-    "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
+    "@elastic/plugin-helpers": "^7.1.8",
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",
     "eslint": "^5.10.0",

@@ -2,11 +2,109 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.13.0 - Kibana v7.6.1 - Revision 857
+## Wazuh v3.13.0 - Kibana v7.7.0, v7.7.1 - Revision 880
 
 ### Added
 
-- Fixed error: only one instance of babel-polyfill is allowed [#2236](https://github.com/wazuh/wazuh-kibana-app/issues/2236)
+- Support for Wazuh v3.13.0
+- Support for Kibana v7.7.1
+- Support for Open Distro 1.8
+- New navigation experience with a global menu [#1965](https://github.com/wazuh/wazuh-kibana-app/issues/1965)
+- Added a Breadcrumb in Kibana top nav [#2161](https://github.com/wazuh/wazuh-kibana-app/issues/2161)
+- Added a new Agents Summary Screen [#1963](https://github.com/wazuh/wazuh-kibana-app/issues/1963)
+- Added a new feature to add sample data to dashboards [#2115](https://github.com/wazuh/wazuh-kibana-app/issues/2115)
+- Added MITRE integration [#1877](https://github.com/wazuh/wazuh-kibana-app/issues/1877)
+- Added Google Cloud Platform integration [#1873](https://github.com/wazuh/wazuh-kibana-app/issues/1873)
+- Added TSC integration [#2204](https://github.com/wazuh/wazuh-kibana-app/pull/2204)
+- Added a new Integrity monitoring state view for agent [#2153](https://github.com/wazuh/wazuh-kibana-app/issues/2153)
+- Added a new Integrity monitoring files detail view [#2156](https://github.com/wazuh/wazuh-kibana-app/issues/2156)
+- Added a new component to explore Compliance requirements [#2156](https://github.com/wazuh/wazuh-kibana-app/issues/2261)
+
+### Changed
+
+- Code migration to React.js
+- Global review of styles
+- Unified Overview and Agent dashboards into new Modules [#2110](https://github.com/wazuh/wazuh-kibana-app/issues/2110)
+- Changed Vulnerabilities dashboard visualizations [#2262](https://github.com/wazuh/wazuh-kibana-app/issues/2262)
+
+### Fixed
+
+- Open Distro tenants have been fixed and are functional now [#1890](https://github.com/wazuh/wazuh-kibana-app/issues/1890).
+- Improved navigation performance [#2200](https://github.com/wazuh/wazuh-kibana-app/issues/2200).
+- Avoid creating the wazuh-monitoring index pattern if it is disabled [#2100](https://github.com/wazuh/wazuh-kibana-app/issues/2100)
+- SCA checks without compliance field can't be expanded [#2264](https://github.com/wazuh/wazuh-kibana-app/issues/2264)
+
+
+## Wazuh v3.12.3 - Kibana v7.7.1 - Revision 876
+
+### Added
+
+- Support for Kibana v7.7.1
+
+
+## Wazuh v3.12.3 - Kibana v7.7.0 - Revision 875
+
+### Added
+
+- Support for Kibana v7.7.0
+
+
+## Wazuh v3.12.3 - Kibana v6.8.8, v7.6.1, v7.6.2 - Revision 874
+
+### Added
+
+- Support for Wazuh v3.12.3
+
+
+## Wazuh v3.12.2 - Kibana v6.8.8, v7.6.1, v7.6.2 - Revision 873
+
+### Added
+
+- Support for Wazuh v3.12.2
+
+
+## Wazuh v3.12.1 - Kibana v6.8.8, v7.6.1, v7.6.2 - Revision 872
+
+### Added
+
+- Support Wazuh 3.12.1
+- Added new FIM settings on configuration on demand. [#2147](https://github.com/wazuh/wazuh-kibana-app/issues/2147)
+
+### Changed
+
+- Updated agent's variable names in deployment guides. [#2169](https://github.com/wazuh/wazuh-kibana-app/pull/2169)
+
+### Fixed
+
+- Pagination is now shown in table-type visualizations. [#2180](https://github.com/wazuh/wazuh-kibana-app/issues/2180)
+
+
+## Wazuh v3.12.0 - Kibana v6.8.8, v7.6.2 - Revision 871
+
+### Added
+
+- Support for Kibana v6.8.8 and v7.6.2
+
+## Wazuh v3.12.0 - Kibana v6.8.7, v7.4.2, v7.6.1 - Revision 870
+
+### Added
+
+- Support for Wazuh v3.12.0
+- Added a new setting to hide manager alerts from dashboards. [#2102](https://github.com/wazuh/wazuh-kibana-app/pull/2102)
+- Added a new setting to be able to change API from the top menu. [#2143](https://github.com/wazuh/wazuh-kibana-app/issues/2143)
+- Added a new setting to enable/disable the known fields health check [#2037](https://github.com/wazuh/wazuh-kibana-app/pull/2037)
+- Added suport for PCI 11.2.1 and 11.2.3 rules. [#2062](https://github.com/wazuh/wazuh-kibana-app/pull/2062)
+
+### Changed
+
+- Restructuring of the optimize/wazuh directory. Now the Wazuh configuration file (wazuh.yml) is placed on /usr/share/kibana/optimize/wazuh/config. [#2116](https://github.com/wazuh/wazuh-kibana-app/pull/2116)
+- Improve performance of Dasboards reports generation. [1802344](https://github.com/wazuh/wazuh-kibana-app/commit/18023447c6279d385df84d7f4a5663ed2167fdb5)
+
+### Fixed
+
+- Discover time range selector is now displayed on the Cluster section. [08901df](https://github.com/wazuh/wazuh-kibana-app/commit/08901dfcbe509f17e4fab26877c8b7dae8a66bff)
+- Added the win_auth_failure rule group to Authentication failure metrics. [#2099](https://github.com/wazuh/wazuh-kibana-app/pull/2099)
+- Negative values in Syscheck attributes now have their correct value in reports. [7c3e84e](https://github.com/wazuh/wazuh-kibana-app/commit/7c3e84ec8f00760b4f650cfc00a885d868123f99)
 
 
 ## Wazuh v3.11.4 - Kibana v7.6.1 - Revision 858
