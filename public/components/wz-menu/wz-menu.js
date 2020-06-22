@@ -427,6 +427,11 @@ class WzMenu extends Component {
 
   removeSelectedAgent() {
     store.dispatch(updateCurrentAgentData({}));
+    if(window.location.href.includes("/agents?")){
+      window.location.href = "#/agents-preview";
+      this.route.reload();
+      return;
+    }
     const { filterManager } = getServices();
     const currentAppliedFilters = filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {
@@ -613,7 +618,7 @@ class WzMenu extends Component {
                 <EuiToolTip position="top" content={"Unpin agent"}>
                   <EuiButtonEmpty
                     color="text"
-                    onClick={() => { this.removeSelectedAgent(); this.setState({ menuOpened: false }) }}>
+                    onClick={() => {  this.setState({ menuOpened: false }); this.removeSelectedAgent(); }}>
                     <EuiIcon type="pinFilled" color="danger" size="m" />
                   </EuiButtonEmpty>
                 </EuiToolTip>

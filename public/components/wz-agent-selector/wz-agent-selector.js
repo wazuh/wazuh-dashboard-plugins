@@ -36,6 +36,7 @@ class WzAgentSelector extends Component {
 
   async componentDidMount() {
     const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.route = $injector.get('$route');
     this.location = $injector.get('$location');
   }
 
@@ -44,8 +45,14 @@ class WzAgentSelector extends Component {
   }
 
   agentTableSearch(agentIdList){
-    this.location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null);
     this.closeAgentModal();
+    if(window.location.href.includes("/agents?")){
+      this.location.search('agent', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null);
+      this.route.reload();
+      return;
+    }
+    this.location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null);
+
     const { filterManager } = getServices();
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
@@ -80,6 +87,12 @@ class WzAgentSelector extends Component {
   }
 
   removeAgentsFilter(shouldUpdate){
+    this.closeAgentModal();
+    if(window.location.href.includes("/agents?")){
+      window.location.href = "#/agents-preview"
+      this.route.reload();
+      return;
+    }
     const { filterManager } = getServices();
     const currentAppliedFilters = filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {

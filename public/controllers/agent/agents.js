@@ -750,6 +750,9 @@ export class AgentsController {
       );
 
       this.$scope.syscollector = (syscollectorData || {}).data || {};
+      if(!this.$scope.syscollector.os && !this.$scope.syscollector.hardware ){
+        this.switchTab("welcome")
+      }
 
       return;
     } catch (error) {
