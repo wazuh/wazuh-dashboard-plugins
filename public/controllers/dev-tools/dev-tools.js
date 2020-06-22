@@ -593,7 +593,7 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
           const output = await this.apiReq.request(method, path, JSONraw);
-          if(output.includes('3029')) {
+          if(typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }
           else {
