@@ -28,7 +28,7 @@ export function filtersToObject(filters: IFilter[]) {
     if (field === 'q') {
       return {
         ...acc,
-        q: buildQFilter((acc || {}).field, value),
+        q: buildQFilter(acc['q'], value),
       }
     }
     const newAcc = {
