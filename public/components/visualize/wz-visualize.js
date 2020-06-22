@@ -24,8 +24,6 @@ import {
   EuiCallOut,
   EuiLink
 } from '@elastic/eui';
-import { RequirementCard } from '../../controllers/overview/components/requirement-card';
-import AlertsStats from '../../controllers/overview/components/alerts-stats';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
@@ -38,29 +36,6 @@ import { Metrics } from '../overview/metrics/metrics'
 const visHandler = new VisHandlers();
 
 export class WzVisualize extends Component {
-  cardReqs = {
-    'pci': {
-      items: async () => await this.commonData.getPCI(),
-      reqTitle: 'PCI DSS Requirement'
-    },
-    'gdpr': {
-      items: async () => await this.commonData.getGDPR(),
-      reqTitle: 'GDPR Requirement'
-    },
-    'hipaa': {
-      items: async () => await this.commonData.getHIPAA(),
-      reqTitle: 'HIPAA Requirement'
-    },
-    'nist': {
-      items: async () => await this.commonData.getNIST(),
-      reqTitle: 'NIST 800-53 Requirement'
-    },
-    'tsc': {
-      items: async () => await this.commonData.getTSC(),
-      reqTitle: 'TSC Requirement'
-    }
-  }
-
   constructor(props) {
     super(props);
     this.visualizations = this.props.isAgent
@@ -69,13 +44,8 @@ export class WzVisualize extends Component {
     this.state = {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
-      cardReqs: {},
       thereAreSampleAlerts: false,
       adminMode: false,
-      metricItems:
-        this.props.selectedTab !== 'welcome'
-          ? this.getMetricItems(this.props.selectedTab)
-          : []
     };
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
@@ -90,13 +60,6 @@ export class WzVisualize extends Component {
 
   async componentDidMount() {
     this.agentsStatus = false;
-    const { selectedTab } = this.state;
-    const cardReqs = Object.keys(this.cardReqs).includes(selectedTab) && {
-      items: await this.cardReqs[selectedTab].items(),
-      reqTitle: this.cardReqs[selectedTab].reqTitle,
-    }
-    this.setState({ cardReqs })
-
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
       const result = ((data || {}).data || {}).data || false;
@@ -147,17 +110,8 @@ export class WzVisualize extends Component {
     this.visualizations = this.props.isAgent && this.props.isAgent.length ? agentVisualizations : visualizations;
     const { selectedTab } = this.props;
     if (selectedTab !== this.state.selectedTab) {
-      const cardReqs = Object.keys(this.cardReqs).includes(selectedTab) && {
-        items: await this.cardReqs[selectedTab].items(),
-        reqTitle: this.cardReqs[selectedTab].reqTitle,
-      }
       this.setState({
-        cardReqs,
-        selectedTab: selectedTab,
-        metricItems:
-          selectedTab !== 'welcome'
-            ? this.getMetricItems(selectedTab)
-            : []
+        selectedTab: selectedTab
       });
     }
     // when it changes no selected agent to selected or inverse, remove previous visualizations VisHanderls
@@ -166,29 +120,13 @@ export class WzVisualize extends Component {
     }
   }
 
-  getMetricItems(tab) {
-    const items = [];
-    if (
-      this.visualizations &&
-      this.visualizations[tab] &&
-      this.visualizations[tab].metrics
-    ) {
-      this.visualizations[tab].metrics.forEach(x => {
-        items.push({ id: x.id, description: x.description, color: x.color });
-      });
-    }
-    return {
-      items
-    };
-  }
-
   expand = id => {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
   render() {
     this.visualizations = this.rawVisualizations.getType() !== 'general' ? agentVisualizations : visualizations;
-    const { selectedTab, cardReqs } = this.state;
+    const { selectedTab } = this.state;
     const renderVisualizations = vis => {
       return (
         <EuiFlexItem
@@ -286,12 +224,6 @@ export class WzVisualize extends Component {
           </EuiCallOut>
         )}
 
-        {/* Cards for Regulatory Compliance Dashboards */}
-        {cardReqs && cardReqs.items && (
-          <div style={{ padding: '10px 12px 8px' }}>
-            <RequirementCard {...cardReqs} />
-          </div>
-        )}
         {this.props.resultState === 'none' && (
           <div className="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8">
             <EuiCallOut title="There are no results for selected time range. Try another
