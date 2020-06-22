@@ -666,14 +666,12 @@ function discoverController(
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
+      /// Wazuh 7.7.x  
       let q = { ...query };
       if (query && typeof query === 'object') {
-        /// Wazuh 7.7.x          
-        if ($scope.tabView !== 'discover') {
-          q.update_Id = new Date().getTime().toString();
-        }
-        ///
+        q.update_Id = new Date().getTime().toString();
       }
+      ///
       setAppState({ query: q });
       // WAZUH  query from search bar
       discoverPendingUpdates.removeAll();
