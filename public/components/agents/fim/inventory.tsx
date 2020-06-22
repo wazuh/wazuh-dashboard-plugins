@@ -40,6 +40,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 import { ICustomBadges } from '../../wz-search-bar/components';
+import { filtersToObject } from '../../wz-search-bar';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -217,7 +218,8 @@ export class Inventory extends Component {
   async downloadCsv() {
     const { filters } = this.state;
     try {
-      const formatedFilters = Object.keys(filters).map(key => ({name: key, value: filters[key]}));
+      const filtersObject = filtersToObject(filters);
+      const formatedFilters = Object.keys(filtersObject).map(key => ({name: key, value: filtersObject[key]}));
       this.showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
         '/syscheck/' + this.props.agent.id,
