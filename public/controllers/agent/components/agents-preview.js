@@ -52,7 +52,7 @@ export class AgentsPreview extends Component {
     this.setGlobalBreadcrumb();
     this.getSummary();
     if( this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'] ){
-      this.setState({ showAgentsEvolutionVisualization: true });
+      this._isMount && this.setState({ showAgentsEvolutionVisualization: true });
       const tabVisualizations = new TabVisualizations();
       tabVisualizations.removeAll();
       tabVisualizations.setTab('general');
@@ -142,7 +142,7 @@ export class AgentsPreview extends Component {
   }
   
   removeFilters(){
-    this.setState({agentTableFilters: []})
+    this._isMount && this.setState({agentTableFilters: []})
   }
 
   render() {
@@ -169,7 +169,7 @@ export class AgentsPreview extends Component {
                   {this.totalAgents > 0 && (
                     <EuiFlexItem style={{ alignItems: 'center' }}>
                       <Pie
-                        legendAction={(status) => this.setState({agentTableFilters: 
+                        legendAction={(status) => this._isMount && this.setState({agentTableFilters: 
                           [
                             {
                               className: 'wzFilterBarOperator',
@@ -202,7 +202,7 @@ export class AgentsPreview extends Component {
                                   <EuiToolTip
                                   position='top'
                                   content='Show active agents'>
-                                  <a onClick={() => this.setState({agentTableFilters: 
+                                  <a onClick={() => this._isMount && this.setState({agentTableFilters: 
                                   [
                                     {
                                       className: 'wzFilterBarOperator',
@@ -225,7 +225,7 @@ export class AgentsPreview extends Component {
                                   <EuiToolTip
                                   position='top'
                                   content='Show disconnected agents'>
-                                  <a onClick={() => this.setState({agentTableFilters: 
+                                  <a onClick={() => this._isMount && this.setState({agentTableFilters: 
                                   [
                                     {
                                       className: 'wzFilterBarOperator',
@@ -248,7 +248,7 @@ export class AgentsPreview extends Component {
                                   <EuiToolTip
                                   position='top'
                                   content='Show never connected agents'>
-                                  <a onClick={() => this.setState({agentTableFilters: 
+                                  <a onClick={() => this._isMount && this.setState({agentTableFilters: 
                                   [
                                     {
                                       className: 'wzFilterBarOperator',
