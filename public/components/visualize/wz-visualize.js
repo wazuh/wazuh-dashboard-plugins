@@ -214,7 +214,7 @@ export class WzVisualize extends Component {
     return (
       <Fragment>
         {/* Sample alerts Callout */}
-        {this.state.thereAreSampleAlerts && (
+        {this.state.thereAreSampleAlerts && this.props.resultState === 'ready' && (
           <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px 16px 8px' }}>
             <p>The data displayed may contain sample alerts. {this.state.adminMode && (
               <Fragment>

@@ -593,12 +593,17 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
           const output = await this.apiReq.request(method, path, JSONraw);
-          this.apiOutputBox.setValue(
-            JSON.stringify((output || {}).data || {}, null, 2).replace(
-              /\\\\/g,
-              '\\'
-            )
-          );
+          if(output.includes('3029')) {
+            this.apiOutputBox.setValue('This method is not allowed without admin mode');
+          }
+          else {
+            this.apiOutputBox.setValue(
+              JSON.stringify((output || {}).data || {}, null, 2).replace(
+                /\\\\/g,
+                '\\'
+              )
+            );
+          }
         }
       }
 
