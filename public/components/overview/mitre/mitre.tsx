@@ -101,7 +101,7 @@ export class Mitre extends Component {
     filterParams["time"] = this.state.filterParams["time"];
     filterParams["query"] = this.state.filterParams["query"];
     filterParams["filters"] =  filters; 
-    this.setState({ searchBarFilters: filters, filterParams });
+    this.setState({ searchBarFilters: filters, filterParams, isLoading: true }, () => this.setState({isLoading:false}));
   }
 
 

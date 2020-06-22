@@ -203,7 +203,7 @@ export class ComplianceTable extends Component {
     filterParams["time"] = this.state.filterParams["time"];
     filterParams["query"] = this.state.filterParams["query"];
     filterParams["filters"] = filters;
-    this.setState({ searchBarFilters: filters, filterParams });
+    this.setState({ searchBarFilters: filters, filterParams, loadingAlerts: true });
   }
 
 
