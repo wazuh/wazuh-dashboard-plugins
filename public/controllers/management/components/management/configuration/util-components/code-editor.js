@@ -56,7 +56,7 @@ class WzCodeEditor extends Component {
             onChange={onChange}
             isReadOnly={isReadOnly}
             setOptions={setOptions || {
-              fontSize: '16px',
+              fontSize: '14px',
               enableSnippets: true
             }}
             aria-label="Code Editor"
