@@ -59,7 +59,8 @@
     "read-last-lines": "^1.7.2",
     "redux": "^4.0.4",
     "timsort": "^0.3.0",
-    "winston": "3.0.0"
+    "winston": "3.0.0",
+    "brace": "^0.11.1"
   },
   "devDependencies": {
     "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
