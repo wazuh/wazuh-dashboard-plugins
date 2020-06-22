@@ -238,18 +238,19 @@ export class Metrics extends Component {
           const key = Object.keys(item)[0]
           newResults[key] = item[key];
         });
-        this.setState({results: newResults, loading:false})
+        this.setState({results: newResults, loading:false, buildingMetrics: false})
       });
     
   }
 
   componentDidUpdate(){
-    if(!this.state.loading && this.props.resultState === 'ready' && this.state.resultState === 'loading'){
-      this.setState({loading:true, resultState: this.props.resultState}, () => {
+    if(!this.state.buildingMetrics && this.props.resultState === 'ready' && this.state.resultState === 'loading'){
+      this.setState({ buildingMetrics: true, resultState: this.props.resultState}, () => {
         this.stats = this.buildMetric();
       }); 
     }else if(this.props.resultState !== this.state.resultState){
-      this.setState({resultState: this.props.resultState});
+      const isLoading = this.props.resultState === 'loading' ? {loading:true} : {};
+      this.setState({resultState: this.props.resultState, ...isLoading});
     }
   }
 
