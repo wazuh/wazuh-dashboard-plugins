@@ -34,15 +34,10 @@ import {
 
 import GroupsAgentsColums from './utils/columns-agents';
 import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
+import { getAgentFilterValues } from './get-agents-filters-values';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
-  // TODO: add suggests
-  suggestions = [
-    { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
-    
-  ]
-
   constructor(props) {
     super(props);
     this.state = {
@@ -51,7 +46,20 @@ class WzGroupAgentsTable extends Component {
       totalItems: 0,
       filters: [],
     };
-
+    this.suggestions = [
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
+      { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'node_name', description: 'Filter by node name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('node_name', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'manager', description: 'Filter by manager', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('manager', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'version', description: 'Filter by agent version', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('version', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'configSum', description: 'Filter by agent config sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('configSum', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'mergedSum', description: 'Filter by agent merged sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('mergedSum', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      //{ type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      //{ type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+    ]
     this.groupsHandler = GroupsHandler;
   }
 

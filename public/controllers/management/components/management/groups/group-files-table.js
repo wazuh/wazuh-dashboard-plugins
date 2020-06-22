@@ -29,8 +29,9 @@ import { WzSearchBar, filtersToObject } from '../../../../../components/wz-searc
 
 class WzGroupFilesTable extends Component {
   _isMounted = false;
-  // TODO: add suggests
   suggestions = [
+    //{ type: 'q', label: 'filename', description: 'Filter by file name', operators: ['=', '!=',], values: async (value) => getGroupsFilesValues('filename', value, {},this.props.state.itemDetail.name )},
+    //{ type: 'params', label: 'hash', description: 'Filter by hash', operators: ['=', '!=',], values: async (value) => getGroupsFilesValues('hash', value, {},this.props.state.itemDetail.name )},
   ];
 
   constructor(props) {
