@@ -694,8 +694,8 @@ export const visualizations = {
         height: 360,
         vis: [
           {
-            title: 'Attacks by tactic',
-            id: 'Wazuh-App-Overview-MITRE-Attacks-By-Tactic',
+            title: 'Attacks by technique',
+            id: 'Wazuh-App-Overview-MITRE-Attacks-By-Technique',
             width: 33
           },
           {
@@ -704,7 +704,7 @@ export const visualizations = {
             width: 34
           },
           {
-            title: 'Mitre tactics by agent',
+            title: 'Mitre techniques by agent',
             id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
             width: 33
           }
