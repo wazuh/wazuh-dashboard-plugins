@@ -30,8 +30,7 @@ export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
-    const { agent } = this.props;
-    this.state = { agent, itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false }
+    this.state = { itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false };
     this.policies = [];
     this.wzReq = WzRequest;
     this.timeService = TimeService;
@@ -158,12 +157,18 @@ export class Inventory extends Component {
       const id = match[0].split('=')[1];
       const policy = await this.wzReq.apiReq(
         'GET',
-        `/sca/${this.state.agent.id}`,
+        `/sca/${this.props.agent.id}`,
         { "q": "policy_id=" + id }
       );
       await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
       window.location.href = window.location.href.replace(new RegExp('redirectPolicy=' + '[^&]*'), '');
       this.setState({ loading: false });
+    }
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
+      await this.initialize();
     }
   }
 
@@ -203,7 +208,7 @@ export class Inventory extends Component {
       this.lookingPolicy = false;
       const policies = await this.wzReq.apiReq(
         'GET',
-        `/sca/${this.state.agent.id}`,
+        `/sca/${this.props.agent.id}`,
         {}
       );
       this.policies = (((policies || {}).data || {}).data || {}).items || [];
@@ -233,7 +238,7 @@ export class Inventory extends Component {
     if (policy) {
       const checks = await this.wzReq.apiReq(
         'GET',
-        `/sca/${this.state.agent.id}/checks/${policy.policy_id}`,
+        `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
         {}
       );
       this.checks = (((checks || {}).data || {}).data || {}).items || [];
@@ -314,7 +319,7 @@ export class Inventory extends Component {
     try {
       this.showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
-        '/sca/' + this.state.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
+        '/sca/' + this.props.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
         [],
         this.state.lookingPolicy.policy_id + '.csv'
       );
@@ -375,7 +380,7 @@ export class Inventory extends Component {
           )}
         </div>
         <EuiPage>
-          {((this.state.agent && (this.state.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
             <EuiCallOut title="No scans available" iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                 Refresh
@@ -383,14 +388,14 @@ export class Inventory extends Component {
             </EuiCallOut>
           )}
 
-          {((this.state.agent && (this.state.agent || {}).status === 'Never connected' && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status === 'Never connected' && !this.state.loading) &&
             <EuiCallOut title="Agent has never connected" style={{width: "100%"}} iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                   Refresh
               </EuiButton>
             </EuiCallOut>
           )}
-          {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
             <div>
               {((this.state.data || []).length &&
                 <EuiFlexGroup style={{ 'marginTop': 0 }}>
@@ -417,7 +422,7 @@ export class Inventory extends Component {
               </EuiPanel>
             </div>
           )}
-          {((this.state.agent && (this.state.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
             <div>
               <EuiPanel paddingSize="l">
                 <EuiFlexGroup>
