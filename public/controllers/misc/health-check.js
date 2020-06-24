@@ -247,11 +247,12 @@ export class HealthCheck {
             if (!apiVersion) {
               this.errors.push('Error fetching Wazuh API version');
             };
-            const apiSplit = apiVersion.split('v')[1].split('.');
+
+            const api = /v?(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/.exec(apiVersion);
             const appSplit = setupData.data.data['app-version'].split('.');
 
             const i = this.results.map(item => item.id).indexOf(1);
-            if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
+            if (api.groups.version !== appSplit[0] || api.groups.minor !== appSplit[1]) {
               this.errors.push(
                 'API version mismatch. Expected v' +
                   setupData.data.data['app-version']
