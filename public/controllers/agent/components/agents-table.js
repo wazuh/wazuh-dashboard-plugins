@@ -81,7 +81,7 @@ export class AgentsTable extends Component {
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-    this.setState({
+    this._isMount && this.setState({
       pageIndex,
       pageSize,
       sortField,
@@ -96,7 +96,7 @@ export class AgentsTable extends Component {
       'agents_preview_selected_options',
       JSON.stringify(selectedOptions)
     );
-    this.setState({
+    this._isMount && this.setState({
       q,
       search,
       selectedOptions,
@@ -114,7 +114,7 @@ export class AgentsTable extends Component {
     const filterVersion = await this.filterBarModelWazuhVersion();
     const filterOsPlatform = await this.filterBarModelOsPlatform();
     const filterNodes = await this.filterBarModelNodes();
-    this.setState({
+    this._isMount && this.setState({
       filterStatus,
       filterGroups,
       filterOs,
@@ -124,9 +124,13 @@ export class AgentsTable extends Component {
     });
   }
 
+  componentWillUnmount(){
+    this._isMount = false;
+  }
+  
   async reloadAgents() {
     const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
-    this.setState({
+    this._isMount && this.setState({
       isProcessing: true,
       isLoading: true,
       avaibleAgents: totalAgent.data.data.items
@@ -136,7 +140,7 @@ export class AgentsTable extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if(this.props.filters && this.props.filters.length){
-      this.setState({selectedOptions: this.props.filters, 
+      this._isMount && this.setState({selectedOptions: this.props.filters, 
         q:`${this.props.filters[0].group}=${ this.props.filters[0].label_}`,
         isProcessing: true,
         isLoading: false});
@@ -146,12 +150,12 @@ export class AgentsTable extends Component {
       const { q, search } = this.state;
       const { q: prevQ, search: prevSearch } = prevState;
       if (prevQ !== q || prevSearch !== search) {
-        this.setState({ pageIndex: 0 });
+        this._isMount && this.setState({ pageIndex: 0 });
       }
       await this.getItems();
     }
     if (prevState.allSelected === false && this.state.allSelected === true) {
-      this.setState({ loadingAllItem: true });
+      this._isMount && this.setState({ loadingAllItem: true });
       this.getAllItems();
     }
   }
@@ -194,7 +198,7 @@ export class AgentsTable extends Component {
     const agentsFiltered = await this.props
       .wzReq('GET', '/agents', filterAll)
       .then(() => {
-        this.setState({ loadingAllItem: false });
+        this._isMount && this.setState({ loadingAllItem: false });
       });
 
     const formatedAgents = (
@@ -345,7 +349,7 @@ export class AgentsTable extends Component {
   }
 
   reloadAgent = () => {
-    this.setState({
+    this._isMount && this.setState({
       isProcessing: true,
       isLoading: true
     });
@@ -400,10 +404,10 @@ export class AgentsTable extends Component {
     });
 
     selectedItems.length !== pageSize
-      ? this.setState({ allSelected: false })
+      ? this._isMount && this.setState({ allSelected: false })
       : false;
 
-    this.setState({ selectedItems });
+    this._isMount && this.setState({ selectedItems });
   };
 
   renderUpgradeButton() {
@@ -557,7 +561,7 @@ export class AgentsTable extends Component {
           iconType="trash"
           color="danger"
           onClick={() => {
-            this.setState({ purgeModal: true });
+            this._isMount && this.setState({ purgeModal: true });
           }}
         >
           Delete all agents
@@ -587,7 +591,7 @@ export class AgentsTable extends Component {
               <EuiFlexItem grow={false}>
                 <EuiButton
                   onClick={() => {
-                    this.setState(prevState => ({
+                    this._isMount && this.setState(prevState => ({
                       allSelected: !prevState.allSelected
                     }));
                   }}
@@ -610,7 +614,7 @@ export class AgentsTable extends Component {
     agents.forEach(element => {
       element.id === agentID ? (element.upgrading = true) : false;
     });
-    this.setState({ agents });
+    this._isMount && this.setState({ agents });
   }
 
   changeUpgradingState = agentID => {
@@ -620,7 +624,7 @@ export class AgentsTable extends Component {
         ? (element.upgrading = false)
         : false;
     });
-    this.setState(() => ({ agents }));
+    this._isMount && this.setState(() => ({ agents }));
   };
 
   onClickUpgrade = () => {
@@ -685,7 +689,7 @@ export class AgentsTable extends Component {
         this.getAllItems();
         this.reloadAgents();
       });
-    this.setState({ purgeModal: false });
+    this._isMount && this.setState({ purgeModal: false });
   };
 
   onClickPurgeAll = () => {
@@ -719,7 +723,7 @@ export class AgentsTable extends Component {
         this.reloadAgents();
       });
 
-    this.setState({ purgeModal: false });
+    this._isMount && this.setState({ purgeModal: false });
   };
 
   columns() {
