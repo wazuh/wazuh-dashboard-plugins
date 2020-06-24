@@ -24,7 +24,8 @@ import { npSetup } from 'ui/new_platform';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import DateMatch from '@elastic/datemath';
 import { toastNotifications } from 'ui/notify';
-import store from '../../../../redux/store'
+import store from '../../../../redux/store';
+import { WazuhConfig } from '../../../../react-services/wazuh-config';
 
 import {
   EuiBasicTable,
@@ -116,6 +117,7 @@ export class Discover extends Component {
       hover: ""
     }
 
+    this.wazuhConfig = new WazuhConfig();
     this.nameEquivalences = {
       "syscheck.event": "Action",
       "rule.id": "Rule ID",
@@ -231,11 +233,27 @@ export class Discover extends Component {
   buildFilter() {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
     const { searchBarFilters, query } = this.state;
+    const { hideManagerAlerts } = this.wazuhConfig.getConfig();
+    const extraFilters = [];
+    if(hideManagerAlerts) extraFilters.push({
+        meta: {
+          alias: null,
+          disabled: false,
+          key: 'agent.id',
+          negate: true,
+          params: { query: '000' },
+          type: 'phrase',
+          index: this.indexPattern.title
+        },
+        query: { match_phrase: { 'agent.id': '000' } },
+        $state: { store: 'appState' }
+      });
+  
     const elasticQuery =
       buildEsQuery(
         undefined,
         query,
-        searchBarFilters,
+        [...searchBarFilters, ...extraFilters],
         getEsQueryConfig(npSetup.core.uiSettings)
       );
     const pattern = AppState.getCurrentPattern();
@@ -249,6 +267,7 @@ export class Discover extends Component {
   }
 
   async getAlerts() {
+    if(!this.indexPattern) return;
     //compare filters so we only make a request into Elasticsearch if needed
       const newFilters = this.buildFilter();
     try{
