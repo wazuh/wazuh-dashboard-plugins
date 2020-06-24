@@ -18,6 +18,7 @@ import {
   EuiTitle,
   EuiFieldSearch,
   EuiSpacer,
+  EuiCallOut,
   EuiToolTip,
   EuiSwitch,
   EuiPopover,
@@ -206,7 +207,7 @@ export class ComplianceSubrequirements extends Component {
         </EuiFlexGrid>
       )
     } else {
-      return <>No results.</>
+      return <EuiCallOut title='There are no results.' iconType='help' color='warning'></EuiCallOut>
     }
   }
 
