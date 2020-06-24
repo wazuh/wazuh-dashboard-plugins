@@ -34,6 +34,7 @@ import {
 
 import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { filtersToObject } from '../../../../../components/wz-search-bar';
 
 class WzRulesetTable extends Component {
   _isMounted = false;
@@ -73,7 +74,6 @@ class WzRulesetTable extends Component {
             parseInt(id)
           );
           this.props.updateRuleInfo(info);
-          window.location.href = window.location.href.replace(regex, '');
         }
         this.setState({ isRedirect: false });
       }
@@ -83,12 +83,13 @@ class WzRulesetTable extends Component {
   async componentDidUpdate(prevProps) {
     const { isProcessing, section, showingFiles, filters, } = this.props.state;
     
-    const processingChange = prevProps.state.isProcessing !== isProcessing;
+    const processingChange = prevProps.state.isProcessing !== isProcessing ||
+    (prevProps.state.isProcessing && isProcessing);
     const sectionChanged = prevProps.state.section !== section;
     const showingFilesChanged =
       prevProps.state.showingFiles !== showingFiles;
     const filtersChanged = prevProps.state.filters !== filters;
-    if ((this._isMounted && processingChange && isProcessing ) || sectionChanged) {
+    if ((this._isMounted && processingChange && isProcessing ) || sectionChanged || filtersChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
         await this.setState({
           pageSize: this.state.pageSize,
@@ -125,6 +126,7 @@ class WzRulesetTable extends Component {
     });
 
     const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
+    this.props.updateTotalItems(total_affected_items);
     this.setState({
       items: affected_items,
       totalItems : total_affected_items,
@@ -154,7 +156,7 @@ class WzRulesetTable extends Component {
       offset: pageIndex * pageSize,
       limit: pageSize,
       ...this.buildSortFilter(),
-      ...filters
+      ...filtersToObject(filters)
     };
 
     return filter;
@@ -207,11 +209,11 @@ class WzRulesetTable extends Component {
     };
     const sorting = !!sortField
       ? {
-          sort: {
-            field: sortField,
-            direction: sortDirection
-          }
+        sort: {
+          field: sortField,
+          direction: sortDirection
         }
+      }
       : {};
 
     if (!error) {
@@ -225,7 +227,11 @@ class WzRulesetTable extends Component {
           onClick: async () => {
             const { section } = this.props.state;
             if (section === 'rules') {
-              const result = await this.rulesetHandler.getRuleInformation(item.filename, id);
+              const result = await this.rulesetHandler.getRuleInformation(
+                item.file,
+                id
+              );
+              window.location.href = `${window.location.href}&redirectRule=${id}`;
               this.props.updateRuleInfo(result);
             } else if (section === 'decoders') {
               const result = await this.rulesetHandler.getDecoderInformation(item.filename, name);
@@ -268,7 +274,7 @@ class WzRulesetTable extends Component {
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
               >
-                <p>This items will be removed</p>
+                <p>These items will be removed</p>
                 <div>
                   {itemList.map(function (item, i) {
                     return (
@@ -310,7 +316,8 @@ class WzRulesetTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

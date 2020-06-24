@@ -1225,7 +1225,7 @@ export class WazuhApiCtrl {
       } else if (output && output.data && output.data.data && !output.data.data.total_affected_items) {
         throw new Error('No results');
       } else {
-        throw new Error('An error occurred fetching data from the Wazuh API');
+        throw new Error(`An error occurred fetching data from the Wazuh API${output && output.body && output.body.message ? `: ${output.body.message}` : ''}`);
       }
     } catch (error) {
       log('wazuh-api:csv', error.message || error);

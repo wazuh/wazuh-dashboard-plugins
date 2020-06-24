@@ -11,7 +11,9 @@ import {
   EuiText,
   EuiSpacer,
   EuiInMemoryTable,
-  EuiLink
+  EuiLink,
+  EuiAccordion,
+  EuiFlexGrid,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -83,9 +85,8 @@ class WzDecoderInfo extends Component {
    * Clean the existing filters and sets the new ones and back to the previous section
    */
   setNewFiltersAndBack(filters) {
-    const fil = filters.filters || filters;
     this.props.cleanFilters();
-    this.props.updateFilters(fil);
+    this.props.updateFilters(filters);
     this.props.cleanInfo();
   }
 
@@ -97,31 +98,28 @@ class WzDecoderInfo extends Component {
    */
   renderInfo(position, file, path) {
     return (
-      <ul>
-        <li key="position">
-          <b>Position:</b>&nbsp;
-          <span className="subdued-color">{position}</span>
-        </li>
-        <EuiSpacer size="s" />
-        <li key="file">
-          <b>File:</b>
+      <EuiFlexGrid columns={4}>
+        <EuiFlexItem key="position">
+          <b style={{ paddingBottom: 6 }}>Position</b>{position}
+        </EuiFlexItem>
+        <EuiFlexItem key="file">
+          <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink onClick={async () => this.setNewFiltersAndBack({ filename: file })}>
               &nbsp;{file}
             </EuiLink>
           </EuiToolTip>
-        </li>
-        <EuiSpacer size="s" />
-        <li key="path">
-          <b>Path:</b>
+        </EuiFlexItem>
+        <EuiFlexItem key="path">
+          <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink onClick={async () => this.setNewFiltersAndBack({ relative_dirname: path })}>
               &nbsp;{path}
             </EuiLink>
           </EuiToolTip>
-        </li>
+        </EuiFlexItem>
         <EuiSpacer size="s" />
-      </ul>
+      </EuiFlexGrid>
     );
   }
 
@@ -131,6 +129,8 @@ class WzDecoderInfo extends Component {
    */
   renderDetails(details) {
     const detailsToRender = [];
+    const capitalize = str => str[0].toUpperCase() + str.slice(1);
+
     Object.keys(details).forEach(key => {
       let content = details[key];
       if (key === 'regex') {
@@ -141,15 +141,13 @@ class WzDecoderInfo extends Component {
         content = <span className="subdued-color">{details[key]}</span>;
       }
       detailsToRender.push(
-        <Fragment key={`decoder-detail-${key}`}>
-          <li>
-            <b>{key}:</b>&nbsp;{content}
-          </li>
-          <EuiSpacer size="s" />
-        </Fragment>
+        <EuiFlexItem key={`decoder-detail-${key}`} grow={3} style={{ maxWidth: 'calc(25% - 24px)' }}>
+          <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b><div>{content}</div>
+        </EuiFlexItem>
       );
     });
-    return <ul>{detailsToRender}</ul>;
+
+    return <EuiFlexGrid columns={4}>{detailsToRender}</EuiFlexGrid>;
   }
 
   /**
@@ -166,7 +164,7 @@ class WzDecoderInfo extends Component {
           key={`decoder-info-color-order-${i}`}
           style={{ color: colors[i] }}
         >
-          {valuesArray[i]}
+          {valuesArray[i].startsWith(" ") ? valuesArray[i] : ` ${valuesArray[i]}`}
         </span>
       );
       result.push(coloredString);
@@ -234,73 +232,87 @@ class WzDecoderInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiTitle>
-                  <h2>
+                  <span style={{ fontSize: '22px' }}>
                     <EuiToolTip position="right" content="Back to decoders">
                       <EuiButtonIcon
                         aria-label="Back"
-                        color="subdued"
+                        color="primary"
                         iconSize="l"
                         iconType="arrowLeft"
                         onClick={() => this.props.cleanInfo()}
                       />
                     </EuiToolTip>
                     {name}
-                  </h2>
+                  </span>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size="m" />
             {/* Cards */}
-            <EuiFlexGroup>
-              {/* General info */}
-              <EuiFlexItem>
-                <EuiPanel paddingSize="m">
-                  <EuiTitle size={'s'}>
-                    <h3>Information</h3>
-                  </EuiTitle>
-                  <EuiSpacer size="s" />
-                  {this.renderInfo(position, filename, relative_dirname)}
-                </EuiPanel>
-              </EuiFlexItem>
-              {/* Details */}
-              <EuiFlexItem>
-                <EuiPanel paddingSize="m">
-                  <EuiTitle size={'s'}>
-                    <h3>Details</h3>
-                  </EuiTitle>
-                  <EuiSpacer size="s" />
-                  {this.renderDetails(details)}
-                </EuiPanel>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-
-            {/* Table */}
-            <EuiSpacer size="l" />
-            <EuiPanel paddingSize="m">
+            <EuiPanel style={{ margin: '16px 0', padding: '16px 16px 0px 16px' }}>
               <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
+                {/* General info */}
+                <EuiFlexItem style={{ marginBottom: 16, marginTop: 8 }}>
+                  <EuiAccordion
+                    id="Info"
+                    buttonContent={
                       <EuiTitle size="s">
-                        <h5>Related decoders</h5>
+                        <h3>Information</h3>
                       </EuiTitle>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiSpacer size="m" />
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiInMemoryTable
-                        itemId="id"
-                        items={decoders}
-                        columns={columns}
-                        rowProps={onClickRow}
-                        pagination={true}
-                        loading={isLoading}
-                        sorting={true}
-                        message={null}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
+                    }
+                    paddingSize="none"
+                    initialIsOpen={true}>
+                    <div className='flyout-row details-row'>
+                      {this.renderInfo(position, file, path)}
+                    </div>
+                  </EuiAccordion>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGroup>
+                <EuiFlexItem style={{ marginTop: 8 }}>
+                  <EuiAccordion
+                    id="Details"
+                    buttonContent={
+                      <EuiTitle size="s">
+                        <h3>Details</h3>
+                      </EuiTitle>
+                    }
+                    paddingSize="none"
+                    initialIsOpen={true}>
+                    <div className='flyout-row details-row'>
+                      {this.renderDetails(details)}
+                    </div>
+                  </EuiAccordion>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              {/* Table */}
+              <EuiFlexGroup>
+                <EuiFlexItem style={{ marginTop: 8 }}>
+                  <EuiAccordion
+                    id="Related"
+                    buttonContent={
+                      <EuiTitle size="s">
+                        <h3>Related decoders</h3>
+                      </EuiTitle>
+                    }
+                    paddingSize="none"
+                    initialIsOpen={true}>
+                    <div className='flyout-row related-rules-row'>
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <EuiInMemoryTable
+                            itemId="id"
+                            items={decoders}
+                            columns={columns}
+                            rowProps={onClickRow}
+                            pagination={true}
+                            loading={isLoading}
+                            sorting={true}
+                            message={null}
+                          />
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </div>
+                  </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiPanel>

@@ -1,5 +1,5 @@
-export { WzSearchBar, suggestItem } from './wz-search-bar';
+export { WzSearchBar, suggestItem, IWzSuggestItem, IWzSearchBarProps } from './wz-search-bar';
 
-export { qSuggests } from './lib/q-handler';
+export { qSuggests, IFilter, filtersToObject } from './lib';
 
 export { apiSuggests } from './lib/api-handler';

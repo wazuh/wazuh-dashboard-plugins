@@ -26,8 +26,12 @@ import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
+import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
+import { Vis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/types';
+import { convertToSerializedVis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/saved_visualizations/_saved_vis';
 import { toastNotifications } from 'ui/notify';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { EuiLoadingChart } from '@elastic/eui';
 
 class KibanaVis extends Component {
   _isMounted = false;
@@ -56,7 +60,11 @@ class KibanaVis extends Component {
       chrome: npStart.core.chrome,
       overlays: npStart.core.overlays
     };
-    this.savedObjectLoaderVisualize = createSavedVisLoader(services);
+    const servicesForVisualizations = {
+      ...services,
+      ...{ visualizationTypes: new TypesService().start() },
+    }
+    this.savedObjectLoaderVisualize = createSavedVisLoader(servicesForVisualizations);
     this.factory = null;
     this.visID = this.props.visID;
     this.tab = this.props.tab;
@@ -104,14 +112,14 @@ class KibanaVis extends Component {
   async callUpdateMetric() {
     try {
       if (this.visHandler) {
-        const data = await this.visHandler.handler.dataHandler.getData();
+        const data = await this.visHandler.handler.execution.getData();
         if (
           data &&
           data.value &&
           data.value.visData &&
           data.value.visData.rows &&
           this.props.state[this.visID] !==
-            data.value.visData.rows['0']['col-0-1']
+          data.value.visData.rows['0']['col-0-1']
         ) {
           store.dispatch(
             this.updateMetric({
@@ -122,7 +130,7 @@ class KibanaVis extends Component {
         }
         // This check if data.value.visData.tables exists and dispatch that value as stat
         // FIXME: this is correct?
-        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && data.value.visData.tables['0'] && data.value.visData.tables['0'].rows && data.value.visData.tables['0'].rows['0'] && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']){
+        if (data && data.value && data.value.visData && data.value.visData.tables && data.value.visData.tables.length && data.value.visData.tables['0'] && data.value.visData.tables['0'].rows && data.value.visData.tables['0'].rows['0'] && this.props.state[this.visID] !== data.value.visData.tables['0'].rows['0']['col-0-2']) {
           store.dispatch(
             this.updateMetric({ name: this.visID, value: data.value.visData.tables['0'].rows['0']['col-0-2'] })
           );
@@ -176,8 +184,9 @@ class KibanaVis extends Component {
       const timeFilterSeconds = this.calculateTimeFilterSeconds(
         timefilter.getTime()
       );
-      const timeRange =
-        isAgentStatus && timeFilterSeconds < 900
+      const timeRange = this.visID === 'Wazuh-App-Overview-General-Agents-Evolution'
+        ? { from: 'now-7d', to: 'now', mode: 'quick' }
+        : isAgentStatus && timeFilterSeconds < 900
           ? { from: 'now-15m', to: 'now', mode: 'quick' }
           : timefilter.getTime();
       const filters = isAgentStatus ? [] : discoverList[1] || [];
@@ -209,20 +218,25 @@ class KibanaVis extends Component {
           this.visualization.searchSource.setField('source', false);
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
-
+          const vis = new Vis(this.visualization.visState.type, await convertToSerializedVis(this.visualization));
           this.visHandler = await this.factory.createFromObject(
-            this.visualization,
+            vis,
             visInput
           );
-          setTimeout(() => {
-            this.visHandler.render($(`[id="${this.visID}"]`)[0]).then(() => {
+          if (this.visHandler)
+            setTimeout(async () => {
+              await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
               this.visHandler.handler.data$.subscribe(this.renderComplete());
             });
-          })
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
           // There's a visualization object -> just update its filters
+
+          if (this.props.isMetric) {
+            this.callUpdateMetric();
+          }
+
           this.rendered = true;
           this.$rootScope.rendered = 'true';
           this.visHandler.updateInput(visInput);
@@ -272,10 +286,11 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
     try {
       this.visHandler.destroy();
-    } catch (error) {} // eslint-disable-line
+      this.visHandler = null;
+    } catch (error) { } // eslint-disable-line
   };
 
   renderComplete = async () => {
@@ -301,16 +316,6 @@ class KibanaVis extends Component {
       this.$rootScope.resultState = 'none';
     } else {
       const currentCompleted = Math.round((currentLoaded / totalTabVis) * 100);
-
-      const visTitle = (((this.visHandler || {}).vis || {})._state || {}).title;
-      if (visTitle === 'Mitre attack count') {
-        //   $scope.$emit('sendVisDataRows', {
-        //     mitreRows: visHandler.dataLoader['visData'],
-        //   });
-      }
-      if (this.props.isMetric) {
-        this.callUpdateMetric();
-      }
       if (currentCompleted >= 100) {
         this.$rootScope.rendered = 'true';
         if (visId.includes('AWS-geo')) {
@@ -331,13 +336,19 @@ class KibanaVis extends Component {
   };
 
   render() {
+    const height = this.props.resultState === 'loading' ? 0 : "100%"
     return (
       this.visID && (
-        <div
-          id={this.visID}
-          vis-id={this.visID}
-          style={{ height: '100%' }}
-        ></div>
+        <span>
+          <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', textAlign: "center", paddingTop: 100 }}>
+            <EuiLoadingChart size="xl" />
+          </div>
+          <div
+            id={this.visID}
+            vis-id={this.visID}
+            style={{ height }}
+          ></div>
+        </span>
       )
     );
   }

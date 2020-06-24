@@ -20,6 +20,7 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export class AgentsPreviewController {
   /**
@@ -178,7 +179,7 @@ export class AgentsPreviewController {
    */
   async downloadCsv(filters) {
     try {
-      this.errorHandler.info(
+      ErrorHandler.info(
         'Your download should begin automatically...',
         'CSV'
       );
@@ -189,7 +190,7 @@ export class AgentsPreviewController {
 
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Download CSV');
+      ErrorHandler.handle(error, 'Download CSV');
     }
     return;
   }
@@ -231,7 +232,7 @@ export class AgentsPreviewController {
 
       this.pattern = AppState.getCurrentPattern();
     } catch (error) {
-      this.errorInit = this.errorHandler.handle(error, false, false, true);
+      this.errorInit = ErrorHandler.handle(error, '', { silent: true });
     }
     this.loading = false;
     this.$scope.$applyAsync();

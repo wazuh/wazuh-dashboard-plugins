@@ -2,13 +2,13 @@
 
     <!-- Cluster disabled or not running -->
     <div ng-if="!isClusterEnabled || !isClusterRunning">
-        <react-component name="ClusterDisabled" props="{enabled: isClusterEnabled, running: isClusterRunning}" />
+        <react-component name="ClusterDisabled" props="{enabled: isClusterEnabled, running: isClusterRunning}" ></react-component>
     </div>
 
     <!-- Cluster enabled -->
     <div ng-show="isClusterEnabled && isClusterRunning" class="monitoring-discover" >
         <div ng-show="loading" style="padding: 16px">
-            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
         </div>
 
         <!-- Discover search bar section -->

@@ -35,7 +35,7 @@ class WzConfigurationVulnerabilities extends Component {
     return (
       this.wodleConfig &&
       this.wodleConfig['vulnerability-detector'] &&
-      this.wodleConfig['vulnerability-detector'].disabled !== 'yes'
+      this.wodleConfig['vulnerability-detector'].enabled === 'yes'
     );
   }
   render() {

@@ -19,7 +19,7 @@
     </div>
     <div ng-show="!load && agent">
         <div ng-if="welcomeCardsProps">
-            <react-component name="AgentsWelcome" props="welcomeCardsProps" />
+            <react-component name="AgentsWelcome" props="getWelcomeCardsProps(resultState)" ></react-component>
         </div>
     </div>
 </div>

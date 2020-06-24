@@ -63,15 +63,14 @@ export class VisHandlers {
 
     // Check raw response from all rendered tables
     let tables = this.list.filter(
-      item => (((item || {}).vis || {})._state || {}).type === 'table'
+      item => (((item || {}).vis || {}).type || {}).type === 'table'
     );
     for (let i = 0; i < tables.length; i++) {
       const columns = [];
       const title =
-        tables[i].vis._state.title ||
-        tables[i].dataLoader.previousVisState.title ||
+        tables[i].vis.title ||
         'Table';
-      const item = await tables[i].handler.dataHandler.getData();
+      const item = await tables[i].handler.execution.getData();
       for (const table of item.value.visData.tables) {
         columns.push(...table.columns.map(t => t.name));
       }

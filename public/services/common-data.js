@@ -11,8 +11,10 @@
  */
 import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
+import { ErrorHandler } from '../react-services/error-handler';
 import { ShareAgent } from '../factories/share-agent';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
+import rison from 'rison-node';
 
 export class CommonData {
   /**
@@ -23,7 +25,7 @@ export class CommonData {
    * @param {*} $location
    * @param {*} globalState
    */
-  constructor($rootScope, $timeout, errorHandler, $location, globalState) {
+  constructor($rootScope, $timeout, errorHandler, $location, globalState, $window, $route) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.genericReq = GenericRequest;
@@ -32,8 +34,9 @@ export class CommonData {
     this.shareAgent = new ShareAgent();
     this.globalState = globalState;
     this.savedTimefilter = null;
+    this.$window = $window;
+    this.$route = $route;
     this.refreshInterval = { pause: true, value: 0 };
-
     this.overviewTabs = {
       hostMonitoringTabs: ['general', 'fim', 'aws', 'gcp'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
@@ -126,6 +129,7 @@ export class CommonData {
     try {
       const tabFilters = {
         general: { group: '' },
+        welcome: { group: '' },
         fim: { group: 'syscheck' },
         pm: { group: 'rootcheck' },
         vuls: { group: 'vulnerability-detector' },
@@ -156,7 +160,7 @@ export class CommonData {
         )
       );
 
-      if (tab !== 'general') {
+      if (tab !== 'general' && tab !== 'welcome') {
         if (tab === 'pci') {
           this.removeDuplicateExists('rule.pci_dss');
           filters.push(filterHandler.pciQuery());
@@ -180,16 +184,56 @@ export class CommonData {
           filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
         }
       }
+
+      const regex = new RegExp('addRuleFilter=' + '[^&]*');
+      const match = this.$window.location.href.match(regex);
+      if (match && match[0]) {
+        const id = match[0].split('=')[1];
+        let filter = filterHandler.ruleIdQuery(id);
+        filter.$state.isImplicit = false;
+        filters.push(filter);
+        this.$window.location.href = this.$window.location.href.replace(regex, '');
+      }
+
       if (agent) filters.push(filterHandler.agentQuery(agent));
+      filters.push(...this.addWazuhParamFilters());
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
-      this.errorHandler.handle(
+      ErrorHandler.handle(
         'An error occurred while creating custom filters for visualizations',
         agent ? 'Agents' : 'Overview',
-        true
+        { warning: true }
       );
     }
+  }
+
+  removeParam(key, sourceURL) {
+    var rtn = sourceURL.split("?")[0],
+        param,
+        params_arr = [],
+        queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+    if (queryString !== "") {
+        params_arr = queryString.split("&");
+        for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+            param = params_arr[i].split("=")[0];
+            if (param === key) {
+                params_arr.splice(i, 1);
+            }
+        }
+        rtn = rtn + "?" + params_arr.join("&");
+    }
+    return rtn;
+}
+  /**
+    Find the `_w` parameter in the url and return a list of filters if it exists
+   */
+  addWazuhParamFilters() {
+    const { _w } = this.$route.current.params;
+    if (!_w) return [];
+    const { filters } = rison.decode(_w);
+    window.location.href = this.removeParam('_w', window.location.href)
+    return filters || [];
   }
 
   /**
@@ -384,12 +428,12 @@ export class CommonData {
     return target.hostMonitoringTabs.includes(tab)
       ? target.hostMonitoringTabs
       : target.systemAuditTabs.includes(tab)
-      ? target.systemAuditTabs
-      : target.securityTabs.includes(tab)
-      ? target.securityTabs
-      : target.complianceTabs.includes(tab)
-      ? target.complianceTabs
-      : false;
+        ? target.systemAuditTabs
+        : target.securityTabs.includes(tab)
+          ? target.securityTabs
+          : target.complianceTabs.includes(tab)
+            ? target.complianceTabs
+            : false;
   }
 
   getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {

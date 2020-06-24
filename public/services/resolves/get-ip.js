@@ -10,14 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
-import { SavedObject } from '../../react-services/saved-objects';
-import { PatternHandler } from '../../react-services/pattern-handler';
+import { npStart } from 'ui/new_platform';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export function getIp(
-  indexPatterns,
   $q,
   $window,
   $location,
@@ -31,7 +29,7 @@ export function getIp(
 
   const buildSavedObjectsClient = async () => {
     try {
-      const savedObjectsClient = Private(SavedObjectsClientProvider);
+      const savedObjectsClient = npStart.core.savedObjects.client;
 
       const savedObjectsData = await savedObjectsClient.find({
         type: 'index-pattern',
@@ -63,7 +61,7 @@ export function getIp(
         return;
       }
 
-      const courierData = await indexPatterns.get(currentPattern);
+      const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
 
       deferred.resolve({
         list: onlyWazuhAlerts,
@@ -74,7 +72,7 @@ export function getIp(
     } catch (error) {
       deferred.reject(error);
       wzMisc.setBlankScr(
-        errorHandler.handle(error, 'Elasticsearch', false, true)
+        ErrorHandler.handle(error, 'Elasticsearch', { silent: true })
       );
       $location.path('/blank-screen');
     }
@@ -85,7 +83,7 @@ export function getIp(
     currentParams && (currentParams.agent || currentParams.agent === '000');
   const targetedRule =
     currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
-  if (!targetedAgent && !targetedRule && healthCheck($window)) {
+  if (!targetedRule && healthCheck($window)) {
     deferred.reject();
     $location.path('/health-check');
   } else {

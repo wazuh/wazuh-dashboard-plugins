@@ -125,11 +125,11 @@ export const windowsInvalidLoginPassword = {
     groups: ['windows',  'windows_security', 'win_authentication_failed'],
     id: 60122,
     level: 5,
-    pci_dss: ['IV_35.7.d', 'IV_32.2'],
+    pci_dss: ['10.2.4', '10.2.5'],
     gpg13: ['7.1'],
+    gdpr: ['IV_35.7.d', 'IV_32.2'],
     hipaa: ['164.312.b'],
-    nist_800_53: ['AU.1', 'AC.7'],
-    gdpr: ['10.2.4', '10.2.5']
+    nist_800_53: ['AU.1', 'AC.7']
   }
 }
 
@@ -209,7 +209,8 @@ export const bruteForceTryingAccessSystem = {
     description: "sshd: brute force trying to get access to the system.",
     groups: ["syslog","sshd","authentication_failures"],
     mitre: {
-      tactics: ["Credential Access","Lateral Movement"],
+      tactic: ["Credential Access","Lateral Movement"],
+      technique: ["Brute Force","Remove Services"],
       id: ["T1110","T1021"]
     },
     id: "5712",
@@ -252,7 +253,8 @@ export const maximumAuthenticationAttemptsExceeded = {
     description: "Maximum authentication attempts exceeded.",
     groups: ["syslog","sshd","authentication_failed"],
     mitre: {
-      tactics: ["Credential Access","Lateral Movement"],
+      tactic: ["Credential Access","Lateral Movement"],
+      technique: ["Brute Force","Remove Services"],
       id: ["T1110","T1021"]
     },
     id: "5758",

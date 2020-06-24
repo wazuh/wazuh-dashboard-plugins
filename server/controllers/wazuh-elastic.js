@@ -759,8 +759,11 @@ export class WazuhElasticCtrl {
       }
       payload.sort.push(sort);
       payload.size = size;
+      payload.track_total_hits = true;
       payload.from = req.payload.offset || 0;
-      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload, namespace);
       return { alerts: data.hits.hits, hits: data.hits.total.value };
     } catch (error) {
       log('wazuh-elastic:alerts', error.message || error);
@@ -796,10 +799,10 @@ export class WazuhElasticCtrl {
    */
   async haveSampleAlertsOfCategory(req, reply){
     if(!req.params || typeof req.params !== 'object'){
-      return ErrorResponse('Missing params', 1000, 500, reply);
+      return ErrorResponse('Missing params', 1000, 400, reply);
     };
     if(!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)){
-      return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
+      return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     try{
       const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
@@ -829,12 +832,20 @@ export class WazuhElasticCtrl {
    */
   async createSampleAlerts(req, reply){
     if(!req.params || typeof req.params !== 'object'){
-      return ErrorResponse('Missing params', 1000, 500, reply);
+      return ErrorResponse('Missing params', 1000, 400, reply);
     };
     if(!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)){
-      return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
+      return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
+    //Get configuration
+    const configFile = getConfiguration();
+    
+    // Check if admin mode is enabled
+    if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
+      return ErrorResponse('Admin mode is required to create sample data', 1000, 403, reply);
+    };
+
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
     const bulkPrefix = JSON.stringify({
       index: {
@@ -851,7 +862,6 @@ export class WazuhElasticCtrl {
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       if(!existsSampleIndex){
         // Create wazuh sample alerts index
-        const configFile = getConfiguration();
 
         const shards =
           typeof (configFile || {})['wazuh.alerts.shards'] !== 'undefined'
@@ -890,7 +900,7 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:createSampleAlerts',
         `Error adding sample alerts to ${sampleAlertsIndex} index`
       );
-      return ErrorResponse(error.message || error, 1000, 400, reply);
+      return ErrorResponse(error.message || error, 1000, 500, reply);
     }
   }
   /**
@@ -902,11 +912,20 @@ export class WazuhElasticCtrl {
   async deleteSampleAlerts(req, reply){
     // Delete Wazuh sample alert index
     if(!req.params || typeof req.params !== 'object'){
-      return ErrorResponse('Missing params', 1000, 500, reply);
+      return ErrorResponse('Missing params', 1000, 400, reply);
     };
     if(!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)){
-      return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
+      return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
+    
+    //Get configuration
+    const configFile = getConfiguration();
+    
+    // Check if admin mode is enabled
+    if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
+      return ErrorResponse('Admin mode is required to delete sample data', 1000, 403, reply);
+    };
+
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
     try{
       // Check if Wazuh sample alerts index exists

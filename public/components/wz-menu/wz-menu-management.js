@@ -10,11 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon } from '@elastic/eui';
+import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { updateAdminMode } from '../../redux/actions/appStateActions';
+import { AppNavigate } from '../../react-services/app-navigate'
 
 class WzMenuManagement extends Component {
   constructor(props) {
@@ -39,7 +40,6 @@ class WzMenuManagement extends Component {
       logs: { id: 'logs', text: 'Logs' },
       reporting: { id: 'reporting', text: 'Reporting' },
       statistics: { id: 'statistics', text: 'Statistics' },
-      sample_data: { id: 'sample_data', text: 'Sample Data' },
     };
 
     this.paths = {
@@ -59,17 +59,17 @@ class WzMenuManagement extends Component {
   }
 
   async componentDidMount() {
-    try{
+    try {
       const adminMode = await checkAdminMode();
-      if(this.props.adminMode !== adminMode){
+      if (this.props.adminMode !== adminMode) {
         this.props.updateAdminMode(adminMode);
       };
-    }catch(error){}
+    } catch (error) { }
   }
 
-  clickMenuItem = section => {
+  clickMenuItem = (ev, section) => {
     this.props.closePopover();
-    window.location.href = `#/manager/${section}?tab=${section}`;
+    AppNavigate.navigateToModule(ev, 'manager', { tab: section })
   };
 
   createItem = (item, data = {}) => {
@@ -79,7 +79,8 @@ class WzMenuManagement extends Component {
       id: item.id,
       name: item.text,
       isSelected: this.props.state.section === item.id,
-      onClick: () => this.clickMenuItem(item.id)
+      onClick: () => { },
+      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
 
@@ -94,7 +95,6 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.lists),
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
-          ...(this.props.adminMode ? [this.createItem(this.managementSections.sample_data)] : [])
         ],
       })
     ];
@@ -106,7 +106,7 @@ class WzMenuManagement extends Component {
         items: [
           this.createItem(this.managementSections.status),
           this.createItem(this.managementSections.cluster),
-          this.createItem(this.managementSections.statistics),
+          // this.createItem(this.managementSections.statistics),
           this.createItem(this.managementSections.logs),
           this.createItem(this.managementSections.reporting)
         ]
@@ -115,6 +115,17 @@ class WzMenuManagement extends Component {
 
     return (
       <div className="WzManagementSideMenu">
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false} style={{ marginLeft: 14 }}>
+            <EuiButtonEmpty iconType="apps"
+              onClick={() => {
+                this.props.closePopover();
+                window.location.href = '#/manager';
+              }}>
+              Management directory
+              </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />

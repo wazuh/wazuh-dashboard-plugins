@@ -81,7 +81,7 @@ const app = getAngularModule('app/wazuh');
 
 app.config([
   '$compileProvider',
-  function($compileProvider) {
+  function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -90,21 +90,23 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function($httpProvider) {
+  function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
 app.run([
   '$injector',
-  function(_$injector) {
+  function (_$injector) {
     chrome
       .setRootTemplate(
+        `<div>
+        <div class="wazuhNotReadyYet"></div>
+        <div ng-view class="mainView"></div>
+        <react-component name="WzMenuWrapper" props=""></react-component>
+        <react-component name="WzAgentSelectorWrapper" props=""></react-component>
+       </div>
         `
-    <react-component name="WzMenuWrapper" props="" />
-    <div class="wazuhNotReadyYet"></div>
-    <div ng-view class="mainView"></div>
-  `
       )
       .setRootController(() => require('./app'));
     changeWazuhNavLogo();
@@ -116,6 +118,6 @@ app.run([
       .then(adminMode => {
         store.dispatch(updateAdminMode(adminMode))
       })
-      .catch(() => {/* Do nothing if it fails */})
+      .catch(() => {/* Do nothing if it fails */ })
   }
 ]);

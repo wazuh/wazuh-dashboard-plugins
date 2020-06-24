@@ -56,8 +56,8 @@ class WzConfigurationOpenScapEvaluations extends Component {
             />
           )}
         {currentConfig &&
-          wodleConfig['open-scap'] &&
-          !wodleConfig['open-scap'].content &&
+          ((wodleConfig['open-scap'] &&
+          !wodleConfig['open-scap'].content) || !wodleConfig['open-scap']) &&
           !isString(currentConfig['wmodules-wmodules']) && (
             <WzNoConfig error="not-present" help={helpLinks} />
           )}

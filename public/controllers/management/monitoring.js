@@ -14,6 +14,7 @@ import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiRequest } from '../../react-services/api-request';
+import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
@@ -195,7 +196,7 @@ export function ClusterController(
 
       $scope.$applyAsync();
     } catch (error) {
-      errorHandler.handle(error, 'Cluster');
+      ErrorHandler.handle(error, 'Cluster');
     }
   });
 
@@ -216,10 +217,10 @@ export function ClusterController(
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters);
     } catch (error) {
-      errorHandler.handle(
+      ErrorHandler.handle(
         'An error occurred while creating custom filters for visualizations',
         'Cluster',
-        true
+        { warning: true }
       );
     }
   };
@@ -228,12 +229,6 @@ export function ClusterController(
    * This set some required settings at init
    */
   const load = async () => {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Cluster' }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
     try {
       visHandlers.removeAll();
@@ -286,7 +281,7 @@ export function ClusterController(
       return;
     } catch (error) {
       $scope.loading = false;
-      errorHandler.handle(error, 'Cluster');
+      ErrorHandler.handle(error, 'Cluster');
     }
   };
 
@@ -302,6 +297,12 @@ export function ClusterController(
 
   $scope.expandArray = [false, false];
 
+  const breadcrumb = [
+    { text: '' },
+    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Cluster' }
+  ];
+  store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   if (clusterEnabled) load();
 
   //listeners

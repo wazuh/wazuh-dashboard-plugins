@@ -12,32 +12,6 @@
 
 export const agentVisualizations = {
   general: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-General-Metric-alerts',
-        description: 'Total',
-        value: 'totalAlerts',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-General-Level-12-alerts',
-        description: 'Level 12 or above alerts',
-        value: 'level12',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Agents-General-Authentication-failure',
-        description: 'Authentication failure',
-        value: 'authFailure',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Agents-General-Authentication-success',
-        description: 'Authentication success',
-        value: 'authSuccess',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 400,
@@ -54,7 +28,7 @@ export const agentVisualizations = {
         height: 300,
         vis: [
           {
-            title: 'Top 5 agents',
+            title: 'Top 5 alerts',
             id: 'Wazuh-App-Agents-General-Top-5-alerts',
             width: 33
           },
@@ -69,19 +43,57 @@ export const agentVisualizations = {
             width: 34
           }
         ]
+      }
+    ]
+  },
+  aws: {
+    rows: [
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Sources',
+            id: 'Wazuh-App-Agents-AWS-Top-sources',
+            width: 25
+          },
+          {
+            title: 'Accounts',
+            id: 'Wazuh-App-Agents-AWS-Top-accounts',
+            width: 25
+          },
+          {
+            title: 'S3 buckets',
+            id: 'Wazuh-App-Agents-AWS-Top-buckets',
+            width: 25
+          },
+          {
+            title: 'Regions',
+            id: 'Wazuh-App-Agents-AWS-Top-regions',
+            width: 25
+          }
+        ]
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Events by source over time',
+            id: 'Wazuh-App-Agents-AWS-Events-by-source',
+            width: 50
+          },
+          {
+            title: 'Events by S3 bucket over time',
+            id: 'Wazuh-App-Agents-AWS-Events-by-s3-bucket',
+            width: 50
+          }
+        ]
       },
       {
         height: 570,
         vis: [
           {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-General-Alerts-summary',
-            width: 60
-          },
-          {
-            title: 'Groups summary',
-            id: 'Wazuh-App-Agents-General-Groups-summary',
-            width: 40
+            title: 'Geolocation map',
+            id: 'Wazuh-App-Agents-AWS-geo'
           }
         ]
       }
@@ -126,15 +138,6 @@ export const agentVisualizations = {
             title: 'Files deleted',
             id: 'Wazuh-App-Agents-FIM-Files-deleted',
             width: 34
-          }
-        ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-FIM-Alerts-summary'
           }
         ]
       }
@@ -230,15 +233,6 @@ export const agentVisualizations = {
             width: 25
           }
         ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-PCI-Last-alerts'
-          }
-        ]
       }
     ]
   },
@@ -278,15 +272,6 @@ export const agentVisualizations = {
             width: 25
           }
         ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-GDPR-Last-alerts'
-          }
-        ]
       }
     ]
   },
@@ -318,15 +303,6 @@ export const agentVisualizations = {
           {
             title: 'Requirements over time',
             id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime'
-          }
-        ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-NIST-Last-alerts'
           }
         ]
       }
@@ -368,15 +344,6 @@ export const agentVisualizations = {
             width: 25
           }
         ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-TSC-Last-alerts'
-          }
-        ]
       }
     ]
   },
@@ -416,44 +383,13 @@ export const agentVisualizations = {
             width: 25
           }
         ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-HIPAA-Last-alerts'
-          }
-        ]
       }
     ]
   },
   vuls: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-Critical-severity',
-        description: 'Critical severity alerts',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-High-severity',
-        description: 'High severity alerts',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-Medium-severity',
-        description: 'Medium severity alerts',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-App-Agents-vuls-Metric-Low-severity',
-        description: 'Low severity alerts',
-        color: 'subdued'
-      }
-    ],
     rows: [
       {
-        height: 300,
+        height: 400,
         vis: [
           {
             title: 'Alerts severity over time',
@@ -468,54 +404,43 @@ export const agentVisualizations = {
         ]
       },
       {
-        height: 270,
+        height: 330,
         vis: [
           {
             title: 'Most common CVEs',
             id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
-            width: 33
+            width: 25
           },
           {
-            title: 'Severity distribution',
-            id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
-            width: 33
+            title: 'Alerts evolution: Commonly affected packages',
+            id: 'Wazuh-App-Agents-vuls-evolution-affected-packages',
+            width: 50
           },
           {
-            title: 'Commonly affected packages',
-            id: 'Wazuh-App-Agents-vuls-Commonly-affected-packages',
-            width: 34
+            title: 'Most common CWEs',
+            id: 'Wazuh-App-Agents-vuls-Most-common-CWEs',
+            width: 25
           }
         ]
       },
       {
-        height: 570,
+        height: 330,
         vis: [
           {
-            title: 'Alert summary',
-            id: 'Wazuh-App-Agents-vuls-Alert-summary'
-          }
+            title: 'Severity distribution',
+            id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
+            width: 25
+          },
+          {
+            title: 'Top affected packages by CVEs',
+            id: 'Wazuh-App-Agents-vuls-packages-CVEs',
+            width: 75
+          },
         ]
       }
     ]
   },
   virustotal: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-Virustotal-Total-Malicious',
-        description: 'Total malicious',
-        color: 'danger'
-      },
-      {
-        id: 'Wazuh-App-Agents-Virustotal-Total-Positives',
-        description: 'Total positives',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-Virustotal-Total',
-        description: 'Total',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 250,
@@ -572,15 +497,6 @@ export const agentVisualizations = {
             title: 'Most common rules',
             id: 'Wazuh-App-Agents-Osquery-monst-common-rules-being-fired',
             width: 75
-          }
-        ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Overview-Osquery-Alerts-summary'
           }
         ]
       }
@@ -655,36 +571,10 @@ export const agentVisualizations = {
             id: 'Wazuh-App-Agents-Docker-Actions-over-time'
           }
         ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Docker-Events-summary'
-          }
-        ]
       }
     ]
   },
   oscap: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-OSCAP-Last-score',
-        description: 'Last score',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Agents-OSCAP-Higher-score-metric',
-        description: 'Highest score',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-OSCAP-Lower-score-metric',
-        description: 'Lowest score',
-        color: 'secondary'
-      }
-    ],
     rows: [
       {
         height: 230,
@@ -734,61 +624,10 @@ export const agentVisualizations = {
             width: 50
           }
         ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-OSCAP-Last-alerts'
-          }
-        ]
       }
     ]
   },
   ciscat: {
-    metrics: [
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-error',
-        description: 'Last not checked',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-fail',
-        description: 'Last pass',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-not-checked',
-        description: 'Last scan score',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-pass',
-        description: 'Last scan date',
-        color: 'subdued'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-score',
-        description: 'Last errors',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-timestamp',
-        description: 'Last fails',
-        color: 'primary'
-      },
-      // {
-      //   id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark',
-      //   description: 'Last scan benchmark',
-      //   color: 'secondary'
-      // },
-      {
-        id: 'Wazuh-app-Agents-CISCAT-last-scan-unknown',
-        description: 'Last unknown',
-        color: 'subdued'
-      }
-    ],
     rows: [
       {
         height: 320,
@@ -802,15 +641,6 @@ export const agentVisualizations = {
             title: 'Scan result evolution',
             id: 'Wazuh-app-Agents-CISCAT-scan-result-evolution',
             width: 40
-          }
-        ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-app-Agents-CISCAT-alerts-summary'
           }
         ]
       }
@@ -841,41 +671,10 @@ export const agentVisualizations = {
             id: 'Wazuh-App-Agents-PM-Events-per-agent-evolution'
           }
         ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-PM-Alerts-summary'
-          }
-        ]
       }
     ]
   },
   audit: {
-    metrics: [
-      {
-        id: 'Wazuh-App-Agents-Audit-New-files-metric',
-        description: 'New files',
-        color: 'primary'
-      },
-      {
-        id: 'Wazuh-App-Agents-Audit-Read-files-metric',
-        description: 'Read files',
-        color: 'secondary'
-      },
-      {
-        id: 'Wazuh-App-Agents-Audit-Modified-files-metric',
-        description: 'Modified files',
-        color: 'accent'
-      },
-      {
-        id: 'Wazuh-App-Agents-Audit-Removed-files-metric',
-        description: 'Removed files',
-        color: 'danger'
-      }
-    ],
     rows: [
       {
         height: 250,
@@ -903,15 +702,6 @@ export const agentVisualizations = {
           {
             title: 'Alerts over time',
             id: 'Wazuh-App-Agents-Audit-Alerts-over-time'
-          }
-        ]
-      },
-      {
-        height: 570,
-        vis: [
-          {
-            title: 'Alerts summary',
-            id: 'Wazuh-App-Agents-Audit-Last-alerts'
           }
         ]
       }

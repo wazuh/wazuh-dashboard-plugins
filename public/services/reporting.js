@@ -14,6 +14,7 @@ import $ from 'jquery';
 import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
+import { ErrorHandler } from '../react-services/error-handler';
 
 export class ReportingService {
   constructor(
@@ -52,7 +53,7 @@ export class ReportingService {
   async startVis2Png(tab, isAgents = false, syscollectorFilters = null) {
     try {
       if (this.vis2png.isWorking()) {
-        this.errorHandler.handle('Report in progress', 'Reporting', true);
+        ErrorHandler.handle('Report in progress', 'Reporting', { warning: true });
         return;
       }
       this.$rootScope.reportBusy = true;
@@ -109,7 +110,7 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.errorHandler.info(
+      ErrorHandler.info(
         'Success. Go to Wazuh > Management > Reporting',
         'Reporting'
       );
@@ -118,7 +119,7 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
     }
   }
 
@@ -155,7 +156,7 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.errorHandler.info(
+      ErrorHandler.info(
         'Success. Go to Wazuh > Management > Reporting',
         'Reporting'
       );
@@ -164,7 +165,7 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      this.errorHandler.handle(error.message || error);
+      ErrorHandler.handle(error.message || error);
       this.$rootScope.$applyAsync();
     }
   }

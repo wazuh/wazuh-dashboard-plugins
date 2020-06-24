@@ -70,7 +70,7 @@ const ruleMaxFiredtimes = 10;
  */
 function generateAlert(params) {
     let alert = {
-        _sampledata: true,
+        ["@sampledata"]: true,
         timestamp: "2020-01-27T11:08:47.777+0000",
         rule: {
             level: 3,
@@ -271,7 +271,8 @@ function generateAlert(params) {
 
     if (params.gcp) {
         alert.rule = randomArrayItem(GCP.arrayRules);
-        alert.data = {
+        alert.data.integration = 'gcp';
+        alert.data.gcp = {
             insertId: "uk1zpe23xcj",
             jsonPayload: {
                 authAnswer: GCP.arrayAuthAnswer[Math.floor(GCP.arrayAuthAnswer.length * Math.random())],
@@ -334,10 +335,56 @@ function generateAlert(params) {
     }
 
     if (params.mitre) {
-        const dataMitre = randomArrayItem(Mitre.rule);
+        alert.rule.groups.push(randomArrayItem(Mitre.arrayGroups));
+        alert.rule.description = randomArrayItem(Mitre.arrayRuleDescription);
+        alert.location = randomArrayItem(Mitre.arrayLocation);
+
+        let dataMitre = randomArrayItem(Mitre.rule);
+        let ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+
+        let arrayTactics = [];
+        arrayTactics.push(dataMitre.tactic);
+        let arrayId = [];
+        arrayId.push(ruleMitre.id);
+        let arrayTechniques = [];
+        arrayTechniques.push(ruleMitre.technique);
+
+        if (Math.random() <= 0.3) {
+            ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+            if(arrayId.indexOf(dataMitre.id === -1)) {
+                arrayId.push(ruleMitre.id);
+                arrayTechniques.push(ruleMitre.technique);
+            }
+        }
+
         alert.rule.mitre = {
-            tactics: dataMitre.tactics,
-            id: dataMitre.id[Math.floor(dataMitre.id.length * Math.random())],
+            tactic: arrayTactics,
+            id: arrayId,
+            technique: arrayTechniques
+        }
+
+        if (Math.random() <= 0.5) {
+            arrayTactics = [];
+            arrayId = [];
+            arrayTechniques = [];
+
+            dataMitre = randomArrayItem(Mitre.rule);
+            ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+
+            arrayTactics.push(dataMitre.tactic);
+            arrayId.push(ruleMitre.id);
+            arrayTechniques.push(ruleMitre.technique);
+
+            if (Math.random() <= 0.2) {
+                ruleMitre = dataMitre.rule[Math.floor(dataMitre.rule.length * Math.random())];
+                if(arrayId.indexOf(dataMitre.id === -1)) {
+                    arrayId.push(ruleMitre.id);
+                    arrayTechniques.push(ruleMitre.technique);
+                }
+            }
+            alert.rule.mitre.tactic.concat(arrayTactics);
+            alert.rule.mitre.id.concat(arrayId);
+            alert.rule.mitre.technique.concat(arrayTechniques);
         }
     }
 
@@ -493,21 +540,20 @@ function generateAlert(params) {
     }
 
     if (params.vulnerabilities) {
-        alert.rule.groups.push("vulnerability-detector");
-        alert.rule.gdpr = ['IV_35.7.d'];
-        alert.rule.pci_dss = ['11.2.1', '11.2.3'];
-        alert.data.vulnerability = {};
-        alert.data.vulnerability.package = {};
-
-        alert.data.vulnerability.package.name = randomArrayItem(Vulnerability.packageName);
-        alert.data.vulnerability.cwe_reference = randomArrayItem(Vulnerability.cweReference);
         const dataVulnerability = randomArrayItem(Vulnerability.data);
-        alert.data.vulnerability.severity = dataVulnerability.severity;
-        alert.data.vulnerability.state = dataVulnerability.state;
-        alert.data.vulnerability.cve = dataVulnerability.cve;
-        alert.data.vulnerability.title = dataVulnerability.title;
-        alert.rule.description = dataVulnerability.title;
-        alert.data.vulnerability.reference = dataVulnerability.reference;
+        alert.rule = {
+            ...dataVulnerability.rule,
+            mail: false,
+            groups: ['vulnerability-detector'],
+            gdpr: ['IV_35.7.d'],
+            pci_dss: ['11.2.1', '11.2.3'],
+            tsc: ["CC7.1","CC7.2"]
+        };
+        alert.location = 'vulnerability-detector';
+        alert.decoder = { name: 'json' };
+        alert.data = {
+            ...dataVulnerability.data
+        };
     }
     
     if (params.osquery) {

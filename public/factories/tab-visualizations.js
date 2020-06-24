@@ -20,7 +20,7 @@ export class TabVisualizations {
     }
 
     this.agents = {
-      welcome: 0,
+      welcome: 8,
       general: 11,
       fim: 7,
       gcp: 7,
@@ -32,6 +32,7 @@ export class TabVisualizations {
       gdpr: 6,
       pci: 6,
       hipaa: 6,
+      aws: 8,
       tsc: 6,
       nist: 5,
       virustotal: 6,
@@ -58,7 +59,7 @@ export class TabVisualizations {
       gcp: 5,
       virustotal: 5,
       osquery: 6,
-      sca: 8,
+      sca: 0,
       docker: 5,
       mitre: 6,
       tsc: 6

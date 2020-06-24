@@ -9,18 +9,23 @@
  *
  * Find more information about this on the LICENSE file.
  */
+// @ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
+// @ts-ignore
 import { npSetup } from 'ui/new_platform';
 import { AppState } from '../../../../react-services/app-state';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { Query, esFilters, TimeRange, esQuery } from '../../../../../../../src/plugins/data/common';
-import { SearchParams, SearchResponse, } from 'elasticsearch';
-import { Search } from 'history';
+import { Query, TimeRange, buildRangeFilter, buildEsQuery, getEsQueryConfig } from '../../../../../../../src/plugins/data/common';
+import { SearchParams, SearchResponse } from 'elasticsearch';
 
 export interface IFilterParams {
-  filters: esFilters.Filter[]
+  filters: []
   query: Query
   time: TimeRange
+}
+
+interface IWzResponse extends Response {
+  data: SearchResponse<any>
 }
 
 export async function getIndexPattern() {
@@ -29,16 +34,25 @@ export async function getIndexPattern() {
   return indexPattern;
 }
 
-export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs:any=null ) {
+export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs:any=null, kargs={}) {
   const query = buildQuery(indexPattern, filterParams);
+  const filters = ((query || {}).bool || {}).filter;
+  if(filters && Array.isArray(filters)){
+    filters.forEach(item => {
+      if(item.range && item.range.timestamp && item.range.timestamp.mode){ //range filters can contain a "mode" field that causes an error in an Elasticsearch request
+        delete item.range.timestamp["mode"];
+      }
+    });
+  }
   const search:SearchParams = {
-    index: indexPattern['id'],
+    index: indexPattern['title'],
     body: {
       query,
-      ...(aggs ? {aggs} : {})
+      ...(aggs ? {aggs} : {}),
+      ...kargs
     }
   }
-  const searchResponse: Response = await GenericRequest.request(
+  const searchResponse: IWzResponse = await GenericRequest.request(
     'POST',
     '/elastic/esAlerts',
     search
@@ -48,15 +62,15 @@ export async function getElasticAlerts(indexPattern, filterParams:IFilterParams,
 
 function buildQuery(indexPattern, filterParams:IFilterParams) {
   const { filters, query, time } = filterParams;
-  const timeFilter = esFilters.buildRangeFilter(
+  const timeFilter = buildRangeFilter(
     {name: 'timestamp', type: 'date'}, 
     time,
     indexPattern
   );
-  return esQuery.buildEsQuery(
+  return buildEsQuery(
     undefined,
     query,
     [...filters, timeFilter],
-    esQuery.getEsQueryConfig(npSetup.core.uiSettings) 
+    getEsQueryConfig(npSetup.core.uiSettings) 
   );
 }

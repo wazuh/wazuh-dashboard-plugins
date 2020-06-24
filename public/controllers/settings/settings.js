@@ -17,6 +17,7 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { WzMisc } from '../../factories/misc';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { SavedObject } from '../../react-services/saved-objects';
+import { ErrorHandler } from '../../react-services/error-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import checkAdminMode from '../../controllers/management/components/management/status/utils/check-admin-mode';
@@ -78,7 +79,7 @@ export class SettingsController {
 
       await this.getAppInfo();
     } catch (error) {
-      this.errorHandler.handle('Cannot initialize Settings');
+      ErrorHandler.handle('Cannot initialize Settings');
     }
   }
 
@@ -126,6 +127,7 @@ export class SettingsController {
       { id: 'about', name: 'About' }
     ];
     if (this.admin) {
+      tabs.splice(1, 0, { id: 'sample_data', name: 'Sample data' });
       tabs.splice(1, 0, { id: 'modules', name: 'Modules' });
     }
     this.settingsTabsProps = {
@@ -186,8 +188,8 @@ export class SettingsController {
           this.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
-          const downReason =
-            ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason = typeof error === 'string' ? error :
+            (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
@@ -223,7 +225,7 @@ export class SettingsController {
       this.apiTableProps.currentDefault = this.currentDefault;
       this.$scope.$applyAsync();
 
-      this.errorHandler.info(`API ${manager} set as default`);
+      ErrorHandler.info(`API ${manager} set as default`);
 
       this.getCurrentAPIIndex();
       const extensions = await AppState.getExtensions(id);
@@ -235,7 +237,7 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return this.currentDefault;
     } catch (error) {
-      this.errorHandler.handle(error);
+      ErrorHandler.handle(error);
     }
   }
 
@@ -280,7 +282,7 @@ export class SettingsController {
 
       this.$scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle('Error getting API entries', 'Settings');
+      ErrorHandler.handle('Error getting API entries', 'Settings');
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
     await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
@@ -333,14 +335,14 @@ export class SettingsController {
       this.apiEntries[index].status = 'online';
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
-      !silent && this.errorHandler.info('Connection success', 'Settings');
+      !silent && ErrorHandler.info('Connection success', 'Settings');
       this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.load = false;
       this.$scope.$applyAsync();
       if (!silent) {
-        this.errorHandler.handle(error);
+        ErrorHandler.handle(error);
       }
       return Promise.reject(error);
     }
@@ -352,7 +354,7 @@ export class SettingsController {
    * @param {*} updating
    */
   printError(error, updating) {
-    const text = this.errorHandler.handle(error, 'Settings');
+    const text = ErrorHandler.handle(error, 'Settings');
     if (!updating) this.messageError = text;
     else this.messageErrorUpdate = text;
   }
@@ -409,8 +411,8 @@ export class SettingsController {
       this.$scope.$applyAsync();
     } catch (error) {
       AppState.removeNavigation();
-      this.errorHandler.handle(
-        'Error when loading Wazuh setup info',
+      ErrorHandler.handle(
+        error,
         'Settings'
       );
     }
@@ -553,6 +555,6 @@ export class SettingsController {
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    this.errorHandler.info('Error copied to the clipboard');
+    ErrorHandler.info('Error copied to the clipboard');
   }
 }

@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import { connect } from 'react-redux';
 import { cleanFileContent } from '../../../../../redux/actions/groupsActions';
@@ -33,6 +33,8 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { toastNotifications } from 'ui/notify';
+import 'brace/theme/textmate';
+import { validateXML } from '../configuration/utils/xml';
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -45,7 +47,7 @@ class WzGroupsEditor extends Component {
       enableLiveAutocompletion: true
     };
     this.groupsHandler = GroupsHandler;
-    const { fileContent, adminMode } = this.props.state;
+    const { fileContent } = this.props.state;
 
     const { name, content, isEditable, groupName } = fileContent;
 
@@ -55,7 +57,6 @@ class WzGroupsEditor extends Component {
       content,
       name,
       isEditable,
-      adminMode,
       groupName: groupName
     };
   }
@@ -83,7 +84,7 @@ class WzGroupsEditor extends Component {
    * @param {String} name
    */
   async save(name) {
-    const { adminMode } = this.props.state;
+    const { adminMode } = this.props;
 
     if (!this._isMounted || !adminMode) {
       return;
@@ -127,17 +128,19 @@ class WzGroupsEditor extends Component {
   };
 
   render() {
-    const { name, content, isEditable, groupName, adminMode } = this.state;
+    const { name, content, isEditable, groupName } = this.state;
+    const { adminMode } = this.props;
 
+    const xmlError = validateXML(content);
     const saveButton = (
       <EuiButton
         fill
-        iconType="save"
+        iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}
-        isDisabled={name.length <= 4}
+        isDisabled={name.length <= 4 || (isEditable && xmlError ? true : false)}
         onClick={() => this.save(name)}
       >
-        Save
+        {(isEditable && xmlError) ? 'XML format error' : 'Save'}
       </EuiButton>
     );
 
@@ -150,7 +153,7 @@ class WzGroupsEditor extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>
+                    <span style={{ fontSize: '22px' }}>
                       <EuiToolTip position="right" content={`Back to groups`}>
                         <EuiButtonIcon
                           aria-label="Back"
@@ -160,8 +163,8 @@ class WzGroupsEditor extends Component {
                           onClick={() => this.props.cleanFileContent()}
                         />
                       </EuiToolTip>
-                      <b>{name}</b> of <b>{groupName}</b> group
-                    </h2>
+                      {name} <span style={{ color: 'grey'}}>of</span> {groupName} <span style={{ color: 'grey'}}>group</span>
+                    </span>
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem />
@@ -170,14 +173,21 @@ class WzGroupsEditor extends Component {
                 )}
               </EuiFlexGroup>
               <EuiSpacer size="m" />
+              {xmlError && (
+                <Fragment>
+                  <span style={{ color: 'red' }}> {xmlError}</span>
+                  <EuiSpacer size='s'/>
+                </Fragment>
+              )}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
                     <EuiFlexItem className="codeEditorWrapper">
                       {(isEditable && (
                         <EuiCodeEditor
+                          theme="textmate"
                           width="100%"
-                          height="calc(100vh - 175px)"
+                          height={`calc(100vh - ${(xmlError ? 195 : 175)}px)`}
                           value={content}
                           onChange={newContent =>
                             this.setState({ content: newContent })
@@ -212,7 +222,8 @@ class WzGroupsEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

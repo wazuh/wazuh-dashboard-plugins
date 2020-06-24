@@ -61,8 +61,9 @@ export class WzRequest {
           return;
         }
       }
-      return (err || {}).message || false
-        ? Promise.reject(err.message)
+      const errorMessage = (err && err.response && err.response.data && err.response.data.message) || (err || {}).message;
+      return errorMessage
+        ? Promise.reject(errorMessage)
         : Promise.reject(err || 'Server did not respond');
     }
   }

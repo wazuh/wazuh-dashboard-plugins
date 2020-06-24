@@ -16,7 +16,7 @@ import { resolve } from 'path';
 
 export default function(kibana) {
   return new kibana.Plugin({
-    require: ['kibana', 'elasticsearch'],
+    require: ['kibana', 'elasticsearch', 'visualizations'],
     id: 'wazuh',
     name: 'wazuh',
     uiExports: {
@@ -55,7 +55,7 @@ export default function(kibana) {
           name: 'Wazuh',
           navLinkId: featureId,
           icon: '/plugins/wazuh/img/icon.svg',
-          app: [featureId, 'kibana', 'elasticsearch'],
+          app: [featureId],
           catalogue: [],
           privileges: {
             all: {

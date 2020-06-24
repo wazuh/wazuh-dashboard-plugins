@@ -76,6 +76,28 @@ export class SavedObject {
         : error.message || error;
     }
   }
+  
+  static async existsMonitoringIndexPattern(patternID) {
+    try {
+      await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/index-pattern/${patternID}`
+      );
+
+    } catch (error) {
+      await this.createSavedObject(
+        'index-pattern',
+        patternID,
+        {
+          attributes: {
+            title: patternID,
+            timeFieldName: 'timestamp'
+          }
+        },
+      );
+    }
+  }
+
 
   /**
    *

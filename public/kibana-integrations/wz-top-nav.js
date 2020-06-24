@@ -17,12 +17,8 @@
  * under the License.
  */
 
+import angular from 'angular';
 import 'ngreact';
-import { wrapInI18nContext } from 'ui/i18n';
-import { uiModules } from 'ui/modules';
-import { npStart } from 'ui/new_platform';
-
-const module = uiModules.get('kibana');
 
 export function createTopNavDirective() {
   return {
@@ -71,14 +67,12 @@ export function createTopNavDirective() {
       };
 
       return linkFn;
-    }
+    },
   };
 }
 
-module.directive('wzTopNav', createTopNavDirective);
-
 export const createTopNavHelper = ({ TopNavMenu }) => reactDirective => {
-  return reactDirective(wrapInI18nContext(TopNavMenu), [
+  return reactDirective(TopNavMenu, [
     ['config', { watchDepth: 'value' }],
     ['disabledButtons', { watchDepth: 'reference' }],
 
@@ -92,6 +86,7 @@ export const createTopNavHelper = ({ TopNavMenu }) => reactDirective => {
     ['onClearSavedQuery', { watchDepth: 'reference' }],
     ['onSaved', { watchDepth: 'reference' }],
     ['onSavedQueryUpdated', { watchDepth: 'reference' }],
+    ['onSavedQueryIdChange', { watchDepth: 'reference' }],
 
     ['indexPatterns', { watchDepth: 'collection' }],
     ['filters', { watchDepth: 'collection' }],
@@ -109,14 +104,25 @@ export const createTopNavHelper = ({ TopNavMenu }) => reactDirective => {
     'screenTitle',
     'dateRangeFrom',
     'dateRangeTo',
+    'savedQueryId',
     'isRefreshPaused',
     'refreshInterval',
     'disableAutoFocus',
-    'showAutoRefreshOnly'
+    'showAutoRefreshOnly',
+
+    // temporary flag to use the stateful components
+    'useDefaultBehaviors',
   ]);
 };
 
-module.directive(
-  'wzTopNavHelper',
-  createTopNavHelper(npStart.plugins.navigation.ui)
-);
+let isLoaded = false;
+
+export function loadWzTopNavDirectives(navUi) {
+  if (!isLoaded) {
+    isLoaded = true;
+    angular
+      .module('kibana')
+      .directive('wzTopNav', createTopNavDirective)
+      .directive('wzTopNavHelper', createTopNavHelper(navUi));
+  }
+}

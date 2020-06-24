@@ -34,8 +34,8 @@ export default class EnableModules extends Component {
           title: 'Auditing and Policy Monitoring',
           modules: [
             { name: 'pm', default: true, agent: false },
-            { name: 'sca', default: true, agent: true },
-            { name: 'audit', default: false, agent: false },
+            { name: 'sca', default: true, agent: false },
+            { name: 'audit', default: true, agent: false },
             { name: 'oscap', default: false, agent: false },
             { name: 'ciscat', default: false, agent: false }
           ]
@@ -44,10 +44,10 @@ export default class EnableModules extends Component {
           title: 'Threat Detection and Response',
           modules: [
             { name: 'vuls', default: true, agent: false },
+            { name: 'mitre', default: true, agent: false },
             { name: 'virustotal', default: false, agent: false },
             { name: 'osquery', default: false, agent: false },
             { name: 'docker', default: false, agent: false },
-            { name: 'mitre', default: false, agent: false },
           ]
         },
         {
@@ -92,7 +92,7 @@ export default class EnableModules extends Component {
                   position: 'absolute',
                   top: 0
                 }}
-                checked={this.state.extensions[extension.name]}
+                checked={typeof this.state.extensions[extension.name] !== 'undefined' ? this.state.extensions[extension.name] : false}
                 onChange={() => this.toggleExtension(extension)}
               />
             )}

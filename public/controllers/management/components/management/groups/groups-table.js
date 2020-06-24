@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiBasicTable,
   EuiCallOut,
@@ -20,6 +20,8 @@ import {
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
+import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 import {
   updateLoadingStatus,
@@ -37,25 +39,57 @@ import GroupsColums from './utils/columns-main';
 
 class WzGroupsTable extends Component {
   _isMounted = false;
+
+  suggestions = [
+    {
+      type: 'q', label: 'name', description: 'Filter by group name', operators: ['=', '!=', '~'], values: async (value) => {
+        const result = await WzRequest.apiReq('GET', `/agents/groups`,
+          {
+            limit: 30,
+            ...(value ? { search: value } : {}),
+          })
+        return (((result || {}).data || {}).data || {}).items.map((item) => { return item['name'] });
+      },
+    },
+    { type: 'q', label: 'count', description: 'Filter by number of agents', operators: ['=', '!=', '<', '>'], values: [] },
+
+  ]
+
   constructor(props) {
     super(props);
     this.state = {
       items: [],
       pageSize: 10,
-      totalItems: 0
+      totalItems: 0,
+      filters: [],
     };
 
     this.groupsHandler = GroupsHandler;
   }
 
   async componentDidMount() {
-    this.props.updateIsProcessing(true);
+    await this.getItems();
     this._isMounted = true;
   }
 
-  async componentDidUpdate() {
+  shouldComponentUpdate(nextProps, nextState) {
+    const { items, filters } = this.state;
+    const { isProcessing } = this.props.state;
+    if (isProcessing !== nextProps.state.isProcessing)
+      return true;
+    if (JSON.stringify(items) !== JSON.stringify(nextState.items))
+      return true;
+    if (JSON.stringify(filters) !== JSON.stringify(nextState.filters))
+      return true;
+    return false;
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
     if (this.props.state.isProcessing && this._isMounted) {
-      this.props.updateIsProcessing(false);
+      await this.getItems();
+    }
+    const { filters } = this.state;
+    if (JSON.stringify(filters) !== JSON.stringify(prevState.filters)) {
       await this.getItems();
     }
   }
@@ -77,17 +111,18 @@ class WzGroupsTable extends Component {
         totalItems : total_affected_items,
         isProcessing: false,
       });
-      this.props.updateIsProcessing(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
-      this.props.updateIsProcessing(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
       return Promise.reject(error);
     }
   }
 
   buildFilter() {
     const { pageIndex } = this.props.state;
-    const { pageSize } = this.state;
+    const { pageSize, filters } = this.state;
     const filter = {
+      ...filtersToObject(filters),
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter()
@@ -116,6 +151,8 @@ class WzGroupsTable extends Component {
   };
 
   render() {
+    const { filters } = this.state;
+
     this.groupsColumns = new GroupsColums(this.props);
     const {
       isLoading,
@@ -148,45 +185,48 @@ class WzGroupsTable extends Component {
       };
     };
 
-    if (!error) {
-      const itemList = this.props.state.itemList;
-      return (
-        <div>
-          <EuiBasicTable
-            itemId="id"
-            items={items}
-            columns={columns}
-            pagination={pagination}
-            onChange={this.onTableChange}
-            loading={isLoading}
-            sorting={sorting}
-            message={message}
-            rowProps={getRowProps}
-            search={{ box: { incremental: true } }}
-          />
-          {this.props.state.showModal ? (
-            <EuiOverlayMask>
-              <EuiConfirmModal
-                title={`Delete ${
-                  itemList[0].file ? itemList[0].file : itemList[0].name
-                } group?`}
-                onCancel={() => this.props.updateShowModal(false)}
-                onConfirm={() => {
-                  this.removeItems(itemList);
-                  this.props.updateShowModal(false);
-                }}
-                cancelButtonText="Cancel"
-                confirmButtonText="Delete"
-                defaultFocusedButton="cancel"
-                buttonColor="danger"
-              ></EuiConfirmModal>
-            </EuiOverlayMask>
-          ) : null}
-        </div>
-      );
-    } else {
+    if (error) {
       return <EuiCallOut color="warning" title={error} iconType="gear" />;
     }
+    const itemList = this.props.state.itemList;
+    return (
+      <Fragment>
+        <WzSearchBar
+          filters={filters}
+          suggestions={this.suggestions}
+          onFiltersChange={(filters) => this.setState({ filters })} />
+        <EuiBasicTable
+          itemId="id"
+          items={items}
+          columns={columns}
+          pagination={pagination}
+          onChange={this.onTableChange}
+          loading={isLoading}
+          sorting={sorting}
+          message={message}
+          rowProps={getRowProps}
+          search={{ box: { incremental: true } }}
+        />
+        {this.props.state.showModal ? (
+          <EuiOverlayMask>
+            <EuiConfirmModal
+              title={`Delete ${
+                itemList[0].file ? itemList[0].file : itemList[0].name
+                } group?`}
+              onCancel={() => this.props.updateShowModal(false)}
+              onConfirm={() => {
+                this.removeItems(itemList);
+                this.props.updateShowModal(false);
+              }}
+              cancelButtonText="Cancel"
+              confirmButtonText="Delete"
+              defaultFocusedButton="cancel"
+              buttonColor="danger"
+            ></EuiConfirmModal>
+          </EuiOverlayMask>
+        ) : null}
+      </Fragment>
+    );
   }
 
   showToast = (color, title, text, time) => {
@@ -221,7 +261,8 @@ class WzGroupsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

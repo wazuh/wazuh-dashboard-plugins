@@ -31,6 +31,7 @@ export function ErrorResponse(
   statusCode = null,
   h
 ) {
+  message.includes('password: ') ? message = message.split('password: ')[0] + ' password: ***' : false;
   let filteredMessage = '';
   if (code) {
     const isString = typeof message === 'string';

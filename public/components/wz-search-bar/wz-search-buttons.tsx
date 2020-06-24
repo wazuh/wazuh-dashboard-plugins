@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import { EuiButtonGroup } from '@elastic/eui';
+import { IFilter } from './';
 
 export interface filterButton {
   label: string
@@ -19,23 +20,34 @@ export interface filterButton {
   value: string | number
   iconType?: string
 }
+const combine = (...args) => (input) => args.reduceRight((acc, arg) => acc = arg(acc), input)
 
 export class WzSearchButtons extends Component {
   props!: {
     options: filterButton[]
-    filters: {}
+    filters: IFilter[]
     onChange: Function
   };
   state: {
-    IconSelectedMap: {}
+    IconSelectedMap: {},
+    options: { [label: string]: IFilter }
   };
 
   constructor(props) {
     super(props);
     this.state = {
       IconSelectedMap: {},
+      options: {}
     };
     this.onChange.bind(this);
+    this.toggleIcon.bind(this);
+    this.updateFilters.bind(this);
+  }
+
+  componentDidMount() {
+    const options = this.props.options
+      .reduce((acc, option) => ({ ...acc, [option.label]: option }), {})
+    this.setState({ options });
   }
 
   shouldComponentUpdate(nextProps) {
@@ -48,58 +60,38 @@ export class WzSearchButtons extends Component {
     this.checkFilters();
   }
 
-  buildOptions() {
-    const { options } = this.props;
-    const buttonGroupOption = options.map((item, index) => {
-      return {
-        id: item.label,
-        label: item.label,
-        name: "options",
-        ...(item.iconType && {iconType:item.iconType}),
-      }
-    });
-    return buttonGroupOption;
-  }
+  buildOptions = () => this.props.options.map((item) => ({
+    id: item.label,
+    label: item.label,
+    name: "options",
+    ...(item.iconType && { iconType: item.iconType }),
+  }));
 
-  onChange(optionId) {
+  onChange = optionId => combine(this.props.onChange, this.updateFilters, this.toggleIcon)(optionId);
+
+  toggleIcon = (optionId) => {
     const { IconSelectedMap } = this.state;
-    const newToggleIconIdToSelectedMap = {
-      ...IconSelectedMap,
-      ...{
-        [optionId]: !IconSelectedMap[optionId],
-      },
-    };
-
-    const result = this.changeFilters(optionId, !IconSelectedMap[optionId]);
-    this.props.onChange(result);
-    this.setState({
-      IconSelectedMap: newToggleIconIdToSelectedMap,
-    });
+    return { ...IconSelectedMap, [optionId]: !IconSelectedMap[optionId] };
   }
 
-  changeFilters(optionId, status) {
-    const { options, filters } = this.props;
-    const button = options.find(item => item.label === optionId) || {};
-
-    if(status) {
-      return {
-        ...filters,
-        [button['field']]: button['value']
-      }
-    } else {
-      return delete filters[button['field']]
-    }
+  updateFilters = (IconSelectedMap) => {
+    const { options } = this.state;
+    const { filters } = this.props;
+    return Object.keys(IconSelectedMap).reduce((acc: IFilter[], label) => {
+      const { field, value } = options[label];
+      const filter = filters.find(filter => filter.field === field);
+      ((filter && IconSelectedMap[label]) || IconSelectedMap[label]) && acc.push({ field, value })
+      return acc;
+    }, [])
   }
 
   checkFilters() {
     const { filters, options } = this.props;
     const { IconSelectedMap } = this.state;
-
     for (const button of options) {
-      const filterExist = Object.keys(filters).find( 
-        item => item === button.field && filters[item] === button.value
+      const filterExist = filters.find(
+        filter => filter.field === button.field && filter.value === button.value
       );
-
       IconSelectedMap[button.label] = !!filterExist
     }
   }

@@ -81,7 +81,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		// 	})),
 		// 	{
 		// 		id: 'sample_data',
-		// 		name: 'Sample Data',
+		// 		name: 'Sample data',
 		// 		content: (
 		// 			<Fragment>
 		// 				<EuiSpacer size='m' />
@@ -100,7 +100,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
     const breadcrumb = [
 			{ text: '' },
 			{ text: 'Management', href: '/app/wazuh#/manager' },
-			{ text: 'Sample Data' }
+			{ text: 'Sample data' }
 		];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }

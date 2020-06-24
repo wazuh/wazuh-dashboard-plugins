@@ -421,7 +421,9 @@ md-content.md-default-theme, md-content{
 .wz-border-0 {
   border: 0px;
 }
-
+.table{
+  margin: 0 !important;
+}
 .wz-md-tab .md-tab,
 .wz-md-tab .md-active {
   color: black !important;
@@ -1136,6 +1138,26 @@ wz-xml-file-editor {
   }
 }
 
+.flyout-no-overlap {
+  width: auto;
+}
+
+@media only screen and (max-width: 1000px){
+  .flyout-no-overlap {
+    max-width: 90%;
+  }
+}
+@media only screen and (min-width: 1000px) and (max-width: 1400px){
+  .flyout-no-overlap {
+    max-width: 85%;
+  }
+}
+@media only screen and (min-width: 1400px){
+  .flyout-no-overlap {
+    max-width: 60%;
+  }
+}
+
 .requirements-cards.euiFlexGroup--gutterLarge {
   margin: -10px !important;
 }
@@ -1244,12 +1266,21 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
   position: absolute;
 }
 
-.flyout-no-overlap {
-  margin-top: 50px;
-}
+// TODO: Check this in agents and overview
+// .flyout-no-overlap {
+//   margin-top: 50px;
+// }
 
 .wz-markdown-margin > p {
   margin-top: 5px;
+}
+
+.wz-markdown-margin > ul {
+  list-style: disc;
+}
+
+.wz-markdown-margin > ul > li {
+  margin-left: 25px;
 }
 
 .AgentsTable__soBadge{
@@ -1347,9 +1378,15 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
 }
 
 div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
-  max-height: 350px;
+  max-height: 500px;
   overflow-y: scroll;
 }
+
+div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu-popover {
+  overflow-y: unset;
+  padding-right: 0;
+}
+
 
 .euiSuggestItem .euiSuggestItem__label {
   flex-basis: 25%;
@@ -1368,10 +1405,171 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
   visibility: hidden!important;
 }
 
+.euiTableHeaderCellCheckbox{
+  width: 32px!important;
+}
+
 .kbnTopNavMenu{
   display: none;
 }
 
 .kbnDis-no-padding .globalQueryBar:not(:empty) {
   padding: 0px 0px 16px 0px!important;
+}
+
+.euiCodeBlock.euiCodeBlock-isFullScreen{
+  border: 1px solid #D3DAE6;
+  border-radius: 4px;
+  margin: 22px;
+}
+
+.euiCodeBlock.euiCodeBlock-isFullScreen .euiCodeBlock__controls{
+  padding-right: 16px;
+}
+
+.globalFilterGroup__wrapper{
+  max-height: 100px;
+  height: auto!important;
+}
+
+.agent-selection-table-loading::before{
+  position: absolute;
+  content: '';
+  margin-left: 24px;
+  width: 100%;
+  height: 2px;
+  background-color: #006BB4;
+  -webkit-animation: euiBasicTableLoading 1000ms linear;
+  animation: euiBasicTableLoading 1000ms linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+.wz-menu-agent-info {
+  background-color: #fafbfd;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  border-bottom: 1px solid #d3dae6;
+  height: 54px;
+  margin-top: 0px;
+}
+
+.wz-select-agent-modal {
+  max-width: 60vw;
+}
+
+.wz-markdown-wapper code {
+  color: #1c2226;
+  background-color: #e6e6e6;
+  border-radius: 3px;
+  font-family: courier, monospace;
+  padding: 0 3px;
+}
+
+  /* Change custom discover size */
+.wz-discover > .globalQueryBar > 
+.kbnQueryBar--withDatePicker > 
+.euiFlexItem.euiFlexItem--flexGrowZero >
+.euiFlexGroup > 
+.euiFlexItem.kbnQueryBar__datePickerWrapper {
+  max-width: 300px;
+}
+
+@media (max-width: 1300px) {
+  .wz-select-agent-modal {
+    max-width: 80vw;
+  }
+
+  /* Change custom discover size */
+  .wz-discover > .globalQueryBar > 
+  .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker {
+    flex-wrap: wrap;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .wz-discover > .globalQueryBar > 
+  .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker > 
+  .euiFlexItem {
+    width: 100% !important;
+    -ms-flex-preferred-size: 100% !important;
+    flex-basis: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 16px !important;
+  }
+
+  .wz-discover > .globalQueryBar > 
+  .kbnQueryBar--withDatePicker > :first-child {
+    order: 1;
+    margin-top: -8px;
+  }
+
+  .wz-discover > .globalQueryBar > 
+  .kbnQueryBar--withDatePicker > 
+  .euiFlexItem.euiFlexItem--flexGrowZero >
+  .euiFlexGroup > 
+  .euiFlexItem.kbnQueryBar__datePickerWrapper >
+  .euiFlexGroup {
+    width: 100%;
+  }
+
+  .wz-discover > .globalQueryBar > 
+  .kbnQueryBar--withDatePicker > 
+  .euiFlexItem.euiFlexItem--flexGrowZero >
+  .euiFlexGroup > 
+  .euiFlexItem.kbnQueryBar__datePickerWrapper {
+    flex-grow: 1!important;
+    max-width: none;
+  }
+}
+
+@media (min-width: 1600px) {
+  .agents-evolution-visualization{
+    width: 35vw;
+  }
+}
+
+@media (max-width: 1599px) {
+  .agents-evolution-visualization{
+    width: 30vw;
+  }
+}
+
+
+@media (max-width: 1439px) {
+  .agents-evolution-visualization{
+    width: 25vw;
+  }
+}
+
+@media only screen and (max-width: 1200px){
+  .agents-evolution-visualization-group{
+    flex-wrap: wrap;
+  }
+  .agents-evolution-visualization{
+    width: 92vw;
+  }
+  .agents-status-pie{
+    flex-grow: 1 !important;
+  }
+}
+
+.chrHeaderWrapper--navIsLocked ~ .app-wrapper .wz-module-header-agent-wrapper {
+  padding-left: 240px;
+}
+
+.chrHeaderWrapper--navIsLocked ~ .app-wrapper .wz-module-header-nav-wrapper {
+  padding-left: 240px;
+}
+
+.icon-box-action {
+  display: flex;
+}
+
+@media only screen and (max-width: 1200px) {
+  .hide-agent-status {
+    display: none;
+  }
 }

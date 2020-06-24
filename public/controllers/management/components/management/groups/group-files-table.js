@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { EuiBasicTable, EuiCallOut } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -24,30 +24,39 @@ import {
   updateSortFieldFile,
   updateFileContent
 } from '../../../../../redux/actions/groupsActions';
-
 import GroupsFilesColumns from './utils/columns-files';
+import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
 
 class WzGroupFilesTable extends Component {
   _isMounted = false;
+  suggestions = [
+    //{ type: 'q', label: 'filename', description: 'Filter by file name', operators: ['=', '!=',], values: async (value) => getGroupsFilesValues('filename', value, {},this.props.state.itemDetail.name )},
+    //{ type: 'params', label: 'hash', description: 'Filter by hash', operators: ['=', '!=',], values: async (value) => getGroupsFilesValues('hash', value, {},this.props.state.itemDetail.name )},
+  ];
+
   constructor(props) {
     super(props);
     this.state = {
       items: [],
       pageSize: 10,
-      totalItems: 0
+      totalItems: 0,
+      filters: []
     };
 
     this.groupsHandler = GroupsHandler;
   }
 
   async componentDidMount() {
-    this.props.updateIsProcessing(true);
-
+    await this.getItems();
     this._isMounted = true;
   }
 
-  async componentDidUpdate() {
+  async componentDidUpdate(prevProps, prevState) {
     if (this.props.state.isProcessing && this._isMounted) {
+      await this.getItems();
+    }
+    const { filters } = this.state;
+    if (JSON.stringify(filters) !== JSON.stringify(prevState.filters)) {
       await this.getItems();
     }
   }
@@ -72,17 +81,18 @@ class WzGroupFilesTable extends Component {
         totalItems,
         isProcessing: false
       });
-      this.props.updateIsProcessing(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
-      this.props.updateIsProcessing(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
       return Promise.reject(error);
     }
   }
 
   buildFilter() {
     const { pageIndexFile } = this.props.state;
-    const { pageSize } = this.state;
+    const { pageSize, filters } = this.state;
     const filter = {
+      ...filtersToObject(filters),
       offset: pageIndexFile * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter()
@@ -119,7 +129,7 @@ class WzGroupFilesTable extends Component {
       sortFieldFile,
       sortDirectionFile
     } = this.props.state;
-    const { items, pageSize, totalItems } = this.state;
+    const { items, pageSize, totalItems, filters } = this.state;
     const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
     const pagination = {
@@ -137,7 +147,11 @@ class WzGroupFilesTable extends Component {
 
     if (!error) {
       return (
-        <div>
+        <Fragment>
+          <WzSearchBar
+            filters={filters}
+            suggestions={this.suggestions}
+            onFiltersChange={filters => this.setState({filters})} />
           <EuiBasicTable
             itemId="id"
             items={items}
@@ -149,7 +163,7 @@ class WzGroupFilesTable extends Component {
             message={message}
             search={{ box: { incremental: true } }}
           />
-        </div>
+        </Fragment>
       );
     } else {
       return <EuiCallOut color="warning" title={error} iconType="gear" />;

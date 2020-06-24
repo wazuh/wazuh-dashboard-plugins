@@ -25,7 +25,6 @@ import {
 import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
-  updateAdminMode,
   updateListNodes,
   updateSelectedNode,
   updateListDaemons,
@@ -35,6 +34,9 @@ import {
   updateClusterEnabled,
   cleanInfo
 } from '../../../../../redux/actions/statusActions';
+import {
+  updateAdminMode,
+} from '../../../../../redux/actions/appStateActions';
 import checkAdminMode from './utils/check-admin-mode';
 import StatusHandler from './utils/status-handler';
 

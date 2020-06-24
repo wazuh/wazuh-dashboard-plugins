@@ -11,7 +11,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiCard,
   EuiIcon,
@@ -19,55 +19,307 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiSpacer,
+  EuiText,
   EuiFlexGrid,
-  EuiCallOut,
+  EuiButtonEmpty,
   EuiTitle,
   EuiHealth,
+  EuiHorizontalRule,
   EuiPage,
   EuiButton,
-  EuiToolTip
+  EuiPopover,
+  EuiSelect,
+  EuiLoadingChart,
+  EuiToolTip,
+  EuiButtonIcon,
+  EuiEmptyPrompt,
+  EuiPageBody
 } from '@elastic/eui';
+import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { UnsupportedComponents } from '../../../utils/components-os-support';
+import store from '../../../redux/store';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import { ActionAgents } from '../../../react-services/action-agents';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import MenuAgent from './components/menu-agent';
 import './welcome.less';
+import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
+import KibanaVis from '../../../kibana-integrations/kibana-vis';
+import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
+import { AppState } from '../../../react-services/app-state';
+import { FilterHandler } from '../../../utils/filter-handler';
+import { TabVisualizations } from '../../../factories/tab-visualizations';
+import chrome from 'ui/chrome';
+import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
+import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
+import { UnsupportedComponents } from './../../../utils/components-os-support';
 
 export class AgentsWelcome extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
 
+    this.offset = 275;
+
     this.state = {
-      extensions: this.props.extensions
+      extensions: this.props.extensions,
+      lastScans: [],
+      isLoading: true,
+      sortField: 'start_scan',
+      sortDirection: 'desc',
+      actionAgents: true, // Hide actions agents
+      selectedRequirement: 'pci',
+      menuAgent: {},
+      maxModules: 6,
+      widthWindow: window.innerWidth
     };
+
+    this.platform = false;
   }
 
-  color = status => {
-    if (status.toLowerCase() === 'active') {
-      return 'success';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
-      return 'subdued';
+  updateWidth = () => {
+
+    let menuSize = (window.innerWidth - this.offset);
+    let maxModules = 6;
+    if(menuSize > 1250) {
+      maxModules = 6;
+    } else {
+      if(menuSize > 1100 ) {
+        maxModules = 5;
+      } else {
+        if(menuSize > 900) {
+          maxModules = 4;
+        } else {
+          maxModules = 3;
+          if(menuSize < 750) {
+            maxModules = null;
+          }
+        }
+      }
     }
+
+    this.setState({maxModules: maxModules, widthWindow: window.innerWidth});
   };
 
-  renderTitle() {
-    return (
-      <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-agent-title">
-          <EuiTitle size="s">
-            <h1>
-              <EuiToolTip position="right" content={this.props.agent.status}>
-                <EuiHealth
-                  color={this.color(this.props.agent.status)}
-                ></EuiHealth>
-              </EuiToolTip>
-              {this.props.agent.name} ({this.props.agent.id})
-            </h1>
-          </EuiTitle>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+  setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      {
+        text: 'Agents',
+        href: "#/agents-preview"
+      },
+      {
+        text: `${this.props.agent.name}`,
+        className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
+        truncate: false,
+      }
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
+
+  async componentDidMount() {
+    this._isMount = true;
+    store.dispatch(updateCurrentAgentData(this.props.agent));
+    this.updateMenuAgents();
+    this.updateWidth();
+    this.setGlobalBreadcrumb();
+    const tabVisualizations = new TabVisualizations();
+    tabVisualizations.removeAll();
+    tabVisualizations.setTab('welcome');
+    tabVisualizations.assign({
+      welcome: 8
+    });
+    const filterHandler = new FilterHandler(AppState.getCurrentPattern());
+    await VisFactoryHandler.buildAgentsVisualizations(
+      filterHandler,
+      'welcome',
+      null,
+      this.props.agent.id
     );
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
+    window.addEventListener('resize', this.updateWidth); //eslint-disable-line
+    if (Object.keys(this.props.agent).length) {
+      this.platform = ((this.props.agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((this.props.agent.os || {}).platform || false);
+    }
+  }
+
+  updateMenuAgents() {
+    const defaultMenuAgents = {
+      general: { 
+        id: 'general', 
+        text: 'Security events', 
+        isPin: true, 
+      },
+      fim: { 
+        id: 'fim', 
+        text: 'Integrity monitoring', 
+        isPin: true, 
+      },
+      sca: { 
+        id: 'sca', 
+        text: 'SCA', 
+        isPin: true, 
+      },
+      audit: { 
+        id: 'audit', 
+        text: 'System Auditing', 
+        isPin: true,
+      },
+      vuls: { 
+        id: 'vuls', 
+        text: 'Vulnerabilities', 
+        isPin: true,
+      },
+      mitre: { 
+        id: 'mitre', 
+        text: 'MITRE ATT&CK', 
+        isPin: true, 
+      },
+    }
+
+    let menuAgent = JSON.parse(window.localStorage.getItem('menuAgent'));
+
+    if(!menuAgent) {
+      menuAgent = defaultMenuAgents;
+      window.localStorage.setItem('menuAgent', JSON.stringify(defaultMenuAgents));
+    }
+
+    this.setState({ menuAgent: menuAgent});
+  }
+
+  showModuleByPlatform(menu) {
+    return !this.platform ? false : !UnsupportedComponents[this.platform].includes(menu.id);
+  }
+
+  renderModules() {
+    const menuAgent = [...Object.keys(this.state.menuAgent).map((item) => { return this.state.menuAgent[item] })];
+
+    return (
+      <Fragment>
+        {
+          menuAgent.map((menuAgent, i) => {
+            if(i < this.state.maxModules && this.showModuleByPlatform(menuAgent)) {
+            return (
+            <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+              <EuiButtonEmpty
+                onClick={() => {
+                  window.location.href = `#/overview/?tab=${menuAgent.id}&tabView=${menuAgent.text === 'Security configuration assessment' ? 'inventory' : 'panels'}`;
+                  this.router.reload();
+                }} style={{ cursor: 'pointer' }}>
+                <span>{menuAgent.text !== 'Security configuration assessment' ? menuAgent.text : 'SCA'}&nbsp;</span>
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            )}
+          }
+          )}
+        <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+          <EuiPopover
+            button={
+              <EuiButtonEmpty
+                iconSide="right"
+                iconType="arrowDown"
+                onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
+                More...
+              </EuiButtonEmpty>
+            }
+            isOpen={this.state.switchModule}
+            closePopover={() => this.setState({ switchModule: false })}
+            repositionOnScroll={false}
+            anchorPosition="downCenter">
+            <div>
+              <WzReduxProvider>
+                <div style={{ maxWidth: 730 }}>
+                  <MenuAgent
+                    isAgent={this.props.agent}
+                    updateMenuAgents={() => this.updateMenuAgents()}
+                    closePopover={() => {
+                      this.setState({ switchModule: false })
+                    }
+                    }
+                    switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
+                </div>
+              </WzReduxProvider>
+            </div>
+          </EuiPopover>
+        </EuiFlexItem>
+      </Fragment>
+    )
+  }
+
+  renderTitle() {
+
+      return (
+        <EuiFlexGroup>
+          <EuiFlexItem className="wz-module-header-agent-title">
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <span style={{ display: 'inline-flex' }}>
+                  <EuiTitle size="s">
+                    <h1>
+                      <WzTextWithTooltipIfTruncated position='top' elementStyle={{ maxWidth: "150px"}}>
+                        {this.props.agent.name}
+                      </WzTextWithTooltipIfTruncated>
+                    </h1>
+                  </EuiTitle>
+                </span>
+              </EuiFlexItem>
+              {
+                (this.state.maxModules !== null && 
+                this.renderModules()) ||
+                <EuiFlexItem style={{ marginTop: 7 }}>
+                  <EuiPopover
+                    button={
+                      <EuiButtonEmpty
+                        iconSide="right"
+                        iconType="arrowDown"
+                        onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
+                        Modules
+                      </EuiButtonEmpty>
+                    }
+                    isOpen={this.state.switchModule}
+                    closePopover={() => this.setState({ switchModule: false })}
+                    repositionOnScroll={false}
+                    anchorPosition="downCenter">
+                    <div>
+                      <WzReduxProvider>
+                        <div style={{ maxWidth: 730 }}>
+                          <MenuAgent
+                            isAgent={this.props.agent}
+                            updateMenuAgents={() => this.updateMenuAgents()}
+                            closePopover={() => {
+                              this.setState({ switchModule: false })
+                            }
+                            }
+                            switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
+                        </div>
+                      </WzReduxProvider>
+                    </div>
+                  </EuiPopover>
+                </EuiFlexItem>
+              }
+              <EuiFlexItem></EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  iconType="inspect"
+                  onClick={() => this.props.switchTab('syscollector')}>
+                  Inventory data
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  iconType="gear"
+                  onClick={() => this.props.switchTab('configuration')}>
+                  Configuration
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      );
+
   }
 
   buildTabCard(tab, icon) {
@@ -85,146 +337,286 @@ export class AgentsWelcome extends Component {
       </EuiFlexItem>
     );
   }
+  onClickRestartAgent = () => {
+    const { agent } = this.props;
+    ActionAgents.restartAgent(agent.id);
+  };
+
+  onClickUpgradeAgent = () => {
+    const { agent } = this.props;
+    ActionAgents.upgradeAgent(agent.id);
+  };
+
+  renderUpgradeButton() {
+    const { managerVersion } = this.state;
+    const { agent } = this.props;
+    let outDated = ActionAgents.compareVersions(managerVersion, agent.version);
+
+    if (outDated === true) return;
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          color="secondary"
+          iconType="sortUp"
+          onClick={this.onClickUpgradeAgent}
+        >
+          Upgrade
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  onTimeChange = (datePicker) => {
+    const { start: from, end: to } = datePicker;
+    this.setState({ datePicker: { from, to } });
+  }
+
+  getOptions() {
+    return [
+      { value: 'pci', text: 'PCI DSS' },
+      { value: 'gdpr', text: 'GDPR' },
+      { value: 'nist', text: 'NIST 800-53' },
+      { value: 'hipaa', text: 'HIPAA' },
+      { value: 'gpg13', text: 'GPG13' },
+      { value: 'tsc', text: 'TSC' },
+    ];
+  }
+
+  setSelectValue(e) {
+    this.setState({ selectedRequirement: e.target.value });
+  }
+
+  getRequirementVis() {
+    if (this.state.selectedRequirement === 'pci') {
+      return 'Wazuh-App-Agents-Welcome-Top-PCI';
+    }
+    if (this.state.selectedRequirement === 'gdpr') {
+      return 'Wazuh-App-Agents-Welcome-Top-GDPR';
+    }
+    if (this.state.selectedRequirement === 'hipaa') {
+      return 'Wazuh-App-Agents-Welcome-Top-HIPAA';
+    }
+    if (this.state.selectedRequirement === 'nist') {
+      return 'Wazuh-App-Agents-Welcome-Top-NIST-800-53';
+    }
+    if (this.state.selectedRequirement === 'gpg13') {
+      return 'Wazuh-App-Agents-Welcome-Top-GPG-13';
+    }
+    if (this.state.selectedRequirement === 'tsc') {
+      return 'Wazuh-App-Agents-Welcome-Top-TSC';
+    }
+    return 'Wazuh-App-Agents-Welcome-Top-PCI'
+  }
+
+  renderMitrePanel(){
+    return (
+      <Fragment>
+        <EuiPanel paddingSize="s" height={{ height: 300 }}>
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <h2 className="embPanel__title wz-headline-title">
+                  <EuiText size="xs"><h2>MITRE</h2></EuiText>
+                </h2>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
+                <EuiToolTip position="top" content="Open MITRE">
+                  <EuiButtonIcon
+                    iconType="popout"
+                    color="primary"
+                    onClick={() => {
+                      window.location.href = `#/overview?tab=mitre`;
+                      this.router.reload();
+                    }
+                    }
+                    aria-label="Open MITRE" />
+                </EuiToolTip>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiSpacer size="m" />
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <MitreTopTactics agentId={this.props.agent.id} />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPanel>
+      </Fragment>
+
+    )
+  }
+
+  renderCompliancePanel(){
+    return (
+      <RequirementVis
+        agent={this.props.agent}
+        width={200}
+        height={200}
+        innerRadius={70}
+        outerRadius={100} />
+    )
+  }
+
+  renderEventCountVisualization(){
+    return (
+      <EuiPanel paddingSize="s" >
+        <EuiFlexItem>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <h2 className="embPanel__title wz-headline-title">
+                <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
+              </h2>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size="s" />
+          <div style={{ height: this.props.resultState !== 'loading' ? '225px' : 0 }}>
+            <WzReduxProvider>
+              <KibanaVis
+                visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                tab={'welcome'}
+              ></KibanaVis>
+            </WzReduxProvider>
+          </div>
+          <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', alignSelf: "center", paddingTop: 100 }}>
+            <EuiLoadingChart size="xl" />
+          </div>
+        </EuiFlexItem>
+      </EuiPanel>
+    )
+  }
+
+  renderSCALastScan(){
+    return (
+      <EuiFlexGroup direction="column">
+        <ScaScan switchTab={this.props.switchTab} {...this.props} />
+      </EuiFlexGroup>
+    )
+  }
 
   render() {
     const title = this.renderTitle();
+    const upgradeButton = this.renderUpgradeButton();
+    if (this.props.agent.status === 'Never connected') {
+      return (
+        <EuiEmptyPrompt
+          iconType="securitySignalDetected"
+          style={{ marginTop: 20 }}
+          title={<h2>Agent has never connected.</h2>}
+          body={
+            <Fragment>
+              <p>
+                The agent has been registered but has not yet connected to the manager.
+            </p>
+              <a href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html" target="_blank">
+                https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html
+            </a>
+            </Fragment>
+          }
+          actions={
+            <EuiButton href='#/agents-preview?' color="primary" fill>
+              Back
+          </EuiButton>
+          }
+        />)
+    }
+
     return (
-      <div className="wz-module">
-        <div className="wz-module-header-agent-wrapper">
-          <div className="wz-module-header-agent">{title}</div>
-        </div>
-        <div className="wz-module-body wz-module-body-main">
-          <div className="wz-welcome-page-agent-info">
-            <AgentInfo agent={this.props.agent} {...this.props}></AgentInfo>
+      <div className="wz-module wz-module-welcome">
+        <div className='wz-module-header-agent-wrapper'>
+          <div className='wz-module-header-agent wz-module-header-agent-main'>
+            {title}
           </div>
-          <EuiPage className="wz-welcome-page">
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiPanel betaBadgeLabel="Security Information Management">
-                      <EuiFlexGroup gutterSize="xs">
-                        <EuiFlexItem />
-                      </EuiFlexGroup>
-                      <EuiSpacer size="s" />
-                      <EuiFlexGrid columns={2}>
-                        {this.buildTabCard('general', 'dashboardApp')}
-                        {this.buildTabCard('fim', 'filebeatApp')}
-                        {this.buildTabCard('gcp', 'logoGCPMono')}
-                      </EuiFlexGrid>
-                    </EuiPanel>
-                  </EuiFlexItem>
-                  <EuiFlexItem>
-                    <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
-                      <EuiSpacer size="s" />
-                      <EuiFlexGrid columns={2}>
-                        {this.buildTabCard('pm', 'advancedSettingsApp')}
-                        {this.buildTabCard('sca', 'securityAnalyticsApp')}
-                        {this.props.extensions.audit &&
-                          this.buildTabCard('audit', 'monitoringApp')}
-                        {this.props.extensions.oscap &&
-                          this.buildTabCard('oscap', 'codeApp')}
-                        {this.props.extensions.ciscat &&
-                          this.buildTabCard('ciscat', 'auditbeatApp')}
-                      </EuiFlexGrid>
-                    </EuiPanel>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-
-                <EuiSpacer size="xl" />
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiPanel betaBadgeLabel="Threat Detection and Response">
-                      <EuiSpacer size="s" />
-                      {(
-                        UnsupportedComponents[this.props.agent.agentPlatform] ||
-                        UnsupportedComponents['other']
-                      ).includes('vuls') &&
-                        !this.props.extensions.virustotal &&
-                        !this.props.extensions.osquery &&
-                        !this.props.extensions.mitre &&
-                        !this.props.extensions.docker && (
-                          <EuiFlexGroup>
-                            <EuiFlexItem>
-                              <EuiCallOut
-                                title={
-                                  <p>
-                                    Click the <EuiIcon type="eye" /> icon to
-                                    show thread detection and response
-                                    extensions.
-                                  </p>
-                                }
-                                color="success"
-                                iconType="help"
-                              />
-                            </EuiFlexItem>
-                          </EuiFlexGroup>
-                        )}
-                      <EuiFlexGrid columns={2}>
-                        {!(
-                          UnsupportedComponents[
-                            this.props.agent.agentPlatform
-                          ] || UnsupportedComponents['other']
-                        ).includes('vuls') &&
-                          this.buildTabCard('vuls', 'securityApp')}
-                        {this.props.extensions.virustotal &&
-                          this.buildTabCard('virustotal', 'savedObjectsApp')}
-                        {this.props.extensions.osquery &&
-                          this.buildTabCard('osquery', 'searchProfilerApp')}
-                        {this.props.extensions.docker &&
-                          this.buildTabCard('docker', 'logoDocker')}
-                        {this.props.extensions.mitre &&
-                          this.buildTabCard('mitre', 'spacesApp')}{' '}
-                        {/* TODO- Change "spacesApp" icon*/}
-                      </EuiFlexGrid>
-                    </EuiPanel>
-                  </EuiFlexItem>
-
-                  <EuiFlexItem>
-                    <EuiPanel betaBadgeLabel="Regulatory Compliance">
-                      <EuiSpacer size="s" />
-                      {!this.props.extensions.pci &&
-                        !this.props.extensions.gdpr &&
-                        !this.props.extensions.hipaa &&
-                        !this.props.extensions.nist && (
-                          <EuiFlexGroup>
-                            <EuiFlexItem>
-                              <EuiCallOut
-                                title={
-                                  <p>
-                                    Click the <EuiIcon type="eye" /> icon to
-                                    show regulatory compliance extensions.
-                                  </p>
-                                }
-                                color="success"
-                                iconType="help"
-                              />
-                            </EuiFlexItem>
-                          </EuiFlexGroup>
-                        )}
-                      {(this.props.extensions.pci ||
-                        this.props.extensions.gdpr ||
-                        this.props.extensions.hipaa ||
-                        this.props.extensions.nist ||
-                        this.props.extensions.tsc) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
-                          {this.props.extensions.tsc &&
-                            this.buildTabCard('tsc', 'apmApp')}
-                        </EuiFlexGrid>
-                      )}
-                    </EuiPanel>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlexItem>
+        </div>
+        <div>
+          <div className='wz-module-header-nav-wrapper'>
+            <div className='wz-module-header-nav'>
+              <div style={{ margin: '0 16px' }}>
+                <EuiPanel paddingSize='s' className="wz-welcome-page-agent-info">
+                  <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
+                </EuiPanel>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="wz-module-body">
+          {/* <EuiPage>
+            <EuiFlexGroup className="wz-welcome-page-agent-info-actions">
+              {this.state.hideActions === false &&
+                <EuiFlexItem grow={true} style={{ marginTop: 0 }}>
+                  <EuiFlexGroup justifyContent="flexEnd">
+                    <EuiFlexItem grow={false}>
+                      <EuiButton
+                        color="primary"
+                        iconType="refresh"
+                        onClick={this.onClickRestartAgent}
+                      >
+                        Restart
+                    </EuiButton>
+                    </EuiFlexItem>
+                    {upgradeButton}
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+              }
             </EuiFlexGroup>
+          </EuiPage> */}
+          <EuiPage>
+            <EuiPageBody component="div">
+              <EuiFlexGroup>
+                <EuiFlexItem />
+                <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 6, marginBottom: 10 }}> {/* DatePicker */}
+                  <WzDatePicker condensed={true} onTimeChange={() => { }} />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            {this.state.widthWindow < 1150 && (
+              <Fragment>
+                <EuiFlexGrid columns={2}>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} >
+                    {this.renderMitrePanel()}
+                  </EuiFlexItem>
+                  {this.renderCompliancePanel()}
+                </EuiFlexGrid>
+                <EuiSpacer size='m'/>
+                <EuiFlexGroup>
+                  <FimEventsTable agent={this.props.agent} router={this.router} />
+                </EuiFlexGroup>
+                <EuiSpacer size='m'/>
+                <EuiFlexGroup>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
+                    {this.renderEventCountVisualization()}
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='m'/>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    {this.renderSCALastScan()}
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </Fragment>
+            ) || (
+              <Fragment>
+                <EuiFlexGrid columns={2}>
+                  <EuiFlexItem>
+                    <EuiFlexGroup>
+                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'} >
+                        {this.renderMitrePanel()}
+                      </EuiFlexItem>
+                      {this.renderCompliancePanel()}
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                  <FimEventsTable agent={this.props.agent} router={this.router} />
+                </EuiFlexGrid>
+                <EuiSpacer size="l" />
+                <EuiFlexGroup>
+                  <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'} > {/* Events count evolution */}
+                    {this.renderEventCountVisualization()}
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    {this.renderSCALastScan()}
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </Fragment>
+            )}
+            </EuiPageBody>
           </EuiPage>
         </div>
       </div>

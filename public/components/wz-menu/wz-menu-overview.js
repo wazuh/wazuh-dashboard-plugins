@@ -10,12 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGrid, EuiSideNav, EuiIcon } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon, EuiPanel, EuiStat, EuiButton, EuiToolTip } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
-import { updateCurrentTab } from '../../redux/actions/appStateActions';
+import chrome from 'ui/chrome';
+import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
+import { AppNavigate } from '../../react-services/app-navigate';
+import { UnsupportedComponents } from '../../utils/components-os-support';
 
 class WzMenuOverview extends Component {
   constructor(props) {
@@ -44,6 +47,7 @@ class WzMenuOverview extends Component {
       aws: { id: 'aws', text: 'Amazon AWS' },
       gcp: { id: 'gcp', text: 'Google Cloud Platform' },
       pm: { id: 'pm', text: 'Policy Monitoring' },
+      sca: { id: 'sca', text: 'Security configuration assessment' },
       audit: { id: 'audit', text: 'System Auditing' },
       oscap: { id: 'oscap', text: 'OpenSCAP' },
       ciscat: { id: 'ciscat', text: 'CIS-CAT' },
@@ -69,16 +73,32 @@ class WzMenuOverview extends Component {
   async componentDidMount() {
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
+    const $injector = await chrome.dangerouslyGetActiveInjector();
+    this.router = $injector.get('$route');
   }
 
-  clickMenuItem = section => {
+  clickMenuItem = (ev, section) => {
     this.props.closePopover();
+    const params = { tab : section};
+    if(store.getState().appStateReducers.currentAgentData.id)
+      params["agentId"] = store.getState().appStateReducers.currentAgentData.id;
+    if(section === "sca"){ // SCA initial tab is inventory
+      params["tabView"] = "inventory"
+    }
     const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
       .currentTab;
     if (currentTab !== section) {
       // do not redirect if we already are in that tab
-      window.location.href = `#/overview/?tab=${section}`;
-      store.dispatch(updateCurrentTab(section));
+      if (!this.props.isAgent) {
+        AppNavigate.navigateToModule(ev, 'overview', params )
+      } else {
+        if (!this.props.switchTab) {
+          store.dispatch(updateCurrentAgentData(this.props.isAgent)); 
+          AppNavigate.navigateToModule(ev, 'overview', params )
+        } else {
+          this.props.switchTab(section);
+        }
+      }
     }
   };
 
@@ -103,21 +123,65 @@ class WzMenuOverview extends Component {
       id: item.id,
       name: item.text,
       isSelected: currentTab === item.id,
-      onClick: () => this.clickMenuItem(item.id)
+      onClick:() => {},
+      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
 
+
+  color = (status, hex = false) => {
+    if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
+    else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
+    else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
+
+  removeSelectedAgent(){
+    store.dispatch(updateCurrentAgentData({})); 
+    this.router.reload();
+  }
+
   render() {
+    let securityInformationItems = [
+      this.overviewSections.general,
+      this.overviewSections.fim,
+      this.overviewSections.aws,
+      this.overviewSections.gcp
+    ];
+    let auditingItems = [
+      this.overviewSections.pm,
+      this.overviewSections.ciscat,
+      this.overviewSections.sca
+    ];
+    let threatDetectionItems = [
+      this.overviewSections.virustotal,
+      this.overviewSections.osquery,
+      this.overviewSections.mitre
+    ];
+
+    const agent = store.getState().appStateReducers.currentAgentData;
+
+    let platform = false;
+
+    if (Object.keys(agent).length) {
+      platform = ((agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((agent.os || {}).platform || false);
+    }
+
+    if( !platform || !UnsupportedComponents[platform].includes('audit')) {
+      auditingItems.splice(1, 0, this.overviewSections.audit);
+      auditingItems.splice(2, 0, this.overviewSections.oscap);
+    }
+    if(!platform || !UnsupportedComponents[platform].includes('docker')) {
+      threatDetectionItems.splice(2, 0, this.overviewSections.docker);
+    }
+    if(!platform || !UnsupportedComponents[platform].includes('vuls')) {
+      threatDetectionItems.unshift(this.overviewSections.vuls);
+    }
+    
     const securityInformation = [
       this.createItem(this.overviewSections.securityInformation, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems([
-          this.overviewSections.general,
-          this.overviewSections.fim,
-          this.overviewSections.aws,
-          this.overviewSections.gcp
-        ])
+        items: this.createItems(securityInformationItems)
       })
     ];
 
@@ -125,12 +189,7 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.auditing, {
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems([
-          this.overviewSections.pm,
-          this.overviewSections.audit,
-          this.overviewSections.oscap,
-          this.overviewSections.ciscat
-        ])
+        items: this.createItems(auditingItems)
       })
     ];
 
@@ -138,13 +197,7 @@ class WzMenuOverview extends Component {
       this.createItem(this.overviewSections.threatDetection, {
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems([
-          this.overviewSections.vuls,
-          this.overviewSections.virustotal,
-          this.overviewSections.osquery,
-          this.overviewSections.docker,
-          this.overviewSections.mitre
-        ])
+        items: this.createItems(threatDetectionItems)
       })
     ];
 
@@ -161,34 +214,65 @@ class WzMenuOverview extends Component {
         ])
       })
     ];
+    
+    const addHealthRender = (agent) => {
+      // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
+      return (
+        <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: 3, fontSize: '12px'}}>
+          <span className="euiFlexItem euiFlexItem--flexGrowZero">
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(agent.status)}`} focusable="false" role="img" aria-hidden="true">
+              <circle cx="8" cy="8" r="4"></circle>
+            </svg>
+          </span>
+          <span className="euiFlexItem euiFlexItem--flexGrowZero">{agent.status}</span>
+        </span>
+      )
+    }
+
+    const agentData = store.getState().appStateReducers.currentAgentData
 
     return (
       <div className="WzManagementSideMenu">
         {Object.keys(this.state.extensions).length && (
-          <EuiFlexGrid columns={2}>
-          <EuiFlexItem>
-            <EuiSideNav
-              items={securityInformation}
-              style={{ padding: '4px 12px' }}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiSideNav
-              items={threatDetection}
-              style={{ padding: '4px 12px' }}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiSideNav
-              items={regulatoryCompliance}
-              style={{ padding: '4px 12px' }}
-            />
-          </EuiFlexItem>
-        </EuiFlexGrid>
-        ) || (<div style={{width: 300}}></div>
+          <div>
+            {!agentData.id && (
+              <EuiFlexGroup>
+                <EuiFlexItem grow={false} style={{ marginLeft: 14 }}>
+                  <EuiButtonEmpty iconType="apps"
+                    onClick={() => {
+                      this.props.closePopover();
+                      window.location.href = '#/overview';
+                    }}>
+                    Modules directory
+                  </EuiButtonEmpty>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            )}
+            <EuiFlexGrid columns={2}>
+              <EuiFlexItem>
+                <EuiSideNav
+                  items={securityInformation}
+                  style={{ padding: '4px 12px' }}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiSideNav
+                  items={threatDetection}
+                  style={{ padding: '4px 12px' }}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiSideNav
+                  items={regulatoryCompliance}
+                  style={{ padding: '4px 12px' }}
+                />
+              </EuiFlexItem>
+            </EuiFlexGrid>
+          </div>
+        ) || (<div style={{ width: 300 }}></div>
           )}
       </div>
     );

@@ -26,6 +26,7 @@ import WzConfigurationIntegrityMonitoringIgnored from './integrity-monitoring-ig
 import WzConfigurationIntegrityMonitoringNoDiff from './integrity-monitoring-no-diff';
 import WzConfigurationIntegrityMonitoringWhoData from './integrity-monitoring-who-data';
 import WzConfigurationIntegrityMonitoringSynchronization from './integrity-monitoring-synchronization';
+import WzConfigurationIntegrityMonitoringFileLimit from './integrity-monitoring-file-limit';
 
 class WzConfigurationIntegrityMonitoring extends Component {
   constructor(props) {
@@ -43,7 +44,8 @@ class WzConfigurationIntegrityMonitoring extends Component {
     );
   }
   render() {
-    const { currentConfig } = this.props;
+    const { currentConfig, agent } = this.props;
+    const agentPlatform = ((agent || {}).os || {}).platform;
     return (
       <Fragment>
         {currentConfig['syscheck-syscheck'] &&
@@ -74,13 +76,18 @@ class WzConfigurationIntegrityMonitoring extends Component {
               <WzTabSelectorTab label="No diff">
                 <WzConfigurationIntegrityMonitoringNoDiff {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Who-data">
-                <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
-              </WzTabSelectorTab>
+              {agentPlatform !== 'windows' && (
+                <WzTabSelectorTab label="Who-data">
+                  <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
+                </WzTabSelectorTab>
+              )}
               <WzTabSelectorTab label="Synchronization">
                 <WzConfigurationIntegrityMonitoringSynchronization
                   {...this.props}
                 />
+              </WzTabSelectorTab>
+              <WzTabSelectorTab label="File limit">
+                <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
               </WzTabSelectorTab>
             </WzTabSelector>
           )}

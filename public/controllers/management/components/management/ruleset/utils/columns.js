@@ -7,7 +7,6 @@ export default class RulesetColumns {
   constructor(tableProps) {
     this.tableProps = tableProps;
     this.rulesetHandler = RulesetHandler;
-    this.adminMode = this.tableProps.state.adminMode;
 
     this.buildColumns = () => {
       this.columns = {
@@ -24,7 +23,33 @@ export default class RulesetColumns {
             name: 'Description',
             align: 'left',
             sortable: true,
-            width: '30%'
+            width: '30%',
+            render: (value, item) => {
+              if(value === undefined) return '';
+              const regex = /\$(.*?)\)/g;
+              let result = value.match(regex);
+              let haveTooltip = false;
+              let toolTipDescription = false;
+              if(result !== null) {
+                haveTooltip = true;
+                toolTipDescription = value;
+                for (const oldValue of result) {
+                  let newValue = oldValue.replace('$(',`<strong style="color:#006BB4">`);
+                  newValue = newValue.replace(')', ' </strong>');
+                  value = value.replace(oldValue, newValue);
+                }
+              }
+              return (
+              <div>
+                {haveTooltip === false ? 
+                <span dangerouslySetInnerHTML={{ __html: value}} /> :
+                <EuiToolTip position="bottom" content={toolTipDescription}>
+                  <span dangerouslySetInnerHTML={{ __html: value}} />
+                </EuiToolTip>
+                }
+              </div>
+              );
+            }
           },
           {
             field: 'groups',
@@ -215,7 +240,7 @@ export default class RulesetColumns {
         ]
       };
       // If the admin mode is enabled the action column in CDB lists is shown
-      if (this.adminMode) {
+      if (this.tableProps.adminMode) {
         this.columns.lists[2] =
           {
             name: 'Actions',
@@ -273,7 +298,7 @@ export default class RulesetColumns {
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc'];
+    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc', 'mitre'];
     const buildBadge = field => {
       const idGenerator = () => {
         return (

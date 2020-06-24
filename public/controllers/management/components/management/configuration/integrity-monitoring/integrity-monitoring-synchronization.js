@@ -62,7 +62,7 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
             />
           </WzConfigurationSettingsTabSelector>
         ) : (
-          <WzNoConfig error="This info should be displayed" help={helpLinks} />
+          <WzNoConfig error="not-present" help={helpLinks} />
         )}
       </Fragment>
     );

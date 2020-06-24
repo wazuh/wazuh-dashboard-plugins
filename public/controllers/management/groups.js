@@ -13,6 +13,7 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { GroupHandler } from '../../react-services/group-handler';
+import { ErrorHandler } from '../../react-services/error-handler';
 
 export class GroupsController {
   constructor($scope, $location, errorHandler, reportingService) {
@@ -71,7 +72,7 @@ export class GroupsController {
 
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Groups');
+      ErrorHandler.handle(error, 'Groups');
     }
   }
 
@@ -186,7 +187,7 @@ export class GroupsController {
         this.selectedAgents.loadedAll = true;
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'Error fetching group agents');
+      ErrorHandler.handle(error, 'Error fetching group agents');
     }
     this.selectedAgents.loaded = true;
   }
@@ -195,13 +196,12 @@ export class GroupsController {
     try {
       const params = {
         limit: 500,
-        offset: !searchTerm ? this.availableAgents.offset : 0,
-        select: ['id', 'name'].toString(),
+        offset: !start ? this.availableAgents.offset : 0,
+        select: ['id', 'name']
       };
-
+      
       if (searchTerm) {
         params.search = searchTerm;
-        this.availableAgents.offset = 0;
       }
 
       const req = await this.apiReq.request('GET', '/agents', {
@@ -224,8 +224,7 @@ export class GroupsController {
             value: item.name
           };
         });
-
-      if (searchTerm || start) {
+      if (start) {
         this.availableAgents.data = mapped;
       } else {
         this.availableAgents.data = this.availableAgents.data.concat(mapped);
@@ -237,11 +236,11 @@ export class GroupsController {
         }
         if (!this.availableAgents.loadedAll) {
           this.availableAgents.offset += 499;
-          await this.loadAllAgents();
+          await this.loadAllAgents(searchTerm);
         }
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'Error fetching all available agents');
+      ErrorHandler.handle(error, 'Error fetching all available agents');
     }
   }
 
@@ -271,7 +270,7 @@ export class GroupsController {
         this.multipleSelectorLoading = false;
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'Error adding agents');
+      ErrorHandler.handle(error, 'Error adding agents');
     }
     this.scope.$applyAsync();
     return;
@@ -382,21 +381,20 @@ export class GroupsController {
         const arrayIds = failedIds.map(item => (item.id));
 
         this.failedErrors = this.groupBy(failedErrors, 'message') || false;
-        this.errorHandler.handle(
-          `Group has been updated but an error has occurred with ${arrayIds[0].length === 1 ? '1 agent' : arrayIds[0].length + ' agents'}: 
-          ${arrayIds.toString()}`,
+        ErrorHandler.info(
+          `Group has been updated but an error has occurred with ${failedIds.length} agents`,
           '',
-          true
+          { warning: true }
         );
       } else {
-        this.errorHandler.info('Group has been updated');
+        ErrorHandler.info('Group has been updated');
       }
       // this.addMultipleAgents(false);
       this.multipleSelectorLoading = false;
       this.cancelButton();
     } catch (err) {
       this.multipleSelectorLoading = false;
-      this.errorHandler.handle(err, 'Error applying changes');
+      ErrorHandler.handle(err, 'Error applying changes');
     }
     this.scope.$applyAsync();
     return;
@@ -453,5 +451,37 @@ export class GroupsController {
     this.lookingGroup = true;
     await this.addMultipleAgents(status);
     this.load = false;
+  }
+
+  async reload(element, searchTerm, start, addOffset ){
+    if (element === 'left') {
+      if (!this.availableAgents.loadedAll) {
+        this.multipleSelectorLoading = true;
+        if (start) {
+          this.availableAgents.offset = 0;
+          this.selectedAgents.offset = 0;
+        } else {
+          this.availableAgents.offset += 500;
+        }
+        try {
+          await this.loadAllAgents(searchTerm, start);
+        } catch (error) {
+          this.errorHandler.handle(error, 'Error fetching all available agents');
+        }
+      }
+    } else {
+      if (!this.selectedAgents.loadedAll) {
+        this.multipleSelectorLoading = true;
+        this.selectedAgents.offset += addOffset + 1;
+        try {
+          await this.loadSelectedAgents(searchTerm);
+        } catch (error) {
+          this.errorHandler.handle(error, 'Error fetching all selected agents');
+        }
+      }
+    }
+
+    this.multipleSelectorLoading = false;
+    this.scope.$applyAsync();
   }
 }

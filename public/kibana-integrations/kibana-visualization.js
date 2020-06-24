@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 import $ from 'jquery';
-import { uiModules } from 'ui/modules';
 import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
-
+import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { GenericRequest } from '../react-services/generic-request';
+import { ErrorHandler } from '../react-services/error-handler';
 import { TabVisualizations } from '../factories/tab-visualizations';
 const app = getAngularModule('app/wazuh');
 let lockFields = false;
@@ -52,7 +52,11 @@ app.directive('kbnVis', function() {
         chrome: npStart.core.chrome,
         overlays: npStart.core.overlays
       };
-      const savedObjectLoaderVisualize = createSavedVisLoader(services);
+      const servicesForVisualizations = {
+        ...services,
+        ...{ visualizationTypes: new TypesService().start() },
+      }
+      const savedObjectLoaderVisualize = createSavedVisLoader(servicesForVisualizations);
 
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
@@ -85,7 +89,7 @@ app.directive('kbnVis', function() {
             }
           }
         } catch (error) {
-          errorHandler.handle(error, 'Visualize - setSearchSource');
+          ErrorHandler.handle(error, 'Visualize - setSearchSource');
         }
       };
 
@@ -97,8 +101,9 @@ app.directive('kbnVis', function() {
           const timeFilterSeconds = calculateTimeFilterSeconds(
             timefilter.getTime()
           );
-          const timeRange =
-            isAgentStatus && timeFilterSeconds < 900
+          const timeRange = $scope.visID === 'Wazuh-App-Overview-General-Agents-Evolution'
+              ? { from: 'now-7d', to: 'now', mode: 'quick' }
+              : isAgentStatus && timeFilterSeconds < 900
               ? { from: 'now-15m', to: 'now', mode: 'quick' }
               : timefilter.getTime();
           const filters = isAgentStatus ? [] : discoverList[1] || [];
@@ -137,9 +142,8 @@ app.directive('kbnVis', function() {
                 visualization,
                 visInput
               );
-              visHandler
-                .render($(`[id='${$scope.visID}']`)[0])
-                .then(renderComplete);
+              await visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]);
+              visHandler.handler.data$.subscribe(renderComplete());
               visHandlers.addItem(visHandler);
 
               setSearchSource(discoverList);
@@ -172,9 +176,9 @@ app.directive('kbnVis', function() {
                 lockFields = false;
               } catch (error) {
                 lockFields = false;
-                console.log(error.message || error);
-                errorHandler.handle(
-                  'An error occurred fetching new index pattern fields.'
+                ErrorHandler.handle(
+                  error,
+                  'Error fetching new index pattern fields'
                 );
               }
             }
@@ -182,7 +186,7 @@ app.directive('kbnVis', function() {
             renderInProgress = false;
             return myRender(raw);
           } else {
-            errorHandler.handle(error, 'Visualize');
+            ErrorHandler.handle(error, 'Visualize');
           }
         }
         return;

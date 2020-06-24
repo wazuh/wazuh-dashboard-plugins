@@ -50,12 +50,14 @@ export class AppState {
         } else {
           const wazuhConfig = new WazuhConfig();
           const config = wazuhConfig.getConfig();
+          if(!Object.keys(config).length) return;
           const extensions = {
             audit: config['extensions.audit'],
             pci: config['extensions.pci'],
             gdpr: config['extensions.gdpr'],
             hipaa: config['extensions.hipaa'],
             nist: config['extensions.nist'],
+            tsc: config['extensions.tsc'],
             oscap: config['extensions.oscap'],
             ciscat: config['extensions.ciscat'],
             aws: config['extensions.aws'],

@@ -55,6 +55,7 @@ export const initialWazuhConfig = `---
 #extensions.nist      : true
 #extensions.tsc       : true
 #extensions.audit     : true
+#extensions.mitre     : true
 #extensions.oscap     : false
 #extensions.ciscat    : false
 #extensions.aws       : false
@@ -75,8 +76,8 @@ export const initialWazuhConfig = `---
 #
 # Defines if the user is allowed to change the selected
 # API directly from the Wazuh app top menu.
-# Default: false
-#api.selector: false
+# Default: truepi
+#api.selector: true
 #
 # --------------------------- Index pattern selector ---------------------------
 #

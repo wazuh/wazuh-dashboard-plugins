@@ -18,15 +18,27 @@ import {
   EuiTitle,
   EuiFieldSearch,
   EuiSpacer,
-  EuiToolTip
+  EuiToolTip,
+  EuiSwitch,
+  EuiPopover,
+  EuiText,
+  EuiContextMenu,
+  EuiIcon,
+  EuiOverlayMask,
+  EuiCallOut,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
-import { WzRequest } from '../../../../../react-services/wz-request';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
-export class Techniques extends Component {
+export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
+  timerDelaySearch: ReturnType<typeof setTimeout> | undefined;
+  delaySearchTime: number = 400; // delay time in search bar techniques to do the request. This prevents you from making a request with every change in the search term and wait this time instead after last change
 
   props!: {
     tacticsObject: ITactic
@@ -40,7 +52,11 @@ export class Techniques extends Component {
     searchValue: any,
     isFlyoutVisible: Boolean,
     currentTechniqueData: {},
-    currentTechnique: string
+    currentTechnique: string,
+    hideAlerts: boolean,
+    actionsOpen: string,
+    filteredTechniques: boolean | [string]
+    isSearching: boolean
   }
 
 	constructor(props) {
@@ -51,29 +67,48 @@ export class Techniques extends Component {
       isFlyoutVisible: false,
       currentTechniqueData: {},
       techniquesCount: [],
-      currentTechnique: ''
+      currentTechnique: '',
+      hideAlerts: false,
+      actionsOpen: "",
+      filteredTechniques: false,
+      isSearching: false
     }
     this.onChangeFlyout.bind(this);
 	}
   
   async componentDidMount(){
     this._isMount = true;
-    await this.getTechniquesCount();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { filterParams, indexPattern, selectedTactics, isLoading } = this.props;
+    if (nextProps.isLoading !== isLoading) 
+      return true;
+    if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams))
+      return true;
+    if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern))
+      return true;
+    if (JSON.stringify(nextState.selectedTactics) !== JSON.stringify(selectedTactics))
+      return true;
+    return false;
   }
 
   componentDidUpdate(prevProps) {
-    const { filterParams } = this.props;
-    if ( JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams) )
+    const { isLoading, tacticsObject, filters } = this.props;
+    if ( JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) || (isLoading !== prevProps.isLoading))
       this.getTechniquesCount();
   }
 
   componentWillUnmount() {
     this._isMount = false;
+    if(this.timerDelaySearch){
+      clearTimeout(this.timerDelaySearch);
+    };
   }
 
   async getTechniquesCount() {
     try{
-      const {indexPattern, filterParams} = this.props;
+      const {indexPattern, filters} = this.props;
       if ( !indexPattern ) { return; }
       const aggs = {
         techniques: {
@@ -83,10 +118,10 @@ export class Techniques extends Component {
           }
         }
       }
-      
+      this._isMount && this.setState({loadingAlerts: true});
       // TODO: use `status` and `statusText`  to show errors
       // @ts-ignore
-      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filterParams, aggs);
+      const {data, status, statusText, } = await getElasticAlerts(indexPattern, filters, aggs);
       const { buckets } = data.aggregations.techniques;
       this._isMount && this.setState({techniquesCount: buckets, loadingAlerts: false});
         
@@ -101,63 +136,220 @@ export class Techniques extends Component {
     }
   }
 
+  buildPanel(techniqueID){
+    return [
+      {
+        id: 0,
+        title: 'Actions',
+        items: [
+          {
+            name: 'Filter for value',
+            icon: <EuiIcon type="magnifyWithPlus" size="m" />,
+            onClick: () => {
+              this.closeActionsMenu();
+              this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
+            },
+          },
+          {
+            name: 'Filter out value',
+            icon: <EuiIcon type="magnifyWithMinus" size="m" />,
+            onClick: () => {
+              this.closeActionsMenu();
+              this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: true} );
+            },
+          },
+          {
+            name: 'View technique details',
+            icon: <EuiIcon type="filebeatApp" size="m" />,
+            onClick: () => {
+              this.closeActionsMenu();
+              this.showFlyout(techniqueID)
+            },
+          }
+        ],
+      }
+    ]
+  }
+
+  techniqueColumnsResponsive(){
+    if(this.props && this.props.windowSize){
+      return this.props.windowSize.width < 930 ? 2
+      : this.props.windowSize.width < 1200 ? 3
+      : 4;
+    }else{
+      return 4;
+    }
+  }
+
   renderFacet() {
     const { tacticsObject } = this.props;
     const { techniquesCount } = this.state;
-    const tacticsToRender: Array<any> = [];
-
-    Object.keys(tacticsObject).forEach((key, inx) => {
-      const currentTechniques = tacticsObject[key];
-      if(this.props.selectedTactics[key]){
-        currentTechniques.forEach( (technique,idx) => {
-          if(technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) || mitreTechniques[technique].name.toLowerCase().includes(this.state.searchValue.toLowerCase()) ){
-            const quantity = (techniquesCount.find(item => item.key === technique) || {}).doc_count || 0;
-            tacticsToRender.push({
-              id: technique,
-              label: `${technique} - ${mitreTechniques[technique].name}`,
-              quantity
-            })
-          }
-        });
-
-      }
-    });
+    let tacticsToRender: Array<any> = [];
+    const currentTechniques = Object.keys(tacticsObject).map(tacticsKey => ({tactic: tacticsKey, techniques: tacticsObject[tacticsKey]}))
+      .filter(tactic => this.props.selectedTactics[tactic.tactic])
+      .map(tactic => tactic.techniques)
+      .flat()
+      .filter((techniqueID, index, array) => array.indexOf(techniqueID) === index);
+    
+    tacticsToRender = currentTechniques
+      .filter(techniqueID => this.state.filteredTechniques ? this.state.filteredTechniques.includes(techniqueID) : techniqueID)
+      .map(techniqueID => {
+        return {
+          id: techniqueID,
+          label: `${techniqueID} - ${mitreTechniques[techniqueID].name}`,
+          quantity: (techniquesCount.find(item => item.key === techniqueID) || {}).doc_count || 0
+        }
+      })
+      .filter(technique => this.state.hideAlerts ? technique.quantity !== 0 : true);
 
     const tacticsToRenderOrdered = tacticsToRender.sort((a, b) => b.quantity - a.quantity).map( (item,idx) => {
       const tooltipContent = `View details of ${mitreTechniques[item.id].name} (${item.id})`;
-
+      const toolTipAnchorClass = "wz-display-inline-grid" + (this.state.hover=== item.id ? " wz-mitre-width" : " ");
       return(
-        <EuiFlexItem key={idx} style={{border: "1px solid #8080804a", maxWidth: "calc(25% - 8px)"}}>
-          <EuiToolTip delay="long" position="top" content={tooltipContent}>
-            <EuiFacetButton
-              style={{width: "100%", padding: "0 5px 0 5px"}}
-              quantity={item.quantity}
-              onClick={() => this.showFlyout(item.id)}>
-                {item.id} - {mitreTechniques[item.id].name}
-            </EuiFacetButton>
-        </EuiToolTip>
+        <EuiFlexItem 
+        onMouseEnter={() => this.setState({ hover: item.id })}
+        onMouseLeave={() => this.setState({ hover: "" })}
+        key={idx} style={{border: "1px solid #8080804a", maxHeight: 41}}>
+
+        <EuiPopover
+            id="techniqueActionsContextMenu"
+            anchorClassName="wz-width-100"
+            button={(
+                <EuiFacetButton
+                  style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px"}}
+                  quantity={item.quantity}
+                  onClick={() => this.showFlyout(item.id)}>
+                  <EuiToolTip position="top" content={tooltipContent} anchorClassName={toolTipAnchorClass}>
+                    <span style={{
+                            display: "block",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis"}}>
+                      {item.id} - {mitreTechniques[item.id].name}
+                    </span>
+                  </EuiToolTip>
+
+                  {this.state.hover === item.id &&
+                    <span style={{float: "right"}}>
+                      <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
+                          <EuiIcon onClick={(e) => {this.openDashboard(e,item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
+                      </EuiToolTip> &nbsp;
+                      <EuiToolTip position="top" content={"Inspect " + item.id + " in Events"} >
+                        <EuiIcon onClick={(e) => {this.openDiscover(e,item.id);e.stopPropagation()}} color="primary" type="discoverApp"></EuiIcon>
+                      </EuiToolTip>
+
+                    </span>
+                  }
+                </EuiFacetButton>
+              )
+              }
+            isOpen={this.state.actionsOpen === item.id}
+            closePopover={() => this.closeActionsMenu()}
+            panelPaddingSize="none"
+            style={{width: "100%"}}
+            withTitle
+            anchorPosition="downLeft">
+            <EuiContextMenu initialPanelId={0} panels={this.buildPanel(item.id)} />
+          </EuiPopover>
         </EuiFlexItem>
       );
         
     })
+    if(this.state.isSearching || this.state.loadingAlerts || this.props.isLoading){
+      return (
+        <EuiFlexItem style={{ height: "calc(100vh - 410px)", alignItems: 'center' }} >
+          <EuiLoadingSpinner size='xl' style={{ margin: 0, position: 'absolute', top: '50%', transform: 'translateY(-50%)' }} />
+        </EuiFlexItem>
+      )
+    }
     if(tacticsToRender.length){
       return (
-      <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "420px",overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
+      <EuiFlexGrid columns={this.techniqueColumnsResponsive()} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10}}>
         {tacticsToRenderOrdered}
       </EuiFlexGrid>
       )
     }else{
-      return <>No tactics have been selected.</>
-
+      return <EuiCallOut title='There are no results.' iconType='help' color='warning'></EuiCallOut>
     }
-    
   }
-  onSearchValueChange = e => {
-    this.setState({searchValue: e.target.value});
+
+  openDiscover(e,techniqueID){
+    this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
+    this.props.onSelectedTabChanged('events');
+  }
+
+
+  openDashboard(e,techniqueID){
+    this.addFilter({key: 'rule.mitre.id', value: techniqueID, negate: false} );
+    this.props.onSelectedTabChanged('dashboard');
+  }
+
+ /** 
+   * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
+   * @param filter 
+   */
+  addFilter(filter) {    
+    const { filterManager } = getServices();
+    const matchPhrase = {};
+    matchPhrase[filter.key] = filter.value;
+    const newFilter = {
+      "meta": {
+        "disabled": false,
+        "key": filter.key,
+        "params": { "query": filter.value },
+        "type": "phrase",
+        "negate": filter.negate || false,
+        "index": "wazuh-alerts-3.x-*"
+      },
+      "query": { "match_phrase": matchPhrase },
+      "$state": { "store": "appState" }
+    }
+    filterManager.addFilters([newFilter]);
+  }
+
+  onSearchValueChange = async e => {
+    const searchValue = e.target.value;
+    
+    if(this.timerDelaySearch){
+      clearTimeout(this.timerDelaySearch);
+    };
+    
+    if(searchValue){
+      this.setState({searchValue});
+    }else{
+      this._isMount && this.setState({ searchValue, filteredTechniques: false, isSearching: false });
+      return;
+    }
+
+    this.timerDelaySearch = setTimeout(async () => {
+      try{
+        if(searchValue){
+          this._isMount && this.setState({isSearching: true});
+          const response = await WzRequest.apiReq('GET', '/mitre', {
+            select: "id",
+            search: searchValue,
+            limit: 500
+          });
+          const filteredTechniques = ((((response || {}).data || {}).data).items || []).map(item => item.id);
+          this._isMount && this.setState({ filteredTechniques, isSearching: false });
+        }else{
+          this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+        }
+      }catch(error){
+        this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+      }
+    }, this.delaySearchTime); // delay time in search bar techniques to do the request. This prevents you from making a request with every change in the search term and wait this time instead after last change
+  }
+
+  async closeActionsMenu() {
+    this.setState({actionsOpen: false});
+  }
+
+  async showActionsMenu(techniqueData) {
+    this.setState({actionsOpen: techniqueData });
   }
 
   async showFlyout(techniqueData) {
-    console.log({techniqueData});
     this.setState({isFlyoutVisible: true, currentTechnique: techniqueData });
   }
 
@@ -169,26 +361,45 @@ export class Techniques extends Component {
       this.setState({ isFlyoutVisible });
   }
 
+  hideAlerts(){
+    this.setState({hideAlerts: !this.state.hideAlerts})
+  }
+
 	render() {
     const { isFlyoutVisible, currentTechnique } = this.state;
 		return (
       <div style={{padding: 10}}>
         <EuiFlexGroup>
-          <EuiFlexItem>
+          <EuiFlexItem grow={true}>
             <EuiTitle size="m">
               <h1>Techniques</h1>
             </EuiTitle>
           </EuiFlexItem>
 
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiText grow={false}>
+                    <span>Hide techniques with no alerts </span> &nbsp;
+                  <EuiSwitch
+                    label=""
+                    checked={this.state.hideAlerts}
+                    onChange={e => this.hideAlerts()}
+                  />
+                  </EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup> 
+          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size="xs" />
 
         <EuiFieldSearch
           fullWidth={true}
-          placeholder="Filter techniques"
+          placeholder="Filter techniques of selected tactic/s"
           value={this.state.searchValue}
           onChange={e => this.onSearchValueChange(e)}
           isClearable={true}
+          isLoading={this.state.isSearching}
           aria-label="Use aria labels when no actual label is in use"
         />
         <EuiSpacer size="s" />
@@ -197,12 +408,19 @@ export class Techniques extends Component {
           {this.renderFacet()}
         </div>
         { isFlyoutVisible &&
-          <FlyoutTechnique
-            onChangeFlyout={this.onChangeFlyout}
-            currentTechniqueData={this.state.currentTechniqueData}
-            currentTechnique={currentTechnique} />
+          <EuiOverlayMask
+            // @ts-ignore
+            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
+          
+            <FlyoutTechnique
+              openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
+              openDiscover={(e,itemId) => this.openDiscover(e,itemId)}
+              onChangeFlyout={this.onChangeFlyout}
+              currentTechniqueData={this.state.currentTechniqueData}
+              currentTechnique={currentTechnique} />
+          </EuiOverlayMask>
         } 
       </div>   
 		)
 	}
-}
+})

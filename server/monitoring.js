@@ -516,6 +516,7 @@ export class Monitoring {
           );
       }
 
+      if (!this.ENABLED) return;
       await this.configureKibana();
       return;
     } catch (error) {

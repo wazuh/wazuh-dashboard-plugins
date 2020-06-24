@@ -10,14 +10,25 @@
  * Find more information about this on the LICENSE file.
  */
 import { healthCheck } from './health-check';
-import { recentlyAccessed } from 'plugins/kibana/home/np_ready/components/recently_accessed';
+import { recentlyAccessed } from '../../../../../src/core/public/chrome/recently_accessed';
+import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/public';
+import { npStart } from 'ui/new_platform';
+
 export function getSavedSearch(
   redirectWhenMissing,
   $location,
   $window,
-  savedSearches,
   $route
 ) {
+  const services = {
+    savedObjectsClient: npStart.core.savedObjects.client,
+    indexPatterns: npStart.plugins.data.indexPatterns,
+    chrome: npStart.core.chrome,
+    overlays: npStart.core.overlays,
+  };
+
+  const savedSearches = createSavedSearchesLoader(services);
+
   const currentParams = $location.search();
   const targetedAgent =
     currentParams && (currentParams.agent || currentParams.agent === '000');

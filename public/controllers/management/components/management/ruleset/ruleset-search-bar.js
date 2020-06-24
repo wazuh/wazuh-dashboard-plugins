@@ -26,11 +26,13 @@ class WzRulesetSearchBar extends Component {
 
   rulesItems = [
     {
+      type: 'params',
       label: 'status',
       description: 'Filters the rules by status.',
       values: ['enabled', 'disabled']
     },
     {
+      type: 'params',
       label: 'group',
       description: 'Filters the rules by group',
       values: async value => {
@@ -44,11 +46,13 @@ class WzRulesetSearchBar extends Component {
       },
     },
     {
+      type: 'params',
       label: 'level',
       description: 'Filters the rules by level',
       values: [...Array(16).keys()]
     },
     {
+      type: 'params',
       label: 'file',
       description: 'Filters the rules by file name.',
       values: async value => {
@@ -62,6 +66,7 @@ class WzRulesetSearchBar extends Component {
       },
     },
     {
+      type: 'params',
       label: 'path',
       description: 'Path of the rules files',
       values: async () => {
@@ -74,6 +79,7 @@ class WzRulesetSearchBar extends Component {
       }
     },
     {
+      type: 'params',
       label: 'hipaa',
       description: 'Filters the rules by HIPAA requirement',
       values: async () => {
@@ -83,6 +89,7 @@ class WzRulesetSearchBar extends Component {
       }
     },
     {
+      type: 'params',
       label: 'gdpr',
       description: 'Filters the rules by GDPR requirement',
       values: async () => {
@@ -92,6 +99,7 @@ class WzRulesetSearchBar extends Component {
       }
     },
     {
+      type: 'params',
       label: 'nist-800-53',
       description: 'Filters the rules by NIST requirement',
       values: async () => {
@@ -101,6 +109,7 @@ class WzRulesetSearchBar extends Component {
       }
     },
     {
+      type: 'params',
       label: 'gpg13',
       description: 'Filters the rules by GPG requirement',
       values: async () => {
@@ -110,6 +119,7 @@ class WzRulesetSearchBar extends Component {
       }
     },
     {
+      type: 'params',
       label: 'pci',
       description: 'Filters the rules by PCI requirement',
       values: async () => {
@@ -119,6 +129,7 @@ class WzRulesetSearchBar extends Component {
       }
     },
     {
+      type: 'params',
       label: 'tsc',
       description: 'Filters the rules by TSC requirement',
       values: async () => {
@@ -126,10 +137,20 @@ class WzRulesetSearchBar extends Component {
         const result = await wzReq('GET', '/rules/tsc', {});
         return (((result || {}).data || {}).data || {}).items;
       }
+    },
+    {
+      type: 'params',
+      label: 'mitre',
+      description: 'Filters the rules by MITRE requirement',
+      values: async () => {
+        const result = await WzRequest.apiReq('GET', '/mitre', {});
+        return (((result || {}).data || {}).data || {}).items.map(item => item.id);
+      }
     }
   ];
   rulesFiles = [
     {
+      type: 'params',
       label: 'file',
       description: 'Filters the rules by file name.',
       values: async value => {
@@ -146,6 +167,7 @@ class WzRulesetSearchBar extends Component {
 
   decodersItems = [
     {
+      type: 'params',
       label: 'file',
       description: 'Filters the decoders by file name.',
       values: async value => {
@@ -159,6 +181,7 @@ class WzRulesetSearchBar extends Component {
       },
     },
     {
+      type: 'params',
       label: 'path',
       description: 'Path of the decoders files.',
       values: async () => {
@@ -171,6 +194,7 @@ class WzRulesetSearchBar extends Component {
       }
     },
     {
+      type: 'params',
       label: 'status',
       description: 'Filters the decoders by status.',
       values: ['enabled', 'disabled']
@@ -199,16 +223,16 @@ class WzRulesetSearchBar extends Component {
   render() {
     const { section, showingFiles, filters } = this.props.state;
     const type = showingFiles ? 'files' : 'items';
-    const apiSuggests = this.apiSuggestsItems[type][section];
+    const suggestions = this.apiSuggestsItems[type][section] || [];
     const buttonOptions = this.buttonOptions[section];
     return (
       <WzSearchBar
-        apiSuggests={apiSuggests}
-        onInputChange={this.props.updateFilters}
-        placeholder={'Add filter or search'}
+        noDeleteFiltersOnUpdateSuggests
+        suggestions={suggestions}
         buttonOptions={buttonOptions}
-        noDeleteFiltersOnUpdateSuggests={true}
-        initFilters={filters}
+        placeholder={'Add filter or search'}
+        filters={filters}
+        onFiltersChange={this.props.updateFilters}
       />
     );
   }

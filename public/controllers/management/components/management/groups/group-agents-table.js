@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiBasicTable,
   EuiCallOut,
@@ -33,6 +33,8 @@ import {
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsAgentsColums from './utils/columns-agents';
+import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
+import { getAgentFilterValues } from './get-agents-filters-values';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -41,20 +43,37 @@ class WzGroupAgentsTable extends Component {
     this.state = {
       items: [],
       pageSize: 10,
-      totalItems: 0
+      totalItems: 0,
+      filters: [],
     };
-
+    this.suggestions = [
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
+      { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'node_name', description: 'Filter by node name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('node_name', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'manager', description: 'Filter by manager', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('manager', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'version', description: 'Filter by agent version', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('version', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'configSum', description: 'Filter by agent config sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('configSum', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      { type: 'q', label: 'mergedSum', description: 'Filter by agent merged sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('mergedSum', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      //{ type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+      //{ type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value,  {q: `group=${this.props.state.itemDetail.name}`})},
+    ]
     this.groupsHandler = GroupsHandler;
   }
 
   async componentDidMount() {
-    this.props.updateIsProcessing(true);
-
+    await this.getItems();
     this._isMounted = true;
   }
 
-  async componentDidUpdate() {
+  async componentDidUpdate(prevProps, prevState) {
     if (this.props.state.isProcessing && this._isMounted) {
+      await this.getItems();
+    }
+    const { filters } = this.state;
+    if (JSON.stringify(filters) !== JSON.stringify(prevState.filters)) {
       await this.getItems();
     }
   }
@@ -79,17 +98,18 @@ class WzGroupAgentsTable extends Component {
         totalItems : total_affected_items,
         isProcessing: false,
       });
-      this.props.updateIsProcessing(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
-      this.props.updateIsProcessing(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
       return Promise.reject(error);
     }
   }
 
   buildFilter() {
     const { pageIndexAgents } = this.props.state;
-    const { pageSize } = this.state;
+    const { pageSize, filters } = this.state;
     const filter = {
+      ...filtersToObject(filters),
       offset: pageIndexAgents * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter()
@@ -126,7 +146,7 @@ class WzGroupAgentsTable extends Component {
       sortFieldAgents,
       sortDirectionAgents
     } = this.props.state;
-    const { items, pageSize, totalItems } = this.state;
+    const { items, pageSize, totalItems, filters } = this.state;
     const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
     const pagination = {
@@ -141,11 +161,15 @@ class WzGroupAgentsTable extends Component {
         direction: sortDirectionAgents
       }
     };
-
     if (!error) {
       const itemList = this.props.state.itemList;
       return (
-        <div>
+        <Fragment>
+          <WzSearchBar
+            filters={filters}
+            suggestions={this.suggestions}
+            onFiltersChange={filters => this.setState({filters})}
+          />
           <EuiBasicTable
             itemId="id"
             items={items}
@@ -175,7 +199,7 @@ class WzGroupAgentsTable extends Component {
               ></EuiConfirmModal>
             </EuiOverlayMask>
           ) : null}
-        </div>
+        </Fragment>
       );
     } else {
       return <EuiCallOut color="warning" title={error} iconType="gear" />;
@@ -216,7 +240,8 @@ class WzGroupAgentsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

@@ -1,9 +1,9 @@
 <div class="md-padding md-padding-top-16" ng-show="wazuh_table_loading">
-    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
 </div>
 
 <div layout="row" layout-padding ng-if="isSyscollector">
-    <react-component name="BasicTable" props="basicTableProps" />
+    <react-component name="BasicTable" props="basicTableProps" ></react-component>
 </div>
 
 
@@ -17,7 +17,7 @@
     </div>
     <span flex></span>
     <span class="wz-text-link" style="line-height: 22px;z-index: 10000;" ng-click="showColumns = !showColumns" tooltip="Columns">
-        <react-component name="EuiIcon" props="{type:'gear'}" />
+        <react-component name="EuiIcon" props="{type:'gear'}" ></react-component>
     </span>
 </div>
 
@@ -61,23 +61,23 @@
                 <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <span ng-click="clickAction(item, 'discover'); $event.stopPropagation()" class="wz-margin-left-8 cursor-pointer"
                         tooltip="Open Discover panel for this agent" tooltip-placement="left" aria-hidden="true">
-                        <react-component name="EuiIcon" props="{type:'discoverApp', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'discoverApp', color:'primary'}" ></react-component>
                     </span>
                     <span ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="cursor-pointer"
                         tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true">
-                        <react-component name="EuiIcon" props="{type:'wrench', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'wrench', color:'primary'}" ></react-component>
                     </span>
                 </td>
                 <td ng-if="path === '/agents/groups' && adminMode" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <span ng-if="removingGroup !== item.name && item.name !== 'default'" ng-click="showConfirmRemoveGroup($event, item); $event.stopPropagation()"
                         ng-class="{'wz-margin-left-8': item.name !== 'default'}" class="cursor-pointer" tooltip="Remove this group"
                         tooltip-placement="left" aria-hidden="true">
-                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" ></react-component>
                     </span>
                     <span ng-if="removingGroup !== item.name" ng-click="editGroup(item); $event.stopPropagation()"
                         tooltip="Edit this group configuration" tooltip-placement="left" ng-class="{'wz-margin-left-8': item.name === 'default'}"
                         class="cursor-pointer">
-                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" ></react-component>
                     </span>
 
                     <div ng-if="removingGroup === item.name && item.name !== 'default'" class="confirmEmbedBubble">
@@ -97,7 +97,7 @@
                     <span ng-if="removingAgent !== item.id && adminMode" ng-click="showConfirmRemoveAgentFromGroup($event, item); $event.stopPropagation()"
                         class="wz-margin-left-8 cursor-pointer" tooltip="Remove this agent from the group"
                         tooltip-placement="left" aria-hidden="true">
-                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" ></react-component>
                     </span>
                     <div ng-if="removingAgent === item.id" class="confirmEmbedBubble">
                         <div layout="row">
@@ -119,18 +119,18 @@
                         ng-click="editFile(item, path); $event.stopPropagation()" class="wz-margin-left-8 cursor-pointer"
                         tooltip="Edit this file" tooltip-placement="left" aria-hidden="true">
 
-                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" ></react-component>
                     </span>
                     <span ng-if="(item.path === 'etc/rules' || item.path === 'etc/decoders' || path === '/lists/files') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode"
                         ng-click="showConfirmRemoveFile($event, item, path); $event.stopPropagation()" class="cursor-pointer"
                         ng-class="{'wz-margin-left-8': path === '/lists/files'}" tooltip="Delete this file"
                         tooltip-placement="right" aria-hidden="true">
-                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" ></react-component>
                     </span>
                     <span ng-if="(item.path !== 'etc/rules' && item.path !== 'etc/decoders') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode && path !== '/lists/files'"
                         class="wz-margin-left-8 cursor-pointer" aria-hidden="true" ng-click="viewFileOnly(item, path); $event.stopPropagation()"
                         tooltip="View this file" tooltip-placement="right" aria-hidden="true">
-                        <react-component name="EuiIcon" props="{type:'eye', color:'primary'}" />
+                        <react-component name="EuiIcon" props="{type:'eye', color:'primary'}" ></react-component>
                     </span>
                     <div ng-if="(item.name && removingFile === item.name) || (item.file && removingFile === item.file)"
                         class="confirmEmbedBubble">
@@ -161,7 +161,7 @@
                         </li>
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
-                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
+                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" ></react-component>
                             </a>
                         </li>
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{'wz-text-active': n == currentPage}"
@@ -170,7 +170,7 @@
                         </li>
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
-                                <react-component name="EuiIcon" props="{type:'arrowRight'}" />
+                                <react-component name="EuiIcon" props="{type:'arrowRight'}" ></react-component>
                             </a>
                         </li>
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
@@ -313,7 +313,7 @@
                         </li>
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
-                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
+                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" ></react-component>
                             </a>
                         </li>
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{'wz-text-active': n == currentPage}"
@@ -322,7 +322,7 @@
                         </li>
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
-                                <react-component name="EuiIcon" props="{type:'arrowRight'}" />
+                                <react-component name="EuiIcon" props="{type:'arrowRight'}" ></react-component>
                             </a>
                         </li>
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
@@ -369,7 +369,7 @@
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
                                 <div layout="row" class="wz-padding-top-10">
-                                    <react-component name="EuiBasicTable" props="getSyscheckRowProps(item)" />
+                                    <react-component name="EuiBasicTable" props="getSyscheckRowProps(item)" ></react-component>
                                 </div>
                             </md-card-content>
                         </md-card>
@@ -388,7 +388,7 @@
                         </li>
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
-                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
+                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" ></react-component>
                             </a>
                         </li>
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{'wz-text-active': n == currentPage}"
@@ -397,7 +397,7 @@
                         </li>
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
-                                <react-component name="EuiIcon" props="{type:'arrowRight'}" />
+                                <react-component name="EuiIcon" props="{type:'arrowRight'}" ></react-component>
                             </a>
                         </li>
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
@@ -414,7 +414,7 @@
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
             <span class="euiCallOutHeader__title">
-                <react-component name="EuiIcon" props="{type:'help'}" />
+                <react-component name="EuiIcon" props="{type:'help'}" ></react-component>
                 {{customEmptyResults}}
             </span>
         </div>
@@ -425,7 +425,7 @@
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
             <span class="euiCallOutHeader__title">
-                <react-component name="EuiIcon" props="{type:'help'}" />
+                <react-component name="EuiIcon" props="{type:'help'}" ></react-component>
                 {{error}}
             </span>
         </div>

@@ -17,20 +17,21 @@
  * under the License.
  */
 import { SavedObjectLoader } from './saved_object_loader';
-import { SavedObjectKibanaServices } from 'ui/saved_objects/types';
+import { SavedObjectKibanaServices } from '../../../../src/plugins/saved_objects/public';
+import { findListItems } from 'plugins/visualizations/np_ready/public/saved_visualizations/find_list_items';
+import { createSavedVisClass } from 'plugins/visualizations/np_ready/public/saved_visualizations/_saved_vis';
+import { TypesStart } from 'plugins/visualizations/vis_types';
 
-import { start as visualizations } from 'plugins/kibana/visualize/../../../visualizations/public/np_ready/public/legacy';
-// @ts-ignore
-import { findListItems } from 'plugins/kibana/visualize/saved_visualizations/find_list_items';
-import { createSavedVisClass } from 'plugins/kibana/visualize/saved_visualizations/_saved_vis';
-import { createVisualizeEditUrl } from 'plugins/kibana/visualize/';
-
-export function createSavedVisLoader(services: SavedObjectKibanaServices) {
-  const { savedObjectsClient } = services;
+export interface SavedObjectKibanaServicesWithVisualizations extends SavedObjectKibanaServices {
+  visualizationTypes: TypesStart;
+}
+export type SavedVisualizationsLoader = ReturnType<typeof createSavedVisLoader>;
+export function createSavedVisLoader(services: SavedObjectKibanaServicesWithVisualizations) {
+  const { savedObjectsClient, visualizationTypes } = services;
 
   class SavedObjectLoaderVisualize extends SavedObjectLoader {
     mapHitSource = (source: Record<string, any>, id: string) => {
-      const visTypes = visualizations.types;
+      const visTypes = visualizationTypes;
       source.id = id;
       source.url = this.urlFor(id);
 
@@ -53,7 +54,7 @@ export function createSavedVisLoader(services: SavedObjectKibanaServices) {
       source.icon = source.type.icon;
       source.image = source.type.image;
       source.typeTitle = source.type.title;
-      source.editUrl = `#${createVisualizeEditUrl(id)}`;
+      source.editUrl = `#/visualize/edit/${id}`;
 
       return source;
     };
@@ -68,7 +69,7 @@ export function createSavedVisLoader(services: SavedObjectKibanaServices) {
         size,
         mapSavedObjectApiHits: this.mapSavedObjectApiHits.bind(this),
         savedObjectsClient,
-        visTypes: visualizations.types.getAliases(),
+        visTypes: visualizationTypes.getAliases(),
       });
     }
   }

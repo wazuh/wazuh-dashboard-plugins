@@ -4,7 +4,6 @@ import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 export default class GroupsAgentsColumns {
   constructor(tableProps) {
     this.tableProps = tableProps;
-    this.adminMode = this.tableProps.state.adminMode;
 
     this.buildColumns = () => {
       this.columns = [
@@ -57,7 +56,7 @@ export default class GroupsAgentsColumns {
         render: item => {
           return (
             <div>
-              {(this.adminMode && (
+              {(this.tableProps.adminMode && (
                 <div>
                   <EuiToolTip position="top" content={`Go to the agent`}>
                     <EuiButtonIcon

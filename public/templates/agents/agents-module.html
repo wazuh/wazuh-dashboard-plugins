@@ -1,22 +1,21 @@
-<div ng-if="tab !== 'welcome' && agent">
-    <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready'}" />
+<div ng-if="agent">
+    <div ng-if="tab !== 'welcome' && agent && agent.status !== 'Never connected'">
+        <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready', cardsProps: getWelcomeCardsProps(resultState), goGroups: goGroups, exportConfiguration: exportConfiguration}" ></react-component>
+    </div>
     <div ng-if='!loadingDashboard'>
-        <div ng-if='showModuleDashboard || showModuleEvents'>
-            <div ng-if='showModuleEvents && !moduleDiscoverReady' style="margin: 0 auto; width: 32px">
-                <span class="euiLoadingSpinner euiLoadingSpinner--xLarge" style="margin-top: 24px"></span>
-            </div>
+        <div ng-show='(showModuleDashboard || showModuleEvents || showMitre) && showModuleDashboard !== "welcome"'>
             <div ng-class="{'no-opacity': !moduleDiscoverReady}">
                 <kbn-dis></kbn-dis>
             </div>
         </div>
     </div>
 
-    <div ng-if="tab === 'mitre' && showModuleDashboard  && !showModuleEvents">
-        <react-component name="Mitre" />
+    <div ng-if="tab === 'mitre' && showMitre">
+        <react-component name="Mitre" ></react-component>
     </div>
 
     <!-- Loading status section -->
-    <div ng-if="tabView === 'panels' && showModuleDashboard && !rendered && resultState !== 'none'"
+    <div ng-if="tabView === 'panels' && !showMitre && showModuleDashboard && !rendered && resultState !== 'none'"
         class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
             <div class="euiSpacer euiSpacer--m"></div>
@@ -47,11 +46,18 @@
             <div class="euiSpacer euiSpacer--l"></div>
         </div>
     </div>
+    <!-- No results section -->
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+    ng-if="tab !== 'welcome'" ng-show="resultState === 'none' && tabView === 'panels' && showModuleDashboard">
+    <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+        one.'}" ></react-component>
+    </div>
+
     <!-- End report status section -->
-    <div ng-if="tab && tab!=='welcome'">
+    <div ng-if="tab && tab!=='welcome'" ng-show="resultState !== 'none'">
         <div ng-class="{'no-opacity': !moduleDiscoverReady}">
             <react-component ng-show='showModuleDashboard' name="WzVisualize"
-                props="{selectedTab: tab, isAgent: true}" />
+                props="{selectedTab: tab, isAgent: true}" ></react-component>
         </div>
     </div>
 </div>

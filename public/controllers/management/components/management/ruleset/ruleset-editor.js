@@ -17,6 +17,7 @@ import {
   updateFileContent
 } from '../../../../../redux/actions/rulesetActions';
 
+import 'brace/theme/textmate';
 // Eui components
 import {
   EuiPage,
@@ -38,6 +39,7 @@ import validateConfigAfterSent from './utils/valid-configuration';
 import { toastNotifications } from 'ui/notify';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+import { validateXML } from '../configuration/utils/xml';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -155,10 +157,10 @@ class WzRulesetEditor extends Component {
   render() {
     const {
       section,
-      adminMode,
       addingRulesetFile,
       fileContent
     } = this.props.state;
+    const { adminMode } = this.props;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
     const isEditable = addingRulesetFile
@@ -170,15 +172,16 @@ class WzRulesetEditor extends Component {
       : `${nameForSaving}.xml`;
     const overwrite = fileContent ? true : false;
 
+    const xmlError = validateXML(content);
     const saveButton = (
       <EuiButton
         fill
-        iconType="save"
+        iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}
-        isDisabled={nameForSaving.length <= 4}
+        isDisabled={nameForSaving.length <= 4 || (isEditable && xmlError ? true : false)}
         onClick={() => this.save(nameForSaving, overwrite)}
       >
-        Save
+        {(isEditable && xmlError) ? 'XML format error' : 'Save'}
       </EuiButton>
     );
 
@@ -218,7 +221,7 @@ class WzRulesetEditor extends Component {
                     </EuiFlexGroup>
                   )) || (
                     <EuiTitle>
-                      <h2>
+                      <span style={{ fontSize: '22px' }}>
                         <EuiToolTip
                           position="right"
                           content={`Back to ${section}`}
@@ -232,7 +235,7 @@ class WzRulesetEditor extends Component {
                           />
                         </EuiToolTip>
                         {nameForSaving}
-                      </h2>
+                      </span>
                     </EuiTitle>
                   )}
                 </EuiFlexItem>
@@ -253,13 +256,20 @@ class WzRulesetEditor extends Component {
                   <EuiSpacer size='s'/>
                 </Fragment>
               )}
+              {xmlError && (
+                <Fragment>
+                  <span style={{ color: 'red' }}> {xmlError}</span>
+                  <EuiSpacer size='s'/>
+                </Fragment>
+              )}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiFlexGroup>
                     <EuiFlexItem className="codeEditorWrapper">
                       <EuiCodeEditor
+                        theme="textmate"
                         width="100%"
-                        height={`calc(100vh - ${showWarningRestart || wazuhNotReadyYet ? 250 : 175}px)`}
+                        height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 250 : (xmlError ? (!showWarningRestart ? 195 : 270) : 175)}px)`}
                         value={content}
                         onChange={newContent =>
                           this.setState({ content: newContent })
@@ -285,7 +295,8 @@ class WzRulesetEditor extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

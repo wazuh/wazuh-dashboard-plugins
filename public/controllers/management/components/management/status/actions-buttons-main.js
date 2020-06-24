@@ -70,7 +70,7 @@ class WzStatusActionButtons extends Component {
       );
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', error.message || error, 3000);
+      this.showToast('danger', `Error restarting cluster: ${error.message || error}`, 3000);
     }
   }
 
@@ -85,7 +85,7 @@ class WzStatusActionButtons extends Component {
       this.showToast('success', 'Restarting manager.', 3000);
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', error.message || error, 3000);
+      this.showToast('danger', `Error restarting manager: ${error.message || error}`, 3000);
     }
   }
 
@@ -161,10 +161,10 @@ class WzStatusActionButtons extends Component {
       isLoading,
       listNodes,
       selectedNode,
-      adminMode,
       clusterEnabled,
       isRestarting
     } = this.props.state;
+    const { adminMode } = this.props;
 
     let options = this.transforToOptions(listNodes);
 
@@ -235,7 +235,8 @@ class WzStatusActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
+    adminMode: state.appStateReducers.adminMode
   };
 };
 

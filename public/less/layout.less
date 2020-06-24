@@ -202,6 +202,12 @@ html{
   padding-bottom: 10px;
 }
 
+
+.wz-padding-21 {
+  padding: 21px !important;
+}
+
+
 .wz-lateral-padding-16 {
   padding-left: 16px;
   padding-right: 16px;
@@ -223,10 +229,34 @@ html{
   width: 100%;
 }
 
+
+
+@media (min-width: 1400px) {
+  .wz-mitre-width {
+    width: 80%;
+  }
+}
+@media (max-width: 1399px) {
+  .wz-mitre-width {
+    width: 65%;
+  }
+}
+
+
+.wz-width-auto {
+  width: auto;
+}
+
 /* Others */
 
 .wz-no-display {
   display: none !important;
+}
+
+.wz-display-inline-grid {
+  display: inline-grid;
+  display: -moz-inline-grid;
+  display: -ms-inline-grid;
 }
 
 .wazuh-column {
@@ -238,7 +268,9 @@ html{
 
 .no-opacity {
   opacity: 0 !important;
+  width: 0 !important;
   height: 0px !important;
+  overflow: hidden;
 }
 
 .no-opacity-overview-monitoring {
@@ -410,7 +442,6 @@ md-dialog.modalTheme .md-button {
   left: 48px;
   right: 20px;
   max-width: 100% !important;
-  background-color: white;
   margin: 35px;
   outline: 35px solid rgba(0, 0, 0, 0.2);
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
+import chrome from 'ui/chrome';
 
 export class Pie extends Component {
   constructor(props) {
@@ -8,16 +9,21 @@ export class Pie extends Component {
   }
 
   componentDidMount() {
-    d3.select('body')
+    const isDarkTheme = chrome.getUiSettingsClient().get('theme:darkMode');
+    this.pieElement = d3.select('body')
       .append('div')
       .attr('class', 'tooltip-donut')
       .style('display', 'none')
       .style('position', 'absolute')
-      .style('background', '#ffffff')
+      .style('background', isDarkTheme ? '#1a1b20' : '#ffffff')
       .style('padding', '6px')
       .style('border-radius', '5px')
       .style('z-index', 100)
       .style('border', '1px solid #D3DAE6');
+  }
+
+  componentWillUnmount(){
+    this.pieElement && this.pieElement.remove();
   }
 
   render() {
@@ -66,9 +72,17 @@ export class Pie extends Component {
                 fill={colors[i]}
                 stroke={colors[i]}
               ></rect>
+              {this.props.legendAction && 
+                    <text onClick={() => {this.props.legendAction(d.data.label)}} x="15" y="10" style={{ fontSize: 12, cursor: "pointer" }}>
+                      <title>Filter {d.data.label.toLowerCase()} agents</title> 
+                      {d.data.label}
+                    </text>
+              || 
+
               <text x="15" y="10" style={{ fontSize: 12 }}>
                 {d.data.label}
               </text>
+                }
             </g>
           ))}
         </g>

@@ -24,10 +24,19 @@ import {
   EuiToolTip,
   EuiTitle,
   EuiHealth,
-  EuiSpacer
+  EuiSpacer,
+  EuiCallOut,
+  EuiOverlayMask,
+  EuiConfirmModal,
+  EuiLoadingSpinner
 } from '@elastic/eui';
-import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
+import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar';
+import { CheckUpgrade } from './checkUpgrade';
+import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
+import { ActionAgents } from '../../../react-services/action-agents';
+import { AppNavigate } from '../../../react-services/app-navigate';
+import { AgentGroupTruncate } from '../../../components/common/util';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -47,44 +56,26 @@ export class AgentsTable extends Component {
       selectedOptions: selectedOptions || [],
       sortDirection: 'asc',
       sortField: 'id',
-      totalItems: 0
+      totalItems: 0,
+      selectedItems: [],
+      allSelected: false,
+      purgeModal: false
     };
     this.downloadCsv.bind(this);
   }
 
-  async componentDidMount() {
-    this._isMount = true;
-    await this.getItems();
-    const filterStatus = this.filterBarModelStatus();
-    const filterGroups = await this.filterBarModelGroups();
-    const filterOs = await this.filterBarModelOs();
-    const filterVersion = await this.filterBarModelWazuhVersion();
-    const filterOsPlatform = await this.filterBarModelOsPlatform();
-    const filterNodes = await this.filterBarModelNodes();
-    this._isMount &&
-      this.setState({
-        filterStatus,
-        filterGroups,
-        filterOs,
-        filterVersion,
-        filterOsPlatform,
-        filterNodes
-      });
-  }
+  async UNSAFE_componentWillMount() {
+    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+    const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
+    const agentActive = await WzRequest.apiReq('GET', '/agents', {
+      q: 'status=active'
+    });
 
-  async componentDidUpdate(prevProps, prevState) {
-    if (this.state.isProcessing) {
-      const { q, search } = this.state;
-      const { q: prevQ, search: prevSearch } = prevState;
-      if (prevQ !== q || prevSearch !== search) {
-        this._isMount && this.setState({ pageIndex: 0 });
-      }
-      await this.getItems();
-    }
-  }
-
-  componentWillUnmount() {
-    this._isMount = false;
+    this.setState({
+      managerVersion: managerVersion.data.data,
+      agentActive: agentActive.data.data.totalItems,
+      avaibleAgents: totalAgent.data.data.items
+    });
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -114,13 +105,55 @@ export class AgentsTable extends Component {
     });
   };
 
+  async componentDidMount() {
+    this._isMount = true;
+    await this.getItems();
+    const filterStatus = this.filterBarModelStatus();
+    const filterGroups = await this.filterBarModelGroups();
+    const filterOs = await this.filterBarModelOs();
+    const filterVersion = await this.filterBarModelWazuhVersion();
+    const filterOsPlatform = await this.filterBarModelOsPlatform();
+    const filterNodes = await this.filterBarModelNodes();
+    this.setState({
+      filterStatus,
+      filterGroups,
+      filterOs,
+      filterVersion,
+      filterOsPlatform,
+      filterNodes
+    });
+  }
+
   async reloadAgents() {
-    this._isMount &&
-      this.setState({
-        isProcessing: true,
-        isLoading: true
-      });
+    const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
+    this.setState({
+      isProcessing: true,
+      isLoading: true,
+      avaibleAgents: totalAgent.data.data.items
+    });
     await this.props.reload();
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if(this.props.filters && this.props.filters.length){
+      this.setState({selectedOptions: this.props.filters, 
+        q:`${this.props.filters[0].group}=${ this.props.filters[0].label_}`,
+        isProcessing: true,
+        isLoading: false});
+      this.props.removeFilters()
+    }
+    if (this.state.isProcessing) {
+      const { q, search } = this.state;
+      const { q: prevQ, search: prevSearch } = prevState;
+      if (prevQ !== q || prevSearch !== search) {
+        this.setState({ pageIndex: 0 });
+      }
+      await this.getItems();
+    }
+    if (prevState.allSelected === false && this.state.allSelected === true) {
+      this.setState({ loadingAllItem: true });
+      this.getAllItems();
+    }
   }
 
   async getItems() {
@@ -137,6 +170,41 @@ export class AgentsTable extends Component {
       this.setState({
         agents: formatedAgents,
         totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
+        isProcessing: false,
+        isLoading: false
+      });
+  }
+
+  async getAllItems() {
+    const { pageIndex, pageSize } = this.state;
+    const filterTable = {
+      offset: pageIndex * pageSize,
+      limit: pageSize,
+      q: this.buildQFilter(),
+      sort: this.buildSortFilter()
+    };
+
+    const filterAll = {
+      q: this.buildQFilter(),
+      sort: this.buildSortFilter()
+    };
+
+    const rawAgents = await this.props.wzReq('GET', '/agents', filterTable);
+
+    const agentsFiltered = await this.props
+      .wzReq('GET', '/agents', filterAll)
+      .then(() => {
+        this.setState({ loadingAllItem: false });
+      });
+
+    const formatedAgents = (
+      ((rawAgents || {}).data || {}).data || {}
+    ).items.map(this.formatAgent.bind(this));
+    this._isMount &&
+      this.setState({
+        agents: formatedAgents,
+        avaibleAgents: agentsFiltered.data.data.items,
+        totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
         isProcessing: false,
         isLoading: false
       });
@@ -180,7 +248,7 @@ export class AgentsTable extends Component {
       return date !== undefined ? timeService(date) : '-';
     };
     const agentVersion =
-      agent.version !== undefined ? agent.version.split(' ')[1] : '.';
+      agent.version !== undefined ? agent.version.split(' ')[1] : '-';
     const { timeService } = this.props;
     return {
       id: agent.id,
@@ -192,15 +260,16 @@ export class AgentsTable extends Component {
       version: agentVersion,
       dateAdd: timeService(agent.dateAdd),
       lastKeepAlive: lastKeepAlive(agent.lastKeepAlive, timeService),
-      actions: agent
+      actions: agent,
+      upgrading: false
     };
   }
 
   actionButtonsRender(agent) {
     return (
-      <div>
+      <div className={'icon-box-action'}>
         <EuiToolTip
-          content="Open Overview panel for this agent"
+          content="Open summary panel for this agent"
           position="left"
         >
           <EuiButtonIcon
@@ -210,45 +279,23 @@ export class AgentsTable extends Component {
             }}
             iconType="eye"
             color={'primary'}
-            aria-label="Open Overview panel for this agent"
+            aria-label="Open summary panel for this agent"
           />
         </EuiToolTip>
         &nbsp;
-        <EuiToolTip content="Open configuration for this agent" position="left">
-          <EuiButtonIcon
-            onClick={ev => {
-              ev.stopPropagation();
-              this.props.clickAction(agent, 'configuration');
-            }}
-            color={'primary'}
-            iconType="wrench"
-            aria-label="Open configuration for this agent"
-          />
-        </EuiToolTip>
-        {/*         <EuiToolTip content="Restart agent" position="left">
-          <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
-            color={'primary'}
-            iconType="refresh"
-            aria-label="Restart agent"
-          />
-        </EuiToolTip> */}
-        {/*         <EuiToolTip content="Upgrade agent" position="left">
-          <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
-            color={'success'}
-            iconType="sortUp"
-            aria-label="Upgrade agent"
-          />
-        </EuiToolTip> */}
-        {/*         <EuiToolTip content="Delete this agent" position="left">
-          <EuiButtonIcon
-            onClick={() => this.props.clickAction(agent, 'configuration')}
-            color={'danger'}
-            iconType="trash"
-            aria-label="Delete this agent"
-          />
-        </EuiToolTip> */}
+        {agent.status !== 'Never connected' && 
+          <EuiToolTip content="Open configuration for this agent" position="left">
+            <EuiButtonIcon
+              onClick={ev => {
+                ev.stopPropagation();
+                this.props.clickAction(agent, 'configuration');
+              }}
+              color={'primary'}
+              iconType="wrench"
+              aria-label="Open configuration for this agent"
+            />
+          </EuiToolTip>
+        }
       </div>
     );
   }
@@ -278,7 +325,7 @@ export class AgentsTable extends Component {
           className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
           aria-hidden="true"
         ></i>{' '}
-        {os_name === '--' ? '-' : os_name}
+        {os_name === '- -' ? '-' : os_name}
       </span>
     );
   }
@@ -298,10 +345,26 @@ export class AgentsTable extends Component {
       }
     };
 
+    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status}</span></EuiHealth>;
+  }
+
+  reloadAgent = () => {
+    this.setState({
+      isProcessing: true,
+      isLoading: true
+    });
+    this.props.reload();
+  };
+
+  addUpgradeStatus(version, agent) {
+    const { managerVersion } = this.state;
     return (
-      <EuiHealth color={color(status)}>
-        {this.parseAgentStatus(status)}
-      </EuiHealth>
+      <CheckUpgrade
+        {...agent}
+        managerVersion={managerVersion}
+        changeStatusUpdate={this.changeUpgradingState}
+        reloadAgent={this.reloadAgent}
+      />
     );
   }
 
@@ -321,55 +384,405 @@ export class AgentsTable extends Component {
     );
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time
+    });
+  };
+
+  /* MULTISELECT TABLE */
+  onSelectionChange = selectedItems => {
+    const { managerVersion, pageSize } = this.state;
+
+    selectedItems.forEach(item => {
+      if (managerVersion > item.version && item.version !== '.') {
+        item.outdated = true;
+      }
+    });
+
+    selectedItems.length !== pageSize
+      ? this.setState({ allSelected: false })
+      : false;
+
+    this.setState({ selectedItems });
+  };
+
+  renderUpgradeButton() {
+    const { selectedItems } = this.state;
+
+    if (
+      selectedItems.length === 0 ||
+      (selectedItems.length > 0 &&
+        selectedItems.filter(item => item.outdated).length === 0) ||
+      (selectedItems.length > 0 &&
+        selectedItems.filter(item => item.upgrading).length > 0) ||
+      (selectedItems.length > 0 &&
+        selectedItems.filter(item => item.status === 'Active').length === 0) ||
+      (selectedItems.length > 0 &&
+        selectedItems.filter(item => item.status === 'Active').length === 0 &&
+        selectedItems.filter(item => item.status === 'Disconnected').length >
+          0) ||
+      selectedItems.filter(item => item.outdated && item.status === 'Active')
+        .length === 0
+    ) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          color="secondary"
+          iconType="sortUp"
+          onClick={this.onClickUpgrade}
+        >
+          Upgrade{' '}
+          {
+            selectedItems.filter(
+              item => item.outdated && item.status === 'Active'
+            ).length
+          }{' '}
+          agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderUpgradeButtonAll() {
+    const { selectedItems, avaibleAgents, managerVersion } = this.state;
+
+    if (
+      selectedItems.length > 0 &&
+      avaibleAgents.filter(
+        agent =>
+          agent.version !== 'Wazuh ' + managerVersion &&
+          agent.status === 'Active'
+      ).length === 0
+    ) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          color="secondary"
+          iconType="sortUp"
+          onClick={this.onClickUpgradeAll}
+        >
+          Upgrade all agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderRestartButton() {
+    const { selectedItems } = this.state;
+
+    if (
+      selectedItems.length === 0 ||
+      selectedItems.filter(item => item.status === 'Active').length === 0
+    ) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          color="primary"
+          iconType="refresh"
+          onClick={this.onClickRestart}
+        >
+          Restart{' '}
+          {selectedItems.filter(item => item.status === 'Active').length} agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderRestartButtonAll() {
+    const { selectedItems, agentActive, avaibleAgents } = this.state;
+
+    if (
+      (selectedItems.length > 0 &&
+        avaibleAgents.filter(item => item.status === 'Active').length === 0 &&
+        selectedItems.length === 0) ||
+      agentActive === 0
+    ) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          color="primary"
+          iconType="refresh"
+          onClick={this.onClickRestartAll}
+        >
+          Restart all agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderPurgeButton() {
+    const { selectedItems } = this.state;
+
+    if (selectedItems.length === 0) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          iconType="trash"
+          color="danger"
+          onClick={() => {
+            this.setState({ purgeModal: true });
+          }}
+        >
+          Delete {selectedItems.length} agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  renderPurgeButtonAll() {
+    const { selectedItems, allSelected } = this.state;
+
+    if (selectedItems.length === 0 && !allSelected) {
+      return;
+    }
+
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          iconType="trash"
+          color="danger"
+          onClick={() => {
+            this.setState({ purgeModal: true });
+          }}
+        >
+          Delete all agents
+        </EuiButton>
+      </EuiFlexItem>
+    );
+  }
+
+  callOutRender() {
+    const { selectedItems, pageSize, allSelected, totalItems } = this.state;
+
+    if (selectedItems.length === 0) {
+      return;
+    } else if (selectedItems.length === pageSize) {
+      return (
+        <div>
+          <EuiSpacer size="m" />
+          <EuiCallOut
+            size="s"
+            title={
+              !allSelected
+                ? `The ${selectedItems.length} agents on this page are selected`
+                : ''
+            }
+          >
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  onClick={() => {
+                    this.setState(prevState => ({
+                      allSelected: !prevState.allSelected
+                    }));
+                  }}
+                >
+                  {allSelected
+                    ? `Clear all agents selection (${totalItems})`
+                    : `Select all agents (${totalItems})`}
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiCallOut>
+          <EuiSpacer size="s" />
+        </div>
+      );
+    }
+  }
+
+  setUpgradingState(agentID) {
+    const { agents } = this.state;
+    agents.forEach(element => {
+      element.id === agentID ? (element.upgrading = true) : false;
+    });
+    this.setState({ agents });
+  }
+
+  changeUpgradingState = agentID => {
+    const { agents } = this.state;
+    agents.forEach(element => {
+      element.id === agentID && element.upgrading === true
+        ? (element.upgrading = false)
+        : false;
+    });
+    this.setState(() => ({ agents }));
+  };
+
+  onClickUpgrade = () => {
+    const { selectedItems } = this.state;
+    ActionAgents.upgradeAgents(selectedItems);
+  };
+
+  onClickUpgradeAll = () => {
+    const { avaibleAgents, managerVersion } = this.state;
+    ActionAgents.upgradeAllAgents(avaibleAgents, managerVersion);
+  };
+
+  onClickRestart = () => {
+    const { selectedItems } = this.state;
+    ActionAgents.restartAgents(selectedItems);
+    this.reloadAgents();
+  };
+
+  onClickRestartAll = () => {
+    const { avaibleAgents } = this.state;
+    ActionAgents.restartAllAgents(avaibleAgents);
+    this.reloadAgents();
+  };
+
+  onClickPurge = () => {
+    const { selectedItems } = this.state;
+    const auxAgents = selectedItems
+      .map(agent => {
+        return agent.id !== '000' ? agent.id : null;
+      })
+      .filter(agent => agent !== null);
+
+    WzRequest.apiReq('DELETE', `/agents`, {
+      purge: true,
+      ids: auxAgents,
+      older_than: '1s'
+    })
+      .then(value => {
+        value.status === 200
+          ? this.showToast(
+              'success',
+              `Selected agents were successfully deleted`,
+              '',
+              5000
+            )
+          : this.showToast(
+              'warning',
+              `Failed to delete selected agents`,
+              '',
+              5000
+            );
+      })
+      .catch(error => {
+        this.showToast(
+          'danger',
+          `Failed to delete selected agents`,
+          error,
+          5000
+        );
+      })
+      .finally(() => {
+        this.getAllItems();
+        this.reloadAgents();
+      });
+    this.setState({ purgeModal: false });
+  };
+
+  onClickPurgeAll = () => {
+    const { avaibleAgents } = this.state;
+    const auxAgents = avaibleAgents
+      .map(agent => {
+        return agent.id !== '000' ? agent.id : null;
+      })
+      .filter(agent => agent !== null);
+
+    WzRequest.apiReq('DELETE', `/agents`, {
+      purge: true,
+      ids: auxAgents,
+      older_than: '1s'
+    })
+      .then(value => {
+        value.status === 200
+          ? this.showToast(
+              'success',
+              `All agents have been successfully deleted`,
+              '',
+              5000
+            )
+          : this.showToast('warning', `Failed to delete all agents`, '', 5000);
+      })
+      .catch(error => {
+        this.showToast('danger', `Failed to delete all agents`, error, 5000);
+      })
+      .finally(() => {
+        this.getAllItems();
+        this.reloadAgents();
+      });
+
+    this.setState({ purgeModal: false });
+  };
+
   columns() {
     return [
       {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '65px'
+        width: '6%'
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
+        width: '15%',
         truncateText: true
       },
       {
         field: 'ip',
         name: 'IP',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
       {
         field: 'group',
         name: 'Group(s)',
+        width: '20%',
         truncateText: true,
-        sortable: true
+        sortable: true,
+        render: groups => groups !== '-' ? this.renderGroups(groups) : '-'
       },
       {
         field: 'os_name',
         name: 'OS',
         sortable: true,
+        width: '15%',
         truncateText: true,
         render: this.addIconPlatformRender
       },
       {
         field: 'version',
         name: 'Version',
-        width: '100px',
+        width: '5%',
         truncateText: true,
         sortable: true
+        /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
       },
       {
         field: 'dateAdd',
         name: 'Registration date',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
+        width: '10%',
         truncateText: true,
         sortable: true
       },
@@ -378,11 +791,12 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
-        render: this.addHealthStatusRender.bind(this),
+        width: '15%',
+        render: this.addHealthStatusRender
       },
       {
         align: 'right',
-        width: '100px',
+        width: '5%',
         field: 'actions',
         name: 'Actions',
         render: agent => this.actionButtonsRender(agent)
@@ -400,7 +814,7 @@ export class AgentsTable extends Component {
               <EuiFlexItem>
                 {!!this.state.totalItems && (
                   <EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
-                    <h2>{this.state.totalItems} Agents</h2>
+                    <h2>Agents ({this.state.totalItems})</h2>
                   </EuiTitle>
                 )}
               </EuiFlexItem>
@@ -508,7 +922,7 @@ export class AgentsTable extends Component {
         return {
           label: platform,
           group: 'osplatform',
-          query: `os.name=${platform}`
+          query: `os.platform=${platform}`
         };
       });
     return {
@@ -622,8 +1036,15 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => this.props.clickAction(item)
+        onClick: () => {}
       };
+    };
+
+    const getCellProps = item => {
+      return {
+        onMouseDown: (ev) => {
+          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
+      }
     };
 
     const {
@@ -651,16 +1072,26 @@ export class AgentsTable extends Component {
       }
     };
     const isLoading = this.state.isLoading;
+
+    const selection = {
+      selectable: agent => agent.id,
+      /* onSelectionChange: this.onSelectionChange */
+    };
+
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
             items={agents}
+            itemId="id"
             columns={columns}
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
             rowProps={getRowProps}
+            cellProps={getCellProps}
+/*             isSelectable={false}
+            selection={selection} */
             noItemsMessage="No agents found"
             {...(pagination && { pagination })}
           />
@@ -669,10 +1100,72 @@ export class AgentsTable extends Component {
     );
   }
 
+  renderGroups(groups) {
+    return(
+      <AgentGroupTruncate groups={groups} length={25} label={'more'}/> 
+    )
+  }
+
   render() {
+    const {
+      allSelected,
+      purgeModal,
+      selectedItems,
+      loadingAllItem
+    } = this.state;
     const title = this.headRender();
     const filter = this.filterBarRender();
+    const upgradeButton = this.renderUpgradeButton();
+    const restartButton = this.renderRestartButton();
+    const purgeButton = this.renderPurgeButton();
+    const upgradeButtonAll = this.renderUpgradeButtonAll();
+    const restartButtonAll = this.renderRestartButtonAll();
+    const purgeButtonAll = this.renderPurgeButtonAll();
     const table = this.tableRender();
+    const callOut = this.callOutRender();
+    let renderPurgeModal, loadItems, barButtons;
+
+    if (purgeModal) {
+      renderPurgeModal = (
+        <EuiOverlayMask>
+          <EuiConfirmModal
+            title={
+              allSelected
+                ? 'Delete all agents'
+                : `Delete ${selectedItems.length} agents`
+            }
+            onCancel={() => {
+              this.setState({ purgeModal: false });
+            }}
+            onConfirm={allSelected ? this.onClickPurgeAll : this.onClickPurge}
+            cancelButtonText="No, don't do it"
+            confirmButtonText="Yes, delete agents"
+            defaultFocusedButton="confirm"
+            buttonColor="danger"
+          >
+            <p>Are you sure you want to do this?</p>
+          </EuiConfirmModal>
+        </EuiOverlayMask>
+      );
+    }
+
+    if (loadingAllItem) {
+      barButtons = (
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiLoadingSpinner size="l" />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      );
+    } else {
+      barButtons = (
+        <EuiFlexGroup>
+          {allSelected ? upgradeButtonAll : upgradeButton}
+          {allSelected ? restartButtonAll : restartButton}
+          {allSelected ? purgeButtonAll : purgeButton}
+        </EuiFlexGroup>
+      );
+    }
 
     return (
       <div>
@@ -680,7 +1173,11 @@ export class AgentsTable extends Component {
         <EuiSpacer size="m" />
         <EuiPanel paddingSize="m">
           {title}
+          {loadItems}
+          {selectedItems.length > 0 && barButtons}
+          {callOut}
           {table}
+          {renderPurgeModal}
         </EuiPanel>
       </div>
     );

@@ -54,7 +54,7 @@ export class WzStatusNodeInfo extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Versión</EuiFlexItem>
+          <EuiFlexItem>Version</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.version}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -70,16 +70,6 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>Installation type</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.type}</EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>Agents limit</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{nodeInfo.max_agents}</EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>OpenSSL Support</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>
-            {nodeInfo.openssl_support}
-          </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
     );
