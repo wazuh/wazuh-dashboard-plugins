@@ -23,7 +23,8 @@ import {
   EuiHealth,
   EuiCallOut,
   EuiSwitch,
-  EuiSpacer
+  EuiSpacer,
+  EuiLoadingChart
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
@@ -48,4 +49,5 @@ app
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer', EuiSpacer)
   .value('SyscheckTable', SyscheckTable)
-  .value('EuiSpacer', EuiSpacer);
+  .value('EuiSpacer', EuiSpacer)
+  .value('EuiLoadingChart', EuiLoadingChart)
