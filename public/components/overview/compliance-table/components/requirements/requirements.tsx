@@ -15,6 +15,10 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFacetButton,
+  EuiIcon,
+  EuiPopover,
+  EuiContextMenu,
+  EuiButtonIcon,
   EuiFacetGroup,
   EuiToolTip
 } from '@elastic/eui';
@@ -23,6 +27,7 @@ import { requirementsName } from '../../requirement-name';
 export class ComplianceRequirements extends Component {
   _isMount = false;
   state: {
+    isPopoverOpen: boolean
   }
 
   props!: {
@@ -31,6 +36,7 @@ export class ComplianceRequirements extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isPopoverOpen: false,
     }
   }
 
@@ -100,8 +106,49 @@ export class ComplianceRequirements extends Component {
     
   }
 
+  onGearButtonClick(){
+    this.setState({isPopoverOpen: !this.state.isPopoverOpen});
+  }
+  
+
+  closePopover(){
+    this.setState({isPopoverOpen: false});
+  }
+
+  selectAll(status){
+    const {selectedRequirements, onChangeSelectedRequirements} = this.props;
+    Object.keys(selectedRequirements).map( item => {
+      selectedRequirements[item] = status;
+    });
+    onChangeSelectedRequirements(selectedRequirements);
+  }
+
 
   render() {
+    const panels = [
+      {
+        id: 0,
+        title: 'Options',
+        items: [
+          {
+            name: 'Select all',
+            icon: <EuiIcon type="check" size="m" />,
+            onClick: () => {
+              this.closePopover();
+              this.selectAll(true);
+            },
+          },
+          {
+            name: 'Unselect all',
+            icon: <EuiIcon type="cross" size="m" />,
+            onClick: () => {
+              this.closePopover();
+              this.selectAll(false);
+            },
+          },
+        ]
+      }
+    ]
     let sectionStyle = {}
     let title = "";
     if(this.props.section === "gdpr"){
@@ -131,14 +178,14 @@ export class ComplianceRequirements extends Component {
           </EuiFlexItem>
 
           <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}> 
-           {/*  <EuiPopover
+             <EuiPopover
               button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()}></EuiButtonIcon>)}
               isOpen={this.state.isPopoverOpen}
               panelPaddingSize="none"
               withTitle
               closePopover={() => this.closePopover()}>
                 <EuiContextMenu initialPanelId={0} panels={panels} />
-           </EuiPopover>*/}
+           </EuiPopover>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFacetGroup style={{ }}>
