@@ -179,9 +179,9 @@ export class AgentSelectionTable extends Component {
   async getItems() {
     try{
       this.setState({isLoading: true});
-      const rawData = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
-      const data = (((rawData || {}).data || {}).data || {}).items;
-      const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
+      const rawData = await WzRequest.apiReq('GET', '/agents', { params: this.buildFilter() } );
+      const data = (((rawData || {}).data || {}).data || {}).affected_items;
+      const totalItems = (((rawData || {}).data || {}).data || {}).total_affected_items;
       const formattedData = data.map((item, id) => {
         return {
           id: item.id,
@@ -540,22 +540,10 @@ export class AgentSelectionTable extends Component {
     return this.getSelectedItems().length;
   }
 
-  async newSearch(){
-    if(this.areAnyRowsSelected()){
-      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
-      const formattedData = data.data.data.items[0] //TODO: do it correctly
-      store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.updateAgentSearch(this.getSelectedItems());
-    }else{
-      store.dispatch(updateCurrentAgentData({}));
-      this.props.removeAgentsFilter(true);      
-    }
-  }
-
   async selectAgentAndApply(agentID){
     try{
-      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+agentID } );
-      const formattedData = data.data.data.items[0] //TODO: do it correctly
+      const data = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=' + agentID}});
+      const formattedData = data.data.data.affected_items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
       this.props.updateAgentSearch([agentID]);
     }catch(error){
@@ -621,8 +609,8 @@ export class AgentSelectionTable extends Component {
   }
 
   async filterBarModelGroups() {
-    const rawGroups = await WzRequest.apiReq('GET', '/agents/groups', {});
-    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
+    const rawGroups = await WzRequest.apiReq('GET', '/groups', {});
+    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).affected_items;
     const groups = itemsGroups
       .filter(item => {
         return item.count > 0;
@@ -639,13 +627,15 @@ export class AgentSelectionTable extends Component {
   async filterBarModelOs() {
     const rawOs = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'os.name,os.version',
-        q: 'id!=000'
+      '/agents/stats/distinct',
+      { 
+        params: {
+          fields: 'os.name,os.version',
+          q: 'id!=000'
+        }
       }
     );
-    const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
+    const itemsOs = (((rawOs || {}).data || {}).data || {}).affected_items;
     const os = itemsOs
       .filter(item => {
         return Object.keys(item).includes('os');
@@ -667,14 +657,18 @@ export class AgentSelectionTable extends Component {
   async filterBarModelOsPlatform() {
     const rawOsPlatform = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'os.platform',
-        q: 'id!=000'
+      '/agents/stats/distinct',
+      { 
+        params: 
+        {
+          fields: 'os.platform',
+          q: 'id!=000'
+        }
       }
     );
+    
     const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {})
-      .items;
+      .affected_items;
     const osPlatform = itemsOsPlatform
       .filter(item => {
         return Object.keys(item).includes('os');
@@ -696,13 +690,15 @@ export class AgentSelectionTable extends Component {
   async filterBarModelNodes() {
     const rawNodes = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
+      '/agents/stats/distinct',
       {
-        fields: 'node_name',
-        q: 'id!=000;node_name!=unknown'
+        params: {
+          fields: 'node_name',
+          q: 'id!=000;node_name!=unknown'
+        }
       }
     );
-    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
+    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).affected_items;
     const nodes = itemsNodes
       .filter(item => {
         return Object.keys(item).includes('node_name');
@@ -724,13 +720,15 @@ export class AgentSelectionTable extends Component {
   async filterBarModelWazuhVersion() {
     const rawVersions = await WzRequest.apiReq(
       'GET',
-      '/agents/stats/distinct?pretty',
+      '/agents/stats/distinct',
       {
-        fields: 'version',
-        q: 'id!=000'
+        params: {
+            fields: 'version',
+            q: 'id!=000'
+          }
       }
     );
-    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
+    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).affected_items;
     const versions = itemsVersions
       .filter(item => {
         return Object.keys(item).includes('version');
