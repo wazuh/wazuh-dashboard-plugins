@@ -289,8 +289,8 @@ function discoverController(
     stopStateSync();
     stopSyncingGlobalStateWithUrl();
     stopSyncingQueryAppStateWithStateContainer();
-    unlistenHistoryBasePath();
-    //WAZUH 
+    //WAZUH     
+    //unlistenHistoryBasePath();
     if (tabListener) tabListener();
     delete wazuhApp.discoverScope;
   });
@@ -797,12 +797,12 @@ function discoverController(
   };
 
   $scope.resetQuery = function () {
-    history.push(`/discover/${encodeURIComponent($route.current.params.id)}`);
+    //history.push(`/discover/${encodeURIComponent($route.current.params.id)}`);
     $route.reload();
   };
 
   $scope.newQuery = function () {
-    history.push('/discover');
+    //history.push('/discover');
   };
 
   // Wazuh.
