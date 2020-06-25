@@ -5,7 +5,7 @@
 [![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
 [![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
 
-Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, later was integrated with Elastic Stack and OpenSCAP evolving into a more comprehensive solution. You can read more in <https://wazuh.com/>
+Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, and then it was integrated with Elastic Stack and OpenSCAP evolving into a more comprehensive solution. You can learn more about it here [wazuh.com](https://wazuh.com/)
 
 ## Description
 
@@ -14,6 +14,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 - Obtain statistics per agent, search alerts and filter by using the different visualizations.
 - View the Wazuh manager configuration.
 - File integrity monitoring.
+- Scan your assets as part of a configuration assessment audit.
+- Verify that your systems are configured according to your security policies baseline with police monitoring module.
 
 ## Documentation
 
@@ -25,19 +27,19 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Branches
 
-- `stable` branch on correspond to the last Wazuh app stable version.
+- `stable` corresponds to the latest Wazuh app stable version.
 - `master` branch contains the latest code, be aware of possible bugs on this branch.
 
 ## Requisites
 
 - Wazuh HIDS 3.13.0
 - Wazuh RESTful API 3.13.0
-- Kibana 7.7.1
-- Elasticsearch 7.7.1
+- Kibana 7.8.0
+- Elasticsearch 7.8.0
 
 ## Installation
 
-Install the app
+Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
@@ -60,7 +62,7 @@ service kibana restart
 
 ## Upgrade
 
-Note: In Wazuh 3.12.0 (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
+Note: Since Wazuh 3.12.0 release (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
 
 Stop Kibana
 
@@ -76,14 +78,14 @@ systemctl stop kibana
 service kibana stop
 ```
 
-Copy the wazuh.yml to its new location. (Only needed for upgrades from 3.11.x to 3.12.y)
+Copy the `wazuh.yml` to its new location. (Only needed for upgrades from 3.11.x to 3.12.y)
 
 ```
 mkdir -p /usr/share/kibana/optimize/wazuh/config
 cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 ```
 
-Remove the app using kibana-plugin tool
+Remove the Wazuh app using the kibana-plugin tool
 
 ```
 cd /usr/share/kibana/
@@ -96,14 +98,14 @@ Remove generated bundles
 rm -rf /usr/share/kibana/optimize/bundles
 ```
 
-Update file permissions. This will avoid several errors prior to updating the app:
+Update file permissions. This will prevent errors when generating new bundles or updating the app:
 
 ```
 chown -R kibana:kibana /usr/share/kibana/optimize
 chown -R kibana:kibana /usr/share/kibana/plugins
 ```
 
-Install the app
+Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
@@ -136,6 +138,7 @@ service kibana restart
  
 | Wazuh app | Kibana | Open Distro | Package                                                         |
 | :-------: | :----: | :---------: | :-------------------------------------------------------------- |
+|   3.13.0  |  7.8.0 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.8.0.zip> |
 |   3.13.0  |  7.7.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.7.1.zip> |
 |   3.13.0  |  7.7.0 |    1.8.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.7.0.zip> |
 |   3.12.3  |  7.7.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.7.1.zip> |
@@ -223,18 +226,18 @@ service kibana restart
 
 ## Contribute
 
-If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to <mailto:wazuh+subscribe@googlegroups.com>, to ask questions and participate in discussions.
+If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to [wazuh+subscribe@googlegroups.com](mailto:wazuh+subscribe@googlegroups.com), to ask questions and participate in discussions.
 
 ## Software and libraries used
 
-- https://elastic.co
-- https://elastic.github.io/eui
-- https://material.angularjs.org
-- https://angularjs.org
-- https://nodejs.org
-- https://npmjs.com
-- https://reactjs.org
-- https://redux.js.org
+- [Elastic](https://elastic.co)
+- [Elastic UI framework](https://elastic.github.io/eui)
+- [AngularJS](https://angularjs.org)
+- [AngularJS Material](https://material.angularjs.org)
+- [Node.js](https://nodejs.org)
+- [NPM](https://npmjs.com)
+- [React](https://reactjs.org)
+- [Redux](https://redux.js.org)
 
 ## Copyright & License
 
