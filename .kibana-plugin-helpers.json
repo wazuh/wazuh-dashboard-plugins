@@ -3,7 +3,7 @@
       "package.json",
       "LICENSE",
       "tsconfig.json",
-      "index.js",
+      "index.ts",
       "init.js",
       "server/**/*",
       "!server/wazuh-registry.json",
