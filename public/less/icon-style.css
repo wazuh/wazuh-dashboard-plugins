@@ -1,21 +1,13 @@
-.euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
-  left: -2px;
-  max-width: 18px;
+.euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiImage {
+  max-width: 24px;
 }
 
-.euiNavDrawerGroup__item .euiListGroupItem__button .euiImage img{
-  height: 18px;
-  width: 18px;
+.euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiImage img{
+  height: 24px;
+  width: 24px;
+  filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
 }
 
-.euiNavDrawer:not(.euiNavDrawer-isExpanded) .euiNavDrawerGroup__item .euiListGroupItem__button .euiListGroupItem__label {
-  display: none;
-}
-
-.euiNavDrawer:not(.euiNavDrawer-isExpanded) .euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
-  margin-right: 0!important;
-}
-
-.euiNavDrawer .euiNavDrawerGroup__item .euiListGroupItem__button .euiImage {
-  margin-right: 10px;
+.euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiImage {
+  margin: 0px 8px 0px 0px
 }

@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import React, { Component, Fragment } from 'react';
 // Redux
 import store from '../../../../redux/store';
 
@@ -22,8 +21,6 @@ import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
-// import { GroupsTable } from './groups/groups-table';
-// import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
 
 class WzManagementMain extends Component {
@@ -44,20 +41,16 @@ class WzManagementMain extends Component {
     const { section } = this.props;
     const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem style={{ marginBottom: 0 }}>
-          <div>
-            {(section === 'groups' && <WzGroups {...this.props} />) ||
-              (section === 'status' && <WzStatus />) ||
-              (section === 'reporting' && <WzReporting />) || 
-              (section === 'statistics' && <WzStatistics />) || 
-              (section === 'logs' && <WzLogs />) || 
-              (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
-              (ruleset.includes(section) && <WzRuleset />)
-            }
-          </div>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      <Fragment>
+        {(section === 'groups' && <WzGroups {...this.props} />) ||
+          (section === 'status' && <WzStatus />) ||
+          (section === 'reporting' && <WzReporting />) ||
+          (section === 'statistics' && <WzStatistics />) ||
+          (section === 'logs' && <WzLogs />) ||
+          (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
+          (ruleset.includes(section) && <WzRuleset />)
+        }
+      </Fragment>
     );
   }
 }

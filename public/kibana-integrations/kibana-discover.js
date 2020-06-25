@@ -49,11 +49,11 @@ import { RequestAdapter } from '../../../../src/plugins/inspector/public';
 import { getSortArray, getSortForSearchSource } from 'plugins/kibana/discover/np_ready/angular/doc_table';
 import * as columnActions from 'plugins/kibana/discover/np_ready/angular/doc_table/actions/columns';
 
-import { addHelpMenuToAppChrome } from 'plugins/kibana/discover/np_ready/components/help_menu/help_menu_util';
 import 'plugins/kibana/discover/np_ready/components/fetch_error';
 import { getPainlessError } from 'plugins/kibana/discover/np_ready/angular/get_painless_error';
 import { discoverResponseHandler } from 'plugins/kibana/discover/np_ready/angular/response_handler';
 import {
+  getHistory,
   getRequestInspectorStats,
   getResponseInspectorStats,
   getServices,
@@ -68,7 +68,6 @@ import { buildServices } from 'plugins/kibana/discover/build_services';
 import { npStart } from 'ui/new_platform';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
-import { start as visualizations } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/legacy';
 ///////////
 
 import {
@@ -90,10 +89,12 @@ const fetchStatuses = {
 
 const app = uiModules.get('app/discover', []);
 const wazuhApp = getAngularModule('app/wazuh');
+const buildGetHistory = getHistory;
 app.run(async () => {
   const services = await buildServices(
     npStart.core,
-    npStart.plugins
+    npStart.plugins,
+    buildGetHistory
   );
   setServices(services);
 });
@@ -140,7 +141,8 @@ function discoverController(
   (async () => {
     const services = await buildServices(
       npStart.core,
-      npStart.plugins
+      npStart.plugins,
+      buildGetHistory
     );
     setServices(services);
   })();
@@ -149,15 +151,18 @@ function discoverController(
     core,
     chrome,
     data,
-    history,
     filterManager,
     timefilter,
     toastNotifications,
-    uiSettings: config
+    history: getHistory,
+    uiSettings: config,
+    visualizations
   } = getServices();
 
   const wazuhConfig = new WazuhConfig();
   const modulesHelper = ModulesHelper;
+
+  const history = getHistory();
 
   const getTimeField = () => {
     return isDefaultType($scope.indexPattern) ? $scope.indexPattern.timeFieldName : undefined;
@@ -199,7 +204,7 @@ function discoverController(
     { filters: esFilters.FilterStateStore.APP_STATE }
   );
 
-  const appStateUnsubscribe = appStateContainer.subscribe(async newState => {
+  const appStateUnsubscribe = appStateContainer.subscribe(async (newState) => {
     const { state: newStatePartial } = splitState(newState);
     const { state: oldStatePartial } = splitState(getPreviousAppState());
 
@@ -209,7 +214,7 @@ function discoverController(
 
         // detect changes that should trigger fetching of new data
         const changes = ['interval', 'sort', 'query'].filter(
-          prop => !_.isEqual(newStatePartial[prop], oldStatePartial[prop])
+          (prop) => !_.isEqual(newStatePartial[prop], oldStatePartial[prop])
         );
 
         if (changes.length) {
@@ -228,7 +233,7 @@ function discoverController(
     }
   });
 
-  $scope.setIndexPattern = async id => {
+  $scope.setIndexPattern = async (id) => {
     await replaceUrlAppState({ index: id });
     $route.reload();
   };
@@ -244,7 +249,7 @@ function discoverController(
           $scope.updateDataSource();
         },
       },
-      error => addFatalError(core.fatalErrors, error)
+      (error) => addFatalError(core.fatalErrors, error)
     )
   );
 
@@ -252,7 +257,7 @@ function discoverController(
     requests: new RequestAdapter(),
   };
 
-  $scope.timefilterUpdateHandler = ranges => {
+  $scope.timefilterUpdateHandler = (ranges) => {
     timefilter.setTime({
       from: moment(ranges.from).toISOString(),
       to: moment(ranges.to).toISOString(),
@@ -270,7 +275,7 @@ function discoverController(
 
   $scope.$watch(
     () => uiCapabilities.discover.saveQuery,
-    newCapability => {
+    (newCapability) => {
       $scope.showSaveQuery = newCapability;
     }
   );
@@ -348,8 +353,8 @@ function discoverController(
       return $scope.fieldCounts;
     }
 
-    return await new Promise(resolve => {
-      const unwatch = $scope.$watch('fetchStatus', newValue => {
+    return await new Promise((resolve) => {
+      const unwatch = $scope.$watch('fetchStatus', (newValue) => {
         if (newValue === fetchStatuses.COMPLETE) {
           unwatch();
           resolve($scope.fieldCounts);
@@ -406,8 +411,8 @@ function discoverController(
       fields: selectFields,
       metaFields: $scope.indexPattern.metaFields,
       conflictedTypesFields: $scope.indexPattern.fields
-        .filter(f => f.type === 'conflict')
-        .map(f => f.name),
+        .filter((f) => f.type === 'conflict')
+        .map((f) => f.name),
       indexPatternId: searchSource.getField('index').id,
     };
   };
@@ -544,7 +549,7 @@ function discoverController(
               $scope.updateTime();
             },
           },
-          error => addFatalError(core.fatalErrors, error)
+          (error) => addFatalError(core.fatalErrors, error)
         )
       );
       //Handling change oft the histogram interval
@@ -643,7 +648,7 @@ function discoverController(
         });
       })
       .then(onResults)
-      .catch(error => {
+      .catch((error) => {
         // If the request was aborted then no need to surface this error in the UI
         if (error instanceof Error && error.name === 'AbortError') return;
 
@@ -682,7 +687,7 @@ function discoverController(
     }
   };
 
-  $scope.updateSavedQueryId = newSavedQueryId => {
+  $scope.updateSavedQueryId = (newSavedQueryId) => {
     if (newSavedQueryId) {
       setAppState({ savedQuery: newSavedQueryId });
     } else {
@@ -737,6 +742,7 @@ function discoverController(
       if ($scope.vis.data.aggs.aggs[1]) {
         $scope.bucketInterval = $scope.vis.data.aggs.aggs[1].buckets.getInterval();
       }
+      $scope.updateTime();
     }
 
     $scope.hits = resp.hits.total;
@@ -747,9 +753,9 @@ function discoverController(
     // if we haven't counted yet, reset the counts
     const counts = ($scope.fieldCounts = $scope.fieldCounts || {});
 
-    $scope.rows.forEach(hit => {
+    $scope.rows.forEach((hit) => {
       const fields = Object.keys($scope.indexPattern.flattenHit(hit));
-      fields.forEach(fieldName => {
+      fields.forEach((fieldName) => {
         counts[fieldName] = (counts[fieldName] || 0) + 1;
       });
     });
@@ -767,7 +773,7 @@ function discoverController(
     });
     inspectorRequest = inspectorAdapters.requests.start(title, { description });
     inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
-    $scope.searchSource.getSearchRequestBody().then(body => {
+    $scope.searchSource.getSearchRequestBody().then((body) => {
       inspectorRequest.json(body);
     });
   }
@@ -796,6 +802,7 @@ function discoverController(
 
   $scope.resetQuery = function () {
     history.push(`/discover/${encodeURIComponent($route.current.params.id)}`);
+    $route.reload();
   };
 
   $scope.newQuery = function () {
@@ -831,10 +838,18 @@ function discoverController(
     // Wazuh. Set the size to 0 depending on the selected searchSource
     const size = noHits ? 0 : $scope.opts.sampleSize;
     searchSource
+      .setField('index', $scope.indexPattern)
       .setField('size', size) // Wazuh. Use custom size
-      .setField('sort', getSortForSearchSource($scope.state.sort, indexPattern))
-      .setField('query', !$scope.state.query ? null : $scope.state.query)
-      .setField('filter', filterManager.filters);
+      .setField(
+        'sort',
+        getSortForSearchSource(
+          $scope.state.sort,
+          indexPattern,
+          config.get('discover:sort:defaultOrder')
+        )
+      )
+      .setField('query', $scope.state.query || null)
+      .setField('filter', filterManager.getFilters());
 
     //Wazuh update the visualizations
     $rootScope.$broadcast('updateVis');
@@ -1074,6 +1089,7 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   init();
   // Propagate current app state to url, then start syncing
   replaceUrlAppState().then(() => startStateSync());

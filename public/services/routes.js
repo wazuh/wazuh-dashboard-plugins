@@ -86,7 +86,6 @@ function nestedResolve($q, errorHandler, $rootScope, $location, $window) {
 }
 
 function savedSearch(
-  redirectWhenMissing,
   $location,
   $window,
   $rootScope,
@@ -96,7 +95,6 @@ function savedSearch(
   if (!healthCheckStatus) return;
   assignPreviousLocation($rootScope, $location);
   return getSavedSearch(
-    redirectWhenMissing,
     $location,
     $window,
     $route

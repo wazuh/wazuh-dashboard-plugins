@@ -10,12 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import $ from 'jquery';
-import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
-import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
+import { TypesService } from '../../../../src/plugins/visualizations/public/vis_types';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { GenericRequest } from '../react-services/generic-request';
 import { ErrorHandler } from '../react-services/error-handler';
@@ -49,6 +48,7 @@ app.directive('kbnVis', function() {
       const services = {
         savedObjectsClient: npStart.core.savedObjects.client,
         indexPatterns: npStart.plugins.data.indexPatterns,
+        search: npStart.plugins.data.search,
         chrome: npStart.core.chrome,
         overlays: npStart.core.overlays
       };
@@ -115,10 +115,6 @@ app.directive('kbnVis', function() {
             query
           };
 
-          if (!factory) {
-            factory = embeddables.getEmbeddableFactory('visualization');
-          }
-
           if (raw && discoverList.length) {
             // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -138,7 +134,7 @@ app.directive('kbnVis', function() {
               // Visualization doesn't need "hits"
               visualization.searchSource.setField('size', 0);
 
-              visHandler = await factory.createFromObject(
+              visHandler = await npStart.plugins.visualizations.__LEGACY.createVisEmbeddableFromObject(
                 visualization,
                 visInput
               );
@@ -270,9 +266,6 @@ app.directive('kbnVis', function() {
         // Forcing a digest cycle
         $rootScope.$applyAsync();
       };
-
-      // Initializing the visualization
-      let factory = null;
     }
   };
 });

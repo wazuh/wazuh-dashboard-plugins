@@ -13,9 +13,11 @@ import { healthCheck } from './health-check';
 import { recentlyAccessed } from '../../../../../src/core/public/chrome/recently_accessed';
 import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/public';
 import { npStart } from 'ui/new_platform';
+import {
+  redirectWhenMissing,
+} from 'plugins/kibana/discover/kibana_services';
 
 export function getSavedSearch(
-  redirectWhenMissing,
   $location,
   $window,
   $route
@@ -23,12 +25,12 @@ export function getSavedSearch(
   const services = {
     savedObjectsClient: npStart.core.savedObjects.client,
     indexPatterns: npStart.plugins.data.indexPatterns,
+    search: npStart.plugins.data.search,
     chrome: npStart.core.chrome,
     overlays: npStart.core.overlays,
   };
 
   const savedSearches = createSavedSearchesLoader(services);
-
   const currentParams = $location.search();
   const targetedAgent =
     currentParams && (currentParams.agent || currentParams.agent === '000');
@@ -58,6 +60,6 @@ export function getSavedSearch(
             '/management/kibana/objects/savedSearches/' +
             $route.current.params.id
         })
-      );
+      )
   }
 }
