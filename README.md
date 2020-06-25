@@ -27,7 +27,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Branches
 
-- `stable` branch on correspond to the last Wazuh app stable version.
+- `stable` corresponds to the latest Wazuh app stable version.
 - `master` branch contains the latest code, be aware of possible bugs on this branch.
 
 ## Requisites
@@ -39,7 +39,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Installation
 
-Install the app
+Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
@@ -62,7 +62,7 @@ service kibana restart
 
 ## Upgrade
 
-Note: In Wazuh 3.12.0 (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
+Note: Since Wazuh 3.12.0 release (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/optimize/wazuh/config/wazuh.yml`.
 
 Stop Kibana
 
@@ -85,7 +85,7 @@ mkdir -p /usr/share/kibana/optimize/wazuh/config
 cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 ```
 
-Remove the app using kibana-plugin tool
+Remove the Wazuh app using the kibana-plugin tool
 
 ```
 cd /usr/share/kibana/
@@ -98,14 +98,14 @@ Remove generated bundles
 rm -rf /usr/share/kibana/optimize/bundles
 ```
 
-Update file permissions. This will avoid several errors prior to updating the app:
+Update file permissions. This will prevent errors when generating new bundles or updating the app:
 
 ```
 chown -R kibana:kibana /usr/share/kibana/optimize
 chown -R kibana:kibana /usr/share/kibana/plugins
 ```
 
-Install the app
+Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
