@@ -221,9 +221,12 @@ export default class RulesetHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/files?path=etc/rules/${rule.file ||
-        rule}&overwrite=${overwrite}`, {
-          body: content
+        `/manager/files`, {
+          params: {
+            path: `etc/rules/${rule.file || rule}`,
+            overwrite: overwrite
+          },
+          body: content.toString()
         }
       );
       return result;
@@ -242,9 +245,12 @@ export default class RulesetHandler {
     try {
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/files?path=etc/decoders/${decoder.file ||
-        decoder}&overwrite=${overwrite}`, {
-          body: content
+        '/manager/files?', {
+          params: {
+            path: `etc/decoders/${decoder.file || decoder}`,
+            overwrite: overwrite
+          },
+          body: content.toString()
         }
       );
       return result;

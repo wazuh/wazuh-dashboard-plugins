@@ -903,7 +903,7 @@ export class WazuhApiCtrl {
       }
 
       // DELETE and PUT must use URL query but we accept objects in Dev Tools
-      if ((method === 'DELETE' || method === 'PUT') && dataProperties.length) {
+      if (devTools && (method === 'DELETE' || method === 'PUT') && dataProperties.length) {
         (Object.keys(data) || []).forEach(key => {
           fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
             data[key] !== '' ? '=' : ''

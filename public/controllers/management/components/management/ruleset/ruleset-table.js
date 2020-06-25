@@ -66,11 +66,16 @@ class WzRulesetTable extends Component {
       if (match && match[0]) {
         this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
-        const result = await WzRequest.apiReq('GET', `/rules/${id}`, {});
-        const items = ((result.data || {}).data || {}).items || [];
+        const result = await WzRequest.apiReq('GET', `/rules`, 
+        {
+          params: {
+            rule_ids: id
+          }
+        });
+        const items = ((result.data || {}).data || {}).affected_items || [];
         if (items.length) {
           const info = await this.rulesetHandler.getRuleInformation(
-            items[0].file,
+            items[0].filename,
             parseInt(id)
           );
           this.props.updateRuleInfo(info);

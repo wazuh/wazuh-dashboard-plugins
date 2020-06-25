@@ -105,7 +105,7 @@ class WzDecoderInfo extends Component {
         <EuiFlexItem key="file">
           <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ filename: file })}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'filename', value: file}])}>
               &nbsp;{file}
             </EuiLink>
           </EuiToolTip>
@@ -113,7 +113,7 @@ class WzDecoderInfo extends Component {
         <EuiFlexItem key="path">
           <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack({ relative_dirname: path })}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'relative_dirname', value: path}])}>
               &nbsp;{path}
             </EuiLink>
           </EuiToolTip>
@@ -262,7 +262,7 @@ class WzDecoderInfo extends Component {
                     paddingSize="none"
                     initialIsOpen={true}>
                     <div className='flyout-row details-row'>
-                      {this.renderInfo(position, file, path)}
+                      {this.renderInfo(position, filename, relative_dirname)}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>

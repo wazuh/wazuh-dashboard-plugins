@@ -235,7 +235,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ filename: file })}
+              onClick={async () => this.setNewFiltersAndBack([{field:'filename', value: file}])}
             >
               {file}
             </EuiLink>
@@ -245,7 +245,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack({ relative_dirname: path })}
+              onClick={async () => this.setNewFiltersAndBack([{field:'relative_dirname', value: path}])}
             >
               {path}
             </EuiLink>
@@ -461,7 +461,7 @@ class WzRuleInfo extends Component {
                     paddingSize="none"
                     initialIsOpen={true}>
                     <div className='flyout-row details-row'>
-                      {this.renderInfo(id, level, file, path, groups)}
+                      {this.renderInfo(id, level, filename, relative_dirname, groups)}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>
