@@ -74,11 +74,11 @@ class WzGroupFilesTable extends Component {
         this.props.state.itemDetail.name,
         { params: this.buildFilter() }
       );
-      const { items, totalItems } = ((rawItems || {}).data || {}).data;
+      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
       this.setState({
-        items,
-        totalItems,
+        items: affected_items,
+        totalItems: total_affected_items,
         isProcessing: false
       });
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
