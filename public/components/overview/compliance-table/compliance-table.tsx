@@ -342,7 +342,7 @@ export class ComplianceTable extends Component {
         </EuiFlexItem>
       </EuiFlexGroup>
 
-      <EuiFlexGroup style={{ margin: 8 }}>
+      <EuiFlexGroup style={{ margin: '0 8px' }}>
         <EuiFlexItem>
           <EuiPanel paddingSize="none">
             {!!Object.keys(complianceObject).length && this.state.filterParams.time.from !== "init" &&

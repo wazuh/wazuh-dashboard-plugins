@@ -217,7 +217,7 @@ export class Mitre extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
 
-        <EuiFlexGroup style={{margin: 8}}>
+        <EuiFlexGroup style={{ margin: '0 8px' }}>
           <EuiFlexItem>
             <EuiPanel paddingSize="none">
                 <EuiFlexGroup >

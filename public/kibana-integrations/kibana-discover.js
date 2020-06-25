@@ -1015,10 +1015,14 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   $scope.$watch('fetchStatus', () => {
-    if ($scope.fetchStatus === fetchStatuses.LOADING) {
-      modulesHelper.hideCloseButtons();
-    } else {
-      modulesHelper.activeNoImplicitsFilters();
+    if ($scope.fetchStatus !== fetchStatuses.UNINITIALIZED) {
+      if ($scope.fetchStatus === fetchStatuses.LOADING) {
+        setTimeout(() => {
+          modulesHelper.hideCloseButtons();
+        }, $scope.tabView === 'inventory' ? 500 : 100);
+      } else {
+        modulesHelper.activeNoImplicitsFilters();
+      }
     }
   });
 
