@@ -131,21 +131,22 @@ export class AgentSelectionTable extends Component {
   }
 
   onChangeItemsPerPage = async itemsPerPage => {
-    this.setState({ itemsPerPage }, async () => await this.getItems());
+    this._isMounted && this.setState({ itemsPerPage }, async () => await this.getItems());
   };
 
   onChangePage = async pageIndex => {
-    this.setState({ pageIndex }, async () => await this.getItems());
+    this._isMounted && this.setState({ pageIndex }, async () => await this.getItems());
   };
 
   async componentDidMount() {
+    this._isMounted = true;
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
     const tmpSelectedAgents = {};
     if(!store.getState().appStateReducers.currentAgentData.id){
       tmpSelectedAgents[store.getState().appStateReducers.currentAgentData.id] = true;
     }
-    this.setState({itemIdToSelectedMap: this.props.selectedAgents});
+    this._isMounted && this.setState({itemIdToSelectedMap: this.props.selectedAgents});
     try{
       await this.getItems();
       const filterStatus = this.filterBarModelStatus();
@@ -154,7 +155,7 @@ export class AgentSelectionTable extends Component {
       const filterVersion = await this.filterBarModelWazuhVersion();
       const filterOsPlatform = await this.filterBarModelOsPlatform();
       const filterNodes = await this.filterBarModelNodes();
-      this.setState({
+      this._isMounted && this.setState({
         filterStatus,
         filterGroups,
         filterOs,
@@ -163,6 +164,10 @@ export class AgentSelectionTable extends Component {
         filterNodes
       });
     }catch(error){}
+  }
+
+  componentWillUnmount(){
+    this._isMounted = false;
   }
 
   getArrayFormatted(arrayText) {
@@ -178,7 +183,7 @@ export class AgentSelectionTable extends Component {
 
   async getItems() {
     try{
-      this.setState({isLoading: true});
+      this._isMounted && this.setState({isLoading: true});
       const rawData = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
       const data = (((rawData || {}).data || {}).data || {}).items;
       const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
@@ -192,10 +197,9 @@ export class AgentSelectionTable extends Component {
           group: item.group || '-',
         };
       });
-  
-      this.setState({ agents: formattedData, totalItems, isLoading: false });
+      this._isMounted && this.setState({ agents: formattedData, totalItems, isLoading: false });
     }catch(err){
-      this.setState({ isLoading: false });
+      this._isMounted && this.setState({ isLoading: false });
     }
   }
 
@@ -261,11 +265,11 @@ export class AgentSelectionTable extends Component {
         ? 'desc'
         : 'asc';
 
-    this.setState({ sortField, sortDirection }, async () => await this.getItems());
+    this._isMounted && this.setState({ sortField, sortDirection }, async () => await this.getItems());
   };
 
   toggleItem = itemId => {
-    this.setState(previousState => {
+    this._isMounted && this.setState(previousState => {
       const newItemIdToSelectedMap = {
         [itemId]: !previousState.itemIdToSelectedMap[itemId],
       };
@@ -280,8 +284,7 @@ export class AgentSelectionTable extends Component {
     const allSelected = this.areAllItemsSelected();
     const newItemIdToSelectedMap = {};
     this.state.agents.forEach(item => (newItemIdToSelectedMap[item.id] = !allSelected));
-
-    this.setState({
+    this._isMounted && this.setState({
       itemIdToSelectedMap: newItemIdToSelectedMap,
     });
   };
@@ -304,7 +307,7 @@ export class AgentSelectionTable extends Component {
   };
 
   togglePopover = itemId => {
-    this.setState(previousState => {
+    this._isMounted && this.setState(previousState => {
       const newItemIdToOpenActionsPopoverMap = {
         ...previousState.itemIdToOpenActionsPopoverMap,
         [itemId]: !previousState.itemIdToOpenActionsPopoverMap[itemId],
@@ -319,7 +322,7 @@ export class AgentSelectionTable extends Component {
   closePopover = itemId => {
     // only update the state if this item's popover is open
     if (this.isPopoverOpen(itemId)) {
-      this.setState(previousState => {
+      this._isMounted && this.setState(previousState => {
         const newItemIdToOpenActionsPopoverMap = {
           ...previousState.itemIdToOpenActionsPopoverMap,
           [itemId]: false,
@@ -515,11 +518,11 @@ export class AgentSelectionTable extends Component {
     //   'agents_preview_selected_options',
     //   JSON.stringify(result.selectedOptions)
     // );
-    this.setState({ isLoading: true, ...result}, async () => {
+    this._isMounted && this.setState({ isLoading: true, ...result}, async () => {
       try{
         await this.getItems()
       }catch(error){
-        this.setState({ isLoading: false});
+        this._isMounted && this.setState({ isLoading: false});
       }
     });
   }
@@ -531,7 +534,7 @@ export class AgentSelectionTable extends Component {
   }
 
   unselectAgents(){
-    this.setState({itemIdToSelectedMap: {}});
+    this._isMounted && this.setState({itemIdToSelectedMap: {}});
     this.props.removeAgentsFilter(true);      
     store.dispatch(updateCurrentAgentData({}));
   }
@@ -565,7 +568,7 @@ export class AgentSelectionTable extends Component {
   }
 
   showContextMenu(id){
-    this.setState({contextMenuId: id})
+    this._isMounted && this.setState({contextMenuId: id})
   }
 
   addIconPlatformRender(os) {

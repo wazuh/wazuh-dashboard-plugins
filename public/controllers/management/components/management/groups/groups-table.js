@@ -68,8 +68,8 @@ class WzGroupsTable extends Component {
   }
 
   async componentDidMount() {
-    await this.getItems();
     this._isMounted = true;
+    await this.getItems();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -106,7 +106,7 @@ class WzGroupsTable extends Component {
       const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
       const { items, totalItems } = ((rawItems || {}).data || {}).data;
 
-      this.setState({
+      this._isMounted && this.setState({
         items,
         totalItems,
       });
@@ -142,7 +142,7 @@ class WzGroupsTable extends Component {
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-    this.setState({ pageSize });
+    this._isMounted && this.setState({ pageSize });
     this.props.updatePageIndex(pageIndex);
     this.props.updateSortDirection(sortDirection);
     this.props.updateSortField(sortField);
@@ -193,7 +193,7 @@ class WzGroupsTable extends Component {
         <WzSearchBar
           filters={filters}
           suggestions={this.suggestions}
-          onFiltersChange={(filters) => this.setState({ filters })} />
+          onFiltersChange={(filters) => this._isMounted && this.setState({ filters })} />
         <EuiBasicTable
           itemId="id"
           items={items}
