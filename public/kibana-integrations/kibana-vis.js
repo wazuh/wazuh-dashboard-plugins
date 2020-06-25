@@ -218,11 +218,8 @@ class KibanaVis extends Component {
             vis,
             visInput
           );
-          if (this.visHandler)
-            setTimeout(async () => {
-              await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
-              this.visHandler.handler.data$.subscribe(this.renderComplete());
-            });
+          await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
+          this.visHandler.handler.data$.subscribe(this.renderComplete());
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {

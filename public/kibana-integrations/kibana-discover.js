@@ -263,10 +263,6 @@ function discoverController(
       to: moment(ranges.to).toISOString(),
       mode: 'absolute',
     });
-    //WAZUH
-    $scope.updateQuery({
-      query: $scope.state.query
-    }, false);
   };
   $scope.intervalOptions = search.aggs.intervalOptions;
   $scope.minimumVisibleRows = 50;
