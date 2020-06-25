@@ -282,7 +282,7 @@ export class Inventory extends Component {
       );
 
       this.checks = (((checks || {}).data || {}).data || {}).items || [];
-      this.buildSuggestionSearchBar(policy, this.checks);
+      this.buildSuggestionSearchBar(policy.policy_id, this.checks);
     }
     this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
   }
@@ -542,7 +542,7 @@ export class Inventory extends Component {
                   <EuiFlexItem>
                     <WzSearchBar
                       filters={this.state.filters}
-                      suggestions={this.suggestions[this.state.lookingPolicy]}
+                      suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
                       placeholder='Add filter or search' 
                       onFiltersChange={filters => this.setState({filters})} />
                   </EuiFlexItem>
