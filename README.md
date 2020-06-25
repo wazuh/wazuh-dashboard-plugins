@@ -14,6 +14,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 - Obtain statistics per agent, search alerts and filter by using the different visualizations.
 - View the Wazuh manager configuration.
 - File integrity monitoring.
+- Scan your assets as part of a configuration assessment audit.
+- Verify that your systems are configured according to your security policies baseline with police monitoring module.
 
 ## Documentation
 
