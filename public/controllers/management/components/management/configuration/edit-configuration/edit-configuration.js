@@ -405,7 +405,7 @@ const WzEditorConfiguration = compose(
                 value={editorValue}
                 onChange={value => onChange(value)}
                 minusHeight={
-                  wazuhNotReadyYet || infoChangesAfterRestart ? 270 : 215
+                  wazuhNotReadyYet || infoChangesAfterRestart ? 270 : 220
                 }
               />
               )}
