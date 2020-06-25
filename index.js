@@ -45,10 +45,10 @@ export default (kibana) => {
 
     init(server) {
       const coreSetup = server.newPlatform.setup.core;
-      const pluginsSetup: PluginsSetup = {
+      const pluginsSetup = {
         discover: server.newPlatform.setup.plugins.discover
       };
-      const legacySetup: LegacySetup = {
+      const legacySetup = {
         server
       };
 
