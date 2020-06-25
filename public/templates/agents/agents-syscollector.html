@@ -8,6 +8,11 @@
     </div>
   </div>
 
+  <div ng-if="agent && agent.status === 'Never connected'">
+    <react-component name="WzEuiPrompt" props="{icon:'securitySignalDetected', title:'Agent has never connected', promptText:'The agent has been registered but has not yet connected to the manager',docsUrl:'https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html',
+      href:'#/agents-preview?', actionButton: 'Back to agents'}"></react-component>
+  </div>
+  
   <div ng-if="agent && agent.status !== 'Never connected'">
     <div layout="row" class="layout-padding" ng-if="!hasSize(syscollector)">
       <md-card flex class="wz-md-card" flex>
