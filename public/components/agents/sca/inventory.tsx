@@ -277,7 +277,7 @@ export class Inventory extends Component {
     if (policy) {
       const checks = await this.wzReq.apiReq(
         'GET',
-        `/sca/${this.state.agent.id}/checks/${policy.policy_id}`,
+        `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
         {...filtersObject}
       );
 
