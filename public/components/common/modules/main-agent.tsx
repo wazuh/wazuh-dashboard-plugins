@@ -22,12 +22,14 @@ import {
   EuiIcon,
   EuiPopover,
   EuiButtonEmpty,
-  EuiButton
+  EuiButton,
 } from '@elastic/eui';
 import '../../common/modules/module.less';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import chrome from 'ui/chrome';
+import { FilterHandler } from '../../../utils/filter-handler';
+import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { Events, Dashboard, Loader, Settings } from '../../common/modules';
@@ -39,9 +41,22 @@ import { MainSca } from '../../agents/sca';
 import { MainMitre } from '../modules/main-mitre';
 
 export class MainModuleAgent extends Component {
+  props!: {
+    [key: string]: any
+  };
+  state: {
+    selectView: Boolean,
+    loadingReport: Boolean,
+    switchModule: Boolean,
+    showAgentInfo: Boolean
+  };
+  reportingService: ReportingService;
+  filterHandler: FilterHandler
+
   constructor(props) {
     super(props);
     this.reportingService = new ReportingService();
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.state = {
       selectView: false,
       loadingReport: false,
@@ -106,6 +121,41 @@ export class MainModuleAgent extends Component {
     if (status.toLowerCase() === 'active') { return hex ? '#017D73' : 'success'; }
     else if (status.toLowerCase() === 'disconnected') { return hex ? '#BD271E' : 'danger'; }
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
+  }
+
+  async startReport() {
+    this.setState({ loadingReport: true });
+    const syscollectorFilters: any[] = [];
+    const agent = (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
+    if (this.props.section === 'syscollector' && agent) {
+      syscollectorFilters.push(
+        this.filterHandler.managerQuery(agent, true)
+      );
+      syscollectorFilters.push(
+        this.filterHandler.agentQuery(agent)
+      );
+    }
+    await this.reportingService.startVis2Png(
+      this.props.section,
+      agent,
+      syscollectorFilters.length ? syscollectorFilters : null
+    );
+    this.setState({ loadingReport: false });
+  }
+
+  renderReportButton() {
+    return (
+      (this.props.section === 'syscollector' &&
+        <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
+          <EuiButtonEmpty
+            iconType="document"
+            isLoading={this.state.loadingReport}
+            onClick={async () => this.startReport()}>
+            Generate report
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+      )
+    );
   }
 
   renderTitle() {
@@ -187,7 +237,7 @@ export class MainModuleAgent extends Component {
               )} */}
             </EuiFlexItem>
             <EuiFlexItem />
-
+            {this.renderReportButton()}
           </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>

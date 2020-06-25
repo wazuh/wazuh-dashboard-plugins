@@ -18,6 +18,15 @@
       </md-card>
     </div>
 
+    <!-- Report status section -->
+    <div layout="column" layout-align="center center" class="wz-margin-top-8"
+        ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
+        <!-- <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div> -->
+        <react-component name="EuiLoadingChart" props="{size: 'l'}" ></react-component>
+        <div class="percentage">{{reportStatus}}</div>
+    </div>
+    <!-- End report status section -->
+
     <div layout="row" class="layout-padding wz-padding-bottom-0"
       ng-if="hasSize(syscollector) && (!hasSize(syscollector.hardware) || !hasSize(syscollector.os))">
       <md-card flex class="wz-md-card" flex>
