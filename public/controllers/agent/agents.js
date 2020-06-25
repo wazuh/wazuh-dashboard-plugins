@@ -483,6 +483,24 @@ export class AgentsController {
     } else if (this.ignoredTabs.includes(this.$scope.tab)) {
       timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
+    if(tab === 'syscollector'){ // TODO: Migrate syscollector to React
+      let breadcrumb = [
+          {
+            text: '',
+          },
+          {
+            text: 'Agents',
+            href: "#/agents-preview"
+          },
+          { agent: this.$scope.agent },
+          {
+            text: 'Inventory Data',
+            className: 'wz-global-breadcrumb-popover'
+          },
+        ];
+      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+      $('#breadcrumbNoTitle').attr("title","");
+    }
 
     // Update agent status
     if (!force && ((this.$scope || {}).agent || false)) {
@@ -750,9 +768,6 @@ export class AgentsController {
       );
 
       this.$scope.syscollector = (syscollectorData || {}).data || {};
-      if(!this.$scope.syscollector.os && !this.$scope.syscollector.hardware ){
-        this.switchTab("welcome")
-      }
 
       return;
     } catch (error) {
