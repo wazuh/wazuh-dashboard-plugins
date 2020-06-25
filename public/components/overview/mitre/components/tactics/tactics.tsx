@@ -287,7 +287,7 @@ export class Tactics extends Component {
 
           <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}> 
             <EuiPopover
-              button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()}></EuiButtonIcon>)}
+              button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()} aria-label={'tactics options'}></EuiButtonIcon>)}
               isOpen={this.state.isPopoverOpen}
               panelPaddingSize="none"
               withTitle
