@@ -42,12 +42,14 @@ export default class SettingsLogs extends Component {
   };
 
   componentDidMount() {
+    this._isMounted = true;
     this.refresh();
     this.height = window.innerHeight - this.offset; //eslint-disable-line
     window.addEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
     window.removeEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
@@ -56,7 +58,7 @@ export default class SettingsLogs extends Component {
       refreshingEntries: true
     });
     const logs = await this.props.getLogs();
-    this.setState({
+    this._isMounted && this.setState({
       refreshingEntries: false,
       logs
     });
