@@ -25,14 +25,17 @@ import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
+import { WzSearchBar, filtersToObject} from '../../../components/wz-search-bar';
 
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
-    this.state = { itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false };
+    const { agent } = this.props;
+    this.state = { agent, itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false , filters: []}
     this.policies = [];
     this.wzReq = WzRequest;
+    this.suggestions = {};
     this.timeService = TimeService;
     this.columnsPolicies = [
       {
@@ -202,6 +205,41 @@ export class Inventory extends Component {
     );
   }
 
+  buildSuggestionSearchBar(policy, checks){
+    if(this.suggestions[policy]) return;
+    const distinctFields = {};
+    checks.forEach(item => {
+      Object.keys(item).forEach(field => {
+        if(typeof item[field] === 'string'){
+          if(!distinctFields[field]){
+            distinctFields[field] = {};
+          }
+          if(!distinctFields[field][item[field]]){
+            distinctFields[field][item[field]] = true;
+          }
+        }
+      });
+    });
+
+    // TODO: pending API
+     // { type: 'params', label: 'command', description: 'Filter by check command', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["command"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'title', description: 'Filter by check title', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["title"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["result"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["status"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["rationale"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["registry"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'description', description: 'Filter by check description', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["description"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'remediation', description: 'Filter by check remediation', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["remediation"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'reason', description: 'Filter by check reason', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["reason"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+    
+    this.suggestions[policy] = [ 
+      { type: 'params', label: 'condition', description: 'Filter by check condition', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["condition"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'file', description: 'Filter by check file', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["file"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'references', description: 'Filter by check references', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["references"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+    ]
+
+  }
+
   async initialize() {
     try {
       this._isMount && this.setState({ loading: true });
@@ -234,14 +272,17 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy) {
+    const filtersObject= filtersToObject(this.state.filters);
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
       const checks = await this.wzReq.apiReq(
         'GET',
         `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
-        {}
+        {...filtersObject}
       );
+
       this.checks = (((checks || {}).data || {}).data || {}).items || [];
+      this.buildSuggestionSearchBar(policy.policy_id, this.checks);
     }
     this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
   }
@@ -325,6 +366,12 @@ export class Inventory extends Component {
       );
     } catch (error) {
       this.showToast('danger', error, 3000);
+    }
+  }
+
+  componentDidUpdate(prevProps,prevState){
+    if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
+      this.loadScaPolicy(this.state.lookingPolicy);
     }
   }
 
@@ -490,6 +537,17 @@ export class Inventory extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size="m" />
+                
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <WzSearchBar
+                      filters={this.state.filters}
+                      suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
+                      placeholder='Add filter or search' 
+                      onFiltersChange={filters => this.setState({filters})} />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiInMemoryTable
@@ -500,7 +558,6 @@ export class Inventory extends Component {
                       itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
                       isExpandable={true}
                       sorting={sorting}
-                      search={search}
                       pagination={pagination}
                       loading={this.state.loadingPolicy}
                     />
