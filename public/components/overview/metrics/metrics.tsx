@@ -21,6 +21,7 @@ import { buildRangeFilter, buildPhrasesFilter,buildPhraseFilter, buildExistsFilt
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
+import { ModulesHelper } from '../../common/modules/modules-helper'
 
 
 
@@ -60,6 +61,7 @@ export class Metrics extends Component {
         time: {from: 'init', to: 'init'},
       },
     }
+    this.modulesHelper = ModulesHelper;
     this.stats = <></>;
 
     this.metricsList = {
@@ -102,6 +104,7 @@ export class Metrics extends Component {
 
   async componentDidMount() {
     this.indexPattern = await getIndexPattern();
+    this.scope = await this.modulesHelper.getDiscoverScope();
     this._isMount = true;
     this.buildMetric();
   }
@@ -126,10 +129,11 @@ export class Metrics extends Component {
   buildMetric(){
     if(!this.metricsList[this.props.section] || !this._isMount) return <></>;
     const newFilters = this.filterManager.filters;
+    const searchBarQuery = this.scope.state.query;
     const newTime = this.timefilter.getTime();
       const filterParams = {};
       filterParams["time"] = this.timefilter.getTime(); 
-      filterParams["query"] = this.state.filterParams.query; 
+      filterParams["query"] = searchBarQuery; 
       filterParams["filters"] = this.filterManager.filters; 
       this.setState({filterParams, loading: true, results:{}})
       
