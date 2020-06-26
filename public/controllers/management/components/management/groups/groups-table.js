@@ -40,22 +40,7 @@ import GroupsColums from './utils/columns-main';
 class WzGroupsTable extends Component {
   _isMounted = false;
 
-  suggestions = [
-    {
-      type: 'q', label: 'name', description: 'Filter by group name', operators: ['=', '!=', '~'], values: async (value) => {
-        const result = await WzRequest.apiReq('GET', `/groups`, {
-          params: 
-            {
-              limit: 30,
-              ...(value ? { search: value } : {}),
-            }
-          });
-        return (((result || {}).data || {}).data || {}).affected_items.map((item) => { return item['name'] });
-      },
-    },
-    { type: 'q', label: 'count', description: 'Filter by number of agents', operators: ['=', '!=', '<', '>'], values: [] },
-
-  ]
+  suggestions = []; //TODO: Fix suggestions without q search for API 4.0
 
   constructor(props) {
     super(props);
