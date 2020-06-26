@@ -53,7 +53,7 @@ class WzRulesetSearchBar extends Component {
     },
     {
       type: 'params',
-      label: 'file',
+      label: 'filename',
       description: 'Filters the rules by file name.',
       values: async value => {
         const filter = { limit: 30 };
@@ -62,20 +62,20 @@ class WzRulesetSearchBar extends Component {
         }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/files', filter);
-        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.file});
+        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.filename});
       },
     },
     {
       type: 'params',
-      label: 'path',
+      label: 'relative_dirname',
       description: 'Path of the rules files',
-      values: async () => {
+      values: async value => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/manager/configuration', {
+        const result = await wzReq('GET', '/manager/configuration', {params: {
           section: 'ruleset',
           field: 'rule_dir'
-        });
-        return ((result || {}).data || {}).data;
+        }});
+        return (((result || {}).data || {}).data || {}).affected_items[0].ruleset.rule_dir;
       }
     },
     {
@@ -84,7 +84,7 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by HIPAA requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/rules/hipaa', {});
+        const result = await wzReq('GET', '/rules/requirement/hipaa', {});
         return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
@@ -94,7 +94,7 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by GDPR requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/rules/gdpr', {});
+        const result = await wzReq('GET', '/rules/requirement/gdpr', {});
         return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
@@ -104,7 +104,7 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by NIST requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/rules/nist-800-53', {});
+        const result = await wzReq('GET', '/rules/requirement/nist-800-53', {});
         return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
@@ -114,7 +114,7 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by GPG requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/rules/gpg13', {});
+        const result = await wzReq('GET', '/rules/requirement/gpg13', {});
         return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
@@ -124,7 +124,7 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by PCI requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/rules/pci', {});
+        const result = await wzReq('GET', '/rules/requirement/pci_dss', {});
         return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
@@ -134,8 +134,8 @@ class WzRulesetSearchBar extends Component {
       description: 'Filters the rules by TSC requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/rules/tsc', {});
-        return (((result || {}).data || {}).data || {}).items;
+        const result = await wzReq('GET', '/rules/requirement/tsc', {});
+        return (((result || {}).data || {}).data || {}).affected_items;
       }
     },
     {
@@ -143,15 +143,15 @@ class WzRulesetSearchBar extends Component {
       label: 'mitre',
       description: 'Filters the rules by MITRE requirement',
       values: async () => {
-        const result = await WzRequest.apiReq('GET', '/mitre', {});
-        return (((result || {}).data || {}).data || {}).items.map(item => item.id);
+        const result = await WzRequest.apiReq('GET', '/rules/requirement/mitre', {});
+        return (((result || {}).data || {}).data || {}).affected_items;
       }
     }
   ];
   rulesFiles = [
     {
       type: 'params',
-      label: 'file',
+      label: 'filename',
       description: 'Filters the rules by file name.',
       values: async value => {
         const filter = { limit: 30 };
@@ -160,7 +160,7 @@ class WzRulesetSearchBar extends Component {
         }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/files', filter);
-        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.file});
+        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.filename});
       },
     },
   ];
@@ -168,7 +168,7 @@ class WzRulesetSearchBar extends Component {
   decodersItems = [
     {
       type: 'params',
-      label: 'file',
+      label: 'filename',
       description: 'Filters the decoders by file name.',
       values: async value => {
         const filter = { limit: 30 };
@@ -177,20 +177,20 @@ class WzRulesetSearchBar extends Component {
         }
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/decoders/files', filter);
-        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.file});
+        return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item.filename});
       },
     },
     {
       type: 'params',
-      label: 'path',
+      label: 'relative_dirname',
       description: 'Path of the decoders files.',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
-        const result = await wzReq('GET', '/manager/configuration', {
+        const result = await wzReq('GET', '/manager/configuration', {params: {
           section: 'ruleset',
           field: 'decoder_dir'
-        });
-        return ((result || {}).data || {}).data;
+        }});
+        return (((result || {}).data || {}).data || {}).affected_items[0].ruleset.decoder_dir;
       }
     },
     {
