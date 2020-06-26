@@ -339,7 +339,7 @@ export class AgentsPreview extends Component {
                     <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
                       <WzReduxProvider>
                         <KibanaVis
-                          visID={'Wazuh-App-Overview-General-Agents-Evolution'}
+                          visID={'Wazuh-App-Overview-General-Agents-status'}
                           tab={'general'}
                         />
                       </WzReduxProvider>
