@@ -119,10 +119,10 @@ class WzConfigurationSwitch extends Component {
         if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
           const nodes = await clusterNodes();
           // set cluster nodes in Redux Store
-          this.props.updateClusterNodes(nodes.data.data.items);
+          this.props.updateClusterNodes(nodes.data.data.affected_items);
           // set cluster node selected in Redux Store
           this.props.updateClusterNodeSelected(
-            nodes.data.data.items.find(node => node.type === 'master').name
+            nodes.data.data.affected_items.find(node => node.type === 'master').name
           );
         }else{
           // do nothing if it isn't a cluster
