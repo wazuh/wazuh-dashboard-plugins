@@ -197,9 +197,8 @@ export class GroupsController {
       const params = {
         limit: 500,
         offset: !start ? this.availableAgents.offset : 0,
-        select: ['id', 'name']
-      };
-      
+        select: ['id', 'name'].toString()
+      };    
       if (searchTerm) {
         params.search = searchTerm;
       }
