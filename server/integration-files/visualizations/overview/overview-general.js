@@ -291,22 +291,5 @@ export default [
           '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
-  },
-  {
-    _id: "Wazuh-App-Overview-General-Agents-Evolution",
-    _type: "visualization",
-    _source: {
-      title: "Agents evolution",
-      visState:
-        '{"title": "Agents evolution","type": "histogram","params": {"type": "histogram","grid": {"categoryLines": true,"valueAxis": "ValueAxis-1"},"categoryAxes": [{"id": "CategoryAxis-1","type": "category","position": "bottom","show": true,"style": {},"scale": {"type": "linear"},"labels": {"show": true,"filter": true,"truncate": 100},"title": {}}],"valueAxes": [{"id": "ValueAxis-1","name": "LeftAxis-1","type": "value","position": "left","show": true,"style": {},"scale": {"type": "linear","mode": "normal"},"labels": {"show": true,"rotate": 0,"filter": false,"truncate": 100},"title": {"text": "Agents"}}],"seriesParams": [{"show": true,"type": "line","mode": "normal","data": {"label": "Agents","id": "1"},"valueAxis": "ValueAxis-1","drawLinesBetweenPoints": true,"lineWidth": 2,"showCircles": false}],"addTooltip": true,"addLegend": true,"legendPosition": "right","times": [],"addTimeMarker": false,"labels": {"show": false},"thresholdLine": {"show": false,"value": 10,"width": 1,"style": "full","color": "#E7664C"},"radiusRatio": 50},"aggs": [{"id": "1","enabled": true,"type": "cardinality","schema": "metric","params": {"field": "id","customLabel": "Agents"}},{"id": "2","enabled": true,"type": "date_histogram","schema": "segment","params": {"field": "timestamp","timeRange": {"from": "now-7d","to": "now"},"useNormalizedEsInterval": true,"scaleMetricValues": false,"interval": "auto","drop_partials": false,"min_doc_count": 1,"extended_bounds": {}}},{"id": "3","enabled": true,"type": "terms","schema": "group","params": {"field": "status","orderBy": "1","order": "desc","size": 10,"otherBucket": false,"otherBucketLabel": "Other","missingBucket": false,"missingBucketLabel": "Missing"}}]}',
-      uiStateJSON:
-        '{"vis":{"colors":{"Never connected":"#447EBC","Active":"#E5AC0E"}}}',
-      description: "",
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-monitoring","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    }
   }
 ];
