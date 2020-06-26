@@ -43,12 +43,14 @@ class WzGroupsTable extends Component {
   suggestions = [
     {
       type: 'q', label: 'name', description: 'Filter by group name', operators: ['=', '!=', '~'], values: async (value) => {
-        const result = await WzRequest.apiReq('GET', `/agents/groups`,
-          {
-            limit: 30,
-            ...(value ? { search: value } : {}),
-          })
-        return (((result || {}).data || {}).data || {}).items.map((item) => { return item['name'] });
+        const result = await WzRequest.apiReq('GET', `/groups`, {
+          params: 
+            {
+              limit: 30,
+              ...(value ? { search: value } : {}),
+            }
+          });
+        return (((result || {}).data || {}).data || {}).affected_items.map((item) => { return item['name'] });
       },
     },
     { type: 'q', label: 'count', description: 'Filter by number of agents', operators: ['=', '!=', '<', '>'], values: [] },
