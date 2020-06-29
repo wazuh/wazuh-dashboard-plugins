@@ -11,4 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
- export { AgentGroupTruncate } from './agent-group-truncate/'
+ export { AgentGroupTruncate, GroupTruncate} from './agent-group-truncate/';
