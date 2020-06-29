@@ -208,7 +208,6 @@ class WzGroupsTable extends Component {
           rowProps={getRowProps}
           search={{ box: { incremental: true } }}
         />
-        <div>SHOW MODAL {String(this.props.state.showModal)}</div>
         {this.props.state.showModal ? (
           <EuiOverlayMask>
             <EuiConfirmModal
