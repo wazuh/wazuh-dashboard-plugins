@@ -148,18 +148,20 @@ export class Inventory extends Component {
       'GET',
       `/syscheck/${agentID}`,
       {
-        limit: type === 'file' ? '15' : '1',
-        type,
-        ...(type === 'file' && {sort: '+file'})
+        params: {
+          limit: type === 'file' ? '15' : '1',
+          type,
+          ...(type === 'file' && {sort: '+file'})
+        }
       }
     );
     if (type === 'file') {
       return {
-        totalItemsFile: ((response.data || {}).data || {}).totalItems || 0,
-        syscheck: ((response.data || {}).data || {}).items || [],
+        totalItemsFile: ((response.data || {}).data || {}).total_affected_items || 0,
+        syscheck: ((response.data || {}).data || {}).affected_items || [],
       }
     }
-    return ((response.data || {}).data || {}).totalItems || 0;
+    return ((response.data || {}).data || {}).total_affected_items || 0;
   }
 
   renderTabs() {

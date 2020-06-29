@@ -63,14 +63,22 @@ export class FlyoutDetail extends Component {
         const match = window.location.href.match(regex);
         if (match && match[0]) {
           const file = decodeURIComponent(match[0].split('=')[1]);
-          const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {q: `file=${file}`});
-          currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
+          const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
+            params: {
+              q: `file=${file}`
+            }
+          });
+          currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
         }
       } else if(this.props.item){
         currentFile = this.props.item;
       }else{
-        const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {q: `file=${this.props.fileName}`});
-        currentFile = ((((data || {}).data || {}).data || {}).items || [])[0];
+        const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
+          params: {
+            q: `file=${this.props.fileName}`
+          }
+        });
+        currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
       }
       if (!currentFile) {
         throw (false);

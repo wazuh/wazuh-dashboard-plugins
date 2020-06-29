@@ -88,8 +88,12 @@ export class InventoryTable extends Component {
         return item.file === file;
       })
     } else {
-      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, { 'file': file });
-      fileData = ((response.data || {}).data || {}).items || [];
+      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
+        params: { 
+          'file': file 
+        }
+      });
+      fileData = ((response.data || {}).data || {}).affected_items || [];
     }
     if (!redirect)
       window.location.href = window.location.href += `&file=${file}`;
@@ -109,13 +113,13 @@ export class InventoryTable extends Component {
     try {
       const syscheck = await WzRequest.apiReq(
       'GET',
-      `/syscheck/${agentID}`,
-      this.buildFilter()
-      );
+      `/syscheck/${agentID}`, {
+        params: this.buildFilter()
+      });
       
       this.setState({
-        syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
-        totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
+        syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},
+        totalItems: (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
         isLoading: false,
         error: undefined
       });
