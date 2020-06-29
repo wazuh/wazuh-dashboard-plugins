@@ -15,12 +15,12 @@ import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { npSetup } from 'ui/new_platform';
 import { AppState } from '../../../../react-services/app-state';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { Query, TimeRange, buildRangeFilter, buildEsQuery, getEsQueryConfig } from '../../../../../../../src/plugins/data/common';
+import { Query, TimeRange, buildRangeFilter, buildEsQuery, getEsQueryConfig, Filter } from '../../../../../../../src/plugins/data/common';
 import { SearchParams, SearchResponse } from 'elasticsearch';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
 
 export interface IFilterParams {
-  filters: []
+  filters: Filter[]
   query: Query
   time: TimeRange
 }
