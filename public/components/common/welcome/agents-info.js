@@ -30,10 +30,10 @@ export class AgentInfo extends Component {
   }
 
   async componentDidMount() {
-    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+    const managerVersion = await WzRequest.apiReq('GET', '//', {});
 
     this.setState({
-      managerVersion: ((managerVersion || {}).data || {}).data || {}
+      managerVersion: ((managerVersion || {}).data || {}).api_version || {}
     });
   }
 

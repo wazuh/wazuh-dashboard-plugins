@@ -65,16 +65,18 @@ export class AgentsTable extends Component {
   }
 
   async UNSAFE_componentWillMount() {
-    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+    const managerVersion = await WzRequest.apiReq('GET', '//', {});
     const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
     const agentActive = await WzRequest.apiReq('GET', '/agents', {
-      q: 'status=active'
+      params: {
+        q: 'status=active'
+      }
     });
 
     this.setState({
-      managerVersion: managerVersion.data.data,
+      managerVersion: managerVersion.data.api_version,
       agentActive: agentActive.data.data.totalItems,
-      avaibleAgents: totalAgent.data.data.items
+      avaibleAgents: totalAgent.data.data.affected_items
     });
   }
 
