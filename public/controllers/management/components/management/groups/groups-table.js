@@ -74,7 +74,9 @@ class WzGroupsTable extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     const { items, filters } = this.state;
-    const { isProcessing } = this.props.state;
+    const { isProcessing, showModal } = this.props.state;
+    if (showModal !== nextProps.state.showModal)
+      return true;
     if (isProcessing !== nextProps.state.isProcessing)
       return true;
     if (JSON.stringify(items) !== JSON.stringify(nextState.items))
@@ -206,6 +208,7 @@ class WzGroupsTable extends Component {
           rowProps={getRowProps}
           search={{ box: { incremental: true } }}
         />
+        <div>SHOW MODAL {String(this.props.state.showModal)}</div>
         {this.props.state.showModal ? (
           <EuiOverlayMask>
             <EuiConfirmModal
