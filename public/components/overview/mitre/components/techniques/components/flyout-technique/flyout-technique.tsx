@@ -114,9 +114,11 @@ export class FlyoutTechnique extends Component {
       this.setState({loading: true, techniqueData: {}});
       const { currentTechnique } = this.props;
       const result = await WzRequest.apiReq('GET', '/mitre', {
-        q: `id=${currentTechnique}`
+        params: {
+          q: `id=${currentTechnique}`
+        }
       });
-      const rawData = (((result || {}).data || {}).data || {}).items
+      const rawData = (((result || {}).data || {}).data || {}).affected_items
       !!rawData && this.formatTechniqueData(rawData[0]);
     }catch(err){
       this.setState({loading: false});

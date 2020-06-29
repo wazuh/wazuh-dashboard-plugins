@@ -326,11 +326,13 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         if(searchValue){
           this._isMount && this.setState({isSearching: true});
           const response = await WzRequest.apiReq('GET', '/mitre', {
-            select: "id",
-            search: searchValue,
-            limit: 500
+            params: {
+              select: "id",
+              search: searchValue,
+              limit: 500
+            }
           });
-          const filteredTechniques = ((((response || {}).data || {}).data).items || []).map(item => item.id);
+          const filteredTechniques = ((((response || {}).data || {}).data).affected_items || []).map(item => item.id);
           this._isMount && this.setState({ filteredTechniques, isSearching: false });
         }else{
           this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
