@@ -23,18 +23,22 @@ import {
   EuiHealth,
   EuiCallOut,
   EuiSwitch,
-  EuiSpacer
+  EuiSpacer,
+  EuiEmptyPrompt,
+  EuiLoadingChart
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
+import { WzEuiPrompt } from '../directives/wz-eui-prompt/components/wz-eui-prompt';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
 app
   .value('EuiIcon', EuiIcon)
   .value('EuiTextArea', EuiTextArea)
+  .value('EuiEmptyPrompt', EuiEmptyPrompt)
   .value('EuiSuperSelect', EuiSuperSelect)
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
@@ -45,7 +49,9 @@ app
   .value('EuiCallOut', EuiCallOut)
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
+  .value('WzEuiPrompt', WzEuiPrompt)
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer', EuiSpacer)
   .value('SyscheckTable', SyscheckTable)
-  .value('EuiSpacer', EuiSpacer);
+  .value('EuiSpacer', EuiSpacer)
+  .value('EuiLoadingChart', EuiLoadingChart)

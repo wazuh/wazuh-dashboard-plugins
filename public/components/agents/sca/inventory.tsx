@@ -25,15 +25,17 @@ import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
+import { WzSearchBar, filtersToObject} from '../../../components/wz-search-bar';
 
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
     const { agent } = this.props;
-    this.state = { agent, itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false }
+    this.state = { agent, itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false , filters: []}
     this.policies = [];
     this.wzReq = WzRequest;
+    this.suggestions = {};
     this.timeService = TimeService;
     this.columnsPolicies = [
       {
@@ -158,12 +160,18 @@ export class Inventory extends Component {
       const id = match[0].split('=')[1];
       const policy = await this.wzReq.apiReq(
         'GET',
-        `/sca/${this.state.agent.id}`,
+        `/sca/${this.props.agent.id}`,
         { "q": "policy_id=" + id }
       );
       await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
       window.location.href = window.location.href.replace(new RegExp('redirectPolicy=' + '[^&]*'), '');
       this.setState({ loading: false });
+    }
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
+      await this.initialize();
     }
   }
 
@@ -197,11 +205,50 @@ export class Inventory extends Component {
     );
   }
 
+  buildSuggestionSearchBar(policy, checks){
+    if(this.suggestions[policy]) return;
+    const distinctFields = {};
+    checks.forEach(item => {
+      Object.keys(item).forEach(field => {
+        if(typeof item[field] === 'string'){
+          if(!distinctFields[field]){
+            distinctFields[field] = {};
+          }
+          if(!distinctFields[field][item[field]]){
+            distinctFields[field][item[field]] = true;
+          }
+        }
+      });
+    });
+
+    // TODO: pending API
+     // { type: 'params', label: 'command', description: 'Filter by check command', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["command"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'title', description: 'Filter by check title', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["title"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["result"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["status"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["rationale"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["registry"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'description', description: 'Filter by check description', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["description"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'remediation', description: 'Filter by check remediation', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["remediation"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+     // { type: 'params', label: 'reason', description: 'Filter by check reason', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["reason"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+    
+    this.suggestions[policy] = [ 
+      { type: 'params', label: 'condition', description: 'Filter by check condition', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["condition"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'file', description: 'Filter by check file', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["file"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'references', description: 'Filter by check references', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["references"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+    ]
+
+  }
+
   async initialize() {
     try {
       this._isMount && this.setState({ loading: true });
       this.lookingPolicy = false;
-      const policies = await WzRequest.apiReq('GET', `/sca/${this.state.agent.id}`, {});
+      const policies = await this.wzReq.apiReq(
+        'GET',
+        `/sca/${this.props.agent.id}`,
+        {}
+      );
       this.policies = (((policies || {}).data || {}).data || {}).affected_items || [];
       const models = [];
       for (let i = 0; i < this.policies.length; i++) {
@@ -225,10 +272,17 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy) {
+    const filtersObject= filtersToObject(this.state.filters);
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
-      const checks = await this.wzReq.apiReq('GET', `/sca/${this.state.agent.id}/checks/${policy.policy_id}`, {});
+      const checks = await this.wzReq.apiReq(
+        'GET',
+        `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
+        { params: {...filtersObject} }
+      );
+
       this.checks = (((checks || {}).data || {}).data || {}).affected_items || [];
+      this.buildSuggestionSearchBar(policy.policy_id, this.checks);
     }
     this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
   }
@@ -306,12 +360,18 @@ export class Inventory extends Component {
     try {
       this.showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
-        '/sca/' + this.state.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
+        '/sca/' + this.props.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
         [],
         this.state.lookingPolicy.policy_id + '.csv'
       );
     } catch (error) {
       this.showToast('danger', error, 3000);
+    }
+  }
+
+  componentDidUpdate(prevProps,prevState){
+    if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
+      this.loadScaPolicy(this.state.lookingPolicy);
     }
   }
 
@@ -367,7 +427,7 @@ export class Inventory extends Component {
           )}
         </div>
         <EuiPage>
-          {((this.state.agent && (this.state.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
             <EuiCallOut title="No scans available" iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                 Refresh
@@ -375,14 +435,14 @@ export class Inventory extends Component {
             </EuiCallOut>
           )}
 
-          {((this.state.agent && (this.state.agent || {}).status === 'Never connected' && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status === 'Never connected' && !this.state.loading) &&
             <EuiCallOut title="Agent has never connected" style={{width: "100%"}} iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                   Refresh
               </EuiButton>
             </EuiCallOut>
           )}
-          {((this.state.agent && (this.state.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).os && !this.state.lookingPolicy && (this.policies || []).length > 0 && !this.state.loading) &&
             <div>
               {((this.state.data || []).length &&
                 <EuiFlexGroup style={{ 'marginTop': 0 }}>
@@ -409,7 +469,7 @@ export class Inventory extends Component {
               </EuiPanel>
             </div>
           )}
-          {((this.state.agent && (this.state.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).os && this.state.lookingPolicy && !this.state.loading) &&
             <div>
               <EuiPanel paddingSize="l">
                 <EuiFlexGroup>
@@ -477,6 +537,17 @@ export class Inventory extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size="m" />
+                
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <WzSearchBar
+                      filters={this.state.filters}
+                      suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
+                      placeholder='Add filter or search' 
+                      onFiltersChange={filters => this.setState({filters})} />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiInMemoryTable
@@ -487,7 +558,6 @@ export class Inventory extends Component {
                       itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
                       isExpandable={true}
                       sorting={sorting}
-                      search={search}
                       pagination={pagination}
                       loading={this.state.loadingPolicy}
                     />

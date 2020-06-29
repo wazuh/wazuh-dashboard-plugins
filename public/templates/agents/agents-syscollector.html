@@ -8,6 +8,11 @@
     </div>
   </div>
 
+  <div ng-if="agent && agent.status === 'Never connected'">
+    <react-component name="WzEuiPrompt" props="{icon:'securitySignalDetected', title:'Agent has never connected', promptText:'The agent has been registered but has not yet connected to the manager',docsUrl:'https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html',
+      href:'#/agents-preview?', actionButton: 'Back to agents'}"></react-component>
+  </div>
+  
   <div ng-if="agent && agent.status !== 'Never connected'">
     <div layout="row" class="layout-padding" ng-if="!hasSize(syscollector)">
       <md-card flex class="wz-md-card" flex>
@@ -17,6 +22,15 @@
         </md-card-content>
       </md-card>
     </div>
+
+    <!-- Report status section -->
+    <div layout="column" layout-align="center center" class="wz-margin-top-8"
+        ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
+        <!-- <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div> -->
+        <react-component name="EuiLoadingChart" props="{size: 'l'}" ></react-component>
+        <div class="percentage">{{reportStatus}}</div>
+    </div>
+    <!-- End report status section -->
 
     <div layout="row" class="layout-padding wz-padding-bottom-0"
       ng-if="hasSize(syscollector) && (!hasSize(syscollector.hardware) || !hasSize(syscollector.os))">

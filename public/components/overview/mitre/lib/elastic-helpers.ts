@@ -17,6 +17,7 @@ import { AppState } from '../../../../react-services/app-state';
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { Query, TimeRange, buildRangeFilter, buildEsQuery, getEsQueryConfig } from '../../../../../../../src/plugins/data/common';
 import { SearchParams, SearchResponse } from 'elasticsearch';
+import { WazuhConfig } from '../../../../react-services/wazuh-config';
 
 export interface IFilterParams {
   filters: []
@@ -35,7 +36,30 @@ export async function getIndexPattern() {
 }
 
 export async function getElasticAlerts(indexPattern, filterParams:IFilterParams, aggs:any=null, kargs={}) {
-  const query = buildQuery(indexPattern, filterParams);
+  const wazuhConfig = new WazuhConfig();
+  const extraFilters = [];
+  const { hideManagerAlerts } = wazuhConfig.getConfig();
+  if(hideManagerAlerts) extraFilters.push({
+      meta: {
+        alias: null,
+        disabled: false,
+        key: 'agent.id',
+        negate: true,
+        params: { query: '000' },
+        type: 'phrase',
+        index: indexPattern.title
+      },
+      query: { match_phrase: { 'agent.id': '000' } },
+      $state: { store: 'appState' }
+    });
+
+
+  const queryFilters:IFilterParams = {};
+  queryFilters["query"] = filterParams.query;
+  queryFilters["time"] = filterParams.time;
+  queryFilters["filters"] = [...filterParams.filters, ...extraFilters];
+
+  const query = buildQuery(indexPattern, queryFilters);
   const filters = ((query || {}).bool || {}).filter;
   if(filters && Array.isArray(filters)){
     filters.forEach(item => {

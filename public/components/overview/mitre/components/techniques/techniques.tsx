@@ -258,7 +258,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     if(this.state.isSearching || this.state.loadingAlerts || this.props.isLoading){
       return (
         <EuiFlexItem style={{ height: "calc(100vh - 410px)", alignItems: 'center' }} >
-          <EuiLoadingSpinner size='xl' style={{ margin: 0, position: 'absolute', top: '50%', transform: 'translateY(-50%)' }} />
+          <EuiLoadingSpinner size='xl'/>
         </EuiFlexItem>
       )
     }
