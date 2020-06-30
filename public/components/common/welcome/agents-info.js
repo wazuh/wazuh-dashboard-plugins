@@ -21,6 +21,7 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
+import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate'
 
 export class AgentInfo extends Component {
@@ -124,7 +125,7 @@ export class AgentInfo extends Component {
     const stats = items.map(item => {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
-          <EuiStat
+          <WzStat
             title={
               item.description === 'Groups' ? (
                 <GroupTruncate agent={this.props.agent} groups={this.props.agent.group} length={40} label={'more'} {...this.props}/>

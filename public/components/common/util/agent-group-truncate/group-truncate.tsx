@@ -38,7 +38,7 @@ export class GroupTruncate extends React.Component {
 
   renderButton(auxIndex) {
     return (
-      <EuiLink style={{textDecoration: 'none'}} onClick={() => this.setState({popoverOpen: !this.state.popoverOpen})}>
+      <EuiLink style={{textDecoration: 'none'}} className={'no-focus'} onClick={() => this.setState({popoverOpen: !this.state.popoverOpen})}>
         &nbsp;{`+${auxIndex} ${this.props.label}`}
       </EuiLink>
     )
@@ -94,9 +94,9 @@ export class GroupTruncate extends React.Component {
     const button = this.renderButton(auxIndex);
     return (
       <span style={{display: 'inline'}}>
-        <span>
+        <Fragment>
           {auxGroups}
-        </span>
+        </Fragment>
         {auxIndex > 0 && 
             <EuiPopover
               button={button}
@@ -118,9 +118,7 @@ export class GroupTruncate extends React.Component {
   render() {
     const groups = this.renderGroups(this.props.groups)
     return (
-    <span>
-      {groups}
-    </span>
+      groups
     )
   }
 }
