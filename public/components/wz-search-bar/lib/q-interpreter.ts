@@ -31,7 +31,7 @@ export class QInterpreter {
   }
 
   private descomposeQuery (query:string):queryObject[] {
-    const descomposeRegex = /((?<conjuntion>and |or )?(?<field>[\w\.\-]+)?(?<operator>=|!=|<|>|~)?(?<value>[\[\]\{\}\\\w\.\-\:\%\/\s]+)?)/i;
+    const descomposeRegex = new RegExp("((?<conjuntion>and |or )?(?<field>[\\w\\.\\-]+)?(?<operator>=|!=|<|>|~)?(?<value>[\\[\\]\\{\\}\\\\\\w\\.\\-\\:\\%\\/\\s]+)?)","i");
     const getQueryObjects = (query, queries=[]):queryObject[] => {
       const firstConjuntion = / and | or /i.exec(query);
       const currentQ = !!firstConjuntion ? query.slice(0,firstConjuntion.index) : query;
