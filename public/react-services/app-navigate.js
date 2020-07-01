@@ -17,10 +17,7 @@ import { getIndexPattern } from '../components/overview/mitre/lib';
 import { buildPhraseFilter } from '../../../../src/plugins/data/common';
 import rison from 'rison-node';
 
-
 export class AppNavigate {
-
-
   static getUrlParameter(sParam) {
     var sPageURL = window.location.hash.split('?')[1],
         sURLVariables = sPageURL.split('&'),

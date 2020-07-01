@@ -31,7 +31,7 @@ import managementTemplate from '../templates/management/management.pug';
 import overviewTemplate from '../templates/visualize/dashboards.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
-import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import toolsTemplate from '../templates/tools/tools.pug';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
@@ -174,8 +174,8 @@ routes
     redirectTo: function () { },
     resolve: { wzKibana }
   })
-  .when('/wazuh-dev', {
-    template: devToolsTemplate,
+  .when('/tools', {
+    template: toolsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/blank-screen', {

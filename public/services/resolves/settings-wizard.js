@@ -177,7 +177,7 @@ export function settingsWizard(
               AppState.setNavigation({
                 reloaded: false,
                 discoverPrevious: false,
-                discoverSections: ['/overview/', '/agents', '/wazuh-dev']
+                discoverSections: ['/overview/', '/agents', '/tools']
               });
               throw new Error('Could not select any API entry');
             }
