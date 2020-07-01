@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { EuiEmptyPrompt, EuiButton, EuiFlexGroup, EuiFlexItem, EuiIcon } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiButton, EuiFlexGroup, EuiFlexItem, EuiIcon, EuiCallOut } from '@elastic/eui';
 import {InventoryMetrics} from './components/syscollector-metrics';
 import {SyscollectorTable} from './components/syscollector-table';
 
@@ -41,6 +41,13 @@ export function SyscollectorInventory({agent}){
 
   return (
     <div style={{overflow: 'hidden'}}>
+      {agent && agent.status === 'Disconnected' && 
+         <EuiCallOut
+         style={{margin: "8px 16px 8px 16px"}}
+         title="This agent is currently disconnected, the data may be outdated."
+         iconType="iInCircle"
+       />
+      }
       <EuiFlexGroup gutterSize="s"> 
         <EuiFlexItem style={{marginBottom: 0}}>
           <InventoryMetrics agent={agent}></InventoryMetrics> 
