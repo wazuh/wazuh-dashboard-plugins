@@ -23,12 +23,13 @@ import { I18nProvider } from '@kbn/i18n/react';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
-import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
+import { getElasticAlerts, getIndexPattern, IFilterParams } from '../mitre/lib';
 import { pciRequirementsFile } from '../../../../server/integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../../../../server/integration-files/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../server/integration-files/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../server/integration-files/nist-requirements';
 import { tscRequirementsFile } from '../../../../server/integration-files/tsc-requirements';
+import { KbnSearchBar } from '../../kbn-search-bar';
 
 
 export class ComplianceTable extends Component {
@@ -45,10 +46,7 @@ export class ComplianceTable extends Component {
   state: {
     selectedRequirement: string,
     flyoutOn: boolean,
-    dateRange: object,
-    filterParams: object,
-    query: object,
-    searchBarFilters: [],
+    filterParams: IFilterParams,
     complianceObject: object,
     descriptions: object,
     loadingAlerts: boolean
@@ -70,13 +68,10 @@ export class ComplianceTable extends Component {
       loadingAlerts: true,
       selectedRequirements: {},
       filterParams: {
-        filters: [],
+        filters: this.filterManager.getFilters() || [],
         query: { language: 'kuery', query: '' },
-        time: { from: 'init', to: 'init' },
+        time: this.timefilter.getTime(),
       },
-      dateRange: this.timefilter.getTime(),
-      query: { language: "kuery", query: "" },
-      searchBarFilters: [],
     }
 
     this.onChangeSelectedRequirements.bind(this);
@@ -189,78 +184,15 @@ export class ComplianceTable extends Component {
 
   onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
     const { dateRange, query } = payload;
-    this.timefilter.setTime(dateRange);
-    const filterParams = {};
-    filterParams["time"] = dateRange;
-    filterParams["query"] = query;
-    filterParams["filters"] = this.state.filterParams["filters"];
-    this.setState({ dateRange, query, filterParams, loadingAlerts: true });
+    const { filters } = this.state.filterParams;
+    const filterParams:IFilterParams = { time: dateRange, filters, query};
+    this.setState({ filterParams, loadingAlerts: true });
   }
 
   onFiltersUpdated = (filters: []) => {
-    this.filterManager.setFilters(filters);
-    const filterParams = {};
-    filterParams["time"] = this.state.filterParams["time"];
-    filterParams["query"] = this.state.filterParams["query"];
-    filterParams["filters"] = filters;
-    this.setState({ searchBarFilters: filters, filterParams, loadingAlerts: true });
-  }
-
-
-
-  getSearchBar() {
-    const { filterManager, KibanaServices } = this;
-    if (JSON.stringify(filterManager.filters) !== JSON.stringify(this.state.filterParams.filters || JSON.stringify(this.state.dateRange) !== JSON.stringify(this.state.filterParams.time))) {
-      const filterParams = {};
-      filterParams["filters"] = filterManager.filters
-      filterParams["query"] = this.state.filterParams.query
-      filterParams["time"] = this.state.dateRange
-      this.setState({ filterParams })
-    }
-
-    const storage = {
-      ...window.localStorage,
-      get: (key) => JSON.parse(window.localStorage.getItem(key) || '{}'),
-      set: (key, value) => window.localStorage.setItem(key, JSON.stringify(value)),
-      remove: (key) => window.localStorage.removeItem(key)
-    }
-    const http = {
-      ...KibanaServices.indexPatterns.apiClient.http
-    }
-    const savedObjects = {
-      ...KibanaServices.indexPatterns.savedObjectsClient
-    }
-    const data = {
-      ...KibanaServices.data,
-      query: {
-        ...KibanaServices.data.query,
-      }
-    }
-    const { dateRange, query, loadingAlerts } = this.state;
-    return (
-      <KibanaContextProvider services={{
-        ...KibanaServices,
-        appName: "wazuhMitre",
-        data,
-        storage,
-        http,
-        savedObjects
-      }} >
-        <I18nProvider>
-          <SearchBar
-            indexPatterns={[this.indexPattern]}
-            filters={filterManager.filters}
-            dateRangeFrom={dateRange.from}
-            dateRangeTo={dateRange.to}
-            onQuerySubmit={this.onQuerySubmit}
-            onFiltersUpdated={this.onFiltersUpdated}
-            query={query}
-            isLoading={loadingAlerts}
-            timeHistory={this.timefilter._history}
-            {...{ appName: 'wazuhCompliance' }} />
-        </I18nProvider>
-      </KibanaContextProvider>
-    );
+    const { time, query} = this.state.filterParams;
+    const filterParams = {time, query, filters};
+    this.setState({ filterParams, loadingAlerts: true });
   }
 
   async componentDidUpdate(prevProps) {
@@ -334,12 +266,15 @@ export class ComplianceTable extends Component {
 
 
   render() {
-    const { complianceObject } = this.state;
+    const { complianceObject, loadingAlerts } = this.state;
     return (<div>
       <EuiFlexGroup>
         <EuiFlexItem>
           <div className='wz-discover hide-filter-controll' >
-            {this.getSearchBar()}
+            <KbnSearchBar 
+              onQuerySubmit={this.onQuerySubmit}
+              onFiltersUpdated={this.onFiltersUpdated}
+              isLoading={loadingAlerts} />
           </div>
         </EuiFlexItem>
       </EuiFlexGroup>

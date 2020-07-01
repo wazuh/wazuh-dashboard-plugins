@@ -20,17 +20,12 @@ import { ApiRequest } from '../../../react-services/api-request';
 import { toastNotifications } from 'ui/notify';
 import { IFilterParams, getIndexPattern } from './lib';
 
-import { SearchBar, FilterManager } from '../../../../../../src/plugins/data/public/';
-import { KibanaContextProvider } from '../../../../../../src/plugins/kibana_react/public/context';
-import { I18nProvider } from '@kbn/i18n/react';
-//@ts-ignore
+import {  FilterManager, Filter } from '../../../../../../src/plugins/data/public/';
 //@ts-ignore
 import { getServices } from 'plugins/kibana/discover/kibana_services';
-
-import {
-  TimeRange,
-  Query
-} from '../../../../../../src/plugins/data/common';
+import { KbnSearchBar } from '../../kbn-search-bar';
+import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
+import { ModulesHelper } from '../../common/modules/modules-helper';
 
 export interface ITactic {
   [key:string]: string[]
@@ -50,12 +45,9 @@ export class Mitre extends Component {
   indexPattern: any;
   destroyWatcher: any;
   state: {
-    dateRange: TimeRange,
     tacticsObject: ITactic,
     selectedTactics: Object,
     filterParams: IFilterParams,
-    query: Query,
-    searchBarFilters: [],
     isLoading: boolean
   } 
 
@@ -71,54 +63,41 @@ export class Mitre extends Component {
       selectedTactics: {},
       isLoading: true,
       filterParams: {
-        filters: this.filterManager.filters || [],
+        filters: this.filterManager.getFilters() || [],
         query: { language: 'kuery', query: '' },
-        time: this.timefilter._time,
+        time: this.timefilter.getTime(),
       },
-      dateRange: this.timefilter.getTime(),
-      query: { language: "kuery", query: "" },
-      searchBarFilters: [],
     }
     this.onChangeSelectedTactics.bind(this);
     this.onQuerySubmit.bind(this);
     this.onFiltersUpdated.bind(this);
   }
 
-
-  onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
-    const { dateRange, query } = payload;
-    this.timefilter.setTime(dateRange);
-    const filterParams = {};
-    filterParams["time"] = dateRange;
-    filterParams["query"] = query; 
-    filterParams["filters"] = this.state.filterParams["filters"]; 
-    this.setState({ dateRange, query, filterParams, isLoading: true }, () => this.setState({isLoading:false}));
-  }
-
-  onFiltersUpdated = (filters: []) => {
-    this.filterManager.setFilters(filters);
-    const filterParams = {};
-    filterParams["time"] = this.state.filterParams["time"];
-    filterParams["query"] = this.state.filterParams["query"];
-    filterParams["filters"] =  filters; 
-    this.setState({ searchBarFilters: filters, filterParams, isLoading: true }, () => this.setState({isLoading:false}));
-  }
-
-
-
-
   async componentDidMount(){
     this._isMount = true;
-    this.filtersSubscriber = this.filterManager.updated$.subscribe(() => {
-      this.onFiltersUpdated(this.filterManager.filters)
-    });
     this.indexPattern = await getIndexPattern();
+    const scope = await ModulesHelper.getDiscoverScope();
+    const query = scope.state.query;
+    const { filters, time} = this.state.filterParams;
+    this.setState({filterParams: {query, filters, time}})
     await this.buildTacticsObject();
   }
 
   componentWillUnmount() {
     this._isMount = false;
-    this.filtersSubscriber.unsubscribe();
+  }
+
+  onQuerySubmit = (payload: { dateRange: TimeRange, query: Query }) => {
+    const { query, dateRange } = payload;
+    const { filters } = this.state.filterParams
+    const filterParams = { query, time: dateRange , filters};
+    this.setState({ filterParams, isLoading: true }, () => this.setState({isLoading:false}));
+  }
+
+  onFiltersUpdated = (filters: Filter[]) => {
+    const { query, time } = this.state.filterParams;
+    const filterParams = { query, time, filters };
+    this.setState({ filterParams, isLoading: true }, () => this.setState({isLoading:false}));
   }
 
   showToast = (color, title, text, time) => {
@@ -129,55 +108,6 @@ export class Mitre extends Component {
       toastLifeTimeMs: time
     });
   };
-
-
-  getSearchBar() {
-    const { filterManager, KibanaServices } = this;
-
-    const storage = {
-      ...window.localStorage,
-      get: (key) => JSON.parse(window.localStorage.getItem(key) || '{}'),
-      set: (key, value) => window.localStorage.setItem(key, JSON.stringify(value)),
-      remove: (key) => window.localStorage.removeItem(key)
-    }
-    const http = {
-      ...KibanaServices.indexPatterns.apiClient.http
-    }
-    const savedObjects = {
-      ...KibanaServices.indexPatterns.savedObjectsClient
-    }
-    const data = {
-      ...KibanaServices.data,
-      query: {
-        ...KibanaServices.data.query,
-      }
-    }
-    const { dateRange, query, isLoading } = this.state;
-    return (
-      <KibanaContextProvider services={{
-          ...KibanaServices,
-          appName: "wazuhMitre",
-          data,
-          storage,
-          http,
-          savedObjects
-        }} >
-        <I18nProvider>
-          <SearchBar
-            indexPatterns={[this.indexPattern]}
-            filters={filterManager.filters}
-            dateRangeFrom={dateRange.from}
-            dateRangeTo={dateRange.to}
-            onQuerySubmit={this.onQuerySubmit}
-            onFiltersUpdated={this.onFiltersUpdated}
-            query={query}
-            isLoading={isLoading}
-            timeHistory={this.timefilter._history}
-            {...{ appName: 'wazuhMitre' }} />
-        </I18nProvider>
-      </KibanaContextProvider>
-    );
-  }
 
   async buildTacticsObject(){
     try{
@@ -209,12 +139,16 @@ export class Mitre extends Component {
   }
 
   render() {
+    const { isLoading } = this.state;
     return (
       <div>
         <EuiFlexGroup>
           <EuiFlexItem>
             <div className='wz-discover hide-filter-controll' >
-              {this.getSearchBar()}
+              <KbnSearchBar
+                onQuerySubmit={this.onQuerySubmit}
+                onFiltersUpdated={this.onFiltersUpdated}
+                isLoading={isLoading} />
             </div>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -239,7 +173,6 @@ export class Mitre extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
             </EuiPanel>
-            
           </EuiFlexItem>
         </EuiFlexGroup>
        
