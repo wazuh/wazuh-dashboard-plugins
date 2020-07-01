@@ -124,7 +124,7 @@ class WzRulesetEditor extends Component {
       this.showToast(
         'danger',
         'Error',
-        'Error saving rule: ' + error,
+        'Error saving file: ' + error,
         3000
       );
     }
