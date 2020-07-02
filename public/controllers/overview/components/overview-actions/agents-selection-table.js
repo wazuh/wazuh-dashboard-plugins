@@ -35,9 +35,10 @@ import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eu
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
 import chrome from 'ui/chrome';
-import { WzFilterBar } from '../../../../components/wz-filter-bar/wz-filter-bar';
 import { AgentGroupTruncate } from '../../../../components/common/util/agent-group-truncate/agent_group_truncate'
-
+import { WzSearchBar, filtersToObject } from '../../../../components/wz-search-bar';
+import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
+import _ from 'lodash';
 
 const checkField = field => {
   return field !== undefined ? field : '-';
@@ -62,8 +63,7 @@ export class AgentSelectionTable extends Component {
       sortField: 'id',
       agents: [],
       selectedOptions: [],
-      q: '',
-      search: ''
+      filters: []
     };
 
     this.columns = [
@@ -128,6 +128,21 @@ export class AgentSelectionTable extends Component {
         render: status => this.addHealthStatusRender(status),
       },
     ];
+    this.suggestions = [
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
+      { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
+      { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
+      { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
+      { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000'})},
+      { type: 'q', label: 'group', description: 'Filter by agent group', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000'})},
+      { type: 'q', label: 'node_name', description: 'Filter by node name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000'})},
+      { type: 'q', label: 'manager', description: 'Filter by manager', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000'})},
+      { type: 'q', label: 'version', description: 'Filter by agent version', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000'})},
+      { type: 'q', label: 'configSum', description: 'Filter by agent config sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000'})},
+      { type: 'q', label: 'mergedSum', description: 'Filter by agent merged sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000'})},
+      { type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000'})},
+      { type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000'})},
+    ];
   }
 
   onChangeItemsPerPage = async itemsPerPage => {
@@ -149,25 +164,17 @@ export class AgentSelectionTable extends Component {
     this._isMounted && this.setState({itemIdToSelectedMap: this.props.selectedAgents});
     try{
       await this.getItems();
-      const filterStatus = this.filterBarModelStatus();
-      const filterGroups = await this.filterBarModelGroups();
-      const filterOs = await this.filterBarModelOs();
-      const filterVersion = await this.filterBarModelWazuhVersion();
-      const filterOsPlatform = await this.filterBarModelOsPlatform();
-      const filterNodes = await this.filterBarModelNodes();
-      this._isMounted && this.setState({
-        filterStatus,
-        filterGroups,
-        filterOs,
-        filterVersion,
-        filterOsPlatform,
-        filterNodes
-      });
     }catch(error){}
   }
 
   componentWillUnmount(){
     this._isMounted = false;
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if(!(_.isEqual(prevState.filters,this.state.filters))){
+      await this.getItems();
+    }
   }
 
   getArrayFormatted(arrayText) {
@@ -232,16 +239,14 @@ export class AgentSelectionTable extends Component {
   }
 
   buildFilter() {
-    const { itemsPerPage, pageIndex, search, q } = this.state;
+    const { itemsPerPage, pageIndex, filters } = this.state;
     const filter = {
-      q: `id!=000${q ? `;${q}` : ''}`,
-      offset: pageIndex * itemsPerPage,
+      ...filtersToObject(filters),
+      offset: (pageIndex * itemsPerPage) || 0,
       limit: pageIndex * itemsPerPage + itemsPerPage,
-      ...this.buildSortFilter(),
+      ...this.buildSortFilter()
     };
-    if (search) {
-      filter['search'] = search;
-    }
+    filter.q = !filter.q ? `id!=000` : `id!=000;${filter.q}`;
     return filter;
   }
 
@@ -602,153 +607,6 @@ export class AgentSelectionTable extends Component {
       <AgentGroupTruncate groups={groups} length={25} label={'more'}/>
     ) : groups
   }
-  
-  filterBarModelStatus() {
-    return {
-      label: 'Status',
-      options: [
-        {
-          label: 'Active',
-          group: 'status'
-        },
-        {
-          label: 'Disconnected',
-          group: 'status'
-        },
-        {
-          label: 'Never connected',
-          group: 'status'
-        }
-      ]
-    };
-  }
-
-  async filterBarModelGroups() {
-    const rawGroups = await WzRequest.apiReq('GET', '/agents/groups', {});
-    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
-    const groups = itemsGroups
-      .filter(item => {
-        return item.count > 0;
-      })
-      .map(item => {
-        return { label: item.name, group: 'group' };
-      });
-    return {
-      label: 'Groups',
-      options: groups
-    };
-  }
-
-  async filterBarModelOs() {
-    const rawOs = await WzRequest.apiReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'os.name,os.version',
-        q: 'id!=000'
-      }
-    );
-    const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
-    const os = itemsOs
-      .filter(item => {
-        return Object.keys(item).includes('os');
-      })
-      .map(item => {
-        const { name, version } = item.os;
-        return {
-          label: `${name}-${version}`,
-          group: 'osname',
-          query: `os.name=${name};os.version=${version}`
-        };
-      });
-    return {
-      label: 'OS Name',
-      options: os
-    };
-  }
-
-  async filterBarModelOsPlatform() {
-    const rawOsPlatform = await WzRequest.apiReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'os.platform',
-        q: 'id!=000'
-      }
-    );
-    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {})
-      .items;
-    const osPlatform = itemsOsPlatform
-      .filter(item => {
-        return Object.keys(item).includes('os');
-      })
-      .map(item => {
-        const { platform } = item.os;
-        return {
-          label: platform,
-          group: 'osplatform',
-          query: `os.platform=${platform}`
-        };
-      });
-    return {
-      label: 'OS Platform',
-      options: osPlatform
-    };
-  }
-
-  async filterBarModelNodes() {
-    const rawNodes = await WzRequest.apiReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'node_name',
-        q: 'id!=000;node_name!=unknown'
-      }
-    );
-    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
-    const nodes = itemsNodes
-      .filter(item => {
-        return Object.keys(item).includes('node_name');
-      })
-      .map(item => {
-        const { node_name } = item;
-        return {
-          label: node_name,
-          group: 'nodename',
-          query: `node_name=${node_name}`
-        };
-      });
-    return {
-      label: 'Nodes',
-      options: nodes
-    };
-  }
-
-  async filterBarModelWazuhVersion() {
-    const rawVersions = await WzRequest.apiReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'version',
-        q: 'id!=000'
-      }
-    );
-    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
-    const versions = itemsVersions
-      .filter(item => {
-        return Object.keys(item).includes('version');
-      })
-      .map(item => {
-        return {
-          label: item.version,
-          group: 'version'
-        };
-      });
-    return {
-      label: 'Version',
-      options: versions
-    };
-  }
 
   render() {
     const pagination = {
@@ -762,32 +620,15 @@ export class AgentSelectionTable extends Component {
     };
     const selectedAgent = store.getState().appStateReducers.currentAgentData;
 
-    const {
-      filterStatus,
-      filterGroups,
-      filterOs,
-      filterVersion,
-      filterOsPlatform,
-      filterNodes,
-      selectedOptions
-    } = this.state;
-    const model = [
-      filterStatus || { label: 'Status', options: [] },
-      filterGroups || { label: 'Groups', options: [] },
-      filterOs || { label: 'OS Name', options: [] },
-      filterOsPlatform || { label: 'OS Platform', options: [] },
-      filterVersion || { label: 'Version', options: [] },
-      filterNodes || { label: 'Nodes', options: [] }
-    ];
-
     return (
       <div>
         <EuiFlexGroup gutterSize="m">
           <EuiFlexItem>
-            <WzFilterBar
-              model={model}
-              clickAction={(e) => this.onQueryChange(e)}
-              selectedOptions={selectedOptions}
+            <WzSearchBar
+              filters={this.state.filters}
+              suggestions={this.suggestions}
+              onFiltersChange={filters => this.setState({filters, pageIndex: 0})}
+              placeholder="Filter or search agent"
             />
           </EuiFlexItem>
         </EuiFlexGroup>
