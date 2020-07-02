@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
@@ -36,7 +36,7 @@ import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { AgentGroupTruncate } from '../../../components/common/util';
+import { GroupTruncate } from '../../../components/common/util';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -1036,7 +1036,8 @@ export class AgentsTable extends Component {
     const getCellProps = item => {
       return {
         onMouseDown: (ev) => {
-          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
+          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()
+        }
       }
     };
 
@@ -1095,7 +1096,7 @@ export class AgentsTable extends Component {
 
   renderGroups(groups) {
     return(
-      <AgentGroupTruncate groups={groups} length={25} label={'more'}/> 
+      <GroupTruncate groups={groups} length={25} label={'more'} action={'filter'} {...this.props} /> 
     )
   }
 

@@ -21,18 +21,23 @@ import {
   EuiPopover,
 } from '@elastic/eui';
 
-
 export class GroupTruncate extends React.Component {
   _isMount = false;
   state: {
     groups: any,
     popoverOpen: boolean
   }
+  props!: {
+    label: String,
+    length: number,
+    agent: Object,
+    action: String
+  }
   constructor(props) {
     super(props);
     this.state = {
       groups: '',
-      popoverOpen: false
+      popoverOpen: false,
     }
   }
 
@@ -41,6 +46,34 @@ export class GroupTruncate extends React.Component {
       <EuiLink style={{textDecoration: 'none'}} className={'no-focus'} onClick={() => this.setState({popoverOpen: !this.state.popoverOpen})}>
         &nbsp;{`+${auxIndex} ${this.props.label}`}
       </EuiLink>
+    )
+  }
+
+  action(index) {
+    switch (this.props.action) {
+      case 'redirect':
+        return this.props.goGroups(this.props.agent, index);
+      case 'filter':
+        return console.log('filtros');
+      default:
+        console.error('Property error in GroupTruncate component');
+        break;
+    }
+  }
+
+  renderBadge(group, index) {
+    return (
+      <EuiBadge
+        color={'hollow'}
+        key={`agent-group-${index}`}
+        onClickAriaLabel={`agent-group-${group}`}
+        onClick={
+          () => {
+            this.action(index)
+          }
+        }>
+        {group}
+      </EuiBadge>
     )
   }
 
@@ -55,39 +88,21 @@ export class GroupTruncate extends React.Component {
         auxLength = auxLength + group.length;
         if (auxLength >= length ) {
           tooltipGroups.push(
-            <EuiFlexItem className={'badge-group-truncate'} key={`agent-group-${index}`}>
-              <EuiBadge
-                color={'hollow'}
-                key={`agent-group-${index}`}
-                onClickAriaLabel={`agent-group-${group}`}
-                onClick={() => this.props.goGroups(this.props.agent, index)}>
-                {group}
-              </EuiBadge>
+            <EuiFlexItem grow={1} key={`agent-group-${index}`}>
+              {this.renderBadge(group, index)}
             </EuiFlexItem>
           );
           ++auxIndex;
         } else {
           auxGroups.push(
-            <EuiBadge
-              color={'hollow'}
-              key={`agent-group-${index}`}
-              onClickAriaLabel={`agent-group-${group}`}
-              onClick={() => this.props.goGroups(this.props.agent, index)}>
-              {group}
-            </EuiBadge>
+            this.renderBadge(group, index)
           );
         }
       });
     } else {
       groups.map( (group, index) => {
         auxGroups.push(
-          <EuiBadge
-            color={'hollow'}
-            key={`agent-group-${index}`}
-            onClickAriaLabel={`agent-group-${group}`}
-            onClick={() => this.props.goGroups(this.props.agent, index)}>
-            {group}
-          </EuiBadge>
+          this.renderBadge(group, index)
         )
       })
     }
@@ -98,18 +113,18 @@ export class GroupTruncate extends React.Component {
           {auxGroups}
         </Fragment>
         {auxIndex > 0 && 
-            <EuiPopover
-              button={button}
-              isOpen={this.state.popoverOpen}
-              closePopover={() => this.setState({popoverOpen: false})}>
-              <EuiFlexGroup style={{ width: '500px' }} gutterSize="none">
-                <EuiFlexItem grow={false}>
-                  <EuiFlexGrid columns={4}>
-                    {tooltipGroups}
-                  </EuiFlexGrid>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPopover>
+          <EuiPopover
+            button={button}
+            isOpen={this.state.popoverOpen}
+            closePopover={() => this.setState({popoverOpen: false})}>
+            <EuiFlexGroup style={{ width: '500px' }} gutterSize="none">
+              <EuiFlexItem grow={false}>
+                <EuiFlexGrid columns={4} gutterSize={'s'}>
+                  {tooltipGroups}
+                </EuiFlexGrid>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPopover>
         }
       </span>
     );

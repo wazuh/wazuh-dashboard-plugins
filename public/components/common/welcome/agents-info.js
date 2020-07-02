@@ -128,7 +128,14 @@ export class AgentInfo extends Component {
           <WzStat
             title={
               item.description === 'Groups' ? (
-                <GroupTruncate agent={this.props.agent} groups={this.props.agent.group} length={40} label={'more'} {...this.props}/>
+                <GroupTruncate
+                  agent={this.props.agent}
+                  groups={this.props.agent.group}
+                  length={40}
+                  label={'more'}
+                  action={'redirect'}
+                  agent={this.props.agent}
+                  {...this.props}/>
               ) : item.description === 'Operating system' ? (
                 this.addTextPlatformRender(this.props.agent)
               ) : item.description === 'Status' ? (
