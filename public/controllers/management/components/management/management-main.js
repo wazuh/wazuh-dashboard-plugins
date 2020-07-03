@@ -12,7 +12,7 @@
 import React, { Component, Fragment } from 'react';
 // Redux
 import store from '../../../../redux/store';
-
+import ReactDOM from 'react-dom';
 import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';
@@ -21,12 +21,18 @@ import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
+import { LogtestFlyout } from '../../../../components/tools/logtest/logtest-flyout'
 import { connect } from 'react-redux';
+import { EuiBetaBadge } from '@elastic/eui';
 
 class WzManagementMain extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      isOpen: false,
+      isDocked: true,
+      showLogtestFlyout: false
+    };
     this.store = store;
   }
   UNSAFE_componentWillMount() {
@@ -35,6 +41,31 @@ class WzManagementMain extends Component {
 
   componentWillUnmount() {
     store.dispatch(updateRulesetSection(''));
+  }
+
+  buildLogtestButton() {
+    const breadcrumbExists = document.getElementsByClassName('wz-global-breadcrumb');
+    if (!breadcrumbExists.length) {
+      setTimeout(() => {
+        this.buildLogtestButton();
+      }, 500);
+    } else {
+      const container = document.getElementsByClassName('euiBreadcrumbs');
+      return ReactDOM.createPortal(
+        <EuiBetaBadge
+          label="Test ruleset"
+          title="Logtest tool"
+          tooltipContent="Check your ruleset testing logs"
+          style={{ margin: '0px 8px', cursor: 'pointer' }}
+          onClick={() => this.switchLogtestFlyout()}
+        />,
+        container[0]
+      );
+    }
+  }
+
+  switchLogtestFlyout() {
+    this.setState({ showLogtestFlyout: !this.state.showLogtestFlyout })
   }
 
   render() {
@@ -49,6 +80,16 @@ class WzManagementMain extends Component {
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
           (ruleset.includes(section) && <WzRuleset />)
+        }
+        {ruleset.includes(section) &&
+          <Fragment>
+            {!this.state.showLogtestFlyout &&
+              this.buildLogtestButton()
+            }
+            {this.state.showLogtestFlyout &&
+              <LogtestFlyout switchLogtestFlyout={() => this.switchLogtestFlyout()}></LogtestFlyout>
+            }
+          </Fragment>
         }
       </Fragment>
     );

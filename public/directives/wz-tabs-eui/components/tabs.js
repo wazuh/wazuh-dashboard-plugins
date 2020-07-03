@@ -53,7 +53,7 @@ export class Tabs extends Component {
   render() {
     return (
       <Fragment>
-        <EuiTabs display={this.props.condensed ? 'condensed' : 'default'}>
+        <EuiTabs display={this.props.condensed ? 'condensed' : 'default'} style={{padding: '0 16px'}}>
           {this.renderTabs()}
         </EuiTabs>
       </Fragment>

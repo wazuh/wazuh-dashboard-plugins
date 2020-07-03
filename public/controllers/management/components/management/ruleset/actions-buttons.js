@@ -187,7 +187,7 @@ class WzRulesetActionButtons extends Component {
           })
         }
       >
-        {`Add new ${section} file`}
+        {`Add new file`}
       </EuiButtonEmpty>
     );
 
@@ -213,7 +213,7 @@ class WzRulesetActionButtons extends Component {
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >
-        {showingFiles ? `Manage ${section}` : `Manage ${section} files`}
+        {showingFiles ? `Manage ${section}` : `Manage files`}
       </EuiButtonEmpty>
     );
 

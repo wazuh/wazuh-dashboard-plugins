@@ -10,20 +10,20 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { DynamicHeight } from '../../utils/dynamic-height';
+import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
   EuiPage,
   EuiTitle,
   EuiButton,
-  EuiButtonIcon,
-  EuiButtonEmpty,
   EuiTextArea,
   EuiFlexGroup,
+  EuiFieldText,
+  EuiSelect,
   EuiFlexItem,
   EuiCodeBlock,
   EuiSpacer,
   EuiPanel,
-  EuiFlyoutFooter
+  EuiBadge
 } from '@elastic/eui';
 
 export class Logtest extends Component {
@@ -32,7 +32,8 @@ export class Logtest extends Component {
 
     this.state = {
       value: '',
-      testing: false
+      testing: false,
+      logTypeSelect: 'log',
     };
   }
 
@@ -65,61 +66,117 @@ export class Logtest extends Component {
       testResult: result
     });
   };
-  ;
-  dynamicHeight = () =>
-    DynamicHeight.dynamicHeightStatic('.euiCodeBlock', 70);
+
+  getLogsTypeOptions() {
+    return [
+      { value: 'log', text: 'Log' }
+    ];
+  }
+
+  buildControls() {
+    const logsTypeOptions = this.getLogsTypeOptions();
+    return (
+      <Fragment>
+        <EuiFlexItem grow={false}>
+          <EuiSelect
+            id="logsTypeOptions"
+            options={logsTypeOptions}
+            value={this.state.logTypeSelect}
+            onChange={(e) => this.setState({ logTypeSelect: e.target.value })}
+            aria-label="Logs type"
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiFieldText
+            placeholder="Log location"
+            value={this.state.logLocation}
+            onChange={e => this.setState({ logLocation: e.target.value })}
+            aria-label="Log location"
+          />
+        </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            isLoading={this.state.testing}
+            isDisabled={this.state.testing || !this.state.value}
+            iconType="play"
+            fill
+            onClick={() => {
+              this.test();
+            }}
+          >
+            Test
+              </EuiButton>
+        </EuiFlexItem>
+      </Fragment>
+    );
+  }
+
+  buildLogtest() {
+
+    return (
+      <Fragment>
+        <EuiTextArea
+          placeholder="Type one log per line..."
+          fullWidth={true}
+          aria-label=""
+          rows={this.props.showClose ? 10 : 4}
+          onChange={this.onChange}
+        />        
+        <EuiSpacer size='m'></EuiSpacer>
+        <EuiCodeBlock
+          language="json"
+          fontSize="s"
+          style={!this.props.onFlyout && {height: 'calc(100vh - 400px)'} || {height: 'calc(100vh - 355px)'}}
+          isCopyable={this.state.testResult ? true : false}
+        >
+          {this.state.testResult || 'The test result will appear here.'}
+        </EuiCodeBlock>
+      </Fragment>
+    );
+  }
 
   render() {
-    const codeBlock = {
-      zIndex: '100'
-    };
-
-    this.dynamicHeight();
     return (
-      <EuiPage>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiFlexGroup gutterSize="xs">
-              <EuiTitle size="s">
-                <h2>Test your logs</h2>
-              </EuiTitle>
-              <EuiFlexItem />
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  isLoading={this.state.testing}
-                  isDisabled={this.state.testing || !this.state.value}
-                  iconType="play"
-                  fill
-                  onClick={() => {
-                    this.test();
-                  }}
-                >
-                  Test
-              </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiSpacer size="m" />
+      <Fragment>
+        {!this.props.onFlyout &&
+          <EuiPage>
             <EuiPanel paddingSize="l">
-              <EuiTextArea
-                placeholder="Type one log per line..."
-                fullWidth={true}
-                aria-label=""
-                rows={this.props.showClose ? 10 : 4}
-                onChange={this.onChange}
-              />
-              <EuiCodeBlock
-                style={codeBlock}
-                language="json"
-                fontSize="s"
-                overflowHeight={350}
-                isCopyable={this.state.testResult ? true : false}
-              >
-                {this.state.testResult || 'The test result will appear here.'}
-              </EuiCodeBlock>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiFlexGroup gutterSize="m">
+                    <Fragment>
+                      <EuiFlexItem grow={false}>
+                        <EuiTitle size="m">
+                          <h2>Test your logs</h2>
+                        </EuiTitle>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false} style={{ padding: '10px 0' }}>
+                        <EuiBadge color='#BD271E' iconType="clock">Test session started at 2020/02/07 12:56:32</EuiBadge>
+                      </EuiFlexItem>
+                    </Fragment>
+                    <EuiFlexItem />
+                    {this.buildControls()}
+                  </EuiFlexGroup>
+                  <EuiSpacer size="s" />
+                  {this.buildLogtest()}
+                </EuiFlexItem>
+              </EuiFlexGroup>
             </EuiPanel>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiPage>
+          </EuiPage>
+          ||
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiFlexGroup gutterSize="m">
+                <EuiFlexItem />
+                {this.buildControls()}
+              </EuiFlexGroup>
+              <EuiSpacer size="s" />
+              {this.buildLogtest()}
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        }
+      </Fragment>
     );
   }
 }

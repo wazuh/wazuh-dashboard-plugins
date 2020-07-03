@@ -135,7 +135,7 @@ export default class WzLogs extends Component {
     if (this.state.selectedDaemon !== 'all')
       result['category'] = this.state.selectedDaemon;
     if (this.state.appliedSearch) result['search'] = this.state.appliedSearch;
-    if (this.state.descendingSort) result['sort'] = '+timestamp';
+    if (this.state.descendingSort) result['sort'] = '+Error';
     else result['sort'] = '-timestamp';
 
     return result;

@@ -32,7 +32,7 @@ import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 import { WzEuiPrompt } from '../directives/wz-eui-prompt/components/wz-eui-prompt';
-import { Logtest } from './tools/logtest';
+import { Logtest } from './tools/logtest/logtest';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
