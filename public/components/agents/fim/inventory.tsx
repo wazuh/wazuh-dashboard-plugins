@@ -41,7 +41,6 @@ import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
-import { catch } from 'fetch-mock';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -331,7 +330,7 @@ export class Inventory extends Component {
       );
   
       return (((response.data || {}).data).syscheck || {}).disabled === 'no';
-    } catch {
+    } catch (error) {
       return false;
     }
   }
