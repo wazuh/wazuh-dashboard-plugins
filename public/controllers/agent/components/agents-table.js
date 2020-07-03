@@ -38,6 +38,7 @@ import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
+import { IWzSuggestItem } from '../../../components/wz-search-bar'
 import _ from 'lodash';
 
 export class AgentsTable extends Component {
@@ -907,9 +908,24 @@ export class AgentsTable extends Component {
     );
   }
 
+  filterGroupBadge = (group) => {
+    const { filters } = this.state;
+    let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
+    if (filters.length > 0) {
+      !auxFilters.includes(group) ? 
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      }) : false;
+    } else {
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      })
+    }
+  }
+
   renderGroups(groups) {
     return(
-      <GroupTruncate groups={groups} length={25} label={'more'} action={'filter'} {...this.props} /> 
+      <GroupTruncate groups={groups} length={25} label={'more'} action={'filter'} filterAction={this.filterGroupBadge} {...this.props} /> 
     )
   }
 

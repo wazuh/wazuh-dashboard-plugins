@@ -19,6 +19,7 @@ import {
   EuiLink,
   EuiBadge,
   EuiPopover,
+  EuiButtonEmpty
 } from '@elastic/eui';
 
 export class GroupTruncate extends React.Component {
@@ -31,8 +32,10 @@ export class GroupTruncate extends React.Component {
     label: String,
     length: number,
     agent: Object,
-    action: String
+    action: String,
+    filterAction: any
   }
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -41,24 +44,34 @@ export class GroupTruncate extends React.Component {
     }
   }
 
-  renderButton(auxIndex) {
-    return (
-      <EuiLink style={{textDecoration: 'none'}} className={'no-focus'} onClick={() => this.setState({popoverOpen: !this.state.popoverOpen})}>
-        &nbsp;{`+${auxIndex} ${this.props.label}`}
-      </EuiLink>
-    )
+  filterAction(group) {
+    this.props.filterAction(group);
   }
 
-  action(index) {
+  action(index, group) {
     switch (this.props.action) {
       case 'redirect':
         return this.props.goGroups(this.props.agent, index);
       case 'filter':
-        return console.log('filtros');
+        return this.filterAction(group);
       default:
-        console.error('Property error in GroupTruncate component');
+        console.error('Wrong property in GroupTruncate component');
         break;
     }
+  }
+
+  renderButton(auxIndex) {
+    return (
+      <EuiLink style={{textDecoration: 'none'}}
+        className={'no-focus'}
+        onMouseDown={ (ev) => { ev.stopPropagation() }}
+        onClick={ (ev) => {
+          ev.stopPropagation();
+          this.setState({popoverOpen: !this.state.popoverOpen})
+        }}>
+        &nbsp;{`+${auxIndex} ${this.props.label}`}
+      </EuiLink>
+    )
   }
 
   renderBadge(group, index) {
@@ -66,10 +79,12 @@ export class GroupTruncate extends React.Component {
       <EuiBadge
         color={'hollow'}
         key={`agent-group-${index}`}
-        onClickAriaLabel={`agent-group-${group}`}
+        onClickAriaLabel={`agent-group-${index}`}
+        onMouseDown={ (ev) => { ev.stopPropagation() }}
         onClick={
-          () => {
-            this.action(index)
+          (ev) => {
+            ev.stopPropagation();
+            this.action(index, group);
           }
         }>
         {group}
