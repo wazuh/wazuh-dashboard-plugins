@@ -16,7 +16,7 @@ export const divideChildren = (children, ref, parentWidth, width):{
 } => {
   return children.reduce((acc, child, key) => {
     const currentChild = ((ref || {}).current || {}).childNodes[key]
-    const isPopOver = ((currentChild || {}).classList || []).contains('euiPopover');
+    const isPopOver = !!currentChild && !!currentChild.classList && currentChild.classList.contains('euiPopover');
     const currentWidth = acc.width + ((isPopOver) ? 5000 : (currentChild || {}).offsetWidth || 100) ;
     const newAcc = {
       ...acc,
