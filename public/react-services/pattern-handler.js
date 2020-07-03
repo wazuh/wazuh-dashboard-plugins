@@ -14,25 +14,53 @@ import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
 import { toastNotifications } from 'ui/notify';
+import { WazuhConfig } from '../react-services/wazuh-config';
 
 export class PatternHandler {
   /**
    * Get the available pattern list
    */
-  static async getPatternList() {
+  static async getPatternList(where) {
     try {
       var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+     
+ 
+      if(where === 'healthcheck'){
+        function getIndexPatterns () {
+          return new Promise(function (resolve, reject) {
+            setTimeout(async function () {
+              var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
+              resolve(patternList);
+            }, 500);
+          });
+        }
+        var i = 0;
+        // if the index pattern doesn't exist yet, we check 5 more times with a delay of 500ms
+        while(i<5 && !patternList.length){ 
+          i++;
+          patternList = await getIndexPatterns()
+          .then(
+            function (result) {
+              return result;
+            }
+          );
+        }
+      }
       if (!patternList.length) {
         // if no valid index patterns are found we try to create the wazuh-alerts-3.x-*
         try {
+          const wazuhConfig = new WazuhConfig();
+          const { pattern } = wazuhConfig.getConfig();
+          if(!pattern) return;
+          
           toastNotifications.add({
             color: 'warning',
             title:
-              'No valid index patterns were found, proceeding to create default wazuh-alerts-3.x-* index pattern',
+              `No valid index patterns were found, proceeding to create default ${pattern} index pattern`,
             toastLifeTimeMs: 5000
           });
 
-          await SavedObject.createWazuhIndexPattern();
+          await SavedObject.createWazuhIndexPattern(pattern);
         } catch (err) {
           toastNotifications.add({
             color: 'error',
@@ -63,8 +91,7 @@ export class PatternHandler {
         }
         patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
       }
-
-      if (AppState.getCurrentPattern()) {
+      if (AppState.getCurrentPattern() && patternList.length) {
         let filtered = patternList.filter(
           item => item.id === AppState.getCurrentPattern()
         );
@@ -73,6 +100,7 @@ export class PatternHandler {
 
       return patternList;
     } catch (error) {
+      console.error("getPatternList", error)
       throw new Error('Error Pattern Handler (getPatternList)');
     }
     return;
