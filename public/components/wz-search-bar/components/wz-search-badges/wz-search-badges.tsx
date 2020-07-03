@@ -11,12 +11,16 @@
  */
 import React, { } from 'react';
 import { EuiBadge } from '@elastic/eui';
+import { GroupingComponents} from '../../../common/util';
 import './wz-search-badges.less';
+
+const buttonLabel = (count) => `+${count} filters`;
 
 export function WzSearchBadges({ filters, onFiltersChange }) {
   const removeFilter = (key) => { const newFilters = [...filters]; newFilters.splice(key, 1); onFiltersChange(newFilters) };
   const badges = filters.map((filter, key) => badge({ filter, key, removeFilter }));
-  return badges;
+  const gruopingBadges = GroupingComponents({children: badges, buttonLabel})
+  return gruopingBadges;
 }
 
 function badge({ filter, key, removeFilter }) {
