@@ -99,7 +99,7 @@ export class HealthCheck {
       let patternTitle = '';
       if (this.checks.pattern) {
         const i = this.results.map(item => item.id).indexOf(2);
-        let patternData = await SavedObject.existsIndexPattern(patternId);
+        let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
         if(!patternData) patternData = {};  
         patternTitle = patternData.title;
         /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-3.x-*.
@@ -112,7 +112,7 @@ export class HealthCheck {
               await SavedObject.existsMonitoringIndexPattern('wazuh-monitoring-3.x-*'); //this checks if it exists, if not it automatically creates the index pattern
           }catch(err){}
         if (!patternData.status) {
-          const patternList = await PatternHandler.getPatternList();
+          const patternList = await PatternHandler.getPatternList("healthcheck");
           if (patternList.length) {
             const currentPattern = patternList[0].id;
             AppState.setCurrentPattern(currentPattern);

@@ -157,7 +157,7 @@ export class SavedObject {
           attributes: {
             fields: JSON.stringify(fields.data.fields),
             timeFieldName: 'timestamp',
-            title: 'wazuh-alerts-3.x-*'
+            title: id
           }
         }
       );
@@ -172,21 +172,21 @@ export class SavedObject {
   /**
    * Creates the 'wazuh-alerts-3.x-*'  index pattern
    */
-  static async createWazuhIndexPattern() {
+  static async createWazuhIndexPattern(pattern) {
     try {
       const fields = await GenericRequest.request(
         //we check if indices exist before creating the index pattern
         'GET',
-        `/api/index_patterns/_fields_for_wildcard?pattern=wazuh-alerts-3.x-*&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+        `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
         {}
       );
 
       await this.createSavedObject(
         'index-pattern',
-        'wazuh-alerts-3.x-*',
+        pattern,
         {
           attributes: {
-            title: 'wazuh-alerts-3.x-*',
+            title: pattern,
             timeFieldName: 'timestamp'
           }
         },
