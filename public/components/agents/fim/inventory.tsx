@@ -149,16 +149,23 @@ export class Inventory extends Component {
     this.setState({ selectedTabId: id });
   }
 
+  buildFilter(type) {
+    const filters = filtersToObject(this.state.filters);
+    const filter = {
+      ...filters,
+      limit: type === 'file' ? '15' : '1',
+      type,
+      ...(type === 'file' && {sort: '+file'})
+    };
+    return filter;
+  }
+  
   async getItemNumber(type: 'file' | 'registry') {
     const agentID = this.props.agent.id;
     const response = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
-      {
-        limit: type === 'file' ? '15' : '1',
-        type,
-        ...(type === 'file' && {sort: '+file'})
-      }
+      this.buildFilter(type),
     );
     if (type === 'file') {
       return {
@@ -222,6 +229,7 @@ export class Inventory extends Component {
       toastLifeTimeMs: time,
     });
   };
+
   async downloadCsv() {
     const { filters } = this.state;
     try {
