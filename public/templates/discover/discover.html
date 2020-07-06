@@ -5,37 +5,38 @@
   <wz-top-nav
     app-name="'discover'"
     config="topNavMenu"
-    show-search-bar="tabView"
-    show-filter-bar="tabView !== 'cluster-monitoring'"
-    show-query-input="tabView !== 'cluster-monitoring'"
-    show-date-picker="indexPattern.isTimeBased()"
-    show-save-query="showSaveQuery && tabView !== 'cluster-monitoring'"
     index-patterns="[indexPattern]"
     on-query-submit="updateQuery"
     on-saved-query-id-change="updateSavedQueryId"
     query="state.query"
     saved-query-id="state.savedQuery"
     screen-title="screenTitle"
+    show-search-bar="tabView"
+    show-filter-bar="tabView !== 'cluster-monitoring'"
+    show-query-input="tabView !== 'cluster-monitoring'"
+    show-date-picker="indexPattern.isTimeBased()"
+    show-save-query="showSaveQuery && tabView !== 'cluster-monitoring'"
     use-default-behaviors="true"
   >
-</wz-top-nav>
+  </wz-top-nav>
 
-<main ng-show="tabView !== 'cluster-monitoring'" class="container-fluid">
-  <div ng-show="tabView === 'discover'" class="row">
-    <div ng-show="tabView === 'discover'" class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar" data-test-subj="discover-sidebar">
+  <main ng-show="tabView !== 'cluster-monitoring'" class="container-fluid">
+    <div ng-show="tabView === 'discover'" class="row">
+      <div ng-show="tabView === 'discover'" class="col-md-2 dscSidebar__container collapsible-sidebar" id="discover-sidebar" data-test-subj="discover-sidebar">
         <div class="dscFieldChooser">
-          <disc-field-chooser
+          <discover-sidebar
             columns="state.columns"
-            hits="rows"
             field-counts="fieldCounts"
-            index-pattern="searchSource.getField('index')"
+            hits="rows"
             index-pattern-list="opts.indexPatternList"
-            state="state"
             on-add-field="addColumn"
             on-add-filter="filterQuery"
             on-remove-field="removeColumn"
+            selected-index-pattern="searchSource.getField('index')"
+            set-index-pattern="setIndexPattern"
+            state="state"
           >
-          </disc-field-chooser>
+          </discover-sidebar>
         </div>
       </div>
 
@@ -103,6 +104,7 @@
                 class="kuiLink"
                 type="button"
                 id="reload_saved_search"
+                data-test-subj="resetSavedSearch"
                 ng-click="resetQuery()"
               >
                 {{::'kbn.discover.reloadSavedSearchButton' | i18n: {defaultMessage: 'Reset search'} }}

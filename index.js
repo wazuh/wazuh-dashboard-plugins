@@ -10,13 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-// Imports the init module
-import { initApp } from './init';
 import { resolve } from 'path';
+import { WazuhPlugin, LegacySetup } from './server/plugin';
 
-export default function(kibana) {
+export default (kibana) => {
   return new kibana.Plugin({
-    require: ['kibana', 'elasticsearch', 'visualizations'],
+    require: ['kibana', 'elasticsearch'],
     id: 'wazuh',
     name: 'wazuh',
     uiExports: {
@@ -24,7 +23,7 @@ export default function(kibana) {
         id: 'wazuh',
         title: 'Wazuh',
         description: 'Wazuh app for Kibana',
-        icon: 'plugins/wazuh/img/icon.svg',
+        icon: 'plugins/wazuh/img/icon_blue.svg',
         main: 'plugins/wazuh/app'
       },
       hacks: ['plugins/wazuh/icon-style'],
@@ -44,7 +43,16 @@ export default function(kibana) {
       }).default();
     },
 
-    init(server, options) {
+    init(server) {
+      const coreSetup = server.newPlatform.setup.core;
+      const pluginsSetup = {
+        discover: server.newPlatform.setup.plugins.discover
+      };
+      const legacySetup = {
+        server
+      };
+
+      new WazuhPlugin().setup(coreSetup, pluginsSetup, legacySetup);
       // eslint-disable-line no-unused-vars
       const xpackMainPlugin = server.plugins.xpack_main;
       if (xpackMainPlugin) {
@@ -52,9 +60,9 @@ export default function(kibana) {
 
         xpackMainPlugin.registerFeature({
           id: featureId,
-          name: 'Wazuh',
+          name: 'C',
           navLinkId: featureId,
-          icon: '/plugins/wazuh/img/icon.svg',
+          icon: '/plugins/wazuh/img/icon_blue.svg',
           app: [featureId],
           catalogue: [],
           privileges: {
@@ -79,9 +87,6 @@ export default function(kibana) {
           }
         });
       }
-
-      // Add server routes and initialize the plugin here
-      initApp(server, options);
     }
   });
 }

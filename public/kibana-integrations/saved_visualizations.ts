@@ -18,9 +18,9 @@
  */
 import { SavedObjectLoader } from './saved_object_loader';
 import { SavedObjectKibanaServices } from '../../../../src/plugins/saved_objects/public';
-import { findListItems } from 'plugins/visualizations/np_ready/public/saved_visualizations/find_list_items';
-import { createSavedVisClass } from 'plugins/visualizations/np_ready/public/saved_visualizations/_saved_vis';
-import { TypesStart } from 'plugins/visualizations/vis_types';
+import { findListItems } from '../../../../src/plugins/visualizations/public/saved_visualizations/find_list_items';
+import { createSavedVisClass } from '../../../../src/plugins/visualizations/public/saved_visualizations/_saved_vis';
+import { TypesStart } from '../../../../src/plugins/visualizations/public/vis_types';
 
 export interface SavedObjectKibanaServicesWithVisualizations extends SavedObjectKibanaServices {
   visualizationTypes: TypesStart;
@@ -74,5 +74,9 @@ export function createSavedVisLoader(services: SavedObjectKibanaServicesWithVisu
     }
   }
   const SavedVis = createSavedVisClass(services);
-  return new SavedObjectLoaderVisualize(SavedVis, savedObjectsClient, services.chrome);
+  return new SavedObjectLoaderVisualize(
+    SavedVis,
+    savedObjectsClient,
+    services.chrome
+  ) as SavedObjectLoader & { findListItems: (search: string, size: number) => any };
 }

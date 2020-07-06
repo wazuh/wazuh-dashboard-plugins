@@ -102,7 +102,7 @@ export class FlyoutTechnique extends Component {
         $(`.technique-reference-citation-${reference.index}`).each(function(){
           $(this).off();
           $(this).click(() => {
-            $(`.euiFlyoutBody__overflow`).scrollTop($(`#technique-reference-${reference.index}`).position().top);
+            $(`.euiFlyoutBody__overflow`).scrollTop($(`#technique-reference-${reference.index}`).position().top - 150);
           });
         })
       })

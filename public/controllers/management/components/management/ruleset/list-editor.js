@@ -230,6 +230,9 @@ class WzListEditor extends Component {
         );
         return;
       }
+      name = name.endsWith('.cdb')
+      ? name.replace('.cdb', '')
+      : name;
       const overwrite = addingNew; // If adding new disable the overwrite
       const raw = this.itemsToRaw();
       if (!raw) {

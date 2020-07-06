@@ -380,7 +380,7 @@ md-divider.md-default-theme, md-divider {
   border-top: 1px solid #343741!important;
 }
 
-.euiAccordion {
+.flyout-body .euiAccordion {
   border-bottom: 1px solid #343741!important;
 }
 

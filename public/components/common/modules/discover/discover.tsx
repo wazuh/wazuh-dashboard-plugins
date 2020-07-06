@@ -11,10 +11,8 @@
  */
 
 import React, { Component, } from 'react';
-import { I18nProvider } from '@kbn/i18n/react'
 import './discover.less';
-import { KibanaContextProvider } from '../../../../../../../src/plugins/kibana_react/public/context'
-import { SearchBar, FilterManager } from '../../../../../../../src/plugins/data/public/'
+import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/'
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
 import { RowDetails } from './row-details';
@@ -26,6 +24,7 @@ import DateMatch from '@elastic/datemath';
 import { toastNotifications } from 'ui/notify';
 import store from '../../../../redux/store';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
+import { KbnSearchBar } from '../../../kbn-search-bar';
 
 import {
   EuiBasicTable,
@@ -62,23 +61,24 @@ export class Discover extends Component {
   KibanaServices: { [key: string]: any };
   filterManager: FilterManager;
   state: {
-    sort: object,
-    alerts: { _source: {}, _id: string }[],
-    total: number,
-    pageIndex: number,
-    pageSize: number,
-    sortField: string,
-    sortDirection: Direction,
-    isLoading: boolean,
-    requestFilters: object,
+    sort: object
+    alerts: { _source: {}, _id: string }[]
+    total: number
+    pageIndex: number
+    pageSize: number
+    sortField: string
+    sortDirection: Direction
+    isLoading: boolean
+    requestFilters: object
     requestSize: number
     requestOffset: number
-    itemIdToExpandedRowMap: any,
-    dateRange: TimeRange,
-    query: Query,
+    itemIdToExpandedRowMap: any
+    dateRange: TimeRange
+    searchBarFilters: []
+    query: Query
     elasticQuery: object
-    filters: [],
-    columns: string[],
+    filters: []
+    columns: string[]
     hover: string
   };
   indexPattern!: IIndexPattern
@@ -194,7 +194,6 @@ export class Discover extends Component {
       const findAndHide = () => {
         const switcher = document.querySelector("#filterEditorCustomLabelSwitch")
         if ( !switcher ) return setTimeout(findAndHide, 100);
-        console.log(switcher.parentElement);
         switcher.parentElement.style.display = "none"
       }
       button.onclick = findAndHide;
@@ -475,69 +474,17 @@ export class Discover extends Component {
   }
 
   onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
-    const { dateRange, query } = payload;
-    this.timefilter.setTime(dateRange);
-    this.setState({ dateRange, query });
+    this.setState(payload);
   }
 
-  onFiltersUpdated = (filters: []) => {
-    this.filterManager.setFilters(filters);
+  onFiltersUpdated = (filters: Filter[]) => {
     this.setState({ searchBarFilters: filters });
-  }
-
-  getSearchBar() {
-    const { filterManager, KibanaServices } = this;
-    const storage = {
-      ...window.localStorage,
-      get: (key) => JSON.parse(window.localStorage.getItem(key) || '{}'),
-      set: (key, value) => window.localStorage.setItem(key, JSON.stringify(value)),
-      remove: (key) => window.localStorage.removeItem(key)
-    }
-    const http = {
-      ...KibanaServices.indexPatterns.apiClient.http
-    }
-    const savedObjects = {
-      ...KibanaServices.indexPatterns.savedObjectsClient
-    }
-    const data = {
-      ...KibanaServices.data,
-      query: {
-        ...KibanaServices.data.query,
-        filterManager,
-      }
-    }
-    const { dateRange, query, searchBarFilters } = this.state;
-    return (
-      <KibanaContextProvider services={{
-          ...KibanaServices,
-          appName: "wazuhFim",
-          data,
-          filterManager,
-          storage,
-          http,
-          savedObjects
-        }} >
-        <I18nProvider>
-          <SearchBar
-            indexPatterns={[this.indexPattern]}
-            filters={searchBarFilters}
-            dateRangeFrom={dateRange.from}
-            dateRangeTo={dateRange.to}
-            onQuerySubmit={this.onQuerySubmit}
-            onFiltersUpdated={this.onFiltersUpdated}
-            query={query}
-            timeHistory={this.timefilter._history}
-            {...{ appName: 'wazuhFim' }} />
-        </I18nProvider>
-      </KibanaContextProvider>
-    );
   }
 
   render() {
     if (this.state.isLoading)
       return (<div style={{ alignSelf: "center" }}><EuiLoadingSpinner size="xl" /> </div>)
-    const {total, searchBarFilters, itemIdToExpandedRowMap} = this.state;
-
+    const {total, itemIdToExpandedRowMap, query} = this.state;
     const getRowProps = item => {
       const { _id } = item;
       return {
@@ -567,7 +514,12 @@ export class Discover extends Component {
     return (
       <div
         className='wz-discover hide-filter-controll' >
-        {this.getSearchBar()}
+        <KbnSearchBar  
+          indexPattern={this.indexPattern} 
+          filterManager={this.filterManager}
+          onQuerySubmit={this.onQuerySubmit}
+          onFiltersUpdated={this.onFiltersUpdated}
+          query={query} />
         {total 
           ? <EuiFlexGroup>
               <EuiFlexItem>

@@ -28,7 +28,7 @@ export class ModulesHelper {
     );
     if (fields.length) {
       fields.forEach(field => {
-        const attr = field.getAttribute('attr-field');
+        const attr = field.getAttribute('data-attr-field');
         if (attr.startsWith('_')) {
           field.style.display = 'none';
         }

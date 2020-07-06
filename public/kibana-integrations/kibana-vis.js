@@ -12,7 +12,6 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery';
-import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 import { DiscoverPendingUpdates } from '../factories/discover-pending-updates';
@@ -26,9 +25,9 @@ import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
-import { TypesService } from '../../../../src/legacy/core_plugins/visualizations/public';
-import { Vis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/types';
-import { convertToSerializedVis } from '../../../../src/legacy/core_plugins/visualizations/public/np_ready/public/saved_visualizations/_saved_vis';
+import { TypesService } from '../../../../src/plugins/visualizations/public/vis_types';
+import { Vis } from '../../../../src/plugins/visualizations/public';
+import { convertToSerializedVis } from '../../../../src/plugins/visualizations/public/saved_visualizations/_saved_vis';
 import { toastNotifications } from 'ui/notify';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { EuiLoadingChart } from '@elastic/eui';
@@ -57,6 +56,7 @@ class KibanaVis extends Component {
     const services = {
       savedObjectsClient: npStart.core.savedObjects.client,
       indexPatterns: npStart.plugins.data.indexPatterns,
+      search: npStart.plugins.data.search,
       chrome: npStart.core.chrome,
       overlays: npStart.core.overlays
     };
@@ -65,7 +65,6 @@ class KibanaVis extends Component {
       ...{ visualizationTypes: new TypesService().start() },
     }
     this.savedObjectLoaderVisualize = createSavedVisLoader(servicesForVisualizations);
-    this.factory = null;
     this.visID = this.props.visID;
     this.tab = this.props.tab;
   }
@@ -197,10 +196,6 @@ class KibanaVis extends Component {
         query
       };
 
-      if (!this.factory) {
-        this.factory = embeddables.getEmbeddableFactory('visualization');
-      }
-
       if (raw && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -218,15 +213,12 @@ class KibanaVis extends Component {
           // Visualization doesn't need "hits"
           this.visualization.searchSource.setField('size', 0);
           const vis = new Vis(this.visualization.visState.type, await convertToSerializedVis(this.visualization));
-          this.visHandler = await this.factory.createFromObject(
+          this.visHandler = await npStart.plugins.visualizations.__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput
           );
-          if (this.visHandler)
-            setTimeout(async () => {
-              await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
-              this.visHandler.handler.data$.subscribe(this.renderComplete());
-            });
+          await this.visHandler.render($(`[id="${this.visID}"]`)[0]);
+          this.visHandler.handler.data$.subscribe(this.renderComplete());
           this.visHandlers.addItem(this.visHandler);
           this.setSearchSource(discoverList);
         } else if (this.rendered && !this.deadField) {
