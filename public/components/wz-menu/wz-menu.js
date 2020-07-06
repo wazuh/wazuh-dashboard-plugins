@@ -155,8 +155,7 @@ class WzMenu extends Component {
       if (currentTab !== this.state.currentMenuTab) {
         this.setState({ currentMenuTab: currentTab, hover: currentTab });
       }
-
-      const list = await PatternHandler.getPatternList();
+      const list = await PatternHandler.getPatternList('api');
       if (!list) return;
 
       // Abort if we have disabled the pattern selector
