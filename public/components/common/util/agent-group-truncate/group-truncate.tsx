@@ -18,8 +18,7 @@ import {
   EuiFlexGrid,
   EuiLink,
   EuiBadge,
-  EuiPopover,
-  EuiButtonEmpty
+  EuiPopover
 } from '@elastic/eui';
 
 export class GroupTruncate extends React.Component {
@@ -62,7 +61,8 @@ export class GroupTruncate extends React.Component {
 
   renderButton(auxIndex) {
     return (
-      <EuiLink style={{textDecoration: 'none'}}
+      <EuiLink
+        style={{textDecoration: 'none'}}
         className={'no-focus'}
         onMouseDown={ (ev) => { ev.stopPropagation() }}
         onClick={ (ev) => {
