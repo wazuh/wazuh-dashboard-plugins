@@ -132,7 +132,7 @@ export class GroupTruncate extends React.Component {
             button={button}
             isOpen={this.state.popoverOpen}
             closePopover={() => this.setState({popoverOpen: false})}>
-            <EuiFlexGroup style={{ width: '500px' }} gutterSize="none">
+            <EuiFlexGroup style={{ maxWidth: '500px' }} gutterSize="none">
               <EuiFlexItem grow={false}>
                 <EuiFlexGrid columns={4} gutterSize={'s'}>
                   {tooltipGroups}
