@@ -258,6 +258,35 @@ export class Metrics extends Component {
     }
   }
 
+  filterSecurityStat(filterName) {
+    const { filterManager } = getServices();
+    const filters = {
+      'Level 12 or above alerts': () => {
+        const valuesArray = {gte: 12, lt: null};
+        return {
+          ...buildRangeFilter({ name: "rule.level", type: "integer" }, valuesArray, this.indexPattern),
+          "$state": { "store": "appState" }
+        }
+      },
+      'Authentication failure': () => {
+        const valuesArray = ["win_authentication_failed", "authentication_failed", "authentication_failures"];
+        return {
+          ...buildPhrasesFilter({ name: "rule.groups", type: "string" }, valuesArray, this.indexPattern),
+          "$state": { "store": "appState" }
+        }
+      },
+      'Authentication success': () => {
+        return {
+          ...buildPhraseFilter(
+            {name: "rule.groups", type: 'string'},
+            "authentication_success", this.indexPattern),
+          "$state": { "store": "appState" }
+        }
+      }
+    }
+    const filter = filters[filterName]();
+    filterManager.addFilters(filter);
+  }
 
   buildStatsComp(){
     const { section } = this.props;
@@ -272,6 +301,7 @@ export class Metrics extends Component {
               titleColor={this.metricsList[section][idx].color || 'primary'}
               isLoading={this.state.loading}
               textAlign="center"
+              onClick={ () => section === 'general' && this.filterSecurityStat(item.name)}
             />
           </EuiFlexItem>
         )
