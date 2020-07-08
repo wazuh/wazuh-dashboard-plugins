@@ -302,6 +302,8 @@ export class Metrics extends Component {
               isLoading={this.state.loading}
               textAlign="center"
               onClick={ () => section === 'general' && this.filterSecurityStat(item.name)}
+              className={(section === 'general' && item.name !== 'Total') ? "statWithLink" : "statWithNoLink"}
+              style={{cursor: (section === 'general' && item.name !== 'Total') ? "pointer" : "auto"}}
             />
           </EuiFlexItem>
         )
