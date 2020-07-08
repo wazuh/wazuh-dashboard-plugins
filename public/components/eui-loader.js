@@ -33,6 +33,7 @@ import { SyscheckTable } from '../directives/wz-syscheck-table/components/sysche
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 import { WzEuiPrompt } from '../directives/wz-eui-prompt/components/wz-eui-prompt';
 import { Logtest } from './tools/logtest/logtest';
+import { MainDevTools } from './tools/devtools/main-dev-tools';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -57,3 +58,4 @@ app
   .value('EuiSpacer', EuiSpacer)
   .value('EuiLoadingChart', EuiLoadingChart)
   .value('Logtest', Logtest)
+  .value('MainDevTools', MainDevTools)

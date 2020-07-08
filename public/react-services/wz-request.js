@@ -23,7 +23,7 @@ export class WzRequest {
    * @param {String} path
    * @param {Object} payload
    */
-  static async genericReq(method, path, payload = null, customTimeout = false) {
+  static async genericReq(method, path, payload = null, customTimeout = false, fullResponse = false) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -61,7 +61,7 @@ export class WzRequest {
           return;
         }
       }
-      const errorMessage = (err && err.response && err.response.data && err.response.data.message) || (err || {}).message;
+      const errorMessage = fullResponse ? err.response : (err && err.response && err.response.data && err.response.data.message) || (err || {}).message;
       return errorMessage
         ? Promise.reject(errorMessage)
         : Promise.reject(err || 'Server did not respond');
@@ -87,6 +87,27 @@ export class WzRequest {
       return ((error || {}).data || {}).message || false
         ? Promise.reject(error.data.message)
         : Promise.reject(error.message || error);
+    }
+  }
+
+
+  /**
+   * Perform a request to the Wazuh API, if it fails the full RESPONSE is sent
+   * @param {String} method Eg. GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} body Request body
+   */
+  static async fullResponseApiReq(method, path, body) {
+    try {
+      if (!method || !path || !body) {
+        throw new Error('Missing parameters');
+      }
+      const id = JSON.parse(AppState.getCurrentAPI()).id;
+      const requestData = { method, path, body, id };
+      const data = await this.genericReq('POST', '/api/request', requestData, false, true);
+      return Promise.resolve(data);
+    } catch (error) {
+      return Promise.reject(error)
     }
   }
 

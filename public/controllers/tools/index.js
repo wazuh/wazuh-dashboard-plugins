@@ -10,11 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import { DevToolsController } from './dev-tools';
 import { ToolsController } from './tools';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
 .controller('toolsController', ToolsController)
-.controller('devToolsController', DevToolsController);
