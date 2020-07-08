@@ -47,13 +47,19 @@ export class ApiRequest {
   public async getData():Promise<object> {
     try {
       const response = await this.makeRequest();
+      if(response.data.error !== 0) throw response.data;
       return response.data;
     } catch (error) {
-      if(error.response.status === 401){
-        log('apiRequest', `Wrong Wazuh API credentials used`);
-        throw error.response;
+      if(error.response && error.response.status === 401){
+        throw {error: 401, message: 'Wrong Wazuh API credentials used'};
       }
-      return error.response.data;
+      if(error.code && error.code === 'ECONNRESET') {
+        throw {error: 3005, message: 'Wrong protocol being used to connect to the Wazuh API'};
+      }
+      if(error.code && ['ENOTFOUND','EHOSTUNREACH','EINVAL','EAI_AGAIN','ECONNREFUSED'].includes(error.code)) {
+        throw {error: 3005, message: 'Wazuh API is not reachable. Please check your url and port.'};
+      }
+      throw error;
     }
   }
 }
