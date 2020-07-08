@@ -191,9 +191,12 @@ export class Monitoring {
       ? await this.apiInterceptor.request('GET', `${getPath(api)}/cluster/local/info`, {},  { idHost: api.id})
       : false;
       
-      api.clusterName =
-        (((clusterName || {}).data   || {}).data || {}).affected_items[0].cluster || false;
-
+      if( (((clusterName || {}).data   || {}).data || {}).affected_items) {
+        api.clusterName =  (((clusterName || {}).data   || {}).data || {}).affected_items[0].cluster || false;
+      } else {
+        api.clusterName = false;
+      }
+      
       if (response.status === 200 && ((response.data || {}).data || {}).affected_items) {
         log(
           'monitoring:checkAndSaveStatus',
