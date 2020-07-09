@@ -32,7 +32,7 @@ const Direction: {[key: string]: 'row' | 'column'} = {
 
 export const GroupingComponents: React.FunctionComponent<IGroupingComponents> = ({children, buttonLabel, width = 0.5, direction = 'vertical'}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {parentWidth, ref} = useParentWidth(children);
+  const {parentWidth, ref} = useParentWidth();
   const childrenObj = divideChildren(children, ref, parentWidth, width)
   const label = buttonLabel(childrenObj.hide.length) 
   return (
