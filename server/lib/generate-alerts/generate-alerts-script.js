@@ -37,7 +37,6 @@ const alertIDMax = 6000;
 // Rule
 const ruleDescription = ["Sample alert 1", "Sample alert 2", "Sample alert 3", "Sample alert 4", "Sample alert 5"];
 const ruleMaxLevel = 14;
-const ruleMaxFiredtimes = 10;
 
 /**
  * Generate a alert
@@ -78,12 +77,6 @@ function generateAlert(params) {
             id: "5502",
             mail: false,
             groups: [],
-            // "firedtimes": 3,
-            // "pci_dss": ["10.2.5"],
-            // "gpg13": ["7.8", "7.9"],
-            // "gdpr": ["IV_32.2"],
-            // "hipaa": ["164.312.b"],
-            // "nist_800_53": ["AU.14", "AC.7"]
         },
         agent: {
             id: "000",
@@ -100,35 +93,16 @@ function generateAlert(params) {
         decoder: {},
         data: {},
         location: ""
-
-        // "full_log": "Sample alert full log",
-        // "predecoder": {
-        //     "program_name": "sshd",
-        //     "timestamp": "Jan 27 11:08:46",
-        //     "hostname": "master"
-        // },
-        // "decoder": {
-        //     "parent": "pam",
-        //     "name": "pam"
-        // },
-        // "data": {
-        //     "dstuser": "root"
-        // },
-        // "location": "/random"
     }
-
-    // Random fields for base alert
-    // alert.id = // TODO: generate random?;
     if(!params.aws) {
         alert.agent = randomArrayItem(Agents);
     }
     alert.rule.description = randomArrayItem(ruleDescription);
     alert.rule.id = `${randomIntervalInteger(1,alertIDMax)}`;
     alert.rule.level = randomIntervalInteger(1,ruleMaxLevel);
-    // alert.rule.firedtimes = randomIntervalInteger(1,ruleMaxFiredtimes);
+
     alert.timestamp = randomDate();
     
-
     if (params.manager) {
         if (params.manager.name) {
             alert.manager.name = params.manager.name;
@@ -405,16 +379,6 @@ function generateAlert(params) {
         if(typeAlert.full_log){
             alert.full_log = interpolateAlertProps(typeAlert.full_log, alert);
         }
-        // alert.data.oscap.scan = {};
-        // alert.data.oscap.scan.profile = {};
-        // alert.data.oscap.check = {};
-
-        // alert.data.oscap.scan.profile.title = randomArrayItem(OpenSCAP.scanProfileTitle);
-        // alert.data.oscap.scan.content = randomArrayItem(OpenSCAP.scanContent);
-        // alert.data.oscap.scan.score = randomIntervalInteger(50, 80);
-        // alert.data.oscap.check.result = randomArrayItem(OpenSCAP.checkResult);
-        // alert.data.oscap.check.severity = randomArrayItem(OpenSCAP.checkSeverity);
-        // alert.data.oscap.check.title = randomArrayItem(OpenSCAP.checkTitle);
     }
 
     if (params.rootcheck) {
@@ -822,7 +786,7 @@ function generateAlert(params) {
         alert.input = { type: 'log' };
         alert.location = Apache.location;
         alert.decoder = {...Apache.decoder};
-        //Thu Apr 23 13:23:29.375928 2020
+        
         alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
             _timestamp_apache: formatDate(new Date(alert.timestamp), 'E N D h:m:s.l Y'),
             _pi_id: randomIntervalInteger(10000,30000)
@@ -924,7 +888,6 @@ function randomDate(inf, sup) {
     return formatDate(lastWeek, 'Y-M-DTh:m:s.l+0000')
 }
 
-// Format date
 const formatterNumber = (number, zeros = 0) => ("0".repeat(zeros) + `${number}`).slice(-zeros);
 const monthNames = {
     long: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -988,29 +951,3 @@ export {
     generateAlert,
     generateAlerts
 };
-
-/* Use:
-    generateAlert(params)
-    generateAlerts(params, numberAlerts)
-
-Examples:
-
-    // --------- Generate an alert ---------
-
-    - Generate syscheck (Integrity monitoring) sample alert
-    generateAlert({syscheck: true});
-    
-    - Generate syscheck alert with PCI DSS
-    generateAlert({syscheck: true, pci_dss: true});
-    
-    - Generate OpenSCAP alert with manager name and cluster info
-    generateAlert({openscap: true, manager: {name: 'mymanager'}, cluster: {name: 'mycluster', node: 'mynode'}});
-
-    // --------- Generate multiple alerts ---------
-
-    - Generate 1000 random alerts of Osquery
-    generateAlerts({osquery: true}, 1000);
-
-    - Generate 1000 random alerts of PCI DSS with manager name and cluster info
-    generateAlerts({pci_dss: true, manager: {name: 'mymanager'}, cluster: {name: 'mycluster', node: 'mynode'}}, 1000);
-*/
