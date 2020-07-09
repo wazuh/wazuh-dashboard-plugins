@@ -265,6 +265,12 @@ export class Metrics extends Component {
     }
   }
 
+  checkAvaibleClass(itemName) {
+    const exception = [ 'Level 12 or above alerts', 'Authentication failure', 'Authentication success',
+     'Lowest scan score', 'Critical Severity Alerts', 'High Severity Alerts', 'Medium Severity Alerts',
+     'Low Severity Alerts', 'Total malicious', 'Total positives' ];
+     return exception.includes(itemName);
+  }
 
   buildStatsComp(){
     const { section } = this.props;
@@ -274,12 +280,13 @@ export class Metrics extends Component {
         return(
           <EuiFlexItem grow={count>20 ? 3 : 1} key={`${item.name}`}>
             <EuiStat
-            /// TODO: add tooltip and cursor pointer
               title={this.state.metricsOnClicks[item.name] ? <span style={{fontSize: count>20 ? "2rem": "2.25rem" }} onClick={this.state.metricsOnClicks[item.name]}>{this.state.results[item.name]}</span> : <span style={{fontSize: count>20 ? "2rem": "2.25rem" }}>{this.state.results[item.name]}</span>}
               description={item.name}
               titleColor={this.metricsList[section][idx].color || 'primary'}
               isLoading={this.state.loading}
               textAlign="center"
+              className={ this.checkAvaibleClass(item.name) ? "statWithLink" : "statWithNoLink"}
+              style={{cursor: this.checkAvaibleClass(item.name) ? "pointer" : "auto"}}
             />
           </EuiFlexItem>
         )
