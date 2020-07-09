@@ -35,8 +35,7 @@ export class LogtestFlyout extends Component {
     };
   }
 
-  componentWillUnmount() {
-    this.props.switchLogtestFlyout()
+  componentWillUnmount() {  
     $('body').removeClass('euiBody--logtestIsOpen');
   }
 
@@ -57,6 +56,7 @@ export class LogtestFlyout extends Component {
         className="logtest-flyout"
         aria-labelledby="flyoutSmallTitle"
         hideCloseButton
+        onClose={() => $('body').removeClass('euiBody--logtestIsOpen')}
       >
         <EuiFlyoutHeader
           hasBorder
