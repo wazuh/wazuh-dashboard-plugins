@@ -14,6 +14,7 @@ import {
   EuiStat,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiToolTip,
 } from '@elastic/eui';
 import { FilterManager } from '../../../../../../src/plugins/data/public/';
 import { buildRangeFilter, buildPhrasesFilter,buildPhraseFilter, buildExistsFilter} from '../../../../../../src/plugins/data/common';
@@ -265,11 +266,15 @@ export class Metrics extends Component {
     }
   }
 
-  checkAvaibleClass(itemName) {
-    const exception = [ 'Level 12 or above alerts', 'Authentication failure', 'Authentication success',
-     'Lowest scan score', 'Critical Severity Alerts', 'High Severity Alerts', 'Medium Severity Alerts',
-     'Low Severity Alerts', 'Total malicious', 'Total positives' ];
-     return exception.includes(itemName);
+  buildTitleButton = (count, itemName) => {
+    return <EuiToolTip position="top" content={`Filter by ${itemName}`}>
+      <span
+        className={ 'statWithLink' }
+        style={{ cursor: "pointer", fontSize: count > 20 ? "2rem" : "2.25rem" }}
+        onClick={ this.state.metricsOnClicks[itemName] }>
+        {this.state.results[itemName]}
+      </span>
+    </EuiToolTip>
   }
 
   buildStatsComp(){
@@ -280,13 +285,12 @@ export class Metrics extends Component {
         return(
           <EuiFlexItem grow={count>20 ? 3 : 1} key={`${item.name}`}>
             <EuiStat
-              title={this.state.metricsOnClicks[item.name] ? <span style={{fontSize: count>20 ? "2rem": "2.25rem" }} onClick={this.state.metricsOnClicks[item.name]}>{this.state.results[item.name]}</span> : <span style={{fontSize: count>20 ? "2rem": "2.25rem" }}>{this.state.results[item.name]}</span>}
+              title={this.state.metricsOnClicks[item.name] ? this.buildTitleButton(count, item.name) : 
+              <span style={{ fontSize: count > 20 ? "2rem" : "2.25rem" }}>{this.state.results[item.name]}</span>}
               description={item.name}
               titleColor={this.metricsList[section][idx].color || 'primary'}
               isLoading={this.state.loading}
               textAlign="center"
-              className={ this.checkAvaibleClass(item.name) ? "statWithLink" : "statWithNoLink"}
-              style={{cursor: this.checkAvaibleClass(item.name) ? "pointer" : "auto"}}
             />
           </EuiFlexItem>
         )
