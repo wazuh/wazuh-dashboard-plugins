@@ -221,21 +221,17 @@ export class Inventory extends Component {
       });
     });
 
-    // TODO: pending API
-     // { type: 'params', label: 'command', description: 'Filter by check command', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["command"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'title', description: 'Filter by check title', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["title"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["result"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["status"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["rationale"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["registry"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'description', description: 'Filter by check description', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["description"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'remediation', description: 'Filter by check remediation', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["remediation"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'reason', description: 'Filter by check reason', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["reason"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-    
     this.suggestions[policy] = [ 
-      { type: 'params', label: 'condition', description: 'Filter by check condition', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["condition"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-      { type: 'params', label: 'file', description: 'Filter by check file', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["file"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-      { type: 'params', label: 'references', description: 'Filter by check references', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["references"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'condition', description: 'Filter by check condition', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["condition"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'file', description: 'Filter by check file', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["file"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'title', description: 'Filter by check title', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["title"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["result"]).filter(item => item && item &&  item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["status"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["rationale"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["registry"] || {}).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'description', description: 'Filter by check description', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["description"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'remediation', description: 'Filter by check remediation', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["remediation"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'reason', description: 'Filter by check reason', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["reason"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
     ]
 
   }
@@ -275,6 +271,7 @@ export class Inventory extends Component {
     const filtersObject= filtersToObject(this.state.filters);
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
+      try{
       const checks = await this.wzReq.apiReq(
         'GET',
         `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
@@ -283,6 +280,16 @@ export class Inventory extends Component {
 
       this.checks = (((checks || {}).data || {}).data || {}).items || [];
       this.buildSuggestionSearchBar(policy.policy_id, this.checks);
+      }catch(err){ 
+        // We can't ensure the suggestions contains valid characters
+        toastNotifications.add({
+          color: 'danger',
+          title: 'Error',
+          text: 'The filter contains invalid characters',
+          toastLifeTimeMs: 10000,
+      });
+        this.setState({ lookingPolicy: policy, loadingPolicy: false })
+      }
     }
     this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
   }
@@ -544,7 +551,7 @@ export class Inventory extends Component {
                       filters={this.state.filters}
                       suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
                       placeholder='Add filter or search' 
-                      onFiltersChange={filters => this.setState({filters})} />
+                      onFiltersChange={filters => {this.setState({filters})}} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
 
