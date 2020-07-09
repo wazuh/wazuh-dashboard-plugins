@@ -35,7 +35,9 @@ export class LogtestFlyout extends Component {
     };
   }
 
-  componentWillUnmount() {  }
+  componentWillUnmount() {  
+    $('body').removeClass('euiBody--logtestIsOpen');
+  }
 
   dockLogtestFlyout() {
     this.setState({ docked: !this.state.docked }, () => {
