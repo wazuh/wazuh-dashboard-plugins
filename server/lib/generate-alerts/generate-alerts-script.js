@@ -119,7 +119,9 @@ function generateAlert(params) {
 
     // Random fields for base alert
     // alert.id = // TODO: generate random?;
-    alert.agent = randomArrayItem(Agents);
+    if(!params.aws) {
+        alert.agent = randomArrayItem(Agents);
+    }
     alert.rule.description = randomArrayItem(ruleDescription);
     alert.rule.id = `${randomIntervalInteger(1,alertIDMax)}`;
     alert.rule.level = randomIntervalInteger(1,ruleMaxLevel);
