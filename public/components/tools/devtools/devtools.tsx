@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, Fragment } from 'react'
 import { EuiIcon, EuiFlexGroup, EuiFlexItem, EuiBadge, EuiButtonEmpty, EuiToolTip, EuiScreenReaderOnly, EuiProgress, EuiCodeEditor, EuiButtonIcon } from '@elastic/eui';
 import * as senseEditor from '../../../../../../src/plugins/console/public/application/models/sense_editor/';
 import { AppState } from '../../../react-services/app-state'
@@ -22,9 +22,7 @@ import queryString from 'querystring-browser';
 import { apiRequestList } from './api-requests-list';
 import 'brace/theme/textmate';
 import { DevToolsHistory } from './devToolsHistory';
-
-
-
+import * as FileSaver from '../../../services/file-saver';
 
 export function DevTools({ initialTextValue }) {
   const editorRef = useRef(null);
@@ -61,7 +59,7 @@ export function DevTools({ initialTextValue }) {
     const gutter = $('#wz-dev-right-column .ace_gutter');
     const gutterWidth = gutter.width();
     const gutterOffset = gutter.offset();
-    $('#wz-tabs-margin').css('marginRight', gutterWidth + gutterOffset.left - 67); //67 is the width of the History button
+    $('#wz-tabs-margin').css('marginRight', gutterWidth + gutterOffset.left - 66); //66 is the width of the History button
   };
 
   useEffect(() => {
@@ -118,12 +116,12 @@ export function DevTools({ initialTextValue }) {
       const rightOrigWidth = $('#wz-dev-right-column').width();
       const gutter = $('#wz-dev-right-column .ace_gutter');
       $(evtDocument).mousemove(function (e) {
-        const leftWidth = e.pageX;
-        let rightWidth = leftOrigWidth - leftWidth;
+        const leftWidth = e.pageX - 10;
+        let rightWidth = leftOrigWidth - leftWidth + 10;
         const gutterWidth = gutter.width();
         const gutterOffset = gutter.offset();
         $('#wz-dev-left-column').css('width', leftWidth);
-        $('#wz-tabs-margin').css('marginRight', gutterWidth + gutterOffset.left - 67); //67 is the width of the History button
+        $('#wz-tabs-margin').css('marginRight', gutterWidth + gutterOffset.left - 66); //66 is the width of the History button
         $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
       });
     });
@@ -173,10 +171,10 @@ export function DevTools({ initialTextValue }) {
   }, [tabsState, selectedTab, statusBadges])
 
   const abs = {
-    height: 'calc(100vh - 170px)',
+    height: !isPanelVisible ? 'calc(100vh - 140px)' : 'calc(100vh - 445px)',
     width: 'auto',
     position: 'relative',
-    margin: 0
+    marginTop: -1
   };
 
   const addNewTab = () => {
@@ -301,9 +299,19 @@ export function DevTools({ initialTextValue }) {
     editorInstanceRef.current.coreEditor.insert(nextReqEnd, `\n\n${req.method} ${req.endpoint}\n${req.data}`)
   }
 
+  const exportOutput = () => {
+    try {
+      // eslint-disable-next-line	
+      const blob = new Blob([(tabsState || [""])[selectedTab]], {
+        type: 'application/json'
+      });
+      FileSaver.saveAs(blob, 'export.json');
+    } catch (error) { }
+  }
+
   const renderRightColumn = () => {
     return (
-      <div id="wz-dev-right-column" style={{ width: "70%", marginTop: 2, height: '100%' }}>
+      <div id="wz-dev-right-column" style={{ width: "70%", borderTop: '1px solid #8080801c', height: '100%' }}>
         <EuiCodeEditor
           theme="textmate"
           width="100%"
@@ -320,7 +328,7 @@ export function DevTools({ initialTextValue }) {
 
   const renderLeftColumn = () => {
     return (
-      <div id="wz-dev-left-column" style={{ width: "30%", marginTop: 2 }} className="conApp__editor">
+      <div id="wz-dev-left-column" style={{ width: "30%", borderTop: '1px solid #8080801c' }} className="conApp__editor">
         <ul className="conApp__autoComplete" id="autocomplete" />
         <EuiFlexGroup
           className="conApp__editorActions"
@@ -360,8 +368,8 @@ export function DevTools({ initialTextValue }) {
 
   const renderActionsBar = () => {
     return (
-      <EuiFlexGroup gutterSize="none" responsive={false}>
-        <EuiFlexItem id="wz-tabs-margin" style={{ marginRight: 'calc(30vw - 12px)' }} grow={false}>
+      <EuiFlexGroup gutterSize="none" responsive={false} style={{ paddingTop: 6, paddingLeft: 8 }}>
+        <EuiFlexItem id="wz-tabs-margin" style={{ marginRight: 'calc(30vw - 4px)' }} grow={false}>
           <EuiButtonEmpty
             color="text"
             onClick={showHistory}
@@ -369,7 +377,7 @@ export function DevTools({ initialTextValue }) {
             History
             </EuiButtonEmpty>
         </EuiFlexItem>
-        <EuiFlexItem className="wz-devtools-tabs" >
+        <EuiFlexItem className="wz-devtools-tabs" style={{ zIndex: 1 }}>
           <EuiFlexGroup gutterSize="none" responsive={false}>
             {!isPanelVisible &&
               <EuiFlexItem grow={false} style={{ maxWidth: "70%", overflow: 'auto' }} ><EuiFlexGroup gutterSize="none" responsive={false}>{showTabs()}</EuiFlexGroup></EuiFlexItem>}
@@ -387,24 +395,49 @@ export function DevTools({ initialTextValue }) {
         <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
           {statusBadges[selectedTab] && getBadge()}
         </EuiFlexItem>
+        <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
+          <EuiButtonIcon
+            color={'subdued'}
+            onClick={() => exportOutput()}
+            iconType="importAction"
+            aria-label="Export"
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
+          <EuiButtonIcon
+            color={'subdued'}
+            onClick={() => window.open(
+              'https://documentation.wazuh.com/current/user-manual/api/reference.html'
+            )}
+            iconType="questionInCircle"
+            aria-label="Reference"
+          />
+        </EuiFlexItem>
       </EuiFlexGroup>)
   }
 
   return (
-    <div>
+    <Fragment>
       {renderActionsBar()}
       {isPanelVisible &&
         <EuiFlexGroup>
           <EuiFlexItem>
             <DevToolsHistory localStorage={window.localStorage} closeHistory={closeHistory} addRequest={addRequest} />
           </EuiFlexItem>
-        </EuiFlexGroup>}
-      <div style={abs} className="conApp">
-        {loading && <EuiProgress size="xs" color="accent" position="absolute" />}
-        {renderLeftColumn()}
-        <div className="wz-dev-column-separator layout-column" style={{ marginTop: 2 }}><span style={{ paddingTop: 'calc(50vh - 80px)' }}>︙</span></div>
-        {renderRightColumn()}
-      </div>
-    </div>
+        </EuiFlexGroup>
+      }
+      <EuiFlexGroup style={{ padding: "0px 8px" }}>
+        <EuiFlexItem style={{ marginBottom: 0 }}>
+          <div style={abs} className="conApp">
+            {loading && <EuiProgress size="xs" color="accent" position="absolute" />}
+            {renderLeftColumn()}
+            <div className="wz-dev-column-separator layout-column" style={{ marginTop: 0, borderTop: '1px solid #8080801c' }}>
+              <span><EuiIcon type='grabHorizontal'></EuiIcon></span>
+            </div>
+            {renderRightColumn()}
+          </div>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </Fragment>
   );
 }

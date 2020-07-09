@@ -118,7 +118,7 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
     }
 
     return (
-        <EuiPanel paddingSize="s" style={{ margin: 4 }}>
+        <EuiPanel paddingSize="s" style={{ margin: "0px 8px" }}>
             <EuiFlexGroup>
                 <EuiFlexItem>
                     <EuiTitle size="s"><h3>History</h3></EuiTitle>
@@ -150,7 +150,7 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
                     </EuiButtonEmpty>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                    <EuiButton fill onClick={() => addRequest(JSON.parse(selectedRequest))}>
+                    <EuiButton disabled={!selectedRequest} fill onClick={() => addRequest(JSON.parse(selectedRequest))}>
                         Apply
                 </EuiButton>
                 </EuiFlexItem>
