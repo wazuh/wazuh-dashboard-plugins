@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, Fragment } from 'react'
 import { EuiIcon, EuiFlexGroup, EuiFlexItem, EuiBadge, EuiButtonEmpty, EuiToolTip, EuiScreenReaderOnly, EuiProgress, EuiCodeEditor, EuiButtonIcon } from '@elastic/eui';
 import * as senseEditor from '../../../../../../src/plugins/console/public/application/models/sense_editor/';
 import { AppState } from '../../../react-services/app-state'
@@ -23,8 +23,6 @@ import { apiRequestList } from './api-requests-list';
 import 'brace/theme/textmate';
 import { DevToolsHistory } from './devToolsHistory';
 import * as FileSaver from '../../../services/file-saver';
-
-
 
 
 export function DevTools({ initialTextValue }) {
@@ -320,6 +318,16 @@ GET /syscollector/000/packages?search=ssh
     const position = editorInstanceRef.current.coreEditor.getCurrentPosition();
     const nextReqEnd = editorInstanceRef.current.nextRequestEnd(position);
     editorInstanceRef.current.coreEditor.insert(nextReqEnd, `\n\n${req.method} ${req.endpoint}\n${req.data}`)
+  }
+
+  const exportOutput = () => {
+    try {
+      // eslint-disable-next-line	
+      const blob = new Blob([(tabsState || [""])[selectedTab]], {
+        type: 'application/json'
+      });
+      FileSaver.saveAs(blob, 'export.json');
+    } catch (error) { }
   }
 
   const renderRightColumn = () => {
