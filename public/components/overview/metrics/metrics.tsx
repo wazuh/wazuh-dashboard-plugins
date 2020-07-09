@@ -39,6 +39,7 @@ export class Metrics extends Component {
   state: {
     resultState: string,
     results: object,
+    metricsOnClicks: object,
     loading: boolean,
     filterParams: object,
   } 
@@ -54,6 +55,7 @@ export class Metrics extends Component {
     this.state = {
       resultState: "",
       results: {},
+      metricsOnClicks: {},
       loading: true,
       filterParams: {
         filters: [],
@@ -136,6 +138,7 @@ export class Metrics extends Component {
       filterParams["query"] = searchBarQuery; 
       filterParams["filters"] = this.filterManager.filters; 
       this.setState({filterParams, loading: true, results:{}})
+      const newOnClick = {};
       
       const result = this.metricsList[this.props.section].map(async(item)=> {
         let filters = [];
@@ -151,6 +154,7 @@ export class Metrics extends Component {
           rangeFilterParams["time"] = filterParams["time"];
           rangeFilterParams["query"] = filterParams["query"];
           rangeFilterParams["filters"].push(filters)
+          newOnClick[item.name] = () => {this.filterManager.addFilters(filters)};
           results[item.name] = await this.getResults(rangeFilterParams);
           return results ;
         }else if(item.type === "phrases"){
@@ -163,7 +167,8 @@ export class Metrics extends Component {
           phrasesFilter["filters"] = [...filterParams["filters"]]
           phrasesFilter["time"] = filterParams["time"];
           phrasesFilter["query"] = filterParams["query"];
-          phrasesFilter["filters"].push(filters)
+          phrasesFilter["filters"].push(filters);
+          newOnClick[item.name] = () => {this.filterManager.addFilters(filters)};
           results[item.name] = await this.getResults(phrasesFilter);
           return results ;
 
@@ -194,7 +199,8 @@ export class Metrics extends Component {
           existsFilters["filters"] = [...filterParams["filters"]]
           existsFilters["time"] = filterParams["time"];
           existsFilters["query"] = filterParams["query"];
-          existsFilters["filters"].push(filters)
+          existsFilters["filters"].push(filters);
+          newOnClick[item.name] = () => {this.filterManager.addFilters(filters)};
           results[item.name] = await this.getResults(existsFilters);
           return results ;
         }else  if(item.type === "unique-count"){
@@ -226,7 +232,8 @@ export class Metrics extends Component {
           phraseFilter["filters"] = [...filterParams["filters"]]
           phraseFilter["time"] = filterParams["time"];
           phraseFilter["query"] = filterParams["query"];
-          phraseFilter["filters"].push(filters)
+          phraseFilter["filters"].push(filters);
+          newOnClick[item.name] = () => {this.filterManager.addFilters(filters)};
           results[item.name] = await this.getResults(phraseFilter);
           return results ;
         }else{
@@ -242,7 +249,7 @@ export class Metrics extends Component {
           const key = Object.keys(item)[0]
           newResults[key] = item[key];
         });
-        this.setState({results: newResults, loading:false, buildingMetrics: false})
+        this.setState({results: newResults, loading:false, buildingMetrics: false, metricsOnClicks: newOnClick})
       });
     
   }
@@ -267,7 +274,8 @@ export class Metrics extends Component {
         return(
           <EuiFlexItem grow={count>20 ? 3 : 1} key={`${item.name}`}>
             <EuiStat
-              title={<span style={{fontSize: count>20 ? "2rem": "2.25rem" }}>{this.state.results[item.name]}</span>}
+            /// TODO: add tooltip and cursor pointer
+              title={this.state.metricsOnClicks[item.name] ? <span style={{fontSize: count>20 ? "2rem": "2.25rem" }} onClick={this.state.metricsOnClicks[item.name]}>{this.state.results[item.name]}</span> : <span style={{fontSize: count>20 ? "2rem": "2.25rem" }}>{this.state.results[item.name]}</span>}
               description={item.name}
               titleColor={this.metricsList[section][idx].color || 'primary'}
               isLoading={this.state.loading}
