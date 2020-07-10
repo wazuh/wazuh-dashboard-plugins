@@ -230,7 +230,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
                   </EuiToolTip>
 
                   {this.state.hover === item.id &&
-                    <span style={{float: "right"}}>
+                    <span style={{float: "right", position: 'fixed'}}>
                       <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
                           <EuiIcon onClick={(e) => {this.openDashboard(e,item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
                       </EuiToolTip> &nbsp;

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React Components to some utilities.
+ * Wazuh app - React Component component to display simple data with title and description arranged in a row.
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
@@ -11,5 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
- export { AgentGroupTruncate, GroupTruncate} from './agent-group-truncate';
- export { GroupingComponents } from './grouping-components';
+export { WzStat } from './wzStat';

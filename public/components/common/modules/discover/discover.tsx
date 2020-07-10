@@ -119,6 +119,7 @@ export class Discover extends Component {
 
     this.wazuhConfig = new WazuhConfig();
     this.nameEquivalences = {
+      "agent.id": "Agent",
       "syscheck.event": "Action",
       "rule.id": "Rule ID",
       "rule.description": "Description",
@@ -328,7 +329,11 @@ export class Discover extends Component {
 
 
   columns = () => {
-    const columns = this.state.columns.map((item) => {
+    var columnsList = [...this.state.columns];
+    if(!store.getState().appStateReducers.currentAgentData.id){
+      columnsList.splice(2, 0, 'agent.id');
+    }
+    const columns = columnsList.map((item) => {
       if(item === "icon"){
         return  {
           width: "25px",
@@ -354,14 +359,17 @@ export class Discover extends Component {
       }
       let width = false;
       const arrayCompilance = ["rule.pci_dss", "rule.gdpr", "rule.nist_800_53", "rule.tsc", "rule.hipaa"];
-
+      
+      if(item === 'agent.id') {
+        width = '75px';
+      }
       if(item === 'rule.level') {
         width = '75px';
       }
       if(item === 'rule.id') {
         width = '90px';
       }
-      if(item === 'rule.description' && this.state.columns.indexOf('syscheck.event') === -1) {
+      if(item === 'rule.description' && columnsList.indexOf('syscheck.event') === -1) {
         width = '30%';
       }
       if(item === 'syscheck.event') {

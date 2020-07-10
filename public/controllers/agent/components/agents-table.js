@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
@@ -35,9 +35,10 @@ import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { AgentGroupTruncate } from '../../../components/common/util';
+import { GroupTruncate } from '../../../components/common/util';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
+import { IWzSuggestItem } from '../../../components/wz-search-bar'
 import _ from 'lodash';
 
 export class AgentsTable extends Component {
@@ -849,7 +850,8 @@ export class AgentsTable extends Component {
     const getCellProps = item => {
       return {
         onMouseDown: (ev) => {
-          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
+          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()
+        }
       }
     };
 
@@ -906,9 +908,24 @@ export class AgentsTable extends Component {
     );
   }
 
+  filterGroupBadge = (group) => {
+    const { filters } = this.state;
+    let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
+    if (filters.length > 0) {
+      !auxFilters.includes(group) ? 
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      }) : false;
+    } else {
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      })
+    }
+  }
+
   renderGroups(groups) {
     return(
-      <AgentGroupTruncate groups={groups} length={25} label={'more'}/> 
+      <GroupTruncate groups={groups} length={25} label={'more'} action={'filter'} filterAction={this.filterGroupBadge} {...this.props} /> 
     )
   }
 

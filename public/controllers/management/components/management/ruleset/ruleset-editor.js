@@ -124,7 +124,7 @@ class WzRulesetEditor extends Component {
       this.showToast(
         'danger',
         'Error',
-        'Error saving CDB list: ' + error,
+        'Error saving file: ' + error,
         3000
       );
     }
@@ -167,7 +167,7 @@ class WzRulesetEditor extends Component {
       ? true
       : path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode;
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
-    nameForSaving = name.endsWith('.xml')
+    nameForSaving = nameForSaving.endsWith('.xml')
       ? nameForSaving
       : `${nameForSaving}.xml`;
     const overwrite = fileContent ? true : false;
