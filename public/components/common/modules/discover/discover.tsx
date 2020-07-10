@@ -566,7 +566,7 @@ export class Discover extends Component {
     const noResultsText = `No results match for this search criteria`
     return (
       <div
-        className='wz-discover hide-filter-controll' >
+        className='wz-discover hide-filter-control' >
         {this.getSearchBar()}
         {total 
           ? <EuiFlexGroup>

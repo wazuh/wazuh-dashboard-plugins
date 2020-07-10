@@ -138,9 +138,8 @@ service kibana restart
  
 | Wazuh app | Kibana | Open Distro | Package                                                         |
 | :-------: | :----: | :---------: | :-------------------------------------------------------------- |
-|   3.13.1  |  7.8.0 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.8.0.zip> |
-|   3.13.1  |  7.7.0 |    1.8.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.7.0.zip> |
-|   3.13.0  |  7.8.0 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.8.0.zip> |
+|   3.13.1  |  7.8.0 |    1.9.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.8.0.zip> |
+|   3.13.0  |  7.8.0 |    1.9.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.8.0.zip> |
 |   3.13.0  |  7.7.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.7.1.zip> |
 |   3.13.0  |  7.7.0 |    1.8.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.7.0.zip> |
 |   3.12.3  |  7.7.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.12.3_7.7.1.zip> |

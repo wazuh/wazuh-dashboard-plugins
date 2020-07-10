@@ -213,7 +213,7 @@ export class Mitre extends Component {
       <div>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <div className='wz-discover hide-filter-controll' >
+            <div className='wz-discover hide-filter-control' >
               {this.getSearchBar()}
             </div>
           </EuiFlexItem>
