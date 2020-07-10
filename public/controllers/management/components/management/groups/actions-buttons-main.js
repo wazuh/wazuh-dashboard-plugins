@@ -248,29 +248,30 @@ class WzGroupsActionButtons extends Component {
               isOpen={this.state.isPopoverOpen}
               closePopover={() => this.closePopover()}
             >
-              <EuiFormRow label="Introduce the group name" id="">
-                <EuiFieldText
-                  className="groupNameInput"
-                  value={this.state.newGroupName}
-                  onChange={this.onChangeNewGroupName}
-                  aria-label=""
-                />
-              </EuiFormRow>
-              <EuiSpacer size="xs" />
-              <EuiFlexGroup>
+            <EuiFlexGroup direction={'column'}>
                 <EuiFlexItem>
-                  <EuiButton
-                    iconType="save"
-                    isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
-                    fill
-                    onClick={async () => {
-                      await this.createGroup();
-                    }}
-                  >
-                    Save new group
-                  </EuiButton>
-                </EuiFlexItem>
-              </EuiFlexGroup>
+                  <EuiFormRow label="Introduce the group name" id="">
+                    <EuiFieldText
+                      className="groupNameInput"
+                      value={this.state.newGroupName}
+                      onChange={this.onChangeNewGroupName}
+                      aria-label=""
+                    />
+                  </EuiFormRow>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiButton
+                  iconType="save"
+                  isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
+                  fill
+                  onClick={async () => {
+                    await this.createGroup();
+                  }}
+                >
+                  Save new group
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
             </EuiPopover>
           </EuiFlexItem>
         )}
