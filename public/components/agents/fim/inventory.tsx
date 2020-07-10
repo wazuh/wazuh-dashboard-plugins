@@ -51,7 +51,8 @@ export class Inventory extends Component {
     totalItemsRegistry: number
     isLoading: Boolean
     syscheck: []
-    customBadges: ICustomBadges[]
+    customBadges: ICustomBadges[],
+    isConfigured: Boolean
   }
 
   props: any;
@@ -66,6 +67,7 @@ export class Inventory extends Component {
       totalItemsRegistry: 0,
       isLoading: true,
       customBadges: [],
+      isConfigured: false
     }
     this.onFiltersChange.bind(this);
   }
@@ -89,8 +91,9 @@ export class Inventory extends Component {
     const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
     const {totalItemsFile, syscheck} = await this.getItemNumber('file');
     const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
+    const isConfigured = await this.isConfigured();
     if (this._isMount){
-      this.setState({ totalItemsFile, totalItemsRegistry, syscheck, isLoading: false });
+      this.setState({ totalItemsFile, totalItemsRegistry, syscheck, isLoading: false, isConfigured });
     }
   }
 
@@ -138,20 +141,31 @@ export class Inventory extends Component {
     this.setState({ filters });
   }
 
+  onTotalItemsChange = (totalItems: number) => {
+    this.setState({ totalItemsFile: totalItems });
+  }
+
   onSelectedTabChanged = id => {
     this.setState({ selectedTabId: id });
   }
 
+  buildFilter(type) {
+    const filters = filtersToObject(this.state.filters);
+    const filter = {
+      ...filters,
+      limit: type === 'file' ? '15' : '1',
+      type,
+      ...(type === 'file' && {sort: '+file'})
+    };
+    return filter;
+  }
+  
   async getItemNumber(type: 'file' | 'registry') {
     const agentID = this.props.agent.id;
     const response = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
-      {
-        limit: type === 'file' ? '15' : '1',
-        type,
-        ...(type === 'file' && {sort: '+file'})
-      }
+      this.buildFilter(type),
     );
     if (type === 'file') {
       return {
@@ -215,6 +229,7 @@ export class Inventory extends Component {
       toastLifeTimeMs: time,
     });
   };
+
   async downloadCsv() {
     const { filters } = this.state;
     try {
@@ -249,7 +264,8 @@ export class Inventory extends Component {
             filters={filters}
             items={syscheck}
             totalItems={totalItemsFile}
-            onFiltersChange={this.onFiltersChange} />
+            onFiltersChange={this.onFiltersChange} 
+            onTotalItemsChange={this.onTotalItemsChange}/>
         }
         {selectedTabId === 'registry' &&
           <RegistryTable
@@ -305,22 +321,37 @@ export class Inventory extends Component {
     </EuiPage>;
   }
 
+  async isConfigured() {
+    try {
+      const response = await WzRequest.apiReq(
+        'GET',
+        `/agents/${this.props.agent.id}/config/syscheck/syscheck`,
+        {}
+      );
+  
+      return (((response.data || {}).data).syscheck || {}).disabled === 'no';
+    } catch (error) {
+      return false;
+    }
+  }
+
   render() {
-    const { totalItemsFile, totalItemsRegistry, isLoading } = this.state;
+    const { isLoading, isConfigured } = this.state;
     if (isLoading) {
       return this.loadingInventory()
     }
     const table = this.renderTable();
-    const tabs = this.renderTabs()
-    const notItems = !(totalItemsFile + totalItemsRegistry)
-    return notItems
-      ? this.noConfiguredMonitoring()
-      : (<EuiPage>
+    const tabs = this.renderTabs();
+
+    return isConfigured
+      ? (<EuiPage>
         <EuiPanel>
           {tabs}
           <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
           {table}
         </EuiPanel>
-      </EuiPage>)
+      </EuiPage>) 
+      : this.noConfiguredMonitoring()
+      
   }
 }

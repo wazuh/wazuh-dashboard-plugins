@@ -44,7 +44,8 @@ export class InventoryTable extends Component {
     filters: IFilter[]
     agent: any
     items: []
-    totalItems: number
+    totalItems: number,
+    onTotalItemsChange: Function
   }
 
   constructor(props) {
@@ -112,6 +113,8 @@ export class InventoryTable extends Component {
       `/syscheck/${agentID}`,
       this.buildFilter()
       );
+
+      this.props.onTotalItemsChange((((syscheck || {}).data || {}).data || {}).totalItems);
       
       this.setState({
         syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
