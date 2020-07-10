@@ -115,8 +115,7 @@ export class OverviewWelcome extends Component {
                         this.buildTabCard('osquery', 'searchProfilerApp')}
                       {this.props.extensions.docker &&
                         this.buildTabCard('docker', 'logoDocker')}
-                      {this.props.extensions.mitre &&
-                        this.buildTabCard('mitre', 'spacesApp')}{' '}
+                      {this.buildTabCard('mitre', 'spacesApp')}{' '}
                       {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
                   </EuiPanel>
@@ -150,19 +149,19 @@ export class OverviewWelcome extends Component {
                       this.props.extensions.hipaa ||
                       this.props.extensions.tsc ||
                       this.props.extensions.nist) && (
-                      <EuiFlexGrid columns={2}>
-                        {this.props.extensions.pci &&
-                          this.buildTabCard('pci', 'visTagCloud')}
-                        {this.props.extensions.nist &&
-                          this.buildTabCard('nist', 'apmApp')}
-                        {this.props.extensions.tsc &&
-                          this.buildTabCard('tsc', 'apmApp')}
-                        {this.props.extensions.gdpr &&
-                          this.buildTabCard('gdpr', 'visBarVertical')}
-                        {this.props.extensions.hipaa &&
-                          this.buildTabCard('hipaa', 'emsApp')}
-                      </EuiFlexGrid>
-                    )}
+                        <EuiFlexGrid columns={2}>
+                          {this.props.extensions.pci &&
+                            this.buildTabCard('pci', 'visTagCloud')}
+                          {this.props.extensions.nist &&
+                            this.buildTabCard('nist', 'apmApp')}
+                          {this.props.extensions.tsc &&
+                            this.buildTabCard('tsc', 'apmApp')}
+                          {this.props.extensions.gdpr &&
+                            this.buildTabCard('gdpr', 'visBarVertical')}
+                          {this.props.extensions.hipaa &&
+                            this.buildTabCard('hipaa', 'emsApp')}
+                        </EuiFlexGrid>
+                      )}
                   </EuiPanel>
                 </EuiFlexItem>
               </EuiFlexGroup>
