@@ -18,7 +18,10 @@ export default {
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html',
   icon: 'logoAWSMono',
   avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for_agent: false,
+  api_component: 'wmodules',
+  api_configuration: 'wmodules',
+  api_module: 'aws',
   steps: [
     {
       title: 'Required settings',

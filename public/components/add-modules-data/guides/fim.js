@@ -19,6 +19,9 @@ export default {
   icon: 'filebeatApp',
   avaliable_for_manager: true,
   avaliable_for_agent: true,
+  api_component: 'syscheck',
+  api_configuration: 'syscheck',
+  api_module: 'syscheck',
   steps: [
     {
       title: 'Directories/files to monitoring',
@@ -266,7 +269,6 @@ export default {
           type: 'input',
           placeholder: 'Windows registry entry',
           default_value: 'HKEY_LOCAL_MACHINE\\Software',
-          required: true,
           repeatable: true,
           removable: true,
           agent_os: 'windows',
@@ -325,7 +327,7 @@ export default {
           name: 'frequency',
           description: 'Frequency that the syscheck will be run (in seconds).',
           type: 'input-number',
-          required: true,
+          // required: true,
           default_value: 43200,
           values: { min: 1 },
           placeholder: 'Time in seconds.',
