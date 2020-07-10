@@ -19,7 +19,8 @@ const initialState = {
   adminMode: false,
   currentAgentData: {},
   showExploreAgentModal: false,
-  showExploreAgentModalGlobal: false
+  showExploreAgentModalGlobal: false,
+  showFlyoutLogtest: false,
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -80,11 +81,17 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-
   if (action.type === 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL') {
     return {
       ...state,
       showExploreAgentModalGlobal: action.showExploreAgentModalGlobal
+    };
+  }
+
+  if (action.type === 'SHOW_FLYOUT_LOGTEST') {
+    return {
+      ...state,
+      showFlyoutLogtest: action.showFlyoutLogtest
     };
   }
 

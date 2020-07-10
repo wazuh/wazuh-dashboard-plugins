@@ -105,6 +105,7 @@ app.run([
         <div ng-view class="mainView"></div>
         <react-component name="WzMenuWrapper" props=""></react-component>
         <react-component name="WzAgentSelectorWrapper" props=""></react-component>
+        <react-component name="FlyoutLogtestWrapper" props=""></react-component>
        </div>
         `
       )

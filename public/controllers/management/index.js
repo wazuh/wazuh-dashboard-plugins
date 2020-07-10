@@ -16,6 +16,8 @@ import { ManagementController } from './management';
 import { ClusterController } from './monitoring';
 import { ManagementWelcomeWrapper } from '../../components/common/welcome/management-welcome-wrapper';
 import WzManagement from './components/management/management-provider';
+import {LogtestFlyout} from '../../components/tools/logtest/logtest-flyout.js';
+import {FlyoutLogtestWrapper} from '../../components/tools/logtest/logtest-wrapper';
 import WzManagementConfiguration from './components/management/configuration/configuration-main';
 
 const app = uiModules.get('app/wazuh', []);
@@ -26,4 +28,6 @@ app
   .controller('clusterController', ClusterController)
   .value('ManagementWelcomeWrapper', ManagementWelcomeWrapper)
   .value('WzManagement', WzManagement)
+  .value('LogtestFlyout', LogtestFlyout)
+  .value('FlyoutLogtestWrapper', FlyoutLogtestWrapper)
   .value('WzManagementConfiguration', WzManagementConfiguration);

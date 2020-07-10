@@ -14,6 +14,7 @@ import React, { Component, Fragment } from 'react';
 import store from '../../../../redux/store';
 import ReactDOM from 'react-dom';
 import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
+import { showFlyoutLogtest  } from '../../../../redux/actions/appStateActions';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
@@ -30,8 +31,7 @@ class WzManagementMain extends Component {
     super(props);
     this.state = {
       isOpen: false,
-      isDocked: true,
-      showLogtestFlyout: false
+      isDocked: true
     };
     this.store = store;
   }
@@ -65,7 +65,7 @@ class WzManagementMain extends Component {
   }
 
   switchLogtestFlyout() {
-    this.setState({ showLogtestFlyout: !this.state.showLogtestFlyout })
+    this.props.showFlyoutLogtest(!this.props.showLogtestFlyout);
   }
 
   render() {
@@ -83,11 +83,8 @@ class WzManagementMain extends Component {
         }
         {ruleset.includes(section) &&
           <Fragment>
-            {!this.state.showLogtestFlyout &&
+            {!this.props.showLogtestFlyout &&
               this.buildLogtestButton()
-            }
-            {this.state.showLogtestFlyout &&
-              <LogtestFlyout switchLogtestFlyout={() => this.switchLogtestFlyout()}></LogtestFlyout>
             }
           </Fragment>
         }
@@ -98,13 +95,15 @@ class WzManagementMain extends Component {
 
 function mapStateToProps(state) {
   return {
-    state: state.managementReducers
+    state: state.managementReducers,
+    showFlyout: state.appStateReducers.showFlyoutLogtest,
   };
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateRulesetSection: section => dispatch(updateRulesetSection(section))
+    updateRulesetSection: section => dispatch(updateRulesetSection(section)),
+    showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
   };
 };
 

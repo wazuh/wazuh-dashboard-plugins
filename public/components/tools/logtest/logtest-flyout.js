@@ -23,8 +23,10 @@ import {
   EuiButtonEmpty,
   EuiBadge
 } from '@elastic/eui';
+import { showFlyoutLogtest  } from '../../../redux/actions/appStateActions';
+import { connect } from 'react-redux';
 
-export class LogtestFlyout extends Component {
+class LogtestFlyout extends Component {
   constructor(props) {
     super(props);
 
@@ -35,9 +37,7 @@ export class LogtestFlyout extends Component {
     };
   }
 
-  componentWillUnmount() {  
-    $('body').removeClass('euiBody--logtestIsOpen');
-  }
+  componentWillUnmount() {}
 
   dockLogtestFlyout() {
     this.setState({ docked: !this.state.docked }, () => {
@@ -51,8 +51,11 @@ export class LogtestFlyout extends Component {
 
   render() {
     const container = document.getElementById('kibana-body');
+    const showFlyoutLogtest = this.props.showFlyout;
+
     return ReactDOM.createPortal(
-      <EuiFlyout
+        showFlyoutLogtest && 
+        (<EuiFlyout
         className="logtest-flyout"
         aria-labelledby="flyoutSmallTitle"
         hideCloseButton
@@ -77,7 +80,11 @@ export class LogtestFlyout extends Component {
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 size="s"
-                onClick={() => this.props.switchLogtestFlyout()}
+                onClick={() => {
+                  this.state.docked = false;
+                  $('body').removeClass('euiBody--logtestIsOpen');
+                  this.props.showFlyoutLogtest(false);
+                }}
                 iconType={'cross'}>
                 Close
               </EuiButtonEmpty>
@@ -89,8 +96,28 @@ export class LogtestFlyout extends Component {
             <Logtest onFlyout={true}></Logtest>
           </div>
         </EuiFlyoutBody>
-      </EuiFlyout>,
+      </EuiFlyout>)
+      ,
       container
     );
   }
 }
+
+const mapDispatchToProps = dispatch => {
+  return {
+    showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
+  };
+};
+
+const mapStateToProps = state => {
+  return {
+    showFlyout: state.appStateReducers.showFlyoutLogtest,
+  };
+};
+
+export const FlyoutComponentWithVariableControl =  connect(
+  mapStateToProps,
+  mapDispatchToProps
+  )(LogtestFlyout);
+
+ 
