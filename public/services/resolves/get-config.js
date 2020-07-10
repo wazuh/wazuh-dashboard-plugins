@@ -31,7 +31,6 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'extensions.gcp': false,
     'extensions.virustotal': false,
     'extensions.osquery': false,
-    'extensions.mitre': true,
     'extensions.docker': false,
     timeout: 20000,
     'api.selector': true,
