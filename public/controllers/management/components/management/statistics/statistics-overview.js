@@ -30,6 +30,7 @@ import {
 
 import StatisticsHandler from './utils/statistics-handler';
 import { clusterNodes } from '../configuration/utils/wz-fetch';
+import { WzStatisticsRemoted } from './statistics-dashboard-remoted'
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -201,6 +202,8 @@ export class WzStatisticsOverview extends Component {
             !this.state.isLoading
           ) && (
             <div>
+            <WzStatisticsRemoted />
+            <EuiSpacer size={'m'} />
               <EuiCallOut
                 title={this.info[this.state.selectedTabId]}
                 iconType="iInCircle"

@@ -558,6 +558,14 @@ export class WazuhElasticCtrl {
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
             query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
+          }else {
+            /*  TODO: specify wazuh-statitistic index pattern and cluster name
+            example:
+            if(title === 'Wazuh Statistics XXXX){
+              query+= .es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")
+            }
+            */
+            query = visState.params.expression;
           }
 
           visState.params.expression = query;
@@ -651,7 +659,9 @@ export class WazuhElasticCtrl {
         throw new Error('Missing parameters creating visualizations');
       }
 
-      const file = ClusterVisualizations['monitoring'];
+      const type = req.params.tab.split('-')[1];
+
+      const file = ClusterVisualizations[type];
       const nodes = req.payload.nodes.items;
       const name = req.payload.nodes.name;
       const masterNode = req.payload.nodes.master_node;
