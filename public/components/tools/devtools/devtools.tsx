@@ -23,6 +23,7 @@ import { apiRequestList } from './api-requests-list';
 import 'brace/theme/textmate';
 import { DevToolsHistory } from './devToolsHistory';
 import * as FileSaver from '../../../services/file-saver';
+import { ErrorHandler } from '../../../react-services/error-handler';
 
 export function DevTools({ initialTextValue }) {
   const editorRef = useRef(null);
@@ -306,7 +307,9 @@ export function DevTools({ initialTextValue }) {
         type: 'application/json'
       });
       FileSaver.saveAs(blob, 'export.json');
-    } catch (error) { }
+    } catch (error) {
+      ErrorHandler.handle(error, 'Export JSON');
+    }
   }
 
   const renderRightColumn = () => {
@@ -396,22 +399,30 @@ export function DevTools({ initialTextValue }) {
           {statusBadges[selectedTab] && getBadge()}
         </EuiFlexItem>
         <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
-          <EuiButtonIcon
-            color={'subdued'}
-            onClick={() => exportOutput()}
-            iconType="importAction"
-            aria-label="Export"
-          />
+          <EuiToolTip
+            position="left"
+            content="Export in JSON">
+            <EuiButtonIcon
+              color={'subdued'}
+              onClick={() => exportOutput()}
+              iconType="importAction"
+              aria-label="Export"
+            />
+          </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
-          <EuiButtonIcon
-            color={'subdued'}
-            onClick={() => window.open(
-              'https://documentation.wazuh.com/current/user-manual/api/reference.html'
-            )}
-            iconType="questionInCircle"
-            aria-label="Reference"
-          />
+          <EuiToolTip
+            position="left"
+            content="API reference">
+            <EuiButtonIcon
+              color={'subdued'}
+              onClick={() => window.open(
+                'https://documentation.wazuh.com/current/user-manual/api/reference.html'
+              )}
+              iconType="questionInCircle"
+              aria-label="Reference"
+            />
+          </EuiToolTip>
         </EuiFlexItem>
       </EuiFlexGroup>)
   }
