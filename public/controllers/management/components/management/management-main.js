@@ -22,17 +22,13 @@ import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
-import { LogtestFlyout } from '../../../../components/tools/logtest/logtest-flyout'
 import { connect } from 'react-redux';
 import { EuiBetaBadge } from '@elastic/eui';
 
 class WzManagementMain extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isOpen: false,
-      isDocked: true
-    };
+    this.state = {};
     this.store = store;
   }
   UNSAFE_componentWillMount() {
@@ -57,15 +53,11 @@ class WzManagementMain extends Component {
           title="Logtest tool"
           tooltipContent="Check your ruleset testing logs"
           style={{ margin: '0px 8px', cursor: 'pointer' }}
-          onClick={() => this.switchLogtestFlyout()}
+          onClick={() => this.props.showFlyoutLogtest(true)}
         />,
         container[0]
       );
     }
-  }
-
-  switchLogtestFlyout() {
-    this.props.showFlyoutLogtest(!this.props.showLogtestFlyout);
   }
 
   render() {
@@ -83,7 +75,7 @@ class WzManagementMain extends Component {
         }
         {ruleset.includes(section) &&
           <Fragment>
-            {!this.props.showLogtestFlyout &&
+            {!this.props.showFlyout &&
               this.buildLogtestButton()
             }
           </Fragment>
