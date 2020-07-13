@@ -30,7 +30,7 @@ import {
   EuiCallOut,
   EuiSpacer
 } from '@elastic/eui';
-
+import { WzRequest } from '../../../react-services/wz-request';
 import PropTypes from 'prop-types';
 
 export class RegisterAgent extends Component {
@@ -41,7 +41,8 @@ export class RegisterAgent extends Component {
       status: 'incomplete',
       selectedOS: '',
       serverAddress: '',
-      wazuhPassword: ''
+      wazuhPassword: '',
+      protocol: ''
     };
   }
 
@@ -49,16 +50,47 @@ export class RegisterAgent extends Component {
     try {
       const wazuhVersion = await this.props.getWazuhVersion();
       const apiAddress = await this.props.getCurrentApiAddress();
-      const needsPassword = await this.props.needsPassword();
+      const needsPassword = this.getAuthInfo();
+      const protocol = this.getRemoteInfo();
       this.setState({
         serverAddress: apiAddress,
-        needsPassword: needsPassword,
-        wazuhVersion: wazuhVersion
+        needsPassword,
+        protocol,
+        wazuhVersion
       });
     } catch (error) {
       this.setState({
         wazuhVersion: version
       });
+    }
+  }
+
+  async getAuthInfo() {
+    try {
+      const result = await WzRequest.apiReq(
+        'GET',
+        '/agents/000/config/auth/auth',
+        {}
+      );
+      const auth = ((result.data || {}).data || {}).auth || {};
+      const usePassword = auth.use_password === 'yes';
+      return usePassword;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async getRemoteInfo() {
+    try {
+      const result = await WzRequest.apiReq(
+        'GET',
+        '/agents/000/config/request/remote',
+        {}
+      );
+      const remote = ((result.data || {}).data || {}).remote || {};
+      return remote.protocol;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -149,34 +181,34 @@ export class RegisterAgent extends Component {
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
-      }yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
+        }yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.x86_64.rpm`,
+        }-1.x86_64.rpm`,
       debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
         this.state.wazuhVersion
-      }-1_amd64.deb && sudo WAZUH_MANAGER='${this.state.serverAddress}'${
+        }-1_amd64.deb && sudo WAZUH_MANAGER='${this.state.serverAddress}'${
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
-      }dpkg -i ./wazuh-agent.deb`,
+        }dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
+        }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
         this.state.serverAddress
-      }'${
+        }'${
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD '${this.state.wazuhPassword}' `
           : ' '
-      }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
         this.state.wazuhVersion
-      }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q WAZUH_MANAGER='${
+        }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q WAZUH_MANAGER='${
         this.state.serverAddress
-      }' WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}'${
+        }' WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}'${
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
           : ' '
-      }`
+        }`
     };
 
     const field = `${this.state.selectedOS}Text`;
