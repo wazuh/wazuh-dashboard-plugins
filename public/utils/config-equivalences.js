@@ -52,5 +52,7 @@ export const configEquivalences = {
   hideManagerAlerts:
     'Hide the alerts of the manager in all dashboards and discover',
   'logs.level':
-    'Set the app logging level, allowed values are info and debug. Default is info.'
+    'Set the app logging level, allowed values are info and debug. Default is info.',
+  'enrollment.dns':
+    'Set the Wazuh server address in the agent deployment.',
 };
