@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import store from '../../../../redux/store';
 import ReactDOM from 'react-dom';
 import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
-import { showFlyoutLogtest  } from '../../../../redux/actions/appStateActions';
+import { showFlyoutLogtest } from '../../../../redux/actions/appStateActions';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
@@ -44,6 +44,7 @@ class WzManagementMain extends Component {
     if (!breadcrumbExists.length) {
       setTimeout(() => {
         this.buildLogtestButton();
+        this.forceUpdate();
       }, 500);
     } else {
       const container = document.getElementsByClassName('euiBreadcrumbs');
