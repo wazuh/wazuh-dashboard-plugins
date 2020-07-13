@@ -12,7 +12,6 @@
 import React, { Component, Fragment } from 'react';
 import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
-import { ApiRequest } from '../../../react-services/api-request';
 import {
   EuiSteps,
   EuiFlexGroup,
@@ -24,7 +23,6 @@ import {
   EuiCodeBlock,
   EuiTitle,
   EuiButton,
-  EuiButtonIcon,
   EuiButtonEmpty,
   EuiCopy,
   EuiPage,
@@ -33,11 +31,11 @@ import {
   EuiSpacer,
   EuiProgress
 } from '@elastic/eui';
+import { WzRequest } from '../../../react-services/wz-request';
 
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
-    this.apiReq = ApiRequest;
     this.wazuhConfig = new WazuhConfig();
     this.configuration = this.wazuhConfig.getConfig();
     this.state = {
@@ -60,9 +58,10 @@ export class RegisterAgent extends Component {
       if (!serverAddress) {
         serverAddress = await this.props.getCurrentApiAddress();
       }
-      let needsPassword = await this.getAuthInfo();
+      let authInfo = await this.getAuthInfo();
+      const needsPassword = (authInfo.auth || {}).use_password === 'yes';
       if (needsPassword) {
-        wazuhPassword = this.configuration["enrollment.password"] || '';
+        wazuhPassword = authInfo['authd.pass'] || '';
         if (wazuhPassword) {
           hidePasswordInput = true;
         }
@@ -87,14 +86,12 @@ export class RegisterAgent extends Component {
 
   async getAuthInfo() {
     try {
-      const result = await this.apiReq.request(
+      const result = await WzRequest.apiReq(
         'GET',
         '/agents/000/config/auth/auth',
         {}
       );
-      const auth = ((result.data || {}).data || {}).auth || {};
-      const usePassword = auth.use_password === 'yes';
-      return usePassword;
+      return (result.data || {}).data || {};
     } catch (error) {
       return false;
     }
@@ -102,13 +99,13 @@ export class RegisterAgent extends Component {
 
   async getRemoteInfo() {
     try {
-      const result = await this.apiReq.request(
+      const result = await WzRequest.apiReq(
         'GET',
         '/agents/000/config/request/remote',
         {}
       );
       const remote = ((result.data || {}).data || {}).remote || {};
-      return (remote[0] || {}).protocol === 'tcp';
+      return (remote[0] || {}).protocol !== 'udp';
     } catch (error) {
       return false;
     }

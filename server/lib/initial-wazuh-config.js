@@ -133,14 +133,11 @@ export const initialWazuhConfig = `---
 # Allowed values: info, debug
 #logs.level: info
 #
-# ------------------------------- Enrollment agents -----------------------------
-# Wazuh server address
+# -------------------------------- Enrollment DNS -------------------------------
+# Set the variable WAZUH_REGISTRATION_SERVER in agents deployment.
 # Default value: ''
 #enrollment.dns: ''
 #
-# Wazuh registration password
-# Default value: ''
-#enrollment.password: ''
 #-------------------------------- API entries -----------------------------------
 #The following configuration is the default structure to define an API entry.
 #

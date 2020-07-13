@@ -54,5 +54,5 @@ export const configEquivalences = {
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.',
   'enrollment.dns':
-    'Wazuh server address.'
+    'Set the Wazuh server address in the agent deployment.',
 };
