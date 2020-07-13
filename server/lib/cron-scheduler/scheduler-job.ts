@@ -2,6 +2,8 @@ import { jobs } from './predefined-jobs';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import { IApi, ApiRequest, SaveDocument } from './index';
 import { ErrorHandler } from './error-handler';
+import { configuredJobs } from './configured-jobs';
+import { Route } from 'react-router';
 
 export class SchedulerJob {
   jobName: string;
@@ -17,19 +19,21 @@ export class SchedulerJob {
   }
 
   public async run() {
-    const { index, status } = jobs[this.jobName];
+    const { index, status } = configuredJobs({})[this.jobName];
     if ( !status ) { return; }
     try {
       const hosts = await this.getApiObjects();
-      const data = await hosts.reduce(async (acc, host) => {
+      const data = await hosts.reduce(async (acc:Promise<object[]>, host) => {
+        const {status} = configuredJobs({host, jobName: this.jobName})[this.jobName];
+        if (!status) return acc;
         const response = await this.getResponses(host);
         const accResolve = await Promise.resolve(acc)
         return [
           ...accResolve,
           ...response,
-        ]
+        ];
       }, Promise.resolve([]));
-      await this.saveDocument.save(data, index);
+      !!data.length && await this.saveDocument.save(data, index);
     } catch (error) {
       ErrorHandler(error, this.server);
     } 
@@ -69,14 +73,14 @@ export class SchedulerJob {
 
   private async getResponsesForIRequest(host: any,  data: object[]) {
     const { request, params } = jobs[this.jobName];
-    const fieldName = this.getParamName(request.request);
+    const fieldName = this.getParamName(typeof request !== 'string' && request.request);
     const paramList = await this.getParamList(fieldName, host);
     for (const param of paramList) {
-      const paramRequest = request.request.replace(/\{.+\}/, param);
-      const apiRequest = new ApiRequest(paramRequest, host, params);
-      const response = await apiRequest.getData();
-      response.data['apiName'] = host.id;
-      response.data[fieldName] = param;
+      const paramRequest = typeof request !== 'string' && request.request.replace(/\{.+\}/, param);
+      const apiRequest = !!paramRequest && new ApiRequest(paramRequest, host, params);
+      const response = apiRequest && await apiRequest.getData() || {};
+      response['data']['apiName'] = host.id;
+      response['data'][fieldName] = param;
       data.push(response);
     }
   }
@@ -106,7 +110,6 @@ export class SchedulerJob {
       return item
     }
     const keys = Object.keys(item)
-    console.log({keys})
     if(keys.length > 1 || keys.length < 0) throw { error: 10006, message: `More than one key or none were obtained: ${keys}`}
     return item[keys[0]];
   }

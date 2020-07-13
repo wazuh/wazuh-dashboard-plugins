@@ -1,6 +1,4 @@
-
 import Axios, { AxiosRequestConfig, AxiosResponse }from 'axios';
-import { log } from '../../logger';
 import { Agent } from 'https';
 
 export interface IApi {

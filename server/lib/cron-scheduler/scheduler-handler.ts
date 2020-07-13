@@ -1,4 +1,5 @@
 import { jobs, SchedulerJob } from './index';
+import { configuredJobs } from './configured-jobs';
 import { schedule } from 'node-cron';
 
 export class SchedulerHandler {
@@ -10,7 +11,7 @@ export class SchedulerHandler {
   }
 
   run() {
-    for (const job of Object.keys(jobs)) {
+    for (const job in configuredJobs({})) {
       const schedulerJob:SchedulerJob = new SchedulerJob(job, this.server);
       this.schedulerJobs.push(schedulerJob);
       const task = schedule(

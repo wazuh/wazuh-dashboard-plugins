@@ -1,10 +1,7 @@
-import {
-  BulkIndexDocumentsParams,
-} from 'elasticsearch';
+import { BulkIndexDocumentsParams } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
 import { log } from '../../logger.js';
 import { indexDate } from '../index-date.js';
-
 
 export interface IIndexConfiguration {
   name: string
@@ -28,11 +25,19 @@ export class SaveDocument {
     const { name, creation, mapping } = indexConfig;
     const index = this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
-    await this.checkIndexAndCreateIfNotExists(indexCreation);
-    const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
-    const response = await this.callWithInternalUser('bulk', createDocumentObject);
-    log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
-    await this.checkIndexPatternAndCreateIfNotExists(index);
+    try {
+      await this.checkIndexAndCreateIfNotExists(indexCreation);
+      const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
+      const response = await this.callWithInternalUser('bulk', createDocumentObject);
+      log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
+      await this.checkIndexPatternAndCreateIfNotExists(index);
+    } catch(error) {
+      if (error.status === 403)
+        throw {error: 403, message: `Authorization Exception in the index "${index}"`}
+      if (error.status === 409)
+        throw {error: 409, message: `Duplicate index-pattern: ${index}`}
+      throw error;
+    }
   }
 
   private async checkIndexAndCreateIfNotExists(index) {

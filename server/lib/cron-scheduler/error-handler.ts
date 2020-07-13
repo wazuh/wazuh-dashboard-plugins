@@ -12,11 +12,13 @@ export function ErrorHandler(error, server) {
   const errorLevel = ErrorLevels[error.error] || ERROR;
   log('Cron-scheduler', error, errorLevel === ERROR ? INFO : errorLevel);
   if (errorLevel === DEBUG && logLevel !== DEBUG) return;
-  server.log([COLOR, 'CRON-SCHEDULER', errorLevel === DEBUG ? INFO : errorLevel], `${JSON.stringify(error)}`);
+  server.log([COLOR, 'Cron-scheduler', errorLevel === DEBUG ? INFO : errorLevel], `${JSON.stringify(error)}`);
 }
 
 const ErrorLevels = {
   401: INFO,
+  403: ERROR,
+  409: DEBUG,
   3005: INFO,
   3013: DEBUG,
   10001: INFO,
