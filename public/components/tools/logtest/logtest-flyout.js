@@ -25,6 +25,7 @@ import {
 } from '@elastic/eui';
 import { showFlyoutLogtest  } from '../../../redux/actions/appStateActions';
 import { connect } from 'react-redux';
+import { withRouter, Router } from 'react-router-dom';
 
 class LogtestFlyout extends Component {
   constructor(props) {
@@ -38,6 +39,14 @@ class LogtestFlyout extends Component {
   }
 
   componentWillUnmount() {}
+
+  componentDidUpdate() {
+    if(!this.props.location.hash.includes('tab=rules') && !this.props.location.hash.includes('tab=decoders') && !this.props.location.hash.includes('tab=lists') && this.props.showFlyout) {
+      this.state.docked = false;
+      $('body').removeClass('euiBody--logtestIsOpen');
+      this.props.showFlyoutLogtest(false);
+    }
+  }
 
   dockLogtestFlyout() {
     this.setState({ docked: !this.state.docked }, () => {
@@ -115,9 +124,9 @@ const mapStateToProps = state => {
   };
 };
 
+const LogtestFlyoutWithRouter = withRouter(LogtestFlyout);
+
 export const FlyoutComponentWithVariableControl =  connect(
   mapStateToProps,
   mapDispatchToProps
-  )(LogtestFlyout);
-
- 
+  )(LogtestFlyoutWithRouter);
