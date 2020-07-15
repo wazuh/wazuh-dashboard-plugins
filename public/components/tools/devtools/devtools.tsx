@@ -344,7 +344,7 @@ export function DevTools({ initialTextValue }) {
   const renderRightColumn = () => {
     $('#wz-dev-right-column').on('resizeComponent',function(){
       let $rightColumn = $('#wz-dev-right-column');
-      console.log($rightColumn.width());
+      
       if ($rightColumn.width() < 860) { 
         $('#selectTabs').show();
         $('#buttonSelectTab').hide();
