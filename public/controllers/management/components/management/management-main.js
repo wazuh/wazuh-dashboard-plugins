@@ -14,6 +14,7 @@ import React, { Component, Fragment } from 'react';
 import store from '../../../../redux/store';
 import ReactDOM from 'react-dom';
 import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
+import { showFlyoutLogtest } from '../../../../redux/actions/appStateActions';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
@@ -21,18 +22,13 @@ import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
-import { LogtestFlyout } from '../../../../components/tools/logtest/logtest-flyout'
 import { connect } from 'react-redux';
 import { EuiBetaBadge } from '@elastic/eui';
 
 class WzManagementMain extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isOpen: false,
-      isDocked: true,
-      showLogtestFlyout: false
-    };
+    this.state = {};
     this.store = store;
   }
   UNSAFE_componentWillMount() {
@@ -48,6 +44,7 @@ class WzManagementMain extends Component {
     if (!breadcrumbExists.length) {
       setTimeout(() => {
         this.buildLogtestButton();
+        this.forceUpdate();
       }, 500);
     } else {
       const container = document.getElementsByClassName('euiBreadcrumbs');
@@ -57,15 +54,11 @@ class WzManagementMain extends Component {
           title="Logtest tool"
           tooltipContent="Check your ruleset testing logs"
           style={{ margin: '0px 8px', cursor: 'pointer' }}
-          onClick={() => this.switchLogtestFlyout()}
+          onClick={() => this.props.showFlyoutLogtest(true)}
         />,
         container[0]
       );
     }
-  }
-
-  switchLogtestFlyout() {
-    this.setState({ showLogtestFlyout: !this.state.showLogtestFlyout })
   }
 
   render() {
@@ -83,11 +76,8 @@ class WzManagementMain extends Component {
         }
         {ruleset.includes(section) &&
           <Fragment>
-            {!this.state.showLogtestFlyout &&
+            {!this.props.showFlyout &&
               this.buildLogtestButton()
-            }
-            {this.state.showLogtestFlyout &&
-              <LogtestFlyout switchLogtestFlyout={() => this.switchLogtestFlyout()}></LogtestFlyout>
             }
           </Fragment>
         }
@@ -98,13 +88,15 @@ class WzManagementMain extends Component {
 
 function mapStateToProps(state) {
   return {
-    state: state.managementReducers
+    state: state.managementReducers,
+    showFlyout: state.appStateReducers.showFlyoutLogtest,
   };
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateRulesetSection: section => dispatch(updateRulesetSection(section))
+    updateRulesetSection: section => dispatch(updateRulesetSection(section)),
+    showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
   };
 };
 

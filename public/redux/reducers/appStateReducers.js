@@ -19,7 +19,9 @@ const initialState = {
   adminMode: false,
   currentAgentData: {},
   showExploreAgentModal: false,
-  showExploreAgentModalGlobal: false
+  showExploreAgentModalGlobal: false,
+  showFlyoutLogtest: false,
+  dockedFlyoutLogtest: false,
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -80,7 +82,6 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-
   if (action.type === 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL') {
     return {
       ...state,
@@ -88,7 +89,19 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
+  if (action.type === 'SHOW_FLYOUT_LOGTEST') {
+    return {
+      ...state,
+      showFlyoutLogtest: action.showFlyoutLogtest
+    };
+  }
 
+  if (action.type === 'UPDATE_DOCKED_LOGTEST') {
+    return {
+      ...state,
+      dockedFlyoutLogtest: action.dockedFlyoutLogtest
+    };
+  }
 
   return state;
 };

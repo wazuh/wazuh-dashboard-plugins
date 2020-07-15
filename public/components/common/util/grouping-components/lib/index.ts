@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React Components to some utilities.
+ * Wazuh app - Component to group some components within another
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
@@ -10,6 +10,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
- export { AgentGroupTruncate, GroupTruncate} from './agent-group-truncate';
- export { GroupingComponents } from './grouping-components';
+export { divideChildren } from './divide-children';

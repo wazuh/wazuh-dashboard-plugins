@@ -70,7 +70,7 @@ export const updateExtensions = (id, extensions) => {
 
 /**
  * Updates adminMode in the appState store
- * @param extensions
+ * @param adminMode
  */
 export const updateAdminMode = adminMode => {
   return {
@@ -82,7 +82,7 @@ export const updateAdminMode = adminMode => {
 
 /**
  * Updates currentAgentData in the appState store
- * @param extensions
+ * @param data
  */
 export const updateCurrentAgentData = (data) => {
   return {
@@ -94,7 +94,7 @@ export const updateCurrentAgentData = (data) => {
 
 /**
  * Updates showExploreAgentModal in the appState store
- * @param extensions
+ * @param shouldShow
  */
 export const showExploreAgentModal = (shouldShow) => {
   return {
@@ -106,11 +106,33 @@ export const showExploreAgentModal = (shouldShow) => {
 
 /**
  * Updates showExploreAgentModalGlobal in the appState store
- * @param extensions
+ * @param shouldShow
  */
 export const showExploreAgentModalGlobal = (shouldShow) => {
   return {
     type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
     showExploreAgentModalGlobal: shouldShow
+  };
+};
+
+/**
+ * Updates showFlyoutLogtest in the appState store
+ * @param showFlyout
+ */
+export const showFlyoutLogtest = (showFlyout) => {
+  return {
+    type: 'SHOW_FLYOUT_LOGTEST',
+    showFlyoutLogtest: showFlyout
+  };
+};
+
+/**
+ * Updates dockedFlyoutLogtest in the appState store
+ * @param updateDockedLogtest
+ */
+export const updateDockedLogtest = (dockedFlyout) => {
+  return {
+    type: 'UPDATE_DOCKED_LOGTEST',
+    dockedFlyoutLogtest: dockedFlyout
   };
 };

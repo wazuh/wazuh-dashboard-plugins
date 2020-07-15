@@ -23,8 +23,12 @@ import {
   EuiButtonEmpty,
   EuiBadge
 } from '@elastic/eui';
+import { showFlyoutLogtest  } from '../../../redux/actions/appStateActions';
+import { updateDockedLogtest  } from '../../../redux/actions/appStateActions';
+import { connect } from 'react-redux';
+import { withRouter, Router } from 'react-router-dom';
 
-export class LogtestFlyout extends Component {
+class LogtestFlyout extends Component {
   constructor(props) {
     super(props);
 
@@ -35,24 +39,33 @@ export class LogtestFlyout extends Component {
     };
   }
 
-  componentWillUnmount() {  
-    $('body').removeClass('euiBody--logtestIsOpen');
+  componentWillUnmount() {}
+
+  componentDidUpdate() {
+    if(!this.props.location.hash.includes('tab=rules') && !this.props.location.hash.includes('tab=decoders') && !this.props.location.hash.includes('tab=lists') && this.props.showFlyout) {
+      this.props.updateDockedLogtest(false);
+      $('body').removeClass('euiBody--logtestIsOpen');
+      this.props.showFlyoutLogtest(false);
+    }
   }
 
   dockLogtestFlyout() {
-    this.setState({ docked: !this.state.docked }, () => {
-      if (this.state.docked) {
-        $('body').addClass('euiBody--logtestIsOpen');
-      } else {
-        $('body').removeClass('euiBody--logtestIsOpen');
-      }
-    })
+    const docked = !this.props.dockedFlyoutLogtest;
+    if (docked) {
+      $('body').addClass('euiBody--logtestIsOpen');
+    } else {
+      $('body').removeClass('euiBody--logtestIsOpen');
+    }
+    this.props.updateDockedLogtest(docked);
   }
 
   render() {
     const container = document.getElementById('kibana-body');
+    const showFlyoutLogtest = this.props.showFlyout;
+
     return ReactDOM.createPortal(
-      <EuiFlyout
+        showFlyoutLogtest && 
+        (<EuiFlyout
         className="logtest-flyout"
         aria-labelledby="flyoutSmallTitle"
         hideCloseButton
@@ -70,14 +83,18 @@ export class LogtestFlyout extends Component {
               <EuiButtonEmpty
                 size="s"
                 onClick={() => this.dockLogtestFlyout()}
-                iconType={this.state.docked && 'lockOpen' || 'lock'}>
-                {this.state.docked && 'Undock Logtest' || 'Dock Logtest'}
+                iconType={this.props.dockedFlyoutLogtest && 'lockOpen' || 'lock'}>
+                {this.props.dockedFlyoutLogtest && 'Undock Logtest' || 'Dock Logtest'}
               </EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 size="s"
-                onClick={() => this.props.switchLogtestFlyout()}
+                onClick={() => {
+                  this.props.updateDockedLogtest(false);
+                  $('body').removeClass('euiBody--logtestIsOpen');
+                  this.props.showFlyoutLogtest(false);
+                }}
                 iconType={'cross'}>
                 Close
               </EuiButtonEmpty>
@@ -89,8 +106,30 @@ export class LogtestFlyout extends Component {
             <Logtest onFlyout={true}></Logtest>
           </div>
         </EuiFlyoutBody>
-      </EuiFlyout>,
+      </EuiFlyout>)
+      ,
       container
     );
   }
 }
+
+const mapDispatchToProps = dispatch => {
+  return {
+    showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
+    updateDockedLogtest: dockedFlyout => dispatch(updateDockedLogtest(dockedFlyout)),
+  };
+};
+
+const mapStateToProps = state => {
+  return {
+    showFlyout: state.appStateReducers.showFlyoutLogtest,
+    dockedFlyoutLogtest: state.appStateReducers.dockedFlyoutLogtest,
+  };
+};
+
+const LogtestFlyoutWithRouter = withRouter(LogtestFlyout);
+
+export const FlyoutComponentWithVariableControl =  connect(
+  mapStateToProps,
+  mapDispatchToProps
+  )(LogtestFlyoutWithRouter);
