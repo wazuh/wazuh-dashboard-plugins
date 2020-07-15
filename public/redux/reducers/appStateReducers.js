@@ -21,6 +21,7 @@ const initialState = {
   showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
   showFlyoutLogtest: false,
+  dockedFlyoutLogtest: false,
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -95,7 +96,12 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-
+  if (action.type === 'UPDATE_DOCKED_LOGTEST') {
+    return {
+      ...state,
+      dockedFlyoutLogtest: action.dockedFlyoutLogtest
+    };
+  }
 
   return state;
 };

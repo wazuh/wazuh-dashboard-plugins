@@ -125,3 +125,14 @@ export const showFlyoutLogtest = (showFlyout) => {
     showFlyoutLogtest: showFlyout
   };
 };
+
+/**
+ * Updates dockedFlyoutLogtest in the appState store
+ * @param updateDockedLogtest
+ */
+export const updateDockedLogtest = (dockedFlyout) => {
+  return {
+    type: 'UPDATE_DOCKED_LOGTEST',
+    dockedFlyoutLogtest: dockedFlyout
+  };
+};

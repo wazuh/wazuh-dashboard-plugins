@@ -24,6 +24,7 @@ import {
   EuiBadge
 } from '@elastic/eui';
 import { showFlyoutLogtest  } from '../../../redux/actions/appStateActions';
+import { updateDockedLogtest  } from '../../../redux/actions/appStateActions';
 import { connect } from 'react-redux';
 import { withRouter, Router } from 'react-router-dom';
 
@@ -42,20 +43,20 @@ class LogtestFlyout extends Component {
 
   componentDidUpdate() {
     if(!this.props.location.hash.includes('tab=rules') && !this.props.location.hash.includes('tab=decoders') && !this.props.location.hash.includes('tab=lists') && this.props.showFlyout) {
-      this.state.docked = false;
+      this.props.updateDockedLogtest(false);
       $('body').removeClass('euiBody--logtestIsOpen');
       this.props.showFlyoutLogtest(false);
     }
   }
 
   dockLogtestFlyout() {
-    this.setState({ docked: !this.state.docked }, () => {
-      if (this.state.docked) {
-        $('body').addClass('euiBody--logtestIsOpen');
-      } else {
-        $('body').removeClass('euiBody--logtestIsOpen');
-      }
-    })
+    const docked = !this.props.dockedFlyoutLogtest;
+    if (docked) {
+      $('body').addClass('euiBody--logtestIsOpen');
+    } else {
+      $('body').removeClass('euiBody--logtestIsOpen');
+    }
+    this.props.updateDockedLogtest(docked);
   }
 
   render() {
@@ -82,15 +83,15 @@ class LogtestFlyout extends Component {
               <EuiButtonEmpty
                 size="s"
                 onClick={() => this.dockLogtestFlyout()}
-                iconType={this.state.docked && 'lockOpen' || 'lock'}>
-                {this.state.docked && 'Undock Logtest' || 'Dock Logtest'}
+                iconType={this.props.dockedFlyoutLogtest && 'lockOpen' || 'lock'}>
+                {this.props.dockedFlyoutLogtest && 'Undock Logtest' || 'Dock Logtest'}
               </EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 size="s"
                 onClick={() => {
-                  this.state.docked = false;
+                  this.props.updateDockedLogtest(false);
                   $('body').removeClass('euiBody--logtestIsOpen');
                   this.props.showFlyoutLogtest(false);
                 }}
@@ -115,12 +116,14 @@ class LogtestFlyout extends Component {
 const mapDispatchToProps = dispatch => {
   return {
     showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
+    updateDockedLogtest: dockedFlyout => dispatch(updateDockedLogtest(dockedFlyout)),
   };
 };
 
 const mapStateToProps = state => {
   return {
     showFlyout: state.appStateReducers.showFlyoutLogtest,
+    dockedFlyoutLogtest: state.appStateReducers.dockedFlyoutLogtest,
   };
 };
 

@@ -76,6 +76,7 @@ import { checkAdminMode } from './controllers/management/components/management/c
 import store from './redux/store';
 import { updateAdminMode } from './redux/actions/appStateActions';
 import { showFlyoutLogtest } from './redux/actions/appStateActions';
+import { updateDockedLogtest } from './redux/actions/appStateActions';
 
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
@@ -99,14 +100,15 @@ app.config([
 app.run(['$rootScope', 
     function ($rootScope) {
         $rootScope.$on('$routeChangeStart', function (event, next, current) {
-          if(!next.params.tab.includes('rules') && !next.params.tab.includes('decoders') && !next.params.tab.includes('lists') && store.getState().appStateReducers.showFlyoutLogtest) {
+          if( (!next.params.tab && store.getState().appStateReducers.showFlyoutLogtest) || (next.params && next.params.tab && !next.params.tab.includes('rules') && !next.params.tab.includes('decoders') && !next.params.tab.includes('lists') && store.getState().appStateReducers.showFlyoutLogtest)) {
             if (!confirm('¿Cerrar de todos modos?')) {
               event.preventDefault();
               // Chrome requires returnValue to be set.
               event.returnValue = ""
             } else {
               $('body').removeClass('euiBody--logtestIsOpen');
-              store.dispatch(showFlyoutLogtest(false))
+              store.dispatch(updateDockedLogtest(false));
+              store.dispatch(showFlyoutLogtest(false));
             }
           }
         });
