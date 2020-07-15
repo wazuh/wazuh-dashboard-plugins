@@ -13,7 +13,7 @@
  */
 
 import React, { useRef, useEffect, useState, Fragment } from 'react'
-import { EuiIcon, EuiFlexGroup, EuiFlexItem, EuiBadge, EuiButtonEmpty, EuiToolTip, EuiScreenReaderOnly, EuiProgress, EuiCodeEditor, EuiButtonIcon } from '@elastic/eui';
+import { EuiIcon, EuiFlexGroup, EuiFlexItem, EuiBadge, EuiButtonEmpty, EuiToolTip, EuiScreenReaderOnly, EuiProgress, EuiCodeEditor, EuiButtonIcon, EuiSelect } from '@elastic/eui';
 import * as senseEditor from '../../../../../../src/plugins/console/public/application/models/sense_editor/';
 import { AppState } from '../../../react-services/app-state'
 import { WzRequest } from '../../../react-services/wz-request';
@@ -312,9 +312,55 @@ export function DevTools({ initialTextValue }) {
     }
   }
 
+  $.event.special.resizeComponent = {
+    remove: function() {
+        $(this).children('iframe.width-changed').remove();
+    },
+    add: function () {
+      var elm = $(this);
+      var iframe = elm.children('iframe.width-changed');
+      if (!iframe.length) {
+        iframe = $('<iframe/>').addClass('width-changed').prependTo(this);
+      }
+
+      var oldWidth = elm.width();
+      function elmResized() {
+        var width = elm.width();
+        if (oldWidth != width) {
+          elm.trigger('resizeComponent', [width, oldWidth]);
+          oldWidth = width;
+        }
+      }
+
+      var timer = 0;
+      var ielm = iframe[0];
+      (ielm.contentWindow || ielm).onresize = function() {
+          clearTimeout(timer);
+          timer = setTimeout(elmResized, 10);
+      };
+    }
+  }
+
   const renderRightColumn = () => {
+    $('#wz-dev-right-column').on('resizeComponent',function(){
+      let $rightColumn = $('#wz-dev-right-column');
+      console.log($rightColumn.width());
+      if ($rightColumn.width() < 860) { 
+        $('#selectTabs').show();
+        $('#buttonSelectTab').hide();
+        $('#addButtonTab').addClass('marginAddTab');
+        $('.wideElementsDevTools').hide();
+      } 
+      if ($rightColumn.width() > 860) {
+        $('#selectTabs').hide();
+        $('#buttonSelectTab').show();
+        $('#addButtonTab').removeClass('marginAddTab');
+        $('.wideElementsDevTools').show();
+      }
+    });
+
     return (
-      <div id="wz-dev-right-column" style={{ width: "70%", borderTop: '1px solid #8080801c', height: '100%' }}>
+      <div id="wz-dev-right-column" style={{ width: "70%", minWidth: "30%",borderTop: '1px solid #8080801c', height: '100%' }}>
         <EuiCodeEditor
           theme="textmate"
           width="100%"
@@ -369,6 +415,36 @@ export function DevTools({ initialTextValue }) {
       </div>)
   }
 
+  const renderSelectTabs = () => {
+    let auxTabs: { index: number, text: string }[] = [];
+    for (let index = 0; index < tabsState.length; index++) {
+      auxTabs.push({
+        index: index,
+        text: `Tab ${index+1}`
+      });
+    }
+
+    const onchange = (value) => {
+      let auxTabIndex = value.split(' ');
+      setSelectedTab(parseInt(auxTabIndex[1]) - 1)
+    }
+
+    return (
+      <EuiFlexItem
+        id={'selectTabs'}
+        grow={false}
+        className={'selectDevTools'}>
+        <EuiSelect
+          id="selectTab"
+          options={auxTabs}
+          value={auxTabs.text}
+          onChange={ (e) => onchange(e.target.value)}
+          aria-label="Selected tabs"
+        />
+      </EuiFlexItem>
+    )
+  }
+
   const renderActionsBar = () => {
     return (
       <EuiFlexGroup gutterSize="none" responsive={false} style={{ paddingTop: 6, paddingLeft: 8 }}>
@@ -383,10 +459,21 @@ export function DevTools({ initialTextValue }) {
         <EuiFlexItem className="wz-devtools-tabs" style={{ zIndex: 1 }}>
           <EuiFlexGroup gutterSize="none" responsive={false}>
             {!isPanelVisible &&
-              <EuiFlexItem grow={false} style={{ maxWidth: "70%", overflow: 'auto' }} ><EuiFlexGroup gutterSize="none" responsive={false}>{showTabs()}</EuiFlexGroup></EuiFlexItem>}
+              <EuiFlexItem 
+                grow={false}
+                style={{ overflow: 'auto' }}
+                id={'buttonSelectTab'}
+                className={'wideElementsDevTools'}
+              >
+                <EuiFlexGroup gutterSize="none" responsive={false}>
+                  {showTabs()}
+                </EuiFlexGroup>
+              </EuiFlexItem>}
+            {!isPanelVisible && renderSelectTabs()}
             {!isPanelVisible && tabsState.length < 5 && <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 onClick={(ev) => { ev.stopPropagation(); addNewTab() }}
+                id={'addButtonTab'}
                 color="text"
                 iconType="plusInCircle"
                 aria-label="open new tab"
@@ -398,7 +485,7 @@ export function DevTools({ initialTextValue }) {
         <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
           {statusBadges[selectedTab] && getBadge()}
         </EuiFlexItem>
-        <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
+        <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }} className={'wideElementsDevTools'}>
           <EuiToolTip
             position="left"
             content="Export in JSON">
@@ -410,7 +497,7 @@ export function DevTools({ initialTextValue }) {
             />
           </EuiToolTip>
         </EuiFlexItem>
-        <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }}>
+        <EuiFlexItem grow={false} style={{ alignSelf: 'center', marginRight: 12 }} className={'wideElementsDevTools'}>
           <EuiToolTip
             position="left"
             content="API reference">
