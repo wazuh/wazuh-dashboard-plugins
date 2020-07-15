@@ -101,7 +101,7 @@ app.run(['$rootScope',
     function ($rootScope) {
         $rootScope.$on('$routeChangeStart', function (event, next, current) {
           if( (!next.params.tab && store.getState().appStateReducers.showFlyoutLogtest) || (next.params && next.params.tab && !next.params.tab.includes('rules') && !next.params.tab.includes('decoders') && !next.params.tab.includes('lists') && store.getState().appStateReducers.showFlyoutLogtest)) {
-            if (!confirm('¿Cerrar de todos modos?')) {
+            if (!confirm('Are you sure you want to close the Logtest session?')) {
               event.preventDefault();
               // Chrome requires returnValue to be set.
               event.returnValue = ""
