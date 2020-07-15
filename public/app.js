@@ -75,6 +75,7 @@ import './directives';
 import { checkAdminMode } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
 import { updateAdminMode } from './redux/actions/appStateActions';
+import { showFlyoutLogtest } from './redux/actions/appStateActions';
 
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
@@ -93,6 +94,23 @@ app.config([
   function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
+]);
+
+app.run(['$rootScope', 
+    function ($rootScope) {
+        $rootScope.$on('$routeChangeStart', function (event, next, current) {
+          if(!next.params.tab.includes('rules') && !next.params.tab.includes('decoders') && !next.params.tab.includes('lists') && store.getState().appStateReducers.showFlyoutLogtest) {
+            if (!confirm('¿Cerrar de todos modos?')) {
+              event.preventDefault();
+              // Chrome requires returnValue to be set.
+              event.returnValue = ""
+            } else {
+              $('body').removeClass('euiBody--logtestIsOpen');
+              store.dispatch(showFlyoutLogtest(false))
+            }
+          }
+        });
+    }
 ]);
 
 app.run([
