@@ -313,8 +313,8 @@ export function DevTools({ initialTextValue }) {
   }
 
   $.event.special.resizeComponent = {
-    remove: function() {
-        $(this).children('iframe.width-changed').remove();
+    remove: function () {
+      $(this).children('iframe.width-changed').remove();
     },
     add: function () {
       var elm = $(this);
@@ -334,23 +334,23 @@ export function DevTools({ initialTextValue }) {
 
       var timer = 0;
       var ielm = iframe[0];
-      (ielm.contentWindow || ielm).onresize = function() {
-          clearTimeout(timer);
-          timer = setTimeout(elmResized, 10);
+      (ielm.contentWindow || ielm).onresize = function () {
+        clearTimeout(timer);
+        timer = setTimeout(elmResized, 10);
       };
     }
   }
 
   const renderRightColumn = () => {
-    $('#wz-dev-right-column').on('resizeComponent',function(){
+    $('#wz-dev-right-column').on('resizeComponent', function () {
       let $rightColumn = $('#wz-dev-right-column');
-      
-      if ($rightColumn.width() < 860) { 
+
+      if ($rightColumn.width() < 860) {
         $('#selectTabs').show();
         $('#buttonSelectTab').hide();
         $('#addButtonTab').addClass('marginAddTab');
         $('.wideElementsDevTools').hide();
-      } 
+      }
       if ($rightColumn.width() > 860) {
         $('#selectTabs').hide();
         $('#buttonSelectTab').show();
@@ -360,7 +360,7 @@ export function DevTools({ initialTextValue }) {
     });
 
     return (
-      <div id="wz-dev-right-column" style={{ width: "70%", minWidth: "30%",borderTop: '1px solid #8080801c', height: '100%' }}>
+      <div id="wz-dev-right-column" style={{ width: "70%", borderTop: '1px solid #8080801c', height: '100%' }}>
         <EuiCodeEditor
           theme="textmate"
           width="100%"
@@ -420,7 +420,7 @@ export function DevTools({ initialTextValue }) {
     for (let index = 0; index < tabsState.length; index++) {
       auxTabs.push({
         index: index,
-        text: `Tab ${index+1}`
+        text: `Tab ${index + 1}`
       });
     }
 
@@ -435,10 +435,11 @@ export function DevTools({ initialTextValue }) {
         grow={false}
         className={'selectDevTools'}>
         <EuiSelect
+          style={{ height: 36 }}
           id="selectTab"
           options={auxTabs}
           value={auxTabs.text}
-          onChange={ (e) => onchange(e.target.value)}
+          onChange={(e) => onchange(e.target.value)}
           aria-label="Selected tabs"
         />
       </EuiFlexItem>
@@ -459,7 +460,7 @@ export function DevTools({ initialTextValue }) {
         <EuiFlexItem className="wz-devtools-tabs" style={{ zIndex: 1 }}>
           <EuiFlexGroup gutterSize="none" responsive={false}>
             {!isPanelVisible &&
-              <EuiFlexItem 
+              <EuiFlexItem
                 grow={false}
                 style={{ overflow: 'auto' }}
                 id={'buttonSelectTab'}
