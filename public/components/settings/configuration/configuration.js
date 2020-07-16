@@ -13,16 +13,14 @@
 
 import React, { Component } from 'react';
 import {
-  EuiFlexGroup,
   EuiFlexItem,
-  EuiButtonIcon,
-  EuiToolTip,
   EuiPanel,
   EuiPage,
-  EuiTitle,
-  EuiText
+  EuiPageBody,
+  EuiPageHeader,
 } from '@elastic/eui';
 import { WzConfigurationTable } from './configuration-table';
+import { Header, Categories } from './components';
 
 export class WzConfigurationSettings extends Component {
   constructor(props) {
@@ -34,47 +32,28 @@ export class WzConfigurationSettings extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() { }
 
   render() {
     return (
-      <EuiPage>
-        <EuiPanel paddingSize="l">
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>
-                      App current settings&nbsp;
-                      <EuiToolTip
-                        position="right"
-                        content="More about configuration file"
-                      >
-                        <EuiButtonIcon
-                          iconType="questionInCircle"
-                          iconSize="l"
-                          aria-label="Help"
-                          target="_blank"
-                          href="https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html"
-                        ></EuiButtonIcon>
-                      </EuiToolTip>
-                    </h2>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                Configuration file located at
-                /usr/share/kibana/optimize/wazuh/config/wazuh.yml
-              </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <WzConfigurationTable {...this.props} />
-        </EuiPanel>
+      <EuiPage >
+        <EuiPageBody Component="div">
+          <EuiPageHeader>
+            <Header />
+          </EuiPageHeader>
+          <Categories all={[]}/>
+
+
+
+          <br/>
+          ⬇ TO DELETE ⬇
+          <br/>
+          <EuiFlexItem>
+            <EuiPanel paddingSize="l">
+              <WzConfigurationTable {...this.props} />
+            </EuiPanel>
+          </EuiFlexItem>
+        </EuiPageBody>
       </EuiPage>
     );
   }
