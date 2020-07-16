@@ -18,8 +18,14 @@ export default {
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-ciscat.html',
   icon: 'securityApp',
   callout_warning: `CIS-CAT is not installed by default. It is a proprietary software that you have to obtain for using this module.`,
-  avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for: {
+    manager: true,
+    agent: true,
+    centralized: true
+  },
+  api_component: 'wmodules',
+  api_configuration: 'wmodules',
+  api_module: 'cis-cat',
   steps: [
     {
       title: 'Settings',
@@ -37,7 +43,7 @@ export default {
           type: 'input-number',
           required: true,
           placeholder: 'Time in seconds',
-          values: { min: 1 },
+          values: { min: 0 },
           default_value: 1800,
           validate_error_message: 'A positive number (seconds)'
         },
@@ -147,10 +153,10 @@ export default {
           name: 'content',
           description: `Define an evaluation. At present, you can only run assessments for XCCDF policy files.`,
           removable: false,
-          required: true,
+          // required: true,
           validate_error_message: 'Any directory or file name.',
-          show_attributes: true,
-          show_options: true,
+          // show_attributes: true,
+          // show_options: true,
           attributes: [
             {
               name: 'type',
@@ -168,15 +174,6 @@ export default {
               required: true,
               placeholder: 'Path where the benchmark files are located',
               validate_error_message: 'Path where the benchmark files are located'
-            },
-            {
-              name: 'timeout',
-              description: `Timeout for the evaluation (in seconds).
-              Use of this attribute overwrites the generic timeout.`,
-              type: 'input-number',
-              values: { min: 1 },
-              default_value: 1800,
-              validate_error_message: 'A positive number (seconds)'
             }
           ],
           options: [
@@ -187,10 +184,45 @@ export default {
               required: true,
               placeholder: 'Profile',
               validate_error_message: 'A valid profile.'
+            },
+            {
+              name: 'timeout',
+              description: `Timeout for the evaluation (in seconds).
+              Use of this attribute overwrites the generic timeout.`,
+              type: 'input-number',
+              values: { min: 1 },
+              default_value: 1800,
+              validate_error_message: 'A positive number (seconds)'
             }
           ]
         }
       ]
     }
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.interval ? {interval: `${config.interval}s`} : {}),
+      ...(config.timeout ? {timeout: Number(config.timeout)} : {}),
+      ...(config.content && config.content[0] ? {content: {
+        profile: config.content[0].profile,
+        '@': Object.keys(config.content[0]).filter(key => key !== 'profile').reduce((accum, key) => {
+          accum[key] = config.content[0][key];
+          return accum;
+      },{})}} : {})
+    }
+  },
+  mapCentralizedConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.timeout ? {timeout: Number(config.timeout)} : {}),
+      ...(config.content ? {content: {
+          profile: config.content.profile,
+          ...(config.content.timeout ? {timeout: Number(config.content.timeout)} : {}),
+          '@': Object.keys(config.content).filter(key => key !== 'profile').reduce((accum, key) => {
+            accum[key] = config.content[key];
+            return accum;
+        },{})}} : {})
+    }
+  }
 }

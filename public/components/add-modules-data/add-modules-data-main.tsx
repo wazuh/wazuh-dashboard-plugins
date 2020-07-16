@@ -33,6 +33,7 @@ import modeGuides from './guides';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import store from '../../redux/store';
+import { withAdminModeProtectedRoute } from '../common/hocs/withAdminModeProtectedRoute';
 
 const guides = Object.keys(modeGuides).map(key => modeGuides[key]).sort((a,b) => {
 	if (a.name < b.name) { return -1 }
@@ -49,7 +50,7 @@ interface IStateWzAddModulesData {
 	selectedGuideCategory: any
 };
 
-export default class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
+export default withAdminModeProtectedRoute('#/manager')(class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
 	tabs: any
 	constructor(props){
 		super(props);
@@ -154,4 +155,4 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 			</Fragment>
 		)
 	}
-}
+})

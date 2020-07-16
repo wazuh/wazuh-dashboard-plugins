@@ -17,8 +17,11 @@ export default {
   category: 'Security information management',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html',
   icon: 'filebeatApp',
-  avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for: {
+    manager: true,
+    agent: true,
+    centralized: true
+  },
   api_component: 'syscheck',
   api_configuration: 'syscheck',
   api_module: 'syscheck',
@@ -43,6 +46,8 @@ export default {
           },
           placeholder: 'Any directory comma separated',
           default_value: '/etc,/usr/bin,/usr/sbin,/bin,/sbin',
+          default_value_linux: '/etc,/usr/bin,/usr/sbin,/bin,/sbin',
+          default_value_windows: '',
           attributes: [
             {
               name: 'realtime',
@@ -555,5 +560,79 @@ export default {
           }
       ]
     },
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.synchronization ? {
+        synchronization: {
+          ...config.synchronization,
+          ...(typeof config.synchronization.max_interval !== undefined ? {max_interval: `${config.synchronization.max_interval}s`} : {}),
+          ...(typeof config.synchronization.interval !== undefined ? {interval: `${config.synchronization.interval}s`} : {}),
+        }
+      } : {}),
+      ...(config.directories ? {
+        directories: config.directories.map(directory => {
+          const mapped = {
+            '#': directory.dir,
+            ...(directory.opts ? {'@': directory.opts.reduce((accum, opt) => {
+              accum[opt] = true;
+              return accum
+            }, {})} : {})
+          }
+          return mapped
+        })
+      } : {}),
+      ...(config.ignore || config.ignore_sregex ? {
+        ignore: [
+          ...(config.ignore ? config.ignore.map(ignore => ({
+              '#': ignore
+          })): []),
+          ...(config.ignore_sregex ? config.ignore_sregex.map(ignore => ({
+            '#': ignore,
+            '@': {
+              type: 'sregex'
+            }
+          })): [])
+        ]
+      } : {})
+    }
+  },
+  mapCentralizedConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.synchronization ? {
+        synchronization: {
+          ...config.synchronization,
+          ...(typeof config.synchronization.max_interval !== undefined ? {max_interval: `${config.synchronization.max_interval}s`} : {}),
+          ...(typeof config.synchronization.interval !== undefined ? {interval: `${config.synchronization.interval}s`} : {}),
+        }
+      } : {}),
+      ...(config.directories ? {
+        directories: config.directories.map(directory => {
+          const mapped = {
+            '#': directory.path,
+            ...(Object.keys(directory).length > 1 ? {'@': Object.keys(directory).filter(key => key !== 'path').reduce((accum, opt) => {
+              accum[opt] = ({yes: true, no: false})[directory[opt]];
+              return accum
+            }, {})} : {})
+          }
+          return mapped
+        })
+      } : {}),
+      ...(config.ignore || config.ignore_sregex ? {
+        ignore: [
+          ...(config.ignore ? config.ignore.map(ignore => ({
+              '#': ignore
+          })): []),
+          ...(config.ignore_sregex ? config.ignore_sregex.map(ignore => ({
+            '#': ignore,
+            '@': {
+              type: 'sregex'
+            }
+          })): [])
+        ]
+      } : {})
+    }
+  }
 }

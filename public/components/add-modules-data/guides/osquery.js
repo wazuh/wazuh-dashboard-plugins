@@ -18,8 +18,14 @@ export default {
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html',
   icon: 'securityApp',
   callout_warning: 'Osquery is not installed by default. It is an open source software that you have to obtain for using this module.',
-  avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for: {
+    manager: true,
+    agent: true,
+    centralized: true
+  },
+  api_component: 'wmodules',
+  api_configuration: 'wmodules',
+  api_module: 'osquery',
   steps: [
     {
       title: 'Settings',
@@ -42,7 +48,7 @@ export default {
           name: 'bin_path',
           description: 'Full path to the folder that contains the osqueryd executable.',
           type: 'input',
-          required: true,
+          // required: true,
           placeholder: 'Any valid path.',
           default_value_linux: '',
           default_value_windows: 'C:\\Program Files\\osquery\\osqueryd'
@@ -104,5 +110,31 @@ export default {
         }
       ]
     }
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.interval ? {interval: `${config.interval}s`} : {}),
+      ...(config.timeout ? {timeout: Number(config.timeout)} : {}),
+      ...(config.content && config.content[0] ? {content: {
+        profile: config.content[0].profile,
+        '@': Object.keys(config.content[0]).filter(key => key !== 'profile').reduce((accum, key) => {
+          accum[key] = config.content[0][key];
+          return accum;
+      },{})}} : {})
+    }
+  },
+  mapCentralizedConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.timeout ? {timeout: Number(config.timeout)} : {}),
+      ...(config.content ? {content: {
+          profile: config.content.profile,
+          ...(config.content.timeout ? {timeout: Number(config.content.timeout)} : {}),
+          '@': Object.keys(config.content).filter(key => key !== 'profile').reduce((accum, key) => {
+            accum[key] = config.content[key];
+            return accum;
+        },{})}} : {})
+    }
+  }
 }

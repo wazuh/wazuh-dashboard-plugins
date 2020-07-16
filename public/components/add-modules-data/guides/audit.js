@@ -17,8 +17,11 @@ export default {
   category: 'Auditing and policy monitoring',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/localfile.html',
   icon: 'securityApp',
-  avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for: {
+    manager: true,
+    agent: true,
+    centralized: true
+  },
   steps: [
     {
       title: 'Settings',

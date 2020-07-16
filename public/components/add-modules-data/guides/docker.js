@@ -17,8 +17,13 @@ export default {
   category: 'Threat detection and response',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html',
   icon: 'logoDocker',
-  avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for: {
+    manager: true,
+    agent: ['windows']
+  },
+  api_component: 'wmodules',
+  api_configuration: 'wmodules',
+  api_module: 'docker-listener',
   steps: [
     {
       title: 'Settings',
@@ -59,5 +64,11 @@ export default {
         }
       ]
     }
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.interval ? {interval: `${config.interval}s`} : {})
+    }
+  }
 }

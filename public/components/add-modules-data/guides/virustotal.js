@@ -17,7 +17,9 @@ export default {
   category: 'Threat detection and response',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html',
   icon: 'securityApp',
-  avaliable_for_manager: true,
+  avaliable_for: {
+    manager: true
+  },
   steps: [
     {
       title: 'Required settings',
