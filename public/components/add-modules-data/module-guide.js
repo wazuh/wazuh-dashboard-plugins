@@ -1713,7 +1713,7 @@ class WzModuleGuide extends Component {
               <EuiFlexItem grow={false} style={{marginTop: 0, marginBottom: 0}}>
                 {/* <EuiButton size='s' color='ghost' iconType='eye' isDisabled={invalidConfiguration} onClick={this.toggleShowConfig}>{invalidConfiguration ? 'Error in config': 'Preview XML configuration'}</EuiButton> */}
                 <WzButtonModal
-                  button={<EuiButton size='s' color='ghost' iconType='eye' isDisabled={invalidConfiguration} onClick={this.toggleShowConfig}>{invalidConfiguration ? 'Error in config': 'Preview XML configuration'}</EuiButton>}
+                  button={<EuiButton size='s' color='ghost' iconType='eye' isDisabled={invalidConfiguration} onClick={this.toggleShowConfig}>{invalidConfiguration ? 'Error in configuration': 'Preview XML configuration'}</EuiButton>}
                   isOpen={showConfig}
                   onClose={this.toggleShowConfig}
                 >
