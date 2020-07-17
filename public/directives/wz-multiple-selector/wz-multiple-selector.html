@@ -31,25 +31,6 @@
                 </div>
             </div>
         </div>
-        <!--         <div class='wzMultipleSelectorButtons'>
-            <button ng-disabled='availableItems.length === 0 || availableItems.length > 500' type='button' class='btn wz-button-groups'
-                tooltip='Add all items' tooltip-placement='top' ng-click='moveAll(availableItems, selectedItems, "a");
-                availableItem=null;availableFilter="" ;doReload("left", availableFilter, true)'>
-                <span><i class='fa fa-forward'></i></span>
-            </button>
-            <button ng-disabled='!availableItem || availableItem.length > 500' type='button' class='btn wz-button-groups'
-                tooltip='Add selected items' tooltip-placement='top' ng-click='moveItem(availableItem, availableItems, selectedItems, "a");availableItem=null;availableFilter=""'>
-                <span><i class='fa fa-arrow-right'></i></span>
-            </button>
-            <button ng-disabled='!selectedElement || selectedElement.length > 500' type='button' class='btn wz-button-groups'
-                tooltip='Remove selected items' tooltip-placement='top' ng-click='moveItem(selectedElement, selectedItems, availableItems, "r");selectedFilter="";selectedElement=null'>
-                <span><i class='fa fa-arrow-left'></i></span>
-            </button>
-            <button ng-disabled='selectedItems.length === 0 || selectedItems.length > 500' type='button' class='btn wz-button-groups'
-                tooltip='Remove all items' tooltip-placement='top' ng-click='moveAll(selectedItems, availableItems, "r");selectedElement=null;selectedFilter="";doReload("right")'>
-                <span><i class='fa fa-backward'></i></span>
-            </button>
-        </div> -->
         <div class="euiKeyPadMenu wzMultipleSelectorButtons" role="menu">
             <button type="button" class="euiKeyPadMenuItem"
                 ng-disabled='availableItems.length === 0 || availableItems.length > 500' ng-click='moveAll(availableItems, selectedItems, "a");

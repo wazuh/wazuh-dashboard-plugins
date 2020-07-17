@@ -32,6 +32,7 @@ import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 import { WzEuiPrompt } from '../directives/wz-eui-prompt/components/wz-eui-prompt';
+import { MultipleAgentSelector } from './management/groups/multiple-agent-selector';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -55,3 +56,4 @@ app
   .value('SyscheckTable', SyscheckTable)
   .value('EuiSpacer', EuiSpacer)
   .value('EuiLoadingChart', EuiLoadingChart)
+  .value('MultipleAgentSelector', MultipleAgentSelector)
