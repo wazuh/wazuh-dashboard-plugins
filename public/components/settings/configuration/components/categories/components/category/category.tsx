@@ -11,14 +11,43 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Fragment } from 'react';
-import { FieldDescription, FieldForm } from './components';
+import React, { } from 'react';
+import { FieldForm } from './components';
+import {
+  EuiFlexItem,
+  EuiPanel,
+  EuiText,
+  EuiFlexGroup,
+  EuiForm,
+  EuiDescribedFormGroup,
+  EuiTitle,
+  EuiFormRow
+} from '@elastic/eui';
 
-export const Category = () => {
+export const Category = ({ name, items }) => {
   return (
-    <Fragment>
-      <FieldDescription name="Name test" description="Description Test" />
-      <FieldForm />
-    </Fragment>
+    <EuiFlexItem>
+      <EuiPanel>
+        <EuiText>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <h2>{name}</h2>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiText>
+        <EuiForm>
+          {items.map((item, idx) => (
+            <EuiDescribedFormGroup
+              key={idx}
+              title={<EuiTitle size="s"><span>{item.name}</span></EuiTitle>}
+              description={item.description} >
+              <EuiFormRow label={item.setting}>
+                <FieldForm item={item} />
+              </EuiFormRow>
+            </EuiDescribedFormGroup>
+          ))}
+        </EuiForm>
+      </EuiPanel>
+    </EuiFlexItem>
   )
 }

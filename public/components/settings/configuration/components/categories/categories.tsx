@@ -10,13 +10,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Fragment } from 'react';
+import React, { } from 'react';
 import { Category } from './components';
-export const Categories = ({all}) => {
+import { ISetting } from '../../configuration';
+import { EuiFlexGroup } from '@elastic/eui';
+export const Categories = ({ config }: { config: ISetting[] }) => {
+  const categories = config.reduce((acc, conf) => {
+    if (!conf.category) return acc;
+    return {
+      ...acc,
+      [conf.category]: [
+        ...(acc[conf.category] || []),
+        conf,
+      ]
+    }
+  }, {})
   return (
-    <Fragment>
-      {[1].map((item, idx) => <Category key={idx} />)}
-    </Fragment>
+    <EuiFlexGroup direction='column'>
+      {Object.keys(categories).map((category, idx) => <Category key={idx} name={category} items={categories[category]} />)}
+    </EuiFlexGroup>
   )
 
 }

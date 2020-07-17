@@ -13,8 +13,9 @@
 import React from 'react';
 
 
-export const FieldForm = () => {
+export const FieldForm = ({ item }) => {
+  console.log({ item })
   return (
-    <span>Field Form</span>
+    <span>{item.form.type}</span>
   );
-}; 
+};
