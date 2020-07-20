@@ -68,9 +68,10 @@ export default class GroupsAgentsColumns {
                       color="primary"
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={`Delete agent`}>
+                  <EuiToolTip position="top"
+                    content={`Remove agent from this group`}>
                     <EuiButtonIcon
-                      aria-label="Delete agent"
+                      aria-label="Remove agent from this group"
                       iconType="trash"
                       onClick={async () => {
                         this.tableProps.updateListItemsForRemove([item]);
@@ -82,19 +83,19 @@ export default class GroupsAgentsColumns {
                   </EuiToolTip>
                 </div>
               )) || (
-                <div>
-                  <EuiToolTip position="top" content={`Go to the agent`}>
-                    <EuiButtonIcon
-                      aria-label="Go to the agent"
-                      iconType="eye"
-                      onClick={async () => {
-                        this.tableProps.groupsProps.showAgent(item);
-                      }}
-                      color="primary"
-                    />
-                  </EuiToolTip>
-                </div>
-              )}
+                  <div>
+                    <EuiToolTip position="top" content={`Go to the agent`}>
+                      <EuiButtonIcon
+                        aria-label="Go to the agent"
+                        iconType="eye"
+                        onClick={async () => {
+                          this.tableProps.groupsProps.showAgent(item);
+                        }}
+                        color="primary"
+                      />
+                    </EuiToolTip>
+                  </div>
+                )}
             </div>
           );
         }
