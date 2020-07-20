@@ -85,12 +85,19 @@ export function SyscollectorTable({tableParams}) {
         }, 400));
     }
 
+    const getTotal = () => {
+        if(syscollector.isLoading)
+            return <>{'( '}<EuiLoadingSpinner></EuiLoadingSpinner>{' )'}</>;
+        else
+            return `(${syscollector.data.totalItems})`;
+    }
+
 
     return (
         <EuiPanel paddingSize="m" style={{margin: '12px 16px 12px 16px'}}>
             <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                    <span style={{display: "flex"}}> <EuiIcon type={tableParams.icon} style={{marginTop: 3}}></EuiIcon>  &nbsp; <EuiText>{tableParams.title}</EuiText> </span>
+                    <span style={{display: "flex"}}> <EuiIcon type={tableParams.icon} style={{marginTop: 3}}></EuiIcon>  &nbsp; <EuiText>{tableParams.title} {tableParams.hasTotal ? getTotal() : ''}</EuiText> </span>
                 </EuiFlexItem>
             </EuiFlexGroup>
             <EuiHorizontalRule margin="xs" />
