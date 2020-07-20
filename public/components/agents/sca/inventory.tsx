@@ -173,6 +173,9 @@ export class Inventory extends Component {
     if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
       await this.initialize();
     }
+    if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
+      this.loadScaPolicy(this.state.lookingPolicy);
+    }
   }
 
   componentWillUnmount() {
@@ -366,12 +369,6 @@ export class Inventory extends Component {
       );
     } catch (error) {
       this.showToast('danger', error, 3000);
-    }
-  }
-
-  componentDidUpdate(prevProps,prevState){
-    if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
-      this.loadScaPolicy(this.state.lookingPolicy);
     }
   }
 
