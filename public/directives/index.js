@@ -12,6 +12,4 @@
 import './wz-enter/wz-enter';
 import './wz-table';
 import './wz-table-eui';
-import './wz-multiple-selector/wz-multiple-selector';
-import './wz-multiple-selector/wz-multiple-selector.less';
 import './wz-src/wz-src';

@@ -1,7 +1,11 @@
-import React, { Component, Fragment } from 'react';
-import { EuiPage, EuiPanel, EuiFlexGroup, EuiFlexItem, EuiProgress, EuiSpacer, EuiButton, EuiTitle, EuiFieldSearch, EuiKeyPadMenu, EuiKeyPadMenuItem, EuiIcon, EuiSelect } from '@elastic/eui';
+import React, { Component } from 'react';
+import {
+  EuiPage, EuiPanel, EuiFlexGroup, EuiFlexItem, EuiProgress, EuiSpacer, EuiButton,
+  EuiButtonIcon, EuiBadge, EuiTitle, EuiLoadingSpinner, EuiFieldSearch, EuiKeyPadMenu, EuiKeyPadMenuItem, EuiIcon
+} from '@elastic/eui';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzRequest } from '../../../react-services/wz-request';
+import './multiple-agent-selector.less'
 import $ from 'jquery';
 
 export class MultipleAgentSelector extends Component {
@@ -27,31 +31,26 @@ export class MultipleAgentSelector extends Component {
       currentDeleting: 0,
       moreThan500: false,
       load: false,
-      multipleSelectorLoading: false
+      savingChanges: false
     };
   }
 
   async componentDidMount() {
-    $('#wzMultipleSelector select').scroll((ev) => {
-      this.scrollList(ev.currentTarget);
-    });
     this.setState({ load: true });
     try {
-      this.setState({ multipleSelectorLoading: true });
       while (!this.state.selectedAgents.loadedAll) {
         await this.loadSelectedAgents();
         this.setState({
-          availableAgents: {
-            ...this.state.availableAgents,
-            offset: this.state.availableAgents.offset + 499,
+          selectedAgents: {
+            ...this.state.selectedAgents,
+            offset: this.state.selectedAgents.offset + 499,
           }
         })
       }
       this.firstSelectedList = [...this.state.selectedAgents.data];
       await this.loadAllAgents("", true);
       this.setState({
-        load: false,
-        multipleSelectorLoading: false
+        load: false
       });
     } catch (error) {
       ErrorHandler.handle(error, 'Error adding agents');
@@ -186,22 +185,22 @@ export class MultipleAgentSelector extends Component {
   getItemsToSave() {
     const original = this.firstSelectedList;
     const modified = this.state.selectedAgents.data;
-    this.deletedAgents = [];
-    this.addedAgents = [];
+    const deletedAgents = [];
+    const addedAgents = [];
 
     modified.forEach(mod => {
       if (original.filter(e => e.key === mod.key).length === 0) {
-        this.addedAgents.push(mod);
+        addedAgents.push(mod);
       }
     });
     original.forEach(orig => {
       if (modified.filter(e => e.key === orig.key).length === 0) {
-        this.deletedAgents.push(orig);
+        deletedAgents.push(orig);
       }
     });
 
-    const addedIds = [...new Set(this.addedAgents.map(x => x.key))];
-    const deletedIds = [...new Set(this.deletedAgents.map(x => x.key))];
+    const addedIds = [...new Set(addedAgents.map(x => x.key))];
+    const deletedIds = [...new Set(deletedAgents.map(x => x.key))];
 
     return { addedIds, deletedIds };
   }
@@ -229,7 +228,7 @@ export class MultipleAgentSelector extends Component {
     const itemsToSave = this.getItemsToSave();
     const failedIds = [];
     try {
-      this.setState({ multipleSelectorLoading: true });
+      this.setState({ savingChanges: true });
       if (itemsToSave.addedIds.length) {
         const addResponse = await WzRequest.apiReq(
           'POST',
@@ -265,10 +264,10 @@ export class MultipleAgentSelector extends Component {
       } else {
         ErrorHandler.info('Group has been updated');
       }
-      this.setState({ multipleSelectorLoading: false });
+      this.setState({ savingChanges: false });
       this.props.cancelButton();
     } catch (err) {
-      this.setState({ multipleSelectorLoading: false });
+      this.setState({ savingChanges: false });
       ErrorHandler.handle(err, 'Error applying changes');
     }
     return;
@@ -304,6 +303,8 @@ export class MultipleAgentSelector extends Component {
         to.push(item)
       }
     }
+    $('#wzMultipleSelectorLeft').val('');
+    $('#wzMultipleSelectorRight').val('');
   };
 
   moveAll = (from, to, type) => {
@@ -322,7 +323,6 @@ export class MultipleAgentSelector extends Component {
   async reload(element, searchTerm, start = false, addOffset) {
     if (element === 'left') {
       if (!this.state.availableAgents.loadedAll) {
-        this.setState({ multipleSelectorLoading: true });
         if (start) {
           this.setState({
             availableAgents: {
@@ -330,7 +330,7 @@ export class MultipleAgentSelector extends Component {
               offset: 0,
             },
             selectedAgents: {
-              ...this.state.availableAgents,
+              ...this.state.selectedAgents,
               offset: 0,
             }
           })
@@ -351,7 +351,6 @@ export class MultipleAgentSelector extends Component {
     } else {
       if (!this.state.selectedAgents.loadedAll) {
         this.setState(
-          { multipleSelectorLoading: true },
           {
             selectedAgents: {
               ...this.state.selectedAgents,
@@ -365,22 +364,17 @@ export class MultipleAgentSelector extends Component {
         }
       }
     }
-    this.setState({ multipleSelectorLoading: false });
   }
 
-  scrollList = (target) => {
-    const pos = target.scrollTop + target.offsetHeight;
-    const max = target.scrollHeight;
-    if (pos >= max) {
-      target.parentElement.parentElement.parentElement.className ===
-        'wzMultipleSelectorLeft'
-        ? this.reload('left', this.state.availableFilter, false)
-        : this.reload('right', this.state.selectedFilter, false);
+  scrollList = async (target) => {
+    if (target === 'left') {
+      await this.reload('left', this.state.availableFilter, false)
+    } else {
+      await this.reload('right', this.state.selectedFilter, false);
     }
   };
 
   render() {
-    let selectedFilter = '';
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiFlexGroup>
@@ -400,10 +394,15 @@ export class MultipleAgentSelector extends Component {
                     <EuiFlexGroup>
                       <EuiFlexItem>
                         <EuiFlexGroup>
-                          <EuiFlexItem grow={false}>
-                            <EuiButton onClick={() => this.props.cancelButton()} iconType="arrowLeft">
-                              Back
-                          </EuiButton>
+                          <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+                            <EuiButtonIcon
+                              aria-label="Back"
+                              style={{ paddingTop: 8 }}
+                              color="primary"
+                              iconSize="l"
+                              iconType="arrowLeft"
+                              onClick={() => this.props.cancelButton()}
+                            />
                           </EuiFlexItem>
                           <EuiFlexItem grow={false}>
                             <EuiTitle size="m">
@@ -416,59 +415,64 @@ export class MultipleAgentSelector extends Component {
                       <EuiFlexItem grow={false}>
                         {!this.state.moreThan500 && (
                           <EuiButton fill onClick={() => this.saveAddAgents()}
+                            isLoading={this.state.savingChanges}
                             isDisabled={this.state.currentDeleting === 0 && this.state.currentAdding === 0}>
                             Apply changes
                           </EuiButton>
                         )}
                         {this.state.moreThan500 && (
-                          <span className='error-msg'><i class="fa fa-exclamation-triangle"></i>
-                          It is not possible to apply changes of more than 500 additions or deletions
+                          <span className='error-msg'><i className="fa fa-exclamation-triangle"></i>
+                          &nbsp;Changes cannot be applied with more than 500 additions or removals
                           </span>
                         )}
                       </EuiFlexItem>
                     </EuiFlexGroup>
                     <EuiFlexGroup>
                       <EuiFlexItem style={{ marginTop: 30 }}>
-                        {!this.multipleSelectorLoading && (
-                          <span className="wzMultipleSelectorCounter">
-                            <span style={{ color: 'green' }}>+{this.state.currentAdding}</span>&nbsp;
-                            <span style={{ color: 'red' }}>-{this.state.currentDeleting}</span>
-                          </span>
-                        )}
                         <div id='wzMultipleSelector'>
                           <div className='wzMultipleSelectorLeft'>
                             <EuiPanel paddingSize="m">
-                              <EuiTitle size="s">
-                                <h4>Available agents</h4>
-                              </EuiTitle>
+                              <EuiFlexGroup>
+                                <EuiFlexItem>
+                                  <EuiTitle size="s">
+                                    <h4>Available agents</h4>
+                                  </EuiTitle>
+                                </EuiFlexItem>
+                                {/*{!this.state.selectedAgents.loadedAll && ( */}
+                                <EuiFlexItem grow={false}>
+                                  <EuiButtonIcon
+                                    aria-label="Back"
+                                    color="primary"
+                                    iconType="refresh"
+                                    onClick={() => this.reload("left", this.state.availableFilter, true)}
+                                  />
+                                </EuiFlexItem>
+                                {/*)} */}
+                              </EuiFlexGroup>
                               <EuiSpacer size={"s"}></EuiSpacer>
-                              {/* {!this.state.selectedAgents.loadedAll && ( */}
-                              <span onClick={() => this.reload("left", this.state.availableFilter, true)} className='pull-right cursor-pointer'>
-                                <span className='fa fa-refresh' aria-hidden='true'></span>
-                              </span>
-                              {/* )} */}
                               <EuiFieldSearch
                                 placeholder="Filter..."
                                 onChange={(ev) => {
                                   this.setState({ availableFilter: ev.target.value, availableItem: [] });
                                 }}
                                 onSearch={value => {
-                                  this.setState({ availableFilter: value });
-                                  this.reload("left", this.state.availableFilter, true)
+                                  this.setState({ availableFilter: value },
+                                    () => { this.reload("left", this.state.availableFilter, true) });
                                 }}
                                 isClearable={true}
                                 fullWidth={true}
-                                aria-label="Use aria labels when no actual label is in useFilter"
+                                aria-label="Filter"
                               />
                               <EuiSpacer size={"m"}></EuiSpacer>
                               <select
+                                id="wzMultipleSelectorLeft"
                                 size='15'
                                 multiple
                                 onChange={(e) => {
                                   this.setState({
                                     availableItem: Array.from(e.target.selectedOptions, option => option.value),
                                     selectedElement: []
-                                  }, this.checkLimit());
+                                  }, () => { this.checkLimit() });
                                 }}
                                 style={{ width: '100%', backgroundColor: '#fbfcfd', border: '1px solid #D3DAE6' }}
                                 onDoubleClick={() => {
@@ -484,6 +488,34 @@ export class MultipleAgentSelector extends Component {
                                   </option>
                                 ))}
                               </select>
+                              {(!this.state.availableAgents.loadedAll &&
+                                !this.state.loadingAvailableAgents && (
+                                  <>
+                                    <EuiSpacer size="m" />
+                                    <p
+                                      className="wz-load-extra"
+                                      onClick={() => {
+                                        this.setState({ loadingAvailableAgents: true },
+                                          async () => {
+                                            await this.scrollList('left');
+                                            this.setState({ loadingAvailableAgents: false })
+                                          });
+                                      }}
+                                    >
+                                      {' '}
+                                      <EuiIcon type="refresh" /> &nbsp; Click here to load more agents
+                                  </p>
+                                  </>
+                                )) ||
+                                (this.state.loadingAvailableAgents && (
+                                  <>
+                                    <EuiSpacer size="m" />
+                                    <p className="wz-load-extra">
+                                      {' '}
+                                      <EuiLoadingSpinner size="m" /> &nbsp; Loading...
+                                  </p>
+                                  </>
+                                ))}
                             </EuiPanel>
                           </div>
                           <EuiKeyPadMenu className="wzMultipleSelectorButtons">
@@ -491,12 +523,12 @@ export class MultipleAgentSelector extends Component {
                               label="Add all items"
                               onClick={() => {
                                 this.moveAll(this.state.availableAgents.data, this.state.selectedAgents.data, "a");
-                                this.setState({ availableItem: [], availableFilter: '' });
-                                this.reload("left", this.state.availableFilter, true)
+                                this.setState({ availableItem: [], availableFilter: '' },
+                                  () => { this.reload("left", this.state.availableFilter, true) });
                               }}
                               isDisabled={this.state.availableAgents.data.length === 0 || this.state.availableAgents.data.length > 500}
                             >
-                              <EuiIcon type="editorRedo" size="l" />
+                              <EuiIcon type="editorRedo" color={'primary'} size="l" />
                             </EuiKeyPadMenuItem>
                             <EuiKeyPadMenuItem
                               label="Add selected items"
@@ -506,7 +538,7 @@ export class MultipleAgentSelector extends Component {
                               }}
                               isDisabled={!this.state.availableItem.length || this.state.availableItem.length > 500}
                             >
-                              <EuiIcon type="arrowRight" size="l" />
+                              <EuiIcon type="arrowRight" color={'primary'} size="l" />
                             </EuiKeyPadMenuItem>
                             <EuiKeyPadMenuItem
                               label="Remove selected items"
@@ -516,25 +548,35 @@ export class MultipleAgentSelector extends Component {
                               }}
                               isDisabled={!this.state.selectedElement.length || this.state.selectedElement.length > 500}
                             >
-                              <EuiIcon type="arrowLeft" size="l" />
+                              <EuiIcon type="arrowLeft" color={'primary'} size="l" />
                             </EuiKeyPadMenuItem>
                             <EuiKeyPadMenuItem
                               label="Remove all items"
                               onClick={() => {
                                 this.moveAll(this.state.selectedAgents.data, this.state.availableAgents.data, "r");
-                                this.setState({ selectedElement: [], selectedFilter: "" });
-                                this.reload("right")
+                                this.setState({ selectedElement: [], selectedFilter: "" },
+                                  () => { this.reload("right") });
                               }}
-                              isDisabled={!this.state.selectedAgents.data.length === 0 || this.state.selectedAgents.data.length > 500}
+                              isDisabled={this.state.selectedAgents.data.length === 0 || this.state.selectedAgents.data.length > 500}
                             >
-                              <EuiIcon type="editorUndo" size="l" />
+                              <EuiIcon type="editorUndo" color={'primary'} size="l" />
                             </EuiKeyPadMenuItem>
                           </EuiKeyPadMenu>
                           <div className='wzMultipleSelectorRight'>
                             <EuiPanel paddingSize="m">
-                              <EuiTitle size="s">
-                                <h4>Current agents in the group ({this.state.totalSelectedAgents})</h4>
-                              </EuiTitle>
+                              <EuiFlexGroup>
+                                <EuiFlexItem>
+                                  <EuiTitle size="s">
+                                    <h4>Current agents in the group ({this.state.totalSelectedAgents})</h4>
+                                  </EuiTitle>
+                                </EuiFlexItem>
+                                <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+                                  <EuiBadge color={'#017D73'}>Added: {this.state.currentAdding}</EuiBadge>
+                                </EuiFlexItem>
+                                <EuiFlexItem grow={false}>
+                                  <EuiBadge color={'#BD271E'}>Removed: {this.state.currentDeleting}</EuiBadge>
+                                </EuiFlexItem>
+                              </EuiFlexGroup>
                               <EuiSpacer size={"s"}></EuiSpacer>
                               <EuiFieldSearch
                                 placeholder="Filter..."
@@ -546,13 +588,14 @@ export class MultipleAgentSelector extends Component {
                               />
                               <EuiSpacer size={"m"}></EuiSpacer>
                               <select
+                                id="wzMultipleSelectorRight"
                                 size='15'
                                 multiple
                                 onChange={(e) => {
                                   this.setState({
                                     selectedElement: Array.from(e.target.selectedOptions, option => option.value),
                                     availableItem: []
-                                  }, this.checkLimit());
+                                  }, () => { this.checkLimit() });
                                 }}
                                 style={{ width: '100%', backgroundColor: '#fbfcfd', border: '1px solid #D3DAE6' }}
                                 onDoubleClick={(e) => {
@@ -571,13 +614,34 @@ export class MultipleAgentSelector extends Component {
                                     </option>
                                   ))}
                               </select>
-                              {/*<select size='10' multiple ng-model='selectedElement' ng-change='availableItem=null;this.checkLimit()'
-                                  className='width-100'
-                                  ng-dblclick='moveItem(selectedElement, selectedItems, availableItems, "r");selectedElement=null'>
-                                  <option ng-repeat='item in selectedItems | filter: selectedFilter | orderBy:sort'
-                                    ng-class="item.type === 'a' ? 'wzMultipleSelectorAdding' : item.type === 'r' ? 'wzMultipleSelectorRemoving' : ''"
-                                    ng-value="{{item}}">{ {{ item.key + " - " + item.value }}}</option>
-                                </select> */}
+                              {(!this.state.selectedAgents.loadedAll &&
+                                !this.state.loadingSelectedAgents && (
+                                  <>
+                                    <EuiSpacer size="m" />
+                                    <p
+                                      className="wz-load-extra"
+                                      onClick={() => {
+                                        this.setState({ loadingSelectedAgents: true },
+                                          async () => {
+                                            await this.scrollList('right');
+                                            this.setState({ loadingSelectedAgents: false })
+                                          });
+                                      }}
+                                    >
+                                      {' '}
+                                      <EuiIcon type="refresh" /> &nbsp; Click here to load more agents
+                                  </p>
+                                  </>
+                                )) ||
+                                (this.state.loadingSelectedAgents && (
+                                  <>
+                                    <EuiSpacer size="m" />
+                                    <p className="wz-load-extra">
+                                      {' '}
+                                      <EuiLoadingSpinner size="m" /> &nbsp; Loading...
+                                  </p>
+                                  </>
+                                ))}
                             </EuiPanel>
                           </div>
                         </div>
