@@ -614,34 +614,6 @@ export class MultipleAgentSelector extends Component {
                                     </option>
                                   ))}
                               </select>
-                              {(!this.state.selectedAgents.loadedAll &&
-                                !this.state.loadingSelectedAgents && (
-                                  <>
-                                    <EuiSpacer size="m" />
-                                    <p
-                                      className="wz-load-extra"
-                                      onClick={() => {
-                                        this.setState({ loadingSelectedAgents: true },
-                                          async () => {
-                                            await this.scrollList('right');
-                                            this.setState({ loadingSelectedAgents: false })
-                                          });
-                                      }}
-                                    >
-                                      {' '}
-                                      <EuiIcon type="refresh" /> &nbsp; Click here to load more agents
-                                  </p>
-                                  </>
-                                )) ||
-                                (this.state.loadingSelectedAgents && (
-                                  <>
-                                    <EuiSpacer size="m" />
-                                    <p className="wz-load-extra">
-                                      {' '}
-                                      <EuiLoadingSpinner size="m" /> &nbsp; Loading...
-                                  </p>
-                                  </>
-                                ))}
                             </EuiPanel>
                           </div>
                         </div>
