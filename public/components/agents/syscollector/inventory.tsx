@@ -76,13 +76,13 @@ export function SyscollectorInventory({agent}){
 
       <EuiFlexGroup gutterSize="s">
         <EuiFlexItem >
-          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/packages`, title: "Packages", columns: packagesColumns, icon: "apps",  searchBar: true, exportFormatted: 'packages.csv' }} />
+          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/packages`, hasTotal: true, title: "Packages", columns: packagesColumns, icon: "apps",  searchBar: true, exportFormatted: 'packages.csv' }} />
         </EuiFlexItem>
       </EuiFlexGroup>
 
       <EuiFlexGroup gutterSize="s">
         <EuiFlexItem >
-          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/processes`, title: "Processes", columns: processesColumns, icon: "console",  searchBar: true, exportFormatted: 'processes.csv' }} />
+          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/processes`, hasTotal: true, title: "Processes", columns: processesColumns, icon: "console",  searchBar: true, exportFormatted: 'processes.csv' }} />
         </EuiFlexItem>
       </EuiFlexGroup>
 
