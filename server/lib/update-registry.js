@@ -16,7 +16,7 @@ import { log } from '../logger';
 export class UpdateRegistry {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../server/wazuh-registry.json');
+    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh-registry.json');
   }
 
   /**
@@ -192,7 +192,7 @@ export class UpdateRegistry {
   }
 
   /**
-   * Compare the hosts from wazuh.yml and the host in the wazuh-registry.file in order to remove the orphan registry register
+   * Compare the hosts from wazuh.yml and the host in the wazuh-registry.json file in order to remove the orphan registry register
    * @param {Array} hosts
    */
   async removeOrphanEntries(hosts) {
