@@ -9,7 +9,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './wz-enter/wz-enter';
-import './wz-table';
-import './wz-table-eui';
 import './wz-src/wz-src';

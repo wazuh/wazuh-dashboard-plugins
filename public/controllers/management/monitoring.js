@@ -99,6 +99,7 @@ export function ClusterController(
       monitoring: 1
     });
     assignFilters();
+    $scope.nodeProps = { goBack: () => $scope.goBack() }
     $rootScope.$broadcast('updateVis');
   };
 

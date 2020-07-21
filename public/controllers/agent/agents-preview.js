@@ -13,7 +13,7 @@ import * as FileSaver from '../../services/file-saver';
 import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
-import { clickAction } from '../../directives/wz-table/lib/click-action';
+import { clickAction } from '../../services/click-action';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -213,7 +213,7 @@ export class AgentsPreviewController {
         this.mostActiveAgent.id = info.data.data;
       }
       return this.mostActiveAgent;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   /**
