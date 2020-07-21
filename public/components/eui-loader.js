@@ -28,8 +28,7 @@ import {
   EuiLoadingChart
 } from '@elastic/eui';
 
-import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
-import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
+import { Tabs } from './common/tabs/tabs';
 import { MultipleAgentSelector } from './management/groups/multiple-agent-selector';
 import { NodeList } from './management/cluster/node-list';
 
@@ -50,7 +49,6 @@ app
   .value('Tabs', Tabs)
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer', EuiSpacer)
-  .value('SyscheckTable', SyscheckTable)
   .value('EuiSpacer', EuiSpacer)
   .value('EuiLoadingChart', EuiLoadingChart)
   .value('MultipleAgentSelector', MultipleAgentSelector)
