@@ -69,7 +69,7 @@ export const nameEquivalence = {
   'xpack.rbac.enabled': 'X-Pack RBAC',
   'wazuh.monitoring.enabled': 'Status',
   'wazuh.monitoring.frequency': 'Frecuency',
-  'wazuh.monitoring.shards': 'Indix shards',
+  'wazuh.monitoring.shards': 'Index shards',
   'wazuh.monitoring.replicas': 'Index replicas',
   'wazuh.monitoring.creation': 'Interval creation',
   'wazuh.monitoring.pattern': 'Index pattern',
@@ -126,8 +126,8 @@ export const formEquivalence = {
   'xpack.rbac.enabled': { type: BOOLEAN },
   'wazuh.monitoring.enabled': { type: BOOLEAN },
   'wazuh.monitoring.frequency': { type: NUMBER },
-  'wazuh.monitoring.shards': { type: BOOLEAN },
-  'wazuh.monitoring.replicas': { type: BOOLEAN },
+  'wazuh.monitoring.shards': { type: NUMBER },
+  'wazuh.monitoring.replicas': { type: NUMBER },
   'wazuh.monitoring.creation': {
     type: LIST, params: {
       options: [
@@ -141,5 +141,10 @@ export const formEquivalence = {
   'wazuh.monitoring.pattern': { type: TEXT },
   admin: { type: BOOLEAN },
   hideManagerAlerts: { type: BOOLEAN },
-  'logs.level': { type: LIST },
+  'logs.level': { type: LIST, params: {
+    options: [
+      { text: 'Info', value: 'info' },
+      { text: 'Debug', value: 'debug' },
+    ]
+  } },
 }

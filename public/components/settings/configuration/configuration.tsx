@@ -12,16 +12,22 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Header, Categories } from './components';
 import {
   EuiFlexItem,
-  EuiPanel,
   EuiPage,
   EuiPageBody,
   EuiPageHeader,
+  EuiBottomBar,
+  EuiFlexGroup,
+  EuiButtonEmpty,
 } from '@elastic/eui';
-import { WzConfigurationTable } from './configuration-table';
-import { Header, Categories } from './components';
-import { configEquivalences, nameEquivalence, categoriesEquivalence, formEquivalence } from '../../../utils/config-equivalences';
+import {
+  configEquivalences,
+  nameEquivalence,
+  categoriesEquivalence,
+  formEquivalence
+} from '../../../utils/config-equivalences';
 
 export type ISetting = {
   setting: string
@@ -30,6 +36,7 @@ export type ISetting = {
   category: string
   name: string
   readonly?: boolean
+  form: { type: string, params: {} }
 }
 
 export const WzConfigurationSettings = (props) => {
@@ -50,26 +57,22 @@ export const WzConfigurationSettings = (props) => {
     ], []);
     setConfig(formatedConfig);
   }, []);
+  const [updatedConfig, setUpdateConfig] = useState({});
   return (
     <EuiPage >
-      <EuiPageBody>
+      <EuiPageBody className='mgtPage__body' restrictWidth>
         <EuiPageHeader>
           <Header />
         </EuiPageHeader>
-        <Categories config={config} />
-
-
-        {/* TODO: Delete this
-        <br />
-          ⬇ TO DELETE ⬇
-          <br />
-        <EuiFlexItem>
-          <EuiPanel paddingSize="l">
-            <WzConfigurationTable {...props} />
-          </EuiPanel>
-        </EuiFlexItem> */}
-
-
+        <Categories config={config} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
+        {!!Object.keys(updatedConfig).length &&
+          <EuiBottomBar paddingSize="s">
+            <EuiFlexGroup>
+              <EuiFlexItem>{`${Object.keys(updatedConfig).length}`} unsaved settings</EuiFlexItem>
+              <EuiFlexItem grow={false}><EuiButtonEmpty iconSide='left' iconType='cross' onClick={() => setUpdateConfig({})}>Cancel changes</EuiButtonEmpty></EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiBottomBar>
+        }
       </EuiPageBody>
     </EuiPage>
   );

@@ -14,8 +14,15 @@ import React, { } from 'react';
 import { Category } from './components';
 import { ISetting } from '../../configuration';
 import { EuiFlexGroup } from '@elastic/eui';
-export const Categories = ({ config }: { config: ISetting[] }) => {
-  const categories = config.reduce((acc, conf) => {
+
+interface ICategoriesProps {
+  config: ISetting[],
+  updatedConfig: {[field:string]: string | number | boolean | []}
+  setUpdatedConfig({}): void 
+}
+
+export const Categories:React.FunctionComponent<ICategoriesProps> = ({ config, updatedConfig, setUpdatedConfig }) => {
+  const categories: {[category:string]: ISetting[]} = config.reduce((acc, conf) => {
     if (!conf.category) return acc;
     return {
       ...acc,
@@ -27,8 +34,13 @@ export const Categories = ({ config }: { config: ISetting[] }) => {
   }, {})
   return (
     <EuiFlexGroup direction='column'>
-      {Object.keys(categories).map((category, idx) => <Category key={idx} name={category} items={categories[category]} />)}
+      {Object.keys(categories).map((category, idx) => ( 
+        <Category 
+          key={idx}
+          name={category}
+          items={categories[category]}
+          updatedConfig={updatedConfig} 
+          setUpdatedConfig={setUpdatedConfig} />))}
     </EuiFlexGroup>
-  )
-
+  );
 }

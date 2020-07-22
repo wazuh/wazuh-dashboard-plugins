@@ -10,12 +10,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React from 'react';
-
-
-export const FieldForm = ({ item }) => {
-  console.log({ item })
-  return (
-    <span>{item.form.type}</span>
-  );
-};
+export { FieldForm } from './field-form';

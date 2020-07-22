@@ -13,6 +13,7 @@
 
 import React, { } from 'react';
 import { FieldForm } from './components';
+import { ISetting } from '../../../../configuration';
 import {
   EuiFlexItem,
   EuiPanel,
@@ -24,10 +25,17 @@ import {
   EuiFormRow
 } from '@elastic/eui';
 
-export const Category = ({ name, items }) => {
+interface ICategoryProps {
+  name: string
+  items: ISetting[]
+  updatedConfig: { [field: string]: string | number | boolean | [] }
+  setUpdatedConfig({ }): void
+}
+
+export const Category: React.FunctionComponent<ICategoryProps> = ({ name, items, updatedConfig, setUpdatedConfig }) => {
   return (
     <EuiFlexItem>
-      <EuiPanel>
+      <EuiPanel paddingSize="l">
         <EuiText>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -38,11 +46,12 @@ export const Category = ({ name, items }) => {
         <EuiForm>
           {items.map((item, idx) => (
             <EuiDescribedFormGroup
+              fullWidth
               key={idx}
               title={<EuiTitle size="s"><span>{item.name}</span></EuiTitle>}
               description={item.description} >
-              <EuiFormRow label={item.setting}>
-                <FieldForm item={item} />
+              <EuiFormRow label={item.setting} fullWidth>
+                <FieldForm item={item} updatedConfig={updatedConfig} setUpdatedConfig={setUpdatedConfig} />
               </EuiFormRow>
             </EuiDescribedFormGroup>
           ))}
