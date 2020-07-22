@@ -559,13 +559,17 @@ export class WazuhElasticCtrl {
           } else if (title === 'Wazuh App Cluster Overview Manager') {
             query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
           }else {
-            /*  TODO: specify wazuh-statitistic index pattern and cluster name
-            example:
-            if(title === 'Wazuh Statistics XXXX){
-              query+= .es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")
+
+           if(title.startsWith('Wazuh App Statistics') && name !== '-' &&  name !== 'all'  && visState.params.expression.includes('q=')){
+            const expressionRegex = /q=\'\*\'/gi
+            query += visState.params.expression.replace(expressionRegex,`q="analysisd.nodeName:${name} AND analysisd.apiName=${master_node}"`) // TODO - REMOVE analysisd.
+         
+           } else if(title.startsWith('Wazuh App Statistics')){
+             const expressionRegex = /q=\'\*\'/gi
+              query += visState.params.expression.replace(expressionRegex,`q="analysisd.apiName=${master_node}"`) // TODO - REMOVE analysisd. 
+           }else{
+              query = visState.params.expression;
             }
-            */
-            query = visState.params.expression;
           }
 
           visState.params.expression = query;

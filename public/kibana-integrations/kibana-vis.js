@@ -327,7 +327,7 @@ class KibanaVis extends Component {
   };
 
   render() {
-    const height = this.props.resultState === 'loading' ? 0 : "100%"
+    const height = this.props.resultState === 'loading' ? 0 : "100%";
     return (
       this.visID && (
         <span>
