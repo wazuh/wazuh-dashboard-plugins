@@ -101,10 +101,10 @@ export default withAdminModeProtectedRoute('#/manager')(class WzAddModulesData e
 		this.setState({ selectedGuideCategory });
 	}
 	getModulesFromCategory(category: string = ''){
-		return category !== '' ? guides.filter(guide => guide.category === category) : guides;
+		return category !== '' ? guides.filter(guide => guide.category === category && (guide.disabled ? false : true)) : guides;
 	}
 	render(){
-		const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES. 
+		const { guide, selectedGuideCategory } = this.state; 
 		return (
 			<Fragment>
 

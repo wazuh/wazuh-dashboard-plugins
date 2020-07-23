@@ -33,12 +33,14 @@ export default {
       elements: [
         {
           name: 'disabled',
+          display_name: 'Disable the module',
           description: 'Disable the osquery wodle.',
           type: 'switch',
           required: true
         },
         {
           name: 'run_daemon',
+          display_name: 'Run daemon',
           description: 'Makes the module run osqueryd as a subprocess or lets the module monitor the results log without running Osquery.',
           type: 'switch',
           required: true,
@@ -46,6 +48,7 @@ export default {
         },
         {
           name: 'bin_path',
+          display_name: 'Executable path',
           description: 'Full path to the folder that contains the osqueryd executable.',
           type: 'input',
           // required: true,
@@ -55,6 +58,7 @@ export default {
         },
         {
           name: 'log_path',
+          display_name: 'Log path',
           description: 'Full path to the results log written by Osquery.',
           type: 'input',
           required: true,
@@ -65,6 +69,7 @@ export default {
         },
         {
           name: 'config_path',
+          display_name: 'Configuration path',
           description: 'Path to the Osquery configuration file. This path can be relative to the folder where the Wazuh agent is running.',
           type: 'input',
           required: true,
@@ -74,6 +79,7 @@ export default {
         },
         {
           name: 'add_labels',
+          display_name: 'Add labels',
           description: 'Add the agent labels defined as decorators.',
           type: 'switch',
           required: true,
@@ -87,6 +93,7 @@ export default {
       elements: [
         {
           name: 'pack',
+          display_name: 'Query pack',
           description: 'Add a query pack to the configuration.',
           type: 'input',
           placeholder: 'Path to pack configuration file',
@@ -99,7 +106,8 @@ export default {
           attributes: [
             {
               name: 'name',
-              description: 'Name for this pack',
+              display_name: 'Pack name',
+              // description: 'Name for this pack',
               type: 'input',
               required: true,
               placeholder: 'Name for this pack',
@@ -114,27 +122,15 @@ export default {
   mapAgentConfigurationAPIResponse(config){
     return {
       ...config,
-      ...(config.interval ? {interval: `${config.interval}s`} : {}),
-      ...(config.timeout ? {timeout: Number(config.timeout)} : {}),
-      ...(config.content && config.content[0] ? {content: {
-        profile: config.content[0].profile,
-        '@': Object.keys(config.content[0]).filter(key => key !== 'profile').reduce((accum, key) => {
-          accum[key] = config.content[0][key];
-          return accum;
-      },{})}} : {})
+      ...(config.packs ? {pack: config.packs.map(pack => ({
+        '#': pack.path,
+        '@': {
+          ...(pack.name ? {name: pack.name} : {})
+        }
+      }))} : {})
     }
   },
-  mapCentralizedConfigurationAPIResponse(config){
-    return {
-      ...config,
-      ...(config.timeout ? {timeout: Number(config.timeout)} : {}),
-      ...(config.content ? {content: {
-          profile: config.content.profile,
-          ...(config.content.timeout ? {timeout: Number(config.content.timeout)} : {}),
-          '@': Object.keys(config.content).filter(key => key !== 'profile').reduce((accum, key) => {
-            accum[key] = config.content[key];
-            return accum;
-        },{})}} : {})
-    }
-  }
+  // mapCentralizedConfigurationAPIResponse(config){
+    
+  // }
 }

@@ -22,6 +22,9 @@ export default {
     agent: true,
     centralized: true
   },
+  api_component: 'wmodules',
+  api_configuration: 'wmodules',
+  api_module: 'open-scap',
   steps: [
     {
       title: 'Settings',
@@ -29,12 +32,14 @@ export default {
       elements: [
         {
           name: 'disabled',
+          display_name: 'Disable the module',
           description: `Disables the OpenSCAP wodle.`,
           type: 'switch',
           required: true
         },
         {
           name: 'timeout',
+          display_name: 'Evaluation timeout',
           description: 'Timeout for each evaluation in seconds',
           type: 'input-number',
           required: true,
@@ -45,7 +50,8 @@ export default {
         },
         {
           name: 'interval',
-          description: 'Interval between OpenSCAP executions.',
+          display_name: 'Interval between executions',
+          // description: 'Interval between OpenSCAP executions.',
           type: 'input',
           required: true,
           placeholder: 'Time in format <number><time unit suffix>, e.g.: 1d',
@@ -55,6 +61,7 @@ export default {
         },
         {
           name: 'scan-on-start',
+          display_name: 'Scan on start',
           description: 'Run evaluation immediately when service is started.',
           type: 'switch',
           required: true,
@@ -68,6 +75,7 @@ export default {
       elements: [
         {
           name: 'content',
+          display_name: 'Content',
           description: `Define an evaluation.`,
           removable: true,
           required: true,
@@ -81,17 +89,19 @@ export default {
           attributes: [
             {
               name: 'type',
+              display_name: 'Profile type',
               description: 'Select content type: xccdf or oval.',
               type: 'select',
               required: true,
               values: [
-                {value: 'xccdf ', text: 'xccdf '},
+                {value: 'xccdf', text: 'xccdf '},
                 {value: 'oval', text: 'oval'}
               ],
               default_value: 'xccdf'
             },
             {
               name: 'path',
+              display_name: 'Path of policy file',
               description: `Use the specified policy file (DataStream, XCCDF or OVAL).
               Default path: /var/ossec/wodles/oscap/content`,
               type: 'input',
@@ -101,35 +111,29 @@ export default {
               validate_error_message: 'Use the specified policy file'
             },
             {
-              name: 'timeout',
-              description: `Timeout for the evaluation (in seconds).
-              Use of this attribute overwrites the generic timeout.`,
-              type: 'input-number',
-              placeholder: 'Time in seconds',
-              values: { min: 1 },
-              default_value: 1800,
-              validate_error_message: 'A positive number'
-            },
-            {
               name: 'xccdf-id',
-              description: 'XCCDF id.',
+              display_name: 'XCCDF id',
+              // description: 'XCCDF id.',
               type: 'input',
               placeholder: 'XCCDF id'
             },
             {
               name: 'oval-id',
-              description: 'OVAL id.',
+              display_name: 'OVAL id',
+              // description: 'OVAL id.',
               type: 'input',
               placeholder: 'OVAL id'
             },
             {
               name: 'datastream-id',
-              description: 'Datastream id.',
+              display_name: 'Datastream id',
+              // description: 'Datastream id.',
               type: 'input',
               placeholder: 'Datastream id'
             },
             {
               name: 'cpe',
+              display_name: 'CPE',
               description: `CPE dictionary file.
               Default path: /var/ossec/wodles/oscap/content`,
               type: 'input',
@@ -141,13 +145,25 @@ export default {
           show_options: true,
           options: [
             {
+              name: 'timeout',
+              display_name: 'Evaluation timeout',
+              description: `Timeout for the evaluation (in seconds).
+              Use of this attribute overwrites the generic timeout.`,
+              type: 'input-number',
+              placeholder: 'Time in seconds',
+              values: { min: 1 },
+              default_value: 1800,
+              validate_error_message: 'A positive number'
+            },
+            {
               name: 'profile',
+              display_name: 'Profile',
               description: 'Select profile.',
               type: 'input',
               placeholder: 'Profile',
               repeatable: true,
               removable: true,
-              required: true,
+              // required: true,
               repeatable_insert_first: true,
               repeatable_insert_first_properties: {
                 removable: false
@@ -157,5 +173,30 @@ export default {
         }
       ]
     }
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(typeof config.interval !== 'undefined' ? { interval: `${config.interval}s` } : {}),
+      ...(typeof config.content !== 'undefined' ? { content: config.content.map(content => ({
+        ...content,
+        '@': Object.keys(content).filter(key => ['type', 'path'].includes(key)).reduce((accum, key) => {
+          if(key === 'type'){
+            if(content[key] === 1){
+              accum[key] = 'xccdf'
+            }
+          }else{
+            accum[key] = content[key];
+          }
+          return accum;
+        }, {}),
+        ...(typeof content.profile !== 'undefined' ? { profile : config.profile.map(profile => ({
+          '@': Object.keys(profile).reduce((accum,key) => {
+            accum[key] = content[key];
+            return accum;
+          }, {})
+        }))} : {})
+      }))} : {})
+    }
+  }
 }

@@ -20,6 +20,11 @@ export default {
   avaliable_for: {
     manager: true
   },
+  api_component: 'integrator',
+  api_configuration: 'integration',
+  api_module: 'integration',
+  api_integration: 'virustotal',
+  contain_secrets: true,
   steps: [
     {
       title: 'Required settings',
@@ -27,6 +32,7 @@ export default {
       elements: [
         {
           name: 'name',
+          display_name: 'Integration name',
           description: 'This indicates the service to integrate with.',
           type: 'input',
           required: true,
@@ -35,19 +41,49 @@ export default {
         },
         {
           name: 'api_key',
+          display_name: 'VirusTotal API key',
           description: 'This is the key that you would have retrieved from the VirusTotal API.',
           type: 'input',
           required: true,
-          placeholder: 'VirusTotal Api key'
+          placeholder: 'VirusTotal Api key',
+          secret: true
         }
       ]
     },
     {
-      title: 'Optional settings',
+      title: 'Other settings',
       description: '',
       elements: [
         {
+          name: 'alert_format',
+          display_name: 'Alert format',
+          description: 'This writes the alert file in the JSON format. The Integrator makes use this file to fetch fields values.',
+          type: 'input',
+          placeholder: 'json',
+          default_value: 'json',
+          field_read_only: true,
+          required: true,
+          validate_error_message: 'json'
+        },
+        {
+          name: 'max_log',
+          display_name: 'Maximum log',
+          description: 'The maximum length of an alert snippet that will be sent to the Integrator. Longer strings will be truncated with ...',
+          type: 'input-number',
+          values: { min: 165, max: 1024 },
+          default_value: 165,
+          placeholder: 'Any integer from 165 to 1024 inclusive.',
+          validate_error_message: 'Any integer from 165 to 1024 inclusive.'
+        }
+      ]
+    },
+    {
+      title: 'Alert filters',
+      description: 'Filters the alerts of files to send to VirusTotal',
+      elements: [
+        {
           name: 'level',
+          display_name: 'Level filter',
           description: 'This filters alerts by rule level so that only alerts with the specified level or above are pushed.',
           type: 'input-number',
           values: { min: 0, max: 16 },
@@ -57,6 +93,7 @@ export default {
         },
         {
           name: 'rule_id',
+          display_name: 'Rule ID filter',
           description: 'This filters alerts by rule ID.',
           type: 'input',
           default_value: '',
@@ -65,35 +102,26 @@ export default {
         },
         {
           name: 'group',
+          display_name: 'Group filter',
           description: 'This filters alerts by rule group. For the VirusTotal integration, only rules from the syscheck group are available.',
           type: 'input',
           placeholder: 'Any rule group or comma-separated rule groups.'
         },
         {
           name: 'event_location',
+          display_name: 'Event location filter',
           description: 'This filters alerts by where the event originated. Follows the OS_Regex Syntax.',
           type: 'input',
           placeholder: 'Any single log file.'
-        },
-        {
-          name: 'alert_format',
-          description: 'This writes the alert file in the JSON format. The Integrator makes use this file to fetch fields values.',
-          type: 'input',
-          placeholder: 'json',
-          default_value: 'json',
-          field_read_only: true,
-          validate_error_message: 'json'
-        },
-        {
-          name: 'max_log',
-          description: 'The maximum length of an alert snippet that will be sent to the Integrator. Longer strings will be truncated with ...',
-          type: 'input-number',
-          values: { min: 165, max: 1024 },
-          default_value: 165,
-          placeholder: 'Any integer from 165 to 1024 inclusive.',
-          validate_error_message: 'Any integer from 165 to 1024 inclusive.'
         }
       ]
     }
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(typeof config.rule_id !== 'undefined' ? {rule_id: config.rule_id.join(',')} : {}),
+      ...(typeof config.location !== 'undefined' ? {event_location: config.location.join(',')} : {})
+    }
+  }
 }
