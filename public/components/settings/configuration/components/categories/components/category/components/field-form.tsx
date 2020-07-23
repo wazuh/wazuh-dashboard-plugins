@@ -18,7 +18,7 @@ import {
   EuiSelect,
   EuiCodeEditor
 } from '@elastic/eui';
-import { ISetting } from '../../../../../../configuration';
+import { ISetting } from '../../../../../configuration';
 
 interface IFieldForm {
   item: ISetting
@@ -26,7 +26,6 @@ interface IFieldForm {
   setUpdatedConfig({ }): void
 }
 export const FieldForm: React.FunctionComponent<IFieldForm> = (props) => {
-  console.log({ props })
   const { item } = props;
   switch (item.form.type) {
     case 'text':
@@ -58,7 +57,7 @@ const NumberForm: React.FunctionComponent<IFieldForm> = (props) => (
     onChange={e => onChange(e.target.value, props)} />)
 const BooleanForm: React.FunctionComponent<IFieldForm> = (props) => (
   <EuiSwitch
-    label={`${props.item.value}`}
+    label={`${getValue(props)}`}
     checked={getValue(props)}
     onChange={(e) => onChange(e.target.checked, props)} />);
 

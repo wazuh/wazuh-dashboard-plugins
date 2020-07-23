@@ -12,15 +12,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Header, Categories } from './components';
+import { Header, Categories, ButtonBar } from './components';
+import { useKbnLoadingIndicator} from '../../common/hooks';
 import {
-  EuiFlexItem,
   EuiPage,
   EuiPageBody,
   EuiPageHeader,
-  EuiBottomBar,
-  EuiFlexGroup,
-  EuiButtonEmpty,
 } from '@elastic/eui';
 import {
   configEquivalences,
@@ -40,7 +37,9 @@ export type ISetting = {
 }
 
 export const WzConfigurationSettings = (props) => {
+  const [loading, setLoading ] = useKbnLoadingIndicator();
   const [config, setConfig] = useState<ISetting[]>([]);
+  const [updatedConfig, setUpdateConfig] = useState({});
   useEffect(() => {
     const rawConfig = props.wazuhConfig.getConfig();
     const formatedConfig = Object.keys(rawConfig).reduce<ISetting[]>((acc, conf) => [
@@ -57,7 +56,6 @@ export const WzConfigurationSettings = (props) => {
     ], []);
     setConfig(formatedConfig);
   }, []);
-  const [updatedConfig, setUpdateConfig] = useState({});
   return (
     <EuiPage >
       <EuiPageBody className='mgtPage__body' restrictWidth>
@@ -65,14 +63,11 @@ export const WzConfigurationSettings = (props) => {
           <Header />
         </EuiPageHeader>
         <Categories config={config} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
-        {!!Object.keys(updatedConfig).length &&
-          <EuiBottomBar paddingSize="s">
-            <EuiFlexGroup>
-              <EuiFlexItem>{`${Object.keys(updatedConfig).length}`} unsaved settings</EuiFlexItem>
-              <EuiFlexItem grow={false}><EuiButtonEmpty iconSide='left' iconType='cross' onClick={() => setUpdateConfig({})}>Cancel changes</EuiButtonEmpty></EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiBottomBar>
-        }
+        <ButtonBar 
+          updatedConfig={updatedConfig}
+          setUpdateConfig={setUpdateConfig} 
+          setLoading={setLoading}
+          config={config} />
       </EuiPageBody>
     </EuiPage>
   );
