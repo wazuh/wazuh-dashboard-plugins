@@ -35,7 +35,7 @@ import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eu
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
 import chrome from 'ui/chrome';
-import { AgentGroupTruncate } from '../../../../components/common/util/agent-group-truncate/agent_group_truncate'
+import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/'
 import { WzSearchBar, filtersToObject } from '../../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
 import _ from 'lodash';
@@ -94,7 +94,7 @@ export class AgentSelectionTable extends Component {
           show: false,
         },
         isSortable: true,
-        render: this.renderGroups
+        render: groups => this.renderGroups(groups)
       },
       {
         id: 'version',
@@ -590,9 +590,30 @@ export class AgentSelectionTable extends Component {
     );
   }
 
+  filterGroupBadge = (group) => {
+    const { filters } = this.state;
+    let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
+    if (filters.length > 0) {
+      !auxFilters.includes(group) ? 
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      }) : false;
+    } else {
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      })
+    }
+  }
+
   renderGroups(groups){
     return Array.isArray(groups) ? (
-      <AgentGroupTruncate groups={groups} length={25} label={'more'}/>
+      <GroupTruncate
+        groups={groups}
+        length={20}
+        label={'more'}
+        action={'filter'}
+        filterAction={this.filterGroupBadge}
+        {...this.props} /> 
     ) : groups
   }
 

@@ -13,7 +13,7 @@ import * as FileSaver from '../../services/file-saver';
 import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
-import { clickAction } from '../../directives/wz-table/lib/click-action';
+import { clickAction } from '../../services/click-action';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -29,7 +29,6 @@ export class AgentsPreviewController {
    * @param {Object} $location
    * @param {Object} errorHandler
    * @param {Object} csvReq
-   * @param {Object} wzTableFilter
    */
   constructor(
     $scope,
@@ -37,7 +36,6 @@ export class AgentsPreviewController {
     $route,
     errorHandler,
     csvReq,
-    wzTableFilter,
     commonData,
     $window
   ) {
@@ -49,7 +47,6 @@ export class AgentsPreviewController {
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
     this.shareAgent = new ShareAgent();
-    this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
@@ -212,7 +209,7 @@ export class AgentsPreviewController {
         this.mostActiveAgent.id = info.data.data;
       }
       return this.mostActiveAgent;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   /**

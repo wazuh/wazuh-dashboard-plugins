@@ -184,16 +184,16 @@ class WzGroupAgentsTable extends Component {
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title={`Delete ${
+                title={`Remove ${
                   itemList[0].file ? itemList[0].file : itemList[0].name
-                } agent?`}
+                } agent from this group?`}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
                   this.props.updateShowModal(false);
                 }}
                 cancelButtonText="Cancel"
-                confirmButtonText="Delete"
+                confirmButtonText="Remove"
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
               ></EuiConfirmModal>

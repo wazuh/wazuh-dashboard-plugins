@@ -43,7 +43,6 @@ export class AgentsController {
    * @param {Object} reportingService
    * @param {Object} visFactoryService
    * @param {Object} csvReq
-   * @param {Object} wzTableFilter
    */
   constructor(
     $scope,
@@ -53,8 +52,8 @@ export class AgentsController {
     commonData,
     reportingService,
     visFactoryService,
-    csvReq,
-    wzTableFilter
+    csvReq
+    
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -68,7 +67,6 @@ export class AgentsController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
-    this.wzTableFilter = wzTableFilter;
     this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.timeService = TimeService;

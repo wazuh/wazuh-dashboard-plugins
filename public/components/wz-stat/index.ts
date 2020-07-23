@@ -1,5 +1,6 @@
 /*
- * Wazuh app - Load all the directives.
+ * Wazuh app - React Component component to display simple data with title and description arranged in a row.
+ *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,9 +10,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './wz-enter/wz-enter';
-import './wz-table';
-import './wz-table-eui';
-import './wz-multiple-selector/wz-multiple-selector';
-import './wz-multiple-selector/wz-multiple-selector.less';
-import './wz-src/wz-src';
+
+export { WzStat } from './wzStat';

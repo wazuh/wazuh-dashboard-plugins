@@ -176,7 +176,7 @@ export class ComplianceSubrequirements extends Component {
                 </EuiToolTip>
 
                 {this.state.hover === item.id &&
-                  <span style={{ float: "right" }}>
+                  <span style={{ float: "right", position: 'fixed' }}>
                     <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
                       <EuiIcon onMouseDown={(e) => { this.openDashboard(e, item.id); e.stopPropagation() }} color="primary" type="visualizeApp"></EuiIcon>
                     </EuiToolTip> &nbsp;

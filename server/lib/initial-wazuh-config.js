@@ -55,7 +55,6 @@ export const initialWazuhConfig = `---
 #extensions.nist      : true
 #extensions.tsc       : true
 #extensions.audit     : true
-#extensions.mitre     : true
 #extensions.oscap     : false
 #extensions.ciscat    : false
 #extensions.aws       : false

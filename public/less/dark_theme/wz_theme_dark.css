@@ -427,3 +427,11 @@ svg .legend text {
   background-color: #1a1b20;
   border-bottom: 1px solid #343741!important;
 }
+
+.flyout-row {
+  border: none;
+}
+
+.application .euiAccordion, .flyout-body .euiAccordion {
+  border-bottom: 1px solid #343741!important;
+}
