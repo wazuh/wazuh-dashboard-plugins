@@ -11,5 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { FieldDescription } from './field-description';
 export { FieldForm } from './field-form';

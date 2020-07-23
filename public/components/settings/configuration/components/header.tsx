@@ -85,7 +85,6 @@ const SearchBar = ({query, setQuery}) => {
     setCategories(cats);
   }, [])
   const onChange = (args) => {
-    console.log(args)
     if(args.error){
       setError(args.error);
     } else {

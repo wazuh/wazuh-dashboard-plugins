@@ -24,6 +24,7 @@ import {
   EuiTitle,
   EuiFormRow
 } from '@elastic/eui';
+import { EuiIconTip } from '@elastic/eui';
 
 interface ICategoryProps {
   name: string
@@ -48,7 +49,19 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ name, items,
             <EuiDescribedFormGroup
               fullWidth
               key={idx}
-              title={<EuiTitle size="s"><span>{item.name}</span></EuiTitle>}
+              className={`mgtAdvancedSettings__field${isUpdated(updatedConfig, item) ? ' mgtAdvancedSettings__field--unsaved' : ''}`}
+              title={
+                <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
+                  <span>
+                    {item.name}
+                    {isUpdated(updatedConfig, item)
+                      && <EuiIconTip
+                        anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
+                        type={'dot'}
+                        color={'warning'}
+                        aria-label={item.setting}
+                        content={`${updatedConfig[item.setting]}`} />}
+                  </span></EuiTitle>}
               description={item.description} >
               <EuiFormRow label={item.setting} fullWidth>
                 <FieldForm item={item} updatedConfig={updatedConfig} setUpdatedConfig={setUpdatedConfig} />
@@ -60,3 +73,5 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({ name, items,
     </EuiFlexItem>
   )
 }
+
+const isUpdated = (configs, item) => typeof configs[item.setting] !== 'undefined'

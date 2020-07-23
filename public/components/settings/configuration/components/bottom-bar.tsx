@@ -36,8 +36,8 @@ interface IButtonBarProps {
 
 export const ButtonBar: React.FunctionComponent<IButtonBarProps> = ({ updatedConfig, setUpdateConfig, setLoading, config }) => {
   return (!!Object.keys(updatedConfig).length
-    ? <EuiBottomBar paddingSize="s">
-      <EuiFlexGroup>
+    ? <EuiBottomBar paddingSize="m">
+      <EuiFlexGroup alignItems='center' justifyContent='spaceBetween' gutterSize='s'>
         <SettingLabel updatedConfig={updatedConfig} />
         <CancelButton setUpdateConfig={setUpdateConfig} />
         <SaveButton
@@ -52,8 +52,8 @@ export const ButtonBar: React.FunctionComponent<IButtonBarProps> = ({ updatedCon
 }
 
 const SettingLabel = ({ updatedConfig }) => (
-  <EuiFlexItem className=''>
-    <EuiText color='ghost'>
+  <EuiFlexItem className='mgtAdvancedSettingsForm__unsavedCount'>
+    <EuiText color='ghost' className='mgtAdvancedSettingsForm__unsavedCountMessage'>
       {`${Object.keys(updatedConfig).length} unsaved settings`}
     </EuiText>
   </EuiFlexItem>
@@ -67,6 +67,7 @@ const CancelButton = ({ setUpdateConfig }) => (
       iconSide='left'
       iconType='cross'
       color="ghost"
+      className="mgtAdvancedSettingsForm__button"
       onClick={() => setUpdateConfig({})}>
       Cancel changes
     </EuiButtonEmpty>
@@ -81,6 +82,7 @@ const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
       iconSide='left'
       iconType='check'
       color='secondary'
+      className="mgtAdvancedSettingsForm__button"
       onClick={() => saveSettings(updatedConfig, setUpdateConfig, setLoading, config)} >
       Save changes
       </EuiButton>
