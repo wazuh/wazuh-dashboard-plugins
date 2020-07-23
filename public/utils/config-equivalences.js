@@ -82,6 +82,7 @@ const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
 const SECURITY = 'Security';
 const MONITORING = 'Monitoring'
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING,];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,

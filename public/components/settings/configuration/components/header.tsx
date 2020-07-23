@@ -11,7 +11,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
+import {categoriesNames} from '../../../../utils/config-equivalences';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -21,8 +22,9 @@ import {
   EuiText,
   EuiSearchBar,
 } from '@elastic/eui';
+import { EuiFormErrorText } from '@elastic/eui';
 
-export const Header = () => {
+export const Header = ({query, setQuery}) => {
   return (
     <EuiFlexGroup gutterSize='none'>
       <EuiFlexItem>
@@ -31,9 +33,9 @@ export const Header = () => {
           <SubTitle />
         </EuiFlexGroup>
       </EuiFlexItem>
-      <EuiFlexItem grow={false}>
+      <EuiFlexItem>
         <EuiFlexGroup gutterSize='none' direction='column'>
-          <SearchBar />
+          <SearchBar query={query} setQuery={setQuery}/>
         </EuiFlexGroup>
       </EuiFlexItem>
     </EuiFlexGroup>
@@ -75,10 +77,38 @@ const SubTitle = () => {
   )
 }
 
-const SearchBar = () => {
+const SearchBar = ({query, setQuery}) => {
+  const [categories, setCategories] = useState([]);
+  const [error, setError] = useState();
+  useEffect(() => {
+    const cats = categoriesNames.map(item => ({value: item}));
+    setCategories(cats);
+  }, [])
+  const onChange = (args) => {
+    console.log(args)
+    if(args.error){
+      setError(args.error);
+    } else {
+      setError(undefined);
+      setQuery(args);
+    }
+  }
   return (
-    <EuiSearchBar 
-
-    />
+    <Fragment>
+      <EuiSearchBar 
+        filters={[{
+          type:'field_value_selection',
+          field:'category',
+          name:'Categories',
+          multiSelect:'or',
+          options:categories,
+        }]}
+        query={query.query || query}
+        onChange={onChange}
+        />
+      {!!error &&
+        <EuiFormErrorText>{`${error.name}: ${error.message}`}</EuiFormErrorText >
+      }
+    </Fragment>
   )
 }

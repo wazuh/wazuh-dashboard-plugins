@@ -18,6 +18,7 @@ import {
   EuiPage,
   EuiPageBody,
   EuiPageHeader,
+  Query,
 } from '@elastic/eui';
 import {
   configEquivalences,
@@ -39,6 +40,7 @@ export type ISetting = {
 export const WzConfigurationSettings = (props) => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [config, setConfig] = useState<ISetting[]>([]);
+  const [query, setQuery] = useState('');
   const [updatedConfig, setUpdateConfig] = useState({});
   useEffect(() => {
     const rawConfig = props.wazuhConfig.getConfig();
@@ -60,9 +62,9 @@ export const WzConfigurationSettings = (props) => {
     <EuiPage >
       <EuiPageBody className='mgtPage__body' restrictWidth>
         <EuiPageHeader>
-          <Header />
+          <Header query={query} setQuery={setQuery} />
         </EuiPageHeader>
-        <Categories config={config} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
+        <Categories config={Query.execute(query.query || query, config)} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
         <ButtonBar 
           updatedConfig={updatedConfig}
           setUpdateConfig={setUpdateConfig} 
