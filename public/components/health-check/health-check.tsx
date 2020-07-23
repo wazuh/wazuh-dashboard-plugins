@@ -197,10 +197,10 @@ export class HealthCheck extends Component {
                     if (this.state.checks.setup) {
                         const versionData = await ApiRequest.request(
                             'GET',
-                            '/version',
+                            '//',
                             {}
                         );
-                        const apiVersion = versionData.data.data;
+                        const apiVersion = versionData.data.api_version;
                         const setupData = await GenericRequest.request(
                             'GET',
                             '/api/setup'
@@ -212,12 +212,12 @@ export class HealthCheck extends Component {
                             errors.push('Error fetching Wazuh API version');
                         };
                         this.setState({ results, errors });
-                        const apiSplit = apiVersion.split('v')[1].split('.');
+                        const api = /v?(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/.exec(apiVersion);
                         const appSplit = setupData.data.data['app-version'].split('.');
 
-                        const i = results.map(item => item.id).indexOf(1);
-                        if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
-                            errors.push(
+                        const i = this.state.results.map(item => item.id).indexOf(1);
+                        if (api.groups.version !== appSplit[0] || api.groups.minor !== appSplit[1]) {
+                            this.errors.push(
                                 'API version mismatch. Expected v' +
                                 setupData.data.data['app-version']
                             );
@@ -338,11 +338,11 @@ export class HealthCheck extends Component {
                     />
                 </div>
                 <EuiSpacer size="xxl" />
-                {this.state.errors.map(error => (
+                {!!this.state.errors.map(error => (
                     <EuiCallOut title={error} color="danger" iconType="alert"></EuiCallOut>)
                 )}
                 <EuiSpacer size="xxl" />
-                {this.state.errors.length && (
+                {!!this.state.errors.length && (
                     <EuiButton
                         fill
                         onClick={() => this.goApp()}>
