@@ -191,9 +191,9 @@ export class AgentSelectionTable extends Component {
   async getItems() {
     try{
       this._isMounted && this.setState({isLoading: true});
-      const rawData = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
-      const data = (((rawData || {}).data || {}).data || {}).items;
-      const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
+      const rawData = await WzRequest.apiReq('GET', '/agents', { params: this.buildFilter() });
+      const data = (((rawData || {}).data || {}).data || {}).affected_items;
+      const totalItems = (((rawData || {}).data || {}).data || {}).total_affected_items;
       const formattedData = data.map((item, id) => {
         return {
           id: item.id,
@@ -548,22 +548,10 @@ export class AgentSelectionTable extends Component {
     return this.getSelectedItems().length;
   }
 
-  async newSearch(){
-    if(this.areAnyRowsSelected()){
-      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
-      const formattedData = data.data.data.items[0] //TODO: do it correctly
-      store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.updateAgentSearch(this.getSelectedItems());
-    }else{
-      store.dispatch(updateCurrentAgentData({}));
-      this.props.removeAgentsFilter(true);      
-    }
-  }
-
   async selectAgentAndApply(agentID){
     try{
-      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+agentID } );
-      const formattedData = data.data.data.items[0] //TODO: do it correctly
+      const data = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=' + agentID}});
+      const formattedData = data.data.data.affected_items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
       this.props.updateAgentSearch([agentID]);
     }catch(error){

@@ -22,6 +22,6 @@ export async function getFilterValues(field, value, agentId, filters={}) {
   if (value) {
     filter['search'] = value;
   }
-  const result = await WzRequest.apiReq('GET', `/syscheck/${agentId}`, filter)
-  return (((result || {}).data || {}).data || {}).items.map((item) => {return item[field]});
+  const result = await WzRequest.apiReq('GET', `/syscheck/${agentId}`, { params: filter });
+  return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return item[field]});
 }

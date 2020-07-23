@@ -644,7 +644,7 @@ export class WazuhElasticCtrl {
         !req.params.tab ||
         !req.payload ||
         !req.payload.nodes ||
-        !req.payload.nodes.items ||
+        !req.payload.nodes.affected_items ||
         !req.payload.nodes.name ||
         (req.params.tab && !req.params.tab.includes('cluster-'))
       ) {
@@ -652,7 +652,7 @@ export class WazuhElasticCtrl {
       }
 
       const file = ClusterVisualizations['monitoring'];
-      const nodes = req.payload.nodes.items;
+      const nodes = req.payload.nodes.affected_items;
       const name = req.payload.nodes.name;
       const masterNode = req.payload.nodes.master_node;
 

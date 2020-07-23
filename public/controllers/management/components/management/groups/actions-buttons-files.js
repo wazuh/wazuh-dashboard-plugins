@@ -146,7 +146,7 @@ class WzGroupsActionButtonsFiles extends Component {
   async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
     const result = await this.groupsHandler.getFileContent(
-      `/agents/groups/${itemDetail.name}/files/agent.conf`
+      `/groups/${itemDetail.name}/files/agent.conf/xml`
     );
 
     const data = this.autoFormat(result);
@@ -235,11 +235,7 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(
-        `/agents/groups/${this.props.state.itemDetail.name}/files`,
-        filters,
-        'Groups'
-      );
+      await this.exportCsv(`/groups/${this.props.state.itemDetail.name}/files`, filters, 'Groups');
       this.showToast(
         'success',
         'Success',

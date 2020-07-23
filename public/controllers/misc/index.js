@@ -10,11 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import { HealthCheck } from './health-check';
 import { BlankScreenController } from './blank-screen-controller';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
-  .controller('healthCheck', HealthCheck)
   .controller('blankScreenController', BlankScreenController);

@@ -25,8 +25,10 @@ import {
   EuiEmptyPrompt,
   EuiToolTip
 } from '@elastic/eui';
-import { Pie } from '../../../components/d3/pie';
-import { AgentsTable } from './agents-table';
+import { Pie } from "../../../components/d3/pie";
+import { ProgressChart } from "../../../components/d3/progress";
+import { AgentsTable } from './agents-table'
+import { WzRequest } from '../../../react-services/wz-request';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
@@ -87,51 +89,22 @@ export class AgentsPreview extends Component {
 
   async getSummary() {
     try {
-      this._isMount && this.setState({ loading: true });
-      const summaryData = await this.props.tableProps.wzReq(
-        'GET',
-        '/agents/summary',
-        {}
-      );
+      this.setState({ loading: true });
+      const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
       this.summary = summaryData.data.data;
-      this.totalAgents = this.summary.Total - 1;
+      this.totalAgents = this.summary.total - 1;
       const model = [
-        {
-          id: 'active',
-          label: 'Active',
-          value: (this.summary['Active'] || 1) - 1
-        },
-        {
-          id: 'disconnected',
-          label: 'Disconnected',
-          value: this.summary['Disconnected'] || 0
-        },
-        {
-          id: 'neverConnected',
-          label: 'Never connected',
-          value: this.summary['Never connected'] || 0
-        }
+        { id: 'active', label: "Active", value: (this.summary['active'] || 1) - 1 },
+        { id: 'disconnected', label: "Disconnected", value: this.summary['disconnected'] || 0 },
+        { id: 'neverConnected', label: "Never connected", value: this.summary['never_connected'] || 0 }
       ];
-      this._isMount && this.setState({ data: model });
-
-      this.agentsCoverity = this.totalAgents
-        ? (((this.summary['Active'] || 1) - 1) / this.totalAgents) * 100
-        : 0;
-
-      const lastAgent = await this.props.tableProps.wzReq('GET', '/agents', {
-        limit: 1,
-        sort: '-dateAdd',
-        q: 'id!=000'
-      });
-      this.lastAgent = lastAgent.data.data.items[0];
+      this.setState({ data: model });
+      this.agentsCoverity = this.totalAgents ? (((this.summary['active'] || 1) - 1) / this.totalAgents) * 100 : 0;
+      const lastAgent = await WzRequest.apiReq('GET', '/agents', {params: { limit: 1, sort: '-dateAdd', q: 'id!=000' }});
+      this.lastAgent = lastAgent.data.data.affected_items[0];
       this.mostActiveAgent = await this.props.tableProps.getMostActive();
-
-      const osresult = await this.props.tableProps.wzReq(
-        'GET',
-        '/agents/summary/os',
-        { q: 'id!=000' }
-      );
-      this.platforms = this.groupBy(osresult.data.data.items);
+      const osresult = await WzRequest.apiReq('GET', '/agents/summary/os', {});
+      this.platforms = this.groupBy(osresult.data.data.affected_items);
       const platformsModel = [];
       for (let [key, value] of Object.entries(this.platforms)) {
         platformsModel.push({ id: key, label: key, value: value });

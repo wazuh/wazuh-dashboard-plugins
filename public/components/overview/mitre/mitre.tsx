@@ -111,8 +111,12 @@ export class Mitre extends Component {
 
   async buildTacticsObject(){
     try{
-      const data = await ApiRequest.request('GET', '/mitre', { select: "phase_name"});
-      const result = (((data || {}).data || {}).data || {}).items;
+      const data = await ApiRequest.request('GET', '/mitre', { 
+        params: {
+          select: "phase_name"
+        }
+      });
+      const result = (((data || {}).data || {}).data || {}).affected_items;
       const tacticsObject = {};
       result && result.forEach(item => {
           const {id, phase_name} = item;

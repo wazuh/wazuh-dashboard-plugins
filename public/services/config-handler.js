@@ -44,7 +44,7 @@ export class ConfigHandler {
   async saveNodeConfiguration(node, content) {
     try {
       const result = await this.apiReq.request(
-        'POST',
+        'PUT',
         `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
         { content, origin: 'xmleditor' }
       );

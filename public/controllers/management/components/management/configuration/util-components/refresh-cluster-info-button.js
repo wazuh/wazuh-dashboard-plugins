@@ -39,15 +39,15 @@ class WzRefreshClusterInfoButton extends Component {
         // try if it is a cluster
         const nodes = await clusterNodes();
         // set cluster nodes in Redux Store
-        this.props.updateClusterNodes(nodes.data.data.items);
+        this.props.updateClusterNodes(nodes.data.data.affected_items);
         // set cluster node selected in Redux Store
-        const existsClusterCurrentNodeSelected = nodes.data.data.items.find(
+        const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(
           node => node.name === this.props.clusterNodeSelected
         );
         this.props.updateClusterNodeSelected(
           existsClusterCurrentNodeSelected
             ? existsClusterCurrentNodeSelected.name
-            : nodes.data.data.items.find(node => node.type === 'master').name
+            : nodes.data.data.affected_items.find(node => node.type === 'master').name
         );
       }else{
         // do nothing if it isn't a cluster

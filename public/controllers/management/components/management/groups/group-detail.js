@@ -127,10 +127,11 @@ class WzGroupDetail extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiFlexGroup>
-                <EuiFlexItem grow={false}>
+                <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
                   <EuiToolTip position="right" content={`Back to groups`}>
                     <EuiButtonIcon
                       aria-label="Back"
+                      style={{ paddingTop: 8 }}
                       color="primary"
                       iconSize="l"
                       iconType="arrowLeft"

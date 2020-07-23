@@ -19,7 +19,7 @@ export async function checkTimestamp(genericReq, $location, wzMisc) {
       if (!current) AppState.setCreatedAt(data.data.lastRestart);
       wzMisc.setLastRestart(data.data.lastRestart);
     } else {
-      wzMisc.setBlankScr('Your wazuh-registry is empty or corrupt.');
+      wzMisc.setBlankScr('Your wazuh-registry.json is empty or corrupt.');
       $location.search('tab', null);
       $location.path('/blank-screen');
     }

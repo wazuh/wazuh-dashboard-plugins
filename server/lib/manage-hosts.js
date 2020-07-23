@@ -37,7 +37,7 @@ export class ManageHosts {
       return `  - ${!id ? new Date().getTime() : id}:
       url: ${host.url}
       port: ${host.port}
-      user: ${host.username || host.user}
+      username: ${host.username || host.user}
       password: ${host.password}`;
     } catch (error) {
       log('manage-hosts:composeHost', error.message || error);
@@ -52,7 +52,7 @@ export class ManageHosts {
   composeRegex(host) {
     try {
       const hostId = Object.keys(host)[0];
-      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*user\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`;
+      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*username\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`;
       log('manage-hosts:composeRegex', 'Composing regex', 'debug');
       return new RegExp(`${reg}`, 'gm');
     } catch (error) {
@@ -171,7 +171,7 @@ export class ManageHosts {
           id: id,
           url: host.url,
           port: host.api_port,
-          user: host.api_user,
+          username: host.api_username,
           password: this.decodeApiPassword(host.api_password),
           cluster_info: host.cluster_info,
           extensions: host.extensions

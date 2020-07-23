@@ -89,14 +89,14 @@ class WzGroupAgentsTable extends Component {
     try {
       const rawItems = await this.groupsHandler.agentsGroup(
         this.props.state.itemDetail.name,
-        this.buildFilter()
+        { params: this.buildFilter() }
       );
-      const { items, totalItems } = ((rawItems || {}).data || {}).data;
+      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
       this.setState({
-        items,
-        totalItems,
-        isProcessing: false
+        items: affected_items,
+        totalItems : total_affected_items,
+        isProcessing: false,
       });
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
@@ -184,16 +184,16 @@ class WzGroupAgentsTable extends Component {
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title={`Delete ${
+                title={`Remove ${
                   itemList[0].file ? itemList[0].file : itemList[0].name
-                } agent?`}
+                } agent from this group?`}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
                   this.props.updateShowModal(false);
                 }}
                 cancelButtonText="Cancel"
-                confirmButtonText="Delete"
+                confirmButtonText="Remove"
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
               ></EuiConfirmModal>

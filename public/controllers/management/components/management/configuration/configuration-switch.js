@@ -119,10 +119,10 @@ class WzConfigurationSwitch extends Component {
         if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
           const nodes = await clusterNodes();
           // set cluster nodes in Redux Store
-          this.props.updateClusterNodes(nodes.data.data.items);
+          this.props.updateClusterNodes(nodes.data.data.affected_items);
           // set cluster node selected in Redux Store
           this.props.updateClusterNodeSelected(
-            nodes.data.data.items.find(node => node.type === 'master').name
+            nodes.data.data.affected_items.find(node => node.type === 'master').name
           );
         }else{
           // do nothing if it isn't a cluster
@@ -137,9 +137,11 @@ class WzConfigurationSwitch extends Component {
       // If manager/cluster require agent platform info to filter sections in overview. It isn't coming from props for Management/Configuration
       try{
         this.setState({ loadingOverview: true });
-        const masterNodeInfo = await WzRequest.apiReq('GET', '/agents/000', {});
+        
+        const masterNodeInfo = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=000'}});
+
         this.setState({
-          masterNodeInfo: masterNodeInfo.data.data
+          masterNodeInfo: masterNodeInfo.data.affected_items[0]
         });
         this.setState({ loadingOverview: false });
       }catch(error){
