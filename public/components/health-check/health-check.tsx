@@ -190,6 +190,7 @@ export class HealthCheck extends Component {
                 } else if (data.data.error || data.data.data.apiIsDown) {
                     errors.push(data.data.data.apiIsDown ? 'Wazuh API is down.' : `Error connecting to the API.${data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''}`);
                     results[i].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
+                    results[i + 1].description = <span><EuiIcon type="alert" color="danger" ></EuiIcon> Error</span>;
                     this.setState({ results, errors });
                 } else {
                     results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
