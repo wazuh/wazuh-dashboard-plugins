@@ -11,14 +11,19 @@
 */
 export default {
   id: 'docker',
-  name: 'Docker Listener',
+  name: 'Docker listener',
   wodle_name: 'docker-listener',
   description: 'Configuration options of the Docker wodle.',
   category: 'Threat detection and response',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html',
   icon: 'logoDocker',
-  avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for: {
+    manager: true,
+    agent: ['windows']
+  },
+  api_component: 'wmodules',
+  api_configuration: 'wmodules',
+  api_module: 'docker-listener',
   steps: [
     {
       title: 'Settings',
@@ -26,12 +31,14 @@ export default {
       elements: [
         {
           name: 'disabled',
+          display_name: 'Disables the module',
           description: 'Disables the Docker wodle.',
           type: 'switch',
           required: true
         },
         {
           name: 'interval',
+          display_name: 'Interval time',
           description: 'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days)',
           type: 'input',
           required: true,
@@ -42,6 +49,7 @@ export default {
         },
         {
           name: 'attempts',
+          display_name: 'Number of attempts',
           description: 'Number of attempts to execute the wodle.',
           type: 'input-number',
           required: true,
@@ -52,6 +60,7 @@ export default {
         },
         {
           name: 'run_on_start',
+          display_name: 'Run on start',
           description: `Run command immediately when service is started.`,
           type: 'switch',
           required: true,
@@ -59,5 +68,11 @@ export default {
         }
       ]
     }
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(config.interval ? {interval: `${config.interval}s`} : {})
+    }
+  }
 }

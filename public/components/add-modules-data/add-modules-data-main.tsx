@@ -28,12 +28,12 @@ import {
 } from '@elastic/eui';
 
 import WzModuleGuide from './module-guide';
-import WzSampleData from './sample-data';
 import modeGuides from './guides';
 
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import store from '../../redux/store';
+import { withAdminModeProtectedRoute } from '../common/hocs/withAdminModeProtectedRoute';
 
 const guides = Object.keys(modeGuides).map(key => modeGuides[key]).sort((a,b) => {
 	if (a.name < b.name) { return -1 }
@@ -50,57 +50,44 @@ interface IStateWzAddModulesData {
 	selectedGuideCategory: any
 };
 
-export default class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
+export default withAdminModeProtectedRoute('#/manager')(class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
 	tabs: any
 	constructor(props){
 		super(props);
-		// DON'T DELETE THE BELOW CODE. IT'S FOR MODULE GUIDES.
-		// const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
-		// this.tabs = [
-		// 	...categories.map(category => ({
-		// 		id: category,
-		// 		name: category,
-		// 		content: (
-		// 			<Fragment>
-		// 				<EuiSpacer size='m' />
-		// 				<EuiFlexGrid columns={4}>
-		// 					{this.getModulesFromCategory(category).map(extension => (
-		// 						<EuiFlexItem key={`add-modules-data--${extension.id}`}>
-		// 							<EuiCard
-		// 								layout='horizontal'
-		// 								icon={(<EuiIcon size='xl' type={extension.icon} />) }
-		// 								title={extension.name}
-		// 								description={(TabDescription[extension.id] && TabDescription[extension.id].description) || extension.description}
-		// 								onClick={() => this.changeGuide(extension.id) }
-		// 							/>
-		// 						</EuiFlexItem>
-		// 					))}
-		// 				</EuiFlexGrid>
-		// 			</Fragment>
-		// 		)
-		// 	})),
-		// 	{
-		// 		id: 'sample_data',
-		// 		name: 'Sample data',
-		// 		content: (
-		// 			<Fragment>
-		// 				<EuiSpacer size='m' />
-		// 				<WzSampleData/>
-		// 			</Fragment>
-		// 		)
-		// 	}
-		// ];
-		// this.state = {
-		// 	guide: '',
-		// 	selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
-		// }
-		// "redirect=sample_data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
+		const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
+		this.tabs = categories.map(category => ({
+				id: category,
+				name: category,
+				content: (
+					<Fragment>
+						<EuiSpacer size='m' />
+						<EuiFlexGrid columns={4}>
+							{this.getModulesFromCategory(category).map(extension => (
+								<EuiFlexItem key={`add-modules-data--${extension.id}`}>
+									<EuiCard
+										layout='horizontal'
+										icon={(<EuiIcon size='xl' type={extension.icon} />) }
+										title={extension.name}
+										description={(TabDescription[extension.id] && TabDescription[extension.id].description) || extension.description}
+										onClick={() => this.changeGuide(extension.id) }
+									/>
+								</EuiFlexItem>
+							))}
+						</EuiFlexGrid>
+					</Fragment>
+				)
+			}));
+			
+		this.state = {
+			guide: '',
+			selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
+		}
 	}
 	setGlobalBreadcrumb() {
     const breadcrumb = [
 			{ text: '' },
 			{ text: 'Management', href: '/app/wazuh#/manager' },
-			{ text: 'Sample data' }
+			{ text: 'Setup modules' }
 		];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
@@ -114,67 +101,58 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		this.setState({ selectedGuideCategory });
 	}
 	getModulesFromCategory(category: string = ''){
-		return category !== '' ? guides.filter(guide => guide.category === category) : guides;
+		return category !== '' ? guides.filter(guide => guide.category === category && (guide.disabled ? false : true)) : guides;
 	}
 	render(){
-		// const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES. 
+		const { guide, selectedGuideCategory } = this.state; 
 		return (
-			<EuiPage restrictWidth='1200px'>
-				<EuiPageBody>
-					{/** Module guides with sample data rendered as tabs */}
-					{/* {guide && (
-						<WzModuleGuide guideId={guide} close={() => this.changeGuide('')} {...this.props}/>
-						) || (
-						<Fragment>
-							<EuiFlexGroup>
-								<EuiFlexItem>
-									<EuiTitle size='l'>
-										<h2>
-											{this.props.close && (
-												<Fragment>
-													<EuiToolTip
-														position='top'
-														content='Back'
-													>
-														<EuiButtonIcon onClick={() => this.props.close()} iconType='arrowLeft' iconSize='l' aria-label='Back'/>
-													</EuiToolTip>
-													<span> </span>
-												</Fragment>
-											)}
-											<span>Sample data</span>
-										</h2>
-									</EuiTitle>
-								</EuiFlexItem>
-							</EuiFlexGroup>
-							<EuiSpacer size='m'/>
-							<EuiFlexGroup>
-								<EuiFlexItem>
-									<EuiTabbedContent
-										tabs={this.tabs}
-										selectedTab={selectedGuideCategory}
-										onTabClick={selectedTab => {
-											this.changeSelectedGuideCategory(selectedTab);
-										}}
-									/>
-								</EuiFlexItem>
-							</EuiFlexGroup>
-						</Fragment>
-					)} */}
-					{/* Only sample data */}
-					<EuiFlexGroup>
-						<EuiFlexItem>
-							<EuiTitle size='l'><span>Sample data</span></EuiTitle>
-							<EuiText color='subdued'>Add sample data to modules.</EuiText>
-						</EuiFlexItem>
-					</EuiFlexGroup>
-					<EuiSpacer size='m'/>
-					<EuiFlexGroup>
-						<EuiFlexItem>
-							<WzSampleData/>
-						</EuiFlexItem>
-					</EuiFlexGroup>
-				</EuiPageBody>
-			</EuiPage>
+			<Fragment>
+
+				<EuiPage restrictWidth='1200px'>
+					<EuiPageBody>
+						{guide && (
+							<WzModuleGuide guideId={guide} close={() => this.changeGuide('')} {...this.props}/>
+							) || (
+							<Fragment>
+								<EuiFlexGroup>
+									<EuiFlexItem>
+										<EuiTitle size='l'>
+											<h2>
+												{this.props.close && (
+													<Fragment>
+														<EuiToolTip
+															position='top'
+															content='Back'
+														>
+															<EuiButtonIcon onClick={() => this.props.close()} iconType='arrowLeft' iconSize='l' aria-label='Back'/>
+														</EuiToolTip>
+														<span> </span>
+													</Fragment>
+												)}
+												<span>Setup modules</span>
+											</h2>
+										</EuiTitle>
+										<EuiText color='subdued'>Use interactive guides to configure the modules.</EuiText>
+									</EuiFlexItem>
+								</EuiFlexGroup>
+								<EuiSpacer size='m'/>
+								<EuiFlexGroup>
+									<EuiFlexItem>
+										<EuiTabbedContent
+											tabs={this.tabs}
+											selectedTab={selectedGuideCategory}
+											onTabClick={selectedTab => {
+												this.changeSelectedGuideCategory(selectedTab);
+											}}
+										/>
+									</EuiFlexItem>
+								</EuiFlexGroup>
+							</Fragment>
+						)}
+					</EuiPageBody>
+				</EuiPage>
+				{guide && <EuiSpacer size='xxl'/>}
+			</Fragment>
 		)
 	}
-}
+})
