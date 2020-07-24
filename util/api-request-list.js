@@ -19,7 +19,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#run-an-ar-command-in-the-agent"
       },
       {
         name: '/agents/:agent_id/group/:group_id',
@@ -30,7 +31,8 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#add-agent-group"
       },
       {
         name: '/agents/:agent_id/restart',
@@ -38,7 +40,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#restart-an-agent"
       },
       {
         name: '/agents/:agent_id/upgrade',
@@ -46,7 +49,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#upgrade-agent-using-online-repository"
       },
       {
         name: '/agents/:agent_id/upgrade_custom',
@@ -54,7 +58,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#upgrade-agent-using-custom-file"
       },
       {
         name: '/agents/:agent_name',
@@ -62,7 +67,8 @@ export const apiRequestList = [
           {
             name: ':agent_name'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#add-agent-quick-method"
       },
       {
         name: '/agents/groups/:group_id',
@@ -70,11 +76,13 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#create-a-group"
       },
       {
         name: '/agents/restart',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#restart-all-agents"
       },
       {
         name: '/cluster/:node_id/restart',
@@ -82,19 +90,23 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#restart-a-specific-node-in-cluster"
       },
       {
         name: '/cluster/restart',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#restart-all-nodes-in-cluster"
       },
       {
         name: '/manager/restart',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#restart-wazuh-manager"
       },
       {
         name: '/rootcheck',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#run-rootcheck-scan-in-all-agents"
       },
       {
         name: '/rootcheck/:agent_id',
@@ -102,11 +114,13 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#run-rootcheck-scan-in-an-agent"
       },
       {
         name: '/syscheck',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#run-syscheck-scan-in-all-agents"
       },
       {
         name: '/syscheck/:agent_id',
@@ -114,7 +128,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#run-syscheck-scan-in-an-agent"
       }
     ]
   },
@@ -123,7 +138,8 @@ export const apiRequestList = [
     endpoints: [
       {
         name: '/agents',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#delete-agents"
       },
       {
         name: '/agents/:agent_id',
@@ -131,7 +147,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#delete-an-agent"
       },
       {
         name: '/agents/:agent_id/group',
@@ -139,7 +156,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#remove-a-single-group-of-an-agent"
       },
       {
         name: '/agents/:agent_id/group/:group_id',
@@ -150,7 +168,8 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#remove-a-single-group-of-an-agent"
       },
       {
         name: '/agents/group/:group_id',
@@ -158,11 +177,13 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#remove-a-single-group-of-multiple-agents"
       },
       {
         name: '/agents/groups',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#delete-a-list-of-groups"
       },
       {
         name: '/agents/groups/:group_id',
@@ -170,19 +191,18 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#remove-group"
       },
       {
         name: '/cache',
-        args: []
-      },
-      {
-        name: '/cache',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#delete-cache-index"
       },
       {
         name: '/rootcheck',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#clear-rootcheck-database"
       },
       {
         name: '/rootcheck/:agent_id',
@@ -190,7 +210,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#clear-rootcheck-database-of-an-agent"
       },
       {
         name: '/syscheck/:agent_id',
@@ -198,7 +219,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#clear-syscheck-database-of-an-agent"
       }
     ]
   },
@@ -207,7 +229,8 @@ export const apiRequestList = [
     endpoints: [
       {
         name: '/agents',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-all-agents"
       },
       {
         name: '/agents/:agent_id',
@@ -215,7 +238,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-an-agent"
       },
       {
         name: '/agents/:agent_id/config/:component/:configuration',
@@ -229,7 +253,8 @@ export const apiRequestList = [
           {
             name: ':configuration'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-active-configuration"
       },
       {
         name: '/agents/:agent_id/group/is_sync',
@@ -237,7 +262,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-sync-status-of-agent"
       },
       {
         name: '/agents/:agent_id/key',
@@ -245,7 +271,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-agent-key"
       },
       {
         name: '/agents/:agent_id/upgrade_result',
@@ -253,11 +280,13 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-upgrade-result-from-agent"
       },
       {
         name: '/agents/groups',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-groups"
       },
       {
         name: '/agents/groups/:group_id',
@@ -265,7 +294,8 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-agents-in-a-group"
       },
       {
         name: '/agents/groups/:group_id/configuration',
@@ -273,7 +303,8 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-group-configuration"
       },
       {
         name: '/agents/groups/:group_id/files',
@@ -281,7 +312,8 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-group-files"
       },
       {
         name: '/agents/groups/:group_id/files/:filename',
@@ -292,7 +324,8 @@ export const apiRequestList = [
           {
             name: ':filename'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-a-file-in-group"
       },
       {
         name: '/agents/name/:agent_name',
@@ -300,35 +333,43 @@ export const apiRequestList = [
           {
             name: ':agent_name'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-an-agent-by-its-name"
       },
       {
         name: '/agents/no_group',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-agents-without-group"
       },
       {
         name: '/agents/outdated',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-outdated-agents"
       },
       {
         name: '/agents/stats/distinct',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-distinct-fields-in-agents"
       },
       {
         name: '/agents/summary',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-agents-summary"
       },
       {
         name: '/agents/summary/os',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-os-summary"
       },
       {
         name: '/cache',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-cache-index"
       },
       {
         name: '/cache/config',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#return-cache-configuration"
       },
       {
         name: '/ciscat/:agent_id/results',
@@ -336,7 +377,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-cis-cat-results-from-an-agent"
       },
       {
         name: '/cluster/:node_id/configuration',
@@ -344,7 +386,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-node-id-s-configuration"
       },
       {
         name: '/cluster/:node_id/configuration/validation',
@@ -352,7 +395,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#check-wazuh-configuration-in-a-cluster-node"
       },
       {
         name: '/cluster/:node_id/files',
@@ -360,7 +404,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-local-file-from-any-cluster-node"
       },
       {
         name: '/cluster/:node_id/info',
@@ -368,7 +413,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-id-s-information"
       },
       {
         name: '/cluster/:node_id/logs',
@@ -376,7 +422,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-ossec-log-from-a-specific-node-in-cluster"
       },
       {
         name: '/cluster/:node_id/logs/summary',
@@ -384,7 +431,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-summary-of-ossec-log-from-a-specific-node-in-cluster"
       },
       {
         name: '/cluster/:node_id/stats',
@@ -392,7 +440,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-node-id-s-stats"
       },
       {
         name: '/cluster/:node_id/stats/analysisd',
@@ -400,7 +449,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-node-id-s-analysisd-stats"
       },
       {
         name: '/cluster/:node_id/stats/hourly',
@@ -408,7 +458,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-node-id-s-stats-by-hour"
       },
       {
         name: '/cluster/:node_id/stats/remoted',
@@ -416,7 +467,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-node-id-s-remoted-stats"
       },
       {
         name: '/cluster/:node_id/stats/weekly',
@@ -424,7 +476,8 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-node-id-s-stats-by-week"
       },
       {
         name: '/cluster/:node_id/status',
@@ -432,27 +485,33 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-node-id-s-status"
       },
       {
         name: '/cluster/config',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-the-cluster-configuration"
       },
       {
         name: '/cluster/configuration/validation',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#check-wazuh-configuration-in-all-cluster-nodes"
       },
       {
         name: '/cluster/healthcheck',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#show-cluster-health"
       },
       {
         name: '/cluster/node',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-local-node-info"
       },
       {
         name: '/cluster/nodes',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-nodes-info"
       },
       {
         name: '/cluster/nodes/:node_name',
@@ -460,15 +519,18 @@ export const apiRequestList = [
           {
             name: ':node_name'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-node-info"
       },
       {
         name: '/cluster/status',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-info-about-cluster-status"
       },
       {
         name: '/manager/stats/remoted',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-remoted-stats"
       },
       {
         name: '/sca/:agent_id',
@@ -476,7 +538,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-security-configuration-assessment-sca-database"
       },
       {
         name: '/sca/:agent_id/checks/:policy_id',
@@ -487,11 +550,18 @@ export const apiRequestList = [
           {
             name: ':policy_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-security-configuration-assessment-sca-checks-database"
+      },
+      {
+        name: '/summary/agents',
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-a-full-summary-of-agents"
       },
       {
         name: '/decoders',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-all-decoders"
       },
       {
         name: '/decoders/:decoder_name',
@@ -499,71 +569,88 @@ export const apiRequestList = [
           {
             name: ':decoder_name'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-decoders-by-name"
       },
       {
         name: '/decoders/files',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-all-decoders-files"
       },
       {
         name: '/decoders/parents',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-all-parent-decoders"
       },
       {
         name: '/lists',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-all-lists"
       },
       {
         name: '/lists/files',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-paths-from-all-lists"
       },
       {
         name: '/manager/configuration',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-manager-configuration"
       },
       {
         name: '/manager/configuration/validation',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#check-wazuh-configuration"
       },
       {
         name: '/manager/files',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-local-file"
       },
       {
         name: '/manager/info',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-manager-information"
       },
       {
         name: '/manager/logs',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-ossec-log"
       },
       {
         name: '/manager/logs/summary',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-summary-of-ossec-log"
       },
       {
         name: '/manager/stats',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-manager-stats"
       },
       {
         name: '/manager/stats/analysisd',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-analysisd-stats"
       },
       {
         name: '/manager/stats/hourly',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-manager-stats-by-hour"
       },
       {
         name: '/manager/stats/remoted',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-remoted-stats"
       },
       {
         name: '/manager/stats/weekly',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-manager-stats-by-week"
       },
       {
         name: '/manager/status',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-manager-status"
       },
       {
         name: '/rootcheck/:agent_id',
@@ -571,7 +658,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rootcheck-database"
       },
       {
         name: '/rootcheck/:agent_id/cis',
@@ -579,7 +667,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rootcheck-cis-requirements"
       },
       {
         name: '/rootcheck/:agent_id/last_scan',
@@ -587,7 +676,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-last-rootcheck-scan"
       },
       {
         name: '/rootcheck/:agent_id/pci',
@@ -595,11 +685,13 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rootcheck-pci-requirements"
       },
       {
         name: '/rules',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-all-rules"
       },
       {
         name: '/rules/:rule_id',
@@ -607,35 +699,43 @@ export const apiRequestList = [
           {
             name: ':rule_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rules-by-id"
       },
       {
         name: '/rules/files',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-files-of-rules"
       },
       {
         name: '/rules/gdpr',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rule-gdpr-requirements"
       },
       {
         name: '/rules/groups',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rule-groups"
       },
       {
         name: '/rules/pci',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rule-pci-requirements"
       },
       {
         name: '/rules/hipaa',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rule-hipaa-requirements"
       },
       {
         name: '/rules/nist-800-53',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rule-nist-800-53-requirements"
       },
       {
         name: '/rules/tsc',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-rule-tsc-requirements"
       },
       {
         name: '/syscheck/:agent_id',
@@ -643,7 +743,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-syscheck-files"
       },
       {
         name: '/syscheck/:agent_id/last_scan',
@@ -651,7 +752,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-last-syscheck-scan"
       },
       {
         name: '/syscollector/:agent_id/hardware',
@@ -659,7 +761,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-hardware-info"
       },
       {
         name: '/syscollector/:agent_id/netaddr',
@@ -667,7 +770,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-network-address-info-of-an-agent"
       },
       {
         name: '/syscollector/:agent_id/netiface',
@@ -675,7 +779,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-network-interface-info-of-an-agent"
       },
       {
         name: '/syscollector/:agent_id/netproto',
@@ -683,7 +788,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-network-protocol-info-of-an-agent"
       },
       {
         name: '/syscollector/:agent_id/os',
@@ -691,7 +797,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-os-info"
       },
       {
         name: '/syscollector/:agent_id/packages',
@@ -699,7 +806,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-packages-info"
       },
       {
         name: '/syscollector/:agent_id/ports',
@@ -707,7 +815,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-ports-info-of-an-agent"
       },
       {
         name: '/syscollector/:agent_id/processes',
@@ -715,7 +824,8 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#get-processes-info"
       }
     ]
   },
@@ -724,7 +834,8 @@ export const apiRequestList = [
     endpoints: [
       {
         name: '/agents',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#add-agent"
       },
       {
         name: '/agents/group/:group_id',
@@ -732,7 +843,8 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#add-a-list-of-agents-to-a-group"
       },
       {
         name: '/agents/groups/:group_id/configuration',
@@ -740,7 +852,8 @@ export const apiRequestList = [
           {
             name: ':group_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#put-configuration-file-agent-conf-into-a-group"
       },
       {
         name: '/agents/groups/:group_id/files/:file_name',
@@ -751,15 +864,18 @@ export const apiRequestList = [
           {
             name: ':file_name'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#upload-file-into-a-group"
       },
       {
         name: '/agents/insert',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#insert-agent"
       },
       {
         name: '/agents/restart',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#restart-a-list-of-agents"
       },
       {
         name: '/cluster/:node_id/files',
@@ -767,11 +883,13 @@ export const apiRequestList = [
           {
             name: ':node_id'
           }
-        ]
+        ],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#update-local-file-at-any-cluster-node"
       },
       {
         name: '/manager/files',
-        args: []
+        args: [],
+        documentationLink: "https://documentation.wazuh.com/current/user-manual/api/reference.html#update-local-file"
       }
     ]
   }

@@ -37,7 +37,7 @@ export class ToolsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'Tools' }];
+      const breadcrumb = [{ text: '' }, { text: 'Dev Tools' }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       this.switchTab('devTools'); 
       /*

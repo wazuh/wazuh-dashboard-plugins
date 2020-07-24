@@ -13,7 +13,7 @@
  */
 
 import React, { useRef, useEffect, useState, Fragment } from 'react'
-import { EuiIcon, EuiFlexGroup, EuiFlexItem, EuiBadge, EuiButtonEmpty, EuiToolTip, EuiScreenReaderOnly, EuiProgress, EuiCodeEditor, EuiButtonIcon, EuiSelect } from '@elastic/eui';
+import { EuiIcon, EuiFlexGroup, EuiFlexItem, EuiBadge, EuiButtonEmpty, EuiToolTip, EuiScreenReaderOnly, EuiProgress, EuiCodeEditor, EuiButtonIcon, EuiSelect, EuiPopover } from '@elastic/eui';
 import * as senseEditor from '../../../../../../src/plugins/console/public/application/models/sense_editor/';
 import { AppState } from '../../../react-services/app-state'
 import { WzRequest } from '../../../react-services/wz-request';
@@ -23,7 +23,9 @@ import { apiRequestList } from './api-requests-list';
 import 'brace/theme/textmate';
 import { DevToolsHistory } from './devToolsHistory';
 import * as FileSaver from '../../../services/file-saver';
-
+import { ErrorHandler } from '../../../react-services/error-handler';
+import { toastNotifications } from 'ui/notify';
+import _ from 'lodash';
 
 export function DevTools({ initialTextValue }) {
   const editorRef = useRef(null);
@@ -38,6 +40,7 @@ export function DevTools({ initialTextValue }) {
   const [isPanelVisible, setisPanelVisible] = useState(false);
   const showHistory = () => setisPanelVisible(isPopoverOpen => !isPopoverOpen);
   const closeHistory = () => setisPanelVisible(false);
+  const [popoverOpen, setPopoverOpen] = useState(false)
 
   const codeEditorOptions = {
     fontSize: '14px',
@@ -180,7 +183,7 @@ GET /syscollector/000/packages?search=ssh
   }, [tabsState, selectedTab, statusBadges])
 
   const abs = {
-    height: !isPanelVisible ? 'calc(100vh - 140px)' : 'calc(100vh - 445px)',
+    height: !isPanelVisible ? 'calc(100vh - 115px)' : 'calc(100vh - 445px)',
     width: 'auto',
     position: 'relative',
     marginTop: -1
@@ -349,6 +352,49 @@ GET /syscollector/000/packages?search=ssh
     }
   }
 
+  const showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time
+    });
+  };
+
+  const convertCurl = async () => {
+    const request = await editorInstanceRef.current.getRequest();
+    const curl = await editorInstanceRef.current.getRequestsAsCURL('https://localhost:55000', request.range);
+    /* Auxiliar textarea creator */
+    const el = document.createElement('textarea');
+    el.value = curl;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('success', 'Request copied as cURL', '' , 3000);
+    setPopoverOpen(false);
+  }
+
+  const goToDocumentation = async () => {
+    try {
+      const request = await editorInstanceRef.current.getRequest();
+      const splitReq = request.url.split('?');
+      const requestPath = splitReq[0];
+      const requestArray = requestPath.substr(1).split('/')
+      const filtered = apiRequestList[request.method].map(o => ({...o, splitURL: o.value.split('/')})).filter(o => {
+        return o.splitURL.length === requestArray.length
+      }).find(o => {
+        return o.splitURL.reduce((accum,str,index) => {
+          return accum && (str.startsWith(':') ? true : str === requestArray[index])
+        },true)
+      })
+      window.open(filtered.documentationLink, '_blank');
+      setPopoverOpen(false); 
+    } catch (error) {
+      showToast('danger', 'No documentation related to this request was found.', '' , 3000);
+    }
+  }
+
   const renderRightColumn = () => {
     $('#wz-dev-right-column').on('resizeComponent',function(){
       let $rightColumn = $('#wz-dev-right-column');
@@ -405,6 +451,47 @@ GET /syscollector/000/packages?search=ssh
                 <EuiIcon type="play" />
               </button>
             </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem>
+          <EuiPopover
+            button={
+              <button
+                onClick={ () => setPopoverOpen(true) }
+                data-test-subj="sendRequestButton"
+                aria-label={"More Actions"}
+              >
+                <EuiIcon type="wrench" />
+              </button>
+            }
+            isOpen={popoverOpen}
+            closePopover={ () => setPopoverOpen(false) }>
+            <EuiFlexGroup
+              direction={'column'}
+              alignItems={'flexStart'}
+              justifyContent={'flexStart'}
+              >
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  color={'text'}
+                  onClick={() => convertCurl() }
+                  data-test-subj="sendRequestButton"
+                  aria-label={"cURL"}
+                  >
+                  <EuiIcon type="console" /> Copy as cURL
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  color={'text'}
+                  onClick={() => goToDocumentation() }
+                  data-test-subj="sendRequestButton"
+                  aria-label={"Documentation reference"}
+                  >
+                  <EuiIcon type="link" /> Open documentation
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPopover>
           </EuiFlexItem>
         </EuiFlexGroup>
 
