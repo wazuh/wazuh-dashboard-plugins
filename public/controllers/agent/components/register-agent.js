@@ -96,7 +96,7 @@ export class RegisterAgent extends Component {
         {}
       );
       const remote = ((result.data || {}).data || {}).remote || {};
-      return (remote[0] || {}).protocol === 'tcp';
+      return (remote[0] || {}).protocol !== 'tcp';
     } catch (error) {
       return false;
     }
@@ -209,7 +209,7 @@ export class RegisterAgent extends Component {
           : ''
         }${
         this.state.tcpProtocol
-          ? ' WAZUH_PROTOCOL=TCP'
+          ? " WAZUH_PROTOCOL='TCP'"
           : ''
         } yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
         this.state.wazuhVersion
@@ -226,7 +226,7 @@ export class RegisterAgent extends Component {
           : ''
         }${
         this.state.tcpProtocol
-          ? ' WAZUH_PROTOCOL=TCP'
+          ? " WAZUH_PROTOCOL='TCP'"
           : ''
         } dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${
@@ -235,7 +235,7 @@ export class RegisterAgent extends Component {
         this.state.serverAddress
         }'${
         this.state.registrationServer
-          ? ` WAZUH_REGISTRATION_SERVER='${this.state.registrationServer}'`
+          ? ` WAZUH_REGISTRATION_SERVER '${this.state.registrationServer}'`
           : ''
         }${
         this.state.needsPassword
@@ -243,7 +243,7 @@ export class RegisterAgent extends Component {
           : ''
         }${
         this.state.tcpProtocol
-          ? ' WAZUH_PROTOCOL=TCP'
+          ? " WAZUH_PROTOCOL 'TCP'"
           : ''
         } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
@@ -256,7 +256,7 @@ export class RegisterAgent extends Component {
           : ''
         }${
         this.state.tcpProtocol
-          ? ' WAZUH_PROTOCOL=TCP'
+          ? " WAZUH_PROTOCOL='TCP'"
           : ''
         }`
     };
