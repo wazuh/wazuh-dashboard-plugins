@@ -79,7 +79,7 @@ export class ManageHosts {
           path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml')
         )
       ) {
-        await fs.writeFileSync(this.file, this.initialConfig, 'utf8');
+        await fs.writeFileSync(this.file, this.initialConfig, {encoding: 'utf8', mode: 0o600});
       }
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
