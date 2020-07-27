@@ -1,5 +1,6 @@
 /*
- * Wazuh app - React hooks
+ * Wazuh app - React component building the configuration component.
+ *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,14 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { useFilterManager } from './use-filter-manager';
-
-export { useIndexPattern } from './use-index-pattern';
-
-export { useKbnLoadingIndicator } from './use-kbn-loading-indicator';
-
-export { useQuery } from './use-query';
-
-export { useTimeFilter } from './use-time-filter';
-
-export { useWindowSize } from './useWindowSize';
+export { FieldForm } from './field-form';
