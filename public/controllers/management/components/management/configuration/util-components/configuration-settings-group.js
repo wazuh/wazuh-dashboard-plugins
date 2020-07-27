@@ -16,10 +16,7 @@ import PropTypes from 'prop-types';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiTitle,
-  EuiText,
   EuiSpacer,
-  EuiButtonEmpty
 } from '@elastic/eui';
 
 import WzConfigurationSetting from './configuration-setting';

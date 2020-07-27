@@ -96,7 +96,7 @@ class WzRuleInfo extends Component {
         width: '5%'
       },
       {
-        field: 'file',
+        field: 'filename',
         name: 'File',
         align: 'left',
         sortable: true,
@@ -107,7 +107,7 @@ class WzRuleInfo extends Component {
               <EuiLink
                 onClick={async event => {
                   event.stopPropagation();
-                  const noLocal = item.path.startsWith('ruleset/');
+                  const noLocal = item.relative_dirname.startsWith('ruleset/');
                   const result = await this.rulesetHandler.getRuleContent(
                     value,
                     noLocal
@@ -115,7 +115,7 @@ class WzRuleInfo extends Component {
                   const file = {
                     name: value,
                     content: result,
-                    path: item.path
+                    path: item.relative_dirname
                   };
                   this.props.updateFileContent(file);
                 }}
@@ -235,7 +235,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'file', value: file}])}
+              onClick={async () => this.setNewFiltersAndBack([{field:'filename', value: file}])}
             >
               {file}
             </EuiLink>
@@ -245,7 +245,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'path', value: path}])}
+              onClick={async () => this.setNewFiltersAndBack([{field:'relative_dirname', value: path}])}
             >
               {path}
             </EuiLink>
@@ -395,24 +395,11 @@ class WzRuleInfo extends Component {
 
   render() {
     const { ruleInfo, isLoading } = this.props.state;
-    const currentRuleId =
-      this.state && this.state.currentRuleId
-        ? this.state.currentRuleId
-        : ruleInfo.current;
-    const rules = ruleInfo.items;
-    const currentRuleArr = rules.filter(r => {
-      return r.id === currentRuleId;
-    });
+    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : ruleInfo.current;
+    const rules = ruleInfo.affected_items;
+    const currentRuleArr = rules.filter(r => { return r.id === currentRuleId });
     const currentRuleInfo = currentRuleArr[0];
-    const {
-      description,
-      details,
-      file,
-      path,
-      level,
-      id,
-      groups
-    } = currentRuleInfo;
+    const { description, details, filename, relative_dirname, level, id, groups } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
@@ -474,7 +461,7 @@ class WzRuleInfo extends Component {
                     paddingSize="none"
                     initialIsOpen={true}>
                     <div className='flyout-row details-row'>
-                      {this.renderInfo(id, level, file, path, groups)}
+                      {this.renderInfo(id, level, filename, relative_dirname, groups)}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>

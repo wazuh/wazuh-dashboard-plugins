@@ -54,3 +54,98 @@ export const configEquivalences = {
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.'
 };
+
+export const nameEquivalence = {
+  pattern: 'Index pattern',
+  'checks.pattern': 'Index pattern',
+  'checks.template': 'Index template',
+  'checks.api': 'API connection',
+  'checks.setup': 'API version',
+  'checks.fields': 'Know fields',
+  timeout: 'Request timeout',
+  'api.selector': 'API selector',
+  'ip.selector': 'IP selector',
+  'ip.ignore': 'IP ignore',
+  'xpack.rbac.enabled': 'X-Pack RBAC',
+  'wazuh.monitoring.enabled': 'Status',
+  'wazuh.monitoring.frequency': 'Frecuency',
+  'wazuh.monitoring.shards': 'Index shards',
+  'wazuh.monitoring.replicas': 'Index replicas',
+  'wazuh.monitoring.creation': 'Interval creation',
+  'wazuh.monitoring.pattern': 'Index pattern',
+  admin: 'Admin mode',
+  hideManagerAlerts: 'Hide manager alerts',
+  'logs.level': 'Log level',
+}
+
+const HEALTH_CHECK = 'Health Check';
+const GENERAL = 'General';
+const SECURITY = 'Security';
+const MONITORING = 'Monitoring'
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING,];
+
+export const categoriesEquivalence = {
+  pattern: GENERAL,
+  'checks.pattern': HEALTH_CHECK,
+  'checks.template': HEALTH_CHECK,
+  'checks.api': HEALTH_CHECK,
+  'checks.setup': HEALTH_CHECK,
+  'checks.fields': HEALTH_CHECK,
+  timeout: GENERAL,
+  'api.selector': GENERAL,
+  'ip.selector': GENERAL,
+  'ip.ignore': GENERAL,
+  'xpack.rbac.enabled': SECURITY,
+  'wazuh.monitoring.enabled': MONITORING,
+  'wazuh.monitoring.frequency': MONITORING,
+  'wazuh.monitoring.shards': MONITORING,
+  'wazuh.monitoring.replicas': MONITORING,
+  'wazuh.monitoring.creation': MONITORING,
+  'wazuh.monitoring.pattern': MONITORING,
+  admin: SECURITY,
+  hideManagerAlerts: GENERAL,
+  'logs.level': GENERAL,
+}
+
+const TEXT = 'text';
+const NUMBER = 'number';
+const LIST = 'list';
+const BOOLEAN = 'boolean';
+const ARRAY = 'array';
+
+export const formEquivalence = {
+  pattern: { type: TEXT },
+  'checks.pattern': { type: BOOLEAN },
+  'checks.template': { type: BOOLEAN },
+  'checks.api': { type: BOOLEAN },
+  'checks.setup': { type: BOOLEAN },
+  'checks.fields': { type: BOOLEAN },
+  timeout: { type: NUMBER },
+  'api.selector': { type: BOOLEAN },
+  'ip.selector': { type: BOOLEAN },
+  'ip.ignore': { type: ARRAY },
+  'xpack.rbac.enabled': { type: BOOLEAN },
+  'wazuh.monitoring.enabled': { type: BOOLEAN },
+  'wazuh.monitoring.frequency': { type: NUMBER },
+  'wazuh.monitoring.shards': { type: NUMBER },
+  'wazuh.monitoring.replicas': { type: NUMBER },
+  'wazuh.monitoring.creation': {
+    type: LIST, params: {
+      options: [
+        { text: 'Hourly', value: 'h' },
+        { text: 'Daily', value: 'd' },
+        { text: 'Weekly', value: 'w' },
+        { text: 'Monthly', value: 'm' },
+      ]
+    }
+  },
+  'wazuh.monitoring.pattern': { type: TEXT },
+  admin: { type: BOOLEAN },
+  hideManagerAlerts: { type: BOOLEAN },
+  'logs.level': { type: LIST, params: {
+    options: [
+      { text: 'Info', value: 'info' },
+      { text: 'Debug', value: 'debug' },
+    ]
+  } },
+}

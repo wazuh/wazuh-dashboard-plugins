@@ -66,11 +66,16 @@ class WzRulesetTable extends Component {
       if (match && match[0]) {
         this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
-        const result = await WzRequest.apiReq('GET', `/rules/${id}`, {});
-        const items = ((result.data || {}).data || {}).items || [];
+        const result = await WzRequest.apiReq('GET', `/rules`, 
+        {
+          params: {
+            rule_ids: id
+          }
+        });
+        const items = ((result.data || {}).data || {}).affected_items || [];
         if (items.length) {
           const info = await this.rulesetHandler.getRuleInformation(
-            items[0].file,
+            items[0].filename,
             parseInt(id)
           );
           this.props.updateRuleInfo(info);
@@ -119,19 +124,18 @@ class WzRulesetTable extends Component {
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
-      this.buildFilter()
-    ).catch(error => {
+      { params: this.buildFilter() },
+    ).catch((error) => {
       console.warn(`Error when get the items of ${section}: `, error);
       return {};
     });
 
-    const { items = [], totalItems = 0 } =
-      ((rawItems || {}).data || {}).data || {};
-    this.props.updateTotalItems(totalItems);
+    const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
+    this.props.updateTotalItems(total_affected_items);
     this.setState({
-      items,
-      totalItems,
-      isLoading: false
+      items: affected_items,
+      totalItems : total_affected_items,
+      isLoading:false
     });
   }
 
@@ -235,20 +239,11 @@ class WzRulesetTable extends Component {
               window.location.href = `${window.location.href}&redirectRule=${id}`;
               this.props.updateRuleInfo(result);
             } else if (section === 'decoders') {
-              const result = await this.rulesetHandler.getDecoderInformation(
-                item.file,
-                name
-              );
+              const result = await this.rulesetHandler.getDecoderInformation(item.filename, name);
               this.props.updateDecoderInfo(result);
             } else {
-              const result = await this.rulesetHandler.getCdbList(
-                `${item.path}/${item.name}`
-              );
-              const file = {
-                name: item.name,
-                content: result,
-                path: item.path
-              };
+              const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.filename}`);
+              const file = { name: item.filename, content: result, path: item.relative_dirname };
               this.props.updateListContent(file);
             }
           }
@@ -287,7 +282,9 @@ class WzRulesetTable extends Component {
                 <p>These items will be removed</p>
                 <div>
                   {itemList.map(function (item, i) {
-                    return <li key={i}>{item.file ? item.file : item.name}</li>;
+                    return (
+                      <li key={i}>{(item.filename) ? item.filename : item.name}</li>
+                    );
                   })}
                 </div>
               </EuiConfirmModal>
@@ -312,10 +309,7 @@ class WzRulesetTable extends Component {
   async removeItems(items) {
     this.setState({ isLoading: true });
     const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile(
-        item.file ? item.file : item.name,
-        item.path
-      );
+      await this.rulesetHandler.deleteFile((item.filename) ? item.filename : item.name, item.relative_dirname);
     });
 
     Promise.all(results).then(completed => {

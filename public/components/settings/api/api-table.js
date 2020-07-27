@@ -156,8 +156,8 @@ export class ApiTable extends Component {
         sortable: true
       },
       {
-        field: 'user',
-        name: 'User',
+        field: 'username',
+        name: 'Username',
         align: 'left',
         sortable: true
       },

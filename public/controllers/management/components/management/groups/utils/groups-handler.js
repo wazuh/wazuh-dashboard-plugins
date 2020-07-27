@@ -10,7 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WzRequest } from '../../../../../../react-services/wz-request';
+import {
+  WzRequest
+} from '../../../../../../react-services/wz-request';
 
 export default class GroupsHandler {
   /**
@@ -19,11 +21,11 @@ export default class GroupsHandler {
    */
   static async saveGroup(name) {
     try {
-      const result = await WzRequest.apiReq(
-        'PUT',
-        `/agents/groups/${name}`,
-        {}
-      );
+      const result = await WzRequest.apiReq('POST', `/groups`, {
+        params: {
+          group_id: name
+        }
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -36,8 +38,10 @@ export default class GroupsHandler {
    */
   static async deleteGroup(name) {
     try {
-      const result = await WzRequest.apiReq('DELETE', '/agents/groups', {
-        ids: name
+      const result = await WzRequest.apiReq('DELETE', `/groups`, {
+        params: {
+          list_groups: name
+        }
       });
       return result;
     } catch (error) {
@@ -69,11 +73,7 @@ export default class GroupsHandler {
    */
   static async agentsGroup(name, filters) {
     try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/agents/groups/${name}`,
-        filters
-      );
+      const result = await WzRequest.apiReq('GET', `/groups/${name}/agents`, filters);
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -86,11 +86,7 @@ export default class GroupsHandler {
    */
   static async filesGroup(name, filters) {
     try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/agents/groups/${name}/files`,
-        filters
-      );
+      const result = await WzRequest.apiReq('GET', `/groups/${name}/files`, filters);
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -103,7 +99,7 @@ export default class GroupsHandler {
    */
   static async listGroups(filters) {
     try {
-      const result = await WzRequest.apiReq('GET', '/agents/groups', filters);
+      const result = await WzRequest.apiReq('GET', '/groups', filters);
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -116,8 +112,8 @@ export default class GroupsHandler {
    */
   static async getFileContent(path) {
     try {
-      const result = await WzRequest.apiReq('GET', path, { format: 'xml' });
-      return ((result || {}).data || {}).data || false;
+      const result = await WzRequest.apiReq('GET', path, {});
+      return ((result || {}).data) || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -131,14 +127,9 @@ export default class GroupsHandler {
    */
   static async sendGroupConfiguration(fileName, groupId, content) {
     try {
-      const result = await WzRequest.apiReq(
-        'POST',
-        `/agents/groups/${groupId}/files/${fileName}`,
-        {
-          content,
-          origin: 'xmleditor'
-        }
-      );
+      const result = await WzRequest.apiReq('PUT', `/groups/${groupId}/configuration`, {
+        body: content
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);

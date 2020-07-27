@@ -91,7 +91,7 @@ class WzRulesetActionButtons extends Component {
       } else if (path === 'etc/decoders') {
         upload = this.rulesetHandler.sendDecoderConfiguration;
       } else {
-        upload = this.rulesetHandler.uploadCdbList;
+        upload = this.rulesetHandler.updateCdbList;
       }
       for (let idx in files) {
         const { file, content } = files[idx];

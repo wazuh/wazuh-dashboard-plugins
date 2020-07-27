@@ -99,6 +99,7 @@ export function ClusterController(
       monitoring: 1
     });
     assignFilters();
+    $scope.nodeProps = { goBack: () => $scope.goBack() }
     $rootScope.$broadcast('updateVis');
   };
 
@@ -126,7 +127,7 @@ export function ClusterController(
       });
 
       $scope.currentNode.healthCheck =
-        data.data.data.nodes[$scope.currentNode.name];
+        data.data.data.affected_items[0];
 
       if (
         $scope.currentNode.healthCheck &&
@@ -246,27 +247,22 @@ export function ClusterController(
 
       const data = await Promise.all([
         ApiRequest.request('GET', '/cluster/nodes', {}),
-        ApiRequest.request('GET', '/cluster/config', {}),
-        ApiRequest.request('GET', '/version', {}),
+        ApiRequest.request('GET', '/cluster/local/config', {}),
+        ApiRequest.request('GET', '//', {}),
         ApiRequest.request('GET', '/agents', { limit: 1 }),
         ApiRequest.request('GET', '/cluster/healthcheck', {})
       ]);
 
-      const result = data.map(item => ((item || {}).data || {}).data || false);
+      const nodeList = (((data[0] || {}).data || {}).data || {}) || false;
+      const clusterConfig = ((((data[1] || {}).data || {}).data || {}) || false);
+      const version = ((data[2] || {}).data || {}).api_version || false;
+      const agents = ((((data[3] || {}).data || {}).data || {}) || false);
 
-      const [
-        nodeList,
-        clusterConfig,
-        version,
-        agents,
-        clusterHealthCheck
-      ] = result;
 
-      $scope.nodesCount = nodeList.totalItems;
-      $scope.configuration = clusterConfig;
+      $scope.nodesCount = nodeList.total_affected_items;
+      $scope.configuration = clusterConfig.affected_items[0];
       $scope.version = version;
-      $scope.agentsCount = agents.totalItems - 1;
-      $scope.healthCheck = clusterHealthCheck;
+      $scope.agentsCount = agents.total_affected_items - 1;
 
       nodeList.name = $scope.configuration.name;
       nodeList.master_node = $scope.configuration.node_name;

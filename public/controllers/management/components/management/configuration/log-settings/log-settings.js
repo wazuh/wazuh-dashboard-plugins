@@ -11,9 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
-import {} from '@elastic/eui';
 import WzConfigurationLogSettingsAlerts from './log-settings-alerts';
 import WzConfigurationLogSettingsArchives from './log-settings-archives';
 import WzConfigurationLogSettingsInternal from './log-settings-internal';

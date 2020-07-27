@@ -103,13 +103,13 @@ export class WzStatusOverview extends Component {
     const [stats, clusterStatus, managerInfo] = parsedData;
 
     // Once Wazuh core fixes agent 000 issues, this should be adjusted
-    const active = stats.Active - 1;
-    const total = stats.Total - 1;
+    const active = stats.active - 1;
+    const total = stats.total - 1;
 
     this.props.updateStats({
       agentsCountActive: active,
-      agentsCountDisconnected: stats.Disconnected,
-      agentsCountNeverConnected: stats['Never connected'],
+      agentsCountDisconnected: stats.disconnected,
+      agentsCountNeverConnected: stats.never_connected,
       agentsCountTotal: total,
       agentsCoverity: total ? (active / total) * 100 : 0
     });
@@ -124,21 +124,15 @@ export class WzStatusOverview extends Component {
       clusterStatus.running === 'yes'
     ) {
       const nodes = await this.statusHandler.clusterNodes();
-      const listNodes = nodes.data.data.items;
+      const listNodes = nodes.data.data.affected_items;
       this.props.updateListNodes(listNodes);
-      const masterNode = nodes.data.data.items.filter(
-        item => item.type === 'master'
-      )[0];
+      const masterNode = nodes.data.data.affected_items.filter(item => item.type === 'master')[0];
       this.props.updateSelectedNode(masterNode.name);
-      const daemons = await this.statusHandler.clusterNodeStatus(
-        masterNode.name
-      );
-      const listDaemons = this.objToArr(daemons.data.data);
+      const daemons = await this.statusHandler.clusterNodeStatus(masterNode.name);
+      const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
       this.props.updateListDaemons(listDaemons);
-      const nodeInfo = await this.statusHandler.clusterNodeInfo(
-        masterNode.name
-      );
-      this.props.updateNodeInfo(nodeInfo.data.data);
+      const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
+      this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
     } else {
       if (
         clusterStatus &&
@@ -152,14 +146,14 @@ export class WzStatusOverview extends Component {
         );
       } else {
         const daemons = await this.statusHandler.managerStatus();
-        const listDaemons = this.objToArr(daemons.data.data);
+        const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
         this.props.updateListDaemons(listDaemons);
-        this.props.updateSelectedNode(false);
-        this.props.updateNodeInfo(managerInfo);
+        const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
+        this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
       }
     }
     const lastAgentRaw = await this.statusHandler.lastAgentRaw();
-    const [lastAgent] = lastAgentRaw.data.data.items;
+    const [lastAgent] = lastAgentRaw.data.data.affected_items;
 
     this.props.updateAgentInfo(lastAgent);
     this.props.updateLoadingStatus(false);

@@ -6,7 +6,6 @@
       "index.js",
       "init.js",
       "server/**/*",
-      "!server/wazuh-registry.json",
       "public/**/*",
       "util/**/*"
     ]

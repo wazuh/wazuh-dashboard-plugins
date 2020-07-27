@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 import packageJSON from '../../package.json';
-import needle from 'needle';
 import { getPath } from '../../util/get-path';
+import { ApiInterceptor } from './api-interceptor'
 
 export function buildOptionsObject(api) {
   return {
     headers: {
       'wazuh-app-version': packageJSON.version
     },
-    username: api.user,
+    username: api.username,
     password: api.password,
     rejectUnauthorized: false
   };
@@ -26,17 +26,18 @@ export function buildOptionsObject(api) {
 
 export async function fetchAllAgents(api, maxSize, payload, options) {
   try {
+    this.apiInterceptor = new ApiInterceptor();
     let agents = [];
     // Prevents infinite loop if offset gets higher than maxSize
     while (agents.length < maxSize && payload.offset < maxSize) {
-      const response = await needle(
-        'get',
+      const response = await this.apiInterceptor.request(
+        'GET',
         `${getPath(api)}/agents`,
-        payload,
-        options
+        {params: payload},
+        {idHost: api.id}
       );
-      if (!response.error && response.body.data.items) {
-        agents = agents.concat(response.body.data.items);
+      if (!response.error && response.data.data.affected_items) {
+        agents = agents.concat(response.data.data.affected_items);
         payload.offset += payload.limit;
       } else {
         throw new Error('Can not access Wazuh API');

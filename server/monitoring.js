@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import cron from 'node-cron';
-import needle from 'needle';
 import { getPath } from '../util/get-path';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
@@ -21,6 +20,7 @@ import { indexDate } from './lib/index-date';
 import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 import { WazuhHostsCtrl } from '../server/controllers/wazuh-hosts';
+import { ApiInterceptor } from './lib/api-interceptor';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -42,6 +42,7 @@ export class Monitoring {
     this.wazuhHosts = new WazuhHostsCtrl();
     this.agentsArray = [];
     this.quiet = quiet;
+    this.apiInterceptor = new ApiInterceptor();
     this.initVariables();
   }
 
@@ -171,39 +172,40 @@ export class Monitoring {
         `Prepare OptionsObject for API: ${api.url}:${api.port}`,
         'debug'
       );
-      const options = ApiHelper.buildOptionsObject(api);
-
-      const response = await needle(
-        'get',
-        `${getPath(api)}/agents`,
-        payload,
-        options
+      const response = await this.apiInterceptor.request(
+        'GET',
+        getPath(api) + '/agents',
+        {params: payload},
+        { idHost: api.id}
       );
 
-      const isCluster = await needle(
-        'get',
-        `${getPath(api)}/cluster/status`,
+      const isCluster = await this.apiInterceptor.request(
+        'GET',
+        getPath(api) + '/cluster/status',
         {},
-        options
+        { idHost: api.id}
       );
 
       const clusterName =
-        (((isCluster || {}).body || {}).data || {}).enabled === 'yes'
-          ? await needle('get', `${getPath(api)}/cluster/node`, {}, options)
-          : false;
-
-      api.clusterName =
-        (((clusterName || {}).body || {}).data || {}).cluster || false;
-
-      if (!response.error && ((response.body || {}).data || {}).totalItems) {
+      (((isCluster || {}).data || {}).data || {}).enabled === 'yes'
+      ? await this.apiInterceptor.request('GET', `${getPath(api)}/cluster/local/info`, {},  { idHost: api.id})
+      : false;
+      
+      if( (((clusterName || {}).data   || {}).data || {}).affected_items) {
+        api.clusterName =  (((clusterName || {}).data   || {}).data || {}).affected_items[0].cluster || false;
+      } else {
+        api.clusterName = false;
+      }
+      
+      if (response.status === 200 && ((response.data || {}).data || {}).affected_items) {
         log(
           'monitoring:checkAndSaveStatus',
           `Calling checkStatus for API: ${api.url}:${api.port}`,
           'debug'
         );
-        await this.checkStatus(api, response.body.data.totalItems);
-      } else if ((response || {}).error) {
-        const msg = ((response || {}).body || {}).message || false;
+        await this.checkStatus(api, response.data.data.total_affected_items);
+      } else if (response.status !== 200) {
+        const msg = ((response || {}).data || {}).message || false;
         const extraLog =
           msg ||
           'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
@@ -250,7 +252,8 @@ export class Monitoring {
           user: element.user,
           password: element.password,
           url: element.url,
-          port: element.port
+          port: element.port,
+          id: element.id
         };
         log(
           'monitoring:loadCredentials',
