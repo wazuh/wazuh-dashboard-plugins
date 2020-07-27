@@ -109,6 +109,34 @@ export default {
               placeholder: 'Policy file',
               default_value: '/var/ossec/wodles/oscap/content',
               validate_error_message: 'Use the specified policy file'
+            }
+          ],
+          show_options: true,
+          options: [
+            {
+              name: 'timeout',
+              display_name: 'Evaluation timeout',
+              description: `Timeout for the evaluation (in seconds).
+              Use of this attribute overwrites the generic timeout.`,
+              type: 'input-number',
+              placeholder: 'Time in seconds',
+              values: { min: 1 },
+              default_value: 1800,
+              validate_error_message: 'A positive number'
+            },
+            {
+              name: 'profile',
+              display_name: 'Profile',
+              description: 'Select profile.',
+              type: 'input',
+              placeholder: 'Profile',
+              repeatable: true,
+              removable: true,
+              // required: true,
+              // repeatable_insert_first: true,
+              // repeatable_insert_first_properties: {
+              //   removable: false
+              // }
             },
             {
               name: 'xccdf-id',
@@ -140,34 +168,6 @@ export default {
               placeholder: '/var/ossec/wodles/oscap/content',
               default_value: '/var/ossec/wodles/oscap/content',
               validate_error_message: 'CPE dictionary file.'
-            }
-          ],
-          show_options: true,
-          options: [
-            {
-              name: 'timeout',
-              display_name: 'Evaluation timeout',
-              description: `Timeout for the evaluation (in seconds).
-              Use of this attribute overwrites the generic timeout.`,
-              type: 'input-number',
-              placeholder: 'Time in seconds',
-              values: { min: 1 },
-              default_value: 1800,
-              validate_error_message: 'A positive number'
-            },
-            {
-              name: 'profile',
-              display_name: 'Profile',
-              description: 'Select profile.',
-              type: 'input',
-              placeholder: 'Profile',
-              repeatable: true,
-              removable: true,
-              // required: true,
-              repeatable_insert_first: true,
-              repeatable_insert_first_properties: {
-                removable: false
-              }
             }
           ]
         }
