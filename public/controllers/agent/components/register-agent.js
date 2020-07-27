@@ -11,7 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 import { version } from '../../../../package.json';
-
+import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
   EuiSteps,
   EuiFlexGroup,
@@ -28,7 +28,8 @@ import {
   EuiPage,
   EuiPageBody,
   EuiCallOut,
-  EuiSpacer
+  EuiSpacer,
+  EuiProgress
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import PropTypes from 'prop-types';
@@ -36,31 +37,38 @@ import PropTypes from 'prop-types';
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
-
+    this.wazuhConfig = new WazuhConfig();
+    this.configuration = this.wazuhConfig.getConfig();
     this.state = {
       status: 'incomplete',
       selectedOS: '',
       serverAddress: '',
+      registrationServer: '',
       wazuhPassword: '',
-      protocol: ''
+      tcpProtocol: false
     };
   }
 
   async componentDidMount() {
     try {
+      this.setState({ loading: true });
       const wazuhVersion = await this.props.getWazuhVersion();
+      const registrationServer = this.configuration["enrollment.dns"] || false;
       const apiAddress = await this.props.getCurrentApiAddress();
-      const needsPassword = this.getAuthInfo();
-      const protocol = this.getRemoteInfo();
+      const needsPassword = await this.getAuthInfo();
+      const tcpProtocol = await this.getRemoteInfo();
       this.setState({
         serverAddress: apiAddress,
+        registrationServer,
         needsPassword,
-        protocol,
-        wazuhVersion
+        tcpProtocol,
+        wazuhVersion,
+        loading: false
       });
     } catch (error) {
       this.setState({
-        wazuhVersion: version
+        wazuhVersion: version,
+        loading: false
       });
     }
   }
@@ -88,7 +96,7 @@ export class RegisterAgent extends Component {
         {}
       );
       const remote = ((result.data || {}).data || {}).remote || {};
-      return remote.protocol;
+      return (remote[0] || {}).protocol === 'tcp';
     } catch (error) {
       return false;
     }
@@ -102,6 +110,10 @@ export class RegisterAgent extends Component {
     this.setState({ serverAddress: event.target.value });
   }
 
+  setRegistrationServer(event) {
+    this.setState({ registrationServer: event.target.value });
+  }
+
   setWazuhPassword(event) {
     this.setState({ wazuhPassword: event.target.value });
   }
@@ -111,8 +123,10 @@ export class RegisterAgent extends Component {
    * @param {Array} steps
    */
   cleanSteps(steps) {
-    if (this.state.needsPassword) return steps;
-    steps.splice(2, 1);
+    if (!this.state.needsPassword)
+      steps.splice(3, 1);
+    if (!this.state.registrationServer)
+      steps.splice(2, 1);
     return steps;
   }
 
@@ -157,6 +171,14 @@ export class RegisterAgent extends Component {
       />
     );
 
+    const registrationInput = (
+      <EuiFieldText
+        placeholder="Registration server address..."
+        value={this.state.registrationServer}
+        onChange={event => this.setRegistrationServer(event)}
+      />
+    );
+
     const passwordInput = (
       <EuiFieldText
         placeholder="Wazuh password..."
@@ -178,36 +200,64 @@ export class RegisterAgent extends Component {
     };
     const customTexts = {
       rpmText: `sudo WAZUH_MANAGER='${this.state.serverAddress}'${
+        this.state.registrationServer
+          ? ` WAZUH_REGISTRATION_SERVER='${this.state.registrationServer}'`
+          : ''
+        }${
         this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
-          : ' '
-        }yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
+          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
+          : ''
+        }${
+        this.state.tcpProtocol
+          ? ' WAZUH_PROTOCOL=TCP'
+          : ''
+        } yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
         this.state.wazuhVersion
         }-1.x86_64.rpm`,
       debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
         this.state.wazuhVersion
         }-1_amd64.deb && sudo WAZUH_MANAGER='${this.state.serverAddress}'${
+        this.state.registrationServer
+          ? ` WAZUH_REGISTRATION_SERVER='${this.state.registrationServer}'`
+          : ''
+        }${
         this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
-          : ' '
-        }dpkg -i ./wazuh-agent.deb`,
+          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
+          : ''
+        }${
+        this.state.tcpProtocol
+          ? ' WAZUH_PROTOCOL=TCP'
+          : ''
+        } dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${
         this.state.wazuhVersion
         }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
         this.state.serverAddress
         }'${
+        this.state.registrationServer
+          ? ` WAZUH_REGISTRATION_SERVER='${this.state.registrationServer}'`
+          : ''
+        }${
         this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD '${this.state.wazuhPassword}' `
-          : ' '
-        }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
+          ? ` WAZUH_REGISTRATION_PASSWORD '${this.state.wazuhPassword}'`
+          : ''
+        }${
+        this.state.tcpProtocol
+          ? ' WAZUH_PROTOCOL=TCP'
+          : ''
+        } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
         this.state.wazuhVersion
         }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q WAZUH_MANAGER='${
         this.state.serverAddress
-        }' WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}'${
+        }' WAZUH_REGISTRATION_SERVER='${this.state.registrationServer || this.state.serverAddress}'${
         this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
-          : ' '
+          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
+          : ''
+        }${
+        this.state.tcpProtocol
+          ? ' WAZUH_PROTOCOL=TCP'
+          : ''
         }`
     };
 
@@ -260,6 +310,10 @@ export class RegisterAgent extends Component {
         children: <Fragment>{ipInput}</Fragment>
       },
       {
+        title: 'Wazuh registration server',
+        children: <Fragment>{registrationInput}</Fragment>
+      },
+      {
         title: 'Wazuh password',
         children: <Fragment>{passwordInput}</Fragment>
       },
@@ -310,9 +364,19 @@ export class RegisterAgent extends Component {
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer></EuiSpacer>
-                  <EuiFlexItem>
-                    <EuiSteps steps={this.cleanSteps(steps)} />
-                  </EuiFlexItem>
+                  {this.state.loading && (
+                    <>
+                      <EuiFlexItem>
+                        <EuiProgress size="xs" color="primary" />
+                      </EuiFlexItem>
+                      <EuiSpacer></EuiSpacer>
+                    </>
+                  )}
+                  {!this.state.loading && (
+                    <EuiFlexItem>
+                      <EuiSteps steps={this.cleanSteps(steps)} />
+                    </EuiFlexItem>
+                  )}
                 </EuiPanel>
               </EuiFlexItem>
             </EuiFlexGroup>

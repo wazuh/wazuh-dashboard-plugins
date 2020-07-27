@@ -52,7 +52,9 @@ export const configEquivalences = {
   hideManagerAlerts:
     'Hide the alerts of the manager in all dashboards and discover',
   'logs.level':
-    'Set the app logging level, allowed values are info and debug. Default is info.'
+    'Set the app logging level, allowed values are info and debug. Default is info.',
+  'enrollment.dns':
+    'Set the variable WAZUH_REGISTRATION_SERVER with this value in the agent deployment.'
 };
 
 export const nameEquivalence = {
@@ -76,6 +78,7 @@ export const nameEquivalence = {
   admin: 'Admin mode',
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',
+  'enrollment.dns': 'Enrollment DNS'
 }
 
 const HEALTH_CHECK = 'Health Check';
@@ -105,6 +108,7 @@ export const categoriesEquivalence = {
   admin: SECURITY,
   hideManagerAlerts: GENERAL,
   'logs.level': GENERAL,
+  'enrollment.dns': GENERAL,
 }
 
 const TEXT = 'text';
@@ -142,10 +146,13 @@ export const formEquivalence = {
   'wazuh.monitoring.pattern': { type: TEXT },
   admin: { type: BOOLEAN },
   hideManagerAlerts: { type: BOOLEAN },
-  'logs.level': { type: LIST, params: {
-    options: [
-      { text: 'Info', value: 'info' },
-      { text: 'Debug', value: 'debug' },
-    ]
-  } },
+  'logs.level': {
+    type: LIST, params: {
+      options: [
+        { text: 'Info', value: 'info' },
+        { text: 'Debug', value: 'debug' },
+      ]
+    }
+  },
+  'enrollment.dns': { type: TEXT },
 }
