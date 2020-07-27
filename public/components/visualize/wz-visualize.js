@@ -32,6 +32,10 @@ import { checkAdminMode } from '../../controllers/management/components/manageme
 import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics'
+import { SavedObject } from '../../react-services/saved-objects';
+import { AppState } from '../../react-services/app-state';
+import { npStart } from 'ui/new_platform';
+import { toastNotifications } from 'ui/notify';
 
 const visHandler = new VisHandlers();
 
@@ -46,6 +50,9 @@ export class WzVisualize extends Component {
       expandedVis: false,
       thereAreSampleAlerts: false,
       adminMode: false,
+      hasRefreshedKnownFields: false,
+      refreshingKnownFields: [],
+      refreshingIndex: true
     };
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
@@ -57,6 +64,16 @@ export class WzVisualize extends Component {
       'wazuh.monitoring.enabled'
     ];
   }
+
+
+  showToast(color, title = '', text = '', time = 3000){
+    toastNotifications.add({
+        color: color,
+        title: title,
+        text: text,
+        toastLifeTimeMs: time,
+    });
+  };
 
   async componentDidMount() {
     this.agentsStatus = false;
@@ -121,6 +138,29 @@ export class WzVisualize extends Component {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
+  refreshKnownFields =  async() => {
+    if(!this.state.hasRefreshedKnownFields){ // Known fields are refreshed only once per dashboard loading
+      try{
+        this.setState({hasRefreshedKnownFields: true, isRefreshing: true});
+        const currentPattern = AppState.getCurrentPattern(); 
+        const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
+        await SavedObject.refreshIndexPattern(currentPattern)
+        const fields = await courierData.fieldsFetcher.fetch({});
+        await courierData.initFields(fields);
+        this.setState({isRefreshing: false});
+        this.showToast('success', 'The index pattern was refreshed successfully.');
+
+      }catch(err){
+        this.setState({isRefreshing: false});
+        this.showToast('danger', 'The index pattern could not be refreshed');
+
+      }
+    }else if(this.state.isRefreshing){
+      await new Promise(r => setTimeout(r, 150));
+      await this.refreshKnownFields();
+    }
+  }
+
   render() {
     this.visualizations = this.rawVisualizations.getType() !== 'general' ? agentVisualizations : visualizations;
     const { selectedTab } = this.state;
@@ -159,6 +199,7 @@ export class WzVisualize extends Component {
                     this.monitoringEnabled)) && (
                     <WzReduxProvider>
                       <KibanaVis
+                        refreshKnownFields={this.refreshKnownFields}
                         visID={vis.id}
                         tab={selectedTab}
                         {...this.props}
