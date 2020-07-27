@@ -28,8 +28,8 @@ export default {
   // api_module: 'localfile',
   steps: [
     {
-      title: 'Settings',
-      description: '',
+      title: 'Configure the local files',
+      description: 'You can add this option multiple times.',
       elements: [
         {
           name: 'localfile',
@@ -38,6 +38,10 @@ export default {
           repeatable: true,
           removable: true,
           required: true,
+          repeatable_insert_first: true,
+          repeatable_insert_first_properties: {
+            removable: false
+          },
           options: [
             {
               name: 'log_format',

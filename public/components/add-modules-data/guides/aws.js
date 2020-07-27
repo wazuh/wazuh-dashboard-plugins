@@ -26,7 +26,7 @@ export default {
   contain_secrets: true,
   steps: [
     {
-      title: 'Required settings',
+      title: 'General settings',
       description: '',
       elements: [
         {
@@ -56,13 +56,6 @@ export default {
           required: true,
           default_value: true
         },
-        
-      ]
-    },
-    {
-      title: 'Optional settings',
-      description: '',
-      elements: [
         {
           name: 'remove_from_bucket',
           display_name: 'Remove from bucket',
@@ -80,7 +73,7 @@ export default {
       ]
     },
     {
-      title: 'Buckets',
+      title: 'Add buckets',
       description: 'Defines one or more buckets to process.',
       elements: [
         {

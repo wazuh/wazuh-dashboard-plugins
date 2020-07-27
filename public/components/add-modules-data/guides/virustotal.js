@@ -27,7 +27,7 @@ export default {
   contain_secrets: true,
   steps: [
     {
-      title: 'Required settings',
+      title: 'Configure the general settings',
       description: '',
       elements: [
         {
@@ -47,13 +47,7 @@ export default {
           required: true,
           placeholder: 'VirusTotal Api key',
           secret: true
-        }
-      ]
-    },
-    {
-      title: 'Other settings',
-      description: '',
-      elements: [
+        },
         {
           name: 'alert_format',
           display_name: 'Alert format',
@@ -78,7 +72,7 @@ export default {
       ]
     },
     {
-      title: 'Alert filters',
+      title: 'Add filters to alerts of files',
       description: 'Filters the alerts of files to send to VirusTotal',
       elements: [
         {

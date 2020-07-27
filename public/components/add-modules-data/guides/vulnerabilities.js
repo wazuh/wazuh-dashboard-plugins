@@ -25,7 +25,7 @@ export default {
   api_module: 'vulnerability-detector',
   steps: [
     {
-      title: 'Settings',
+      title: 'Configure the general settings',
       description: '',
       elements: [
         {
@@ -67,7 +67,7 @@ export default {
       ]
     },
     {
-      title: 'Providers',
+      title: 'Add providers',
       description: 'Define providers of vulnerability updates.',
       elements: [
         {

@@ -27,7 +27,7 @@ export default {
   api_module: 'open-scap',
   steps: [
     {
-      title: 'Settings',
+      title: 'Configure the general settings',
       description: '',
       elements: [
         {
@@ -70,7 +70,7 @@ export default {
       ]
     },
     {
-      title: 'Content',
+      title: 'Add evaluations',
       description: 'Define evaluations.',
       elements: [
         {

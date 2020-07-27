@@ -28,7 +28,7 @@ export default {
   api_module: 'cis-cat',
   steps: [
     {
-      title: 'Settings',
+      title: 'Configure the general settings',
       description: '',
       elements: [
         {
@@ -154,8 +154,8 @@ export default {
       ]
     },
     {
-      title: 'Content',
-      description: 'Define an evaluation.',
+      title: 'Add evaluations',
+      description: 'Define evaluations.',
       elements: [
         {
           name: 'content',
@@ -167,6 +167,11 @@ export default {
           // show_attributes: true,
           // show_options: true,
           repeatable: true,
+          removable: true,
+          repeatable_insert_first: true,
+          repeatable_insert_first_properties: {
+            removable: false
+          },
           attributes: [
             {
               name: 'type',

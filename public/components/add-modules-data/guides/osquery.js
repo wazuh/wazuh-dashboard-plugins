@@ -28,7 +28,7 @@ export default {
   api_module: 'osquery',
   steps: [
     {
-      title: 'Settings',
+      title: 'Configute the general settings',
       description: '',
       elements: [
         {
@@ -88,7 +88,7 @@ export default {
       ]
     },
     {
-      title: 'Packs',
+      title: 'Add packs',
       description: 'Add a query pack to the configuration. This option can be defined multiple times.',
       elements: [
         {

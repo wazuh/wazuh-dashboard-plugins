@@ -26,7 +26,7 @@ export default {
   api_module: 'docker-listener',
   steps: [
     {
-      title: 'Settings',
+      title: 'Configure the module',
       description: '',
       elements: [
         {
