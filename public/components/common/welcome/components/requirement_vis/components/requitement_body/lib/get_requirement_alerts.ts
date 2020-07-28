@@ -15,6 +15,7 @@
 import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../../../overview/mitre/lib';
 import { getWazuhFilter } from '../../../../fim_events_table';
 import { buildPhraseFilter, buildExistsFilter } from '../../../../../../../../../../../src/plugins/data/common';
+import { toastNotifications } from 'ui/notify';
 
 export async function getRequirementAlerts(agentId, time, requirement) {
   const indexPattern = await getIndexPattern();
@@ -37,8 +38,17 @@ export async function getRequirementAlerts(agentId, time, requirement) {
   }
 
   const response = await getElasticAlerts(indexPattern, filterParams, aggs);
+  const alerts_count = ((((response || {}).data || {}).aggregations || {}).alerts_count || {}).buckets;
+  if (typeof alerts_count === 'undefined') {
+    toastNotifications.add({
+      color: 'warning',
+      title: 'Error getting alerts from compliances',
+      text: "Your environment may not have any index with Wazuh's alerts."
+    })
+  }
+
   return {
-    alerts_count: ((((response || {}).data || {}).aggregations || {}).alerts_count || {}).buckets,
+    alerts_count: alerts_count || [],
     total_alerts: (((response || {}).data || {}).hits || {}).total
   };
 }
