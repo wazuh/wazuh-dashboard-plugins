@@ -191,7 +191,11 @@ export class AgentsWelcome extends Component {
   }
 
   showModuleByPlatform(menu) {
-    return !this.platform ? false : !UnsupportedComponents[this.platform].includes(menu.id);
+    try {
+      return !this.platform ? false : !UnsupportedComponents[this.platform].includes(menu.id);
+    } catch (error) {
+      return !UnsupportedComponents['other'].includes(menu.id);
+    }
   }
 
   renderModules() {

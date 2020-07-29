@@ -40,11 +40,9 @@ export class HealthCheck extends Component {
      * Manage an error
      */
     handleError(error) {
-        this.setState({
-            errors: this.state.errors.push(
-                ErrorHandler.handle(error, 'Health Check', { silent: true })
-            )
-        });
+        let errors = this.state.errors;
+        errors.push(ErrorHandler.handle(error, 'Health Check', { silent: true }));
+        this.setState({ errors });
     }
 
     /**
@@ -194,6 +192,7 @@ export class HealthCheck extends Component {
                     this.setState({ results, errors });
                 } else {
                     results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
+                    this.setState({ results, errors });
                     if (this.state.checks.setup) {
                         const versionData = await ApiRequest.request(
                             'GET',
@@ -211,7 +210,6 @@ export class HealthCheck extends Component {
                         if (!apiVersion) {
                             errors.push('Error fetching Wazuh API version');
                         };
-                        this.setState({ results, errors });
                         const api = /v?(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/.exec(apiVersion);
                         const appSplit = setupData.data.data['app-version'].split('.');
 
@@ -225,7 +223,7 @@ export class HealthCheck extends Component {
                             this.setState({ results, errors });
                         } else {
                             results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
-                            this.setState({ results });
+                            this.setState({ results, errors });
                         }
                     }
                 }
@@ -282,7 +280,7 @@ export class HealthCheck extends Component {
                 },
                 {
                     id: 4,
-                    title: 'Check index pattern known fields',
+                    title: 'Check index pattern fields',
                     description: checks.fields ? <span><EuiLoadingSpinner size="m" /> Checking...</span> : 'Disabled'
                 }
             );
@@ -338,9 +336,17 @@ export class HealthCheck extends Component {
                     />
                 </div>
                 <EuiSpacer size="xxl" />
-                {!!this.state.errors.map(error => (
-                    <EuiCallOut title={error} color="danger" iconType="alert"></EuiCallOut>)
-                )}
+                {(this.state.errors || []).map(error => (
+                    <>
+                        <EuiCallOut
+                            title={error}
+                            color="danger"
+                            iconType="alert"
+                            style={{ textAlign: 'left' }}>
+                        </EuiCallOut>
+                        <EuiSpacer size="xs" />
+                    </>
+                ))}
                 <EuiSpacer size="xxl" />
                 {!!this.state.errors.length && (
                     <EuiButton
