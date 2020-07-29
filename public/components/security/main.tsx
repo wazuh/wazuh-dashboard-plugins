@@ -1,12 +1,17 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 import store from '../../redux/store';
 import {
-    EuiIcon,
+    EuiPage,
+    EuiFlexGroup,
+    EuiFlexItem,
+    EuiPanel,
     EuiTabs,
     EuiTab,
     EuiSpacer,
 } from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
+import { Users } from './users/users';
+import { Roles } from './roles/roles';
 
 const tabs = [
     {
@@ -28,6 +33,7 @@ export const WzSecurity = () => {
         const breadcrumb = [{ text: '' }, { text: 'Security' }];
         store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     }, []);
+
     const onSelectedTabChanged = id => {
         setSelectedTabId(id);
     };
@@ -46,8 +52,19 @@ export const WzSecurity = () => {
     };
 
     return (
-        <Fragment>
-            <EuiTabs>{renderTabs()}</EuiTabs>
-        </Fragment>
+        <EuiPage>
+            <EuiFlexGroup>
+                <EuiFlexItem>
+                    <EuiTabs>{renderTabs()}</EuiTabs>
+                    <EuiSpacer size='m'></EuiSpacer>
+                    {selectedTabId === 'users' &&
+                        <Users></Users>
+                    }
+                    {selectedTabId === 'roles' &&
+                        <Roles></Roles>
+                    }
+                </EuiFlexItem>
+            </EuiFlexGroup>
+        </EuiPage>
     );
 };
