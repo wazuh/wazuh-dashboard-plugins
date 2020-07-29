@@ -75,7 +75,7 @@ export const initialWazuhConfig = `---
 #
 # Defines if the user is allowed to change the selected
 # API directly from the Wazuh app top menu.
-# Default: truepi
+# Default: true
 #api.selector: true
 #
 # --------------------------- Index pattern selector ---------------------------
@@ -133,6 +133,14 @@ export const initialWazuhConfig = `---
 # Allowed values: info, debug
 #logs.level: info
 #
+# ------------------------------- Enrollment agents -----------------------------
+# Wazuh server address
+# Default value: ''
+#enrollment.dns: ''
+#
+# Wazuh registration password
+# Default value: ''
+#enrollment.password: ''
 #-------------------------------- API entries -----------------------------------
 #The following configuration is the default structure to define an API entry.
 #
