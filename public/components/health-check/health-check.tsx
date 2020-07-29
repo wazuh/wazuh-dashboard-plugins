@@ -290,7 +290,7 @@ export class HealthCheck extends Component {
                     if (checks.fields) {
                         const i = results.map(item => item.id).indexOf(4);
                         try {
-                            await GenericRequest.request('GET', '/elastic/known-fields/all', {});
+                            await PatternHandler.refreshIndexPattern();
                             results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
                             this.setState({ results });
                         } catch (error) {
