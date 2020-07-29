@@ -150,7 +150,7 @@ export class WzConfigurationTable extends Component {
 
       let arrayItems = [];
       for (const key in data) {
-        if (key.includes('extension') || key.includes('hosts')) {
+        if (key.includes('extension') || key.includes('hosts') || key === 'enrollment.password') {
           delete data[key];
         } else {
           arrayItems.push({
