@@ -60,7 +60,7 @@ export default (kibana) => {
 
         xpackMainPlugin.registerFeature({
           id: featureId,
-          name: 'C',
+          name: 'Wazuh',
           navLinkId: featureId,
           icon: '/plugins/wazuh/img/icon_blue.svg',
           app: [featureId],
