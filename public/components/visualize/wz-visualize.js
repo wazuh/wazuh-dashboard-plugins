@@ -31,10 +31,8 @@ import { CommonData } from '../../services/common-data';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
-import { Metrics } from '../overview/metrics/metrics'
-import { SavedObject } from '../../react-services/saved-objects';
-import { AppState } from '../../react-services/app-state';
-import { npStart } from 'ui/new_platform';
+import { Metrics } from '../overview/metrics/metrics';
+import { PatternHandler } from '../../react-services/pattern-handler';
 import { toastNotifications } from 'ui/notify';
 
 const visHandler = new VisHandlers();
@@ -142,11 +140,7 @@ export class WzVisualize extends Component {
     if(!this.state.hasRefreshedKnownFields){ // Known fields are refreshed only once per dashboard loading
       try{
         this.setState({hasRefreshedKnownFields: true, isRefreshing: true});
-        const currentPattern = AppState.getCurrentPattern(); 
-        const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
-        await SavedObject.refreshIndexPattern(currentPattern)
-        const fields = await courierData.fieldsFetcher.fetch({});
-        await courierData.initFields(fields);
+        await PatternHandler.refreshIndexPattern();
         this.setState({isRefreshing: false});
         this.showToast('success', 'The index pattern was refreshed successfully.');
 
