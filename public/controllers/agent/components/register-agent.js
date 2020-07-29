@@ -108,7 +108,7 @@ export class RegisterAgent extends Component {
         {}
       );
       const remote = ((result.data || {}).data || {}).remote || {};
-      return (remote[0] || {}).protocol !== 'tcp';
+      return (remote[0] || {}).protocol === 'tcp';
     } catch (error) {
       return false;
     }
