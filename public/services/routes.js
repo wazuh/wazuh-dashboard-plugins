@@ -30,6 +30,7 @@ import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
 import managementTemplate from '../templates/management/management.pug';
 import overviewTemplate from '../templates/visualize/dashboards.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
+import securityTemplate from '../templates/security/security.html';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
@@ -160,6 +161,10 @@ routes
   })
   .when('/settings', {
     template: settingsTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
+  .when('/security', {
+    template: securityTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {

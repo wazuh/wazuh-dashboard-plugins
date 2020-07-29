@@ -36,16 +36,16 @@ class WzMenuSettings extends Component {
   }
 
   async componentDidMount() {
-    try{
+    try {
       const adminMode = await checkAdminMode();
-      if(this.props.adminMode !== adminMode){
+      if (this.props.adminMode !== adminMode) {
         this.props.updateAdminMode(adminMode);
-      };
-    }catch(error){}
+      }
+    } catch (error) { }
   }
 
   avaibleSettings() {
-    const {adminMode} = this.props;
+    const { adminMode } = this.props;
     let auxSettings = {
       settings: { id: 'settings', text: 'Settings' },
       api: { id: 'api', text: 'API configuration' },
@@ -59,11 +59,11 @@ class WzMenuSettings extends Component {
       delete auxSettings.modules;
       delete auxSettings.sample_data;
     }
-    return(auxSettings);
+    return (auxSettings);
   }
 
   avaibleRenderSettings() {
-    const {adminMode} = this.props;
+    const { adminMode } = this.props;
     const avaibleSettings = this.avaibleSettings()
     let auxItems = [
       this.createItem(avaibleSettings.api),
@@ -75,13 +75,13 @@ class WzMenuSettings extends Component {
       auxItems.splice(1, 0, this.createItem(avaibleSettings.sample_data));
       auxItems.splice(1, 0, this.createItem(avaibleSettings.modules));
     }
-    return(auxItems);
+    return (auxItems);
   }
 
-  clickMenuItem = async(ev,section) => {
+  clickMenuItem = async (ev, section) => {
     this.props.closePopover();
-    AppNavigate.navigateToModule(ev, 'settings', {tab: section} );
-    if(this.props.currentMenuTab === 'settings'){
+    AppNavigate.navigateToModule(ev, 'settings', { tab: section });
+    if (this.props.currentMenuTab === 'settings') {
       const $injector = await chrome.dangerouslyGetActiveInjector();
       const router = $injector.get('$route');
       router.reload();
@@ -95,7 +95,7 @@ class WzMenuSettings extends Component {
       id: item.id,
       name: item.text,
       isSelected: this.props.state.section === item.id,
-      onClick: () => {},
+      onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
@@ -104,16 +104,18 @@ class WzMenuSettings extends Component {
     const avaibleSettings = this.avaibleSettings()
     const renderSettings = this.avaibleRenderSettings()
     const sideNavAdmin = [
-      this.createItem(avaibleSettings.settings, {
+      {
+        name: avaibleSettings.settings.text,
+        id: avaibleSettings.settings.id,
         disabled: true,
         icon: <EuiIcon type="gear" color="primary" />,
         items: renderSettings
-      })
+      }
     ];
 
 
     return (
-      <div className="WzManagementSideMenu" style={{ width: 200}}>
+      <div className="WzManagementSideMenu" style={{ width: 200 }}>
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />

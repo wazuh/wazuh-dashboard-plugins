@@ -86,7 +86,10 @@ class WzMenuManagement extends Component {
 
   render() {
     const sideNavAdmin = [
-      this.createItem(this.managementSections.administration, {
+      {
+        name: this.managementSections.administration.text,
+        id: this.managementSections.administration.id,
+        id: 0,
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
@@ -96,11 +99,13 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
         ],
-      })
+      }
     ];
 
     const sideNavStatus = [
-      this.createItem(this.managementSections.statusReports, {
+      {
+        name: this.managementSections.statusReports.text,
+        id: this.managementSections.statusReports.id,
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: [
@@ -110,7 +115,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.logs),
           this.createItem(this.managementSections.reporting)
         ]
-      })
+      }
     ];
 
     return (
