@@ -579,23 +579,6 @@ class WzMenu extends Component {
             <EuiButtonEmpty
               className={
                 'wz-menu-button ' +
-                (this.state.currentMenuTab === "settings" && !this.isAnyPopoverOpen() || (this.state.isSettingsPopoverOpen)
-                  ? 'wz-menu-active'
-                  : '')}
-              color="text"
-              aria-label="Settings"
-              onClick={this.onClickSettingsButton.bind(this)}
-            >
-              <EuiIcon type="advancedSettingsApp" color="primary" size="m" />
-              <span className="wz-menu-button-title ">Settings</span>
-              <span className="flex"></span>
-              {this.state.isSettingsPopoverOpen && (
-                <EuiIcon color="subdued" type="arrowRight" />
-              )}
-            </EuiButtonEmpty>
-            <EuiButtonEmpty
-              className={
-                'wz-menu-button ' +
                 (this.state.currentMenuTab === "security" && !this.isAnyPopoverOpen() || (this.state.isSecurityPopoverOpen)
                   ? 'wz-menu-active'
                   : '')}
@@ -607,6 +590,23 @@ class WzMenu extends Component {
               <span className="wz-menu-button-title ">Security</span>
               <span className="flex"></span>
               {this.state.isSecurityPopoverOpen && (
+                <EuiIcon color="subdued" type="arrowRight" />
+              )}
+            </EuiButtonEmpty>
+            <EuiButtonEmpty
+              className={
+                'wz-menu-button ' +
+                (this.state.currentMenuTab === "settings" && !this.isAnyPopoverOpen() || (this.state.isSettingsPopoverOpen)
+                  ? 'wz-menu-active'
+                  : '')}
+              color="text"
+              aria-label="Settings"
+              onClick={this.onClickSettingsButton.bind(this)}
+            >
+              <EuiIcon type="advancedSettingsApp" color="primary" size="m" />
+              <span className="wz-menu-button-title ">Settings</span>
+              <span className="flex"></span>
+              {this.state.isSettingsPopoverOpen && (
                 <EuiIcon color="subdued" type="arrowRight" />
               )}
             </EuiButtonEmpty>

@@ -37,6 +37,7 @@ class WzMenuSecurity extends Component {
     return [
       this.createItem({ id: 'users', text: 'Users' }),
       this.createItem({ id: 'roles', text: 'Roles' }),
+      this.createItem({ id: 'policies', text: 'Policies' }),
     ]
   }
 

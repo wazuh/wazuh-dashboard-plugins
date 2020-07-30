@@ -12,6 +12,7 @@ import {
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { Users } from './users/users';
 import { Roles } from './roles/roles';
+import { Policies } from './policies/policies';
 
 const tabs = [
     {
@@ -22,6 +23,11 @@ const tabs = [
     {
         id: 'roles',
         name: 'Roles',
+        disabled: false,
+    },
+    {
+        id: 'policies',
+        name: 'Policies',
         disabled: false,
     },
 ];
@@ -62,6 +68,9 @@ export const WzSecurity = () => {
                     }
                     {selectedTabId === 'roles' &&
                         <Roles></Roles>
+                    }
+                    {selectedTabId === 'policies' &&
+                        <Policies></Policies>
                     }
                 </EuiFlexItem>
             </EuiFlexGroup>
