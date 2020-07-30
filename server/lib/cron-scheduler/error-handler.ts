@@ -8,11 +8,13 @@ const ERROR = 'error';
 const COLOR = '\u001b[34mwazuh\u001b[39m';
 
 export function ErrorHandler(error, server) {
-  const {['logs.level']:logLevel } = getConfiguration();
+  const { ['logs.level']: logLevel } = getConfiguration();
   const errorLevel = ErrorLevels[error.error] || ERROR;
   log('Cron-scheduler', error, errorLevel === ERROR ? INFO : errorLevel);
-  if (errorLevel === DEBUG && logLevel !== DEBUG) return;
-  server.log([COLOR, 'Cron-scheduler', errorLevel === DEBUG ? INFO : errorLevel], `${JSON.stringify(error)}`);
+  try {
+    if (errorLevel === DEBUG && logLevel !== DEBUG) return;
+    server.log([COLOR, 'Cron-scheduler', errorLevel === DEBUG ? INFO : errorLevel], `${JSON.stringify(error)}`);
+  } catch (error) { }
 }
 
 const ErrorLevels = {

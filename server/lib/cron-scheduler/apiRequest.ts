@@ -1,5 +1,5 @@
-import Axios, { AxiosRequestConfig, AxiosResponse }from 'axios';
-import { Agent } from 'https';
+import { AxiosResponse }from 'axios';
+import { ApiInterceptor } from '../api-interceptor.js';
 
 export interface IApi {
   id: string
@@ -18,34 +18,31 @@ export class ApiRequest {
   private api: IApi;
   private request: string;
   private params: {};
+  private apiInterceptor: ApiInterceptor;
 
   constructor(request:string, api:IApi, params:{}={}, ) {
     this.request = request;
     this.api = api;
     this.params = params;
+    this.apiInterceptor = new ApiInterceptor()
   }
 
   private async makeRequest():Promise<AxiosResponse> {
-    const {url, port, user, password} = this.api;
+    const {id, url, port} = this.api;
     
-    const requestConfig: AxiosRequestConfig = {
-      method: 'GET',
-      baseURL: `${url}:${port}`,
-      url: this.request,
-      params: this.params,
-      headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
-      auth: {username: user, password: password},
-      httpsAgent: new Agent({rejectUnauthorized: false})
-    }
-    
-    const response = await Axios(requestConfig);
+    const response: AxiosResponse = await this.apiInterceptor.request(
+      'GET',
+      `${url}:${port}/v4/${this.request}`,
+      this.params,
+      {idHost: id }
+    )
     return response;
   }
 
   public async getData():Promise<object> {
     try {
       const response = await this.makeRequest();
-      if(response.data.error !== 0) throw response.data;
+      if(response.data.status) throw response;
       return response.data;
     } catch (error) {
       if(error.response && error.response.status === 401){

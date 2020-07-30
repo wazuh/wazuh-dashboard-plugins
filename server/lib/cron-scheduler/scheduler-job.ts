@@ -3,7 +3,6 @@ import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import { IApi, ApiRequest, SaveDocument } from './index';
 import { ErrorHandler } from './error-handler';
 import { configuredJobs } from './configured-jobs';
-import { Route } from 'react-router';
 
 export class SchedulerJob {
   jobName: string;
@@ -60,7 +59,7 @@ export class SchedulerJob {
   private async getResponses(host): Promise<object[]> {
     const { request, params } = jobs[this.jobName];
     const data:object[] = [];
-
+    
     if (typeof request === 'string') {
       const apiRequest = new ApiRequest(request, host, params);
       const response = await apiRequest.getData()
@@ -75,13 +74,17 @@ export class SchedulerJob {
     const { request, params } = jobs[this.jobName];
     const fieldName = this.getParamName(typeof request !== 'string' && request.request);
     const paramList = await this.getParamList(fieldName, host);
+    console.log({jobName: this.jobName, paramList})
     for (const param of paramList) {
       const paramRequest = typeof request !== 'string' && request.request.replace(/\{.+\}/, param);
       const apiRequest = !!paramRequest && new ApiRequest(paramRequest, host, params);
       const response = apiRequest && await apiRequest.getData() || {};
-      response['data']['apiName'] = host.id;
-      response['data'][fieldName] = param;
-      data.push(response);
+      data.push({
+        ...response,
+        apiName: host.id,
+        [fieldName]: param,
+      });
+
     }
   }
 
@@ -99,9 +102,9 @@ export class SchedulerJob {
     // @ts-ignore
     const apiRequest = new ApiRequest(request.params[fieldName].request, host)
     const response = await apiRequest.getData();
-    const { items } = response['data'];
-    if (items === undefined || items.lenght === 0 ) throw {error: 10005, message: `Empty response when tried to get the parameters list: ${JSON.stringify(response)}`}
-    const values = items.map(this.mapParamList)
+    const { affected_items } = response['data'];
+    if (affected_items === undefined || affected_items.lenght === 0 ) throw {error: 10005, message: `Empty response when tried to get the parameters list: ${JSON.stringify(response)}`}
+    const values = affected_items.map(this.mapParamList)
     return values
   }
 
