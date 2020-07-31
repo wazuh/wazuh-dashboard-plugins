@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     EuiPageContent,
     EuiPageContentHeader,
@@ -17,29 +17,31 @@ import {
     EuiComboBox
 } from '@elastic/eui';
 import { RolesTable } from './roles-table';
+import { ApiRequest } from '../../../react-services/api-request'
 
 export const Roles = () => {
     const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
     const [roleName, setRoleName] = useState('');
+    const [policies, setPolicies] = useState('');
 
     const onChangeRoleName = e => {
-      setRoleName(e.target.value);
+        setRoleName(e.target.value);
     };
 
-    const policiesOptions = [
-        {
-            label: 'agent:read'
-        },
-        {
-            label: 'agent:delete',
-        },
-        {
-            label: 'rules:read',
-        },
-        {
-            label: 'rules:delete',
-        }
-    ];
+    async function getData() {
+        const request = await ApiRequest.request(
+            'GET',
+            '/security/policies',
+            {}
+        );
+        const policies = ((((request || {}).data || {}).data || {}).affected_items || [])
+            .map(x => { return { 'label': x.name } });
+        setPolicies(policies);
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     const [selectedPolicies, setSelectedRole] = useState([]);
 
@@ -76,7 +78,7 @@ export const Roles = () => {
                                 helpText="Assign policies to the role.">
                                 <EuiComboBox
                                     placeholder="Select policies"
-                                    options={policiesOptions}
+                                    options={policies}
                                     selectedOptions={selectedPolicies}
                                     onChange={onChangePolicies}
                                     isClearable={true}
