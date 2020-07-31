@@ -3,7 +3,7 @@ import { ApiRequest, IApi } from './index'
 jest.mock('axios');
 
 describe('ApiRequest', () => {
-  const apiExample1:IApi = {
+  const apiExample1: IApi = {
     id: 'default',
     user: 'foo',
     password: 'bar',
@@ -21,55 +21,95 @@ describe('ApiRequest', () => {
 
   test('should return the object with the data of the request ', async () => {
     const mockResponse = {
-      data: { error: 0, data: 'v3.12.0' },
+      data: { "enabled": "yes", "running": "yes" },
       status: 200,
       statusText: 'OK',
       headers: {},
       config: {},
     }
     axios.mockResolvedValue(mockResponse);
-    
-    const apiRequest = new ApiRequest('/version', apiExample1);
+
+    const apiRequest = new ApiRequest('/cluster/status', apiExample1);
     const response = await apiRequest.getData();
 
-    expect(response).toEqual(mockResponse.data);    
+    expect(response).toEqual(mockResponse.data);
   });
 
   test('should return the object with the error when the path is invalid', async () => {
     const mockResponse = {
       response: {
-        data: { 
-          error: 603,
-          message: 'The requested URL was not found on this server' },
+        data: {
+          "type": "about:blank",
+          "title": "Not Found",
+          "detail": "Nothing matches the given URI",
+          "status": 404
+        },
+        status: 404,
+        statusText: 'Not Found',
+        headers: {},
+        config: {},
+      },
+      status: 404
+    };
+    axios.mockRejectedValue(mockResponse);
+
+    const apiRequest = new ApiRequest('/cluster/statu', apiExample1);
+    try {
+      await apiRequest.getData();
+    } catch (error) {
+      expect(error).toEqual({error: 404, message: "Nothing matches the given URI"});
+    }
+  })
+
+  test('should throw an error when the api user are unauthorized', async () => {
+    const mockResponse = {
+      response: {
+        response: {
+          data: {
+            "type": "about:blank",
+            "title": "Unauthorized",
+            "detail": "The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password),or your browser doesn't understand how to supply the credentials required.",
+            "status": 401
+          },
           status: 404,
           statusText: 'Not Found',
           headers: {},
           config: {},
+        },
+        "status": 401
       }
-    }
+    };
     axios.mockRejectedValue(mockResponse);
 
-    const apiRequest = new ApiRequest('/versio', apiExample1);
-    const response = await apiRequest.getData();
-
-    expect(response).toEqual(mockResponse.response.data);
+    const apiRequest = new ApiRequest('/cluster/status', apiExample1);
+    try {
+      await apiRequest.getData();
+    } catch (error) {
+      expect(error).toEqual({error: 401, message: 'Wrong Wazuh API credentials used'});
+    }
   })
 
-  test('should ', async () => {
-    const apiRequest = new ApiRequest('/version', apiExample1);
-    const response = await apiRequest.makeRequest();
-  });
-  
-  // test('should throw an error when the api user are invalid', () => {
-  //   expect(true).toBe(false);
-  // })
-  
-  // test('should throw an error when the port api are invalid', () => {
-  //   expect(true).toBe(false);
-  // })
-  
-  // test('should throw an error when the url api are invalid', () => {
-  //   expect(true).toBe(false);
-  // })
+  test('should throw an error when the port or url api are invalid', async () => {
+    const mockResponse = {response: { data: { detail: 'ECONNREFUSED' }, status: 500} }
+    axios.mockRejectedValue(mockResponse);
+
+    const apiRequest = new ApiRequest('/cluster/status', apiExample1);
+    try {
+      await apiRequest.getData();
+    } catch (error) {
+      expect(error).toStrictEqual({error: 3005, message: 'Wazuh API is not reachable. Please check your url and port.'});
+    }
+  })
+
+  test('should throw an error when the url api are invalid', async () => {
+    const mockResponse = {response: { data: { detail: 'ECONNRESET' }, status: 500} }
+    axios.mockRejectedValue(mockResponse);
+    const apiRequest = new ApiRequest('/cluster/status', apiExample1);
+    try {
+      await apiRequest.getData();
+    } catch (error) {
+      expect(error).toStrictEqual({error: 3005, message: 'Wrong protocol being used to connect to the Wazuh API'});
+    }
+  })
 
 })

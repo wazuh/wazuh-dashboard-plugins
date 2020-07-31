@@ -6,15 +6,17 @@ const DEBUG = 'debug';
 const INFO = 'info';
 const ERROR = 'error';
 const COLOR = '\u001b[34mwazuh\u001b[39m';
-
+const ERROR_COLOR = (errorLevel) => [COLOR, 'Cron-scheduler', errorLevel === DEBUG ? INFO : errorLevel]
 export function ErrorHandler(error, server) {
   const { ['logs.level']: logLevel } = getConfiguration();
   const errorLevel = ErrorLevels[error.error] || ERROR;
   log('Cron-scheduler', error, errorLevel === ERROR ? INFO : errorLevel);
   try {
     if (errorLevel === DEBUG && logLevel !== DEBUG) return;
-    server.log([COLOR, 'Cron-scheduler', errorLevel === DEBUG ? INFO : errorLevel], `${JSON.stringify(error)}`);
-  } catch (error) { }
+    server.log(ERROR_COLOR(errorLevel), `${JSON.stringify(error)}`);
+  } catch (error) {
+    server.log(ERROR_COLOR(ERROR), `Message to long to show in console output, check the log file`)
+  }
 }
 
 const ErrorLevels = {

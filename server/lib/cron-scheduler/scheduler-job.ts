@@ -74,7 +74,6 @@ export class SchedulerJob {
     const { request, params } = jobs[this.jobName];
     const fieldName = this.getParamName(typeof request !== 'string' && request.request);
     const paramList = await this.getParamList(fieldName, host);
-    console.log({jobName: this.jobName, paramList})
     for (const param of paramList) {
       const paramRequest = typeof request !== 'string' && request.request.replace(/\{.+\}/, param);
       const apiRequest = !!paramRequest && new ApiRequest(paramRequest, host, params);
