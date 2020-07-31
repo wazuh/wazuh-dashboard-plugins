@@ -4,7 +4,6 @@ import {
     EuiPage,
     EuiFlexGroup,
     EuiFlexItem,
-    EuiPanel,
     EuiTabs,
     EuiTab,
     EuiSpacer,
