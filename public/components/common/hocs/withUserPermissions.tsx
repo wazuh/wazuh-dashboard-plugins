@@ -23,25 +23,25 @@ export const withUserPermissions = WrappedComponent => props => {
 }
 
 // This HOC hides the wrapped component if user has not permissions
-export const withUserPermissionsValidation = validateUserPermissions => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(validateUserPermissions, props);
+export const withUserPermissionsValidation = requiredUserPermissions => WrappedComponent => props => {
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(typeof requiredUserPermissions === 'function' ? requiredUserPermissions(props) : requiredUserPermissions);
   return <WrappedComponent {...props} userPermissionsRequirements={userPermissionsValidation} userPermissions={userPermissions}/>;
 }
 
 // This HOC redirects to redirectURL if user has not permissions
-export const withUserPermissionsPrivate = (validateUserPermissions, redirectURL) => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsPrivate(validateUserPermissions, redirectURL, props);
+export const withUserPermissionsPrivate = (read_api_config, redirectURL) => WrappedComponent => props => {
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsPrivate(read_api_config, redirectURL);
   return userPermissionsValidation ? <WrappedComponent {...props} userPermissionsValidation={userPermissionsValidation} userPermissions={userPermissions}/> : null;
 }
 
 // This HOC hides the wrapped component if user has not permissions
-export const withUserPermissionsValidationButton = validateUserPermissions => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(validateUserPermissions, props);
+export const withUserPermissionsValidationButton = requiredUserPermissions => WrappedComponent => props => {
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(typeof requiredUserPermissions === 'function' ? requiredUserPermissions(props) : requiredUserPermissions);
   const wrappedComponent = <WrappedComponent {...props} isDisabled={Boolean(userPermissionsValidation) || props.isDisabled} userPermissionsRequirements={userPermissionsValidation} userPermissions={userPermissions}/>
   return userPermissionsValidation ? 
     <EuiToolTip
-      content={userPermissionsValidation}
-      {...props.tooltipPosition ? {position: props.tooltipPosition} : {}}
+      content={`Require ${userPermissionsValidation.map(permission => typeof permission === 'object' ? permission.action : permission).join(', ')} ${userPermissionsValidation.length > 1 ? 'permissions': 'permission'}`}
+      {...props.tooltip}
     >
       {wrappedComponent}
     </EuiToolTip> : wrappedComponent

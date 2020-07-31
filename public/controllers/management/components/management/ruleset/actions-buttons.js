@@ -31,6 +31,7 @@ import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
 import RulesetHandler from './utils/ruleset-handler';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzRulesetActionButtons extends Component {
   constructor(props) {
@@ -177,7 +178,9 @@ class WzRulesetActionButtons extends Component {
 
     // Add new rule button
     const addNewRuleButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        permissions={[{action: 'cluster:upload_file', resource: 'node:id:*'}]}
+        buttonType='empty'
         iconType="plusInCircle"
         onClick={() =>
           this.props.updteAddingRulesetFile({
@@ -188,7 +191,7 @@ class WzRulesetActionButtons extends Component {
         }
       >
         {`Add new ${section} file`}
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     //Add new CDB list button
