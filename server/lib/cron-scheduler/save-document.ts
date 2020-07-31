@@ -70,7 +70,7 @@ export class SaveDocument {
       body: {
         query: {
           match: {
-            _id: `index-pattern:${index}*`
+            _id: `index-pattern:${index}-*`
           }
         }
       }
@@ -84,11 +84,11 @@ export class SaveDocument {
     const response = await this.callWithInternalUser('create', {
       index: KIBANA_INDEX,
       type: '_doc',
-      'id': `index-pattern:${index}*`,
+      'id': `index-pattern:${index}-*`,
       body: {
         type: 'index-pattern',
         'index-pattern': {
-          title: `${index}*`,
+          title: `${index}-*`,
           timeFieldName: 'timestamp',
         }
       }
