@@ -30,6 +30,7 @@ import configurationSettingsGroup from './configuration-settings';
 
 import { connect } from 'react-redux';
 import { isString, isFunction } from './utils/utils';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 const columns = [
   {
@@ -114,7 +115,45 @@ class WzConfigurationOverview extends Component {
                   <WzRefreshClusterInfoButton />
                 </EuiFlexItem>
               )}
-              {this.props.agent.id === '000' && this.props.adminMode && (
+              {this.props.agent.id === '000' && (
+                <EuiFlexItem>
+                  {this.props.clusterNodeSelected ? (
+                    <WzButtonPermissions
+                      buttonType='empty'
+                      permissions={[{action: 'cluster:upload_file', resource: 'node:id:*'}]}
+                      iconSide="left"
+                      iconType="pencil"
+                      onClick={() =>
+                        this.updateConfigurationSection(
+                          'edit-configuration',
+                          `Manager configuration`,
+                          '',
+                          'Edit configuration'
+                        )}
+                    >
+                      Edit configuration
+                    </WzButtonPermissions>
+                  ) : (
+                    <WzButtonPermissions
+                      buttonType='empty'
+                      permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/ossec.conf'}]}
+                      iconSide="left"
+                      iconType="pencil"
+                      onClick={() =>
+                        this.updateConfigurationSection(
+                          'edit-configuration',
+                          `Cluster configuration`,
+                          '',
+                          'Edit configuration'
+                        )}
+                    >
+                      Edit configuration
+                    </WzButtonPermissions>
+                  )
+                  }
+                </EuiFlexItem>
+              )}
+              {/* {this.props.agent.id === '000' && this.props.adminMode && (
                 <EuiFlexItem>
                   <EuiButtonEmpty
                     iconSide="left"
@@ -133,7 +172,7 @@ class WzConfigurationOverview extends Component {
                     Edit configuration
                   </EuiButtonEmpty>
                 </EuiFlexItem>
-              )}
+              )} */}
               {this.props.agent.id !== '000' && this.props.agent.status === 'Active' && (
                 <EuiFlexItem>
                   <ExportConfiguration

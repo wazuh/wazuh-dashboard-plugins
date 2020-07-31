@@ -11,6 +11,7 @@
  */
 
 import { useSelector } from 'react-redux';
+import { checkMissingUserPermissions } from '../../../react-services/rbac';
 
 // It retuns user permissions
 export const useUserPermissions = () => {
@@ -19,14 +20,15 @@ export const useUserPermissions = () => {
 }
 
 // It returns user permissions validation and user permissions
-export const useUserPermissionsValidation = (invalidateUserPermissions, props) => {
+export const useUserPermissionsValidation = (requiredPermissions) => {
   const userPermissions = useUserPermissions();
-  return [invalidateUserPermissions(userPermissions, props), userPermissions];
+  const requiredPermissionsArray = typeof requiredPermissions === 'function' ? requiredPermissions() : requiredPermissions;
+  return [checkMissingUserPermissions(requiredPermissionsArray, userPermissions), userPermissions];
 }
 
 // It redirects to other URL if user permissions are not valid
-export const useUserPermissionsPrivate = (invalidateUserPermissions, redirectURL, props) => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(invalidateUserPermissions, props);
+export const useUserPermissionsPrivate = (requiredPermissions, redirectURL) => {
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(requiredPermissions);
   if(userPermissionsValidation){
     window.location.href = redirectURL;
   }

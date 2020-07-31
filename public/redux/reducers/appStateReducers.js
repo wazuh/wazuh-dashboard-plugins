@@ -19,7 +19,158 @@ const initialState = {
   adminMode: false,
   currentAgentData: {},
   showExploreAgentModal: false,
-  showExploreAgentModalGlobal: false
+  showExploreAgentModalGlobal: false,
+  userPermissions: {
+    "agent:create": {
+      "*:*:*": "allow"
+    },
+    "group:create": {
+      "*:*:*": "allow"
+    },
+    "agent:read": {
+      "agent:id:*": "allow",
+      "agent:group:*": "allow"
+    },
+    "agent:delete": {
+      "agent:id:*": "allow",
+      "agent:group:*": "allow"
+    },
+    "agent:modify_group": {
+      "agent:id:*": "allow",
+      "agent:group:*": "allow"
+    },
+    "agent:restart": {
+      "agent:id:*": "allow",
+      "agent:group:*": "allow"
+    },
+    "agent:upgrade": {
+      "agent:id:*": "allow",
+      "agent:group:*": "allow"
+    },
+    "group:read": {
+      "group:id:*": "allow"
+    },
+    "group:delete": {
+      "group:id:*": "allow"
+    },
+    "group:update_config": {
+      "group:id:*": "allow"
+    },
+    "group:modify_assignments": {
+      "group:id:*": "allow"
+    },
+    "active-response:command": {
+      "agent:id:*": "allow"
+    },
+    "security:create": {
+      "*:*:*": "allow"
+    },
+    "security:create_user": {
+      "*:*:*": "allow"
+    },
+    "security:read_config": {
+      "*:*:*": "allow"
+    },
+    "security:update_config": {
+      "*:*:*": "allow"
+    },
+    "security:revoke": {
+      "*:*:*": "allow"
+    },
+    "security:read": {
+      "role:id:*": "allow",
+      "policy:id:*": "allow",
+      "user:id:*": "allow"
+    },
+    "security:update": {
+      "role:id:*": "allow",
+      "policy:id:*": "allow",
+      "user:id:*": "allow"
+    },
+    "security:delete": {
+      "role:id:*": "allow",
+      "policy:id:*": "allow",
+      "user:id:*": "allow"
+    },
+    "cluster:status": {
+      "*:*:*": "allow"
+    },
+    "manager:read": {
+      "*:*:*": "allow"
+    },
+    "manager:read_api_config": {
+      "*:*:*": "allow"
+    },
+    "manager:update_api_config": {
+      "*:*:*": "allow"
+    },
+    "manager:upload_file": {
+      "*:*:*": "allow"
+    },
+    "manager:restart": {
+      "*:*:*": "allow"
+    },
+    "manager:delete_file": {
+      "*:*:*": "allow",
+      "file:path:*": "allow"
+    },
+    "manager:read_file": {
+      "file:path:*": "allow"
+    },
+    "cluster:delete_file": {
+      "node:id:*": "allow",
+      "node:id:*&file:path:*": "allow"
+    },
+    "cluster:read_api_config": {
+      "node:id:*": "allow"
+    },
+    "cluster:read": {
+      "node:id:*": "allow"
+    },
+    "cluster:update_api_config": {
+      "node:id:*": "allow"
+    },
+    "cluster:restart": {
+      "node:id:*": "allow"
+    },
+    "cluster:upload_file": {
+      "node:id:*": "allow"
+    },
+    "cluster:read_file": {
+      "node:id:*&file:path:*": "allow"
+    },
+    "ciscat:read": {
+      "agent:id:*": "allow"
+    },
+    "decoders:read": {
+      "decoder:file:*": "allow"
+    },
+    "lists:read": {
+      "list:path:*": "allow"
+    },
+    "rules:read": {
+      "rule:file:*": "allow"
+    },
+    "mitre:read": {
+      "*:*:*": "allow"
+    },
+    "sca:read": {
+      "agent:id:*": "allow"
+    },
+    "syscheck:clear": {
+      "agent:id:*": "allow"
+    },
+    "syscheck:read": {
+      "agent:id:*": "allow"
+    },
+    "syscheck:run": {
+      "agent:id:*": "allow"
+    },
+    "syscollector:read": {
+      "agent:id:*": "allow"
+    },
+    "rbac_mode": "black"
+  }
 };
 
 const appStateReducers = (state = initialState, action) => {

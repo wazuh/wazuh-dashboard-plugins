@@ -40,6 +40,7 @@ import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar'
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { IWzSuggestItem } from '../../../components/wz-search-bar'
 import _ from 'lodash';
+import { WzButtonPermissions } from '../../../components/common/permissions/button';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -805,12 +806,14 @@ export class AgentsTable extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
+            <WzButtonPermissions
+              buttonType='empty'
+              permissions={[{action: 'agent:create', resource: '*:*:*'}]}
               iconType="plusInCircle"
               onClick={() => this.props.addingNewAgent()}
             >
               Deploy new agent
-            </EuiButtonEmpty>
+            </WzButtonPermissions>
           </EuiFlexItem>
           {formattedButton}
         </EuiFlexGroup>

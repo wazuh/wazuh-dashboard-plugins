@@ -23,6 +23,7 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button'
 
 import {
   updateLoadingStatus,
@@ -208,13 +209,15 @@ class WzGroupsActionButtons extends Component {
 
     // Add new group button
     const newGroupButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
         iconSide="left"
         iconType="plusInCircle"
+        permissions={[{action: 'group:create', resource: '*:*:*'}]}
         onClick={() => this.togglePopover()}
       >
         Add new group
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Export button
