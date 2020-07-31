@@ -1,110 +1,121 @@
 //@ts-nocheck
 import {
-  job,
   SchedulerJob,
   IApi,
-  SaveDocument
+  jobs
 } from './index';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 jest.mock('../../controllers/wazuh-hosts');
-jest.mock('./save-document')
+jest.mock('./save-document');
+jest.mock('./predefined-jobs', () => ({
+  jobs: {
+    testJob1: {
+      status: true,
+      method: 'GET',
+      request: '/manager/status',
+      params: {},
+      interval: '* */2 * * *',
+      index: 'manager-status',
+    },
+    testJob2: {
+      status: true,
+      method: 'GET',
+      request: '/manager/status',
+      params: {},
+      interval: '* */2 * * *',
+      index: 'manager-status',
+    }
+  }
+}));
 
 describe('SchedulerJob', () => {
-  const oneApi = [ { 
-    url: 'http://localhost',
+  const oneApi = [{
+    url: 'https://localhost',
     port: 55000,
-    user: 'foo',
+    username: 'foo',
     password: 'bar',
     id: 'default',
-    cluster_info: { 
+    cluster_info: {
       status: 'disabled',
       manager: 'master',
       node: 'node01',
-      cluster: 'Disabled' 
-    } 
-  } ];
-  const twoApi = [ 
-    { 
-      url: 'http://localhost',
+      cluster: 'Disabled'
+    }
+  }];
+  const twoApi = [
+    {
+      url: 'https://localhost',
       port: 55000,
-      user: 'foo',
+      username: 'foo',
       password: 'bar',
       id: 'internal',
-      cluster_info: { 
+      cluster_info: {
         status: 'disabled',
         manager: 'master',
         node: 'node01',
-        cluster: 'Disabled' 
-      } 
-    }, 
-    { 
-      url: 'http://externalhost',
+        cluster: 'Disabled'
+      }
+    },
+    {
+      url: 'https://externalhost',
       port: 55000,
-      user: 'foo',
+      username: 'foo',
       password: 'bar',
       id: 'external',
-      cluster_info: { 
+      cluster_info: {
         status: 'disabled',
         manager: 'master',
         node: 'node01',
-        cluster: 'Disabled' 
-      } 
-    }, 
+        cluster: 'Disabled'
+      }
+    },
   ];
-  const threeApi = [ 
-    { 
-      url: 'http://localhost',
+  const threeApi = [
+    {
+      url: 'https://localhost',
       port: 55000,
-      user: 'foo',
+      username: 'foo',
       password: 'bar',
       id: 'internal',
-      cluster_info: { 
+      cluster_info: {
         status: 'disabled',
         manager: 'master',
         node: 'node01',
-        cluster: 'Disabled' 
-      } 
-    }, 
-    { 
-      url: 'http://externalhost',
+        cluster: 'Disabled'
+      }
+    },
+    {
+      url: 'https://externalhost',
       port: 55000,
-      user: 'foo',
+      username: 'foo',
       password: 'bar',
       id: 'external',
-      cluster_info: { 
+      cluster_info: {
         status: 'disabled',
         manager: 'master',
         node: 'node01',
-        cluster: 'Disabled' 
-      } 
-    }, 
-    { 
-      url: 'http://externalhost',
+        cluster: 'Disabled'
+      }
+    },
+    {
+      url: 'https://externalhost',
       port: 55000,
-      user: 'foo',
+      username: 'foo',
       password: 'bar',
       id: 'experimental',
-      cluster_info: { 
+      cluster_info: {
         status: 'disabled',
         manager: 'master',
         node: 'node01',
-        cluster: 'Disabled' 
-      } 
-    }, 
+        cluster: 'Disabled'
+      }
+    },
   ];
-  const testJob: job = {
-    status: true,
-    method: 'GET',
-    request: '/manager/status',
-    params: {},
-    index: 'manager-status',
-    interval: '* */2 * * *',
-    creation: 'w',
-  }
+
   let schedulerJob: SchedulerJob;
 
   beforeEach(() => {
-    schedulerJob = new SchedulerJob({...testJob});
+    schedulerJob = new SchedulerJob('testJob1', {});
   });
 
   afterEach(() => {
@@ -113,13 +124,14 @@ describe('SchedulerJob', () => {
 
   it('should job is assigned ', () => {
     expect(schedulerJob).toBeInstanceOf(SchedulerJob);
-    expect(schedulerJob.job).toEqual(testJob);
+    expect(schedulerJob.jobName).toEqual('testJob1');
   });
 
   it('should get API object when no specified the `apis` parameter on the job object', async () => {
-    WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(oneApi)
-    const apis: IApi[] = await schedulerJob.getApiObjects();
+    WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(oneApi);
 
+
+    const apis: IApi[] = await schedulerJob.getApiObjects();
     expect(apis).not.toBeUndefined();
     expect(apis).not.toBeFalsy();
     expect(apis).toEqual(oneApi);
@@ -136,10 +148,10 @@ describe('SchedulerJob', () => {
 
   it('should get one of two API object when specified the id in `apis` parameter on the job object', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(twoApi)
-    schedulerJob.job = {...testJob, apis: ['internal']}
+    jobs[schedulerJob.jobName] = { ...jobs[schedulerJob.jobName], apis: ['internal'] };
     const apis: IApi[] = await schedulerJob.getApiObjects();
     const filteredTwoApi = twoApi.filter(item => item.id === 'internal')
-    
+
     expect(apis).not.toBeUndefined();
     expect(apis).not.toBeFalsy();
     expect(apis).toEqual(filteredTwoApi);
@@ -148,10 +160,10 @@ describe('SchedulerJob', () => {
   it('should get two of three API object when specified the id in `apis` parameter on the job object', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(threeApi)
     const selectedApis = ['internal', 'external'];
-    schedulerJob.job = {...testJob, apis: selectedApis}
+    jobs[schedulerJob.jobName] = { ...jobs[schedulerJob.jobName], apis: selectedApis };
     const apis: IApi[] = await schedulerJob.getApiObjects();
-    const filteredThreeApi = threeApi.filter(item =>  selectedApis.includes(item.id))
-    
+    const filteredThreeApi = threeApi.filter(item => selectedApis.includes(item.id))
+
     expect(apis).not.toBeUndefined();
     expect(apis).not.toBeFalsy();
     expect(apis).toEqual(filteredThreeApi);
@@ -159,15 +171,17 @@ describe('SchedulerJob', () => {
 
   it('should throw an exception when no get APIs', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue([])
-    await expect(schedulerJob.getApiObjects()).rejects.toThrow();
-    await expect(schedulerJob.getApiObjects()).rejects.toThrowError(/10001/);
+    await expect(schedulerJob.getApiObjects()).rejects.toEqual(
+      { error: 10001, message: 'No Wazuh host configured in wazuh.yml' }
+    );
   });
 
   it('should throw an exception when no match API', async () => {
     WazuhHostsCtrl.prototype.getHostsEntries.mockResolvedValue(threeApi)
-    schedulerJob.job = {...testJob, apis: ['unkown']}
-    await expect(schedulerJob.getApiObjects()).rejects.toThrow();
-    await expect(schedulerJob.getApiObjects()).rejects.toThrowError(/10002/);
+    jobs[schedulerJob.jobName] = { ...jobs[schedulerJob.jobName], apis: ['unkown'] };
+    await expect(schedulerJob.getApiObjects()).rejects.toEqual(
+      { error: 10002, message: 'No host was found with the indicated ID' }
+    );
   });
 
 })

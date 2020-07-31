@@ -41,7 +41,7 @@ export class SchedulerJob {
   private async getApiObjects() {
     const { apis } = jobs[this.jobName];
     const hosts:IApi[] = await this.wazuhHosts.getHostsEntries(false, false, false);
-    if (hosts.length <= 0) throw {error: 10001, message: 'No Wazuh host configured in wazuh.yml' }
+    if (!hosts.length) throw {error: 10001, message: 'No Wazuh host configured in wazuh.yml' }
     if(apis){
       return this.filterHosts(hosts, apis);
     }
@@ -51,7 +51,7 @@ export class SchedulerJob {
   private filterHosts(hosts: IApi[], apis: string[]) {
     const filteredHosts = hosts.filter(host => apis.includes(host.id));
     if (filteredHosts.length <= 0) {
-      throw {error: '10002', message: 'No host was found with the indicated ID'};
+      throw {error: 10002, message: 'No host was found with the indicated ID'};
     }
     return filteredHosts;
   }
