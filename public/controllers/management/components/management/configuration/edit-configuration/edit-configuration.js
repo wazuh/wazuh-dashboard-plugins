@@ -30,6 +30,7 @@ import WzCodeEditor from '../util-components/code-editor';
 import WzWazuhAPINotReachable from '../util-components/wz-api-not-reachable';
 import WzConfigurationPath from '../util-components/configuration-path';
 import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import withLoading from '../util-hocs/loading';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 import {
@@ -247,31 +248,27 @@ class WzEditConfiguration extends Component {
                 XML format error
               </EuiButton>
             ) : (
-              <EuiButton
+              <WzButtonPermissions
+                permissions={[this.props.clusterNodeSelected ? {action: 'cluster:upload_file', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:upload_file', resource: 'file:path:/etc/ossec.conf'}]}
                 isDisabled={saving || disableSaveRestartButtons}
                 iconType="save"
                 onClick={() => this.editorSave()}
               >
                 Save
-              </EuiButton>
+              </WzButtonPermissions>
             )}
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            {restarting ? (
-              <EuiButton fill isDisabled>
-                <EuiLoadingSpinner size="s" /> Restarting{' '}
-                {clusterNodeSelected || 'Manager'}
-              </EuiButton>
-            ) : (
-              <EuiButton
-                fill
-                iconType="refresh"
-                onClick={() => this.toggleRestart()}
-                isDisabled={disableSaveRestartButtons}
-              >
-                Restart {clusterNodeSelected || 'Manager'}
-              </EuiButton>
-            )}
+            <WzButtonPermissions
+              permissions={[this.props.clusterNodeSelected ? {action: 'cluster:restart', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:restart', resource: '*:*:*'}]}
+              fill
+              iconType="refresh"
+              onClick={() => this.toggleRestart()}
+              isDisabled={disableSaveRestartButtons || restarting}
+              isLoading={restarting}
+            >
+              {restarting ? 'Restarting' : 'Restart' } {clusterNodeSelected || 'Manager'}
+            </WzButtonPermissions>
           </EuiFlexItem>
         </WzConfigurationPath>
         <WzEditorConfiguration

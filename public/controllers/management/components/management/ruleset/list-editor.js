@@ -42,6 +42,7 @@ import exportCsv from '../../../../../react-services/wz-csv';
 
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzListEditor extends Component {
   constructor(props) {
@@ -63,21 +64,6 @@ class WzListEditor extends Component {
     this.rulesetHandler = RulesetHandler;
 
     this.columns = [
-      {
-        field: 'key',
-        name: 'Key',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'value',
-        name: 'Value',
-        align: 'left',
-        sortable: true
-      }
-    ];
-
-    this.adminColumns = [
       {
         field: 'key',
         name: 'Key',
@@ -413,8 +399,10 @@ class WzListEditor extends Component {
    * @param {String} path
    */
   renderAddAndSave(name, path, newList = false, items = []) {
+
     const saveButton = (
-      <EuiButton
+      <WzButtonPermissions
+        permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists'}]}
         fill
         isDisabled={items.length === 0}
         iconType="save"
@@ -422,19 +410,20 @@ class WzListEditor extends Component {
         onClick={async () => this.saveList(name, path, newList)}
       >
         Save
-      </EuiButton>
+      </WzButtonPermissions>
     );
 
     return (
       <Fragment>
         {!this.state.isPopoverOpen && (
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
+            <WzButtonPermissions
+              permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists'}]}
               iconType="plusInCircle"
               onClick={() => this.openAddEntry()}
             >
               Add new entry
-            </EuiButtonEmpty>
+            </WzButtonPermissions>
           </EuiFlexItem>
         )}
         {/* Save button */}
@@ -533,11 +522,10 @@ class WzListEditor extends Component {
   //isDisabled={nameForSaving.length <= 4}
   render() {
     const { listInfo, isLoading, error } = this.props.state;
-    const { adminMode } = this.props;
     const { name, path } = listInfo;
 
     const message = isLoading ? false : 'No results...';
-    const columns = adminMode ? this.adminColumns : this.columns;
+    const columns = this.columns;
 
     const addingNew = name === false || !name;
     const listName = this.state.newListName || name;
@@ -584,8 +572,7 @@ class WzListEditor extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 )}
-                {adminMode &&
-                  !this.state.editing &&
+                {!this.state.editing &&
                   this.renderAddAndSave(
                     listName,
                     path,
@@ -632,8 +619,7 @@ class WzListEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.rulesetReducers
   };
 };
 

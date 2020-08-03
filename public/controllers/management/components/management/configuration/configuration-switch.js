@@ -50,14 +50,12 @@ import { WzAgentNeverConnectedPrompt } from './configuration-no-agent';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 
-import { clusterNodes, checkAdminMode, clusterReq } from './utils/wz-fetch';
+import { clusterNodes, clusterReq } from './utils/wz-fetch';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
 } from '../../../../../redux/actions/configurationActions';
-import {
-  updateAdminMode
-} from '../../../../../redux/actions/appStateActions';
+
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
@@ -97,13 +95,6 @@ class WzConfigurationSwitch extends Component {
     });
   };
   async componentDidMount() {
-    // Check admin mode
-    try {
-      const adminMode = await checkAdminMode();
-      this.props.updateAdminMode(adminMode);
-    } catch (error) {
-      this.props.updateAdminMode(false);
-    }
     // If agent, check if is synchronized or not
     if (this.props.agent.id !== '000') {
       try {
@@ -410,8 +401,7 @@ const mapDispatchToProps = dispatch => ({
   updateClusterNodes: clusterNodes =>
     dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: clusterNodeSelected =>
-    dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
+    dispatch(updateClusterNodeSelected(clusterNodeSelected))
 });
 
 export default compose(

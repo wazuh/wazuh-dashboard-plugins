@@ -13,7 +13,6 @@ import {
 } from '../../../../../redux/actions/appStateActions';
 
 import { connect } from 'react-redux';
-import checkAdminMode from './utils/check-admin-mode';
 
 // Wazuh components
 import WzRulesetTable from './ruleset-table';
@@ -36,16 +35,6 @@ class WzRulesetOverview extends Component {
     this.state = {
       totalItems: 0
     }
-  }
-
-  componentDidMount() {
-    this.setAdminMode();
-  }
-
-  async setAdminMode() {
-    //Set the admin mode
-    const admin = await checkAdminMode();
-    this.props.updateAdminMode(admin);
   }
 
   setGlobalBreadcrumb() {

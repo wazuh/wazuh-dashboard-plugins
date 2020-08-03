@@ -35,6 +35,9 @@ import {
 import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { filtersToObject } from '../../../../../components/wz-search-bar';
+import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
+import { checkMissingUserPermissions } from '../../../../../react-services/rbac';
+import { compose } from 'redux';
 
 class WzRulesetTable extends Component {
   _isMounted = false;
@@ -229,7 +232,7 @@ class WzRulesetTable extends Component {
         return {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
-          onClick: async () => {
+          onClick: !checkMissingUserPermissions([{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}], this.props.userPermissions) ? async () => {
             const { section } = this.props.state;
             if (section === 'rules') {
               const result = await this.rulesetHandler.getRuleInformation(
@@ -246,7 +249,7 @@ class WzRulesetTable extends Component {
               const file = { name: item.filename, content: result, path: item.relative_dirname };
               this.props.updateListContent(file);
             }
-          }
+          } : undefined
         };
       };
 
@@ -321,8 +324,7 @@ class WzRulesetTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.rulesetReducers
   };
 };
 
@@ -342,7 +344,10 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
+  withUserPermissions
 )(WzRulesetTable);

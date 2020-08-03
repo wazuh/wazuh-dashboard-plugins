@@ -163,7 +163,6 @@ class WzRulesetActionButtons extends Component {
 
   render() {
     const { section, showingFiles } = this.props.state;
-    const { adminMode } = this.props;
 
     // Export button
     const exportButton = (
@@ -179,7 +178,7 @@ class WzRulesetActionButtons extends Component {
     // Add new rule button
     const addNewRuleButton = (
       <WzButtonPermissions
-        permissions={[{action: 'cluster:upload_file', resource: 'node:id:*'}]}
+        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
         buttonType='empty'
         iconType="plusInCircle"
         onClick={() =>
@@ -196,7 +195,9 @@ class WzRulesetActionButtons extends Component {
 
     //Add new CDB list button
     const addNewCdbListButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists/files'}]}
         iconType="plusInCircle"
         onClick={() =>
           this.props.updateListContent({
@@ -207,17 +208,19 @@ class WzRulesetActionButtons extends Component {
         }
       >
         {`Add new ${section} file`}
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Manage files
     const manageFiles = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >
         {showingFiles ? `Manage ${section}` : `Manage ${section} files`}
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Refresh
@@ -237,16 +240,16 @@ class WzRulesetActionButtons extends Component {
 
     return (
       <Fragment>
-        {section !== 'lists' && adminMode && (
+        {section !== 'lists' && (
           <EuiFlexItem grow={false}>{manageFiles}</EuiFlexItem>
         )}
-        {adminMode && section !== 'lists' && (
+        {section !== 'lists' && (
           <EuiFlexItem grow={false}>{addNewRuleButton}</EuiFlexItem>
         )}
-        {adminMode && section === 'lists' && (
+        {section === 'lists' && (
           <EuiFlexItem grow={false}>{addNewCdbListButton}</EuiFlexItem>
         )}
-        {(section === 'lists' || showingFiles) && adminMode && (
+        {(section === 'lists' || showingFiles) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
               msg={section}
@@ -264,8 +267,7 @@ class WzRulesetActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.rulesetReducers
   };
 };
 

@@ -120,13 +120,13 @@ class WzConfigurationOverview extends Component {
                   {this.props.clusterNodeSelected ? (
                     <WzButtonPermissions
                       buttonType='empty'
-                      permissions={[{action: 'cluster:upload_file', resource: 'node:id:*'}]}
+                      permissions={[{action: 'cluster:upload_file', resource: `node:id:${this.props.clusterNodeSelected}`}]}
                       iconSide="left"
                       iconType="pencil"
                       onClick={() =>
                         this.updateConfigurationSection(
                           'edit-configuration',
-                          `Manager configuration`,
+                          `Cluster configuration`,
                           '',
                           'Edit configuration'
                         )}
@@ -142,7 +142,7 @@ class WzConfigurationOverview extends Component {
                       onClick={() =>
                         this.updateConfigurationSection(
                           'edit-configuration',
-                          `Cluster configuration`,
+                          `Manager configuration`,
                           '',
                           'Edit configuration'
                         )}
@@ -153,26 +153,6 @@ class WzConfigurationOverview extends Component {
                   }
                 </EuiFlexItem>
               )}
-              {/* {this.props.agent.id === '000' && this.props.adminMode && (
-                <EuiFlexItem>
-                  <EuiButtonEmpty
-                    iconSide="left"
-                    iconType="pencil"
-                    onClick={() =>
-                      this.updateConfigurationSection(
-                        'edit-configuration',
-                        `${
-                          this.props.clusterNodeSelected ? 'Cluster' : 'Manager'
-                        } configuration`,
-                        '',
-                        'Edit configuration'
-                      )
-                    }
-                  >
-                    Edit configuration
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-              )} */}
               {this.props.agent.id !== '000' && this.props.agent.status === 'Active' && (
                 <EuiFlexItem>
                   <ExportConfiguration
@@ -217,8 +197,7 @@ class WzConfigurationOverview extends Component {
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  adminMode: state.appStateReducers.adminMode
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);

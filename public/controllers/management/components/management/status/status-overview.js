@@ -37,7 +37,6 @@ import {
 import {
   updateAdminMode,
 } from '../../../../../redux/actions/appStateActions';
-import checkAdminMode from './utils/check-admin-mode';
 import StatusHandler from './utils/status-handler';
 
 // Wazuh components
@@ -84,9 +83,6 @@ export class WzStatusOverview extends Component {
    */
   async fetchData() {
     this.props.updateLoadingStatus(true);
-    //Set the admin mode
-    const admin = await checkAdminMode();
-    this.props.updateAdminMode(admin);
 
     const agSumm = await this.statusHandler.agentsSummary();
     const clusStat = await this.statusHandler.clusterStatus();

@@ -105,17 +105,25 @@ const initialState = {
       "*:*:*": "allow"
     },
     "manager:upload_file": {
-      "*:*:*": "allow"
+      "*:*:*": "allow",
+      "file:path:etc/rules/local_rules.xml": "deny",
+      "file:path:etc/lists/audit-keys": "deny",
+      "file:path:etc/rules/0010-rules_config.xml": "deny"
     },
     "manager:restart": {
       "*:*:*": "allow"
     },
     "manager:delete_file": {
       "*:*:*": "allow",
-      "file:path:*": "allow"
+      "file:path:*": "allow",
+      "file:path:etc/lists/audit-keys": "deny",
+      "file:path:etc/rules/local_rules.xml": "deny"
     },
     "manager:read_file": {
-      "file:path:*": "allow"
+      "file:path:*": "allow",
+      "file:path:etc/rules/local_rules.xml": "deny",
+      "file:path:etc/lists/audit-keys": "deny",
+      "file:path:ruleset/rules/0010-rules_config.xml": "deny"
     },
     "cluster:delete_file": {
       "node:id:*": "allow",
@@ -130,12 +138,12 @@ const initialState = {
     "cluster:update_api_config": {
       "node:id:*": "allow"
     },
-    "cluster:restart": {
-      "node:id:*": "allow"
-    },
-    "cluster:upload_file": {
-      "node:id:*": "allow"
-    },
+    // "cluster:restart": {
+    //   "node:id:*": "allow"
+    // },
+    // "cluster:upload_file": {
+    //   "node:id:*": "allow"
+    // },
     "cluster:read_file": {
       "node:id:*&file:path:*": "allow"
     },
