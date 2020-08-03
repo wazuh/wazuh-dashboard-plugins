@@ -9,7 +9,7 @@ import {
     EuiSpacer,
     EuiLoadingSpinner
 } from '@elastic/eui';
-import { ApiRequest } from '../../../react-services/api-request'
+import { ApiRequest } from '../../../react-services/api-request';
 
 export const RolesTable = () => {
     const [roles, setRoles] = useState('');

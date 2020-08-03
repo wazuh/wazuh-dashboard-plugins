@@ -315,16 +315,18 @@ export class AgentsPreview extends Component {
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
-            <AgentsTable
-              filters={this.state.agentTableFilters}
-              removeFilters={() => this.removeFilters()}
-              wzReq={this.props.tableProps.wzReq}
-              addingNewAgent={this.props.tableProps.addingNewAgent}
-              downloadCsv={this.props.tableProps.downloadCsv}
-              clickAction={this.props.tableProps.clickAction}
-              timeService={this.props.tableProps.timeService}
-              reload={() => this.getSummary()}
-            />
+            <WzReduxProvider>
+              <AgentsTable
+                filters={this.state.agentTableFilters}
+                removeFilters={() => this.removeFilters()}
+                wzReq={this.props.tableProps.wzReq}
+                addingNewAgent={this.props.tableProps.addingNewAgent}
+                downloadCsv={this.props.tableProps.downloadCsv}
+                clickAction={this.props.tableProps.clickAction}
+                timeService={this.props.tableProps.timeService}
+                reload={() => this.getSummary()}
+              />
+            </WzReduxProvider>
         </EuiFlexItem>
       </EuiPage>
     );
