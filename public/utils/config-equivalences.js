@@ -52,7 +52,9 @@ export const configEquivalences = {
   hideManagerAlerts:
     'Hide the alerts of the manager in all dashboards and discover',
   'logs.level':
-    'Set the app logging level, allowed values are info and debug. Default is info.'
+    'Set the app logging level, allowed values are info and debug. Default is info.',
+  'cron.prefix':
+    'Define the index prefix of predefined jobs'
 };
 
 export const nameEquivalence = {

@@ -63,7 +63,7 @@ export class VisHandlers {
 
     // Check raw response from all rendered tables
     let tables = this.list.filter(
-      item => (((item || {}).vis || {}).type || {}).type === 'table'
+      item => (((item || {}).vis || {}).type || {}).name === 'table'
     );
     for (let i = 0; i < tables.length; i++) {
       const columns = [];

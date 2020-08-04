@@ -78,7 +78,7 @@ export class SavedObject {
     }
   }
   
-  static async existsMonitoringIndexPattern(patternID) {
+  static async existsOrCreateIndexPattern(patternID) {
     try {
       await GenericRequest.request(
         'GET',
