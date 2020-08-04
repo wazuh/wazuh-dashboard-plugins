@@ -6,6 +6,8 @@ import {
     EuiFlexItem,
     EuiTabs,
     EuiTab,
+    EuiPanel,
+    EuiEmptyPrompt,
     EuiSpacer,
 } from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
@@ -33,6 +35,7 @@ const tabs = [
 
 export const WzSecurity = () => {
     const [selectedTabId, setSelectedTabId] = useState('users');
+    const [securityError, setSecurityError] = useState(false);
 
     useEffect(() => {
         const breadcrumb = [{ text: '' }, { text: 'Security' }];
@@ -58,21 +61,39 @@ export const WzSecurity = () => {
 
     return (
         <EuiPage>
-            <EuiFlexGroup>
-                <EuiFlexItem>
-                    <EuiTabs>{renderTabs()}</EuiTabs>
-                    <EuiSpacer size='m'></EuiSpacer>
-                    {selectedTabId === 'users' &&
-                        <Users></Users>
-                    }
-                    {selectedTabId === 'roles' &&
-                        <Roles></Roles>
-                    }
-                    {selectedTabId === 'policies' &&
-                        <Policies></Policies>
-                    }
-                </EuiFlexItem>
-            </EuiFlexGroup>
+            {!securityError &&
+                <EuiFlexGroup>
+                    <EuiFlexItem>
+                        <EuiTabs>{renderTabs()}</EuiTabs>
+                        <EuiSpacer size='m'></EuiSpacer>
+                        {selectedTabId === 'users' &&
+                            <Users setSecurityError={setSecurityError}></Users>
+                        }
+                        {selectedTabId === 'roles' &&
+                            <Roles></Roles>
+                        }
+                        {selectedTabId === 'policies' &&
+                            <Policies></Policies>
+                        }
+                    </EuiFlexItem>
+                </EuiFlexGroup>
+            }
+            {securityError &&
+                <EuiFlexGroup alignItems="center" justifyContent="center">
+                    <EuiPanel grow={false}>
+                        <EuiEmptyPrompt
+                            iconType="securityApp"
+                            title={<h2>You need permission to manage users</h2>}
+                            body={
+                            <>
+                                <p>Contact your system administrator.</p>
+                            </>
+                            }
+                        />
+                    </EuiPanel>
+
+                </EuiFlexGroup>
+            }
         </EuiPage>
     );
 };

@@ -780,4 +780,20 @@ export class ElasticWrapper {
       }
     }
   }
+
+  /**
+   * Get user roles
+   */
+  async getRoles(req, user) {
+    const params = {
+      path: `_security/user/${user}`,
+      method: 'GET',
+    };
+    const result = await this.elasticRequest.callWithRequest(
+      req,
+      'transport.request',
+      params
+    );
+    return ((result || {})[user] || {}).roles || []
+  }
 }

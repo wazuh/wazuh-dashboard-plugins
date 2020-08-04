@@ -79,6 +79,17 @@ export const updateAdminMode = adminMode => {
   };
 };
 
+/**
+ * Updates currentPlatform in the appState store
+ * @param extensions
+ */
+export const updateCurrentPlatform = currentPlatform => {
+  return {
+    type: 'UPDATE_CURRENT_PLATFORM',
+    currentPlatform
+  };
+};
+
 
 /**
  * Updates currentAgentData in the appState store

@@ -1,18 +1,22 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     EuiInMemoryTable,
-    EuiBadge
+    EuiBadge,
+    EuiFlexGroup,
+    EuiFlexItem
 } from '@elastic/eui';
 
-export const UsersTable = () => {
-    const users = [
-        {
-            id: '1',
-            user: 'wazuh',
-            roles: ['Admin']
-        }
-    ]
+export const UsersTable = ({ users, editUserFlyover}) => {
+    
+    const getRowProps = item => {
+        const { id } = item;
+        return {
+          'data-test-subj': `row-${id}`,
+          onClick: () => editUserFlyover(item),
+        };
+      };
+    
     const columns = [
         {
             field: 'user',
@@ -21,13 +25,31 @@ export const UsersTable = () => {
             truncateText: true,
         },
         {
+            field: 'full_name',
+            name: 'Full name',
+            sortable: true,
+            truncateText: true,
+        },
+        {
+            field: 'email',
+            name: 'Email',
+            sortable: true,
+            truncateText: true,
+        },
+        {
             field: 'roles',
             name: 'Roles',
             dataType: 'boolean',
             render: roles => {
-                return roles.map(role => {
-                    return <EuiBadge color="secondary">{role}</EuiBadge>;
+                const tmpRoles = roles.map(role => {
+                    return <EuiFlexItem grow={false}><EuiBadge color="secondary">{role}</EuiBadge></EuiFlexItem>;
                 });
+                return <EuiFlexGroup
+                    wrap
+                    responsive={false}
+                    gutterSize="xs">
+                    {tmpRoles}
+                </EuiFlexGroup>
             },
             sortable: true,
         },
@@ -35,7 +57,7 @@ export const UsersTable = () => {
 
     const sorting = {
         sort: {
-            field: 'user',
+            field: 'roles',
             direction: 'desc',
         },
     };
@@ -52,6 +74,7 @@ export const UsersTable = () => {
             items={users}
             columns={columns}
             search={search}
+            rowProps={getRowProps}
             pagination={true}
             sorting={sorting}
         />

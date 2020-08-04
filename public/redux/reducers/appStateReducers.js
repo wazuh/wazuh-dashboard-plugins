@@ -17,6 +17,7 @@ const initialState = {
   currentTab: '',
   extensions: {},
   adminMode: false,
+  currentPlatform: false,
   currentAgentData: {},
   showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
@@ -224,6 +225,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       adminMode: action.adminMode
+    };
+  }
+
+  if (action.type === 'UPDATE_CURRENT_PLATFORM') {
+    return {
+      ...state,
+      currentPlatform: action.currentPlatform
     };
   }
 

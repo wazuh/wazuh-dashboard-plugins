@@ -22,6 +22,7 @@ import {
 import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
+import { result } from '../lib/generate-alerts/sample-data/ciscat';
 
 export class WazuhElasticCtrl {
   /**
@@ -324,8 +325,72 @@ export class WazuhElasticCtrl {
       const spaces = this._server.plugins.spaces;
       const namespace = spaces && spaces.getSpaceId(req);
       return { namespace };
-    } catch (err) {
+    } catch (error) {
       log('wazuh-elastic:getCurrentSpace', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+  }
+
+  /**
+   * Get current logged in user
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} current user
+   */
+  async getCurrentUser(req, reply) {
+    try {
+      let user = "";
+      if(this._server.plugins.security) {
+        user = await this._server.plugins.security.getUser(req);
+      }
+      return { user };
+    } catch (error) {
+      console.log("error", error)
+      log('wazuh-elastic:getCurrentUser', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+  }
+
+
+
+  /**
+   * Check if current user can manage security
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} 
+   */
+  async getRoles(req, reply) {
+    try {
+      if(!req.params && !req.params.user)
+        throw new Error('Missing parameters');
+      const user = req.params.user;
+      let roles = [];
+      if(this._server.plugins.security) { // XPACK
+        roles = await this.wzWrapper.getRoles(req, user);
+      }
+      return { roles };
+    } catch (error) {
+      console.log("error", error)
+      log('wazuh-elastic:getRoles', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+  }
+
+  /**
+   * Returns current security platform
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} 
+   */
+  async getCurrentPlatform(req, reply) {
+    try {
+      if(this._server.plugins.security) { // XPACK
+        return {platform: 'xpack'}
+      }
+
+      return { platform: false}
+    } catch (error) {
+      log('wazuh-elastic:getCurrentPlatform', error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, reply);
     }
   }
