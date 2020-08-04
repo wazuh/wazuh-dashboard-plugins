@@ -29,8 +29,8 @@ export const withUserPermissionsValidation = requiredUserPermissions => WrappedC
 }
 
 // This HOC redirects to redirectURL if user has not permissions
-export const withUserPermissionsPrivate = (read_api_config, redirectURL) => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsPrivate(read_api_config, redirectURL);
+export const withUserPermissionsPrivate = (requiredUserPermissions, redirectURL) => WrappedComponent => props => {
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsPrivate(requiredUserPermissions, redirectURL);
   return userPermissionsValidation ? <WrappedComponent {...props} userPermissionsValidation={userPermissionsValidation} userPermissions={userPermissions}/> : null;
 }
 
