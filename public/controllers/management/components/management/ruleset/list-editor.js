@@ -402,7 +402,7 @@ class WzListEditor extends Component {
 
     const saveButton = (
       <WzButtonPermissions
-        permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists'}]}
+        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/lists/${name}`}]}
         fill
         isDisabled={items.length === 0}
         iconType="save"
@@ -418,7 +418,7 @@ class WzListEditor extends Component {
         {!this.state.isPopoverOpen && (
           <EuiFlexItem grow={false}>
             <WzButtonPermissions
-              permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists'}]}
+              permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/lists/${name}`}]}
               iconType="plusInCircle"
               onClick={() => this.openAddEntry()}
             >

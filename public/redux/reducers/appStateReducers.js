@@ -117,13 +117,16 @@ const initialState = {
       "*:*:*": "allow",
       "file:path:*": "allow",
       "file:path:etc/lists/audit-keys": "deny",
-      "file:path:etc/rules/local_rules.xml": "deny"
+      "file:path:etc/rules/local_rules.xml": "deny",
+      "file:path:etc/decoders/local_decoder.xml": "deny"
     },
     "manager:read_file": {
       "file:path:*": "allow",
       "file:path:etc/rules/local_rules.xml": "deny",
       "file:path:etc/lists/audit-keys": "deny",
-      "file:path:ruleset/rules/0010-rules_config.xml": "deny"
+      "file:path:ruleset/rules/0010-rules_config.xml": "deny",
+      "file:path:etc/decoders/local_decoder.xml": "deny",
+      "file:path:ruleset/decoders/0005-wazuh_decoders.xml": "deny",
     },
     "cluster:delete_file": {
       "node:id:*": "allow",
