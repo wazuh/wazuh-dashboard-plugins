@@ -119,7 +119,12 @@ export const initialWazuhConfig = `---
 # Default index pattern to use for Wazuh monitoring
 #wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
 #
+# --------------------------------- wazuh-cron ----------------------------------
 #
+# Customize the index prefix of predefined jobs
+# This change is not retroactive, if you change it new indexes will be created
+# cron.prefix: test
+# 
 # ------------------------------- App privileges --------------------------------
 #admin: true
 #
