@@ -30,7 +30,8 @@ const initialState = {
     },
     "agent:read": {
       "agent:id:*": "allow",
-      "agent:group:*": "allow"
+      "agent:group:*": "allow",
+      "agent:id:001": "deny"
     },
     "agent:delete": {
       "agent:id:*": "allow",
@@ -38,7 +39,8 @@ const initialState = {
     },
     "agent:modify_group": {
       "agent:id:*": "allow",
-      "agent:group:*": "allow"
+      "agent:group:*": "allow",
+      "agent:id:001": "deny"
     },
     "agent:restart": {
       "agent:id:*": "allow",
@@ -49,13 +51,16 @@ const initialState = {
       "agent:group:*": "allow"
     },
     "group:read": {
-      "group:id:*": "allow"
+      "group:id:*": "allow",
+      // "group:id:custom-group": "deny",
     },
     "group:delete": {
-      "group:id:*": "allow"
+      "group:id:*": "allow",
+      "group:id:custom-group": "deny",
     },
     "group:update_config": {
-      "group:id:*": "allow"
+      "group:id:*": "allow",
+      "group:id:custom-group": "deny",
     },
     "group:modify_assignments": {
       "group:id:*": "allow"
@@ -97,7 +102,7 @@ const initialState = {
       "*:*:*": "allow"
     },
     "manager:read": {
-      "*:*:*": "allow"
+      "*:*:*": "deny"
     },
     "manager:read_api_config": {
       "*:*:*": "allow"
@@ -259,7 +264,19 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
+  if (action.type === 'UPDATE_USER_ROLES') {
+    return {
+      ...state,
+      userRoles: action.userRoles
+    };
+  }
 
+  if (action.type === 'UPDATE_USER_PERMISSIONS') {
+    return {
+      ...state,
+      userPermissions: action.userPermissions
+    };
+  }
 
   return state;
 };

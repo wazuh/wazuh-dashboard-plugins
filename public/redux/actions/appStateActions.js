@@ -125,3 +125,25 @@ export const showExploreAgentModalGlobal = (shouldShow) => {
     showExploreAgentModalGlobal: shouldShow
   };
 };
+
+/**
+ * Updates userRoles in the appState store
+ * @param extensions
+ */
+export const updateUserRoles = userRoles => {
+  return {
+    type: 'UPDATE_USER_ROLES',
+    userRoles
+  };
+};
+
+/**
+ * Updates userPermissions in the appState store
+ * @param extensions
+ */
+export const updateUserPermissions = userPermissions => {
+  return {
+    type: 'UPDATE_USER_PERMISSIONS',
+    userPermissions
+  };
+};
