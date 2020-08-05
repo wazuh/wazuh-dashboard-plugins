@@ -940,26 +940,30 @@ const wazuhPermissions = {
   }
 }
 
-export const checkMissingUserPermissions = (requiredPermissions, userPermissions) => {
-  const filtered = requiredPermissions.filter(permission => {
-    if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
-      const actionName = typeof permission === 'string' ? permission : permission.action;
-      if(!userPermissions[actionName]){ return true };
-      let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
-      const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
-      if(typeof userPermissions[actionName][actionResource] === 'undefined' && typeof userPermissions[actionName][actionResourceAll] === 'undefined' && typeof userPermissions[actionName][RESOURCE_ANY] === 'undefined'){ return true };
-      return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
-        : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
-        : (wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY]) : false)
-    }
-  });
-
-  return filtered.length ? filtered : false;
+export class WzUserPermissions{
+  static checkMissingUserPermissions = (requiredPermissions, userPermissions) => {
+    const filtered = requiredPermissions.filter(permission => {
+      if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
+        const actionName = typeof permission === 'string' ? permission : permission.action;
+        if(!userPermissions[actionName]){ return true };
+        let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
+        const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
+        if(typeof userPermissions[actionName][actionResource] === 'undefined' && typeof userPermissions[actionName][actionResourceAll] === 'undefined' && typeof userPermissions[actionName][RESOURCE_ANY] === 'undefined'){ return true };
+        return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
+          : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
+          : (wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY]) : false)
+      }
+    });
+  
+    return filtered.length ? filtered : false;
+  }
 }
 
-const isAllow = value => value === 'allow';
-
+// Constants
 const RESOURCE_ANY = '*:*:*';
 const RESOURCE_ANY_SHORT = '*:*';
 const RBAC_MODE_BLACK = 'black';
 const RBAC_MODE_WHITE = 'white';
+
+// Utility functions
+const isAllow = value => value === 'allow';

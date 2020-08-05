@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get query of Kibana searchBar
+ * Wazuh app - React HOCs to manage user permission requirements
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,10 +11,7 @@
  */
 
 import React from "react";
-import { useUserPermissions, useUserPermissionsValidation, useUserPermissionsPrivate } from '../hooks/useUserPermissions';
-import { 
-  EuiToolTip
-} from '@elastic/eui';
+import { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsPrivate } from '../hooks/useUserPermissions';
 
 // This HOC passes permissionsValidation to wrapped component
 export const withUserPermissions = WrappedComponent => props => {
@@ -23,8 +20,8 @@ export const withUserPermissions = WrappedComponent => props => {
 }
 
 // This HOC hides the wrapped component if user has not permissions
-export const withUserPermissionsValidation = requiredUserPermissions => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(typeof requiredUserPermissions === 'function' ? requiredUserPermissions(props) : requiredUserPermissions);
+export const withUserPermissionsRequirements = requiredUserPermissions => WrappedComponent => props => {
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsRequirements(typeof requiredUserPermissions === 'function' ? requiredUserPermissions(props) : requiredUserPermissions);
   return <WrappedComponent {...props} userPermissionsRequirements={userPermissionsValidation} userPermissions={userPermissions}/>;
 }
 
@@ -32,18 +29,4 @@ export const withUserPermissionsValidation = requiredUserPermissions => WrappedC
 export const withUserPermissionsPrivate = (requiredUserPermissions, redirectURL) => WrappedComponent => props => {
   const [userPermissionsValidation, userPermissions] = useUserPermissionsPrivate(requiredUserPermissions, redirectURL);
   return userPermissionsValidation ? <WrappedComponent {...props} userPermissionsValidation={userPermissionsValidation} userPermissions={userPermissions}/> : null;
-}
-
-// This HOC hides the wrapped component if user has not permissions
-export const withUserPermissionsValidationButton = requiredUserPermissions => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(typeof requiredUserPermissions === 'function' ? requiredUserPermissions(props) : requiredUserPermissions);
-  const wrappedComponent = <WrappedComponent {...props} isDisabled={Boolean(userPermissionsValidation) || props.isDisabled} userPermissionsRequirements={userPermissionsValidation} userPermissions={userPermissions}/>
-  return userPermissionsValidation ? 
-    <EuiToolTip
-      content={`Require ${userPermissionsValidation.map(permission => typeof permission === 'object' ? permission.action : permission).join(', ')} ${userPermissionsValidation.length > 1 ? 'permissions': 'permission'}`}
-      {...props.tooltip}
-    >
-      {wrappedComponent}
-    </EuiToolTip> : wrappedComponent
-  ;
 }

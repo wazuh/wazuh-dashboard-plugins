@@ -1,6 +1,7 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import GroupsHandler from './groups-handler';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 export default class GroupsColums {
   constructor(tableProps) {
@@ -34,59 +35,42 @@ export default class GroupsColums {
         render: item => {
           return (
             <div>
-              {(this.tableProps.adminMode && (
-                <div>
-                  <EuiToolTip
-                    position="top"
-                    content={'Edit group configuration'}
-                  >
-                    <EuiButtonIcon
-                      aria-label="Edit group configuration"
-                      iconType="pencil"
-                      onClick={async ev => {
-                        ev.stopPropagation();
-                        this.showGroupConfiguration(item.name);
-                      }}
-                    />
-                  </EuiToolTip>
-                  <EuiToolTip
-                    position="top"
-                    content={
-                      item.name === 'default'
-                        ? `The ${item.name} group cannot be deleted`
-                        : `Delete ${item.name}`
-                    }
-                  >
-                    <EuiButtonIcon
-                      aria-label="Delete content"
-                      iconType="trash"
-                      onClick={async ev => {
-                        ev.stopPropagation();
-                        this.tableProps.updateListItemsForRemove([item]);
-                        this.tableProps.updateShowModal(true);
-                      }}
-                      color="danger"
-                      disabled={item.name === 'default'}
-                    />
-                  </EuiToolTip>
-                </div>
-              )) || (
-                <div>
-                  <EuiToolTip
-                    position="top"
-                    content={`View ${item.name} details`}
-                  >
-                    <EuiButtonIcon
-                      aria-label="View group details"
-                      iconType="eye"
-                      onClick={async () => {
-                        this.tableProps.updateGroupDetail(item);
-                      }}
-                      color="primary"
-                    />
-                  </EuiToolTip>
-                </div>
-              )}
+              <WzButtonPermissions
+                buttonType='icon'
+                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
+                tooltip={{position: 'top', content: `View ${item.name} details`}}
+                aria-label="View group details"
+                iconType="eye"
+                onClick={async () => {
+                  this.tableProps.updateGroupDetail(item);
+                }}
+                color="primary"
+              />
+              <WzButtonPermissions
+                buttonType='icon'
+                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
+                tooltip={{position: 'top', content: 'Edit group configuration'}}
+                aria-label="Edit group configuration"
+                iconType="pencil"
+                onClick={async ev => {
+                  ev.stopPropagation();
+                  this.showGroupConfiguration(item.name);
+                }}
+              />
+              <WzButtonPermissions
+                buttonType='icon'
+                permissions={[{action: 'group:delete', resource: `group:id:${item.name}`}]}
+                tooltip={{posiiton: 'top', content: item.name === 'default' ? `The ${item.name} group cannot be deleted`: `Delete ${item.name}`}}
+                aria-label="Delete content"
+                iconType="trash"
+                onClick={async ev => {
+                  ev.stopPropagation();
+                  this.tableProps.updateListItemsForRemove([item]);
+                  this.tableProps.updateShowModal(true);
+                }}
+                color="danger"
+                isDisabled={item.name === 'default'}
+              />
             </div>
           );
         }

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get query of Kibana searchBar
+ * Wazuh app - React hooks to manage user role requirements
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,26 +11,29 @@
  */
 
 import { useSelector } from 'react-redux';
-import { checkMissingUserPermissions } from '../../../react-services/rbac';
+import { wzUserRoles } from '../../../react-services/wz-user-roles';
 
-// It retuns user permissions
+// It retuns user Roles
 export const useUserRoles = () => {
-  const userPermissions = useSelector(state => state.appStateReducers.userRoles);
-  return userPermissions;
+  const userRoles = useSelector(state => state.appStateReducers.userRoles);
+  return userRoles;
 }
 
-// It returns user permissions validation and user permissions
+// It returns user roles validation and user roles
 export const useUserRolesRequirements = (requiredRoles) => {
   const userRoles = useUserRoles();
-  const requiredPermissionsArray = typeof requiredRoles === 'function' ? requiredRoles() : requiredRoles;
-  return [checkMissingUserPermissions(requiredPermissionsArray, userRoles), userRoles];
+  if(requiredRoles === null){
+    return [false, userRoles]
+  }
+  const requiredRolesArray = typeof requiredRoles === 'function' ? requiredRoles() : requiredRoles;
+  return [wzUserRoles.checkMissingUserRoles(requiredRolesArray, userRoles), userRoles];
 }
 
-// It redirects to other URL if user permissions are not valid
+// It redirects to other URL if user roles are not valid
 export const useUserRolesPrivate = (requiredRoles, redirectURL) => {
-  const [userPermissionsValidation, userPermissions] = useUserRolesRequirements(requiredRoles);
-  if(userPermissionsValidation){
+  const [userRolesValidation, userRoles] = useUserRolesRequirements(requiredRoles);
+  if(userRolesValidation){
     window.location.href = redirectURL;
   }
-  return [userPermissionsValidation, userPermissions];
+  return [userRolesValidation, userRoles];
 }

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get query of Kibana searchBar
+ * Wazuh app - React hooks to manage user permission requirements
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,7 +11,7 @@
  */
 
 import { useSelector } from 'react-redux';
-import { checkMissingUserPermissions } from '../../../react-services/rbac';
+import { WzUserPermissions } from '../../../react-services/wz-user-permissions';
 
 // It retuns user permissions
 export const useUserPermissions = () => {
@@ -20,15 +20,18 @@ export const useUserPermissions = () => {
 }
 
 // It returns user permissions validation and user permissions
-export const useUserPermissionsValidation = (requiredPermissions) => {
+export const useUserPermissionsRequirements = (requiredPermissions) => {
   const userPermissions = useUserPermissions();
+  if(requiredPermissions === null){
+    return [false, userPermissions]
+  }
   const requiredPermissionsArray = typeof requiredPermissions === 'function' ? requiredPermissions() : requiredPermissions;
-  return [checkMissingUserPermissions(requiredPermissionsArray, userPermissions), userPermissions];
+  return [WzUserPermissions.checkMissingUserPermissions(requiredPermissionsArray, userPermissions), userPermissions];
 }
 
 // It redirects to other URL if user permissions are not valid
 export const useUserPermissionsPrivate = (requiredPermissions, redirectURL) => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(requiredPermissions);
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsRequirements(requiredPermissions);
   if(userPermissionsValidation){
     window.location.href = redirectURL;
   }
