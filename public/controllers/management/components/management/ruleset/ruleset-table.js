@@ -36,7 +36,7 @@ import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { filtersToObject } from '../../../../../components/wz-search-bar';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
-import { checkMissingUserPermissions } from '../../../../../react-services/rbac';
+import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
 
 class WzRulesetTable extends Component {
@@ -232,7 +232,7 @@ class WzRulesetTable extends Component {
         return {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
-          onClick: !checkMissingUserPermissions([{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}], this.props.userPermissions) ? async () => {
+          onClick: !WzUserPermissions.checkMissingUserPermissions([{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}], this.props.userPermissions) ? async () => {
             const { section } = this.props.state;
             if (section === 'rules') {
               const result = await this.rulesetHandler.getRuleInformation(

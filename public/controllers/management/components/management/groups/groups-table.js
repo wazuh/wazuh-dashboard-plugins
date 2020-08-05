@@ -24,7 +24,7 @@ import { toastNotifications } from 'ui/notify';
 import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
-import { checkMissingUserPermissions } from '../../../../../react-services/rbac';
+import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 
 import {
   updateLoadingStatus,
@@ -172,7 +172,7 @@ class WzGroupsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: !checkMissingUserPermissions([{action: 'group:read', resource: `group:id:${item.name}`}],this.props.userPermissions) ? () => this.props.updateGroupDetail(item) : undefined
+        onClick: !WzUserPermissions.checkMissingUserPermissions([{action: 'group:read', resource: `group:id:${item.name}`}],this.props.userPermissions) ? () => this.props.updateGroupDetail(item) : undefined
       };
     };
 
