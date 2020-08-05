@@ -85,8 +85,9 @@ export class wzUserRoles {
     let filtered;
     if (typeof requiredRoles === 'string') {
       return requiredRoles === userRoles.name ? false : filtered = requiredRoles;
-    } else if (requiredRoles.isArray()) {
-      filtered = requiredRoles.map(roles => roles !== userRoles.name ? false : null)
+    } else if (Array.isArray(requiredRoles)) {
+      const rolesUserNotOwn = requiredRoles.filter(requiredRole => !userRoles.includes(requiredRole));
+      return rolesUserNotOwn.length ? rolesUserNotOwn : false;
     }
   }
 }
