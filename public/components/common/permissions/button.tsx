@@ -11,7 +11,7 @@
  */
 
 import React, { Fragment } from 'react';
-import { useUserPermissionsValidation } from '../hooks/useUserPermissions';
+import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
 import { useUserRolesRequirements } from '../hooks/useUserRoles';
 
 import {
@@ -24,7 +24,7 @@ import {
 } from '@elastic/eui';
 
 export const WzButtonPermissions = ({permissions = null, roles = null, buttonType = 'default', tooltip, ...rest}) => {
-  const [userPermissionRequirements, userPermissions] = useUserPermissionsValidation(typeof permissions === 'function' ? permissions(rest) : permissions);
+  const [userPermissionRequirements, userPermissions] = useUserPermissionsRequirements(typeof permissions === 'function' ? permissions(rest) : permissions);
   const [userRolesRequirements, userRoles] = useUserRolesRequirements(typeof roles === 'function' ? roles(rest) : roles);
 
   const Button = buttonType === 'default' ? EuiButton

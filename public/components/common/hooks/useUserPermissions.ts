@@ -20,7 +20,7 @@ export const useUserPermissions = () => {
 }
 
 // It returns user permissions validation and user permissions
-export const useUserPermissionsValidation = (requiredPermissions) => {
+export const useUserPermissionsRequirements = (requiredPermissions) => {
   const userPermissions = useUserPermissions();
   if(requiredPermissions === null){
     return [false, userPermissions]
@@ -31,7 +31,7 @@ export const useUserPermissionsValidation = (requiredPermissions) => {
 
 // It redirects to other URL if user permissions are not valid
 export const useUserPermissionsPrivate = (requiredPermissions, redirectURL) => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsValidation(requiredPermissions);
+  const [userPermissionsValidation, userPermissions] = useUserPermissionsRequirements(requiredPermissions);
   if(userPermissionsValidation){
     window.location.href = redirectURL;
   }
