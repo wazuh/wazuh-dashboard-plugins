@@ -13,7 +13,7 @@
 import React from "react";
 import { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from '../hooks/useUserRoles';
 
-// This HOC passes permissionsValidation to wrapped component
+// This HOC passes rolesValidation to wrapped component
 export const withUserRoles = WrappedComponent => props => {
   const userRoles = useUserRoles();
   return <WrappedComponent {...props} userRoles={userRoles}/>;
