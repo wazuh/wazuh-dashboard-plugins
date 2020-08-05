@@ -18,10 +18,13 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
 import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
+import { checkMissingUserPermissions } from '../../../../../react-services/rbac';
 
 import {
   updateLoadingStatus,
@@ -169,7 +172,7 @@ class WzGroupsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => this.props.updateGroupDetail(item)
+        onClick: !checkMissingUserPermissions([{action: 'group:read', resource: `group:id:${item.name}`}],this.props.userPermissions) ? () => this.props.updateGroupDetail(item) : undefined
       };
     };
 
@@ -249,8 +252,7 @@ class WzGroupsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 
@@ -271,7 +273,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  connect(mapStateToProps,mapDispatchToProps),
+  withUserPermissions
 )(WzGroupsTable);

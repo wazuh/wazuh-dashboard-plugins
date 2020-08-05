@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get query of Kibana searchBar
+ * Wazuh app - React hooks to manage user permission requirements
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@ export const useUserPermissions = () => {
 // It returns user permissions validation and user permissions
 export const useUserPermissionsValidation = (requiredPermissions) => {
   const userPermissions = useUserPermissions();
+  if(requiredPermissions === null){
+    return [false, userPermissions]
+  }
   const requiredPermissionsArray = typeof requiredPermissions === 'function' ? requiredPermissions() : requiredPermissions;
   return [checkMissingUserPermissions(requiredPermissionsArray, userPermissions), userPermissions];
 }
