@@ -40,18 +40,18 @@ export const PoliciesTable = () => {
             truncateText: true,
         },
         {
-            field: 'policy.resources',
-            name: 'Resources',
-            sortable: true,
-            truncateText: true,
-        },
-        {
             field: 'policy.actions',
             name: 'Actions',
             sortable: true,
             render: actions => {
                 return (actions || []).join(", ")
             },
+            truncateText: true,
+        },
+        {
+            field: 'policy.resources',
+            name: 'Resources',
+            sortable: true,
             truncateText: true,
         },
         {
