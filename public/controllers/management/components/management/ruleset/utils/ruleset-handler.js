@@ -10,7 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WzRequest } from '../../../../../../react-services/wz-request';
+import {
+  WzRequest
+} from '../../../../../../react-services/wz-request';
 
 export default class RulesetHandler {
   /**
@@ -21,10 +23,14 @@ export default class RulesetHandler {
   static async getRuleInformation(file, id) {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, {
-        file
+        params: {
+          filename: file
+        }
       });
       const info = ((result || {}).data || {}).data || false;
-      if (info) Object.assign(info, { current: id }); //Assign the current rule ID to filter later in the component
+      if (info) Object.assign(info, {
+        current: id
+      }); //Assign the current rule ID to filter later in the component
       return info;
     } catch (error) {
       return Promise.reject(error);
@@ -38,10 +44,14 @@ export default class RulesetHandler {
   static async getDecoderInformation(file, name) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
-        file
+        params: {
+          filename: file
+        }
       });
       const info = ((result || {}).data || {}).data || false;
-      if (info) Object.assign(info, { current: name });
+      if (info) Object.assign(info, {
+        current: name
+      });
       return info;
     } catch (error) {
       return Promise.reject(error);
@@ -54,7 +64,7 @@ export default class RulesetHandler {
   static async getRules(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -66,7 +76,7 @@ export default class RulesetHandler {
   static async getRulesFiles(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/rules/files`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -79,7 +89,7 @@ export default class RulesetHandler {
   static async getLists(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/lists/files`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -91,7 +101,7 @@ export default class RulesetHandler {
   static async getDecoders(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -103,7 +113,7 @@ export default class RulesetHandler {
   static async getDecodersFiles(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders/files`, filters);
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -115,9 +125,11 @@ export default class RulesetHandler {
   static async getLocalRules() {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, {
-        path: 'etc/rules'
+        params: {
+          relative_dirname: 'etc/rules'
+        }
       });
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -131,7 +143,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
         path: 'etc/decoders'
       });
-      return (((result || {}).data || {}).data || {}).items || false;
+      return (((result || {}).data || {}).data || {}).affected_items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -159,9 +171,9 @@ export default class RulesetHandler {
    */
   static async getDecoderContent(path, nolocal = true) {
     try {
-      const _path = nolocal
-        ? `ruleset/decoders/${path}`
-        : `etc/decoders/${path}`;
+      const _path = nolocal ?
+        `ruleset/decoders/${path}` :
+        `etc/decoders/${path}`;
       const result = await this.getFileContent(_path);
       return result;
     } catch (error) {
@@ -189,9 +201,11 @@ export default class RulesetHandler {
   static async getFileContent(path) {
     try {
       const result = await WzRequest.apiReq('GET', `/manager/files`, {
-        path: path
+        params: {
+          path: path
+        }
       });
-      return ((result || {}).data || {}).data || false;
+      return ((result || {}).data || {}).contents || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -206,10 +220,14 @@ export default class RulesetHandler {
   static async sendRuleConfiguration(rule, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
-        `/manager/files?path=etc/rules/${rule.file ||
-          rule}&overwrite=${overwrite}`,
-        { content, origin: 'xmleditor' }
+        'PUT',
+        `/manager/files`, {
+          params: {
+            path: `etc/rules/${rule.file || rule}`,
+            overwrite: overwrite
+          },
+          body: content.toString()
+        }
       );
       return result;
     } catch (error) {
@@ -226,10 +244,14 @@ export default class RulesetHandler {
   static async sendDecoderConfiguration(decoder, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
-        `/manager/files?path=etc/decoders/${decoder.file ||
-          decoder}&overwrite=${overwrite}`,
-        { content, origin: 'xmleditor' }
+        'PUT',
+        '/manager/files?', {
+          params: {
+            path: `etc/decoders/${decoder.file || decoder}`,
+            overwrite: overwrite
+          },
+          body: content.toString()
+        }
       );
       return result;
     } catch (error) {
@@ -244,12 +266,17 @@ export default class RulesetHandler {
    * @param {String} content
    * @param {Boolean} overwrite
    */
-  static async sendCdbList(list, path, content, overwrite) {
+  static async sendCdbList(list, path, content, overwrite, addingNew = false) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
-        `/manager/files?path=${path}/${list}&overwrite=${overwrite}`,
-        { content, origin: 'raw' }
+        'PUT',
+        `/manager/files`, {
+          params: {
+            path: `${path}/${list}`,
+            overwrite: overwrite
+          },
+          body: content.toString()
+        }
       );
       return result;
     } catch (error) {
@@ -257,12 +284,18 @@ export default class RulesetHandler {
     }
   }
 
-  static async uploadCdbList(list, content, overwrite) {
+
+  static async updateCdbList(list, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
-        'POST',
-        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
-        { content, origin: 'raw' }
+        'PUT',
+        `/manager/files`, {
+          params: {
+            path: `etc/lists/${list}`,
+            overwrite: !overwrite
+          },
+          body: content.toString()
+        }
       );
       return result;
     } catch (error) {
@@ -276,10 +309,12 @@ export default class RulesetHandler {
    * @param {String} path
    */
   static async deleteFile(file, path) {
-    const fullPath = `${path}/${file}`;
+    let fullPath = `${path}/${file}`;
     try {
       const result = await WzRequest.apiReq('DELETE', '/manager/files', {
-        path: fullPath
+        params: {
+          path: fullPath
+        }
       });
       return result;
     } catch (error) {

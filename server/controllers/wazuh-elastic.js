@@ -656,7 +656,7 @@ export class WazuhElasticCtrl {
         !req.params.tab ||
         !req.payload ||
         !req.payload.nodes ||
-        !req.payload.nodes.items ||
+        !req.payload.nodes.affected_items ||
         !req.payload.nodes.name ||
         (req.params.tab && !req.params.tab.includes('cluster-'))
       ) {

@@ -534,16 +534,16 @@ export class WazuhReportingCtrl {
       if (isAgents && typeof isAgents === 'string') {
         const agent = await this.apiRequest.makeGenericRequest(
           'GET',
-          `/agents/${isAgents}`,
-          {},
+          `/agents`,
+          { params: { list_agents: isAgents }},
           apiId
         );
         if (
-          typeof ((agent || {}).data || {}).status === 'string' &&
-          ((agent || {}).data || {}).status !== 'Active'
+          typeof ((((agent || {}).data || {}).affected_items || [])[0] || {}).status === 'string' &&
+          ((((agent || {}).data || {}).affected_items || [])[0] || {}).status !== 'active'
         ) {
           this.dd.content.push({
-            text: `Warning. Agent is ${agent.data.status.toLowerCase()}`,
+            text: `Warning. Agent is ${agent.data.affected_items[0].status.toLowerCase()}`,
             style: 'standard'
           });
           this.dd.content.push('\n');
@@ -701,11 +701,12 @@ export class WazuhReportingCtrl {
       if (multi) {
         const agents = await this.apiRequest.makeGenericRequest(
           'GET',
-          `/agents/groups/${multi}`,
+          `/groups/${multi}/agents`,
           {},
           apiId
         );
-        for (let item of ((agents || {}).data || {}).items || []) {
+
+        for (let item of ((agents || {}).data || {}).affected_items || []) {
           const str = Array(6).fill('-');
           if ((item || {}).id) str[0] = item.id;
           if ((item || {}).name) str[1] = item.name;
@@ -731,9 +732,9 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (agent && agent.data) {
+            if (agent && agent.data.affected_items[0]) {
               data = {};
-              Object.assign(data, agent.data);
+              Object.assign(data, agent.data.affected_items[0]);
             }
           } catch (error) {
             log(
@@ -821,10 +822,10 @@ export class WazuhReportingCtrl {
       const agents = await this.apiRequest.makeGenericRequest(
         'GET',
         '/agents',
-        { limit: 1 },
+        { params: {limit: 1 }},
         apiId
       );
-      const totalAgents = agents.data.totalItems;
+      const totalAgents = agents.data.total_affected_items;
 
       if (section === 'overview' && tab === 'vuls') {
         log(
@@ -1519,13 +1520,13 @@ export class WazuhReportingCtrl {
         );
 
         if (lastScan && lastScan.data) {
-          if (lastScan.data.start && lastScan.data.end) {
+          if (lastScan.data.affected_items[0].start && lastScan.data.affected_items[0].end) {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`
             });
-          } else if (lastScan.data.start) {
+          } else if (lastScan.data.affected_items[0].start) {
             this.dd.content.push({
-              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`
+              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.affected_items[0].start}).`
             });
           } else {
             this.dd.content.push({
@@ -1597,14 +1598,14 @@ export class WazuhReportingCtrl {
           this.dd.content.push({ text: 'Hardware information', style: 'h2' });
           this.dd.content.push('\n');
           const ulcustom = [];
-          if (hardware.data.cpu && hardware.data.cpu.cores)
-            ulcustom.push(hardware.data.cpu.cores + ' cores ');
-          if (hardware.data.cpu && hardware.data.cpu.name)
-            ulcustom.push(hardware.data.cpu.name);
-          if (hardware.data.ram && hardware.data.ram.total)
+          if (hardware.data.affected_items[0].cpu && hardware.data.affected_items[0].cpu.cores)
+            ulcustom.push(hardware.data.affected_items[0].cpu.cores + ' cores ');
+          if (hardware.data.affected_items[0].cpu && hardware.data.affected_items[0].cpu.name)
+            ulcustom.push(hardware.data.affected_items[0].cpu.name);
+          if (hardware.data.affected_items[0].ram && hardware.data.affected_items[0].ram.total)
             ulcustom.push(
-              Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-                'GB RAM'
+              Number(hardware.data.affected_items[0].ram.total / 1024 / 1024).toFixed(2) +
+              'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1952,7 +1953,7 @@ export class WazuhReportingCtrl {
             try {
               configuration = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}/configuration`,
+                `/groups/${g_id}/configuration`, 
                 {},
                 apiId
               );
@@ -2150,7 +2151,7 @@ export class WazuhReportingCtrl {
             try {
               agentsInGroup = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}`,
+                `/groups/${g_id}/agents`,
                 {},
                 apiId
               );
@@ -2160,7 +2161,7 @@ export class WazuhReportingCtrl {
             await this.renderHeader(
               tab,
               g_id,
-              (((agentsInGroup || []).data || []).items || []).map(x => x.id),
+              (((agentsInGroup || []).data || []).affected_items || []).map(x => x.id),
               apiId
             );
           }

@@ -55,7 +55,6 @@ export const initialWazuhConfig = `---
 #extensions.nist      : true
 #extensions.tsc       : true
 #extensions.audit     : true
-#extensions.mitre     : true
 #extensions.oscap     : false
 #extensions.ciscat    : false
 #extensions.aws       : false
@@ -120,7 +119,12 @@ export const initialWazuhConfig = `---
 # Default index pattern to use for Wazuh monitoring
 #wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
 #
+# --------------------------------- wazuh-cron ----------------------------------
 #
+# Customize the index prefix of predefined jobs
+# This change is not retroactive, if you change it new indexes will be created
+# cron.prefix: test
+# 
 # ------------------------------- App privileges --------------------------------
 #admin: true
 #
@@ -141,14 +145,13 @@ export const initialWazuhConfig = `---
 #  - <id>:
 #     url: http(s)://<url>
 #     port: <port>
-#     user: <user>
-#     password: <password>
+#     username: <username> 
+#     password: <password> 
 
 hosts:
   - default:
      url: https://localhost
      port: 55000
-     user: foo
-     password: bar
-
-`;
+     username: wazuh
+     password: wazuh
+`

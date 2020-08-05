@@ -31,7 +31,9 @@ import { CommonData } from '../../services/common-data';
 import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
-import { Metrics } from '../overview/metrics/metrics'
+import { Metrics } from '../overview/metrics/metrics';
+import { PatternHandler } from '../../react-services/pattern-handler';
+import { toastNotifications } from 'ui/notify';
 
 const visHandler = new VisHandlers();
 
@@ -46,6 +48,9 @@ export class WzVisualize extends Component {
       expandedVis: false,
       thereAreSampleAlerts: false,
       adminMode: false,
+      hasRefreshedKnownFields: false,
+      refreshingKnownFields: [],
+      refreshingIndex: true
     };
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
@@ -58,36 +63,43 @@ export class WzVisualize extends Component {
     ];
   }
 
+
+  showToast(color, title = '', text = '', time = 3000){
+    toastNotifications.add({
+        color: color,
+        title: title,
+        text: text,
+        toastLifeTimeMs: time,
+    });
+  };
+
   async componentDidMount() {
     this.agentsStatus = false;
     if (!this.monitoringEnabled) {
-      const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
+      const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
       const result = ((data || {}).data || {}).data || false;
       if (result) {
         this.agentsStatus = [
           {
             title: 'Total',
-            description: result.Total - 1
+            description: result.total - 1,
           },
           {
             title: 'Active',
-            description: result.Active - 1
+            description: result.active - 1,
           },
           {
             title: 'Disconnected',
-            description: result.Disconnected
+            description: result.disconnected,
           },
           {
             title: 'Never Connected',
-            description: result['Never connected']
+            description: result['never_connected'],
           },
           {
             title: 'Agents coverage',
-            description:
-              (result.Total - 1
-                ? ((result.Active - 1) / (result.Total - 1)) * 100
-                : 0) + '%'
-          }
+            description: ((result.total - 1) ? ((result.active - 1) / (result.total - 1)) * 100 : 0) + '%',
+          },
         ];
       }
     }
@@ -123,6 +135,25 @@ export class WzVisualize extends Component {
   expand = id => {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
+
+  refreshKnownFields =  async() => {
+    if(!this.state.hasRefreshedKnownFields){ // Known fields are refreshed only once per dashboard loading
+      try{
+        this.setState({hasRefreshedKnownFields: true, isRefreshing: true});
+        await PatternHandler.refreshIndexPattern();
+        this.setState({isRefreshing: false});
+        this.showToast('success', 'The index pattern was refreshed successfully.');
+
+      }catch(err){
+        this.setState({isRefreshing: false});
+        this.showToast('danger', 'The index pattern could not be refreshed');
+
+      }
+    }else if(this.state.isRefreshing){
+      await new Promise(r => setTimeout(r, 150));
+      await this.refreshKnownFields();
+    }
+  }
 
   render() {
     this.visualizations = this.rawVisualizations.getType() !== 'general' ? agentVisualizations : visualizations;
@@ -162,6 +193,7 @@ export class WzVisualize extends Component {
                     this.monitoringEnabled)) && (
                     <WzReduxProvider>
                       <KibanaVis
+                        refreshKnownFields={this.refreshKnownFields}
                         visID={vis.id}
                         tab={selectedTab}
                         {...this.props}

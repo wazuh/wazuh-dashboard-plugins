@@ -314,9 +314,9 @@ export class SettingsController {
 
       // Get the Api information
       const api = this.apiEntries[index];
-      const { user, url, port, id } = api;
+      const { username, url, port, id } = api;
       const tmpData = {
-        user: user,
+        username: username,
         url: url,
         port: port,
         cluster_info: {},

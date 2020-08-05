@@ -367,7 +367,7 @@ export class DevToolsController {
     const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
+        'GET /agents?status=active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
         JSON.stringify({ limit: 5 }, null, 2);
 
       AppState.setCurrentDevTools(demoStr);
@@ -576,23 +576,27 @@ export class DevToolsController {
             : `/${requestCopy}`
           : '/';
 
-        let JSONraw = {};
+        let body = {};
         try {
-          JSONraw = JSON.parse(paramsInline || desiredGroup.requestTextJson);
+          body = JSON.parse(paramsInline || desiredGroup.requestTextJson);
         } catch (error) {
-          JSONraw = {};
+          body = {};
         }
 
         if (typeof extra.pretty !== 'undefined') delete extra.pretty;
-        if (typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
+        if (typeof body.pretty !== 'undefined') delete body.pretty;
 
+        let params = {};
         // Assign inline parameters
-        for (const key in extra) JSONraw[key] = extra[key];
+        for (const key in extra) params[key] = extra[key];
         const path = req.includes('?') ? req.split('?')[0] : req;
 
-        if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
-          const output = await this.apiReq.request(method, path, JSONraw);
+          const output = await this.apiReq.request(method, path, {
+            params: params,
+            body: body,
+            devTools: true,
+          });
           if(typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }

@@ -11,7 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -66,7 +65,9 @@ const mainSettings = [
 const columns = [
   { field: 'address', name: 'Address', render: renderValueOrNoValue },
   { field: 'port', name: 'Port', render: renderValueOrDefault('1514') },
-  { field: 'protocol', name: 'Protocol', render: renderValueOrDefault('udp') }
+  { field: 'protocol', name: 'Protocol', render: renderValueOrDefault('udp') },
+  { field: 'max_retries', name: 'Maximum retries to connect', render: renderValueOrNoValue },
+  { field: 'retry_interval', name: 'Retry interval to connect', render: renderValueOrNoValue },
 ];
 
 class WzConfigurationClient extends Component {

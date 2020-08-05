@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
-  "version": "3.13.0",
-  "revision": "0881",
-  "code": "0880-0",
+  "version": "4.0.0",
+  "revision": "4001",
+  "code": "4001-0",
   "kibana": {
-    "version": "7.8.0"
+    "version": "7.8.1"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -37,7 +37,8 @@
     "test": "_mocha test/**/*",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
-    "test:browser": "plugin-helpers test:browser"
+    "test:browser": "plugin-helpers test:browser",
+    "test:jest": "node scripts/jest"
   },
   "dependencies": {
     "angular-animate": "1.7.8",
@@ -64,6 +65,7 @@
   },
   "devDependencies": {
     "@elastic/plugin-helpers": "^7.1.8",
+    "@types/node-cron": "^2.0.3",
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",
     "eslint": "^5.10.0",

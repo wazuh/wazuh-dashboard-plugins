@@ -49,6 +49,10 @@ export class WazuhHostsCtrl {
    */
   joinHostRegistry(hosts, registry, removePassword = true) {
     try {
+      if (!Array.isArray(hosts)) {
+        throw new Error('Hosts configuration error in wazuh.yml');
+      }
+
       const joined = [];
       hosts.forEach(h => {
         const id = Object.keys(h)[0];

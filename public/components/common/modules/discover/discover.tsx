@@ -521,7 +521,7 @@ export class Discover extends Component {
     const noResultsText = `No results match for this search criteria`
     return (
       <div
-        className='wz-discover hide-filter-controll' >
+        className='wz-discover hide-filter-control' >
         <KbnSearchBar  
           indexPattern={this.indexPattern} 
           filterManager={this.filterManager}

@@ -78,11 +78,14 @@ export class WzSearchButtons extends Component {
     const { options } = this.state;
     const { filters } = this.props;
     return Object.keys(IconSelectedMap).reduce((acc: IFilter[], label) => {
+      const newFilters = [...filters];
       const { field, value } = options[label];
-      const filter = filters.find(filter => filter.field === field);
-      ((filter && IconSelectedMap[label]) || IconSelectedMap[label]) && acc.push({ field, value })
-      return acc;
-    }, [])
+      const filterIdx = filters.findIndex(filter => filter.field === field);
+      (filterIdx !== -1 && !IconSelectedMap[label]) 
+      ? newFilters.splice(filterIdx, 1)
+      : newFilters.push({ field, value })
+      return newFilters;
+    }, filters)
   }
 
   checkFilters() {

@@ -11,6 +11,7 @@
  */
 
 import { GenericRequest } from './generic-request';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 export class SavedObject {
   /**
@@ -77,7 +78,7 @@ export class SavedObject {
     }
   }
   
-  static async existsMonitoringIndexPattern(patternID) {
+  static async existsOrCreateIndexPattern(patternID) {
     try {
       await GenericRequest.request(
         'GET',
@@ -156,11 +157,33 @@ export class SavedObject {
         {
           attributes: {
             fields: JSON.stringify(fields.data.fields),
-            timeFieldName: 'timestamp',
-            title: id
+            timeFieldName: 'timestamp'
           }
         }
       );
+      return;
+    } catch (error) {
+      return ((error || {}).data || {}).message || false
+        ? error.data.message
+        : error.message || error;
+    }
+  }
+
+  /**
+   * Refresh an index pattern
+   */
+  static async refreshIndexPattern(pattern) {
+    try {
+      const {title : patternTitle} = await getServices().indexPatterns.get(pattern);
+      const fields = await GenericRequest.request(
+        //we check if indices exist before creating the index pattern
+        'GET',
+        `/api/index_patterns/_fields_for_wildcard?pattern=${patternTitle}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+        {}
+      );
+
+      await this.refreshFieldsOfIndexPattern(pattern, fields);
+
       return;
     } catch (error) {
       return ((error || {}).data || {}).message || false

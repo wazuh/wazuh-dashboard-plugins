@@ -128,7 +128,6 @@ export function settingsWizard(
           gcp: config['extensions.gcp'],
           virustotal: config['extensions.virustotal'],
           osquery: config['extensions.osquery'],
-          mitre: config['extensions.mitre'],
           docker: config['extensions.docker']
         };
         AppState.setExtensions(currentApi, extensions);

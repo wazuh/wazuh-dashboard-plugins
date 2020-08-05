@@ -100,7 +100,7 @@ export class AddApi extends Component {
   - <id>:
      url: <api_url>
      port: <api_port>
-     user: <api_user>
+     username: <api_username>
      password: <api_password>`;
 
     const checkConnectionChildren = (
@@ -148,7 +148,7 @@ export class AddApi extends Component {
           Where <EuiCode>{'<id>'}</EuiCode> is an arbitrary ID,{' '}
           <EuiCode>{'<api_url>'}</EuiCode> is the URL of the Wazuh API,{' '}
           <EuiCode>{'<api_port>'}</EuiCode> is the port,{' '}
-          <EuiCode>{'<api_user>'}</EuiCode> and{' '}
+          <EuiCode>{'<api_username>'}</EuiCode> and{' '}
           <EuiCode>{'<api_password>'}</EuiCode> are the credentials to
           authenticate.
         </EuiText>

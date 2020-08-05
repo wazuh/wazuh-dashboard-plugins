@@ -14,12 +14,12 @@
 import { useRef, useState, useEffect } from "react";
 
 
-export const useParentWidth = (children) => {
+export const useParentWidth = () => {
     const ref = useRef(null);
     const [parentWidth, setParentWidth] = useState(0);
 
     useEffect(() => {
         setParentWidth((((ref || {}).current || {}).parentNode || {}).offsetWidth || 0);
-    }, [children]);
+    });
     return {parentWidth, ref};
 }

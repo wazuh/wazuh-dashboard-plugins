@@ -77,16 +77,18 @@ export class AgentsTable extends Component {
   }
 
   async UNSAFE_componentWillMount() {
-    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+    const managerVersion = await WzRequest.apiReq('GET', '//', {});
     const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
     const agentActive = await WzRequest.apiReq('GET', '/agents', {
-      q: 'status=active'
+      params: {
+        q: 'status=active'
+      }
     });
 
     this.setState({
-      managerVersion: managerVersion.data.data,
+      managerVersion: managerVersion.data.api_version,
       agentActive: agentActive.data.data.totalItems,
-      avaibleAgents: totalAgent.data.data.items
+      avaibleAgents: totalAgent.data.data.affected_items
     });
   }
 
@@ -143,17 +145,17 @@ export class AgentsTable extends Component {
       const rawAgents = await this.props.wzReq(
         'GET',
         '/agents',
-        this.buildFilter()
+        { params: this.buildFilter() }
       );
   
       const formatedAgents = (
         ((rawAgents || {}).data || {}).data || {}
-      ).items.map(this.formatAgent.bind(this));
+      ).affected_items.map(this.formatAgent.bind(this));
 
       this._isMount &&
         this.setState({
           agents: formatedAgents,
-          totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
+          totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
           isLoading: false
         });
     }catch(error){
@@ -313,13 +315,17 @@ export class AgentsTable extends Component {
     );
   }
 
+  parseAgentStatus(status){
+    return status === 'never_connected' ? 'never connected' : status
+  }
+
   addHealthStatusRender(status) {
     const color = status => {
       if (status.toLowerCase() === 'active') {
         return 'success';
       } else if (status.toLowerCase() === 'disconnected') {
         return 'danger';
-      } else if (status.toLowerCase() === 'never connected') {
+      } else if (status.toLowerCase() === 'never_connected') {
         return 'subdued';
       }
     };

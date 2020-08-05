@@ -5,7 +5,7 @@
     <div ng-if='!loadingDashboard'>
         <div ng-show='(showModuleDashboard || showModuleEvents || showMitre) && showModuleDashboard !== "welcome"'>
             <div ng-class="{'no-opacity': !moduleDiscoverReady}">
-                <kbn-dis></kbn-dis>
+                <kbn-dis class='hide-filter-control'></kbn-dis>
             </div>
         </div>
     </div>

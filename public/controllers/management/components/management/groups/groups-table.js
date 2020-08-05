@@ -40,20 +40,7 @@ import GroupsColums from './utils/columns-main';
 class WzGroupsTable extends Component {
   _isMounted = false;
 
-  suggestions = [
-    {
-      type: 'q', label: 'name', description: 'Filter by group name', operators: ['=', '!=', '~'], values: async (value) => {
-        const result = await WzRequest.apiReq('GET', `/agents/groups`,
-          {
-            limit: 30,
-            ...(value ? { search: value } : {}),
-          })
-        return (((result || {}).data || {}).data || {}).items.map((item) => { return item['name'] });
-      },
-    },
-    { type: 'q', label: 'count', description: 'Filter by number of agents', operators: ['=', '!=', '<', '>'], values: [] },
-
-  ]
+  suggestions = []; //TODO: Fix suggestions without q search for API 4.0
 
   constructor(props) {
     super(props);
@@ -105,12 +92,12 @@ class WzGroupsTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
-      const { items, totalItems } = ((rawItems || {}).data || {}).data;
+      const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
+      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
-      this._isMounted && this.setState({
-        items,
-        totalItems,
+      this.setState({
+        items : affected_items,
+        totalItems : total_affected_items
       });
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
