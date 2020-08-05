@@ -16,31 +16,31 @@ import {
   EuiToolTip
 } from '@elastic/eui';
 
-// This HOC passes permissionsValidation to wrapped component
+// This HOC passes rolesValidation to wrapped component
 export const withUserRoles = WrappedComponent => props => {
   const userRoles = useUserRoles();
   return <WrappedComponent {...props} userRoles={userRoles}/>;
 }
 
-// This HOC hides the wrapped component if user has not permissions
-export const withUserPermissionsValidation = requiredUserRoles => WrappedComponent => props => {
+// This HOC hides the wrapped component if user has not roles
+export const withUserRolesValidation = requiredUserRoles => WrappedComponent => props => {
   const [userRolesRequirements, userRoles] = useUserRolesRequirements(typeof requiredUserRoles === 'function' ? requiredUserRoles(props) : requiredUserRoles);
   return <WrappedComponent {...props} userRolesRequirements={userRolesRequirements} userRoles={userRoles}/>;
 }
 
-// This HOC redirects to redirectURL if user has not permissions
-export const withUserPermissionsPrivate = (read_api_config, redirectURL) => WrappedComponent => props => {
+// This HOC redirects to redirectURL if user has not roles
+export const withUserRolesPrivate = (read_api_config, redirectURL) => WrappedComponent => props => {
   const [userRolesRequirements, userRoles] = useUserRolesPrivate(read_api_config, redirectURL);
   return userRolesRequirements ? <WrappedComponent {...props} userRolesRequirements={userRolesRequirements} userRoles={userRoles}/> : null;
 }
 
-// This HOC hides the wrapped component if user has not permissions
-export const withUserPermissionsValidationButton = requiredUserRoles => WrappedComponent => props => {
+// This HOC hides the wrapped component if user has not roles
+export const withUserRolesValidationButton = requiredUserRoles => WrappedComponent => props => {
   const [userRolesRequirements, userRoles] = useUserRolesRequirements(typeof requiredUserRoles === 'function' ? requiredUserRoles(props) : requiredUserRoles);
-  const wrappedComponent = <WrappedComponent {...props} isDisabled={Boolean(userRolesRequirements) || props.isDisabled} userPermissionsRequirements={userRolesRequirements} userRoles={userRoles}/>
+  const wrappedComponent = <WrappedComponent {...props} isDisabled={Boolean(userRolesRequirements) || props.isDisabled} userRolesRequirements={userRolesRequirements} userRoles={userRoles}/>
   return userRolesRequirements ? 
     <EuiToolTip
-      content={`Require ${userRolesRequirements.map(permission => typeof permission === 'object' ? permission.action : permission).join(', ')} ${userRolesRequirements.length > 1 ? 'roles': 'role'}`}
+      content={`Require ${userRolesRequirements.map(roles => typeof roles === 'object' ? roles.action : roles).join(', ')} ${userRolesRequirements.length > 1 ? 'roles': 'role'}`}
       {...props.tooltip}
     >
       {wrappedComponent}
