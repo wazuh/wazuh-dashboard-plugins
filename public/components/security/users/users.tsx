@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     EuiPageContent,
     EuiPageContentHeader,
@@ -7,57 +7,52 @@ import {
     EuiPageContentBody,
     EuiButton,
     EuiTitle,
-    EuiFlyout,
     EuiOverlayMask,
-    EuiFlyoutHeader,
-    EuiFlyoutBody,
-    EuiForm,
-    EuiFormRow,
-    EuiSpacer,
-    EuiSuperSelect,
-    EuiComboBox
 } from '@elastic/eui';
 import { UsersTable } from './users-table';
 
-export const Users = () => {
+import {WazuhSecurity} from '../../../factories/wazuh-security'
+import {useApiRequest} from '../../common/hooks/useApiRequest';
+import { CreateUser } from './create-user';
+import { AppState } from '../../../react-services/app-state'
+import { EditUser } from './edit-user';
+import { ErrorHandler } from '../../../react-services/error-handler';
+
+export const Users = ({setSecurityError}) => {
     const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-
-    const usersOptions = [
-        {
-            value: 'wazuh',
-            inputDisplay: 'wazuh'
-        },
-        {
-            value: 'other',
-            inputDisplay: 'other'
-        },
-    ];
-
-    const [userValue, setUserValue] = useState();
-
-    const onUserValueChange = value => {
-        setUserValue(value);
-    };
-
-    const rolesOptions = [
-        {
-            label: 'Admin'
-        },
-        {
-            label: 'Read',
-        },
-        {
-            label: 'Viewer',
-        },
-        {
-            label: 'Wazuh',
+    const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
+    const [editingUser, setEditingUser] = useState(false);
+    const [users,setUsers] = useState([]);
+    const getUsers = async() => {
+        try{
+            const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
+            const wazuhSecurity = new WazuhSecurity();
+            const response = await wazuhSecurity.security.getUsers();
+            // Filter by users with the role "wazuh_user"
+            const wazuh_users = response.filter(item => { 
+                return item.roles.includes('wazuh_user')
+            });
+            // Show only roles that starts with "wazuh_<currentAPI>"
+            const users = wazuh_users.map((item,idx) => {
+                const filteredRoles = item.roles.filter(role => {
+                    return role.startsWith(`wazuh_${currentApi}_`);
+                }).map(item => {return item.replace(`wazuh_${currentApi}_`,"")});
+                return {id: idx, user: item.username, roles: filteredRoles, full_name: item.full_name, email: item.email}
+            });
+            setUsers(users)
+        }catch(error){
+            setSecurityError(true);
         }
-    ];
+    }
+    useEffect(() => {
+        getUsers();
+      }, []);
 
-    const [selectedRoles, setSelectedRole] = useState([]);
 
-    const onChangeRoles = selectedRoles => {
-        setSelectedRole(selectedRoles);
+
+    const closeFlyout = async() => {
+        setIsFlyoutVisible(false);
+        await getUsers();
     };
 
     let flyout;
@@ -67,43 +62,30 @@ export const Users = () => {
                 e.target.className === 'euiOverlayMask' &&
                     setIsFlyoutVisible(false)
             }}>
-                <EuiFlyout
-                    onClose={() => setIsFlyoutVisible(false)}>
-                    <EuiFlyoutHeader hasBorder={false}>
-                        <EuiTitle size="m">
-                            <h2>New user</h2>
-                        </EuiTitle>
-                    </EuiFlyoutHeader>
-                    <EuiFlyoutBody>
-                        <EuiForm component="form" style={{ padding: 24 }}>
-                            <EuiFormRow label="Select a user"
-                                helpText="Select a user from the users available in your security plugin.">
-                                <EuiSuperSelect
-                                    options={usersOptions}
-                                    valueOfSelected={userValue}
-                                    onChange={value => onUserValueChange(value)}
-                                />
-                            </EuiFormRow>
-                            <EuiFormRow label="Roles"
-                                helpText="Assign roles to the user from the roles available in your security plugin.">
-                                <EuiComboBox
-                                    placeholder="Select roles"
-                                    options={rolesOptions}
-                                    selectedOptions={selectedRoles}
-                                    onChange={onChangeRoles}
-                                    isClearable={true}
-                                    data-test-subj="demoComboBox"
-                                />
-                            </EuiFormRow>
-                            <EuiSpacer />
-                            <EuiButton type="submit" fill>
-                                Create user
-                                    </EuiButton>
-                        </EuiForm>
-                    </EuiFlyoutBody>
-                </EuiFlyout>
+                <CreateUser closeFlyout={closeFlyout}/> 
             </EuiOverlayMask >
         );
+    }
+    let editFlyout;
+    const closeEditFlyout = async() => {
+        await getUsers();
+        setIsEditFlyoutVisible(false);
+    }
+
+    if (isEditFlyoutVisible) {
+        editFlyout = (
+            <EuiOverlayMask onClick={(e) => {
+                e.target.className === 'euiOverlayMask' &&
+                    setIsEditFlyoutVisible(false)
+            }}>
+                <EditUser currentUser={editingUser} closeFlyout={closeEditFlyout} />
+            </EuiOverlayMask >
+        );
+    }
+
+    const showEditFlyover = (item) => {
+        setEditingUser(item);
+        setIsEditFlyoutVisible(true);
     }
 
     return (
@@ -121,11 +103,12 @@ export const Users = () => {
                             Create user
                                 </EuiButton>
                         {flyout}
+                        {editFlyout}
                     </div>
                 </EuiPageContentHeaderSection>
             </EuiPageContentHeader>
             <EuiPageContentBody>
-                <UsersTable></UsersTable>
+                <UsersTable users={users} editUserFlyover={showEditFlyover}></UsersTable>
             </EuiPageContentBody>
         </EuiPageContent>
     );

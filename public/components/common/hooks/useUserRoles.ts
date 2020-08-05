@@ -11,7 +11,7 @@
  */
 
 import { useSelector } from 'react-redux';
-import { checkMissingUserPermissions } from '../../../react-services/rbac';
+import { wzUserRoles } from '../../../react-services/wz-user-roles';
 
 // It retuns user permissions
 export const useUserRoles = () => {
@@ -26,8 +26,7 @@ export const useUserRolesRequirements = (requiredRoles) => {
     return [false, userRoles]
   }
   const requiredPermissionsArray = typeof requiredRoles === 'function' ? requiredRoles() : requiredRoles;
-  const rolesUserNotOwn = requiredPermissionsArray.filter(role => !userRoles.includes(role));
-  return [rolesUserNotOwn.length ? rolesUserNotOwn : false, userRoles];
+  return [wzUserRoles.checkMissingUserRoles(requiredPermissionsArray, userRoles), userRoles];
 }
 
 // It redirects to other URL if user permissions are not valid

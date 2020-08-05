@@ -17,6 +17,7 @@ const initialState = {
   currentTab: '',
   extensions: {},
   adminMode: false,
+  currentPlatform: false,
   currentAgentData: {},
   showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
@@ -181,6 +182,286 @@ const initialState = {
       "agent:id:*": "allow"
     },
     "rbac_mode": "black"
+  },
+  userRoles: {
+    "id": 1,
+    "name": "administrator",
+    "rule": {
+      "FIND": {
+        "r'^auth[a-zA-Z]+$'": [
+          "full_admin"
+        ]
+      }
+    },
+    "policies": [
+      {
+        "id": 1,
+        "name": "agents_all_resourceless",
+        "policy": {
+          "actions": [
+            "agent:create",
+            "group:create"
+          ],
+          "resources": [
+            "*:*:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 2,
+        "name": "agents_all_agents",
+        "policy": {
+          "actions": [
+            "agent:read",
+            "agent:delete",
+            "agent:modify_group",
+            "agent:restart",
+            "agent:upgrade"
+          ],
+          "resources": [
+            "agent:id:*",
+            "agent:group:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 3,
+        "name": "agents_all_groups",
+        "policy": {
+          "actions": [
+            "group:read",
+            "group:delete",
+            "group:update_config",
+            "group:modify_assignments"
+          ],
+          "resources": [
+            "group:id:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 6,
+        "name": "agents_commands_agents",
+        "policy": {
+          "actions": [
+            "active-response:command"
+          ],
+          "resources": [
+            "agent:id:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 7,
+        "name": "security_all_resourceless",
+        "policy": {
+          "actions": [
+            "security:create",
+            "security:create_user",
+            "security:read_config",
+            "security:update_config",
+            "security:revoke"
+          ],
+          "resources": [
+            "*:*:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 8,
+        "name": "security_all_security",
+        "policy": {
+          "actions": [
+            "security:read",
+            "security:update",
+            "security:delete"
+          ],
+          "resources": [
+            "role:id:*",
+            "policy:id:*",
+            "user:id:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 20,
+        "name": "cluster_all_resourceless",
+        "policy": {
+          "actions": [
+            "cluster:status",
+            "manager:read",
+            "manager:read_api_config",
+            "manager:update_api_config",
+            "manager:upload_file",
+            "manager:restart",
+            "manager:delete_file"
+          ],
+          "resources": [
+            "*:*:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 21,
+        "name": "cluster_all_files",
+        "policy": {
+          "actions": [
+            "manager:delete_file",
+            "manager:read_file"
+          ],
+          "resources": [
+            "file:path:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 22,
+        "name": "cluster_all_nodes",
+        "policy": {
+          "actions": [
+            "cluster:delete_file",
+            "cluster:read_api_config",
+            "cluster:read",
+            "cluster:read_api_config",
+            "cluster:update_api_config",
+            "cluster:restart",
+            "cluster:upload_file"
+          ],
+          "resources": [
+            "node:id:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 23,
+        "name": "cluster_all_combination",
+        "policy": {
+          "actions": [
+            "cluster:read_file",
+            "cluster:delete_file"
+          ],
+          "resources": [
+            "node:id:*&file:path:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 11,
+        "name": "ciscat_read_ciscat",
+        "policy": {
+          "actions": [
+            "ciscat:read"
+          ],
+          "resources": [
+            "agent:id:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 12,
+        "name": "decoders_read_decoders",
+        "policy": {
+          "actions": [
+            "decoders:read"
+          ],
+          "resources": [
+            "decoder:file:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 14,
+        "name": "lists_read_rules",
+        "policy": {
+          "actions": [
+            "lists:read"
+          ],
+          "resources": [
+            "list:path:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 15,
+        "name": "rules_read_rules",
+        "policy": {
+          "actions": [
+            "rules:read"
+          ],
+          "resources": [
+            "rule:file:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 13,
+        "name": "mitre_read_mitre",
+        "policy": {
+          "actions": [
+            "mitre:read"
+          ],
+          "resources": [
+            "*:*:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 16,
+        "name": "sca_read_sca",
+        "policy": {
+          "actions": [
+            "sca:read"
+          ],
+          "resources": [
+            "agent:id:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 18,
+        "name": "syscheck_all_syscheck",
+        "policy": {
+          "actions": [
+            "syscheck:clear",
+            "syscheck:read",
+            "syscheck:run"
+          ],
+          "resources": [
+            "agent:id:*"
+          ],
+          "effect": "allow"
+        }
+      },
+      {
+        "id": 19,
+        "name": "syscollector_read_syscollector",
+        "policy": {
+          "actions": [
+            "syscollector:read"
+          ],
+          "resources": [
+            "agent:id:*"
+          ],
+          "effect": "allow"
+        }
+      }
+    ]
   }
 };
 
@@ -224,6 +505,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       adminMode: action.adminMode
+    };
+  }
+
+  if (action.type === 'UPDATE_CURRENT_PLATFORM') {
+    return {
+      ...state,
+      currentPlatform: action.currentPlatform
     };
   }
 
