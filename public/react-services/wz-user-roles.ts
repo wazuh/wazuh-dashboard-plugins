@@ -82,12 +82,7 @@ export class wzUserRoles {
   }
 
   static checkMissingUserRoles(requiredRoles, userRoles) {
-    let filtered;
-    if (typeof requiredRoles === 'string') {
-      return requiredRoles === userRoles.name ? false : filtered = requiredRoles;
-    } else if (Array.isArray(requiredRoles)) {
-      const rolesUserNotOwn = requiredRoles.filter(requiredRole => !userRoles.includes(requiredRole));
-      return rolesUserNotOwn.length ? rolesUserNotOwn : false;
-    }
+    const rolesUserNotOwn = requiredRoles.filter(requiredRole => !userRoles.includes(requiredRole));
+    return rolesUserNotOwn.length ? rolesUserNotOwn : false; 
   }
 }
