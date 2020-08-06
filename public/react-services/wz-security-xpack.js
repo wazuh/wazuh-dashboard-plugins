@@ -11,6 +11,7 @@
  */
 
 import { GenericRequest } from "./generic-request";
+import { WzRequest } from './wz-request';
 
 export class WzSecurityXpack {
   static async getUsers() {
@@ -57,6 +58,19 @@ export class WzSecurityXpack {
       const response = await GenericRequest.request(
         "DELETE",
         `/internal/security/users/${username}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async createPolicy(params) {
+    try {
+      const response = await WzRequest.apiReq(
+        "POST",
+        '/security/policies',
+        { ...params }
       );
       return response.data;
     } catch (error) {

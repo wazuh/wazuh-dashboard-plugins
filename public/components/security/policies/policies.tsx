@@ -22,6 +22,8 @@ import {
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
 import { ApiRequest } from '../../../react-services/api-request';
+import { WazuhSecurity } from '../../../factories/wazuh-security'
+import { ErrorHandler } from '../../../react-services/error-handler';
 
 export const Policies = () => {
     const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
@@ -37,6 +39,25 @@ export const Policies = () => {
     const [policyName, setPolicyName] = useState('');
 
     useEffect(() => { loadResources() }, [addedActions]);
+
+    const createPolicy = async () => {
+        try {
+            const wazuhSecurity = new WazuhSecurity();
+            await wazuhSecurity.security.createPolicy(
+                {
+                    name: policyName,
+                    policy: {
+                        actions: addedActions.map(x => x.action),
+                        resources: addedResources.map(x => x.resource),
+                        effect: effectValue
+                    }
+                });
+            ErrorHandler.info('Policy was successfully created', '');
+        } catch (error) {
+            ErrorHandler.handle(error, 'Error creating policy');
+        }
+        setIsFlyoutVisible(false);
+    }
 
     const onChangePolicyName = e => {
         setPolicyName(e.target.value);
@@ -147,10 +168,12 @@ export const Policies = () => {
     }
 
     const addResource = () => {
-        setAddedResources(addedResources =>
-            [...addedResources,
-            { resource: `${resourceValue}:${resourceIdentifierValue}` }
-            ])
+        if (!addedResources.filter(x => x.resource === `${resourceValue}:${resourceIdentifierValue}`).length) {
+            setAddedResources(addedResources =>
+                [...addedResources,
+                { resource: `${resourceValue}:${resourceIdentifierValue}` }
+                ])
+        }
         setResourceIdentifierValue('');
     }
 
@@ -162,6 +185,14 @@ export const Policies = () => {
                 ])
         }
         setActionValue('');
+    }
+
+    const removeAction = (action) => {
+        setAddedActions(addedActions.filter(x => x !== action));
+    }
+
+    const removeResource = (resource) => {
+        setAddedResources(addedResources.filter(x => x !== resource));
     }
 
     const actions_columns = [
@@ -180,7 +211,7 @@ export const Policies = () => {
                     type: 'icon',
                     color: 'danger',
                     icon: 'trash',
-                    onClick: () => '',
+                    onClick: (action) => removeAction(action),
                 },
             ],
         }
@@ -202,7 +233,7 @@ export const Policies = () => {
                     type: 'icon',
                     color: 'danger',
                     icon: 'trash',
-                    onClick: () => '',
+                    onClick: (resource) => removeResource(resource),
                 },
             ],
         }
@@ -288,7 +319,7 @@ export const Policies = () => {
                                 </EuiFlexItem>
                                 <EuiFlexItem>
                                     <EuiFormRow label="Resource identifier"
-                                        helpText="Introduce the resource identificator. * for all.">
+                                        helpText="Introduce the resource identifier. Type * for all.">
                                         <EuiFieldText
                                             placeholder={getIdentifier()}
                                             value={resourceIdentifierValue}
@@ -331,8 +362,8 @@ export const Policies = () => {
                             </EuiFormRow>
                             <EuiSpacer />
                             <EuiButton
-                                type="submit"
                                 disabled={!policyName || !addedActions.length || !addedResources.length || !effectValue}
+                                onClick={() => createPolicy()}
                                 fill>
                                 Create policy
                                     </EuiButton>
