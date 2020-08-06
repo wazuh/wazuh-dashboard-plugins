@@ -22,7 +22,7 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -38,7 +38,7 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -54,7 +54,7 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -70,7 +70,7 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -80,13 +80,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Overview events decoded',
       visState:
-        `{"title":"Wazuh App Statistics Overview events decode","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_events_decoded, q='*').label(\'Syscheck Events Decoded\').bars(stack=true), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck, q='*').label(\'Syscollector Events Decoded\').bars(stack=true), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_events_decoded, q='*').label(\'Rootcheck Events Decoded\').bars(stack=true), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_events_decoded, q='*').label(\'SCA Events Decoded\').bars(stack=true), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_events_decoded, q='*').label(\'Other Events Decoded\').bars(stack=true), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_events_decoded, q='*').label(\'Host Info Events Decoded\').bars(stack=true)","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Overview events decode","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_events_decoded, q='*').label(\'Syscheck Events Decoded\').bars(stack=true), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck, q='*').label(\'Syscollector Events Decoded\').bars(stack=true), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_events_decoded, q='*').label(\'Rootcheck Events Decoded\').bars(stack=true), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_events_decoded, q='*').label(\'SCA Events Decoded\').bars(stack=true), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_events_decoded, q='*').label(\'Other Events Decoded\').bars(stack=true), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_events_decoded, q='*').label(\'Host Info Events Decoded\').bars(stack=true)","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -96,13 +96,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Syscheck',
       visState:
-        `{"title":"Wazuh App Statistics Syscheck","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_events_decoded, q='*').label(\'Syscheck Events Decoded\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_edps, q='*').label(\'Syscheck EDPS\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Syscheck","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_events_decoded, q='*').label(\'Syscheck Events Decoded\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_edps, q='*').label(\'Syscheck EDPS\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -112,13 +112,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Syscollector',
       visState:
-        `{"title":"Wazuh App Statistics Syscollector","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_events_decoded, q='*').label(\'syscollector Events Decoded\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_edps, q='*').label(\'syscollector EDPS\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Syscollector","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_events_decoded, q='*').label(\'syscollector Events Decoded\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_edps, q='*').label(\'syscollector EDPS\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -128,13 +128,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Rootcheck',
       visState:
-        `{"title":"Wazuh App Statistics Rootcheck","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_events_decoded, q='*').label(\'Rootcheck Events Decoded\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_edps, q='*').label(\'Rootcheck EDPS\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage) ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Rootcheck","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_events_decoded, q='*').label(\'Rootcheck Events Decoded\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_edps, q='*').label(\'Rootcheck EDPS\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage) ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -144,13 +144,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics SCA',
       visState:
-        `{"title":"Wazuh App Statistics SCA","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_events_decoded, q='*').label(\'SCA Events Decoded\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_edps, q='*').label(\'SCA EDPS\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics SCA","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_events_decoded, q='*').label(\'SCA Events Decoded\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_edps, q='*').label(\'SCA EDPS\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.sca_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -160,13 +160,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics HostInfo',
       visState:
-        `{"title":"Wazuh App Statistics HostInfo","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_events_decoded, q='*').label(\'Host info Events Decoded\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_edps, q='*').label(\'Host info EDPS\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics HostInfo","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_events_decoded, q='*').label(\'Host info Events Decoded\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_edps, q='*').label(\'Host info EDPS\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -176,13 +176,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Other',
       visState:
-        `{"title":"Wazuh App Statistics Other","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_events_decoded, q='*').label(\'Host info Events Decoded\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_edps, q='*').label(\'Host info EDPS\'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Other","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_events_decoded, q='*').label(\'Host info Events Decoded\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_edps, q='*').label(\'Host info EDPS\'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*') ).label(\'Queue Usage\').color(\'green\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*').if(gte, 0.7, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*') ), null) .color(\'#FFCC11\').label(\'Queue Usage 70%+\'), .es(index=wazuh-stati*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*').if(gte, 0.9, .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.other_queue_usage, q='*') ), null) .color(\'red\').label(\'Queue Usage 90%+\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -193,13 +193,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Events by Node',
       visState:
-        `{"title":"Wazuh App Statistics Events by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*') .label('Total'), .es(index=wazuh-statistic*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*', split=analysisd.nodeName.keyword:5).label(\'Events processed by Node: $1\',\'^.* > analysisd.nodeName.keyword:(\\\\S+) > .*\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Events by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*') .label('Total'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*', split=analysisd.nodeName.keyword:5).label(\'Events processed by Node: $1\',\'^.* > analysisd.nodeName.keyword:(\\\\S+) > .*\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -209,13 +209,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Events Dropped by Node',
       visState:
-        `{"title":"Wazuh App Statistics Events Dropped by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=sum:analysisd.events_dropped, q='*') .label('Total'), .es(index=wazuh-statistic*, timefield=timestamp,metric=sum:analysisd.events_dropped, q='*', split=analysisd.nodeName.keyword:5).label(\'Events dropped by Node: $1\',\'^.* > analysisd.nodeName.keyword:(\\\\S+) > .*\')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Events Dropped by Node","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=sum:analysisd.events_dropped, q='*') .label('Total'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=sum:analysisd.events_dropped, q='*', split=analysisd.nodeName.keyword:5).label(\'Events dropped by Node: $1\',\'^.* > analysisd.nodeName.keyword:(\\\\S+) > .*\')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },
@@ -225,13 +225,13 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Queues Usage',
       visState:
-        `{"title":"Wazuh App Statistics Queues Usage","type":"timelion","params":{"expression":".es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.event_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.event_queue_usage, q='*') ).label('Event queue usage'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rule_matching_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.rule_matching_queue_usage, q='*') ).label('Rule matching queue usage'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.alerts_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.alerts_queue_usage, q='*') ).label('Alerts log queue usage'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.firewall_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.firewall_queue_usage, q='*') ).label('Firewall log queue usage'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.statistical_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.statistical_queue_usage, q='*') ).label('Statistical log queue usage'), .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.archives_queue_size, q='*').multiply( .es(index=wazuh-statistic*, timefield=timestamp,metric=avg:analysisd.archives_queue_usage, q='*') ).label('Statistical log queue usage')","interval":"auto"},"aggs":[]}`,
+        `{"title":"Wazuh App Statistics Queues Usage","type":"timelion","params":{"expression":".es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.event_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.event_queue_usage, q='*') ).label('Event queue usage'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rule_matching_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.rule_matching_queue_usage, q='*') ).label('Rule matching queue usage'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.alerts_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.alerts_queue_usage, q='*') ).label('Alerts log queue usage'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.firewall_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.firewall_queue_usage, q='*') ).label('Firewall log queue usage'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.statistical_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.statistical_queue_usage, q='*') ).label('Statistical log queue usage'), .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.archives_queue_size, q='*').multiply( .es(index=wazuh-statistic-*, timefield=timestamp,metric=avg:analysisd.archives_queue_usage, q='*') ).label('Statistical log queue usage')","interval":"auto"},"aggs":[]}`,
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-statistic-*","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
   },

@@ -26,7 +26,6 @@ import {
   EuiSelect,
 } from "@elastic/eui";
 
-import StatisticsHandler from "./utils/statistics-handler";
 import { clusterNodes } from "../configuration/utils/wz-fetch";
 import { WzStatisticsRemoted } from "./statistics-dashboard-remoted";
 import { WzStatisticsAnalysisd } from "./statistics-dashboard-analysisd";
@@ -44,7 +43,6 @@ export class WzStatisticsOverview extends Component {
       searchvalue: "",
       clusterNodeSelected: 'all',
     };
-    this.statisticsHandler = StatisticsHandler;
     this.tabs = [
       {
         id: "remoted",
@@ -68,7 +66,7 @@ export class WzStatisticsOverview extends Component {
     this._isMounted = true;
     try {
       const data = await clusterNodes();
-      const nodes = data.data.data.items.map((item) => {
+      const nodes = data.data.data.affected_items.map((item) => {
         return { value: item.name, text: `${item.name} (${item.type})` };
       });
       nodes.unshift({value:'all', text: 'All'})

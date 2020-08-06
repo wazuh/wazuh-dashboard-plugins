@@ -45,7 +45,7 @@ export function WzStatisticsAnalysisd({clusterNodeSelected}) {
       const visData = await GenericRequest.request(
         "POST",
         `/elastic/visualizations/cluster-statistics/wazuh-statistic*`,
-        { nodes: { items: [{}], master_node: JSON.parse(AppState.getCurrentAPI()).id, name: clusterNodeSelected, } }
+        { nodes: { affected_items: [{}], master_node: JSON.parse(AppState.getCurrentAPI()).id, name: clusterNodeSelected, } }
       );
       await rawVisualizations.assignItems(visData.data.raw);
       store.dispatch(
