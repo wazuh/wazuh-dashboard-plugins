@@ -15,19 +15,12 @@ import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh statistics overview
 import WzStatisticsOverview from './statistics-overview';
 
-class WzStatistics extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <WzStatisticsOverview />
-      </WzReduxProvider>
-    );
-  }
+function WzStatistics() {
+  return (
+    <WzReduxProvider>
+      <WzStatisticsOverview />
+    </WzReduxProvider>
+  );
 }
 
 export default WzStatistics;

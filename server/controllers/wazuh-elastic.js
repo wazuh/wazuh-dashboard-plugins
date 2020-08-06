@@ -558,6 +558,18 @@ export class WazuhElasticCtrl {
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
             query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
+          }else {
+
+           if(title.startsWith('Wazuh App Statistics') && name !== '-' &&  name !== 'all'  && visState.params.expression.includes('q=')){
+            const expressionRegex = /q=\'\*\'/gi
+            query += visState.params.expression.replace(expressionRegex,`q="analysisd.nodeName:${name} AND analysisd.apiName=${master_node}"`) // TODO - REMOVE analysisd.
+         
+           } else if(title.startsWith('Wazuh App Statistics')){
+             const expressionRegex = /q=\'\*\'/gi
+              query += visState.params.expression.replace(expressionRegex,`q="analysisd.apiName=${master_node}"`) // TODO - REMOVE analysisd. 
+           }else{
+              query = visState.params.expression;
+            }
           }
 
           visState.params.expression = query;
@@ -651,8 +663,10 @@ export class WazuhElasticCtrl {
         throw new Error('Missing parameters creating visualizations');
       }
 
-      const file = ClusterVisualizations['monitoring'];
-      const nodes = req.payload.nodes.affected_items;
+      const type = req.params.tab.split('-')[1];
+
+      const file = ClusterVisualizations[type];
+      const nodes = req.payload.nodes.items;
       const name = req.payload.nodes.name;
       const masterNode = req.payload.nodes.master_node;
 
