@@ -19,9 +19,9 @@ import WzRulesetTable from './ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../../../redux/store';
 import { WzRulesetTotalItems } from './ruleset-total-items';
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import { compose } from 'redux';
 
 class WzRulesetOverview extends Component {
   sectionNames = {
@@ -35,23 +35,6 @@ class WzRulesetOverview extends Component {
     this.state = {
       totalItems: 0
     }
-  }
-
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: this.sectionNames[this.props.state.section] }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
-  componentDidUpdate() {
-    this.setGlobalBreadcrumb();
-  }
-
-  clickActionFilterBar(obj) {
-    console.log('clicking ', obj);
   }
 
   render() {
@@ -101,7 +84,22 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(WzRulesetOverview);
+export default compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
+  withGlobalBreadcrumb(props => {
+    const sectionNames = {
+      rules: 'Rules',
+      decoders: 'Decoders',
+      lists: 'CDB lists'
+    }
+    return [
+      { text: '' },
+      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: sectionNames[props.state.section] }
+    ];
+  }),
+  withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: `${props.state.section.slice(0,-1)}:file:*`}])
+)(WzRulesetOverview);

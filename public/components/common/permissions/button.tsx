@@ -23,7 +23,21 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
-export const WzButtonPermissions = ({permissions = null, roles = null, buttonType = 'default', tooltip, ...rest}) => {
+interface IUserPermissionsObject{action: string, resource: string};
+type TUserPermissionsFunction = (props : any) => TUserPermissions;
+type TUserPermissions = (string | IUserPermissionsObject)[] | null;
+type TUserRoles = string[] | null;
+type TUserRolesFunction = (props : any) => TUserRoles;
+
+interface IWzButtonPermissionsProps{
+  permissions: TUserPermissions | TUserPermissionsFunction
+  roles: TUserRoles | TUserRolesFunction
+  buttonType?: 'default' | 'empty' | 'icon' | 'link'
+  tooltip?: any
+  rest?: any
+};
+
+export const WzButtonPermissions = ({permissions = null, roles = null, buttonType = 'default', tooltip, ...rest} : IWzButtonPermissionsProps) => {
   const [userPermissionRequirements, userPermissions] = useUserPermissionsRequirements(typeof permissions === 'function' ? permissions(rest) : permissions);
   const [userRolesRequirements, userRoles] = useUserRolesRequirements(typeof roles === 'function' ? roles(rest) : roles);
 

@@ -16,3 +16,7 @@ export { withKibanaContext, withKibanaContextExtendsProps } from './withKibanaCo
 export { withUserPermissions, withUserPermissionsRequirements, withUserPermissionsPrivate  } from './withUserPermissions';
 
 export { withUserRoles, withUserRolesRequirements, withUserRolesPrivate  } from './withUserRoles';
+
+export { withUserAuthorizationPrompt  } from './withUserAuthorization';
+
+export { withGlobalBreadcrumb  } from './withGlobalBreadcrumb';

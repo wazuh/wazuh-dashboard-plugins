@@ -4,6 +4,7 @@ import ReportingHandler from './reporting-handler';
 
 import chrome from 'ui/chrome';
 import moment from 'moment-timezone';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 export default class ReportingColums {
   constructor(tableProps) {
@@ -50,7 +51,9 @@ export default class ReportingColums {
               </EuiToolTip>
 
               <EuiToolTip position="top" content={'Delete report'}>
-                <EuiButtonIcon
+                <WzButtonPermissions
+                  buttonType='icon'
+                  roles={['administrator']}
                   aria-label="Delete report"
                   iconType="trash"
                   onClick={async () => {
@@ -58,7 +61,7 @@ export default class ReportingColums {
                     this.tableProps.updateShowModal(true);
                   }}
                   color="danger"
-                  disabled={item.name === 'default'}
+                  isDisabled={item.name === 'default'}
                 />
               </EuiToolTip>
             </div>

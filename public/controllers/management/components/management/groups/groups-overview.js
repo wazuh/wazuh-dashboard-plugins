@@ -27,6 +27,8 @@ import WzGroupsActionButtons from './actions-buttons-main';
 import { connect } from 'react-redux';
 import { updateAdminMode } from '../../../../../redux/actions/appStateActions';
 import checkAdminMode from './utils/check-admin-mode';
+import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs'
+import { compose } from 'redux';
 
 export class WzGroupsOverview extends Component {
   _isMounted = false;
@@ -34,22 +36,7 @@ export class WzGroupsOverview extends Component {
     super(props);
   }
 
-  componentDidMount() {
-    this._isMounted = true;
-    this.setAdminMode();
-  }
 
-  componentDidUpdate() {}
-
-  componentWillUnmount() {
-    this._isMounted = false;
-  }
-
-  async setAdminMode() {
-    //Set the admin mode
-    const admin = await checkAdminMode();
-    this.props.updateAdminMode(admin);
-  }
 
   render() {
     return (
@@ -92,13 +79,10 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updateAdminMode: status => dispatch(updateAdminMode(status))
-  };
-};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  withUserAuthorizationPrompt([{action: 'groups:read', resource: '*:*:*'}]),
+  connect(
+    mapStateToProps
+  ),
 )(WzGroupsOverview);

@@ -49,6 +49,7 @@ import { withRenderIfOrWrapped } from './util-hocs/render-if';
 import { WzAgentNeverConnectedPrompt } from './configuration-no-agent';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
+import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
 import { clusterNodes, clusterReq } from './utils/wz-fetch';
 import {
@@ -405,7 +406,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default compose(
-  withRenderIfOrWrapped((props) => props.agent.status === 'Never connected', WzAgentNeverConnectedPrompt),
+  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ? {action: 'manager:read', resource: '*:*:*'} : {action: 'agent:read', resource: `agent:id:${props.agent.id}`}]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
+  withRenderIfOrWrapped((props) => props.agent.status === 'never_connected', WzAgentNeverConnectedPrompt),
   connect(
     mapStateToProps,
     mapDispatchToProps

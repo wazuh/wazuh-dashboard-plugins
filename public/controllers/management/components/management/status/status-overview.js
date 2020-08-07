@@ -48,6 +48,9 @@ import WzStatusAgentInfo from './status-agent-info';
 
 import { toastNotifications } from 'ui/notify';
 
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import { compose } from 'redux';
+
 export class WzStatusOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -241,7 +244,15 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  withGlobalBreadcrumb([
+    { text: '' },
+    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Status' }
+  ]),
+  withUserAuthorizationPrompt([{action: 'agent:read', resource: '*:*:*'}, {action: 'manager:read', resource: '*:*:*'}, {action: 'cluster:read', resource: 'node:id:*'}]),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ) 
 )(WzStatusOverview);

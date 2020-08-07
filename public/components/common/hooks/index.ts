@@ -21,3 +21,7 @@ export { useQuery } from './use-query';
 export { useTimeFilter } from './use-time-filter';
 
 export { useWindowSize } from './useWindowSize';
+
+export { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsPrivate } from './useUserPermissions';
+
+export { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from './useUserRoles';
