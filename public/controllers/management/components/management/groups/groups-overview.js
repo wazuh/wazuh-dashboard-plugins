@@ -81,7 +81,7 @@ const mapStateToProps = state => {
 
 
 export default compose(
-  withUserAuthorizationPrompt([{action: 'groups:read', resource: '*:*:*'}]),
+  withUserAuthorizationPrompt([{action: 'group:read', resource: '*:*:*'}]),
   connect(
     mapStateToProps
   ),
