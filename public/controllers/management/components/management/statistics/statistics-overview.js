@@ -30,6 +30,7 @@ import { clusterNodes } from "../configuration/utils/wz-fetch";
 import { WzStatisticsRemoted } from "./statistics-dashboard-remoted";
 import { WzStatisticsAnalysisd } from "./statistics-dashboard-analysisd";
 import { WzDatePicker } from "../../../../../components/wz-date-picker/wz-date-picker";
+import { AppNavigate } from "../../../../../react-services/app-navigate";
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -69,7 +70,7 @@ export class WzStatisticsOverview extends Component {
       const nodes = data.data.data.affected_items.map((item) => {
         return { value: item.name, text: `${item.name} (${item.type})` };
       });
-      nodes.unshift({value:'all', text: 'All'})
+      nodes.unshift({ value: 'all', text: 'All' })
       this.setState({
         clusterNodes: nodes,
         clusterNodeSelected: nodes[0].value,
@@ -82,8 +83,6 @@ export class WzStatisticsOverview extends Component {
     }
     this.fetchData();
   }
-
-  componentDidUpdate() {}
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -125,7 +124,7 @@ export class WzStatisticsOverview extends Component {
         loadingNode: true
       },
       () => {
-        this.setState({ clusterNodeSelected: newValue, loadingNode: false})
+        this.setState({ clusterNodeSelected: newValue, loadingNode: false })
       }
     );
   };
@@ -164,18 +163,26 @@ export class WzStatisticsOverview extends Component {
               this.state.clusterNodes.length &&
               this.state.clusterNodeSelected
             ) && (
-              <EuiFlexItem grow={false}>
-                <EuiSelect
-                  id="selectNode"
-                  options={this.state.clusterNodes}
-                  value={this.state.clusterNodeSelected}
-                  onChange={this.onSelectNode}
-                  aria-label="Select node"
-                />
-              </EuiFlexItem>
-            )}
-            <EuiFlexItem grow={false}> 
+                <EuiFlexItem grow={false}>
+                  <EuiSelect
+                    id="selectNode"
+                    options={this.state.clusterNodes}
+                    value={this.state.clusterNodeSelected}
+                    onChange={this.onSelectNode}
+                    aria-label="Select node"
+                  />
+                </EuiFlexItem>
+              )}
+            <EuiFlexItem grow={false}>
               <WzDatePicker condensed={true} onTimeChange={() => { }} />
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                onMouseDown={e => AppNavigate.navigateToModule(e, 'settings', { tab: 'configuration', category: 'statistic' })}
+                iconType="gear"
+                iconSide="left" >
+                Settings
+              </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
@@ -193,7 +200,7 @@ export class WzStatisticsOverview extends Component {
           <EuiSpacer size={"m"} />
           {(
             <>
-              {this.state.selectedTabId === "remoted"  && !this.state.loadingNode && (
+              {this.state.selectedTabId === "remoted" && !this.state.loadingNode && (
                 <div>
                   <EuiSpacer size={"m"} />
                   <EuiCallOut
@@ -201,7 +208,7 @@ export class WzStatisticsOverview extends Component {
                     iconType="iInCircle"
                   />
                   <EuiSpacer size={"m"} />
-                  <WzStatisticsRemoted  clusterNodeSelected={this.state.clusterNodeSelected} />
+                  <WzStatisticsRemoted clusterNodeSelected={this.state.clusterNodeSelected} />
                 </div>
               )}
               {this.state.selectedTabId === "analysisd" && !this.state.loadingNode && (

@@ -13,6 +13,7 @@
 
 import React, { useState, useEffect, Fragment } from 'react';
 import {categoriesNames} from '../../../../utils/config-equivalences';
+import { AppNavigate } from '../../../../react-services/app-navigate';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -83,6 +84,7 @@ const SearchBar = ({query, setQuery}) => {
   useEffect(() => {
     const cats = categoriesNames.map(item => ({value: item}));
     setCategories(cats);
+    getDefaultCategory(setQuery)
   }, [])
   const onChange = (args) => {
     if(args.error){
@@ -110,4 +112,9 @@ const SearchBar = ({query, setQuery}) => {
       }
     </Fragment>
   )
+}
+
+const getDefaultCategory = (setQuery) => {
+  const category:string | undefined = AppNavigate.getUrlParameter('category')
+  category && setQuery(`category:(${category})`)
 }

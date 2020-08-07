@@ -55,20 +55,13 @@ export const configEquivalences = {
     'Set the app logging level, allowed values are info and debug. Default is info.',
   'cron.prefix':
     'Define the index prefix of predefined jobs.',
-  'cron.remoted.status':
-    'Enable or disable the remoted task.',
-  'cron.remoted.apis':
+  'cron.statistic.status':
+    'Enable or disable the statistics tasks.',
+  'cron.statistic.apis':
     'Enter the ID of the APIs you want to save data from, leave this empty to run the task on all configured APIs.',
-  'cron.remoted.interval': 'Define the frequency of task execution using cron schedule expressions.',
-  'cron.remoted.index.name': 'Define the name of the index in which the documents are to be saved.',
-  'cron.remoted.index.creation': 'Define the interval in which the index will be created.',
-  'cron.analysisd.status':
-    'Enable or disable the analysisd task.',
-  'cron.analysisd.apis':
-    'Enter the ID of the APIs you want to save data from, leave this empty to run the task on all configured APIs.',
-  'cron.analysisd.interval': 'Define the frequency of task execution using cron schedule expressions.',
-  'cron.analysisd.index.name': 'Define the name of the index in which the documents are to be saved.',
-  'cron.analysisd.index.creation': 'Define the interval in which the index will be created.',
+  'cron.statistic.interval': 'Define the frequency of task execution using cron schedule expressions.',
+  'cron.statistic.index.name': 'Define the name of the index in which the documents are to be saved.',
+  'cron.statistic.index.creation': 'Define the interval in which the index will be created.',
 };
 
 export const nameEquivalence = {
@@ -92,25 +85,19 @@ export const nameEquivalence = {
   admin: 'Admin mode',
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',
-  'cron.remoted.status': 'Status',
-  'cron.remoted.apis': 'Includes apis',
-  'cron.remoted.interval': 'Interval',
-  'cron.remoted.index.name': 'Index name',
-  'cron.remoted.index.creation': 'Index creation',
-  'cron.analysisd.status': 'Status',
-  'cron.analysisd.apis': 'Includes apis',
-  'cron.analysisd.interval': 'Interval',
-  'cron.analysisd.index.name': 'Index name',
-  'cron.analysisd.index.creation': 'Index creation',
+  'cron.statistic.status': 'Status',
+  'cron.statistic.apis': 'Includes apis',
+  'cron.statistic.interval': 'Interval',
+  'cron.statistic.index.name': 'Index name',
+  'cron.statistic.index.creation': 'Index creation',
 }
 
 const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
 const SECURITY = 'Security';
 const MONITORING = 'Monitoring'
-const STATISTIC_REMOTED = 'Statistic - remoted'
-const STATISTIC_ANALYSISD = 'Statistic - analysisd'
-export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTIC_REMOTED, STATISTIC_ANALYSISD];
+const STATISTIC = 'Statistic'
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTIC,];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
@@ -133,16 +120,11 @@ export const categoriesEquivalence = {
   admin: SECURITY,
   hideManagerAlerts: GENERAL,
   'logs.level': GENERAL,
-  'cron.remoted.status': STATISTIC_REMOTED,
-  'cron.remoted.apis': STATISTIC_REMOTED,
-  'cron.remoted.interval': STATISTIC_REMOTED,
-  'cron.remoted.index.name': STATISTIC_REMOTED,
-  'cron.remoted.index.creation': STATISTIC_REMOTED,
-  'cron.analysisd.status': STATISTIC_ANALYSISD,
-  'cron.analysisd.apis': STATISTIC_ANALYSISD,
-  'cron.analysisd.interval': STATISTIC_ANALYSISD,
-  'cron.analysisd.index.name': STATISTIC_ANALYSISD,
-  'cron.analysisd.index.creation': STATISTIC_ANALYSISD,
+  'cron.statistic.status': STATISTIC,
+  'cron.statistic.apis': STATISTIC,
+  'cron.statistic.interval': STATISTIC,
+  'cron.statistic.index.name': STATISTIC,
+  'cron.statistic.index.creation': STATISTIC,
 }
 
 const TEXT = 'text';
@@ -189,25 +171,11 @@ export const formEquivalence = {
       ]
     }
   },
-  'cron.remoted.status': { type: BOOLEAN },
-  'cron.remoted.apis': { type: ARRAY },
-  'cron.remoted.interval': { type: INTERVAL },
-  'cron.remoted.index.name': { type: TEXT },
-  'cron.remoted.index.creation': {
-    type: LIST, params: {
-      options: [
-        { text: 'Hourly', value: 'h' },
-        { text: 'Daily', value: 'd' },
-        { text: 'Weekly', value: 'w' },
-        { text: 'Monthly', value: 'm' },
-      ]
-    }
-  },
-  'cron.analysisd.status': { type: BOOLEAN },
-  'cron.analysisd.apis': { type: ARRAY },
-  'cron.analysisd.interval': { type: INTERVAL },
-  'cron.analysisd.index.name': { type: TEXT },
-  'cron.analysisd.index.creation': {
+  'cron.statistic.status': { type: BOOLEAN },
+  'cron.statistic.apis': { type: ARRAY },
+  'cron.statistic.interval': { type: INTERVAL },
+  'cron.statistic.index.name': { type: TEXT },
+  'cron.statistic.index.creation': {
     type: LIST, params: {
       options: [
         { text: 'Hourly', value: 'h' },
