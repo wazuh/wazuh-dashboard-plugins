@@ -13,8 +13,10 @@ import {
 } from '@elastic/eui';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { AppState } from '../../../react-services/app-state';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization';
 
-export default class EnableModules extends Component {
+export class EnableModulesWrapper extends Component {
   constructor(props) {
     super(props);
     this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
@@ -157,4 +159,13 @@ export default class EnableModules extends Component {
       );
     });
   }
+}
+
+const WzEnableModulesWithAdministrator = withUserAuthorizationPrompt(null, ['administrator'])(EnableModulesWrapper);
+export function EnableModules() {
+  return(
+    <WzReduxProvider>
+      <WzEnableModulesWithAdministrator />
+    </WzReduxProvider>
+  );
 }

@@ -169,17 +169,17 @@ export default class WzSampleData extends Component {
               <EuiFlexItem grow={false}>
                 {exists && (
                 <WzButtonPermissions
-                color='danger'
-                roles={['administrator']}
-                onClick={() => this.removeSampleData(category)}
+                  color='danger'
+                  roles={['administrator']}
+                  onClick={() => this.removeSampleData(category)}
                 >
                  {removeDataLoading && 'Removing data' || 'Remove data'}
                 </WzButtonPermissions>
                 ) || (
                   <WzButtonPermissions
-                  isLoading={addDataLoading}
-                  roles={['administrator']}
-                  onClick={() => this.addSampleData(category)}
+                    isLoading={addDataLoading}
+                    roles={['administrator']}
+                    onClick={() => this.addSampleData(category)}
                   >
                    {addDataLoading && 'Adding data' || 'Add data'}
                   </WzButtonPermissions>

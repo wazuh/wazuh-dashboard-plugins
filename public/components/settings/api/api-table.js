@@ -26,6 +26,8 @@ import {
   EuiText,
   EuiLoadingSpinner
 } from '@elastic/eui';
+import { WzButtonPermissions } from '../../common/permissions/button';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
 
 export class ApiTable extends Component {
   constructor(props) {
@@ -212,22 +214,23 @@ export class ApiTable extends Component {
         render: item => (
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <EuiToolTip position="bottom" content={<p>Set as default</p>}>
-                <EuiButtonIcon
-                  iconType={
-                    item.id === this.props.currentDefault
-                      ? 'starFilled'
-                      : 'starEmpty'
-                  }
-                  aria-label="Set as default"
-                  onClick={async () => {
-                    const currentDefault = await this.props.setDefault(item);
-                    this.setState({
-                      currentDefault
-                    });
-                  }}
-                />
-              </EuiToolTip>
+              <WzButtonPermissions
+                buttonType='icon'        
+                roles={['administrator']}
+                tooltip={{position: 'top', content: <p>Set as default</p>}}
+                iconType={
+                  item.id === this.props.currentDefault
+                    ? 'starFilled'
+                    : 'starEmpty'
+                }
+                aria-label="Set as default"
+                onClick={async () => {
+                  const currentDefault = await this.props.setDefault(item);
+                  this.setState({
+                    currentDefault
+                  });
+                }}
+              />
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position="bottom" content={<p>Check connection</p>}>
@@ -253,52 +256,56 @@ export class ApiTable extends Component {
 
     return (
       <EuiPage>
-        <EuiPanel paddingSize="l">
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Wazuh API configuration</h2>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
-                iconType="plusInCircle"
-                onClick={() => this.props.showAddApi()}
-              >
-                Add new
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
-                iconType="refresh"
-                onClick={async () => await this.refresh()}
-              >
-                Refresh
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                From here you can manage and configure the API entries. You can
-                also check their connection and status.
-              </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiInMemoryTable
-            itemId="id"
-            items={items}
-            search={search}
-            columns={columns}
-            pagination={true}
-            sorting={true}
-            loading={this.state.refreshingEntries}
-          />
-        </EuiPanel>
+        <WzReduxProvider>
+          <EuiPanel paddingSize="l">
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiTitle>
+                      <h2>Wazuh API configuration</h2>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <WzButtonPermissions
+                  buttonType='empty'              
+                  iconType="plusInCircle"
+                  roles={['administrator']}
+                  onClick={() => this.props.showAddApi()}
+                >
+                  Add new
+                </WzButtonPermissions>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  iconType="refresh"
+                  onClick={async () => await this.refresh()}
+                >
+                  Refresh
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
+                  From here you can manage and configure the API entries. You can
+                  also check their connection and status.
+                </EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiInMemoryTable
+              itemId="id"
+              items={items}
+              search={search}
+              columns={columns}
+              pagination={true}
+              sorting={true}
+              loading={this.state.refreshingEntries}
+            />
+          </EuiPanel>
+        </WzReduxProvider>
       </EuiPage>
     );
   }

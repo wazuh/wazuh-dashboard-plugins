@@ -26,6 +26,8 @@ import {
   categoriesEquivalence,
   formEquivalence
 } from '../../../utils/config-equivalences';
+import WzReduxProvider from '../../../redux/wz-redux-provider'
+import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 
 export type ISetting = {
   setting: string
@@ -37,7 +39,7 @@ export type ISetting = {
   form: { type: string, params: {} }
 }
 
-export const WzConfigurationSettings = (props) => {
+const WzConfigurationSettingsProvider = (props) => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [config, setConfig] = useState<ISetting[]>([]);
   const [query, setQuery] = useState('');
@@ -52,7 +54,6 @@ export const WzConfigurationSettings = (props) => {
         description: configEquivalences[conf],
         category: categoriesEquivalence[conf],
         name: nameEquivalence[conf],
-        readOnly: conf === 'admin',
         form: formEquivalence[conf],
       }
     ], []);
@@ -72,5 +73,13 @@ export const WzConfigurationSettings = (props) => {
           config={config} />
       </EuiPageBody>
     </EuiPage>
+  );
+}
+const WzConfigurationSettingsWrapper = withUserAuthorizationPrompt(null, ['administrator'])(WzConfigurationSettingsProvider);
+export function WzConfigurationSettings(props) {
+  return(
+    <WzReduxProvider>
+      <WzConfigurationSettingsWrapper {...props}/>
+    </WzReduxProvider>
   );
 }

@@ -16,7 +16,6 @@ const initialState = {
   wazuhNotReadyYet: '',
   currentTab: '',
   extensions: {},
-  adminMode: false,
   currentPlatform: false,
   currentAgentData: {},
   showExploreAgentModal: false,

@@ -24,8 +24,9 @@ import {
 } from '@elastic/eui';
 import WzSampleData from './sample-data'
 import WzReduxProvider from '../../redux/wz-redux-provider';
+import { withUserAuthorizationPrompt } from '../../components/common/hocs/withUserAuthorization'
 
-export class WzSampleDataWrapper extends Component {
+export class WzSampleDataProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -63,4 +64,13 @@ export class WzSampleDataWrapper extends Component {
     </EuiPage>
     );
   }
+}
+
+const WzSampleDataWrapperWithAdministrator = withUserAuthorizationPrompt(null, ['administrator'])(WzSampleDataProvider);
+export function WzSampleDataWrapper() {
+  return (
+  <WzReduxProvider>
+    <WzSampleDataWrapperWithAdministrator />
+  </WzReduxProvider>
+  )
 }

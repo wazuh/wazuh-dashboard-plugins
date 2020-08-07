@@ -195,7 +195,6 @@ export class ManagementController {
   $onInit() {
     this.clusterInfo = AppState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
-    this.adminMode = !!(configuration || {}).admin;
 
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
       this.tab = 'groups';

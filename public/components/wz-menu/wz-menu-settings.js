@@ -13,8 +13,6 @@ import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
-import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
-import { updateAdminMode } from '../../redux/actions/appStateActions';
 import { AppNavigate } from '../../react-services/app-navigate';
 import chrome from 'ui/chrome';
 
@@ -35,17 +33,7 @@ class WzMenuSettings extends Component {
     }
   }
 
-  async componentDidMount() {
-    try {
-      const adminMode = await checkAdminMode();
-      if (this.props.adminMode !== adminMode) {
-        this.props.updateAdminMode(adminMode);
-      }
-    } catch (error) { }
-  }
-
   avaibleSettings() {
-    const { adminMode } = this.props;
     let auxSettings = {
       settings: { id: 'settings', text: 'Settings' },
       api: { id: 'api', text: 'API configuration' },
@@ -55,26 +43,19 @@ class WzMenuSettings extends Component {
       logs: { id: 'logs', text: 'Logs' },
       about: { id: 'about', text: 'About' },
     };
-    if (!adminMode) {
-      delete auxSettings.modules;
-      delete auxSettings.sample_data;
-    }
     return (auxSettings);
   }
 
   avaibleRenderSettings() {
-    const { adminMode } = this.props;
     const avaibleSettings = this.avaibleSettings()
     let auxItems = [
       this.createItem(avaibleSettings.api),
+      this.createItem(avaibleSettings.modules),
+      this.createItem(avaibleSettings.sample_data),
       this.createItem(avaibleSettings.configuration),
       this.createItem(avaibleSettings.logs),
       this.createItem(avaibleSettings.about),
     ]
-    if (adminMode) {
-      auxItems.splice(1, 0, this.createItem(avaibleSettings.sample_data));
-      auxItems.splice(1, 0, this.createItem(avaibleSettings.modules));
-    }
     return (auxItems);
   }
 
@@ -129,17 +110,9 @@ class WzMenuSettings extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
 )(WzMenuSettings);

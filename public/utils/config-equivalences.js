@@ -33,8 +33,6 @@ export const configEquivalences = {
     'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':
     'Disable certain index pattern names from being available in index pattern selector from the Wazuh app.',
-  'xpack.rbac.enabled':
-    'Enable or disable X-Pack RBAC security capabilities when using the app.',
   'wazuh.monitoring.enabled':
     'Enable or disable the wazuh-monitoring index creation and/or visualization.',
   'wazuh.monitoring.frequency':
@@ -47,8 +45,6 @@ export const configEquivalences = {
     'Define the interval in which the wazuh-monitoring index will be created.',
   'wazuh.monitoring.pattern':
     'Default index pattern to use on the app for Wazuh monitoring.',
-  admin:
-    'Enable or disable administrator requests to the Wazuh API when using the app.',
   hideManagerAlerts:
     'Hide the alerts of the manager in all dashboards and discover',
   'logs.level':
@@ -75,16 +71,14 @@ export const nameEquivalence = {
   'wazuh.monitoring.replicas': 'Index replicas',
   'wazuh.monitoring.creation': 'Interval creation',
   'wazuh.monitoring.pattern': 'Index pattern',
-  admin: 'Admin mode',
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',
 }
 
 const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
-const SECURITY = 'Security';
 const MONITORING = 'Monitoring'
-export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING,];
+export const categoriesNames = [HEALTH_CHECK, GENERAL, MONITORING,];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
@@ -97,14 +91,12 @@ export const categoriesEquivalence = {
   'api.selector': GENERAL,
   'ip.selector': GENERAL,
   'ip.ignore': GENERAL,
-  'xpack.rbac.enabled': SECURITY,
   'wazuh.monitoring.enabled': MONITORING,
   'wazuh.monitoring.frequency': MONITORING,
   'wazuh.monitoring.shards': MONITORING,
   'wazuh.monitoring.replicas': MONITORING,
   'wazuh.monitoring.creation': MONITORING,
   'wazuh.monitoring.pattern': MONITORING,
-  admin: SECURITY,
   hideManagerAlerts: GENERAL,
   'logs.level': GENERAL,
 }
@@ -142,7 +134,6 @@ export const formEquivalence = {
     }
   },
   'wazuh.monitoring.pattern': { type: TEXT },
-  admin: { type: BOOLEAN },
   hideManagerAlerts: { type: BOOLEAN },
   'logs.level': { type: LIST, params: {
     options: [
