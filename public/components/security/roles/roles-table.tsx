@@ -65,11 +65,11 @@ export const RolesTable = () => {
                                         <b>Actions</b>
                                         <p>{((data.policy || {}).actions || []).join(", ")}</p>
                                         <EuiSpacer size="s" />
-                                        <b>Effect</b>
-                                        <p>{(data.policy || {}).effect}</p>
-                                        <EuiSpacer size="s" />
                                         <b>Resources</b>
                                         <p>{(data.policy || {}).resources}</p>
+                                        <EuiSpacer size="s" />
+                                        <b>Effect</b>
+                                        <p>{(data.policy || {}).effect}</p>
                                     </div>
                                 }>
                                 <EuiBadge color="hollow" onClick={() => { }}>{
