@@ -145,7 +145,8 @@ export class RowDetails extends Component {
 
 
   renderRows() {
-    const fieldsToShow = ['agent', 'cluster', 'manager', 'rule', 'decoder', 'syscheck'];
+    const fieldsToShow = ['agent', 'cluster', 'manager', 'rule', 'decoder', 'syscheck', 'full_log', 'location'];
+
     var rows: any[] = [];
 
     for (var i = 0; i < fieldsToShow.length; i++) {

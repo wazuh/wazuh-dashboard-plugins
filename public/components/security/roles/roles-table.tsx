@@ -9,35 +9,17 @@ import {
     EuiSpacer,
     EuiLoadingSpinner
 } from '@elastic/eui';
-import { ApiRequest } from '../../../react-services/api-request';
+const isReserved = {administrator : true, 'readonly' : true, 'users_admin' : true, 'agents_readonly' : true, 'agents_admin' : true, 'cluster_readonly' : true, 'cluster_admin' : true};
 
-export const RolesTable = () => {
-    const [roles, setRoles] = useState('');
-    const [policiesData, setPolicies] = useState('');
-    const [loading, setLoading] = useState(false);
-    async function getData() {
-        setLoading(true);
-        const roles_request = await ApiRequest.request(
-            'GET',
-            '/security/roles',
-            {}
-        );
-        const roles = (((roles_request || {}).data || {}).data || {}).affected_items || [];
-        setRoles(roles);
-        const uniquePolicies = new Set(roles.map(x => x.policies).reduce((a, b) => [...a, ...b], []));
-        const policies_request = await ApiRequest.request(
-            'GET',
-            '/security/policies',
-            { 'policy_ids': Array.from(uniquePolicies) }
-        );
-        const policies = (((policies_request || {}).data || {}).data || {}).affected_items || [];
-        setPolicies(policies);
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        getData();
-    }, []);
+export const RolesTable = ({roles,policiesData, loading, editRole}) => {
+   
+    const getRowProps = item => {
+        const { id } = item;
+        return {
+          'data-test-subj': `row-${id}`,
+          onClick: () => editRole(item),
+        };
+      };
 
     const columns = [
         {
@@ -83,6 +65,15 @@ export const RolesTable = () => {
             },
             sortable: true,
         },
+        {
+            field: 'name',
+            name: 'Status',
+            render: (item) => {
+                return isReserved[item] && <EuiBadge color="primary" >Default role</EuiBadge>
+            },
+            width: 150,
+            sortable: false,
+        },
     ];
 
     const sorting = {
@@ -105,6 +96,7 @@ export const RolesTable = () => {
             columns={columns}
             search={search}
             pagination={true}
+            rowProps={getRowProps}
             loading={loading}
             sorting={sorting}
         />
