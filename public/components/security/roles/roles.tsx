@@ -18,36 +18,48 @@ import {
 } from '@elastic/eui';
 import { RolesTable } from './roles-table';
 import { ApiRequest } from '../../../react-services/api-request'
+import { CreateRole } from './create-role';
+import { EditRole } from './edit-role';
 
 export const Roles = () => {
     const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-    const [roleName, setRoleName] = useState('');
-    const [policies, setPolicies] = useState('');
+    const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
+    const [editingRole, setEditingRole] = useState(false);
+    const [roles, setRoles] = useState([])
+    const [policiesData, setPoliciesData] = useState([])
+    const [loadingTable, setLoadingTable] = useState(false);
 
-    const onChangeRoleName = e => {
-        setRoleName(e.target.value);
-    };
 
     async function getData() {
-        const request = await ApiRequest.request(
+        setLoadingTable(true);
+        const roles_request = await ApiRequest.request(
             'GET',
-            '/security/policies',
+            '/security/roles',
             {}
         );
-        const policies = ((((request || {}).data || {}).data || {}).affected_items || [])
-            .map(x => { return { 'label': x.name } });
-        setPolicies(policies);
+        const roles = (((roles_request || {}).data || {}).data || {}).affected_items || [];
+        setRoles(roles);
+        const policies_request = await ApiRequest.request(
+            'GET',
+            '/security/policies',
+            {  }
+        );
+        const policiesData = (((policies_request || {}).data || {}).data || {}).affected_items || [];
+        setPoliciesData(policiesData);
+        setLoadingTable(false);
     }
 
     useEffect(() => {
         getData();
-    }, []);
+    }, []); 
 
-    const [selectedPolicies, setSelectedRole] = useState([]);
 
-    const onChangePolicies = selectedPolicies => {
-        setSelectedRole(selectedPolicies);
+
+    const closeFlyout = async() => {
+        setIsFlyoutVisible(false);
+        await getData();
     };
+
 
     let flyout;
     if (isFlyoutVisible) {
@@ -56,42 +68,30 @@ export const Roles = () => {
                 e.target.className === 'euiOverlayMask' &&
                     setIsFlyoutVisible(false)
             }}>
-                <EuiFlyout
-                    onClose={() => setIsFlyoutVisible(false)}>
-                    <EuiFlyoutHeader hasBorder={false}>
-                        <EuiTitle size="m">
-                            <h2>New role</h2>
-                        </EuiTitle>
-                    </EuiFlyoutHeader>
-                    <EuiFlyoutBody>
-                        <EuiForm component="form" style={{ padding: 24 }}>
-                            <EuiFormRow label="Role name"
-                                helpText="Introduce a name for this new role.">
-                                <EuiFieldText
-                                    placeholder=""
-                                    value={roleName}
-                                    onChange={e => onChangeRoleName(e)}
-                                    aria-label=""
-                                />
-                            </EuiFormRow>
-                            <EuiFormRow label="Policies"
-                                helpText="Assign policies to the role.">
-                                <EuiComboBox
-                                    placeholder="Select policies"
-                                    options={policies}
-                                    selectedOptions={selectedPolicies}
-                                    onChange={onChangePolicies}
-                                    isClearable={true}
-                                    data-test-subj="demoComboBox"
-                                />
-                            </EuiFormRow>
-                            <EuiSpacer />
-                            <EuiButton type="submit" fill>
-                                Create role
-                                    </EuiButton>
-                        </EuiForm>
-                    </EuiFlyoutBody>
-                </EuiFlyout>
+                <CreateRole closeFlyout={closeFlyout} />
+            </EuiOverlayMask >
+        );
+    }
+    
+    const editRole = (item) => {
+        setEditingRole(item);
+        setIsEditFlyoutVisible(true);
+    }
+
+   
+    const closeEditingFlyout = async() => {
+        setIsEditFlyoutVisible(false);
+        await getData();
+    };
+
+    let editFlyout;
+    if (isEditFlyoutVisible) {
+        editFlyout = (
+            <EuiOverlayMask onClick={async(e) => {
+                e.target.className === 'euiOverlayMask' &&
+                    await closeEditingFlyout();
+            }}>
+                <EditRole role={editingRole} closeFlyout={closeEditingFlyout}/>
             </EuiOverlayMask >
         );
     }
@@ -109,13 +109,14 @@ export const Roles = () => {
                         <EuiButton
                             onClick={() => setIsFlyoutVisible(true)}>
                             Create role
-                                </EuiButton>
+                        </EuiButton>
                         {flyout}
+                        {editFlyout}
                     </div>
                 </EuiPageContentHeaderSection>
             </EuiPageContentHeader>
             <EuiPageContentBody>
-                <RolesTable></RolesTable>
+                <RolesTable loading={loadingTable} roles={roles} policiesData={policiesData} editRole={editRole}></RolesTable>
             </EuiPageContentBody>
         </EuiPageContent>
     );

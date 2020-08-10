@@ -9,35 +9,16 @@ import {
     EuiSpacer,
     EuiLoadingSpinner
 } from '@elastic/eui';
-import { ApiRequest } from '../../../react-services/api-request';
 
-export const RolesTable = () => {
-    const [roles, setRoles] = useState('');
-    const [policiesData, setPolicies] = useState('');
-    const [loading, setLoading] = useState(false);
-    async function getData() {
-        setLoading(true);
-        const roles_request = await ApiRequest.request(
-            'GET',
-            '/security/roles',
-            {}
-        );
-        const roles = (((roles_request || {}).data || {}).data || {}).affected_items || [];
-        setRoles(roles);
-        const uniquePolicies = new Set(roles.map(x => x.policies).reduce((a, b) => [...a, ...b], []));
-        const policies_request = await ApiRequest.request(
-            'GET',
-            '/security/policies',
-            { 'policy_ids': Array.from(uniquePolicies) }
-        );
-        const policies = (((policies_request || {}).data || {}).data || {}).affected_items || [];
-        setPolicies(policies);
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        getData();
-    }, []);
+export const RolesTable = ({roles,policiesData, loading, editRole}) => {
+   
+    const getRowProps = item => {
+        const { id } = item;
+        return {
+          'data-test-subj': `row-${id}`,
+          onClick: () => editRole(item),
+        };
+      };
 
     const columns = [
         {
@@ -105,6 +86,7 @@ export const RolesTable = () => {
             columns={columns}
             search={search}
             pagination={true}
+            rowProps={getRowProps}
             loading={loading}
             sorting={sorting}
         />

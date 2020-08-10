@@ -23,7 +23,7 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/_find?type=index-pattern&search_fields=title&search=wazuh*`
+        `/api/saved_objects/_find?type=index-pattern&search_fields=title`
       );
       const indexPatterns = ((result || {}).data || {}).saved_objects || [];
 
