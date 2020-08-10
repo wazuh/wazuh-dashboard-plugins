@@ -31,4 +31,5 @@ const ErrorLevels = {
   10004: DEBUG,
   10005: DEBUG,
   10006: DEBUG,
+  10007: DEBUG,
 }

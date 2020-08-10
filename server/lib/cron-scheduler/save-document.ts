@@ -21,7 +21,7 @@ export class SaveDocument {
     this.callWithInternalUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
   }
 
-  async save(doc:object[], indexConfig:IIndexConfiguration) {
+  async save(doc: object[], indexConfig: IIndexConfiguration) {
     const { name, creation, mapping } = indexConfig;
     const index = this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
@@ -31,31 +31,31 @@ export class SaveDocument {
       const response = await this.callWithInternalUser('bulk', createDocumentObject);
       log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
       await this.checkIndexPatternAndCreateIfNotExists(index);
-    } catch(error) {
+    } catch (error) {
       if (error.status === 403)
-        throw {error: 403, message: `Authorization Exception in the index "${index}"`}
+        throw { error: 403, message: `Authorization Exception in the index "${index}"` }
       if (error.status === 409)
-        throw {error: 409, message: `Duplicate index-pattern: ${index}`}
+        throw { error: 409, message: `Duplicate index-pattern: ${index}` }
       throw error;
     }
   }
 
   private async checkIndexAndCreateIfNotExists(index) {
-    const exists = await this.callWithInternalUser('indices.exists',{index});
+    const exists = await this.callWithInternalUser('indices.exists', { index });
     log(this.logPath, `Index '${index}' exists? ${exists}`, 'debug');
-    if(!exists) {
-      const response = await this.callWithInternalUser('indices.create', 
-      {
-        index, 
-        body: {
-          settings: {
-            index: { 
-              number_of_shards: 2,
-              number_of_replicas: 0
+    if (!exists) {
+      const response = await this.callWithInternalUser('indices.create',
+        {
+          index,
+          body: {
+            settings: {
+              index: {
+                number_of_shards: 2,
+                number_of_replicas: 0
+              }
             }
           }
-        }
-      });
+        });
 
       log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
     }
@@ -81,52 +81,64 @@ export class SaveDocument {
   }
 
   private async createIndexPattern(KIBANA_INDEX: any, index: any) {
-    const response = await this.callWithInternalUser('create', {
-      index: KIBANA_INDEX,
-      type: '_doc',
-      'id': `index-pattern:${index}-*`,
-      body: {
-        type: 'index-pattern',
-        'index-pattern': {
-          title: `${index}-*`,
-          timeFieldName: 'timestamp',
+    try {
+      const response = await this.callWithInternalUser('create', {
+        index: KIBANA_INDEX,
+        type: '_doc',
+        'id': `index-pattern:${index}-*`,
+        body: {
+          type: 'index-pattern',
+          'index-pattern': {
+            title: `${index}-*`,
+            timeFieldName: 'timestamp',
+          }
         }
-      }
-    });
-    log(
-      this.logPath, 
-      `The indexPattern no exist, response of createIndexPattern: ${JSON.stringify(response)}`, 
-      'debug'
-    );
+      });
+      log(
+        this.logPath,
+        `The indexPattern no exist, response of createIndexPattern: ${JSON.stringify(response)}`,
+        'debug'
+      );
+    } catch (error) {
+      this.throwDuplicateIndexError(error);
+      throw error;
+    }
   }
+
+  private throwDuplicateIndexError(error) {
+    const { type, reason } = ((error || {}).body || {}).error || {};
+    if (type === 'version_conflict_engine_exception')
+      throw { error: 10007, message: reason }
+  }
+
 
   private getKibanaIndex() {
     return ((((this.server || {})
-    // @ts-ignore
+      // @ts-ignore
       .registrations || {})
       .kibana || {})
       .options || {})
       .index || '.kibana';
   }
 
-  private createDocument (doc, index, mapping:string): BulkIndexDocumentsParams {
+  private createDocument(doc, index, mapping: string): BulkIndexDocumentsParams {
     const createDocumentObject: BulkIndexDocumentsParams = {
       index,
       type: '_doc',
-      body: doc.flatMap(item => [{ 
-        index: { _index: index } },
-        {
-          ...this.buildData(item, mapping),
-          timestamp: new Date(Date.now()).toISOString()
-        }
+      body: doc.flatMap(item => [{
+        index: { _index: index }
+      },
+      {
+        ...this.buildData(item, mapping),
+        timestamp: new Date(Date.now()).toISOString()
+      }
       ])
     };
     log(this.logPath, `Document object: ${JSON.stringify(createDocumentObject)}`, 'debug');
     return createDocumentObject;
   }
 
-  buildData(item, mapping)
-  {
+  buildData(item, mapping) {
     const getValue = (key: string, item) => {
       const keys = key.split('.');
       if (keys.length === 1) {
@@ -141,10 +153,10 @@ export class SaveDocument {
       )
       return JSON.parse(data);
     }
-    if (typeof item.data === 'object'){
+    if (typeof item.data === 'object') {
       return item.data;
     }
-    return {data: item.data};
+    return { data: item.data };
   }
 
   private addIndexPrefix(index): string {
@@ -152,5 +164,5 @@ export class SaveDocument {
     const prefix = configFile['cron.prefix'] || 'wazuh';
     return `${prefix}-${index}`;
   }
-    
+
 }
