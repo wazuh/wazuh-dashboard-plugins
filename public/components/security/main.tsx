@@ -10,10 +10,11 @@ import {
     EuiEmptyPrompt,
     EuiSpacer,
 } from '@elastic/eui';
-import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { Users } from './users/users';
 import { Roles } from './roles/roles';
 import { Policies } from './policies/policies';
+import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
+import { compose } from 'redux';
 
 const tabs = [
     {
@@ -33,14 +34,14 @@ const tabs = [
     },
 ];
 
-export const WzSecurity = () => {
+export const WzSecurity = compose(
+    withReduxProvider,
+    withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
+    withUserAuthorizationPrompt(null, ['administrator'])
+)(() => {
     const [selectedTabId, setSelectedTabId] = useState('users');
     const [securityError, setSecurityError] = useState(false);
 
-    useEffect(() => {
-        const breadcrumb = [{ text: '' }, { text: 'Security' }];
-        store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    }, []);
 
     const onSelectedTabChanged = id => {
         setSelectedTabId(id);
@@ -96,4 +97,4 @@ export const WzSecurity = () => {
             }
         </EuiPage>
     );
-};
+});

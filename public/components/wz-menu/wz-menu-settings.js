@@ -38,7 +38,7 @@ class WzMenuSettings extends Component {
       settings: { id: 'settings', text: 'Settings' },
       api: { id: 'api', text: 'API configuration' },
       modules: { id: 'modules', text: 'Modules' },
-      sample_data: { id: 'sample_data', text: 'Sample Data' },
+      sample_data: { id: 'sample_data', text: 'Sample data' },
       configuration: { id: 'configuration', text: 'Configuration' },
       logs: { id: 'logs', text: 'Logs' },
       about: { id: 'about', text: 'About' },

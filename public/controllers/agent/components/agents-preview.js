@@ -29,8 +29,6 @@ import { Pie } from "../../../components/d3/pie";
 import { ProgressChart } from "../../../components/d3/progress";
 import { AgentsTable } from './agents-table'
 import { WzRequest } from '../../../react-services/wz-request';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../redux/store';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
@@ -39,9 +37,14 @@ import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
+import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { compose } from 'redux';
 
-
-export class AgentsPreview extends Component {
+export const AgentsPreview = compose(
+  withReduxProvider,
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
+  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}])
+)(class AgentsPreview extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
@@ -51,7 +54,6 @@ export class AgentsPreview extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    this.setGlobalBreadcrumb();
     this.getSummary();
     if( this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'] ){
       this._isMount && this.setState({ showAgentsEvolutionVisualization: true });
@@ -72,11 +74,6 @@ export class AgentsPreview extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
-  }
-
-  setGlobalBreadcrumb() {
-    const breadcrumb = [{ text: '' }, { text: 'Agents' }];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
 
   groupBy = function(arr) {
@@ -331,7 +328,7 @@ export class AgentsPreview extends Component {
       </EuiPage>
     );
   }
-}
+});
 
 AgentsTable.propTypes = {
   tableProps: PropTypes.object,
