@@ -189,7 +189,7 @@ const initialState = {
     },
     "rbac_mode": "black"
   },
-  userRoles: ['administrators']
+  userRoles: ['administrator']
 };
 
 const appStateReducers = (state = initialState, action) => {
