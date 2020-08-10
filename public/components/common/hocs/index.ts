@@ -20,3 +20,5 @@ export { withUserRoles, withUserRolesRequirements, withUserRolesPrivate  } from 
 export { withUserAuthorizationPrompt  } from './withUserAuthorization';
 
 export { withGlobalBreadcrumb  } from './withGlobalBreadcrumb';
+
+export { withReduxProvider  } from './withReduxProvider';
