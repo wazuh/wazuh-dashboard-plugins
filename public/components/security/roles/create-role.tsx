@@ -68,9 +68,6 @@ export const CreateRole = ({ closeFlyout }) => {
             );
             const data = (result.data || {}).data;
             if(data.failed_items && data.failed_items.length){
-                const message = (result.data || {}).message || "";
-                ErrorHandler.handle( data.failed_items[0].error.message, message);
-                closeFlyout(false);
                 return;
             }
             let roleId = "";
@@ -92,9 +89,6 @@ export const CreateRole = ({ closeFlyout }) => {
             
             const policiesData = (policyResult.data || {}).data;
             if(policiesData.failed_items && policiesData.failed_items.length){
-                const message = (policyResult.data || {}).message || "";
-                ErrorHandler.handle(policiesData.failed_items[0].error.message, "Role was created but there was an error assigning policies. "+ message);
-                closeFlyout(false);
                 return;
             }
             ErrorHandler.info('Role was successfully created with the selected policies');

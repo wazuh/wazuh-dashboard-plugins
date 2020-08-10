@@ -6,10 +6,12 @@ import {
 } from '@elastic/eui';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { ApiRequest } from '../../../react-services/api-request';
+import { ErrorHandler } from '../../../react-services/error-handler';
 
 
 
 export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
+    const [isLoading, setIsLoading] = useState(false);
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortField, setSortField] = useState('role');
@@ -76,10 +78,11 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
               type: 'icon',
               color: 'danger',
               icon: 'trash',
-              enabled : () => !isDisabled,
+              enabled : () => !isDisabled && !isLoading,
               onClick: async(item) => {
                   try{
-                    await ApiRequest.request(
+                    setIsLoading(true);
+                    const response = await ApiRequest.request(
                         'DELETE',
                         `/security/roles/${role.id}/policies`,
                         {
@@ -88,8 +91,15 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
                             }
                         }
                     );
+                    const removePolicy = (response.data || {}).data;
+                    if (removePolicy.failed_items && removePolicy.failed_items.length) {
+                        setIsLoading(false);
+                        return;
+                    }
+                    ErrorHandler.info(`Policy was successfull removed from role ${role.name}`);
                     await onChange();
                   }catch(err){ }
+                  setIsLoading(false);
               },
             },
           ],
@@ -126,6 +136,7 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
       <EuiBasicTable
         items={pageOfItems}
         itemId="id"
+        loading={isLoading}
         itemIdToExpandedRowMap={itemIdToExpandedRowMap}
         isExpandable={true}
         hasActions={true}

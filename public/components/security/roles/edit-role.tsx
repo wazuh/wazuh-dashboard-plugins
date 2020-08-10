@@ -99,14 +99,13 @@ export const EditRole = ({ role, closeFlyout }) => {
 
             const policiesData = (policyResult.data || {}).data;
             if (policiesData.failed_items && policiesData.failed_items.length) {
-                const message = (policyResult.data || {}).message || "";
-                ErrorHandler.handle(policiesData.failed_items[0].error.message, message);
                 return;
             }
             ErrorHandler.info('Role was successfully updated with the selected policies');
+            setSelectedPolicies([])
             await update();
         } catch (error) {
-            ErrorHandler.handle(error, "There was an error.");
+            ErrorHandler.handle(error, "There was an error");
         }
     }
 
@@ -143,7 +142,6 @@ export const EditRole = ({ role, closeFlyout }) => {
                             <EuiComboBox
                                 placeholder="Select policies"
                                 options={policies}
-                                singleSelection={{ asPlainText: true }}
                                 isDisabled={isReserved}
                                 selectedOptions={selectedPolicies}
                                 onChange={onChangePolicies}
