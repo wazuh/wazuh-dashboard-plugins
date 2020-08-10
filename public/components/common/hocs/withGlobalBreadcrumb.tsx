@@ -12,7 +12,7 @@
 import React, { useEffect } from 'react';
 import { useGlobalBreadcrumb  } from '../hooks/useGlobalBreadcrumb';
 
-type TBreadcrumbSection = {text: string, href: string} 
+type TBreadcrumbSection = {text: string, href?: string} 
 type TBreadcrumb = TBreadcrumbSection[];
 type TBreadcrumbParameter = TBreadcrumb | ((props: any) => TBreadcrumb);
 

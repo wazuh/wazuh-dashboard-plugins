@@ -14,8 +14,15 @@ import React, { Fragment } from 'react';
 import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
 import { useUserRolesRequirements } from '../hooks/useUserRoles';
 import { EuiEmptyPrompt, EuiSpacer, EuiPanel } from '@elastic/eui';
+import { TUserPermissions, TUserPermissionsFunction, TUserRoles, TUserRolesFunction } from '../permissions/button';
 
-export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}) => {
+interface IEmptyPromptNoPermissions{
+  permissions?: TUserPermissions
+  roles?: TUserRoles
+  actions?: React.ReactNode
+}
+
+export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}: IEmptyPromptNoPermissions) => {
   const prompt = (<EuiEmptyPrompt
     iconType="securityApp"
     title={<h2>You have no permissions</h2>}
@@ -23,13 +30,13 @@ export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}) => {
       <Fragment>
         {permissions && (
           <p>
-            This section requires {permissions.map(permission => (<strong>{typeof permission === 'object' ? permission.action : permission}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {permissions.length > 1 ? 'permissions' : 'permission'}
+            This section requires {permissions.map(permission => (<strong key={`empty-prompt-no-permissions-${typeof permission === 'object' ? permission.action : permission}`}>{typeof permission === 'object' ? permission.action : permission}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {permissions.length > 1 ? 'permissions' : 'permission'}
           </p>
         )}
         {permissions && roles && (<EuiSpacer />)}
         {roles && (
           <p>
-            This section requires {roles.map(role => (<strong>{role}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {roles.length > 1 ? 'roles' : 'role'}
+            This section requires {roles.map(role => (<strong key={`empty-prompt-no-permissions-${role}`}>{role}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {roles.length > 1 ? 'roles' : 'role'}
           </p>
         )}
       </Fragment>
@@ -42,7 +49,14 @@ export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}) => {
   )
 }
 
-export const WzPromptPermissions = ({permissions = null, roles = null, children, ...rest}) => {
+interface IPromptNoPermissions{
+  permissions?: TUserPermissions | TUserPermissionsFunction
+  roles?: TUserRoles | TUserRolesFunction
+  children?: React.ReactNode
+  rest?: any
+}
+
+export const WzPromptPermissions = ({permissions = null, roles = null, children, ...rest} : IPromptNoPermissions) => {
   const [userPermissionRequirements, userPermissions] = useUserPermissionsRequirements(typeof permissions === 'function' ? permissions(rest) : permissions);
   const [userRolesRequirements, userRoles] = useUserRolesRequirements(typeof roles === 'function' ? roles(rest) : roles);
 

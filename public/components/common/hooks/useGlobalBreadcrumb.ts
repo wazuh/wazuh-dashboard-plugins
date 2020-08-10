@@ -13,7 +13,7 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateGlobalBreadcrumb  } from '../../../redux/actions/globalBreadcrumbActions';
 
-type TBreadcrumbSection = {text: string, href: string} 
+type TBreadcrumbSection = {text: string, href?: string} 
 type TBreadcrumb = TBreadcrumbSection[];
 
 // It updates global breadcrumb

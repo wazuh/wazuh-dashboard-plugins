@@ -23,15 +23,15 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
-interface IUserPermissionsObject{action: string, resource: string};
-type TUserPermissionsFunction = (props : any) => TUserPermissions;
-type TUserPermissions = (string | IUserPermissionsObject)[] | null;
-type TUserRoles = string[] | null;
-type TUserRolesFunction = (props : any) => TUserRoles;
+export interface IUserPermissionsObject{action: string, resource: string};
+export type TUserPermissionsFunction = (props : any) => TUserPermissions;
+export type TUserPermissions = (string | IUserPermissionsObject)[] | null;
+export type TUserRoles = string[] | null;
+export type TUserRolesFunction = (props : any) => TUserRoles;
 
 interface IWzButtonPermissionsProps{
-  permissions: TUserPermissions | TUserPermissionsFunction
-  roles: TUserRoles | TUserRolesFunction
+  permissions?: TUserPermissions | TUserPermissionsFunction
+  roles?: TUserRoles | TUserRolesFunction
   buttonType?: 'default' | 'empty' | 'icon' | 'link'
   tooltip?: any
   rest?: any
