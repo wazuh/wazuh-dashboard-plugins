@@ -101,8 +101,6 @@ export class GroupsController {
           }
         );
         this.buildGroupsTableProps(loadedGroups.data.data.affected_items);
-        const configuration = this.wazuhConfig.getConfig();
-        this.adminMode = !!(configuration || {}).admin;
         this.load = false;
       }
       this.scope.$applyAsync();

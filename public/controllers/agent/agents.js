@@ -257,9 +257,6 @@ export class AgentsController {
       this.$scope.$applyAsync();
     };
 
-    const configuration = this.wazuhConfig.getConfig();
-    this.$scope.adminMode = !!(configuration || {}).admin;
-
     //Load
     try {
       this.$scope.getAgent();

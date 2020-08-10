@@ -219,9 +219,6 @@ export class AgentsPreviewController {
     try {
       this.errorInit = false;
 
-      const configuration = this.wazuhConfig.getConfig();
-      this.$scope.adminMode = !!(configuration || {}).admin;
-
       const clusterInfo = AppState.getClusterInfo();
       this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';

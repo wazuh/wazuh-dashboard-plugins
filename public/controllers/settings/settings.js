@@ -20,7 +20,6 @@ import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import checkAdminMode from '../../controllers/management/components/management/status/utils/check-admin-mode';
 
 export class SettingsController {
   /**
@@ -62,7 +61,6 @@ export class SettingsController {
     try {
       const breadcrumb = [{ text: '' }, { text: 'Settings' }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      this.admin = await checkAdminMode();
 
       const location = this.$location.search();
       if (location && location.tab) {
@@ -122,14 +120,12 @@ export class SettingsController {
 
     let tabs = [
       { id: 'api', name: 'API' },
+      { id: 'modules', name: 'Modules' },
+      { id: 'sample_data', name: 'Sample data' },
       { id: 'configuration', name: 'Configuration' },
       { id: 'logs', name: 'Logs' },
       { id: 'about', name: 'About' }
     ];
-    if (this.admin) {
-      tabs.splice(1, 0, { id: 'sample_data', name: 'Sample data' });
-      tabs.splice(1, 0, { id: 'modules', name: 'Modules' });
-    }
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);

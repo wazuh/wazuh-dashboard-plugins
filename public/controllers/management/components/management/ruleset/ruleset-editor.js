@@ -165,7 +165,7 @@ class WzRulesetEditor extends Component {
     const { name, content, path, showWarningRestart } = this.state;
     const isEditable = addingRulesetFile
       ? true
-      : path !== 'ruleset/rules' && path !== 'ruleset/decoders' /*&& adminMode*/;
+      : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
     nameForSaving = nameForSaving.endsWith('.xml')
       ? nameForSaving

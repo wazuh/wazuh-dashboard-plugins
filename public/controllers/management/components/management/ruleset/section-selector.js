@@ -59,7 +59,7 @@ class WzSectionSelector extends Component {
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
       const items = result.data.data.items;
-      //Set the admin mode
+      
       this.props.toggleShowFiles(false);
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(false);
@@ -99,7 +99,7 @@ const mapDispatchToProps = dispatch => {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
-    cleanFilters: () => dispatch(cleanFilters())
+    cleanFilters: () => dispatch(cleanFilters()),
     updateError: error => dispatch(updateError(error)),
     updateIsProcessing: isProcessing =>
       dispatch(updateIsProcessing(isProcessing))

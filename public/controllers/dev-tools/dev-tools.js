@@ -597,17 +597,12 @@ export class DevToolsController {
             body: body,
             devTools: true,
           });
-          if(typeof output === 'string' && output.includes('3029')) {
-            this.apiOutputBox.setValue('This method is not allowed without admin mode');
-          }
-          else {
-            this.apiOutputBox.setValue(
-              JSON.stringify((output || {}).data || {}, null, 2).replace(
-                /\\\\/g,
-                '\\'
-              )
-            );
-          }
+          this.apiOutputBox.setValue(
+            JSON.stringify((output || {}).data || {}, null, 2).replace(
+              /\\\\/g,
+              '\\'
+            )
+          );
         }
       }
 

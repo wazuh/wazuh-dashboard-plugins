@@ -125,9 +125,6 @@ export const initialWazuhConfig = `---
 # This change is not retroactive, if you change it new indexes will be created
 # cron.prefix: test
 # 
-# ------------------------------- App privileges --------------------------------
-#admin: true
-#
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
 #hideManagerAlerts: false

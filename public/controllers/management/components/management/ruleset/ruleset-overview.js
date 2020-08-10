@@ -8,9 +8,6 @@ import {
   EuiText,
   EuiTitle
 } from '@elastic/eui';
-import {
-  updateAdminMode
-} from '../../../../../redux/actions/appStateActions';
 
 import { connect } from 'react-redux';
 
@@ -78,16 +75,9 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updateAdminMode: status => dispatch(updateAdminMode(status)),
-  };
-};
-
 export default compose(
   connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
   ),
   withGlobalBreadcrumb(props => {
     const sectionNames = {

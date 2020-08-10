@@ -69,17 +69,6 @@ export const updateExtensions = (id, extensions) => {
 };
 
 /**
- * Updates adminMode in the appState store
- * @param extensions
- */
-export const updateAdminMode = adminMode => {
-  return {
-    type: 'UPDATE_ADMIN_MODE',
-    adminMode
-  };
-};
-
-/**
  * Updates currentPlatform in the appState store
  * @param extensions
  */

@@ -25,8 +25,6 @@ import WzGroupsTable from './groups-table';
 import WzGroupsActionButtons from './actions-buttons-main';
 
 import { connect } from 'react-redux';
-import { updateAdminMode } from '../../../../../redux/actions/appStateActions';
-import checkAdminMode from './utils/check-admin-mode';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs'
 import { compose } from 'redux';
 
@@ -35,8 +33,6 @@ export class WzGroupsOverview extends Component {
   constructor(props) {
     super(props);
   }
-
-
 
   render() {
     return (

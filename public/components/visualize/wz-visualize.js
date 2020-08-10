@@ -28,7 +28,6 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
-import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
@@ -47,7 +46,6 @@ export class WzVisualize extends Component {
       selectedTab: this.props.selectedTab,
       expandedVis: false,
       thereAreSampleAlerts: false,
-      adminMode: false,
       hasRefreshedKnownFields: false,
       refreshingKnownFields: [],
       refreshingIndex: true
@@ -111,11 +109,6 @@ export class WzVisualize extends Component {
       });
     } catch (error) { }
 
-    // Check adminMode
-    try {
-      const adminMode = await checkAdminMode();
-      this.setState({ adminMode });
-    } catch (error) { }
   }
 
   async componentDidUpdate(prevProps) {
@@ -248,11 +241,8 @@ export class WzVisualize extends Component {
         {/* Sample alerts Callout */}
         {this.state.thereAreSampleAlerts && this.props.resultState === 'ready' && (
           <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px 16px 8px' }}>
-            <p>The data displayed may contain sample alerts. {this.state.adminMode && (
-              <Fragment>
-                Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
-              </Fragment>
-            )}</p>
+            <p>The data displayed may contain sample alerts. Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
+            </p>
           </EuiCallOut>
         )}
 

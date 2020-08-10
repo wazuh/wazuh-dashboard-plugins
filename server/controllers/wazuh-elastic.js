@@ -903,13 +903,14 @@ export class WazuhElasticCtrl {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
+    //TODO: replace by administrator user role requirement
     //Get configuration
     const configFile = getConfiguration();
     
     // Check if admin mode is enabled
-    if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
-      return ErrorResponse('Admin mode is required to create sample data', 1000, 403, reply);
-    };
+    // if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
+    //   return ErrorResponse('Admin mode is required to create sample data', 1000, 403, reply);
+    // };
 
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
     const bulkPrefix = JSON.stringify({
@@ -983,13 +984,14 @@ export class WazuhElasticCtrl {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
+    //TODO: replace by administrator user role requirement
     //Get configuration
-    const configFile = getConfiguration();
+    // const configFile = getConfiguration();
     
     // Check if admin mode is enabled
-    if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
-      return ErrorResponse('Admin mode is required to delete sample data', 1000, 403, reply);
-    };
+    // if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
+    //   return ErrorResponse('Admin mode is required to delete sample data', 1000, 403, reply);
+    // };
 
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
     try{
