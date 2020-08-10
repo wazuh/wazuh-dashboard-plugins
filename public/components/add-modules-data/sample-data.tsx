@@ -28,7 +28,6 @@ import {
 
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
-import { connect } from 'react-redux';
 
 export default class WzSampleData extends Component {
   categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
@@ -75,7 +74,7 @@ export default class WzSampleData extends Component {
   async componentDidMount(){
     // Check if sample data for each category was added
     try{
-      const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
+      const results = await PromiseAllRecursiveObject(this.categories.reduce((accum, cur) => {
         accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
@@ -207,13 +206,13 @@ const zipObject = (keys = [], values = []) => {
   }, {})
 }
 
-const PromiseAllRecusiveObject = function (obj) {
+const PromiseAllRecursiveObject = function (obj) {
   const keys = Object.keys(obj);
   return Promise.all(keys.map(key => {
     const value = obj[key];
     // Promise.resolve(value) !== value should work, but !value.then always works
     if (typeof value === 'object' && !value.then) {
-      return PromiseAllRecusiveObject(value);
+      return PromiseAllRecursiveObject(value);
     }
     return value;
   }))

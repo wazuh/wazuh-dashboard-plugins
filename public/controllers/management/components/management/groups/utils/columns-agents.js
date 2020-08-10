@@ -57,47 +57,30 @@ export default class GroupsAgentsColumns {
         render: item => {
           return (
             <div>
-              {(this.tableProps.adminMode && (
-                <div>
-                  <WzButtonPermissions
-                    buttonType='icon'
-                    permissions={[{action: 'agent:read', resource: `agent:id:${item.id}`}]}
-                    tooltip={{position: 'top', content: 'Go to the agent'}}
-                    aria-label="Go to the agent"
-                    iconType="eye"
-                    onClick={async () => {
-                      this.tableProps.groupsProps.showAgent(item);
-                    }}
-                    color="primary"
-                  />
-                  <WzButtonPermissions
-                    buttonType='icon'
-                    permissions={[{action: 'agent:modify_group', resource: `agent:id:${item.id}`}]}
-                    tooltip={{position: 'top', content: 'Remove agent from this group'}}
-                    aria-label="Remove agent from this group"
-                    iconType="trash"
-                    onClick={async () => {
-                      this.tableProps.updateListItemsForRemove([item]);
-                      this.tableProps.updateShowModal(true);
-                    }}
-                    color="danger"
-                    isDisabled={item.name === 'default'}
-                  />
-                </div>
-              )) || (
-                  <div>
-                    <EuiToolTip position="top" content={`Go to the agent`}>
-                      <EuiButtonIcon
-                        aria-label="Go to the agent"
-                        iconType="eye"
-                        onClick={async () => {
-                          this.tableProps.groupsProps.showAgent(item);
-                        }}
-                        color="primary"
-                      />
-                    </EuiToolTip>
-                  </div>
-                )}
+              <WzButtonPermissions
+                buttonType='icon'
+                permissions={[{action: 'agent:read', resource: `agent:id:${item.id}`}]}
+                tooltip={{position: 'top', content: 'Go to the agent'}}
+                aria-label="Go to the agent"
+                iconType="eye"
+                onClick={async () => {
+                  this.tableProps.groupsProps.showAgent(item);
+                }}
+                color="primary"
+              />
+              <WzButtonPermissions
+                buttonType='icon'
+                permissions={[{action: 'agent:modify_group', resource: `agent:id:${item.id}`}]}
+                tooltip={{position: 'top', content: 'Remove agent from this group'}}
+                aria-label="Remove agent from this group"
+                iconType="trash"
+                onClick={async () => {
+                  this.tableProps.updateListItemsForRemove([item]);
+                  this.tableProps.updateShowModal(true);
+                }}
+                color="danger"
+                isDisabled={item.name === 'default'}
+              />
             </div>
           );
         }

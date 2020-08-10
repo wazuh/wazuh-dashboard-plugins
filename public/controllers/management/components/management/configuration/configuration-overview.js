@@ -117,40 +117,21 @@ class WzConfigurationOverview extends Component {
               )}
               {this.props.agent.id === '000' && (
                 <EuiFlexItem>
-                  {this.props.clusterNodeSelected ? (
-                    <WzButtonPermissions
-                      buttonType='empty'
-                      permissions={[{action: 'cluster:upload_file', resource: `node:id:${this.props.clusterNodeSelected}`}]}
-                      iconSide="left"
-                      iconType="pencil"
-                      onClick={() =>
-                        this.updateConfigurationSection(
-                          'edit-configuration',
-                          `Cluster configuration`,
-                          '',
-                          'Edit configuration'
-                        )}
-                    >
-                      Edit configuration
-                    </WzButtonPermissions>
-                  ) : (
-                    <WzButtonPermissions
-                      buttonType='empty'
-                      permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/ossec.conf'}]}
-                      iconSide="left"
-                      iconType="pencil"
-                      onClick={() =>
-                        this.updateConfigurationSection(
-                          'edit-configuration',
-                          `Manager configuration`,
-                          '',
-                          'Edit configuration'
-                        )}
-                    >
-                      Edit configuration
-                    </WzButtonPermissions>
-                  )
-                  }
+                  <WzButtonPermissions
+                    buttonType='empty'
+                    permissions={[this.props.clusterNodeSelected ? {action: 'cluster:read_file', resource: `node:id:${this.props.clusterNodeSelected}`}: {action: 'manager:read_file', resource: 'file:path:/etc/ossec.conf'}]}
+                    iconSide="left"
+                    iconType="pencil"
+                    onClick={() =>
+                      this.updateConfigurationSection(
+                        'edit-configuration',
+                        `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`,
+                        '',
+                        'Edit configuration'
+                      )}
+                  >
+                    Edit configuration
+                  </WzButtonPermissions>
                 </EuiFlexItem>
               )}
               {this.props.agent.id !== '000' && this.props.agent.status === 'Active' && (
