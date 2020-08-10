@@ -34,9 +34,6 @@ import {
   updateClusterEnabled,
   cleanInfo
 } from '../../../../../redux/actions/statusActions';
-import {
-  updateAdminMode,
-} from '../../../../../redux/actions/appStateActions';
 import StatusHandler from './utils/status-handler';
 
 // Wazuh components
@@ -230,7 +227,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateAdminMode: status => dispatch(updateAdminMode(status)),
     updateListNodes: listNodes => dispatch(updateListNodes(listNodes)),
     updateSelectedNode: selectedNode =>
       dispatch(updateSelectedNode(selectedNode)),
