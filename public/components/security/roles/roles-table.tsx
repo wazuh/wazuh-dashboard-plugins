@@ -9,6 +9,7 @@ import {
     EuiSpacer,
     EuiLoadingSpinner
 } from '@elastic/eui';
+const isReserved = {administrator : true, 'readonly' : true, 'users_admin' : true, 'agents_readonly' : true, 'agents_admin' : true, 'cluster_readonly' : true, 'cluster_admin' : true};
 
 export const RolesTable = ({roles,policiesData, loading, editRole}) => {
    
@@ -63,6 +64,15 @@ export const RolesTable = ({roles,policiesData, loading, editRole}) => {
                     <EuiLoadingSpinner size="m" />
             },
             sortable: true,
+        },
+        {
+            field: 'name',
+            name: 'Status',
+            render: (item) => {
+                return isReserved[item] && <EuiBadge color="primary" >Default role</EuiBadge>
+            },
+            width: 150,
+            sortable: false,
         },
     ];
 
