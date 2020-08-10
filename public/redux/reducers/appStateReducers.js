@@ -50,8 +50,9 @@ const initialState = {
       "agent:group:*": "allow"
     },
     "group:read": {
+      "*:*:*": "allow", // hardcoded
       "group:id:*": "allow",
-      // "group:id:custom-group": "deny",
+      "group:id:custom-group": "deny",
     },
     "group:delete": {
       "group:id:*": "allow",
@@ -101,7 +102,7 @@ const initialState = {
       "*:*:*": "allow"
     },
     "manager:read": {
-      "*:*:*": "deny"
+      "*:*:*": "allow"
     },
     "manager:read_api_config": {
       "*:*:*": "allow"
@@ -146,12 +147,12 @@ const initialState = {
     "cluster:update_api_config": {
       "node:id:*": "allow"
     },
-    // "cluster:restart": {
-    //   "node:id:*": "allow"
-    // },
-    // "cluster:upload_file": {
-    //   "node:id:*": "allow"
-    // },
+    "cluster:restart": {
+      "node:id:*": "allow"
+    },
+    "cluster:upload_file": {
+      "node:id:*": "allow"
+    },
     "cluster:read_file": {
       "node:id:*&file:path:*": "allow"
     },
@@ -162,6 +163,7 @@ const initialState = {
       "decoder:file:*": "allow"
     },
     "lists:read": {
+      "*:*:*": "allow",
       "list:path:*": "allow"
     },
     "rules:read": {
@@ -187,7 +189,7 @@ const initialState = {
     },
     "rbac_mode": "black"
   },
-  userRoles: ['administrator']
+  userRoles: ['administrators']
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -223,13 +225,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       extensions: action.extensions
-    };
-  }
-
-  if (action.type === 'UPDATE_ADMIN_MODE') {
-    return {
-      ...state,
-      adminMode: action.adminMode
     };
   }
 
