@@ -11,6 +11,7 @@
  */
 import { AppState } from './app-state';
 import { GenericRequest } from './generic-request';
+import { ErrorHandler } from './error-handler';
 
 export class ApiRequest {
   /**
@@ -37,6 +38,14 @@ export class ApiRequest {
         '/api/request',
         requestData
       );
+
+      const hasFailed = ((data.data || {}).data || {}).total_failed_items || 0;
+      if(hasFailed){
+        const error = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
+        const failed_ids = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
+        const message = ((data.data || {}).message || "Unexpected error");
+        ErrorHandler.handle(`(${error.code}) - ${error.message} ${failed_ids ? `. Affected ids: ${failed_ids} ` : ""}`, message);
+      }
 
       if (data.error) {
         throw new Error(data.error);
