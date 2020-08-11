@@ -500,7 +500,7 @@ export class AgentsWelcome extends Component {
   render() {
     const title = this.renderTitle();
     const upgradeButton = this.renderUpgradeButton();
-    if (this.props.agent.status === 'Never connected') {
+    if (this.props.agent.status === 'never_connected') {
       return (
         <EuiEmptyPrompt
           iconType="securitySignalDetected"

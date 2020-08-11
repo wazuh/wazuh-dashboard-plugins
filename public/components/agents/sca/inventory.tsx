@@ -431,7 +431,7 @@ export class Inventory extends Component {
           )}
         </div>
         <EuiPage>
-          {((this.props.agent && (this.props.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status !== 'never_connected' && !(this.policies || []).length && !this.state.loading) &&
             <EuiCallOut title="No scans available" iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                 Refresh
@@ -439,7 +439,7 @@ export class Inventory extends Component {
             </EuiCallOut>
           )}
 
-          {((this.props.agent && (this.props.agent || {}).status === 'Never connected' && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status === 'never_connected' && !this.state.loading) &&
             <EuiCallOut title="Agent has never connected" style={{width: "100%"}} iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                   Refresh

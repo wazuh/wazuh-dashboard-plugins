@@ -5,7 +5,7 @@ import {SyscollectorTable} from './components/syscollector-table';
 
 export function SyscollectorInventory({agent}){
 
-  if (agent && agent.status === 'Never connected'){
+  if (agent && agent.status === 'never_connected'){
     return (<EuiEmptyPrompt
       iconType="securitySignalDetected"
       style={{ marginTop: 20 }}

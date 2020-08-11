@@ -50,6 +50,11 @@ export const AgentsPreview = compose(
     super(props);
     this.state = { data: [], loading: false, showAgentsEvolutionVisualization: false, agentTableFilters: [] };
     this.wazuhConfig = new WazuhConfig();
+    this.agentStatusLabelToIDMap = {
+      'Active': 'active',
+      'Disconnected': 'disconnected',
+      'Never connected': 'never_connected'
+    }
   }
 
   async componentDidMount() {
@@ -74,6 +79,10 @@ export const AgentsPreview = compose(
 
   componentWillUnmount() {
     this._isMount = false;
+  }
+
+  agentStatusLabelToID(label){
+    return this.agentStatusLabelToIDMap[label];
   }
 
   groupBy = function(arr) {
@@ -140,7 +149,7 @@ export const AgentsPreview = compose(
                     <EuiFlexItem style={{ alignItems: 'center' }}>
                       <Pie
                         legendAction={(status) => this._isMount && this.setState({
-                          agentTableFilters: [ {field: 'q', value: `status=${status}`}]
+                          agentTableFilters: [ {field: 'q', value: `status=${this.agentStatusLabelToID(status)}`}]
                         })}
                         width={300}
                         height={150}
@@ -166,7 +175,7 @@ export const AgentsPreview = compose(
                                   position='top'
                                   content='Show active agents'>
                                   <a onClick={() => this._isMount && this.setState({
-                                    agentTableFilters: [ {field: 'q', value: 'status=Active'} ]
+                                    agentTableFilters: [ {field: 'q', value: 'status=active'} ]
                                   })} >{this.state.data[0].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
@@ -182,7 +191,7 @@ export const AgentsPreview = compose(
                                   position='top'
                                   content='Show disconnected agents'>
                                   <a onClick={() => this._isMount && this.setState({
-                                    agentTableFilters: [ {field: 'q', value: 'status=Disconnected'} ]
+                                    agentTableFilters: [ {field: 'q', value: 'status=disconnected'} ]
                                   })} >{this.state.data[1].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
@@ -198,7 +207,7 @@ export const AgentsPreview = compose(
                                   position='top'
                                   content='Show never connected agents'>
                                   <a onClick={() => this._isMount && this.setState({
-                                    agentTableFilters: [ {field: 'q', value: 'status=Never connected'} ]
+                                    agentTableFilters: [ {field: 'q', value: 'status=never_connected'} ]
                                   })} >{this.state.data[2].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}

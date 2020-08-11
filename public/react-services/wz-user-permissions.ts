@@ -965,6 +965,10 @@ export class WzUserPermissions{
   
     return filtered.length ? filtered : false;
   }
+
+  static decodeToken(token){
+    // return jwtDecode(token) // require add "jwt-decode" to dependencies of app
+  }
 }
 
 // Constants

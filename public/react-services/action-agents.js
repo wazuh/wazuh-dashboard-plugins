@@ -66,7 +66,7 @@ export class ActionAgents {
       if (
         agent.id !== '000' &&
         this.compareVersions(agent.version, managerVersion) === true &&
-        agent.status === 'Active'
+        agent.status === 'active'
       ) {
         WzRequest.apiReq('PUT', `/agents/${agent.id}/upgrade`, '1')
           .then(() => {})
@@ -127,7 +127,7 @@ export class ActionAgents {
   static restartAllAgents(selectedItems) {
     let idAvaibleAgents = [];
     selectedItems.forEach(agent => {
-      if (agent.id !== '000' && agent.status === 'Active') {
+      if (agent.id !== '000' && agent.status === 'active') {
         idAvaibleAgents.push(agent.id);
       }
     });
