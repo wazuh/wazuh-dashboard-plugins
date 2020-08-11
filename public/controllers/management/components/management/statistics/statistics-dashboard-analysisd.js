@@ -10,51 +10,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useEffect, useState } from "react";
-import { EuiFlexGroup, EuiFlexItem, EuiPanel } from "@elastic/eui";
+import React from "react";
 import WzReduxProvider from "../../../../../redux/wz-redux-provider";
 import KibanaVis from "../../../../../kibana-integrations/kibana-vis";
-import { TabVisualizations } from "../../../../../factories/tab-visualizations";
-import { LoadedVisualizations } from "../../../../../factories/loaded-visualizations";
-import { DiscoverPendingUpdates } from "../../../../../factories/discover-pending-updates";
-import { RawVisualizations } from "../../../../../factories/raw-visualizations";
-import { GenericRequest } from "../../../../../react-services/generic-request";
-import store from "../../../../../redux/store";
-import { updateVis } from "../../../../../redux/actions/visualizationsActions";
-import { AppState } from "../../../../../react-services/app-state";
+import { EuiFlexGroup, EuiFlexItem, EuiPanel } from "@elastic/eui";
+import { useBuildStatisticsVisualizations } from './hooks';
 
 
 export function WzStatisticsAnalysisd({clusterNodeSelected}) {
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const tabVisualizations = new TabVisualizations();
-    const rawVisualizations = new RawVisualizations();
-    const discoverPendingUpdates = new DiscoverPendingUpdates();
-    const loadedVisualizations = new LoadedVisualizations();
-    discoverPendingUpdates.removeAll();
-    rawVisualizations.removeAll();
-    tabVisualizations.removeAll();
-    loadedVisualizations.removeAll();
-    tabVisualizations.setTab("statistics");
-    tabVisualizations.assign({
-      statistics: 2,
-    });
-    const buildStatisticsVisualizations = async () => {
-      discoverPendingUpdates.addItem({ query: "", language: "lucene" }, []);
-      const visData = await GenericRequest.request(
-        "POST",
-        `/elastic/visualizations/cluster-statistics/wazuh-statistic*`,
-        { nodes: { affected_items: [{}], master_node: JSON.parse(AppState.getCurrentAPI()).id, name: clusterNodeSelected, } }
-      );
-      await rawVisualizations.assignItems(visData.data.raw);
-      store.dispatch(
-        updateVis({ update: true, raw: rawVisualizations.getList() })
-      );
-      setLoaded(true);
-    };
-    buildStatisticsVisualizations();
-  }, []);
+  useBuildStatisticsVisualizations(clusterNodeSelected);
+  
   return (
     <div>
       <EuiFlexGroup>
