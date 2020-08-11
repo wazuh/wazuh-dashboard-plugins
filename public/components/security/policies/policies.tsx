@@ -24,6 +24,7 @@ import { PoliciesTable } from './policies-table';
 import { ApiRequest } from '../../../react-services/api-request';
 import { WazuhSecurity } from '../../../factories/wazuh-security'
 import { ErrorHandler } from '../../../react-services/error-handler';
+import { EditPolicyFlyout } from './edit-policy';
 
 export const Policies = () => {
     const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
@@ -37,8 +38,33 @@ export const Policies = () => {
     const [actions, setActions] = useState([]);
     const [actionValue, setActionValue] = useState('');
     const [policyName, setPolicyName] = useState('');
+    const [policies, setPolicies] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [isEditingPolicy, setIsEditingPolicy] = useState(false);
+    const [editingPolicy, setEditingPolicy] = useState('');
 
     useEffect(() => { loadResources() }, [addedActions]);
+
+    const getPolicies = async() => {
+        setLoading(true);
+        const request = await ApiRequest.request(
+            'GET',
+            '/security/policies',
+            {}
+        );
+        const policies = (((request || {}).data || {}).data || {}).affected_items || [];
+        setPolicies(policies);
+        setLoading(false);
+    }
+
+    useEffect(() => {
+        getPolicies();
+    }, []);
+
+    const editPolicy = (item) => {
+        setEditingPolicy(item);
+        setIsEditingPolicy(true);
+    }
 
     const createPolicy = async () => {
         try {
@@ -114,11 +140,9 @@ export const Policies = () => {
             {}
         );
         const resources_data = ((resources_request || {}).data || []);
-        console.log(resources_data)
         setAvailableResources(resources_data);
 
         const actions_data = ((actions_request || {}).data || []);
-        console.log(actions_data)
         setAvailableActions(actions_data);
         const actions = Object.keys(actions_data)
             .map((x, idx) => {
@@ -239,6 +263,21 @@ export const Policies = () => {
         }
     ];
 
+    const closeEditingFlyout = async() => {
+        setIsEditingPolicy(false);
+        await getPolicies();
+    };
+
+
+    let editFlyout;
+    if(isEditingPolicy){
+        editFlyout = ( <EuiOverlayMask onClick={(e) => {
+            e.target.className === 'euiOverlayMask' &&
+            closeEditingFlyout()
+        }}>
+            <EditPolicyFlyout closeFlyout={closeEditingFlyout} policy={editingPolicy} />
+        </EuiOverlayMask>)
+    }
     let flyout;
     if (isFlyoutVisible) {
         flyout = (
@@ -389,11 +428,12 @@ export const Policies = () => {
                             Create policy
                                 </EuiButton>
                         {flyout}
+                        {editFlyout}
                     </div>
                 </EuiPageContentHeaderSection>
             </EuiPageContentHeader>
             <EuiPageContentBody>
-                <PoliciesTable></PoliciesTable>
+                <PoliciesTable loading={loading} policies={policies} editPolicy={editPolicy} ></PoliciesTable>
             </EuiPageContentBody>
         </EuiPageContent>
     );

@@ -6,24 +6,16 @@ import {
 } from '@elastic/eui';
 import { ApiRequest } from '../../../react-services/api-request';
 
-export const PoliciesTable = () => {
-    const [policies, setPolicies] = useState('');
-    const [loading, setLoading] = useState(false);
-    async function getData() {
-        setLoading(true);
-        const request = await ApiRequest.request(
-            'GET',
-            '/security/policies',
-            {}
-        );
-        const policies = (((request || {}).data || {}).data || {}).affected_items || [];
-        setPolicies(policies);
-        setLoading(false);
-    }
+export const PoliciesTable = ({policies, loading, editPolicy}) => {
 
-    useEffect(() => {
-        getData();
-    }, []);
+    const getRowProps = item => {
+        const { id } = item;
+        return {
+          'data-test-subj': `row-${id}`,
+          onClick: () => editPolicy(item),
+        };
+      };
+
 
     const columns = [
         {
@@ -81,6 +73,7 @@ export const PoliciesTable = () => {
             items={policies}
             columns={columns}
             search={search}
+            rowProps={getRowProps}
             pagination={true}
             loading={loading}
             sorting={sorting}
