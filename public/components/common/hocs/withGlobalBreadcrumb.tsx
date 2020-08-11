@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hooks to manage user permission requirements
+ * Wazuh app - React HOC for the global breadcrumb
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

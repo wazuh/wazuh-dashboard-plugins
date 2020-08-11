@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hooks to wrap a component with Wazuh Redux provider
+ * Wazuh app - React HOC to wrap a component with Wazuh Redux store
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
