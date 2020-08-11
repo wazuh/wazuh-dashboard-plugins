@@ -85,6 +85,7 @@ export const nameEquivalence = {
   admin: 'Admin mode',
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',
+  'cron.prefix': 'Cron prefix',
   'cron.statistic.status': 'Status',
   'cron.statistic.apis': 'Includes apis',
   'cron.statistic.interval': 'Interval',
@@ -120,6 +121,7 @@ export const categoriesEquivalence = {
   admin: SECURITY,
   hideManagerAlerts: GENERAL,
   'logs.level': GENERAL,
+  'cron.prefix': GENERAL,
   'cron.statistic.status': STATISTIC,
   'cron.statistic.apis': STATISTIC,
   'cron.statistic.interval': STATISTIC,
@@ -171,6 +173,7 @@ export const formEquivalence = {
       ]
     }
   },
+  'cron.prefix': { type: TEXT },
   'cron.statistic.status': { type: BOOLEAN },
   'cron.statistic.apis': { type: ARRAY },
   'cron.statistic.interval': { type: INTERVAL },
