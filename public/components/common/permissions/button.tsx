@@ -61,7 +61,7 @@ export const WzButtonPermissions = ({permissions = null, roles = null, buttonTyp
       {(userPermissionRequirements && userRolesRequirements) && <EuiSpacer size='s' />}
       {userRolesRequirements && (
         <div>
-          Require {userRolesRequirements.join(',')} {userRolesRequirements.length > 1 ? 'roles': 'role'}
+          Require {userRolesRequirements.join(', ')} {userRolesRequirements.length > 1 ? 'roles': 'role'}
         </div>
       )}
     </Fragment>
