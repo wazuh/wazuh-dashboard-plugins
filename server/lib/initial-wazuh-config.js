@@ -130,7 +130,7 @@ export const initialWazuhConfig = `---
 #
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
-#hideManagerAlerts: false
+#hideManagerAlerts: true
 #
 # ------------------------------- App logging level -----------------------------
 # Set the logging level for the Wazuh App log files.
