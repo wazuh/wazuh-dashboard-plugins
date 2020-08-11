@@ -41,10 +41,11 @@ export class SaveDocument {
   }
 
   private async checkIndexAndCreateIfNotExists(index) {
-    const exists = await this.callWithInternalUser('indices.exists', { index });
-    log(this.logPath, `Index '${index}' exists? ${exists}`, 'debug');
-    if (!exists) {
-      const response = await this.callWithInternalUser('indices.create',
+    try {
+      const exists = await this.callWithInternalUser('indices.exists', { index });
+      log(this.logPath, `Index '${index}' exists? ${exists}`, 'debug');
+      if (!exists) {
+        const response = await this.callWithInternalUser('indices.create',
         {
           index,
           body: {
@@ -56,9 +57,18 @@ export class SaveDocument {
             }
           }
         });
-
-      log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
+        
+        log(this.logPath, `Status of create a new index: ${JSON.stringify(response)}`, 'debug');
+      }
+    } catch (error) {
+      this.checkDuplicateIndexError(error);
     }
+  }
+
+  private checkDuplicateIndexError(error: any) {
+    const { type } = ((error || {}).body || {}).error || {};
+    if (!['resource_already_exists_exception'].includes(type))
+      throw error;
   }
 
   private async checkIndexPatternAndCreateIfNotExists(index) {
@@ -100,15 +110,14 @@ export class SaveDocument {
         'debug'
       );
     } catch (error) {
-      this.throwDuplicateIndexError(error);
-      throw error;
+      this.checkDuplicateIndexPatterError(error);
     }
   }
 
-  private throwDuplicateIndexError(error) {
-    const { type, reason } = ((error || {}).body || {}).error || {};
-    if (type === 'version_conflict_engine_exception')
-      throw { error: 10007, message: reason }
+  private checkDuplicateIndexPatterError(error) {
+    const { type } = ((error || {}).body || {}).error || {};
+    if (!['version_conflict_engine_exception', 'resource_already_exists_exception'].includes(type))
+      throw error;
   }
 
 
