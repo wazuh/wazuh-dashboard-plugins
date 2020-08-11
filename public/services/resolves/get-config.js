@@ -50,7 +50,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'cron.statistic.index.name': 'statistic',
     'cron.statistic.index.creation': 'w',
     admin: true,
-    hideManagerAlerts: false,
+    hideManagerAlerts: true,
     'logs.level': 'info'
   };
 
