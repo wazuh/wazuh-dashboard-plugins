@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import store from '../../redux/store';
 import {
     EuiPage,
     EuiFlexGroup,
@@ -39,11 +38,25 @@ export const WzSecurity = compose(
     withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
     withUserAuthorizationPrompt(null, ['administrator'])
 )(() => {
-    const [selectedTabId, setSelectedTabId] = useState('users');
+    // Get the initial tab when the component is initiated
+    const securityTabRegExp = new RegExp(`tab=(${tabs.map(tab => tab.id).join('|')})`);
+    const tab = window.location.href.match(securityTabRegExp);
+
+    const [selectedTabId, setSelectedTabId] = useState(tab && tab[1] || 'users');
     const [securityError, setSecurityError] = useState(false);
 
-
+    const listenerLocationChanged = () => {
+        const tab = window.location.href.match(securityTabRegExp);
+        setSelectedTabId(tab && tab[1] || 'users')
+    }
+    // This allows to redirect to a Security tab if you click a Security link in menu when you're already in a Security section 
+    useEffect(() => {
+        window.addEventListener('popstate', listenerLocationChanged)
+        return () => window.removeEventListener('popstate', listenerLocationChanged);
+    });
+    
     const onSelectedTabChanged = id => {
+        window.location.href = window.location.href.replace(`tab=${selectedTabId}`, `tab=${id}`);
         setSelectedTabId(id);
     };
 
