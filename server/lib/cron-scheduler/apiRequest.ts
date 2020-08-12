@@ -32,7 +32,7 @@ export class ApiRequest {
     
     const response: AxiosResponse = await this.apiInterceptor.request(
       'GET',
-      `${url}:${port}/v4/${this.request}`,
+      `${url}:${port}/${this.request}`,
       this.params,
       {idHost: id }
     )
