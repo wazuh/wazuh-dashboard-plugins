@@ -11,12 +11,14 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
+import { validate } from 'node-cron';
 import {
   EuiFieldText,
   EuiFieldNumber,
   EuiSwitch,
   EuiSelect,
-  EuiCodeEditor
+  EuiCodeEditor,
+  EuiTextColor
 } from '@elastic/eui';
 import { ISetting } from '../../../../../configuration';
 
@@ -38,6 +40,8 @@ export const FieldForm: React.FunctionComponent<IFieldForm> = (props) => {
       return <ListForm {...props} />
     case 'array':
       return <ArrayForm {...props} />
+    case 'interval':
+      return <IntervalForm {...props} />
     default:
       return null;
   }
@@ -67,7 +71,32 @@ const ListForm: React.FunctionComponent<IFieldForm> = (props) => (
     value={getValue(props)}
     onChange={(e) => onChange(e.target.value, props)} />);
 
-const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {  
+const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
+  const [interval, setInterval] = useState<string>(getValue(props));
+  const [invalid, setInvalid] = useState(false);
+  useEffect(() => {
+    if (validate(interval)) {
+      setInvalid(false);
+      getValue(props) !== interval && onChange(interval, props);
+    } else {
+      setInvalid(true);
+      deleteChange(props);
+    }
+  }, [interval])
+  return (
+    <>
+      <EuiFieldText
+        fullWidth
+        value={interval}
+        isInvalid={invalid}
+        onChange={e => setInterval(e.target.value)}
+      />
+      {invalid && <EuiTextColor color='danger'>Invalid cron schedule expressions</EuiTextColor>}
+    </>
+  );
+}
+
+const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
   const [list, setList] = useState(JSON.stringify(getValue(props)));
   useEffect(() => {
     setList(JSON.stringify(getValue(props)))
@@ -81,21 +110,21 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
     }
   }
   return (
-    <EuiCodeEditor 
+    <EuiCodeEditor
       mode='javascript'
       theme='github'
       height='50px'
       value={list}
       onChange={setList}
       onBlur={checkErrors} />
-    );
+  );
 }
 
 //#endregion
 
-//#region Helpers 
+//#region Helpers
 
-const getValue = ({item, updatedConfig}:IFieldForm) => typeof updatedConfig[item.setting] !== 'undefined'
+const getValue = ({ item, updatedConfig }: IFieldForm) => typeof updatedConfig[item.setting] !== 'undefined'
   ? updatedConfig[item.setting]
   : item.value;
 
@@ -105,6 +134,13 @@ const onChange = (value: string | number | boolean | [], props: IFieldForm) => {
     ...updatedConfig,
     [item.setting]: value,
   })
+}
+
+const deleteChange = (props: IFieldForm) => {
+  const { updatedConfig, setUpdatedConfig, item } = props;
+  const newConfig = { ...updatedConfig };
+  delete newConfig[item.setting];
+  setUpdatedConfig(newConfig);
 }
 
 //#endregion

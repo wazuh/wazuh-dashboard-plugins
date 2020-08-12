@@ -27,14 +27,14 @@ import {
 
 
 
-interface IButtonBarProps {
+interface IBottomBarProps {
   updatedConfig: { [setting: string]: string | number | boolean | object }
   setUpdateConfig(setting: {}): void
   setLoading(loading:boolean): void
   config: ISetting[]
 }
 
-export const ButtonBar: React.FunctionComponent<IButtonBarProps> = ({ updatedConfig, setUpdateConfig, setLoading, config }) => {
+export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ updatedConfig, setUpdateConfig, setLoading, config }) => {
   return (!!Object.keys(updatedConfig).length
     ? <EuiBottomBar paddingSize="m">
       <EuiFlexGroup alignItems='center' justifyContent='spaceBetween' gutterSize='s'>

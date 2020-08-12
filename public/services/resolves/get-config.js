@@ -44,6 +44,11 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'wazuh.monitoring.creation': 'd',
     'wazuh.monitoring.pattern': 'wazuh-monitoring-3.x-*',
     'cron.prefix': 'wazuh',
+    'cron.statistic.status': true,
+    'cron.statistic.apis': [],
+    'cron.statistic.interval': '0 0 * * * *',
+    'cron.statistic.index.name': 'statistic',
+    'cron.statistic.index.creation': 'w',
     admin: true,
     hideManagerAlerts: false,
     'logs.level': 'info'
