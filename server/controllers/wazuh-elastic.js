@@ -561,7 +561,7 @@ export class WazuhElasticCtrl {
           } else {
             if (title.startsWith('Wazuh App Statistics')) {
               const { searchSourceJSON } = bulk_content.visualization.kibanaSavedObjectMeta;
-              bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON = searchSourceJSON.replace('wazuh-statistic-*', pattern_name);
+              bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON = searchSourceJSON.replace('wazuh-statistics-*', pattern_name);
             }
             if (title.startsWith('Wazuh App Statistics') && name !== '-' && name !== 'all' && visState.params.expression.includes('q=')) {
               const expressionRegex = /q=\'\*\'/gi
