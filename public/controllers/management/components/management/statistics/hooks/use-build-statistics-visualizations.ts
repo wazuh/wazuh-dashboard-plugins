@@ -23,7 +23,7 @@ import { AppState } from "../../../../../../react-services/app-state";
 import { WazuhConfig } from '../../../../../../react-services/wazuh-config.js';
 
 export const useBuildStatisticsVisualizations = (clusterNodeSelected) => {
-  const { 'cron.prefix': indexPrefix, 'cron.statistic.index.name': indexName } = new WazuhConfig().getConfig();
+  const { 'cron.prefix': indexPrefix, 'cron.statistics.index.name': indexName } = new WazuhConfig().getConfig();
   useEffect(() => {
     const tabVisualizations = new TabVisualizations();
     const rawVisualizations = new RawVisualizations();

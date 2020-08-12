@@ -707,7 +707,7 @@ function discoverController(
       x: {
         accessor: 0,
         label: agg.makeLabel(),
-        format: fieldFormats.serialize(agg),
+        format: fieldFormats ? fieldFormats.serialize(agg) : agg.toSerializedFieldFormat(),
         params: {
           date: true,
           interval: moment.duration(esValue, esUnit),
@@ -719,7 +719,7 @@ function discoverController(
       },
       y: {
         accessor: 1,
-        format: fieldFormats.serialize(metric),
+        format: fieldFormats ? fieldFormats.serialize(agg) : metric.toSerializedFieldFormat(),
         label: metric.makeLabel(),
       },
     };

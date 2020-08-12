@@ -51,13 +51,13 @@ export const configEquivalences = {
     'Set the app logging level, allowed values are info and debug. Default is info.',
   'cron.prefix':
     'Define the index prefix of predefined jobs.',
-  'cron.statistic.status':
+  'cron.statistics.status':
     'Enable or disable the statistics tasks.',
-  'cron.statistic.apis':
+  'cron.statistics.apis':
     'Enter the ID of the APIs you want to save data from, leave this empty to run the task on all configured APIs.',
-  'cron.statistic.interval': 'Define the frequency of task execution using cron schedule expressions.',
-  'cron.statistic.index.name': 'Define the name of the index in which the documents are to be saved.',
-  'cron.statistic.index.creation': 'Define the interval in which the index will be created.',
+  'cron.statistics.interval': 'Define the frequency of task execution using cron schedule expressions.',
+  'cron.statistics.index.name': 'Define the name of the index in which the documents are to be saved.',
+  'cron.statistics.index.creation': 'Define the interval in which the index will be created.',
 };
 
 export const nameEquivalence = {
@@ -81,19 +81,19 @@ export const nameEquivalence = {
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',
   'cron.prefix': 'Cron prefix',
-  'cron.statistic.status': 'Status',
-  'cron.statistic.apis': 'Includes apis',
-  'cron.statistic.interval': 'Interval',
-  'cron.statistic.index.name': 'Index name',
-  'cron.statistic.index.creation': 'Index creation',
+  'cron.statistics.status': 'Status',
+  'cron.statistics.apis': 'Includes apis',
+  'cron.statistics.interval': 'Interval',
+  'cron.statistics.index.name': 'Index name',
+  'cron.statistics.index.creation': 'Index creation',
 }
 
 const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
 const SECURITY = 'Security';
 const MONITORING = 'Monitoring'
-const STATISTIC = 'Statistic'
-export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTIC,];
+const STATISTICS = 'Statistics'
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS,];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
@@ -115,11 +115,11 @@ export const categoriesEquivalence = {
   hideManagerAlerts: GENERAL,
   'logs.level': GENERAL,
   'cron.prefix': GENERAL,
-  'cron.statistic.status': STATISTIC,
-  'cron.statistic.apis': STATISTIC,
-  'cron.statistic.interval': STATISTIC,
-  'cron.statistic.index.name': STATISTIC,
-  'cron.statistic.index.creation': STATISTIC,
+  'cron.statistics.status': STATISTICS,
+  'cron.statistics.apis': STATISTICS,
+  'cron.statistics.interval': STATISTICS,
+  'cron.statistics.index.name': STATISTICS,
+  'cron.statistics.index.creation': STATISTICS,
 }
 
 const TEXT = 'text';
@@ -166,11 +166,11 @@ export const formEquivalence = {
     }
   },
   'cron.prefix': { type: TEXT },
-  'cron.statistic.status': { type: BOOLEAN },
-  'cron.statistic.apis': { type: ARRAY },
-  'cron.statistic.interval': { type: INTERVAL },
-  'cron.statistic.index.name': { type: TEXT },
-  'cron.statistic.index.creation': {
+  'cron.statistics.status': { type: BOOLEAN },
+  'cron.statistics.apis': { type: ARRAY },
+  'cron.statistics.interval': { type: INTERVAL },
+  'cron.statistics.index.name': { type: TEXT },
+  'cron.statistics.index.creation': {
     type: LIST, params: {
       options: [
         { text: 'Hourly', value: 'h' },

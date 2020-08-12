@@ -5,7 +5,11 @@
 [![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
 [![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
 
-Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, and then it was integrated with Elastic Stack and OpenSCAP evolving into a more comprehensive solution. You can learn more about it here [wazuh.com](https://wazuh.com/)
+This repository contains the Wazuh Kibana plugin, from which you can navigate through the Wazuh data using visualizations in a simple and understandable way. It also allows you to manage the configuration and capabilities of the Wazuh server.
+
+Wazuh is a security detection, visibility, and compliance open source project. Wazuh helps you to gain deeper security visibility into your infrastructure by monitoring hosts at an operating system and application level. This is provided by integrating OSSEC and Elastic Stack, making them work together as a unified solution, and simplifying their configuration and management.
+
+You can learn more about it here [wazuh.com](https://wazuh.com/)
 
 ## Description
 
@@ -24,6 +28,10 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 - [Screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
 
 ![Overview](/public/img/app.png)
+
+![Overview](/public/img/app2.png)
+
+![Overview](/public/img/app3.png)
 
 ## Branches
 

@@ -28,7 +28,7 @@ export const jobs: {[key:string]: IJob} = {
     params: {},
     interval: '0 0 * * * *',
     index: {
-      name: 'statistic',
+      name: 'statistics',
       creation: 'w',
       mapping: '{"remoted": ${data}, "apiName": ${apiName}, "cluster": "false"}',
     }
@@ -40,7 +40,7 @@ export const jobs: {[key:string]: IJob} = {
     params: {},
     interval: '0 0 * * * *',
     index: {
-      name: 'statistic',
+      name: 'statistics',
       creation: 'w',
       mapping: '{"analysisd": ${data}, "apiName": ${apiName}, "cluster": "false"}',
     }
@@ -59,7 +59,7 @@ export const jobs: {[key:string]: IJob} = {
     params: {},
     interval: '0 0 * * * *',
     index: {
-      name:'statistic',
+      name:'statistics',
       creation: 'w',
       mapping: '{"remoted": ${data}, "apiName": ${apiName}, "nodeName": ${nodeName}, "cluster": "true"}',
     }
@@ -78,7 +78,7 @@ export const jobs: {[key:string]: IJob} = {
     params: {},
     interval: '0 0 * * * *',
     index: {
-      name: 'statistic',
+      name: 'statistics',
       creation: 'w',
       mapping: '{"analysisd": ${data}, "apiName": ${apiName}, "nodeName": ${nodeName}, "cluster": "true"}',
     }
