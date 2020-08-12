@@ -54,7 +54,7 @@ export const RolesTable = ({roles,policiesData, loading, editRole}) => {
                                         <p>{(data.policy || {}).effect}</p>
                                     </div>
                                 }>
-                                <EuiBadge color="hollow" onClick={() => { }}>{
+                                <EuiBadge color="hollow" onClick={() => {}} onClickAriaLabel={`${data.name} policy`} title={null}>{
                                     data.name
                                 }</EuiBadge>
                             </EuiToolTip>
