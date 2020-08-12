@@ -179,6 +179,21 @@ export class ElasticWrapper {
     }
   }
 
+  addFormatMap(fields){
+    const tmpFields = JSON.parse(fields);
+    if(!tmpFields["data.virustotal.permalink"]){
+      tmpFields["data.virustotal.permalink"] = {"id":"url"};
+    }
+    if(!tmpFields["data.vulnerability.reference"]){
+      tmpFields["data.vulnerability.reference"] = {"id":"url"};
+    }
+    if(!tmpFields["data.url"]){
+      tmpFields["data.url"] = {"id":"url"};
+    }
+    return tmpFields;
+  }
+
+
   /**
    * Updates index-pattern known fields
    * @param {*} id 'index-pattern:' + id
@@ -203,6 +218,8 @@ export class ElasticWrapper {
 
       // If true, it's an existing index pattern, we need to review its known fields
       const { fields } = ((pattern || {})._source || {})['index-pattern'] || {};
+      const {fieldFormatMap}  = ((pattern || {})._source || {})['index-pattern'] || {};
+      const currentFieldsFormatMap = this.addFormatMap(fieldFormatMap);
       if (fields) {
         currentFields = JSON.parse(fields);
 
@@ -263,11 +280,7 @@ export class ElasticWrapper {
             'index-pattern': {
               timeFieldName: 'timestamp',
               fields: currentFieldsString,
-              fieldFormatMap: `{
-                  "data.virustotal.permalink":{"id":"url"},
-                  "data.vulnerability.reference":{"id":"url"},
-                  "data.url":{"id":"url"}
-                }`,
+              fieldFormatMap: JSON.stringify(currentFieldsFormatMap) ,
               sourceFilters: '[{"value":"@timestamp"}]'
             }
           }
