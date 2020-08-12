@@ -33,7 +33,7 @@ export class WazuhElasticCtrl {
     this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
     this.wzSampleAlertsCaterories = {
-      'security': [{ syscheck: true }, { aws: true }, { gcp: true }, { authentication: true }, { ssh: true }, { apache: true, alerts: 2000 }, { web: true }, { windows: { service_control_manager: true}, alerts: 1000}],
+      'security': [{ syscheck: true }, { aws: true }, { gcp: true }, { authentication: true }, { ssh: true }, { apache: true, alerts: 2000 }, { web: true }, { windows: { service_control_manager: true }, alerts: 1000 }],
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
@@ -98,28 +98,28 @@ export class WazuhElasticCtrl {
       log(
         'wazuh-elastic:getTemplate',
         `Template is valid: ${
-          isIncluded && Array.isArray(isIncluded) && isIncluded.length
-            ? 'yes'
-            : 'no'
+        isIncluded && Array.isArray(isIncluded) && isIncluded.length
+          ? 'yes'
+          : 'no'
         }`,
         'debug'
       );
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? {
-            statusCode: 200,
-            status: true,
-            data: `Template found for ${req.params.pattern}`
-          }
+          statusCode: 200,
+          status: true,
+          data: `Template found for ${req.params.pattern}`
+        }
         : {
-            statusCode: 200,
-            status: false,
-            data: `No template found for ${req.params.pattern}`
-          };
+          statusCode: 200,
+          status: false,
+          data: `No template found for ${req.params.pattern}`
+        };
     } catch (error) {
       log('wazuh-elastic:getTemplate', error.message || error);
       return ErrorResponse(
         `Could not retrieve templates from Elasticsearch due to ${error.message ||
-          error}`,
+        error}`,
         4002,
         500,
         reply
@@ -148,16 +148,16 @@ export class WazuhElasticCtrl {
       return filtered.length >= 1
         ? { statusCode: 200, status: true, data: 'Index pattern found' }
         : {
-            statusCode: 500,
-            status: false,
-            error: 10020,
-            message: 'Index pattern not found'
-          };
+          statusCode: 500,
+          status: false,
+          error: 10020,
+          message: 'Index pattern not found'
+        };
     } catch (error) {
       log('wazuh-elastic:checkPattern', error.message || error);
       return ErrorResponse(
         `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message ||
-          error}`,
+        error}`,
         4003,
         500,
         reply
@@ -224,9 +224,9 @@ export class WazuhElasticCtrl {
         typeof data.aggregations['2'].buckets[0] === 'undefined'
         ? { statusCode: 200, data: '' }
         : {
-            statusCode: 200,
-            data: data.aggregations['2'].buckets[0].key
-          };
+          statusCode: 200,
+          data: data.aggregations['2'].buckets[0].key
+        };
     } catch (error) {
       log('wazuh-elastic:getFieldTop', error.message || error);
       return ErrorResponse(error.message || error, 4004, 500, reply);
@@ -250,7 +250,7 @@ export class WazuhElasticCtrl {
       log('wazuh-elastic:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from elasticsearch due to ${error.message ||
-          error}`,
+        error}`,
         4005,
         500,
         reply
@@ -623,6 +623,21 @@ export class WazuhElasticCtrl {
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
             query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
+          } else {
+            if (title.startsWith('Wazuh App Statistics')) {
+              const { searchSourceJSON } = bulk_content.visualization.kibanaSavedObjectMeta;
+              bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON = searchSourceJSON.replace('wazuh-statistic-*', pattern_name);
+            }
+            if (title.startsWith('Wazuh App Statistics') && name !== '-' && name !== 'all' && visState.params.expression.includes('q=')) {
+              const expressionRegex = /q=\'\*\'/gi
+              query += visState.params.expression.replace(expressionRegex, `q="nodeName:${name} AND apiName=${master_node}"`)
+
+            } else if (title.startsWith('Wazuh App Statistics')) {
+              const expressionRegex = /q=\'\*\'/gi
+              query += visState.params.expression.replace(expressionRegex, `q="apiName=${master_node}"`) 
+            } else {
+              query = visState.params.expression;
+            }
           }
 
           visState.params.expression = query;
@@ -716,8 +731,10 @@ export class WazuhElasticCtrl {
         throw new Error('Missing parameters creating visualizations');
       }
 
-      const file = ClusterVisualizations['monitoring'];
-      const nodes = req.payload.nodes.affected_items;
+      const type = req.params.tab.split('-')[1];
+
+      const file = ClusterVisualizations[type];
+      const nodes = req.payload.nodes.items;
       const name = req.payload.nodes.name;
       const masterNode = req.payload.nodes.master_node;
 
@@ -765,8 +782,8 @@ export class WazuhElasticCtrl {
         ((req || {}).params || {}).pattern === 'all'
           ? await checkKnownFields(this.wzWrapper, false, false, false, true)
           : await this.wzWrapper.updateIndexPatternKnownFields(
-              req.params.pattern
-            );
+            req.params.pattern
+          );
 
       return { acknowledge: true, output: output };
     } catch (error) {
@@ -843,14 +860,14 @@ export class WazuhElasticCtrl {
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
    */
-  async haveSampleAlerts(req, reply){
-    try{
+  async haveSampleAlerts(req, reply) {
+    try {
       // Check if wazuh sample alerts index exists
       const results = await Promise.all(Object.keys(this.wzSampleAlertsCaterories)
         .map((category) => this.wzWrapper.checkIfIndexExists(this.buildSampleIndexByCategory(category))));
-      
+
       return { sampleAlertsInstalled: results.some(result => result) }
-    }catch(error){
+    } catch (error) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
     }
   }
@@ -862,19 +879,19 @@ export class WazuhElasticCtrl {
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
    */
-  async haveSampleAlertsOfCategory(req, reply){
-    if(!req.params || typeof req.params !== 'object'){
+  async haveSampleAlertsOfCategory(req, reply) {
+    if (!req.params || typeof req.params !== 'object') {
       return ErrorResponse('Missing params', 1000, 400, reply);
     };
-    if(!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)){
+    if (!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
-    try{
+    try {
       const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
       // Check if wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       return { index: sampleAlertsIndex, exists: existsSampleIndex }
-    }catch(error){
+    } catch (error) {
       ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
     }
   }
@@ -895,18 +912,18 @@ export class WazuhElasticCtrl {
    * @param {*} reply
    * {index: string, alerts: [...], count: number} or ErrorResponse
    */
-  async createSampleAlerts(req, reply){
-    if(!req.params || typeof req.params !== 'object'){
+  async createSampleAlerts(req, reply) {
+    if (!req.params || typeof req.params !== 'object') {
       return ErrorResponse('Missing params', 1000, 400, reply);
     };
-    if(!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)){
+    if (!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
     //TODO: replace by administrator user role requirement
     //Get configuration
     const configFile = getConfiguration();
-    
+
     // Check if admin mode is enabled
     // if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
     //   return ErrorResponse('Admin mode is required to create sample data', 1000, 403, reply);
@@ -920,13 +937,13 @@ export class WazuhElasticCtrl {
     });
     const alertGenerateParams = req.payload && req.payload.params || {};
 
-    const sampleAlerts = this.wzSampleAlertsCaterories[req.params.category].map((typeAlert) => generateAlerts({...typeAlert, ...alertGenerateParams}, req.payload.alerts || typeAlert.alerts || this.defaultNumSampleAlerts)).flat();
+    const sampleAlerts = this.wzSampleAlertsCaterories[req.params.category].map((typeAlert) => generateAlerts({ ...typeAlert, ...alertGenerateParams }, req.payload.alerts || typeAlert.alerts || this.defaultNumSampleAlerts)).flat();
     const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}`).join('\n');
     // Index alerts
-    try{
+    try {
       // Check if wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
-      if(!existsSampleIndex){
+      if (!existsSampleIndex) {
         // Create wazuh sample alerts index
 
         const shards =
@@ -954,14 +971,14 @@ export class WazuhElasticCtrl {
           'debug'
         );
       }
-      await this.wzWrapper.elasticRequest.callWithInternalUser('bulk',{ body: bulk });
+      await this.wzWrapper.elasticRequest.callWithInternalUser('bulk', { body: bulk });
       log(
         'wazuh-elastic:createSampleAlerts',
         `Added sample alerts to ${sampleAlertsIndex} index`,
         'debug'
       );
       return { index: sampleAlertsIndex, alerts: sampleAlerts, count: sampleAlerts.length }
-    }catch(error){
+    } catch (error) {
       log(
         'wazuh-elastic:createSampleAlerts',
         `Error adding sample alerts to ${sampleAlertsIndex} index`
@@ -975,12 +992,12 @@ export class WazuhElasticCtrl {
    * @param {*} reply
    * {result: "deleted", index: string} or ErrorResponse
    */
-  async deleteSampleAlerts(req, reply){
+  async deleteSampleAlerts(req, reply) {
     // Delete Wazuh sample alert index
-    if(!req.params || typeof req.params !== 'object'){
+    if (!req.params || typeof req.params !== 'object') {
       return ErrorResponse('Missing params', 1000, 400, reply);
     };
-    if(!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)){
+    if (!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
@@ -994,22 +1011,22 @@ export class WazuhElasticCtrl {
     // };
 
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
-    try{
+    try {
       // Check if Wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
-      if(existsSampleIndex){
+      if (existsSampleIndex) {
         // Delete Wazuh sample alerts index
-        await this.wzWrapper.elasticRequest.callWithInternalUser('indices.delete',{index: sampleAlertsIndex});
+        await this.wzWrapper.elasticRequest.callWithInternalUser('indices.delete', { index: sampleAlertsIndex });
         log(
           'wazuh-elastic:deleteSampleAlerts',
           `Deleted ${sampleAlertsIndex} index`,
           'debug'
         );
         return { result: 'deleted', index: sampleAlertsIndex };
-      }else{
+      } else {
         return ErrorResponse(`${sampleAlertsIndex} index doesn't exist`, 1000, 500, reply)
       }
-    }catch(error){
+    } catch (error) {
       log(
         'wazuh-elastic:deleteSampleAlerts',
         `Error deleting sample alerts of ${sampleAlertsIndex} index`
