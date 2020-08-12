@@ -26,7 +26,7 @@ export const jobs: {[key:string]: IJob} = {
     method: "GET",
     request: '/manager/stats/remoted?pretty',
     params: {},
-    interval: '*/5 * * * * *',
+    interval: '0 0 * * * *',
     index: {
       name: 'statistic',
       creation: 'w',
@@ -38,7 +38,7 @@ export const jobs: {[key:string]: IJob} = {
     method: "GET",
     request: '/manager/stats/analysisd?pretty',
     params: {},
-    interval: '*/5 * * * * *',
+    interval: '0 0 * * * *',
     index: {
       name: 'statistic',
       creation: 'w',
@@ -57,7 +57,7 @@ export const jobs: {[key:string]: IJob} = {
       }
     },
     params: {},
-    interval: '*/5 * * * * *',
+    interval: '0 0 * * * *',
     index: {
       name:'statistic',
       creation: 'w',
@@ -76,7 +76,7 @@ export const jobs: {[key:string]: IJob} = {
       }
     },
     params: {},
-    interval: '*/5 * * * * *',
+    interval: '0 0 * * * *',
     index: {
       name: 'statistic',
       creation: 'w',

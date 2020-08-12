@@ -10,12 +10,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiButtonEmpty,
-  EuiInMemoryTable,
   EuiPanel,
   EuiTitle,
   EuiPage,
@@ -25,40 +24,42 @@ import {
   EuiTab,
   EuiSpacer,
   EuiSelect,
-  EuiProgress
-} from '@elastic/eui';
+} from "@elastic/eui";
 
-import StatisticsHandler from './utils/statistics-handler';
-import { clusterNodes } from '../configuration/utils/wz-fetch';
+import { clusterNodes } from "../configuration/utils/wz-fetch";
+import { WzStatisticsRemoted } from "./statistics-dashboard-remoted";
+import { WzStatisticsAnalysisd } from "./statistics-dashboard-analysisd";
+import { WzDatePicker } from "../../../../../components/wz-date-picker/wz-date-picker";
+import { AppNavigate } from "../../../../../react-services/app-navigate";
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
     this.state = {
-      selectedTabId: 'remoted',
+      selectedTabId: "remoted",
       stats: {},
       isLoading: false,
-      searchvalue: '',
-      clusterNodeSelected: false
+      loadingNode: false,
+      searchvalue: "",
+      clusterNodeSelected: 'all',
     };
-    this.statisticsHandler = StatisticsHandler;
     this.tabs = [
       {
-        id: 'remoted',
-        name: 'remoted'
+        id: "remoted",
+        name: "Listener Engine",
       },
       {
-        id: 'analysisd',
-        name: 'analysisd'
-      }
+        id: "analysisd",
+        name: "Analysis Engine",
+      },
     ];
 
     this.info = {
       remoted:
-        'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
+        "Remoted statistics are cumulative, this means that the information shown is since the data exists.",
       analysisd:
-        "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'."
+        "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
     };
   }
 
@@ -66,33 +67,32 @@ export class WzStatisticsOverview extends Component {
     this._isMounted = true;
     try {
       const data = await clusterNodes();
-      const nodes = data.data.data.items.map(item => {
+      const nodes = data.data.data.affected_items.map((item) => {
         return { value: item.name, text: `${item.name} (${item.type})` };
       });
+      nodes.unshift({ value: 'all', text: 'All' })
       this.setState({
         clusterNodes: nodes,
-        clusterNodeSelected: nodes[0].value
+        clusterNodeSelected: nodes[0].value,
       });
     } catch (err) {
       this.setState({
         clusterNodes: [],
-        clusterNodeSelected: false
+        clusterNodeSelected: false,
       });
     }
     this.fetchData();
   }
 
-  componentDidUpdate() {}
-
   componentWillUnmount() {
     this._isMounted = false;
   }
 
-  onSelectedTabChanged = id => {
+  onSelectedTabChanged = (id) => {
     this.setState(
       {
         selectedTabId: id,
-        searchvalue: ''
+        searchvalue: "",
       },
       () => {
         this.fetchData();
@@ -100,18 +100,9 @@ export class WzStatisticsOverview extends Component {
     );
   };
 
+
   async fetchData() {
-    this.setState({
-      isLoading: true
-    });
-    const data = await this.statisticsHandler.demonStatistics(
-      this.state.selectedTabId,
-      this.state.clusterNodeSelected
-    );
-    this.setState({
-      stats: data.data.data,
-      isLoading: false
-    });
+
   }
 
   renderTabs() {
@@ -126,13 +117,14 @@ export class WzStatisticsOverview extends Component {
     ));
   }
 
-  onSelectNode = e => {
+  onSelectNode = (e) => {
+    const newValue = e.target.value;
     this.setState(
       {
-        clusterNodeSelected: e.target.value
+        loadingNode: true
       },
       () => {
-        this.fetchData();
+        this.setState({ clusterNodeSelected: newValue, loadingNode: false })
       }
     );
   };
@@ -149,11 +141,11 @@ export class WzStatisticsOverview extends Component {
     const search = {
       box: {
         incremental: true,
-        schema: true
-      }
+        schema: true,
+      },
     };
     return (
-      <EuiPage style={{ background: 'transparent' }}>
+      <EuiPage style={{ background: "transparent" }}>
         <EuiPanel>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -171,16 +163,27 @@ export class WzStatisticsOverview extends Component {
               this.state.clusterNodes.length &&
               this.state.clusterNodeSelected
             ) && (
-              <EuiFlexItem grow={false}>
-                <EuiSelect
-                  id="selectNode"
-                  options={this.state.clusterNodes}
-                  value={this.state.clusterNodeSelected}
-                  onChange={this.onSelectNode}
-                  aria-label="Select node"
-                />
-              </EuiFlexItem>
-            )}
+                <EuiFlexItem grow={false}>
+                  <EuiSelect
+                    id="selectNode"
+                    options={this.state.clusterNodes}
+                    value={this.state.clusterNodeSelected}
+                    onChange={this.onSelectNode}
+                    aria-label="Select node"
+                  />
+                </EuiFlexItem>
+              )}
+            <EuiFlexItem grow={false}>
+              <WzDatePicker condensed={true} onTimeChange={() => { }} />
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                onMouseDown={e => AppNavigate.navigateToModule(e, 'settings', { tab: 'configuration', category: 'statistic' })}
+                iconType="gear"
+                iconSide="left" >
+                Settings
+              </EuiButtonEmpty>
+            </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -194,34 +197,32 @@ export class WzStatisticsOverview extends Component {
               <EuiTabs>{this.renderTabs()}</EuiTabs>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size={'m'} />
-          {this.state.isLoading && <EuiProgress size="xs" color="primary" />}
-          {!!(
-            (Object.entries(this.state.stats) || []).length &&
-            !this.state.isLoading
-          ) && (
-            <div>
-              <EuiCallOut
-                title={this.info[this.state.selectedTabId]}
-                iconType="iInCircle"
-              />
-              <EuiSpacer size={'m'} />
-              <EuiInMemoryTable
-                items={Object.entries(this.state.stats)}
-                columns={[
-                  {
-                    field: '0',
-                    name: 'Indicator'
-                  },
-                  {
-                    field: '1',
-                    name: 'Value'
-                  }
-                ]}
-                pagination={true}
-                search={search}
-              />
-            </div>
+          <EuiSpacer size={"m"} />
+          {(
+            <>
+              {this.state.selectedTabId === "remoted" && !this.state.loadingNode && (
+                <div>
+                  <EuiSpacer size={"m"} />
+                  <EuiCallOut
+                    title={this.info[this.state.selectedTabId]}
+                    iconType="iInCircle"
+                  />
+                  <EuiSpacer size={"m"} />
+                  <WzStatisticsRemoted clusterNodeSelected={this.state.clusterNodeSelected} />
+                </div>
+              )}
+              {this.state.selectedTabId === "analysisd" && !this.state.loadingNode && (
+                <div>
+                  <EuiSpacer size={"m"} />
+                  <EuiCallOut
+                    title={this.info[this.state.selectedTabId]}
+                    iconType="iInCircle"
+                  />
+                  <EuiSpacer size={"m"} />
+                  <WzStatisticsAnalysisd clusterNodeSelected={this.state.clusterNodeSelected} />
+                </div>
+              )}
+            </>
           )}
         </EuiPanel>
       </EuiPage>

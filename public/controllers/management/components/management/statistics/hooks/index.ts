@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component building the configuration component.
+ * Wazuh app - React component for building Remoted dashboard
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
@@ -10,6 +10,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { Header } from './header';
-export { Categories } from './categories';
-export { BottomBar } from './bottom-bar';
+
+export { useBuildStatisticsVisualizations } from './use-build-statistics-visualizations';

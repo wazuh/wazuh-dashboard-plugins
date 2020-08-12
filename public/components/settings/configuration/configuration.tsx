@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Header, Categories, ButtonBar } from './components';
+import { Header, Categories, BottomBar } from './components';
 import { useKbnLoadingIndicator} from '../../common/hooks';
 import {
   EuiPage,
@@ -28,6 +28,7 @@ import {
 } from '../../../utils/config-equivalences';
 import WzReduxProvider from '../../../redux/wz-redux-provider'
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
+import { EuiSpacer } from '@elastic/eui';
 
 export type ISetting = {
   setting: string
@@ -66,7 +67,8 @@ const WzConfigurationSettingsProvider = (props) => {
           <Header query={query} setQuery={setQuery} />
         </EuiPageHeader>
         <Categories config={Query.execute(query.query || query, config)} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
-        <ButtonBar 
+        <EuiSpacer size="xxl" />
+        <BottomBar 
           updatedConfig={updatedConfig}
           setUpdateConfig={setUpdateConfig} 
           setLoading={setLoading}
