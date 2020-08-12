@@ -128,26 +128,20 @@ export const initialWazuhConfig = `---
 # ------------------------------ wazuh-statistics -------------------------------
 #
 # Custom setting to enable/disable statistics tasks.
-#cron.remoted.status: true
-#cron.analysisd.status: true
+#cron.statistic.status: true
 #
 # Enter the ID of the APIs you want to save data from, leave this empty to run
 # the task on all configured APIs
-#cron.remoted.apis: []
-#cron.analysisd.apis: []
+#cron.statistic.apis: []
 #
 # Define the frequency of task execution using cron schedule expressions
-#
-#cron.remoted.interval: 0 0 * * * *
-#cron.analysisd.interval: 0 0 * * * *
+#cron.statistic.interval: 0 0 * * * *
 #
 # Define the name of the index in which the documents are to be saved.
-#cron.remoted.index.name: statistic
-#cron.analysisd.index.name: statistic
+#cron.statistic.index.name: statistic
 #
 # Define the interval in which the index will be created
-#cron.remoted.index.creation: w
-#cron.analysisd.index.creation: w
+#cron.statistic.index.creation: w
 #
 # ------------------------------- App privileges --------------------------------
 #admin: true
