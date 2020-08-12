@@ -38,14 +38,14 @@ const checkConfiguration = (params: { jobObj: { [key: string]: IJob }, host?: IA
   cronSettigns.forEach(setting => applySettings(setting, config[setting], jobObj))
   return { jobObj, host };
 }
-const cronRegx = /cron.(?<task>statistic).((?<index>\w+)\.)?(?<config>\w+)$/;
+const cronRegx = /cron.(?<task>statistics).((?<index>\w+)\.)?(?<config>\w+)$/;
 
 const checkSetting = (setting) => cronRegx.test(setting);
 
 const applySettings = (setting, value, jobObj: { [key: string]: IJob }) => {
   const { task, index, config } = cronRegx.exec(setting).groups;
   Object.keys(jobObj).forEach(key => {
-    if(task === 'statistic') {
+    if(task === 'statistics') {
       applyStatisticSetting(jobObj[key], index, config, value)
     } else if (!key.includes(task)) {
       return;

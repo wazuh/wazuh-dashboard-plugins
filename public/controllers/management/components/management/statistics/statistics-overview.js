@@ -178,7 +178,7 @@ export class WzStatisticsOverview extends Component {
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
-                onMouseDown={e => AppNavigate.navigateToModule(e, 'settings', { tab: 'configuration', category: 'statistic' })}
+                onMouseDown={e => AppNavigate.navigateToModule(e, 'settings', { tab: 'configuration', category: 'statistics' })}
                 iconType="gear"
                 iconSide="left" >
                 Settings
