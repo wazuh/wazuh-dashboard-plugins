@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Header, Categories, ButtomBar } from './components';
+import { Header, Categories, BottomBar } from './components';
 import { useKbnLoadingIndicator} from '../../common/hooks';
 import {
   EuiPage,
@@ -67,7 +67,7 @@ export const WzConfigurationSettings = (props) => {
         </EuiPageHeader>
         <Categories config={Query.execute(query.query || query, config)} updatedConfig={updatedConfig} setUpdatedConfig={setUpdateConfig} />
         <EuiSpacer size="xxl" />
-        <ButtomBar 
+        <BottomBar 
           updatedConfig={updatedConfig}
           setUpdateConfig={setUpdateConfig} 
           setLoading={setLoading}
