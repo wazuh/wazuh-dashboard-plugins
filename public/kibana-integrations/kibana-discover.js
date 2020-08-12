@@ -71,6 +71,7 @@ import { ModulesHelper } from '../components/common/modules/modules-helper';
 ///////////
 
 import {
+  fieldFormats,
   esFilters,
   indexPatterns as indexPatternsUtils,
   connectToQueryState,
@@ -706,7 +707,7 @@ function discoverController(
       x: {
         accessor: 0,
         label: agg.makeLabel(),
-        format: agg.toSerializedFieldFormat(),
+        format: fieldFormats ? fieldFormats.serialize(agg) : agg.toSerializedFieldFormat(),
         params: {
           date: true,
           interval: moment.duration(esValue, esUnit),
@@ -718,7 +719,7 @@ function discoverController(
       },
       y: {
         accessor: 1,
-        format: metric.toSerializedFieldFormat(),
+        format: fieldFormats ? fieldFormats.serialize(agg) : metric.toSerializedFieldFormat(),
         label: metric.makeLabel(),
       },
     };
