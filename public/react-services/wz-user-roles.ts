@@ -72,7 +72,7 @@ export class wzUserRoles {
   /* TODO: Check when we use token in requests and add redux */
   static async getUserRoles() {
     try {
-      const data = await this.genericReq('GET', '/v4/security/users/me');
+      const data = await this.genericReq('GET', '/security/users/me');
       return Promise.resolve(data);
     } catch (error) {
       return ((error || {}).data || {}).message || false

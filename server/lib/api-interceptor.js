@@ -38,7 +38,7 @@ export class ApiInterceptor {
           username: api.username,
           password: api.password,
         },
-        url: `${api.url}:${api.port}/v4/security/user/authenticate`,
+        url: `${api.url}:${api.port}/security/user/authenticate`,
       };
 
       const response = await axios(options);

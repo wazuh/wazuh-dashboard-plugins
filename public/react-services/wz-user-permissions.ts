@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
- // Data extrated of /v4/security/actions endpoint
+ // Data extrated of /security/actions endpoint
 const wazuhPermissions = {
   "active-response:command": {
     "description": "Allow to execute active response commands in the agents",
@@ -944,18 +944,18 @@ export class WzUserPermissions{
   static checkMissingUserPermissions = (requiredPermissions, userPermissions) => {
     const filtered = requiredPermissions.filter(permission => {
       const actionName = typeof permission === 'string' ? permission : permission.action;
+      let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
+      const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
       if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
+        // API RBAC mode = 'black'
         if(!userPermissions[actionName]){ return false };
-        let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
-        const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
         if(typeof userPermissions[actionName][actionResource] === 'undefined' && typeof userPermissions[actionName][actionResourceAll] === 'undefined' && typeof userPermissions[actionName][RESOURCE_ANY] === 'undefined'){ return false };
         return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
           : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
           : (wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY]) : false)
       }else{
+        // API RBAC mode = 'white'
         if(!userPermissions[actionName]){ return true };
-        let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
-        const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
         if(typeof userPermissions[actionName][actionResource] === 'undefined' && typeof userPermissions[actionName][actionResourceAll] === 'undefined' && typeof userPermissions[actionName][RESOURCE_ANY] === 'undefined'){ return true };
         return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
           : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])

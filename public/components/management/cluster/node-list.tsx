@@ -20,8 +20,12 @@ export class NodeList extends Component {
             params.search = searchTerm;
         }
         this.setState({ loading: true });
-        const request = await WzRequest.apiReq('GET', '/cluster/nodes', params);
-        this.setState({ nodes: (((request || {}).data || {}).data || {}).items || [], loading: false });
+        try{
+            const request = await WzRequest.apiReq('GET', '/cluster/nodes', {params});
+            this.setState({ nodes: (((request || {}).data || {}).data || {}).affected_items || [], loading: false });
+        }catch(error){
+            this.setState({ loading: false });
+        }
     }
 
     render() {
