@@ -60,20 +60,20 @@ class WzRuleInfo extends Component {
         sortable: true,
         width: '30%',
         render: (value, item) => {
-          if(value === undefined) return '';
+          if (value === undefined) return '';
           const regex = /\$(.*?)\)/g;
           let result = value.match(regex);
-          if(result !== null) {
+          if (result !== null) {
             for (const oldValue of result) {
-              let newValue = oldValue.replace('$(',`<strong style="color:#006BB4">`);
+              let newValue = oldValue.replace('$(', `<strong style="color:#006BB4">`);
               newValue = newValue.replace(')', ' </strong>');
               value = value.replace(oldValue, newValue);
             }
           }
           return (
-          <div>
-            <span dangerouslySetInnerHTML={{ __html: value}} />
-          </div>
+            <div>
+              <span dangerouslySetInnerHTML={{ __html: value }} />
+            </div>
           );
         }
       },
@@ -158,7 +158,7 @@ class WzRuleInfo extends Component {
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc', 'mitre'];
+    const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
     const buildBadge = field => {
       const idGenerator = () => {
         return (
@@ -225,7 +225,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>Level</b>
           <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'level', value: level}])}
+              onClick={async () => this.setNewFiltersAndBack([{ field: 'level', value: level }])}
             >
               {level}
             </EuiLink>
@@ -235,7 +235,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>File</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'filename', value: file}])}
+              onClick={async () => this.setNewFiltersAndBack([{ field: 'filename', value: file }])}
             >
               {file}
             </EuiLink>
@@ -245,7 +245,7 @@ class WzRuleInfo extends Component {
           <b style={{ paddingBottom: 6 }}>Path</b>
           <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'relative_dirname', value: path}])}
+              onClick={async () => this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])}
             >
               {path}
             </EuiLink>
@@ -259,20 +259,39 @@ class WzRuleInfo extends Component {
     );
   }
 
-  getFormattedDetails(value){
+  getFormattedDetails(value) {
 
-    if(Array.isArray(value) && value[0].type){
+    if (Array.isArray(value) && value[0].type) {
       let link = "";
       let name = "";
 
       value.forEach(item => {
-        if(item.type === 'cve')
+        if (item.type === 'cve')
           name = item.name;
-        if(item.type === 'link')
+        if (item.type === 'link')
           link = <a href={item.name} target="_blank">{item.name}</a>
       })
       return <span>{name}: {link}</span>
-    }else{
+    } else if (value && typeof value === 'object' && value.constructor === Object) {
+      let list = [];
+      Object.keys(value).forEach((key, idx) => {
+        list.push(
+          <span key={key}>
+            {key}:&nbsp;
+            {value[key]}
+            {idx < Object.keys(value).length - 1 && ', '}
+            <br />
+          </span>
+        );
+      });
+      return (
+        <ul>
+          <li>
+            {list}
+          </li>
+        </ul>
+      );
+    } else {
       return (
         <WzTextWithTooltipTruncated position='top'>
           {value}
@@ -309,7 +328,7 @@ class WzRuleInfo extends Component {
       listGroups.push(
         <span key={group}>
           <EuiLink
-            onClick={async () => this.setNewFiltersAndBack([{field: 'group', value: group}])}
+            onClick={async () => this.setNewFiltersAndBack([{ field: 'group', value: group }])}
           >
             <EuiToolTip
               position="top"
@@ -345,7 +364,7 @@ class WzRuleInfo extends Component {
         return (
           <span key={element}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field: key, value: element}])}
+              onClick={async () => this.setNewFiltersAndBack([{ field: key, value: element }])}
             >
               <EuiToolTip position="top" content="Filter by this compliance">
                 <span>{element}</span>
@@ -372,6 +391,7 @@ class WzRuleInfo extends Component {
    * @param {Number} ruleId
    */
   changeBetweenRules(ruleId) {
+    window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), `redirectRule=${ruleId}`);
     this.setState({ currentRuleId: ruleId });
   }
 
@@ -380,12 +400,12 @@ class WzRuleInfo extends Component {
    * @param {string} value 
    */
   updateStyleTitle(value) {
-    if(value === undefined) return '';
+    if (value === undefined) return '';
     const regex = /\$(.*?)\)/g;
     let result = value.match(regex);
-    if(result !== null) {
+    if (result !== null) {
       for (const oldValue of result) {
-        let newValue = oldValue.replace('$(',`<span style="color:#006BB4">`);
+        let newValue = oldValue.replace('$(', `<span style="color:#006BB4">`);
         newValue = newValue.replace(')', ' </span>');
         value = value.replace(oldValue, newValue);
       }
@@ -432,7 +452,7 @@ class WzRuleInfo extends Component {
                         }}
                       />
                     </EuiToolTip>
-                    {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description)}} />}
+                    {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description) }} />}
                   </span>
                 </EuiTitle>
               </EuiFlexItem>

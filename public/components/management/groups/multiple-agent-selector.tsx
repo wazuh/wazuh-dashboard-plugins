@@ -62,16 +62,18 @@ export class MultipleAgentSelector extends Component {
       const params = {
         limit: 500,
         offset: !start ? this.state.availableAgents.offset : 0,
-        select: ['id', 'name']
+        select: ['id', 'name'].toString()
       };
 
       if (searchTerm) {
         params.search = searchTerm;
       }
 
-      const req = await WzRequest.apiReq('GET', '/agents', params);
+      const req = await WzRequest.apiReq('GET', '/agents', {	
+        params: params	
+      });
 
-      this.totalAgents = req.data.data.total_affected_items;
+      const totalAgents = req.data.data.total_affected_items;
 
       const mapped = req.data.data.affected_items
         .filter(item => {
@@ -101,7 +103,7 @@ export class MultipleAgentSelector extends Component {
       }
 
       if (this.state.availableAgents.data.length < 10 && !searchTerm) {
-        if (this.state.availableAgents.offset >= this.totalAgents) {
+        if (this.state.availableAgents.offset >= totalAgents) {
           this.setState({
             availableAgents: {
               ...this.state.availableAgents,
@@ -128,15 +130,16 @@ export class MultipleAgentSelector extends Component {
     try {
       let params = {
         offset: !searchTerm ? this.state.selectedAgents.offset : 0,
-        select: ['id', 'name']
+        select: ['id', 'name'].toString()
       };
       if (searchTerm) {
         params.search = searchTerm;
       }
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/agents/groups/${this.props.currentGroup.name}`,
-        params
+      const result = await WzRequest.apiReq(	
+        'GET',	
+        `/groups/${this.props.currentGroup.name}/agents`, {	
+          params	
+        },	
       );
       this.setState({ totalSelectedAgents: result.data.data.total_affected_items })
       const mapped = result.data.data.affected_items.map(item => {
@@ -230,20 +233,28 @@ export class MultipleAgentSelector extends Component {
     try {
       this.setState({ savingChanges: true });
       if (itemsToSave.addedIds.length) {
-        const addResponse = await WzRequest.apiReq(
-          'POST',
-          `/agents/group/${this.props.currentGroup.name}`,
-          { ids: itemsToSave.addedIds }
+        const addResponse = await WzRequest.apiReq(	
+          'PUT',	
+          `/agents/group`, {	
+            params: {	
+              group_id: this.props.currentGroup.name,	
+              list_agents: itemsToSave.addedIds.toString()	
+            }	
+          }	
         );
         if (addResponse.data.data.failed_ids) {
           failedIds.push(...addResponse.data.data.failed_ids);
         }
       }
       if (itemsToSave.deletedIds.length) {
-        const deleteResponse = await WzRequest.apiReq(
-          'DELETE',
-          `/agents/group/${this.props.currentGroup.name}`,
-          { ids: itemsToSave.deletedIds.toString() }
+        const deleteResponse = await WzRequest.apiReq(	
+          'DELETE',	
+          `/agents/group`, {	
+            params: {	
+              group_id: this.props.currentGroup.name,	
+              list_agents: itemsToSave.deletedIds.toString()	
+            }	
+          }	
         );
         if (deleteResponse.data.data.total_failed_items) {
           failedIds.push(...deleteResponse.data.data.failed_items);

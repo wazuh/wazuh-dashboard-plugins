@@ -12,4 +12,4 @@
  */
 export { Header } from './header';
 export { Categories } from './categories';
-export { ButtonBar } from './bottom-bar';
+export { BottomBar } from './bottom-bar';

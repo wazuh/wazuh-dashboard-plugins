@@ -119,6 +119,29 @@ export const initialWazuhConfig = `---
 # Default index pattern to use for Wazuh monitoring
 #wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
 #
+# --------------------------------- wazuh-cron ----------------------------------
+#
+# Customize the index prefix of predefined jobs
+# This change is not retroactive, if you change it new indexes will be created
+# cron.prefix: test
+#
+# ------------------------------ wazuh-statistics -------------------------------
+#
+# Custom setting to enable/disable statistics tasks.
+#cron.statistics.status: true
+#
+# Enter the ID of the APIs you want to save data from, leave this empty to run
+# the task on all configured APIs
+#cron.statistics.apis: []
+#
+# Define the frequency of task execution using cron schedule expressions
+#cron.statistics.interval: 0 0 * * * *
+#
+# Define the name of the index in which the documents are to be saved.
+#cron.statistics.index.name: statistics
+#
+# Define the interval in which the index will be created
+#cron.statistics.index.creation: w
 #
 # ------------------------------- App privileges --------------------------------
 #admin: true
@@ -145,8 +168,8 @@ export const initialWazuhConfig = `---
 #  - <id>:
 #     url: http(s)://<url>
 #     port: <port>
-#     username: <username> 
-#     password: <password> 
+#     username: <username>
+#     password: <password>
 
 hosts:
   - default:

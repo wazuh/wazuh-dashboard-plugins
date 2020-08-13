@@ -50,11 +50,20 @@ export const configEquivalences = {
   admin:
     'Enable or disable administrator requests to the Wazuh API when using the app.',
   hideManagerAlerts:
-    'Hide the alerts of the manager in all dashboards and discover',
+    'Hide the alerts of the manager in all dashboards.',
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.',
   'enrollment.dns':
-    'Set the variable WAZUH_REGISTRATION_SERVER with this value in the agent deployment.'
+    'Set the variable WAZUH_REGISTRATION_SERVER with this value in the agent deployment.',
+  'cron.prefix':
+    'Define the index prefix of predefined jobs.',
+  'cron.statistics.status':
+    'Enable or disable the statistics tasks.',
+  'cron.statistics.apis':
+    'Enter the ID of the APIs you want to save data from, leave this empty to run the task on all configured APIs.',
+  'cron.statistics.interval': 'Define the frequency of task execution using cron schedule expressions.',
+  'cron.statistics.index.name': 'Define the name of the index in which the documents are to be saved.',
+  'cron.statistics.index.creation': 'Define the interval in which the index will be created.',
 };
 
 export const nameEquivalence = {
@@ -78,14 +87,21 @@ export const nameEquivalence = {
   admin: 'Admin mode',
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',
-  'enrollment.dns': 'Enrollment DNS'
+  'enrollment.dns': 'Enrollment DNS',
+  'cron.prefix': 'Cron prefix',
+  'cron.statistics.status': 'Status',
+  'cron.statistics.apis': 'Includes apis',
+  'cron.statistics.interval': 'Interval',
+  'cron.statistics.index.name': 'Index name',
+  'cron.statistics.index.creation': 'Index creation',
 }
 
 const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
 const SECURITY = 'Security';
 const MONITORING = 'Monitoring'
-export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING,];
+const STATISTICS = 'Statistics'
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS,];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
@@ -109,6 +125,12 @@ export const categoriesEquivalence = {
   hideManagerAlerts: GENERAL,
   'logs.level': GENERAL,
   'enrollment.dns': GENERAL,
+  'cron.prefix': GENERAL,
+  'cron.statistics.status': STATISTICS,
+  'cron.statistics.apis': STATISTICS,
+  'cron.statistics.interval': STATISTICS,
+  'cron.statistics.index.name': STATISTICS,
+  'cron.statistics.index.creation': STATISTICS,
 }
 
 const TEXT = 'text';
@@ -116,6 +138,7 @@ const NUMBER = 'number';
 const LIST = 'list';
 const BOOLEAN = 'boolean';
 const ARRAY = 'array';
+const INTERVAL = 'interval'
 
 export const formEquivalence = {
   pattern: { type: TEXT },
@@ -155,4 +178,19 @@ export const formEquivalence = {
     }
   },
   'enrollment.dns': { type: TEXT },
+  'cron.prefix': { type: TEXT },
+  'cron.statistics.status': { type: BOOLEAN },
+  'cron.statistics.apis': { type: ARRAY },
+  'cron.statistics.interval': { type: INTERVAL },
+  'cron.statistics.index.name': { type: TEXT },
+  'cron.statistics.index.creation': {
+    type: LIST, params: {
+      options: [
+        { text: 'Hourly', value: 'h' },
+        { text: 'Daily', value: 'd' },
+        { text: 'Weekly', value: 'w' },
+        { text: 'Monthly', value: 'm' },
+      ]
+    }
+  },
 }

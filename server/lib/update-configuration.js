@@ -47,9 +47,10 @@ export class UpdateConfigurationFile {
     try {
       const data = fs.readFileSync(this.file, { encoding: 'utf-8' });
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
+      const formatedValue = this.formatValue(value);
       const result = exists
-        ? data.replace(re, `${key}: ${value}`)
-        : `${data}\n${key}: ${value}`;
+        ? data.replace(re, `${key}: ${formatedValue}`)
+        : `${data}\n${key}: ${formatedValue}`;
       fs.writeFileSync(this.file, result, 'utf8');
       log('update-configuration:updateLine', 'Updating line', 'debug');
       return true;
@@ -58,6 +59,12 @@ export class UpdateConfigurationFile {
       throw error;
     }
   }
+
+  formatValue = (value) => typeof value === 'string'
+    ? isNaN(Number(value)) ? `'${value}'` : value
+    : typeof value === 'object' 
+      ? JSON.stringify(value)
+      : value
 
   /**
    * Updates wazuh.yml file. If it fails, it throws the error to the next function.
@@ -84,8 +91,8 @@ export class UpdateConfigurationFile {
         'Updating configuration',
         'debug'
       );
-      return { 
-        needRestart: needRestartFields.includes(key), 
+      return {
+        needRestart: needRestartFields.includes(key),
         needReload: newReloadFields.includes(key)
       };
     } catch (error) {
