@@ -127,7 +127,7 @@ export const EditRole = ({ role, closeFlyout }) => {
                     <h2>
                         Edit {role.name} role &nbsp;
                         {isReserved &&
-                            <EuiBadge color='primary'>Default role</EuiBadge>
+                            <EuiBadge color='primary'>Reserved</EuiBadge>
                         }
                     </h2>
                 </EuiTitle>
@@ -151,7 +151,7 @@ export const EditRole = ({ role, closeFlyout }) => {
                         </EuiFormRow>
                     </EuiFlexItem>
                     <EuiFlexItem grow={true}>
-                        <EuiButton style={{ marginTop: 20, maxWidth: 45 }} isDisabled={isReserved} type="submit" fill onClick={addPolicy}>
+                        <EuiButton style={{ marginTop: 20, maxWidth: 45 }} isDisabled={isReserved} fill onClick={addPolicy}>
                             Add policy
                     </EuiButton>
 

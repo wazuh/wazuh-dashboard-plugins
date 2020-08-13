@@ -116,7 +116,7 @@ export const Roles = () => {
                 </EuiPageContentHeaderSection>
             </EuiPageContentHeader>
             <EuiPageContentBody>
-                <RolesTable loading={loadingTable} roles={roles} policiesData={policiesData} editRole={editRole}></RolesTable>
+                <RolesTable loading={loadingTable} roles={roles} policiesData={policiesData} editRole={editRole} updateRoles={getData}></RolesTable>
             </EuiPageContentBody>
         </EuiPageContent>
     );

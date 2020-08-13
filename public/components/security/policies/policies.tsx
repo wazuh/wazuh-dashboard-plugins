@@ -79,6 +79,7 @@ export const Policies = () => {
                     }
                 });
             ErrorHandler.info('Policy was successfully created', '');
+            await getPolicies();
         } catch (error) {
             ErrorHandler.handle(error, 'Error creating policy');
         }
@@ -433,7 +434,7 @@ export const Policies = () => {
                 </EuiPageContentHeaderSection>
             </EuiPageContentHeader>
             <EuiPageContentBody>
-                <PoliciesTable loading={loading} policies={policies} editPolicy={editPolicy} ></PoliciesTable>
+                <PoliciesTable loading={loading} policies={policies} editPolicy={editPolicy} updatePolicies={getPolicies}></PoliciesTable>
             </EuiPageContentBody>
         </EuiPageContent>
     );

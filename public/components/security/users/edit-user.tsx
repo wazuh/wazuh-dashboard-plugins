@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
 import {
     EuiButton,
-    EuiButtonEmpty,
     EuiTitle,
     EuiFlyout,
-    EuiOverlayMask,
     EuiFlyoutHeader,
-    EuiHorizontalRule,
     EuiFlyoutBody,
     EuiForm,
     EuiFlexGroup,
     EuiFlexItem,
-    EuiFieldText,
-    EuiConfirmModal,
     EuiFormRow,
     EuiSpacer,
-    EuiFieldPassword,
     EuiComboBox
 } from '@elastic/eui';
 
@@ -74,7 +68,7 @@ export const EditUser = ({ currentUser, closeFlyout }) => {
                     <EuiSpacer />
                     <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                            <EuiButton type="submit" fill onClick={editUser}>
+                            <EuiButton fill onClick={editUser}>
                                 Apply
                             </EuiButton>
                         </EuiFlexItem>

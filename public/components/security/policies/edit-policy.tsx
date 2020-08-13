@@ -11,6 +11,7 @@ import {
     EuiSpacer,
     EuiFlexGroup,
     EuiFlexItem,
+    EuiBadge,
     EuiSuperSelect,
     EuiText,
     EuiInMemoryTable,
@@ -21,6 +22,7 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 
 
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
+    const isReserved = policy.id < 27;
     const [actionValue, setActionValue] = useState('');
     const [addedActions, setAddedActions] = useState([]);
     const [availableResources, setAvailableResources] = useState([]);
@@ -198,6 +200,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     name: 'Remove',
                     description: 'Remove this action',
                     type: 'icon',
+                    enabled: () => !isReserved,
                     color: 'danger',
                     icon: 'trash',
                     onClick: (action) => removeAction(action),
@@ -221,6 +224,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     description: 'Remove this resource',
                     type: 'icon',
                     color: 'danger',
+                    enabled: () => !isReserved,
                     icon: 'trash',
                     onClick: (resource) => removeResource(resource),
                 },
@@ -264,7 +268,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">
                     <h2>
-                        Edit policy {policy.name}
+                        Edit policy {policy.name}&nbsp;&nbsp;
+                        {isReserved &&
+                            <EuiBadge color='primary'>Reserved</EuiBadge>
+                        }
                     </h2>
                 </EuiTitle>
             </EuiFlyoutHeader>
@@ -273,6 +280,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     helpText="Introduce a name for this new policy.">
                     <EuiFieldText
                         placeholder=""
+                        disabled={isReserved}
                         value={policy.name}
                         readOnly={true}
                         onChange={() => { }}
@@ -286,6 +294,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                             helpText="Set an action where the policy will be carried out.">
                             <EuiSuperSelect
                                 options={actions}
+                                disabled={isReserved}
                                 valueOfSelected={actionValue}
                                 onChange={value => onChangeActionValue(value)}
                                 itemLayoutAlign="top"
@@ -299,7 +308,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                             <EuiButton
                                 onClick={() => addAction()}
                                 iconType="plusInCircle"
-                                disabled={!actionValue}
+                                disabled={!actionValue || isReserved}
                             >Add</EuiButton>
                         </EuiFormRow>
                     </EuiFlexItem>
@@ -328,7 +337,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                                 onChange={value => onChangeResourceValue(value)}
                                 itemLayoutAlign="top"
                                 hasDividers
-                                disabled={!addedActions.length}
+                                disabled={!addedActions.length || isReserved}
                             />
                         </EuiFormRow>
                     </EuiFlexItem>
@@ -339,7 +348,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                                 placeholder={getIdentifier()}
                                 value={resourceIdentifierValue}
                                 onChange={e => onChangeResourceIdentifierValue(e)}
-                                disabled={!resourceValue}
+                                disabled={!resourceValue || isReserved}
                             />
                         </EuiFormRow>
                     </EuiFlexItem>
@@ -348,7 +357,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                             <EuiButton
                                 onClick={() => addResource()}
                                 iconType="plusInCircle"
-                                disabled={!resourceIdentifierValue}
+                                disabled={!resourceIdentifierValue || isReserved}
                             >Add</EuiButton>
                         </EuiFormRow>
                     </EuiFlexItem>
@@ -377,7 +386,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                 </EuiFormRow>
                 <EuiSpacer />
                 <EuiButton
-                    disabled={false}
+                    disabled={isReserved}
                     onClick={updatePolicy}
                     fill>
                     Apply
