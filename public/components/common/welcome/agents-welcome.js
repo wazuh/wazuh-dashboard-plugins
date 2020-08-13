@@ -76,6 +76,9 @@ export class AgentsWelcome extends Component {
     };
 
     this.platform = false;
+    if (Object.keys(this.props.agent).length) {
+      this.platform = ((this.props.agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((this.props.agent.os || {}).platform || false);
+    }
   }
 
   updateWidth = () => {
@@ -141,9 +144,6 @@ export class AgentsWelcome extends Component {
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
     window.addEventListener('resize', this.updateWidth); //eslint-disable-line
-    if (Object.keys(this.props.agent).length) {
-      this.platform = ((this.props.agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((this.props.agent.os || {}).platform || false);
-    }
   }
 
   updateMenuAgents() {
@@ -182,11 +182,23 @@ export class AgentsWelcome extends Component {
 
     let menuAgent = JSON.parse(window.localStorage.getItem('menuAgent'));
 
-    if(!menuAgent) {
+    // Check if pinned modules to agent menu are enabled in Settings/Modules, if not then modify localstorage removing the disabled modules
+    if(menuAgent){
+      const needUpdateMenuAgent = Object.keys(menuAgent).map(moduleName => menuAgent[moduleName]).reduce((accum, item) => {
+        if(typeof this.props.extensions[item.id] !== 'undefined' && this.props.extensions[item.id] === false){
+          delete menuAgent[item.id];
+          accum = true;
+        }
+        return accum;
+      }, false);
+      if(needUpdateMenuAgent){
+        // Update the pinned modules matching to enabled modules in Setings/Modules
+        window.localStorage.setItem('menuAgent', JSON.stringify(menuAgent))
+      }
+    }else{
       menuAgent = defaultMenuAgents;
       window.localStorage.setItem('menuAgent', JSON.stringify(defaultMenuAgents));
     }
-
     this.setState({ menuAgent: menuAgent});
   }
 
