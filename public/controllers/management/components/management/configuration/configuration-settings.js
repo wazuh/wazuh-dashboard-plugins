@@ -199,9 +199,14 @@ export default [
       },
       {
         name: 'Azure Logs',
-        description: 'Configuration options of the Azure-Logs wodle',
+        description: 'Configuration options of the Azure Logs wodle',
         goto: 'azure-logs',
         when: 'manager'
+      },
+      {
+        name: 'Google Cloud Pub/Sub',
+        description: 'Configuration options of the Google Cloud Pub/Sub module',
+        goto: 'gcp-pubsub'
       }
     ]
   }
