@@ -14,8 +14,6 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  EuiFlexGroup,
-  EuiFlexItem,
   EuiFieldText,
   EuiSpacer,
   EuiTextAlign
@@ -43,7 +41,7 @@ class WzConfigurationSetting extends Component {
   render() {
     const { isMobile } = this.state;
     const { keyItem, label, value } = this.props;
-    return value ? (
+    return (value || typeof value === 'number' || typeof value === 'boolean')  ? (
       <Fragment>
         <div
           style={{
