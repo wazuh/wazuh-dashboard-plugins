@@ -391,6 +391,7 @@ class WzRuleInfo extends Component {
    * @param {Number} ruleId
    */
   changeBetweenRules(ruleId) {
+    window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), `redirectRule=${ruleId}`);
     this.setState({ currentRuleId: ruleId });
   }
 
