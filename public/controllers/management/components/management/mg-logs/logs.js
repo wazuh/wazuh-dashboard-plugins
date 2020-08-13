@@ -245,7 +245,8 @@ export default compose(
       { value: 'error', text: 'Error' },
       { value: 'warning', text: 'Warning' },
       { value: 'critical', text: 'Critical' },
-      { value: 'debug', text: 'Debug' }
+      { value: 'debug', text: 'Debug' },
+      { value: 'debug2', text: 'Debug2'}
     ];
   }
 
