@@ -134,7 +134,7 @@ export default compose(
     if (this.state.logLevelSelect !== 'all')
       result['level'] = this.state.logLevelSelect;
     if (this.state.selectedDaemon !== 'all')
-      result['category'] = this.state.selectedDaemon;
+      result['tag'] = this.state.selectedDaemon;
     if (this.state.appliedSearch) result['search'] = this.state.appliedSearch;
     if (this.state.descendingSort) result['sort'] = '+timestamp';
     else result['sort'] = '-timestamp';
