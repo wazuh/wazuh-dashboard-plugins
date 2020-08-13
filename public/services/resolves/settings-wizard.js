@@ -214,12 +214,12 @@ export function settingsWizard(
                 'Wazuh App: Default API has been updated.',
                 defaultApi
               );
+              $location.path('health-check');
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
               );
             }
-            $location.path('health-check');
             deferred.resolve();
           })
           .catch(error => {

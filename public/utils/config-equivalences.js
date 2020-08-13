@@ -53,6 +53,8 @@ export const configEquivalences = {
     'Hide the alerts of the manager in all dashboards.',
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.',
+  'enrollment.dns':
+    'Set the Wazuh server address in the agent deployment.',
   'cron.prefix':
     'Define the index prefix of predefined jobs.',
   'cron.statistics.status':
@@ -85,6 +87,7 @@ export const nameEquivalence = {
   admin: 'Admin mode',
   hideManagerAlerts: 'Hide manager alerts',
   'logs.level': 'Log level',
+  'enrollment.dns': 'Enrollment DNS',
   'cron.prefix': 'Cron prefix',
   'cron.statistics.status': 'Status',
   'cron.statistics.apis': 'Includes apis',
@@ -121,6 +124,7 @@ export const categoriesEquivalence = {
   admin: SECURITY,
   hideManagerAlerts: GENERAL,
   'logs.level': GENERAL,
+  'enrollment.dns': GENERAL,
   'cron.prefix': GENERAL,
   'cron.statistics.status': STATISTICS,
   'cron.statistics.apis': STATISTICS,
@@ -173,6 +177,7 @@ export const formEquivalence = {
       ]
     }
   },
+  'enrollment.dns': { type: TEXT },
   'cron.prefix': { type: TEXT },
   'cron.statistics.status': { type: BOOLEAN },
   'cron.statistics.apis': { type: ARRAY },
