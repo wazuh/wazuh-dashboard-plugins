@@ -167,8 +167,8 @@ export default compose(
           logsPath,
           { params: this.buildFilters(customOffset) }
         );
-        const resultItems = ((tmpResult || {}).data.data || {}).items;
-        totalItems = ((tmpResult || {}).data.data || {}).totalItems;
+        const resultItems = ((tmpResult || {}).data.data || {}).affected_items;
+        totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (err) {
         result = '';
