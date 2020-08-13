@@ -22,7 +22,7 @@ import {
   EuiText,
   EuiCodeBlock,
   EuiTitle,
-  EuiButtonIcon,
+  EuiButton,
   EuiButtonEmpty,
   EuiCopy,
   EuiPage,
@@ -32,7 +32,6 @@ import {
   EuiProgress
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
-import PropTypes from 'prop-types';
 
 export class RegisterAgent extends Component {
   constructor(props) {
@@ -43,9 +42,8 @@ export class RegisterAgent extends Component {
       status: 'incomplete',
       selectedOS: '',
       serverAddress: '',
-      registrationServer: '',
       wazuhPassword: '',
-      tcpProtocol: false
+      udpProtocol: false
     };
   }
 
@@ -53,15 +51,28 @@ export class RegisterAgent extends Component {
     try {
       this.setState({ loading: true });
       const wazuhVersion = await this.props.getWazuhVersion();
-      const registrationServer = this.configuration["enrollment.dns"] || false;
-      const apiAddress = await this.props.getCurrentApiAddress();
-      const needsPassword = await this.getAuthInfo();
-      const tcpProtocol = await this.getRemoteInfo();
+      let serverAddress = false;
+      let wazuhPassword = '';
+      let hidePasswordInput = false;
+      serverAddress = this.configuration["enrollment.dns"] || false;
+      if (!serverAddress) {
+        serverAddress = await this.props.getCurrentApiAddress();
+      }
+      let authInfo = await this.getAuthInfo();
+      const needsPassword = (authInfo.auth || {}).use_password === 'yes';
+      if (needsPassword) {
+        wazuhPassword = authInfo['authd.pass'] || '';
+        if (wazuhPassword) {
+          hidePasswordInput = true;
+        }
+      }
+      const udpProtocol = await this.getRemoteInfo();
       this.setState({
-        serverAddress: apiAddress,
-        registrationServer,
+        serverAddress,
         needsPassword,
-        tcpProtocol,
+        hidePasswordInput,
+        wazuhPassword,
+        udpProtocol,
         wazuhVersion,
         loading: false
       });
@@ -80,9 +91,7 @@ export class RegisterAgent extends Component {
         '/agents/000/config/auth/auth',
         {}
       );
-      const auth = ((result.data || {}).data || {}).auth || {};
-      const usePassword = auth.use_password === 'yes';
-      return usePassword;
+      return (result.data || {}).data || {};
     } catch (error) {
       return false;
     }
@@ -110,10 +119,6 @@ export class RegisterAgent extends Component {
     this.setState({ serverAddress: event.target.value });
   }
 
-  setRegistrationServer(event) {
-    this.setState({ registrationServer: event.target.value });
-  }
-
   setWazuhPassword(event) {
     this.setState({ wazuhPassword: event.target.value });
   }
@@ -123,11 +128,21 @@ export class RegisterAgent extends Component {
    * @param {Array} steps
    */
   cleanSteps(steps) {
-    if (!this.state.needsPassword)
-      steps.splice(3, 1);
-    if (!this.state.registrationServer)
+    if (!this.state.needsPassword || this.state.hidePasswordInput)
       steps.splice(2, 1);
     return steps;
+  }
+
+  obfuscatePassword(text) {
+    let obfuscate = '';
+    const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
+    const match = regex.exec(text);
+    const password = match[1];
+    if (password) {
+      [...password].forEach(() => obfuscate += '*')
+      text = text.replace(password, obfuscate);
+    }
+    return text;
   }
 
   render() {
@@ -171,14 +186,6 @@ export class RegisterAgent extends Component {
       />
     );
 
-    const registrationInput = (
-      <EuiFieldText
-        placeholder="Registration server address..."
-        value={this.state.registrationServer}
-        onChange={event => this.setRegistrationServer(event)}
-      />
-    );
-
     const passwordInput = (
       <EuiFieldText
         placeholder="Wazuh password..."
@@ -187,29 +194,17 @@ export class RegisterAgent extends Component {
       />
     );
 
-    const copyButton = {
-      position: 'relative',
-      float: 'right',
-      zIndex: '1000',
-      right: '8px',
-      top: '16px'
-    };
-
     const codeBlock = {
       zIndex: '100'
     };
     const customTexts = {
       rpmText: `sudo WAZUH_MANAGER='${this.state.serverAddress}'${
-        this.state.registrationServer
-          ? ` WAZUH_REGISTRATION_SERVER='${this.state.registrationServer}'`
-          : ''
-        }${
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
           : ''
         }${
-        this.state.tcpProtocol
-          ? " WAZUH_PROTOCOL='TCP'"
+        this.state.udpProtocol
+          ? " WAZUH_PROTOCOL='UDP'"
           : ''
         } yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
         this.state.wazuhVersion
@@ -217,16 +212,12 @@ export class RegisterAgent extends Component {
       debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
         this.state.wazuhVersion
         }-1_amd64.deb && sudo WAZUH_MANAGER='${this.state.serverAddress}'${
-        this.state.registrationServer
-          ? ` WAZUH_REGISTRATION_SERVER='${this.state.registrationServer}'`
-          : ''
-        }${
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
           : ''
         }${
-        this.state.tcpProtocol
-          ? " WAZUH_PROTOCOL='TCP'"
+        this.state.udpProtocol
+          ? " WAZUH_PROTOCOL='UDP'"
           : ''
         } dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${
@@ -234,29 +225,25 @@ export class RegisterAgent extends Component {
         }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
         this.state.serverAddress
         }'${
-        this.state.registrationServer
-          ? ` WAZUH_REGISTRATION_SERVER '${this.state.registrationServer}'`
-          : ''
-        }${
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD '${this.state.wazuhPassword}'`
           : ''
         }${
-        this.state.tcpProtocol
-          ? " WAZUH_PROTOCOL 'TCP'"
+        this.state.udpProtocol
+          ? " WAZUH_PROTOCOL 'UDP'"
           : ''
         } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
         this.state.wazuhVersion
         }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q WAZUH_MANAGER='${
         this.state.serverAddress
-        }' WAZUH_REGISTRATION_SERVER='${this.state.registrationServer || this.state.serverAddress}'${
+        }' WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}'${
         this.state.needsPassword
           ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
           : ''
         }${
-        this.state.tcpProtocol
-          ? " WAZUH_PROTOCOL='TCP'"
+        this.state.udpProtocol
+          ? " WAZUH_PROTOCOL='UDP'"
           : ''
         }`
     };
@@ -265,32 +252,34 @@ export class RegisterAgent extends Component {
     const text = customTexts[field];
     const language = this.state.selectedOS === 'win' ? 'ps' : 'bash';
     const windowsAdvice = this.state.selectedOS === 'win' && (
-      <EuiCallOut
-        size="s"
-        title="You will need administrator privileges to perform this installation."
-        iconType="iInCircle"
-      />
+      <>
+        <EuiCallOut
+          title="You will need administrator privileges to perform this installation."
+          iconType="iInCircle"
+        />
+        <EuiSpacer></EuiSpacer>
+      </>
     );
 
     const guide = (
       <div>
         {this.state.selectedOS && (
           <EuiText>
-            <div style={copyButton}>
-              <EuiCopy textToCopy={text}>
-                {copy => (
-                  <EuiButtonIcon
-                    onClick={copy}
-                    iconType="copy"
-                    aria-label="Copy"
-                  />
-                )}
-              </EuiCopy>
-            </div>
+            <p>You can use this command to install and enroll the Wazuh agent in one or more host.</p>
             <EuiCodeBlock style={codeBlock} language={language}>
-              {text}
+              {this.state.wazuhPassword ? this.obfuscatePassword(text) : text}
             </EuiCodeBlock>
             {windowsAdvice}
+            <EuiCopy textToCopy={text}>
+              {copy => (
+                <EuiButton
+                  fill
+                  iconType="copy"
+                  onClick={copy}>
+                  Copy command
+                </EuiButton>
+              )}
+            </EuiCopy>
           </EuiText>
         )}
       </div>
@@ -298,7 +287,7 @@ export class RegisterAgent extends Component {
 
     const steps = [
       {
-        title: 'Choose your OS',
+        title: 'Choose OS',
         children: (
           <Fragment>
             {rpmButton} {debButton} {windowsButton} {macOSButton}
@@ -310,15 +299,11 @@ export class RegisterAgent extends Component {
         children: <Fragment>{ipInput}</Fragment>
       },
       {
-        title: 'Wazuh registration server',
-        children: <Fragment>{registrationInput}</Fragment>
-      },
-      {
         title: 'Wazuh password',
         children: <Fragment>{passwordInput}</Fragment>
       },
       {
-        title: 'Complete the installation',
+        title: 'Install and enroll the agent',
         children: (
           <div>
             <Fragment>
@@ -386,10 +371,3 @@ export class RegisterAgent extends Component {
     );
   }
 }
-
-RegisterAgent.propTypes = {
-  addNewAgent: PropTypes.func,
-  getWazuhVersion: PropTypes.func,
-  getCurrentApiAddress: PropTypes.func,
-  needsPassword: PropTypes.func
-};

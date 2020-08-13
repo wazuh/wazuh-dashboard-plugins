@@ -54,7 +54,7 @@ export const configEquivalences = {
   'logs.level':
     'Set the app logging level, allowed values are info and debug. Default is info.',
   'enrollment.dns':
-    'Set the variable WAZUH_REGISTRATION_SERVER with this value in the agent deployment.',
+    'Set the Wazuh server address in the agent deployment.',
   'cron.prefix':
     'Define the index prefix of predefined jobs.',
   'cron.statistics.status':
