@@ -146,7 +146,7 @@ export const CreateRole = ({ closeFlyout }) => {
                 </EuiFormRow>
                 <EuiSpacer />
                 <EuiButton fill onClick={createUser}>
-                    Create user
+                    Create role
                 </EuiButton>
             </EuiForm>
             </EuiFlyoutBody>
