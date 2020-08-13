@@ -132,7 +132,7 @@ export default compose(
       result['offset'] = customOffset;
     }
     if (this.state.logLevelSelect !== 'all')
-      result['type_log'] = this.state.logLevelSelect;
+      result['level'] = this.state.logLevelSelect;
     if (this.state.selectedDaemon !== 'all')
       result['category'] = this.state.selectedDaemon;
     if (this.state.appliedSearch) result['search'] = this.state.appliedSearch;
