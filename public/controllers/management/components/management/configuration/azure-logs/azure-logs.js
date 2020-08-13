@@ -92,7 +92,7 @@ class WzConfigurationAzure extends Component {
         {currentConfig && this.wodleConfig['azure-logs'] && (
           <WzConfigurationSettingsTabSelector
             title="Main settings"
-            description="Common settings applied to all Amazon S3 buckets"
+            description="Configuration for the Azure logs wodle"
             currentConfig={this.wodleConfig}
             minusHeight={260}
             helpLinks={helpLinks}

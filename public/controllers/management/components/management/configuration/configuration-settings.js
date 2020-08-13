@@ -194,8 +194,7 @@ export default [
         name: 'Amazon S3',
         description:
           'Security events related to Amazon AWS services, collected directly via AWS API',
-        goto: 'aws-s3',
-        when: 'manager'
+        goto: 'aws-s3'
       },
       {
         name: 'Azure Logs',
