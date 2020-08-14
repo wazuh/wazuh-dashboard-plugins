@@ -33,7 +33,8 @@ import modeGuides from './guides';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import store from '../../redux/store';
-import { withAdminModeProtectedRoute } from '../common/hocs/withAdminModeProtectedRoute';
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../common/hocs/';
+import { compose } from 'redux';
 
 const guides = Object.keys(modeGuides).map(key => modeGuides[key]).sort((a,b) => {
 	if (a.name < b.name) { return -1 }
@@ -50,7 +51,14 @@ interface IStateWzAddModulesData {
 	selectedGuideCategory: any
 };
 
-export default withAdminModeProtectedRoute('#/manager')(class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
+export default compose(
+	withGlobalBreadcrumb([
+		{ text: '' },
+		{ text: 'Management', href: '/app/wazuh#/manager' },
+		{ text: 'Setup modules' }
+	]),
+	withUserAuthorizationPrompt(null, ['administrator'])
+)(class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
 	tabs: any
 	constructor(props){
 		super(props);
@@ -83,17 +91,6 @@ export default withAdminModeProtectedRoute('#/manager')(class WzAddModulesData e
 			selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
 		}
 	}
-	setGlobalBreadcrumb() {
-    const breadcrumb = [
-			{ text: '' },
-			{ text: 'Management', href: '/app/wazuh#/manager' },
-			{ text: 'Setup modules' }
-		];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-  componentDidMount() {
-    this.setGlobalBreadcrumb();
-  }
 	changeGuide = (guide: string = '') => {
 		this.setState({ guide });
 	}

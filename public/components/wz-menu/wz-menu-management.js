@@ -88,7 +88,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.lists),
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
-          ...(this.props.adminMode ? [this.createItem(this.managementSections.modules_guides)] : []),
+          this.createItem(this.managementSections.modules_guides)
         ],
       }
     ];

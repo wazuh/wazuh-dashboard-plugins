@@ -137,20 +137,18 @@ class ManagementWelcome extends Component {
                       description="Manage your Wazuh cluster configuration."
                     />
                   </EuiFlexItem>
-                  {this.props.adminMode ? (
-                    <EuiFlexItem>
-                      <EuiCard
-                        layout="horizontal"
-                        className="homSynopsis__card"
-                        icon={
-                          <EuiIcon size="xl" type="devToolsApp" color="primary" />
-                        }
-                        title="Setup modules"
-                        onClick={() => this.switchSection('setup_modules')}
-                        description="Configure modules using guides."
-                      />
-                    </EuiFlexItem>
-                  ) : <EuiFlexItem />}
+                  <EuiFlexItem>
+                    <EuiCard
+                      layout="horizontal"
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon size="xl" type="devToolsApp" color="primary" />
+                      }
+                      title="Setup modules"
+                      onClick={() => this.switchSection('setup_modules')}
+                      description="Configure modules using guides."
+                    />
+                  </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>
