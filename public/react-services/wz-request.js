@@ -87,7 +87,7 @@ export class WzRequest {
         const error = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
         const failed_ids = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
         const message = ((data.data || {}).message || "Unexpected error");
-        return Promise.reject(`${message} (${error.code}) - ${error.message} ${failed_ids ? `. Affected ids: ${failed_ids} ` : ""}`)
+        return Promise.reject(`${message} (${error.code}) - ${error.message} ${failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ""}`)
       }
       return Promise.resolve(data);
     } catch (error) {
