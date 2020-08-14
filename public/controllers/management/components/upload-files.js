@@ -88,7 +88,7 @@ export class UploadFiles extends Component {
                   'success',
                   'Success',
                   <Fragment>
-                    <div>Susccessfully imported</div>
+                    <div>Successfully imported</div>
                     <ul>
                       {files.map(f => (
                         <li

@@ -848,8 +848,7 @@ export class WazuhApiCtrl {
 
       if (typeof (data || {}).content === 'string' && (data || {}).origin === 'raw') {
         options.content_type = 'application/octet-stream';
-        body = data.content;
-        delete data.content;
+        data.body = data.content
         delete data.origin;
       }
       const delay = (data || {}).delay || 0;
