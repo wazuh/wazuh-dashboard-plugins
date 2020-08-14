@@ -38,13 +38,11 @@ import { toastNotifications } from 'ui/notify';
 const visHandler = new VisHandlers();
 
 export class WzVisualize extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
-    this.visualizations = this.props.isAgent
-      ? agentVisualizations
-      : visualizations;
     this.state = {
-      selectedTab: this.props.selectedTab,
+      visualizations: !!props.isAgent ? agentVisualizations : visualizations,
       expandedVis: false,
       thereAreSampleAlerts: false,
       adminMode: false,
@@ -64,16 +62,18 @@ export class WzVisualize extends Component {
   }
 
 
-  showToast(color, title = '', text = '', time = 3000){
+  showToast(color, title = '', text = '', time = 3000) {
     toastNotifications.add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
     });
   };
 
   async componentDidMount() {
+    this._isMount = true;
+    // visHandler.removeAll();
     this.agentsStatus = false;
     if (!this.monitoringEnabled) {
       const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
@@ -106,58 +106,50 @@ export class WzVisualize extends Component {
 
     // Check if there is sample alerts installed
     try {
-      this.setState({
-        thereAreSampleAlerts: (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled
-      });
-    } catch (error) { }
-
-    // Check adminMode
-    try {
+      thereAreSampleAlerts = await WzRequest.genericReq('GET', '/elastic/samplealerts', {}).data.sampleAlertsInstalled;
       const adminMode = await checkAdminMode();
-      this.setState({ adminMode });
+      this._isMount && this.setState({ thereAreSampleAlerts, adminMode });
     } catch (error) { }
   }
 
   async componentDidUpdate(prevProps) {
-    this.visualizations = this.props.isAgent && this.props.isAgent.length ? agentVisualizations : visualizations;
-    const { selectedTab } = this.props;
-    if (selectedTab !== this.state.selectedTab) {
-      this.setState({
-        selectedTab: selectedTab
-      });
-    }
-    // when it changes no selected agent to selected or inverse, remove previous visualizations VisHanderls
-    if ((!prevProps.isAgent && this.props.isAgent) || (prevProps.isAgent && !this.props.isAgent)) {
+    if (prevProps.isAgent !== this.props.isAgent) {
+      this._isMount &&
+        this.setState({ visualizations: !!this.props.isAgent ? agentVisualizations : visualizations });
       visHandler.removeAll();
     }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   expand = id => {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
-  refreshKnownFields =  async() => {
-    if(!this.state.hasRefreshedKnownFields){ // Known fields are refreshed only once per dashboard loading
-      try{
-        this.setState({hasRefreshedKnownFields: true, isRefreshing: true});
+  refreshKnownFields = async () => {
+    if (!this.state.hasRefreshedKnownFields) { // Known fields are refreshed only once per dashboard loading
+      try {
+        this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
         await PatternHandler.refreshIndexPattern();
-        this.setState({isRefreshing: false});
+        this.setState({ isRefreshing: false });
         this.showToast('success', 'The index pattern was refreshed successfully.');
 
-      }catch(err){
-        this.setState({isRefreshing: false});
+      } catch (err) {
+        this.setState({ isRefreshing: false });
         this.showToast('danger', 'The index pattern could not be refreshed');
 
       }
-    }else if(this.state.isRefreshing){
+    } else if (this.state.isRefreshing) {
       await new Promise(r => setTimeout(r, 150));
       await this.refreshKnownFields();
     }
   }
 
   render() {
-    this.visualizations = this.rawVisualizations.getType() !== 'general' ? agentVisualizations : visualizations;
-    const { selectedTab } = this.state;
+    const { visualizations } = this.state;
+    const { selectedTab } = this.props;
     const renderVisualizations = vis => {
       return (
         <EuiFlexItem
@@ -264,12 +256,12 @@ export class WzVisualize extends Component {
         )}
         <EuiFlexItem className={this.props.resultState === 'none' && 'no-opacity' || ''}>
 
-        <Metrics section={selectedTab} resultState={this.props.resultState} /> 
+          <Metrics section={selectedTab} resultState={this.props.resultState} />
 
           {selectedTab &&
             selectedTab !== 'welcome' &&
-            this.visualizations[selectedTab] &&
-            this.visualizations[selectedTab].rows.map((row, i) => {
+            visualizations[selectedTab] &&
+            visualizations[selectedTab].rows.map((row, i) => {
               return (
                 <EuiFlexGroup
                   key={i}
