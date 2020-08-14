@@ -38,7 +38,7 @@ export async function getAgentFilterValues(field, value, filters = {}) {
     }
   };
 
-  const arrayResult = (((result || {}).data || {}).data || {}).items.map(
+  const arrayResult = (((result || {}).data || {}).data || {}).affected_items.map(
     (item) => {
       return getChild(item, field);
     }
