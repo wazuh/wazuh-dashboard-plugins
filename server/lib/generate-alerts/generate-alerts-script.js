@@ -94,9 +94,7 @@ function generateAlert(params) {
         data: {},
         location: ""
     }
-    if(!params.aws) {
-        alert.agent = randomArrayItem(Agents);
-    }
+    alert.agent = randomArrayItem(Agents);
     alert.rule.description = randomArrayItem(ruleDescription);
     alert.rule.id = `${randomIntervalInteger(1,alertIDMax)}`;
     alert.rule.level = randomIntervalInteger(1,ruleMaxLevel);
