@@ -215,10 +215,9 @@ export class ElasticWrapper {
       } catch (error) {} // eslint-disable-line
 
       let currentFields = [];
-
       // If true, it's an existing index pattern, we need to review its known fields
-      const { fields } = ((pattern || {})._source || {})['index-pattern'] || {};
-      const {fieldFormatMap}  = ((pattern || {})._source || {})['index-pattern'] || {};
+      const { fields, fieldFormatMap } = ((pattern || {})._source || {})['index-pattern'] || {};
+      if( !fields || !fieldFormatMap ) throw {message: " No index pattern found, open the interface to generate"}
       const currentFieldsFormatMap = this.addFormatMap(fieldFormatMap);
       if (fields) {
         currentFields = JSON.parse(fields);
