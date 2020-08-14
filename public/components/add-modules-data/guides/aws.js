@@ -17,21 +17,29 @@ export default {
   category: 'Security information management',
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html',
   icon: 'logoAWSMono',
-  avaliable_for_manager: true,
-  avaliable_for_agent: true,
+  avaliable_for: {
+    manager: true
+  },
+  api_component: 'wmodules',
+  api_configuration: 'wmodules',
+  api_module: 'aws-s3',
+  contain_secrets: true,
   steps: [
     {
-      title: 'Required settings',
+      title: 'General settings',
       description: '',
       elements: [
         {
           name: 'disabled',
+          display_name: 'Disable the module',
           description: `Disables the AWS-S3 wodle.`,
           type: 'switch',
-          required: true
+          required: true,
+          default_value: false
         },
         {
           name: 'interval',
+          display_name: 'Interval',
           description: 'Frequency for reading from the S3 bucket.',
           type: 'input',
           required: true,
@@ -42,26 +50,22 @@ export default {
         },
         {
           name: 'run_on_start',
+          display_name: 'Run on start',
           description: 'Run evaluation immediately when service is started.',
           type: 'switch',
           required: true,
           default_value: true
         },
-        
-      ]
-    },
-    {
-      title: 'Optional settings',
-      description: '',
-      elements: [
         {
           name: 'remove_from_bucket',
+          display_name: 'Remove from bucket',
           description: 'Define if you want to remove logs from your S3 bucket after they are read by the wodle.',
           type: 'switch',
           default_value: true
         },
         {
           name: 'skip_on_error',
+          display_name: 'Skip on error',
           description: 'When unable to process and parse a CloudTrail log, skip the log and continue processing',
           type: 'switch',
           default_value: true
@@ -69,11 +73,12 @@ export default {
       ]
     },
     {
-      title: 'Buckets',
+      title: 'Add buckets',
       description: 'Defines one or more buckets to process.',
       elements: [
         {
           name: 'bucket',
+          display_name: 'Bucket',
           description: 'Defines a bucket to process.',
           removable: true,
           required: true,
@@ -87,6 +92,7 @@ export default {
           attributes: [
             {
               name: 'type',
+              display_name: 'Bucket type',
               description: 'Specifies type of bucket.',
               info: 'Different configurations as macie has custom type.',
               type: 'select',
@@ -105,6 +111,7 @@ export default {
           options: [
             {
               name: 'name',
+              display_name: 'Bucket name',
               description: 'Name of the S3 bucket from where logs are read.',
               type: 'input',
               required: true,
@@ -112,48 +119,61 @@ export default {
             },
             {
               name: 'aws_account_id',
+              display_name: 'AWS account ID',
               description: 'The AWS Account ID for the bucket logs. Only works with CloudTrail buckets.',
               type: 'input',
-              placeholder: 'Comma list of 12 digit AWS Account ID'
+              placeholder: 'Comma list of 12 digit AWS Account ID',
+              required: true
             },
             {
               name: 'aws_account_alias',
+              display_name: 'AWS account alias',
               description: 'A user-friendly name for the AWS account.',
               type: 'input',
               placeholder: 'AWS account user-friendly name'
             },
             {
               name: 'access_key',
+              display_name: 'Access key',
               description: 'The access key ID for the IAM user with the permission to read logs from the bucket.',
               type: 'input',
-              placeholder: 'Any alphanumerical key.'
+              placeholder: 'Any alphanumerical key.',
+              required: true,
+              secret: true
             },
             {
               name: 'secret_key',
+              display_name: 'Secret key',
               description: 'The secret key created for the IAM user with the permission to read logs from the bucket.',
               type: 'input',
-              placeholder: 'Any alphanumerical key.'
+              placeholder: 'Any alphanumerical key.',
+              required: true,
+              secret: true
             },
             {
               name: 'aws_profile',
+              display_name: 'AWS profile',
               description: 'A valid profile name from a Shared Credential File or AWS Config File with the permission to read logs from the bucket.',
               type: 'input',
               placeholder: 'Valid profile name'
             },
             {
               name: 'iam_role_arn',
+              display_name: 'Role arn',
               description: 'A valid role arn with permission to read logs from the bucket.Valid role arn',
               type: 'input',
               placeholder: 'Valid role arn'
             },
             {
               name: 'path',
+              display_name: 'Path or prefix',
               description: 'If defined, the path or prefix for the bucket.',
               type: 'input',
               placeholder: 'Path or prefix for the bucket.'
             },
             {
               name: 'only_logs_after',
+              display_name: 'Only logs after',
               description: 'A valid date, in YYYY-MMM-DD format, that only logs from after that date will be parsed. All logs from before that date will be skipped.',
               type: 'input',
               placeholder: 'Date, e.g.: 2020-APR-02',
@@ -162,13 +182,14 @@ export default {
             },
             {
               name: 'regions',
+              display_name: 'Regions',
               description: 'A comma-delimited list of regions to limit parsing of logs. Only works with CloudTrail buckets.',
               type: 'input',
-              default_value: 'All regions',
               placeholder: 'Comma-delimited list of valid regions'
             },
             {
               name: 'aws_organization_id',
+              display_name: 'AWS organization ID',
               description: 'Name of AWS organization. Only works with CloudTrail buckets.',
               type: 'input',
               placeholder: 'Valid AWS organization name'
@@ -177,5 +198,23 @@ export default {
         }
       ]
     }
-  ]
+  ],
+  mapAgentConfigurationAPIResponse(config){
+    return {
+      ...config,
+      ...(typeof config.interval !== 'undefined' ? {interval: `${config.interval}s`} : {}),
+      ...(typeof config.buckets !== 'undefined' ? {
+        bucket: config.buckets.map(bucket => {
+          const mapped = {
+            '@': {type: bucket.type},
+            ...(Object.keys(bucket).filter(key => key !== 'type').reduce((accum, key) => {
+              accum[key] = bucket[key]
+              return accum
+            }, {}))
+          };
+          return mapped
+        })
+      } : {})
+    }
+  }
 }

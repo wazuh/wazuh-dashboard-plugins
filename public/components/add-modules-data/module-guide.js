@@ -9,7 +9,7 @@
 *
 * Find more information about this on the LICENSE file.
 */
-import React, { Component, Fragment } from "react";
+import React, { Component, Fragment, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import {
@@ -26,6 +26,7 @@ import {
   EuiFieldNumber,
   EuiSwitch,
   EuiSelect,
+  EuiButton,
   EuiButtonEmpty,
   EuiToolTip,
   EuiButtonToggle,
@@ -41,13 +42,37 @@ import {
   EuiTabs,
   EuiTab,
   EuiCode,
-  EuiBadge
+  EuiBadge,
+  EuiAccordion,
+  EuiBottomBar,
+  EuiModal,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
+  EuiModalBody,
+  EuiHealth,
+  EuiModalFooter,
+  EuiSelectable,
+  EuiForm,
+  EuiFormRow,
+  EuiDescribedFormGroup,
+  EuiHorizontalRule
 } from "@elastic/eui";
 
 import moduleGuides from './guides';
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from '../../controllers/management/components/management/configuration/utils/xml-beautifier';
 import { toastNotifications } from 'ui/notify';
+import withLoading from "../../controllers/management/components/management/configuration/util-hocs/loading";
+import { clusterReq, clusterNodes, fetchFile, saveFileManager, saveFileCluster, restartNodeSelected } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { WzRequest } from '../../react-services/wz-request';
+import { connect } from 'react-redux';
+import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
+import $ from 'jquery';
+import _ from 'lodash';
+import { WzAgentSelector, WzGroupSelector } from './module-guide-selector';
+import { WzButtonAsync } from '../common/util/button-async';
+import { WzButtonModal, WzButtonConfirmModal } from '../common/util/button-modal';
+import WzLoading from '../../controllers/management/components/management/configuration/util-components/loading';
 
 const js2xmlOptionsParser = {
   format: {
@@ -57,7 +82,7 @@ const js2xmlOptionsParser = {
 
 const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
 
-const agentTypeButtons = [
+const configurationTypes = [
   {
     id: 'manager',
     label: 'Manager'
@@ -65,6 +90,10 @@ const agentTypeButtons = [
   {
     id: 'agent',
     label: 'Agent'
+  },
+  {
+    id: 'centralized',
+    label: 'Centralized'
   }
 ];
 
@@ -79,7 +108,327 @@ const agentOsTabs = [
   }
 ];
 
+const agentTypeSelector = [
+  {
+    id: 'registered',
+    label: 'Registered'
+  },
+  {
+    id: 'custom',
+    label: 'Custom'
+  }
+];
+
+const agentOSSelector = [
+  {
+    id: 'linux',
+    label: 'Linux'
+  },
+  {
+    id: 'windows',
+    label: 'Windows'
+  }
+];
+
 const renderOSIcon = (os) => <i className={`fa fa-${os} AgentsTable__soBadge AgentsTable__soBadge--${os}`} aria-hidden="true"/>;
+
+const WzModuleGuideNodeSelector = withLoading(
+  async (props) => {
+    try{
+      const clusterStatus = await clusterReq();
+      if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
+        const nodesResponse = await clusterNodes();
+        const items = ((nodesResponse.data || {}).data || {}).affected_items || [];
+        props.updateClusterNodes(items);
+        props.clusterNodeSelect(items.length > 0 ? items[0].name : '');
+        return { isCluster: true, nodes: nodesResponse.data.data.affected_items };
+      }else{
+        return { isCluster: false };
+      }
+    }catch(error){
+      return {};
+    }
+  },
+  (props, prevProps) => props.agentTypeSelected === 'manager' && prevProps.agentTypeSelected !== 'manager'
+)((props) => {
+  useEffect(() => {
+    props.setAgentOSSelected('linux');
+  }, [])
+  return (
+  <Fragment>
+    <EuiFlexGroup>
+      {props.isCluster && props.nodes && props.nodes.length > 0 && (
+        <EuiFlexItem grow={false}>
+          <EuiText>Cluster mode is enabled. Choose a node:</EuiText>
+          <EuiSpacer size='s'/>
+          <EuiSelect
+            id='selectClusterNodeConfigurationModuleGuide'
+            options={props.nodes.map(node => ({
+              value: node.name,
+              text: `${node.name} (${node.type})`
+            }))}
+            value={props.clusterNodeSelected}
+            onChange={(e) => props.clusterNodeSelect(e.target.value)}
+            aria-label='Select Cluster node'
+            fullWidth={true}
+          />
+        </EuiFlexItem>
+      )}
+    </EuiFlexGroup>
+    <EuiSpacer />
+    <EuiText>Load the current configuration or from scratch:</EuiText>
+    <EuiSpacer size='s'/>
+    <EuiFlexGroup>
+      <EuiFlexItem grow={false}>
+        <WzButtonAsync disableWhileLoading onClick={props.setStepsGuideLoadedConfiguration} size='s'>Load</WzButtonAsync>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiButton onClick={props.setStepsGuideFromScratch} size='s'>New</EuiButton>
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  </Fragment>
+)});
+
+const WzModuleGuideAgentSelector = props => {
+  const [typeSelection, setTypeSelection] = useState(agentTypeSelector[0].id);
+  const onChange = (value) => {
+    props.cleanStepsGuide();
+    setTypeSelection(value);
+  }
+
+  const resetAgentState = () => {
+    props.setAgentSelected(undefined);
+  }
+
+  useEffect(() => {
+    resetAgentState();
+    return () => resetAgentState();
+  }, [typeSelection]);
+
+  return (
+    <Fragment>
+      <EuiText>Agent type</EuiText>
+      <EuiSpacer size='s'/>
+      <EuiButtonGroup
+        color='primary'
+        options={agentTypeSelector}
+        idSelected={typeSelection}
+        onChange={onChange}
+      />
+      <EuiSpacer size='s'/>
+      {typeSelection === agentTypeSelector[0].id ? (
+        <WzModuleGuideAgentRegistered {...props} />
+      ) : typeSelection === agentTypeSelector[1].id ? (
+        <WzModuleGuideAgentSelectorCustom {...props}/>
+      ) : null}
+    </Fragment>
+  )
+}
+
+const WzModuleGuideAgentRegistered = props => {
+  const [isSelectionOpened, setIsSelectionOpened] = useState(false);
+
+  const onClickIsSelectionOpened = () => setIsSelectionOpened(true);
+  const onClickIsSelectionClosed = () => setIsSelectionOpened(false);
+  const onSelectItem = (agent) => {
+    const agentOS = (((agent.os || {}).platform || '')) === 'windows' ? 'windows'
+      : (((agent.os || {}).uname || '')).includes('Linux') ? 'linux'
+      : undefined
+    if(Array.isArray(props.guide.avaliable_for.agent) && !props.guide.avaliable_for.agent.includes(agentOS)){
+      toastNotifications.add({
+        title: `This module is not avaliable for OS of selected agent: ${capitalize(agentOS)}`,
+        color: 'danger'
+      })
+      return 
+    }
+    props.setAgentSelected(agent);
+
+    props.setAgentOSSelected(agentOS);
+  };
+  const color = status => {
+    if (status.toLowerCase() === 'active') {
+      return 'success';
+    } else if (status.toLowerCase() === 'disconnected') {
+      return 'danger';
+    } else if (status.toLowerCase() === 'never connected') {
+      return 'subdued';
+    }
+  };
+
+  return (
+    <Fragment>
+      <EuiFlexGroup alignItems='center' responsive={false}>
+        <EuiFlexItem grow={false}>
+          <WzAgentSelector
+            onSelectItem={onSelectItem}
+            modal={{title: 'Select an agent', className:'wz-select-agent-modal'}}
+            isOpen={isSelectionOpened}
+            onClose={onClickIsSelectionClosed}
+            button={<EuiButton onClick={onClickIsSelectionOpened} size='s'>Select an agent</EuiButton>}
+          />
+        </EuiFlexItem>
+        {props.agentSelected && (
+          <EuiFlexItem grow={false}>
+            <EuiHealth color={color(props.agentSelected.status)}><span className={'hide-agent-status'}>{props.agentSelected.name} ({props.agentSelected.id})</span></EuiHealth>
+          </EuiFlexItem>
+        )}
+      </EuiFlexGroup>
+      {props.agentSelected && (
+        <Fragment>
+          <EuiSpacer size='s' />
+          <EuiText>{props.agentSelected.status !== 'Never connected' ? 'Load the current configuration or from scratch:' : 'From scratch'}</EuiText>
+          <EuiSpacer size='s'/>
+          <EuiFlexGroup>
+            {props.agentSelected.status !== 'Never connected' && (
+              <EuiFlexItem grow={false}>
+                <WzButtonAsync disableWhileLoading onClick={props.setStepsGuideLoadedConfiguration} size='s'>Load</WzButtonAsync>
+              </EuiFlexItem>
+            )}
+            <EuiFlexItem grow={false}>
+              <EuiButton onClick={props.setStepsGuideFromScratch} size='s'>New</EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </Fragment>
+      )}
+    </Fragment>
+  )
+}
+
+const WzModuleGuideAgentSelectorCustom = props => {
+  return (
+    <Fragment>
+      <EuiText>Operating system</EuiText>
+      <EuiSpacer size='s'/>
+      <EuiButtonGroup
+        color='primary'
+        options={agentOSSelector.filter(agentOS => props.guide.avaliable_for.agent === true || Array.isArray(props.guide.avaliable_for.agent) && props.guide.avaliable_for.agent.includes(agentOS.id))}
+        idSelected={props.agentOSSelected}
+        onChange={props.setAgentOSSelected}
+      />
+      <EuiSpacer size='s'/>
+      <EuiButton onClick={props.setStepsGuideFromScratch} isDisabled={!props.agentOSSelected} size='s'>
+        New
+      </EuiButton>
+    </Fragment>
+  )
+}
+
+const WzModuleGuideCentralizedSelector = props => {
+  const [isSelectionOpened, setIsSelectionOpened] = useState(false);
+  const [ isLoading, setIsLoading ] = useState(false);
+  const onClickIsSelectionOpened = () => setIsSelectionOpened(true);
+  const onClickIsSelectionClosed = () => setIsSelectionOpened(false);
+  const onSelectItem = (group) => {
+    props.setGroupSelected(group.name);
+    resetCentralizedState();
+  };
+
+  useEffect(() => {
+    return () => {
+      props.setGroupSelected(false);
+      resetCentralizedState();
+    };
+  }, []);
+
+  const resetCentralizedState = () => {
+    props.setCentralizedConfigurations(false);
+    props.setCentralizedFilters(false);
+  }
+  const newConfiguration = () => {
+    resetCentralizedState();
+    props.setStepsGuideFromScratch();
+  }
+  const loadConfiguration = async () => {
+    props.setCentralizedFilters(false);
+    await props.setStepsGuideLoadedConfiguration();
+  }
+  return (
+    <Fragment>
+      <EuiFlexGroup alignItems='center' responsive={false}>
+        <EuiFlexItem grow={false}>
+          <WzGroupSelector
+            onSelectItem={onSelectItem}
+            modal={{title: 'Select a group'}}
+            isOpen={isSelectionOpened}
+            onClose={onClickIsSelectionClosed}
+            button={<EuiButton onClick={onClickIsSelectionOpened} size='s'>Select a group</EuiButton>}
+          />
+        </EuiFlexItem>
+        {props.groupSelected && (
+          <EuiFlexItem grow={false}>
+            {props.groupSelected}
+          </EuiFlexItem>
+        )}
+      </EuiFlexGroup>
+      {props.groupSelected && (
+        <Fragment>
+          <EuiSpacer size='s' />
+          <EuiText>Load the current configuration or from scratch:</EuiText>
+          <EuiSpacer size='s'/>
+          <EuiFlexGroup>
+            <EuiFlexItem grow={false}>
+              <WzButtonAsync disableWhileLoading onClick={loadConfiguration} onChange={setIsLoading} size='s'>Load</WzButtonAsync>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton onClick={newConfiguration} size='s'>New</EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </Fragment>
+      )}
+      {isLoading && (
+        <Fragment>
+          <div>Loading</div>
+          <WzLoading />
+        </Fragment>
+      )}
+      {props.centralizedConfigurations && (
+        <Fragment>
+          <EuiSpacer size='s'/>
+          <EuiText>Select a configuration:</EuiText>
+          <EuiSpacer size='s'/>
+          <EuiSelectable
+            aria-label='Select a configuration'
+            singleSelection
+            options={props.centralizedConfigurations}
+            listProps={{ bordered: true }}
+            renderOption={option => {
+              return (
+                <div style={{cursor: 'pointer'}}>
+                  {Object.keys(option.filters).length > 0 && Object.keys(option.filters).sort().map(key => <EuiBadge>{`${key}: ${option.filters[key]}`}</EuiBadge>) || 'No filters'}
+                </div>
+              )
+            }}
+            onChange={props.setCentralizedConfigurations}>
+            {list => list }
+          </EuiSelectable>
+        </Fragment>
+      )}
+    </Fragment>
+  )
+}
+
+const WzCalloutActionModuleGuide = ({ name='' , action, loading}) => (
+  <EuiCallOut>
+    <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
+      <EuiFlexItem style={{ marginTop: '0', marginBottom: '0'}}>
+        <EuiText style={{color: 'rgb(0, 107, 180)'}} >
+          <EuiIcon type='iInCircle' color='primary' style={{marginBottom: '7px', marginRight: '6px'}}/>
+          <span>{name} configuration changes will not take effect until a restart is performed.</span>
+        </EuiText>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false} style={{ marginTop: '0', marginBottom: '0'}}>
+        <EuiButton
+          iconType="refresh"
+          onClick={action}
+          isDisabled={loading}
+          isLoading={loading}
+        >
+          Restart
+        </EuiButton>
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  </EuiCallOut>
+)
 
 class WzModuleGuide extends Component {
   constructor(props) {
@@ -87,14 +436,182 @@ class WzModuleGuide extends Component {
     this.guide = Object.keys(moduleGuides).map(key => moduleGuides[key]).find(guide => guide.id === props.guideId);
     this.specificGuide = Boolean(this.props.agent);
     this.state = {
-      modalRestartIsVisble: false,
-      agentTypeSelected: (this.props.agent && ((this.props.agent.id === '000' ? 'manager' : 'agent') || this.props.agent.type)) || (this.guide.avaliable_for_manager ? 'manager' : 'agent'),
-      agentOSSelected: this.props.agent && (typeof this.props.agent.os === 'string' ? this.props.agent.os : (this.props.agent.os.platform === 'windows' ? 'windows' : 'linux')) || ''
+      agentTypeSelected: (this.props.agent && ((this.props.agent.id === '000' ? 'manager' : 'agent') || this.props.agent.type)) || (this.guide.avaliable_for.manager ? 'manager' : 'agent'),
+      agentOSSelected: this.props.agent && (typeof this.props.agent.os === 'string' ? this.props.agent.os : (this.props.agent.os && this.props.agent.os.platform === 'windows' ? 'windows' : 'linux')) || '',
+      clusterNodes: false, //TODO: remove of this state?
+      clusterNodeSelected: false,
+      agentSelected: false,
+      groupSelected: false,
+      centralizedConfigurations: false,
+      centralizedFilters: false,
+      applyChanges: false,
+      showConfig: false,
+      updatingConfiguration: false,
+      actions: []
     };
+    // this.state.steps = [];
     this.state.steps = this.buildInitialSteps(this.guide.steps);
   }
   componentDidMount(){
     window.scrollTo(0, 0);
+    this._isMounted = true;
+  }
+  componentWillUnmount(){
+    this._isMounted = false;
+    this.manageToastsPosition('default');
+  }
+  async componentDidUpdate(prevProps, prevState){
+    // if(prevState.clusterNodeSelected !== this.state.clusterNodeSelected || prevState.agentTypeSelected !== this.state.agentTypeSelected || prevState.agentOSSelected !== this.state.agentOSSelected || prevState.groupSelected !== this.state.groupSelected || !_.isEqual(prevState.agentSelected, this.state.agentSelected)){
+    //   this.cleanStepsGuide();
+    // }
+    
+    if(prevState.agentTypeSelected !== this.state.agentTypeSelected){
+      if(this.state.agentTypeSelected === 'manager'){
+        this.setState({agentOSSelected: 'linux'}, () => this.setState({ steps: this.buildInitialSteps(this.guide.steps)}));
+      }else if(this.state.agentTypeSelected === 'agent'){
+        this.setState({agentOSSelected: 'linux'}, () => this.setState({ steps: this.buildInitialSteps(this.guide.steps)}));
+      }else if(this.state.agentTypeSelected === 'centralized'){
+        this.setState({agentOSSelected: '', centralizedFilters: this.buildCentralizedFilters()}, () => this.setState({ steps: this.buildInitialSteps(this.guide.steps)}));
+      }
+      
+      // this.cleanStepsGuide(() => this.setState({ steps: this.buildInitialSteps(this.guide.steps)}))
+    }
+    if(this.state.agentTypeSelected === 'agent' && prevState.agentOSSelected !== this.state.agentOSSelected){
+      this.setState({ steps: this.buildInitialSteps(this.guide.steps)});
+    }
+    if(this.state.steps.length > 0){
+      this.manageToastsPosition('move');
+    }else if(this.state.steps.length === 0){
+      this.manageToastsPosition('default');
+    }
+  }
+  manageToastsPosition(action){
+    if (action === 'move'){
+      $('.euiGlobalToastList').addClass('euiGlobalToastListWzModuleGuides');
+    }else{
+      $('.euiGlobalToastList').removeClass('euiGlobalToastListWzModuleGuides');
+    }
+  }
+  setStepsGuideLoadedConfiguration = async () => {
+    this.setState({ steps: []});
+    let moduleConfiguration;
+    try{
+      if(this.state.agentTypeSelected === 'manager'){
+        if(this.state.clusterNodeSelected){
+          // Cluster node configuration
+          const moduleConfigResponse = await WzRequest.apiReq('GET', `/cluster/${this.state.clusterNodeSelected}/configuration/${this.guide.api_component}/${this.guide.api_configuration}`, {});
+          moduleConfiguration = ((((moduleConfigResponse || {}).data || {}).data || {}).affected_items || [])[0];
+          if(this.guide.api_component === 'wmodules' && this.guide.api_configuration === 'wmodules'){
+            moduleConfiguration = (moduleConfiguration.wmodules.find(wmodule => wmodule[this.guide.api_module]) || {})[this.guide.api_module] || undefined;
+          }else if(this.guide.api_module){
+            moduleConfiguration = moduleConfiguration[this.guide.api_module];
+          };
+          if(this.guide.api_module === 'integration'){
+            moduleConfiguration = moduleConfiguration.find(integration => integration.name === this.guide.api_integration)
+          };
+          this.setState({ steps: this.buildInitialSteps(this.guide.steps, this.mapAPIConfigurationToStepsGuide(moduleConfiguration)) });
+          this.addToastLoadConfiguration(moduleConfiguration, this.state.clusterNodeSelected);
+        }else{
+          // Manager configuration
+          const moduleConfigResponse = await WzRequest.apiReq('GET', `/manager/configuration/${this.guide.api_component}/${this.guide.api_configuration}`, {});
+          moduleConfiguration = ((((moduleConfigResponse || {}).data || {}).data || {}).affected_items || [])[0];
+          if(this.guide.api_module){
+            moduleConfiguration = moduleConfiguration[this.guide.api_module];
+          };
+          if(this.guide.api_module === 'integration'){
+            moduleConfiguration = moduleConfiguration.find(integration => integration.name === this.guide.api_integration)
+          };
+          this.setState({ steps: this.buildInitialSteps(this.guide.steps, this.mapAPIConfigurationToStepsGuide(moduleConfiguration)) });
+          this.addToastLoadConfiguration(moduleConfiguration, 'Manager');
+        }
+      }else if (this.state.agentTypeSelected === 'agent'){
+        // Agent configuration
+        const moduleConfigResponse = await WzRequest.apiReq('GET', `/agents/${this.state.agentSelected.id}/config/${this.guide.api_component}/${this.guide.api_configuration}`, {});
+        moduleConfiguration = (((moduleConfigResponse || {}).data || {}).data || {});
+        if(this.guide.api_module){
+          moduleConfiguration = moduleConfiguration[this.guide.api_module];
+        };
+        this.setState({ steps: this.buildInitialSteps(this.guide.steps, this.mapAPIConfigurationToStepsGuide(moduleConfiguration)) });
+        this.addToastLoadConfiguration(moduleConfiguration, `${this.state.agentSelected.name} (${this.state.agentSelected.id}) agent`);
+      }else if (this.state.agentTypeSelected === 'centralized'){
+        // Centralized configuration
+        if(!this.state.centralizedConfigurations){
+          const moduleConfigResponse = await WzRequest.apiReq('GET', `/groups/${this.state.groupSelected}/files/agent.conf/json`, {});
+          moduleConfiguration = (((moduleConfigResponse || {}).data || {}).data || []);
+          if(moduleConfigResponse.length <= 1){
+            moduleConfiguration = moduleConfigResponse[0]
+            // if(this.guide.api_module){
+            //   moduleConfiguration = moduleConfiguration[this.guide.api_module];
+            // };
+            this.setState({ centralizedFilters: this.buildCentralizedFilters(moduleConfiguration.filters), steps: this.buildInitialSteps(this.guide.steps, this.mapAPIGroupsConfigurationToStepsGuide(moduleConfiguration.config[this.guide.api_module])) });
+            this.addToastLoadConfiguration(moduleConfiguration, `${this.state.groupSelected} group`);
+          }else{
+            this.setState({ centralizedConfigurations: moduleConfiguration.map(centralizedConfiguration => ({...centralizedConfiguration, label: `${Object.keys(centralizedConfiguration.filters).sort().map(centralizedConfigurationFilter => `${centralizedConfigurationFilter}: ${centralizedConfiguration.filters[centralizedConfigurationFilter]}`).join(' ')}` || 'No filters'})) });
+            this.addToast({
+              title: 'This group has multiple configurations for this module.',
+              color: 'success',
+              time: 5000
+            });
+          }
+        }else{
+          moduleConfiguration = this.state.centralizedConfigurations && this.state.centralizedConfigurations.find(centralizedConfiguration => centralizedConfiguration.checked === 'on');
+          if(moduleConfiguration){
+            this.setState({ centralizedFilters: this.buildCentralizedFilters(moduleConfiguration.filters), steps: this.buildInitialSteps(this.guide.steps, this.mapAPIGroupsConfigurationToStepsGuide(moduleConfiguration.config[this.guide.api_module])) });
+            this.addToastLoadConfiguration(moduleConfiguration, `${this.state.groupSelected} group - ${moduleConfiguration.label}`);
+          }
+        }
+      }
+      if(this.guide.contain_secrets){
+        this.addToast({
+          title: 'There are settings which contain secrets, these were removed for security reasons. You need add them again.',
+          color: 'warning'
+        });
+      }
+    }catch(error){
+      this.addToast({
+        title: 'Load configuration  error',
+        text: typeof error === 'string' ? error : error.message,
+        color: 'danger'
+      })
+    }
+  }
+  setStepsGuideFromScratch = () => {
+    this.setState({ steps: this.buildInitialSteps(this.guide.steps), ...(this.state.agentTypeSelected === 'centralized' ? {centralizedFilters: this.buildCentralizedFilters({})} : {})});
+    this.addToast({
+      title: 'Configuration from scratch',
+      color: 'success'
+    })
+  }
+  addToastLoadConfiguration(moduleConfiguration, name){
+    if(typeof moduleConfiguration === 'undefined'){
+      this.addToast({
+        title: 'Load configuration',
+        text: `${name} doesn't have configuration for this module. Guide was loaded with default values.`,
+        color: 'warning',
+        time: 5000
+      });
+    }else{
+      this.addToast({
+        title: 'Load configuration',
+        text: `${name} configuration was loaded.`,
+        color: 'success'
+      });
+    }
+  }
+  setAgentSelected = (agentSelected) => {
+    this.setState( { agentSelected });
+  }
+  setGroupSelected = (groupSelected) => {
+    this.setState( { groupSelected });
+  }
+  cleanStepsGuide = (callback) => {
+    this.setState({ steps: [] }, callback);
+  }
+  updateClusterNodes = clusterNodes => {
+    this.setState({ clusterNodes });
+  }
+  clusterNodeSelect = (clusterNodeSelected) => {
+    this.setState({ clusterNodeSelected });
   }
   setElementProp(keyID, prop, value) {
     let obj = this.getSettingbyKeyID(keyID);
@@ -108,23 +625,225 @@ class WzModuleGuide extends Component {
     }
     return obj;
   }
-  buildInitialSteps(steps) {
-    return [...steps.map(step => ({ ...step, elements: step.elements && step.elements.filter((element) => this.filterElementByAgent(element)).map((element) => this.buildConfigurationElement(element)) || [] }))].filter((step) => step.elements && step.elements.length);
+  buildManagerSelectorStep(){
+    return {
+      title: 'Select the manager',
+      children: (
+        <WzModuleGuideNodeSelector
+          {...this.props}
+          updateClusterNodes={this.updateClusterNodes}
+          clusterNodeSelect={this.clusterNodeSelect}
+          agentTypeSelected={this.state.agentTypeSelected}
+          setStepsGuideLoadedConfiguration={this.setStepsGuideLoadedConfiguration}
+          setStepsGuideFromScratch={this.setStepsGuideFromScratch}
+          setAgentOSSelected={this.setAgentOSSelected}
+        />
+      )
+    }
   }
-  buildConfigurationElementValue(option) {
-    const defaultValue = option.default_value_linux !== undefined && this.state.agentOSSelected === 'linux' ?
-    option.default_value_linux
-    : option.default_value_windows !== undefined && this.state.agentOSSelected === 'windows' ?
-    option.default_value_windows
-    : option.default_value
+  buildAgentSelectorStep(){
+    return {
+      title: 'Select the agent',
+      children: (
+        <WzModuleGuideAgentSelector
+          {...this.props}
+          updateClusterNodes={this.updateClusterNodes}
+          clusterNodeSelect={this.clusterNodeSelect}
+          agentTypeSelected={this.state.agentTypeSelected}
+          agentSelected={this.state.agentSelected}
+          setAgentSelected={this.setAgentSelected}
+          setStepsGuideLoadedConfiguration={this.setStepsGuideLoadedConfiguration}
+          setStepsGuideFromScratch={this.setStepsGuideFromScratch}
+          agentOSSelected={this.state.agentOSSelected}
+          setAgentOSSelected={this.setAgentOSSelected}
+          cleanStepsGuide={this.cleanStepsGuide}
+          guide={this.guide}
+        />
+      )
+    }
+  }
+  buildCentralizedSelectorStep(){
+    return {
+      title: 'Select the group',
+      children: (
+        <WzModuleGuideCentralizedSelector
+          {...this.props}
+          agentTypeSelected={this.state.agentTypeSelected}
+          agentOSSelected={this.state.agentOSSelected}
+          groupSelected={this.state.groupSelected}
+          updateClusterNodes={this.updateClusterNodes}
+          clusterNodeSelect={this.clusterNodeSelect}
+          setGroupSelected={this.setGroupSelected}
+          setStepsGuideLoadedConfiguration={this.setStepsGuideLoadedConfiguration}
+          setStepsGuideFromScratch={this.setStepsGuideFromScratch}
+          setAgentOSSelected={this.setAgentOSSelected}
+          centralizedConfigurations={this.state.centralizedConfigurations}
+          setCentralizedConfigurations={this.setCentralizedConfigurations}
+          setCentralizedFilters={this.setCentralizedFilters}
+        />
+      )
+    }
+  }
+  renderCentralizedOption(option, keyID){
+    switch (option.type) {
+      case 'input': {
+        const invalid = this.checkInvalidElement(option);
+        return (
+          <Fragment>
+            <EuiFieldText
+              placeholder={option.placeholder}
+              value={option.value}
+              isInvalid={invalid}
+              disabled={option.field_disabled}
+              readOnly={option.field_read_only}
+              onChange={(e) => { this.setCentralizedOptionProp(keyID, 'value', e.target.value); option.onChange && option.onChange(e.target.value) }}
+            />
+            {invalid === true && <EuiText color='danger'>{option.validate_error_message}</EuiText>}
+          </Fragment>
+        )
+      }
+      case 'select':
+        return (
+          <EuiSelect
+            id={option.name}
+            options={option.values}
+            value={option.value}
+            disabled={option.field_disabled}
+            onChange={(e) => {this.setCentralizedOptionProp(keyID, 'value', e.target.value); option.onChange && option.onChange(e.target.value)}}
+            aria-label={`${option.name}-select`}
+          />
+        )
+      default:
+        return null
+    }
+  }
+  setCentralizedOptionProp(keyID, prop, value){
+    this.state.centralizedFilters[keyID][prop] = value;
+    this.setState({ centralizedFilters:  this.state.centralizedFilters });
+  }
+  buildCentralizedSelectorFiltersStep(){
+    return this.state.centralizedFilters ? [{
+      title: 'Add filters to the module configuration block',
+      children: (
+        <Fragment>
+          <EuiText color='subdued'>Add filters to this configuration if it is applicable.</EuiText>
+          <EuiSpacer size='s'/>
+          {this.state.centralizedFilters && this.state.centralizedFilters.map((centralizedFilter, keyID) => (
+            <Fragment key={`centralized-filter-${centralizedFilter.name}`}>
+              <EuiPanel>
+                <EuiDescribedFormGroup
+                  fullWidth
+                  title={(<span>
+                    {centralizedFilter.toggleable && (
+                      <EuiToolTip
+                      position='top'
+                      content={'Enable to configure this setting'}
+                    >
+                      <EuiSwitch label='' showLabel={false} checked={centralizedFilter.enabled} compressed onChange={() => this.setElementProp(keyID, 'enabled', !centralizedFilter.enabled)}/>
+                    </EuiToolTip>
+                    )}
+                    <span> {this.renderOptionSetting(centralizedFilter, keyID, {})}</span>
+                  </span>)}
+                  description={centralizedFilter.description}>
+                    {centralizedFilter.type && (
+                      <EuiFormRow label={centralizedFilter.name}>
+                        {this.renderCentralizedOption(centralizedFilter, keyID)}
+                      </EuiFormRow>
+                    )}
+                </EuiDescribedFormGroup>
+
+                {/* <EuiText>{centralizedFilter.display_name}</EuiText>
+                <EuiSpacer size='s' />
+                <EuiText color='subdued'>{centralizedFilter.description}</EuiText>
+                {centralizedFilter.enabled && (
+                  <Fragment>
+                    <EuiSpacer size='s' />
+                    {this.renderCentralizedOption(centralizedFilter, keyID)}
+                  </Fragment>
+                )} */}
+              </EuiPanel>
+              <EuiSpacer size='s'/>
+            </Fragment>
+          ))}
+        </Fragment>
+      )
+    }] : []
+  }
+  setCentralizedConfigurations = (centralizedConfigurations) => {
+    this.setState({centralizedConfigurations}, () => {
+      if(this.state.centralizedConfigurations){
+        this.setStepsGuideLoadedConfiguration();
+      }
+    });
+  }
+  setCentralizedFilters = (centralizedFilters) => {
+    this.setState({centralizedFilters});
+  }
+  buildCentralizedFilters(filters = {}){
+    const self = this;
+    const centralizedFiltersTypes = [
+      {
+        name: 'name',
+        display_name: 'Agent',
+        description: 'Allows assignment of the block to one particular agent.',
+        type: 'input',
+        ignore_invalid_value: true,
+      },
+      {
+        name: 'os',
+        display_name: 'Operating system',
+        description: 'Allows assignment of the block to an operating system. If an OS is set, the specific settings of another OS will be ignored.',
+        type: 'select',
+        values: [
+          {value: '', text: 'All'},
+          {value: 'Linux', text: 'Linux'},
+          {value: 'Windows', text: 'Windows'},
+        ],
+        default_value: '',
+        ignore_invalid_value: true,
+        onChange(agentOSSelected){
+          self.setState({ agentOSSelected }, () => { /*TODO: */})
+        }
+      },
+      {
+        name: 'profile',
+        display_name: 'Profile',
+        description: 'Allows assignment of a profile name to a block. Any agent configured to use the defined profile may use the block.',
+        type: 'input',
+        ignore_invalid_value: true,
+      }
+    ];
+
+    return centralizedFiltersTypes.map(centralizedFilter => ({
+      ...centralizedFilter,
+      value: filters[centralizedFilter.name] || '',
+      // toggleable: true,
+      enabled: true,
+      collapsible: true,
+      collapsed: false,
+      elements: undefined,
+      show_options: false,
+      options: undefined,
+      show_attributes: false,
+      attributes: undefined
+    }));
+  }
+  buildInitialSteps(steps, config = {}) {
+    return [...steps.map(step => ({ ...step, elements: step.elements && step.elements.filter((element) => this.filterElementByAgent(element)).map((element) => this.buildConfigurationElement(element, config[element.name])) || [] }))].filter((step) => step.elements && step.elements.length);
+  }
+  buildConfigurationElementValue(option, config) {
+    const defaultValue = typeof config !== 'undefined' && typeof config !== 'object' ? config 
+      : option.default_value_linux !== undefined && this.state.agentOSSelected === 'linux' ? option.default_value_linux
+      : option.default_value_windows !== undefined && this.state.agentOSSelected === 'windows' ? option.default_value_windows
+      : option.default_value
     switch (option.type) {
       case 'input':{
-        return defaultValue || '';
+        return option.secret ? '' : (defaultValue || '');
       }
       case 'input-number':
         return defaultValue !== undefined ? defaultValue : 0;
       case 'switch':
-        return defaultValue || false;
+        return (typeof defaultValue === 'string' ? ({ yes: true, no: false })[defaultValue] : defaultValue) || false;
       case 'select':
         return defaultValue !== undefined ? defaultValue : option.values[0].value;
       default:
@@ -134,8 +853,8 @@ class WzModuleGuide extends Component {
   buildConfigurationElementToggleable(option){
     return option.required ? false : option.toggleable !== undefined ? option.toggleable : true;
   }
-  buildConfigurationElementEnabled(option){
-    return option.required ? true : option.enabled !== undefined ? option.enabled : false;
+  buildConfigurationElementEnabled(option, config){
+    return option.required || typeof config !== 'undefined' ? true : option.enabled !== undefined ? option.enabled : false;
   }
   filterElementByAgent(element){
     if(element.agent_os && element.agent_type){
@@ -147,24 +866,12 @@ class WzModuleGuide extends Component {
     }
     return true
   }
-  resetGuideWithNotification = () => {
-    this.resetGuide(true);
-    this.addToast({
-      title: 'The guide was restarted',
-      color: 'success'
-    });
-  }
-  resetGuide(){
-    this.setState({
-      steps: this.buildInitialSteps(this.guide.steps),
-      modalRestartIsVisble: false
-    });
-  }
   addToast({color, title, text, time = 3000}){
     toastNotifications.add({title, text, toastLifeTimeMs: time, color})
   }
   transformStateElementToJSON(element, accum){
-    if (!element.enabled && !element.elements) { return accum}
+    if (this.filterCentralizedOptionOS(element)){ return accum }
+    if (!element.enabled && !element.elements) { return accum }
     if (element.repeatable) {
       if (!accum[element.name]) {
         accum[element.name] = []
@@ -220,41 +927,141 @@ class WzModuleGuide extends Component {
     }
   }
   transformToXML() {
-    const json = this.transformStateToJSON();
-    return (this.guide.wodle_name) ? 
-    XMLBeautifier(js2xmlparser.parse('configuration', { wodle: {'@': {name: this.guide.wodle_name}, ...json}}, js2xmlOptionsParser).replace("<?xml version=\"1.0\"?>\n", "").replace("<configuration>\n", "").replace("</configuration>","").replace("    <wodle", "<wodle"))
-    : XMLBeautifier(js2xmlparser.parse(this.guide.xml_tag || this.guide.id, json, js2xmlOptionsParser).replace("<?xml version=\"1.0\"?>\n", ""));
+    let json = this.transformStateToJSON();
+    if(this.guide.wodle_name){
+      json = { wodle: {'@': {name: this.guide.wodle_name}, ...json}};
+    }else{
+      // json = { [this.guide.xml_tag || this.guide.id]: {...json } };
+      json = { 
+        ...(this.guide.xml_tag === '' ? {...json } : {[this.guide.xml_tag || this.guide.id]: {...json }})
+      };
+    };
+    if(this.state.agentTypeSelected === 'centralized'){
+      if(this.state.centralizedFilters){
+        const agent_config = this.state.centralizedFilters
+          .filter(centralizedFilter => (centralizedFilter.type === 'input' && centralizedFilter.value) || (centralizedFilter.type === 'select' && centralizedFilter.value) )
+          .reduce((accum, centralizedFilter) => {
+            accum['@'][centralizedFilter.name] = centralizedFilter.value;
+            return accum
+        },{'@': {}});
+        json = { agent_config: {...agent_config, ...json}};
+      }
+    }else{
+      json = { ossec_config: {...json}};
+    }
+    return XMLBeautifier(js2xmlparser.parse('configuration', json, js2xmlOptionsParser).replace("<?xml version=\"1.0\"?>\n", "").replace("<configuration>\n    ", "").replace("</configuration>",""));
   }
-  buildConfigurationElement(element, params = {}) {
+  buildConfigurationElement(element, config, params = {}) {
     return {
       ...element,
-      value: this.buildConfigurationElementValue(element),
+      value: this.buildConfigurationElementValue(element, typeof config === 'object' ? config['#'] : config),
       toggleable: this.buildConfigurationElementToggleable(element),
-      enabled: this.buildConfigurationElementEnabled(element),
+      enabled: this.buildConfigurationElementEnabled(element, config),
       collapsible: (element.attributes || element.options) ? true : false,
       collapsed: (element.attributes || element.options) ? false : undefined,
-      elements: !params.ignore_repeatable && element.repeatable ? (element.repeatable_insert_first ? [this.buildConfigurationElement({...element, ...element.repeatable_insert_first_properties }, {ignore_repeatable: true})] : []) : undefined,
-      show_options: element.show_options || false,
+      elements: !params.ignore_repeatable && element.repeatable ? (
+        config && config.length > 0 ? config.map(e => this.buildConfigurationElement({...element }, e, {ignore_repeatable: true}))
+        : element.repeatable_insert_first ? [this.buildConfigurationElement({...element, ...element.repeatable_insert_first_properties }, config && config[element.name], {ignore_repeatable: true})]
+        : []
+      ) : undefined,
+      show_options: typeof element.show_options !== 'undefined' ? element.show_options : (element.options && element.options.filter((option) => this.filterElementByAgent(option)).length || false),
       options: element.options && element.options.filter((option) => this.filterElementByAgent(option)).map(option => ({ 
         ...option, 
-        value: this.buildConfigurationElementValue(option),
+        value: this.buildConfigurationElementValue(option, config && typeof config === 'object' && config[option.name] && typeof config[option.name] === 'object'? config[option.name]['#'] : config && config[option.name]  ),
         toggleable: this.buildConfigurationElementToggleable(option),
-        enabled: this.buildConfigurationElementEnabled(option),
-        elements: option.repeatable ? (option.repeatable_insert_first ? [this.buildConfigurationElement({...option, ...option.repeatable_insert_first_properties}, {ignore_repeatable: true})] : []) : undefined,
-        attributes: option.attributes && option.attributes.length ? option.attributes.map((optionAtribute) => this.buildConfigurationElement(optionAtribute)) : undefined
+        enabled: this.buildConfigurationElementEnabled(option, config && config[option.name]),
+        elements: option.repeatable ? (
+          config && config[option.name] && config[option.name].length > 0 ? config[option.name].map(e => this.buildConfigurationElement({...option }, e, {ignore_repeatable: true}))
+          : option.repeatable_insert_first ? [this.buildConfigurationElement({...option, ...option.repeatable_insert_first_properties }, config && config[option.name], {ignore_repeatable: true})]
+          : []
+        ) : undefined,
+        attributes: option.attributes && option.attributes.length ? option.attributes.map((optionAtribute) => this.buildConfigurationElement(optionAtribute, config && config[option.name] && config[option.name]['@'] && config[option.name]['@'][optionAtribute.name])) : undefined
       })) || undefined,
-      show_attributes: element.show_attributes || false,
-      attributes: element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).map(attribute => ({ 
+      // show_attributes: element.show_attributes || false,
+      show_attributes: typeof element.show_attributes !== 'undefined' ? element.show_attributes : (element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).length || false),
+      attributes: element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).map(attribute => {return ({ 
         ...attribute,
-        value: this.buildConfigurationElementValue(attribute),
+        value: this.buildConfigurationElementValue(attribute, config && config['@'] && typeof config['@'][attribute.name] !== 'undefined' ? config['@'][attribute.name] : undefined),
         toggleable: this.buildConfigurationElementToggleable(attribute),
-        enabled: this.buildConfigurationElementEnabled(attribute)
-      })) || undefined
+        enabled: this.buildConfigurationElementEnabled(attribute, config && config['@'] && typeof config['@'][attribute.name] !== 'undefined' ? config['@'][attribute.name] : undefined)
+      })}) || undefined
+    }
+  }
+  mapAPIConfigurationToStepsGuide(config){
+    return this.guide.mapAgentConfigurationAPIResponse && config ? this.guide.mapAgentConfigurationAPIResponse(config) : config;
+  }
+  mapAPIGroupsConfigurationToStepsGuide(config){
+    return this.guide.mapCentralizedConfigurationAPIResponse && config ? this.guide.mapCentralizedConfigurationAPIResponse(config) : config;
+  }
+  filterCentralizedOptionOS(element){
+    return this.state.agentTypeSelected === 'centralized' && this.state.agentOSSelected && element.agent_os && element.agent_os !== this.state.agentOSSelected.toLowerCase()
+  }
+  async updateConfiguration(text) {
+    try {
+      if(this.state.agentTypeSelected === 'manager'){
+        this.state.clusterNodeSelected
+          ? await saveFileCluster(
+              text,
+              this.state.clusterNodeSelected
+            )
+          : await saveFileManager(text);
+        this.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type="check" />
+              &nbsp;
+              <span>
+                <b>{this.state.clusterNodeSelected || 'Manager'}</b> configuration
+                has been updated. Changes will not take effect until a restart is performed.
+              </span>
+            </Fragment>
+          ),
+          color: 'success'
+        });
+      }else if(this.state.agentTypeSelected === 'centralized'){
+        await WzRequest.apiReq(
+          'PUT',
+          `/groups/${this.state.groupSelected}/configuration`,
+          {body: text}
+        )
+        this.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type="check" />
+              &nbsp;
+              <span>
+                <b>{this.state.groupSelected}</b> group configuration
+                has been updated
+              </span>
+            </Fragment>
+          ),
+          color: 'success'
+        });
+      }
+    } catch (error) {
+      if (error.details) {
+        this.addToast({
+          title: (
+            <Fragment>
+              <EuiIcon type="alert" />
+              &nbsp;
+              <span>
+                File {this.state.agentTypeSelected === 'manager' ? 'ossec.conf' : 'agent.conf'} saved, but there were found several error while
+                validating the configuration.
+              </span>
+            </Fragment>
+          ),
+          color: 'warning',
+          text: error.details
+        });
+      } else {
+        return Promise.reject(error);
+      }
     }
   }
   addElementToStep(keyID, element, params){
     const obj = this.getSettingbyKeyID(keyID);
-    obj.push(this.buildConfigurationElement(element, params));
+    obj.push(this.buildConfigurationElement(element, undefined, params));
     this.setState({ steps: this.state.steps });
   }
   removeElementOfStep(keyID) {
@@ -263,8 +1070,6 @@ class WzModuleGuide extends Component {
     this.setState({ steps: this.state.steps });
   }
   renderSteps() {
-    const xmlConfig = this.transformToXML();
-
     const configurationSteps = this.state.steps.map((step, key) => ({
       title: step.title || '',
       children: (
@@ -290,172 +1095,156 @@ class WzModuleGuide extends Component {
       status: this.checkInvalidElements(step.elements) ? 'danger' : 'complete'
     }));
     const invalidConfiguration = configurationSteps.reduce((accum, step) => accum || step.status === 'danger', false);
+      // || (this.state.centralizedFilters ? this.checkInvalidElements(this.state.centralizedFilters) : false);
 
-    return [
-      ...configurationSteps,
-      {
-        title: !invalidConfiguration ? 'Edit ossec.conf' : 'Configuration error',
-        children: (
-          <Fragment>
-            {!invalidConfiguration ? (
-              <Fragment>
-                <EuiCodeBlock
-                  language="xml"
-                  color="dark"
-                  isCopyable>
-                  {xmlConfig}
-                </EuiCodeBlock>
-                <EuiSpacer size='s'/>
-                {this.state.agentTypeSelected === 'manager' ? (
-                  <Fragment>
-                    <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>Management</EuiCode> {'>'} <EuiCode>Configuration</EuiCode> {'>'} <EuiCode>Edit configuration</EuiCode>, paste configuration, save and restart manager or node.</EuiText>
-                  </Fragment>
-                  ) : this.state.agentOSSelected === 'linux' ? (
-                    <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>/var/ossec/etc</EuiCode> in Linux agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
-                    ) : (
-                      <EuiText>When you finish of configure the module, copy above XML configuration. Go to <EuiCode>C:\Program Files (x86)\ossec-agent</EuiCode> in Windows agent, include the above configuration in <EuiCode>ossec.conf</EuiCode> and restart the agent.</EuiText>
-                )}
-                <EuiSpacer size='s' />
-                <EuiText>The above section must be located within the top-level <EuiCode>{`<ossec_config>`}</EuiCode> tag.</EuiText>
-              </Fragment>
-              ) : (
-                <EuiText color='danger'>There is an error in the configuration, please check fields that have errors.</EuiText>
-            )}
-          </Fragment>
-        ),
-        status: invalidConfiguration ? 'danger' : 'complete'
-      }
+    const guideSteps = [
+      // ---- DON'T DELETE THIS ----
+      // ...(this.state.agentTypeSelected === 'manager' ? [this.buildManagerSelectorStep()] : []), 
+      // ...(this.state.agentTypeSelected === 'agent' ? [this.buildAgentSelectorStep()] : []),
+      // ...(this.state.agentTypeSelected === 'centralized' ? [this.buildCentralizedSelectorStep()] : []),
+      ...(this.state.agentTypeSelected === 'centralized' && this.state.centralizedFilters ? this.buildCentralizedSelectorFiltersStep() : []),
+      // ---- DON'T DELETE THIS ----
+      ...(configurationSteps.length > 0 ? configurationSteps : []),
     ]
+
+    return { guideSteps, invalidConfiguration }
   }
-  renderOption(guideOption, keyID, options) {
-    return (
+  renderOption(guideOption, keyID, options = {}){
+    return !guideOption.elements && (
       <Fragment>
-        {!guideOption.elements ? (
-          <EuiPanel>
-            {this.renderOptionSetting(guideOption, keyID, options)}
-            {guideOption.enabled && guideOption.attributes && guideOption.attributes.length && ((guideOption.collapsible && !guideOption.collapsed) || !guideOption.collapsible)? (
-              <Fragment>
-                {guideOption.type && (<EuiSpacer size='m' />)}
+        <EuiPanel>
+          <EuiDescribedFormGroup
+            fullWidth
+            title={(<span>
+              {guideOption.toggleable && (
                 <EuiToolTip
-                  position='top'
-                  content='Show / hide attributes'
-                >
-                  <EuiButtonToggle
-                    label='Attributes'
-                    color={this.checkInvalidElements(guideOption.attributes) ? 'danger' : 'primary'}
-                    fill={guideOption.show_attributes}
-                    iconType={!guideOption.show_attributes ? 'eye' : 'eyeClosed'}
-                    onChange={() => this.setElementProp(keyID, 'show_attributes', !guideOption.show_attributes)}
-                    style={{marginRight: '4px'}}
-                  />
-                </EuiToolTip>
-                {guideOption.show_attributes && guideOption.attributes && guideOption.attributes.length && (
-                  <Fragment>
-                    <EuiSpacer size='m' />
-                    <EuiFlexGrid columns={2} style={{ marginLeft: '8px' }}>
-                      {guideOption.attributes.map((guideSubOption, key) => (
-                        <EuiFlexItem key={`module-guide-${guideOption.name}-${guideSubOption.name}`}>
-                          {this.renderOptionSetting(guideSubOption, [...keyID, 'attributes', key], { ignore_description: true })}
-                        </EuiFlexItem>
-                      ))}
-                    </EuiFlexGrid>
-                  </Fragment>
-                )}
-              </Fragment>
-            ) : null}
-            {guideOption.enabled && guideOption.options && guideOption.options.length && ((guideOption.collapsible && !guideOption.collapsed) || !guideOption.collapsible)? (
-              <Fragment>
-                {guideOption.show_attributes && (<EuiSpacer size='m' />)}
-                <EuiToolTip
-                  position='top'
-                  content='Show / hide options'
-                >
-                  <EuiButtonToggle
-                    label='Options'
-                    color={this.checkInvalidElements(guideOption.options) ? 'danger' : 'primary'}
-                    fill={guideOption.show_options}
-                    iconType={!guideOption.show_options ? 'eye' : 'eyeClosed'}
-                    onChange={() => this.setElementProp(keyID, 'show_options', !guideOption.show_options)}
-                    style={{marginRight: '4px'}}
-                  />
-                </EuiToolTip>
-                {guideOption.show_options && guideOption.options && guideOption.options.length && (
-                  <Fragment>
-                    <EuiSpacer size='m' />
-                    {guideOption.options.map((guideSubOption, key) => {
-                      return !guideSubOption.elements ? (
-                      <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
-                        <EuiFlexGroup>
-                          <EuiFlexItem key={`module-guide-${guideOption.name}-${guideSubOption.name}`}>
-                            {/* {this.renderOptionSetting(guideSubOption, [...keyID, 'options', key], { ignore_description: true })} */}
-                            {this.renderOption(guideSubOption, [...keyID, 'options', key])}
-                            <EuiSpacer size='s'/>
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      </Fragment>
-                    ) : (
-                      <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
-                        {guideSubOption.elements.map((guideSubOptionElement, keyGuideSubOptionElement) => (
-                          <Fragment key={`module-guide-${guideOption.name}-${guideSubOption.name}-${keyGuideSubOptionElement}`}>
-                            <EuiFlexGroup>
-                              <EuiFlexItem>
-                                {this.renderOption(guideSubOptionElement, [...keyID,'options', key,'elements',keyGuideSubOptionElement])}
-                              </EuiFlexItem>
-                            </EuiFlexGroup>
-                            <EuiSpacer size='s'/>
-                          </Fragment>
-                        ))}
-                        <EuiFlexGroup justifyContent='center'>
-                          <EuiFlexItem grow={false}>
-                          <EuiToolTip
-                            position='top'
-                            content={guideSubOption.description}
-                          >
-                            <EuiButtonEmpty iconType='plusInCircle' onClick={() => this.addElementToStep([...keyID,'options', key,'elements'], guideSubOption, {ignore_repeatable: true})}>Add {guideSubOption.name}</EuiButtonEmpty>
-                          </EuiToolTip>
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      </Fragment>
-                    )
-                    })}
-                  </Fragment>
-                )}
-              </Fragment>
-            ) : null}
-          </EuiPanel>
-        ) : (
-          <Fragment>
-            {guideOption.elements.map((guideSubOption, key) => (
-              <Fragment key={`module-guide-${guideSubOption.name}-${key}`}>
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    {this.renderOption(guideSubOption, [...keyID, 'elements', key])}
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-                <EuiSpacer size='s'/>
-              </Fragment>
-            ))}
-            <EuiFlexGroup justifyContent='center'>
-              <EuiFlexItem grow={false}>
-              <EuiToolTip
                 position='top'
-                content={guideOption.description}
+                content={this.filterCentralizedOptionOS(guideOption) ? 'Disabled due to other OS is selected' : 'Enable to configure this setting'}
               >
-                <EuiButtonEmpty iconType='plusInCircle' onClick={() => this.addElementToStep([...keyID,'elements'], guideOption, {ignore_repeatable: true})}>Add {guideOption.name}</EuiButtonEmpty>
+                <EuiSwitch label='' showLabel={false} checked={guideOption.enabled} disabled={this.filterCentralizedOptionOS(guideOption)} compressed onChange={() => this.setElementProp(keyID, 'enabled', !guideOption.enabled)}/>
               </EuiToolTip>
-              </EuiFlexItem>
-            </EuiFlexGroup>
+              )}
+              <span> {this.renderOptionSetting(guideOption, keyID, {})}</span>
+            </span>)}
+            description={guideOption.description}>
+              {guideOption.type && (
+                <EuiFormRow label={guideOption.name}>
+                  {this.renderOptionType(guideOption, keyID)}
+                </EuiFormRow>
+              )}
+          </EuiDescribedFormGroup>
+          {guideOption.enabled && guideOption.attributes && guideOption.attributes.length > 0 && (
+            <Fragment>
+              {guideOption.type && (<EuiHorizontalRule margin='s'/>)}
+              <EuiButtonToggle
+                label='Advanced attributes'
+                isEmpty
+                color={this.checkInvalidElements(guideOption.attributes) ? 'danger' : 'primary'}
+                iconType={guideOption.show_attributes ? 'arrowDown' : 'arrowRight'}
+                iconSide='right'
+                onChange={() => this.setElementProp(keyID, 'show_attributes', !guideOption.show_attributes)}
+                style={{marginRight: '4px'}}
+                size='s'
+                title={null}
+              />
+              {guideOption.show_attributes && guideOption.attributes && guideOption.attributes.length && (
+                <Fragment>
+                  <EuiSpacer size='m' />
+                  <EuiFlexGrid columns={2} style={{ marginLeft: '8px' }}>
+                    {guideOption.attributes.map((guideSubOption, key) => (
+                      <EuiFlexItem key={`module-guide-${guideOption.name}-${guideSubOption.name}`}>
+                        {this.renderOption(guideSubOption, [...keyID, 'attributes', key], { ignore_description: true })}
+                      </EuiFlexItem>
+                    ))}
+                  </EuiFlexGrid>
+                </Fragment>
+              )}
+            </Fragment>
+          )}
+          {guideOption.enabled && guideOption.options && guideOption.options.length && ((guideOption.collapsible && !guideOption.collapsed) || !guideOption.collapsible)? (
+            <Fragment>
+              {guideOption.show_attributes && (<EuiHorizontalRule margin='s'/>)}
+              <EuiButtonToggle
+                label='Options'
+                isEmpty
+                color={this.checkInvalidElements(guideOption.options) ? 'danger' : 'primary'}
+                iconType={guideOption.show_options ? 'arrowDown' : 'arrowRight'}
+                iconSide='right'
+                onChange={() => this.setElementProp(keyID, 'show_options', !guideOption.show_options)}
+                style={{marginRight: '4px'}}
+                size='s'
+              />
+              {guideOption.show_options && guideOption.options && guideOption.options.length && (
+                <Fragment>
+                  <EuiSpacer size='m' />
+                  {guideOption.options.map((guideSubOption, key) => {
+                    return !guideSubOption.elements ? (
+                    <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
+                      <EuiFlexGroup>
+                        <EuiFlexItem key={`module-guide-${guideOption.name}-${guideSubOption.name}`}>
+                          {this.renderOption(guideSubOption, [...keyID, 'options', key])}
+                          <EuiSpacer size='s'/>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </Fragment>
+                  ) : (
+                    <Fragment key={`${guideOption.name}-options-${guideSubOption.name}`}>
+                      {guideSubOption.elements.map((guideSubOptionElement, keyGuideSubOptionElement) => (
+                        <Fragment key={`module-guide-${guideOption.name}-${guideSubOption.name}-${keyGuideSubOptionElement}`}>
+                          <EuiFlexGroup>
+                            <EuiFlexItem>
+                              {this.renderOption(guideSubOptionElement, [...keyID,'options', key,'elements',keyGuideSubOptionElement])}
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+                          <EuiSpacer size='s'/>
+                        </Fragment>
+                      ))}
+                      <EuiFlexGroup justifyContent='center'>
+                        <EuiFlexItem grow={false}>
+                        <EuiToolTip
+                          position='top'
+                          content={`Add more ${guideSubOption.display_name || guideSubOption.name} to configuration`}
+                        >
+                          <EuiButtonEmpty iconType='plusInCircle' onClick={() => this.addElementToStep([...keyID,'options', key,'elements'], guideSubOption, {ignore_repeatable: true})}>Add {guideSubOption.display_name || guideSubOption.name}</EuiButtonEmpty>
+                        </EuiToolTip>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </Fragment>
+                  )
+                  })}
+                </Fragment>
+              )}
+            </Fragment>
+          ) : null}
+        </EuiPanel>
+      </Fragment>
+    ) || (
+      <Fragment>
+        {guideOption.elements.length > 0 && guideOption.elements.map((option, index) => (
+          <Fragment key={`${guideOption.name}-elements-${option.name}-${index}`}>
+            {this.renderOption(option,[...keyID, 'elements', index])}
           </Fragment>
-        )}
-        {/* <EuiSpacer size='m' /> */}
+        )
+        ).reduce((prev, curr) => [prev, <EuiSpacer key={String(keyID)} size='s'/>, curr])}
+        <EuiSpacer />
+        <EuiFlexGroup justifyContent='center'>
+          <EuiFlexItem grow={false}>
+          <EuiToolTip
+            position='top'
+            content={`Add more ${guideOption.display_name || guideOption.name}  to configuration`}
+          >
+            <EuiButtonEmpty iconType='plusInCircle' onClick={() => this.addElementToStep([...keyID,'elements'], guideOption, {ignore_repeatable: true})}>Add {guideOption.display_name || guideOption.name}</EuiButtonEmpty>
+          </EuiToolTip>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </Fragment>
     )
   }
-  renderOptionSetting(guideOption, keyID, options = {}) {
-    const checkboxLabel = (
+  renderOptionSetting(guideOption, keyID, options = {}){
+    return (
       <Fragment>
-        <EuiText color={guideOption.enabled ? 'default' : 'subdued'} style={{ display: 'inline' }} size='m'>
-          <span>{guideOption.name}</span>
+        <span className={`euiTextColor euiTextColor--${guideOption.enabled ? 'default' : 'subdued'}`} style={{ display: 'inline' }}>
+          <span>{guideOption.display_name || guideOption.name}</span>
           {guideOption.description && options.ignore_description && (
             <span style={{margin: '0 0 0 6px'}}>
               <EuiToolTip
@@ -492,7 +1281,7 @@ class WzModuleGuide extends Component {
                 position='top'
                 content={`only for ${capitalize(guideOption.agent_os)}`}
               >
-                <i className={`fa fa-${guideOption.agent_os} AgentsTable__soBadge AgentsTable__soBadge--${guideOption.agent_os}`} aria-hidden="true"/>
+                {renderOSIcon(guideOption.agent_os)}
               </EuiToolTip>
             </span>
           )}
@@ -500,66 +1289,13 @@ class WzModuleGuide extends Component {
             <span style={{margin: '0 0 0 6px'}}>
               <EuiToolTip
                 position='top'
-                content='Remove this option'
+                content='Remove this setting'
               >
-                <EuiButtonIcon color='danger' iconType='minusInCircle' onClick={() => this.removeElementOfStep(keyID)}/>
+                <EuiButtonIcon color='danger' iconType='cross' onClick={() => this.removeElementOfStep(keyID)} aria-label='Remove setting'/>
               </EuiToolTip>
             </span>
           )}
-          {guideOption.enabled && guideOption.collapsible && (
-            <Fragment>
-              <EuiToolTip
-                position='top'
-                content='Show / hide option'
-              >
-              <EuiButtonToggle
-                label=''
-                color={this.checkInvalidElements([guideOption]) ? 'danger' : 'primary'}
-                isEmpty
-                isIconOnly
-                size='s'
-                iconType={guideOption.collapsed ? 'eye' : 'eyeClosed'}
-                onChange={() => this.setElementProp(keyID, 'collapsed', !guideOption.collapsed)}
-              />
-            </EuiToolTip>
-            </Fragment>
-          )}
-        </EuiText>
-      </Fragment>)
-    return (
-      <Fragment>
-        {guideOption.toggleable ? (
-          <EuiCheckbox
-            id={[...keyID, guideOption.name].join('-')}
-            label={checkboxLabel}
-            style={{ display: 'inline' }}
-            checked={guideOption.enabled}
-            onChange={() => {
-              this.setElementProp(keyID, 'enabled', !guideOption.enabled)
-              if(guideOption.collapsible){
-                this.setElementProp(keyID, 'collapsed', false)
-              }
-            }}
-          />
-        ) : checkboxLabel}
-        {!options.ignore_description && guideOption.description && (
-          <Fragment>
-            <EuiSpacer size='xs' />
-            <EuiText color='subdued'>{guideOption.description}</EuiText>
-          </Fragment>
-        )}
-        {((guideOption.collapsible && !guideOption.collapsed) || !guideOption.collapsible) && (
-          <Fragment>
-            <div>
-              {guideOption.enabled && (<EuiSpacer size='s' />)}
-              {typeof guideOption.enabled === 'boolean' ?
-                (guideOption.enabled ? this.renderOptionType(guideOption, keyID) : null)
-                : this.renderOptionType(guideOption, keyID)
-              }
-            </div>
-            {/* {typeof guideOption.enabled === 'boolean' && (<EuiSpacer size='m' />)} */}
-          </Fragment>
-        )}
+        </span>
       </Fragment>
     )
   }
@@ -574,19 +1310,20 @@ class WzModuleGuide extends Component {
     }, false)
   }
   checkInvalidElement(element) {
-    if (!element.enabled) { return undefined }
+    if (!element.enabled) { return undefined };
+    if(element.ignore_invalid_value){ return false };
     switch (element.type) {
       case 'input': {
         return (element.validate && !element.validate(element))
         || (element.validate_regex && !element.value.match(element.validate_regex))
-        || (!element.value)
+        || (!element.value);
       }
       case 'input-number': {
         return (element.validate && !element.validate(element))
         || (element.values && (element.values.min !== undefined && element.values.max !== undefined && element.value < element.values.min || element.value > element.values.max))
         || (element.values && (element.values.min !== undefined && element.values.max === undefined && element.value < element.values.min))
         || (element.values && (element.values.min === undefined && element.values.max !== undefined && element.value > element.values.max))
-        || (element.value === '')
+        || (element.value === '');
       }
       default:
         return undefined;
@@ -602,11 +1339,11 @@ class WzModuleGuide extends Component {
               placeholder={guideOption.placeholder}
               value={guideOption.value}
               isInvalid={invalid}
-              disabled={guideOption.field_disabled}
+              disabled={guideOption.field_disabled || !guideOption.enabled}
               readOnly={guideOption.field_read_only}
               onChange={(e) => { this.setElementProp(keyID, 'value', e.target.value) }}
             />
-            {invalid === true && <EuiText color='danger'>{guideOption.validate_error_message}</EuiText>}
+            {invalid === true && <EuiText color='danger' size='s'>{guideOption.validate_error_message}</EuiText>}
           </Fragment>
         )
       }
@@ -620,11 +1357,11 @@ class WzModuleGuide extends Component {
               min={guideOption.values && guideOption.values.min}
               max={guideOption.values && guideOption.values.max}
               isInvalid={invalid === true}
-              disabled={guideOption.field_disabled}
+              disabled={guideOption.field_disabled || !guideOption.enabled}
               readOnly={guideOption.field_read_only}
               onChange={(e) => { this.setElementProp(keyID, 'value', e.target.value) }}
             />
-            {invalid === true && <EuiText color='danger'>{guideOption.validate_error_message}</EuiText>}
+            {invalid === true && <EuiText color='danger' size='s'>{guideOption.validate_error_message}</EuiText>}
           </Fragment>
         )
       }
@@ -633,7 +1370,7 @@ class WzModuleGuide extends Component {
           <EuiSwitch
             label={guideOption.values && guideOption.values[String(guideOption.value)] || ({ true: 'yes', false: 'no' })[String(guideOption.value)]}
             checked={guideOption.value}
-            disabled={guideOption.field_disabled}
+            disabled={guideOption.field_disabled || !guideOption.enabled}
             onChange={(e) => { this.setElementProp(keyID, 'value', e.target.checked) }}
           />
         )
@@ -643,7 +1380,7 @@ class WzModuleGuide extends Component {
             id={guideOption.name}
             options={guideOption.values}
             value={guideOption.value}
-            disabled={guideOption.field_disabled}
+            disabled={guideOption.field_disabled || !guideOption.enabled}
             onChange={(e) => this.setElementProp(keyID, 'value', e.target.value)}
             aria-label={`${guideOption.name}-select`}
           />
@@ -668,24 +1405,124 @@ class WzModuleGuide extends Component {
         return guideOption.value
     }
   }
-  toggleResetGuideModal = () => {
-    this.setState({ modalRestartIsVisble: !this.state.modalRestartIsVisble });
+  toggleApplyChanges = () => {
+    this.setState({ applyChanges: !this.state.applyChanges });
   }
-  onChangeAgentTypeSelected = (agentTypeSelected) => {
-    this.setState({ agentTypeSelected, agentOSSelected: agentTypeSelected === 'agent' ? 'linux' : '' }, () => {
-      this.resetGuide()
-    });
+  toggleShowConfig = () => {
+    this.setState({ showConfig: !this.state.showConfig });
   }
-  onChangeAgentOSSelected(agentOSSelected){
-    this.setState({ agentOSSelected }, () => {
-      this.resetGuide()
-    });
+  applyChanges = async () =>{
+    this.setState({ applyChanges: false });
+    try{
+      let configuration;
+      this.setState({ updatingConfiguration: true });
+      if(this.state.agentTypeSelected === 'manager'){
+        configuration = await fetchFile(this.state.clusterNodeSelected);
+      }else if(this.state.agentTypeSelected === 'centralized'){
+        const configurationResponse = await WzRequest.apiReq('GET', `/groups/${this.state.groupSelected}/files/agent.conf/xml`, {});
+        configuration = ((configurationResponse || {}).data || {}).data || '';
+      }
+      let xmlTag;
+      if(this.guide.wodle_name){
+        xmlTag = {
+          open: `<wodle name="${this.guide.wodle_name}">`,
+          close: '</wodle>'
+        }
+      }else{
+        const tag = this.guide.xml_tag || this.guide.id;
+        xmlTag = {
+          open: `<${tag}>`,
+          close: `</${tag}>`
+        }
+      }
+      const regexp = new RegExp(`${xmlTag.open}[\\s\\S]*?${xmlTag.close}`, 'g');
+
+      if(configuration.match(regexp)){
+        configuration = configuration.replace(regexp, '');
+      }
+      //TODO: add configuration block if this isn't exists
+      const parentTag = (this.state.agentTypeSelected === 'manager' || this.state.agentTypeSelected === 'agent') ? 'ossec_config'
+        : this.state.agentTypeSelected === 'centralized' ? 'agent_config' : false;
+      const regexpParent = new RegExp(`<${parentTag}>[\\t\\n ]*<\\/${parentTag}>`,'g');
+      await this.updateConfiguration(`${configuration}\n${this.transformToXML()}`.replace(regexpParent,''));
+      
+    if(this.state.agentTypeSelected === 'manager'){
+      const newAction = {type: 'manager', isNode: Boolean(this.state.clusterNodeSelected), name: this.state.clusterNodeSelected || 'Manager', loading: false };
+      this.setState({ 
+        actions: [...this.state.actions.filter((action,index,actions) => action.type !== newAction.type || action.isNode !== newAction.isNode || action.name !== newAction.name), newAction],
+        updatingConfiguration: false
+      });
+    }
+
+    }catch(error){
+      this.setState({ updatingConfiguration: false });
+      this.addToast({
+        title: (
+          <Fragment>
+            <EuiIcon type="alert" />
+            &nbsp;
+            <span>Error saving configuration</span>
+          </Fragment>
+        ),
+        color: 'danger',
+        text: typeof error === 'string' ? error : error.message
+      });
+    }
+  }
+  openRestartAgentManagerModal = (action) => {
+    this.setState({ restartAgentManagerModal: true, restartAgentManagerAction: action });
+  }
+  closeRestartAgentManagerModal = () => {
+    this.setState({ restartAgentManagerModal: false, restartAgentManagerAction: false });
+  }
+  restartAgentManager = async () => {
+    const { restartAgentManagerAction } = this.state;
+    try{
+      let removeAction;
+      this.setState({ restartAgentManagerModal: false, actions: this.state.actions.map(action => { if (action === restartAgentManagerAction){removeAction = {...action, loading: true}; return removeAction}else{return action}}) });
+      if(restartAgentManagerAction.type === 'manager'){
+        await restartNodeSelected(restartAgentManagerAction.isNode ? restartAgentManagerAction.name : undefined, this.props.updateWazuhNotReadyYet);
+        this.props.updateWazuhNotReadyYet('');
+        this.addToast({
+          title: <span><strong>{restartAgentManagerAction.isNode ? restartAgentManagerAction.name : 'Manager'}</strong> was restarted</span>,
+          color: 'success'
+        });
+        this.setState({actions: this.state.actions.filter(action => action !== removeAction) });
+      }
+    }catch(error){
+      this.setState({ actions: this.state.actions.map(action => action === restartAgentManagerAction ? {...action, loading: false} : action) })
+      this.addToast({
+        title: 'Error occured while restarting',
+        text: typeof error === 'string' ? error : error.message,
+        color: 'danger'
+      });
+    }
+  }
+  setAgentTypeSelected = (agentTypeSelected) => {
+    this.setState({ agentTypeSelected, agentOSSelected: agentTypeSelected === 'manager' ? 'linux' : '' });
+  }
+  setAgentOSSelected = (agentOSSelected) => {
+    this.setState({ agentOSSelected });
   }
   render() {
     const { guide } = this;
-    const { modalRestartIsVisble, agentTypeSelected, agentOSSelected } = this.state;
+    const { agentTypeSelected, agentOSSelected, applyChanges, actions, restartAgentManagerModal, showConfig, updatingConfiguration } = this.state;
+    const { guideSteps, invalidConfiguration } = this.renderSteps(); 
+    const actionRestartManager = this.state.actions.find(action => action.type === 'manager' && action.name === this.state.clusterNodeSelected);
+    let moduleConfigurationEntity;
+
+    if(this.state.agentTypeSelected === 'manager'){
+      moduleConfigurationEntity = this.state.clusterNodeSelected || 'Manager';
+    }else if(this.state.agentTypeSelected === 'agent'){
+      // moduleConfigurationEntity = this.state.agentSelected ? `${this.state.agentSelected.name} (${this.state.agentSelected.id})` : `custom agent${this.state.agentOSSelected ? ` (${capitalize(this.state.agentOSSelected)})` : ''}`;
+      moduleConfigurationEntity = this.state.agentSelected ? `${this.state.agentSelected.name} (${this.state.agentSelected.id})` : `Agent${this.state.agentOSSelected ? ` (${capitalize(this.state.agentOSSelected)})` : ''}`;
+    }else if(this.state.agentTypeSelected === 'centralized'){
+      // moduleConfigurationEntity = this.state.groupSelected;
+      moduleConfigurationEntity = this.state.groupSelecte || 'Centralized';
+    };
+
     return (
-      <div>
+      <Fragment>
         <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
             <EuiFlexGroup>
@@ -719,6 +1556,7 @@ class WzModuleGuide extends Component {
                       <EuiCallOut title='Warning' color="warning" iconType="alert">
                         <p>{guide.callout_warning}</p>
                       </EuiCallOut>
+                      <EuiSpacer />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 )}
@@ -753,17 +1591,25 @@ class WzModuleGuide extends Component {
             </EuiFlexItem>
           )}
         </EuiFlexGroup>
-        {!this.specificGuide && guide.avaliable_for_manager && guide.avaliable_for_agent && (
+        {!this.specificGuide && guide.avaliable_for && Object.keys(guide.avaliable_for).length > 1 && (
           <EuiFlexGroup justifyContent='center'>
             <EuiFlexItem grow={false}>
               <EuiButtonGroup
                 color='primary'
-                options={agentTypeButtons}
+                options={configurationTypes.filter(entity => Object.keys(guide.avaliable_for).includes(entity.id))}
                 idSelected={this.state.agentTypeSelected}
-                onChange={this.onChangeAgentTypeSelected}
+                onChange={this.setAgentTypeSelected}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
+        )}
+        {actions && actions.length > 0 && (
+          <Fragment>
+            <EuiSpacer/>
+            {actions.map((action, index) => (
+              <WzCalloutActionModuleGuide name={action.name} loading={action.loading} action={() => this.openRestartAgentManagerModal(action)}/>
+            )).reduce((prev, curr) => [prev, <EuiSpacer size='s'/>, curr])}
+          </Fragment>
         )}
         <EuiSpacer size='l' />
         <EuiFlexGroup>
@@ -777,13 +1623,16 @@ class WzModuleGuide extends Component {
                     </h2>
                   </EuiTitle>
                 </EuiFlexItem>
-                <EuiFlexItem grow={false}>
+                {/* <EuiFlexItem>
+                  {this.state.agentTypeSelected} - {this.state.agentOSSelected}
+                </EuiFlexItem> */}
+                {/* <EuiFlexItem grow={false}>
                   <EuiFlexGroup justifyContent='flexEnd'>
                     <EuiFlexItem>
                       <EuiButtonEmpty iconType='refresh' onClick={() => this.toggleResetGuideModal()}>Reset guide</EuiButtonEmpty>
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                </EuiFlexItem>
+                </EuiFlexItem> */}
               </EuiFlexGroup>
               <EuiFlexGroup>
                 <EuiFlexItem>
@@ -793,7 +1642,7 @@ class WzModuleGuide extends Component {
                         {agentOsTabs.map((agentOSTab) => (
                           <EuiTab key={`agent-tab-${agentOSTab.name}`}
                             isSelected={agentOSTab.id === agentOSSelected}
-                            onClick={() => this.onChangeAgentOSSelected(agentOSTab.id)}
+                            onClick={() => this.setAgentOSSelected(agentOSTab.id)}
                             >
                             {agentOSTab.name}
                           </EuiTab>
@@ -802,25 +1651,149 @@ class WzModuleGuide extends Component {
                       <EuiSpacer size='l'/>
                     </Fragment>
                   )}
-                  <EuiSteps headingElement="h2" steps={this.renderSteps()} />
+                  <EuiSteps headingElement="h2" steps={guideSteps} />
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
-        {modalRestartIsVisble && (
+        {this.state.steps.length > 0 && (
+          <EuiBottomBar>
+            <EuiFlexGroup justifyContent='flexEnd' style={{paddingTop: 3, paddingBottom: 3}}>
+              <EuiFlexItem grow={false} style={{marginTop: 0, marginBottom: 0}}>
+                <WzButtonModal
+                  button={<EuiButton size='s' color='ghost' iconType='eye' isDisabled={invalidConfiguration} onClick={this.toggleShowConfig}>{invalidConfiguration ? 'Error in configuration': 'Preview XML configuration'}</EuiButton>}
+                  isOpen={showConfig}
+                  onClose={this.toggleShowConfig}
+                  className='wz-modal-expanded'
+                >
+                  <EuiModalHeader>
+                    <EuiModalHeaderTitle>Module XML configuration - {moduleConfigurationEntity}</EuiModalHeaderTitle>
+                  </EuiModalHeader>
+        
+                  <EuiModalBody>
+                    <EuiCodeBlock
+                      language="xml"
+                      color="dark"
+                      isCopyable>
+                      {this.transformToXML()}
+                    </EuiCodeBlock>
+                    <EuiSpacer />
+                    {this.state.agentTypeSelected === 'manager' && (
+                      <EuiText>When you finish of configure the module, copy above XML configuration, and include it in <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> file of the <strong>manager</strong>. Then restart the manager.</EuiText>
+                    )}
+                    {this.state.agentTypeSelected === 'agent' && (
+                      <Fragment>
+                        {this.state.agentOSSelected === 'linux' ? (
+                          <EuiText>When you finish of configure the module, copy above XML configuration, and include it in <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> file of <strong>{this.state.agentOSSelected} agent</strong>. Then restart the agent.</EuiText>
+                          ) : (
+                            <EuiText>When you finish of configure the module, copy above XML configuration, and include it in <EuiCode>C:\Program Files (x86)\ossec-agent\ossec.conf</EuiCode> file of <strong>{moduleConfigurationEntity}</strong> agent. Then restart the agent.</EuiText>
+                        )}
+                      </Fragment>
+                    )}
+                    {this.state.agentTypeSelected === 'centralized' && (
+                      <Fragment>
+                        {/* <EuiText>When you finish of configure the module, copy above XML configuration, go to <EuiCode>Management/Groups</EuiCode>, choose <strong>{this.state.groupSelected}</strong> group, edit <EuiCode>Management/Groups</EuiCode> and include the above configuration in <EuiCode>agent.conf</EuiCode> and save.</EuiText> */}
+                        <EuiText>When you finish of configure the module, copy above XML configuration, go to <EuiCode>Management/Groups</EuiCode>, edit the <EuiCode>agent.conf</EuiCode> of the group and save.</EuiText>
+                      </Fragment>
+                    )}
+                    {(this.state.agentTypeSelected === 'manager' || this.state.agentTypeSelected === 'agent') && (
+                      <Fragment>
+                        <EuiSpacer size='s'/>
+                        <EuiCallOut size='s'>
+                          <EuiText size='s' style={{color: 'rgb(0, 107, 180)'}}>
+                            <EuiIcon type='alert'></EuiIcon>
+                            <span> You could need to remove other configuration blocks for this module in the <EuiCode>ossec.conf</EuiCode> file if they exist and you want only this configuration applied.</span>
+                          </EuiText>
+                        </EuiCallOut>
+                      </Fragment>
+                    )}
+                  </EuiModalBody>
+                </WzButtonModal>
+              </EuiFlexItem>
+              {/* {actionRestartManager && (
+                <EuiFlexItem grow={false} style={{marginTop: 0, marginBottom: 0}}>
+                  <EuiButton size='s' fill iconType='refresh' isDisabled={actionRestartManager.loading} isLoading={actionRestartManager.loading} onClick={() => this.openRestartAgentManagerModal(actionRestartManager)}>Restart</EuiButton>   
+                </EuiFlexItem>
+              )}
+              {['manager','centralized'].includes(this.state.agentTypeSelected) && (
+                <EuiFlexItem grow={false} style={{marginTop: 0, marginBottom: 0}}>
+                  <WzButtonConfirmModal
+                    button={<EuiButton size='s' color='secondary' iconType='check' fill isLoading={updatingConfiguration} isDisabled={invalidConfiguration || updatingConfiguration} onClick={this.toggleApplyChanges}>Apply configuration</EuiButton>}
+                    isOpen={this.state.steps.length > 0 && applyChanges}
+                    title={`Do you want to apply changes for ${this.state.agentTypeSelected === 'manager' ? (this.state.clusterNodeSelected || 'Manager') : `${this.state.groupSelected} group` }?`}
+                    onCancel={this.toggleApplyChanges}
+                    onConfirm={this.applyChanges}
+                    cancelButtonText="No, don't do it"
+                    confirmButtonText="Yes, do it"
+                    defaultFocusedButton="confirm"
+                  ></WzButtonConfirmModal>
+                  
+                </EuiFlexItem>
+              )} */}
+            </EuiFlexGroup>
+          </EuiBottomBar>
+        )}
+        {/* {this.state.steps.length > 0 && applyChanges && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title="Do you want reset the guide?"
-              onCancel={this.toggleResetGuideModal}
-              onConfirm={this.resetGuideWithNotification}
+              title={`Do you want to apply changes for ${this.state.agentTypeSelected === 'manager' ? (this.state.clusterNodeSelected || 'Manager') : `${this.state.groupSelected} group` }?`}
+              onCancel={this.toggleApplyChanges}
+              onConfirm={this.applyChanges}
+              cancelButtonText="No, don't do it"
+              confirmButtonText="Yes, do it"
+              defaultFocusedButton="confirm">
+            </EuiConfirmModal>
+          </EuiOverlayMask>
+        )} */}
+        {restartAgentManagerModal && (
+          <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeRestartAgentManagerModal() }}>
+            <EuiConfirmModal
+              title={`Do you want to restart ${this.state.restartAgentManagerAction.name}?`}
+              onCancel={this.closeRestartAgentManagerModal}
+              onConfirm={this.restartAgentManager}
               cancelButtonText="No, don't do it"
               confirmButtonText="Yes, do it"
               defaultFocusedButton="confirm">
             </EuiConfirmModal>
           </EuiOverlayMask>
         )}
-      </div>
+        {/* {showConfig && (
+          <EuiOverlayMask>
+            <EuiModal onClose={this.toggleShowConfig} initialFocus="[name=popswitch]">
+              <EuiModalHeader>
+                <EuiModalHeaderTitle>Module XML configuration - {moduleConfigurationEntity}</EuiModalHeaderTitle>
+              </EuiModalHeader>
+    
+              <EuiModalBody>
+                <EuiCodeBlock
+                  language="xml"
+                  color="dark"
+                  isCopyable>
+                  {this.transformToXML()}
+                </EuiCodeBlock>
+                {this.state.agentTypeSelected === 'agent' && (
+                  <Fragment>
+                    <EuiSpacer />
+                    {this.state.agentOSSelected === 'linux' ? (
+                      <EuiText>When you finish of configure the module, copy above XML configuration, and include it in <EuiCode>/var/ossec/etc/ossec.conf</EuiCode> file of <strong>{moduleConfigurationEntity}</strong> agent. Then restart the agent.</EuiText>
+                      ) : (
+                        <EuiText>When you finish of configure the module, copy above XML configuration, and include it in <EuiCode>C:\Program Files (x86)\ossec-agent\ossec.conf</EuiCode> file of <strong>{moduleConfigurationEntity}</strong> agent. Then restart the agent.</EuiText>
+                    )}
+                    <EuiSpacer />
+                    <EuiCallOut size='s'>
+                      <EuiText size='s' style={{color: 'rgb(0, 107, 180)'}}>
+                        <EuiIcon type='alert'></EuiIcon>
+                        <span> You could need to remove other configuration blocks for this module in the <EuiCode>ossec.conf</EuiCode> file if they exist and you want only this configuration applied.</span>
+                      </EuiText>
+                    </EuiCallOut>
+                  </Fragment>
+                )}
+              </EuiModalBody>
+            </EuiModal>
+          </EuiOverlayMask>
+        )} */}
+      </Fragment>
     )
   }
 }
@@ -843,4 +1816,8 @@ WzModuleGuide.propTypes = {
   ])
 }
 
-export default WzModuleGuide;
+const mapDispatchToProps = dispatch => ({
+  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value))
+});
+
+export default connect(null,mapDispatchToProps)(WzModuleGuide);
