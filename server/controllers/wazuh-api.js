@@ -832,23 +832,18 @@ export class WazuhApiCtrl {
       options['idHost'] = id;
 
       // Set content type application/xml if needed
-      if (typeof (data || {}).content === 'string' && (data || {}).origin === 'xmleditor') {
+      if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
         options.content_type = 'application/xml';
-        body = data.content;
-        delete data.content;
         delete data.origin;
       }
 
-      if (typeof (data || {}).content === 'string' && (data || {}).origin === 'json') {
+      if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
         options.content_type = 'application/json';
-        body = data.content.replace(new RegExp('\\n', 'g'), '');
-        delete data.content;
         delete data.origin;
       }
 
-      if (typeof (data || {}).content === 'string' && (data || {}).origin === 'raw') {
+      if (typeof (data || {}).body === 'string' && (data || {}).origin === 'raw') {
         options.content_type = 'application/octet-stream';
-        data.body = data.content
         delete data.origin;
       }
       const delay = (data || {}).delay || 0;

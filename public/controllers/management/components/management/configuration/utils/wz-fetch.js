@@ -428,7 +428,7 @@ export const saveFileManager = async text => {
           path: 'etc/ossec.conf',
           overwrite: true
         },
-        content: xml.toString(),
+        body: xml.toString(),
         origin: 'raw'
       }
     );

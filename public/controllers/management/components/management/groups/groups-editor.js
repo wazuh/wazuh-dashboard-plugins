@@ -101,7 +101,7 @@ class WzGroupsEditor extends Component {
           savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
         });
         this.setState({ isSaving: false });
-        this.showToast('warning', warning.savedMessage, warning.details, 3000);
+        this.showToast('warning', warning.savedMessage, error, 3000);
         return;
       }
       this.setState({ isSaving: false });
