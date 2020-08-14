@@ -41,6 +41,7 @@ import WzConfigurationIntegrityMonitoring from './integrity-monitoring/integrity
 import WzConfigurationIntegrityAgentless from './agentless/agentless';
 import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzConfigurationAzureLogs from './azure-logs/azure-logs';
+import WzConfigurationGoogleCloudPubSub from './google-cloud-pub-sub/google-cloud-pub-sub';
 import WzViewSelector, {
   WzViewSelectorSwitch
 } from './util-components/view-selector';
@@ -378,6 +379,14 @@ class WzConfigurationSwitch extends Component {
               </WzViewSelectorSwitch>
               <WzViewSelectorSwitch view="azure-logs">
                 <WzConfigurationAzureLogs
+                  clusterNodeSelected={this.props.clusterNodeSelected}
+                  agent={agent}
+                  updateBadge={this.updateBadge}
+                  updateConfigurationSection={this.updateConfigurationSection}
+                />
+              </WzViewSelectorSwitch>
+              <WzViewSelectorSwitch view="gcp-pubsub">
+                <WzConfigurationGoogleCloudPubSub
                   clusterNodeSelected={this.props.clusterNodeSelected}
                   agent={agent}
                   updateBadge={this.updateBadge}
