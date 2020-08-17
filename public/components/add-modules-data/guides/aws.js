@@ -18,7 +18,9 @@ export default {
   documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html',
   icon: 'logoAWSMono',
   avaliable_for: {
-    manager: true
+    manager: true,
+    agent: true,
+    centralized: true
   },
   api_component: 'wmodules',
   api_configuration: 'wmodules',
@@ -195,6 +197,26 @@ export default {
               placeholder: 'Valid AWS organization name'
             }
           ]
+        }
+      ]
+    },
+    //TODO: add these settings. Not yet available. Issue opened: https://github.com/wazuh/wazuh-documentation/issues/2809
+    {
+      title: 'Add services',
+      description: '',
+      elements: [
+        {
+          name: 'service',
+          display_name: 'Service',
+          description: 'Defines a service to process.',
+          removable: true,
+          required: true,
+          repeatable: true,
+          repeatable_insert_first: true,
+          repeatable_insert_first_properties: {
+            removable: false
+          },
+          validate_error_message: 'Any directory or file name.'
         }
       ]
     }
