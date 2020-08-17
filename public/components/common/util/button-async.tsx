@@ -10,12 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState } from 'react';
-import { EuiButton } from '@elastic/eui';
+import { EuiButton, EuiButtonEmpty, EuiButtonIcon, EuiLink } from '@elastic/eui';
 
-export const WzButtonAsync = ({button, disableWhileLoading, onClick, onChange, onClickStart, onClickEnd, onClickSuccess, onClickError, children, ...buttonProps}) => {
+export const WzButtonAsync = ({buttonType = 'default', disableWhileLoading, onClick, onChange, onClickStart, onClickEnd, onClickSuccess, onClickError, children, loadingLabel, ...rest}) => {
   const [isLoading, setIsLoading] = useState(false);
-  const Button = button || EuiButton;
-  
+  const Button = buttonType === 'default' ? EuiButton
+    : buttonType === 'empty' ? EuiButtonEmpty 
+    : buttonType === 'icon' ? EuiButtonIcon 
+    : buttonType === 'link' ? EuiLink 
+    : buttonType;
+
+  const disabled = Boolean((disableWhileLoading && isLoading) || rest.isDisabled || rest.disabled);
+  const disabledProp = buttonType !== 'link' ? { isDisabled: disabled } : { disabled };
+
   useState(() => {
     onChange && onChange(isLoading);
   }, [isLoading]);
@@ -32,5 +39,5 @@ export const WzButtonAsync = ({button, disableWhileLoading, onClick, onChange, o
     setIsLoading(false);
     onClickEnd && onClickEnd();
   } : undefined;
-  return <Button {...buttonProps} onClick={executeOnClick} isLoading={isLoading} isDisabled={disableWhileLoading && isLoading}>{children}</Button>
+  return <Button {...rest} onClick={executeOnClick} isLoading={isLoading} {...disabledProp}>{isLoading && loadingLabel ? loadingLabel : children}</Button>
 }

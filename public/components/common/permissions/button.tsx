@@ -23,6 +23,8 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
+import { WzButtonAsync } from '../util/button-async';
+
 export interface IUserPermissionsObject{action: string, resource: string};
 export type TUserPermissionsFunction = (props : any) => TUserPermissions;
 export type TUserPermissions = (string | IUserPermissionsObject)[] | null;
@@ -45,12 +47,14 @@ export const WzButtonPermissions = ({permissions = null, roles = null, buttonTyp
     : buttonType === 'empty' ? EuiButtonEmpty 
     : buttonType === 'icon' ? EuiButtonIcon 
     : buttonType === 'link' ? EuiLink 
-    : null
-  const disabled = Boolean(userRolesRequirements || userPermissionRequirements || rest.isDisabled);
-  const disabledProp = buttonType !== 'link' ? { isDisabled: disabled } : { disabled };
+    : buttonType;
 
-  const button = <Button {...rest} {...disabledProp} onClick={(disabled || !rest.onClick) ? undefined : rest.onClick}/>
+  const disabled = Boolean(userRolesRequirements || userPermissionRequirements || rest.isDisabled || rest.disabled);
+  const disabledProp = buttonType !== 'link' ? { isDisabled: disabled } : { disabled };
   
+  const button = rest.onClick && (rest.onClick.constructor.name === 'AsyncFunction' || rest.async) ? <WzButtonAsync buttonType={buttonType} {...rest} {...disabledProp} onClick={(disabled || !rest.onClick) ? undefined : rest.onClick}></WzButtonAsync>
+  : <Button {...rest} {...disabledProp} onClick={(disabled || !rest.onClick) ? undefined : rest.onClick}/>
+
   const buttonTextRequirements = (userRolesRequirements || userPermissionRequirements) && (
     <Fragment>
       {userPermissionRequirements && (
