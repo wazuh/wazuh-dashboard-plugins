@@ -51,7 +51,8 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'cron.statistics.index.creation': 'w',
     admin: true,
     hideManagerAlerts: false,
-    'logs.level': 'info'
+    'logs.level': 'info',
+    'enrollment.dns': ''
   };
 
   try {

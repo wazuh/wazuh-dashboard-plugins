@@ -77,7 +77,7 @@ export class UpdateConfigurationFile {
       }
       this.busy = true;
       //TODO: replace by administrator user role requirement
-      // const configuration = getConfiguration(true) || {};
+      const configuration = getConfiguration(true) || {};
       // const adminUndefined = !Object.keys(configuration).includes('admin');
       // const adminIsTrue = configuration.admin;
 
