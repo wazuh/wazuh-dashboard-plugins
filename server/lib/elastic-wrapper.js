@@ -12,6 +12,7 @@
 
 import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
+import { IndexPatternsFetcher } from '../../../../src/plugins/data/server/';
 
 export class ElasticWrapper {
   constructor(server) {
@@ -741,9 +742,9 @@ export class ElasticWrapper {
     try {
       const metaFields = ['_source', '_id', '_type', '_index', '_score'];
       const callCluster = this.elasticRequest.callWithInternalUser;
-      const patternService = await this._server.indexPatternsServiceFactory({
+      const patternService = await new IndexPatternsFetcher(
         callCluster
-      });
+      );
 
       detectedFields = await patternService.getFieldsForWildcard({
         pattern,
