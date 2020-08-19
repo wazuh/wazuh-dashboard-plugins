@@ -19,12 +19,12 @@ export const visualizations = {
           {
             title: 'Alert level evolution',
             id: 'Wazuh-App-Overview-General-Alert-level-evolution',
-            width: 50
+            width: 60
           },
           {
             title: 'Top MITRE ATT&CKS',
             id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
-            width: 50
+            width: 40
           }
         ]
       },
