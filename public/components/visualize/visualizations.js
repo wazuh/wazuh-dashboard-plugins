@@ -22,8 +22,8 @@ export const visualizations = {
             width: 50
           },
           {
-            title: 'Alerts',
-            id: 'Wazuh-App-Overview-General-Alerts',
+            title: 'Top MITRE ATT&CKS',
+            id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
             width: 50
           }
         ]
@@ -34,27 +34,13 @@ export const visualizations = {
           {
             title: 'Top 5 agents',
             id: 'Wazuh-App-Overview-General-Top-5-agents',
-            width: 33
+            width: 30
           },
-          {
-            title: 'Top 5 rule groups',
-            id: 'Wazuh-App-Overview-General-Top-5-rule-groups',
-            width: 33
-          },
-          {
-            title: 'Agents status',
-            id: 'Wazuh-App-Overview-General-Agents-status',
-            width: 34
-          }
-        ]
-      },
-      {
-        height: 360,
-        vis: [
           {
             title: 'Alerts evolution - Top 5 agents',
-            id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'
-          }
+            id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents',
+            width: 70
+          },
         ]
       },
       {
