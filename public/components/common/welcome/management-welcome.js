@@ -204,6 +204,22 @@ class ManagementWelcome extends Component {
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiCard
+                      layout="horizontal"
+                      className="homSynopsis__card"
+                      icon={
+                        <EuiIcon size="xl" type="visualizeApp" color="primary" />
+                      }
+                      title="Statistics"
+                      onClick={() => this.switchSection('statistics')}
+                      description="Information about the Wazuh environment"
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>
           </EuiFlexGroup>
