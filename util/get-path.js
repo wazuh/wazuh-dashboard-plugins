@@ -35,5 +35,6 @@ export function getPath(config) {
     path = `${config.url}:${config.port}`;
   }
 
+  path = path + '/v4'
   return path;
 }

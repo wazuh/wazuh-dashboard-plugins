@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
- // Data extrated of /security/actions endpoint
+ // Data extrated of /v4/security/actions endpoint
 const wazuhPermissions = {
   "active-response:command": {
     "description": "Allow to execute active response commands in the agents",

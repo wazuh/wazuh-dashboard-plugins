@@ -68,7 +68,7 @@ export class WazuhApiCtrl {
       // Fetch needed information about the cluster and the manager itself
       const responseManagerInfo = await this.apiInterceptor.request(
         'get',
-        `${api.url}:${api.port}/manager/info`,
+        `${api.url}:${api.port}/v4/manager/info`,
         {},
         { idHost: id }
       );
@@ -89,7 +89,7 @@ export class WazuhApiCtrl {
         delete api.cluster_info;
         const responseAgents = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/agents`,
+          `${api.url}:${api.port}/v4/agents`,
           { params: {list_agents: '000'}},
           { idHost: id }
         );
@@ -99,7 +99,7 @@ export class WazuhApiCtrl {
 
           const responseClusterStatus = await this.apiInterceptor.request(
             'get',
-            `${api.url}:${api.port}/cluster/status`,
+            `${api.url}:${api.port}/v4/cluster/status`,
             {},
             { idHost: id }
           );
@@ -107,7 +107,7 @@ export class WazuhApiCtrl {
             if (responseClusterStatus.data.data.enabled === 'yes') {
               const responseClusterLocalInfo = await this.apiInterceptor.request(
                 'get',
-                `${api.url}:${api.port}/cluster/local/info`,
+                `${api.url}:${api.port}/v4/cluster/local/info`,
                 {},
                 { idHost: id }
               );
@@ -181,7 +181,7 @@ export class WazuhApiCtrl {
 
               const response = await this.apiInterceptor(
                 'get',
-                `${host.url}:${host.port}/manager/info`,
+                `${host.url}:${host.port}/v4/manager/info`,
                 {},
                 { idHost: id }
               );
@@ -266,7 +266,7 @@ export class WazuhApiCtrl {
 
       let responseManagerInfo = await this.apiInterceptor.request(
         'GET',
-        `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
+        `${apiAvailable.url}:${apiAvailable.port}/v4/manager/info`,
         {},
         { idHost: req.payload.id }
       );
@@ -291,7 +291,7 @@ export class WazuhApiCtrl {
       if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         let responseAgents = await this.apiInterceptor.request(
           'GET',
-          `${apiAvailable.url}:${apiAvailable.port}/agents`,
+          `${apiAvailable.url}:${apiAvailable.port}/v4/agents`,
           { params: {list_agents: '000'}},
           { idHost: req.payload.id }
         );
@@ -301,7 +301,7 @@ export class WazuhApiCtrl {
 
           let responseCluster = await this.apiInterceptor.request(
             'GET',
-            `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
+            `${apiAvailable.url}:${apiAvailable.port}/v4/cluster/status`,
             {},
             { idHost: req.payload.id }
           );
@@ -312,7 +312,7 @@ export class WazuhApiCtrl {
               // If cluster mode is active
               let responseClusterLocal = await this.apiInterceptor.request(
                 'GET',
-                `${apiAvailable.url}:${apiAvailable.port}/cluster/local/info`,
+                `${apiAvailable.url}:${apiAvailable.port}/v4/cluster/local/info`,
                 {},
                 { idHost: req.payload.id }
               );
@@ -380,7 +380,7 @@ export class WazuhApiCtrl {
 
         const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/pci`,
+          `${api.url}:${api.port}/v4/rules/requirement/pci`,
           {},
           { idHost: apiId }
         );
@@ -443,7 +443,7 @@ export class WazuhApiCtrl {
         // Checking for GDPR
         const version = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}//`,
+          `${api.url}:${api.port}/v4//`,
           {},
           { idHost: apiId }
         );
@@ -463,7 +463,7 @@ export class WazuhApiCtrl {
 
         const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/gdpr`,
+          `${api.url}:${api.port}/v4/rules/requirement/gdpr`,
           {},
           { idHost: apiId }
         );
@@ -545,7 +545,7 @@ export class WazuhApiCtrl {
 
         const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/hipaa`,
+          `${api.url}:${api.port}/v4/rules/requirement/hipaa`,
           {},
           { idHost: apiId }
         );
@@ -613,7 +613,7 @@ export class WazuhApiCtrl {
       
         const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/requirement/nist-800-53`,
+          `${api.url}:${api.port}/v4/rules/requirement/nist-800-53`,
           {},
           { idHost: apiId }
         );
@@ -1120,7 +1120,7 @@ export class WazuhApiCtrl {
 
       const output = await this.apiInterceptor.request(
         'GET',
-        `${config.url}:${config.port}/${tmpPath}`,
+        `${config.url}:${config.port}/v4/${tmpPath}`,
         { params: params },
         { idHost: req.payload.id }
       );
@@ -1138,7 +1138,7 @@ export class WazuhApiCtrl {
           params.offset += params.limit;
           const tmpData = await this.apiInterceptor.request(
             'GET',
-            `${config.url}:${config.port}/${tmpPath}`,
+            `${config.url}:${config.port}/v4/${tmpPath}`,
             { params: params },
             { idHost: req.payload.id }
           );
@@ -1232,7 +1232,7 @@ export class WazuhApiCtrl {
 
       const config = await this.manageHosts.getHostById(req.params.api);
 
-      const distinctUrl = `${config.url}:${config.port}/overview​/agents`;
+      const distinctUrl = `${config.url}:${config.port}/v4/overview​/agents`;
 
       const data = await this.apiInterceptor.request(
         'get',
@@ -1437,8 +1437,8 @@ export class WazuhApiCtrl {
       const config = await this.manageHosts.getHostById(api);
 
       const data = await Promise.all([
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, {idHost: api}),
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, {idHost: api})
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/v4/syscollector/${agent}/hardware`, {}, {idHost: api}),
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/v4/syscollector/${agent}/os`, {}, {idHost: api})
       ]);
 
       const result = data.map(item => (item.data || {}).data || []);
