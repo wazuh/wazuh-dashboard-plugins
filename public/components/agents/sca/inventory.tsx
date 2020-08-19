@@ -26,6 +26,7 @@ import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 import { WzSearchBar, filtersToObject} from '../../../components/wz-search-bar';
+import { RuleText } from './components';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -318,7 +319,7 @@ export class Inventory extends Component {
     } else {
       let checks = '';
       checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
-      checks += item.condition ? ` (Condition: ${item.condition})` : ''
+      checks += item.condition ? ` (Condition: ${item.condition})` : '';
       const listItems = [
         {
           title: 'Check not applicable due to:',
@@ -342,7 +343,7 @@ export class Inventory extends Component {
         },
         {
           title: checks,
-          description: item.rulesText,
+          description: <RuleText rulesText={item.rulesText} />,
         },
         {
           title: 'Compliance',
