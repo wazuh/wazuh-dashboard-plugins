@@ -90,7 +90,7 @@ export class WazuhApiCtrl {
         const responseAgents = await this.apiInterceptor.request(
           'get',
           `${api.url}:${api.port}/agents`,
-          { params: {list_agents: '000'}},
+          { params: { list_agents: '000' } },
           { idHost: id }
         );
 
@@ -131,14 +131,14 @@ export class WazuhApiCtrl {
               };
             }
           } else {
-             // Cluster mode is not active
-             api.cluster_info = {
+            // Cluster mode is not active
+            api.cluster_info = {
               status: 'disabled',
               manager: managerName,
               cluster: 'Disabled',
             };
           }
-          
+
           if (api.cluster_info) {
             // Update cluster information in the wazuh-registry.json
             await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
@@ -199,7 +199,7 @@ export class WazuhApiCtrl {
                 req.idChanged = id;
                 return this.checkStoredAPI(req, reply, false);
               }
-            } catch (error) {} // eslint-disable-line
+            } catch (error) { } // eslint-disable-line
           }
         } catch (error) {
           return ErrorResponse(error.message || error, 3020, 500, reply);
@@ -292,7 +292,7 @@ export class WazuhApiCtrl {
         let responseAgents = await this.apiInterceptor.request(
           'GET',
           `${apiAvailable.url}:${apiAvailable.port}/agents`,
-          { params: {list_agents: '000'}},
+          { params: { list_agents: '000' } },
           { idHost: req.payload.id }
         );
 
@@ -467,7 +467,7 @@ export class WazuhApiCtrl {
           {},
           { idHost: apiId }
         );
-        
+
         if ((((response || {}).data || {}).data || {}).affected_items) {
           let GDPRobject = {};
           for (const item of response.data.data.affected_items) {
@@ -610,7 +610,7 @@ export class WazuhApiCtrl {
           // Can not get credentials from wazuh-hosts
           return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
-      
+
         const response = await this.apiInterceptor.request(
           'get',
           `${api.url}:${api.port}/rules/requirement/nist-800-53`,
@@ -901,7 +901,7 @@ export class WazuhApiCtrl {
         (Object.keys(data) || []).forEach(key => {
           fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
             data[key] !== '' ? '=' : ''
-          }${data[key]}`;
+            }${data[key]}`;
         });
         data = {};
       }
@@ -987,7 +987,7 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const fullUrl = getPath(api) + path; 
+      const fullUrl = getPath(api) + path;
 
       log('wazuh-api:makeGenericRequest', `${method} ${fullUrl}`, 'debug');
 
@@ -1002,7 +1002,6 @@ export class WazuhApiCtrl {
         cleanKeys(response);
         return response.data;
       }
-
       throw ((response || {}).data || {}).error && ((response || {}).data || {}).message
         ? { message: response.data.message, code: response.data.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
@@ -1124,9 +1123,9 @@ export class WazuhApiCtrl {
         { params: params },
         { idHost: req.payload.id }
       );
-      
+
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
-      
+
       const isFileGroups = req.payload.path.startsWith('/groups/') && req.payload.path.endsWith('/files');
 
       const totalItems = isFileGroups ? (((output || {}).data || {}).data || {}).totalItems : (((output || {}).data || {}).data || {}).total_affected_items;
@@ -1199,8 +1198,8 @@ export class WazuhApiCtrl {
         fields = fields.map(item => ({ value: item, default: '-' }));
 
         const json2csvParser = new Parser({ fields });
-        
-        let csv = json2csvParser.parse(itemsArray);        
+
+        let csv = json2csvParser.parse(itemsArray);
         for (const field of fields) {
           const { value } = field;
           if (csv.includes(value)) {
@@ -1437,8 +1436,8 @@ export class WazuhApiCtrl {
       const config = await this.manageHosts.getHostById(api);
 
       const data = await Promise.all([
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, {idHost: api}),
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, {idHost: api})
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, { idHost: api }),
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, { idHost: api })
       ]);
 
       const result = data.map(item => (item.data || {}).data || []);
