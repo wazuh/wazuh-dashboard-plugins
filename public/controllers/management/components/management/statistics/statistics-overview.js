@@ -31,6 +31,8 @@ import { WzStatisticsRemoted } from "./statistics-dashboard-remoted";
 import { WzStatisticsAnalysisd } from "./statistics-dashboard-analysisd";
 import { WzDatePicker } from "../../../../../components/wz-date-picker/wz-date-picker";
 import { AppNavigate } from "../../../../../react-services/app-navigate";
+import store from '../../../../../redux/store';
+import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -63,9 +65,19 @@ export class WzStatisticsOverview extends Component {
     };
   }
 
+   setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: 'Statistics' }
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
   async componentDidMount() {
     this._isMounted = true;
     try {
+      this.setGlobalBreadcrumb();
       const data = await clusterNodes();
       const nodes = data.data.data.affected_items.map((item) => {
         return { value: item.name, text: `${item.name} (${item.type})` };
