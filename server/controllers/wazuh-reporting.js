@@ -728,10 +728,10 @@ export class WazuhReportingCtrl {
           try {
             const agent = await this.apiRequest.makeGenericRequest(
               'GET',
-              `/agents/${item}`,
-              {},
+              `/agents`,
+              {params: {q:`id=${item}`}},
               apiId
-            );
+              );
             if (agent && agent.data.affected_items[0]) {
               data = {};
               Object.assign(data, agent.data.affected_items[0]);
@@ -1628,15 +1628,16 @@ export class WazuhReportingCtrl {
         );
 
         if (os && os.data) {
+          const osData = os.data.affected_items[0];
           this.dd.content.push({ text: 'OS information', style: 'h2' });
           this.dd.content.push('\n');
           const ulcustom = [];
-          if (os.data.sysname) ulcustom.push(os.data.sysname);
-          if (os.data.version) ulcustom.push(os.data.version);
-          if (os.data.architecture) ulcustom.push(os.data.architecture);
-          if (os.data.release) ulcustom.push(os.data.release);
-          if (os.data.os && os.data.os.name && os.data.os.version)
-            ulcustom.push(os.data.os.name + ' ' + os.data.os.version);
+          if (osData.sysname) ulcustom.push(osData.sysname);
+          if (osData.version) ulcustom.push(osData.version);
+          if (osData.architecture) ulcustom.push(osData.architecture);
+          if (osData.release) ulcustom.push(osData.release);
+          if (osData.os && osData.os.name && osData.os.version)
+            ulcustom.push(osData.os.name + ' ' + osData.os.version);
           ulcustom &&
             ulcustom.length &&
             this.dd.content.push({
@@ -2415,33 +2416,21 @@ export class WazuhReportingCtrl {
         const isSycollector = tab === 'syscollector';
         if (isSycollector) {
           log('reporting:report', `Syscollector report`, 'debug');
-          let agentId = '';
+          const agentId = ((((req || {}).payload || {}).filters[1] || {}).meta || {}).value;
           let agentOs = '';
           try {
-            if (
-              !req.payload.filters ||
-              !req.payload.filters[1] ||
-              !req.payload.filters[1].meta ||
-              !req.payload.filters[1].meta.value
-            ) {
+            if ( !agentId ) {
               throw new Error(
                 'Syscollector reporting needs a valid agent in order to work properly'
               );
             }
             const agent = await this.apiRequest.makeGenericRequest(
               'GET',
-              `/agents/${req.payload.filters[1].meta.value}`,
-              {},
+              '/agents',
+              {params: {q: `id=${agentId}`}},
               apiId
             );
-            agentId =
-              agent && agent.data && agent.data.id
-                ? agent.data.id
-                : req.payload.filters[1].meta.value;
-            agentOs =
-              agent && agent.data && agent.data.os && agent.data.os.platform
-                ? agent.data.os.platform
-                : '';
+            agentOs = ((((agent || {}).data || {}).affected_items[0] || {}).os || {}).platform || '';
           } catch (error) {
             log('reporting:report', error.message || error, 'debug');
           }
