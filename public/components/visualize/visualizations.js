@@ -29,7 +29,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 270,
+        height: 360,
         vis: [
           {
             title: 'Top 5 agents',
