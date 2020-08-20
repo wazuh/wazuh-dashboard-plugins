@@ -123,7 +123,8 @@ class WzRulesetTable extends Component {
     this.setState({
       items: []
     });
-
+    this.props.updateTotalItems(false);
+    
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
