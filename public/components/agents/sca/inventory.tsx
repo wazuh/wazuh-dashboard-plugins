@@ -373,7 +373,7 @@ export class Inventory extends Component {
       await exportCsv(
         '/sca/' + this.props.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
         [],
-        this.state.lookingPolicy.policy_id + '.csv'
+        this.state.lookingPolicy.policy_id
       );
     } catch (error) {
       this.showToast('danger', error, 3000);
