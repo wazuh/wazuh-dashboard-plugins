@@ -173,25 +173,10 @@ class WzEditConfiguration extends Component {
     }
   }
 
-  async updateClusterInfo(){
-    try{
-      const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
-      const data = await ApiCheck.checkStored(currentApi.id);
-      //update cluster info
-      const cluster_info = (((data || {}).data || {}).data || {})
-       .cluster_info;
-      if (cluster_info) {
-        AppState.setClusterInfo(cluster_info);
-      }
-    } catch(err){ }
-
-  }
-
   async checkIfClusterOrManager() {
     try {
       // in case which enable/disable cluster configuration, update Redux Store
       const clusterStatus = await clusterReq();
-      await this.updateClusterInfo();
       if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
         // try if it is a cluster
         const nodes = await clusterNodes();

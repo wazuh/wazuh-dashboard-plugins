@@ -72,6 +72,25 @@ class WzMenu extends Component {
   async componentDidMount() {
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
+    try{
+      const result = await this.genericReq.request('GET', '/hosts/apis', {});
+      const APIlist = (result || {}).data || [];
+      if (APIlist.length){
+        const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
+        const filteredApi = APIlist.filter(api => api.id === apiId);
+        const selectedApi = filteredApi[0];
+        if(selectedApi){
+          const apiData = await ApiCheck.checkStored(selectedApi.id);
+          //update cluster info
+          const cluster_info = (((apiData || {}).data || {}).data || {})
+              .cluster_info;
+          if (cluster_info) {
+              AppState.setClusterInfo(cluster_info);
+          }
+        }
+    }
+    }catch(err){}
+
   }
 
   showToast = (color, title, text, time) => {
