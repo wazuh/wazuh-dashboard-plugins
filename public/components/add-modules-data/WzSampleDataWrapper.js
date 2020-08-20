@@ -24,12 +24,18 @@ import {
 } from '@elastic/eui';
 import WzSampleData from './sample-data'
 import WzReduxProvider from '../../redux/wz-redux-provider';
-import { withUserAuthorizationPrompt } from '../../components/common/hocs/withUserAuthorization'
+import { withUserAuthorizationPrompt } from '../../components/common/hocs/withUserAuthorization';
+import store from '../../redux/store';
+import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
 
 export class WzSampleDataProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+  }
+
+  componentDidMount(){
+    store.dispatch(updateSelectedSettingsSection('sample_data'));
   }
 
   render() {

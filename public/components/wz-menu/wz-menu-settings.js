@@ -33,7 +33,7 @@ class WzMenuSettings extends Component {
     }
   }
 
-  avaibleSettings() {
+  availableSettings() {
     let auxSettings = {
       settings: { id: 'settings', text: 'Settings' },
       api: { id: 'api', text: 'API configuration' },
@@ -47,14 +47,14 @@ class WzMenuSettings extends Component {
   }
 
   avaibleRenderSettings() {
-    const avaibleSettings = this.avaibleSettings()
+    const availableSettings = this.availableSettings()
     let auxItems = [
-      this.createItem(avaibleSettings.api),
-      this.createItem(avaibleSettings.modules),
-      this.createItem(avaibleSettings.sample_data),
-      this.createItem(avaibleSettings.configuration),
-      this.createItem(avaibleSettings.logs),
-      this.createItem(avaibleSettings.about),
+      this.createItem(availableSettings.api),
+      this.createItem(availableSettings.modules),
+      this.createItem(availableSettings.sample_data),
+      this.createItem(availableSettings.configuration),
+      this.createItem(availableSettings.logs),
+      this.createItem(availableSettings.about),
     ]
     return (auxItems);
   }
@@ -75,19 +75,19 @@ class WzMenuSettings extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      isSelected: this.props.state.section === item.id,
+      isSelected: this.props.state.selected_settings_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
 
   render() {
-    const avaibleSettings = this.avaibleSettings()
+    const availableSettings = this.availableSettings()
     const renderSettings = this.avaibleRenderSettings()
     const sideNavAdmin = [
       {
-        name: avaibleSettings.settings.text,
-        id: avaibleSettings.settings.id,
+        name: availableSettings.settings.text,
+        id: availableSettings.settings.id,
         disabled: true,
         icon: <EuiIcon type="gear" color="primary" />,
         items: renderSettings
@@ -109,7 +109,7 @@ class WzMenuSettings extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
+    state: state.appStateReducers,
   };
 };
 
