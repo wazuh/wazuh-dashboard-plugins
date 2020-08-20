@@ -9,7 +9,7 @@ interface IRuleText {
 export const RuleText: React.FunctionComponent<IRuleText> = ({ rulesText }) => {
   const splitRulesText = rulesText.split(' -> ');
   return (
-    <EuiText>
+    <EuiText size="s">
       <ul>
         {splitRulesText.map(text => <li>{text}</li>)}
       </ul>
