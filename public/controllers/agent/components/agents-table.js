@@ -316,9 +316,6 @@ export class AgentsTable extends Component {
     );
   }
 
-  parseAgentStatus(status){
-    return status === 'never_connected' ? 'never connected' : status
-  }
 
   addHealthStatusRender(status) {
     const color = status => {
@@ -331,7 +328,7 @@ export class AgentsTable extends Component {
       }
     };
 
-    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status}</span></EuiHealth>;
+    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status === 'never_connected' ? 'never connected' : status}</span></EuiHealth>;
   }
 
   reloadAgent = () => {
