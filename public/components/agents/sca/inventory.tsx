@@ -170,7 +170,7 @@ export class Inventory extends Component {
     }
   }
 
-  async componentDidUpdate(prevProp, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
       await this.initialize();
     }
@@ -560,11 +560,13 @@ export class Inventory extends Component {
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiInMemoryTable
-                      items={this.checks.filter(check => {
-                        return !this.state.filters.some(filter => {
-                          return typeof check[filter.field] === 'string' && check[filter.field].toLowerCase().includes(filter.value.toLowerCase());
-                        });
-                      })}
+                      items={this.checks.filter(check => 
+                        this.state.filters.every(filter =>                         
+                          typeof check[filter.field] === 'string' && (filter.value === '' ? check[filter.field] === filter.value
+                            : check[filter.field].toLowerCase().includes(filter.value.toLowerCase())
+                          )
+                        )
+                      )}
                       columns={this.columnsChecks}
                       rowProps={getChecksRowProps}
                       itemId="id"
