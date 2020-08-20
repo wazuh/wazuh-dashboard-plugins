@@ -172,7 +172,7 @@ export class Inventory extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
-      await this.initialize();
+      this.setState({ lookingPolicy: false}, async () => await this.initialize());
     }
     // if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
     //   this.loadScaPolicy(this.state.lookingPolicy);
