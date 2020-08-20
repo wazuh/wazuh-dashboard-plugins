@@ -170,13 +170,13 @@ export class Inventory extends Component {
     }
   }
 
-  async componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProp, prevState) {
     if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
       await this.initialize();
     }
-    if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
-      this.loadScaPolicy(this.state.lookingPolicy);
-    }
+    // if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
+    //   this.loadScaPolicy(this.state.lookingPolicy);
+    // }
   }
 
   componentWillUnmount() {
@@ -229,7 +229,7 @@ export class Inventory extends Component {
       { type: 'params', label: 'condition', description: 'Filter by check condition', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["condition"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'file', description: 'Filter by check file', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["file"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'title', description: 'Filter by check title', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["title"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
-      { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["result"]).filter(item => item && item &&  item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["result"]).filter(item => item && item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["status"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["rationale"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
       { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["registry"] || {}).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
@@ -380,6 +380,10 @@ export class Inventory extends Component {
     }
   }
 
+  buttonStat(text, field, value){
+    return <button onClick={() => this.setState({ filters: [{field, value}]})}>{text}</button>
+  }
+
   render() {
     const getPoliciesRowProps = (item, idx) => {
       return {
@@ -526,13 +530,13 @@ export class Inventory extends Component {
                 <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.pass} description="Pass" titleColor="secondary" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.pass, 'result', 'passed')} description="Pass" titleColor="secondary" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.fail} description="Fail" titleColor="danger" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.fail, 'result', 'failed')} description="Fail" titleColor="danger" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.invalid} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.invalid, 'result', '')} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
@@ -556,7 +560,11 @@ export class Inventory extends Component {
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiInMemoryTable
-                      items={this.checks}
+                      items={this.checks.filter(check => {
+                        return !this.state.filters.some(filter => {
+                          return typeof check[filter.field] === 'string' && check[filter.field].toLowerCase().includes(filter.value.toLowerCase());
+                        });
+                      })}
                       columns={this.columnsChecks}
                       rowProps={getChecksRowProps}
                       itemId="id"
