@@ -26,7 +26,7 @@ import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
 import { WzSearchBar, filtersToObject} from '../../../components/wz-search-bar';
-import { RuleText } from './components';
+import { RuleText, ComplianceText } from './components';
 
 export class Inventory extends Component {
   _isMount = false;
@@ -347,7 +347,7 @@ export class Inventory extends Component {
         },
         {
           title: 'Compliance',
-          description: item.complianceText
+          description: <ComplianceText complianceText={item.complianceText} /> 
         }
       ];
       const itemsToShow = listItems.filter(x => {
