@@ -14,6 +14,8 @@ import {
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { AppState } from '../../../react-services/app-state';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
+import store from '../../../redux/store';
+import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization';
 
 export class EnableModulesWrapper extends Component {
@@ -67,6 +69,7 @@ export class EnableModulesWrapper extends Component {
   }
 
   async componentDidMount() {
+    store.dispatch(updateSelectedSettingsSection('modules'));
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
   }
