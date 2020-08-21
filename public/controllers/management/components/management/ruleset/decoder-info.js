@@ -104,19 +104,23 @@ class WzDecoderInfo extends Component {
         </EuiFlexItem>
         <EuiFlexItem key="file">
           <b style={{ paddingBottom: 6 }}>File</b>
-          <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'filename', value: file}])}>
-              &nbsp;{file}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+              <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'filename', value: file}])}>
+                &nbsp;{file}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="path">
           <b style={{ paddingBottom: 6 }}>Path</b>
-          <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'relative_dirname', value: path}])}>
-              &nbsp;{path}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+              <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'relative_dirname', value: path}])}>
+                &nbsp;{path}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiSpacer size="s" />
       </EuiFlexGrid>
