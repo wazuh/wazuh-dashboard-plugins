@@ -61,13 +61,13 @@ class WzRulesetTable extends Component {
   }
 
   async componentDidMount() {
-    this.props.updateIsProcessing(true);
     this._isMounted = true;
+    this.props.updateIsProcessing(true);
     if (this.props.state.section === 'rules') {
       const regex = new RegExp('redirectRule=' + '[^&]*');
       const match = window.location.href.match(regex);
       if (match && match[0]) {
-        this.setState({ isRedirect: true });
+        this._isMounted && this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
         const result = await WzRequest.apiReq('GET', `/rules`, 
         {
@@ -83,7 +83,7 @@ class WzRulesetTable extends Component {
           );
           this.props.updateRuleInfo(info);
         }
-        this.setState({ isRedirect: false });
+        this._isMounted && this.setState({ isRedirect: false });
       }
     }
   }
@@ -99,14 +99,14 @@ class WzRulesetTable extends Component {
     const filtersChanged = prevProps.state.filters !== filters;
     if ((this._isMounted && processingChange && isProcessing ) || sectionChanged || filtersChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
-        await this.setState({
+        this._isMounted && await this.setState({
           pageSize: this.state.pageSize,
           pageIndex: 0,
           sortDirection: null,
           sortField: null
         });
       }
-      this.setState({ isLoading: true });
+      this._isMounted && this.setState({ isLoading: true });
       this.props.updateIsProcessing(false);
 
       await this.getItems();
@@ -120,7 +120,7 @@ class WzRulesetTable extends Component {
   async getItems() {
     const { section, showingFiles } = this.props.state;
 
-    this.setState({
+    this._isMounted && this.setState({
       items: []
     });
     this.props.updateTotalItems(false);
@@ -136,7 +136,7 @@ class WzRulesetTable extends Component {
 
     const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
     this.props.updateTotalItems(total_affected_items);
-    this.setState({
+    this._isMounted && this.setState({
       items: affected_items,
       totalItems : total_affected_items,
       isLoading:false
