@@ -48,7 +48,7 @@ export class PatternHandler {
         }
       }
       if (!patternList.length) {
-        // if no valid index patterns are found we try to create the wazuh-alerts-3.x-*
+        // if no valid index patterns are found we try to create the wazuh-alerts-*
         try {
           const wazuhConfig = new WazuhConfig();
           const { pattern } = wazuhConfig.getConfig();

@@ -38,9 +38,9 @@ export const configEquivalences = {
   'wazuh.monitoring.frequency':
     'Define in seconds the frequency the app generates a new document on the wazuh-monitoring index.',
   'wazuh.monitoring.shards':
-    'Define the number of shards to use for the wazuh-monitoring-3.x-* indices.',
+    'Define the number of shards to use for the wazuh-monitoring-* indices.',
   'wazuh.monitoring.replicas':
-    'Define the number of replicas to use for the wazuh-monitoring-3.x-* indices.',
+    'Define the number of replicas to use for the wazuh-monitoring-* indices.',
   'wazuh.monitoring.creation':
     'Define the interval in which the wazuh-monitoring index will be created.',
   'wazuh.monitoring.pattern':

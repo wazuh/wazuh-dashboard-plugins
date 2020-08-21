@@ -11,6 +11,7 @@ import { ApiRequest } from '../../react-services/api-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';
+import { WAZUH_MONITORING_PATTERN } from '../../../util/constants';
 
 export class HealthCheck extends Component {
     constructor(props) {
@@ -59,14 +60,14 @@ export class HealthCheck extends Component {
                 let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
                 if (!patternData) patternData = {};
                 patternTitle = patternData.title;
-                /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-3.x-*.
+                /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-*.
                    Currently is not possible to change that index pattern as it has always been created on our backend.
                    This extra check checks if the index pattern exists for the current logged in user
                    in case it doesn't exist, the index pattern is automatically created. This is necessary to make it work with Opendistro multinenancy
                    as every index pattern is stored in its current tenant .kibana-tenant-XX index. 
                    */
                 try {
-                    await SavedObject.existsMonitoringIndexPattern('wazuh-monitoring-3.x-*'); //this checks if it exists, if not it automatically creates the index pattern
+                    await SavedObject.existsMonitoringIndexPattern(WAZUH_MONITORING_PATTERN); //this checks if it exists, if not it automatically creates the index pattern
                 } catch (err) { }
                 if (!patternData.status) {
                     const patternList = await PatternHandler.getPatternList("healthcheck");
