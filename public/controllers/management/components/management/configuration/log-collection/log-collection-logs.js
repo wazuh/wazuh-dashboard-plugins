@@ -53,9 +53,11 @@ const mainSettings = [
   {
     field: 'target',
     label: 'Redirect output to this socket',
-    render: renderValueOrDefault('agent')
+    render: renderTargetField
   }
 ];
+
+const renderTargetField = item => item ? item.join(', ') : 'agent';
 
 const getMainSettingsAgentOrManager = agent =>
   agent && agent.id === '000'
@@ -76,7 +78,12 @@ class WzConfigurationLogCollectionLogs extends Component {
       currentConfig['logcollector-localfile']['localfile-logs']
         ? settingsListBuilder(
             currentConfig['logcollector-localfile']['localfile-logs'],
-            'file'
+            [
+              'file',
+              'alias',
+              'commnad', 
+              (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`
+            ]
           )
         : [];
     return (
