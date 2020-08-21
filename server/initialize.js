@@ -19,6 +19,7 @@ import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from './lib/manage-hosts';
 import { UpdateRegistry } from './lib/update-registry';
+import { WAZUH_ALERTS_PATTERN } from '../util/constants';
 
 const manageHosts = new ManageHosts();
 const wazuhRegistry = new UpdateRegistry().file;
@@ -40,7 +41,7 @@ export function Initialize(server) {
     pattern =
       configurationFile && typeof configurationFile.pattern !== 'undefined'
         ? configurationFile.pattern
-        : 'wazuh-alerts-3.x-*';
+        : WAZUH_ALERTS_PATTERN;
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
       typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
@@ -65,7 +66,7 @@ export function Initialize(server) {
     );
   }
 
-  const defaultIndexPattern = pattern || 'wazuh-alerts-3.x-*';
+  const defaultIndexPattern = pattern || WAZUH_ALERTS_PATTERN;
 
   // Save Wazuh App setup
   const saveConfiguration = () => {

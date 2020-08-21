@@ -23,6 +23,7 @@ import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import { result } from '../lib/generate-alerts/sample-data/ciscat';
+import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PREFIX, WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 export class WazuhElasticCtrl {
   /**
@@ -37,8 +38,8 @@ export class WazuhElasticCtrl {
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
-    this.wzSampleAlertsIndexPrefix = 'wazuh-alerts-3.x-';
-    this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-3.x-sample-security, wazuh-alerts-3.x-sample-auditing-policy-monitoring, wazuh-alerts-3.x-threat-detection
+    this.wzSampleAlertsIndexPrefix = WAZUH_ALERTS_PREFIX;
+    this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-sample-security, wazuh-alerts-sample-auditing-policy-monitoring, wazuh-alerts-threat-detection
     this.defaultNumSampleAlerts = 3000;
   }
 
@@ -499,7 +500,7 @@ export class WazuhElasticCtrl {
     try {
       const config = getConfiguration();
       let monitoringPattern =
-        (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
+        (config || {})['wazuh.monitoring.pattern'] || WAZUH_MONITORING_PATTERN;
       log(
         'wazuh-elastic:buildVisualizationsRaw',
         `Building ${app_objects.length} visualizations`,
@@ -801,7 +802,7 @@ export class WazuhElasticCtrl {
    *   filters: [{rule.groups: "syscheck"}, {agent.id: "001"} ]
    *   from: "now-1y"
    *   offset: 0
-   *   pattern: "wazuh-alerts-3.x-*"
+   *   pattern: "wazuh-alerts-*"
    *   sort: {timestamp: {order: "asc"}}
    *   to: "now"
    * }
@@ -810,7 +811,7 @@ export class WazuhElasticCtrl {
    */
   async alerts(req, reply) {
     try {
-      const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
+      const pattern = req.payload.pattern || WAZUH_ALERTS_PATTERN;
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
       const size = req.payload.size || 500;

@@ -13,6 +13,7 @@
 import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server/';
+import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from '../../util/constants';
 
 export class ElasticWrapper {
   constructor(server) {
@@ -75,7 +76,7 @@ export class ElasticWrapper {
 
   /**
    * This function creates a new index pattern.
-   * @param {*} title Eg: 'wazuh-alerts-3.x-*'
+   * @param {*} title Eg: 'wazuh-alerts-
    * @param {*} id Optional.
    */
   async createIndexPattern(title, id) {
@@ -393,7 +394,7 @@ export class ElasticWrapper {
         false;
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
-        index: title || 'wazuh-alerts-3.x-*',
+        index: title || WAZUH_ALERTS_PATTERN,
         type: '_doc',
         body: payload
       });
@@ -631,7 +632,7 @@ export class ElasticWrapper {
       const data = await this.elasticRequest.callWithInternalUser('delete', {
         index: this.WZ_KIBANA_INDEX,
         type: '_doc',
-        id: 'index-pattern:wazuh-monitoring-*'
+        id: `index-pattern:${WAZUH_MONITORING_PATTERN}`
       });
 
       return data;

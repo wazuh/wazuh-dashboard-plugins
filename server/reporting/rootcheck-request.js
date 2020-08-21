@@ -11,6 +11,7 @@
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
+import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 export class RootcheckRequest {
   /**
@@ -32,7 +33,7 @@ export class RootcheckRequest {
     gte,
     lte,
     filters,
-    pattern = 'wazuh-alerts-3.x-*',
+    pattern = WAZUH_ALERTS_PATTERN,
     size = 5
   ) {
     try {
@@ -85,7 +86,7 @@ export class RootcheckRequest {
     gte,
     lte,
     filters,
-    pattern = 'wazuh-alerts-3.x-*'
+    pattern = WAZUH_ALERTS_PATTERN
   ) {
     try {
       const base = {};
@@ -132,7 +133,7 @@ export class RootcheckRequest {
     gte,
     lte,
     filters,
-    pattern = 'wazuh-alerts-3.x-*'
+    pattern = WAZUH_ALERTS_PATTERN
   ) {
     try {
       const base = {};
