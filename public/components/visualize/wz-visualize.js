@@ -33,6 +33,8 @@ import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { toastNotifications } from 'ui/notify';
+import { Discover } from '../../components/common/modules/discover';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 const visHandler = new VisHandlers();
 
@@ -48,6 +50,7 @@ export class WzVisualize extends Component {
       refreshingKnownFields: [],
       refreshingIndex: true
     };
+    this.KibanaServices =  getServices();
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
     this.wzReq = WzRequest;
@@ -275,6 +278,39 @@ export class WzVisualize extends Component {
               );
             })}
         </EuiFlexItem>
+        <EuiFlexGroup style={{margin: 0}}>
+          <EuiFlexItem>
+            {this.props.selectedTab === "general" && this.props.resultState !== "none" && 
+
+          <EuiPanel
+          paddingSize="none"
+          className={
+            this.state.expandedVis === 'security-alerts' ? 'fullscreen h-100 wz-overflow-y-auto wz-overflow-x-hidden' : 'h-100'
+          }
+        >
+          <EuiFlexItem className="h-100" style={{marginBottom: 12}}>
+            <EuiFlexGroup
+              style={{ padding: '12px 12px 0px' }}
+              className="embPanel__header"
+            >
+              <h2 className="embPanel__title wz-headline-title">
+                Security Alerts
+              </h2>
+              <EuiButtonIcon
+                color="text"
+                style={{ padding: '0px 6px', height: 30 }}
+                onClick={() => this.expand('security-alerts')}
+                iconType="expand"
+                aria-label="Expand"
+              />
+            </EuiFlexGroup>
+            <Discover shareFilterManager={[...this.KibanaServices.filterManager.filters]} initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']} implicitFilters={[]} initialFilters={[]}  updateTotalHits={(total) => {}} />
+
+          </EuiFlexItem>
+        </EuiPanel>
+            }
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </Fragment>
     );
   }
