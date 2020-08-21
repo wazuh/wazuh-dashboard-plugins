@@ -300,7 +300,7 @@ export class Inventory extends Component {
     this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items });
   }
 
-  getItems = () => this.checks.filter(check =>
+  getItems = () => !!this.checks && this.checks.filter(check =>
       this.state.filters.every(filter =>
         typeof check[filter.field] === 'string' && (filter.value === '' ? check[filter.field] === filter.value
           : check[filter.field].toLowerCase().includes(filter.value.toLowerCase())
