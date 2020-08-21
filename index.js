@@ -11,7 +11,7 @@
  */
 
 import { resolve } from 'path';
-import { WazuhPlugin, LegacySetup } from './server/plugin';
+import { WazuhPlugin } from './server/plugin';
 
 export default (kibana) => {
   return new kibana.Plugin({
@@ -60,7 +60,7 @@ export default (kibana) => {
 
         xpackMainPlugin.registerFeature({
           id: featureId,
-          name: 'C',
+          name: 'Wazuh',
           navLinkId: featureId,
           icon: '/plugins/wazuh/img/icon_blue.svg',
           app: [featureId],

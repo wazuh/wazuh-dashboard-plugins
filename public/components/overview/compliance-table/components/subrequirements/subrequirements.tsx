@@ -27,7 +27,7 @@ import {
   EuiOverlayMask,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
 

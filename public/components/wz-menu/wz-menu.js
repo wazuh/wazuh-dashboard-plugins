@@ -41,7 +41,7 @@ import chrome from 'ui/chrome';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 
 class WzMenu extends Component {
   constructor(props) {
@@ -641,7 +641,7 @@ class WzMenu extends Component {
         <EuiFlexGroup
           direction="row"
           responsive={false}
-          style={{ paddingTop: 5 }}
+          style={{ paddingTop: 2 }}
         >
           <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
             <img src={logotype_url} className="navBarLogo" alt=""></img>

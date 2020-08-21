@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import 'ui/autoload/styles';
+import 'ui/autoload/all';
 import 'uiExports/visTypes';
 import 'uiExports/visResponseHandlers';
 import 'uiExports/visRequestHandlers';
@@ -57,8 +57,6 @@ import 'angular-material/angular-material';
 
 // Cookies
 import 'angular-cookies/angular-cookies';
-
-import 'ui/autoload/all';
 import chrome from 'ui/chrome';
 
 // Set up Wazuh app
@@ -76,7 +74,7 @@ import { checkAdminMode } from './controllers/management/components/management/c
 import store from './redux/store';
 import { updateAdminMode } from './redux/actions/appStateActions';
 
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from '../../../src/plugins/discover/public/kibana_services';
 const app = getAngularModule('app/wazuh');
 
 app.config([

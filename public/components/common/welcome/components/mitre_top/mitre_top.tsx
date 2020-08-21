@@ -24,7 +24,7 @@ import {
 } from '@elastic/eui';
 import { FlyoutTechnique } from '../../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { getIndexPattern } from '../../../../../components/overview/mitre/lib';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { getMitreCount } from './lib';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 

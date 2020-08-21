@@ -23,7 +23,7 @@ import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions
 import store from '../../redux/store';
 import { AgentSelectionTable } from '../../controllers/overview/components/overview-actions/agents-selection-table';
 import chrome from 'ui/chrome';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 
 class WzAgentSelector extends Component {
   constructor(props) {
