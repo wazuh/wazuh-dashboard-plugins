@@ -234,13 +234,15 @@ class WzRulesetTable extends Component {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
           onClick: !WzUserPermissions.checkMissingUserPermissions([{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}], this.props.userPermissions) ? async () => {
+            if(this.isLoading) return;
+            this.setState({isLoading: true});
             const { section } = this.props.state;
+            window.location.href = `${window.location.href}&redirectRule=${id}`;
             if (section === 'rules') {
               const result = await this.rulesetHandler.getRuleInformation(
                 item.filename,
                 id
               );
-              window.location.href = `${window.location.href}&redirectRule=${id}`;
               this.props.updateRuleInfo(result);
             } else if (section === 'decoders') {
               const result = await this.rulesetHandler.getDecoderInformation(item.filename, name);
@@ -250,6 +252,7 @@ class WzRulesetTable extends Component {
               const file = { name: item.filename, content: result, path: item.relative_dirname };
               this.props.updateListContent(file);
             }
+            this.setState({isLoading: false});
           } : undefined
         };
       };
