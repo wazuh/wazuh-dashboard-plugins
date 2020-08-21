@@ -11,7 +11,7 @@ export const RuleText: React.FunctionComponent<IRuleText> = ({ rulesText }) => {
   return (
     <EuiText size="s">
       <ul>
-        {splitRulesText.map(text => <li>{text}</li>)}
+        {splitRulesText.map((text, idx) => <li key={idx}>{text}</li>)}
       </ul>
     </EuiText>
   )

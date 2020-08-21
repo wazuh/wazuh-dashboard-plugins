@@ -23,7 +23,7 @@ export const ComplianceText: React.FunctionComponent<IComplianceText> = ({ compl
   const listItems: item[] = complianceList.map(item => /(?<title>\S+): (?<description>.+)/.exec(item)?.groups).filter(item => !!item);
   return (
     <EuiFlexGroup direction="column" gutterSize="xs">
-      {listItems.map(item => <ComplianceItem item={item} />)}
+      {listItems.map((item, idx) => <ComplianceItem key={idx} item={item} />)}
     </EuiFlexGroup>
   )
 }
