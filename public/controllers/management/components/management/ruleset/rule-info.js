@@ -228,7 +228,7 @@ class WzRuleInfo extends Component {
   renderInfo(id, level, file, path, groups) {
     return (
       <EuiFlexGrid columns={4}>
-      <EuiFlexItem key="level" grow={1}>
+      <EuiFlexItem key="rule_ids" grow={1}>
         <b style={{ paddingBottom: 6 }}>ID</b>
         <span>
           <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
@@ -422,7 +422,7 @@ class WzRuleInfo extends Component {
 
       const values = compliance[key].map((element, index) => {
         return (
-          <span key={element}>
+          <span key={index}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack([{ field: key, value: element }])}
             >
@@ -448,7 +448,7 @@ class WzRuleInfo extends Component {
       
       const values = this.state.mitreTechniques.map((element, index) => {
         return (
-          <span key={element}>
+          <span key={index}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack([{ field: 'mitre', value: this.state.mitreIds[index] }])}
             >
@@ -460,7 +460,7 @@ class WzRuleInfo extends Component {
           </span>
         );
       });
-      listCompliance.push(<EuiFlexItem key={'mitreTechniques'} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+      listCompliance.push(<EuiFlexItem key={index} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
         <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTechniques']}</b>
         {this.state.mitreLoading && <EuiLoadingSpinner size="m" /> || <p>{values}</p>}
         <EuiSpacer size="s" />
@@ -469,7 +469,7 @@ class WzRuleInfo extends Component {
 
     if(this.state.mitreTactics && this.state.mitreTactics.length){
       
-      listCompliance.push(<EuiFlexItem key={'mitreTactics'} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+      listCompliance.push(<EuiFlexItem key={index} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
         <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTactics']}</b>
         <p>{this.state.mitreTactics.toString()}</p>
         <EuiSpacer size="s" />
