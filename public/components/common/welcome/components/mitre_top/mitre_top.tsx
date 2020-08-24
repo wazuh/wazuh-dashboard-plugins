@@ -245,7 +245,7 @@ export class MitreTopTactics extends Component {
         {!selectedTactic || alertsCount.length === 0 ? tacticsTop : tecniquesTop}
         {alertsCount.length === 0 && emptyPrompt}
         {flyoutOn &&
-        <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+        <EuiOverlayMask onClick={() => this.closeFlyout() } >
           <FlyoutTechnique 
             openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
             openDiscover={(e,itemId) => this.openDiscover(e,itemId)}

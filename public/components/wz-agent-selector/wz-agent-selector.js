@@ -117,7 +117,7 @@ class WzAgentSelector extends Component {
 
     if (this.props.state.showExploreAgentModalGlobal) {
       modal = (
-        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
+        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
           <EuiModal
             className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}
