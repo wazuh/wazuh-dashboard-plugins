@@ -232,7 +232,7 @@ class WzMenuOverview extends Component {
     const agentData = store.getState().appStateReducers.currentAgentData
 
     return (
-      <div className="WzManagementSideMenu">
+      <div className="WzManagementSideMenu wz-menu-overview">
         {Object.keys(this.state.extensions).length && (
           <div>
             {!agentData.id && (

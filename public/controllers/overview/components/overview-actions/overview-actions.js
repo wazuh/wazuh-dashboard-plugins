@@ -144,7 +144,7 @@ class OverviewActions extends Component {
 
     if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
+        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
           <EuiModal
             className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}
