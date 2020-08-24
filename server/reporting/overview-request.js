@@ -11,7 +11,6 @@
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 export class OverviewRequest {
   /**
@@ -29,7 +28,7 @@ export class OverviewRequest {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @returns {Array<String>} E.g:['000','130','300']
    */
-  async topLevel15(gte, lte, filters, pattern = WAZUH_ALERTS_PATTERN){
+  async topLevel15(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
     try {
       const base = {};
 

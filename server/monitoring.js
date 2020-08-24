@@ -21,7 +21,6 @@ import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 import { WazuhHostsCtrl } from '../server/controllers/wazuh-hosts';
 import { ApiInterceptor } from './lib/api-interceptor';
-import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PREFIX, WAZUH_MONITORING_PATTERN } from '../util/constants';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -37,8 +36,8 @@ export class Monitoring {
     this.FREQUENCY = 900;
     this.CRON_FREQ = '0 1 * * * *';
     this.CREATION = 'd';
-    this.index_pattern = WAZUH_MONITORING_PATTERN;
-    this.index_prefix = WAZUH_MONITORING_PREFIX;
+    this.index_pattern = 'wazuh-monitoring-3.x-*';
+    this.index_prefix = 'wazuh-monitoring-3.x-';
     this.wzWrapper = new ElasticWrapper(server);
     this.wazuhHosts = new WazuhHostsCtrl();
     this.agentsArray = [];
@@ -347,7 +346,7 @@ export class Monitoring {
 
   /**
    * Creating wazuh-monitoring index
-   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-3.x-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
   async createIndex(datedIndex, clusterName) {
@@ -403,7 +402,7 @@ export class Monitoring {
 
   /**
    * Inserting one document per agent into Elastic. Bulk.
-   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-3.x-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
   async insertDocument(datedIndex, clusterName) {
@@ -550,7 +549,7 @@ export class Monitoring {
           currentTemplate['wazuh-agent'].index_patterns;
       } catch (error) {
         // Init with the default index pattern
-        monitoringTemplate.index_patterns = [WAZUH_MONITORING_PATTERN];
+        monitoringTemplate.index_patterns = ['wazuh-monitoring-3.x-*'];
       }
 
       // Check if the user is using a custom pattern
@@ -603,7 +602,7 @@ export class Monitoring {
         !this.quiet &&
           log(
             'monitoring:init',
-            'Checking if wazuh-monitoring-* index pattern exists...',
+            'Checking if wazuh-monitoring-3.x-* index pattern exists...',
             'debug'
           );
 
@@ -618,7 +617,7 @@ export class Monitoring {
         await this.wzWrapper.updateMonitoringIndexPatternKnownFields(patternId);
       } catch (error) {
         const didNotFindMsg =
-          "Didn't find wazuh-monitoring- index pattern for Kibana. Proceeding to create it...";
+          "Didn't find wazuh-monitoring-3.x-* index pattern for Kibana. Proceeding to create it...";
         !this.quiet && log('monitoring:init', didNotFindMsg, 'info');
         !this.quiet && this.server.log(monitoringErrorLogColors, didNotFindMsg);
         return this.createWazuhMonitoring();

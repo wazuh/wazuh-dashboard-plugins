@@ -11,7 +11,6 @@
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 export class PciRequest {
   /**
@@ -29,7 +28,7 @@ export class PciRequest {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @returns {Array<String>}
    */
-  async topPCIRequirements(gte, lte, filters, pattern = WAZUH_ALERTS_PATTERN){
+  async topPCIRequirements(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
     if (filters.includes('rule.pci_dss: exists')) {
       const first = filters.split('AND rule.pci_dss: exists')[0];
       const second = filters.split('AND rule.pci_dss: exists')[1];
@@ -99,7 +98,7 @@ export class PciRequest {
     lte,
     filters,
     requirement,
-    pattern = WAZUH_ALERTS_PATTERN
+    pattern = 'wazuh-alerts-3.x-*'
   ) {
     if (filters.includes('rule.pci_dss: exists')) {
       const first = filters.split('AND rule.pci_dss: exists')[0];

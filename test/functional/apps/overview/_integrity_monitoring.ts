@@ -13,7 +13,6 @@
 import expect from '@kbn/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
 import { SearchParams } from 'elasticsearch';
-import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');
@@ -33,7 +32,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     let es_index: string;
     before(async () => {
       await PageObjects.wazuhCommon.OpenIntegrityMonitoring();
-      es_index = WAZUH_ALERTS_PATTERN;
+      es_index = 'wazuh-alerts-3.x-*';
     });
 
     beforeEach(async () => {
