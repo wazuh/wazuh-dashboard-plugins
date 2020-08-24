@@ -216,8 +216,9 @@ export const Techniques = withWindowSize(class Techniques extends Component {
             anchorClassName="wz-width-100"
             button={(
                 <EuiFacetButton
-                  style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px"}}
+                  style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px", maxHeight: 40}}
                   quantity={item.quantity}
+                  className={"module-table"}
                   onClick={() => this.showFlyout(item.id)}>
                   <EuiToolTip position="top" content={tooltipContent} anchorClassName={toolTipAnchorClass}>
                     <span style={{
