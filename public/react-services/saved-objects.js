@@ -17,7 +17,6 @@ export class SavedObject {
   /**
    *
    * Returns the full list of index patterns
-   * ONLY indices that matches the pattern "wazuh*" will be returned
    */
   static async getListOfIndexPatterns() {
     try {
@@ -193,7 +192,7 @@ export class SavedObject {
   }
 
   /**
-   * Creates the 'wazuh-alerts-3.x-*'  index pattern
+   * Creates the 'wazuh-alerts-*'  index pattern
    */
   static async createWazuhIndexPattern(pattern) {
     try {

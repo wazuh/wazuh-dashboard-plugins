@@ -33,7 +33,7 @@ export const initialWazuhConfig = `---
 # ------------------------------- Index patterns -------------------------------
 #
 # Default index pattern to use.
-#pattern: wazuh-alerts-3.x-*
+#pattern: wazuh-alerts-*
 #
 # ----------------------------------- Checks -----------------------------------
 #
@@ -107,17 +107,17 @@ export const initialWazuhConfig = `---
 # Default: 900 (s)
 #wazuh.monitoring.frequency: 900
 #
-# Configure wazuh-monitoring-3.x-* indices shards and replicas.
+# Configure wazuh-monitoring-* indices shards and replicas.
 #wazuh.monitoring.shards: 2
 #wazuh.monitoring.replicas: 0
 #
-# Configure wazuh-monitoring-3.x-* indices custom creation interval.
+# Configure wazuh-monitoring-* indices custom creation interval.
 # Values: h (hourly), d (daily), w (weekly), m (monthly)
 # Default: d
 #wazuh.monitoring.creation: d
 #
 # Default index pattern to use for Wazuh monitoring
-#wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
+#wazuh.monitoring.pattern: wazuh-monitoring-*
 #
 # --------------------------------- wazuh-cron ----------------------------------
 #

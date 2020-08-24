@@ -24,6 +24,7 @@ import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { WzRequest } from '../../react-services/wz-request';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
+import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
 
 export class OverviewController {
   /**
@@ -335,7 +336,7 @@ export class OverviewController {
    * @param {*} id
    */
   addMitrefilter(id) {
-    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    const filter = `{"meta":{"index":${WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }
 

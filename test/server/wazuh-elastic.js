@@ -1,5 +1,6 @@
 const chai = require('chai');
 const needle = require('needle');
+const { WAZUH_ALERTS_PATTERN } = require('../../util/constants');
 
 const kibanaServer = process.env.KIBANA_IP || 'localhost';
 
@@ -28,7 +29,7 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/known-fields/{pattern}', async () => {
       const res = await needle(
         'get',
-        `${kibanaServer}:5601/elastic/known-fields/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/known-fields/${WAZUH_ALERTS_PATTERN}`,
         {},
         headers
       );
@@ -36,7 +37,7 @@ describe('wazuh-elastic', () => {
       res.body.output.should.be.a('object');
       //res.body.output._index.should.be.eql('.kibana');
       res.body.output._type.should.be.eql('doc');
-      res.body.output._id.should.be.eql('index-pattern:wazuh-alerts-3.x-*');
+      res.body.output._id.should.be.eql(`index-pattern:${WAZUH_ALERTS_PATTERN}`);
     });
   });
 
@@ -44,7 +45,7 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'get',
-        `${kibanaServer}:5601/elastic/visualizations/overview-general/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/visualizations/overview-general/${WAZUH_ALERTS_PATTERN}`,
         {},
         headers
       );
@@ -59,7 +60,7 @@ describe('wazuh-elastic', () => {
     it('POST /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'post',
-        `${kibanaServer}:5601/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/visualizations/cluster-monitoring/${WAZUH_ALERTS_PATTERN}`,
         { nodes: { items: [], name: 'node01' } },
         headers
       );
@@ -76,19 +77,19 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/template/{pattern}', async () => {
       const res = await needle(
         'get',
-        `${kibanaServer}:5601/elastic/template/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/template/${WAZUH_ALERTS_PATTERN}`,
         {},
         headers
       );
       res.body.statusCode.should.be.eql(200);
       res.body.status.should.be.eql(true);
-      res.body.data.should.be.eql('Template found for wazuh-alerts-3.x-*');
+      res.body.data.should.be.eql(`Template found for ${WAZUH_ALERTS_PATTERN}`);
     });
 
     it('GET /elastic/index-patterns/{pattern}', async () => {
       const res = await needle(
         'get',
-        `${kibanaServer}:5601/elastic/index-patterns/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/index-patterns/${WAZUH_ALERTS_PATTERN}`,
         {},
         headers
       );
