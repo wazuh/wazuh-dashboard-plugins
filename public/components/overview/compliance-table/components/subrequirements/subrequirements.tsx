@@ -31,7 +31,6 @@ import { getServices } from '../../../../../../../../src/plugins/discover/public
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
 
-
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
   state: {
@@ -277,7 +276,7 @@ export class ComplianceSubrequirements extends Component {
         </div>
 
         {this.state.flyoutOn &&
-          <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+          <EuiOverlayMask onClick={() => this.closeFlyout() } >
             <RequirementFlyout
               currentRequirement={this.state.selectedRequirement}
               onChangeFlyout={this.onChangeFlyout}
