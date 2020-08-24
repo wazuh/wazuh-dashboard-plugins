@@ -1,0 +1,1 @@
+<div ng-cloak ng-controller="toolsController as tctrl">
