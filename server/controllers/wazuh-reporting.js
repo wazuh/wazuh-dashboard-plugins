@@ -40,7 +40,6 @@ import {
 } from '../integration-files/visualizations';
 
 import { log } from '../logger';
-import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 const BASE_OPTIMIZE_PATH = '../../../../optimize';
 const REPORTING_PATH = `${BASE_OPTIMIZE_PATH}/wazuh/downloads/reports`;
@@ -805,7 +804,7 @@ export class WazuhReportingCtrl {
     from,
     to,
     filters,
-    pattern = WAZUH_ALERTS_PATTERN,
+    pattern = 'wazuh-alerts-3.x-*',
     agent = null
   ) {
     try {

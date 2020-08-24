@@ -30,7 +30,7 @@ import {
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
-import { WAZUH_ALERTS_PATTERN } from '../../../../../../util/constants';
+
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -71,7 +71,7 @@ export class ComplianceSubrequirements extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": WAZUH_ALERTS_PATTERN
+        "index": "wazuh-alerts-3.x-*"
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }

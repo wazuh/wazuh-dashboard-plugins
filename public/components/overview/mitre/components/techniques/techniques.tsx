@@ -34,7 +34,6 @@ import { ITactic } from '../../';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
-import {WAZUH_ALERTS_PATTERN} from '../../../../../../util/constants';
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
@@ -300,7 +299,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": WAZUH_ALERTS_PATTERN
+        "index": "wazuh-alerts-3.x-*"
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }

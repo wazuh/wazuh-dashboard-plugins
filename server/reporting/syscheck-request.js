@@ -11,7 +11,6 @@
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 export class SyscheckRequest {
   /**
@@ -29,7 +28,7 @@ export class SyscheckRequest {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @returns {Array<String>}
    */
-  async top3agents(gte, lte, filters, pattern = WAZUH_ALERTS_PATTERN){
+  async top3agents(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
     try {
       const base = {};
 
@@ -75,7 +74,7 @@ export class SyscheckRequest {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @returns {Array<String>}
    */
-  async top3Rules(gte, lte, filters, pattern = WAZUH_ALERTS_PATTERN){
+  async top3Rules(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
     try {
       const base = {};
 
@@ -133,7 +132,7 @@ export class SyscheckRequest {
     }
   }
 
-  async lastTenDeletedFiles(gte, lte, filters, pattern = WAZUH_ALERTS_PATTERN){
+  async lastTenDeletedFiles(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
     try {
       const base = {};
 
@@ -186,7 +185,7 @@ export class SyscheckRequest {
     gte,
     lte,
     filters,
-    pattern = WAZUH_ALERTS_PATTERN
+    pattern = 'wazuh-alerts-3.x-*'
   ) {
     try {
       const base = {};

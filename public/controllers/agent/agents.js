@@ -31,7 +31,6 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
 
 export class AgentsController {
   /**
@@ -631,7 +630,7 @@ export class AgentsController {
    * @param {*} id
    */
   addMitrefilter(id) {
-    const filter = `{"meta":{"index":${WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter)
     });

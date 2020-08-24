@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WAZUH_MONITORING_PATTERN } from "../../util/constants";
-
 /**
  * Refresh known fields for all valid index patterns.
  * Optionally forces the default index pattern creation.
@@ -119,8 +117,8 @@ export async function checkKnownFields(
 
     for (const item of list) {
       if (
-        item.title.includes(WAZUH_MONITORING_PATTERN) ||
-        item.id.includes(WAZUH_MONITORING_PATTERN)
+        item.title.includes('wazuh-monitoring-*') ||
+        item.id.includes('wazuh-monitoring-*')
       ) {
         continue;
       }

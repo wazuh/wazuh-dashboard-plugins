@@ -80,7 +80,6 @@ import {
   search,
 } from '../../../../src/plugins/data/public';
 import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
-import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -499,7 +498,7 @@ function discoverController(
                         negate: true,
                         params: { query: '000' },
                         type: 'phrase',
-                        index: WAZUH_ALERTS_PATTERN
+                        index: 'wazuh-alerts-3.x-*'
                       },
                       query: { match_phrase: { 'agent.id': '000' } },
                       $state: { store: 'appState' }

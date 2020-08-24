@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Wazuh Constants file
+ * Wazuh app - Load the Dev Tools controller.
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,8 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { uiModules } from 'ui/modules';
+import { ToolsController } from './tools';
 
-export const WAZUH_ALERTS_PREFIX = "wazuh-alerts-";
-export const WAZUH_ALERTS_PATTERN = "wazuh-alerts-*";
-export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
-export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
+const app = uiModules.get('app/wazuh', []);
+
+app
+.controller('toolsController', ToolsController)

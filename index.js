@@ -12,7 +12,6 @@
 
 import { resolve } from 'path';
 import { WazuhPlugin, LegacySetup } from './server/plugin';
-import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from './util/constants'
 
 export default (kibana) => {
   return new kibana.Plugin({
@@ -71,8 +70,8 @@ export default (kibana) => {
               app: [featureId],
               api: [],
               savedObject: {
-                all: [WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN],
-                read: [WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN]
+                all: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
+                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
               },
               ui: ['save', 'show']
             },
@@ -81,7 +80,7 @@ export default (kibana) => {
               api: [],
               savedObject: {
                 all: [],
-                read: [WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN]
+                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
               },
               ui: ['show']
             }
