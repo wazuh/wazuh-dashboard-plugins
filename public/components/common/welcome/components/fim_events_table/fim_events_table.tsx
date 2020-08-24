@@ -88,7 +88,7 @@ function FimTable({ agent }) {
         noItemsMessage="No recent events" />
         {isOpen && (
           <EuiOverlayMask
-            onClick={(e: Event) => e.target.className === 'euiOverlayMask' && setIsOpen(false)}
+            onClick={() => setIsOpen(false)}
           >
             <FlyoutDetail
             agentId={agent.id}

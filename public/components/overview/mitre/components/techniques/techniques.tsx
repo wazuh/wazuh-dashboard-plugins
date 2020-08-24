@@ -410,7 +410,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         { isFlyoutVisible &&
           <EuiOverlayMask
             // @ts-ignore
-            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
+            onClick={() => this.onChangeFlyout(false) } >
           
             <FlyoutTechnique
               openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
