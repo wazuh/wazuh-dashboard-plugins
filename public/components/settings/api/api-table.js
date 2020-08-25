@@ -28,6 +28,8 @@ import {
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
+import store from '../../../redux/store';
+import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 
 export class ApiTable extends Component {
   constructor(props) {
@@ -40,6 +42,7 @@ export class ApiTable extends Component {
   }
 
   componentDidMount() {
+    store.dispatch(updateSelectedSettingsSection('api'));
     this.setState({
       apiEntries: this.props.apiEntries
     });

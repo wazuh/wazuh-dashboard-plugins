@@ -226,7 +226,8 @@ export default class RulesetHandler {
             path: `etc/rules/${rule.file || rule}`,
             overwrite: overwrite
           },
-          body: content.toString()
+          body: content.toString(),
+          origin: 'raw'
         }
       );
       return result;
@@ -250,7 +251,8 @@ export default class RulesetHandler {
             path: `etc/decoders/${decoder.file || decoder}`,
             overwrite: overwrite
           },
-          body: content.toString()
+          body:content.toString(),
+          origin: 'raw'
         }
       );
       return result;
@@ -275,7 +277,8 @@ export default class RulesetHandler {
             path: `${path}/${list}`,
             overwrite: overwrite
           },
-          body: content.toString()
+          body: content.toString(),
+          origin: 'raw'
         }
       );
       return result;
@@ -294,7 +297,8 @@ export default class RulesetHandler {
             path: `etc/lists/${list}`,
             overwrite: !overwrite
           },
-          body: content.toString()
+          body: content.toString(),
+          origin: 'raw'
         }
       );
       return result;

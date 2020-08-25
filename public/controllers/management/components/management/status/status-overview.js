@@ -144,8 +144,8 @@ export class WzStatusOverview extends Component {
         const daemons = await this.statusHandler.managerStatus();
         const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
         this.props.updateListDaemons(listDaemons);
-        const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
-        this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
+        this.props.updateSelectedNode(false);
+        this.props.updateNodeInfo((managerInfo.affected_items || [])[0] || {});
       }
     }
     const lastAgentRaw = await this.statusHandler.lastAgentRaw();

@@ -14,10 +14,12 @@ import {
   EuiLink,
   EuiAccordion,
   EuiFlexGrid,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { ApiRequest } from '../../../../../react-services/api-request'
 
 import RulesetHandler from './utils/ruleset-handler';
 
@@ -41,9 +43,17 @@ class WzRuleInfo extends Component {
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53',
       tsc: 'TSC',
+      'mitreTactics': 'MITRE Tactics',
+      'mitreTechniques': 'MITRE Techniques',
       'mitre': 'MITRE'
     };
-
+    this.state = {
+      mitreTactics: [],
+      mitreLoading: false,
+      mitreTechniques: [],
+      mitreRuleId: "",
+      mitreIds: []
+    };
     this.rulesetHandler = RulesetHandler;
     this.columns = [
       {
@@ -218,38 +228,53 @@ class WzRuleInfo extends Component {
   renderInfo(id, level, file, path, groups) {
     return (
       <EuiFlexGrid columns={4}>
-        <EuiFlexItem key="id" grow={1}>
-          <b style={{ paddingBottom: 6 }}>ID</b>{id}
-        </EuiFlexItem>
-        <EuiFlexItem key="level" grow={1}>
-          <b style={{ paddingBottom: 6 }}>Level</b>
-          <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
+      <EuiFlexItem key="rule_ids" grow={1}>
+        <b style={{ paddingBottom: 6 }}>ID</b>
+        <span>
+          <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{ field: 'level', value: level }])}
+              onClick={async () => this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])}
             >
-              {level}
+              {id}
             </EuiLink>
           </EuiToolTip>
+        </span>
+      </EuiFlexItem>
+        <EuiFlexItem key="level" grow={1}>
+          <b style={{ paddingBottom: 6 }}>Level</b>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
+              <EuiLink
+                onClick={async () => this.setNewFiltersAndBack([{ field: 'level', value: level }])}
+              >
+                {level}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="file" grow={1}>
           <b style={{ paddingBottom: 6 }}>File</b>
-          <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{ field: 'filename', value: file }])}
-            >
-              {file}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+              <EuiLink
+                onClick={async () => this.setNewFiltersAndBack([{ field: 'filename', value: file }])}
+              >
+                {file}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="path" grow={1}>
           <b style={{ paddingBottom: 6 }}>Path</b>
-          <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])}
-            >
-              {path}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+              <EuiLink
+                onClick={async () => this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])}
+              >
+                {path}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="Groups" grow={1}><b style={{ paddingBottom: 6 }}>Groups</b>
           {this.renderGroups(groups)}
@@ -350,19 +375,54 @@ class WzRuleInfo extends Component {
     );
   }
 
+
+  async addMitreInformation(compliance, currentRuleId){
+    try{
+      this.setState({mitreLoading: true, mitreRuleId: currentRuleId })
+      const mitreName = [];
+      const mitreIds = [];
+      const mitreTactics = await Promise.all(compliance.map(async (i) => {
+        const data = await ApiRequest.request('GET', '/mitre', { 
+          params: {
+            q: `id=${i}`
+          }
+        });
+        const formattedData = (((((data || {}).data).data || {}).affected_items || [])[0] || {});
+        const techniques = formattedData.phase_name || [];
+        mitreName.push(formattedData.json.name);
+        mitreIds.push(i);
+        return techniques;
+      }));
+      if(mitreTactics.length){
+        let removeDuplicates = (arr) => arr.filter((v,i) => arr.indexOf(v) === i)
+        const uniqueTactics = removeDuplicates(mitreTactics.flat());
+        this.setState({mitreLoading: false, mitreRuleId: currentRuleId, mitreIds, mitreTactics: uniqueTactics, mitreTechniques:mitreName })
+      }
+    }catch(error){
+      this.setState({mitreLoading: false})
+    }
+  }
+
   /**
    * Render the compliance(HIPAA, NIST...)
    * @param {Array} compliance
    */
   renderCompliance(compliance) {
+    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : this.props.state.ruleInfo.current;
+    if(compliance.mitre && compliance.mitre.length && currentRuleId !== this.state.mitreRuleId){
+      this.addMitreInformation(compliance.mitre, currentRuleId);
+    }else if(currentRuleId !== this.state.mitreRuleId){
+      this.setState({mitreLoading: false, mitreRuleId: currentRuleId, mitreIds: [], mitreTactics: [], mitreTechniques: [] });
+    }
     const listCompliance = [];
+    if(compliance.mitre) delete compliance.mitre;
     const keys = Object.keys(compliance);
     for (let i in Object.keys(keys)) {
       const key = keys[i];
 
       const values = compliance[key].map((element, index) => {
         return (
-          <span key={element}>
+          <span key={index}>
             <EuiLink
               onClick={async () => this.setNewFiltersAndBack([{ field: key, value: element }])}
             >
@@ -383,6 +443,39 @@ class WzRuleInfo extends Component {
         </EuiFlexItem>
       );
     }
+
+    if(this.state.mitreTechniques && this.state.mitreTechniques.length){
+      
+      const values = this.state.mitreTechniques.map((element, index) => {
+        return (
+          <span key={index}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack([{ field: 'mitre', value: this.state.mitreIds[index] }])}
+            >
+              <EuiToolTip position="top" content="Filter by this compliance">
+                <span>{element}</span>
+              </EuiToolTip>
+            </EuiLink>
+            {index < this.state.mitreTechniques.length - 1 && ', '}
+          </span>
+        );
+      });
+      listCompliance.push(<EuiFlexItem key={index} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+        <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTechniques']}</b>
+        {this.state.mitreLoading && <EuiLoadingSpinner size="m" /> || <p>{values}</p>}
+        <EuiSpacer size="s" />
+      </EuiFlexItem>)
+    }
+
+    if(this.state.mitreTactics && this.state.mitreTactics.length){
+      
+      listCompliance.push(<EuiFlexItem key={index} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+        <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTactics']}</b>
+        <p>{this.state.mitreTactics.toString()}</p>
+        <EuiSpacer size="s" />
+      </EuiFlexItem>)
+    }
+
     return <EuiFlexGrid columns={4}>{listCompliance}</EuiFlexGrid>;
   }
 

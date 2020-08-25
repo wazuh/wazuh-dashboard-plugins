@@ -25,6 +25,8 @@ import {
 } from '@elastic/eui';
 
 import { TimeService } from '../../../react-services/time-service';
+import store from '../../../redux/store';
+import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 
 export default class SettingsLogs extends Component {
   constructor(props) {
@@ -42,6 +44,7 @@ export default class SettingsLogs extends Component {
   };
 
   componentDidMount() {
+    store.dispatch(updateSelectedSettingsSection('logs'));
     this._isMounted = true;
     this.refresh();
     this.height = window.innerHeight - this.offset; //eslint-disable-line

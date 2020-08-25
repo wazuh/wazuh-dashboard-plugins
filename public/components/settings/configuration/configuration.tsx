@@ -27,6 +27,8 @@ import {
   formEquivalence
 } from '../../../utils/config-equivalences';
 import WzReduxProvider from '../../../redux/wz-redux-provider'
+import store from '../../../redux/store'
+import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 import { EuiSpacer } from '@elastic/eui';
 
@@ -46,6 +48,7 @@ const WzConfigurationSettingsProvider = (props) => {
   const [query, setQuery] = useState('');
   const [updatedConfig, setUpdateConfig] = useState({});
   useEffect(() => {
+    store.dispatch(updateSelectedSettingsSection('configuration'));
     const rawConfig = props.wazuhConfig.getConfig();
     const formatedConfig = Object.keys(rawConfig).reduce<ISetting[]>((acc, conf) => [
       ...acc,

@@ -62,10 +62,10 @@ export class ScaScan extends Component {
   }
 
   async getLastScan(agentId: Number) {
-    const scans = await WzRequest.apiReq('GET', `/sca/${agentId}?sort=-end_scan`, { limit: 1 });
+    const scans = await WzRequest.apiReq('GET', `/sca/${agentId}?sort=-end_scan`, {params:{ limit: 1} });
     this._isMount &&
       this.setState({
-        lastScan: (((scans.data || {}).data || {}).items || {})[0],
+        lastScan: (((scans.data || {}).data || {}).affected_items || {})[0],
         isLoading: false,
       });
   }
@@ -104,18 +104,18 @@ export class ScaScan extends Component {
       <Fragment>
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
-            <EuiTitle size="s">
+            <EuiTitle size="xs">
               <EuiLink onClick={() => {
                   window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
                   store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                 }
               }>
-                <h3>{lastScan.name}</h3>
+                <h4>{lastScan.name}</h4>
               </EuiLink>
             </EuiTitle>
           </EuiFlexItem>
-          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
+          <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
             <EuiBadge color="secondary">{lastScan.policy_id}</EuiBadge>
           </EuiFlexItem>
         </EuiFlexGroup>

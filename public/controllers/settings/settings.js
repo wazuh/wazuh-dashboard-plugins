@@ -20,6 +20,7 @@ import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
+import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
 
 export class SettingsController {
   /**
@@ -65,6 +66,7 @@ export class SettingsController {
       const location = this.$location.search();
       if (location && location.tab) {
         this.tab = location.tab;
+        if(this.tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
       }
       // Set component props
       this.setComponentProps();
@@ -150,6 +152,7 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab) {
+    if(tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }

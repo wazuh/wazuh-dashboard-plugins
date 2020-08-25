@@ -215,25 +215,15 @@ export class AgentSelectionTable extends Component {
       return 'success';
     } else if (status.toLowerCase() === 'disconnected') {
       return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
+    } else if (status.toLowerCase() === 'never_connected') {
       return 'subdued';
-    }
-  }
-
-  agentStatusBadgeColor(status){
-    if (status.toLowerCase() === 'active') {
-      return 'secondary';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
-      return 'default';
     }
   }
 
   addHealthStatusRender(status) {
     return (
       <EuiHealth color={this.agentStatusColor(status)} style={{ whiteSpace: 'no-wrap' }}>
-        {status}
+        {status === 'never_connected' ? 'never connected' : status}
       </EuiHealth>
     );
   }
