@@ -6,27 +6,31 @@ import { AppState } from '../../../../react-services/app-state';
 
 
 export function SyscollectorTable({ tableParams }) {
-  const [params, setParams] = useState({ limit: 500, offset: 0, sort: '+', search: "" });
+  const [params, setParams] = useState({ limit: 10, offset: 0,});
   const [pageIndex, setPageIndex] = useState(0);
   const [searchBarValue, setSearchBarValue] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState('');
-  const [timerDelaySearch, setTimerDelaySearch] = useState(false);
+  const [timerDelaySearch, setTimerDelaySearch] = useState<NodeJS.Timeout>();
   const [sortDirection, setSortDirection] = useState('');
-  const syscollector = useApiRequest('GET', tableParams.path, params, (result) => { return ((result || {}).data || {}).data || {}; });
+  const [loading, data, error] = useApiRequest('GET', tableParams.path, params);
+
   const onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-
     setPageIndex(pageIndex);
     setPageSize(pageSize);
     setSortField(sortField);
     setSortDirection(sortDirection);
-    const newParams = params;
-    newParams.offset = Math.floor((pageIndex * pageSize) / params.limit) * params.limit;
     const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
-    newParams.sort = direction + field;
+    const newParams = {
+      ...params,
+      limit: pageSize,
+      offset: Math.floor((pageIndex * pageSize) / params.limit) * params.limit,
+      ...(!!field ? {sort: `${direction}${field}`} : {})
+    }
+
     setParams(newParams);
 
   };
@@ -48,7 +52,7 @@ export function SyscollectorTable({ tableParams }) {
   const pagination = {
     pageIndex: pageIndex,
     pageSize: pageSize,
-    totalItemCount: syscollector.data.total_affected_items || 0,
+    totalItemCount: data.total_affected_items || 0,
     pageSizeOptions: [10, 25, 50],
   };
 
@@ -59,36 +63,23 @@ export function SyscollectorTable({ tableParams }) {
     }
   };
 
-  const itemsOfPage = () => {
-    const result = [];
-    const start = (pageIndex * pageSize) % 500;
-    const end = start + pageSize;
-    for (var i = start; i < end && ((pageIndex * pageSize)) < pagination.totalItemCount; i++) {
-      if (syscollector.data.affected_items[i])
-        result.push(syscollector.data.affected_items[i]);
-    }
-    return result;
-  }
-
   const onChange = (e) => {
     const value = e.target.value;
-    if (timerDelaySearch)
-      setTimerDelaySearch(clearTimeout(timerDelaySearch));
-
     setSearchBarValue(value);
-
-    setTimerDelaySearch(setTimeout(() => {
+    timerDelaySearch && clearTimeout(timerDelaySearch);
+    const timeoutId = setTimeout(() => {
       const newParams = { ...params, search: value };
       setParams(newParams);
       setPageIndex(0);
-    }, 400));
+    }, 400)
+    setTimerDelaySearch(timeoutId);
   }
 
   const getTotal = () => {
-    if (syscollector.isLoading)
+    if (loading)
       return <>{'( '}<EuiLoadingSpinner></EuiLoadingSpinner>{' )'}</>;
     else
-      return `(${syscollector.data.total_affected_items})`;
+      return `(${data.total_affected_items})`;
   }
 
 
@@ -116,10 +107,11 @@ export function SyscollectorTable({ tableParams }) {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
-            items={itemsOfPage()}
+            items={data.affected_items || []}
             columns={columns}
             pagination={pagination}
-            loading={syscollector.isLoading}
+            loading={loading}
+            error={error}
             sorting={sorting}
             onChange={onTableChange}
           />

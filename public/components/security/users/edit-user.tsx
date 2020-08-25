@@ -20,8 +20,8 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 export const EditUser = ({ currentUser, closeFlyout }) => {
     const userRoles = currentUser.roles ? currentUser.roles.map(item => { return { label: item } }) : [];
     const [selectedRoles, setSelectedRole] = useState(userRoles);
-    const roles = useApiRequest('GET', '/security/roles', {}, (result) => { return ((result || {}).data || {}).data || {}; });
-    const rolesOptions = roles.data.affected_items ? roles.data.affected_items.map(item => { return { label: item.name } }) : [];
+    const [loading, data, error] = useApiRequest('GET', '/security/roles', {});
+    const rolesOptions = data.affected_items ? data.affected_items.map(item => { return { label: item.name } }) : [];
 
 
 
@@ -59,7 +59,7 @@ export const EditUser = ({ currentUser, closeFlyout }) => {
                             placeholder="Select roles"
                             options={rolesOptions}
                             selectedOptions={selectedRoles}
-                            isLoading={roles.isLoading}
+                            isLoading={loading}
                             onChange={onChangeRoles}
                             isClearable={true}
                             data-test-subj="demoComboBox"
