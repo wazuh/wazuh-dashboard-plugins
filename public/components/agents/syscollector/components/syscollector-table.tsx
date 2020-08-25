@@ -6,7 +6,7 @@ import { AppState } from '../../../../react-services/app-state';
 
 
 export function SyscollectorTable({ tableParams }) {
-  const [params, setParams] = useState({ limit: 10, offset: 0,});
+  const [params, setParams] = useState({ limit: 10, offset: 0, });
   const [pageIndex, setPageIndex] = useState(0);
   const [searchBarValue, setSearchBarValue] = useState("");
   const [pageSize, setPageSize] = useState(10);
@@ -28,7 +28,7 @@ export function SyscollectorTable({ tableParams }) {
       ...params,
       limit: pageSize,
       offset: Math.floor((pageIndex * pageSize) / params.limit) * params.limit,
-      ...(!!field ? {sort: `${direction}${field}`} : {})
+      ...(!!field ? { sort: `${direction}${field}` } : {})
     }
 
     setParams(newParams);
@@ -122,7 +122,7 @@ export function SyscollectorTable({ tableParams }) {
           <EuiFlexItem grow={true} > </EuiFlexItem>
           <EuiFlexItem grow={false} >
             <EuiButtonEmpty
-              onClick={async () => await AppState.downloadCsv(tableParams.path, tableParams.exportFormatted, params.search ? [{ name: 'search', value: params.search }] : [])}
+              onClick={async () => await AppState.downloadCsv(tableParams.path, tableParams.exportFormatted, !!params.search ? [{ name: 'search', value: params.search }] : [])}
               iconType="importAction">
               Download CSV
             </EuiButtonEmpty>
