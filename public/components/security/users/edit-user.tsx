@@ -20,10 +20,13 @@ import { ApiRequest } from '../../../react-services/api-request';
 export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) => {
     const userRolesFormatted = userRoles && userRoles.length ? userRoles.map(item => { return { label: rolesObject[item], id:item } }) : [];
     const [selectedRoles, setSelectedRole] = useState(userRolesFormatted);
-    const roles = useApiRequest('GET', '/security/roles', {}, (result) => { return ((result || {}).data || {}).data || {}; });
-    const rolesOptions = roles.data.affected_items ? roles.data.affected_items.map(item => { return { label: item.name, id: item.id } }) : [];
-    const rules = useApiRequest('GET', '/security/rules', { params: {search: `wui_${currentUser.user}`}}, (result) => { return ((result || {}).data || {}).data || {}; });
-    var userRules = rules.data.affected_items ? rules.data.affected_items.filter(item => {return item.name === `wui_${currentUser.user}`}) : {};
+    const [rolesParams, setRoleParams] = useState({});
+    const [rolesLoading, roles, rolesError] = useApiRequest('GET', '/security/roles', rolesParams);
+    const rolesOptions = roles.affected_items ? roles.affected_items.map(item => { return { label: item.name, id: item.id } }) : [];
+
+    const [rulesParams, setRuleParams] = useState({search: `wui_${currentUser.user}`});
+    const [rulesLoading, rules, rulesError] = useApiRequest('GET', '/security/rules', rulesParams);
+    var userRules = rules.affected_items ? rules.affected_items.filter(item => {return item.name === `wui_${currentUser.user}`}) : [];
     const [isLoading, setIsLoading] = useState(false);
 
     const editUser = async () => {
@@ -102,7 +105,7 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
                             placeholder="Select roles"
                             options={rolesOptions}
                             selectedOptions={selectedRoles}
-                            isLoading={roles.isLoading || isLoading}
+                            isLoading={rulesLoading || isLoading}
                             onChange={onChangeRoles}
                             isClearable={true}
                             data-test-subj="demoComboBox"
