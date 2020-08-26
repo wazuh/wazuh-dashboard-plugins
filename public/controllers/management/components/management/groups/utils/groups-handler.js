@@ -128,7 +128,8 @@ export default class GroupsHandler {
   static async sendGroupConfiguration(fileName, groupId, content) {
     try {
       const result = await WzRequest.apiReq('PUT', `/groups/${groupId}/configuration`, {
-        body: content
+        body: content,
+        origin: 'xmleditor'
       });
       return result;
     } catch (error) {

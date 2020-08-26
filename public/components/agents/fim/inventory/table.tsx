@@ -115,10 +115,10 @@ export class InventoryTable extends Component {
       const syscheck = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
-      this.buildFilter()
+      { params: this.buildFilter()},
       );
 
-      this.props.onTotalItemsChange((((syscheck || {}).data || {}).data || {}).totalItems);
+      this.props.onTotalItemsChange((((syscheck || {}).data || {}).data || {}).total_affected_items);
       
       this.setState({
         syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},

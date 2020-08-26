@@ -146,13 +146,15 @@ export class OverviewController {
     //check if we need to load an agent filter
     const agent = this.$location.search().agentId;
     if (agent && store.getState().appStateReducers.currentAgentData.id !== agent) {
-      const data = await this.wzReq('GET', '/agents', { "q": "id=" + agent });
-      const formattedData = data.data.data.items[0];
+      const params = { "q": `id=${agent}` }
+      const data = await this.wzReq('GET', '/agents', { params });
+      const agentList = data.data.data.affected_items;
+      const formattedData = agentList[0];
       this.visualizeProps["isAgent"] = agent;
       store.dispatch(updateCurrentAgentData(formattedData));
       this.$location.search('agentId', String(agent));
+      this.updateSelectedAgents(agentList);
     }
-
   }
 
   /**

@@ -165,7 +165,7 @@ export class Inventory extends Component {
     const response = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
-      this.buildFilter(type),
+      { params: this.buildFilter(type) },
     );
     if (type === 'file') {
       return {

@@ -41,7 +41,7 @@ export function SyscollectorInventory({agent}){
 
   return (
     <div style={{overflow: 'hidden'}}>
-      {agent && agent.status === 'Disconnected' && 
+      {agent && agent.status === 'disconnected' && 
          <EuiCallOut
          style={{margin: "8px 16px 8px 16px"}}
          title="This agent is currently disconnected, the data may be outdated."

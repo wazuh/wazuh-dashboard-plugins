@@ -78,7 +78,7 @@ export class GroupsController {
         const data = await this.apiReq.request('GET',
           '/groups', {
             params: {
-              limit: 1000
+              limit: 500
             },
           });
         const filtered = data.data.data.affected_items.filter(group => group.name === globalGroup);
@@ -96,7 +96,7 @@ export class GroupsController {
         const loadedGroups = await this.apiReq.request('GET',
           '/groups', {
             params: {
-              limit: 1000
+              limit: 500
             }
           }
         );

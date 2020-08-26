@@ -132,9 +132,9 @@ export default compose(
       result['offset'] = customOffset;
     }
     if (this.state.logLevelSelect !== 'all')
-      result['type_log'] = this.state.logLevelSelect;
+      result['level'] = this.state.logLevelSelect;
     if (this.state.selectedDaemon !== 'all')
-      result['category'] = this.state.selectedDaemon;
+      result['tag'] = this.state.selectedDaemon;
     if (this.state.appliedSearch) result['search'] = this.state.appliedSearch;
     if (this.state.descendingSort) result['sort'] = '+timestamp';
     else result['sort'] = '-timestamp';
@@ -167,8 +167,8 @@ export default compose(
           logsPath,
           { params: this.buildFilters(customOffset) }
         );
-        const resultItems = ((tmpResult || {}).data.data || {}).items;
-        totalItems = ((tmpResult || {}).data.data || {}).totalItems;
+        const resultItems = ((tmpResult || {}).data.data || {}).affected_items;
+        totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (err) {
         result = '';
@@ -245,7 +245,8 @@ export default compose(
       { value: 'error', text: 'Error' },
       { value: 'warning', text: 'Warning' },
       { value: 'critical', text: 'Critical' },
-      { value: 'debug', text: 'Debug' }
+      { value: 'debug', text: 'Debug' },
+      { value: 'debug2', text: 'Debug2'}
     ];
   }
 

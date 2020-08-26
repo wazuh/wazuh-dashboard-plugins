@@ -108,7 +108,7 @@ class WzRulesetEditor extends Component {
         });
         this.setState({ isSaving: false });
         this.goToEdit(name);
-        this.showToast('warning', warning.savedMessage, warning.details, 3000);
+        this.showToast('warning', warning.savedMessage, error, 3000);
         return;
       }
       this.setState({ isSaving: false });

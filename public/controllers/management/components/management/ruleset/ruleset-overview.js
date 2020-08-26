@@ -6,7 +6,8 @@ import {
   EuiPanel,
   EuiPage,
   EuiText,
-  EuiTitle
+  EuiTitle,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -16,7 +17,6 @@ import WzRulesetTable from './ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-import { WzRulesetTotalItems } from './ruleset-total-items';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 
@@ -44,7 +44,7 @@ class WzRulesetOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiTitle>
-                <h2>{this.sectionNames[section]} <WzRulesetTotalItems section={section} totalItems={totalItems} /></h2>
+                <h2>{this.sectionNames[section]} {totalItems === false ? <EuiLoadingSpinner /> : <span>({totalItems})</span>}</h2>
               </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem></EuiFlexItem>

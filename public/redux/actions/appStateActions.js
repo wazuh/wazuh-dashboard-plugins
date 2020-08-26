@@ -136,3 +136,14 @@ export const updateUserPermissions = userPermissions => {
     userPermissions
   };
 };
+
+/**
+* Updates selectedSettingsSection in the appState store
+* @param extensions
+*/
+export const updateSelectedSettingsSection = selected_settings_section => {
+ return {
+   type: 'UPDATE_SELECTED_SETTINGS_SECTION',
+   selected_settings_section
+ };
+};

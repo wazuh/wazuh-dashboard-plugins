@@ -734,7 +734,7 @@ export class WazuhElasticCtrl {
       const type = req.params.tab.split('-')[1];
 
       const file = ClusterVisualizations[type];
-      const nodes = req.payload.nodes.items;
+      const nodes = req.payload.nodes.affected_items;
       const name = req.payload.nodes.name;
       const masterNode = req.payload.nodes.master_node;
 

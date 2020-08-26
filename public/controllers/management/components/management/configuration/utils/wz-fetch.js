@@ -405,7 +405,8 @@ export const saveFileCluster = async (text, node) => {
           path: 'etc/ossec.conf',
           overwrite: true
         },
-        body: xml.toString()
+        body: xml.toString(),
+        origin: 'raw'
       }
     );
     await validateAfterSent(node);
@@ -428,7 +429,8 @@ export const saveFileManager = async text => {
           path: 'etc/ossec.conf',
           overwrite: true
         },
-        body: xml.toString()
+        body: xml.toString(),
+        origin: 'raw'
       }
     );
     await validateAfterSent(false);
