@@ -4,10 +4,11 @@ import {
     EuiInMemoryTable,
     EuiBadge,
     EuiFlexGroup,
+    EuiLoadingSpinner,
     EuiFlexItem
 } from '@elastic/eui';
 
-export const UsersTable = ({ users, editUserFlyover}) => {
+export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, relationUserRole}) => {
     
     const getRowProps = item => {
         const { id } = item;
@@ -37,12 +38,17 @@ export const UsersTable = ({ users, editUserFlyover}) => {
             truncateText: true,
         },
         {
-            field: 'roles',
+            field: 'user',
             name: 'Roles',
             dataType: 'boolean',
-            render: roles => {
-                const tmpRoles = roles.map(role => {
-                    return <EuiFlexItem grow={false}><EuiBadge color="secondary">{role}</EuiBadge></EuiFlexItem>;
+            render: (user) => {
+                if(rolesLoading){
+                    return <EuiLoadingSpinner size="m" />
+                }
+                const userRoles = relationUserRole[user];
+                if(!userRoles || !userRoles.length) return <></>;
+                const tmpRoles = userRoles.map(role => {
+                    return <EuiFlexItem grow={false}><EuiBadge color="secondary">{roles[role]}</EuiBadge></EuiFlexItem>;
                 });
                 return <EuiFlexGroup
                     wrap

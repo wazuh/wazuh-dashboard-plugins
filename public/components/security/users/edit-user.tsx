@@ -15,22 +15,65 @@ import {
 
 import { useApiRequest } from '../../common/hooks/useApiRequest';
 import { ErrorHandler } from '../../../react-services/error-handler';
+import { ApiRequest } from '../../../react-services/api-request';
 
-
-export const EditUser = ({ currentUser, closeFlyout }) => {
-    const userRoles = currentUser.roles ? currentUser.roles.map(item => { return { label: item } }) : [];
-    const [selectedRoles, setSelectedRole] = useState(userRoles);
+export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) => {
+    const userRolesFormatted = userRoles && userRoles.length ? userRoles.map(item => { return { label: rolesObject[item], id:item } }) : [];
+    const [selectedRoles, setSelectedRole] = useState(userRolesFormatted);
     const roles = useApiRequest('GET', '/security/roles', {}, (result) => { return ((result || {}).data || {}).data || {}; });
-    const rolesOptions = roles.data.affected_items ? roles.data.affected_items.map(item => { return { label: item.name } }) : [];
-
-
-
+    const rolesOptions = roles.data.affected_items ? roles.data.affected_items.map(item => { return { label: item.name, id: item.id } }) : [];
+    const rules = useApiRequest('GET', '/security/rules', { params: {search: `wui_${currentUser.user}`}}, (result) => { return ((result || {}).data || {}).data || {}; });
+    var userRules = rules.data.affected_items ? rules.data.affected_items.filter(item => {return item.name === `wui_${currentUser.user}`}) : {};
+    const [isLoading, setIsLoading] = useState(false);
 
     const editUser = async () => {
+        setIsLoading(true);
         const formattedRoles = selectedRoles.map(item => {
-            return item.label;
+            return item.id;
         });
-        
+        if(!userRules.length){
+            const data = await ApiRequest.request(
+                'POST',
+                '/security/rules',
+                {
+                    "name": `wui_${currentUser.user}`,
+                    "rule": {
+                        "FIND": {
+                        "username": `${currentUser.user}`
+                        }
+                    }
+                }
+            );
+            userRules = ((data.data || {}).data || {}).affected_items || [];
+        }
+        const ruleId = (userRules[0] || {}).id || false;
+        if(ruleId){
+            const toAdd = formattedRoles.filter(value => !userRoles.includes(value));
+            const toRemove = userRoles.filter(value => !formattedRoles.includes(value));
+            await Promise.all(toAdd.map(async (role) => {  
+                const data = await ApiRequest.request(
+                    'POST',
+                    `/security/roles/${role}/rules`,
+                    {
+                        params: {
+                            rule_ids: ruleId
+                        }
+                    }
+                );
+            }));
+
+            await Promise.all(toRemove.map(async (role) => {  
+                const data = await ApiRequest.request(
+                    'DELETE',
+                    `/security/roles/${role}/rules`,
+                    {
+                        params: {
+                            rule_ids: ruleId
+                        }
+                    }
+                );
+            }));
+        }
         closeFlyout(false)
     }
 
@@ -53,13 +96,13 @@ export const EditUser = ({ currentUser, closeFlyout }) => {
             <EuiFlyoutBody>
                 <EuiForm component="form" style={{ padding: 24 }}>
                     <EuiFormRow label="Roles"
-                        helpText="Assign roles to the user from the roles available in your security plugin.">
+                        helpText="Assign roles to the selected user">
 
                         <EuiComboBox
                             placeholder="Select roles"
                             options={rolesOptions}
                             selectedOptions={selectedRoles}
-                            isLoading={roles.isLoading}
+                            isLoading={roles.isLoading || isLoading}
                             onChange={onChangeRoles}
                             isClearable={true}
                             data-test-subj="demoComboBox"
@@ -68,7 +111,7 @@ export const EditUser = ({ currentUser, closeFlyout }) => {
                     <EuiSpacer />
                     <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                            <EuiButton fill onClick={editUser}>
+                            <EuiButton fill isLoading={isLoading} onClick={editUser}>
                                 Apply
                             </EuiButton>
                         </EuiFlexItem>
