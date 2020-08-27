@@ -21,7 +21,13 @@ export class WzSecurityOpendistro {
         `/api/v1/configuration/internalusers`,
         {}
       );
-      return users.data;
+      const tmpUsers = (users.data || {}).data || {};
+      const usersArray = Object.keys(tmpUsers).map(user => {
+        const full_name = ((tmpUsers[user] || {}).attributes || {}).full_name || null;
+        const email = ((tmpUsers[user] || {}).attributes || {}).email || null;
+        return {username: user, email, full_name, roles: []}
+      })
+      return usersArray;
     } catch (error) {
       throw error;
     }

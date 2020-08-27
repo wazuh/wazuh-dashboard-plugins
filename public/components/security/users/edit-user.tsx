@@ -95,7 +95,7 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
             <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">
                     <h2>Edit {currentUser.user} user &nbsp; &nbsp;
-                    {currentUser.user === 'elastic' &&
+                    {currentUser.user === 'elastic' || currentUser.user === 'admin' &&
                             <EuiBadge color='primary'>Reserved</EuiBadge>
                         }</h2>
                 </EuiTitle>
@@ -118,7 +118,7 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
                     <EuiSpacer />
                     <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                            <EuiButton fill isLoading={isLoading} isDisabled={currentUser.user === 'elastic'} onClick={editUser}>
+                            <EuiButton fill isLoading={isLoading} isDisabled={currentUser.user === 'elastic' || currentUser.user === 'admin'} onClick={editUser}>
                                 Apply
                             </EuiButton>
                         </EuiFlexItem>

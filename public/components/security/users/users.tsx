@@ -44,7 +44,7 @@ export const Users = ({setSecurityError}) => {
             const rules =  ((rulesData.data || {}).data || {}).affected_items || [];
             const userRelationRole = {}
             users.forEach(item => {
-                const filteredRule = rules.filter(x => x.name === `wui_${item.user}` || item.user === 'elastic');
+                const filteredRule = rules.filter(x => x.name === `wui_${item.user}` || item.user === 'elastic' || item.user ==='admin');
                 if(filteredRule.length){
                     userRelationRole[item.user] = filteredRule[0].roles;
                 }
