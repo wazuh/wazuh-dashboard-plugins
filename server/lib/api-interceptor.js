@@ -26,11 +26,11 @@ export class ApiInterceptor {
     this.updateRegistry = new UpdateRegistry();
   }
 
-  async authenticateApi(idHost) {
+  async authenticateApi(idHost, authContext = undefined) {
     try {
       const api = await this.manageHosts.getHostById(idHost);
       const options = {
-        method: 'GET',
+        method: !!authContext ? 'POST' : 'GET',
         headers: {
           'content-type': 'application/json',
         },
@@ -38,10 +38,14 @@ export class ApiInterceptor {
           username: api.username,
           password: api.password,
         },
-        url: `${api.url}:${api.port}/security/user/authenticate`,
+        url: `${api.url}:${api.port}/security/user/authenticate${!!authContext ? '/run_as' : ''}`,
+        ...(!!authContext ? { data: authContext } : {})
       };
 
       const response = await axios(options);
+      if (!!authContext) {
+        return response.data.token;
+      }
       const token = response.data.token;
       await this.updateRegistry.updateTokenByHost(idHost, token);
       return response;

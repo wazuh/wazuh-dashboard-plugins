@@ -15,6 +15,7 @@ import { Initialize } from './server/initialize';
 import { WazuhElasticRouter } from './server/routes/wazuh-elastic';
 import { Monitoring } from './server/monitoring';
 import { WazuhApiRoutes } from './server/routes/wazuh-api';
+import { WazuhLoginRoutes } from './server/routes/wazuh-login';
 import { WazuhHostsRoutes } from './server/routes/wazuh-hosts';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
@@ -43,6 +44,7 @@ export function initApp(server) {
       WazuhHostsRoutes(server);
       WazuhReportingRoutes(server);
       WazuhUtilsRoutes(server);
+      WazuhLoginRoutes(server);
     })
     .catch(error => {
       log('init:initApp', error.message || error);
