@@ -14,3 +14,4 @@ export const WAZUH_ALERTS_PREFIX = "wazuh-alerts-";
 export const WAZUH_ALERTS_PATTERN = "wazuh-alerts-*";
 export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
 export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
+export const WAZUH_SAMPLE_ALERT_PREFIX = "wazuh-alerts-4.x-";
