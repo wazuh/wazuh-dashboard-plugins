@@ -60,10 +60,7 @@ export const CreateRole = ({ closeFlyout }) => {
                 'POST',
                 '/security/roles',
                 {
-                        "name": roleName,
-                        "rule": {
-                            "MATCH": { "definition": roleName }
-                        }
+                        "name": roleName
                 }
             );
             const data = (result.data || {}).data;
@@ -94,7 +91,7 @@ export const CreateRole = ({ closeFlyout }) => {
             ErrorHandler.info('Role was successfully created with the selected policies');
 
         } catch (error) {
-            ErrorHandler.handle(error, "There was an error.");
+            ErrorHandler.handle(error, "There was an error");
         }
         closeFlyout(false)
     }

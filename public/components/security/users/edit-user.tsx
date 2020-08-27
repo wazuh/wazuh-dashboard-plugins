@@ -10,6 +10,7 @@ import {
     EuiFlexItem,
     EuiFormRow,
     EuiSpacer,
+    EuiBadge,
     EuiComboBox
 } from '@elastic/eui';
 
@@ -93,7 +94,10 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
             onClose={() => closeFlyout()}>
             <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">
-                    <h2>Edit {currentUser.user} user</h2>
+                    <h2>Edit {currentUser.user} user &nbsp; &nbsp;
+                    {currentUser.user === 'elastic' &&
+                            <EuiBadge color='primary'>Reserved</EuiBadge>
+                        }</h2>
                 </EuiTitle>
             </EuiFlyoutHeader>
             <EuiFlyoutBody>
@@ -114,7 +118,7 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
                     <EuiSpacer />
                     <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                            <EuiButton fill isLoading={isLoading} onClick={editUser}>
+                            <EuiButton fill isLoading={isLoading} isDisabled={currentUser.user === 'elastic'} onClick={editUser}>
                                 Apply
                             </EuiButton>
                         </EuiFlexItem>
