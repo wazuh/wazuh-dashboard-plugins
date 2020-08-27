@@ -388,7 +388,9 @@ export class WazuhElasticCtrl {
       if(this._server.plugins.security) { // XPACK
         return {platform: 'xpack'}
       }
-
+      if(this._server.plugins.opendistro_security){
+        return {platform: 'opendistro'}
+      }
       return { platform: false}
     } catch (error) {
       log('wazuh-elastic:getCurrentPlatform', error.message || error);

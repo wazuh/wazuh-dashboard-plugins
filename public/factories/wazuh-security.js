@@ -12,6 +12,7 @@
  */
 
 import { WzSecurityXpack } from '../react-services/wz-security-xpack';
+import { WzSecurityOpendistro } from '../react-services/wz-security-opendistro';
 import store from '../redux/store';
 
 
@@ -26,6 +27,8 @@ export class WazuhSecurity {
     const platform = store.getState().appStateReducers.currentPlatform;
     if(platform === 'xpack'){
       this.security = WzSecurityXpack;
+    }else if(platform === 'opendistro'){
+     this.security =  WzSecurityOpendistro;
     }else{
       this.security = false;
     }
