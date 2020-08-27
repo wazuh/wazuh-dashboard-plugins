@@ -685,7 +685,7 @@ class WzMenu extends Component {
                 <EuiToolTip position="top" content={`Open ${currentAgent.name} summary`}>
                   <EuiButtonEmpty
                     color="primary"
-                    onMouseDown={(ev) => { AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.setState({ menuOpened: false }) }}>
+                    onMouseDown={(ev) => { AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); this.setState({ menuOpened: false }) }}>
                     <EuiIcon type="visualizeApp" color="primary" size="m" />
                   </EuiButtonEmpty>
                 </EuiToolTip>
