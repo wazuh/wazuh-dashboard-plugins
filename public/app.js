@@ -74,6 +74,7 @@ import './factories';
 import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import { WzAuthentication } from './react-services/wz-authentication'
 
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
@@ -115,5 +116,8 @@ app.run([
     checkCurrentSecurityPlatform().then((item) => {
       store.dispatch(updateCurrentPlatform(item))
     }).catch(() => {})
+
+    // Init the process of refreshing the user's token when app start.
+    WzAuthentication.refresh();
   }
 ]);

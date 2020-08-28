@@ -46,10 +46,12 @@
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
     "axios": "^0.19.0",
+    "brace": "^0.11.1",
     "d3": "^5.12.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
+    "jwt-decode": "^2.2.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
     "pdfmake": "^0.1.37",
@@ -60,8 +62,7 @@
     "read-last-lines": "^1.7.2",
     "redux": "^4.0.4",
     "timsort": "^0.3.0",
-    "winston": "3.0.0",
-    "brace": "^0.11.1"
+    "winston": "3.0.0"
   },
   "devDependencies": {
     "@elastic/plugin-helpers": "^7.1.8",
