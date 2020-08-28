@@ -12,18 +12,28 @@
 import {} from '../lib/get-configuration';
 import { ApiInterceptor } from '../lib/api-interceptor';
 import { ISecurityFactory, SecurityObj } from '../lib/security-factory';
+import { ManageHosts } from '../lib/manage-hosts';
+
 
 export class WazuhLoginCtrl {
   static PLATFORM?: 'xpack' | 'opendistro';
   server; 
   securityObj: ISecurityFactory;
   apiInterceptor: ApiInterceptor;
+  manageHosts: ManageHosts;
 
   constructor(server) {
     this.server = server;
+    this.manageHosts = new ManageHosts();
     WazuhLoginCtrl.PLATFORM = this.getCurrentPlatform(server);
     this.securityObj = SecurityObj(WazuhLoginCtrl.PLATFORM, server);
     this.apiInterceptor = new ApiInterceptor();
+  }
+
+  async checkWazuhWui(apiId){
+    const host = await this.manageHosts.getHostById(apiId);
+    if(host && host.username === 'wazuh-wui') return true;
+    return false;
   }
 
   getCurrentPlatform(server) {
@@ -41,6 +51,7 @@ export class WazuhLoginCtrl {
   async getToken(req, reply) {
     try {
       const authContext = await this.securityObj.getCurrentUser(req);
+      const isWazuhWui = await this.checkWazuhWui('default');
       const token = await this.apiInterceptor.authenticateApi('default', authContext)
       return { token };
     } catch (error){
