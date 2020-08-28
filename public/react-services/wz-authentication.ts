@@ -29,7 +29,7 @@ export class WzAuthentication{
   private static async login(){
     try{
       const idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      const response = await WzRequest.genericReq('GET', '/wz-login/login', { idHost });
+      const response = await WzRequest.genericReq('POST', '/wz-login/login', { idHost });
       return response.data.token as string;
     }catch(error){
       return Promise.reject(error);
@@ -39,12 +39,11 @@ export class WzAuthentication{
     try{
       // Get user token
       const token: string = await WzAuthentication.login();
-      console.log('refresh token', token)
+      console.log('refresh token', token) // TODO: delete debug code
 
       // Decode token and get expiration time
       userToken = jwtDecode(token);
       const expirationTime = (userToken.exp - (Date.now() / 1000) - marginSeconds) as number;
-      console.log(userToken.exp, Date.now() / 1000, userToken.exp - (Date.now() / 1000))
       
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userToken.rbac_policies));

@@ -30,18 +30,17 @@ export class WazuhLoginCtrl {
     if (server.plugins.security) {
       return 'xpack';
     }
-
     if (server.plugins.opendistro_security) {
       return 'opendistro';
     }
-
     return undefined;
   }
 
   async getToken(req, reply) {
     try {
+      const { idHost } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
-      const token = await this.apiInterceptor.authenticateApi('default', authContext)
+      const token = await this.apiInterceptor.authenticateApi(idHost, authContext)
       return { token };
     } catch (error){
       console.log("error", error)
