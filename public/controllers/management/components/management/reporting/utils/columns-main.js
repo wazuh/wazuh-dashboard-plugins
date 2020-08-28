@@ -50,20 +50,19 @@ export default class ReportingColums {
                 />
               </EuiToolTip>
 
-              <EuiToolTip position="top" content={'Delete report'}>
-                <WzButtonPermissions
-                  buttonType='icon'
-                  roles={['administrator']}
-                  aria-label="Delete report"
-                  iconType="trash"
-                  onClick={async () => {
-                    this.tableProps.updateListItemsForRemove([item]);
-                    this.tableProps.updateShowModal(true);
-                  }}
-                  color="danger"
-                  isDisabled={item.name === 'default'}
-                />
-              </EuiToolTip>
+              <WzButtonPermissions
+                buttonType='icon'
+                roles={['administrator']}
+                aria-label="Delete report"
+                iconType="trash"
+                tooltip={{position: 'top', content: 'Delete report'}}
+                onClick={async () => {
+                  this.tableProps.updateListItemsForRemove([item]);
+                  this.tableProps.updateShowModal(true);
+                }}
+                color="danger"
+                isDisabled={item.name === 'default'}
+              />
             </div>
           );
         }
