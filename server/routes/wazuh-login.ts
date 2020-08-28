@@ -15,7 +15,7 @@ export function WazuhLoginRoutes(server) {
   const ctrl = new WazuhLoginCtrl(server);
   
   server.route({
-    method: 'GET',
+    method: 'POST',
     path: '/wz-login/login',
     handler(req, reply) {
       return ctrl.getToken(req, reply);
@@ -23,7 +23,7 @@ export function WazuhLoginRoutes(server) {
   })
 
   server.route({
-    method: 'GET',
+    method: 'POST',
     path: '/wz-login/logout',
     handler(req, reply) {
       return "Logout";

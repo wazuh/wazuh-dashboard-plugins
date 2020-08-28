@@ -51,8 +51,11 @@ export class WazuhLoginCtrl {
       const { idHost } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
       const isWazuhWui = await this.checkWazuhWui('default');
-      const token = await this.apiInterceptor.authenticateApi(idHost, authContext)
-      return { token };
+      const token = await this.apiInterceptor.authenticateApi(idHost, authContext);
+      const response = reply.response({token})
+      // TODO: This add the token to the cookies
+      response.state('wz-token', token, {isSecure: false, path: '/api/request'})
+      return response;
     } catch (error){
       console.log("error", error)
       // log('wazuh-elastic:getCurrentUser', error.message || error);
