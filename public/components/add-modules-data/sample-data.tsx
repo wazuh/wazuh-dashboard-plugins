@@ -28,6 +28,7 @@ import {
 
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
 export default class WzSampleData extends Component {
   categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
@@ -169,7 +170,7 @@ export default class WzSampleData extends Component {
                 {exists && (
                 <WzButtonPermissions
                   color='danger'
-                  roles={['administrator']}
+                  roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
                   onClick={() => this.removeSampleData(category)}
                 >
                  {removeDataLoading && 'Removing data' || 'Remove data'}
@@ -177,7 +178,7 @@ export default class WzSampleData extends Component {
                 ) || (
                   <WzButtonPermissions
                     isLoading={addDataLoading}
-                    roles={['administrator']}
+                    roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
                     onClick={() => this.addSampleData(category)}
                   >
                    {addDataLoading && 'Adding data' || 'Add data'}

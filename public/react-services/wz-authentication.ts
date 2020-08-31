@@ -15,6 +15,7 @@ import { AppState } from './app-state';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
 import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../util/constants';
 
 const delay = (timeout: number) => new Promise(res => {refreshTimeout = setTimeout(res, timeout)});
 
@@ -39,7 +40,6 @@ export class WzAuthentication{
     try{
       // Get user token
       const token: string = await WzAuthentication.login();
-      console.log('refresh token', token) // TODO: delete debug code
 
       // Decode token and get expiration time
       userToken = jwtDecode(token);
@@ -47,7 +47,7 @@ export class WzAuthentication{
       
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userToken.rbac_policies));
-      store.dispatch(updateUserRoles(userToken.rbac_roles));
+      store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(userToken.rbac_roles)));
       
       // Wait to next expiration time and call itself recursively
       await delay(expirationTime*1000);
@@ -55,6 +55,9 @@ export class WzAuthentication{
     }catch(error){
       return Promise.reject(error);
     }
+  }
+  private static mapUserRolesIDToAdministratorRole(roles){
+    return roles.map((role: number) => role === WAZUH_ROLE_ADMINISTRATOR_ID ? WAZUH_ROLE_ADMINISTRATOR_NAME : role);
   }
   static cancelRefresh(){
     clearTimeout(refreshTimeout);

@@ -14,6 +14,7 @@ import { Roles } from './roles/roles';
 import { Policies } from './policies/policies';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
 import { compose } from 'redux';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
 const tabs = [
     {
@@ -36,7 +37,7 @@ const tabs = [
 export const WzSecurity = compose(
     withReduxProvider,
     withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
-    withUserAuthorizationPrompt(null, ['administrator'])
+    withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(() => {
     // Get the initial tab when the component is initiated
     const securityTabRegExp = new RegExp(`tab=(${tabs.map(tab => tab.id).join('|')})`);

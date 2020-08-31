@@ -17,6 +17,7 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
 
 export class EnableModulesWrapper extends Component {
   constructor(props) {
@@ -164,7 +165,7 @@ export class EnableModulesWrapper extends Component {
   }
 }
 
-const WzEnableModulesWithAdministrator = withUserAuthorizationPrompt(null, ['administrator'])(EnableModulesWrapper);
+const WzEnableModulesWithAdministrator = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(EnableModulesWrapper);
 export function EnableModules() {
   return(
     <WzReduxProvider>

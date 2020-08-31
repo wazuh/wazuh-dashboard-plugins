@@ -27,6 +27,7 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import { withUserAuthorizationPrompt } from '../../components/common/hocs/withUserAuthorization';
 import store from '../../redux/store';
 import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
 export class WzSampleDataProvider extends Component {
   constructor(props) {
@@ -72,7 +73,7 @@ export class WzSampleDataProvider extends Component {
   }
 }
 
-const WzSampleDataWrapperWithAdministrator = withUserAuthorizationPrompt(null, ['administrator'])(WzSampleDataProvider);
+const WzSampleDataWrapperWithAdministrator = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(WzSampleDataProvider);
 export function WzSampleDataWrapper() {
   return (
   <WzReduxProvider>
