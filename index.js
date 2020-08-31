@@ -24,7 +24,7 @@ export default (kibana) => {
         id: 'wazuh',
         title: 'Wazuh',
         description: 'Wazuh app for Kibana',
-        icon: 'plugins/wazuh/img/icon_blue.svg',
+        icon: 'plugins/wazuh/img/icon_blue.png',
         main: 'plugins/wazuh/app'
       },
       hacks: ['plugins/wazuh/icon-style'],
