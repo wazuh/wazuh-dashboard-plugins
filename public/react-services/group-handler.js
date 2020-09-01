@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WzRequest } from './api-request';
+import { WzRequest } from './wz-request';
 
 export class GroupHandler {
   static async removeGroup(group) {
