@@ -64,6 +64,7 @@ export class WazuhLoginCtrl {
       }
       const response = reply.response({token})
       response.state('wz-token', token, {isSecure: false, path: '/api/'})
+      response.state('wz-user', token, {isSecure: false, path: '/api/'})
 
       return { token };
     } catch (error){
