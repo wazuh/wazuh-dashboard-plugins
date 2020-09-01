@@ -12,6 +12,7 @@
 
 import { WzRequest } from './wz-request';
 import { AppState } from './app-state';
+import { GenericRequest } from './generic-request';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
 import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
@@ -30,9 +31,19 @@ export class WzAuthentication{
   private static async login(){
     try{
       const idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      const response = await WzRequest.genericReq('POST', '/wz-login/login', { idHost });
+      if(!idHost){
+        const response = await GenericRequest.request('GET', '/hosts/apis');
+        const hosts = response.data;
+        for(var i=0; i< hosts.length; i++){
+          const loginResponse =  await WzRequest.genericReq('POST', '/api/login', { idHost: hosts[i].id});
+        }
+
+    }else{
+      const response = await WzRequest.genericReq('POST', '/api/login', { idHost });
       return response.data.token as string;
+    }
     }catch(error){
+      console.log("error", error)
       return Promise.reject(error);
     }
   }

@@ -41,29 +41,27 @@ export class ApiInterceptor {
         url: `${api.url}:${api.port}/security/user/authenticate${!!authContext ? '/run_as' : ''}`,
         ...(!!authContext ? { data: authContext } : {})
       };
-
       const response = await axios(options);
       if (!!authContext) {
         return response.data.token;
       }
       const token = response.data.token;
       await this.updateRegistry.updateTokenByHost(idHost, token);
-      return response;
+      return token;
     } catch (error) {
       throw error;
     }
   }
 
-  async buildOptionsObject(method, path, data, options) {
+  async buildOptionsObject(method, path, data, options, token) {
     if (!options.idHost) {
       return {};
     }
     const idHost = options.idHost;
-    let token = await this.updateRegistry.getTokenById(idHost);
 
     if (token === null) {
-      await this.authenticateApi(idHost);
-      token = await this.updateRegistry.getTokenById(idHost);
+       //TODO 
+       console.log("NO TOKEN - TODO REMOVE")
     }
 
     if (token !== null) {
@@ -82,21 +80,23 @@ export class ApiInterceptor {
     }
   }
 
-  async request(method, path, data, options, attempts = 3) {
-    const optionsObject = await this.buildOptionsObject(method, path, data, options);
-
+  async request(method, path, data, options, token, attempts = 3) {
+    const optionsObject = await this.buildOptionsObject(method, path, data, options, token);
+    
     if (optionsObject !== null) {
       return axios(optionsObject)
         .then(response => {
           return response;
         })
         .catch(async error => {
+          console.log("error interceptor - TODO remove");
+          return ; 
           if (attempts > 0 && error.response) {
             if (error.response.status === 401) {
               const responseAuth = await this.authenticateApi(options.idHost);
 
               if (responseAuth.status === 200) {
-                return this.request(method, path, data, options, attempts - 1);
+                return this.request(method, path, data, options,token, attempts - 1);
               } else {
                 return responseAuth;
               }

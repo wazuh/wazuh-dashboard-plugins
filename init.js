@@ -44,7 +44,6 @@ export function initApp(server) {
       WazuhHostsRoutes(server);
       WazuhReportingRoutes(server);
       WazuhUtilsRoutes(server);
-      WazuhLoginRoutes(server);
     })
     .catch(error => {
       log('init:initApp', error.message || error);

@@ -33,6 +33,14 @@ export function WazuhApiRoutes(server) {
     }
   });
 
+  server.route({
+    method: 'POST',
+    path: '/api/login',
+    handler(req, reply) {
+      return ctrl.getToken(req, reply);
+    }
+  })
+
   // Returns the request result (With error control)
   server.route({
     method: 'POST',

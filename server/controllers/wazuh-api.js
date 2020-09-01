@@ -32,6 +32,7 @@ import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
 import { ApiInterceptor } from '../lib/api-interceptor';
+import { SecurityObj } from '../lib/security-factory';
 
 export class WazuhApiCtrl {
   /**
@@ -39,11 +40,78 @@ export class WazuhApiCtrl {
    * @param {*} server
    */
   constructor(server) {
+    this.PLATFORM = this.getCurrentPlatform(server);
     this.queue = Queue;
     this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
+    this.securityObj = SecurityObj(this.PLATFORM, server);
     this.apiInterceptor = new ApiInterceptor();
+  }
+
+  async checkWazuhWui(apiId){
+    const host = await this.manageHosts.getHostById(apiId);
+    if(host && host.username === 'wazuh-wui') return true;
+    return false;
+  }
+
+  getCurrentPlatform(server) {
+    if (server.plugins.security) {
+      return 'xpack';
+    }
+    if (server.plugins.opendistro_security) {
+      return 'opendistro';
+    }
+    return undefined;
+  }
+
+  getTokenFromCookie(cookie){
+    const getWzToken = /.*wz-token=([^;]+)/;
+    const wzToken = cookie.match(getWzToken)
+    if(wzToken && wzToken.length && wzToken[1]) return wzToken[1];
+    return false;
+  }
+
+  getUserFromCookie(cookie){
+    const getWzUser = /.*wz-user=([^;]+)/;
+    const wzUser = cookie.match(getWzUser)
+    if(wzUser && wzUser.length && wzUser[1]) return wzUser[1];
+    return false;
+  }
+
+  getUserFromAuthContext(authContext){
+    if(this.PLATFORM === 'xpack')
+      return authContext.username;
+    if(this.PLATFORM === 'opendistro')
+      return authContext.user_name;
+  }
+
+  async getToken(req, reply) {
+    try {
+      const authContext = await this.securityObj.getCurrentUser(req);
+      const username = this.getUserFromAuthContext(authContext);
+      if(req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie)){
+        const wzToken = this.getTokenFromCookie(req.headers.cookie)
+        if(wzToken) return {token :wzToken, test: true}
+      }
+      const { idHost } = req.payload;
+      const isWazuhWui = await this.checkWazuhWui(idHost);
+      let token;
+      if(isWazuhWui){
+        token = await this.apiInterceptor.authenticateApi(idHost, authContext)
+      }else{
+        token = await this.apiInterceptor.authenticateApi(idHost)
+      }
+      const response = reply.response({token})
+      response.state('wz-token', token, {isSecure: false, path: '/api/'})
+      response.state('wz-user', username, {isSecure: false, path: '/api/'})
+
+      return { token };
+    } catch (error){
+      console.log("error", error)
+      // log('wazuh-elastic:getCurrentUser', error.message || error);
+      // return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
   }
 
   /**
@@ -54,6 +122,7 @@ export class WazuhApiCtrl {
    */
   async checkStoredAPI(req, reply) {
     try {
+      const token = this.getTokenFromCookie(req.headers.cookie);
       // Get config from wazuh.yml
       const id = req.payload.id || req.payload;
       const api = await this.manageHosts.getHostById(id);
@@ -70,7 +139,8 @@ export class WazuhApiCtrl {
         'get',
         `${api.url}:${api.port}/manager/info`,
         {},
-        { idHost: id }
+        { idHost: id },
+        token
       );
 
       // Look for socket-related errors
@@ -91,7 +161,8 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/agents`,
           { params: { list_agents: '000' } },
-          { idHost: id }
+          { idHost: id },
+          token
         );
 
         if (responseAgents.status === 200) {
@@ -101,7 +172,8 @@ export class WazuhApiCtrl {
             'get',
             `${api.url}:${api.port}/cluster/status`,
             {},
-            { idHost: id }
+            { idHost: id },
+            token            
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
@@ -109,7 +181,8 @@ export class WazuhApiCtrl {
                 'get',
                 `${api.url}:${api.port}/cluster/local/info`,
                 {},
-                { idHost: id }
+                { idHost: id },
+                token
               );
               if (responseClusterLocalInfo.status === 200) {
                 const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
@@ -183,7 +256,8 @@ export class WazuhApiCtrl {
                 'get',
                 `${host.url}:${host.port}/manager/info`,
                 {},
-                { idHost: id }
+                { idHost: id },
+                token
               );
 
               if (this.checkResponseIsDown(response)) {
@@ -245,6 +319,7 @@ export class WazuhApiCtrl {
    */
   async checkAPI(req, reply) {
     try {
+      const token = this.getTokenFromCookie(req.headers.cookie);
       let apiAvailable = null;
       const notValid = this.validateCheckApiParams(req.payload);
       if (notValid) return ErrorResponse(notValid, 3003, 500, reply);
@@ -268,7 +343,8 @@ export class WazuhApiCtrl {
         'GET',
         `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
         {},
-        { idHost: req.payload.id }
+        { idHost: req.payload.id },
+        token
       );
 
       const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
@@ -293,7 +369,8 @@ export class WazuhApiCtrl {
           'GET',
           `${apiAvailable.url}:${apiAvailable.port}/agents`,
           { params: { list_agents: '000' } },
-          { idHost: req.payload.id }
+          { idHost: req.payload.id },
+          token
         );
 
         if (responseAgents.status === 200) {
@@ -303,7 +380,8 @@ export class WazuhApiCtrl {
             'GET',
             `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
             {},
-            { idHost: req.payload.id }
+            { idHost: req.payload.id },
+            token
           );
 
           if (responseCluster.status === 200) {
@@ -314,7 +392,8 @@ export class WazuhApiCtrl {
                 'GET',
                 `${apiAvailable.url}:${apiAvailable.port}/cluster/local/info`,
                 {},
-                { idHost: req.payload.id }
+                { idHost: req.payload.id },
+                token
               );
 
               if (responseClusterLocal.status === 200) {
@@ -810,7 +889,7 @@ export class WazuhApiCtrl {
    * @param {Object} reply
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(method, path, data, id, reply) {
+  async makeRequest(method, path, data, id, reply, token) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -906,7 +985,7 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const response = await this.apiInterceptor.request(method, fullUrl, data, options);
+      const response = await this.apiInterceptor.request(method, fullUrl, data, options, token);
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
@@ -1018,6 +1097,7 @@ export class WazuhApiCtrl {
    * @returns {Object} api response or ErrorResponse
    */
   requestApi(req, reply) {
+    const token = this.getTokenFromCookie(req.headers.cookie);
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
     } else if (!req.payload.method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
@@ -1055,7 +1135,8 @@ export class WazuhApiCtrl {
         req.payload.path,
         req.payload.body,
         req.payload.id,
-        reply
+        reply,
+        token
       );
     }
   }
@@ -1089,6 +1170,7 @@ export class WazuhApiCtrl {
    */
   async csv(req, reply) {
     try {
+      const token = this.getTokenFromCookie(req.headers.cookie);
       if (!req.payload || !req.payload.path) throw new Error('Field path is required');
       if (!req.payload.id) throw new Error('Field id is required');
 
@@ -1121,7 +1203,8 @@ export class WazuhApiCtrl {
         'GET',
         `${config.url}:${config.port}/${tmpPath}`,
         { params: params },
-        { idHost: req.payload.id }
+        { idHost: req.payload.id },
+        token
       );
 
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
