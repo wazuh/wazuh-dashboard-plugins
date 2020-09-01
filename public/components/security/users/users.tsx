@@ -13,7 +13,7 @@ import { UsersTable } from './users-table';
 
 import {WazuhSecurity} from '../../../factories/wazuh-security'
 import { EditUser } from './edit-user';
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 
 export const Users = ({setSecurityError}) => {
     const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
@@ -24,7 +24,7 @@ export const Users = ({setSecurityError}) => {
     const [roles, setRoles] = useState({});
     const getUsers = async() => {
         const loadRoles = async(users) => {
-            const rolesData = await ApiRequest.request(
+            const rolesData = await WzRequest.apiReq(
                 'GET',
                 '/security/roles',
                 { }
@@ -36,7 +36,7 @@ export const Users = ({setSecurityError}) => {
             });
             setRoles(rolesObject);
 
-            const rulesData = await ApiRequest.request(
+            const rulesData = await WzRequest.apiReq(
                 'GET',
                 '/security/rules',
                 { }

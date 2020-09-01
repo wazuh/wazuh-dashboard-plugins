@@ -17,7 +17,7 @@ import {
     EuiComboBox
 } from '@elastic/eui';
 import { RolesTable } from './roles-table';
-import { ApiRequest } from '../../../react-services/api-request'
+import { WzRequest } from '../../../react-services/wz-request'
 import { CreateRole } from './create-role';
 import { EditRole } from './edit-role';
 
@@ -32,14 +32,14 @@ export const Roles = () => {
 
     async function getData() {
         setLoadingTable(true);
-        const roles_request = await ApiRequest.request(
+        const roles_request = await WzRequest.apiReq(
             'GET',
             '/security/roles',
             {}
         );
         const roles = (((roles_request || {}).data || {}).data || {}).affected_items || [];
         setRoles(roles);
-        const policies_request = await ApiRequest.request(
+        const policies_request = await WzRequest.apiReq(
             'GET',
             '/security/policies',
             {  }

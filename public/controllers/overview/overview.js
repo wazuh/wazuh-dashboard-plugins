@@ -16,12 +16,11 @@ import { TabDescription } from '../../../server/reporting/tab-description';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
-import { WzRequest } from '../../react-services/wz-request';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
 import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
@@ -52,7 +51,6 @@ export class OverviewController {
     this.$location = $location;
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
-    this.apiReq = ApiRequest;
     this.tabVisualizations = new TabVisualizations();
     this.commonData = commonData;
     this.reportingService = reportingService;
@@ -296,7 +294,7 @@ export class OverviewController {
    */
   async getSummary() {
     try {
-      const data = await this.apiReq.request('GET', '/agents/summary/status', {});
+      const data = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
       const result = ((data || {}).data || {}).data || false;
 

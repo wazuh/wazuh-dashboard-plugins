@@ -33,7 +33,7 @@ import {
 } from '@elastic/eui';
 import './discover.less';
 import { EuiFlexItem } from '@elastic/eui';
-import { ApiRequest } from '../../../../react-services/api-request';
+import { WzRequest } from '../../../../react-services/wz-request';
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
@@ -108,7 +108,7 @@ export class RowDetails extends Component {
   async componentDidMount() {
     this._isMount = true;
     const params = { q: `id=${this.props.item.rule.id}` }
-    const rulesDataResponse = await ApiRequest.request('GET', `/rules`, { params });
+    const rulesDataResponse = await WzRequest.apiReq('GET', `/rules`, { params });
     const ruleData = (rulesDataResponse.data || {}).data || {};
     if (this._isMount) {
       this.setState({ ruleData })

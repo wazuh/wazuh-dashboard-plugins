@@ -21,7 +21,7 @@ import {
     EuiInMemoryTable
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 import { WazuhSecurity } from '../../../factories/wazuh-security'
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { EditPolicyFlyout } from './edit-policy';
@@ -47,7 +47,7 @@ export const Policies = () => {
 
     const getPolicies = async() => {
         setLoading(true);
-        const request = await ApiRequest.request(
+        const request = await WzRequest.apiReq(
             'GET',
             '/security/policies',
             {}
@@ -130,12 +130,12 @@ export const Policies = () => {
         setActionValue(value);
     };
     async function getData() {
-        const resources_request = await ApiRequest.request(
+        const resources_request = await WzRequest.apiReq(
             'GET',
             '/security/resources',
             {}
         );
-        const actions_request = await ApiRequest.request(
+        const actions_request = await WzRequest.apiReq(
             'GET',
             '/security/actions',
             {}

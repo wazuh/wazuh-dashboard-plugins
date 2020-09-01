@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ApiRequest } from './api-request';
+import { WzRequest } from './api-request';
 
 export class GroupHandler {
   static async removeGroup(group) {
     try {
-      const result = await ApiRequest.request(
+      const result = await WzRequest.apiReq(
         'DELETE',
         `/agents/groups/${group}`,
         {}
@@ -27,7 +27,7 @@ export class GroupHandler {
 
   static async removeAgentFromGroup(group, agentId) {
     try {
-      const result = await ApiRequest.request(
+      const result = await WzRequest.apiReq(
         'DELETE',
         `/agents/${agentId}/group/${group}`,
         {}
@@ -40,7 +40,7 @@ export class GroupHandler {
 
   static async addAgentToGroup(group, agentId) {
     try {
-      const result = await ApiRequest.request(
+      const result = await WzRequest.apiReq(
         'PUT',
         `/agents/${agentId}/group/${group}`,
         {}
@@ -53,7 +53,7 @@ export class GroupHandler {
 
   static async sendConfiguration(group, content) {
     try {
-      const result = await ApiRequest.request(
+      const result = await WzRequest.apiReq(
         'POST',
         `/agents/groups/${group}/files/agent.conf`,
         { content, origin: 'xmleditor' }
@@ -66,7 +66,7 @@ export class GroupHandler {
 
   static async createGroup(name) {
     try {
-      const result = await ApiRequest.request(
+      const result = await WzRequest.apiReq(
         'PUT',
         `/agents/groups/${name}`,
         {}

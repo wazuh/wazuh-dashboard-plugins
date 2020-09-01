@@ -12,7 +12,7 @@ import {
     EuiComboBox
 } from '@elastic/eui';
 
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 
 
@@ -25,7 +25,7 @@ export const CreateRole = ({ closeFlyout }) => {
     const [selectedPoliciesError, setSelectedPoliciesError] = useState(false);
 
     async function getData() {
-        const policies_request = await ApiRequest.request(
+        const policies_request = await WzRequest.apiReq(
             'GET',
             '/security/policies',
             {}
@@ -56,11 +56,11 @@ export const CreateRole = ({ closeFlyout }) => {
         }
         
         try {
-            const result = await ApiRequest.request(
+            const result = await WzRequest.apiReq(
                 'POST',
                 '/security/roles',
                 {
-                        "name": roleName
+                    "name": roleName
                 }
             );
             const data = (result.data || {}).data;
@@ -74,7 +74,7 @@ export const CreateRole = ({ closeFlyout }) => {
             const policiesId = selectedPolicies.map(policy => {
                 return policy.id;
             })
-            const policyResult = await ApiRequest.request(
+            const policyResult = await WzRequest.apiReq(
                 'POST',
                 `/security/roles/${roleId}/policies`,
                 {

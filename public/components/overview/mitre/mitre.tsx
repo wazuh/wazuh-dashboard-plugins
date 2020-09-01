@@ -16,7 +16,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 import { toastNotifications } from 'ui/notify';
 import { IFilterParams, getIndexPattern } from './lib';
 
@@ -111,7 +111,7 @@ export class Mitre extends Component {
 
   async buildTacticsObject(){
     try{
-      const data = await ApiRequest.request('GET', '/mitre', { 
+      const data = await WzRequest.apiReq('GET', '/mitre', { 
         params: {
           select: "phase_name"
         }

@@ -7,7 +7,7 @@ import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';
@@ -195,7 +195,7 @@ export class HealthCheck extends Component {
                     results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
                     this.setState({ results, errors });
                     if (this.state.checks.setup) {
-                        const versionData = await ApiRequest.request(
+                        const versionData = await WzRequest.request(
                             'GET',
                             '//',
                             {}

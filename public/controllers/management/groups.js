@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { GroupHandler } from '../../react-services/group-handler';
 import { ErrorHandler } from '../../react-services/error-handler';
@@ -19,7 +19,6 @@ export class GroupsController {
   constructor($scope, $location, errorHandler, reportingService) {
     this.scope = $scope;
     this.location = $location;
-    this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
     this.shareAgent = new ShareAgent();
     this.groupHandler = GroupHandler;
@@ -75,7 +74,7 @@ export class GroupsController {
       if (this.globalAgent) {
         const globalGroup = this.shareAgent.getSelectedGroup();
         // Get ALL groups
-        const data = await this.apiReq.request('GET',
+        const data = await WzRequest.apiReq('GET',
           '/groups', {
             params: {
               limit: 500
@@ -93,7 +92,7 @@ export class GroupsController {
 
         this.shareAgent.deleteAgent();
       } else {
-        const loadedGroups = await this.apiReq.request('GET',
+        const loadedGroups = await WzRequest.apiReq('GET',
           '/groups', {
             params: {
               limit: 500

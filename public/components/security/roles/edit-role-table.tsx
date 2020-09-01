@@ -5,7 +5,7 @@ import {
     EuiDescriptionList,
 } from '@elastic/eui';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 
 
@@ -82,7 +82,7 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
               onClick: async(item) => {
                   try{
                     setIsLoading(true);
-                    const response = await ApiRequest.request(
+                    const response = await WzRequest.request(
                         'DELETE',
                         `/security/roles/${role.id}/policies`,
                         {
