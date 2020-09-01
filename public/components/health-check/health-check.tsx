@@ -195,7 +195,7 @@ export class HealthCheck extends Component {
                     results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
                     this.setState({ results, errors });
                     if (this.state.checks.setup) {
-                        const versionData = await WzRequest.request(
+                        const versionData = await WzRequest.apiReq(
                             'GET',
                             '//',
                             {}

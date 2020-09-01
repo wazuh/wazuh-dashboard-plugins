@@ -82,7 +82,7 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
               onClick: async(item) => {
                   try{
                     setIsLoading(true);
-                    const response = await WzRequest.request(
+                    const response = await WzRequest.apiReq(
                         'DELETE',
                         `/security/roles/${role.id}/policies`,
                         {
