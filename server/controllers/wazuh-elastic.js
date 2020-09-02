@@ -22,8 +22,8 @@ import {
 import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
-import { result } from '../lib/generate-alerts/sample-data/ciscat';
-import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX } from '../../util/constants';
+import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID } from '../../util/constants';
+import jwtDecode from 'jwt-decode';
 
 export class WazuhElasticCtrl {
   /**
@@ -922,8 +922,19 @@ export class WazuhElasticCtrl {
     if (!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
-    
-    //TODO: replace by administrator user role requirement
+  
+    // Check if user has administrator role in token
+    const token = req.state['wz-token'];
+    if(!token){
+      return ErrorResponse('No token provided', 401, 401, reply);
+    };
+    const decodedToken = jwtDecode(token);
+    if(!decodedToken){
+      return ErrorResponse('No permissions in token', 401, 401, reply);
+    };
+    if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+      return ErrorResponse('No administrator role', 401, 401, reply);
+    };
     //Get configuration
     const configFile = getConfiguration();
 
@@ -1004,14 +1015,18 @@ export class WazuhElasticCtrl {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
-    //TODO: replace by administrator user role requirement
-    //Get configuration
-    // const configFile = getConfiguration();
-    
-    // Check if admin mode is enabled
-    // if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
-    //   return ErrorResponse('Admin mode is required to delete sample data', 1000, 403, reply);
-    // };
+    // Check if user has administrator role in token
+    const token = req.state['wz-token'];
+    if(!token){
+      return ErrorResponse('No token provided', 401, 401, reply);
+    };
+    const decodedToken = jwtDecode(token);
+    if(!decodedToken){
+      return ErrorResponse('No permissions in token', 401, 401, reply);
+    };
+    if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+      return ErrorResponse('No administrator role', 401, 401, reply);
+    };
 
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
     try {
