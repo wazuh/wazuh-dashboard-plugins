@@ -51,12 +51,11 @@ export class WzAuthentication{
     try{
       // Get user token
       const token: string = await WzAuthentication.login(force);
-
       // Decode token and get expiration time
       userToken = jwtDecode(token);
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userToken.rbac_policies));
-      store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(userToken.rbac_roles)));
+      store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(userToken.rbac_roles || [])));
       
     }catch(error){
       return Promise.reject(error);

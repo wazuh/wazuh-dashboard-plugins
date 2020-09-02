@@ -93,12 +93,16 @@ export class WazuhApiCtrl {
       const authContext = await this.securityObj.getCurrentUser(req);
       const username = this.getUserFromAuthContext(authContext);
       if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie)){
-        const wzToken = this.getTokenFromCookie(req.headers.cookie)
+        const wzToken = this.getTokenFromCookie(req.headers.cookie);
         if(wzToken){
-          const decodedToken =  jwtDecode(wzToken);
-          const expirationTime = (decodedToken.exp  - (Date.now() / 1000));
-          if(wzToken && expirationTime > 0) {
-            return {token :wzToken, test: true}
+          try{ // if the current token is not a valid jwt token we ask for a new one
+            const decodedToken =  jwtDecode(wzToken);
+            const expirationTime = (decodedToken.exp  - (Date.now() / 1000));
+            if(wzToken && expirationTime > 0) {
+              return {token :wzToken, test: true}
+            }
+          }catch(error){
+            log('wazuh-api:getToken', error.message || error);
           }
         }
       }  

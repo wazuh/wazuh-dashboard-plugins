@@ -94,7 +94,7 @@ export class WzRequest {
     } catch (error) {
       if(error && error.includes("status code 401") && shouldRetry){
         try{
-          WzAuthentication.refresh();
+          await WzAuthentication.refresh(true);
           return await this.apiReq(method, path, body, false);
         }catch(error){
           return ((error || {}).data || {}).message || false
