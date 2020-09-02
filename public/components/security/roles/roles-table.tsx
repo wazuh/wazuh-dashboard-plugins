@@ -10,7 +10,7 @@ import {
     EuiSpacer,
     EuiLoadingSpinner
 } from '@elastic/eui';
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 
 
@@ -96,7 +96,7 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
               onClick={async(ev) => {
                     ev.stopPropagation();
                     try{
-                        const response = await ApiRequest.request(
+                        const response = await WzRequest.apiReq(
                         'DELETE',
                         `/security/roles/`,
                         {

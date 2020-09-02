@@ -26,11 +26,11 @@ export class ApiInterceptor {
     this.updateRegistry = new UpdateRegistry();
   }
 
-  async authenticateApi(idHost) {
+  async authenticateApi(idHost, authContext = undefined) {
     try {
       const api = await this.manageHosts.getHostById(idHost);
       const options = {
-        method: 'GET',
+        method: !!authContext ? 'POST' : 'GET',
         headers: {
           'content-type': 'application/json',
         },
@@ -38,19 +38,23 @@ export class ApiInterceptor {
           username: api.username,
           password: api.password,
         },
-        url: `${api.url}:${api.port}/security/user/authenticate`,
+        url: `${api.url}:${api.port}/security/user/authenticate${!!authContext ? '/run_as' : ''}`,
+        ...(!!authContext ? { data: authContext } : {})
       };
-
       const response = await axios(options);
+      if (!!authContext) {
+        return response.data.token;
+      }
       const token = response.data.token;
       await this.updateRegistry.updateTokenByHost(idHost, token);
-      return response;
+      return token;
     } catch (error) {
       throw error;
     }
   }
 
-  async buildOptionsObject(method, path, data, options) {
+
+  async buildInternalUserOptionsObject(method, path, data, options) {
     if (!options.idHost) {
       return {};
     }
@@ -78,9 +82,37 @@ export class ApiInterceptor {
     }
   }
 
-  async request(method, path, data, options, attempts = 3) {
-    const optionsObject = await this.buildOptionsObject(method, path, data, options);
 
+  async buildOptionsObject(method, path, data, options, token) {
+    if (!options.idHost) {
+      return {};
+    }
+    const idHost = options.idHost;
+
+    if (token === null) {
+       //TODO 
+       console.log("NO TOKEN - TODO REMOVE")
+    }
+
+    if (token !== null) {
+      return {
+        method: method,
+        headers: {
+          'content-type': options.content_type || 'application/json',
+          Authorization: ' Bearer ' + token,
+        },
+        data: data.body || data || {},
+        params: data.params || {},
+        url: path,
+      };
+    } else {
+      return null;
+    }
+  }
+
+
+  async request(method, path, data, options, attempts = 3) {
+    const optionsObject = await this.buildInternalUserOptionsObject(method, path, data, options);
     if (optionsObject !== null) {
       return axios(optionsObject)
         .then(response => {
@@ -106,6 +138,27 @@ export class ApiInterceptor {
               status: 500,
             };
           }
+        });
+    } else {
+      return {
+        data: {
+          detail: 'Error to create the options',
+        },
+        status: 500,
+      };
+    }
+  }
+
+
+  async requestToken(method, path, data, options, token) {
+    const optionsObject = await this.buildOptionsObject(method, path, data, options, token);
+    if (optionsObject !== null) {
+      return axios(optionsObject)
+        .then(response => {
+          return response;
+        })
+        .catch(async error => {
+          throw error;
         });
     } else {
       return {

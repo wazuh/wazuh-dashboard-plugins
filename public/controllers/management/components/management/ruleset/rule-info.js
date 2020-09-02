@@ -19,7 +19,7 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { ApiRequest } from '../../../../../react-services/api-request'
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 import RulesetHandler from './utils/ruleset-handler';
 
@@ -382,7 +382,7 @@ class WzRuleInfo extends Component {
       const mitreName = [];
       const mitreIds = [];
       const mitreTactics = await Promise.all(compliance.map(async (i) => {
-        const data = await ApiRequest.request('GET', '/mitre', { 
+        const data = await WzRequest.apiReq('GET', '/mitre', { 
           params: {
             q: `id=${i}`
           }

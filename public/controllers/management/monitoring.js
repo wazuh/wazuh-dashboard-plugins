@@ -13,7 +13,7 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
@@ -122,7 +122,7 @@ export function ClusterController(
         monitoring: 1
       });
       $scope.currentNode = parameters.node;
-      const data = await ApiRequest.request('GET', '/cluster/healthcheck', {
+      const data = await WzRequest.apiReq('GET', '/cluster/healthcheck', {
         node: $scope.currentNode.name
       });
 
@@ -237,7 +237,7 @@ export function ClusterController(
       rawVisualizations.removeAll();
       loadedVisualizations.removeAll();
 
-      const status = await ApiRequest.request('GET', '/cluster/status', {});
+      const status = await WzRequest.apiReq('GET', '/cluster/status', {});
       $scope.status = status.data.data.running;
       if ($scope.status === 'no') {
         $scope.isClusterRunning = false;
@@ -246,11 +246,11 @@ export function ClusterController(
       }
 
       const data = await Promise.all([
-        ApiRequest.request('GET', '/cluster/nodes', {}),
-        ApiRequest.request('GET', '/cluster/local/config', {}),
-        ApiRequest.request('GET', '//', {}),
-        ApiRequest.request('GET', '/agents', { limit: 1 }),
-        ApiRequest.request('GET', '/cluster/healthcheck', {})
+        WzRequest.apiReq('GET', '/cluster/nodes', {}),
+        WzRequest.apiReq('GET', '/cluster/local/config', {}),
+        WzRequest.apiReq('GET', '//', {}),
+        WzRequest.apiReq('GET', '/agents', { limit: 1 }),
+        WzRequest.apiReq('GET', '/cluster/healthcheck', {})
       ]);
 
       const nodeList = (((data[0] || {}).data || {}).data || {}) || false;

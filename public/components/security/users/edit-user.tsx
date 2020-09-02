@@ -16,7 +16,7 @@ import {
 
 import { useApiRequest } from '../../common/hooks/useApiRequest';
 import { ErrorHandler } from '../../../react-services/error-handler';
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 
 export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) => {
     const userRolesFormatted = userRoles && userRoles.length ? userRoles.map(item => { return { label: rolesObject[item], id:item } }) : [];
@@ -36,14 +36,14 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
             return item.id;
         });
         if(!userRules.length){
-            const data = await ApiRequest.request(
+            const data = await WzRequest.apiReq(
                 'POST',
                 '/security/rules',
                 {
                     "name": `wui_${currentUser.user}`,
                     "rule": {
                         "FIND": {
-                        "username": `${currentUser.user}`
+                        "r'user_?name'": `${currentUser.user}`
                         }
                     }
                 }
@@ -55,7 +55,7 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
             const toAdd = formattedRoles.filter(value => !userRoles.includes(value));
             const toRemove = userRoles.filter(value => !formattedRoles.includes(value));
             await Promise.all(toAdd.map(async (role) => {  
-                const data = await ApiRequest.request(
+                const data = await WzRequest.apiReq(
                     'POST',
                     `/security/roles/${role}/rules`,
                     {
@@ -67,7 +67,7 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
             }));
 
             await Promise.all(toRemove.map(async (role) => {  
-                const data = await ApiRequest.request(
+                const data = await WzRequest.apiReq(
                     'DELETE',
                     `/security/roles/${role}/rules`,
                     {

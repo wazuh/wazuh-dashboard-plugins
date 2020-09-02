@@ -18,9 +18,8 @@ import {
   EuiIcon,
   EuiLoadingSpinner
 } from '@elastic/eui';
-import 'brace/mode/less';
-import 'brace/theme/github';
-import { ApiRequest } from '../../../../../react-services/api-request';
+
+import { WzRequest } from '../../../../../react-services/wz-request';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 
@@ -98,7 +97,7 @@ export default compose(
   async initDaemonsList(logsPath) {
     try {
       const path = logsPath + '/summary';
-      const data = await ApiRequest.request('GET', path, {});
+      const data = await WzRequest.apiReq('GET', path, {});
       const formattedData = (((data || {}).data || {}).data || {}).affected_items;
       const daemonsList = [...['all']];
       for (const daemon of formattedData) {
@@ -148,7 +147,7 @@ export default compose(
     let totalItems = 0;
     if (this.state.selectedNode) {
       try {
-        const tmpResult = await ApiRequest.request(
+        const tmpResult = await WzRequest.apiReq(
           'GET',
           logsPath,
           { params: this.buildFilters(customOffset) }
@@ -162,7 +161,7 @@ export default compose(
       }
     } else {
       try {
-        const tmpResult = await ApiRequest.request(
+        const tmpResult = await WzRequest.apiReq(
           'GET',
           logsPath,
           { params: this.buildFilters(customOffset) }
@@ -189,7 +188,7 @@ export default compose(
    */
   async getLogsPath() {
     try {
-      const clusterStatus = await ApiRequest.request(
+      const clusterStatus = await WzRequest.apiReq(
         'GET',
         '/cluster/status',
         {}
@@ -201,7 +200,7 @@ export default compose(
       if (clusterEnabled) {
         let nodeList = '';
         let selectedNode = '';
-        const nodeListTmp = await ApiRequest.request(
+        const nodeListTmp = await WzRequest.apiReq(
           'GET',
           '/cluster/nodes',
           {}

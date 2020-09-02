@@ -31,6 +31,7 @@ import store from '../../../redux/store'
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 import { EuiSpacer } from '@elastic/eui';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
 
 export type ISetting = {
   setting: string
@@ -80,7 +81,7 @@ const WzConfigurationSettingsProvider = (props) => {
     </EuiPage>
   );
 }
-const WzConfigurationSettingsWrapper = withUserAuthorizationPrompt(null, ['administrator'])(WzConfigurationSettingsProvider);
+const WzConfigurationSettingsWrapper = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(WzConfigurationSettingsProvider);
 export function WzConfigurationSettings(props) {
   return(
     <WzReduxProvider>

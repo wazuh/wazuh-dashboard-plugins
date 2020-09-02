@@ -17,7 +17,7 @@ import {
     EuiInMemoryTable,
     EuiFieldText,
 } from '@elastic/eui';
-import { ApiRequest } from '../../../react-services/api-request';
+import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 
 
@@ -45,7 +45,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         try{
             const actions = addedActions.map(item => item.action)
             const resources = addedResources.map(item => item.resource)
-            const response = await ApiRequest.request(
+            const response = await WzRequest.apiReq(
                 'PUT',
                 `/security/policies/${policy.id}`,
                 {
@@ -54,7 +54,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                       "resources": resources,
                       "effect": effectValue
                     }
-                  }
+                }
             );
 
             const data = (response.data || {}).data;
@@ -70,12 +70,12 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
 
 
     async function getData() {
-        const resources_request = await ApiRequest.request(
+        const resources_request = await WzRequest.apiReq(
             'GET',
             '/security/resources',
             {}
         );
-        const actions_request = await ApiRequest.request(
+        const actions_request = await WzRequest.apiReq(
             'GET',
             '/security/actions',
             {}

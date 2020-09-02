@@ -75,6 +75,12 @@ const mapStateToProps = state => {
   };
 };
 
+const SectionResourceType = {
+  rules: 'file',
+  decoders: 'file',
+  lists: 'path'
+}
+
 export default compose(
   connect(
     mapStateToProps
@@ -91,5 +97,5 @@ export default compose(
       { text: sectionNames[props.state.section] }
     ];
   }),
-  withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: `${props.state.section.slice(0,-1)}:file:*`}])
+  withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: `${props.state.section.slice(0,-1)}:${SectionResourceType[props.state.section]}:*`}])
 )(WzRulesetOverview);

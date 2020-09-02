@@ -9,12 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ApiRequest } from '../react-services/api-request';
+import { WzRequest } from '../react-services/wz-request';
 import { ErrorHandler } from '../react-services/error-handler';
 
 export class ConfigHandler {
   constructor($rootScope, errorHandler) {
-    this.apiReq = ApiRequest;
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
   }
@@ -25,7 +24,7 @@ export class ConfigHandler {
    */
   async saveManagerConfiguration(content) {
     try {
-      const result = await this.apiReq.request(
+      const result = await WzRequest.apiReq(
         'POST',
         `/manager/files?path=etc/ossec.conf&overwrite=true`,
         { content, origin: 'xmleditor' }
@@ -43,7 +42,7 @@ export class ConfigHandler {
    */
   async saveNodeConfiguration(node, content) {
     try {
-      const result = await this.apiReq.request(
+      const result = await WzRequest.apiReq(
         'PUT',
         `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
         { content, origin: 'xmleditor' }
@@ -56,7 +55,7 @@ export class ConfigHandler {
 
   async performClusterRestart() {
     try {
-      await this.apiReq.request('PUT', `/cluster/restart`, { delay: 15000 });
+      await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
       this.$rootScope.$broadcast('removeRestarting', {});
     } catch (error) {
       this.$rootScope.$broadcast('removeRestarting', {});
@@ -69,7 +68,7 @@ export class ConfigHandler {
    */
   async restartManager() {
     try {
-      const validationError = await this.apiReq.request(
+      const validationError = await WzRequest.apiReq(
         'GET',
         `/manager/configuration/validation`,
         {}
@@ -82,7 +81,7 @@ export class ConfigHandler {
         throw new Error(str);
       }
 
-      const result = await this.apiReq.request('PUT', `/manager/restart`, {});
+      const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -94,7 +93,7 @@ export class ConfigHandler {
    */
   async restartCluster() {
     try {
-      const validationError = await this.apiReq.request(
+      const validationError = await WzRequest.apiReq(
         'GET',
         `/cluster/configuration/validation`,
         {}
@@ -118,7 +117,7 @@ export class ConfigHandler {
    */
   async restartNode(node) {
     try {
-      const validationError = await this.apiReq.request(
+      const validationError = await WzRequest.apiReq(
         'GET',
         `/cluster/${node}/configuration/validation`,
         {}
@@ -130,7 +129,7 @@ export class ConfigHandler {
         const str = data.details.join();
         throw new Error(str);
       }
-      const result = await this.apiReq.request(
+      const result = await WzRequest.apiReq(
         'PUT',
         `/cluster/${node}/restart`,
         {}

@@ -5,6 +5,7 @@ import ReportingHandler from './reporting-handler';
 import chrome from 'ui/chrome';
 import moment from 'moment-timezone';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../../../../util/constants';
 
 export default class ReportingColums {
   constructor(tableProps) {
@@ -52,7 +53,7 @@ export default class ReportingColums {
 
               <WzButtonPermissions
                 buttonType='icon'
-                roles={['administrator']}
+                roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
                 aria-label="Delete report"
                 iconType="trash"
                 tooltip={{position: 'top', content: 'Delete report'}}
