@@ -15,7 +15,6 @@ import { Initialize } from './server/initialize';
 import { WazuhElasticRouter } from './server/routes/wazuh-elastic';
 import { Monitoring } from './server/monitoring';
 import { WazuhApiRoutes } from './server/routes/wazuh-api';
-import { WazuhLoginRoutes } from './server/routes/wazuh-login';
 import { WazuhHostsRoutes } from './server/routes/wazuh-hosts';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
