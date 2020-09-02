@@ -20,7 +20,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 import $ from 'jquery';
 import queryString from 'querystring-browser';
 import { apiRequestList } from './api-requests-list';
-import 'brace/theme/textmate';
+import '../../../utils/brace/theme/textmate';
 import { DevToolsHistory } from './devToolsHistory';
 import * as FileSaver from '../../../services/file-saver';
 import { ErrorHandler } from '../../../react-services/error-handler';
