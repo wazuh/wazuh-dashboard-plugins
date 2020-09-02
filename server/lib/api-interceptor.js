@@ -53,6 +53,36 @@ export class ApiInterceptor {
     }
   }
 
+
+  async buildInternalUserOptionsObject(method, path, data, options) {
+    if (!options.idHost) {
+      return {};
+    }
+    const idHost = options.idHost;
+    let token = await this.updateRegistry.getTokenById(idHost);
+
+    if (token === null) {
+      await this.authenticateApi(idHost);
+      token = await this.updateRegistry.getTokenById(idHost);
+    }
+
+    if (token !== null) {
+      return {
+        method: method,
+        headers: {
+          'content-type': options.content_type || 'application/json',
+          Authorization: ' Bearer ' + token,
+        },
+        data: data.body || data || {},
+        params: data.params || {},
+        url: path,
+      };
+    } else {
+      return null;
+    }
+  }
+
+
   async buildOptionsObject(method, path, data, options, token) {
     if (!options.idHost) {
       return {};
@@ -80,23 +110,21 @@ export class ApiInterceptor {
     }
   }
 
-  async request(method, path, data, options, token, attempts = 3) {
-    const optionsObject = await this.buildOptionsObject(method, path, data, options, token);
-    
+
+  async request(method, path, data, options, attempts = 3) {
+    const optionsObject = await this.buildInternalUserOptionsObject(method, path, data, options);
     if (optionsObject !== null) {
       return axios(optionsObject)
         .then(response => {
           return response;
         })
         .catch(async error => {
-          console.log("error interceptor - TODO remove");
-          return ; 
           if (attempts > 0 && error.response) {
             if (error.response.status === 401) {
               const responseAuth = await this.authenticateApi(options.idHost);
 
               if (responseAuth.status === 200) {
-                return this.request(method, path, data, options,token, attempts - 1);
+                return this.request(method, path, data, options, attempts - 1);
               } else {
                 return responseAuth;
               }
@@ -110,6 +138,27 @@ export class ApiInterceptor {
               status: 500,
             };
           }
+        });
+    } else {
+      return {
+        data: {
+          detail: 'Error to create the options',
+        },
+        status: 500,
+      };
+    }
+  }
+
+
+  async requestToken(method, path, data, options, token) {
+    const optionsObject = await this.buildOptionsObject(method, path, data, options, token);
+    if (optionsObject !== null) {
+      return axios(optionsObject)
+        .then(response => {
+          return response;
+        })
+        .catch(async error => {
+          throw error;
         });
     } else {
       return {

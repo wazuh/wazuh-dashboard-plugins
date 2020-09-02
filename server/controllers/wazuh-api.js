@@ -33,6 +33,7 @@ import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
 import { ApiInterceptor } from '../lib/api-interceptor';
 import { SecurityObj } from '../lib/security-factory';
+import jwtDecode from 'jwt-decode';
 
 export class WazuhApiCtrl {
   /**
@@ -88,12 +89,19 @@ export class WazuhApiCtrl {
 
   async getToken(req, reply) {
     try {
+      const { force } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
       const username = this.getUserFromAuthContext(authContext);
-      if(req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie)){
+      if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie)){
         const wzToken = this.getTokenFromCookie(req.headers.cookie)
-        if(wzToken) return {token :wzToken, test: true}
-      }
+        if(wzToken){
+          const decodedToken =  jwtDecode(wzToken);
+          const expirationTime = (decodedToken.exp  - (Date.now() / 1000));
+          if(wzToken && expirationTime > 0) {
+            return {token :wzToken, test: true}
+          }
+        }
+      }  
       const { idHost } = req.payload;
       const isWazuhWui = await this.checkWazuhWui(idHost);
       let token;
@@ -122,7 +130,6 @@ export class WazuhApiCtrl {
    */
   async checkStoredAPI(req, reply) {
     try {
-      const token = this.getTokenFromCookie(req.headers.cookie);
       // Get config from wazuh.yml
       const id = req.payload.id || req.payload;
       const api = await this.manageHosts.getHostById(id);
@@ -139,8 +146,7 @@ export class WazuhApiCtrl {
         'get',
         `${api.url}:${api.port}/manager/info`,
         {},
-        { idHost: id },
-        token
+        { idHost: id }
       );
 
       // Look for socket-related errors
@@ -161,8 +167,7 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/agents`,
           { params: { list_agents: '000' } },
-          { idHost: id },
-          token
+          { idHost: id }          
         );
 
         if (responseAgents.status === 200) {
@@ -172,8 +177,7 @@ export class WazuhApiCtrl {
             'get',
             `${api.url}:${api.port}/cluster/status`,
             {},
-            { idHost: id },
-            token            
+            { idHost: id }      
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
@@ -181,8 +185,7 @@ export class WazuhApiCtrl {
                 'get',
                 `${api.url}:${api.port}/cluster/local/info`,
                 {},
-                { idHost: id },
-                token
+                { idHost: id }
               );
               if (responseClusterLocalInfo.status === 200) {
                 const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
@@ -256,8 +259,7 @@ export class WazuhApiCtrl {
                 'get',
                 `${host.url}:${host.port}/manager/info`,
                 {},
-                { idHost: id },
-                token
+                { idHost: id }
               );
 
               if (this.checkResponseIsDown(response)) {
@@ -319,7 +321,6 @@ export class WazuhApiCtrl {
    */
   async checkAPI(req, reply) {
     try {
-      const token = this.getTokenFromCookie(req.headers.cookie);
       let apiAvailable = null;
       const notValid = this.validateCheckApiParams(req.payload);
       if (notValid) return ErrorResponse(notValid, 3003, 500, reply);
@@ -343,8 +344,7 @@ export class WazuhApiCtrl {
         'GET',
         `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
         {},
-        { idHost: req.payload.id },
-        token
+        { idHost: req.payload.id }
       );
 
       const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
@@ -369,8 +369,7 @@ export class WazuhApiCtrl {
           'GET',
           `${apiAvailable.url}:${apiAvailable.port}/agents`,
           { params: { list_agents: '000' } },
-          { idHost: req.payload.id },
-          token
+          { idHost: req.payload.id }
         );
 
         if (responseAgents.status === 200) {
@@ -380,8 +379,7 @@ export class WazuhApiCtrl {
             'GET',
             `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
             {},
-            { idHost: req.payload.id },
-            token
+            { idHost: req.payload.id }
           );
 
           if (responseCluster.status === 200) {
@@ -392,8 +390,7 @@ export class WazuhApiCtrl {
                 'GET',
                 `${apiAvailable.url}:${apiAvailable.port}/cluster/local/info`,
                 {},
-                { idHost: req.payload.id },
-                token
+                { idHost: req.payload.id }
               );
 
               if (responseClusterLocal.status === 200) {
@@ -985,7 +982,7 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const response = await this.apiInterceptor.request(method, fullUrl, data, options, token);
+      const response = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
@@ -1018,6 +1015,14 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
+      if(error && error.response && error.response.status === 401){        
+        return ErrorResponse(
+          error.message || error,
+          error.code ? `Wazuh API error: ${error.code}` : 3013,
+          401,
+          reply
+        );
+      }
       log('wazuh-api:makeRequest', error.message || error);
       if (devTools) {
         return { error: '3013', message: error.message || error };
@@ -1170,7 +1175,6 @@ export class WazuhApiCtrl {
    */
   async csv(req, reply) {
     try {
-      const token = this.getTokenFromCookie(req.headers.cookie);
       if (!req.payload || !req.payload.path) throw new Error('Field path is required');
       if (!req.payload.id) throw new Error('Field id is required');
 
@@ -1203,8 +1207,7 @@ export class WazuhApiCtrl {
         'GET',
         `${config.url}:${config.port}/${tmpPath}`,
         { params: params },
-        { idHost: req.payload.id },
-        token
+        { idHost: req.payload.id }
       );
 
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
