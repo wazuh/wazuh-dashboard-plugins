@@ -118,6 +118,6 @@ app.run([
     }).catch(() => {})
 
     // Init the process of refreshing the user's token when app start.
-    WzAuthentication.login();
+    WzAuthentication.refresh();
   }
 ]);

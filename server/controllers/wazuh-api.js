@@ -111,8 +111,8 @@ export class WazuhApiCtrl {
         token = await this.apiInterceptor.authenticateApi(idHost)
       }
       const response = reply.response({token})
-      response.state('wz-token', token, {isSecure: false, path: '/api/'})
-      response.state('wz-user', username, {isSecure: false, path: '/api/'})
+      response.state('wz-token', token, {isSecure: false, path: '/'})
+      response.state('wz-user', username, {isSecure: false, path: '/'})
 
       return { token };
     } catch (error){
