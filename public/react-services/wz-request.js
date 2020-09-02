@@ -92,7 +92,7 @@ export class WzRequest {
       }
       return Promise.resolve(data);
     } catch (error) {
-      if((typeof error === 'string' && error.includes("status code 401") && shouldRetry){
+      if(typeof error === 'string' && error.includes("status code 401") && shouldRetry){
         try{
           await WzAuthentication.refresh(true);
           return await this.apiReq(method, path, body, false);
