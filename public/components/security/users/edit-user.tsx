@@ -43,7 +43,7 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
                     "name": `wui_${currentUser.user}`,
                     "rule": {
                         "FIND": {
-                        "username": `${currentUser.user}`
+                        "r'user_?name'": `${currentUser.user}`
                         }
                     }
                 }
