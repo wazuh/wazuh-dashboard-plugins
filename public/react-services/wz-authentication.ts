@@ -28,18 +28,18 @@ export class WzAuthentication{
   static getToken(){
     return userToken;
   }
-  private static async login(){
+  private static async login(force=false){
     try{
       const idHost = JSON.parse(AppState.getCurrentAPI()).id;
       if(!idHost){
         const response = await GenericRequest.request('GET', '/hosts/apis');
         const hosts = response.data;
         for(var i=0; i< hosts.length; i++){
-          const loginResponse =  await WzRequest.genericReq('POST', '/api/login', { idHost: hosts[i].id});
+          const loginResponse =  await WzRequest.genericReq('POST', '/api/login', { idHost: hosts[i].id, force});
+          return ((loginResponse || {}).data || {}).token;
         }
-
     }else{
-      const response = await WzRequest.genericReq('POST', '/api/login', { idHost });
+      const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
       return response.data.token as string;
     }
     }catch(error){
@@ -47,22 +47,17 @@ export class WzAuthentication{
       return Promise.reject(error);
     }
   }
-  static async refresh(){
+  static async refresh(force = false){
     try{
       // Get user token
-      const token: string = await WzAuthentication.login();
+      const token: string = await WzAuthentication.login(force);
 
       // Decode token and get expiration time
       userToken = jwtDecode(token);
-      const expirationTime = (userToken.exp - (Date.now() / 1000) - marginSeconds) as number;
-      
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userToken.rbac_policies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(userToken.rbac_roles)));
       
-      // Wait to next expiration time and call itself recursively
-      await delay(expirationTime*1000);
-      await WzAuthentication.refresh();
     }catch(error){
       return Promise.reject(error);
     }

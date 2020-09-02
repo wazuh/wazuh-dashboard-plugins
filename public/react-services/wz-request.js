@@ -13,6 +13,7 @@ import axios from 'axios';
 import chrome from 'ui/chrome';
 import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
+import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 
@@ -45,13 +46,13 @@ export class WzRequest {
         throw new Error(data.error);
       }
       return Promise.resolve(data);
-    } catch (err) {
+    } catch (error) {
       //if the requests fails, we need to check if the API is down
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (currentApi && currentApi.id) {
         try {
           await ApiCheck.checkStored(currentApi.id);
-        } catch (err) {
+        } catch (error) {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
 
@@ -61,10 +62,10 @@ export class WzRequest {
           return;
         }
       }
-      const errorMessage = (err && err.response && err.response.data && err.response.data.message) || (err || {}).message;
+      const errorMessage = (error && error.response && error.response.data && error.response.data.message) || (error || {}).message;
       return errorMessage
         ? Promise.reject(errorMessage)
-        : Promise.reject(err || 'Server did not respond');
+        : Promise.reject(error || 'Server did not respond');
     }
   }
 
@@ -74,7 +75,7 @@ export class WzRequest {
    * @param {String} path API route
    * @param {Object} body Request body
    */
-  static async apiReq(method, path, body) {
+  static async apiReq(method, path, body, shouldRetry=true) {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
@@ -91,6 +92,16 @@ export class WzRequest {
       }
       return Promise.resolve(data);
     } catch (error) {
+      if(error && error.includes("status code 401") && shouldRetry){
+        try{
+          WzAuthentication.refresh();
+          return await this.apiReq(method, path, body, false);
+        }catch(error){
+          return ((error || {}).data || {}).message || false
+          ? Promise.reject(error.data.message)
+          : Promise.reject(error.message || error)
+        }
+      }
       return ((error || {}).data || {}).message || false
         ? Promise.reject(error.data.message)
         : Promise.reject(error.message || error);
