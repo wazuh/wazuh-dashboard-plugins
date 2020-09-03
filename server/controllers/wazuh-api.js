@@ -110,7 +110,7 @@ export class WazuhApiCtrl {
             const decodedToken =  jwtDecode(wzToken);
             const expirationTime = (decodedToken.exp  - (Date.now() / 1000));
             if(wzToken && expirationTime > 0) {
-              return {token :wzToken, test: true}
+              return {token: wzToken}
             }
           }catch(error){
             log('wazuh-api:getToken', error.message || error);
@@ -131,9 +131,13 @@ export class WazuhApiCtrl {
 
       return { token };
     } catch (error){
-      console.log("error", error)
-      // log('wazuh-elastic:getCurrentUser', error.message || error);
-      // return ErrorResponse(error.message || error, 4011, 500, reply);
+      log('wazuh-api:getToken', error.message || error);
+      return ErrorResponse(
+        'Error getting authorization token',
+        3000,
+        500,
+        reply
+      );
     }
   }
 
