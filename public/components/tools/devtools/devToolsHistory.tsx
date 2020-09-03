@@ -97,7 +97,7 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
     const showOutputEditor = () => {
         return (
             <EuiCodeEditor
-                theme="textmate"
+                // theme="textmate"
                 width="100%"
                 height="100%"
                 value={hoverRequest ? formatReq(hoverRequest) : selectedRequest ? formatReq(selectedRequest) : "No history available"}

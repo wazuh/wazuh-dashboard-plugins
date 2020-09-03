@@ -20,7 +20,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 import $ from 'jquery';
 import queryString from 'querystring-browser';
 import { apiRequestList } from './api-requests-list';
-import '../../../utils/brace/theme/textmate';
+// import '../../../utils/brace/theme/textmate';
 import { DevToolsHistory } from './devToolsHistory';
 import * as FileSaver from '../../../services/file-saver';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -415,7 +415,7 @@ GET /syscollector/000/packages?search=ssh
     return (
       <div id="wz-dev-right-column" style={{ width: "70%", minWidth: "30%",borderTop: '1px solid #8080801c', height: '100%' }}>
         <EuiCodeEditor
-          theme="textmate"
+          // theme="textmate"
           width="100%"
           height="100%"
           value={(tabsState || [""])[selectedTab]}

@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 
 import { EuiCodeEditor, EuiSpacer } from '@elastic/eui';
 
-import '../../../../../../utils/brace/theme/textmate';
+// import '../../../../../../utils/brace/theme/textmate';
 
 class WzCodeEditor extends Component {
   constructor(props) {
@@ -44,7 +44,7 @@ class WzCodeEditor extends Component {
           (title && <div>{title}</div>)}
         <div className="codeEditorWrapper">
           <EuiCodeEditor
-            theme="textmate"
+            // theme="textmate"
             mode={mode}
             width="100%"
             height={height || `calc(100vh - ${minusHeight || 360}px)`} // Groups section has -250px
