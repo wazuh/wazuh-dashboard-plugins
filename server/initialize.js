@@ -20,9 +20,13 @@ import fs from 'fs';
 import { ManageHosts } from './lib/manage-hosts';
 import { UpdateRegistry } from './lib/update-registry';
 import { WAZUH_ALERTS_PATTERN } from '../util/constants';
+import path from 'path';
 
 const manageHosts = new ManageHosts();
-const wazuhRegistry = new UpdateRegistry().file;
+const registry = new UpdateRegistry()
+const wazuhRegistry = registry.file;
+
+const OPTIMIZE_WAZUH_PATH = '../../../optimize/wazuh';
 
 export function Initialize(server) {
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
@@ -44,7 +48,7 @@ export function Initialize(server) {
         : WAZUH_ALERTS_PATTERN;
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -69,7 +73,7 @@ export function Initialize(server) {
   const defaultIndexPattern = pattern || WAZUH_ALERTS_PATTERN;
 
   // Save Wazuh App setup
-  const saveConfiguration = () => {
+  const saveConfiguration = async () => {
     try {
       const commonDate = new Date().toISOString();
 
@@ -81,9 +85,14 @@ export function Initialize(server) {
         lastRestart: commonDate,
         hosts: {}
       };
-
       try {
-        fs.writeFileSync(wazuhRegistry, JSON.stringify(configuration), err => {
+        if (!fs.existsSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH))) {
+          fs.mkdirSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH));
+        }
+        if (!fs.existsSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`))) {
+          fs.mkdirSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`));
+        }
+        await fs.writeFileSync(wazuhRegistry, JSON.stringify(configuration), 'utf8', err => {
           if (err) {
             throw new Error(err);
           }
@@ -290,7 +299,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -311,7 +320,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );
