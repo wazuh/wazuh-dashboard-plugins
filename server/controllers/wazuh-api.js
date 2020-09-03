@@ -66,7 +66,16 @@ export class WazuhApiCtrl {
     return undefined;
   }
 
+  getApiIdFromCookie(cookie){
+    if(!cookie) false;
+    const getWzApi = /.*wz-api=([^;]+)/;
+    const wzApi = cookie.match(getWzApi)
+    if(wzApi && wzApi.length && wzApi[1]) return wzApi[1];
+    return false;
+  }
+
   getTokenFromCookie(cookie){
+    if(!cookie) false;
     const getWzToken = /.*wz-token=([^;]+)/;
     const wzToken = cookie.match(getWzToken)
     if(wzToken && wzToken.length && wzToken[1]) return wzToken[1];
@@ -74,6 +83,7 @@ export class WazuhApiCtrl {
   }
 
   getUserFromCookie(cookie){
+    if(!cookie) false;
     const getWzUser = /.*wz-user=([^;]+)/;
     const wzUser = cookie.match(getWzUser)
     if(wzUser && wzUser.length && wzUser[1]) return wzUser[1];
@@ -90,9 +100,10 @@ export class WazuhApiCtrl {
   async getToken(req, reply) {
     try {
       const { force } = req.payload;
+      const { idHost } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
       const username = this.getUserFromAuthContext(authContext);
-      if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie)){
+      if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie && idHost === this.getApiIdFromCookie(req.headers.cookie))){
         const wzToken = this.getTokenFromCookie(req.headers.cookie);
         if(wzToken){
           try{ // if the current token is not a valid jwt token we ask for a new one
@@ -106,7 +117,6 @@ export class WazuhApiCtrl {
           }
         }
       }  
-      const { idHost } = req.payload;
       const isWazuhWui = await this.checkWazuhWui(idHost);
       let token;
       if(isWazuhWui){
@@ -117,6 +127,7 @@ export class WazuhApiCtrl {
       const response = reply.response({token})
       response.state('wz-token', token, {isSecure: false, path: '/'})
       response.state('wz-user', username, {isSecure: false, path: '/'})
+      response.state('wz-api', idHost, {isSecure: false, path: '/'})
 
       return { token };
     } catch (error){
@@ -422,6 +433,23 @@ export class WazuhApiCtrl {
       throw new Error(tmpMsg);
     } catch (error) {
       log('wazuh-api:checkAPI', error.message || error);
+
+      if(error && error.response && error.response.status === 401){
+        return ErrorResponse(
+          'Unathorized. Please check API credentials.',
+          401,
+          401,
+          reply
+        );
+      }
+      if(error && error.response && error.response.data && error.response.data.detail){
+        return ErrorResponse(
+          error.response.data.detail,
+          error.response.status || 500,
+          error.response.status || 500,
+          reply
+        );
+      }
       if (error.code === 'EPROTO') {
         return ErrorResponse(
           'Wrong protocol being used to connect to the Wazuh API',
@@ -1107,6 +1135,15 @@ export class WazuhApiCtrl {
    */
   requestApi(req, reply) {
     const token = this.getTokenFromCookie(req.headers.cookie);
+    const idApi = this. getApiIdFromCookie(req.headers.cookie);
+    if(idApi !== req.payload.id){ // if the current token belongs to a different API id, we relogin to obtain a new token
+      return ErrorResponse(
+        'status code 401',
+        401,
+        401,
+        reply
+      );
+    }
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
     } else if (!req.payload.method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
