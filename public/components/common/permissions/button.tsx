@@ -55,13 +55,21 @@ export const WzButtonPermissions = ({permissions = null, roles = null, buttonTyp
     <Fragment>
       {userPermissionRequirements && (
         <div>
-          Require {userPermissionRequirements.map(permission => typeof permission === 'object' ? permission.action : permission).join(', ')} {userPermissionRequirements.length > 1 ? 'permissions': 'permission'}
+          Require {userPermissionRequirements.map(permission => 
+            <Fragment key={`buton-no-permissions-${typeof permission === 'object' ? permission.action : permission}-${typeof permission === 'object' ? permission.resource : ''}`}>
+              {typeof permission === 'object' ? 
+                (<Fragment>
+                  <strong>{permission.action}</strong> (<span style={{textDecoration: 'underline'}}>{permission.resource}</span>
+                </Fragment>)
+                : <strong>{permission}</strong>
+              }
+            </Fragment>).reduce((prev, cur) => [prev, ', ' , cur])} {userPermissionRequirements.length > 1 ? 'permissions': 'permission'}
         </div>
       )}
       {(userPermissionRequirements && userRolesRequirements) && <EuiSpacer size='s' />}
       {userRolesRequirements && (
         <div>
-          Require {userRolesRequirements.join(', ')} {userRolesRequirements.length > 1 ? 'roles': 'role'}
+          Require {userRolesRequirements.map(role => <strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>).reduce((prev, cur) => [prev, ', ' , cur])} {userRolesRequirements.length > 1 ? 'roles': 'role'}
         </div>
       )}
     </Fragment>

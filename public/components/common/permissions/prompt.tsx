@@ -30,13 +30,20 @@ export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}: IEmpty
       <Fragment>
         {permissions && (
           <p>
-            This section requires {permissions.map(permission => (<strong key={`empty-prompt-no-permissions-${typeof permission === 'object' ? permission.action : permission}`}>{typeof permission === 'object' ? permission.action : permission}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {permissions.length > 1 ? 'permissions' : 'permission'}
+            This section requires {permissions.map(permission => 
+              <Fragment key={`empty-prompt-no-permissions-${typeof permission === 'object' ? permission.action : permission}-${typeof permission === 'object' ? permission.resource : ''}`}>
+                {typeof permission === 'object' ? 
+                  <Fragment><strong>{permission.action}</strong> (<span style={{textDecoration: 'underline'}}>{permission.resource}</span>)</Fragment>
+                  : <strong>{permission}</strong>
+                } 
+              </Fragment>
+              ).reduce((accum, cur) => [accum, ', ', cur])} {permissions.length > 1 ? 'permissions' : 'permission'}
           </p>
         )}
         {permissions && roles && (<EuiSpacer />)}
         {roles && (
           <p>
-            This section requires {roles.map(role => (<strong key={`empty-prompt-no-permissions-${role}`}>{role}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {roles.length > 1 ? 'roles' : 'role'}
+            This section requires {roles.map(role => (<strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {roles.length > 1 ? 'roles' : 'role'}
           </p>
         )}
       </Fragment>
