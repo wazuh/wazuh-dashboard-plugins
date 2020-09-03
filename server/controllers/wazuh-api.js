@@ -67,7 +67,7 @@ export class WazuhApiCtrl {
   }
 
   getApiIdFromCookie(cookie){
-    if(!cookie) false;
+    if(!cookie) return false;
     const getWzApi = /.*wz-api=([^;]+)/;
     const wzApi = cookie.match(getWzApi)
     if(wzApi && wzApi.length && wzApi[1]) return wzApi[1];
@@ -75,7 +75,7 @@ export class WazuhApiCtrl {
   }
 
   getTokenFromCookie(cookie){
-    if(!cookie) false;
+    if(!cookie) return false;
     const getWzToken = /.*wz-token=([^;]+)/;
     const wzToken = cookie.match(getWzToken)
     if(wzToken && wzToken.length && wzToken[1]) return wzToken[1];
@@ -83,7 +83,7 @@ export class WazuhApiCtrl {
   }
 
   getUserFromCookie(cookie){
-    if(!cookie) false;
+    if(!cookie) return false;
     const getWzUser = /.*wz-user=([^;]+)/;
     const wzUser = cookie.match(getWzUser)
     if(wzUser && wzUser.length && wzUser[1]) return wzUser[1];
