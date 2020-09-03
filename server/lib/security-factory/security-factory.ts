@@ -1,4 +1,4 @@
-import { OpendistroFactory, XpackFactory } from './factories';
+import { OpendistroFactory, XpackFactory, DefaultFactory } from './factories';
 
 export interface ISecurityFactory {
   getCurrentUser(req): Promise<{ user }> 
@@ -11,6 +11,6 @@ export function SecurityObj(platform, server) {
     case 'opendistro':
       return new OpendistroFactory(server);
     default:
-      return null;
+      return new DefaultFactory(server);
   }
 }
