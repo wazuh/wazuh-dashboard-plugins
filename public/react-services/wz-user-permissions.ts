@@ -946,28 +946,27 @@ export class WzUserPermissions{
       const actionName = typeof permission === 'string' ? permission : permission.action;
       let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
       const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
+      const userPartialResources = userPermissions[actionName] ? Object.keys(userPermissions[actionName]).filter(resource => !([actionResource,actionResourceAll].includes(resource)) && (resource.match(actionResource.replace('*','\\*')) || resource.match(actionResourceAll.replace('*','\\*'))) ) : undefined;
       if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
         // API RBAC mode = 'black'
         if(!userPermissions[actionName]){ return false };
-        if(typeof userPermissions[actionName][actionResource] === 'undefined' && typeof userPermissions[actionName][actionResourceAll] === 'undefined' && typeof userPermissions[actionName][RESOURCE_ANY] === 'undefined'){ return false };
         return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
-          : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
-          : (wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY]) : false)
+        : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
+        : userPartialResources ? userPartialResources.some(resource => !isAllow(userPermissions[actionName][resource]))
+        : wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
+        : false
       }else{
         // API RBAC mode = 'white'
         if(!userPermissions[actionName]){ return true };
-        if(typeof userPermissions[actionName][actionResource] === 'undefined' && typeof userPermissions[actionName][actionResourceAll] === 'undefined' && typeof userPermissions[actionName][RESOURCE_ANY] === 'undefined'){ return true };
         return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
           : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
-          : (wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY]) : true)
+          : userPartialResources ? userPartialResources.some(resource => !isAllow(userPermissions[actionName][resource]))
+          : wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
+          : true
       }
     });
   
     return filtered.length ? filtered : false;
-  }
-
-  static decodeToken(token){
-    // return jwtDecode(token) // require add "jwt-decode" to dependencies of app
   }
 }
 
