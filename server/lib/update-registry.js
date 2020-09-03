@@ -13,10 +13,12 @@ import fs from 'fs';
 import path from 'path';
 import { log } from '../logger';
 
+const OPTIMIZE_WAZUH_PATH = '../../../../optimize/wazuh';
+
 export class UpdateRegistry {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../../../optimize/wazuh/config/wazuh-registry.json');
+    this.file = path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config/wazuh-registry.json`);
   }
 
   /**
