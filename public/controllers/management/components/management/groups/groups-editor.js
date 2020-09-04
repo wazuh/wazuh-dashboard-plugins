@@ -33,7 +33,7 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { toastNotifications } from 'ui/notify';
-// import '../../../../../utils/brace/theme/textmate';
+import 'brace/theme/textmate';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
@@ -185,7 +185,7 @@ class WzGroupsEditor extends Component {
                     <EuiFlexItem className="codeEditorWrapper">
                       {(isEditable && (
                         <EuiCodeEditor
-                          // theme="textmate"
+                          theme="textmate"
                           width="100%"
                           height={`calc(100vh - ${(xmlError ? 195 : 175)}px)`}
                           value={content}

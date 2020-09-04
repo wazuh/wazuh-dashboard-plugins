@@ -1017,7 +1017,6 @@ export class WazuhApiCtrl {
         });
         data = {};
       }
-
       const response = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
 
       const responseIsDown = this.checkResponseIsDown(response);
@@ -1061,7 +1060,8 @@ export class WazuhApiCtrl {
       }
       log('wazuh-api:makeRequest', error.message || error);
       if (devTools) {
-        return { error: '3013', message: error.message || error };
+        const errorMsg = (error.response || {}).data || error.message
+        return { error: '3013', message: errorMsg || error };
       } else {
         if ((error || {}).code && ApiErrorEquivalence[error.code]) {
           error.message = ApiErrorEquivalence[error.code];

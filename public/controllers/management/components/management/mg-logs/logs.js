@@ -18,7 +18,8 @@ import {
   EuiIcon,
   EuiLoadingSpinner
 } from '@elastic/eui';
-
+import 'brace/mode/less';	
+import 'brace/theme/github';	
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';

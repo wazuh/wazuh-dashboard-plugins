@@ -15,5 +15,5 @@ import './management';
 import './agent';
 import './settings';
 import './security';
-import './tools';
+import './dev-tools';
 import './misc';

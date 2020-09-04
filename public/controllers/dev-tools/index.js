@@ -14,5 +14,4 @@ import { DevToolsController } from './dev-tools';
 
 const app = uiModules.get('app/wazuh', []);
 
-app
-.controller('devToolsController', DevToolsController);	
+app.controller('devToolsController', DevToolsController);
