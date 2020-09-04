@@ -17,7 +17,7 @@ import {
   updateFileContent
 } from '../../../../../redux/actions/rulesetActions';
 
-// import '../../../../../utils/brace/theme/textmate';
+import 'brace/theme/textmate';
 // Eui components
 import {
   EuiPage,

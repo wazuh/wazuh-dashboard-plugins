@@ -1008,6 +1008,15 @@ export class WazuhApiCtrl {
         }
       }
 
+      // DELETE and PUT must use URL query but we accept objects in Dev Tools
+      if (devTools && (method === 'DELETE' || method === 'PUT') && dataProperties.length) {
+        (Object.keys(data) || []).forEach(key => {
+          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
+            data[key] !== '' ? '=' : ''
+            }${data[key]}`;
+        });
+        data = {};
+      }
       const response = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
 
       const responseIsDown = this.checkResponseIsDown(response);

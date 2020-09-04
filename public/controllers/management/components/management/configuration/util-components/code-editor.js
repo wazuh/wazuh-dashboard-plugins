@@ -15,7 +15,8 @@ import PropTypes from 'prop-types';
 
 import { EuiCodeEditor, EuiSpacer } from '@elastic/eui';
 
-// import '../../../../../../utils/brace/theme/textmate';
+import 'brace/theme/textmate';
+import 'brace/ext/language_tools';
 
 class WzCodeEditor extends Component {
   constructor(props) {

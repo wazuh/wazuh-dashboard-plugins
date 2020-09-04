@@ -33,7 +33,7 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { toastNotifications } from 'ui/notify';
-// import '../../../../../utils/brace/theme/textmate';
+import 'brace/theme/textmate';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
