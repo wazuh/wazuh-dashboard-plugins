@@ -20,7 +20,6 @@ import { ChromeStart, SavedObjectsClientContract, SavedObjectsFindOptions } from
 import { SavedObject } from '../../../../src/plugins/saved_objects/public/types';
 import { StringUtils } from '../../../../src/plugins/saved_objects/public/saved_object/helpers/string_utils';
 
-
 /**
  * The SavedObjectLoader class provides some convenience functions
  * to load and save one kind of saved objects (specified in the constructor).
@@ -56,15 +55,18 @@ export class SavedObjectLoader {
   async processFunc() {
     return;
   }
-
   /**
-   * Retrieve a saved object by id. Returns a promise that completes when the object finishes
+   * Retrieve a saved object by id or create new one.
+   * Returns a promise that completes when the object finishes
    * initializing.
-   * @param id
+   * @param opts
    * @returns {Promise<SavedObject>}
    */
-  async get(id: string, raw: any) {
-    const instance = new this.Class(id);
+  async get(opts?: Record<string, unknown> | string, raw?: any) {
+    // can accept object as argument in accordance to SavedVis class
+    // see src/plugins/saved_objects/public/saved_object/saved_object_loader.ts
+    // @ts-ignore
+    const instance = new this.Class(opts);
 
     instance.init = _.once(() => {
       // ensure that the esType is defined

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 import store from '../../../../redux/store';
 import { connect } from 'react-redux';
 import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
@@ -144,7 +144,7 @@ class OverviewActions extends Component {
 
     if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
+        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
           <EuiModal
             className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}

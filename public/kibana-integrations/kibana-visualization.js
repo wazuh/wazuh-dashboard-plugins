@@ -15,7 +15,7 @@ import dateMath from '@elastic/datemath';
 import { npStart } from 'ui/new_platform';
 import { createSavedVisLoader } from './saved_visualizations';
 import { TypesService } from '../../../../src/plugins/visualizations/public/vis_types';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from '../../../../src/plugins/discover/public/kibana_services';
 import { GenericRequest } from '../react-services/generic-request';
 import { ErrorHandler } from '../react-services/error-handler';
 import { TabVisualizations } from '../factories/tab-visualizations';
@@ -129,13 +129,18 @@ app.directive('kbnVis', function() {
                 rawVis[0]
               );
 
+              visualization.searchSource = await npStart.plugins.data.search.searchSource.create();
               // Visualization doesn't need the "_source"
               visualization.searchSource.setField('source', false);
               // Visualization doesn't need "hits"
               visualization.searchSource.setField('size', 0);
+              const visState = convertToSerializedVis(visualization);
+              const vis = new Vis(visualization.visState.type, visState);
+              await vis.setState(visState);
+
 
               visHandler = await npStart.plugins.visualizations.__LEGACY.createVisEmbeddableFromObject(
-                visualization,
+                vis,
                 visInput
               );
               await visHandler.render($(`[vis-id="'${$scope.visID}'"]`)[0]);

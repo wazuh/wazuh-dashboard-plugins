@@ -31,7 +31,7 @@ import {
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { mitreTechniques, getElasticAlerts, IFilterParams } from '../../lib'
 import { ITactic } from '../../';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
@@ -209,15 +209,16 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         <EuiFlexItem 
         onMouseEnter={() => this.setState({ hover: item.id })}
         onMouseLeave={() => this.setState({ hover: "" })}
-        key={idx} style={{border: "1px solid #8080804a", maxHeight: 41}}>
+        key={idx} style={{border: "1px solid #8080804a", maxWidth: 'calc(25% - 8px)', maxHeight: 41}}>
 
         <EuiPopover
             id="techniqueActionsContextMenu"
             anchorClassName="wz-width-100"
             button={(
                 <EuiFacetButton
-                  style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px"}}
+                  style={{width: "100%", padding: "0 5px 0 5px", lineHeight: "40px", maxHeight: 40}}
                   quantity={item.quantity}
+                  className={"module-table"}
                   onClick={() => this.showFlyout(item.id)}>
                   <EuiToolTip position="top" content={tooltipContent} anchorClassName={toolTipAnchorClass}>
                     <span style={{
@@ -410,7 +411,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         { isFlyoutVisible &&
           <EuiOverlayMask
             // @ts-ignore
-            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.onChangeFlyout(false) }} >
+            onClick={() => this.onChangeFlyout(false) } >
           
             <FlyoutTechnique
               openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
