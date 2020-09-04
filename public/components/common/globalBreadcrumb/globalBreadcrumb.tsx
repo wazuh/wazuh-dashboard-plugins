@@ -16,10 +16,10 @@ class WzGlobalBreadcrumb extends Component {
   async componentDidMount() {
     const $injector = await chrome.dangerouslyGetActiveInjector();
     this.router = $injector.get('$route');
-    $('#breadcrumbNoTitle').attr("title","");
+    $('#breadcrumbNoTitle').attr("title", "");
   }
-  componnedDidUpdate(){
-    $('#breadcrumbNoTitle').attr("title","");
+  componnedDidUpdate() {
+    $('#breadcrumbNoTitle').attr("title", "");
   }
   render() {
     const container = document.getElementsByClassName('euiBreadcrumbs');
@@ -32,19 +32,18 @@ class WzGlobalBreadcrumb extends Component {
               responsive={false}
               truncate={false}
               max={6}
-              showMaxPopover
               breadcrumbs={this.props.state.breadcrumb.map(breadcrumb => breadcrumb.agent ? {
                 text: (
-                  <a 
-                    style={{marginRight: 0, height: 16 }}
+                  <a
+                    style={{ margin: '0px 0px -5px 0px', height: 20 }}
                     className="euiLink euiLink--subdued euiBreadcrumb "
-                    onClick={(ev) =>  {ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": breadcrumb.agent.id  } ); this.router.reload();}}
+                    onClick={(ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": breadcrumb.agent.id }); this.router.reload(); }}
                     id="breadcrumbNoTitle"
-                    >
+                  >
                     <EuiToolTip position="top" content={"View agent summary"}>
                       <span>{breadcrumb.agent.name}</span>
                     </EuiToolTip>
-                  </a> )
+                  </a>)
               } : breadcrumb)}
               aria-label="Wazuh global breadcrumbs"
             />,

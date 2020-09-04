@@ -195,7 +195,7 @@ export class EventsMitre extends Component {
       this.state.isFlyoutVisible &&
       <EuiOverlayMask
         // @ts-ignore
-        onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+        onClick={() => this.closeFlyout()} >
 
 
         <FlyoutTechnique

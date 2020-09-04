@@ -25,7 +25,7 @@ import {
   EuiOverlayMask
 } from '@elastic/eui'
 // @ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { getFimAlerts } from './lib';
@@ -88,7 +88,7 @@ function FimTable({ agent }) {
         noItemsMessage="No recent events" />
         {isOpen && (
           <EuiOverlayMask
-            onClick={(e: Event) => e.target.className === 'euiOverlayMask' && setIsOpen(false)}
+            onClick={() => setIsOpen(false)}
           >
             <FlyoutDetail
             agentId={agent.id}

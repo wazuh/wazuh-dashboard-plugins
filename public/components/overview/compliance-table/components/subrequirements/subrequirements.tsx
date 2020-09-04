@@ -27,10 +27,9 @@ import {
   EuiOverlayMask,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
-
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -161,8 +160,9 @@ export class ComplianceSubrequirements extends Component {
             anchorClassName="wz-width-100"
             button={(
               <EuiFacetButton
-                style={{ width: "100%", padding: "0 5px 0 5px", lineHeight: "40px" }}
+                style={{ width: "100%", padding: "0 5px 0 5px", lineHeight: "40px", maxHeight: "40px" }}
                 quantity={item.quantity}
+                className={"module-table"}
                 onClick={() => { this.showFlyout(item.id) }}>
                 <EuiToolTip position="top" content={tooltipContent} anchorClassName={toolTipAnchorClass}>
                   <span style={{
@@ -202,7 +202,7 @@ export class ComplianceSubrequirements extends Component {
     })
     if (tacticsToRender.length) {
       return (
-        <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", paddingRight: 10 }}>
+        <EuiFlexGrid columns={4} gutterSize="s" style={{ maxHeight: "calc(100vh - 385px)", overflow: "overlay", overflowX: "hidden", maxWidth: "82vw", paddingRight: 10 }}>
           {tacticsToRenderOrdered}
         </EuiFlexGrid>
       )
@@ -277,7 +277,7 @@ export class ComplianceSubrequirements extends Component {
         </div>
 
         {this.state.flyoutOn &&
-          <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+          <EuiOverlayMask onClick={() => this.closeFlyout() } >
             <RequirementFlyout
               currentRequirement={this.state.selectedRequirement}
               onChangeFlyout={this.onChangeFlyout}

@@ -23,8 +23,8 @@ import '../../common/modules/module.less';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { ModulesDefaults } from './modules-defaults';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { MainModuleAgent } from './main-agent'
 import { MainModuleOverview } from './main-overview';
 import store from '../../../redux/store';

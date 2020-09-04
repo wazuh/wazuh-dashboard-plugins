@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 // @ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 // @ts-ignore
 import { npSetup } from 'ui/new_platform';
 import { AppState } from '../../../../react-services/app-state';

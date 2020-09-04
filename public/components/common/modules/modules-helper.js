@@ -1,5 +1,5 @@
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import chrome from 'ui/chrome';
 
 export class ModulesHelper {

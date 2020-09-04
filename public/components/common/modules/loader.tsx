@@ -11,7 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { EuiLoadingSpinner, EuiSpacer } from '@elastic/eui';
 
 const app = getAngularModule('app/wazuh');

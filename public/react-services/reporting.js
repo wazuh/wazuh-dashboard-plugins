@@ -18,7 +18,7 @@ import { Vis2PNG } from '../factories/vis2png';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
 import { toastNotifications } from 'ui/notify';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from '../../../../src/plugins/discover/public/kibana_services';
 const app = getAngularModule('app/wazuh');
 
 export class ReportingService {

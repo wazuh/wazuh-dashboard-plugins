@@ -11,7 +11,7 @@
  */
 
 import { resolve } from 'path';
-import { WazuhPlugin, LegacySetup } from './server/plugin';
+import { WazuhPlugin } from './server/plugin';
 
 export default (kibana) => {
   return new kibana.Plugin({
@@ -26,7 +26,6 @@ export default (kibana) => {
         icon: 'plugins/wazuh/img/icon_blue.svg',
         main: 'plugins/wazuh/app'
       },
-      hacks: ['plugins/wazuh/icon-style'],
       __bundleProvider__(kbnServer) {
         kbnServer.uiBundles.addPostLoader({
           test: /\.pug$/,
@@ -54,39 +53,6 @@ export default (kibana) => {
 
       new WazuhPlugin().setup(coreSetup, pluginsSetup, legacySetup);
       // eslint-disable-line no-unused-vars
-      const xpackMainPlugin = server.plugins.xpack_main;
-      if (xpackMainPlugin) {
-        const featureId = 'wazuh';
-
-        xpackMainPlugin.registerFeature({
-          id: featureId,
-          name: 'C',
-          navLinkId: featureId,
-          icon: '/plugins/wazuh/img/icon_blue.svg',
-          app: [featureId],
-          catalogue: [],
-          privileges: {
-            all: {
-              app: [featureId],
-              api: [],
-              savedObject: {
-                all: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
-              },
-              ui: ['save', 'show']
-            },
-            read: {
-              app: [featureId],
-              api: [],
-              savedObject: {
-                all: [],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
-              },
-              ui: ['show']
-            }
-          }
-        });
-      }
     }
   });
 }

@@ -24,7 +24,7 @@ import {
 } from '@elastic/eui';
 import { FlyoutTechnique } from '../../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { getIndexPattern } from '../../../../../components/overview/mitre/lib';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { getMitreCount } from './lib';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 
@@ -245,7 +245,7 @@ export class MitreTopTactics extends Component {
         {!selectedTactic || alertsCount.length === 0 ? tacticsTop : tecniquesTop}
         {alertsCount.length === 0 && emptyPrompt}
         {flyoutOn &&
-        <EuiOverlayMask onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+        <EuiOverlayMask onClick={() => this.closeFlyout() } >
           <FlyoutTechnique 
             openDashboard={(e,itemId) => this.openDashboard(e,itemId)}
             openDiscover={(e,itemId) => this.openDiscover(e,itemId)}

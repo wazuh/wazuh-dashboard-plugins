@@ -27,7 +27,7 @@ import {
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
 // @ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 import { ModulesHelper } from '../../../common/modules/modules-helper'
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/common';
