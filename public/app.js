@@ -44,6 +44,8 @@ import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 // Font Awesome, Kibana UI framework and others
 import './utils/fontawesome/css/font-awesome.min.css';
 
+// Dev tools
+import './utils/codemirror';
 
 import './utils/jquery-ui';
 
