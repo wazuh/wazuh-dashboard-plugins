@@ -268,7 +268,7 @@ class WzRulesetEditor extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem className="codeEditorWrapper">
                       <EuiCodeEditor
-                        // theme="textmate"
+                        theme="textmate"
                         width="100%"
                         height={`calc(100vh - ${((showWarningRestart && !xmlError) || wazuhNotReadyYet) ? 250 : (xmlError ? (!showWarningRestart ? 195 : 270) : 175)}px)`}
                         value={content}
