@@ -1008,16 +1008,6 @@ export class WazuhApiCtrl {
         }
       }
 
-      // DELETE and PUT must use URL query but we accept objects in Dev Tools
-      if (devTools && (method === 'DELETE' || method === 'PUT') && dataProperties.length) {
-        (Object.keys(data) || []).forEach(key => {
-          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
-            data[key] !== '' ? '=' : ''
-            }${data[key]}`;
-        });
-        data = {};
-      }
-
       const response = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
 
       const responseIsDown = this.checkResponseIsDown(response);
@@ -1061,7 +1051,8 @@ export class WazuhApiCtrl {
       }
       log('wazuh-api:makeRequest', error.message || error);
       if (devTools) {
-        return { error: '3013', message: error.message || error };
+        const errorMsg = (error.response || {}).data || error.message
+        return { error: '3013', message: errorMsg || error };
       } else {
         if ((error || {}).code && ApiErrorEquivalence[error.code]) {
           error.message = ApiErrorEquivalence[error.code];
