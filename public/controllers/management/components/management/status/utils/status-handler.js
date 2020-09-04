@@ -82,6 +82,22 @@ export default class StatusHandler {
   }
 
   /**
+   * Get agents node count
+   */
+  static async clusterAgentsCount() {
+    try {
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/overview/agents`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Get manager info
    */
   static async managerInfo() {
