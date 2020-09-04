@@ -75,7 +75,7 @@ class WzMenuSettings extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      isSelected: this.props.state.selected_settings_section === item.id,
+      isSelected: window.location.href.includes('/settings') && this.props.state.selected_settings_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
