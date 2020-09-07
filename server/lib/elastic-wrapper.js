@@ -85,6 +85,7 @@ export class ElasticWrapper {
         return Promise.reject(
           new Error('No valid title for create index pattern')
         );
+      return ; // Index pattern is now created when accessing the WUI
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: this.WZ_KIBANA_INDEX,
