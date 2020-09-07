@@ -103,7 +103,7 @@ export class WazuhApiCtrl {
       const { idHost } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
       const username = this.getUserFromAuthContext(authContext);
-      if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie && idHost === this.getApiIdFromCookie(req.headers.cookie))){
+      if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie) && idHost === this.getApiIdFromCookie(req.headers.cookie)){
         const wzToken = this.getTokenFromCookie(req.headers.cookie);
         if(wzToken){
           try{ // if the current token is not a valid jwt token we ask for a new one
