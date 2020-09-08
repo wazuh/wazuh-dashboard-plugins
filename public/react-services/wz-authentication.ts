@@ -30,18 +30,13 @@ export class WzAuthentication{
   }
   private static async login(force=false){
     try{
-      const idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      if(!idHost){
-        const response = await GenericRequest.request('GET', '/hosts/apis');
-        const hosts = response.data;
-        for(var i=0; i< hosts.length; i++){
-          const loginResponse =  await WzRequest.genericReq('POST', '/api/login', { idHost: hosts[i].id, force});
-          return ((loginResponse || {}).data || {}).token;
-        }
-    }else{
+      var idHost = JSON.parse(AppState.getCurrentAPI()).id;
+      while(!idHost){
+        await new Promise(r => setTimeout(r, 500));
+        idHost = JSON.parse(AppState.getCurrentAPI()).id;
+      }
       const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
       return response.data.token as string;
-    }
     }catch(error){
       console.log("error", error)
       return Promise.reject(error);
