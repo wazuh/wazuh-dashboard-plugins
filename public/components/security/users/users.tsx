@@ -8,6 +8,7 @@ import {
     EuiButton,
     EuiTitle,
     EuiOverlayMask,
+    EuiEmptyPrompt
 } from '@elastic/eui';
 import { UsersTable } from './users-table';
 
@@ -15,13 +16,14 @@ import {WazuhSecurity} from '../../../factories/wazuh-security'
 import { EditUser } from './edit-user';
 import { WzRequest } from '../../../react-services/wz-request';
 
-export const Users = ({setSecurityError}) => {
+export const Users = () => {
     const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
     const [editingUser, setEditingUser] = useState(false);
     const [users,setUsers] = useState([]);
     const [rolesLoading, setRolesLoading] = useState(true);
     const [relationUserRole, setRelationUserRole] = useState({});
     const [roles, setRoles] = useState({});
+    const [securityError, setSecurityError] = useState(false);
     const getUsers = async() => {
         const loadRoles = async(users) => {
             const rolesData = await WzRequest.apiReq(
@@ -74,6 +76,16 @@ export const Users = ({setSecurityError}) => {
     const closeEditFlyout = async() => {
         await getUsers();
         setIsEditFlyoutVisible(false);
+    }
+
+    if( securityError ){
+        return <EuiEmptyPrompt
+                    iconType="securityApp"
+                    title={<h2>You need permission to manage users</h2>}
+                    body={
+                        <p>Contact your system administrator.</p>
+                    }
+                />
     }
     if (isEditFlyoutVisible) {
         editFlyout = (

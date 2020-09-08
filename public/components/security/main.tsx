@@ -44,7 +44,6 @@ export const WzSecurity = compose(
     const tab = window.location.href.match(securityTabRegExp);
 
     const [selectedTabId, setSelectedTabId] = useState(tab && tab[1] || 'users');
-    const [securityError, setSecurityError] = useState(false);
 
     const listenerLocationChanged = () => {
         const tab = window.location.href.match(securityTabRegExp);
@@ -76,39 +75,21 @@ export const WzSecurity = compose(
 
     return (
         <EuiPage>
-            {!securityError &&
-                <EuiFlexGroup>
-                    <EuiFlexItem>
-                        <EuiTabs>{renderTabs()}</EuiTabs>
-                        <EuiSpacer size='m'></EuiSpacer>
-                        {selectedTabId === 'users' &&
-                            <Users setSecurityError={setSecurityError}></Users>
-                        }
-                        {selectedTabId === 'roles' &&
-                            <Roles></Roles>
-                        }
-                        {selectedTabId === 'policies' &&
-                            <Policies></Policies>
-                        }
-                    </EuiFlexItem>
-                </EuiFlexGroup>
-            }
-            {securityError &&
-                <EuiFlexGroup alignItems="center" justifyContent="center">
-                    <EuiPanel grow={false}>
-                        <EuiEmptyPrompt
-                            iconType="securityApp"
-                            title={<h2>You need permission to manage users</h2>}
-                            body={
-                            <>
-                                <p>Contact your system administrator.</p>
-                            </>
-                            }
-                        />
-                    </EuiPanel>
-
-                </EuiFlexGroup>
-            }
+            <EuiFlexGroup>
+                <EuiFlexItem>
+                    <EuiTabs>{renderTabs()}</EuiTabs>
+                    <EuiSpacer size='m'></EuiSpacer>
+                    {selectedTabId === 'users' &&
+                        <Users></Users>
+                    }
+                    {selectedTabId === 'roles' &&
+                        <Roles></Roles>
+                    }
+                    {selectedTabId === 'policies' &&
+                        <Policies></Policies>
+                    }
+                </EuiFlexItem>
+            </EuiFlexGroup>
         </EuiPage>
     );
 });
