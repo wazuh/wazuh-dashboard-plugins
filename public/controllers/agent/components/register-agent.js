@@ -206,10 +206,10 @@ export class RegisterAgent extends Component {
         this.state.udpProtocol
           ? " WAZUH_PROTOCOL='UDP'"
           : ''
-        } yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${
+        } yum install https://packages.wazuh.com/4.x/yum/wazuh-agent-${
         this.state.wazuhVersion
         }-1.x86_64.rpm`,
-      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
+      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
         this.state.wazuhVersion
         }-1_amd64.deb && sudo WAZUH_MANAGER='${this.state.serverAddress}'${
         this.state.needsPassword
@@ -220,7 +220,7 @@ export class RegisterAgent extends Component {
           ? " WAZUH_PROTOCOL='UDP'"
           : ''
         } dpkg -i ./wazuh-agent.deb`,
-      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${
+      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/osx/wazuh-agent-${
         this.state.wazuhVersion
         }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
         this.state.serverAddress
@@ -233,7 +233,7 @@ export class RegisterAgent extends Component {
           ? " WAZUH_PROTOCOL 'UDP'"
           : ''
         } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
-      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
+      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
         this.state.wazuhVersion
         }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q WAZUH_MANAGER='${
         this.state.serverAddress
