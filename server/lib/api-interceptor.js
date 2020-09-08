@@ -61,7 +61,7 @@ export class ApiInterceptor {
     const idHost = options.idHost;
     let token = await this.updateRegistry.getTokenById(idHost);
 
-    if (token === null) {
+    if (token === null || options.forceRefresh) {
       await this.authenticateApi(idHost);
       token = await this.updateRegistry.getTokenById(idHost);
     }

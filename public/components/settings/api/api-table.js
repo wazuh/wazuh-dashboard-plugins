@@ -66,7 +66,7 @@ export class ApiTable extends Component {
       for (let idx in entries) {
         const entry = entries[idx];
         try {
-          const data = await this.props.testApi(entry);
+          const data = await this.props.testApi(entry, true); // token refresh is forced
           const clusterInfo = data.data || {};
           const id = entries[idx].id;
           entries[idx].status = 'online';
