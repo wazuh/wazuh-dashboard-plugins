@@ -22,7 +22,6 @@ import { enhanceDiscoverEvents } from './events-enhance-discover-fields';
 
 export class Events extends Component {
   intervalTimeEnhancedDiscoverFields: number = 1000;
-  customAttributeEnhancedDiscoverFields: string = 'data-wazuh-discover-field-enhanced';
   isMount: boolean;
   state: {
     flyout: false | {component: any, props: any }
