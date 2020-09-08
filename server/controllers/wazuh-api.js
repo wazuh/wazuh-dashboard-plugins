@@ -370,7 +370,6 @@ export class WazuhApiCtrl {
         {},
         options
       );
-      console.log("response", responseManagerInfo)
       const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
 
       if (responseIsDown) {
