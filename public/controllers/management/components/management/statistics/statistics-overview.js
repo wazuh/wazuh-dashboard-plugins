@@ -90,7 +90,7 @@ export class WzStatisticsOverview extends Component {
     } catch (err) {
       this.setState({
         clusterNodes: [],
-        clusterNodeSelected: false,
+        clusterNodeSelected: 'all',
       });
     }
     this.fetchData();
