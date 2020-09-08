@@ -95,7 +95,7 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
-      testApi: entry => ApiCheck.checkApi(entry),
+      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
       showAddApiWithInitialError: error =>
         this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
@@ -112,7 +112,7 @@ export class SettingsController {
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
       setDefault: entry => this.setDefault(entry),
-      testApi: entry => ApiCheck.checkApi(entry),
+      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
@@ -324,7 +324,7 @@ export class SettingsController {
       };
 
       // Test the connection
-      const data = await ApiCheck.checkApi(tmpData);
+      const data = await ApiCheck.checkApi(tmpData, true);
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry

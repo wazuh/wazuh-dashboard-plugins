@@ -131,9 +131,10 @@ export class WazuhApiCtrl {
 
       return { token };
     } catch (error){
-      log('wazuh-api:getToken', error.message || error);
+      const errorMessage = ((error .response || {}).data || {}).detail;
+      log('wazuh-api:getToken', errorMessage || error.message);
       return ErrorResponse(
-        'Error getting authorization token',
+        `Error getting authorization token: ${errorMessage || ""}`,
         3000,
         500,
         reply
@@ -358,14 +359,17 @@ export class WazuhApiCtrl {
         apiAvailable = req.payload;
         apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
       }
+      const options = { idHost: req.payload.id };
+      if(req.payload.forceRefresh){
+        options["forceRefresh"] = req.payload.forceRefresh;
+      }
 
       let responseManagerInfo = await this.apiInterceptor.request(
         'GET',
         `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
         {},
-        { idHost: req.payload.id }
+        options
       );
-
       const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
 
       if (responseIsDown) {
@@ -621,8 +625,8 @@ export class WazuhApiCtrl {
     if (response.status !== 200) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
-
-      const isDown = socketErrorCodes.includes(response.data.status || 1);
+      const status = (response.data || {}).status || 1
+      const isDown = socketErrorCodes.includes(status);
 
       isDown && log('wazuh-api:makeRequest', 'Wazuh API is online but Wazuh is not ready yet');
 
