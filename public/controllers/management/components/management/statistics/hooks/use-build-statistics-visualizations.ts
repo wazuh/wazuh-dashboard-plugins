@@ -22,7 +22,7 @@ import { updateVis } from "../../../../../../redux/actions/visualizationsActions
 import { AppState } from "../../../../../../react-services/app-state";
 import { WazuhConfig } from '../../../../../../react-services/wazuh-config.js';
 
-export const useBuildStatisticsVisualizations = (clusterNodeSelected) => {
+export const useBuildStatisticsVisualizations = (clusterNodeSelected, refreshVisualizations) => {
   const { 'cron.prefix': indexPrefix, 'cron.statistics.index.name': indexName } = new WazuhConfig().getConfig();
   useEffect(() => {
     const tabVisualizations = new TabVisualizations();
@@ -50,5 +50,5 @@ export const useBuildStatisticsVisualizations = (clusterNodeSelected) => {
       );
     };
     buildStatisticsVisualizations();
-  }, []);
+  }, [refreshVisualizations]);
 }
