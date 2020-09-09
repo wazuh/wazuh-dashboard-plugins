@@ -58,11 +58,14 @@ export class WazuhApiCtrl {
 
   getCurrentPlatform(server) {
     if (server.plugins.security) {
+      console.log("estoy en xpack")
       return 'xpack';
     }
     if (server.plugins.opendistro_security) {
+      console.log("estoy en opendistro")
       return 'opendistro';
     }
+    console.log("no estoy en ninguno")
     return undefined;
   }
 
@@ -99,9 +102,11 @@ export class WazuhApiCtrl {
 
   async getToken(req, reply) {
     try {
+      console.log("get Token")
       const { force } = req.payload;
       const { idHost } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
+      console.log("authconte", authContext)
       const username = this.getUserFromAuthContext(authContext);
       if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie) && idHost === this.getApiIdFromCookie(req.headers.cookie)){
         const wzToken = this.getTokenFromCookie(req.headers.cookie);
@@ -166,7 +171,7 @@ export class WazuhApiCtrl {
         'get',
         `${api.url}:${api.port}/manager/info`,
         {},
-        { idHost: id }
+        { idHost: id, forceRefresh: true }
       );
 
       // Look for socket-related errors
@@ -187,7 +192,7 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/agents`,
           { params: { list_agents: '000' } },
-          { idHost: id }          
+          { idHost: id}          
         );
 
         if (responseAgents.status === 200) {
@@ -1054,6 +1059,7 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
+      console.log("eror", error)
       if(error && error.response && error.response.status === 401){        
         return ErrorResponse(
           error.message || error,
@@ -1062,16 +1068,16 @@ export class WazuhApiCtrl {
           reply
         );
       }
-      log('wazuh-api:makeRequest', error.message || error);
+      const errorMsg = (error.response || {}).data || error.message
+      log('wazuh-api:makeRequest', errorMsg || error);
       if (devTools) {
-        const errorMsg = (error.response || {}).data || error.message
         return { error: '3013', message: errorMsg || error };
       } else {
         if ((error || {}).code && ApiErrorEquivalence[error.code]) {
           error.message = ApiErrorEquivalence[error.code];
         }
         return ErrorResponse(
-          error.message || error,
+          errorMsg || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
           500,
           reply

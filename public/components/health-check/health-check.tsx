@@ -118,7 +118,7 @@ export class HealthCheck extends Component {
             if (hosts.length) {
                 for (var i = 0; i < hosts.length; i++) {
                     try {
-                        const API = await ApiCheck.checkApi(hosts[i]);
+                        const API = await ApiCheck.checkApi(hosts[i], true);
                         if (API && API.data) {
                             return hosts[i].id;
                         }
@@ -144,6 +144,7 @@ export class HealthCheck extends Component {
     async checkApiConnection() {
         let results = this.state.results;
         let errors = this.state.errors;
+        let apiChanged = false;
         try {
             const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
             if (this.state.checks.api && currentApi && currentApi.id) {
@@ -154,21 +155,22 @@ export class HealthCheck extends Component {
                     try {
                         const newApi = await this.trySetDefault();
                         data = await ApiCheck.checkStored(newApi, true);
+                        apiChanged = true;
                     } catch (err2) {
                         throw err2
                     };
                 }
-
-                if (((data || {}).data || {}).idChanged) {
+                if (apiChanged) {
                     this.showToast(
                         'warning',
                         'Selected Wazuh API has been updated',
                         '',
                         3000
                     );
-                    const apiRaw = JSON.parse(AppState.getCurrentAPI());
+                    const api =  ((data || {}).data || {}).data || {};
+                    const name = (api.cluster_info || {}).manager || false;
                     AppState.setCurrentAPI(
-                        JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
+                      JSON.stringify({ name: name, id: api.id })
                     );
                 }
                 //update cluster info

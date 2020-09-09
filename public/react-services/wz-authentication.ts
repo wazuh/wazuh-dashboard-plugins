@@ -36,9 +36,9 @@ export class WzAuthentication{
         idHost = JSON.parse(AppState.getCurrentAPI()).id;
       }
       const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
-      return response.data.token as string;
+      const token = ((response || {}).data || {}).token
+      return token as string;
     }catch(error){
-      console.log("error", error)
       return Promise.reject(error);
     }
   }
@@ -46,12 +46,14 @@ export class WzAuthentication{
     try{
       // Get user token
       const token: string = await WzAuthentication.login(force);
+      if(!token){
+        return;
+      }
       // Decode token and get expiration time
       userToken = jwtDecode(token);
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userToken.rbac_policies));
       store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(userToken.rbac_roles || [])));
-      
     }catch(error){
       return Promise.reject(error);
     }

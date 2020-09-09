@@ -83,7 +83,7 @@ export class WzRequest {
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const data = await this.genericReq('POST', '/api/request', requestData);
-      const hasFailed = ((data.data || {}).data || {}).total_failed_items || 0;
+      const hasFailed = (((data || {}).data || {}).data || {}).total_failed_items || 0;
       if(hasFailed){
         const error = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
         const failed_ids = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).id || {};

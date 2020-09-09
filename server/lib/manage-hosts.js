@@ -140,6 +140,9 @@ export class ManageHosts {
       const host = hosts.filter(h => {
         return Object.keys(h)[0] == id;
       });
+      if(host && !host.length){
+        throw new Error('Selected API is no longer available in wazuh.yml');
+      }
       const key = Object.keys(host[0])[0];
       const result = Object.assign(host[0][key], { id: key }) || {};
       return result;

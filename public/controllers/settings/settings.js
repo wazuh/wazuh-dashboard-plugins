@@ -192,6 +192,9 @@ export class SettingsController {
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
+          if(this.apiEntries[idx].id === this.currentDefault){ // if the selected API is down, we remove it so a new one will selected
+            AppState.removeCurrentAPI();
+          }
         }
       }
       return numError;

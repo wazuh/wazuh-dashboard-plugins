@@ -31,6 +31,7 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
+import { AppState } from '../../../react-services/app-state';
 
 export class ApiTable extends Component {
   constructor(props) {
@@ -80,6 +81,9 @@ export class ApiTable extends Component {
             (error || {}).message || ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
+          if(entries[idx].id === this.props.currentDefault){ // if the selected API is down, we remove it so a new one will selected
+            AppState.removeCurrentAPI();
+          }
         }
       }
       if (numErr) {
