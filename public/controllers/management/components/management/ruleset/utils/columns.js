@@ -80,7 +80,7 @@ export default class RulesetColumns {
               return (
                 <WzButtonPermissions 
                   buttonType='link'
-                  permissions={[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'rules:read', resource: `rule:file:${item.filename}`}]]}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
@@ -130,7 +130,7 @@ export default class RulesetColumns {
               return (
                 <WzButtonPermissions
                   buttonType='link'
-                  permissions={[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'decoders:read', resource: `decoder:file:${item.filename}`}]]}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
@@ -197,7 +197,7 @@ export default class RulesetColumns {
                 return (
                   <WzButtonPermissions
                     buttonType='icon'
-                    permissions={[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                    permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
                     aria-label="Show content"
                     iconType="eye"
                     tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
@@ -215,7 +215,7 @@ export default class RulesetColumns {
                   <div>
                     <WzButtonPermissions
                       buttonType='icon'
-                      permissions={[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                      permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
                       aria-label="Edit content"
                       iconType="pencil"
                       tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
@@ -258,7 +258,7 @@ export default class RulesetColumns {
               <div>
                 <WzButtonPermissions
                   buttonType='icon'
-                  permissions={[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
                   aria-label="Edit content"
                   iconType="pencil"
                   tooltip={{position: 'top', content: `Edit ${item.filename} content`}}

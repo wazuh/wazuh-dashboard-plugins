@@ -57,6 +57,11 @@ class WzRulesetTable extends Component {
       decoders: '/decoders',
       lists: '/lists/files'
     };
+    this.extraSectionPrefixResource = {
+      rules: 'rule:file',
+      decoders: 'decoder:file',
+      lists: 'list:path',
+    };
     this.rulesetHandler = RulesetHandler;
   }
 
@@ -230,10 +235,12 @@ class WzRulesetTable extends Component {
 
       const getRowProps = item => {
         const { id, name } = item;
+        
+        const extraSectionPermissions = this.extraSectionPrefixResource[this.props.state.section];
         return {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
-          onClick: !WzUserPermissions.checkMissingUserPermissions([{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}], this.props.userPermissions) ? async () => {
+          onClick: !WzUserPermissions.checkMissingUserPermissions([[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${this.props.state.section}:read`, resource: `${extraSectionPermissions}:${item.filename}`}]], this.props.userPermissions) ? async () => {
             if(this.isLoading) return;
             this.setState({isLoading: true});
             const { section } = this.props.state;
