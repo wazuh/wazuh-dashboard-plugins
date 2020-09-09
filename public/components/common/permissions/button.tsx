@@ -23,6 +23,8 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
+import { WzPermissionsFormatted } from './format';
+
 export interface IUserPermissionsObject{action: string, resource: string};
 export type TUserPermissionsFunction = (props : any) => TUserPermissions;
 export type TUserPermissions = (string | IUserPermissionsObject)[] | null;
@@ -55,15 +57,8 @@ export const WzButtonPermissions = ({permissions = null, roles = null, buttonTyp
     <Fragment>
       {userPermissionRequirements && (
         <div>
-          Require {userPermissionRequirements.map(permission => 
-            <Fragment key={`buton-no-permissions-${typeof permission === 'object' ? permission.action : permission}-${typeof permission === 'object' ? permission.resource : ''}`}>
-              {typeof permission === 'object' ? 
-                (<Fragment>
-                  <strong>{permission.action}</strong> (<span style={{textDecoration: 'underline'}}>{permission.resource}</span>)
-                </Fragment>)
-                : <strong>{permission}</strong>
-              }
-            </Fragment>).reduce((prev, cur) => [prev, ', ' , cur])} {userPermissionRequirements.length > 1 ? 'permissions': 'permission'}
+          <div>Require the {userPermissionRequirements.length === 1 ? 'permission' : 'permissions'}:</div>
+            {WzPermissionsFormatted(userPermissionRequirements)}
         </div>
       )}
       {(userPermissionRequirements && userRolesRequirements) && <EuiSpacer size='s' />}

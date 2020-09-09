@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get query of Kibana searchBar
+ * Wazuh app - Prompt component with the user required permissions and/or roles
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,7 @@ import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
 import { useUserRolesRequirements } from '../hooks/useUserRoles';
 import { EuiEmptyPrompt, EuiSpacer, EuiPanel } from '@elastic/eui';
 import { TUserPermissions, TUserPermissionsFunction, TUserRoles, TUserRolesFunction } from '../permissions/button';
+import { WzPermissionsFormatted } from './format';
 
 interface IEmptyPromptNoPermissions{
   permissions?: TUserPermissions
@@ -30,14 +31,8 @@ export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}: IEmpty
       <Fragment>
         {permissions && (
           <p>
-            This section requires {permissions.map(permission => 
-              <Fragment key={`empty-prompt-no-permissions-${typeof permission === 'object' ? permission.action : permission}-${typeof permission === 'object' ? permission.resource : ''}`}>
-                {typeof permission === 'object' ? 
-                  <Fragment><strong>{permission.action}</strong> (<span style={{textDecoration: 'underline'}}>{permission.resource}</span>)</Fragment>
-                  : <strong>{permission}</strong>
-                } 
-              </Fragment>
-              ).reduce((accum, cur) => [accum, ', ', cur])} {permissions.length > 1 ? 'permissions' : 'permission'}
+            This section requires the {permissions.length > 1 ? 'permissions' : 'permission'}:
+            {WzPermissionsFormatted(permissions)}
           </p>
         )}
         {permissions && roles && (<EuiSpacer />)}
