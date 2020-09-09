@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, { Fragment } from 'react';
 import { EuiSpacer } from '@elastic/eui';
 
 export const WzPermissionsFormatted = permissions => {
@@ -18,20 +18,25 @@ export const WzPermissionsFormatted = permissions => {
     <div>
       {permissions.map(permission => {
         if(Array.isArray(permission)){
-          return (<div>
-                    <div>- One of: {permission.map(p => PermissionFormatter(p)).reduce((prev, cur) => [prev, ', ', cur])}</div>
+          return (<div key={`no-permissions-${getPermissionComponentKey(permission)}`}>
+                    <div>- One of: {permission.map(p => PermissionFormatter(p, `no-permissions-${getPermissionComponentKey(permission)}-${getPermissionComponentKey(p)}`)).reduce((prev, cur) => [prev, ', ', cur])}</div>
                     <EuiSpacer size='s'/>
                   </div>)
         }else{
-          return <div>- {PermissionFormatter(permission)}</div>
+          return <div key={`no-permissions-${getPermissionComponentKey(permission)}`}>- {PermissionFormatter(permission)}</div>
         }
       })}
     </div>
   )
 }
 
-const PermissionFormatter = permission => typeof permission === 'object' ? (
-  <>
+const PermissionFormatter = (permission, key?: string) => typeof permission === 'object' ? (
+  <Fragment {...(key ? {key}: {})}>
     <strong>{permission.action}</strong> (<span style={{textDecoration: 'underline'}}>{permission.resource}</span>)
-  </>
-) : (<strong>{permission.action}</strong>);
+  </Fragment>
+) : (<strong {...(key ? {key}: {})}>{permission}</strong>);
+
+const getPermissionComponentKey = permission => 
+  Array.isArray(permission) ? permission.map(p => getPermissionComponentKey(p)).join('-')
+  : typeof permission === 'object' ? permission.action
+  : permission;

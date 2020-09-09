@@ -30,16 +30,16 @@ export const WzEmptyPromptNoPermissions = ({permissions, roles, actions}: IEmpty
     body={
       <Fragment>
         {permissions && (
-          <p>
+          <div>
             This section requires the {permissions.length > 1 ? 'permissions' : 'permission'}:
             {WzPermissionsFormatted(permissions)}
-          </p>
+          </div>
         )}
         {permissions && roles && (<EuiSpacer />)}
         {roles && (
-          <p>
+          <div>
             This section requires {roles.map(role => (<strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>)).reduce((accum, cur) => [accum, ', ', cur])} {roles.length > 1 ? 'roles' : 'role'}
-          </p>
+          </div>
         )}
       </Fragment>
     }
