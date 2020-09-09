@@ -68,8 +68,10 @@ export const Policies = () => {
 
     const createPolicy = async () => {
         try {
-            const wazuhSecurity = new WazuhSecurity();
-            await wazuhSecurity.security.createPolicy(
+            const result = await WzRequest.apiReq(
+                'POST',
+                '/security/policies',
+                
                 {
                     name: policyName,
                     policy: {
@@ -77,7 +79,12 @@ export const Policies = () => {
                         resources: addedResources.map(x => x.resource),
                         effect: effectValue
                     }
-                });
+                }
+            );
+            const resultData = (result.data || {}).data;
+            if (resultData.failed_items && resultData.failed_items.length) {
+                return;
+            }
             ErrorHandler.info('Policy was successfully created', '');
             await getPolicies();
         } catch (error) {
