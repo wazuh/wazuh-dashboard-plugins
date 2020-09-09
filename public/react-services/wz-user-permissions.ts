@@ -943,6 +943,10 @@ const wazuhPermissions = {
 export class WzUserPermissions{
   static checkMissingUserPermissions = (requiredPermissions, userPermissions) => {
     const filtered = requiredPermissions.filter(permission => {
+      if(Array.isArray(permission)){
+        const missingOrPermissions = WzUserPermissions.checkMissingUserPermissions(permission, userPermissions);
+        return Array.isArray(missingOrPermissions) ? missingOrPermissions.length === permission.length : missingOrPermissions;
+      }
       const actionName = typeof permission === 'string' ? permission : permission.action;
       let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
       const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
