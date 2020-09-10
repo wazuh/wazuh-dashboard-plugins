@@ -366,7 +366,7 @@ export const saveConfiguration = async (selectedNode, xml) => {
       await saveFileManager(xml);
     }
   } catch (error) {
-    return Promise.error(error.message || error);
+    return Promise.reject(error.message || error);
   }
 };
 
@@ -513,7 +513,7 @@ export const checkCurrentSecurityPlatform = async () => {
 
     return platform;
   } catch (error) {
-    return Promise.error(error);
+    return Promise.reject(error);
   }
 };
 
@@ -534,6 +534,6 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     await makePing(updateWazuhNotReadyYet);
     return { restarted: isCluster ? 'cluster' : 'manager'}
   }catch (error){
-    return Promise.error(error);
+    return Promise.reject(error);
   };
 };
