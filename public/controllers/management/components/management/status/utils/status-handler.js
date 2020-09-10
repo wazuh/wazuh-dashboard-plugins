@@ -127,9 +127,11 @@ export default class StatusHandler {
   static async lastAgentRaw() {
     try {
       const result = await WzRequest.apiReq('GET', '/agents', {
-        limit: 1,
-        sort: '-dateAdd',
-        q: 'id!=000'
+        params: {
+          limit: 1,
+          sort: '-dateAdd',
+          q: 'id!=000'
+        }
       });
       return result;
     } catch (error) {
