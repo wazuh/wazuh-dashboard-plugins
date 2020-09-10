@@ -1403,10 +1403,10 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (((database || {}).data || {}).items) {
+        if (((database || {}).data || {}).affected_items) {
           PdfTable(
             this.dd,
-            database.data.items,
+            database.data.affected_items,
             ['Date', 'Status', 'Event'],
             ['readDay', 'status', 'event'],
             'Last entries from policy monitoring scan'
@@ -1414,14 +1414,14 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (((pci || {}).data || {}).items) {
+        if (((pci || {}).data || {}).affected_items) {
           this.dd.content.push({
             text: 'Fired rules due to PCI requirements',
             style: 'h2',
             pageBreak: 'before'
           });
           this.dd.content.push('\n');
-          for (const item of pci.data.items) {
+          for (const item of pci.data.affected_items) {
             const rules = await this.pciRequest.getRulesByRequirement(
               from,
               to,
@@ -1962,7 +1962,7 @@ export class WazuhReportingCtrl {
             } catch (error) {
               log('reporting:report', error.message || error, 'debug');
             }
-            if (Object.keys(configuration.data.items[0].config).length) {
+            if (Object.keys(configuration.data.affected_items[0].config).length) {
               this.dd.content.push({
                 text: 'Configurations',
                 style: { fontSize: 14, color: '#000' },
@@ -1972,7 +1972,7 @@ export class WazuhReportingCtrl {
                 labels: [],
                 isGroupConfig: true
               };
-              for (let config of configuration.data.items) {
+              for (let config of configuration.data.affected_items) {
                 let filterTitle = '';
                 let index = 0;
                 for (let filter of Object.keys(config.filters)) {
@@ -2447,7 +2447,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (packages && packages.data && packages.data.items) {
+            if (packages && packages.data && packages.data.affected_items) {
               tables.push({
                 title: 'Packages',
                 columns:
@@ -2460,7 +2460,7 @@ export class WazuhReportingCtrl {
                         'Vendor',
                         'Description'
                       ],
-                rows: packages.data.items.map(x => {
+                rows: packages.data.affected_items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
@@ -2488,14 +2488,14 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (processes && processes.data && processes.data.items) {
+            if (processes && processes.data && processes.data.affected_items) {
               tables.push({
                 title: 'Processes',
                 columns:
                   agentOs === 'windows'
                     ? ['Name', 'CMD', 'Priority', 'NLWP']
                     : ['Name', 'Effective user', 'Priority', 'State'],
-                rows: processes.data.items.map(x => {
+                rows: processes.data.affected_items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
@@ -2523,14 +2523,14 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (ports && ports.data && ports.data.items) {
+            if (ports && ports.data && ports.data.affected_items) {
               tables.push({
                 title: 'Network ports',
                 columns:
                   agentOs === 'windows'
                     ? ['Local IP', 'Local port', 'Process', 'State', 'Protocol']
                     : ['Local IP', 'Local port', 'State', 'Protocol'],
-                rows: ports.data.items.map(x => {
+                rows: ports.data.affected_items.map(x => {
                   return agentOs === 'windows'
                     ? [
                         x['local']['ip'],
@@ -2564,11 +2564,11 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (netiface && netiface.data && netiface.data.items) {
+            if (netiface && netiface.data && netiface.data.affected_items) {
               tables.push({
                 title: 'Network interfaces',
                 columns: ['Name', 'Mac', 'State', 'MTU', 'Type'],
-                rows: netiface.data.items.map(x => {
+                rows: netiface.data.affected_items.map(x => {
                   return [x['name'], x['mac'], x['state'], x['mtu'], x['type']];
                 })
               });
@@ -2588,7 +2588,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (netaddr && netaddr.data && netaddr.data.items) {
+            if (netaddr && netaddr.data && netaddr.data.affected_items) {
               tables.push({
                 title: 'Network settings',
                 columns: [
@@ -2598,7 +2598,7 @@ export class WazuhReportingCtrl {
                   'Protocol',
                   'Broadcast'
                 ],
-                rows: netaddr.data.items.map(x => {
+                rows: netaddr.data.affected_items.map(x => {
                   return [
                     x['iface'],
                     x['address'],
@@ -2625,11 +2625,11 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (hotfixes && hotfixes.data && hotfixes.data.items) {
+            if (hotfixes && hotfixes.data && hotfixes.data.affected_items) {
               tables.push({
                 title: 'Windows updates',
                 columns: ['Update code'],
-                rows: hotfixes.data.items.map(x => {
+                rows: hotfixes.data.affected_items.map(x => {
                   return [x['hotfix']];
                 })
               });
