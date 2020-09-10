@@ -19,9 +19,10 @@ html {
   color: #dfe5ef;
 }
 
-.euiToolTipAnchor {
+/* If this style is enabled, the stats with colors are wihte and not show the color in dark mode */
+/* .euiToolTipAnchor {
   color: white;
-}
+} */
 
 .wz-global-breadcrumb .euiToolTipAnchor {
   color: #98A2B3!important;
