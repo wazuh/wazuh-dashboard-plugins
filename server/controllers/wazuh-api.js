@@ -58,14 +58,11 @@ export class WazuhApiCtrl {
 
   getCurrentPlatform(server) {
     if (server.plugins.security) {
-      console.log("estoy en xpack")
       return 'xpack';
     }
     if (server.plugins.opendistro_security) {
-      console.log("estoy en opendistro")
       return 'opendistro';
     }
-    console.log("no estoy en ninguno")
     return undefined;
   }
 
@@ -102,11 +99,9 @@ export class WazuhApiCtrl {
 
   async getToken(req, reply) {
     try {
-      console.log("get Token")
       const { force } = req.payload;
       const { idHost } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
-      console.log("authconte", authContext)
       const username = this.getUserFromAuthContext(authContext);
       if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie) && idHost === this.getApiIdFromCookie(req.headers.cookie)){
         const wzToken = this.getTokenFromCookie(req.headers.cookie);
@@ -1018,7 +1013,7 @@ export class WazuhApiCtrl {
       }
 
       // DELETE and PUT must use URL query but we accept objects in Dev Tools
-      if (devTools && (method === 'DELETE' || method === 'PUT') && dataProperties.length) {
+      if (devTools && dataProperties.length) {
         (Object.keys(data) || []).forEach(key => {
           fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
             data[key] !== '' ? '=' : ''
@@ -1059,7 +1054,6 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      console.log("eror", error)
       if(error && error.response && error.response.status === 401){        
         return ErrorResponse(
           error.message || error,
