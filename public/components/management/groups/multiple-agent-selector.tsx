@@ -486,7 +486,7 @@ export class MultipleAgentSelector extends Component {
                                     selectedElement: []
                                   }, () => { this.checkLimit() });
                                 }}
-                                style={{ width: '100%', backgroundColor: '#fbfcfd', border: '1px solid #D3DAE6' }}
+                                className='wzMultipleSelectorSelect'
                                 onDoubleClick={() => {
                                   this.moveItem(this.state.availableItem, this.state.availableAgents.data, this.state.selectedAgents.data, "a");
                                   this.setState({ availableItem: [] });
@@ -609,7 +609,7 @@ export class MultipleAgentSelector extends Component {
                                     availableItem: []
                                   }, () => { this.checkLimit() });
                                 }}
-                                style={{ width: '100%', backgroundColor: '#fbfcfd', border: '1px solid #D3DAE6' }}
+                                className='wzMultipleSelectorSelect'
                                 onDoubleClick={(e) => {
                                   this.moveItem(this.state.selectedElement, this.state.selectedAgents.data, this.state.availableAgents.data, "r");
                                   this.setState({ selectedElement: [] });
