@@ -107,7 +107,7 @@ export class WzVisualize extends Component {
 
     // Check if there is sample alerts installed
     try {
-      const thereAreSampleAlerts = await WzRequest.genericReq('GET', '/elastic/samplealerts', {}).data.sampleAlertsInstalled;
+      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled;
       this._isMount && this.setState({ thereAreSampleAlerts });
     } catch (error) { }
   }
