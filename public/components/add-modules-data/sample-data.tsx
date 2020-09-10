@@ -28,6 +28,7 @@ import {
 
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
+import { AppState } from '../../react-services/app-state';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
 export default class WzSampleData extends Component {
@@ -91,14 +92,15 @@ export default class WzSampleData extends Component {
 
     // Get information about cluster/manager
     try{
-      const managerInfo = await WzRequest.apiReq('GET', '/manager/info', {});
+      const clusterName = AppState.getClusterInfo().cluster;
+      const managerName =  AppState.getClusterInfo().manager;
       this.generateAlertsParams.manager = {
-        name: managerInfo.data.data.name
+        name: managerName
       };
-      if (managerInfo.data.data.cluster) {
+      if (clusterName && clusterName !== 'Disabled') {
         this.generateAlertsParams.cluster = {
-          name: managerInfo.data.data.cluster.name,
-          node: managerInfo.data.data.cluster.node_name
+          name: clusterName,
+          node: clusterName
         };
       };
       
