@@ -14,7 +14,8 @@ import {
   EuiBasicTable,
   EuiCallOut,
   EuiOverlayMask,
-  EuiConfirmModal
+  EuiConfirmModal,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -185,7 +186,10 @@ class WzGroupsTable extends Component {
         <WzSearchBar
           filters={filters}
           suggestions={this.suggestions}
-          onFiltersChange={(filters) => this._isMounted && this.setState({ filters })} />
+          onFiltersChange={(filters) => this._isMounted && this.setState({ filters })}
+          placeholder='Search group'
+        />
+        <EuiSpacer size='s' />
         <EuiBasicTable
           itemId="id"
           items={items}

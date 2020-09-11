@@ -230,7 +230,7 @@ class WzRulesetSearchBar extends Component {
         noDeleteFiltersOnUpdateSuggests
         suggestions={suggestions}
         buttonOptions={buttonOptions}
-        placeholder={'Add filter or search'}
+        placeholder='Filter or search'
         filters={filters}
         onFiltersChange={this.props.updateFilters}
       />

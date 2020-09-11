@@ -60,7 +60,7 @@ export class FilterBar extends Component {
             filters={filters}
             onFiltersChange={onFiltersChange}
             suggestions={this.suggestions[selectView]}
-            placeholder='Add filter or search' />
+            placeholder='Filter or search file' />
         </EuiFlexItem>
       </EuiFlexGroup>
     )

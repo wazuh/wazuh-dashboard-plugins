@@ -562,7 +562,7 @@ export class Inventory extends Component {
                     <WzSearchBar
                       filters={this.state.filters}
                       suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
-                      placeholder='Add filter or search'
+                      placeholder='Filter or search'
                       onFiltersChange={filters => { this.setState({ filters }) }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>

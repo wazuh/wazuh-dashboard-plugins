@@ -14,7 +14,8 @@ import {
   EuiBasicTable,
   EuiCallOut,
   EuiOverlayMask,
-  EuiConfirmModal
+  EuiConfirmModal,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -169,7 +170,9 @@ class WzGroupAgentsTable extends Component {
             filters={filters}
             suggestions={this.suggestions}
             onFiltersChange={filters => this.setState({filters})}
+            placeholder='Filter or search agent'
           />
+          <EuiSpacer size='s'/>
           <EuiBasicTable
             itemId="id"
             items={items}
