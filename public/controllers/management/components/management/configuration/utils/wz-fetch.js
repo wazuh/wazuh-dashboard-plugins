@@ -181,14 +181,14 @@ export const checkDaemons = async () => {
  * @param {number} [tries=10] Tries
  * @return {Promise}
  */
-export const makePing = async (updateWazuhNotReadyYet, tries = 10) => {
+export const makePing = async (updateWazuhNotReadyYet, tries = 15) => {
   try {
     let isValid = false;
     while (tries--) {
-      await delay(1200);
+      await delay(2000);
       try {
-        const result = await WzRequest.apiReq('GET', '//', {});
-        isValid = (result || {}).api_version;
+        const result = await WzRequest.apiReq('GET', '/ping', {});
+        isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
@@ -262,13 +262,12 @@ export const restartNodeSelected = async (
   try {
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
 
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    isCluster ? await restartNode(selectedNode) : await restartManager();
+    const isCluster = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     // Dispatch a Redux action
     updateWazuhNotReadyYet(
       `Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`
-    ); //FIXME: if it enable/disable cluster, this will show Manager instead node name
+    ); //FIXME: if it enables/disables cluster, this will show Manager instead node name
+    isCluster ? await restartNode(selectedNode) : await restartManager();
     return await makePing(updateWazuhNotReadyYet);
   } catch (error) {
     return Promise.reject(error);
