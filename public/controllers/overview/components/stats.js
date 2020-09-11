@@ -22,24 +22,14 @@ export class Stats extends Component {
   }
 
   goToAgents(status) {
-    let selectedOptions = [];
-
-    if (status !== null) {
-      selectedOptions = [
-        {
-          className: 'wzFilterBarOperator',
-          group: 'status',
-          label: 'status:' + status,
-          label_: status,
-          type: 'AND'
-        }
-      ];
+    if(status){
+      sessionStorage.setItem(
+        'agents_preview_selected_options',
+        JSON.stringify([{field: 'q', value: `status=${status}`}])
+      );
+    }else if(sessionStorage.getItem('agents_preview_selected_options')){
+      sessionStorage.removeItem('agents_preview_selected_options');
     }
-
-    sessionStorage.setItem(
-      'agents_preview_selected_options',
-      JSON.stringify(selectedOptions)
-    );
     window.location.href = '#/agents-preview';
   }
 
@@ -79,7 +69,7 @@ export class Stats extends Component {
               title={
                 <EuiToolTip position="top" content={`Go to active agents`}>
                   <span
-                    onClick={() => this.goToAgents('Active')}
+                    onClick={() => this.goToAgents('active')}
                     className={ 'statWithLink' }
                     style={{ cursor: "pointer" }}
                   >
@@ -97,7 +87,7 @@ export class Stats extends Component {
               title={
                 <EuiToolTip position="top" content={`Go to disconnected agents`}>
                   <span
-                    onClick={() => this.goToAgents('Disconnected')}
+                    onClick={() => this.goToAgents('disconnected')}
                     className={ 'statWithLink' }
                     style={{ cursor: "pointer" }}
                   >
@@ -115,7 +105,7 @@ export class Stats extends Component {
               title={
                 <EuiToolTip position="top" content={`Go to never connected agents`}>
                   <span
-                    onClick={() => this.goToAgents('Never connected')}
+                    onClick={() => this.goToAgents('never_connected')}
                     className={ 'statWithLink' }
                     style={{ cursor: "pointer" }}
                   >

@@ -55,7 +55,7 @@ export class AgentsTable extends Component {
       selectedItems: [],
       allSelected: false,
       purgeModal: false,
-      filters: []
+      filters: sessionStorage.getItem('agents_preview_selected_options') ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options')) : []
     };
     this.suggestions = [
       { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
@@ -109,6 +109,9 @@ export class AgentsTable extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
+    if(sessionStorage.getItem('agents_preview_selected_options')){
+      sessionStorage.removeItem('agents_preview_selected_options');
+    }
   }
 
   async reloadAgents() {
@@ -823,6 +826,7 @@ export class AgentsTable extends Component {
       <EuiFlexGroup>
         <EuiFlexItem style={{ marginRight: 0 }}>
           <WzSearchBar
+            noDeleteFiltersOnUpdateSuggests
             filters={this.state.filters}
             suggestions={this.suggestions}
             onFiltersChange={filters => this.setState({ filters, pageIndex: 0 })}
