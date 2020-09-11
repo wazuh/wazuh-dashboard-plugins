@@ -203,10 +203,10 @@ export class SuggestHandler extends BaseHandler {
   }
 
   createParamFilter(field, value) {
-    const filters = [...this.filters];
+    const filters = [...this.filters.map(filter => ({...filter}))]; // "Clone" the filter elements to new objects
     const idx = filters.findIndex(filter => filter.field === field);
     idx !== -1
-      ? filters[idx].value = value
+      ? filters[idx].value = value // This change in filters produces a bug in ReactJS method componentDidUpdate if you try to modify the filter objects because prevState/prevPros and nextState/nextProps are same object and not cloning filter elements before the change of filter property
       : filters.push({ field: field, value });
     this.props.onFiltersChange(filters);
     this.setInputValue('');
