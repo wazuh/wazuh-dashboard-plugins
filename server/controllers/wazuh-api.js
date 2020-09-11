@@ -862,7 +862,7 @@ export class WazuhApiCtrl {
         { idHost: api.id }
       );
 
-      const daemons = ((response || {}).data || {}).data || {};
+      const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
 
       const isCluster =
         ((api || {}).cluster_info || {}).status === 'enabled' &&
@@ -979,7 +979,6 @@ export class WazuhApiCtrl {
 
       if (path === '/ping') {
         try {
-          // TODO: /ping doesnt work 
           const check = await this.checkDaemons(api, path);
           return check;
         } catch (error) {
