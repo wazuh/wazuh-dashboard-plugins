@@ -134,7 +134,7 @@ class WzConfigurationOverview extends Component {
                   </WzButtonPermissions>
                 </EuiFlexItem>
               )}
-              {this.props.agent.id !== '000' && this.props.agent.status === 'Active' && (
+              {this.props.agent.id !== '000' && this.props.agent.status === 'active' && (
                 <EuiFlexItem>
                   <ExportConfiguration
                     agent={this.props.agent}
