@@ -120,8 +120,8 @@ class WzRulesetSearchBar extends Component {
     },
     {
       type: 'params',
-      label: 'pci',
-      description: 'Filters the rules by PCI requirement',
+      label: 'pci_dss',
+      description: 'Filters the rules by PCI DSS requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/requirement/pci_dss', {});
