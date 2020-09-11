@@ -590,7 +590,7 @@ class WzListEditor extends Component {
                   <WzRestartClusterManagerCallout
                     onRestart={() => this.setState({showWarningRestart: true})}
                     onRestarted={() => this.setState({showWarningRestart: false})}
-                    onRestartedError={() => this.setState({showWarningRestart: false})}
+                    onRestartedError={() => this.setState({showWarningRestart: true})}
                   />
                 </Fragment>
               )}
