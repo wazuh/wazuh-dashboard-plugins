@@ -1061,7 +1061,7 @@ export class WazuhApiCtrl {
           error.message = ApiErrorEquivalence[error.code];
         }
         return ErrorResponse(
-          errorMsg || error,
+          errorMsg.detail || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
           500,
           reply
