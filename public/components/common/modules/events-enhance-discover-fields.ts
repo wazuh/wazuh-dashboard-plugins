@@ -52,6 +52,7 @@ const createElementFieldOpenFlyout = (FlyoutComponent, getFlyoutProps: TGetFlyou
 const createElementFieldOpenFlyoutMultiple = (FlyoutComponent, getFlyoutProps: TGetFlyoutProps, containerOptions) => (content: string, rowData, element, options) => {
   const container = document.createElement(containerOptions.element || 'div');
   const formattedContent = content.match(containerOptions.contentRegex);
+  if(!formattedContent){ return };
   const createElementFieldOpenFlyoutCreator = createElementFieldOpenFlyout(FlyoutComponent, getFlyoutProps);
   formattedContent.forEach((item, itemIndex) => {
     const itemElement = createElementFieldOpenFlyoutCreator(item, rowData, element, options);
