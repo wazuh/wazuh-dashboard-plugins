@@ -30,7 +30,6 @@ import { WzButtonPermissions } from '../../common/permissions/button';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
 import { AppState } from '../../../react-services/app-state';
 
 export class ApiTable extends Component {
@@ -224,7 +223,7 @@ export class ApiTable extends Component {
             <EuiFlexItem grow={false}>
               <WzButtonPermissions
                 buttonType='icon'        
-                roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
+                roles={[]}
                 tooltip={{position: 'top', content: <p>Set as default</p>}}
                 iconType={
                   item.id === this.props.currentDefault
@@ -280,7 +279,7 @@ export class ApiTable extends Component {
                 <WzButtonPermissions
                   buttonType='empty'              
                   iconType="plusInCircle"
-                  roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
+                  roles={[]}
                   onClick={() => this.props.showAddApi()}
                 >
                   Add new
