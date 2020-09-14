@@ -460,7 +460,7 @@ class WzRuleInfo extends Component {
           </span>
         );
       });
-      listCompliance.push(<EuiFlexItem key={index} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+      listCompliance.push(<EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
         <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTechniques']}</b>
         {this.state.mitreLoading && <EuiLoadingSpinner size="m" /> || <p>{values}</p>}
         <EuiSpacer size="s" />
@@ -469,7 +469,7 @@ class WzRuleInfo extends Component {
 
     if(this.state.mitreTactics && this.state.mitreTactics.length){
       
-      listCompliance.push(<EuiFlexItem key={index} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+      listCompliance.push(<EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
         <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTactics']}</b>
         <p>{this.state.mitreTactics.toString()}</p>
         <EuiSpacer size="s" />
