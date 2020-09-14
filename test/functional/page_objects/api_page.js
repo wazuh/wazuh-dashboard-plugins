@@ -29,9 +29,9 @@ export function ApiProvider({ getService, getPageObjects }) {
           `Invalid type: ${type}; use 'apiConfig' or 'apiTableEdit'`
         );
       }
-      await testSubjects.setValue(`${type}Username`, 'foo');
+      await testSubjects.setValue(`${type}Username`, 'wazuh-wui');
       log.debug('insert the user');
-      await testSubjects.setValue(`${type}Password`, 'bar');
+      await testSubjects.setValue(`${type}Password`, 'wazuh-wui');
       log.debug('insert the password');
       await testSubjects.setValue(`${type}Host`, 'http://localhost');
       log.debug('insert the host');
