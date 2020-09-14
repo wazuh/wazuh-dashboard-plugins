@@ -1011,15 +1011,6 @@ export class WazuhApiCtrl {
         }
       }
 
-      // DELETE and PUT must use URL query but we accept objects in Dev Tools
-      if (devTools && dataProperties.length) {
-        (Object.keys(data) || []).forEach(key => {
-          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
-            data[key] !== '' ? '=' : ''
-            }${data[key]}`;
-        });
-        data = {};
-      }
       const response = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
 
       const responseIsDown = this.checkResponseIsDown(response);
@@ -1070,7 +1061,7 @@ export class WazuhApiCtrl {
           error.message = ApiErrorEquivalence[error.code];
         }
         return ErrorResponse(
-          errorMsg || error,
+          errorMsg.detail || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
           500,
           reply
@@ -1259,14 +1250,12 @@ export class WazuhApiCtrl {
       );
 
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
-
-      const isFileGroups = req.payload.path.startsWith('/groups/') && req.payload.path.endsWith('/files');
-
-      const totalItems = isFileGroups ? (((output || {}).data || {}).data || {}).totalItems : (((output || {}).data || {}).data || {}).total_affected_items;
+         
+      const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
 
       if (totalItems && !isList) {
         params.offset = 0;
-        isFileGroups ? itemsArray.push(...output.data.data.items) : itemsArray.push(...output.data.data.affected_items);
+        itemsArray.push(...output.data.data.affected_items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await this.apiInterceptor.request(
@@ -1275,17 +1264,18 @@ export class WazuhApiCtrl {
             { params: params },
             { idHost: req.payload.id }
           );
-          isFileGroups ? itemsArray.push(...tmpData.data.data.items) : itemsArray.push(...tmpData.data.data.affected_items);
+          itemsArray.push(...tmpData.data.data.affected_items);
         }
       }
 
       if (totalItems) {
         const { path, filters } = req.payload;
-        const isArrayOfLists = path.includes('/lists') && !isList;
+        const isArrayOfLists =
+          path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
-        const isAgentsOfGroup = path.startsWith('/groups/') && path.endsWith('/agents');
+        const isAgentsOfGroup = path.startsWith('/agents/groups/');
         const isFiles = path.endsWith('/files');
-        let fields = isFileGroups ? Object.keys(output.data.data.items[0]) : Object.keys(output.data.data.affected_items[0]);
+        let fields = Object.keys(output.data.data.affected_items[0]);
 
         if (isAgents || isAgentsOfGroup) {
           if (isFiles) {

@@ -32,8 +32,8 @@ describe('SchedulerJob', () => {
   const oneApi = [{
     url: 'https://localhost',
     port: 55000,
-    username: 'foo',
-    password: 'bar',
+    username: 'wazuh-wui',
+    password: 'wazuh-wui',
     id: 'default',
     cluster_info: {
       status: 'disabled',
@@ -46,8 +46,8 @@ describe('SchedulerJob', () => {
     {
       url: 'https://localhost',
       port: 55000,
-      username: 'foo',
-      password: 'bar',
+      username: 'wazuh-wui',
+      password: 'wazuh-wui',
       id: 'internal',
       cluster_info: {
         status: 'disabled',
@@ -59,8 +59,8 @@ describe('SchedulerJob', () => {
     {
       url: 'https://externalhost',
       port: 55000,
-      username: 'foo',
-      password: 'bar',
+      username: 'wazuh-wui',
+      password: 'wazuh-wui',
       id: 'external',
       cluster_info: {
         status: 'disabled',
@@ -74,8 +74,8 @@ describe('SchedulerJob', () => {
     {
       url: 'https://localhost',
       port: 55000,
-      username: 'foo',
-      password: 'bar',
+      username: 'wazuh-wui',
+      password: 'wazuh-wui',
       id: 'internal',
       cluster_info: {
         status: 'disabled',
@@ -87,8 +87,8 @@ describe('SchedulerJob', () => {
     {
       url: 'https://externalhost',
       port: 55000,
-      username: 'foo',
-      password: 'bar',
+      username: 'wazuh-wui',
+      password: 'wazuh-wui',
       id: 'external',
       cluster_info: {
         status: 'disabled',
@@ -100,8 +100,8 @@ describe('SchedulerJob', () => {
     {
       url: 'https://externalhost',
       port: 55000,
-      username: 'foo',
-      password: 'bar',
+      username: 'wazuh-wui',
+      password: 'wazuh-wui',
       id: 'experimental',
       cluster_info: {
         status: 'disabled',

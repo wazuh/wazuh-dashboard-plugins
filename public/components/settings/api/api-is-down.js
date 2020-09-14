@@ -110,8 +110,8 @@ hosts:
     - production:
         url: http://172.16.1.2
         port: 55000
-        username: foo
-        password: bar
+        username: wazuh-wui
+        password: wazuh-wui
 `;
 
     const checkConnectionChildren = (
