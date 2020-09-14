@@ -30,7 +30,7 @@ export const jobs: {[key:string]: IJob} = {
     index: {
       name: 'statistics',
       creation: 'w',
-      mapping: '{"remoted": ${data}, "apiName": ${apiName}, "cluster": "false"}',
+      mapping: '{"remoted": ${data.affected_items}, "apiName": ${apiName}, "cluster": "false"}',
     }
   },
   'manager-stats-analysisd': {
@@ -42,7 +42,7 @@ export const jobs: {[key:string]: IJob} = {
     index: {
       name: 'statistics',
       creation: 'w',
-      mapping: '{"analysisd": ${data}, "apiName": ${apiName}, "cluster": "false"}',
+      mapping: '{"analysisd": ${data.affected_items}, "apiName": ${apiName}, "cluster": "false"}',
     }
   },
   'cluster-stats-remoted': {
@@ -61,7 +61,7 @@ export const jobs: {[key:string]: IJob} = {
     index: {
       name:'statistics',
       creation: 'w',
-      mapping: '{"remoted": ${data}, "apiName": ${apiName}, "nodeName": ${nodeName}, "cluster": "true"}',
+      mapping: '{"remoted": ${data.affected_items}, "apiName": ${apiName}, "nodeName": ${nodeName}, "cluster": "true"}',
     }
   },
   'cluster-stats-analysisd': {
@@ -80,7 +80,7 @@ export const jobs: {[key:string]: IJob} = {
     index: {
       name: 'statistics',
       creation: 'w',
-      mapping: '{"analysisd": ${data}, "apiName": ${apiName}, "nodeName": ${nodeName}, "cluster": "true"}',
+      mapping: '{"analysisd": ${data.affected_items}, "apiName": ${apiName}, "nodeName": ${nodeName}, "cluster": "true"}',
     }
   },
 }
