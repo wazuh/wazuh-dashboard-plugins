@@ -24,7 +24,8 @@ import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID } from '../../util/constants';
 import jwtDecode from 'jwt-decode';
-
+import { ManageHosts } from '../lib/manage-hosts';
+import { ApiInterceptor } from '../lib/api-interceptor';
 export class WazuhElasticCtrl {
   /**
    * Constructor
@@ -41,6 +42,8 @@ export class WazuhElasticCtrl {
     this.wzSampleAlertsIndexPrefix = WAZUH_SAMPLE_ALERT_PREFIX;
     this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-sample-security, wazuh-alerts-sample-auditing-policy-monitoring, wazuh-alerts-threat-detection
     this.defaultNumSampleAlerts = 3000;
+    this.manageHosts = new ManageHosts();
+    this.apiInterceptor = new ApiInterceptor();
   }
 
   /**
@@ -935,6 +938,17 @@ export class WazuhElasticCtrl {
     if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
       return ErrorResponse('No administrator role', 401, 401, reply);
     };
+    // Check the provided token is valid
+    const idHost = req.state['wz-api'];
+    if( !idHost ){
+      return ErrorResponse('No API id provided', 401, 401, reply);
+    };
+    const api = await this.manageHosts.getHostById(idHost);
+    const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+    if(responseTokenIsWorking.status !== 200){
+      return ErrorResponse('Token is not valid', 500, 500, reply);
+    };
+
     //Get configuration
     const configFile = getConfiguration();
 
@@ -1026,6 +1040,16 @@ export class WazuhElasticCtrl {
     };
     if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
       return ErrorResponse('No administrator role', 401, 401, reply);
+    };
+    // Check the provided token is valid
+    const idHost = req.state['wz-api'];
+    if( !idHost ){
+      return ErrorResponse('No API id provided', 401, 401, reply);
+    };
+    const api = await this.manageHosts.getHostById(idHost);
+    const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+    if(responseTokenIsWorking.status !== 200){
+      return ErrorResponse('Token is not valid', 500, 500, reply);
     };
 
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
