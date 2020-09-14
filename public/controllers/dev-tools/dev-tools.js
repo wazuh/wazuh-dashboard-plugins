@@ -367,8 +367,8 @@ export class DevToolsController {
     const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
-        JSON.stringify({ limit: 5 }, null, 2);
+        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
+        JSON.stringify({ name: "NewAgent" }, null, 2);
 
       AppState.setCurrentDevTools(demoStr);
       this.apiInputBox.getDoc().setValue(demoStr);
@@ -587,8 +587,8 @@ export class DevToolsController {
         if (typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
 
         // Assign inline parameters
-        for (const key in extra) JSONraw[key] = extra[key];
-        const path = req.includes('?') ? req.split('?')[0] : req;
+        //for (const key in extra) JSONraw[key] = extra[key];
+        const path = req;
 
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
