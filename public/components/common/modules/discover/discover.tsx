@@ -378,7 +378,7 @@ export const Discover = compose(
         return  {
           field: 'timestamp',
           name: 'Time',
-          width: '160px',
+          width: '10%',
           sortable: true,
           render: time => {
             const date = time.split('.')[0];
@@ -392,29 +392,29 @@ export const Discover = compose(
       
       if(item === 'agent.id') {
         link = (ev,x) => {AppNavigate.navigateToModule(ev,'agents', {"tab": "welcome", "agent": x } )};
-        width = '75px';
+        width = '8%';
       }
       if(item === 'agent.name') {
-        width = '150px';
+        width = '12%';
       }
       if(item === 'rule.level') {
-        width = '75px';
+        width = '7%';
       }
       if(item === 'rule.id') {
         link = (ev,x) => AppNavigate.navigateToModule(ev,'manager', {tab:'rules', redirectRule: x});
-        width = '90px';
+        width = '9%';
       }
       if(item === 'rule.description' && columnsList.indexOf('syscheck.event') === -1) {
         width = '30%';
       }
       if(item === 'syscheck.event') {
-        width = '100px';
+        width = '15%';
       }
       if(item === 'rule.mitre.id') {
         link = (ev,x) => {this.setState({showMitreFlyout: true, selectedTechnique: x})};
       }
       if(arrayCompilance.indexOf(item) !== -1) {
-        width = '150px';
+        width = '30%';
       }
 
       let column = {
