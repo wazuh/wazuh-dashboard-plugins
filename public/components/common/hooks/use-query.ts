@@ -12,7 +12,10 @@
 import { useState, useEffect } from 'react';
 import { ModulesHelper } from '../modules/modules-helper';
 
-export function useQuery() {
+export function useQuery(): [{
+  language: 'kuery' | 'lucene';
+  query: string;
+}, ((query: any) => void)] {
   const [query, setQuery] = useState({ language: 'kuery', query: '' });
   useEffect(() => {
     let subscription;

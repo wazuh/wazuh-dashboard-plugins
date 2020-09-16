@@ -33,7 +33,7 @@ import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { toastNotifications } from 'ui/notify';
-import { Discover } from '../../components/common/modules/discover';
+import { SecurityAlerts } from './components';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 const visHandler = new VisHandlers();
@@ -304,7 +304,7 @@ export class WzVisualize extends Component {
                 aria-label="Expand"
               />
             </EuiFlexGroup>
-            <Discover shareFilterManager={[...this.KibanaServices.filterManager.filters]} initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']} implicitFilters={[]} initialFilters={[]}  updateTotalHits={(total) => {}} />
+            <SecurityAlerts />
 
           </EuiFlexItem>
         </EuiPanel>
