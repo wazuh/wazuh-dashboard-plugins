@@ -535,11 +535,11 @@ export class Discover extends Component {
   }
 
   closeMitreFlyout = () => {
-    this.setState({showMitreFlyout: ""});
+    this.setState({showMitreFlyout: false});
   }
   
-  onMitreChangeFlyout = (isFlyoutVisible: boolean) => {
-    this.setState({ isFlyoutVisible });
+  onMitreChangeFlyout = (showMitreFlyout: boolean) => {
+    this.setState({ showMitreFlyout });
   }
 
   openDiscover(e,techniqueID){
@@ -582,7 +582,7 @@ export class Discover extends Component {
     const noResultsText = `No results match for this search criteria`;
     let flyout = this.state.showMitreFlyout ? <EuiOverlayMask
       // @ts-ignore
-      onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeMitreFlyout() }} >
+      onClick={this.closeMitreFlyout} >
       <FlyoutTechnique
         openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
         openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
