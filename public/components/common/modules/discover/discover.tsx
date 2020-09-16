@@ -23,10 +23,12 @@ import { npSetup } from 'ui/new_platform';
 import { getServices } from 'plugins/kibana/discover/kibana_services';
 import DateMatch from '@elastic/datemath';
 import { toastNotifications } from 'ui/notify';
-import store from '../../../../redux/store';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
 import { KbnSearchBar } from '../../../kbn-search-bar';
 import { FlyoutTechnique } from '../../../../components/overview/mitre/components/techniques/components/flyout-technique';
+import { withReduxProvider } from '../../../common/hocs';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import {
   EuiBasicTable,
@@ -54,7 +56,14 @@ import {
 } from '../../../../../../../src/plugins/data/common';
 import '../../../../components/agents/fim/inventory/inventory.less';
 
-export class Discover extends Component {
+const mapStateToProps = state => ({
+  currentAgentData: state.appStateReducers.currentAgentData
+});
+
+export const Discover = compose(
+  withReduxProvider,
+  connect(mapStateToProps)
+)(class Discover extends Component {
   _isMount!: boolean;
   timefilter: {
     getTime(): TimeRange
@@ -160,12 +169,7 @@ export class Discover extends Component {
   async componentDidMount () {
     this._isMount = true;
     try {
-      const newColumns = this.props.initialColumns;
-      if(!store.getState().appStateReducers.currentAgentData.id){
-        newColumns.splice(2, 0, 'agent.id');
-        newColumns.splice(3, 0, 'agent.name');
-      }
-      this.setState({columns: newColumns, searchBarFilters: this.props.shareFilterManager || []}) //initial columns
+      this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}) //initial columns
       await this.getIndexPattern(); 
       this.getAlerts();
     } catch (err) {
@@ -173,18 +177,30 @@ export class Discover extends Component {
     }
   }
 
- 
-
   componentWillUnmount() {
     this._isMount = false;
   }
 
-  async componentDidUpdate() {
+  async componentDidUpdate(prevProps, prevState) {
     if (!this._isMount) { return; }
+    if((!prevProps.currentAgentData.id && this.props.currentAgentData.id) || (prevProps.currentAgentData.id && !this.props.currentAgentData.id)){
+      this.setState({ columns: this.getColumns() }); // Updates the columns to be rendered if you change the selected agent to none or vice versa
+    }
     try {
       await this.getAlerts();
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  getColumns () {
+    if(this.props.currentAgentData.id){
+      return this.props.initialColumns.filter(column => !['agent.id', 'agent.name'].includes(column));
+    }else{
+      const columns = [...this.props.initialColumns];
+      columns.splice(2, 0, 'agent.id');
+      columns.splice(3, 0, 'agent.name');
+      return columns;
     }
   }
 
@@ -292,9 +308,9 @@ export class Discover extends Component {
           this.setState({ isLoading: true, pageIndex:0 });
         else
           this.setState({ isLoading: true});
-        let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
-        if(store.getState().appStateReducers.currentAgentData.id){
-          filtersReq.push({"agent.id": store.getState().appStateReducers.currentAgentData.id})
+          let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
+        if(this.props.currentAgentData.id){
+          filtersReq.push({"agent.id": this.props.currentAgentData.id})
         } 
 
         const alerts = await GenericRequest.request(
@@ -629,4 +645,4 @@ export class Discover extends Component {
         {flyout}
       </div>);
   }
-}
+})
