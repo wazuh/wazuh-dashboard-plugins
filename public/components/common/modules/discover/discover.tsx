@@ -66,7 +66,7 @@ export class Discover extends Component {
   filterManager: FilterManager;
   state: {
     sort: object
-    selectedTechnique : string,
+    selectedTechnique: string,
     showMitreFlyout: boolean,
     alerts: { _source: {}, _id: string }[]
     total: number
@@ -78,10 +78,10 @@ export class Discover extends Component {
     requestFilters: object
     requestSize: number
     requestOffset: number
+    query: { language: "kuery" | "lucene", query: string }
     itemIdToExpandedRowMap: any
     dateRange: TimeRange
     searchBarFilters: []
-    query: Query
     elasticQuery: object
     filters: []
     columns: string[]
@@ -91,16 +91,17 @@ export class Discover extends Component {
   props!: {
     implicitFilters: object[],
     initialFilters: object[],
-    type: any,
+    query?: { language: "kuery" | "lucene", query: string }
+    type?: any,
     updateTotalHits: Function,
-    includeFilters: string,
+    includeFilters?: string,
     initialColumns: string[],
     shareFilterManager: object[],
   }
   constructor(props) {
     super(props);
     this.KibanaServices = getServices();
-    this.filterManager = props.shareFilterManager ? this.KibanaServices.filterManager :  new FilterManager(npSetup.core.uiSettings);
+    this.filterManager = props.shareFilterManager ? this.KibanaServices.filterManager : new FilterManager(npSetup.core.uiSettings);
     this.timefilter = this.KibanaServices.timefilter;
     this.state = {
       sort: {},
@@ -118,7 +119,7 @@ export class Discover extends Component {
       requestOffset: 0,
       itemIdToExpandedRowMap: {},
       dateRange: this.timefilter.getTime(),
-      query: { language: "kuery", query: "" },
+      query: props.query || { language: "kuery", query: "" },
       searchBarFilters: [],
       elasticQuery: {},
       filters: props.initialFilters,
@@ -157,23 +158,23 @@ export class Discover extends Component {
     });
   };
 
-  async componentDidMount () {
+  async componentDidMount() {
     this._isMount = true;
     try {
       const newColumns = this.props.initialColumns;
-      if(!store.getState().appStateReducers.currentAgentData.id){
+      if (!store.getState().appStateReducers.currentAgentData.id) {
         newColumns.splice(2, 0, 'agent.id');
         newColumns.splice(3, 0, 'agent.name');
       }
-      this.setState({columns: newColumns, searchBarFilters: this.props.shareFilterManager || []}) //initial columns
-      await this.getIndexPattern(); 
+      this.setState({ columns: newColumns, searchBarFilters: this.props.shareFilterManager || [] }) //initial columns
+      await this.getIndexPattern();
       this.getAlerts();
     } catch (err) {
       console.log(err);
     }
   }
 
- 
+
 
   componentWillUnmount() {
     this._isMount = false;
@@ -188,15 +189,15 @@ export class Discover extends Component {
     }
   }
 
-  async getIndexPattern () {
-    this.indexPattern = {...await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern())};
-    const fields:IFieldType[] = [];
+  async getIndexPattern() {
+    this.indexPattern = { ...await this.KibanaServices.indexPatterns.get(AppState.getCurrentPattern()) };
+    const fields: IFieldType[] = [];
     Object.keys(this.indexPattern.fields).forEach(item => {
-      if (isNaN(item)) { 
+      if (isNaN(item)) {
         fields.push(this.indexPattern.fields[item]);
-      } else if(this.props.includeFilters && this.indexPattern.fields[item].name.includes(this.props.includeFilters)){
+      } else if (this.props.includeFilters && this.indexPattern.fields[item].name.includes(this.props.includeFilters)) {
         fields.unshift(this.indexPattern.fields[item]);
-      }else {
+      } else {
         fields.push(this.indexPattern.fields[item]);
       }
     })
@@ -205,11 +206,11 @@ export class Discover extends Component {
 
   hideCreateCustomLabel = () => {
     try {
-      const button = document.querySelector(".wz-discover #addFilterPopover > div > button > span > span") ;
-      if ( !button ) return setTimeout(this.hideCreateCustomLabel, 100);
+      const button = document.querySelector(".wz-discover #addFilterPopover > div > button > span > span");
+      if (!button) return setTimeout(this.hideCreateCustomLabel, 100);
       const findAndHide = () => {
         const switcher = document.querySelector("#filterEditorCustomLabelSwitch")
-        if ( !switcher ) return setTimeout(findAndHide, 100);
+        if (!switcher) return setTimeout(findAndHide, 100);
         switcher.parentElement.style.display = "none"
       }
       button.onclick = findAndHide;
@@ -247,22 +248,23 @@ export class Discover extends Component {
 
   buildFilter() {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
-    const { searchBarFilters, query } = this.state;
+    const { searchBarFilters } = this.state;
+    const { query = this.state.query } = this.props;
     const { hideManagerAlerts } = this.wazuhConfig.getConfig();
     const extraFilters = [];
-    if(hideManagerAlerts) extraFilters.push({
-        meta: {
-          alias: null,
-          disabled: false,
-          key: 'agent.id',
-          negate: true,
-          params: { query: '000' },
-          type: 'phrase',
-          index: this.indexPattern.title
-        },
-        query: { match_phrase: { 'agent.id': '000' } },
-        $state: { store: 'appState' }
-      });
+    if (hideManagerAlerts) extraFilters.push({
+      meta: {
+        alias: null,
+        disabled: false,
+        key: 'agent.id',
+        negate: true,
+        params: { query: '000' },
+        type: 'phrase',
+        index: this.indexPattern.title
+      },
+      query: { match_phrase: { 'agent.id': '000' } },
+      $state: { store: 'appState' }
+    });
 
     const shareFilterManager = this.props.shareFilterManager || [];
     const elasticQuery =
@@ -274,7 +276,7 @@ export class Discover extends Component {
       );
     const pattern = AppState.getCurrentPattern();
     const { filters, sortField, sortDirection } = this.state;
-    const { from:oldFrom, to:oldTo } = this.timefilter.getTime();
+    const { from: oldFrom, to: oldTo } = this.timefilter.getTime();
     const sort = { ...(sortField && { [sortField]: { "order": sortDirection } }) };
     const offset = Math.floor((this.state.pageIndex * this.state.pageSize) / this.state.requestSize) * this.state.requestSize;
     const from = dateParse(oldFrom);
@@ -283,19 +285,19 @@ export class Discover extends Component {
   }
 
   async getAlerts() {
-    if(!this.indexPattern || this.state.isLoading) return;
+    if (!this.indexPattern || this.state.isLoading) return;
     //compare filters so we only make a request into Elasticsearch if needed
-      const newFilters = this.buildFilter();
-    try{
+    const newFilters = this.buildFilter();
+    try {
       if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters)) {
-        if(newFilters.offset === this.state.requestFilters.offset) // we only reset pageIndex to 0 if the requestFilters has changed but the offset is the same
-          this.setState({ isLoading: true, pageIndex:0 });
+        if (newFilters.offset === this.state.requestFilters.offset) // we only reset pageIndex to 0 if the requestFilters has changed but the offset is the same
+          this.setState({ isLoading: true, pageIndex: 0 });
         else
-          this.setState({ isLoading: true});
+          this.setState({ isLoading: true });
         let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
-        if(store.getState().appStateReducers.currentAgentData.id){
-          filtersReq.push({"agent.id": store.getState().appStateReducers.currentAgentData.id})
-        } 
+        if (store.getState().appStateReducers.currentAgentData.id) {
+          filtersReq.push({ "agent.id": store.getState().appStateReducers.currentAgentData.id })
+        }
 
         const alerts = await GenericRequest.request(
           'POST',
@@ -308,10 +310,10 @@ export class Discover extends Component {
         if (this._isMount) {
           this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
           this.props.updateTotalHits(alerts.data.hits);
-         
+
         }
       }
-    }catch(err){
+    } catch (err) {
       if (this._isMount) {
         this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
         this.props.updateTotalHits(0);
@@ -319,9 +321,9 @@ export class Discover extends Component {
     }
   }
 
-  removeColumn(id){
-    if(this.state.columns.length < 2){
-      this.showToast('warning', "At least one column must be selected",3000);
+  removeColumn(id) {
+    if (this.state.columns.length < 2) {
+      this.showToast('warning', "At least one column must be selected", 3000);
       return;
     }
     const columns = this.state.columns;
@@ -329,12 +331,12 @@ export class Discover extends Component {
     this.setState(columns)
   }
 
-  addColumn(id){ 
-    if(this.state.columns.length > 11){
-      this.showToast('warning', 'The maximum number of columns is 10',3000);
+  addColumn(id) {
+    if (this.state.columns.length > 11) {
+      this.showToast('warning', 'The maximum number of columns is 10', 3000);
       return;
     }
-    if(this.state.columns.find(element => element === id)){
+    if (this.state.columns.find(element => element === id)) {
       this.removeColumn(id);
       return;
     }
@@ -347,8 +349,8 @@ export class Discover extends Component {
   columns = () => {
     var columnsList = [...this.state.columns];
     const columns = columnsList.map((item) => {
-      if(item === "icon"){
-        return  {
+      if (item === "icon") {
+        return {
           width: "25px",
           isExpander: true,
           render: item => {
@@ -358,8 +360,8 @@ export class Discover extends Component {
           },
         }
       }
-      if(item === "timestamp"){
-        return  {
+      if (item === "timestamp") {
+        return {
           field: 'timestamp',
           name: 'Time',
           width: '160px',
@@ -373,49 +375,49 @@ export class Discover extends Component {
       let width = false;
       let link = false;
       const arrayCompilance = ["rule.pci_dss", "rule.gdpr", "rule.nist_800_53", "rule.tsc", "rule.hipaa"];
-      
-      if(item === 'agent.id') {
-        link = (ev,x) => {AppNavigate.navigateToModule(ev,'agents', {"tab": "welcome", "agent": x } )};
+
+      if (item === 'agent.id') {
+        link = (ev, x) => { AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": x }) };
         width = '75px';
       }
-      if(item === 'agent.name') {
+      if (item === 'agent.name') {
         width = '150px';
       }
-      if(item === 'rule.level') {
+      if (item === 'rule.level') {
         width = '75px';
       }
-      if(item === 'rule.id') {
-        link = (ev,x) => AppNavigate.navigateToModule(ev,'manager', {tab:'rules', redirectRule: x});
+      if (item === 'rule.id') {
+        link = (ev, x) => AppNavigate.navigateToModule(ev, 'manager', { tab: 'rules', redirectRule: x });
         width = '90px';
       }
-      if(item === 'rule.description' && columnsList.indexOf('syscheck.event') === -1) {
+      if (item === 'rule.description' && columnsList.indexOf('syscheck.event') === -1) {
         width = '30%';
       }
-      if(item === 'syscheck.event') {
+      if (item === 'syscheck.event') {
         width = '100px';
       }
-      if(item === 'rule.mitre.id') {
-        link = (ev,x) => {this.setState({showMitreFlyout: true, selectedTechnique: x})};
+      if (item === 'rule.mitre.id') {
+        link = (ev, x) => { this.setState({ showMitreFlyout: true, selectedTechnique: x }) };
       }
-      if(arrayCompilance.indexOf(item) !== -1) {
+      if (arrayCompilance.indexOf(item) !== -1) {
         width = '150px';
       }
 
       let column = {
         field: item,
-        name: (<span 
-          onMouseEnter={() => { this.setState({hover: item}) }}
-          onMouseLeave={() => { this.setState({hover: ""}) }}
-          style={{display: "inline-flex"}}>{this.nameEquivalences[item] || item} {this.state.hover === item &&
-          <EuiToolTip position="top" content={`Remove column`}>
-            <EuiButtonIcon
-              style={{paddingBottom: 12, marginBottom: "-10px", paddingTop: 0}}
-              onClick={(e) => { this.removeColumn(item); e.stopPropagation();}}
-              iconType="cross"
-              aria-label="Filter"
-              iconSize="s"
-            />
-          </EuiToolTip>} 
+        name: (<span
+          onMouseEnter={() => { this.setState({ hover: item }) }}
+          onMouseLeave={() => { this.setState({ hover: "" }) }}
+          style={{ display: "inline-flex" }}>{this.nameEquivalences[item] || item} {this.state.hover === item &&
+            <EuiToolTip position="top" content={`Remove column`}>
+              <EuiButtonIcon
+                style={{ paddingBottom: 12, marginBottom: "-10px", paddingTop: 0 }}
+                onClick={(e) => { this.removeColumn(item); e.stopPropagation(); }}
+                iconType="cross"
+                aria-label="Filter"
+                iconSize="s"
+              />
+            </EuiToolTip>}
         </span>),
         sortable: true
       }
@@ -423,22 +425,22 @@ export class Discover extends Component {
       if (width) {
         column.width = width;
       }
-      if(link && item !== 'rule.mitre.id' || (item === 'rule.mitre.id' && this.props.shareFilterManager)){
+      if (link && item !== 'rule.mitre.id' || (item === 'rule.mitre.id' && this.props.shareFilterManager)) {
         column.render = itemValue => {
           return <span>
-            {(item === 'agent.id' && itemValue === '000') && 
-              <span style={{fontSize: 14, marginLeft: 8}}>{itemValue}</span>
-            || item === 'rule.mitre.id' && Array.isArray(itemValue) &&
+            {(item === 'agent.id' && itemValue === '000') &&
+              <span style={{ fontSize: 14, marginLeft: 8 }}>{itemValue}</span>
+              || item === 'rule.mitre.id' && Array.isArray(itemValue) &&
               itemValue.map(currentItem => <EuiButtonEmpty
-                onClick={(ev) => {ev.stopPropagation();}} 
-                onMouseDown={ (ev) => { ev.stopPropagation(); link(ev,currentItem)}}>
-              {currentItem}
+                onClick={(ev) => { ev.stopPropagation(); }}
+                onMouseDown={(ev) => { ev.stopPropagation(); link(ev, currentItem) }}>
+                {currentItem}
               </EuiButtonEmpty>)
-            || 
+              ||
               <EuiButtonEmpty
-                onClick={(ev) => {ev.stopPropagation();}} 
-                onMouseDown={ (ev) => { ev.stopPropagation(); link(ev,itemValue)}}>
-              {itemValue}
+                onClick={(ev) => { ev.stopPropagation(); }}
+                onMouseDown={(ev) => { ev.stopPropagation(); link(ev, itemValue) }}>
+                {itemValue}
               </EuiButtonEmpty>
             }
           </span>
@@ -485,10 +487,10 @@ export class Discover extends Component {
     return result;
   }
 
-   /**
-   * Adds a new negated filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
-   * @param filter 
-   */
+  /**
+  * Adds a new negated filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
+  * @param filter 
+  */
   addFilterOut(filter) {
     const key = Object.keys(filter)[0];
     const value = filter[key];
@@ -502,7 +504,7 @@ export class Discover extends Component {
     })
 
     this.filterManager.setFilters(filters);
-    if(!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
+    if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
   }
 
   /**
@@ -513,16 +515,16 @@ export class Discover extends Component {
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
-    const filters =  []; //this.state.searchBarFilters;
+    const filters = []; //this.state.searchBarFilters;
     valuesArray.map((item) => {
       const formattedFilter = buildPhraseFilter({ name: key, type: "string" }, item, this.indexPattern);
-      if(formattedFilter.meta.key === 'manager.name' || formattedFilter.meta.key === 'cluster.name'){
+      if (formattedFilter.meta.key === 'manager.name' || formattedFilter.meta.key === 'cluster.name') {
         formattedFilter.meta["removable"] = false;
       }
       filters.push(formattedFilter);
     })
     this.filterManager.addFilters(filters);
-    if(!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
+    if (!this.props.shareFilterManager) this.setState({ searchBarFilters: filters });
 
   }
 
@@ -535,25 +537,26 @@ export class Discover extends Component {
   }
 
   closeMitreFlyout = () => {
-    this.setState({showMitreFlyout: ""});
+    this.setState({ showMitreFlyout: "" });
   }
-  
+
   onMitreChangeFlyout = (isFlyoutVisible: boolean) => {
     this.setState({ isFlyoutVisible });
   }
 
-  openDiscover(e,techniqueID){
-    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "discover", filters:{ 'rule.mitre.id': techniqueID} })
+  openDiscover(e, techniqueID) {
+    AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "discover", filters: { 'rule.mitre.id': techniqueID } })
   }
 
-  openDashboard(e,techniqueID){
-    AppNavigate.navigateToModule(e, 'overview', {"tab": 'mitre', "tabView": "dashboard", filters :{ 'rule.mitre.id': techniqueID}  } )
+  openDashboard(e, techniqueID) {
+    AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "dashboard", filters: { 'rule.mitre.id': techniqueID } })
   }
 
   render() {
     if (this.state.isLoading)
-      return (<div style={{ alignSelf: "center", minHeight: 400}}><EuiLoadingContent  lines={3} /> </div>)
-    const {total, itemIdToExpandedRowMap, query} = this.state;
+      return (<div style={{ alignSelf: "center", minHeight: 400 }}><EuiLoadingContent lines={3} /> </div>)
+    const { total, itemIdToExpandedRowMap, } = this.state;
+    const { query = this.state.query } = this.props;
     const getRowProps = item => {
       const { _id } = item;
       return {
@@ -593,38 +596,38 @@ export class Discover extends Component {
     return (
       <div
         className='wz-discover hide-filter-control' >
-        {!this.props.shareFilterManager && <KbnSearchBar  
-          indexPattern={this.indexPattern} 
+        {!this.props.shareFilterManager && <KbnSearchBar
+          indexPattern={this.indexPattern}
           filterManager={this.filterManager}
           onQuerySubmit={this.onQuerySubmit}
           onFiltersUpdated={this.onFiltersUpdated}
           query={query} />
         }
-        {total 
+        {total
           ? <EuiFlexGroup>
-              <EuiFlexItem>
-                {pageIndexItems.length && (
-                  <EuiBasicTable
-                    items={pageIndexItems}
-                    className="module-discover-table"
-                    itemId="_id"
-                    itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-                    isExpandable={true}
-                    columns={columns}
-                    rowProps={getRowProps}
-                    pagination={pagination}
-                    sorting={sorting}
-                    onChange={this.onTableChange}
-                  />
-                )}
-              </EuiFlexItem>
-            </EuiFlexGroup>
+            <EuiFlexItem>
+              {pageIndexItems.length && (
+                <EuiBasicTable
+                  items={pageIndexItems}
+                  className="module-discover-table"
+                  itemId="_id"
+                  itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+                  isExpandable={true}
+                  columns={columns}
+                  rowProps={getRowProps}
+                  pagination={pagination}
+                  sorting={sorting}
+                  onChange={this.onTableChange}
+                />
+              )}
+            </EuiFlexItem>
+          </EuiFlexGroup>
           : <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiSpacer size="s" />
-                <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
-              </EuiFlexItem>
-            </EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiSpacer size="s" />
+              <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
+            </EuiFlexItem>
+          </EuiFlexGroup>
         }
         {flyout}
       </div>);

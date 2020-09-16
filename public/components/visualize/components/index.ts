@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get Kibana filter manager
+ * Wazuh app - React component for Visualize.
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,11 +9,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useState, useEffect} from 'react';
-//@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
 
-export const useFilterManager = () => {
-    const [filterManager, setFilterManager] = useState(getServices().filterManager);
-    return filterManager;
-}
+export { SecurityAlerts } from './security-alerts';
