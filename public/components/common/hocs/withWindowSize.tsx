@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOC to incldue the window size
+ * Wazuh app - React HOC to include the window size
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

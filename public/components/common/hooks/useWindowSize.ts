@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get query of Kibana searchBar
+ * Wazuh app - React hook for get window size
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
