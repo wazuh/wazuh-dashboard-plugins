@@ -52,40 +52,6 @@ export default (kibana) => {
       };
 
       new WazuhPlugin().setup(coreSetup, pluginsSetup, legacySetup);
-      // eslint-disable-line no-unused-vars
-      const xpackMainPlugin = server.plugins.xpack_main;
-      if (xpackMainPlugin) {
-        const featureId = 'wazuh';
-
-        xpackMainPlugin.registerFeature({
-          id: featureId,
-          name: 'Wazuh',
-          navLinkId: featureId,
-          icon: '/plugins/wazuh/img/icon_blue.svg',
-          app: [featureId],
-          catalogue: [],
-          privileges: {
-            all: {
-              app: [featureId],
-              api: [],
-              savedObject: {
-                all: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
-              },
-              ui: ['save', 'show']
-            },
-            read: {
-              app: [featureId],
-              api: [],
-              savedObject: {
-                all: [],
-                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*']
-              },
-              ui: ['show']
-            }
-          }
-        });
-      }
     }
   });
 }
