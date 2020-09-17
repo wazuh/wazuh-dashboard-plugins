@@ -138,7 +138,7 @@ export class PatternHandler {
       const fields = await courierData.fieldsFetcher.fetch({});
       await courierData.initFields(fields);
     } catch (error) {
-      throw new Error();
+      throw new Error(error);
     }
   }
 }
