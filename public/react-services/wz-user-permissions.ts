@@ -941,6 +941,7 @@ const wazuhPermissions = {
 }
 
 export class WzUserPermissions{
+  // Check the missing permissions of the required ones that the user does not have
   static checkMissingUserPermissions = (requiredPermissions, userPermissions) => {
     const filtered = requiredPermissions.filter(permission => {
       if(Array.isArray(permission)){
@@ -971,6 +972,11 @@ export class WzUserPermissions{
     });
   
     return filtered.length ? filtered : false;
+  }
+  // Check the missing roles of the required ones that the user does not have
+  static checkMissingUserRoles(requiredRoles, userRoles) {
+    const rolesUserNotOwn = requiredRoles.filter(requiredRole => !userRoles.includes(requiredRole));
+    return rolesUserNotOwn.length ? rolesUserNotOwn : false; 
   }
 }
 
