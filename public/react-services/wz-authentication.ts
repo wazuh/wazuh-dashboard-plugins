@@ -12,17 +12,12 @@
 
 import { WzRequest } from './wz-request';
 import { AppState } from './app-state';
-import { GenericRequest } from './generic-request';
 import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
 import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../util/constants';
 
-const delay = (timeout: number) => new Promise(res => {refreshTimeout = setTimeout(res, timeout)});
-
 export let userToken;
-let refreshTimeout;
-const marginSeconds = 0;
 
 export class WzAuthentication{
   static getToken(){
@@ -60,9 +55,6 @@ export class WzAuthentication{
   }
   private static mapUserRolesIDToAdministratorRole(roles){
     return roles.map((role: number) => role === WAZUH_ROLE_ADMINISTRATOR_ID ? WAZUH_ROLE_ADMINISTRATOR_NAME : role);
-  }
-  static cancelRefresh(){
-    clearTimeout(refreshTimeout);
   }
   static logout(){
     //TODO: logout

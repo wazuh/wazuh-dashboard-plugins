@@ -373,7 +373,6 @@ export class WazuhElasticCtrl {
       }
       return { roles };
     } catch (error) {
-      console.log("error", error)
       log('wazuh-elastic:getRoles', error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, reply);
     }
