@@ -24,7 +24,7 @@ export class WzRequest {
    * @param {String} path
    * @param {Object} payload
    */
-  static async genericReq(method, path, payload = null, customTimeout = false) {
+  static async genericReq(method, path, payload = null, customTimeout = false, shouldRetry = true) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -63,6 +63,16 @@ export class WzRequest {
         }
       }
       const errorMessage = (error && error.response && error.response.data && error.response.data.message) || (error || {}).message;
+      if(typeof errorMessage === 'string' && errorMessage.includes("status code 401") && shouldRetry){
+        try{
+          await WzAuthentication.refresh(true);
+          return this.genericReq(method, path, payload, customTimeout, false);
+        }catch(error){
+          return ((error || {}).data || {}).message || false
+          ? Promise.reject(error.data.message)
+          : Promise.reject(error.message || error)
+        }
+      }
       return errorMessage
         ? Promise.reject(errorMessage)
         : Promise.reject(error || 'Server did not respond');
@@ -92,16 +102,6 @@ export class WzRequest {
       }
       return Promise.resolve(data);
     } catch (error) {
-      if(typeof error === 'string' && error.includes("status code 401") && shouldRetry){
-        try{
-          await WzAuthentication.refresh(true);
-          return await this.apiReq(method, path, body, false);
-        }catch(error){
-          return ((error || {}).data || {}).message || false
-          ? Promise.reject(error.data.message)
-          : Promise.reject(error.message || error)
-        }
-      }
       return ((error || {}).data || {}).message || false
         ? Promise.reject(error.data.message)
         : Promise.reject(error.message || error);
