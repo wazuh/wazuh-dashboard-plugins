@@ -121,12 +121,11 @@ export class ApiInterceptor {
         .catch(async error => {
           if (attempts > 0 && error.response) {
             if (error.response.status === 401) {
-              const responseAuth = await this.authenticateApi(options.idHost);
-
-              if (responseAuth.status === 200) {
+              try{
+                await this.authenticateApi(options.idHost);
                 return this.request(method, path, data, options, attempts - 1);
-              } else {
-                return responseAuth;
+              }catch(error){
+                return error.response || error
               }
             }
             return error.response;
