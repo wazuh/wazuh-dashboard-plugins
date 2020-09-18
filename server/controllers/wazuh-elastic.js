@@ -349,7 +349,6 @@ export class WazuhElasticCtrl {
       }
       return { user };
     } catch (error) {
-      console.log("error", error)
       log('wazuh-elastic:getCurrentUser', error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, reply);
     }
@@ -861,7 +860,7 @@ export class WazuhElasticCtrl {
   /**
    * This checks if there is sample alerts
    * @param {*} req
-   * GET /elastic/samplealerts/{pattern}
+   * GET /elastic/samplealerts
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -880,7 +879,7 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * GET /elastic/samplealerts/{pattern}/{category}
+   * GET /elastic/samplealerts/{category}
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -898,13 +897,17 @@ export class WazuhElasticCtrl {
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       return { index: sampleAlertsIndex, exists: existsSampleIndex }
     } catch (error) {
-      ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
+      log(
+        'wazuh-elastic:haveSampleAlertsOfCategory',
+        `Error checking if there are sample alerts indices: ${error.message || error}`
+      );
+      return ErrorResponse(`Error checking if there are sample alerts indices: ${error.message || error}`, 1000, 500, reply);
     }
   }
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * POST /elastic/samplealerts/{pattern}/{category}
+   * POST /elastic/samplealerts/{category}
    * {
    *   "manager": {
    *      "name": "manager_name"
@@ -925,50 +928,48 @@ export class WazuhElasticCtrl {
     if (!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
-  
-    // Check if user has administrator role in token
-    const token = req.state['wz-token'];
-    if(!token){
-      return ErrorResponse('No token provided', 401, 401, reply);
-    };
-    const decodedToken = jwtDecode(token);
-    if(!decodedToken){
-      return ErrorResponse('No permissions in token', 401, 401, reply);
-    };
-    if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
-      return ErrorResponse('No administrator role', 401, 401, reply);
-    };
-    // Check the provided token is valid
-    const idHost = req.state['wz-api'];
-    if( !idHost ){
-      return ErrorResponse('No API id provided', 401, 401, reply);
-    };
-    const api = await this.manageHosts.getHostById(idHost);
-    const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
-    if(responseTokenIsWorking.status !== 200){
-      return ErrorResponse('Token is not valid', 500, 500, reply);
-    };
-
-    //Get configuration
-    const configFile = getConfiguration();
-
-    // Check if admin mode is enabled
-    // if((configFile || {}).admin !== undefined && !configFile.admin){ // If admin mode is not defined in wazuh.yml, it is enabled by default
-    //   return ErrorResponse('Admin mode is required to create sample data', 1000, 403, reply);
-    // };
-
+    
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
-    const bulkPrefix = JSON.stringify({
-      index: {
-        _index: sampleAlertsIndex
-      }
-    });
-    const alertGenerateParams = req.payload && req.payload.params || {};
 
-    const sampleAlerts = this.wzSampleAlertsCaterories[req.params.category].map((typeAlert) => generateAlerts({ ...typeAlert, ...alertGenerateParams }, req.payload.alerts || typeAlert.alerts || this.defaultNumSampleAlerts)).flat();
-    const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}`).join('\n');
-    // Index alerts
     try {
+      // Check if user has administrator role in token
+      const token = req.state['wz-token'];
+      if(!token){
+        return ErrorResponse('No token provided', 401, 401, reply);
+      };
+      const decodedToken = jwtDecode(token);
+      if(!decodedToken){
+        return ErrorResponse('No permissions in token', 401, 401, reply);
+      };
+      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+        return ErrorResponse('No administrator role', 401, 401, reply);
+      };
+      // Check the provided token is valid
+      const idHost = req.state['wz-api'];
+      if( !idHost ){
+        return ErrorResponse('No API id provided', 401, 401, reply);
+      };
+      const api = await this.manageHosts.getHostById(idHost);
+      const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+      if(responseTokenIsWorking.status !== 200){
+        return ErrorResponse('Token is not valid', 500, 500, reply);
+      };
+
+      //Get configuration
+      const configFile = getConfiguration();
+
+      const bulkPrefix = JSON.stringify({
+        index: {
+          _index: sampleAlertsIndex
+        }
+      });
+      const alertGenerateParams = req.payload && req.payload.params || {};
+
+      const sampleAlerts = this.wzSampleAlertsCaterories[req.params.category].map((typeAlert) => generateAlerts({ ...typeAlert, ...alertGenerateParams }, req.payload.alerts || typeAlert.alerts || this.defaultNumSampleAlerts)).flat();
+      const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}`).join('\n');
+      
+      // Index alerts
+    
       // Check if wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       if (!existsSampleIndex) {
@@ -1009,7 +1010,7 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log(
         'wazuh-elastic:createSampleAlerts',
-        `Error adding sample alerts to ${sampleAlertsIndex} index`
+        `Error adding sample alerts to ${sampleAlertsIndex} index: ${error.message || error}`
       );
       return ErrorResponse(error.message || error, 1000, 500, reply);
     }
@@ -1029,31 +1030,33 @@ export class WazuhElasticCtrl {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
-    // Check if user has administrator role in token
-    const token = req.state['wz-token'];
-    if(!token){
-      return ErrorResponse('No token provided', 401, 401, reply);
-    };
-    const decodedToken = jwtDecode(token);
-    if(!decodedToken){
-      return ErrorResponse('No permissions in token', 401, 401, reply);
-    };
-    if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
-      return ErrorResponse('No administrator role', 401, 401, reply);
-    };
-    // Check the provided token is valid
-    const idHost = req.state['wz-api'];
-    if( !idHost ){
-      return ErrorResponse('No API id provided', 401, 401, reply);
-    };
-    const api = await this.manageHosts.getHostById(idHost);
-    const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
-    if(responseTokenIsWorking.status !== 200){
-      return ErrorResponse('Token is not valid', 500, 500, reply);
-    };
-
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
+
     try {
+      // Check if user has administrator role in token
+      const token = req.state['wz-token'];
+      if(!token){
+        return ErrorResponse('No token provided', 401, 401, reply);
+      };
+      const decodedToken = jwtDecode(token);
+      if(!decodedToken){
+        return ErrorResponse('No permissions in token', 401, 401, reply);
+      };
+      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+        return ErrorResponse('No administrator role', 401, 401, reply);
+      };
+      // Check the provided token is valid
+      const idHost = req.state['wz-api'];
+      if( !idHost ){
+        return ErrorResponse('No API id provided', 401, 401, reply);
+      };
+      const api = await this.manageHosts.getHostById(idHost);
+      const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+      if(responseTokenIsWorking.status !== 200){
+        return ErrorResponse('Token is not valid', 500, 500, reply);
+      };
+
+    
       // Check if Wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       if (existsSampleIndex) {
@@ -1071,7 +1074,7 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log(
         'wazuh-elastic:deleteSampleAlerts',
-        `Error deleting sample alerts of ${sampleAlertsIndex} index`
+        `Error deleting sample alerts of ${sampleAlertsIndex} index: ${error.message || error}`
       );
       return ErrorResponse(error.message || error, 1000, 500, reply);
     }
