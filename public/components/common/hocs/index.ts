@@ -22,3 +22,5 @@ export { withUserAuthorizationPrompt  } from './withUserAuthorization';
 export { withGlobalBreadcrumb  } from './withGlobalBreadcrumb';
 
 export { withReduxProvider  } from './withReduxProvider';
+
+export { withGuard } from './withGuard';
