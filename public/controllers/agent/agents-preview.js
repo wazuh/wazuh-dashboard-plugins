@@ -111,8 +111,7 @@ export class AgentsPreviewController {
       hasAgents: this.hasAgents,
       reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
-      getCurrentApiAddress: () => this.getCurrentApiAddress(),
-      needsPassword: () => this.needsPassword()
+      getCurrentApiAddress: () => this.getCurrentApiAddress()
     };
     this.hasAgents = true;
     this.init = false;
@@ -247,24 +246,6 @@ export class AgentsPreviewController {
       'https://documentation.wazuh.com/current/user-manual/registering/index.html',
       '_blank'
     );
-  }
-
-  /**
-   * Returns if the password is neccesary to register a new agent
-   */
-  async needsPassword() {
-    try {
-      const result = await this.apiReq.request(
-        'GET',
-        '/agents/000/config/auth/auth',
-        {}
-      );
-      const auth = ((result.data || {}).data || {}).auth || {};
-      const usePassword = auth.use_password === 'yes';
-      return usePassword;
-    } catch (error) {
-      return false;
-    }
   }
 
   /**
