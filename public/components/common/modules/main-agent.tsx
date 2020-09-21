@@ -315,8 +315,8 @@ export class MainModuleAgent extends Component {
                 }
 
                 {/* ---------------------MODULES WITH CUSTOM PANELS--------------------------- */}
-                {section === 'fim' && <MainFim {...this.props} />}
-                {section === 'sca' && <MainSca {...this.props} />}
+                {section === 'fim' && selectView==='inventory' && <MainFim {...this.props} />}
+                {section === 'sca' && selectView==='inventory' && <MainSca {...this.props} />}
                 {section === 'mitre' && selectView==='inventory' && <MainMitre {...this.props} goToDiscover={(id) => this.props.onSelectedTabChanged(id)} />}
                 {/* -------------------------------------------------------------------------- */}
               </div>
