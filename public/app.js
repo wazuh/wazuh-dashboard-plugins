@@ -69,6 +69,7 @@ import './kibana-integrations';
 import './services';
 import './controllers';
 import './factories';
+import './directives';
 
 // Imports to update adminMode when app starts
 import { checkAdminMode } from './controllers/management/components/management/configuration/utils/wz-fetch';

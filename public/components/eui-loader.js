@@ -31,7 +31,6 @@ import {
 import { Tabs } from './common/tabs/tabs';
 import { MultipleAgentSelector } from './management/groups/multiple-agent-selector';
 import { NodeList } from './management/cluster/node-list';
-import { HealthCheck } from './health-check/health-check';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -54,4 +53,3 @@ app
   .value('EuiLoadingChart', EuiLoadingChart)
   .value('MultipleAgentSelector', MultipleAgentSelector)
   .value('NodeList', NodeList)
-  .value('HealthCheck', HealthCheck)

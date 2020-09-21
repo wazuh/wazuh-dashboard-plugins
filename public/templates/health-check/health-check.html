@@ -1,1 +1,47 @@
-<react-component name="HealthCheck" props=""></react-component>
+<md-content flex="auto" layout="column" layout-align="center" class="health-check" ng-controller="healthCheck as ctrl">
+    <span class="euiLoadingSpinner health-check-loader"></span>
+    <img aria-hidden="true" wz-src="/plugins/wazuh/img/icon_blue.svg" class="health-check-logo" ></img>
+    <div class="margin-top-30">
+        <dl class="euiDescriptionList euiDescriptionList--column euiDescriptionList--center euiDescriptionList--reverse"
+            ng-repeat="result in ctrl.results track by $index">
+            <dt class="euiDescriptionList__title">{{result.description}}</dt>
+            <dd class="euiDescriptionList__description">
+                <div ng-if="result.status === 'disabled'" class="discover-field-details">
+                    Disabled
+                </div>
+                <div ng-if="result.status === 'Ready' || result.status === 'Error'">
+                    <i ng-if="result.status === 'Ready'" class="fa fa-fw fa-check wz-text-teal"></i>
+                    <i ng-if="result.status === 'Error'" class="fa fa-fw fa-warning wz-text-red"></i>
+                    {{result.status}}</td>
+                    <div ng-if="result.status !== 'Ready' && result.status !== 'Error' && result.status !== 'disabled'">
+                        <i class="fa fa-fw fa-spin fa-spinner"></i>
+                    </div>
+                </div>
+            </dd>
+            <div class="euiSpacer euiSpacer--m"></div>
+        </dl>
+    </div>
+    <div layout="row" ng-if="ctrl.errors.length" class="layout-align-center margin-top-30">
+        <ul>
+            <li ng-repeat='error in ctrl.errors track by $index'>
+                <div class="euiCallOut euiCallOut--danger">
+                    <div class="euiCallOutHeader">
+                        <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"
+                            class="euiIcon euiIcon--medium euiCallOutHeader__icon" focusable="false"
+                            role="img" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M7.59 10.059L7.35 5.18h1.3L8.4 10.06h-.81zm.394 1.901a.61.61 0 01-.448-.186.606.606 0 01-.186-.444c0-.174.062-.323.186-.446a.614.614 0 01.448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 01-.189.446.607.607 0 01-.437.184zM2 14a1 1 0 01-.878-1.479l6-11a1 1 0 011.756 0l6 11A1 1 0 0114 14H2zm0-1h12L8 2 2 13z"></path>
+                        </svg>
+                        <span class="euiCallOutHeader__title">{{error}}</span>
+                    </div>
+                </div>
+                <div class="euiSpacer euiSpacer--s"></div>
+            </li>
+        </ul>
+    </div>
+    <div ng-if="ctrl.errors.length" layout="row" class="layout-align-center margin-top-30">
+        <md-button class="wz-button md-raised md-primary" ng-click="ctrl.goApp()" aria-label="Go to app">
+            <i class="fa fa-fw fa-sign-out"></i> Go to app
+        </md-button>
+    </div>
+
+</md-content>
