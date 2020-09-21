@@ -466,12 +466,23 @@ class WzMenu extends Component {
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
 
+  formatAgentStatus = (status) => {
+    if(status === 'active'){
+      return "Active";
+    }
+    if(status === 'disconnected'){
+      return "Disconnected";
+    }
+    if(status === 'never_connected'){
+      return "Never connected";
+    }
+  }
 
   addHealthRender(agent) {
     // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
     return (
       <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow">
-        <EuiToolTip position="top" content={agent.status}>
+        <EuiToolTip position="top" content={this.formatAgentStatus(agent.status)}>
           <span className="euiFlexItem euiFlexItem--flexGrowZero">
             <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(agent.status)}`} focusable="false" role="img" aria-hidden="true">
               <circle cx="8" cy="8" r="4"></circle>
