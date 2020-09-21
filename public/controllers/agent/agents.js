@@ -616,7 +616,7 @@ export class AgentsController {
    * @param {*} id
    */
   addMitrefilter(id) {
-    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    const filter = `{"meta":{"index": ${AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }
 

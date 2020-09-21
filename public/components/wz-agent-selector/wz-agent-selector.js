@@ -24,6 +24,7 @@ import store from '../../redux/store';
 import { AgentSelectionTable } from '../../controllers/overview/components/overview-actions/agents-selection-table';
 import chrome from 'ui/chrome';
 import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
+import { AppState } from '../../react-services/app-state';
 
 class WzAgentSelector extends Component {
   constructor(props) {
@@ -68,7 +69,7 @@ class WzAgentSelector extends Component {
             "negate": false,
             "params": { "query": agentIdList[0] },
             "type": "phrase",
-            "index": "wazuh-alerts-3.x-*"
+            "index": AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"
           },
           "query": {
             "match": {

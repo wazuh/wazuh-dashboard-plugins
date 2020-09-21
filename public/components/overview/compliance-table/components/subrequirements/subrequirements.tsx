@@ -29,6 +29,7 @@ import {
 } from '@elastic/eui';
 import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
+import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
 
 export class ComplianceSubrequirements extends Component {
@@ -70,7 +71,7 @@ export class ComplianceSubrequirements extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": "wazuh-alerts-3.x-*"
+        "index": AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }
