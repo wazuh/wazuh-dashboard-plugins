@@ -52,7 +52,6 @@ export default (kibana) => {
       };
 
       new WazuhPlugin().setup(coreSetup, pluginsSetup, legacySetup);
-      // eslint-disable-line no-unused-vars
     }
   });
 }
