@@ -90,6 +90,7 @@ import {
   SEARCH_ON_PAGE_LOAD_SETTING,
   DOC_HIDE_TIME_COLUMN_SETTING,
 } from '../../../../src/plugins/discover/common/';
+import { AppState } from '../react-services/app-state';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -502,7 +503,7 @@ function discoverController(
                         negate: true,
                         params: { query: '000' },
                         type: 'phrase',
-                        index: 'wazuh-alerts-3.x-*'
+                        index: AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"
                       },
                       query: { match_phrase: { 'agent.id': '000' } },
                       $state: { store: 'appState' }
