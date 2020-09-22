@@ -42,6 +42,7 @@ import exportCsv from '../../../../../react-services/wz-csv';
 
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzListEditor extends Component {
   constructor(props) {
@@ -61,106 +62,6 @@ class WzListEditor extends Component {
     this.items = {};
 
     this.rulesetHandler = RulesetHandler;
-
-    this.columns = [
-      {
-        field: 'key',
-        name: 'Key',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'value',
-        name: 'Value',
-        align: 'left',
-        sortable: true
-      }
-    ];
-
-    this.adminColumns = [
-      {
-        field: 'key',
-        name: 'Key',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'value',
-        name: 'Value',
-        align: 'left',
-        sortable: true,
-        render: (value, item) => {
-          if (this.state.editing === item.key) {
-            return (
-              <EuiFieldText
-                placeholder="New value"
-                value={this.state.editingValue}
-                onChange={this.onChangeEditingValue}
-                aria-label="Use aria labels when no actual label is in use"
-              />
-            );
-          } else {
-            return <span>{value}</span>;
-          }
-        }
-      },
-      {
-        name: 'Actions',
-        align: 'left',
-        render: item => {
-          if (this.state.editing === item.key) {
-            return (
-              <Fragment>
-                <EuiToolTip position="top" content={'Yes'}>
-                  <EuiButtonIcon
-                    aria-label="Confirm value"
-                    iconType="check"
-                    onClick={() => {
-                      this.setEditedValue();
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
-                <EuiToolTip position="top" content={'No'}>
-                  <EuiButtonIcon
-                    aria-label="Cancel edition"
-                    iconType="cross"
-                    onClick={() => this.setState({ editing: false })}
-                    color="danger"
-                  />
-                </EuiToolTip>
-              </Fragment>
-            );
-          } else {
-            return (
-              <Fragment>
-                <EuiToolTip position="top" content={`Edit ${item.key}`}>
-                  <EuiButtonIcon
-                    aria-label="Edit content"
-                    iconType="pencil"
-                    onClick={() => {
-                      this.setState({
-                        editing: item.key,
-                        editingValue: item.value
-                      });
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
-                <EuiToolTip position="top" content={`Remove ${item.key}`}>
-                  <EuiButtonIcon
-                    aria-label="Show content"
-                    iconType="trash"
-                    onClick={() => this.deleteItem(item.key)}
-                    color="danger"
-                  />
-                </EuiToolTip>
-              </Fragment>
-            );
-          }
-        }
-      }
-    ];
   }
 
   componentDidMount() {
@@ -413,8 +314,10 @@ class WzListEditor extends Component {
    * @param {String} path
    */
   renderAddAndSave(name, path, newList = false, items = []) {
+
     const saveButton = (
-      <EuiButton
+      <WzButtonPermissions
+        permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${name}`}]}
         fill
         isDisabled={items.length === 0}
         iconType="save"
@@ -422,19 +325,20 @@ class WzListEditor extends Component {
         onClick={async () => this.saveList(name, path, newList)}
       >
         Save
-      </EuiButton>
+      </WzButtonPermissions>
     );
 
     return (
       <Fragment>
         {!this.state.isPopoverOpen && (
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
+            <WzButtonPermissions
+              permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${name}`}]}
               iconType="plusInCircle"
               onClick={() => this.openAddEntry()}
             >
               Add new entry
-            </EuiButtonEmpty>
+            </WzButtonPermissions>
           </EuiFlexItem>
         )}
         {/* Save button */}
@@ -530,14 +434,102 @@ class WzListEditor extends Component {
     );
   }
 
+  buildTableColumns(fileName, path){
+    return [
+      {
+        field: 'key',
+        name: 'Key',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'value',
+        name: 'Value',
+        align: 'left',
+        sortable: true,
+        render: (value, item) => {
+          if (this.state.editing === item.key) {
+            return (
+              <EuiFieldText
+                placeholder="New value"
+                value={this.state.editingValue}
+                onChange={this.onChangeEditingValue}
+                aria-label="Use aria labels when no actual label is in use"
+              />
+            );
+          } else {
+            return <span>{value}</span>;
+          }
+        }
+      },
+      {
+        name: 'Actions',
+        align: 'left',
+        render: item => {
+          if (this.state.editing === item.key) {
+            return (
+              <Fragment>
+                <EuiToolTip position="top" content={'Yes'}>
+                  <EuiButtonIcon
+                    aria-label="Confirm value"
+                    iconType="check"
+                    onClick={() => {
+                      this.setEditedValue();
+                    }}
+                    color="primary"
+                  />
+                </EuiToolTip>
+                <EuiToolTip position="top" content={'No'}>
+                  <EuiButtonIcon
+                    aria-label="Cancel edition"
+                    iconType="cross"
+                    onClick={() => this.setState({ editing: false })}
+                    color="danger"
+                  />
+                </EuiToolTip>
+              </Fragment>
+            );
+          } else {
+            return (
+              <Fragment>
+                <WzButtonPermissions
+                  buttonType='icon'
+                  aria-label="Edit content"
+                  iconType="pencil"
+                  permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${fileName}`}]}
+                  tooltip={{position: 'top', content: `Edit ${item.key}`}}
+                  onClick={() => {
+                    this.setState({
+                      editing: item.key,
+                      editingValue: item.value
+                    });
+                  }}
+                  color="primary"
+                />
+                <WzButtonPermissions
+                  buttonType='icon'
+                  aria-label="Remove content"
+                  iconType="trash"
+                  permissions={[{action: 'manager:upload_file', resource: `file:path:${path}/${fileName}`}]}
+                  tooltip={{position: 'top', content: `Remove ${item.key}`}}
+                  onClick={() => this.deleteItem(item.key)}
+                  color="danger"
+                />
+              </Fragment>
+            );
+          }
+        }
+      }
+    ];
+  }
+
   //isDisabled={nameForSaving.length <= 4}
   render() {
     const { listInfo, isLoading, error } = this.props.state;
-    const { adminMode } = this.props;
     const { name, path } = listInfo;
 
     const message = isLoading ? false : 'No results...';
-    const columns = adminMode ? this.adminColumns : this.columns;
+    const columns = this.columns;
 
     const addingNew = name === false || !name;
     const listName = this.state.newListName || name;
@@ -584,8 +576,7 @@ class WzListEditor extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 )}
-                {adminMode &&
-                  !this.state.editing &&
+                {!this.state.editing &&
                   this.renderAddAndSave(
                     listName,
                     path,
@@ -599,7 +590,7 @@ class WzListEditor extends Component {
                   <WzRestartClusterManagerCallout
                     onRestart={() => this.setState({showWarningRestart: true})}
                     onRestarted={() => this.setState({showWarningRestart: false})}
-                    onRestartedError={() => this.setState({showWarningRestart: false})}
+                    onRestartedError={() => this.setState({showWarningRestart: true})}
                   />
                 </Fragment>
               )}
@@ -612,7 +603,7 @@ class WzListEditor extends Component {
                       <EuiInMemoryTable
                         itemId="id"
                         items={this.state.items}
-                        columns={columns}
+                        columns={this.buildTableColumns(name, path)}
                         pagination={{ pageSizeOptions: [10, 15] }}
                         sorting={true}
                         message={message}
@@ -632,8 +623,7 @@ class WzListEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.rulesetReducers
   };
 };
 

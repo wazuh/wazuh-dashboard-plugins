@@ -30,8 +30,9 @@ import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
 import managementTemplate from '../templates/management/management.pug';
 import overviewTemplate from '../templates/visualize/dashboards.pug';
 import settingsTemplate from '../templates/settings/settings.pug';
+import securityTemplate from '../templates/security/security.html';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
-import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import toolsTemplate from '../templates/tools/tools.pug';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
@@ -162,6 +163,10 @@ routes
     template: settingsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
+  .when('/security', {
+    template: securityTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
   .when('/visualize/create?', {
     redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
@@ -175,7 +180,7 @@ routes
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {
-    template: devToolsTemplate,
+    template: toolsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/blank-screen', {

@@ -21,7 +21,7 @@ import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 
 export class DevToolsController {
@@ -33,7 +33,7 @@ export class DevToolsController {
    * @param {*} $document
    */
   constructor($scope, $window, errorHandler, $document) {
-    this.apiReq = ApiRequest;
+    this.wzRequest = WzRequest;
     this.genericReq = GenericRequest;
     this.$window = $window;
     this.errorHandler = errorHandler;
@@ -367,8 +367,8 @@ export class DevToolsController {
     const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /agents?status=active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
-        JSON.stringify({ limit: 5 }, null, 2);
+        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
+        JSON.stringify({ name: "NewAgent" }, null, 2);
 
       AppState.setCurrentDevTools(demoStr);
       this.apiInputBox.getDoc().setValue(demoStr);
@@ -576,27 +576,23 @@ export class DevToolsController {
             : `/${requestCopy}`
           : '/';
 
-        let body = {};
+        let JSONraw = {};
         try {
-          body = JSON.parse(paramsInline || desiredGroup.requestTextJson);
+          JSONraw = JSON.parse(paramsInline || desiredGroup.requestTextJson);
         } catch (error) {
-          body = {};
+          JSONraw = {};
         }
 
         if (typeof extra.pretty !== 'undefined') delete extra.pretty;
-        if (typeof body.pretty !== 'undefined') delete body.pretty;
+        if (typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
 
-        let params = {};
         // Assign inline parameters
-        for (const key in extra) params[key] = extra[key];
-        const path = req.includes('?') ? req.split('?')[0] : req;
+        //for (const key in extra) JSONraw[key] = extra[key];
+        const path = req;
 
+        if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
-          const output = await this.apiReq.request(method, path, {
-            params: params,
-            body: body,
-            devTools: true,
-          });
+          const output = await this.wzRequest.apiReq(method, path, JSONraw);
           if(typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }

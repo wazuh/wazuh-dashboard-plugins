@@ -387,6 +387,6 @@ span.CodeMirror-selectedtext { background: none; }
   letter-spacing: normal;
 }
 
-.dev-tools-max-height {
-  height: auto;
-}
+.dev-tools-max-height {	
+  height: auto;	
+} 

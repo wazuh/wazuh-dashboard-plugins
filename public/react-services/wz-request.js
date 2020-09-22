@@ -13,6 +13,7 @@ import axios from 'axios';
 import chrome from 'ui/chrome';
 import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
+import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 
@@ -23,7 +24,7 @@ export class WzRequest {
    * @param {String} path
    * @param {Object} payload
    */
-  static async genericReq(method, path, payload = null, customTimeout = false) {
+  static async genericReq(method, path, payload = null, customTimeout = false, shouldRetry = true) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -45,13 +46,13 @@ export class WzRequest {
         throw new Error(data.error);
       }
       return Promise.resolve(data);
-    } catch (err) {
+    } catch (error) {
       //if the requests fails, we need to check if the API is down
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (currentApi && currentApi.id) {
         try {
           await ApiCheck.checkStored(currentApi.id);
-        } catch (err) {
+        } catch (error) {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
 
@@ -61,10 +62,20 @@ export class WzRequest {
           return;
         }
       }
-      const errorMessage = (err && err.response && err.response.data && err.response.data.message) || (err || {}).message;
+      const errorMessage = (error && error.response && error.response.data && error.response.data.message) || (error || {}).message;
+      if(typeof errorMessage === 'string' && errorMessage.includes("status code 401") && shouldRetry){
+        try{
+          await WzAuthentication.refresh(true);
+          return this.genericReq(method, path, payload, customTimeout, false);
+        }catch(error){
+          return ((error || {}).data || {}).message || false
+          ? Promise.reject(error.data.message)
+          : Promise.reject(error.message || error)
+        }
+      }
       return errorMessage
         ? Promise.reject(errorMessage)
-        : Promise.reject(err || 'Server did not respond');
+        : Promise.reject(error || 'Server did not respond');
     }
   }
 
@@ -74,7 +85,7 @@ export class WzRequest {
    * @param {String} path API route
    * @param {Object} body Request body
    */
-  static async apiReq(method, path, body) {
+  static async apiReq(method, path, body, shouldRetry=true) {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
@@ -82,6 +93,13 @@ export class WzRequest {
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const data = await this.genericReq('POST', '/api/request', requestData);
+      const hasFailed = (((data || {}).data || {}).data || {}).total_failed_items || 0;
+      if(hasFailed){
+        const error = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
+        const failed_ids = ((((data.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
+        const message = ((data.data || {}).message || "Unexpected error");
+        return Promise.reject(`${message} (${error.code}) - ${error.message} ${failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ""}`)
+      }
       return Promise.resolve(data);
     } catch (error) {
       return ((error || {}).data || {}).message || false

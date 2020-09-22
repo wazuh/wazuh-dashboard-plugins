@@ -35,6 +35,7 @@ import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
 import 'brace/theme/textmate';
 import { validateXML } from '../configuration/utils/xml';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -84,9 +85,8 @@ class WzGroupsEditor extends Component {
    * @param {String} name
    */
   async save(name) {
-    const { adminMode } = this.props;
 
-    if (!this._isMounted || !adminMode) {
+    if (!this._isMounted) {
       return;
     }
     try {
@@ -101,7 +101,7 @@ class WzGroupsEditor extends Component {
           savedMessage: `File ${name} saved, but there were found several error while validating the configuration.`
         });
         this.setState({ isSaving: false });
-        this.showToast('warning', warning.savedMessage, warning.details, 3000);
+        this.showToast('warning', warning.savedMessage, error, 3000);
         return;
       }
       this.setState({ isSaving: false });
@@ -129,11 +129,11 @@ class WzGroupsEditor extends Component {
 
   render() {
     const { name, content, isEditable, groupName } = this.state;
-    const { adminMode } = this.props;
 
     const xmlError = validateXML(content);
     const saveButton = (
-      <EuiButton
+      <WzButtonPermissions
+        permissions={[{action: 'group:update_config', resource: `group:id:${groupName}`}]}
         fill
         iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}
@@ -141,7 +141,7 @@ class WzGroupsEditor extends Component {
         onClick={() => this.save(name)}
       >
         {(isEditable && xmlError) ? 'XML format error' : 'Save'}
-      </EuiButton>
+      </WzButtonPermissions>
     );
 
     return (
@@ -168,7 +168,7 @@ class WzGroupsEditor extends Component {
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem />
-                {isEditable && adminMode && (
+                {isEditable && (
                   <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
                 )}
               </EuiFlexGroup>
@@ -193,7 +193,6 @@ class WzGroupsEditor extends Component {
                             this.setState({ content: newContent })
                           }
                           mode="xml"
-                          isReadOnly={!adminMode}
                           wrapEnabled
                           setOptions={this.codeEditorOptions}
                           aria-label="Code Editor"
@@ -222,8 +221,7 @@ class WzGroupsEditor extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 

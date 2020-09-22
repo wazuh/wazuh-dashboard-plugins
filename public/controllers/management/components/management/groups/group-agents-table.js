@@ -14,7 +14,8 @@ import {
   EuiBasicTable,
   EuiCallOut,
   EuiOverlayMask,
-  EuiConfirmModal
+  EuiConfirmModal,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -47,7 +48,7 @@ class WzGroupAgentsTable extends Component {
       filters: [],
     };
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, {q: `group=${this.props.state.itemDetail.name}`})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value,  {q: `group=${this.props.state.itemDetail.name}`})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value,  {q: `group=${this.props.state.itemDetail.name}`})},
@@ -169,7 +170,9 @@ class WzGroupAgentsTable extends Component {
             filters={filters}
             suggestions={this.suggestions}
             onFiltersChange={filters => this.setState({filters})}
+            placeholder='Filter or search agent'
           />
+          <EuiSpacer size='s'/>
           <EuiBasicTable
             itemId="id"
             items={items}
@@ -240,8 +243,7 @@ class WzGroupAgentsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 

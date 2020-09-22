@@ -23,15 +23,15 @@ export class ClusterTimelions extends Component {
       <WzReduxProvider>
         <EuiFlexGroup style={{ height: '450px' }}>
           <EuiFlexItem key={'Wazuh-App-Cluster-monitoring-Overview-Manager'}>
-            <EuiPanel paddingSize="none">
-              <EuiFlexItem
-                className={
-                  this.state.expandedVis ===
-                  'Wazuh-App-Cluster-monitoring-Overview-Manager'
-                    ? 'fullscreen h-100'
-                    : 'h-100'
-                }
-              >
+            <EuiPanel 
+              paddingSize="none" 
+              className={
+                this.state.expandedVis ===
+                'Wazuh-App-Cluster-monitoring-Overview-Manager'
+                  ? 'fullscreen h-100'
+                  : 'h-100'}
+            >
+              <EuiFlexItem className='h-100'>
                 <EuiFlexGroup
                   style={{ padding: '12px 12px 0px' }}
                   className="embPanel__header"
@@ -63,15 +63,15 @@ export class ClusterTimelions extends Component {
             </EuiPanel>
           </EuiFlexItem>
           <EuiFlexItem key={'Wazuh-App-Cluster-monitoring-Overview'}>
-            <EuiPanel paddingSize="none">
-              <EuiFlexItem
-                className={
-                  this.state.expandedVis ===
-                  'Wazuh-App-Cluster-monitoring-Overview'
-                    ? 'fullscreen h-100'
-                    : 'h-100'
-                }
-              >
+            <EuiPanel
+              paddingSize="none"
+              className={
+                this.state.expandedVis ===
+                'Wazuh-App-Cluster-monitoring-Overview'
+                  ? 'fullscreen h-100'
+                  : 'h-100'}
+            >
+              <EuiFlexItem className='h-100'>
                 <EuiFlexGroup
                   style={{ padding: '12px 12px 0px' }}
                   className="embPanel__header"

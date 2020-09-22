@@ -27,7 +27,7 @@ import {
 } from '@elastic/eui';
 
 import { toastNotifications } from 'ui/notify';
-
+import { WzButtonPermissions } from '../../../components/common/permissions/button';
 export class UploadFiles extends Component {
   constructor(props) {
     super(props);
@@ -88,7 +88,7 @@ export class UploadFiles extends Component {
                   'success',
                   'Success',
                   <Fragment>
-                    <div>Susccessfully imported</div>
+                    <div>Successfully imported</div>
                     <ul>
                       {files.map(f => (
                         <li
@@ -249,13 +249,15 @@ export class UploadFiles extends Component {
   }
   render() {
     const button = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${this.props.msg}`}]}
         iconType="importAction"
         iconSide="left"
         onClick={() => this.onButtonClick()}
       >
         Import files
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
     return (
       <EuiPopover

@@ -89,20 +89,29 @@ const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
   </EuiFlexItem>
 )
 
-const saveSettings = (updatedConfig: {}, setUpdateConfig: Function, setLoading: Function, config: ISetting[]) => {
+const saveSettings = async (updatedConfig: {}, setUpdateConfig: Function, setLoading: Function, config: ISetting[]) => {
   setLoading(true);
-  Object.keys(updatedConfig).forEach(async setting => await saveSetting(setting, updatedConfig, config));
-  successToast();
-  setUpdateConfig({});
-  setTimeout(() => setLoading(false), 500);
+  try{
+    await Promise.all(Object.keys(updatedConfig).map(async setting => await saveSetting(setting, updatedConfig, config)));
+    successToast();
+    setUpdateConfig({});
+  }catch(error){
+    errorToast(error);
+  }finally{
+    setLoading(false);
+  }
 }
 
 const saveSetting = async (setting, updatedConfig, config:ISetting[]) => {
-  (config.find(item => item.setting === setting) || {value:''}).value = updatedConfig[setting]
-  const result = await ConfigurationHandler.editKey(setting, updatedConfig[setting]);
-  const response = result.data.data;
-  response.needRestart && restartToast();
-  response.needReload && reloadToast();
+  try{
+    (config.find(item => item.setting === setting) || {value:''}).value = updatedConfig[setting];
+    const result = await ConfigurationHandler.editKey(setting, updatedConfig[setting]);
+    const response = result.data.data;
+    response.needRestart && restartToast();
+    response.needReload && reloadToast();
+  }catch(error){
+    return Promise.reject(error);
+  }
 }
 
 const reloadToast = () => {
@@ -128,5 +137,12 @@ const successToast = () => {
   toastNotifications.add({
     color:'success',
     title:'The configuration has been successfully updated',
+  });
+}
+
+const errorToast = (error) => {
+  toastNotifications.add({
+    color:'danger',
+    title:`Error saving the configuration: ${error.message || error}`,
   });
 }

@@ -31,6 +31,8 @@ import { WzStatisticsRemoted } from "./statistics-dashboard-remoted";
 import { WzStatisticsAnalysisd } from "./statistics-dashboard-analysisd";
 import { WzDatePicker } from "../../../../../components/wz-date-picker/wz-date-picker";
 import { AppNavigate } from "../../../../../react-services/app-navigate";
+import store from '../../../../../redux/store';
+import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -43,6 +45,7 @@ export class WzStatisticsOverview extends Component {
       loadingNode: false,
       searchvalue: "",
       clusterNodeSelected: 'all',
+      refreshVisualizations: Date.now()
     };
     this.tabs = [
       {
@@ -63,9 +66,19 @@ export class WzStatisticsOverview extends Component {
     };
   }
 
+   setGlobalBreadcrumb() {
+    const breadcrumb = [
+      { text: '' },
+      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: 'Statistics' }
+    ];
+    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  }
+
   async componentDidMount() {
     this._isMounted = true;
     try {
+      this.setGlobalBreadcrumb();
       const data = await clusterNodes();
       const nodes = data.data.data.affected_items.map((item) => {
         return { value: item.name, text: `${item.name} (${item.type})` };
@@ -78,10 +91,9 @@ export class WzStatisticsOverview extends Component {
     } catch (err) {
       this.setState({
         clusterNodes: [],
-        clusterNodeSelected: false,
+        clusterNodeSelected: 'all',
       });
     }
-    this.fetchData();
   }
 
   componentWillUnmount() {
@@ -93,17 +105,9 @@ export class WzStatisticsOverview extends Component {
       {
         selectedTabId: id,
         searchvalue: "",
-      },
-      () => {
-        this.fetchData();
       }
     );
   };
-
-
-  async fetchData() {
-
-  }
 
   renderTabs() {
     return this.tabs.map((tab, index) => (
@@ -129,15 +133,11 @@ export class WzStatisticsOverview extends Component {
     );
   };
 
+  refreshVisualizations = () => {
+    this.setState({ refreshVisualizations: Date.now() })
+  }
+
   render() {
-    const refreshButton = (
-      <EuiButtonEmpty
-        iconType="refresh"
-        onClick={async () => await this.fetchData()}
-      >
-        Refresh
-      </EuiButtonEmpty>
-    );
     const search = {
       box: {
         incremental: true,
@@ -157,7 +157,14 @@ export class WzStatisticsOverview extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                iconType="refresh"
+                onClick={this.refreshVisualizations}
+              >
+                Refresh
+              </EuiButtonEmpty>
+            </EuiFlexItem>
             {!!(
               this.state.clusterNodes &&
               this.state.clusterNodes.length &&
@@ -208,7 +215,7 @@ export class WzStatisticsOverview extends Component {
                     iconType="iInCircle"
                   />
                   <EuiSpacer size={"m"} />
-                  <WzStatisticsRemoted clusterNodeSelected={this.state.clusterNodeSelected} />
+                  <WzStatisticsRemoted clusterNodeSelected={this.state.clusterNodeSelected} refreshVisualizations={this.state.refreshVisualizations}/>
                 </div>
               )}
               {this.state.selectedTabId === "analysisd" && !this.state.loadingNode && (
@@ -219,7 +226,7 @@ export class WzStatisticsOverview extends Component {
                     iconType="iInCircle"
                   />
                   <EuiSpacer size={"m"} />
-                  <WzStatisticsAnalysisd clusterNodeSelected={this.state.clusterNodeSelected} />
+                  <WzStatisticsAnalysisd clusterNodeSelected={this.state.clusterNodeSelected} refreshVisualizations={this.state.refreshVisualizations}/>
                 </div>
               )}
             </>

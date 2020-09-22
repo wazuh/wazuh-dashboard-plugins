@@ -32,7 +32,7 @@ export class ApiRequest {
     
     const response: AxiosResponse = await this.apiInterceptor.request(
       'GET',
-      `${url}:${port}/v4/${this.request}`,
+      `${url}:${port}/${this.request}`,
       this.params,
       {idHost: id }
     )
@@ -51,10 +51,10 @@ export class ApiRequest {
       if (error.response && error.response.status === 401){
         throw {error: 401, message: 'Wrong Wazuh API credentials used'};
       }
-      if (error.data && error.data.detail && error.data.detail === 'ECONNRESET') {
+      if (error && error.data && error.data.detail && error.data.detail === 'ECONNRESET') {
         throw {error: 3005, message: 'Wrong protocol being used to connect to the Wazuh API'};
       }
-      if (error.data && error.data.detail && ['ENOTFOUND','EHOSTUNREACH','EINVAL','EAI_AGAIN','ECONNREFUSED'].includes(error.data.detail)) {
+      if (error && error.data && error.data.detail && ['ENOTFOUND','EHOSTUNREACH','EINVAL','EAI_AGAIN','ECONNREFUSED'].includes(error.data.detail)) {
         throw {error: 3005, message: 'Wazuh API is not reachable. Please check your url and port.'};
       }
       throw error;

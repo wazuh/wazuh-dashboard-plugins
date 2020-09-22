@@ -17,13 +17,12 @@ export class SavedObject {
   /**
    *
    * Returns the full list of index patterns
-   * ONLY indices that matches the pattern "wazuh*" will be returned
    */
   static async getListOfIndexPatterns() {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/_find?type=index-pattern&search_fields=title&search=wazuh*`
+        `/api/saved_objects/_find?type=index-pattern&search_fields=title`
       );
       const indexPatterns = ((result || {}).data || {}).saved_objects || [];
 
@@ -193,7 +192,7 @@ export class SavedObject {
   }
 
   /**
-   * Creates the 'wazuh-alerts-3.x-*'  index pattern
+   * Creates the 'wazuh-alerts-*'  index pattern
    */
   static async createWazuhIndexPattern(pattern) {
     try {

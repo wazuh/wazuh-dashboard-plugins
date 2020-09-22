@@ -22,7 +22,10 @@ import {
 import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
-
+import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID } from '../../util/constants';
+import jwtDecode from 'jwt-decode';
+import { ManageHosts } from '../lib/manage-hosts';
+import { ApiInterceptor } from '../lib/api-interceptor';
 export class WazuhElasticCtrl {
   /**
    * Constructor
@@ -36,9 +39,11 @@ export class WazuhElasticCtrl {
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
-    this.wzSampleAlertsIndexPrefix = 'wazuh-alerts-3.x-';
-    this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-3.x-sample-security, wazuh-alerts-3.x-sample-auditing-policy-monitoring, wazuh-alerts-3.x-threat-detection
+    this.wzSampleAlertsIndexPrefix = WAZUH_SAMPLE_ALERT_PREFIX;
+    this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-sample-security, wazuh-alerts-sample-auditing-policy-monitoring, wazuh-alerts-threat-detection
     this.defaultNumSampleAlerts = 3000;
+    this.manageHosts = new ManageHosts();
+    this.apiInterceptor = new ApiInterceptor();
   }
 
   /**
@@ -324,8 +329,72 @@ export class WazuhElasticCtrl {
       const spaces = this._server.plugins.spaces;
       const namespace = spaces && spaces.getSpaceId(req);
       return { namespace };
-    } catch (err) {
+    } catch (error) {
       log('wazuh-elastic:getCurrentSpace', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+  }
+
+  /**
+   * Get current logged in user
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} current user
+   */
+  async getCurrentUser(req, reply) {
+    try {
+      let user = "";
+      if(this._server.plugins.security) {
+        user = await this._server.plugins.security.getUser(req);
+      }
+      return { user };
+    } catch (error) {
+      log('wazuh-elastic:getCurrentUser', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+  }
+
+
+
+  /**
+   * Check if current user can manage security
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} 
+   */
+  async getRoles(req, reply) {
+    try {
+      if(!req.params && !req.params.user)
+        throw new Error('Missing parameters');
+      const user = req.params.user;
+      let roles = [];
+      if(this._server.plugins.security) { // XPACK
+        roles = await this.wzWrapper.getRoles(req, user);
+      }
+      return { roles };
+    } catch (error) {
+      log('wazuh-elastic:getRoles', error.message || error);
+      return ErrorResponse(error.message || error, 4011, 500, reply);
+    }
+  }
+
+  /**
+   * Returns current security platform
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {String} 
+   */
+  async getCurrentPlatform(req, reply) {
+    try {
+      if(this._server.plugins.security) { // XPACK
+        return {platform: 'xpack'}
+      }
+      if(this._server.plugins.opendistro_security){
+        return {platform: 'opendistro'}
+      }
+      return { platform: false}
+    } catch (error) {
+      log('wazuh-elastic:getCurrentPlatform', error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, reply);
     }
   }
@@ -434,7 +503,7 @@ export class WazuhElasticCtrl {
     try {
       const config = getConfiguration();
       let monitoringPattern =
-        (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
+        (config || {})['wazuh.monitoring.pattern'] || WAZUH_MONITORING_PATTERN;
       log(
         'wazuh-elastic:buildVisualizationsRaw',
         `Building ${app_objects.length} visualizations`,
@@ -669,7 +738,7 @@ export class WazuhElasticCtrl {
       const type = req.params.tab.split('-')[1];
 
       const file = ClusterVisualizations[type];
-      const nodes = req.payload.nodes.items;
+      const nodes = req.payload.nodes.affected_items;
       const name = req.payload.nodes.name;
       const masterNode = req.payload.nodes.master_node;
 
@@ -736,7 +805,7 @@ export class WazuhElasticCtrl {
    *   filters: [{rule.groups: "syscheck"}, {agent.id: "001"} ]
    *   from: "now-1y"
    *   offset: 0
-   *   pattern: "wazuh-alerts-3.x-*"
+   *   pattern: "wazuh-alerts-*"
    *   sort: {timestamp: {order: "asc"}}
    *   to: "now"
    * }
@@ -745,7 +814,7 @@ export class WazuhElasticCtrl {
    */
   async alerts(req, reply) {
     try {
-      const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
+      const pattern = req.payload.pattern || WAZUH_ALERTS_PATTERN;
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
       const size = req.payload.size || 500;
@@ -790,7 +859,7 @@ export class WazuhElasticCtrl {
   /**
    * This checks if there is sample alerts
    * @param {*} req
-   * GET /elastic/samplealerts/{pattern}
+   * GET /elastic/samplealerts
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -809,7 +878,7 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * GET /elastic/samplealerts/{pattern}/{category}
+   * GET /elastic/samplealerts/{category}
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -827,13 +896,17 @@ export class WazuhElasticCtrl {
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       return { index: sampleAlertsIndex, exists: existsSampleIndex }
     } catch (error) {
-      ErrorResponse('Sample Alerts category not valid', 1000, 500, reply);
+      log(
+        'wazuh-elastic:haveSampleAlertsOfCategory',
+        `Error checking if there are sample alerts indices: ${error.message || error}`
+      );
+      return ErrorResponse(`Error checking if there are sample alerts indices: ${error.message || error}`, 1000, 500, reply);
     }
   }
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * POST /elastic/samplealerts/{pattern}/{category}
+   * POST /elastic/samplealerts/{category}
    * {
    *   "manager": {
    *      "name": "manager_name"
@@ -854,27 +927,48 @@ export class WazuhElasticCtrl {
     if (!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
-
-    //Get configuration
-    const configFile = getConfiguration();
-
-    // Check if admin mode is enabled
-    if ((configFile || {}).admin !== undefined && !configFile.admin) { // If admin mode is not defined in wazuh.yml, it is enabled by default
-      return ErrorResponse('Admin mode is required to create sample data', 1000, 403, reply);
-    };
-
+    
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
-    const bulkPrefix = JSON.stringify({
-      index: {
-        _index: sampleAlertsIndex
-      }
-    });
-    const alertGenerateParams = req.payload && req.payload.params || {};
 
-    const sampleAlerts = this.wzSampleAlertsCaterories[req.params.category].map((typeAlert) => generateAlerts({ ...typeAlert, ...alertGenerateParams }, req.payload.alerts || typeAlert.alerts || this.defaultNumSampleAlerts)).flat();
-    const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}`).join('\n');
-    // Index alerts
     try {
+      // Check if user has administrator role in token
+      const token = req.state['wz-token'];
+      if(!token){
+        return ErrorResponse('No token provided', 401, 401, reply);
+      };
+      const decodedToken = jwtDecode(token);
+      if(!decodedToken){
+        return ErrorResponse('No permissions in token', 401, 401, reply);
+      };
+      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+        return ErrorResponse('No administrator role', 401, 401, reply);
+      };
+      // Check the provided token is valid
+      const idHost = req.state['wz-api'];
+      if( !idHost ){
+        return ErrorResponse('No API id provided', 401, 401, reply);
+      };
+      const api = await this.manageHosts.getHostById(idHost);
+      const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+      if(responseTokenIsWorking.status !== 200){
+        return ErrorResponse('Token is not valid', 500, 500, reply);
+      };
+
+      //Get configuration
+      const configFile = getConfiguration();
+
+      const bulkPrefix = JSON.stringify({
+        index: {
+          _index: sampleAlertsIndex
+        }
+      });
+      const alertGenerateParams = req.payload && req.payload.params || {};
+
+      const sampleAlerts = this.wzSampleAlertsCaterories[req.params.category].map((typeAlert) => generateAlerts({ ...typeAlert, ...alertGenerateParams }, req.payload.alerts || typeAlert.alerts || this.defaultNumSampleAlerts)).flat();
+      const bulk = sampleAlerts.map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}`).join('\n');
+      
+      // Index alerts
+    
       // Check if wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       if (!existsSampleIndex) {
@@ -915,7 +1009,7 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log(
         'wazuh-elastic:createSampleAlerts',
-        `Error adding sample alerts to ${sampleAlertsIndex} index`
+        `Error adding sample alerts to ${sampleAlertsIndex} index: ${error.message || error}`
       );
       return ErrorResponse(error.message || error, 1000, 500, reply);
     }
@@ -934,17 +1028,34 @@ export class WazuhElasticCtrl {
     if (!req.params.category || !Object.keys(this.wzSampleAlertsCaterories).includes(req.params.category)) {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
-
-    //Get configuration
-    const configFile = getConfiguration();
-
-    // Check if admin mode is enabled
-    if ((configFile || {}).admin !== undefined && !configFile.admin) { // If admin mode is not defined in wazuh.yml, it is enabled by default
-      return ErrorResponse('Admin mode is required to delete sample data', 1000, 403, reply);
-    };
-
+    
     const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
+
     try {
+      // Check if user has administrator role in token
+      const token = req.state['wz-token'];
+      if(!token){
+        return ErrorResponse('No token provided', 401, 401, reply);
+      };
+      const decodedToken = jwtDecode(token);
+      if(!decodedToken){
+        return ErrorResponse('No permissions in token', 401, 401, reply);
+      };
+      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+        return ErrorResponse('No administrator role', 401, 401, reply);
+      };
+      // Check the provided token is valid
+      const idHost = req.state['wz-api'];
+      if( !idHost ){
+        return ErrorResponse('No API id provided', 401, 401, reply);
+      };
+      const api = await this.manageHosts.getHostById(idHost);
+      const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+      if(responseTokenIsWorking.status !== 200){
+        return ErrorResponse('Token is not valid', 500, 500, reply);
+      };
+
+    
       // Check if Wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       if (existsSampleIndex) {
@@ -962,7 +1073,7 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log(
         'wazuh-elastic:deleteSampleAlerts',
-        `Error deleting sample alerts of ${sampleAlertsIndex} index`
+        `Error deleting sample alerts of ${sampleAlertsIndex} index: ${error.message || error}`
       );
       return ErrorResponse(error.message || error, 1000, 500, reply);
     }

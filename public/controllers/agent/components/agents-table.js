@@ -38,8 +38,7 @@ import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
-import { IWzSuggestItem } from '../../../components/wz-search-bar'
-import _ from 'lodash';
+import { WzButtonPermissions } from '../../../components/common/permissions/button';
 
 export class AgentsTable extends Component {
   _isMount = false;
@@ -56,22 +55,22 @@ export class AgentsTable extends Component {
       selectedItems: [],
       allSelected: false,
       purgeModal: false,
-      filters: []
+      filters: sessionStorage.getItem('agents_preview_selected_options') ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options')) : []
     };
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
-      { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
-      { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
-      { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
-      { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000'})},
-      { type: 'q', label: 'group', description: 'Filter by agent group', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000'})},
-      { type: 'q', label: 'node_name', description: 'Filter by node name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000'})},
-      { type: 'q', label: 'manager', description: 'Filter by manager', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000'})},
-      { type: 'q', label: 'version', description: 'Filter by agent version', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000'})},
-      { type: 'q', label: 'configSum', description: 'Filter by agent config sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000'})},
-      { type: 'q', label: 'mergedSum', description: 'Filter by agent merged sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000'})},
-      { type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000'})},
-      { type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000'})},
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
+      { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'group', description: 'Filter by agent group', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'node_name', description: 'Filter by node name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'manager', description: 'Filter by manager', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'version', description: 'Filter by agent version', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'configSum', description: 'Filter by agent config sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'mergedSum', description: 'Filter by agent merged sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }) },
     ];
     this.downloadCsv.bind(this);
   }
@@ -108,10 +107,13 @@ export class AgentsTable extends Component {
     await this.getItems();
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     this._isMount = false;
+    if(sessionStorage.getItem('agents_preview_selected_options')){
+      sessionStorage.removeItem('agents_preview_selected_options');
+    }
   }
-  
+
   async reloadAgents() {
     // const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
     // this._isMount && this.setState({
@@ -123,15 +125,15 @@ export class AgentsTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if(!(_.isEqual(prevState.filters,this.state.filters))
+    if (!(_.isEqual(prevState.filters, this.state.filters))
       || prevState.pageIndex !== this.state.pageIndex
       || prevState.pageSize !== this.state.pageSize
       || prevState.sortField !== this.state.sortField
-      || prevState.sortDirection !== this.state.sortDirection){
+      || prevState.sortDirection !== this.state.sortDirection) {
       await this.getItems();
-    }else if(!(_.isEqual(prevProps.filters,this.props.filters)) && this.props.filters && this.props.filters.length){
-        this.setState( {filters: this.props.filters, pageIndex: 0 });
-        this.props.removeFilters();
+    } else if (!(_.isEqual(prevProps.filters, this.props.filters)) && this.props.filters && this.props.filters.length) {
+      this.setState({ filters: this.props.filters, pageIndex: 0 });
+      this.props.removeFilters();
     }
     // if (prevState.allSelected === false && this.state.allSelected === true) {
     //   this._isMount && this.setState({ loadingAllItem: true });
@@ -140,14 +142,14 @@ export class AgentsTable extends Component {
   }
 
   async getItems() {
-    try{
-      this._isMount && this.setState({isLoading: true});
+    try {
+      this._isMount && this.setState({ isLoading: true });
       const rawAgents = await this.props.wzReq(
         'GET',
         '/agents',
         { params: this.buildFilter() }
       );
-  
+
       const formatedAgents = (
         ((rawAgents || {}).data || {}).data || {}
       ).affected_items.map(this.formatAgent.bind(this));
@@ -158,8 +160,8 @@ export class AgentsTable extends Component {
           totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
           isLoading: false
         });
-    }catch(error){
-      this.setState({isLoading: false});
+    } catch (error) {
+      this.setState({ isLoading: false });
     }
   }
 
@@ -268,7 +270,7 @@ export class AgentsTable extends Component {
           />
         </EuiToolTip>
         &nbsp;
-        {agent.status !== 'Never connected' && 
+        {agent.status !== 'never_connected' &&
           <EuiToolTip content="Open configuration for this agent" position="left">
             <EuiButtonIcon
               onClick={ev => {
@@ -315,9 +317,6 @@ export class AgentsTable extends Component {
     );
   }
 
-  parseAgentStatus(status){
-    return status === 'never_connected' ? 'never connected' : status
-  }
 
   addHealthStatusRender(status) {
     const color = status => {
@@ -330,7 +329,7 @@ export class AgentsTable extends Component {
       }
     };
 
-    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status}</span></EuiHealth>;
+    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status === 'never_connected' ? 'never connected' : status}</span></EuiHealth>;
   }
 
   reloadAgent = () => {
@@ -353,10 +352,11 @@ export class AgentsTable extends Component {
   }
 
   downloadCsv = () => {
-    const { q, search = {} } = this.buildFilter();
-    const filterQ = { name: 'q', value: q };
-    const filterSearch = { name: 'search', value: search };
-    this.props.downloadCsv([filterQ, filterSearch]);
+    const filters = this.buildFilter();
+    const formatedFilters = Object.keys(filters)
+      .filter(field => !['limit', 'offset', 'sort'].includes(field))
+      .map(field => ({name: field, value: filters[field]}))
+    this.props.downloadCsv(formatedFilters);
   };
   formattedButton() {
     return (
@@ -408,7 +408,7 @@ export class AgentsTable extends Component {
       (selectedItems.length > 0 &&
         selectedItems.filter(item => item.status === 'Active').length === 0 &&
         selectedItems.filter(item => item.status === 'Disconnected').length >
-          0) ||
+        0) ||
       selectedItems.filter(item => item.outdated && item.status === 'Active')
         .length === 0
     ) {
@@ -649,17 +649,17 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-              'success',
-              `Selected agents were successfully deleted`,
-              '',
-              5000
-            )
+            'success',
+            `Selected agents were successfully deleted`,
+            '',
+            5000
+          )
           : this.showToast(
-              'warning',
-              `Failed to delete selected agents`,
-              '',
-              5000
-            );
+            'warning',
+            `Failed to delete selected agents`,
+            '',
+            5000
+          );
       })
       .catch(error => {
         this.showToast(
@@ -692,11 +692,11 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-              'success',
-              `All agents have been successfully deleted`,
-              '',
-              5000
-            )
+            'success',
+            `All agents have been successfully deleted`,
+            '',
+            5000
+          )
           : this.showToast('warning', `Failed to delete all agents`, '', 5000);
       })
       .catch(error => {
@@ -805,12 +805,14 @@ export class AgentsTable extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
+            <WzButtonPermissions
+              buttonType='empty'
+              permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
               iconType="plusInCircle"
               onClick={() => this.props.addingNewAgent()}
             >
               Deploy new agent
-            </EuiButtonEmpty>
+            </WzButtonPermissions>
           </EuiFlexItem>
           {formattedButton}
         </EuiFlexGroup>
@@ -824,9 +826,10 @@ export class AgentsTable extends Component {
       <EuiFlexGroup>
         <EuiFlexItem style={{ marginRight: 0 }}>
           <WzSearchBar
+            noDeleteFiltersOnUpdateSuggests
             filters={this.state.filters}
             suggestions={this.suggestions}
-            onFiltersChange={filters => this.setState({filters, pageIndex: 0})}
+            onFiltersChange={filters => this.setState({ filters, pageIndex: 0 })}
             placeholder="Filter or search agent"
           />
         </EuiFlexItem>
@@ -849,14 +852,14 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => {}
+        onClick: () => { }
       };
     };
 
     const getCellProps = item => {
       return {
         onMouseDown: (ev) => {
-          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()
+          AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": item.id, }); ev.stopPropagation()
         }
       }
     };
@@ -874,11 +877,11 @@ export class AgentsTable extends Component {
     const pagination =
       totalItems > 15
         ? {
-            pageIndex: pageIndex,
-            pageSize: pageSize,
-            totalItemCount: totalItems,
-            pageSizeOptions: [15, 25, 50, 100]
-          }
+          pageIndex: pageIndex,
+          pageSize: pageSize,
+          totalItemCount: totalItems,
+          pageSizeOptions: [15, 25, 50, 100]
+        }
         : false;
     const sorting = {
       sort: {
@@ -904,8 +907,8 @@ export class AgentsTable extends Component {
             loading={isLoading}
             rowProps={getRowProps}
             cellProps={getCellProps}
-/*             isSelectable={false}
-            selection={selection} */
+            /*             isSelectable={false}
+                        selection={selection} */
             noItemsMessage="No agents found"
             {...(pagination && { pagination })}
           />
@@ -916,22 +919,22 @@ export class AgentsTable extends Component {
 
   filterGroupBadge = (group) => {
     const { filters } = this.state;
-    let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
+    let auxFilters = filters.map(filter => filter.value.match(/group=(.*S?)/)[1]);
     if (filters.length > 0) {
-      !auxFilters.includes(group) ? 
-      this.setState({
-        filters: [...filters, {field: "q", value: `group=${group}`}],
-      }) : false;
+      !auxFilters.includes(group) ?
+        this.setState({
+          filters: [...filters, { field: "q", value: `group=${group}` }],
+        }) : false;
     } else {
       this.setState({
-        filters: [...filters, {field: "q", value: `group=${group}`}],
+        filters: [...filters, { field: "q", value: `group=${group}` }],
       })
     }
   }
 
   renderGroups(groups) {
-    return(
-      <GroupTruncate groups={groups} length={25} label={'more'} action={'filter'} filterAction={this.filterGroupBadge} {...this.props} /> 
+    return (
+      <GroupTruncate groups={groups} length={25} label={'more'} action={'filter'} filterAction={this.filterGroupBadge} {...this.props} />
     )
   }
 

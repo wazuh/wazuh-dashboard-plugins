@@ -7,10 +7,11 @@ import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';
+import { WAZUH_MONITORING_PATTERN } from '../../../util/constants';
 
 export class HealthCheck extends Component {
     constructor(props) {
@@ -59,14 +60,14 @@ export class HealthCheck extends Component {
                 let patternData = patternId ? await SavedObject.existsIndexPattern(patternId) : false;
                 if (!patternData) patternData = {};
                 patternTitle = patternData.title;
-                /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-3.x-*.
+                /* This extra check will work as long as Wazuh monitoring index ID is wazuh-monitoring-*.
                    Currently is not possible to change that index pattern as it has always been created on our backend.
                    This extra check checks if the index pattern exists for the current logged in user
                    in case it doesn't exist, the index pattern is automatically created. This is necessary to make it work with Opendistro multinenancy
                    as every index pattern is stored in its current tenant .kibana-tenant-XX index. 
                    */
                 try {
-                    await SavedObject.existsMonitoringIndexPattern('wazuh-monitoring-3.x-*'); //this checks if it exists, if not it automatically creates the index pattern
+                    await SavedObject.existsMonitoringIndexPattern(WAZUH_MONITORING_PATTERN); //this checks if it exists, if not it automatically creates the index pattern
                 } catch (err) { }
                 if (!patternData.status) {
                     const patternList = await PatternHandler.getPatternList("healthcheck");
@@ -117,7 +118,7 @@ export class HealthCheck extends Component {
             if (hosts.length) {
                 for (var i = 0; i < hosts.length; i++) {
                     try {
-                        const API = await ApiCheck.checkApi(hosts[i]);
+                        const API = await ApiCheck.checkApi(hosts[i], true);
                         if (API && API.data) {
                             return hosts[i].id;
                         }
@@ -143,6 +144,7 @@ export class HealthCheck extends Component {
     async checkApiConnection() {
         let results = this.state.results;
         let errors = this.state.errors;
+        let apiChanged = false;
         try {
             const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
             if (this.state.checks.api && currentApi && currentApi.id) {
@@ -153,21 +155,22 @@ export class HealthCheck extends Component {
                     try {
                         const newApi = await this.trySetDefault();
                         data = await ApiCheck.checkStored(newApi, true);
+                        apiChanged = true;
                     } catch (err2) {
                         throw err2
                     };
                 }
-
-                if (((data || {}).data || {}).idChanged) {
+                if (apiChanged) {
                     this.showToast(
                         'warning',
                         'Selected Wazuh API has been updated',
                         '',
                         3000
                     );
-                    const apiRaw = JSON.parse(AppState.getCurrentAPI());
+                    const api =  ((data || {}).data || {}).data || {};
+                    const name = (api.cluster_info || {}).manager || false;
                     AppState.setCurrentAPI(
-                        JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
+                      JSON.stringify({ name: name, id: api.id })
                     );
                 }
                 //update cluster info
@@ -194,7 +197,7 @@ export class HealthCheck extends Component {
                     results[i].description = <span><EuiIcon type="check" color="secondary" ></EuiIcon> Ready</span>;
                     this.setState({ results, errors });
                     if (this.state.checks.setup) {
-                        const versionData = await ApiRequest.request(
+                        const versionData = await WzRequest.apiReq(
                             'GET',
                             '//',
                             {}

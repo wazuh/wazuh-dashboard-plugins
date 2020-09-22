@@ -33,7 +33,7 @@ import {
 } from '@elastic/eui';
 import './discover.less';
 import { EuiFlexItem } from '@elastic/eui';
-import { ApiRequest } from '../../../../react-services/api-request';
+import { WzRequest } from '../../../../react-services/wz-request';
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
@@ -107,7 +107,8 @@ export class RowDetails extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const rulesDataResponse = await ApiRequest.request('GET', `/rules`, { q: `id=${this.props.item.rule.id}` });
+    const params = { q: `id=${this.props.item.rule.id}` }
+    const rulesDataResponse = await WzRequest.apiReq('GET', `/rules`, { params });
     const ruleData = (rulesDataResponse.data || {}).data || {};
     if (this._isMount) {
       this.setState({ ruleData })
@@ -445,7 +446,7 @@ export class RowDetails extends Component {
   }
 
   getRule() {
-    const item = this.state.ruleData.items[0];
+    const item = this.state.ruleData.affected_items[0];
     const { id, level, file, path, groups, details } = item;
     const compliance = this.buildCompliance(item);
     return (
@@ -566,7 +567,7 @@ export class RowDetails extends Component {
             {this.state.selectedTabId === 'json' && (
               this.getJSON()
             )}
-            {this.state.selectedTabId === 'rule' && this.state.ruleData.totalItems === 1 && (
+            {this.state.selectedTabId === 'rule' && this.state.ruleData.total_affected_items === 1 && (
               this.getRule()
             ) || this.state.selectedTabId === 'rule' &&
               (

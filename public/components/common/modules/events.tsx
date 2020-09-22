@@ -13,16 +13,27 @@
 import React, { Component, Fragment } from 'react';
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 import { EventsSelectedFiles } from './events-selected-fields';
-import { EventsFim } from '../../agents/fim/events';
-import { EventsMitre } from './mitre-events';
 import { ModulesHelper } from './modules-helper';
 import store from '../../../redux/store';
 
+import { EuiOverlayMask } from '@elastic/eui';
+
+import { enhanceDiscoverEvents } from './events-enhance-discover-fields';
+
 export class Events extends Component {
+  intervalTimeEnhancedDiscoverFields: number = 1000;
+  isMount: boolean;
+  state: {
+    flyout: false | {component: any, props: any }
+    discoverRowsData: any[]
+  }
   constructor(props) {
     super(props);
-    this.modulesHelper = ModulesHelper;
     this.isMount = true;
+    this.state = {
+      flyout: false,
+      discoverRowsData: []
+    };
   }
 
   async componentDidMount() {
@@ -31,11 +42,11 @@ export class Events extends Component {
     const app = getAngularModule('app/wazuh');
     this.$rootScope = app.$injector.get('$rootScope');
     this.$rootScope.showModuleEvents = this.props.section;
-    const scope = await this.modulesHelper.getDiscoverScope();
+    const scope = await ModulesHelper.getDiscoverScope();
     if(this.isMount){
       this.$rootScope.moduleDiscoverReady = true;
       this.$rootScope.$applyAsync();
-      const fields = EventsSelectedFiles[this.props.section];
+      const fields = [...EventsSelectedFiles[this.props.section]];
       const index = fields.indexOf('agent.name');
       if (index > -1 && store.getState().appStateReducers.currentAgentData.id) { //if an agent is pinned we don't show the agent.name column
         fields.splice(index, 1);
@@ -46,11 +57,13 @@ export class Events extends Component {
         scope.removeColumn(false);
       }
       this.fetchWatch = scope.$watchCollection('fetchStatus',
-        () => {
+        (fetchStatus) => {
           if (scope.fetchStatus === 'complete') {
-            setTimeout(() => { this.modulesHelper.cleanAvailableFields() }, 1000);
+            setTimeout(() => { ModulesHelper.cleanAvailableFields() }, 1000);
           }
+          this.setState( { discoverRowsData: scope.rows } );
         });
+      this.enhanceDiscoverRowsInterval = setInterval(this.enhanceDiscoverRows, this.intervalTimeEnhancedDiscoverFields);
     }
   }
 
@@ -60,13 +73,37 @@ export class Events extends Component {
     this.$rootScope.showModuleEvents = false;
     this.$rootScope.moduleDiscoverReady = false;
     this.$rootScope.$applyAsync();
+    clearInterval(this.enhanceDiscoverRowsInterval);
+  }
+
+  enhanceDiscoverRows = () => {
+    enhanceDiscoverEvents(this.state.discoverRowsData, {setFlyout: this.setFlyout, closeFlyout: this.closeFlyout});
+  }
+
+  setFlyout = (flyout) => {
+    this.setState({ flyout });
+  }
+
+  closeFlyout = () => {
+    this.setState({flyout: false});
   }
 
   render() {
+    const { flyout } = this.state;
+    const FlyoutComponent = (flyout || {}).component;
     return (
       <Fragment>
-        {this.props.section === 'fim' && <EventsFim {...this.props}></EventsFim>}
-        {this.props.section === 'mitre' && <EventsMitre {...this.props}></EventsMitre>}
+        {flyout && (
+          <EuiOverlayMask
+            // @ts-ignore
+            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+            <FlyoutComponent
+              closeFlyout={this.closeFlyout}
+              {...this.state.flyout.props}
+              {...this.props}
+            />
+          </EuiOverlayMask>
+        )}
       </Fragment>
     )
   }

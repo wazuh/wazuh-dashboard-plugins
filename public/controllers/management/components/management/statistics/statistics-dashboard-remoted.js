@@ -16,9 +16,8 @@ import KibanaVis from "../../../../../kibana-integrations/kibana-vis";
 import { EuiFlexGroup, EuiFlexItem, EuiPanel } from "@elastic/eui";
 import { useBuildStatisticsVisualizations } from './hooks';
 
-export function WzStatisticsRemoted({clusterNodeSelected}) {
-  useBuildStatisticsVisualizations(clusterNodeSelected);
-
+export function WzStatisticsRemoted({clusterNodeSelected,  refreshVisualizations}) {
+  useBuildStatisticsVisualizations(clusterNodeSelected, refreshVisualizations);
   return (
     <div>
       <EuiFlexGroup>

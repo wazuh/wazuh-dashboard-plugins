@@ -70,10 +70,11 @@ import './services';
 import './controllers';
 import './factories';
 
-// Imports to update adminMode when app starts
-import { checkAdminMode } from './controllers/management/components/management/configuration/utils/wz-fetch';
+// Imports to update currentPlatform when app starts
+import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
-import { updateAdminMode } from './redux/actions/appStateActions';
+import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import { WzAuthentication } from './react-services/wz-authentication'
 
 import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
 const app = getAngularModule('app/wazuh');
@@ -111,12 +112,12 @@ app.run([
     changeWazuhNavLogo();
     app.$injector = _$injector;
 
-    // Set adminMode in Redux when app starts.
-    // It prevents the first rendering, which depends on adminMode, from blinking due to a request to the app backend
-    checkAdminMode()
-      .then(adminMode => {
-        store.dispatch(updateAdminMode(adminMode))
-      })
-      .catch(() => {/* Do nothing if it fails */ })
+    // Set currentSecurity platform in Redux when app starts.
+    checkCurrentSecurityPlatform().then((item) => {
+      store.dispatch(updateCurrentPlatform(item))
+    }).catch(() => {})
+
+    // Init the process of refreshing the user's token when app start.
+    WzAuthentication.refresh();
   }
 ]);

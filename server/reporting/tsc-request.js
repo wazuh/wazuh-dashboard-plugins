@@ -11,6 +11,7 @@
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
+import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 export class TSCRequest {
   /**
@@ -28,7 +29,7 @@ export class TSCRequest {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @returns {Array<String>}
    */
-  async topTSCRequirements(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
+  async topTSCRequirements(gte, lte, filters, pattern = WAZUH_ALERTS_PATTERN) {
     if (filters.includes('rule.tsc: exists')) {
       const first = filters.split('AND rule.tsc: exists')[0];
       const second = filters.split('AND rule.tsc: exists')[1];
@@ -98,7 +99,7 @@ export class TSCRequest {
     lte,
     filters,
     requirement,
-    pattern = 'wazuh-alerts-3.x-*'
+    pattern = WAZUH_ALERTS_PATTERN
   ) {
     if (filters.includes('rule.tsc: exists')) {
       const first = filters.split('AND rule.tsc: exists')[0];

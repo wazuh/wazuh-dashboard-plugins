@@ -11,8 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
-import { updateAdminMode } from '../../redux/actions/appStateActions';
+import { WzButtonPermissions } from '../../components/common/permissions/button';
 
 import {
     EuiFlexItem,
@@ -29,14 +28,10 @@ import {
 
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
-import { connect } from 'react-redux';
+import { AppState } from '../../react-services/app-state';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
-interface IWzSampleDataProps{
-  adminMode?: boolean
-  updateAdminMode: (adminMode: boolean) => void
-};
-
-class WzSampleData extends Component<IWzSampleDataProps> {
+export default class WzSampleData extends Component {
   categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
   generateAlertsParams: any
   state: {
@@ -79,20 +74,9 @@ class WzSampleData extends Component<IWzSampleDataProps> {
     });
   }
   async componentDidMount(){
-    // Check adminMode
-    try{
-      const adminMode: boolean = await checkAdminMode();
-      if(this.props.adminMode !== adminMode){
-        this.props.updateAdminMode(adminMode);
-      };
-      if(!adminMode){ // redirect to root path of the application
-        window.location.href = `#/`;
-      };
-    }catch(error){}
-
     // Check if sample data for each category was added
     try{
-      const results = await PromiseAllRecusiveObject(this.categories.reduce((accum, cur) => {
+      const results = await PromiseAllRecursiveObject(this.categories.reduce((accum, cur) => {
         accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
@@ -108,14 +92,15 @@ class WzSampleData extends Component<IWzSampleDataProps> {
 
     // Get information about cluster/manager
     try{
-      const managerInfo = await WzRequest.apiReq('GET', '/manager/info', {});
+      const clusterName = AppState.getClusterInfo().cluster;
+      const managerName =  AppState.getClusterInfo().manager;
       this.generateAlertsParams.manager = {
-        name: managerInfo.data.data.name
+        name: managerName
       };
-      if (managerInfo.data.data.cluster) {
+      if (clusterName && clusterName !== 'Disabled') {
         this.generateAlertsParams.cluster = {
-          name: managerInfo.data.data.cluster.name,
-          node: managerInfo.data.data.cluster.node_name
+          name: clusterName,
+          node: clusterName
         };
       };
       
@@ -173,7 +158,6 @@ class WzSampleData extends Component<IWzSampleDataProps> {
   }
   renderCard(category){
     const { addDataLoading, exists, removeDataLoading } = this.state[category.categorySampleAlertsIndex];
-    const { adminMode } = this.props;
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard
@@ -186,20 +170,21 @@ class WzSampleData extends Component<IWzSampleDataProps> {
             <EuiFlexGroup justifyContent="flexEnd">
               <EuiFlexItem grow={false}>
                 {exists && (
-                  <EuiButton
-                  isLoading={removeDataLoading}
-                  isDisabled={!adminMode}
+                <WzButtonPermissions
                   color='danger'
-                  onClick={() => this.removeSampleData(category)}>
-                    {removeDataLoading && 'Removing data' || 'Remove data'}
-                </EuiButton>
+                  roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
+                  onClick={() => this.removeSampleData(category)}
+                >
+                 {removeDataLoading && 'Removing data' || 'Remove data'}
+                </WzButtonPermissions>
                 ) || (
-                  <EuiButton
+                  <WzButtonPermissions
                     isLoading={addDataLoading}
-                    isDisabled={!adminMode}
-                    onClick={() => this.addSampleData(category)}>
-                      {addDataLoading && 'Adding data' || 'Add data'}
-                  </EuiButton>
+                    roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
+                    onClick={() => this.addSampleData(category)}
+                  >
+                   {addDataLoading && 'Adding data' || 'Add data'}
+                  </WzButtonPermissions>
                 )}
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -224,29 +209,15 @@ const zipObject = (keys = [], values = []) => {
   }, {})
 }
 
-const PromiseAllRecusiveObject = function (obj) {
+const PromiseAllRecursiveObject = function (obj) {
   const keys = Object.keys(obj);
   return Promise.all(keys.map(key => {
     const value = obj[key];
     // Promise.resolve(value) !== value should work, but !value.then always works
     if (typeof value === 'object' && !value.then) {
-      return PromiseAllRecusiveObject(value);
+      return PromiseAllRecursiveObject(value);
     }
     return value;
   }))
     .then(result => zipObject(keys, result));
 };
-
-const mapStateToProps = state => {
-  return {
-    adminMode: state.appStateReducers.adminMode
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
-  }
-};
-
-export default connect(mapStateToProps,mapDispatchToProps)(WzSampleData);

@@ -5,7 +5,7 @@ import {SyscollectorTable} from './components/syscollector-table';
 
 export function SyscollectorInventory({agent}){
 
-  if (agent && agent.status === 'Never connected'){
+  if (agent && agent.status === 'never_connected'){
     return (<EuiEmptyPrompt
       iconType="securitySignalDetected"
       style={{ marginTop: 20 }}
@@ -41,7 +41,7 @@ export function SyscollectorInventory({agent}){
 
   return (
     <div style={{overflow: 'hidden'}}>
-      {agent && agent.status === 'Disconnected' && 
+      {agent && agent.status === 'disconnected' && 
          <EuiCallOut
          style={{margin: "8px 16px 8px 16px"}}
          title="This agent is currently disconnected, the data may be outdated."

@@ -17,8 +17,8 @@ import { EuiFlexGroup, EuiFlexItem, EuiPanel } from "@elastic/eui";
 import { useBuildStatisticsVisualizations } from './hooks';
 
 
-export function WzStatisticsAnalysisd({clusterNodeSelected}) {
-  useBuildStatisticsVisualizations(clusterNodeSelected);
+export function WzStatisticsAnalysisd({clusterNodeSelected, refreshVisualizations}) {
+  useBuildStatisticsVisualizations(clusterNodeSelected, refreshVisualizations);
   
   return (
     <div>

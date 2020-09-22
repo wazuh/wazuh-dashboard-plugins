@@ -120,8 +120,8 @@ class WzRulesetSearchBar extends Component {
     },
     {
       type: 'params',
-      label: 'pci',
-      description: 'Filters the rules by PCI requirement',
+      label: 'pci_dss',
+      description: 'Filters the rules by PCI DSS requirement',
       values: async () => {
         const wzReq = (...args) => WzRequest.apiReq(...args);
         const result = await wzReq('GET', '/rules/requirement/pci_dss', {});
@@ -230,7 +230,7 @@ class WzRulesetSearchBar extends Component {
         noDeleteFiltersOnUpdateSuggests
         suggestions={suggestions}
         buttonOptions={buttonOptions}
-        placeholder={'Add filter or search'}
+        placeholder='Filter or search'
         filters={filters}
         onFiltersChange={this.props.updateFilters}
       />

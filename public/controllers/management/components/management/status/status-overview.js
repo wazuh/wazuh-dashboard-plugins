@@ -34,10 +34,6 @@ import {
   updateClusterEnabled,
   cleanInfo
 } from '../../../../../redux/actions/statusActions';
-import {
-  updateAdminMode,
-} from '../../../../../redux/actions/appStateActions';
-import checkAdminMode from './utils/check-admin-mode';
 import StatusHandler from './utils/status-handler';
 
 // Wazuh components
@@ -48,6 +44,9 @@ import WzStatusNodeInfo from './status-node-info';
 import WzStatusAgentInfo from './status-agent-info';
 
 import { toastNotifications } from 'ui/notify';
+
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import { compose } from 'redux';
 
 export class WzStatusOverview extends Component {
   _isMounted = false;
@@ -84,29 +83,29 @@ export class WzStatusOverview extends Component {
    */
   async fetchData() {
     this.props.updateLoadingStatus(true);
-    //Set the admin mode
-    const admin = await checkAdminMode();
-    this.props.updateAdminMode(admin);
 
     const agSumm = await this.statusHandler.agentsSummary();
     const clusStat = await this.statusHandler.clusterStatus();
     const manInfo = await this.statusHandler.managerInfo();
+    const agentsCountResponse = await this.statusHandler.clusterAgentsCount();
 
     const data = [];
     data.push(agSumm);
     data.push(clusStat);
     data.push(manInfo);
+    data.push(agentsCountResponse);
 
     const parsedData = data.map(
       item => ((item || {}).data || {}).data || false
     );
-    const [stats, clusterStatus, managerInfo] = parsedData;
+    const [stats, clusterStatus, managerInfo, agentsCount] = parsedData;
 
     // Once Wazuh core fixes agent 000 issues, this should be adjusted
     const active = stats.active - 1;
     const total = stats.total - 1;
 
     this.props.updateStats({
+      agentsCount: agentsCount.nodes,
       agentsCountActive: active,
       agentsCountDisconnected: stats.disconnected,
       agentsCountNeverConnected: stats.never_connected,
@@ -148,8 +147,8 @@ export class WzStatusOverview extends Component {
         const daemons = await this.statusHandler.managerStatus();
         const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
         this.props.updateListDaemons(listDaemons);
-        const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
-        this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
+        this.props.updateSelectedNode(false);
+        this.props.updateNodeInfo((managerInfo.affected_items || [])[0] || {});
       }
     }
     const lastAgentRaw = await this.statusHandler.lastAgentRaw();
@@ -231,7 +230,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateAdminMode: status => dispatch(updateAdminMode(status)),
     updateListNodes: listNodes => dispatch(updateListNodes(listNodes)),
     updateSelectedNode: selectedNode =>
       dispatch(updateSelectedNode(selectedNode)),
@@ -245,7 +243,15 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  withGlobalBreadcrumb([
+    { text: '' },
+    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Status' }
+  ]),
+  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'manager:read', resource: '*:*:*'}, {action: 'cluster:read', resource: 'node:id:*'}]),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ) 
 )(WzStatusOverview);

@@ -41,6 +41,7 @@ import WzConfigurationIntegrityMonitoring from './integrity-monitoring/integrity
 import WzConfigurationIntegrityAgentless from './agentless/agentless';
 import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzConfigurationAzureLogs from './azure-logs/azure-logs';
+import WzConfigurationGoogleCloudPubSub from './google-cloud-pub-sub/google-cloud-pub-sub';
 import WzViewSelector, {
   WzViewSelectorSwitch
 } from './util-components/view-selector';
@@ -49,15 +50,14 @@ import { withRenderIfOrWrapped } from './util-hocs/render-if';
 import { WzAgentNeverConnectedPrompt } from './configuration-no-agent';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
+import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
-import { clusterNodes, checkAdminMode, clusterReq } from './utils/wz-fetch';
+import { clusterNodes, clusterReq } from './utils/wz-fetch';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
 } from '../../../../../redux/actions/configurationActions';
-import {
-  updateAdminMode
-} from '../../../../../redux/actions/appStateActions';
+
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
@@ -97,13 +97,6 @@ class WzConfigurationSwitch extends Component {
     });
   };
   async componentDidMount() {
-    // Check admin mode
-    try {
-      const adminMode = await checkAdminMode();
-      this.props.updateAdminMode(adminMode);
-    } catch (error) {
-      this.props.updateAdminMode(false);
-    }
     // If agent, check if is synchronized or not
     if (this.props.agent.id !== '000') {
       try {
@@ -392,6 +385,14 @@ class WzConfigurationSwitch extends Component {
                   updateConfigurationSection={this.updateConfigurationSection}
                 />
               </WzViewSelectorSwitch>
+              <WzViewSelectorSwitch view="gcp-pubsub">
+                <WzConfigurationGoogleCloudPubSub
+                  clusterNodeSelected={this.props.clusterNodeSelected}
+                  agent={agent}
+                  updateBadge={this.updateBadge}
+                  updateConfigurationSection={this.updateConfigurationSection}
+                />
+              </WzViewSelectorSwitch>
             </WzViewSelector>
           )}
         </EuiPanel>
@@ -410,12 +411,12 @@ const mapDispatchToProps = dispatch => ({
   updateClusterNodes: clusterNodes =>
     dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: clusterNodeSelected =>
-    dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
+    dispatch(updateClusterNodeSelected(clusterNodeSelected))
 });
 
 export default compose(
-  withRenderIfOrWrapped((props) => props.agent.status === 'Never connected', WzAgentNeverConnectedPrompt),
+  withUserAuthorizationPrompt((props) => [props.agent.id === '000' ? {action: 'manager:read', resource: '*:*:*'} : {action: 'agent:read', resource: `agent:id:${props.agent.id}`}]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
+  withRenderIfOrWrapped((props) => props.agent.status === 'never_connected', WzAgentNeverConnectedPrompt),
   connect(
     mapStateToProps,
     mapDispatchToProps

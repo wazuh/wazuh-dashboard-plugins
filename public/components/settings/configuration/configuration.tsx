@@ -26,7 +26,12 @@ import {
   categoriesEquivalence,
   formEquivalence
 } from '../../../utils/config-equivalences';
+import WzReduxProvider from '../../../redux/wz-redux-provider'
+import store from '../../../redux/store'
+import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization'
 import { EuiSpacer } from '@elastic/eui';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
 
 export type ISetting = {
   setting: string
@@ -38,12 +43,13 @@ export type ISetting = {
   form: { type: string, params: {} }
 }
 
-export const WzConfigurationSettings = (props) => {
+const WzConfigurationSettingsProvider = (props) => {
   const [loading, setLoading ] = useKbnLoadingIndicator();
   const [config, setConfig] = useState<ISetting[]>([]);
   const [query, setQuery] = useState('');
   const [updatedConfig, setUpdateConfig] = useState({});
   useEffect(() => {
+    store.dispatch(updateSelectedSettingsSection('configuration'));
     const rawConfig = props.wazuhConfig.getConfig();
     const formatedConfig = Object.keys(rawConfig).reduce<ISetting[]>((acc, conf) => [
       ...acc,
@@ -53,7 +59,6 @@ export const WzConfigurationSettings = (props) => {
         description: configEquivalences[conf],
         category: categoriesEquivalence[conf],
         name: nameEquivalence[conf],
-        readOnly: conf === 'admin',
         form: formEquivalence[conf],
       }
     ], []);
@@ -74,5 +79,13 @@ export const WzConfigurationSettings = (props) => {
           config={config} />
       </EuiPageBody>
     </EuiPage>
+  );
+}
+const WzConfigurationSettingsWrapper = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(WzConfigurationSettingsProvider);
+export function WzConfigurationSettings(props) {
+  return(
+    <WzReduxProvider>
+      <WzConfigurationSettingsWrapper {...props}/>
+    </WzReduxProvider>
   );
 }

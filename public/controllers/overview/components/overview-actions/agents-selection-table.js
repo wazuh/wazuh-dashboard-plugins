@@ -129,7 +129,7 @@ export class AgentSelectionTable extends Component {
       },
     ];
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
@@ -215,25 +215,15 @@ export class AgentSelectionTable extends Component {
       return 'success';
     } else if (status.toLowerCase() === 'disconnected') {
       return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
+    } else if (status.toLowerCase() === 'never_connected') {
       return 'subdued';
-    }
-  }
-
-  agentStatusBadgeColor(status){
-    if (status.toLowerCase() === 'active') {
-      return 'secondary';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
-      return 'default';
     }
   }
 
   addHealthStatusRender(status) {
     return (
       <EuiHealth color={this.agentStatusColor(status)} style={{ whiteSpace: 'no-wrap' }}>
-        {status}
+        {status === 'never_connected' ? 'never connected' : status}
       </EuiHealth>
     );
   }

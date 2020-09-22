@@ -4,7 +4,7 @@
   "revision": "4001",
   "code": "4001-0",
   "kibana": {
-    "version": "7.8.1"
+    "version": "7.8.0"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -50,6 +50,7 @@
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
+    "jwt-decode": "^2.2.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
     "pdfmake": "^0.1.37",

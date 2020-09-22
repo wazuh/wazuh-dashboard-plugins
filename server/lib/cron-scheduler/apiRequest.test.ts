@@ -5,8 +5,8 @@ jest.mock('axios');
 describe('ApiRequest', () => {
   const apiExample1: IApi = {
     id: 'default',
-    user: 'foo',
-    password: 'bar',
+    user: 'wazuh-wui',
+    password: 'wazuh-wui',
     url: 'http://localhost',
     port: 55000,
     cluster_info: {

@@ -16,13 +16,21 @@ import { getConfiguration } from '../lib/get-configuration';
 import { read } from 'read-last-lines';
 import path from 'path';
 import { UpdateConfigurationFile } from '../lib/update-configuration';
+import jwtDecode from 'jwt-decode';
+import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../util/constants';
+import { ManageHosts } from '../lib/manage-hosts';
+import { ApiInterceptor } from '../lib/api-interceptor';
 const updateConfigurationFile = new UpdateConfigurationFile();
 
 export class WazuhUtilsCtrl {
   /**
    * Constructor
+   * @param {*} server
    */
-  constructor() {}
+  constructor(server) {
+    this.manageHosts = new ManageHosts();
+    this.apiInterceptor = new ApiInterceptor();
+  }
 
   /**
    * Returns the wazuh.yml file parsed
@@ -52,6 +60,28 @@ export class WazuhUtilsCtrl {
    */
   async updateConfigurationFile(req, reply) {
     try {
+      // Check if user has administrator role in token
+      const token = req.state['wz-token'];
+      if(!token){
+        return ErrorResponse('No token provided', 401, 401, reply);
+      };
+      const decodedToken = jwtDecode(token);
+      if(!decodedToken){
+        return ErrorResponse('No permissions in token', 401, 401, reply);
+      };
+      if(!decodedToken.rbac_roles || !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)){
+        return ErrorResponse('No administrator role', 401, 401, reply);
+      };
+      // Check the provided token is valid
+      const idHost = req.state['wz-api'];
+      if( !idHost ){
+        return ErrorResponse('No API id provided', 401, 401, reply);
+      };
+      const api = await this.manageHosts.getHostById(idHost);
+      const responseTokenIsWorking = await this.apiInterceptor.requestToken('GET', `${api.url}:${api.port}//`, {}, {idHost}, token);
+      if(responseTokenIsWorking.status !== 200){
+        return ErrorResponse('Token is not valid', 500, 500, reply);
+      };
       const result = updateConfigurationFile.updateConfiguration(req);
       return {
         statusCode: 200,

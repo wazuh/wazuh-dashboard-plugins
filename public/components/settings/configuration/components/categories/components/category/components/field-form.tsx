@@ -112,7 +112,7 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
   return (
     <EuiCodeEditor
       mode='javascript'
-      theme='github'
+      // theme='github'
       height='50px'
       value={list}
       onChange={setList}

@@ -22,6 +22,7 @@ import { WazuhConfig } from './wazuh-config';
 import { CSVRequest } from '../services/csv-request';
 import { toastNotifications } from 'ui/notify';
 import * as FileSaver from '../services/file-saver';
+import { WzAuthentication } from './wz-authentication';
 
 export class AppState {
 
@@ -214,6 +215,7 @@ export class AppState {
         try {
           const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
           store.dispatch(updateApiMenu);
+          WzAuthentication.refresh();
         } catch (err) {}
       }
     } catch (err) {

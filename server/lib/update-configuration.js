@@ -76,13 +76,14 @@ export class UpdateConfigurationFile {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
+      //TODO: replace by administrator user role requirement
       const configuration = getConfiguration(true) || {};
-      const adminUndefined = !Object.keys(configuration).includes('admin');
-      const adminIsTrue = configuration.admin;
+      // const adminUndefined = !Object.keys(configuration).includes('admin');
+      // const adminIsTrue = configuration.admin;
 
-      if (!adminUndefined && !adminIsTrue) {
-        throw new Error('You are not authorized to update the configuration');
-      }
+      // if (!adminUndefined && !adminIsTrue) {
+      //   throw new Error('You are not authorized to update the configuration');
+      // }
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
       this.busy = false;

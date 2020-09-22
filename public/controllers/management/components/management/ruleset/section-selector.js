@@ -22,12 +22,7 @@ import {
   updateIsProcessing
 } from '../../../../redux/actions/rulesetActions';
 
-import {
-  updateAdminMode
-} from '../../../../redux/actions/appStateActions';
-
 import { WzRequest } from '../../../../react-services/wz-request';
-import checkAdminMode from './utils/check-admin-mode';
 
 class WzSectionSelector extends Component {
   constructor(props) {
@@ -64,9 +59,7 @@ class WzSectionSelector extends Component {
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
       const items = result.data.data.items;
-      //Set the admin mode
-      const admin = await checkAdminMode();
-      this.props.updateAdminMode(admin);
+      
       this.props.toggleShowFiles(false);
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(false);
@@ -107,7 +100,6 @@ const mapDispatchToProps = dispatch => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
-    updateAdminMode: status => dispatch(updateAdminMode(status)),
     updateError: error => dispatch(updateError(error)),
     updateIsProcessing: isProcessing =>
       dispatch(updateIsProcessing(isProcessing))

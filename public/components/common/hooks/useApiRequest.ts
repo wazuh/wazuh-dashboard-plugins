@@ -1,29 +1,30 @@
 import { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services/wz-request';
 
-export function useApiRequest(method,path, params, formatFunction) {
-  const [items, setItems] = useState({}); 
-  const [isLoading, setisLoading] = useState(true); 
-  const [error, setError] = useState("");
 
-  useEffect( () => {
-      try{
-        setisLoading(true);
-        const fetchData = async() => {
-          const newParams = {...params};
-          if(!newParams.search) delete newParams["search"];
-          const response = await WzRequest.apiReq(method, path, newParams);
-          setItems(response);
-          setisLoading(false);
-        } 
-        fetchData();
+interface IWzApiResponse {
+  affected_items: { [key: string]: any }[]
+  failed_items: { [key: string]: any }[]
+  total_affected_items: number
+  total_failed_items: number
+}
 
-      }catch(err){
+export function useApiRequest(method, path, params): [boolean, IWzApiResponse, (string | undefined)] {
+  const [items, setItems] = useState<IWzApiResponse>({ affected_items: [], failed_items: [], total_affected_items: 0, total_failed_items: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | undefined>();
+  useEffect(() => {
+    setLoading(true);
+    setError(undefined);
+    WzRequest.apiReq(method, path, { params })
+      .then(response => {
+        setItems(response.data.data);
+        setLoading(false);
+      })
+      .catch(error => {
         setError(error);
-        setisLoading(false);
-      }
-  }, [params.limit, params.offset, params.search, params.sort]);
-
-
-  return {isLoading, data: formatFunction(items), error};
+        setLoading(false)
+      })
+  }, [path, params]);
+  return [loading, items, error];
 }

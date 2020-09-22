@@ -174,6 +174,7 @@ class WzMenuAgent extends Component {
     let securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
+      this.agentSections.aws,
       this.agentSections.gcp
     ];
     let auditingItems = [

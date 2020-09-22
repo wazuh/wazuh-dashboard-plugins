@@ -18,7 +18,7 @@ import chrome from 'ui/chrome';
 import { updateCurrentTab } from '../../redux/actions/appStateActions';
 import { AppState } from '../../react-services/app-state';
 import { UnsupportedComponents } from './../../utils/components-os-support';
-import { AgentInfo } from './../common/welcome/agents-info';
+import { AgentInfo } from './../common/welcome/agents-info';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -154,7 +154,7 @@ class WzMenuAgent extends Component {
       this.agentSections.docker,
       this.agentSections.mitre
     ];
-    
+
     //TODO:
     // if (!(UnsupportedComponents[this.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls')) {
     //   threatDetectionItems.unshift(this.agentSections.vuls);
@@ -167,31 +167,39 @@ class WzMenuAgent extends Component {
     // }
 
     const securityInformation = [
-      this.createItem(this.agentSections.securityInformation, {
+      {
+        name: this.agentSections.securityInformation.text,
+        id: this.agentSections.securityInformation.id,
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: this.createItems(securityInformationItems)
-      })
+      }
     ];
 
     const auditing = [
-      this.createItem(this.agentSections.auditing, {
+      {
+        name: this.agentSections.auditing.text,
+        id: this.agentSections.auditing.id,
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: this.createItems(auditingItems)
-      })
+      }
     ];
 
     const threatDetection = [
-      this.createItem(this.agentSections.threatDetection, {
+      {
+        name: this.agentSections.threatDetection.text,
+        id: this.agentSections.threatDetection.id,
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: this.createItems(threatDetectionItems)
-      })
+      }
     ];
 
     const regulatoryCompliance = [
-      this.createItem(this.agentSections.regulatoryCompliance, {
+      {
+        name: this.agentSections.regulatoryCompliance.text,
+        id: this.agentSections.regulatoryCompliance.id,
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: this.createItems([
@@ -201,7 +209,7 @@ class WzMenuAgent extends Component {
           this.agentSections.nist,
           this.agentSections.tsc
         ])
-      })
+      }
     ];
 
     return (
@@ -229,44 +237,44 @@ class WzMenuAgent extends Component {
               </Fragment>
             )}
             {this.props.isAgent && (
-            <EuiFlexGrid columns={2}>
-              <EuiFlexItem>
-                <EuiSideNav
-                  items={securityInformation}
-                  style={{ padding: '4px 12px' }}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav
-                  items={threatDetection}
-                  style={{ padding: '4px 12px' }}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav
-                  items={regulatoryCompliance}
-                  style={{ padding: '4px 12px' }}
-                />
-              </EuiFlexItem>
-              <EuiHorizontalRule margin="s" />
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  onClick={() => this.clickMenuItem('syscollector')}
-                  iconType="inspect">
-                  <span>Inventory data</span>
-                </EuiButton>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButton
-                  onClick={() => this.clickMenuItem('configuration')}
-                  iconType="gear" >
-                  <span>Configuration</span>
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGrid>
+              <EuiFlexGrid columns={2}>
+                <EuiFlexItem>
+                  <EuiSideNav
+                    items={securityInformation}
+                    style={{ padding: '4px 12px' }}
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiSideNav
+                    items={threatDetection}
+                    style={{ padding: '4px 12px' }}
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiSideNav
+                    items={regulatoryCompliance}
+                    style={{ padding: '4px 12px' }}
+                  />
+                </EuiFlexItem>
+                <EuiHorizontalRule margin="s" />
+                <EuiFlexItem grow={false}>
+                  <EuiButton
+                    onClick={() => this.clickMenuItem('syscollector')}
+                    iconType="inspect">
+                    <span>Inventory data</span>
+                  </EuiButton>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiButton
+                    onClick={() => this.clickMenuItem('configuration')}
+                    iconType="gear" >
+                    <span>Configuration</span>
+                  </EuiButton>
+                </EuiFlexItem>
+              </EuiFlexGrid>
             )}
           </div>
         ) || (<div style={{ width: 300 }}></div>

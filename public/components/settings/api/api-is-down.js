@@ -66,7 +66,7 @@ export class ApiIsDown extends Component {
       for (let idx in entries) {
         const entry = entries[idx];
         try {
-          const data = await this.props.testApi(entry);
+          const data = await this.props.testApi(entry, true); // token refresh is forced
           const clusterInfo = data.data || {};
           const id = entries[idx].id;
           entries[idx].status = 'online';
@@ -110,8 +110,8 @@ hosts:
     - production:
         url: http://172.16.1.2
         port: 55000
-        username: foo
-        password: bar
+        username: wazuh-wui
+        password: wazuh-wui
 `;
 
     const checkConnectionChildren = (

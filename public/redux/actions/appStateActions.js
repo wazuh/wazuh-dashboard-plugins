@@ -69,13 +69,13 @@ export const updateExtensions = (id, extensions) => {
 };
 
 /**
- * Updates adminMode in the appState store
+ * Updates currentPlatform in the appState store
  * @param extensions
  */
-export const updateAdminMode = adminMode => {
+export const updateCurrentPlatform = currentPlatform => {
   return {
-    type: 'UPDATE_ADMIN_MODE',
-    adminMode
+    type: 'UPDATE_CURRENT_PLATFORM',
+    currentPlatform
   };
 };
 
@@ -113,4 +113,37 @@ export const showExploreAgentModalGlobal = (shouldShow) => {
     type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
     showExploreAgentModalGlobal: shouldShow
   };
+};
+
+/**
+ * Updates userRoles in the appState store
+ * @param extensions
+ */
+export const updateUserRoles = userRoles => {
+  return {
+    type: 'UPDATE_USER_ROLES',
+    userRoles
+  };
+};
+
+/**
+ * Updates userPermissions in the appState store
+ * @param extensions
+ */
+export const updateUserPermissions = userPermissions => {
+  return {
+    type: 'UPDATE_USER_PERMISSIONS',
+    userPermissions
+  };
+};
+
+/**
+* Updates selectedSettingsSection in the appState store
+* @param extensions
+*/
+export const updateSelectedSettingsSection = selected_settings_section => {
+ return {
+   type: 'UPDATE_SELECTED_SETTINGS_SECTION',
+   selected_settings_section
+ };
 };

@@ -23,7 +23,6 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
 import { toastNotifications } from 'ui/notify';
-import { ApiRequest } from '../../react-services/api-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { TimeService } from '../../react-services/time-service';
@@ -31,6 +30,7 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
+import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
 
 export class AgentsController {
   /**
@@ -58,7 +58,6 @@ export class AgentsController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
-    this.apiReq = ApiRequest;
     this.errorHandler = errorHandler;
     this.tabVisualizations = new TabVisualizations();
     this.$scope.visualizations = visualizations;
@@ -75,7 +74,6 @@ export class AgentsController {
     // Config on-demand
     this.$scope.isArray = Array.isArray;
     this.configurationHandler = new ConfigurationHandler(
-      this.apiReq,
       errorHandler
     );
     this.$scope.currentConfig = null;
@@ -232,7 +230,7 @@ export class AgentsController {
     this.$scope.restartAgent = async agent => {
       this.$scope.restartingAgent = true;
       try {
-        const data = await this.apiReq.request(
+        const data = await WzRequest.apiReq(
           'PUT',
           `/agents/${agent.id}/restart`,
           {}
@@ -256,9 +254,6 @@ export class AgentsController {
       }
       this.$scope.$applyAsync();
     };
-
-    const configuration = this.wazuhConfig.getConfig();
-    this.$scope.adminMode = !!(configuration || {}).admin;
 
     //Load
     try {
@@ -413,7 +408,7 @@ export class AgentsController {
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
         .addAgentToGroup(group, this.$scope.agent.id)
-        .then(() => this.apiReq.request('GET', `/agents`, {
+        .then(() => WzRequest.apiReq('GET', `/agents`, {
           params: {
             list_agents: this.$scope.agent.id,
           }
@@ -520,7 +515,7 @@ export class AgentsController {
     // Update agent status
     if (!force && ((this.$scope || {}).agent || false)) {
       try {
-        const agentInfo = await this.apiReq.request(
+        const agentInfo = await WzRequest.apiReq(
           'GET',
           `/agents`, {
             params: {
@@ -633,7 +628,7 @@ export class AgentsController {
    * @param {*} id
    */
   addMitrefilter(id) {
-    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    const filter = `{"meta":{"index":${WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter)
     });
@@ -765,7 +760,7 @@ export class AgentsController {
    * Checks if configuration is sync
    */
   async checkSync() {
-    const isSync = await this.apiReq.request(
+    const isSync = await WzRequest.apiReq(
       'GET',
       `/agents/${this.$scope.agent.id}/group/is_sync`, {}
     );
@@ -807,7 +802,7 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = await this.apiReq.request('GET', `/agents`, {
+      const data = await WzRequest.apiReq('GET', `/agents`, {
         params: {
           list_agents: id,
         }
@@ -832,7 +827,7 @@ export class AgentsController {
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
-      const groups = await this.apiReq.request('GET', '/groups', {});
+      const groups = await WzRequest.apiReq('GET', '/groups', {});
       this.$scope.groups = groups.data.data.affected_items
         .map(item => item.name)
         .filter(
@@ -993,7 +988,7 @@ export class AgentsController {
       if (!isActive) {
         throw new Error('Agent is not active');
       }
-      await this.apiReq.request(
+      await WzRequest.apiReq(
         'PUT',
         `/rootcheck/${this.$scope.agent.id}`,
         {}
@@ -1012,7 +1007,7 @@ export class AgentsController {
       if (!isActive) {
         throw new Error('Agent is not active');
       }
-      await this.apiReq.request('PUT', `/syscheck`, {
+      await WzRequest.apiReq('PUT', `/syscheck`, {
         params: {
           list_agents: this.$scope.agent.id
         }

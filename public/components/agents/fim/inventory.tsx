@@ -165,7 +165,7 @@ export class Inventory extends Component {
     const response = await WzRequest.apiReq(
       'GET',
       `/syscheck/${agentID}`,
-      this.buildFilter(type),
+      { params: this.buildFilter(type) },
     );
     if (type === 'file') {
       return {
@@ -279,36 +279,22 @@ export class Inventory extends Component {
   }
 
   noConfiguredMonitoring() {
-    return (<EuiPage>
-      <EuiPageBody component="div">
-        <EuiPageContent verticalPosition="center" horizontalPosition="center">
-          <EuiEmptyPrompt
-            iconType="filebeatApp"
-            title={<h2>Integrity monitoring is not configured for this agent</h2>}
-            body={<Fragment>
-              <EuiHorizontalRule margin='s' />
-              <EuiLink
-                href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
-                target="_blank"
-                style={{ textAlign: "center" }}
-              >
-                https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
-              </EuiLink>
-              <EuiHorizontalRule margin='s' />
-            </Fragment>}
-            actions={
-              <EuiButton
-                href='#/manager/configuration?_g=()&tab=configuration'
-                target="_blank"
-                color="primary"
-                iconType="gear"
-                fill>
-                Configure it
-              </EuiButton>
-            } />
-        </EuiPageContent>
-      </EuiPageBody>
-    </EuiPage>);
+    return (
+      <EuiEmptyPrompt
+        iconType="filebeatApp"
+        title={<h2>Integrity monitoring is not configured for this agent</h2>}
+        body={<Fragment>
+          <EuiHorizontalRule margin='s' />
+          <EuiLink
+            href='https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
+            target="_blank"
+            style={{ textAlign: "center" }}
+          >
+            https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
+          </EuiLink>
+          <EuiHorizontalRule margin='s' />
+        </Fragment>}
+      />);
   }
 
   loadingInventory() {
@@ -328,7 +314,6 @@ export class Inventory extends Component {
         `/agents/${this.props.agent.id}/config/syscheck/syscheck`,
         {}
       );
-  
       return (((response.data || {}).data).syscheck || {}).disabled === 'no';
     } catch (error) {
       return false;
@@ -342,7 +327,6 @@ export class Inventory extends Component {
     }
     const table = this.renderTable();
     const tabs = this.renderTabs();
-
     return isConfigured
       ? (<EuiPage>
         <EuiPanel>

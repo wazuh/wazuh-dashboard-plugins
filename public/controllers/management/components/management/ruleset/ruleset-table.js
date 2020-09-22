@@ -35,6 +35,9 @@ import {
 import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { filtersToObject } from '../../../../../components/wz-search-bar';
+import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
+import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
+import { compose } from 'redux';
 
 class WzRulesetTable extends Component {
   _isMounted = false;
@@ -54,17 +57,22 @@ class WzRulesetTable extends Component {
       decoders: '/decoders',
       lists: '/lists/files'
     };
+    this.extraSectionPrefixResource = {
+      rules: 'rule:file',
+      decoders: 'decoder:file',
+      lists: 'list:path',
+    };
     this.rulesetHandler = RulesetHandler;
   }
 
   async componentDidMount() {
-    this.props.updateIsProcessing(true);
     this._isMounted = true;
+    this.props.updateIsProcessing(true);
     if (this.props.state.section === 'rules') {
       const regex = new RegExp('redirectRule=' + '[^&]*');
       const match = window.location.href.match(regex);
       if (match && match[0]) {
-        this.setState({ isRedirect: true });
+        this._isMounted && this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
         const result = await WzRequest.apiReq('GET', `/rules`, 
         {
@@ -80,7 +88,7 @@ class WzRulesetTable extends Component {
           );
           this.props.updateRuleInfo(info);
         }
-        this.setState({ isRedirect: false });
+        this._isMounted && this.setState({ isRedirect: false });
       }
     }
   }
@@ -96,14 +104,14 @@ class WzRulesetTable extends Component {
     const filtersChanged = prevProps.state.filters !== filters;
     if ((this._isMounted && processingChange && isProcessing ) || sectionChanged || filtersChanged) {
       if (sectionChanged || showingFilesChanged || filtersChanged) {
-        await this.setState({
+        this._isMounted && await this.setState({
           pageSize: this.state.pageSize,
           pageIndex: 0,
           sortDirection: null,
           sortField: null
         });
       }
-      this.setState({ isLoading: true });
+      this._isMounted && this.setState({ isLoading: true });
       this.props.updateIsProcessing(false);
 
       await this.getItems();
@@ -117,10 +125,11 @@ class WzRulesetTable extends Component {
   async getItems() {
     const { section, showingFiles } = this.props.state;
 
-    this.setState({
+    this._isMounted && this.setState({
       items: []
     });
-
+    this.props.updateTotalItems(false);
+    
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
@@ -132,7 +141,7 @@ class WzRulesetTable extends Component {
 
     const { affected_items=[], total_affected_items=0 } = ((rawItems || {}).data || {}).data || {};
     this.props.updateTotalItems(total_affected_items);
-    this.setState({
+    this._isMounted && this.setState({
       items: affected_items,
       totalItems : total_affected_items,
       isLoading:false
@@ -226,17 +235,21 @@ class WzRulesetTable extends Component {
 
       const getRowProps = item => {
         const { id, name } = item;
+        
+        const extraSectionPermissions = this.extraSectionPrefixResource[this.props.state.section];
         return {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
-          onClick: async () => {
+          onClick: !WzUserPermissions.checkMissingUserPermissions([[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${this.props.state.section}:read`, resource: `${extraSectionPermissions}:${item.filename}`}]], this.props.userPermissions) ? async () => {
+            if(this.isLoading) return;
+            this.setState({isLoading: true});
             const { section } = this.props.state;
+            window.location.href = `${window.location.href}&redirectRule=${id}`;
             if (section === 'rules') {
               const result = await this.rulesetHandler.getRuleInformation(
                 item.filename,
                 id
               );
-              window.location.href = `${window.location.href}&redirectRule=${id}`;
               this.props.updateRuleInfo(result);
             } else if (section === 'decoders') {
               const result = await this.rulesetHandler.getDecoderInformation(item.filename, name);
@@ -246,7 +259,8 @@ class WzRulesetTable extends Component {
               const file = { name: item.filename, content: result, path: item.relative_dirname };
               this.props.updateListContent(file);
             }
-          }
+            this.setState({isLoading: false});
+          } : undefined
         };
       };
 
@@ -321,8 +335,7 @@ class WzRulesetTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.rulesetReducers
   };
 };
 
@@ -342,7 +355,10 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
+  withUserPermissions
 )(WzRulesetTable);

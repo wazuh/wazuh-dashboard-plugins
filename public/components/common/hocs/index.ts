@@ -12,3 +12,15 @@
 export { withWindowSize } from './withWindowSize';
 
 export { withKibanaContext, withKibanaContextExtendsProps } from './withKibanaContext';
+
+export { withUserPermissions, withUserPermissionsRequirements, withUserPermissionsPrivate  } from './withUserPermissions';
+
+export { withUserRoles, withUserRolesRequirements, withUserRolesPrivate  } from './withUserRoles';
+
+export { withUserAuthorizationPrompt  } from './withUserAuthorization';
+
+export { withGlobalBreadcrumb  } from './withGlobalBreadcrumb';
+
+export { withReduxProvider  } from './withReduxProvider';
+
+export { withGuard } from './withGuard';

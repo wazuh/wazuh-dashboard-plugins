@@ -20,7 +20,7 @@ import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import checkAdminMode from '../../controllers/management/components/management/status/utils/check-admin-mode';
+import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
 
 export class SettingsController {
   /**
@@ -60,13 +60,13 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'App Settings' }];
+      const breadcrumb = [{ text: '' }, { text: 'Settings' }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      this.admin = await checkAdminMode();
 
       const location = this.$location.search();
       if (location && location.tab) {
         this.tab = location.tab;
+        if(this.tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
       }
       // Set component props
       this.setComponentProps();
@@ -95,7 +95,7 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
-      testApi: entry => ApiCheck.checkApi(entry),
+      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
       showAddApiWithInitialError: error =>
         this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
@@ -112,7 +112,7 @@ export class SettingsController {
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
       setDefault: entry => this.setDefault(entry),
-      testApi: entry => ApiCheck.checkApi(entry),
+      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
@@ -122,14 +122,12 @@ export class SettingsController {
 
     let tabs = [
       { id: 'api', name: 'API' },
+      { id: 'modules', name: 'Modules' },
+      { id: 'sample_data', name: 'Sample data' },
       { id: 'configuration', name: 'Configuration' },
       { id: 'logs', name: 'Logs' },
       { id: 'about', name: 'About' }
     ];
-    if (this.admin) {
-      tabs.splice(1, 0, { id: 'sample_data', name: 'Sample data' });
-      tabs.splice(1, 0, { id: 'modules', name: 'Modules' });
-    }
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
@@ -154,6 +152,7 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab) {
+    if(tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
@@ -193,6 +192,9 @@ export class SettingsController {
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
+          if(this.apiEntries[idx].id === this.currentDefault){ // if the selected API is down, we remove it so a new one will selected
+            AppState.removeCurrentAPI();
+          }
         }
       }
       return numError;
@@ -325,7 +327,7 @@ export class SettingsController {
       };
 
       // Test the connection
-      const data = await ApiCheck.checkApi(tmpData);
+      const data = await ApiCheck.checkApi(tmpData, true);
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry

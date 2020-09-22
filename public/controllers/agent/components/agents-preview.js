@@ -29,8 +29,6 @@ import { Pie } from "../../../components/d3/pie";
 import { ProgressChart } from "../../../components/d3/progress";
 import { AgentsTable } from './agents-table'
 import { WzRequest } from '../../../react-services/wz-request';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../redux/store';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
@@ -39,19 +37,28 @@ import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { WazuhConfig } from './../../../react-services/wazuh-config.js';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
+import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
+import { compose } from 'redux';
 
-
-export class AgentsPreview extends Component {
+export const AgentsPreview = compose(
+  withReduxProvider,
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
+  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}])
+)(class AgentsPreview extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
     this.state = { data: [], loading: false, showAgentsEvolutionVisualization: false, agentTableFilters: [] };
     this.wazuhConfig = new WazuhConfig();
+    this.agentStatusLabelToIDMap = {
+      'Active': 'active',
+      'Disconnected': 'disconnected',
+      'Never connected': 'never_connected'
+    }
   }
 
   async componentDidMount() {
     this._isMount = true;
-    this.setGlobalBreadcrumb();
     this.getSummary();
     if( this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'] ){
       this._isMount && this.setState({ showAgentsEvolutionVisualization: true });
@@ -74,9 +81,8 @@ export class AgentsPreview extends Component {
     this._isMount = false;
   }
 
-  setGlobalBreadcrumb() {
-    const breadcrumb = [{ text: '' }, { text: 'Agents' }];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+  agentStatusLabelToID(label){
+    return this.agentStatusLabelToIDMap[label];
   }
 
   groupBy = function(arr) {
@@ -143,7 +149,7 @@ export class AgentsPreview extends Component {
                     <EuiFlexItem style={{ alignItems: 'center' }}>
                       <Pie
                         legendAction={(status) => this._isMount && this.setState({
-                          agentTableFilters: [ {field: 'q', value: `status=${status}`}]
+                          agentTableFilters: [ {field: 'q', value: `status=${this.agentStatusLabelToID(status)}`}]
                         })}
                         width={300}
                         height={150}
@@ -169,7 +175,7 @@ export class AgentsPreview extends Component {
                                   position='top'
                                   content='Show active agents'>
                                   <a onClick={() => this._isMount && this.setState({
-                                    agentTableFilters: [ {field: 'q', value: 'status=Active'} ]
+                                    agentTableFilters: [ {field: 'q', value: 'status=active'} ]
                                   })} >{this.state.data[0].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
@@ -185,7 +191,7 @@ export class AgentsPreview extends Component {
                                   position='top'
                                   content='Show disconnected agents'>
                                   <a onClick={() => this._isMount && this.setState({
-                                    agentTableFilters: [ {field: 'q', value: 'status=Disconnected'} ]
+                                    agentTableFilters: [ {field: 'q', value: 'status=disconnected'} ]
                                   })} >{this.state.data[1].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
@@ -201,7 +207,7 @@ export class AgentsPreview extends Component {
                                   position='top'
                                   content='Show never connected agents'>
                                   <a onClick={() => this._isMount && this.setState({
-                                    agentTableFilters: [ {field: 'q', value: 'status=Never connected'} ]
+                                    agentTableFilters: [ {field: 'q', value: 'status=never_connected'} ]
                                   })} >{this.state.data[2].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
@@ -315,21 +321,23 @@ export class AgentsPreview extends Component {
             )}
           </EuiFlexGroup>
           <EuiSpacer size="m" />
-            <AgentsTable
-              filters={this.state.agentTableFilters}
-              removeFilters={() => this.removeFilters()}
-              wzReq={this.props.tableProps.wzReq}
-              addingNewAgent={this.props.tableProps.addingNewAgent}
-              downloadCsv={this.props.tableProps.downloadCsv}
-              clickAction={this.props.tableProps.clickAction}
-              timeService={this.props.tableProps.timeService}
-              reload={() => this.getSummary()}
-            />
+            <WzReduxProvider>
+              <AgentsTable
+                filters={this.state.agentTableFilters}
+                removeFilters={() => this.removeFilters()}
+                wzReq={this.props.tableProps.wzReq}
+                addingNewAgent={this.props.tableProps.addingNewAgent}
+                downloadCsv={this.props.tableProps.downloadCsv}
+                clickAction={this.props.tableProps.clickAction}
+                timeService={this.props.tableProps.timeService}
+                reload={() => this.getSummary()}
+              />
+            </WzReduxProvider>
         </EuiFlexItem>
       </EuiPage>
     );
   }
-}
+});
 
 AgentsTable.propTypes = {
   tableProps: PropTypes.object,

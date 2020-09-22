@@ -28,12 +28,13 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
-import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { toastNotifications } from 'ui/notify';
+import { SecurityAlerts } from './components';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 const visHandler = new VisHandlers();
 
@@ -45,11 +46,11 @@ export class WzVisualize extends Component {
       visualizations: !!props.isAgent ? agentVisualizations : visualizations,
       expandedVis: false,
       thereAreSampleAlerts: false,
-      adminMode: false,
       hasRefreshedKnownFields: false,
       refreshingKnownFields: [],
       refreshingIndex: true
     };
+    this.KibanaServices =  getServices();
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
     this.wzReq = WzRequest;
@@ -106,9 +107,8 @@ export class WzVisualize extends Component {
 
     // Check if there is sample alerts installed
     try {
-      thereAreSampleAlerts = await WzRequest.genericReq('GET', '/elastic/samplealerts', {}).data.sampleAlertsInstalled;
-      const adminMode = await checkAdminMode();
-      this._isMount && this.setState({ thereAreSampleAlerts, adminMode });
+      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled;
+      this._isMount && this.setState({ thereAreSampleAlerts });
     } catch (error) { }
   }
 
@@ -240,11 +240,8 @@ export class WzVisualize extends Component {
         {/* Sample alerts Callout */}
         {this.state.thereAreSampleAlerts && this.props.resultState === 'ready' && (
           <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px 16px 8px' }}>
-            <p>The data displayed may contain sample alerts. {this.state.adminMode && (
-              <Fragment>
-                Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
-              </Fragment>
-            )}</p>
+            <p>The data displayed may contain sample alerts. Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
+            </p>
           </EuiCallOut>
         )}
 
@@ -281,6 +278,39 @@ export class WzVisualize extends Component {
               );
             })}
         </EuiFlexItem>
+        <EuiFlexGroup style={{margin: 0}}>
+          <EuiFlexItem>
+            {this.props.selectedTab === "general" && this.props.resultState !== "none" && 
+
+          <EuiPanel
+          paddingSize="none"
+          className={
+            this.state.expandedVis === 'security-alerts' ? 'fullscreen h-100 wz-overflow-y-auto wz-overflow-x-hidden' : 'h-100'
+          }
+        >
+          <EuiFlexItem className="h-100" style={{marginBottom: 12}}>
+            <EuiFlexGroup
+              style={{ padding: '12px 12px 0px' }}
+              className="embPanel__header"
+            >
+              <h2 className="embPanel__title wz-headline-title">
+                Security Alerts
+              </h2>
+              <EuiButtonIcon
+                color="text"
+                style={{ padding: '0px 6px', height: 30 }}
+                onClick={() => this.expand('security-alerts')}
+                iconType="expand"
+                aria-label="Expand"
+              />
+            </EuiFlexGroup>
+            <SecurityAlerts />
+
+          </EuiFlexItem>
+        </EuiPanel>
+            }
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </Fragment>
     );
   }

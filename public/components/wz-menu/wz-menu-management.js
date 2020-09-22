@@ -13,8 +13,6 @@ import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
-import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
-import { updateAdminMode } from '../../redux/actions/appStateActions';
 import { AppNavigate } from '../../react-services/app-navigate'
 
 class WzMenuManagement extends Component {
@@ -58,15 +56,6 @@ class WzMenuManagement extends Component {
     }
   }
 
-  async componentDidMount() {
-    try {
-      const adminMode = await checkAdminMode();
-      if (this.props.adminMode !== adminMode) {
-        this.props.updateAdminMode(adminMode);
-      };
-    } catch (error) { }
-  }
-
   clickMenuItem = (ev, section) => {
     this.props.closePopover();
     AppNavigate.navigateToModule(ev, 'manager', { tab: section })
@@ -86,7 +75,10 @@ class WzMenuManagement extends Component {
 
   render() {
     const sideNavAdmin = [
-      this.createItem(this.managementSections.administration, {
+      {
+        name: this.managementSections.administration.text,
+        id: this.managementSections.administration.id,
+        id: 0,
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: [
@@ -96,11 +88,13 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
         ],
-      })
+      }
     ];
 
     const sideNavStatus = [
-      this.createItem(this.managementSections.statusReports, {
+      {
+        name: this.managementSections.statusReports.text,
+        id: this.managementSections.statusReports.id,
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: [
@@ -110,7 +104,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.logs),
           this.createItem(this.managementSections.reporting)
         ]
-      })
+      }
     ];
 
     return (
@@ -142,17 +136,9 @@ class WzMenuManagement extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
 )(WzMenuManagement);

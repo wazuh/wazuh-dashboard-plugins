@@ -30,7 +30,7 @@ export class CSVRequest {
       const output = await this.genericReq.request('POST', '/api/csv', {
           path,
           id,
-          params: { filters }
+          filters
       });
       return output.data;
     } catch (error) {

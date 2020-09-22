@@ -48,7 +48,7 @@ export class PatternHandler {
         }
       }
       if (!patternList.length) {
-        // if no valid index patterns are found we try to create the wazuh-alerts-3.x-*
+        // if no valid index patterns are found we try to create the wazuh-alerts-*
         try {
           const wazuhConfig = new WazuhConfig();
           const { pattern } = wazuhConfig.getConfig();
@@ -138,7 +138,7 @@ export class PatternHandler {
       const fields = await courierData.fieldsFetcher.fetch({});
       await courierData.initFields(fields);
     } catch (error) {
-      throw new Error();
+      throw new Error(error);
     }
   }
 }
