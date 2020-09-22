@@ -23,8 +23,9 @@ import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions
 import store from '../../redux/store';
 import { AgentSelectionTable } from '../../controllers/overview/components/overview-actions/agents-selection-table';
 import chrome from 'ui/chrome';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
+import { AppState } from '../../react-services/app-state';
 
 class WzAgentSelector extends Component {
   constructor(props) {
@@ -69,7 +70,7 @@ class WzAgentSelector extends Component {
             "negate": false,
             "params": { "query": agentIdList[0] },
             "type": "phrase",
-            "index": WAZUH_ALERTS_PATTERN
+            "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
           },
           "query": {
             "match": {
@@ -118,7 +119,7 @@ class WzAgentSelector extends Component {
 
     if (this.props.state.showExploreAgentModalGlobal) {
       modal = (
-        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
+        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
           <EuiModal
             className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}

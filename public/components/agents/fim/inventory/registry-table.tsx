@@ -234,7 +234,7 @@ export class RegistryTable extends Component {
         {registryTable}
         {this.state.isFlyoutVisible && (
           <EuiOverlayMask
-            onClick={(e: Event) => e.target.className === 'euiOverlayMask' && this.closeFlyout()}
+            onClick={() => this.closeFlyout()}
           >
             <FlyoutDetail
             fileName={this.state.currentFile.file}

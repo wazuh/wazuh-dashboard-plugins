@@ -29,7 +29,7 @@ import { TypesService } from "../../../../src/plugins/visualizations/public/vis_
 import { Vis } from "../../../../src/plugins/visualizations/public";
 import { convertToSerializedVis } from "../../../../src/plugins/visualizations/public/saved_visualizations/_saved_vis";
 import { toastNotifications } from "ui/notify";
-import { getAngularModule } from "plugins/kibana/discover/kibana_services";
+import { getAngularModule } from "../../../../src/plugins/discover/public/kibana_services";
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
@@ -250,15 +250,14 @@ class KibanaVis extends Component {
             this.visID,
             rawVis[0]
           );
-
+          this.visualization.searchSource = await npStart.plugins.data.search.searchSource.create();
           // Visualization doesn't need the "_source"
           this.visualization.searchSource.setField("source", false);
           // Visualization doesn't need "hits"
-          this.visualization.searchSource.setField("size", 0);
-          const vis = new Vis(
-            this.visualization.visState.type,
-            await convertToSerializedVis(this.visualization)
-          );
+          this.visualization.searchSource.setField('size', 0);
+          const visState = await convertToSerializedVis(this.visualization);
+          const vis = new Vis(this.visualization.visState.type, visState);
+          await vis.setState(visState);
           this.visHandler = await npStart.plugins.visualizations.__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput

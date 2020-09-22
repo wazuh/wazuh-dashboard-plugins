@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
   "version": "4.0.0",
-  "revision": "4001",
-  "code": "4001-0",
+  "revision": "4002",
+  "code": "4002-0",
   "kibana": {
-    "version": "7.8.0"
+    "version": "7.9.1"
   },
   "description": "Wazuh app",
   "main": "index.js",

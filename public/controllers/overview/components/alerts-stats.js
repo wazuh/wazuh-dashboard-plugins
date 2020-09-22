@@ -15,12 +15,13 @@ import { visualizations } from '../../../components/visualize/visualizations';
 import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import { connect } from 'react-redux';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
 import { esFilters } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
 import '../../../../public/less/loader';
 import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
+import { AppState } from '../../../react-services/app-state';
 
 
 class AlertsStats extends Component {
@@ -91,7 +92,7 @@ class AlertsStats extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": WAZUH_ALERTS_PATTERN
+        "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }

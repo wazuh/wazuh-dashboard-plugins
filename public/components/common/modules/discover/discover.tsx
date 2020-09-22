@@ -20,7 +20,7 @@ import { RowDetails } from './row-details';
 //@ts-ignore
 import { npSetup } from 'ui/new_platform';
 //@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 import DateMatch from '@elastic/datemath';
 import { toastNotifications } from 'ui/notify';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';

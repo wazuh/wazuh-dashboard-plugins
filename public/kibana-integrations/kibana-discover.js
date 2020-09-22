@@ -35,41 +35,44 @@ uiModules.get('app/wazuh', []).directive('kbnDis', [
 // Added dependencies (from Kibana module)
 import './discover_dependencies';
 import 'ui/directives/render_directive';
-import 'plugins/kibana/discover/np_ready/angular/directives';
+import '../../../../src/plugins/discover/public/application/angular/directives';
+import { DocViewsRegistry } from '../../../../src/plugins/discover/public/application/doc_views/doc_views_registry';
+import { DocViewTable } from '../../../../src/plugins/discover/public/application/components/table/table';
+import { JsonCodeBlock } from '../../../../src/plugins/discover/public/application/components/json_code_block/json_code_block';
 import _ from 'lodash';
-import React from 'react';
+
 import { Subscription, Subject, merge } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import moment from 'moment';
 import dateMath from '@elastic/datemath';
 import { i18n } from '@kbn/i18n';
-import { getState, splitState } from 'plugins/kibana/discover/np_ready/angular/discover_state';
+import { getState, splitState } from '../../../../src/plugins/discover/public/application/angular/discover_state';
 
 import { RequestAdapter } from '../../../../src/plugins/inspector/public';
-import { getSortArray, getSortForSearchSource } from 'plugins/kibana/discover/np_ready/angular/doc_table';
-import * as columnActions from 'plugins/kibana/discover/np_ready/angular/doc_table/actions/columns';
+import { getSortArray, getSortForSearchSource } from '../../../../src/plugins/discover/public/application/angular/doc_table';
+import * as columnActions from '../../../../src/plugins/discover/public/application/angular/doc_table/actions/columns';
 
-import 'plugins/kibana/discover/np_ready/components/fetch_error';
-import { getPainlessError } from 'plugins/kibana/discover/np_ready/angular/get_painless_error';
-import { discoverResponseHandler } from 'plugins/kibana/discover/np_ready/angular/response_handler';
+import '../../../../src/plugins/discover/public/application/components/fetch_error/';
+import { getPainlessError } from '../../../../src/plugins/discover/public/application/angular/get_painless_error';
+import { discoverResponseHandler } from '../../../../src/plugins/discover/public/application/angular/response_handler';
 import {
-  getHistory,
   getRequestInspectorStats,
   getResponseInspectorStats,
   getServices,
   setServices,
+  setDocViewsRegistry,
   subscribeWithScope,
   tabifyAggResponse,
   getAngularModule,
-} from 'plugins/kibana/discover/kibana_services';
+} from '../../../../src/plugins/discover/public/kibana_services';
 
 ///WAZUH///
-import { buildServices } from 'plugins/kibana/discover/build_services';
+import { buildServices } from '../../../../src/plugins/discover/public/build_services';
 import { npStart } from 'ui/new_platform';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 ///////////
-
+import { validateTimeRange } from '../../../../src/plugins/discover/public/application/helpers/validate_time_range';
 import {
   fieldFormats,
   esFilters,
@@ -78,9 +81,18 @@ import {
   syncQueryStateWithUrl,
   getDefaultQuery,
   search,
+  UI_SETTINGS,
 } from '../../../../src/plugins/data/public';
 import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
 import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
+import {
+  DEFAULT_COLUMNS_SETTING,
+  SAMPLE_SIZE_SETTING,
+  SORT_DEFAULT_ORDER_SETTING,
+  SEARCH_ON_PAGE_LOAD_SETTING,
+  DOC_HIDE_TIME_COLUMN_SETTING,
+} from '../../../../src/plugins/discover/common/';
+import { AppState } from '../react-services/app-state';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -90,12 +102,11 @@ const fetchStatuses = {
 
 const app = uiModules.get('app/discover', []);
 const wazuhApp = getAngularModule('app/wazuh');
-const buildGetHistory = getHistory;
 app.run(async () => {
   const services = await buildServices(
     npStart.core,
     npStart.plugins,
-    buildGetHistory
+    { env: { packageInfo: { branch: "7.9" } } }
   );
   setServices(services);
 });
@@ -143,8 +154,24 @@ function discoverController(
     const services = await buildServices(
       npStart.core,
       npStart.plugins,
-      buildGetHistory
+      { env: { packageInfo: { branch: "7.9" } } }
     );
+    this.docViewsRegistry = new DocViewsRegistry();
+    setDocViewsRegistry(this.docViewsRegistry);
+    this.docViewsRegistry.addDocView({
+      title: i18n.translate('discover.docViews.table.tableTitle', {
+        defaultMessage: 'Table',
+      }),
+      order: 10,
+      component: DocViewTable,
+    });
+    this.docViewsRegistry.addDocView({
+      title: i18n.translate('discover.docViews.json.jsonTitle', {
+        defaultMessage: 'JSON',
+      }),
+      order: 20,
+      component: JsonCodeBlock,
+    });
     setServices(services);
   })();
 
@@ -163,11 +190,11 @@ function discoverController(
   const wazuhConfig = new WazuhConfig();
   const modulesHelper = ModulesHelper;
 
-  const history = getHistory();
-
   const getTimeField = () => {
     return isDefaultType($scope.indexPattern) ? $scope.indexPattern.timeFieldName : undefined;
   };
+
+  const history = getHistory();
 
   const {
     appStateContainer,
@@ -175,10 +202,8 @@ function discoverController(
     stopSync: stopStateSync,
     setAppState,
     replaceUrlAppState,
-    isAppStateDirty,
     kbnUrlStateStorage,
     getPreviousAppState,
-    resetInitialAppState,
   } = getState({
     defaultAppState: getStateDefaults(),
     storeInSessionStorage: config.get('state:storeInSessionStorage'),
@@ -225,11 +250,11 @@ function discoverController(
     }
   });
 
-  // this listener is waiting for such a path http://localhost:5601/app/kibana#/discover
+  // this listener is waiting for such a path http://localhost:5601/app/discover#/
   // which could be set through pressing "New" button in top nav or go to "Discover" plugin from the sidebar
   // to reload the page in a right way
   const unlistenHistoryBasePath = history.listen(({ pathname, search, hash }) => {
-    if (!search && !hash && pathname === '/discover') {
+    if (!search && !hash && pathname === '/') {
       $route.reload();
     }
   });
@@ -277,10 +302,6 @@ function discoverController(
     }
   );
 
-  $scope.intervalEnabled = function (interval) {
-    return interval.val !== 'custom';
-  };
-
   let abortController;
   $scope.$on('$destroy', () => {
     if (abortController) abortController.abort();
@@ -321,7 +342,7 @@ function discoverController(
 
   const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   chrome.docTitle.change(`Wazuh${pageTitleSuffix}`);
-  const discoverBreadcrumbsTitle = i18n.translate('kbn.discover.discoverBreadcrumbTitle', {
+  const discoverBreadcrumbsTitle = i18n.translate('discover.discoverBreadcrumbTitle', {
     defaultMessage: 'Wazuh',
   });
 
@@ -329,7 +350,7 @@ function discoverController(
     chrome.setBreadcrumbs([
       {
         text: discoverBreadcrumbsTitle,
-        href: '#/discover',
+        href: '#/',
       },
       { text: savedSearch.title },
     ]);
@@ -383,7 +404,7 @@ function discoverController(
     const { searchFields, selectFields } = await getSharingDataFields(
       $scope.state.columns,
       $scope.indexPattern.timeFieldName,
-      config.get('doc_table:hideTimeColumn')
+      config.get(DOC_HIDE_TIME_COLUMN_SETTING)
     );
     searchSource.setField('fields', searchFields);
     searchSource.setField(
@@ -391,7 +412,7 @@ function discoverController(
       getSortForSearchSource(
         $scope.state.sort,
         $scope.indexPattern,
-        config.get('discover:sort:defaultOrder')
+        config.get(SORT_DEFAULT_ORDER_SETTING)
       )
     );
     searchSource.setField('highlight', null);
@@ -418,13 +439,16 @@ function discoverController(
     const query =
       $scope.searchSource.getField('query') ||
       getDefaultQuery(
-        localStorage.get('kibana.userQueryLanguage') || config.get('search:queryLanguage')
+        localStorage.get('kibana.userQueryLanguage') ||
+        config.get(UI_SETTINGS.SEARCH_QUERY_LANGUAGE)
       );
     return {
       query,
       sort: getSortArray(savedSearch.sort, $scope.indexPattern),
       columns:
-        savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
+        savedSearch.columns.length > 0
+          ? savedSearch.columns
+          : config.get(DEFAULT_COLUMNS_SETTING).slice(),
       index: $scope.indexPattern.id,
       interval: 'auto',
       filters: _.cloneDeep($scope.searchSource.getOwnField('filter')),
@@ -434,27 +458,9 @@ function discoverController(
   $scope.state.index = $scope.indexPattern.id;
   $scope.state.sort = getSortArray($scope.state.sort, $scope.indexPattern);
 
-  $scope.getBucketIntervalToolTipText = () => {
-    return i18n.translate('kbn.discover.bucketIntervalTooltip', {
-      defaultMessage:
-        'This interval creates {bucketsDescription} to show in the selected time range, so it has been scaled to {bucketIntervalDescription}',
-      values: {
-        bucketsDescription:
-          $scope.bucketInterval.scale > 1
-            ? i18n.translate('kbn.discover.bucketIntervalTooltip.tooLargeBucketsText', {
-              defaultMessage: 'buckets that are too large',
-            })
-            : i18n.translate('kbn.discover.bucketIntervalTooltip.tooManyBucketsText', {
-              defaultMessage: 'too many buckets',
-            }),
-        bucketIntervalDescription: $scope.bucketInterval.description,
-      },
-    });
-  };
-
   $scope.opts = {
     // number of records to fetch, then paginate through
-    sampleSize: config.get('discover:sampleSize'),
+    sampleSize: config.get(SAMPLE_SIZE_SETTING),
     timefield: getTimeField(),
     savedSearch: savedSearch,
     indexPatternList: $route.current.locals.ip.list,
@@ -464,7 +470,7 @@ function discoverController(
     // A saved search is created on every page load, so we check the ID to see if we're loading a
     // previously saved search or if it is just transient
     return (
-      config.get('discover:searchOnPageLoad') ||
+      config.get(SEARCH_ON_PAGE_LOAD_SETTING) ||
       savedSearch.id !== undefined ||
       timefilter.getRefreshInterval().pause === false
     );
@@ -499,7 +505,7 @@ function discoverController(
                         negate: true,
                         params: { query: '000' },
                         type: 'phrase',
-                        index: WAZUH_ALERTS_PATTERN
+                        index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
                       },
                       query: { match_phrase: { 'agent.id': '000' } },
                       $state: { store: 'appState' }
@@ -549,12 +555,12 @@ function discoverController(
           (error) => addFatalError(core.fatalErrors, error)
         )
       );
-      //Handling change oft the histogram interval
-      $scope.$watch('state.interval', function (newInterval, oldInterval) {
-        if (newInterval !== oldInterval) {
-          setAppState({ interval: newInterval });
+
+      $scope.changeInterval = (interval) => {
+        if (interval) {
+          setAppState({ interval });
         }
-      });
+      };
 
       $scope.$watchMulti(
         ['rows', 'fetchStatus'],
@@ -601,7 +607,7 @@ function discoverController(
             );
             // Copying it to the rootScope to access it from the Wazuh App //
             $rootScope.resultState = $scope.resultState;
-            /////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////// 
 
             prev = current;
           };
@@ -629,6 +635,10 @@ function discoverController(
     if (!init.complete) return;
     $scope.fetchCounter++;
     $scope.fetchError = undefined;
+    if (!validateTimeRange(timefilter.getTime(), toastNotifications)) {
+      $scope.resultState = 'none';
+      return;
+    }
 
     // Abort any in-progress requests before fetching again
     if (abortController) abortController.abort();
@@ -655,7 +665,7 @@ function discoverController(
           $scope.fetchError = fetchError;
         } else {
           toastNotifications.addError(error, {
-            title: i18n.translate('kbn.discover.errorLoadingData', {
+            title: i18n.translate('discover.errorLoadingData', {
               defaultMessage: 'Error loading data',
             }),
             toastMessage: error.shortMessage || error.body?.message,
@@ -675,7 +685,7 @@ function discoverController(
       }
       ///
       setAppState({ query: q });
-      // WAZUH  query from search bar
+      // WAZUH query from search bar
       discoverPendingUpdates.removeAll();
       discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);
       $scope.fetch();
@@ -762,10 +772,10 @@ function discoverController(
 
   function logInspectorRequest() {
     inspectorAdapters.requests.reset();
-    const title = i18n.translate('kbn.discover.inspectorRequestDataTitle', {
+    const title = i18n.translate('discover.inspectorRequestDataTitle', {
       defaultMessage: 'data',
     });
-    const description = i18n.translate('kbn.discover.inspectorRequestDescription', {
+    const description = i18n.translate('discover.inspectorRequestDescription', {
       defaultMessage: 'This request queries Elasticsearch to fetch the data for the search.',
     });
     inspectorRequest = inspectorAdapters.requests.start(title, { description });
@@ -785,25 +795,46 @@ function discoverController(
       $rootScope.$applyAsync();
     }
     ////////////////////////////////////////////////////////////////////////////
-
-    //this is the timerange for the histogram, should be refactored
+    const { from, to } = timefilter.getTime();
+    // this is the timerange for the histogram, should be refactored
     $scope.timeRange = {
-      from: dateMath.parse(timefilter.getTime().from),
-      to: dateMath.parse(timefilter.getTime().to, { roundUp: true }),
+      from: dateMath.parse(from),
+      to: dateMath.parse(to, { roundUp: true }),
     };
   };
 
   $scope.toMoment = function (datetime) {
+    if (!datetime) {
+      return;
+    }
     return moment(datetime).format(config.get('dateFormat'));
   };
 
   $scope.resetQuery = function () {
-    //history.push(`/discover/${encodeURIComponent($route.current.params.id)}`);
+    /*     history.push(
+          $route.current.params.id ? `/view/${encodeURIComponent($route.current.params.id)}` : '/'
+        ); */
     $route.reload();
   };
 
+  $scope.onSkipBottomButtonClick = function () {
+    // show all the Rows
+    $scope.minimumVisibleRows = $scope.hits;
+
+    // delay scrolling to after the rows have been rendered
+    const bottomMarker = $element.find('#discoverBottomMarker');
+    $timeout(() => {
+      bottomMarker.focus();
+      // The anchor tag is not technically empty (it's a hack to make Safari scroll)
+      // so the browser will show a highlight: remove the focus once scrolled
+      $timeout(() => {
+        bottomMarker.blur();
+      }, 0);
+    }, 0);
+  };
+
   $scope.newQuery = function () {
-    //history.push('/discover');
+    //history.push('/');
   };
 
   // Wazuh.
@@ -812,7 +843,6 @@ function discoverController(
   //                        use it for panels.
   let defaultSearchSource = null,
     noHitsSearchSource = null;
-
   $scope.updateDataSource = () => {
     const { indexPattern, searchSource } = $scope;
     // Wazuh
@@ -842,12 +872,11 @@ function discoverController(
         getSortForSearchSource(
           $scope.state.sort,
           indexPattern,
-          config.get('discover:sort:defaultOrder')
+          config.get(SORT_DEFAULT_ORDER_SETTING)
         )
       )
       .setField('query', $scope.state.query || null)
       .setField('filter', filterManager.getFilters());
-
     //Wazuh update the visualizations
     $rootScope.$broadcast('updateVis');
     store.dispatch(updateVis({ update: true }));
@@ -874,16 +903,24 @@ function discoverController(
 
   $scope.addColumn = function addColumn(columnName) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
-    //$scope.indexPattern.popularizeField(columnName, 1);
+    /*     if (uiCapabilities.discover.save) {
+        $scope.indexPattern.popularizeField(columnName, 1);
+        } */
     const columns = columnActions.addColumn($scope.state.columns, columnName);
     setAppState({ columns });
   };
 
   $scope.removeColumn = function removeColumn(columnName) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
-    //$scope.indexPattern.popularizeField(columnName, 1);
+    /*     if (uiCapabilities.discover.save) {
+          $scope.indexPattern.popularizeField(columnName, 1);
+        } */
     const columns = columnActions.removeColumn($scope.state.columns, columnName);
-    setAppState({ columns });
+    // The state's sort property is an array of [sortByColumn,sortDirection]
+    const sort = $scope.state.sort.length
+      ? $scope.state.sort.filter((subArr) => subArr[0] !== columnName)
+      : [];
+    setAppState({ columns, sort });
   };
 
   $scope.moveColumn = function moveColumn(columnName, newIndex) {
@@ -893,17 +930,6 @@ function discoverController(
 
   $scope.scrollToTop = function () {
     $window.scrollTo(0, 0);
-  };
-
-  $scope.scrollToBottom = function () {
-    // delay scrolling to after the rows have been rendered
-    $timeout(() => {
-      $element.find('#discoverBottomMarker').focus();
-    }, 0);
-  };
-
-  $scope.showAllRows = function () {
-    $scope.minimumVisibleRows = $scope.hits;
   };
 
   async function setupVisualization() {
@@ -931,7 +957,7 @@ function discoverController(
       },
     ];
 
-    $scope.vis = visualizations.createVis('histogram', {
+    $scope.vis = await visualizations.createVis('histogram', {
       title: savedSearch.title,
       params: {
         addLegend: false,
@@ -939,8 +965,7 @@ function discoverController(
       },
       data: {
         aggs: visStateAggs,
-        indexPattern: $scope.searchSource.getField('index').id,
-        searchSource: $scope.searchSource,
+        searchSource: $scope.searchSource.getSerializedFields(),
       },
     });
 
@@ -956,7 +981,7 @@ function discoverController(
   }
 
   function getIndexPatternWarning(index) {
-    return i18n.translate('kbn.discover.valueIsNotConfiguredIndexPatternIDWarningTitle', {
+    return i18n.translate('discover.valueIsNotConfiguredIndexPatternIDWarningTitle', {
       defaultMessage: '{stateVal} is not a configured index pattern ID',
       values: {
         stateVal: `"${index}"`,
@@ -983,7 +1008,7 @@ function discoverController(
       if (ownIndexPattern) {
         toastNotifications.addWarning({
           title: warningTitle,
-          text: i18n.translate('kbn.discover.showingSavedIndexPatternWarningDescription', {
+          text: i18n.translate('discover.showingSavedIndexPatternWarningDescription', {
             defaultMessage:
               'Showing the saved index pattern: "{ownIndexPatternTitle}" ({ownIndexPatternId})',
             values: {
@@ -997,7 +1022,7 @@ function discoverController(
 
       toastNotifications.addWarning({
         title: warningTitle,
-        text: i18n.translate('kbn.discover.showingDefaultIndexPatternWarningDescription', {
+        text: i18n.translate('discover.showingDefaultIndexPatternWarningDescription', {
           defaultMessage:
             'Showing the default index pattern: "{loadedIndexPatternTitle}" ({loadedIndexPatternId})',
           values: {

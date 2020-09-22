@@ -25,7 +25,6 @@ export class PatternHandler {
     try {
       var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
 
-
       if (where === 'healthcheck') {
         function getIndexPatterns() {
           return new Promise(function (resolve, reject) {

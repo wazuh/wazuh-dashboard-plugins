@@ -48,7 +48,7 @@ export async function getRequirementAlerts(agentId, time, requirement) {
   }
 
   return {
-    alerts_count: alerts_count || [],
+    alerts_count: !!alerts_count ? alerts_count : [],
     total_alerts: (((response || {}).data || {}).hits || {}).total
   };
 }

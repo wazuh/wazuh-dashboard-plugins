@@ -314,6 +314,7 @@ export class Inventory extends Component {
         `/agents/${this.props.agent.id}/config/syscheck/syscheck`,
         {}
       );
+
       return (((response.data || {}).data).syscheck || {}).disabled === 'no';
     } catch (error) {
       return false;
@@ -327,6 +328,7 @@ export class Inventory extends Component {
     }
     const table = this.renderTable();
     const tabs = this.renderTabs();
+
     return isConfigured
       ? (<EuiPage>
         <EuiPanel>
@@ -336,6 +338,5 @@ export class Inventory extends Component {
         </EuiPanel>
       </EuiPage>) 
       : this.noConfiguredMonitoring()
-      
   }
 }

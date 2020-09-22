@@ -12,7 +12,7 @@
 import React, {} from 'react';
 import { I18nProvider } from '@kbn/i18n/react';
 //@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 import { SearchBar, TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
 import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/public';
 import { withKibanaContext, withKibanaContextExtendsProps } from '../common/hocs';

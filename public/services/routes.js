@@ -171,11 +171,11 @@ routes
     redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
-  .when('/discover/context/:pattern?/:type?/:id?', {
+  .when('/context/:pattern?/:type?/:id?', {
     redirectTo: function () { },
     resolve: { wzKibana }
   })
-  .when('/discover/doc/:pattern?/:index?/:type?/:id?', {
+  .when('/doc/:pattern?/:index?/:type?/:id?', {
     redirectTo: function () { },
     resolve: { wzKibana }
   })
