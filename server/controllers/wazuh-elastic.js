@@ -22,7 +22,7 @@ import {
 import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
-import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID } from '../../util/constants';
+import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
 import { ApiInterceptor } from '../lib/api-interceptor';
@@ -954,9 +954,6 @@ export class WazuhElasticCtrl {
         return ErrorResponse('Token is not valid', 500, 500, reply);
       };
 
-      //Get configuration
-      const configFile = getConfiguration();
-
       const bulkPrefix = JSON.stringify({
         index: {
           _index: sampleAlertsIndex
@@ -974,21 +971,11 @@ export class WazuhElasticCtrl {
       if (!existsSampleIndex) {
         // Create wazuh sample alerts index
 
-        const shards =
-          typeof (configFile || {})['wazuh.alerts.shards'] !== 'undefined'
-            ? configFile['wazuh.alerts.shards']
-            : 3;
-
-        const replicas =
-          typeof (configFile || {})['wazuh.alerts.replicas'] !== 'undefined'
-            ? configFile['wazuh.alerts.replicas']
-            : 0;
-
         const configuration = {
           settings: {
             index: {
-              number_of_shards: shards,
-              number_of_replicas: replicas
+              number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
+              number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS
             }
           }
         };
