@@ -156,8 +156,8 @@ export class WzStatusOverview extends Component {
       const [lastAgent] = lastAgentRaw.data.data.affected_items;
   
       this.props.updateAgentInfo(lastAgent);
-      this.props.updateLoadingStatus(false);
     }catch(error){/*Do nothing with error */}
+    this.props.updateLoadingStatus(false);
   }
 
   showToast = (color, text, time) => {
