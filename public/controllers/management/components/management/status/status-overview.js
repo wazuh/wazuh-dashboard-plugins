@@ -82,82 +82,82 @@ export class WzStatusOverview extends Component {
    * Fetchs all required data
    */
   async fetchData() {
-    this.props.updateLoadingStatus(true);
-
-    const agSumm = await this.statusHandler.agentsSummary();
-    const clusStat = await this.statusHandler.clusterStatus();
-    const manInfo = await this.statusHandler.managerInfo();
-    const agentsCountResponse = await this.statusHandler.clusterAgentsCount();
-
-    const data = [];
-    data.push(agSumm);
-    data.push(clusStat);
-    data.push(manInfo);
-    data.push(agentsCountResponse);
-
-    const parsedData = data.map(
-      item => ((item || {}).data || {}).data || false
-    );
-    const [stats, clusterStatus, managerInfo, agentsCount] = parsedData;
-
-    // Once Wazuh core fixes agent 000 issues, this should be adjusted
-    const active = stats.active - 1;
-    const total = stats.total - 1;
-
-    this.props.updateStats({
-      agentsCount: agentsCount.nodes,
-      agentsCountActive: active,
-      agentsCountDisconnected: stats.disconnected,
-      agentsCountNeverConnected: stats.never_connected,
-      agentsCountTotal: total,
-      agentsCoverity: total ? (active / total) * 100 : 0
-    });
-
-    this.props.updateClusterEnabled(
-      clusterStatus && clusterStatus.enabled === 'yes'
-    );
-
-    if (
-      clusterStatus &&
-      clusterStatus.enabled === 'yes' &&
-      clusterStatus.running === 'yes'
-    ) {
-      const nodes = await this.statusHandler.clusterNodes();
-      const listNodes = nodes.data.data.affected_items;
-      this.props.updateListNodes(listNodes);
-      const masterNode = nodes.data.data.affected_items.filter(item => item.type === 'master')[0];
-      this.props.updateSelectedNode(masterNode.name);
-      const daemons = await this.statusHandler.clusterNodeStatus(masterNode.name);
-      const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
-      this.props.updateListDaemons(listDaemons);
-      const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
-      this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
-    } else {
+    try{
+      this.props.updateLoadingStatus(true);
+  
+      const agSumm = await this.statusHandler.agentsSummary();
+      const clusStat = await this.statusHandler.clusterStatus();
+      const manInfo = await this.statusHandler.managerInfo();
+      const agentsCountResponse = await this.statusHandler.clusterAgentsCount();
+  
+      const data = [];
+      data.push(agSumm);
+      data.push(clusStat);
+      data.push(manInfo);
+      data.push(agentsCountResponse);
+  
+      const parsedData = data.map(
+        item => ((item || {}).data || {}).data || false
+      );
+      const [stats, clusterStatus, managerInfo, agentsCount] = parsedData;
+  
+      // Once Wazuh core fixes agent 000 issues, this should be adjusted
+      const active = stats.active - 1;
+      const total = stats.total - 1;
+  
+      this.props.updateStats({
+        agentsCount: agentsCount.nodes,
+        agentsCountActive: active,
+        agentsCountDisconnected: stats.disconnected,
+        agentsCountNeverConnected: stats.never_connected,
+        agentsCountTotal: total,
+        agentsCoverity: total ? (active / total) * 100 : 0
+      });
+  
+      this.props.updateClusterEnabled(
+        clusterStatus && clusterStatus.enabled === 'yes'
+      );
+  
       if (
         clusterStatus &&
         clusterStatus.enabled === 'yes' &&
-        clusterStatus.running === 'no'
+        clusterStatus.running === 'yes'
       ) {
-        this.showToast(
-          'danger',
-          `Cluster is enabled but it's not running, please check your cluster health.`,
-          3000
-        );
-      } else {
-        const daemons = await this.statusHandler.managerStatus();
+        const nodes = await this.statusHandler.clusterNodes();
+        const listNodes = nodes.data.data.affected_items;
+        this.props.updateListNodes(listNodes);
+        const masterNode = nodes.data.data.affected_items.filter(item => item.type === 'master')[0];
+        this.props.updateSelectedNode(masterNode.name);
+        const daemons = await this.statusHandler.clusterNodeStatus(masterNode.name);
         const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
         this.props.updateListDaemons(listDaemons);
-        this.props.updateSelectedNode(false);
-        this.props.updateNodeInfo((managerInfo.affected_items || [])[0] || {});
+        const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
+        this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
+      } else {
+        if (
+          clusterStatus &&
+          clusterStatus.enabled === 'yes' &&
+          clusterStatus.running === 'no'
+        ) {
+          this.showToast(
+            'danger',
+            `Cluster is enabled but it's not running, please check your cluster health.`,
+            3000
+          );
+        } else {
+          const daemons = await this.statusHandler.managerStatus();
+          const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
+          this.props.updateListDaemons(listDaemons);
+          this.props.updateSelectedNode(false);
+          this.props.updateNodeInfo((managerInfo.affected_items || [])[0] || {});
+        }
       }
-    }
-    const lastAgentRaw = await this.statusHandler.lastAgentRaw();
-    const [lastAgent] = lastAgentRaw.data.data.affected_items;
-
-    this.props.updateAgentInfo(lastAgent);
-    this.props.updateLoadingStatus(false);
-
-    return;
+      const lastAgentRaw = await this.statusHandler.lastAgentRaw();
+      const [lastAgent] = lastAgentRaw.data.data.affected_items;
+  
+      this.props.updateAgentInfo(lastAgent);
+      this.props.updateLoadingStatus(false);
+    }catch(error){/*Do nothing with error */}
   }
 
   showToast = (color, text, time) => {
