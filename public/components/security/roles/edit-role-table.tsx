@@ -65,7 +65,7 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
       const columns = [
         {
           field: 'label',
-          name: 'Roles',
+          name: 'Policies',
           sortable: false,
           truncateText: true
         },
