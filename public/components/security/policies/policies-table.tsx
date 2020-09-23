@@ -91,7 +91,9 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
                     }
                     ErrorHandler.info('Policy was successfully deleted');
                     await updatePolicies();
-                }catch(error){}
+                }catch(error){
+                    ErrorHandler.handle(error, 'Error deleting policy');
+                }
               }}
               iconType="trash"
               color={'danger'}
