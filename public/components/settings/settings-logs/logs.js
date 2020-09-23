@@ -123,14 +123,16 @@ export default class SettingsLogs extends Component {
             <EuiProgress size="xs" color="primary" />
           )}
           {!this.state.refreshingEntries && (
-            <EuiCodeBlock
-              fontSize="s"
-              paddingSize="m"
-              color="dark"
-              overflowHeight={this.height}
-            >
-              {text}
-            </EuiCodeBlock>
+            <div className='code-block-log-viewer-container'>
+              <EuiCodeBlock
+                fontSize="s"
+                paddingSize="m"
+                color="dark"
+                overflowHeight={this.height}
+              >
+                {text}
+              </EuiCodeBlock>
+            </div>
           )}
         </EuiPanel>
       </EuiPage>
