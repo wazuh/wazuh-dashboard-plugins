@@ -22,7 +22,7 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 
 
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
-    const isReserved = policy.id < 27;
+    const isReserved = policy.id < 100;
     const [actionValue, setActionValue] = useState('');
     const [addedActions, setAddedActions] = useState([]);
     const [availableResources, setAvailableResources] = useState([]);
