@@ -46,7 +46,8 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     admin: true,
     hideManagerAlerts: false,
     'logs.level': 'info',
-    'enrollment.dns': ''
+    'enrollment.dns': '',
+    'enrollment.password': '',
   };
 
   try {
