@@ -89,10 +89,10 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
           width: '5%',
           name: 'Actions',
           render: item => {return <EuiToolTip
-            content={item.id < 8 ? "Reserved roles can't be deleted" : 'Delete role'}
+            content={item.id < 100 ? "Reserved roles can't be deleted" : 'Delete role'}
             position="left">
             <EuiButtonIcon
-              isDisabled={item.id < 8}
+              isDisabled={item.id < 100}
               onClick={async(ev) => {
                     ev.stopPropagation();
                     try{
