@@ -29,7 +29,6 @@ export class AgentsPreviewController {
    * @param {Object} $location
    * @param {Object} errorHandler
    * @param {Object} csvReq
-   * @param {Object} wzTableFilter
    */
   constructor(
     $scope,
@@ -37,7 +36,6 @@ export class AgentsPreviewController {
     $route,
     errorHandler,
     csvReq,
-    wzTableFilter,
     commonData,
     $window
   ) {
@@ -49,7 +47,6 @@ export class AgentsPreviewController {
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
     this.shareAgent = new ShareAgent();
-    this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
@@ -88,7 +85,7 @@ export class AgentsPreviewController {
     if (loc && loc.tab) {
       this.submenuNavItem = loc.tab;
     }
-
+    
     const summaryData = await this.apiReq.request('GET', '/agents/summary', {});
     this.summary = summaryData.data.data;
     if (this.summary.Total - 1 === 0) {
@@ -114,8 +111,7 @@ export class AgentsPreviewController {
       hasAgents: this.hasAgents,
       reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
-      getCurrentApiAddress: () => this.getCurrentApiAddress(),
-      needsPassword: () => this.needsPassword()
+      getCurrentApiAddress: () => this.getCurrentApiAddress()
     };
     this.hasAgents = true;
     this.init = false;
@@ -250,24 +246,6 @@ export class AgentsPreviewController {
       'https://documentation.wazuh.com/current/user-manual/registering/index.html',
       '_blank'
     );
-  }
-
-  /**
-   * Returns if the password is neccesary to register a new agent
-   */
-  async needsPassword() {
-    try {
-      const result = await this.apiReq.request(
-        'GET',
-        '/agents/000/config/auth/auth',
-        {}
-      );
-      const auth = ((result.data || {}).data || {}).auth || {};
-      const usePassword = auth.use_password === 'yes';
-      return usePassword;
-    } catch (error) {
-      return false;
-    }
   }
 
   /**

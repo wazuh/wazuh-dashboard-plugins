@@ -104,7 +104,7 @@ export const objectWithoutProperties = obj => {
  * @returns {function}
  */
 export const renderValueOrDefault = defaultValue => value =>
-  value || defaultValue;
+  typeof value !== 'undefined' ? value : defaultValue;
 
 /**
  * Return value if isn't falsy or '-'
