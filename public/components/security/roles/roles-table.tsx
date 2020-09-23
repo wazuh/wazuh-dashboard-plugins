@@ -79,7 +79,7 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
             field: 'id',
             name: 'Status',
             render: (item) => {
-                return item < 8 && <EuiBadge color="primary" >Reserved</EuiBadge>
+                return item < 100 && <EuiBadge color="primary" >Reserved</EuiBadge>
             },
             width: 150,
             sortable: false,
