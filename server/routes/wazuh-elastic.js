@@ -159,4 +159,12 @@ export function WazuhElasticRouter(server) {
       return ctrl.esAlerts(req, res);
     }
   });
+
+  server.route({
+    method: 'GET',
+    path: '/elastic/statistics',
+    handler(req, res) {
+      return ctrl.existStatisticsIndices(req, res);
+    }
+  });
 }
