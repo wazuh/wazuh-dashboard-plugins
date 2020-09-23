@@ -51,13 +51,13 @@ Restart Kibana
 - Systemd:
 
 ```
-systemctl restart kibana
+sudo systemctl restart kibana
 ```
 
 - SysV Init:
 
 ```
-service kibana restart
+sudo service kibana restart
 ```
 
 ## Upgrade
@@ -69,20 +69,20 @@ Stop Kibana
 - Systemd:
 
 ```
-systemctl stop kibana
+sudo systemctl stop kibana
 ```
 
 - SysV Init:
 
 ```
-service kibana stop
+sudo service kibana stop
 ```
 
 Copy the `wazuh.yml` to its new location. (Only needed for upgrades from 3.11.x)
 
 ```
-mkdir -p /usr/share/kibana/optimize/wazuh/config
-cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+sudo mkdir -p /usr/share/kibana/optimize/wazuh/config
+sudo cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 ```
 
 Remove the Wazuh app using the kibana-plugin tool
@@ -95,14 +95,14 @@ sudo -u kibana bin/kibana-plugin remove wazuh
 Remove generated bundles
 
 ```
-rm -rf /usr/share/kibana/optimize/bundles
+sudo rm -rf /usr/share/kibana/optimize/bundles
 ```
 
 Update file permissions. This will prevent errors when generating new bundles or updating the app:
 
 ```
-chown -R kibana:kibana /usr/share/kibana/optimize
-chown -R kibana:kibana /usr/share/kibana/plugins
+sudo chown -R kibana:kibana /usr/share/kibana/optimize
+sudo chown -R kibana:kibana /usr/share/kibana/plugins
 ```
 
 Install the Wazuh app
@@ -124,13 +124,13 @@ Restart Kibana
 - Systemd:
 
 ```
-systemctl restart kibana
+sudo systemctl restart kibana
 ```
  
 - SysV Init: 
  
 ``` 
-service kibana restart 
+sudo service kibana restart 
 ```
 
  
