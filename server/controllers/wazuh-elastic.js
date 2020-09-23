@@ -1076,15 +1076,16 @@ export class WazuhElasticCtrl {
     }
   }
 
+  // Check if there are indices for Statistics
   async existStatisticsIndices(req, reply) {
     try{
       const config = getConfiguration();
       const statisticsPattern = `${config['cron.prefix'] || 'wazuh'}-${config['cron.statistics.index.name'] || 'statistics'}*`; //TODO: replace by default as constants instead hardcoded ('wazuh' and 'statistics')
-      const data = await this.wzWrapper.checkIfIndexExists(statisticsPattern, { allow_no_indices: false});
+      const data = await this.wzWrapper.checkIfIndexExists(statisticsPattern, { allow_no_indices: false });
       return data;
     }catch(error){
       log('wazuh-elastic:existsStatisticsIndices', error.message || error);
-      return ErrorResponse(error.message || error, 4010, 500, reply);
+      return ErrorResponse(error.message || error, 1000, 500, reply);
     }
   }
 }

@@ -159,7 +159,7 @@ export function WazuhElasticRouter(server) {
       return ctrl.esAlerts(req, res);
     }
   });
-
+  // Check if there are indices for Statistics
   server.route({
     method: 'GET',
     path: '/elastic/statistics',
