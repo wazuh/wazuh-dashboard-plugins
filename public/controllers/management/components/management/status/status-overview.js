@@ -19,7 +19,8 @@ import {
   EuiProgress,
   EuiPage,
   EuiSpacer,
-  EuiFlexGrid
+  EuiFlexGrid,
+  EuiButton
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -47,6 +48,7 @@ import { toastNotifications } from 'ui/notify';
 
 import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
+import { ToastNotifications } from '../../../../../react-services/toast-notifications';
 
 export class WzStatusOverview extends Component {
   _isMounted = false;
@@ -156,7 +158,9 @@ export class WzStatusOverview extends Component {
       const [lastAgent] = lastAgentRaw.data.data.affected_items;
   
       this.props.updateAgentInfo(lastAgent);
-    }catch(error){/*Do nothing with error */}
+    }catch(error){
+      ToastNotifications.error('management:status:overview.fetchData', error);
+    }
     this.props.updateLoadingStatus(false);
   }
 
