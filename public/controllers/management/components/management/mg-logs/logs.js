@@ -46,7 +46,7 @@ export default compose(
 (class WzLogs extends Component {
   constructor(props) {
     super(props);
-    this.offset = 325;
+    this.offset = 350;
     this.state = {
       isCluster: false,
       selectedDaemon: '',
@@ -485,14 +485,16 @@ export default compose(
       <div>
         {(this.state.logsList && (
           <Fragment>
-            <EuiCodeBlock
-              fontSize="s"
-              paddingSize="m"
-              color="dark"
-              overflowHeight={this.height}
-            >
-              {this.state.logsList}
-            </EuiCodeBlock>
+            <div className='code-block-log-viewer-container'>
+              <EuiCodeBlock
+                fontSize="s"
+                paddingSize="m"
+                color="dark"
+                overflowHeight={this.height}
+              >
+                {this.state.logsList}
+              </EuiCodeBlock>
+            </div>
             <EuiSpacer size="m" />
             {(this.state.offset + 100 < this.state.totalItems && (
               <EuiFlexGroup justifyContent='center'>
@@ -524,7 +526,7 @@ export default compose(
     return (
       <EuiPage>
         <EuiPageBody>
-          <EuiPanel>
+          <EuiPanel paddingSize="l">
             {this.header()}
             <EuiSpacer size={'m'}></EuiSpacer>
             {(!this.state.isLoading && this.logsTable()) || (

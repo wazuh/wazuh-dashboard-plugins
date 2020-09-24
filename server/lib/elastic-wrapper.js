@@ -532,13 +532,13 @@ export class ElasticWrapper {
    * Check if an index exists
    * @param {*} index
    */
-  async checkIfIndexExists(index) {
+  async checkIfIndexExists(index, params = {}) {
     try {
       if (!index) return Promise.reject(new Error('No valid index given'));
 
       const data = await this.elasticRequest.callWithInternalUser(
         'indices.exists',
-        { index: index }
+        { index: index, ...params }
       );
 
       return data;
