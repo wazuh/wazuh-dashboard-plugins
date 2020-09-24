@@ -11,7 +11,7 @@
  */
 import React, { useEffect, useState } from 'react';
 //@ts-ignore
-import { loadingCount } from 'ui/chrome';
+import chrome  from 'ui/chrome';
 
 export const useKbnLoadingIndicator = ():[boolean, React.Dispatch<React.SetStateAction<boolean>>, boolean] => {
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export const useKbnLoadingIndicator = ():[boolean, React.Dispatch<React.SetState
   const [visible, setVisible] = useState(0);
 
   useEffect(() => {
-    const subscription = loadingCount.subscribe(count => {setVisible(count); !count && setFlag(false)});
+    const subscription = chrome.loadingCount.subscribe(count => {setVisible(count); !count && setFlag(false)});
     return subscription;
   }, []);
 
