@@ -139,7 +139,7 @@ export const updateUserPermissions = userPermissions => {
 
 /**
 * Updates selectedSettingsSection in the appState store
-* @param extensions
+* @param selected_settings_section
 */
 export const updateSelectedSettingsSection = selected_settings_section => {
  return {
@@ -147,3 +147,14 @@ export const updateSelectedSettingsSection = selected_settings_section => {
    selected_settings_section
  };
 };
+
+/**
+* Updates toastNotification in the appState store
+* @param toastNotification
+*/
+export const updateToastNotificationsModal = toastNotification => {
+  return {
+    type: 'UPDATE_TOAST_NOTIFICATIONS_MODAL',
+    toastNotification
+  };
+ };
