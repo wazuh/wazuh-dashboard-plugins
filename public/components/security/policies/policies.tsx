@@ -87,8 +87,13 @@ export const Policies = () => {
             }
             ErrorHandler.info('Policy was successfully created', '');
             await getPolicies();
+            setPolicyName("");
+            setAddedActions([]);
+            setAddedResources([]);
+            setEffectValue(null);
         } catch (error) {
             ErrorHandler.handle(error, 'Error creating policy');
+            return;
         }
         setIsFlyoutVisible(false);
     }
