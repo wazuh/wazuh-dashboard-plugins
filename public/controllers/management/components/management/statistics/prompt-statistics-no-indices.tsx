@@ -10,15 +10,24 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, useReducer } from 'react';
-import { EuiEmptyPrompt, EuiButton, EuiProgress } from '@elastic/eui';
+import React, { useState, useEffect } from 'react';
+import { EuiEmptyPrompt } from '@elastic/eui';
+import { WazuhConfig } from '../../../../../react-services/wazuh-config';
 
 
 export const PromptStatisticsNoIndices = () => {
+  const [indexName, setIndexName] = useState("");
+
+  useEffect(() => {
+    const wazuhConfig = new WazuhConfig();
+    const config = wazuhConfig.getConfig();
+    setIndexName(`${config["cron.prefix"] || 'wazuh'}-${config["cron.statistics.index.name"] || 'stastistics'}-*`)
+  }, []);
+
   return (
     <EuiEmptyPrompt
       iconType="securitySignalDetected"
-      title={<h2>Statistics has no indices</h2>}
+      title={<h2>{indexName} indices were not found.</h2>}
     />
   )
 }
