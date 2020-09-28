@@ -22,7 +22,8 @@ const initialState = {
   showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
   userPermissions: {},
-  userRoles: []
+  userRoles: [],
+  toastNotification: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -109,6 +110,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       selected_settings_section: action.selected_settings_section
+    };
+  }
+
+  if (action.type === 'UPDATE_TOAST_NOTIFICATIONS_MODAL') {
+    return {
+      ...state,
+      toastNotification: action.toastNotification
     };
   }
 

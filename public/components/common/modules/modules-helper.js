@@ -37,18 +37,14 @@ export class ModulesHelper {
   }
 
   static hideCloseButtons = () => {
-    const closeButtons = $(`.globalFilterItem .euiBadge__iconButton`);
-    const optionsButtons = $(`.globalFilterItem .euiBadge__childButton`);
-    for (let i = 0; i < closeButtons.length; i++) {
-      $(closeButtons[i]).addClass('hide-close-button');
-      $(optionsButtons[i]).off('click');
-    }
+    this.activeNoImplicitsFilters()
   };
 
   static activeNoImplicitsFilters() {
     const { filterManager } = getServices();
-    const implicitFilters = filterManager.filters.filter(
-      x => x.$state.isImplicit
+    const implicitFilters = filterManager.filters.filter((x) => {
+      return x.$state.isImplicit
+    }
     );
     if (!(implicitFilters || []).length) {
       setTimeout(() => {
@@ -73,6 +69,8 @@ export class ModulesHelper {
         const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
         $(closeButton).removeClass('hide-close-button');
       } else {
+        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
+        $(closeButton).addClass('hide-close-button');
         const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
         $(optionsButton).on('click', ev => {
           ev.stopPropagation();

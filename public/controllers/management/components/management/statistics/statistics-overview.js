@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from "react";
+import React, { Component, useState, useEffect } from "react";
 import {
   EuiFlexItem,
   EuiFlexGroup,
@@ -24,6 +24,7 @@ import {
   EuiTab,
   EuiSpacer,
   EuiSelect,
+  EuiProgress
 } from "@elastic/eui";
 
 import { clusterNodes } from "../configuration/utils/wz-fetch";
@@ -31,8 +32,14 @@ import { WzStatisticsRemoted } from "./statistics-dashboard-remoted";
 import { WzStatisticsAnalysisd } from "./statistics-dashboard-analysisd";
 import { WzDatePicker } from "../../../../../components/wz-date-picker/wz-date-picker";
 import { AppNavigate } from "../../../../../react-services/app-navigate";
-import store from '../../../../../redux/store';
-import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
+import { compose } from 'redux';
+import { withGuard, withGlobalBreadcrumb } from "../../../../../components/common/hocs";
+import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
+import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
+import { WazuhConfig } from "../../../../../react-services/wazuh-config";
+import { WzRequest } from '../../../../../react-services/wz-request';
+
+const wzConfig = new WazuhConfig();
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -66,19 +73,9 @@ export class WzStatisticsOverview extends Component {
     };
   }
 
-   setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Statistics' }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
   async componentDidMount() {
     this._isMounted = true;
     try {
-      this.setGlobalBreadcrumb();
       const data = await clusterNodes();
       const nodes = data.data.data.affected_items.map((item) => {
         return { value: item.name, text: `${item.name} (${item.type})` };
@@ -237,4 +234,34 @@ export class WzStatisticsOverview extends Component {
   }
 }
 
-export default WzStatisticsOverview;
+export default compose(
+  withGlobalBreadcrumb([
+    { text: '' },
+    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Statistics' }
+  ]),
+  withGuard(props => {
+    return !((wzConfig.getConfig() || {})['cron.statistics.status']); // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
+  }, PromptStatisticsDisabled)
+)(
+  props => {
+    const [loading, setLoading] = useState(false);
+    const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
+    useEffect(() => {
+      const fetchData = async () => {
+        try{
+          setLoading(true);
+          const data = await WzRequest.genericReq('GET', '/elastic/statistics');
+          setExistStatisticsIndices(data.data);
+        }catch(error){}
+        setLoading(false);
+      };
+  
+      fetchData();
+    }, []);
+    if(loading){
+      return <EuiProgress size="xs" color="primary" />
+    }
+    return existStatisticsIndices ? <WzStatisticsOverview {...props}/> : <PromptStatisticsNoIndices {...props}/>
+  }
+);
