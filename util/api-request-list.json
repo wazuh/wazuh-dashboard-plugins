@@ -7715,6 +7715,32 @@
               "default": false
             }
           }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "properties": {
+              "arguments": {
+                "description": "Command arguments",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "command": {
+                "description": "Command running in the agent. If this value starts by `!`, then it refers to a script name instead of a command name",
+                "type": "string"
+              },
+              "custom": {
+                "description": "Whether the specified command is a custom command or not",
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "command"
+            ]
+          }
         ]
       },
       {
@@ -8209,6 +8235,125 @@
               "default": false
             }
           }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "minProperties": 1,
+            "properties": {
+              "access": {
+                "description": "API Security Options",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "max_login_attempts": {
+                    "description": "Maximum number of login attempts in {block_time} seconds",
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 1,
+                    "example": 5
+                  },
+                  "block_time": {
+                    "description": "Blocking time for IPs that have exceeded {max_login_attempts}. Time counts from the first attempt",
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0,
+                    "example": 300
+                  },
+                  "max_request_per_minute": {
+                    "description": "Maximum number of requests allowed per minute",
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 1,
+                    "example": 300
+                  }
+                }
+              },
+              "behind_proxy_server": {
+                "description": "Set this option to \"yes\" in case the API is running behind a proxy server.",
+                "type": "boolean",
+                "default": false
+              },
+              "logs": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "level": {
+                    "description": "Verbosity level of API logs.",
+                    "default": "info",
+                    "type": "string",
+                    "enum": [
+                      "disabled",
+                      "info",
+                      "warning",
+                      "error",
+                      "debug",
+                      "debug2"
+                    ]
+                  }
+                }
+              },
+              "cache": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "description": "Enable cache.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "time": {
+                    "description": "Cache expiration time in seconds.",
+                    "type": "number",
+                    "format": "double",
+                    "minimum": 0,
+                    "example": 0.75
+                  }
+                }
+              },
+              "cors": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "description": "Enable CORS",
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "source_route": {
+                    "description": "Sources for which the resources will be available. For example 'http://client.example.org'",
+                    "type": "string",
+                    "example": "*"
+                  },
+                  "expose_headers": {
+                    "description": "Which headers can be exposed as part of the response.",
+                    "type": "string",
+                    "example": "*"
+                  },
+                  "allow_headers": {
+                    "description": "Which HTTP headers can be used during the actual request.",
+                    "type": "string",
+                    "example": "*"
+                  },
+                  "allow_credentials": {
+                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled.",
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              },
+              "use_only_authd": {
+                "description": "Force the use of authd when adding and removing agents.",
+                "type": "boolean",
+                "default": false
+              },
+              "experimental_features": {
+                "description": "Enable features under development.",
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
         ]
       },
       {
@@ -8313,6 +8458,125 @@
               "default": false
             }
           }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "minProperties": 1,
+            "properties": {
+              "access": {
+                "description": "API Security Options",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "max_login_attempts": {
+                    "description": "Maximum number of login attempts in {block_time} seconds",
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 1,
+                    "example": 5
+                  },
+                  "block_time": {
+                    "description": "Blocking time for IPs that have exceeded {max_login_attempts}. Time counts from the first attempt",
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0,
+                    "example": 300
+                  },
+                  "max_request_per_minute": {
+                    "description": "Maximum number of requests allowed per minute",
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 1,
+                    "example": 300
+                  }
+                }
+              },
+              "behind_proxy_server": {
+                "description": "Set this option to \"yes\" in case the API is running behind a proxy server.",
+                "type": "boolean",
+                "default": false
+              },
+              "logs": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "level": {
+                    "description": "Verbosity level of API logs.",
+                    "default": "info",
+                    "type": "string",
+                    "enum": [
+                      "disabled",
+                      "info",
+                      "warning",
+                      "error",
+                      "debug",
+                      "debug2"
+                    ]
+                  }
+                }
+              },
+              "cache": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "description": "Enable cache.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "time": {
+                    "description": "Cache expiration time in seconds.",
+                    "type": "number",
+                    "format": "double",
+                    "minimum": 0,
+                    "example": 0.75
+                  }
+                }
+              },
+              "cors": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "description": "Enable CORS",
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "source_route": {
+                    "description": "Sources for which the resources will be available. For example 'http://client.example.org'",
+                    "type": "string",
+                    "example": "*"
+                  },
+                  "expose_headers": {
+                    "description": "Which headers can be exposed as part of the response.",
+                    "type": "string",
+                    "example": "*"
+                  },
+                  "allow_headers": {
+                    "description": "Which HTTP headers can be used during the actual request.",
+                    "type": "string",
+                    "example": "*"
+                  },
+                  "allow_credentials": {
+                    "description": "Browsers will only expose the response to frontend JavaScript code if this is enabled.",
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              },
+              "use_only_authd": {
+                "description": "Force the use of authd when adding and removing agents.",
+                "type": "boolean",
+                "default": false
+              },
+              "experimental_features": {
+                "description": "Enable features under development.",
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
         ]
       },
       {
@@ -8411,6 +8675,30 @@
               "default": false
             }
           }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "minProperties": 1,
+            "properties": {
+              "auth_token_exp_timeout": {
+                "description": "Time in seconds until the token expires",
+                "type": "integer",
+                "format": "int32",
+                "minimum": 30,
+                "example": 3600
+              },
+              "rbac_mode": {
+                "description": "RBAC mode (white/black)",
+                "type": "string",
+                "enum": [
+                  "white",
+                  "black"
+                ],
+                "example": "white"
+              }
+            }
+          }
         ]
       },
       {
@@ -8448,6 +8736,46 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Policy name",
+                "type": "string"
+              },
+              "policy": {
+                "description": "This is the definition of the new policy",
+                "type": "object",
+                "properties": {
+                  "actions": {
+                    "type": "array",
+                    "description": "These are the actions that the policy performs",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": {
+                    "type": "array",
+                    "description": "Resources accessed by policy",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "effect": {
+                    "type": "string",
+                    "description": "Effect of the policy"
+                  }
+                },
+                "required": [
+                  "actions",
+                  "resources",
+                  "effect"
+                ]
+              }
             }
           }
         ]
@@ -8489,6 +8817,17 @@
               "default": false
             }
           }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Role name"
+              }
+            }
+          }
         ]
       },
       {
@@ -8526,6 +8865,21 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Rule name"
+              },
+              "rule": {
+                "type": "object",
+                "description": "Rule body"
+              }
             }
           }
         ]
@@ -8847,6 +9201,50 @@
               "default": false
             }
           }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "policy"
+            ],
+            "properties": {
+              "name": {
+                "description": "Policy name",
+                "type": "string"
+              },
+              "policy": {
+                "description": "This is the definition of the new policy",
+                "type": "object",
+                "properties": {
+                  "actions": {
+                    "type": "array",
+                    "description": "These are the actions that the policy performs",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": {
+                    "type": "array",
+                    "description": "Resources accessed by policy",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "effect": {
+                    "type": "string",
+                    "description": "Effect of the policy"
+                  }
+                },
+                "required": [
+                  "actions",
+                  "resources",
+                  "effect"
+                ]
+              }
+            }
+          }
         ]
       },
       {
@@ -8872,6 +9270,20 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Role name"
+              }
             }
           }
         ]
@@ -9013,6 +9425,25 @@
               "default": false
             }
           }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "rule"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Rule name"
+              },
+              "rule": {
+                "type": "object",
+                "description": "Rule body"
+              }
+            }
+          }
         ]
       },
       {
@@ -9031,6 +9462,12 @@
             "schema": {
               "type": "boolean"
             }
+          }
+        ],
+        "body": [
+          {
+            "name": "type",
+            "type": "object"
           }
         ]
       },

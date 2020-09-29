@@ -151,11 +151,16 @@ const formatEndpoint = (endpointData, jsonData, documentationData) => {
       && endpointData.requestBody.content
       && endpointData.requestBody.content['application/json']
       && endpointData.requestBody.content['application/json'].schema
-      && endpointData.requestBody.content['application/json'].schema.properties
-      && Object.keys(endpointData.requestBody.content['application/json'].schema.properties)
-        .map(bodyParamKey => ({name: bodyParamKey, ...endpointData.requestBody.content['application/json'].schema.properties[bodyParamKey]}))
-        .map((parameter) => extendParamReference(parameter, jsonData))
-    ) || [];
+      && ((endpointData.requestBody.content['application/json'].schema.properties
+          && Object.keys(endpointData.requestBody.content['application/json'].schema.properties)
+            .map(bodyParamKey => ({name: bodyParamKey, ...endpointData.requestBody.content['application/json'].schema.properties[bodyParamKey]}))
+            .map((parameter) => extendParamReference(parameter, jsonData))
+        ) || (endpointData.requestBody.content['application/json'].schema
+          && Object.keys(endpointData.requestBody.content['application/json'].schema)
+            .map(bodyParamKey => ({name: bodyParamKey, ...endpointData.requestBody.content['application/json'].schema}))
+            .map((parameter) => extendParamReference(parameter, jsonData))
+        )
+    )) || [];
   const endpointPath = formatEndpointPath(endpointData.path);
   const endpointDocumentation = (documentationData && documentationData[endpointData.method].find(documentationEndpoint => documentationEndpoint.path === endpointPath) || {}).documentation || '';
   const endpointSummary = endpointData.summary || '';
