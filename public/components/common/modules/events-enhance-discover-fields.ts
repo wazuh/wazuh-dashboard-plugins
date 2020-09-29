@@ -136,9 +136,9 @@ export const enhanceDiscoverEvents = (discoverRowsData, options) => {
     elementsFields.forEach((row, rowIdx) => {
       const parentNode = row.parentNode;
       const currentRowField = row.childNodes[0].childNodes[1].textContent || "";
-      const valueElement = parentNode?.childNodes[2];
+      const valueElement = parentNode.childNodes && parentNode.childNodes[2];
       if(EventsEnhanceDiscoverCell[currentRowField]){
-        enhanceDiscoverEventsCell(currentRowField, valueElement?.textContent, discoverRowsData[rowIdx], valueElement, options)
+        enhanceDiscoverEventsCell(currentRowField, valueElement.textContent || '', discoverRowsData[rowIdx], valueElement, options)
       }
     })
   });
