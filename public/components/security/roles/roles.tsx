@@ -66,7 +66,7 @@ export const Roles = () => {
     flyout = (
       <EuiOverlayMask 
         headerZindexLocation="below"
-        onClick={(e) => { e.target.className === 'euiOverlayMask' && setIsFlyoutVisible(false) }}>
+        onClick={() => {setIsFlyoutVisible(false) }}>
         <CreateRole closeFlyout={closeFlyout} />
       </EuiOverlayMask >
     );
@@ -88,7 +88,7 @@ export const Roles = () => {
     editFlyout = (
       <EuiOverlayMask 
         headerZindexLocation="below"
-        onClick={async (e) => { e.target.className === 'euiOverlayMask' && await closeEditingFlyout(); }}>
+        onClick={async () => {await closeEditingFlyout(); }}>
         <EditRole role={editingRole} closeFlyout={closeEditingFlyout} />
       </EuiOverlayMask >
     );

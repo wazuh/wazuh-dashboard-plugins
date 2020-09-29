@@ -58,7 +58,7 @@ export const ToastNotificationsModal = withReduxProvider(() => {
   ${errorStack}
   \`\`\``
   return (
-    <EuiOverlayMask  onClick={(e: Event) => e.target.className === 'euiOverlayMask' && closeModal()}>
+    <EuiOverlayMask  onClick={() => closeModal()}>
       <EuiModal onClose={closeModal}>
         <EuiModalHeader>
           <EuiModalHeaderTitle>{toastNotification.title}</EuiModalHeaderTitle>
