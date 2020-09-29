@@ -91,7 +91,7 @@ export const Users = () => {
     editFlyout = (
       <EuiOverlayMask
         headerZindexLocation="below"
-        onClick={(e) => { e.target.className === 'euiOverlayMask' && setIsEditFlyoutVisible(false) }}>
+        onClick={() => {setIsEditFlyoutVisible(false) }}>
         <EditUser currentUser={editingUser} closeFlyout={closeEditFlyout} userRoles={relationUserRole[editingUser.user] || []} rolesObject={roles} />
       </EuiOverlayMask >
     );

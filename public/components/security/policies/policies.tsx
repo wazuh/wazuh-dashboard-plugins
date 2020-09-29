@@ -281,7 +281,7 @@ export const Policies = () => {
   if (isEditingPolicy) {
     editFlyout = (<EuiOverlayMask
       headerZindexLocation="below"
-      onClick={(e) => { e.target.className === 'euiOverlayMask' && closeEditingFlyout() }} >
+      onClick={() => {closeEditingFlyout() }} >
       <EditPolicyFlyout closeFlyout={closeEditingFlyout} policy={editingPolicy} />
     </EuiOverlayMask>)
   }
@@ -290,7 +290,7 @@ export const Policies = () => {
     flyout = (
       <EuiOverlayMask 
         headerZindexLocation="below"
-        onClick={(e) => { e.target.className === 'euiOverlayMask' && setIsFlyoutVisible(false) }}>
+        onClick={() => {setIsFlyoutVisible(false) }}>
         <EuiFlyout
           onClose={() => setIsFlyoutVisible(false)}>
           <EuiFlyoutHeader hasBorder={false}>

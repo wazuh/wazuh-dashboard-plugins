@@ -126,9 +126,20 @@ export const enhanceDiscoverEvents = (discoverRowsData, options) => {
     // Ignore the columns whose field doesn't need to be enhanced
     if(!EventsEnhanceDiscoverCell[header.textContent]){ return };
     // Get cells of table header column to be enhanced
-    const elements = document.querySelectorAll(`.kbn-table tbody tr td:nth-child(${headerIndex+1}) div:not([${CUSTOM_ATTRIBUTE_ENHANCED_DISCOVER_FIELD}])`);
+    const elements = document.querySelectorAll(`.kbn-table tbody tr td:nth-child(${headerIndex+1}) div:not([${CUSTOM_ATTRIBUTE_ENHANCED_DISCOVER_FIELD}]) `);
+    const elementsFields = document.querySelectorAll(`.kbn-table tbody tr td .kbnDocViewer__field`);
     elements.forEach((elementRow, elementRowIndex) => {
-      enhanceDiscoverEventsCell(header.textContent, elementRow.textContent, discoverRowsData[elementRowIndex], elementRow, options)
+      if(!elementRow.className.includes('kbnDocViewer__value')){
+        enhanceDiscoverEventsCell(header.textContent, elementRow.textContent, discoverRowsData[elementRowIndex], elementRow, options)
+      }
+    })
+    elementsFields.forEach((row, rowIdx) => {
+      const parentNode = row.parentNode;
+      const currentRowField = row.childNodes[0].childNodes[1].textContent || "";
+      const valueElement = parentNode?.childNodes[2];
+      if(EventsEnhanceDiscoverCell[currentRowField]){
+        enhanceDiscoverEventsCell(currentRowField, valueElement?.textContent, discoverRowsData[rowIdx], valueElement, options)
+      }
     })
   });
 }
