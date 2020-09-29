@@ -82,7 +82,7 @@ const main = async () => {
         accum[httpMethodUppercase] = [...accum[httpMethodUppercase], formatEndpoint({...endpointData[httpMethod], path: endpointPath, method: httpMethodUppercase}, jsonData, documentationData)]
       });
       return accum;
-    }, ['GET', 'PUT', 'POST', 'DELETE', 'HEAD', 'PATCH'].reduce((accum, httpMethod) => ({...accum, [httpMethod]: []}), {}));
+    }, ['GET', 'PUT', 'POST', 'DELETE'].reduce((accum, httpMethod) => ({...accum, [httpMethod]: []}), {}));
     // Map extracted endpoints to <{ method: ('GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD'), endpoints: endpoint[]}>[]
     const resultEndpoints = Object.keys(extractedEndpoints).map(httpMethod => ({method: httpMethod, endpoints: extractedEndpoints[httpMethod].sort(sortAlphabeticalByNameProp)}));
     // Create the directory, if this doesn't exist, where the output file will be created

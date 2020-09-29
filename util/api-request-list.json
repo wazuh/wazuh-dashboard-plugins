@@ -10001,13 +10001,5 @@
         ]
       }
     ]
-  },
-  {
-    "method": "HEAD",
-    "endpoints": []
-  },
-  {
-    "method": "PATCH",
-    "endpoints": []
   }
 ]
