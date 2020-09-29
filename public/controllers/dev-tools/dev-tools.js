@@ -367,7 +367,7 @@ export class DevToolsController {
     const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
+        'GET /agents?status=active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
         JSON.stringify({ name: "NewAgent" }, null, 2);
 
       AppState.setCurrentDevTools(demoStr);
@@ -378,43 +378,87 @@ export class DevToolsController {
     this.groups = this.analyzeGroups();
     const currentGroup = this.calculateWhichGroup();
     this.highlightGroup(currentGroup);
-
+    const self = this;
     // Register our custom Codemirror hint plugin.
     CodeMirror.registerHelper('hint', 'dictionaryHint', function(editor) {
       const model = editor.model;
       function getDictionary(line, word) {
         let hints = [];
         const exp = line.split(/\s+/g);
-        if (exp[0] && exp[0].match(/^(?:GET|PUT|POST|DELETE).*$/)) {
-          let method = model.find(function(item) {
-            return item.method === exp[0];
-          });
-          const forbidChars = /^[^?{]+$/;
-          if (method && !exp[2] && forbidChars.test(word)) {
-            method.endpoints.forEach(function(endpoint) {
-              endpoint.path = endpoint.name;
-              if (endpoint.args && endpoint.args.length > 0) {
-                let argSubs = [];
-                endpoint.args.forEach(function(arg) {
-                  const pathSplitted = endpoint.name.split('/');
-                  const arrayIdx = pathSplitted.indexOf(arg.name);
-                  const wordSplitted = word.split('/');
-                  if (wordSplitted[arrayIdx] && wordSplitted[arrayIdx] != '') {
-                    argSubs.push({
-                      id: arg.name,
-                      value: wordSplitted[arrayIdx]
-                    });
-                  }
-                });
-                let auxPath = endpoint.name;
-                argSubs.forEach(function(arg) {
-                  auxPath = auxPath.replace(arg.id, arg.value);
-                });
-                endpoint.path = auxPath;
+        const currentGroup = self.calculateWhichGroup();
+        const editorCursor = editor.getCursor();
+        const [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] = (currentGroup && currentGroup.requestText && currentGroup.requestText.match(/^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/)) || [];
+        const inputEndpoint = inputPath && inputPath.split('/').filter(item => item).map(item => item.toLowerCase()) || [];
+        if(exp[0] && currentGroup && currentGroup.start === editorCursor.line && !word.includes('{')){
+          // Get API endpoint path hints
+          if(inputHttpMethod && inputPath && inputQueryParamsStart){
+            const inputQuery = inputQueryParams && inputQueryParams.split('&').filter(item => item).map(item => {
+              const [key, value] = item.split('=');
+              return { key, value };
+            }) || [];
+            const definingQueryParamValue = inputQueryParams && inputQueryParams.includes('&') ? inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('&') : (inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('?'));
+            const apiEndpoint = ((model.find(item => item.method === inputHttpMethod) || {}).endpoints || [])
+              .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
+              .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
+              .find(endpoint => endpoint.splitURL.reduce((accum,str,index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]),true));
+            if(!definingQueryParamValue && apiEndpoint && apiEndpoint.query){
+              const inputQueryPreviousKeys = inputQuery.filter(query => query.key && query.value).map(query => query.key);
+              hints = apiEndpoint.query
+                .filter(query => !inputQueryPreviousKeys.includes(query.name))
+                .map(item => `${inputPath}${inputQuery
+                  .filter(query => query.key && query.value)
+                  .reduce((accum, query, index) => `${accum}${index > 0 ? '&' : ''}${query.key}=${query.value}`, '?')}${inputQuery.filter(query => query.key && query.value).length > 0 ? '&' : ''}${item.name}=`)
+            };
+          }else if(inputHttpMethod){
+            if(!inputPath){
+              hints = ((model.find(item => item.method === inputHttpMethod) || {}).endpoints || [])
+                .map(endpoint => endpoint.name);
+            }else{
+              hints = ((model.find(item => item.method === inputHttpMethod) || {}).endpoints || [])
+                .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
+                .filter(endpoint => {
+                  return endpoint.splitURL.reduce((accum, splitPath, index) => {
+                    if(!accum){ return accum };
+                    if(splitPath.startsWith(':') || !inputEndpoint[index] || (inputEndpoint[index] && splitPath.startsWith(inputEndpoint[index]))){
+                      return true;
+                    };
+                  }, true);
+                }).map(endpoint => endpoint.splitURL.reduce((accum, splitPath, index) => 
+                    `${accum}/${splitPath.startsWith(':') && inputEndpoint[index] || splitPath}`
+                  , '')
+                )
+            }
+          } 
+        } else if(currentGroup && currentGroup.requestText && currentGroup.requestTextJson && currentGroup.start < editorCursor.line && currentGroup.end > editorCursor.line){
+          // Get API endpoint body hints
+          const reLineStarts = /^\s*(?:"|')[^"|']*(?::)?$/;
+          if(inputHttpMethod && inputPath){
+            const apiEndpoint = ((model.find(item => item.method === inputHttpMethod) || {}).endpoints || [])
+              .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
+              .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
+              .find(endpoint => endpoint.splitURL.reduce((accum,str,index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]),true));
+            if(apiEndpoint && apiEndpoint.body && reLineStarts.test(line)){
+              let inputBodyPreviousKeys
+              try{
+                const textReplaced = currentGroup.requestTextJson.replace(/(,\s*["|']\S*)}$/g, '}');
+                inputBodyPreviousKeys = Object.keys(JSON.parse(textReplaced));
+              }catch(error){
+                inputBodyPreviousKeys = [];
               }
-            });
-            hints = method.endpoints.map(a => a.path);
-          }
+              hints = apiEndpoint.body
+                .filter(bodyParam => !inputBodyPreviousKeys.includes(bodyParam.name))
+                .filter(bodyParam => bodyParam.name)
+                .map(bodyParam => ({
+                  text: `"${bodyParam.name}": ${bodyParam.type === 'string' ? '""' : ''}`,
+                  displayText: bodyParam.name,
+                  hint: (cm, self, data) => {
+                    editor.replaceRange(line.replace(/\S+/,'')+data.text, { line: editorCursor.line, ch: editorCursor.ch }, { line: editorCursor.line, ch: 0 });
+                    const textReplacedLine = editor.getLine(editorCursor.line)
+                    editor.setCursor({line: editorCursor.line, ch: bodyParam.type === 'string' ? textReplacedLine.length - 1 : textReplacedLine.length});
+                  }
+                }));
+            };
+          };
         } else {
           hints = model.map(a => a.method);
         }
@@ -434,6 +478,7 @@ export class DevToolsController {
         list: (!curWord
           ? []
           : getDictionary(curLine, curWord).filter(function(item) {
+              if(item.text){ return true }
               return item.toUpperCase().includes(curWord.toUpperCase());
             })
         ).sort(),
