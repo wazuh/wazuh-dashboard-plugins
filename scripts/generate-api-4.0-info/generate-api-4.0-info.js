@@ -82,7 +82,7 @@ const main = async () => {
         accum[httpMethodUppercase] = [...accum[httpMethodUppercase], formatEndpoint({...endpointData[httpMethod], path: endpointPath, method: httpMethodUppercase}, jsonData, documentationData)]
       });
       return accum;
-    }, ['GET', 'PUT', 'POST', 'DELETE', 'HEAD'].reduce((accum, httpMethod) => ({...accum, [httpMethod]: []}), {}));
+    }, ['GET', 'PUT', 'POST', 'DELETE', 'HEAD', 'PATCH'].reduce((accum, httpMethod) => ({...accum, [httpMethod]: []}), {}));
     // Map extracted endpoints to <{ method: ('GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD'), endpoints: endpoint[]}>[]
     const resultEndpoints = Object.keys(extractedEndpoints).map(httpMethod => ({method: httpMethod, endpoints: extractedEndpoints[httpMethod].sort(sortAlphabeticalByNameProp)}));
     // Create the directory, if this doesn't exist, where the output file will be created
@@ -139,7 +139,11 @@ const request = apiEndpoint => {
 // Formatters
 // Format the endpoint to use in the Wazuh app
 const formatEndpoint = (endpointData, jsonData, documentationData) => {
-  const formattedParameters = endpointData.parameters && endpointData.parameters.filter(parameter => parameter.$ref).map(parameter => {return getNestedObject(jsonData, parameter.$ref.split('/').splice(1))}) || []
+  const formattedParameters = endpointData.parameters && endpointData.parameters
+    .filter(parameter => parameter.$ref)
+    .map(parameter => getNestedObject(jsonData, parameter.$ref.split('/').splice(1)))
+    .map((parameter) => extendParamReference(parameter, jsonData))
+  || [];
   const endpointPathParams = formattedParameters.filter(parameter => parameter.in === 'path');
   const endpointQueryParams = formattedParameters.filter(parameter => parameter.in === 'query');
   const endpointBodyParams = (
@@ -150,6 +154,7 @@ const formatEndpoint = (endpointData, jsonData, documentationData) => {
       && endpointData.requestBody.content['application/json'].schema.properties
       && Object.keys(endpointData.requestBody.content['application/json'].schema.properties)
         .map(bodyParamKey => ({name: bodyParamKey, ...endpointData.requestBody.content['application/json'].schema.properties[bodyParamKey]}))
+        .map((parameter) => extendParamReference(parameter, jsonData))
     ) || [];
   const endpointPath = formatEndpointPath(endpointData.path);
   const endpointDocumentation = (documentationData && documentationData[endpointData.method].find(documentationEndpoint => documentationEndpoint.path === endpointPath) || {}).documentation || '';
@@ -170,11 +175,9 @@ const formatEndpoint = (endpointData, jsonData, documentationData) => {
       ...(endpointBodyParams.length ? {body: endpointBodyParams.map(formatterEndpointParams).sort(sortAlphabeticalByNameProp)} : {})
   };
 };
-//const formatEndpointPathParams = name => ({name});
-//const formatEndpointQueryParams = ({name, description, schema }) => ({name, description, ...schema});
-//const formatEndpointBodyParams = bodyParam => bodyParam;
+
 const formatEndpointSimpleParams = ({name}) => ({name});
-const formatEndpointFullParams = endpointData => endpointData;
+const formatEndpointFullParams = ({ in: typeParam, ...endpointData}) => endpointData;
 const formatterEndpointParams = OUTPUT_MODE_FULL ? formatEndpointFullParams : formatEndpointSimpleParams;
 const formatEndpointPath = endpointPath => endpointPath.replace(reEndpointPathArgs, (capture, group) => {
   return `:${group}`
@@ -201,6 +204,19 @@ const getEndpointPathArgs = endpointPath => {
     tokens.push(capture[1]);
   };
   return tokens;
+};
+
+// Extend the parameter with the reference data
+const extendParamReference = (parameter, jsonData) => {
+  if (parameter.$ref){
+    return { ...getNestedObject(jsonData, parameter.$ref.split('/').splice(1)) }
+  }else if(parameter.schema && parameter.schema.$ref){
+    return { ...parameter, schema: {...getNestedObject(jsonData, parameter.schema.$ref.split('/').splice(1))}};
+  }else if(parameter.schema && parameter.schema.items && parameter.schema.items.$ref){
+    return { ...parameter, schema: {...parameter.schema, items: { ...getNestedObject(jsonData, parameter.schema.items.$ref.split('/').splice(1)) }}};
+  }else{
+    return parameter;
+  };
 };
 
 // Get the nested object defined with a ordered arrays of keys
