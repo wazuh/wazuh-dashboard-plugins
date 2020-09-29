@@ -414,6 +414,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         </div>
         { isFlyoutVisible &&
           <EuiOverlayMask
+            headerZindexLocation="below"
             // @ts-ignore
             onClick={() => this.onChangeFlyout(false) } >
           

@@ -600,7 +600,7 @@ export const Discover = compose(
     };
     const noResultsText = `No results match for this search criteria`;
     let flyout = this.state.showMitreFlyout ? <EuiOverlayMask
-      // @ts-ignore
+      headerZindexLocation="below"
       onClick={this.closeMitreFlyout} >
       <FlyoutTechnique
         openDashboard={(e, itemId) => this.openDashboard(e, itemId)}

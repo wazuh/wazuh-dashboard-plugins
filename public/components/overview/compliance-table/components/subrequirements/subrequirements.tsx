@@ -279,7 +279,9 @@ export class ComplianceSubrequirements extends Component {
         </div>
 
         {this.state.flyoutOn &&
-          <EuiOverlayMask onClick={() => this.closeFlyout() } >
+          <EuiOverlayMask 
+            headerZindexLocation="below"
+            onClick={() => this.closeFlyout() } >
             <RequirementFlyout
               currentRequirement={this.state.selectedRequirement}
               onChangeFlyout={this.onChangeFlyout}

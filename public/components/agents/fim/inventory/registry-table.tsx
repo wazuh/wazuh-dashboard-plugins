@@ -70,7 +70,7 @@ export class RegistryTable extends Component {
     await this.getSyscheck();
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
-    this.setState({totalItems: this.props.totalItems});
+    this.setState({ totalItems: this.props.totalItems });
     if (match && match[0]) {
       const file = match[0].split('=')[1];
       this.showFlyout(decodeURIComponent(file), true);
@@ -97,8 +97,8 @@ export class RegistryTable extends Component {
       })
     } else {
       const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
-        params: { 
-          'file': file 
+        params: {
+          'file': file
         }
       });
       fileData = ((response.data || {}).data || {}).affected_items || [];
@@ -106,7 +106,7 @@ export class RegistryTable extends Component {
     if (!redirect)
       window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item}));
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item }));
   }
 
   async getSyscheck() {
@@ -125,7 +125,7 @@ export class RegistryTable extends Component {
         error: undefined,
       });
     } catch (error) {
-      this.setState({error, isLoading: false})
+      this.setState({ error, isLoading: false })
     }
   }
 
@@ -234,16 +234,16 @@ export class RegistryTable extends Component {
         {registryTable}
         {this.state.isFlyoutVisible && (
           <EuiOverlayMask
-            onClick={() => this.closeFlyout()}
-          >
+            headerZindexLocation="below"
+            onClick={() => this.closeFlyout()} >
             <FlyoutDetail
-            fileName={this.state.currentFile.file}
-            agentId={this.props.agent.id}
-            item={this.state.syscheckItem}
-            closeFlyout={() => this.closeFlyout()}
-            type='registry'
-            view='inventory'
-            {...this.props} />
+              fileName={this.state.currentFile.file}
+              agentId={this.props.agent.id}
+              item={this.state.syscheckItem}
+              closeFlyout={() => this.closeFlyout()}
+              type='registry'
+              view='inventory'
+              {...this.props} />
           </EuiOverlayMask>
         )}
       </div>

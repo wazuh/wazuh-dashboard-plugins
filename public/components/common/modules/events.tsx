@@ -95,6 +95,7 @@ export class Events extends Component {
       <Fragment>
         {flyout && (
           <EuiOverlayMask
+            headerZindexLocation="below"
             // @ts-ignore
             onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
             <FlyoutComponent
