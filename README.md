@@ -119,18 +119,18 @@ sudo chown kibana:kibana /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 sudo chmod 600 /usr/share/kibana/optimize/wazuh/config/wazuh.yml
 ```
 
-Restart Kibana
+Start Kibana
 
 - Systemd:
 
 ```
-sudo systemctl restart kibana
+sudo systemctl start kibana
 ```
  
 - SysV Init: 
  
 ``` 
-sudo service kibana restart 
+sudo service kibana start 
 ```
 
  
