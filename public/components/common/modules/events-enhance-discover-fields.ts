@@ -138,7 +138,7 @@ export const enhanceDiscoverEvents = (discoverRowsData, options) => {
       const currentRowField = row.childNodes[0].childNodes[1].textContent || "";
       const valueElement = parentNode?.childNodes[2];
       if(EventsEnhanceDiscoverCell[currentRowField]){
-        enhanceDiscoverEventsCell(currentRowField, valueElement?.textContent, discoverRowsData[rowIdx], valueElement, options)
+        enhanceDiscoverEventsCell(currentRowField, valueElement.textContent, discoverRowsData[rowIdx], valueElement, options)
       }
     })
   });
