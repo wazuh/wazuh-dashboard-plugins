@@ -47,7 +47,7 @@ export const ToastNotificationsModal = withReduxProvider(() => {
       setIsOpen(true);
     }
   }, [toastNotification]);
-  console.log('toastNotification',toastNotification)
+
   if(!toastNotification){
     return null;
   };
