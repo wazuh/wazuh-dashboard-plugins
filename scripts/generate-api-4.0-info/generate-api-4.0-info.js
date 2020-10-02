@@ -28,8 +28,8 @@ const reFormatter = /--full/
 const OUTPUT_ENDPOINTS_FILENAME = `${(consoleInput.match(reFilename) || [])[1] || 'api-4.0-endpoints'}.json`;
 const OUTPUT_ENDPOINTS_DIRECTORY = `./endpoints`;
 const OUTPUT_ENDPOINTS_PATH = `${OUTPUT_ENDPOINTS_DIRECTORY}/${OUTPUT_ENDPOINTS_FILENAME}`;
-const DOCUMENTATION_FILE_PATH = `./documentation`;
 const OUTPUT_MODE_FULL = consoleInput.match(reFormatter) && true;
+const WAZUH_DOCUMENTATION_API_REFERENCE_URL = 'https://documentation.wazuh.com/current/user-manual/api/reference.html'
 
 // Define console color codes
 const CONSOLE_COLORS_CODES = {
@@ -53,13 +53,6 @@ const main = async () => {
   if(!WAZUH_API_URL.startsWith('http') ){
     exitWithMessage(`Wazuh API url is not valid. It should start with "http". Example: https://172.16.1.2:55000`);
   };
-  // Try to load the documentation data
-  let documentationData;
-  try{
-    documentationData = require(DOCUMENTATION_FILE_PATH);
-  }catch(error){
-    logger.warning(`Documentation file doesn't exist`);
-  }
 
   try{
     // Log the configuration:
@@ -67,7 +60,6 @@ const main = async () => {
     console.log(`Wazuh API url: ${WAZUH_API_URL}`);
     console.log(`Output file path: ${OUTPUT_ENDPOINTS_PATH}`);
     console.log(`Output mode: ${OUTPUT_MODE_FULL ? 'Full': 'Simple'}`);
-    console.log(`Documentation path: ${DOCUMENTATION_FILE_PATH}`);
     console.log('----------------------------------------------')
 
     // Request to API swagger.json file
@@ -79,7 +71,7 @@ const main = async () => {
       const endpointData = jsonData.paths[endpointPath];
       Object.keys(endpointData).forEach(httpMethod => {
         const httpMethodUppercase = httpMethod.toUpperCase();
-        accum[httpMethodUppercase] = [...accum[httpMethodUppercase], formatEndpoint({...endpointData[httpMethod], path: endpointPath, method: httpMethodUppercase}, jsonData, documentationData)]
+        accum[httpMethodUppercase] = [...accum[httpMethodUppercase], formatEndpoint({...endpointData[httpMethod], path: endpointPath, method: httpMethodUppercase}, jsonData)]
       });
       return accum;
     }, ['GET', 'PUT', 'POST', 'DELETE'].reduce((accum, httpMethod) => ({...accum, [httpMethod]: []}), {}));
@@ -96,9 +88,6 @@ const main = async () => {
         return logger.error('An error appeared saving the output file:', error);
       }
       logger.success(`File was created! Path: ${OUTPUT_ENDPOINTS_PATH}`);
-      if(!documentationData){
-        logger.warning(`Documentation file doesn't exist and the endpoints have not documentation links`);
-      };
     });
   }catch(error){
     logger.error('An error appeared:', error);
@@ -138,7 +127,7 @@ const request = apiEndpoint => {
 }
 // Formatters
 // Format the endpoint to use in the Wazuh app
-const formatEndpoint = (endpointData, jsonData, documentationData) => {
+const formatEndpoint = (endpointData, jsonData) => {
   const formattedParameters = endpointData.parameters && endpointData.parameters
     .filter(parameter => parameter.$ref)
     .map(parameter => getNestedObject(jsonData, parameter.$ref.split('/').splice(1)))
@@ -162,13 +151,10 @@ const formatEndpoint = (endpointData, jsonData, documentationData) => {
         )
     )) || [];
   const endpointPath = formatEndpointPath(endpointData.path);
-  const endpointDocumentation = (documentationData && documentationData[endpointData.method].find(documentationEndpoint => documentationEndpoint.path === endpointPath) || {}).documentation || '';
+  const endpointDocumentation = generateEndpointDocumentationLink(endpointData);
   const endpointSummary = endpointData.summary || '';
   const endpointDescription = endpointData.description || '';
   const endpointTags = endpointData.tags || [];
-  if(!endpointDocumentation){
-    logger.warning(`[${endpointData.method} ${endpointPath}] has not documentation link`);
-  };
   return {
       name: endpointPath,
       documentation: endpointDocumentation,
@@ -245,9 +231,14 @@ const logger = {
   error: createLog('ERROR', CONSOLE_COLORS_CODES.RED),
 };
 
+// Log a message and end script
 const exitWithMessage = message => {
   logger.error(message);
   process.exit(1);
-}
+};
+
+// Generate the endpoint documentation link
+const generateEndpointDocumentationLink = endpointData => `${WAZUH_DOCUMENTATION_API_REFERENCE_URL}#operation/${endpointData.operationId}`;
+
 // Run the method
 main();
