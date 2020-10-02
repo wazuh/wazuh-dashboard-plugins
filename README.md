@@ -68,13 +68,17 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 ![Overview](/public/img/app4.png)
 
-**Agents overview**
+**Regulatory compliance**
 
 ![Overview](/public/img/app5.png)
 
-**Agent summary**
+**Agents overview**
 
 ![Overview](/public/img/app6.png)
+
+**Agent summary**
+
+![Overview](/public/img/app7.png)
 
 ## Branches
 
@@ -83,10 +87,10 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 ## Requisites
 
-- Wazuh HIDS 3.13.1
-- Wazuh RESTful API 3.13.1
-- Kibana 7.8.1
-- Elasticsearch 7.8.1
+- Wazuh HIDS 4.0.0
+- Wazuh RESTful API 4.0.0
+- Kibana 7.9.1
+- Elasticsearch 7.9.1
 
 ## Installation
 
@@ -94,7 +98,7 @@ Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.8.1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-4.0.0_7.9.1.zip
 ```
 
 Restart Kibana
@@ -160,7 +164,7 @@ Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.8.1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-4.0.0_7.9.1.zip
 ```
 
 Update configuration file permissions.
@@ -189,6 +193,12 @@ service kibana restart
  
 | Wazuh app | Kibana | Open Distro | Package                                                         |
 | :-------: | :----: | :---------: | :-------------------------------------------------------------- |
+|   4.0.0   |  7.9.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-4.0.0_7.9.1.zip>  |
+|   4.0.0   |  7.8.0 |    1.9.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-4.0.0_7.8.0.zip>  |
+|   3.13.2  |  7.9.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.2_7.9.1.zip> |
+|   3.13.2  |  7.8.0 |    1.9.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.2_7.8.0.zip> |
+|   3.13.1  |  7.9.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.9.1.zip> |
+|   3.13.1  |  7.9.0 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.9.0.zip> |
 |   3.13.1  |  7.8.1 |             | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.8.1.zip> |
 |   3.13.1  |  7.8.0 |    1.9.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.1_7.8.0.zip> |
 |   3.13.0  |  7.8.0 |    1.9.0    | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.13.0_7.8.0.zip> |

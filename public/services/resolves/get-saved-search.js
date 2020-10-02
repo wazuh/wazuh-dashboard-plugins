@@ -15,7 +15,7 @@ import { createSavedSearchesLoader } from '../../../../../src/plugins/discover/p
 import { npStart } from 'ui/new_platform';
 import {
   redirectWhenMissing,
-} from 'plugins/kibana/discover/kibana_services';
+} from '../../../../../src/plugins/discover/public/kibana_services';
 
 export function getSavedSearch(
   $location,

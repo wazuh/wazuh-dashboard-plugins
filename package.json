@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
   "version": "4.0.0",
-  "revision": "4001",
-  "code": "4001-0",
+  "revision": "4002",
+  "code": "4002-0",
   "kibana": {
-    "version": "7.8.0"
+    "version": "7.9.2"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -66,7 +66,7 @@
     "brace": "^0.11.1"
   },
   "devDependencies": {
-    "@elastic/plugin-helpers": "^7.1.8",
+    "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
     "@types/node-cron": "^2.0.3",
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",

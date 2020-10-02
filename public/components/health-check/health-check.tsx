@@ -3,7 +3,7 @@ import { EuiLoadingSpinner, EuiDescriptionList, EuiIcon, EuiCallOut, EuiSpacer, 
 import chrome from 'ui/chrome';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from '../../../../../src/plugins/discover/public/kibana_services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';

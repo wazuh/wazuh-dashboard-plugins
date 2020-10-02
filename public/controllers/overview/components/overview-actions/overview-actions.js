@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../../src/plugins/discover/public/kibana_services';
 import store from '../../../../redux/store';
 import { connect } from 'react-redux';
 import { showExploreAgentModal, updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
@@ -31,6 +31,7 @@ import {
 import './agents-selector.less';
 import { AgentSelectionTable } from './agents-selection-table';
 import { WAZUH_ALERTS_PATTERN } from '../../../../../util/constants';
+import { AppState } from '../../../../react-services/app-state';
 class OverviewActions extends Component {
   constructor(props) {
     super(props);
@@ -113,7 +114,7 @@ class OverviewActions extends Component {
             "negate": false,
             "params": { "query": agentIdList[0] },
             "type": "phrase",
-            "index": WAZUH_ALERTS_PATTERN
+            "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
           },
           "query": {
             "match": {
@@ -145,7 +146,7 @@ class OverviewActions extends Component {
 
     if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
       modal = (
-        <EuiOverlayMask onClick={(e) => { e.target.className === 'euiOverlayMask' && this.closeAgentModal() }}>
+        <EuiOverlayMask onClick={() => this.closeAgentModal()}>
           <EuiModal
             className="wz-select-agent-modal"
             onClose={() => this.closeAgentModal()}

@@ -22,7 +22,7 @@ import { IFilterParams, getIndexPattern } from './lib';
 
 import {  FilterManager, Filter } from '../../../../../../src/plugins/data/public/';
 //@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { KbnSearchBar } from '../../kbn-search-bar';
 import { TimeRange, Query } from '../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../common/modules/modules-helper';

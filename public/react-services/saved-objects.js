@@ -11,7 +11,7 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../src/plugins/discover/public/kibana_services';
 
 export class SavedObject {
   /**
@@ -156,7 +156,8 @@ export class SavedObject {
         {
           attributes: {
             fields: JSON.stringify(fields.data.fields),
-            timeFieldName: 'timestamp'
+            timeFieldName: 'timestamp',
+            title: id
           }
         }
       );

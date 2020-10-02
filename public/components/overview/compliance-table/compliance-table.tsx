@@ -20,7 +20,7 @@ import { KibanaContextProvider } from '../../../../../../src/plugins/kibana_reac
 
 import { I18nProvider } from '@kbn/i18n/react';
 //@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
 import { getElasticAlerts, getIndexPattern, IFilterParams } from '../mitre/lib';
@@ -88,7 +88,7 @@ export class ComplianceTable extends Component {
     this.buildComplianceObject();
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     this.filtersSubscriber.unsubscribe();
   }
 
@@ -280,18 +280,18 @@ export class ComplianceTable extends Component {
       </EuiFlexGroup>
 
       <EuiFlexGroup style={{ margin: '0 8px' }}>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ width: "calc(100% - 24px)" }}>
           <EuiPanel paddingSize="none">
             {!!Object.keys(complianceObject).length && this.state.filterParams.time.from !== "init" &&
               <EuiFlexGroup>
-                  <EuiFlexItem grow={false} style={{width: "15%", minWidth: 145, maxHeight: "calc(100vh - 300px)",overflowX: "hidden"}}>
+                <EuiFlexItem grow={false} style={{ width: "15%", minWidth: 145, maxHeight: "calc(100vh - 300px)", overflowX: "hidden" }}>
                   <ComplianceRequirements
                     indexPattern={this.indexPattern}
                     section={this.props.section}
                     onChangeSelectedRequirements={this.onChangeSelectedRequirements}
                     {...this.state} />
                 </EuiFlexItem>
-                <EuiFlexItem>
+                <EuiFlexItem style={{ width: "15%" }}>
                   <ComplianceSubrequirements
                     indexPattern={this.indexPattern}
                     filters={this.state.filterParams}

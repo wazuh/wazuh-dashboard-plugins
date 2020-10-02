@@ -11,7 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { getAngularModule } from 'plugins/kibana/discover/kibana_services';
+import { getAngularModule } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { EventsSelectedFiles } from './events-selected-fields';
 import { ModulesHelper } from './modules-helper';
 import store from '../../../redux/store';
@@ -95,8 +95,9 @@ export class Events extends Component {
       <Fragment>
         {flyout && (
           <EuiOverlayMask
+            headerZindexLocation="below"
             // @ts-ignore
-            onClick={(e: Event) => { e.target.className === 'euiOverlayMask' && this.closeFlyout() }} >
+            onClick={() => { this.closeFlyout() }} >
             <FlyoutComponent
               closeFlyout={this.closeFlyout}
               {...this.state.flyout.props}

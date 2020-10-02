@@ -11,7 +11,7 @@
  */
 import { useState, useEffect } from 'react';
 //@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 
 export function useTimeFilter() {
   const { timefilter, } = getServices();

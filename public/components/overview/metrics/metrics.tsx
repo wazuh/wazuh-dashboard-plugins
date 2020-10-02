@@ -20,7 +20,7 @@ import { FilterManager } from '../../../../../../src/plugins/data/public/';
 import { buildRangeFilter, buildPhrasesFilter,buildPhraseFilter, buildExistsFilter} from '../../../../../../src/plugins/data/common';
 
 //@ts-ignore
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
 import { ModulesHelper } from '../../common/modules/modules-helper'
 

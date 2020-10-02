@@ -28,7 +28,7 @@ import { WazuhPluginSetup, WazuhPluginStart } from './types';
 import { initApp } from '../init';
 
 interface LegacySetup {
-  server: Legacy.server
+  server: any
 }
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {

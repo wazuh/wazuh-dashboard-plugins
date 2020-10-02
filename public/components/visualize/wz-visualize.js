@@ -34,7 +34,7 @@ import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { toastNotifications } from 'ui/notify';
 import { SecurityAlerts } from './components';
-import { getServices } from 'plugins/kibana/discover/kibana_services';
+import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 
 const visHandler = new VisHandlers();
 
