@@ -262,7 +262,7 @@ export const RuleEditor = ({save,initialRule, isLoading, isReserved}) => {
                 <EuiFlexGroup>
                     <EuiFlexItem>
                         <EuiText>Assign roles to users who match these rules.
-                        <EuiLink href="https://github.com/wazuh/wazuh-documentation/blob/develop/source/user-manual/api/rbac/auth_context.rst" external target="_blank">
+                        <EuiLink href="https://documentation.wazuh.com/current/user-manual/api/rbac/auth_context.html" external target="_blank">
                                 Learn more
                         </EuiLink>
                         </EuiText>
