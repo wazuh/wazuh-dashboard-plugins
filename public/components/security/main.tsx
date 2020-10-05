@@ -12,6 +12,7 @@ import {
 import { Users } from './users/users';
 import { Roles } from './roles/roles';
 import { Policies } from './policies/policies';
+import { RolesMapping } from './roles-mapping/roles-mapping';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
 import { compose } from 'redux';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
@@ -30,6 +31,11 @@ const tabs = [
     {
         id: 'policies',
         name: 'Policies',
+        disabled: false,
+    },
+    {
+        id: 'roleMapping',
+        name: 'Roles mapping',
         disabled: false,
     },
 ];
@@ -87,6 +93,9 @@ export const WzSecurity = compose(
                     }
                     {selectedTabId === 'policies' &&
                         <Policies></Policies>
+                    }
+                    {selectedTabId === 'roleMapping' &&
+                        <RolesMapping></RolesMapping>
                     }
                 </EuiFlexItem>
             </EuiFlexGroup>
