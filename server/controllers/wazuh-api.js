@@ -25,7 +25,7 @@ import { log } from '../logger';
 import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
-import { apiRequestList } from '../../util/api-request-list';
+import apiRequestList from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
 import fs from 'fs';

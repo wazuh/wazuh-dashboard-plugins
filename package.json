@@ -38,7 +38,8 @@
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
-    "test:jest": "node scripts/jest"
+    "test:jest": "node scripts/jest",
+    "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ..;cd .."
   },
   "dependencies": {
     "angular-animate": "1.7.8",
