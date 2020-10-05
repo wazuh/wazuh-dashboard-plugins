@@ -23,7 +23,7 @@ import { RuleEditor } from './rule-editor';
 export const RolesMappingCreate = ({ closeFlyout, rolesEquivalences, roles }) => {
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [ruleName, setRuleName] = useState("");
-    const [isLoading, setIsLoading] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         initData();
@@ -56,6 +56,10 @@ export const RolesMappingCreate = ({ closeFlyout, rolesEquivalences, roles }) =>
 
     const createRule = async (toSaveRule) => {
         try {
+            setIsLoading(true);
+            const formattedRoles = selectedRoles.map(item => {
+                return item.id;
+            });
             const result = await WzRequest.apiReq(
                 'POST',
                 `/security/rules`,
@@ -64,6 +68,19 @@ export const RolesMappingCreate = ({ closeFlyout, rolesEquivalences, roles }) =>
                     "rule": toSaveRule
                 }
             );
+            const ruleId = ((((result.data || {}).data || {}).affected_items || [])[0] || {}).id;
+            
+            await Promise.all(formattedRoles.map(async (role) => {  
+                const data = await WzRequest.apiReq(
+                    'POST',
+                    `/security/roles/${role}/rules`,
+                    {
+                        params: {
+                            rule_ids: ruleId
+                        }
+                    }
+                );
+            }));
             const msg = (result.data || {}).message || "Role mapping was successfully created"; 
             ErrorHandler.info(msg);
         } catch (error) {
