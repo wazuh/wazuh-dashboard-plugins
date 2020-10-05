@@ -504,7 +504,7 @@ export class DevToolsController {
               paramsBody = Object.keys(paramInnerBody.properties).sort().map(keyBodyParam => ({name:keyBodyParam, ...paramInnerBody.properties[keyBodyParam]}));
             };
             try{
-              const bodySanitizedBodyParam = currentGroup.requestTextJson.replace(/(,\s*"\S*\s*)\}/g, '}')/*.replace(/\{(\s*"\S*\s*)(?:["\}]?)/g, '{')*/;
+              const bodySanitizedBodyParam = currentGroup.requestTextJson.replace(/(,\s*"\S*\s*)\}/g, '}');
               inputBodyPreviousKeys = Object.keys((requestBodyCursorKeys || []).reduce((acumm, key) => acumm[key],JSON.parse(bodySanitizedBodyParam)));
             }catch(error){
               inputBodyPreviousKeys = [];
