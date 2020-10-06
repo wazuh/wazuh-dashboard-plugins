@@ -274,6 +274,7 @@ export class InventoryTable extends Component {
         {filesTable}
         {this.state.isFlyoutVisible &&
           <EuiOverlayMask
+            headerZindexLocation="below"
             onClick={() => this.closeFlyout() } >
             <FlyoutDetail
               fileName={this.state.currentFile}

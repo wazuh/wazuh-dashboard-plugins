@@ -178,6 +178,7 @@ export class EventsFim extends Component {
     return (
       this.state.isFlyoutVisible &&
       <EuiOverlayMask
+        headerZindexLocation="below"
         // @ts-ignore
         onClick={() => this.closeFlyout()} >
         <FlyoutDetail

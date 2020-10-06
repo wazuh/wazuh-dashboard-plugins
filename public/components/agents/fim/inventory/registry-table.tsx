@@ -230,6 +230,7 @@ export class RegistryTable extends Component {
         {registryTable}
         {this.state.isFlyoutVisible && (
           <EuiOverlayMask
+            headerZindexLocation="below"
             onClick={() => this.closeFlyout()}
           >
             <FlyoutDetail
