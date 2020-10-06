@@ -131,10 +131,10 @@ export class WazuhApiCtrl {
 
       return { token };
     } catch (error){
-      const errorMessage = ((error .response || {}).data || {}).detail;
+      const errorMessage = ((error.response || {}).data || {}).detail;
       log('wazuh-api:getToken', errorMessage || error.message);
       return ErrorResponse(
-        `Error getting authorization token: ${errorMessage || ""}`,
+        `Error getting authorization token: ${errorMessage || error.message}`,
         3000,
         500,
         reply

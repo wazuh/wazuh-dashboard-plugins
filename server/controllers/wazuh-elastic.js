@@ -386,7 +386,7 @@ export class WazuhElasticCtrl {
    */
   async getCurrentPlatform(req, reply) {
     try {
-      if(this._server.plugins.security) { // XPACK
+      if(this._server.newPlatform.setup.plugins.security ) { // XPACK
         return {platform: 'xpack'}
       }
       if(this._server.plugins.opendistro_security){
