@@ -9,9 +9,17 @@ export class OpendistroFactory implements ISecurityFactory {
 
   async getCurrentUser(req) {
     try {
-      const securityBackend = this.server.plugins.opendistro_security.getSecurityBackend()
-      const authInfo = await securityBackend.authinfo(req.headers);
-      return authInfo;
+      const elasticRequest = this.server.plugins.elasticsearch.getCluster('data');
+      const params = {
+        path: `_opendistro/_security/api/account`,
+        method: 'GET',
+      };
+      
+      const data = await elasticRequest.callWithRequest(
+        req,
+        'transport.request',
+        params);
+      return data;
     } catch (error) {
       throw error; 
     }
