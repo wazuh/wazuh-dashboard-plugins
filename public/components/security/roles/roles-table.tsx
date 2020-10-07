@@ -76,10 +76,10 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
             sortable: true,
         },
         {
-            field: 'name',
+            field: 'id',
             name: 'Status',
             render: (item) => {
-                return item.id < 8 && <EuiBadge color="primary" >Reserved</EuiBadge>
+                return item < 100 && <EuiBadge color="primary" >Reserved</EuiBadge>
             },
             width: 150,
             sortable: false,
@@ -89,10 +89,10 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
           width: '5%',
           name: 'Actions',
           render: item => {return <EuiToolTip
-            content={item.id < 8 ? "Reserved roles can't be deleted" : 'Delete role'}
+            content={item.id < 100 ? "Reserved roles can't be deleted" : 'Delete role'}
             position="left">
             <EuiButtonIcon
-              isDisabled={item.id < 8}
+              isDisabled={item.id < 100}
               onClick={async(ev) => {
                     ev.stopPropagation();
                     try{

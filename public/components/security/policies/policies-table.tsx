@@ -59,7 +59,7 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
             field: 'id',
             name: 'Status',
             render: (item) => {
-                return item < 27 && <EuiBadge color="primary" >Reserved</EuiBadge>
+                return item < 100 && <EuiBadge color="primary" >Reserved</EuiBadge>
             },
             width: 150,
             sortable: false,
@@ -69,10 +69,10 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
           width: '5%',
           name: 'Actions',
           render: item => {return <EuiToolTip
-            content={item.id < 27 ? "Reserved policies can't be deleted" : 'Delete policy'}
+            content={item.id < 100 ? "Reserved policies can't be deleted" : 'Delete policy'}
             position="left">
             <EuiButtonIcon
-              isDisabled={item.id < 27}
+              isDisabled={item.id < 100}
               onClick={async(ev) => {
                     ev.stopPropagation();
                     try{
@@ -91,7 +91,9 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
                     }
                     ErrorHandler.info('Policy was successfully deleted');
                     await updatePolicies();
-                }catch(error){}
+                }catch(error){
+                    ErrorHandler.handle(error, 'Error deleting policy');
+                }
               }}
               iconType="trash"
               color={'danger'}

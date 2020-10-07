@@ -66,6 +66,7 @@ export const Policies = () => {
     setIsEditingPolicy(true);
   }
 
+
   const createPolicy = async () => {
     try {
       const result = await WzRequest.apiReq(
@@ -87,8 +88,13 @@ export const Policies = () => {
       }
       ErrorHandler.info('Policy was successfully created', '');
       await getPolicies();
+      setPolicyName("");
+      setAddedActions([]);
+      setAddedResources([]);
+      setEffectValue(null);
     } catch (error) {
       ErrorHandler.handle(error, 'Error creating policy');
+      return;
     }
     setIsFlyoutVisible(false);
   }
@@ -281,16 +287,16 @@ export const Policies = () => {
   if (isEditingPolicy) {
     editFlyout = (<EuiOverlayMask
       headerZindexLocation="below"
-      onClick={() => {closeEditingFlyout() }} >
+      onClick={() => { closeEditingFlyout() }} >
       <EditPolicyFlyout closeFlyout={closeEditingFlyout} policy={editingPolicy} />
     </EuiOverlayMask>)
   }
   let flyout;
   if (isFlyoutVisible) {
     flyout = (
-      <EuiOverlayMask 
+      <EuiOverlayMask
         headerZindexLocation="below"
-        onClick={() => {setIsFlyoutVisible(false) }}>
+        onClick={() => { setIsFlyoutVisible(false) }}>
         <EuiFlyout
           onClose={() => setIsFlyoutVisible(false)}>
           <EuiFlyoutHeader hasBorder={false}>
