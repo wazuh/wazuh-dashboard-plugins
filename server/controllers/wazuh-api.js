@@ -60,7 +60,7 @@ export class WazuhApiCtrl {
     if (server.plugins.security) {
       return 'xpack';
     }
-    if (server.plugins.opendistro_security) {
+    if (server.newPlatform.setup.plugins.opendistroSecurity) {
       return 'opendistro';
     }
     return undefined;
