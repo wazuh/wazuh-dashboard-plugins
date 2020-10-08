@@ -43,6 +43,7 @@ export const initialWazuhConfig = `---
 #checks.template: true
 #checks.api     : true
 #checks.setup   : true
+#checks.metaFields: true
 #
 # --------------------------------- Extensions ---------------------------------
 #
