@@ -10,28 +10,28 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 
 
 
-export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
+export const EditRolesTable = ({ policies, role, onChange, isDisabled, loading}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [sortField, setSortField] = useState('role');
-    const [sortDirection, setSortDirection] = useState('asc');
     const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState({});
 
     const onTableChange = ({ page = {}, sort = {} }) => {
         const { index: pageIndex, size: pageSize } = page;
-    
-        const { field: sortField, direction: sortDirection } = sort;
-    
         setPageIndex(pageIndex);
         setPageSize(pageSize);
-        setSortField(sortField);
-        setSortDirection(sortDirection);
       };
 
+      const formatPolicies = (policiesArray) => {
+        return policiesArray.map(policy => {
+          return policies.find(item => item.id === policy)
+        })
+      }
+
       const getItems = () => {
-          const items = policies.slice(pageIndex*pageSize, pageIndex*pageSize + pageSize);
-          return { pageOfItems: items, totalItemCount: policies.length}
+        if(loading) return { pageOfItems: [], totalItemCount: 0};
+        const items = formatPolicies(role.policies.slice(pageIndex*pageSize, pageIndex*pageSize + pageSize));
+        return { pageOfItems: items, totalItemCount: role.policies.length}
       }
 
       const { pageOfItems, totalItemCount } = getItems();
@@ -125,24 +125,17 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled }) => {
     pageSizeOptions: [5, 10, 20],
   };
 
-  const sorting = {
-    sort: {
-      field: sortField,
-      direction: sortDirection,
-    },
-  };
   return (
     <>
       <EuiBasicTable
         items={pageOfItems}
         itemId="id"
-        loading={isLoading}
+        loading={isLoading || loading}
         itemIdToExpandedRowMap={itemIdToExpandedRowMap}
         isExpandable={true}
         hasActions={true}
         columns={columns}
         pagination={pagination}
-        sorting={sorting}
         isSelectable={true}
         onChange={onTableChange}
       />

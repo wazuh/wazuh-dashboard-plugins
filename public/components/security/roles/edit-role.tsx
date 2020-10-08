@@ -23,6 +23,7 @@ const reservedRoles = ['administrator', 'readonly', 'users_admin', 'agents_reado
 
 
 export const EditRole = ({ role, closeFlyout }) => {
+    const [isLoading, setIsLoading] = useState(true);
     const [currentRole, setCurrentRole] = useState({});
     const [isReserved, setIsReserved] = useState(reservedRoles.includes(role.name))
     const [policies, setPolicies] = useState([]);
@@ -32,6 +33,7 @@ export const EditRole = ({ role, closeFlyout }) => {
 
     async function getData() {
         try{
+            setIsLoading(true);
             const roleDataResponse = await WzRequest.apiReq(
                 'GET',
                 '/security/roles',            
@@ -65,6 +67,7 @@ export const EditRole = ({ role, closeFlyout }) => {
         }catch(error){
             ErrorHandler.handle( error, 'Error');
         }
+        setIsLoading(false);
     }
 
     useEffect(() => {
@@ -162,7 +165,7 @@ export const EditRole = ({ role, closeFlyout }) => {
                 <EuiSpacer />
             </EuiForm>
                 <div style={{ margin: 20 }}>
-                    <EditRolesTable policies={assignedPolicies} role={role} onChange={update} isDisabled={isReserved}/>
+                    <EditRolesTable policies={assignedPolicies} role={currentRole} onChange={update} isDisabled={isReserved} loading={isLoading}/>
                 </div>
             </EuiFlyoutBody>
         </EuiFlyout>
