@@ -17,12 +17,8 @@ import store from '../redux/store';
 import { updateUserPermissions, updateUserRoles } from '../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../util/constants';
 
-export let userToken;
 
 export class WzAuthentication{
-  static getToken(){
-    return userToken;
-  }
   private static async login(force=false){
     try{
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
@@ -31,7 +27,7 @@ export class WzAuthentication{
         idHost = JSON.parse(AppState.getCurrentAPI()).id;
       }
       const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
-      const token = ((response || {}).data || {}).token
+      const token = ((response || {}).data || {}).token;
       return token as string;
     }catch(error){
       return Promise.reject(error);
@@ -45,10 +41,27 @@ export class WzAuthentication{
         return;
       }
       // Decode token and get expiration time
-      userToken = jwtDecode(token);
+      const jwtPayload = jwtDecode(token);
+      
+      // Get user Policies
+      const userPolicies = await WzAuthentication.getUserPolicies();
       // Dispatch actions to set permissions and roles
-      store.dispatch(updateUserPermissions(userToken.rbac_policies));
-      store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(userToken.rbac_roles || [])));
+      store.dispatch(updateUserPermissions(userPolicies));
+      store.dispatch(updateUserRoles(WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])));
+    }catch(error){
+      return Promise.reject(error);
+    }
+  }
+  private static async getUserPolicies(){
+    try{
+      var idHost = JSON.parse(AppState.getCurrentAPI()).id;
+      while(!idHost){
+        await new Promise(r => setTimeout(r, 500));
+        idHost = JSON.parse(AppState.getCurrentAPI()).id;
+      }
+      const response = await WzRequest.apiReq('GET', '/security/users/me/policies', { idHost });
+      const policies = ((response || {}).data || {}).data || {};
+      return policies;
     }catch(error){
       return Promise.reject(error);
     }
