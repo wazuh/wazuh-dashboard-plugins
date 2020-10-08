@@ -255,7 +255,7 @@ export function ClusterController(
 
       const nodeList = (((data[0] || {}).data || {}).data || {}) || false;
       const clusterConfig = ((((data[1] || {}).data || {}).data || {}) || false);
-      const version = ((data[2] || {}).data || {}).api_version || false;
+      const version = (((data[2] || {}).data || {}).data || {}).api_version || false;
       const agents = ((((data[3] || {}).data || {}).data || {}) || false);
 
 

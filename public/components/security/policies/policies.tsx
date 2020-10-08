@@ -153,10 +153,10 @@ export const Policies = () => {
       '/security/actions',
       {}
     );
-    const resources_data = ((resources_request || {}).data || []);
+    const resources_data = ((resources_request || {}).data || []).data || {};
     setAvailableResources(resources_data);
 
-    const actions_data = ((actions_request || {}).data || []);
+    const actions_data = ((actions_request || {}).data || []).data || {};
     setAvailableActions(actions_data);
     const actions = Object.keys(actions_data)
       .map((x, idx) => {
