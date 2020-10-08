@@ -60,7 +60,9 @@ export const RolesMapping = () => {
 
   let editFlyout;
   if (isEditingRule) {
-    editFlyout = (<EuiOverlayMask onClick={() => {
+    editFlyout = (<EuiOverlayMask
+        headerZindexLocation="below"
+        onClick={() => {
       setIsEditingRule(false)
     }}>
       <RolesMappingEdit rule={selectedRule} closeFlyout={(isVisible) => { setIsEditingRule(isVisible); initData() }} rolesEquivalences={rolesEquivalences} roles={roles} />
@@ -68,7 +70,9 @@ export const RolesMapping = () => {
   }
   let createFlyout;
   if (isCreatingRule) {
-    editFlyout = (<EuiOverlayMask onClick={() => {
+    editFlyout = (<EuiOverlayMask
+        headerZindexLocation="below"
+        onClick={() => {
       setIsCreatingRule(false)
     }}>
       <RolesMappingCreate closeFlyout={(isVisible) => { setIsCreatingRule(isVisible); initData() }} rolesEquivalences={rolesEquivalences} roles={roles} />
