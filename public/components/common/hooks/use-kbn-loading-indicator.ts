@@ -25,12 +25,12 @@ export const useKbnLoadingIndicator = ():[boolean, React.Dispatch<React.SetState
 
   useEffect(() => {
     if (loading && visible <= 0) {
-      loadingCount.increment();
+      chrome.loadingCount.increment();
       setFlag(true);
     }
 
     if (!loading && flag && visible > 0) {
-      loadingCount.decrement();
+      chrome.loadingCount.decrement();
     }
   }, [visible, loading]);
   return [loading, setLoading, visible > 0]
