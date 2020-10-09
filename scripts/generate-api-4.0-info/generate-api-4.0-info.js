@@ -63,7 +63,7 @@ const main = async () => {
     console.log('----------------------------------------------')
 
     // Request to API swagger.json file
-    const apiData = await request(`${WAZUH_API_URL}/ui/swagger.json`);
+    const apiData = await request(`${WAZUH_API_URL}/openapi.json`);
     // Parse response to JSON
     const jsonData = JSON.parse(apiData);
     // Extract the endpoints, mapped as { [httpMethod: ('GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD')]: endpoint[]}

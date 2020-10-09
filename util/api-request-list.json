@@ -1432,7 +1432,7 @@
         "name": "/cluster/:node_id/stats/hourly",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_hourly_node",
         "description": "Return Wazuh statistical information in node {node_id} per hour. Each number in the averages field represents the average of alerts per hour",
-        "summary": "Get a specified node's stats by hour",
+        "summary": "Get a specified node's stats per hour",
         "tags": [
           "cluster"
         ],
@@ -1508,7 +1508,7 @@
         "name": "/cluster/:node_id/stats/weekly",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_weekly_node",
         "description": "Return Wazuh statistical information in node {node_id} per week. Each number in the averages field represents the average of alerts per hour for that specific day",
-        "summary": "Get a specified node's stats by week",
+        "summary": "Get a specified node's stats per week",
         "tags": [
           "cluster"
         ],
@@ -6293,6 +6293,25 @@
         ]
       },
       {
+        "name": "/security/users/me/policies",
+        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.security_controller.get_user_me_policies",
+        "description": "Get the processed policies information for the current user",
+        "summary": "Get current user processed policies",
+        "tags": [
+          "security"
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/syscheck/:agent_id",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.syscheck_controller.get_syscheck_agent",
         "description": "Return FIM findings in the specified agent",
@@ -9381,6 +9400,7 @@
           {
             "name": "rule_ids",
             "description": "List of rule IDs (separated by comma)",
+            "required": true,
             "schema": {
               "type": "array",
               "items": {

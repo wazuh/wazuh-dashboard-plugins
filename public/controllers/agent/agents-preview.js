@@ -267,7 +267,7 @@ export class AgentsPreviewController {
   async getWazuhVersion() {
     try {
       const data = await WzRequest.apiReq('GET', '//', {});
-      const result = (data || {}).data || {};
+      const result = ((data || {}).data || {}).data || {};
       return result.api_version
     } catch (error) {
       return version;

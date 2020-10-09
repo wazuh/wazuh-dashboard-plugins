@@ -85,7 +85,7 @@ export class AgentsTable extends Component {
     });
 
     this.setState({
-      managerVersion: managerVersion.data.api_version,
+      managerVersion: managerVersion.data.data.api_version,
       agentActive: agentActive.data.data.totalItems,
       avaibleAgents: totalAgent.data.data.affected_items
     });

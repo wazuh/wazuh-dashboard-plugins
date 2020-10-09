@@ -202,7 +202,7 @@ export class HealthCheck extends Component {
                             '//',
                             {}
                         );
-                        const apiVersion = versionData.data.api_version;
+                        const apiVersion = versionData.data.data.api_version;
                         const setupData = await GenericRequest.request(
                             'GET',
                             '/api/setup'

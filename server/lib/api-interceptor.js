@@ -42,10 +42,10 @@ export class ApiInterceptor {
         ...(!!authContext ? { data: authContext } : {})
       };
       const response = await axios(options);
+      const token = (((response || {}).data || {}).data || {}).token;
       if (!!authContext) {
-        return response.data.token;
+        return token;
       }
-      const token = response.data.token;
       await this.updateRegistry.updateTokenByHost(idHost, token);
       return token;
     } catch (error) {

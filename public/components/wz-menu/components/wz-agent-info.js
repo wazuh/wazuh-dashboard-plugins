@@ -42,7 +42,7 @@ export class AgentInfo extends Component {
     const managerVersion = await WzRequest.apiReq('GET', '//', {});
 
     this.setState({
-      managerVersion: ((managerVersion || {}).data || {}).api_version || {}
+      managerVersion: (((managerVersion || {}).data || {}).data || {}).api_version || {}
     });
   }
 
