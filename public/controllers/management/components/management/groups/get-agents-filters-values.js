@@ -43,5 +43,9 @@ export async function getAgentFilterValues(field, value, filters = {}) {
       return getChild(item, field);
     }
   );
-  return arrayResult.filter((item) => item && item.length);
+  return arrayResult
+    .filter((item) => item && item.length)
+    .reduce((accum, item) =>
+      Array.isArray(item) ? [...accum, ...item] : [...accum, item], []) // it lets expand agent.group, which is an string[] (array of strings)
+    .filter((item, index, array) => array.indexOf(item) === index);  // return unique values
 }

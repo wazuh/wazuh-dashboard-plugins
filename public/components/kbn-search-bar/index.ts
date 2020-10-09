@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React Components to some utilities.
- *
+ * Wazuh app - React component to integrate Kibana search bar
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,6 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
- export { AgentGroupTruncate } from './agent-group-truncate';
-
- export { GroupingComponents } from './grouping-components';
+export { KbnSearchBar } from './kbn-search-bar';

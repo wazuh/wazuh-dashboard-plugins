@@ -29,7 +29,6 @@ export class AgentsPreviewController {
    * @param {Object} $location
    * @param {Object} errorHandler
    * @param {Object} csvReq
-   * @param {Object} wzTableFilter
    */
   constructor(
     $scope,
@@ -37,7 +36,6 @@ export class AgentsPreviewController {
     $route,
     errorHandler,
     csvReq,
-    wzTableFilter,
     commonData,
     $window
   ) {
@@ -49,7 +47,6 @@ export class AgentsPreviewController {
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
     this.shareAgent = new ShareAgent();
-    this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
@@ -88,7 +85,7 @@ export class AgentsPreviewController {
     if (loc && loc.tab) {
       this.submenuNavItem = loc.tab;
     }
-
+    
     const summaryData = await this.apiReq.request('GET', '/agents/summary', {});
     this.summary = summaryData.data.data;
     if (this.summary.Total - 1 === 0) {

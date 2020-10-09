@@ -43,7 +43,7 @@ export class AgentsPreview extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
-    this.state = { data: [], loading: false, showAgentsEvolutionVisualization: false };
+    this.state = { data: [], loading: false, showAgentsEvolutionVisualization: false, agentTableFilters: [] };
     this.wazuhConfig = new WazuhConfig();
   }
 
@@ -169,16 +169,9 @@ export class AgentsPreview extends Component {
                   {this.totalAgents > 0 && (
                     <EuiFlexItem style={{ alignItems: 'center' }}>
                       <Pie
-                        legendAction={(status) => this._isMount && this.setState({agentTableFilters: 
-                          [
-                            {
-                              className: 'wzFilterBarOperator',
-                              group: 'status',
-                              label: 'status:' + status,
-                              label_: status,
-                              type: 'AND'
-                            }
-                          ]})}
+                        legendAction={(status) => this._isMount && this.setState({
+                          agentTableFilters: [ {field: 'q', value: `status=${status}`}]
+                        })}
                         width={300}
                         height={150}
                         data={this.state.data}
@@ -202,16 +195,9 @@ export class AgentsPreview extends Component {
                                   <EuiToolTip
                                   position='top'
                                   content='Show active agents'>
-                                  <a onClick={() => this._isMount && this.setState({agentTableFilters: 
-                                  [
-                                    {
-                                      className: 'wzFilterBarOperator',
-                                      group: 'status',
-                                      label: 'status:' + "Active",
-                                      label_: "Active",
-                                      type: 'AND'
-                                    }
-                                  ]})} >{this.state.data[0].value}</a>
+                                  <a onClick={() => this._isMount && this.setState({
+                                    agentTableFilters: [ {field: 'q', value: 'status=Active'} ]
+                                  })} >{this.state.data[0].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
                                 description="Active"
@@ -225,16 +211,9 @@ export class AgentsPreview extends Component {
                                   <EuiToolTip
                                   position='top'
                                   content='Show disconnected agents'>
-                                  <a onClick={() => this._isMount && this.setState({agentTableFilters: 
-                                  [
-                                    {
-                                      className: 'wzFilterBarOperator',
-                                      group: 'status',
-                                      label: 'status:' + "Disconnected",
-                                      label_: "Disconnected",
-                                      type: 'AND'
-                                    }
-                                  ]})} >{this.state.data[1].value}</a>
+                                  <a onClick={() => this._isMount && this.setState({
+                                    agentTableFilters: [ {field: 'q', value: 'status=Disconnected'} ]
+                                  })} >{this.state.data[1].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
                                 description="Disconnected"
@@ -248,16 +227,9 @@ export class AgentsPreview extends Component {
                                   <EuiToolTip
                                   position='top'
                                   content='Show never connected agents'>
-                                  <a onClick={() => this._isMount && this.setState({agentTableFilters: 
-                                  [
-                                    {
-                                      className: 'wzFilterBarOperator',
-                                      group: 'status',
-                                      label: 'status:' + "Never connected",
-                                      label_: "Never connected",
-                                      type: 'AND'
-                                    }
-                                  ]})} >{this.state.data[2].value}</a>
+                                  <a onClick={() => this._isMount && this.setState({
+                                    agentTableFilters: [ {field: 'q', value: 'status=Never connected'} ]
+                                  })} >{this.state.data[2].value}</a>
                                   </EuiToolTip>)}
                                 titleSize={'s'}
                                 description="Never connected"
@@ -339,7 +311,7 @@ export class AgentsPreview extends Component {
                     <div style={{height: this.props.resultState === 'ready' ? '180px' : 0}}>
                       <WzReduxProvider>
                         <KibanaVis
-                          visID={'Wazuh-App-Overview-General-Agents-Evolution'}
+                          visID={'Wazuh-App-Overview-General-Agents-status'}
                           tab={'general'}
                         />
                       </WzReduxProvider>

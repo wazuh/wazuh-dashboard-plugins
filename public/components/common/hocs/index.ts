@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React Components to some utilities.
- *
+ * Wazuh app - React Higher Order Components (HOC)
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
+export { withWindowSize } from './withWindowSize';
 
- export { AgentGroupTruncate } from './agent-group-truncate';
-
- export { GroupingComponents } from './grouping-components';
+export { withKibanaContext, withKibanaContextExtendsProps } from './withKibanaContext';

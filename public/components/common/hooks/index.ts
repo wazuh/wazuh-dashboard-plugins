@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React Components to some utilities.
- *
+ * Wazuh app - React hooks
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,6 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
- export { AgentGroupTruncate } from './agent-group-truncate';
+export { useWindowSize } from './useWindowSize';
 
- export { GroupingComponents } from './grouping-components';
+export { useIndexPattern } from './use-index-pattern';
+
+export { useFilterManager } from './use-filter-manager';
+
+export { useTimeFilter } from './use-time-filter';
+
+export { useQuery } from './use-query';
