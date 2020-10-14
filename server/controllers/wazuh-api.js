@@ -186,7 +186,7 @@ export class WazuhApiCtrl {
         const responseAgents = await this.apiInterceptor.request(
           'get',
           `${api.url}:${api.port}/agents`,
-          { params: { list_agents: '000' } },
+          { params: { agents_list: '000' } },
           { idHost: id}          
         );
 
@@ -391,7 +391,7 @@ export class WazuhApiCtrl {
         let responseAgents = await this.apiInterceptor.request(
           'GET',
           `${apiAvailable.url}:${apiAvailable.port}/agents`,
-          { params: { list_agents: '000' } },
+          { params: { agents_list: '000' } },
           { idHost: req.payload.id }
         );
 

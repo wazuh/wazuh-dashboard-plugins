@@ -40,7 +40,7 @@ export default class GroupsHandler {
     try {
       const result = await WzRequest.apiReq('DELETE', `/groups`, {
         params: {
-          list_groups: name
+          groups_list: name
         }
       });
       return result;

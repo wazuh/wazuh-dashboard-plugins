@@ -238,7 +238,7 @@ export class MultipleAgentSelector extends Component {
           `/agents/group`, {	
             params: {	
               group_id: this.props.currentGroup.name,	
-              list_agents: itemsToSave.addedIds.toString()	
+              agents_list: itemsToSave.addedIds.toString()	
             }	
           }	
         );
@@ -252,7 +252,7 @@ export class MultipleAgentSelector extends Component {
           `/agents/group`, {	
             params: {	
               group_id: this.props.currentGroup.name,	
-              list_agents: itemsToSave.deletedIds.toString()	
+              agents_list: itemsToSave.deletedIds.toString()	
             }	
           }	
         );

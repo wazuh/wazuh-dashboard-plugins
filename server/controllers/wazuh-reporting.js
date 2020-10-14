@@ -536,7 +536,7 @@ export class WazuhReportingCtrl {
         const agent = await this.apiRequest.makeGenericRequest(
           'GET',
           `/agents`,
-          { params: { list_agents: isAgents }},
+          { params: { agents_list: isAgents }},
           apiId
         );
         if (

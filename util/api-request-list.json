@@ -58,7 +58,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -1590,7 +1590,7 @@
         ],
         "query": [
           {
-            "name": "list_nodes",
+            "name": "nodes_list",
             "description": "List of node IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -1627,7 +1627,7 @@
         ],
         "query": [
           {
-            "name": "list_nodes",
+            "name": "nodes_list",
             "description": "List of node IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -1664,7 +1664,7 @@
         ],
         "query": [
           {
-            "name": "list_nodes",
+            "name": "nodes_list",
             "description": "List of node IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -1766,7 +1766,7 @@
             }
           },
           {
-            "name": "list_nodes",
+            "name": "nodes_list",
             "description": "List of node IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -2256,7 +2256,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -2420,7 +2420,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -2533,7 +2533,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -2637,7 +2637,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -2749,7 +2749,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -2972,7 +2972,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -3076,7 +3076,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -3212,7 +3212,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -3322,7 +3322,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -3498,7 +3498,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -3695,7 +3695,7 @@
             }
           },
           {
-            "name": "list_groups",
+            "name": "groups_list",
             "description": "Array of group IDs",
             "schema": {
               "type": "array",
@@ -7706,7 +7706,7 @@
         ],
         "query": [
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -8016,7 +8016,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -8134,7 +8134,7 @@
         ],
         "query": [
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -8229,7 +8229,7 @@
         ],
         "query": [
           {
-            "name": "list_nodes",
+            "name": "nodes_list",
             "description": "List of node IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -8385,7 +8385,7 @@
         ],
         "query": [
           {
-            "name": "list_nodes",
+            "name": "nodes_list",
             "description": "List of node IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -8975,7 +8975,7 @@
         ],
         "query": [
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -9615,7 +9615,7 @@
         ],
         "query": [
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma), use the keyword 'all' to select all agents",
             "required": true,
             "schema": {
@@ -9703,7 +9703,7 @@
         ],
         "query": [
           {
-            "name": "list_groups",
+            "name": "groups_list",
             "description": "Array of group IDs",
             "schema": {
               "type": "array",
@@ -9805,7 +9805,7 @@
             }
           },
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma), use the keyword 'all' to select all agents",
             "required": true,
             "schema": {
@@ -9893,7 +9893,7 @@
         ],
         "query": [
           {
-            "name": "list_nodes",
+            "name": "nodes_list",
             "description": "List of node IDs (separated by comma)",
             "schema": {
               "type": "array",
@@ -9930,7 +9930,7 @@
         ],
         "query": [
           {
-            "name": "list_agents",
+            "name": "agents_list",
             "description": "List of agent IDs (separated by comma), use the keyword 'all' to select all agents",
             "required": true,
             "schema": {
@@ -9971,7 +9971,7 @@
         ],
         "query": [
           {
-            "name": "list_groups",
+            "name": "groups_list",
             "description": "List of group IDs (separated by comma), use the keyword 'all' to select all groups",
             "required": true,
             "schema": {

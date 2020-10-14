@@ -410,7 +410,7 @@ export class AgentsController {
         .addAgentToGroup(group, this.$scope.agent.id)
         .then(() => WzRequest.apiReq('GET', `/agents`, {
           params: {
-            list_agents: this.$scope.agent.id,
+            agents_list: this.$scope.agent.id,
           }
         }))
         .then(agent => {
@@ -519,7 +519,7 @@ export class AgentsController {
           'GET',
           `/agents`, {
             params: {
-              list_agents: this.$scope.agent.id,
+              agents_list: this.$scope.agent.id,
               select: 'status'
             }
           }
@@ -804,7 +804,7 @@ export class AgentsController {
 
       const data = await WzRequest.apiReq('GET', `/agents`, {
         params: {
-          list_agents: id,
+          agents_list: id,
         }
       });
 
@@ -1009,7 +1009,7 @@ export class AgentsController {
       }
       await WzRequest.apiReq('PUT', `/syscheck`, {
         params: {
-          list_agents: this.$scope.agent.id
+          agents_list: this.$scope.agent.id
         }
       });
       ErrorHandler.info(
