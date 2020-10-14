@@ -28,7 +28,7 @@ export const WzFieldSearchDelay = ({ delay = 400, onChange, onSearch, onError, .
   useEffect(() => {
     return () => timerDelay.current && clearTimeout(timerDelay.current);
   },[]);
-  
+
   const onChangeInput = e => {
     const searchValue: string = e.target.value;
     onChange && onChange(searchValue);
@@ -56,5 +56,5 @@ export const WzFieldSearchDelay = ({ delay = 400, onChange, onSearch, onError, .
     setLoading(false);
   }
 
-  return <EuiFieldSearch value={searchTerm} isLoading={loading} onChange={onChangeInput} onSearch={onSearchInput} {...rest}/>
+  return <EuiFieldSearch {...rest} value={searchTerm} isLoading={loading} onChange={onChangeInput} onSearch={onSearchInput}/>
 }
