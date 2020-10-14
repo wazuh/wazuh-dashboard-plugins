@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Multiple agent selector component
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import React, { Component } from 'react';
 import {
   EuiPage, EuiPanel, EuiFlexGroup, EuiFlexItem, EuiProgress, EuiSpacer, EuiButton,
@@ -7,6 +18,7 @@ import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzRequest } from '../../../react-services/wz-request';
 import './multiple-agent-selector.less'
 import $ from 'jquery';
+import { WzFieldSearchDelay } from '../../common/search';
 
 export class MultipleAgentSelector extends Component {
   constructor(props) {
@@ -332,8 +344,15 @@ export class MultipleAgentSelector extends Component {
     return parseInt(a.key);
   };
 
-  async reload(element, searchTerm, start = false, addOffset) {
+  async reload(element, searchTerm, start = false, addOffset = 0) {
     if (element === 'left') {
+      const callbackLoadAgents = async () => {
+        try {
+          await this.loadAllAgents(searchTerm, start);
+        } catch (error) {
+          ErrorHandler.handle(error, 'Error fetching all available agents');
+        };
+      };
       if (!this.state.availableAgents.loadedAll) {
         if (start) {
           this.setState({
@@ -345,20 +364,17 @@ export class MultipleAgentSelector extends Component {
               ...this.state.selectedAgents,
               offset: 0,
             }
-          })
+          }, callbackLoadAgents)
         } else {
           this.setState({
             availableAgents: {
               ...this.state.availableAgents,
               offset: this.state.availableAgents.offset + 500,
             }
-          })
+          }, callbackLoadAgents)
         }
-        try {
-          await this.loadAllAgents(searchTerm, start);
-        } catch (error) {
-          this.errorHandler.handle(error, 'Error fetching all available agents');
-        }
+      }else{
+        callbackLoadAgents();
       }
     } else {
       if (!this.state.selectedAgents.loadedAll) {
@@ -372,7 +388,7 @@ export class MultipleAgentSelector extends Component {
         try {
           await this.loadSelectedAgents(searchTerm);
         } catch (error) {
-          this.errorHandler.handle(error, 'Error fetching all selected agents');
+          ErrorHandler.handle(error, 'Error fetching all selected agents');
         }
       }
     }
@@ -380,7 +396,7 @@ export class MultipleAgentSelector extends Component {
 
   scrollList = async (target) => {
     if (target === 'left') {
-      await this.reload('left', this.state.availableFilter, false)
+      await this.reload('left', this.state.availableFilter, false);
     } else {
       await this.reload('right', this.state.selectedFilter, false);
     }
@@ -462,14 +478,15 @@ export class MultipleAgentSelector extends Component {
                                 {/*)} */}
                               </EuiFlexGroup>
                               <EuiSpacer size={"s"}></EuiSpacer>
-                              <EuiFieldSearch
+                              <WzFieldSearchDelay
                                 placeholder="Filter..."
-                                onChange={(ev) => {
-                                  this.setState({ availableFilter: ev.target.value, availableItem: [] });
+                                onChange={(searchValue) => {
+                                  this.setState({ availableFilter: searchValue, availableItem: [] });
                                 }}
-                                onSearch={value => {
-                                  this.setState({ availableFilter: value },
-                                    () => { this.reload("left", this.state.availableFilter, true) });
+                                onSearch={async searchValue => {
+                                  try{
+                                    await this.reload("left", searchValue, true);
+                                  }catch(error){}
                                 }}
                                 isClearable={true}
                                 fullWidth={true}
