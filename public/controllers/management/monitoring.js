@@ -19,6 +19,7 @@ import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { ModulesHelper } from '../../components/common/modules/modules-helper';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
 export function ClusterController(
   $scope,
@@ -226,6 +227,17 @@ export function ClusterController(
     }
   };
 
+  const clusterStatus = async () => {
+    try {
+      const status = await WzRequest.apiReq('GET', '/cluster/status', {});
+      $scope.permissions = true;
+      return status;
+    } catch (error) {
+      if(error === '3013 - Permission denied: Resource type: *:*')
+        $scope.permissions = false
+    }
+  }
+
   /**
    * This set some required settings at init
    */
@@ -236,8 +248,13 @@ export function ClusterController(
       discoverPendingUpdates.removeAll();
       rawVisualizations.removeAll();
       loadedVisualizations.removeAll();
-
-      const status = await WzRequest.apiReq('GET', '/cluster/status', {});
+      const status = await clusterStatus();
+      if (!status) {
+        $scope.roles = [WAZUH_ROLE_ADMINISTRATOR_NAME];
+        $scope.loading = false;
+        $scope.$applyAsync()
+        return;
+      }
       $scope.status = status.data.data.running;
       if ($scope.status === 'no') {
         $scope.isClusterRunning = false;

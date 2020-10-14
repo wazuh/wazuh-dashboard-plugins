@@ -177,7 +177,6 @@ export class ManagementController {
       configurationProps: {
         agent: {
           id: '000'
-          // agentPlatform: 'linux'
         }, // TODO: get dynamically the agent?
         updateWazuhNotReadyYet: status => {
           this.$rootScope.wazuhNotReadyYet = status;
@@ -193,7 +192,6 @@ export class ManagementController {
    */
   $onInit() {
     this.clusterInfo = AppState.getClusterInfo();
-    const configuration = this.wazuhConfig.getConfig();
 
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
       this.tab = 'groups';
