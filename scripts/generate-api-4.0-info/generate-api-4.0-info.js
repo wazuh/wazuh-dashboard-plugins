@@ -200,7 +200,7 @@ const getEndpointPathArgs = endpointPath => {
 // Extend the parameter with the reference data
 const extendParamReference = (parameter, jsonData) => {
   if (parameter.$ref){
-    return { ...getNestedObject(jsonData, parameter.$ref.split('/').splice(1)) }
+    return { ...(parameter.name && parameter.name !== '$ref'? {name: parameter.name} : {}),...getNestedObject(jsonData, parameter.$ref.split('/').splice(1)) }
   }else if(parameter.schema && parameter.schema.$ref){
     return { ...parameter, schema: {...getNestedObject(jsonData, parameter.schema.$ref.split('/').splice(1))}};
   }else if(parameter.schema && parameter.schema.items && parameter.schema.items.$ref){
