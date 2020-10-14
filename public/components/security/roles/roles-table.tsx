@@ -58,7 +58,7 @@ export const RolesTable = ({roles, policiesData, loading, editRole, updateRoles}
                                         <p>{((data.policy || {}).actions || []).join(", ")}</p>
                                         <EuiSpacer size="s" />
                                         <b>Resources</b>
-                                        <p>{(data.policy || {}).resources}</p>
+                                        <p>{((data.policy || {}).resources || []).join(", ")}</p>
                                         <EuiSpacer size="s" />
                                         <b>Effect</b>
                                         <p>{(data.policy || {}).effect}</p>
