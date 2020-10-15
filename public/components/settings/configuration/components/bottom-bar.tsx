@@ -24,7 +24,7 @@ import {
   EuiButtonEmpty,
   EuiButton
 } from '@elastic/eui';
-
+import { WazuhConfig } from '../../../../react-services/wazuh-config';
 
 
 interface IBottomBarProps {
@@ -106,6 +106,12 @@ const saveSetting = async (setting, updatedConfig, config:ISetting[]) => {
   try{
     (config.find(item => item.setting === setting) || {value:''}).value = updatedConfig[setting];
     const result = await ConfigurationHandler.editKey(setting, updatedConfig[setting]);
+    
+    // Update the app configuration frontend-cached setting in memory with the new value
+    const wzConfig = new WazuhConfig();
+    wzConfig.setConfig({...wzConfig.getConfig(), ...{[setting]: updatedConfig[setting]}});
+    
+    // Show restart and/or reload message in toast
     const response = result.data.data;
     response.needRestart && restartToast();
     response.needReload && reloadToast();
