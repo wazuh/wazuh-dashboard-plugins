@@ -29,6 +29,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "group",
             "description": "Filter by group of agents",
             "schema": {
@@ -55,19 +68,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -2219,6 +2219,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "benchmark",
             "description": "Filter by benchmark type",
             "schema": {
@@ -2253,19 +2266,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -2376,6 +2376,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "board_serial",
             "description": "Filter by board_serial",
             "schema": {
@@ -2417,19 +2430,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -2515,6 +2515,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "hotfix",
             "description": "Filter by hotfix",
             "schema": {
@@ -2530,19 +2543,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -2618,6 +2618,19 @@
             }
           },
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "broadcast",
             "description": "Filter by broadcast direction",
             "schema": {
@@ -2634,19 +2647,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -2738,17 +2738,6 @@
             }
           },
           {
-            "name": "limit",
-            "description": "Maximum number of elements to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 500,
-              "minimum": 1,
-              "maximum": 500
-            }
-          },
-          {
             "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
@@ -2759,6 +2748,17 @@
                 "description": "Agent ID",
                 "format": "numbers"
               }
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
             }
           },
           {
@@ -2931,6 +2931,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "dhcp",
             "description": "Filter by network dhcp (enabled or disabled)",
             "schema": {
@@ -2969,19 +2982,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -3057,6 +3057,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "architecture",
             "description": "Filter by architecture",
             "schema": {
@@ -3073,19 +3086,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -3185,6 +3185,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "architecture",
             "description": "Filter by architecture",
             "schema": {
@@ -3209,19 +3222,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -3311,17 +3311,6 @@
         ],
         "query": [
           {
-            "name": "limit",
-            "description": "Maximum number of elements to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 500,
-              "minimum": 1,
-              "maximum": 500
-            }
-          },
-          {
             "name": "agents_list",
             "description": "List of agent IDs (separated by comma)",
             "schema": {
@@ -3332,6 +3321,17 @@
                 "description": "Agent ID",
                 "format": "numbers"
               }
+            }
+          },
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 500
             }
           },
           {
@@ -3463,6 +3463,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "egroup",
             "description": "Filter by process egroup",
             "schema": {
@@ -3495,19 +3508,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -3663,6 +3663,19 @@
         ],
         "query": [
           {
+            "name": "groups_list",
+            "description": "Array of group IDs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Group name",
+                "format": "group_names"
+              }
+            }
+          },
+          {
             "name": "hash",
             "description": "Select algorithm to generate the returned checksums",
             "schema": {
@@ -3692,19 +3705,6 @@
               "default": 500,
               "minimum": 1,
               "maximum": 500
-            }
-          },
-          {
-            "name": "groups_list",
-            "description": "Array of group IDs",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Group name",
-                "format": "group_names"
-              }
             }
           },
           {
@@ -7998,6 +7998,19 @@
         ],
         "query": [
           {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
             "name": "force_single_group",
             "description": "Whether to append the new group to current agent's multigroup or replace it",
             "schema": {
@@ -8013,19 +8026,6 @@
               "minLength": 1,
               "description": "Group name",
               "format": "group_names"
-            }
-          },
-          {
-            "name": "agents_list",
-            "description": "List of agent IDs (separated by comma)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
-              }
             }
           },
           {
@@ -9086,17 +9086,18 @@
         ],
         "body": [
           {
-            "type": "string",
-            "minLength": 3,
-            "description": "Agent ID",
-            "format": "numbers"
-          },
-          {
             "name": "force_time",
             "description": "Remove the old agent with the same IP if disconnected for <force_time> seconds",
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          {
+            "name": "id",
+            "type": "string",
+            "minLength": 3,
+            "description": "Agent ID",
+            "format": "numbers"
           },
           {
             "name": "ip",
@@ -9794,17 +9795,6 @@
         ],
         "query": [
           {
-            "name": "group_id",
-            "description": "Group ID. (Name of the group)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Group name",
-              "format": "group_names"
-            }
-          },
-          {
             "name": "agents_list",
             "description": "List of agent IDs (separated by comma), use the keyword 'all' to select all agents",
             "required": true,
@@ -9816,6 +9806,17 @@
                 "description": "Agent ID|all",
                 "format": "numbers_delete"
               }
+            }
+          },
+          {
+            "name": "group_id",
+            "description": "Group ID. (Name of the group)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Group name",
+              "format": "group_names"
             }
           },
           {
