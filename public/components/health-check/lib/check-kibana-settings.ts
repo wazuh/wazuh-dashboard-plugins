@@ -14,7 +14,7 @@ export function checkKibanaSettings (removeMetaFields: boolean) {
   removeMetaFields && getKibanaSettings()
   .then(checkMetafieldSetting)
   .then(updateMetaFieldsSetting)
-  .catch(console.log);
+  .catch(error => error !== 'Unable to update config' && console.log(error));
 }
 
 async function getKibanaSettings(): Promise<responseKbnSettings> {
