@@ -1,8 +1,8 @@
 <div ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'" style="padding: 16px">
     
     <!-- Cluster disabled or not running -->
-    <div ng-if="!permissions">
-        <react-component name="WzEmptyPromptNoPermissions" props="{roles}"></react-component>
+    <div ng-if="!authorized">
+        <react-component name="WzEmptyPromptNoPermissions" props="{permissions}"></react-component>
     </div>
 
     <!-- Cluster disabled or not running -->
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Cluster enabled -->
-    <div ng-show="isClusterEnabled && isClusterRunning && permissions" class="monitoring-discover" >
+    <div ng-show="isClusterEnabled && isClusterRunning && authorized" class="monitoring-discover" >
         <div ng-show="loading" style="padding: 16px">
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
         </div>

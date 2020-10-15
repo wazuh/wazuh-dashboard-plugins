@@ -43,6 +43,7 @@ export function ClusterController(
     AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
   $scope.isClusterEnabled = clusterEnabled;
   $scope.isClusterRunning = true;
+  $scope.authorized = true;
   $location.search('tabView', 'cluster-monitoring');
   $location.search('tab', 'monitoring');
   $location.search('_a', null);
@@ -230,11 +231,11 @@ export function ClusterController(
   const clusterStatus = async () => {
     try {
       const status = await WzRequest.apiReq('GET', '/cluster/status', {});
-      $scope.permissions = true;
+      $scope.authorized = true;
       return status;
     } catch (error) {
       if(error === '3013 - Permission denied: Resource type: *:*')
-        $scope.permissions = false
+        $scope.authorized = false
     }
   }
 
@@ -250,7 +251,7 @@ export function ClusterController(
       loadedVisualizations.removeAll();
       const status = await clusterStatus();
       if (!status) {
-        $scope.roles = [WAZUH_ROLE_ADMINISTRATOR_NAME];
+        $scope.permissions = [{action: 'cluster:status', resource: "*:*:*"}];
         $scope.loading = false;
         $scope.$applyAsync()
         return;
