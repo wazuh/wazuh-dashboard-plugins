@@ -209,7 +209,7 @@ export class Monitoring {
         const msg = ((response || {}).data || {}).message || false;
         const extraLog =
           msg ||
-          'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
+          `Agent monitoring cannot be started because Wazuh's API credentials were not found or are incorrect. Open the Wazuh-wui in your browser to see more details.`;
 
         !this.quiet && log('monitoring:checkAndSaveStatus', extraLog);
         !this.quiet && this.server.log(monitoringErrorLogColors, extraLog);
