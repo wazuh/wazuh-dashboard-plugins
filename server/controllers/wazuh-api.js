@@ -1155,25 +1155,6 @@ export class WazuhApiCtrl {
       //Path doesn't start with '/'
       return ErrorResponse('Request path is not valid.', 3015, 400, reply);
     } else {
-      // if (req.payload.method !== 'GET' && !adminMode) {
-      //   log('wazuh-api:requestApi', 'Forbidden action, allowed methods: GET');
-      //   return ErrorResponse(
-      //     req.payload.body && req.payload.body.devTools
-      //       ? 'Allowed method: [GET]'
-      //       : `Forbidden (${req.payload.method} ${req.payload.path}`,
-      //     3029,
-      //     400,
-      //     reply
-      //   );
-      // }
-      // if (req.payload.body.devTools) {
-      //   //delete req.payload.body.devTools;
-      //   const keyRegex = new RegExp(/.*agents\/\d*\/key.*/);
-      //   if (typeof req.payload.path === 'string' && keyRegex.test(req.payload.path) && !adminMode) {
-      //     log('wazuh-api:makeRequest', 'Forbidden route /agents/:id/key');
-      //     return ErrorResponse('Forbidden route /agents/:id/key', 3028, 400, reply);
-      //   }
-      // }
       return this.makeRequest(
         req.payload.method,
         req.payload.path,
