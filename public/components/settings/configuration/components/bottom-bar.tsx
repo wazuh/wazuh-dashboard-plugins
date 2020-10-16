@@ -109,7 +109,7 @@ const saveSetting = async (setting, updatedConfig, config:ISetting[]) => {
     
     // Update the app configuration frontend-cached setting in memory with the new value
     const wzConfig = new WazuhConfig();
-    wzConfig.setConfig({...wzConfig.getConfig(), ...{[setting]: updatedConfig[setting]}});
+    wzConfig.setConfig({...wzConfig.getConfig(), ...{[setting]: formatValueCachedConfiguration(updatedConfig[setting])}});
     
     // Show restart and/or reload message in toast
     const response = result.data.data;
@@ -152,3 +152,7 @@ const errorToast = (error) => {
     title:`Error saving the configuration: ${error.message || error}`,
   });
 }
+
+const formatValueCachedConfiguration = (value) => typeof value === 'string'
+    ? isNaN(Number(value)) ? value : Number(value)
+    : value;

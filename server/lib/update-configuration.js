@@ -68,9 +68,7 @@ export class UpdateConfigurationFile {
 
   formatValueCachedConfiguration = (value) => typeof value === 'string'
     ? isNaN(Number(value)) ? value : Number(value)
-    : typeof value === 'object' 
-      ? JSON.stringify(value)
-      : value
+    : value;
   /**
    * Updates wazuh.yml file. If it fails, it throws the error to the next function.
    * @param {Object} input
