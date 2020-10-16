@@ -16,7 +16,7 @@ import { ApiCheck } from './wz-api-check';
 import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
-
+import { OdfeUtils } from '../utils';
 export class WzRequest {
   /**
    * Permorn a generic request
@@ -47,6 +47,7 @@ export class WzRequest {
       }
       return Promise.resolve(data);
     } catch (error) {
+      OdfeUtils.checkOdfeSessionExpired(error);
       //if the requests fails, we need to check if the API is down
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (currentApi && currentApi.id) {
