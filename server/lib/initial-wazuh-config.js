@@ -64,7 +64,7 @@ export const initialWazuhConfig = `---
 #extensions.osquery   : false
 #extensions.docker    : false
 #
-# ---------------------------------- Time out ----------------------------------
+# ---------------------------------- Timeout ----------------------------------
 #
 # Defines maximum timeout to be used on the Wazuh app requests.
 # It will be ignored if it is bellow 1500.
@@ -143,9 +143,6 @@ export const initialWazuhConfig = `---
 #
 # Define the interval in which the index will be created
 #cron.statistics.index.creation: w
-#
-# ------------------------------- App privileges --------------------------------
-#admin: true
 #
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
