@@ -110,36 +110,10 @@ export const EventsEnhanceDiscoverCell = {
 
 // Method to enhance a cell of discover table
 export const enhanceDiscoverEventsCell = (field, content, rowData, element, options) => {
-  if(!EventsEnhanceDiscoverCell[field]){ return };
+  if(!EventsEnhanceDiscoverCell[field] || !element || element.attributes[CUSTOM_ATTRIBUTE_ENHANCED_DISCOVER_FIELD]){ return };
   const elementCellEnhanced = EventsEnhanceDiscoverCell[field](content, rowData, element, options);
   if(elementCellEnhanced){
     elementCellEnhanced.setAttribute(CUSTOM_ATTRIBUTE_ENHANCED_DISCOVER_FIELD, ''); // Set a custom attribute to indentify that element was enhanced
     element.replaceWith(elementCellEnhanced);
   };
-}
-
-// Method to enhance the cells of discover table
-export const enhanceDiscoverEvents = (discoverRowsData, options) => {
-  // Get table headers
-  const discoverTableHeaders = document.querySelectorAll(`.kbn-table thead th`);
-  discoverTableHeaders.forEach((header, headerIndex) => {
-    // Ignore the columns whose field doesn't need to be enhanced
-    if(!EventsEnhanceDiscoverCell[header.textContent]){ return };
-    // Get cells of table header column to be enhanced
-    const elements = document.querySelectorAll(`.kbn-table tbody tr td:nth-child(${headerIndex+1}) div:not([${CUSTOM_ATTRIBUTE_ENHANCED_DISCOVER_FIELD}]) `);
-    const elementsFields = document.querySelectorAll(`.kbn-table tbody tr td .kbnDocViewer__field`);
-    elements.forEach((elementRow, elementRowIndex) => {
-      if(!elementRow.className.includes('kbnDocViewer__value')){
-        enhanceDiscoverEventsCell(header.textContent, elementRow.textContent, discoverRowsData[elementRowIndex], elementRow, options)
-      }
-    })
-    elementsFields.forEach((row, rowIdx) => {
-      const parentNode = row.parentNode;
-      const currentRowField = row.childNodes[0].childNodes[1].textContent || "";
-      const valueElement = parentNode.childNodes && parentNode.childNodes[2];
-      if(EventsEnhanceDiscoverCell[currentRowField]){
-        enhanceDiscoverEventsCell(currentRowField, (valueElement || {}).textContent || '', discoverRowsData[rowIdx], valueElement, options)
-      }
-    })
-  });
 }
