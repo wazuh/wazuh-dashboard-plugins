@@ -253,16 +253,17 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
         <EuiTitle><h1>Mapping rules</h1></EuiTitle>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiText>Assign roles to users who match these rules.
-                        <EuiLink href="https://documentation.wazuh.com/current/user-manual/api/rbac/auth_context.html" external target="_blank">
-                Learn more
-                        </EuiLink>
+            <EuiText>
+              <span>Assign roles to users who match these rules. </span> 
+              <EuiLink href="https://documentation.wazuh.com/current/user-manual/api/rbac/auth_context.html" external target="_blank">
+                  Learn more
+              </EuiLink>
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel style={{ backgroundColor: "#F5F7FA" }}>
+            <EuiPanel>
               {isJsonEditor &&
                 <div >
                   <EuiCodeEditor
