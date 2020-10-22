@@ -24,3 +24,5 @@ export { withGlobalBreadcrumb  } from './withGlobalBreadcrumb';
 export { withReduxProvider  } from './withReduxProvider';
 
 export { withGuard } from './withGuard';
+
+export { withButtonOpenOnClick } from './withButtonOpenOnClick';
