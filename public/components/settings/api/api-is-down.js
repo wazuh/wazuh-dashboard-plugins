@@ -210,11 +210,11 @@ hosts:
           <div>
             <EuiText>For Systemd</EuiText>
             <EuiSpacer />
-            <EuiCode>$ sudo systemctl status wazuh-api</EuiCode>
+            <EuiCode>$ sudo systemctl status wazuh-manager</EuiCode>
             <EuiSpacer />
             <EuiText>For SysV Init</EuiText>
             <EuiSpacer />
-            <EuiCode>$ sudo service wazuh-api status</EuiCode>
+            <EuiCode>$ sudo service wazuh-manager status</EuiCode>
           </div>
         )
       },
