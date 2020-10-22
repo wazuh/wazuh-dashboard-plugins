@@ -9,6 +9,7 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
+import { WzButtonModalConfirm } from '../../common/buttons';
 
 export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule, updateRules }) => {
   const getRowProps = item => {
@@ -63,14 +64,14 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       align: 'right',
       width: '5%',
       name: 'Actions',
-      render: item => {
-        return <EuiToolTip
-          content={item.id < 3 ? "Reserved policies can't be deleted" : 'Delete policy'}
-          position="left">
-          <EuiButtonIcon
+      render: item => (
+        <div onClick={ev => ev.stopPropagation()}>
+          <WzButtonModalConfirm
+            buttonType='icon'
+            tooltip={{content: item.id < 3 ? "Reserved role mapping can't be deleted" : 'Delete role mapping', position: 'left'}}
             isDisabled={item.id < 3}
-            onClick={async (ev) => {
-              ev.stopPropagation();
+            modalTitle={`Do you want to delete the ${item.name} role mapping?`}
+            onConfirm={async () => {
               try {
                 const response = await WzRequest.apiReq(
                   'DELETE',
@@ -85,18 +86,19 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
                 if (data.failed_items && data.failed_items.length) {
                   return;
                 }
-                ErrorHandler.info('Rule was successfully deleted');
+                ErrorHandler.info('Role mapping was successfully deleted');
                 updateRules();
               } catch (err) {
                 ErrorHandler.error(err);
-              }
+              }  
             }}
-            iconType="trash"
-            color={'danger'}
-            aria-label="Delete policy"
-          />
-        </EuiToolTip>
-      }
+            modalProps={{buttonColor: 'danger'}}
+            iconType='trash'
+            color='danger'
+            aria-label='Delete role mapping'
+      />
+        </div>
+        )
     }
   ];
 
