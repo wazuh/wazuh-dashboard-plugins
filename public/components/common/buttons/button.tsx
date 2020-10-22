@@ -31,12 +31,15 @@ interface WzButtonProps{
   rest?: any
 };
 
+const WzButtons: {[key in WzButtonType]: React.FunctionComponent} = {
+  'default': EuiButton,
+  'empty': EuiButtonEmpty,
+  'icon': EuiButtonIcon,
+  'link': EuiLink,
+}
+
 export const WzButton = ({buttonType = WzButtonType.default, tooltip, ...rest}: WzButtonProps) => {
-  const Button = buttonType === 'default' ? EuiButton
-    : buttonType === 'empty' ? EuiButtonEmpty 
-    : buttonType === 'icon' ? EuiButtonIcon 
-    : buttonType === 'link' ? EuiLink 
-    : null;
+  const Button = WzButtons[buttonType];
   
   const button = <Button {...rest} />
   return tooltip ? 
