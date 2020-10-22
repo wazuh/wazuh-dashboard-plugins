@@ -88,7 +88,7 @@ export const RolesMappingCreate = ({ closeFlyout, rolesEquivalences, roles }) =>
             error={'At least one role must be selected.'}
             helpText="Assign roles to your users.">
             <EuiComboBox
-              placeholder="Select policies"
+              placeholder="Select roles"
               options={getRolesList(roles)}
               isDisabled={false}
               selectedOptions={selectedRoles}

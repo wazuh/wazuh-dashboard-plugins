@@ -8,6 +8,7 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
+import { WzButtonModalConfirm } from '../../common/buttons';
 
 export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) => {
 
@@ -68,13 +69,14 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
           align: 'right',
           width: '5%',
           name: 'Actions',
-          render: item => {return <EuiToolTip
-            content={item.id < 100 ? "Reserved policies can't be deleted" : 'Delete policy'}
-            position="left">
-            <EuiButtonIcon
-              isDisabled={item.id < 100}
-              onClick={async(ev) => {
-                    ev.stopPropagation();
+          render: item => (
+            <div onClick={ev => ev.stopPropagation()}>
+                <WzButtonModalConfirm
+                buttonType='icon'
+                tooltip={{content: item.id < 100 ? "Reserved policies can't be deleted" : 'Delete policy', position: 'left'}}
+                isDisabled={item.id < 100}
+                modalTitle={`Do you want to delete the ${item.name} policy?`}
+                onConfirm={async () => {
                     try{
                         const response = await WzRequest.apiReq(
                         'DELETE',
@@ -94,19 +96,21 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
                 }catch(error){
                     ErrorHandler.handle(error, 'Error deleting policy');
                 }
-              }}
-              iconType="trash"
-              color={'danger'}
-              aria-label="Delete policy"
-            />
-          </EuiToolTip>}
+                }}
+                modalProps={{buttonColor: 'danger'}}
+                iconType='trash'
+                color='danger'
+                aria-label='Delete policy'
+          />
+            </div>
+            )
         }
     ];
 
     const sorting = {
         sort: {
-            field: 'user',
-            direction: 'desc',
+            field: 'id',
+            direction: 'asc',
         },
     };
 
