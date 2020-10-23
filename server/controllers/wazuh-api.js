@@ -34,6 +34,7 @@ import { UpdateRegistry } from '../lib/update-registry';
 import { ApiInterceptor } from '../lib/api-interceptor';
 import { SecurityObj } from '../lib/security-factory';
 import jwtDecode from 'jwt-decode';
+import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
 
 export class WazuhApiCtrl {
   /**
@@ -58,10 +59,10 @@ export class WazuhApiCtrl {
 
   getCurrentPlatform(server) {
     if (server.plugins.security) {
-      return 'xpack';
+      return WAZUH_SECURITY_PLUGIN_XPACK_SECURITY;
     }
     if (server.newPlatform.setup.plugins.opendistroSecurity) {
-      return 'opendistro';
+      return WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH;
     }
     return undefined;
   }
@@ -91,9 +92,9 @@ export class WazuhApiCtrl {
   }
 
   getUserFromAuthContext(authContext){
-    if(this.PLATFORM === 'xpack')
+    if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_XPACK_SECURITY)
       return authContext.username;
-    if(this.PLATFORM === 'opendistro')
+    if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH)
       return authContext.user_name;
   }
 
