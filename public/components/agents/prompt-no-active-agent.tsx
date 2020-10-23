@@ -22,7 +22,7 @@ export const PromptNoActiveAgent = () => {
     <EuiEmptyPrompt
       iconType="watchesApp"
       title={<h2>Agent is not active</h2>}
-      body={<p>This section is only availabe for active agents.</p>}
+      body={<p>This section is only available for active agents.</p>}
       actions={
         <EuiButton color="primary" fill onClick={openAgentSelector}>
           Select agent
