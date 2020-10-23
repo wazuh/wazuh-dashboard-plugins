@@ -26,6 +26,8 @@ import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREF
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
 import { ApiInterceptor } from '../lib/api-interceptor';
+import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
+
 export class WazuhElasticCtrl {
   /**
    * Constructor
@@ -386,11 +388,11 @@ export class WazuhElasticCtrl {
    */
   async getCurrentPlatform(req, reply) {
     try {
-      if(this._server.newPlatform.setup.plugins.security ) { // XPACK
-        return {platform: 'xpack'}
+      if(this._server.newPlatform.setup.plugins.security ) {
+        return {platform: WAZUH_SECURITY_PLUGIN_XPACK_SECURITY}
       }
       if(this._server.newPlatform.setup.plugins.opendistroSecurity){
-        return {platform: 'opendistro'}
+        return {platform: WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH}
       }
       return { platform: false}
     } catch (error) {

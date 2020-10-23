@@ -13,6 +13,7 @@
 
 import { WzSecurityXpack } from '../react-services/wz-security-xpack';
 import { WzSecurityOpendistro } from '../react-services/wz-security-opendistro';
+import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
 import store from '../redux/store';
 
 
@@ -25,9 +26,9 @@ export class WazuhSecurity {
       return WazuhSecurity.instance;
     }
     const platform = store.getState().appStateReducers.currentPlatform;
-    if(platform === 'xpack'){
+    if(platform === WAZUH_SECURITY_PLUGIN_XPACK_SECURITY){
       this.security = WzSecurityXpack;
-    }else if(platform === 'opendistro'){
+    }else if(platform === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH){
      this.security =  WzSecurityOpendistro;
     }else{
       this.security = false;
