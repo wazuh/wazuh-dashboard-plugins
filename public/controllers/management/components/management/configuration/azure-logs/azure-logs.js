@@ -11,9 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-
-import {} from '@elastic/eui';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -95,7 +92,7 @@ class WzConfigurationAzure extends Component {
         {currentConfig && this.wodleConfig['azure-logs'] && (
           <WzConfigurationSettingsTabSelector
             title="Main settings"
-            description="Common settings applied to all Amazon S3 buckets"
+            description="Configuration for the Azure logs wodle"
             currentConfig={this.wodleConfig}
             minusHeight={260}
             helpLinks={helpLinks}

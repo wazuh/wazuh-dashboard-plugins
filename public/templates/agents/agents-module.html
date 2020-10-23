@@ -1,5 +1,5 @@
 <div ng-if="agent">
-    <div ng-if="tab !== 'welcome' && agent && agent.status !== 'Never connected'">
+    <div ng-if="tab !== 'welcome' && agent && agent.status !== 'never_connected'">
         <react-component name="MainModule" props="{agent, section: tab, disabledReport: resultState !== 'ready', cardsProps: getWelcomeCardsProps(resultState), goGroups: goGroups, exportConfiguration: exportConfiguration}" ></react-component>
     </div>
     <div ng-if='!loadingDashboard'>

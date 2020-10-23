@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { EuiBasicTable, EuiCallOut } from '@elastic/eui';
+import { EuiBasicTable, EuiCallOut, EuiSpacer } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -72,13 +72,13 @@ class WzGroupFilesTable extends Component {
     try {
       const rawItems = await this.groupsHandler.filesGroup(
         this.props.state.itemDetail.name,
-        this.buildFilter()
+        { params: this.buildFilter() }
       );
-      const { items, totalItems } = ((rawItems || {}).data || {}).data;
+      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
       this.setState({
-        items,
-        totalItems,
+        items: affected_items,
+        totalItems: total_affected_items,
         isProcessing: false
       });
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
@@ -151,7 +151,10 @@ class WzGroupFilesTable extends Component {
           <WzSearchBar
             filters={filters}
             suggestions={this.suggestions}
-            onFiltersChange={filters => this.setState({filters})} />
+            onFiltersChange={filters => this.setState({filters})}
+            placeholder='Search file'
+          />
+          <EuiSpacer size='s' />
           <EuiBasicTable
             itemId="id"
             items={items}

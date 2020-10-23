@@ -2,7 +2,38 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 886
+## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2 - Revision 4002
+
+### Added
+
+- Support for Wazuh v4.0.0.
+- Support for Kibana v7.9.1 and 7.9.2.
+- Support for Open Distro 1.10.1.
+- Added a RBAC security layer integrated with Open Distro and X-Pack.
+- Added remoted and analysisd statistics.
+- Expand supported deployment variables.
+- Added new configuration view settings for GCP integration.
+- Added logic to change the `metafields` configuration of Kibana [#2524](https://github.com/wazuh/wazuh-kibana-app/issues/2524)
+
+### Changed
+
+- Migrated the default index-pattern to `wazuh-alerts-*`.
+- Removed the `known-fields` functionality.
+- Security Events dashboard redesinged.
+- Redesigned the app settings configuration with categories.
+- Moved the wazuh-registry file to Kibana optimize folder.
+
+### Fixed
+
+- Format options in `wazuh-alerts` index-pattern are not overwritten now.
+- Prevent blank page in detaill agent view.
+- Navigable agents name in Events.
+- Index pattern is not being refreshed.
+- Reporting fails when agent is pinned and compliance controls are visited.
+- Reload rule detail doesn't work properly with the related rules.
+- Fix search bar filter in Manage agent of group [#2541](https://github.com/wazuh/wazuh-kibana-app/pull/2541)
+
+## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 887
 
 ### Added
 

@@ -12,7 +12,7 @@
 import { TabNames } from '../../utils/tab-names';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { ShareAgent } from '../../factories/share-agent';
 import RulesetHandler from './components/management/ruleset/utils/ruleset-handler';
@@ -39,7 +39,6 @@ export class ManagementController {
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;
-    this.apiReq = ApiRequest;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
@@ -178,7 +177,6 @@ export class ManagementController {
       configurationProps: {
         agent: {
           id: '000'
-          // agentPlatform: 'linux'
         }, // TODO: get dynamically the agent?
         updateWazuhNotReadyYet: status => {
           this.$rootScope.wazuhNotReadyYet = status;
@@ -194,8 +192,6 @@ export class ManagementController {
    */
   $onInit() {
     this.clusterInfo = AppState.getClusterInfo();
-    const configuration = this.wazuhConfig.getConfig();
-    this.adminMode = !!(configuration || {}).admin;
 
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
       this.tab = 'groups';
@@ -394,7 +390,7 @@ export class ManagementController {
       const clusterInfo = AppState.getClusterInfo() || {};
       const clusterEnabled = clusterInfo.status === 'enabled';
       if (clusterEnabled) {
-        const response = await this.apiReq.request('GET', '/cluster/nodes', {});
+        const response = await WzRequest.apiReq('GET', '/cluster/nodes', {});
         const nodeList =
           (((response || {}).data || {}).data || {}).items || false;
         if (Array.isArray(nodeList) && nodeList.length) {
@@ -424,7 +420,7 @@ export class ManagementController {
   }
 
   testLogtest = async log => {
-    //return await this.apiReq.request('GET', '/testlog', {log});
+    //return await WzRequest.apiReq('GET', '/testlog', {log});
     const sleep = m => new Promise(r => setTimeout(r, m));
     await sleep(1000);
     return `**Phase 1: Completed pre-decoding.

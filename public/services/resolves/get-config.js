@@ -10,15 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from "../../../util/constants";
+
 export async function getWzConfig($q, genericReq, wazuhConfig) {
   // Remember to keep this values equal to default wazuh.yml values
   const defaultConfig = {
-    pattern: 'wazuh-alerts-3.x-*',
+    pattern: WAZUH_ALERTS_PATTERN,
     'checks.pattern': true,
     'checks.template': true,
     'checks.api': true,
     'checks.setup': true,
     'checks.fields': true,
+    'checks.metaFields': true,
     'extensions.pci': true,
     'extensions.gdpr': true,
     'extensions.hipaa': true,
@@ -42,10 +45,16 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'wazuh.monitoring.shards': 2,
     'wazuh.monitoring.replicas': 0,
     'wazuh.monitoring.creation': 'd',
-    'wazuh.monitoring.pattern': 'wazuh-monitoring-3.x-*',
-    admin: true,
+    'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
+    'cron.prefix': 'wazuh',
+    'cron.statistics.status': true,
+    'cron.statistics.apis': [],
+    'cron.statistics.interval': '0 0 * * * *',
+    'cron.statistics.index.name': 'statistics',
+    'cron.statistics.index.creation': 'w',
     hideManagerAlerts: false,
-    'logs.level': 'info'
+    'logs.level': 'info',
+    'enrollment.dns': ''
   };
 
   try {

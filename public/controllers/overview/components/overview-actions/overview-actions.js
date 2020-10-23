@@ -30,6 +30,8 @@ import {
 } from '@elastic/eui';
 import './agents-selector.less';
 import { AgentSelectionTable } from './agents-selection-table';
+import { WAZUH_ALERTS_PATTERN } from '../../../../../util/constants';
+import { AppState } from '../../../../react-services/app-state';
 class OverviewActions extends Component {
   constructor(props) {
     super(props);
@@ -112,7 +114,7 @@ class OverviewActions extends Component {
             "negate": false,
             "params": { "query": agentIdList[0] },
             "type": "phrase",
-            "index": "wazuh-alerts-3.x-*"
+            "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
           },
           "query": {
             "match": {

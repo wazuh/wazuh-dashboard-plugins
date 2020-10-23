@@ -30,6 +30,7 @@ import WzCodeEditor from '../util-components/code-editor';
 import WzWazuhAPINotReachable from '../util-components/wz-api-not-reachable';
 import WzConfigurationPath from '../util-components/configuration-path';
 import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 import withLoading from '../util-hocs/loading';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 import {
@@ -172,38 +173,23 @@ class WzEditConfiguration extends Component {
     }
   }
 
-  async updateClusterInfo(){
-    try{
-      const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
-      const data = await ApiCheck.checkStored(currentApi.id);
-      //update cluster info
-      const cluster_info = (((data || {}).data || {}).data || {})
-       .cluster_info;
-      if (cluster_info) {
-        AppState.setClusterInfo(cluster_info);
-      }
-    } catch(err){ }
-
-  }
-
   async checkIfClusterOrManager() {
     try {
       // in case which enable/disable cluster configuration, update Redux Store
       const clusterStatus = await clusterReq();
-      await this.updateClusterInfo();
       if(clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'){
         // try if it is a cluster
         const nodes = await clusterNodes();
         // set cluster nodes in Redux Store
-        this.props.updateClusterNodes(nodes.data.data.items);
+        this.props.updateClusterNodes(nodes.data.data.affected_items);
         // set cluster node selected in Redux Store
-        const existsClusterCurrentNodeSelected = nodes.data.data.items.find(
+        const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(
           node => node.name === this.props.clusterNodeSelected
         );
         this.props.updateClusterNodeSelected(
           existsClusterCurrentNodeSelected
             ? existsClusterCurrentNodeSelected.name
-            : nodes.data.data.items.find(node => node.type === 'master').name
+            : nodes.data.data.affected_items.find(node => node.type === 'master').name
         );
         this.props.updateConfigurationSection(
           'edit-configuration',
@@ -247,31 +233,27 @@ class WzEditConfiguration extends Component {
                 XML format error
               </EuiButton>
             ) : (
-              <EuiButton
+              <WzButtonPermissions
+                permissions={[this.props.clusterNodeSelected ? {action: 'cluster:upload_file', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:upload_file', resource: 'file:path:/etc/ossec.conf'}]}
                 isDisabled={saving || disableSaveRestartButtons}
                 iconType="save"
                 onClick={() => this.editorSave()}
               >
                 Save
-              </EuiButton>
+              </WzButtonPermissions>
             )}
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            {restarting ? (
-              <EuiButton fill isDisabled>
-                <EuiLoadingSpinner size="s" /> Restarting{' '}
-                {clusterNodeSelected || 'Manager'}
-              </EuiButton>
-            ) : (
-              <EuiButton
-                fill
-                iconType="refresh"
-                onClick={() => this.toggleRestart()}
-                isDisabled={disableSaveRestartButtons}
-              >
-                Restart {clusterNodeSelected || 'Manager'}
-              </EuiButton>
-            )}
+            <WzButtonPermissions
+              permissions={[this.props.clusterNodeSelected ? {action: 'cluster:restart', resource: `node:id:${this.props.clusterNodeSelected}`} : {action: 'manager:restart', resource: '*:*:*'}]}
+              fill
+              iconType="refresh"
+              onClick={() => this.toggleRestart()}
+              isDisabled={disableSaveRestartButtons || restarting}
+              isLoading={restarting}
+            >
+              {restarting ? 'Restarting' : 'Restart' } {clusterNodeSelected || 'Manager'}
+            </WzButtonPermissions>
           </EuiFlexItem>
         </WzConfigurationPath>
         <WzEditorConfiguration

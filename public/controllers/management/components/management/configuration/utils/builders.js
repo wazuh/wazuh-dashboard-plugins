@@ -30,7 +30,8 @@ export const settingsListBuilder = (items, label) =>
             ? tag(item)
             : sum;
         }, '')
-      : item[label]
+      : typeof label === 'function'
+        ? label(item) : item[label]
   }));
 
 /**

@@ -12,7 +12,7 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPage } from '@elastic/eui';
+import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPage, EuiToolTip } from '@elastic/eui';
 
 export class Stats extends Component {
   constructor(props) {
@@ -22,25 +22,23 @@ export class Stats extends Component {
   }
 
   goToAgents(status) {
-    let selectedOptions = [];
-
-    if (status !== null) {
-      selectedOptions = [
-        {
-          className: 'wzFilterBarOperator',
-          group: 'status',
-          label: 'status:' + status,
-          label_: status,
-          type: 'AND'
-        }
-      ];
+    if(status){
+      sessionStorage.setItem(
+        'agents_preview_selected_options',
+        JSON.stringify([{field: 'q', value: `status=${status}`}])
+      );
+    }else if(sessionStorage.getItem('agents_preview_selected_options')){
+      sessionStorage.removeItem('agents_preview_selected_options');
     }
-
-    sessionStorage.setItem(
-      'agents_preview_selected_options',
-      JSON.stringify(selectedOptions)
-    );
     window.location.href = '#/agents-preview';
+  }
+
+  renderTitle(total) {
+    return <EuiToolTip position="top" content={`Go to all agents`}>
+      <span>
+        {total}
+      </span>
+    </EuiToolTip>
   }
 
   render() {
@@ -48,45 +46,73 @@ export class Stats extends Component {
       <EuiPage>
         <EuiFlexGroup>
           <EuiFlexItem />
-          <EuiFlexItem
-            style={{ cursor: 'pointer' }}
-            onClick={() => this.goToAgents(null)}
-            className="statWithLink">
+          <EuiFlexItem>
             <EuiStat
-              title={this.props.total}
+              title={
+                <EuiToolTip position="top" content={`Go to all agents`}>
+                  <span
+                    className={ 'statWithLink' }
+                    style={{ cursor: "pointer" }}
+                    onClick={() => this.goToAgents(null)}
+                  >
+                    {this.props.total}
+                  </span>
+                </EuiToolTip>
+              }
               description="Total agents"
               titleColor="primary"
               textAlign="center"
             />
           </EuiFlexItem>
-          <EuiFlexItem
-            style={{ cursor: 'pointer' }}
-            onClick={() => this.goToAgents('Active')}
-            className="statWithLink">
+          <EuiFlexItem>
             <EuiStat
-              title={this.props.active}
+              title={
+                <EuiToolTip position="top" content={`Go to active agents`}>
+                  <span
+                    onClick={() => this.goToAgents('active')}
+                    className={ 'statWithLink' }
+                    style={{ cursor: "pointer" }}
+                  >
+                    {this.props.active}
+                  </span>
+                </EuiToolTip>
+              }
               description="Active agents"
               titleColor="secondary"
               textAlign="center"
             />
           </EuiFlexItem>
-          <EuiFlexItem
-            style={{ cursor: 'pointer' }}
-            onClick={() => this.goToAgents('Disconnected')}
-            className="statWithLink">
+          <EuiFlexItem>
             <EuiStat
-              title={this.props.disconnected}
+              title={
+                <EuiToolTip position="top" content={`Go to disconnected agents`}>
+                  <span
+                    onClick={() => this.goToAgents('disconnected')}
+                    className={ 'statWithLink' }
+                    style={{ cursor: "pointer" }}
+                  >
+                    {this.props.disconnected}
+                  </span>
+                </EuiToolTip>
+              }
               description="Disconnected agents"
               titleColor="danger"
               textAlign="center"
             />
           </EuiFlexItem>
-          <EuiFlexItem
-            style={{ cursor: 'pointer' }}
-            onClick={() => this.goToAgents('Never connected')}
-            className="statWithLink">
+          <EuiFlexItem>
             <EuiStat
-              title={this.props.neverConnected}
+              title={
+                <EuiToolTip position="top" content={`Go to never connected agents`}>
+                  <span
+                    onClick={() => this.goToAgents('never_connected')}
+                    className={ 'statWithLink' }
+                    style={{ cursor: "pointer" }}
+                  >
+                    {this.props.neverConnected}
+                  </span>
+                </EuiToolTip>
+              }
               description="Never connected agents"
               titleColor="subdued"
               textAlign="center"

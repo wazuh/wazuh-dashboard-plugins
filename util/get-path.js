@@ -34,5 +34,6 @@ export function getPath(config) {
   } else {
     path = `${config.url}:${config.port}`;
   }
+
   return path;
 }

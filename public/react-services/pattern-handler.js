@@ -13,6 +13,7 @@ import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { SavedObject } from './saved-objects';
+import { npStart } from 'ui/new_platform';
 import { toastNotifications } from 'ui/notify';
 import { WazuhConfig } from '../react-services/wazuh-config';
 
@@ -23,10 +24,9 @@ export class PatternHandler {
   static async getPatternList(where) {
     try {
       var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
-     
- 
-      if(where === 'healthcheck'){
-        function getIndexPatterns () {
+
+      if (where === 'healthcheck') {
+        function getIndexPatterns() {
           return new Promise(function (resolve, reject) {
             setTimeout(async function () {
               var patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
@@ -36,23 +36,23 @@ export class PatternHandler {
         }
         var i = 0;
         // if the index pattern doesn't exist yet, we check 5 more times with a delay of 500ms
-        while(i<5 && !patternList.length){ 
+        while (i < 5 && !patternList.length) {
           i++;
           patternList = await getIndexPatterns()
-          .then(
-            function (result) {
-              return result;
-            }
-          );
+            .then(
+              function (result) {
+                return result;
+              }
+            );
         }
       }
       if (!patternList.length) {
-        // if no valid index patterns are found we try to create the wazuh-alerts-3.x-*
+        // if no valid index patterns are found we try to create the wazuh-alerts-*
         try {
           const wazuhConfig = new WazuhConfig();
           const { pattern } = wazuhConfig.getConfig();
-          if(!pattern) return;
-          
+          if (!pattern) return;
+
           toastNotifications.add({
             color: 'warning',
             title:
@@ -123,5 +123,21 @@ export class PatternHandler {
       throw new Error('Error Pattern Handler (changePattern)');
     }
     return;
+  }
+
+  /**
+ * Refresh current pattern for the given pattern
+ * @param {String} pattern
+ */
+  static async refreshIndexPattern() {
+    try {
+      const currentPattern = AppState.getCurrentPattern();
+      const courierData = await npStart.plugins.data.indexPatterns.get(currentPattern);
+      await SavedObject.refreshIndexPattern(currentPattern)
+      const fields = await courierData.fieldsFetcher.fetch({});
+      await courierData.initFields(fields);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

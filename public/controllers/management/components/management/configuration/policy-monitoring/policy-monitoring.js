@@ -11,7 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzTabSelector, {

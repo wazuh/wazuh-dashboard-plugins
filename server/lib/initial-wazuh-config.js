@@ -33,7 +33,7 @@ export const initialWazuhConfig = `---
 # ------------------------------- Index patterns -------------------------------
 #
 # Default index pattern to use.
-#pattern: wazuh-alerts-3.x-*
+#pattern: wazuh-alerts-*
 #
 # ----------------------------------- Checks -----------------------------------
 #
@@ -43,6 +43,7 @@ export const initialWazuhConfig = `---
 #checks.template: true
 #checks.api     : true
 #checks.setup   : true
+#checks.metaFields: true
 #
 # --------------------------------- Extensions ---------------------------------
 #
@@ -63,7 +64,7 @@ export const initialWazuhConfig = `---
 #extensions.osquery   : false
 #extensions.docker    : false
 #
-# ---------------------------------- Time out ----------------------------------
+# ---------------------------------- Timeout ----------------------------------
 #
 # Defines maximum timeout to be used on the Wazuh app requests.
 # It will be ignored if it is bellow 1500.
@@ -75,7 +76,7 @@ export const initialWazuhConfig = `---
 #
 # Defines if the user is allowed to change the selected
 # API directly from the Wazuh app top menu.
-# Default: truepi
+# Default: true
 #api.selector: true
 #
 # --------------------------- Index pattern selector ---------------------------
@@ -107,21 +108,41 @@ export const initialWazuhConfig = `---
 # Default: 900 (s)
 #wazuh.monitoring.frequency: 900
 #
-# Configure wazuh-monitoring-3.x-* indices shards and replicas.
+# Configure wazuh-monitoring-* indices shards and replicas.
 #wazuh.monitoring.shards: 2
 #wazuh.monitoring.replicas: 0
 #
-# Configure wazuh-monitoring-3.x-* indices custom creation interval.
+# Configure wazuh-monitoring-* indices custom creation interval.
 # Values: h (hourly), d (daily), w (weekly), m (monthly)
 # Default: d
 #wazuh.monitoring.creation: d
 #
 # Default index pattern to use for Wazuh monitoring
-#wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
+#wazuh.monitoring.pattern: wazuh-monitoring-*
 #
+# --------------------------------- wazuh-cron ----------------------------------
 #
-# ------------------------------- App privileges --------------------------------
-#admin: true
+# Customize the index prefix of predefined jobs
+# This change is not retroactive, if you change it new indexes will be created
+# cron.prefix: test
+#
+# ------------------------------ wazuh-statistics -------------------------------
+#
+# Custom setting to enable/disable statistics tasks.
+#cron.statistics.status: true
+#
+# Enter the ID of the APIs you want to save data from, leave this empty to run
+# the task on all configured APIs
+#cron.statistics.apis: []
+#
+# Define the frequency of task execution using cron schedule expressions
+#cron.statistics.interval: 0 0 * * * *
+#
+# Define the name of the index in which the documents are to be saved.
+#cron.statistics.index.name: statistics
+#
+# Define the interval in which the index will be created
+#cron.statistics.index.creation: w
 #
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
@@ -133,6 +154,11 @@ export const initialWazuhConfig = `---
 # Allowed values: info, debug
 #logs.level: info
 #
+# -------------------------------- Enrollment DNS -------------------------------
+# Set the variable WAZUH_REGISTRATION_SERVER in agents deployment.
+# Default value: ''
+#enrollment.dns: ''
+#
 #-------------------------------- API entries -----------------------------------
 #The following configuration is the default structure to define an API entry.
 #
@@ -140,14 +166,13 @@ export const initialWazuhConfig = `---
 #  - <id>:
 #     url: http(s)://<url>
 #     port: <port>
-#     user: <user>
+#     username: <username>
 #     password: <password>
 
 hosts:
   - default:
      url: https://localhost
      port: 55000
-     user: foo
-     password: bar
-
-`;
+     username: wazuh-wui
+     password: wazuh-wui
+`

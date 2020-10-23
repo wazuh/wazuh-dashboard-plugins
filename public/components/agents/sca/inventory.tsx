@@ -25,14 +25,15 @@ import { WzRequest } from '../../../react-services/wz-request';
 import TimeService from '../../../react-services/time-service'
 import exportCsv from '../../../react-services/wz-csv';
 import { toastNotifications } from 'ui/notify';
-import { WzSearchBar, filtersToObject} from '../../../components/wz-search-bar';
+import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
+import { RuleText, ComplianceText } from './components';
 
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
     const { agent } = this.props;
-    this.state = { agent, itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false , filters: []}
+    this.state = { agent, items: [], itemIdToExpandedRowMap: {}, showMoreInfo: false, loading: false, filters: [] }
     this.policies = [];
     this.wzReq = WzRequest;
     this.suggestions = {};
@@ -169,9 +170,13 @@ export class Inventory extends Component {
     }
   }
 
-  async componentDidUpdate(prevProps) {
-    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
-      await this.initialize();
+  async componentDidUpdate(prevProps, prevState) {
+    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)) {
+      this.setState({ lookingPolicy: false }, async () => await this.initialize());
+    }
+    if(!_.isEqual(this.state.filters, prevState.filters)) {
+      const items = this.getItems()
+      this.setState({ items });
     }
   }
 
@@ -205,37 +210,33 @@ export class Inventory extends Component {
     );
   }
 
-  buildSuggestionSearchBar(policy, checks){
-    if(this.suggestions[policy]) return;
+  buildSuggestionSearchBar(policy, checks) {
+    if (this.suggestions[policy]) return;
     const distinctFields = {};
     checks.forEach(item => {
       Object.keys(item).forEach(field => {
-        if(typeof item[field] === 'string'){
-          if(!distinctFields[field]){
+        if (typeof item[field] === 'string') {
+          if (!distinctFields[field]) {
             distinctFields[field] = {};
           }
-          if(!distinctFields[field][item[field]]){
+          if (!distinctFields[field][item[field]]) {
             distinctFields[field][item[field]] = true;
           }
         }
       });
     });
 
-    // TODO: pending API
-     // { type: 'params', label: 'command', description: 'Filter by check command', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["command"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'title', description: 'Filter by check title', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["title"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["result"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["status"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["rationale"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["registry"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'description', description: 'Filter by check description', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["description"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'remediation', description: 'Filter by check remediation', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["remediation"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-     // { type: 'params', label: 'reason', description: 'Filter by check reason', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["reason"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-    
-    this.suggestions[policy] = [ 
-      { type: 'params', label: 'condition', description: 'Filter by check condition', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["condition"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-      { type: 'params', label: 'file', description: 'Filter by check file', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["file"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
-      { type: 'params', label: 'references', description: 'Filter by check references', operators: ['=', '!=',], values: (value) => {return Object.keys(distinctFields["references"]).filter(item => item.toLowerCase().includes(value.toLowerCase())) } },
+    this.suggestions[policy] = [
+      { type: 'params', label: 'condition', description: 'Filter by check condition', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["condition"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'file', description: 'Filter by check file', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["file"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'title', description: 'Filter by check title', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["title"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'result', description: 'Filter by check result', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["result"]).filter(item => item && item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'status', description: 'Filter by check status', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["status"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'rationale', description: 'Filter by check rationale', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["rationale"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'registry', description: 'Filter by check registry', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["registry"] || {}).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'description', description: 'Filter by check description', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["description"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'remediation', description: 'Filter by check remediation', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["remediation"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
+      { type: 'params', label: 'reason', description: 'Filter by check reason', operators: ['=', '!=',], values: (value) => { return Object.keys(distinctFields["reason"]).filter(item => item && item.toLowerCase().includes(value.toLowerCase())) } },
     ]
 
   }
@@ -249,7 +250,7 @@ export class Inventory extends Component {
         `/sca/${this.props.agent.id}`,
         {}
       );
-      this.policies = (((policies || {}).data || {}).data || {}).items || [];
+      this.policies = (((policies || {}).data || {}).data || {}).affected_items || [];
       const models = [];
       for (let i = 0; i < this.policies.length; i++) {
         models.push({
@@ -272,21 +273,41 @@ export class Inventory extends Component {
   }
 
   async loadScaPolicy(policy) {
-    const filtersObject= filtersToObject(this.state.filters);
+    const filtersObject = filtersToObject(this.state.filters);
     this._isMount && this.setState({ loadingPolicy: true, itemIdToExpandedRowMap: {}, pageIndex: 0 });
     if (policy) {
-      const checks = await this.wzReq.apiReq(
-        'GET',
-        `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
-        {...filtersObject}
-      );
+      try {
+        const checks = await this.wzReq.apiReq(
+          'GET',
+          `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
+          { params: { ...filtersObject } }
+        );
 
-      this.checks = (((checks || {}).data || {}).data || {}).items || [];
-      this.buildSuggestionSearchBar(policy.policy_id, this.checks);
+        this.checks = (((checks || {}).data || {}).data || {}).affected_items || [];
+        this.buildSuggestionSearchBar(policy.policy_id, this.checks);
+      } catch (err) {
+        // We can't ensure the suggestions contains valid characters
+        toastNotifications.add({
+          color: 'danger',
+          title: 'Error',
+          text: 'The filter contains invalid characters',
+          toastLifeTimeMs: 10000,
+        });
+        this.setState({ lookingPolicy: policy, loadingPolicy: false })
+      }
     }
-    this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false });
+    const items = this.getItems();
+    this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items });
   }
 
+  getItems = () => !!this.checks && this.checks.filter(check =>
+      this.state.filters.every(filter =>
+        typeof check[filter.field] === 'string' && (filter.value === '' ? check[filter.field] === filter.value
+          : check[filter.field].toLowerCase().includes(filter.value.toLowerCase())
+        )
+      )
+    )
+  
   toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
 
@@ -308,7 +329,7 @@ export class Inventory extends Component {
     } else {
       let checks = '';
       checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
-      checks += item.condition ? ` (Condition: ${item.condition})` : ''
+      checks += item.condition ? ` (Condition: ${item.condition})` : '';
       const listItems = [
         {
           title: 'Check not applicable due to:',
@@ -316,15 +337,15 @@ export class Inventory extends Component {
         },
         {
           title: 'Rationale',
-          description: item.rationale || '-'
+          description: item.rationale || '-'
         },
         {
           title: 'Remediation',
-          description: item.remediation || '-'
+          description: item.remediation || '-'
         },
         {
           title: 'Description',
-          description: item.description || '-'
+          description: item.description || '-'
         },
         {
           title: (item.directory || '').includes(',') ? 'Paths' : 'Path',
@@ -332,11 +353,11 @@ export class Inventory extends Component {
         },
         {
           title: checks,
-          description: item.rulesText,
+          description: <RuleText rulesText={item.rulesText} />,
         },
         {
           title: 'Compliance',
-          description: item.complianceText
+          description: <ComplianceText complianceText={item.complianceText} />
         }
       ];
       const itemsToShow = listItems.filter(x => {
@@ -362,17 +383,15 @@ export class Inventory extends Component {
       await exportCsv(
         '/sca/' + this.props.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
         [],
-        this.state.lookingPolicy.policy_id + '.csv'
+        this.state.lookingPolicy.policy_id
       );
     } catch (error) {
       this.showToast('danger', error, 3000);
     }
   }
 
-  componentDidUpdate(prevProps,prevState){
-    if(this.state.lookingPolicy && JSON.stringify(prevState.filters) !== JSON.stringify(this.state.filters)){
-      this.loadScaPolicy(this.state.lookingPolicy);
-    }
+  buttonStat(text, field, value) {
+    return <button onClick={() => this.setState({ filters: [{ field, value }] })}>{text}</button>
   }
 
   render() {
@@ -427,7 +446,7 @@ export class Inventory extends Component {
           )}
         </div>
         <EuiPage>
-          {((this.props.agent && (this.props.agent || {}).status !== 'Never connected' && !(this.policies || []).length && !this.state.loading) &&
+          {((this.props.agent && (this.props.agent || {}).status !== 'never_connected' && !(this.policies || []).length && !this.state.loading) &&
             <EuiCallOut title="No scans available" iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
                 Refresh
@@ -435,10 +454,10 @@ export class Inventory extends Component {
             </EuiCallOut>
           )}
 
-          {((this.props.agent && (this.props.agent || {}).status === 'Never connected' && !this.state.loading) &&
-            <EuiCallOut title="Agent has never connected" style={{width: "100%"}} iconType="iInCircle">
+          {((this.props.agent && (this.props.agent || {}).status === 'never_connected' && !this.state.loading) &&
+            <EuiCallOut title="Agent has never connected" style={{ width: "100%" }} iconType="iInCircle">
               <EuiButton color="primary" onClick={() => this.initialize()}>
-                  Refresh
+                Refresh
               </EuiButton>
             </EuiCallOut>
           )}
@@ -491,12 +510,12 @@ export class Inventory extends Component {
                           <EuiPopover
                             button={buttonPopover}
                             isOpen={this.state.showMoreInfo}
-                            closePopover={() => this.setState({showMoreInfo: false})}>
-                            <EuiFlexItem style={{width: 700}}>
+                            closePopover={() => this.setState({ showMoreInfo: false })}>
+                            <EuiFlexItem style={{ width: 700 }}>
                               <EuiSpacer size="s" />
                               <EuiText>
                                 <b>Policy description:</b> {this.state.lookingPolicy.description}
-                                  <br></br>
+                                <br></br>
                                 <b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}
                               </EuiText>
                             </EuiFlexItem>
@@ -521,13 +540,13 @@ export class Inventory extends Component {
                 <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.pass} description="Pass" titleColor="secondary" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.pass, 'result', 'passed')} description="Pass" titleColor="secondary" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.fail} description="Fail" titleColor="danger" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.fail, 'result', 'failed')} description="Fail" titleColor="danger" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiStat title={this.state.lookingPolicy.invalid} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
+                    <EuiStat title={this.buttonStat(this.state.lookingPolicy.invalid, 'result', '')} description="Not applicable" titleColor="subdued" titleSize="m" textAlign="center" />
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiStat title={`${this.state.lookingPolicy.score}%`} description="Score" titleColor="accent" titleSize="m" textAlign="center" />
@@ -537,21 +556,21 @@ export class Inventory extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer size="m" />
-                
+
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <WzSearchBar
                       filters={this.state.filters}
                       suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
-                      placeholder='Add filter or search' 
-                      onFiltersChange={filters => this.setState({filters})} />
+                      placeholder='Filter or search'
+                      onFiltersChange={filters => { this.setState({ filters }) }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
 
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiInMemoryTable
-                      items={this.checks}
+                      items={this.state.items}
                       columns={this.columnsChecks}
                       rowProps={getChecksRowProps}
                       itemId="id"

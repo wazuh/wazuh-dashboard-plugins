@@ -11,18 +11,18 @@
  */
 
 import { GenericRequest } from './generic-request';
+import { getServices } from '../../../../src/plugins/discover/public/kibana_services';
 
 export class SavedObject {
   /**
    *
    * Returns the full list of index patterns
-   * ONLY indices that matches the pattern "wazuh*" will be returned
    */
   static async getListOfIndexPatterns() {
     try {
       const result = await GenericRequest.request(
         'GET',
-        `/api/saved_objects/_find?type=index-pattern&search_fields=title&search=wazuh*`
+        `/api/saved_objects/_find?type=index-pattern&search_fields=title`
       );
       const indexPatterns = ((result || {}).data || {}).saved_objects || [];
 
@@ -77,7 +77,7 @@ export class SavedObject {
     }
   }
   
-  static async existsMonitoringIndexPattern(patternID) {
+  static async existsOrCreateIndexPattern(patternID) {
     try {
       await GenericRequest.request(
         'GET',
@@ -170,7 +170,30 @@ export class SavedObject {
   }
 
   /**
-   * Creates the 'wazuh-alerts-3.x-*'  index pattern
+   * Refresh an index pattern
+   */
+  static async refreshIndexPattern(pattern) {
+    try {
+      const {title : patternTitle} = await getServices().indexPatterns.get(pattern);
+      const fields = await GenericRequest.request(
+        //we check if indices exist before creating the index pattern
+        'GET',
+        `/api/index_patterns/_fields_for_wildcard?pattern=${patternTitle}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+        {}
+      );
+
+      await this.refreshFieldsOfIndexPattern(pattern, fields);
+
+      return;
+    } catch (error) {
+      return ((error || {}).data || {}).message || false
+        ? error.data.message
+        : error.message || error;
+    }
+  }
+
+  /**
+   * Creates the 'wazuh-alerts-*'  index pattern
    */
   static async createWazuhIndexPattern(pattern) {
     try {

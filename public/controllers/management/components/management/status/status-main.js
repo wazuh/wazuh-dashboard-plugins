@@ -14,26 +14,10 @@ import React, { Component } from 'react';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzStatusOverview from './status-overview';
-import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../../../redux/store';
 
 class WzStatus extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
-  }
-
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Status' }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
-  componentDidMount() {
-    this.setGlobalBreadcrumb();
   }
 
   render() {

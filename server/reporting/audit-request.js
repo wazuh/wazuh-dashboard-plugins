@@ -12,6 +12,7 @@
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
 import AuditMap from './audit-map';
+import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 export class AuditRequest {
   /**
@@ -33,7 +34,7 @@ export class AuditRequest {
     gte,
     lte,
     filters,
-    pattern = 'wazuh-alerts-3.x-*'
+    pattern = WAZUH_ALERTS_PATTERN
   ) {
     try {
       const base = {};
@@ -98,7 +99,7 @@ export class AuditRequest {
     gte,
     lte,
     filters,
-    pattern = 'wazuh-alerts-3.x-*'
+    pattern = WAZUH_ALERTS_PATTERN
   ) {
     try {
       const base = {};
@@ -170,7 +171,7 @@ export class AuditRequest {
     gte,
     lte,
     filters,
-    pattern = 'wazuh-alerts-3.x-*'
+    pattern = WAZUH_ALERTS_PATTERN
   ) {
     try {
       const base = {};

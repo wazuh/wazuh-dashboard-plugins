@@ -14,7 +14,6 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import { EuiTabs, EuiTab, EuiSpacer } from '@elastic/eui';
-import statusStats from '../../status/status-stats';
 
 class WzTabSelector extends Component {
   constructor(props) {

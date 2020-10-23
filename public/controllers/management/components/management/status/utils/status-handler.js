@@ -18,7 +18,7 @@ export default class StatusHandler {
    */
   static async agentsSummary() {
     try {
-      const result = await WzRequest.apiReq('GET', `/agents/summary`, {});
+      const result = await WzRequest.apiReq('GET', `/agents/summary/status`, {});
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -82,6 +82,22 @@ export default class StatusHandler {
   }
 
   /**
+   * Get agents node count
+   */
+  static async clusterAgentsCount() {
+    try {
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/overview/agents`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Get manager info
    */
   static async managerInfo() {
@@ -111,9 +127,11 @@ export default class StatusHandler {
   static async lastAgentRaw() {
     try {
       const result = await WzRequest.apiReq('GET', '/agents', {
-        limit: 1,
-        sort: '-dateAdd',
-        q: 'id!=000'
+        params: {
+          limit: 1,
+          sort: '-dateAdd',
+          q: 'id!=000'
+        }
       });
       return result;
     } catch (error) {

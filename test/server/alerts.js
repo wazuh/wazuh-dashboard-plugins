@@ -10,7 +10,7 @@ const headers = {
 const date = new Date();
 const day = date.getDate();
 const month = date.getMonth() + 1;
-const index = `wazuh-alerts-3.x-2018.${month >= 10 ? month : `0${month}`}.${
+const index = `wazuh-alerts-2018.${month >= 10 ? month : `0${month}`}.${
   day >= 10 ? day : `0${day}`
 }`;
 

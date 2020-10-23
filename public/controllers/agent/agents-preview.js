@@ -13,11 +13,11 @@ import * as FileSaver from '../../services/file-saver';
 import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
-import { clickAction } from '../../directives/wz-table/lib/click-action';
+import { clickAction } from '../../services/click-action';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ShareAgent } from '../../factories/share-agent';
 import { TimeService } from '../../react-services/time-service';
 import { ErrorHandler } from '../../react-services/error-handler';
@@ -29,7 +29,6 @@ export class AgentsPreviewController {
    * @param {Object} $location
    * @param {Object} errorHandler
    * @param {Object} csvReq
-   * @param {Object} wzTableFilter
    */
   constructor(
     $scope,
@@ -37,19 +36,16 @@ export class AgentsPreviewController {
     $route,
     errorHandler,
     csvReq,
-    wzTableFilter,
     commonData,
     $window
   ) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
-    this.apiReq = ApiRequest;
     this.$location = $location;
     this.$route = $route;
     this.errorHandler = errorHandler;
     this.csvReq = csvReq;
     this.shareAgent = new ShareAgent();
-    this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
@@ -88,10 +84,9 @@ export class AgentsPreviewController {
     if (loc && loc.tab) {
       this.submenuNavItem = loc.tab;
     }
-
-    const summaryData = await this.apiReq.request('GET', '/agents/summary', {});
+    const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
     this.summary = summaryData.data.data;
-    if (this.summary.Total - 1 === 0) {
+    if (this.summary.total - 1 === 0) {
       if (this.addingNewAgent === undefined) {
         this.addNewAgent(true);
       }
@@ -114,15 +109,14 @@ export class AgentsPreviewController {
       hasAgents: this.hasAgents,
       reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
-      getCurrentApiAddress: () => this.getCurrentApiAddress(),
-      needsPassword: () => this.needsPassword()
+      getCurrentApiAddress: () => this.getCurrentApiAddress()
     };
     this.hasAgents = true;
     this.init = false;
-    const instance = new DataFactory(this.apiReq, '/agents', false, false);
+    const instance = new DataFactory(WzRequest.apiReq, '/agents', false, false);
     //Props
     this.tableAgentsProps = {
-      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+      wzReq: (method, path, body) => WzRequest.apiReq(method, path, body),
       addingNewAgent: () => {
         this.addNewAgent(true);
         this.$scope.$applyAsync();
@@ -213,7 +207,7 @@ export class AgentsPreviewController {
         this.mostActiveAgent.id = info.data.data;
       }
       return this.mostActiveAgent;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   /**
@@ -222,9 +216,6 @@ export class AgentsPreviewController {
   async load() {
     try {
       this.errorInit = false;
-
-      const configuration = this.wazuhConfig.getConfig();
-      this.$scope.adminMode = !!(configuration || {}).admin;
 
       const clusterInfo = AppState.getClusterInfo();
       this.firstUrlParam =
@@ -253,24 +244,6 @@ export class AgentsPreviewController {
   }
 
   /**
-   * Returns if the password is neccesary to register a new agent
-   */
-  async needsPassword() {
-    try {
-      const result = await this.apiReq.request(
-        'GET',
-        '/agents/000/config/auth/auth',
-        {}
-      );
-      const auth = ((result.data || {}).data || {}).auth || {};
-      const usePassword = auth.use_password === 'yes';
-      return usePassword;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  /**
    * Returns the current API address
    */
   async getCurrentApiAddress() {
@@ -293,9 +266,9 @@ export class AgentsPreviewController {
    */
   async getWazuhVersion() {
     try {
-      const data = await this.apiReq.request('GET', '/version', {});
-      const result = ((data || {}).data || {}).data;
-      return result ? result.substr(1) : version;
+      const data = await WzRequest.apiReq('GET', '//', {});
+      const result = ((data || {}).data || {}).data || {};
+      return result.api_version
     } catch (error) {
       return version;
     }

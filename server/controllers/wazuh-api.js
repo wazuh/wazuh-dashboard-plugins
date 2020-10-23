@@ -11,7 +11,6 @@
  */
 
 // Require some libraries
-import needle from 'needle';
 import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
@@ -26,12 +25,15 @@ import { log } from '../logger';
 import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
-import { apiRequestList } from '../../util/api-request-list';
+import apiRequestList from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
+import { ApiInterceptor } from '../lib/api-interceptor';
+import { SecurityObj } from '../lib/security-factory';
+import jwtDecode from 'jwt-decode';
 
 export class WazuhApiCtrl {
   /**
@@ -39,10 +41,105 @@ export class WazuhApiCtrl {
    * @param {*} server
    */
   constructor(server) {
+    this.PLATFORM = this.getCurrentPlatform(server);
     this.queue = Queue;
     this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
+    this.securityObj = SecurityObj(this.PLATFORM, server);
+    this.apiInterceptor = new ApiInterceptor();
+  }
+
+  async checkWazuhWui(apiId){
+    const host = await this.manageHosts.getHostById(apiId);
+    if(host && host.username === 'wazuh-wui') return true;
+    return false;
+  }
+
+  getCurrentPlatform(server) {
+    if (server.plugins.security) {
+      return 'xpack';
+    }
+    if (server.newPlatform.setup.plugins.opendistroSecurity) {
+      return 'opendistro';
+    }
+    return undefined;
+  }
+
+  getApiIdFromCookie(cookie){
+    if(!cookie) return false;
+    const getWzApi = /.*wz-api=([^;]+)/;
+    const wzApi = cookie.match(getWzApi)
+    if(wzApi && wzApi.length && wzApi[1]) return wzApi[1];
+    return false;
+  }
+
+  getTokenFromCookie(cookie){
+    if(!cookie) return false;
+    const getWzToken = /.*wz-token=([^;]+)/;
+    const wzToken = cookie.match(getWzToken)
+    if(wzToken && wzToken.length && wzToken[1]) return wzToken[1];
+    return false;
+  }
+
+  getUserFromCookie(cookie){
+    if(!cookie) return false;
+    const getWzUser = /.*wz-user=([^;]+)/;
+    const wzUser = cookie.match(getWzUser)
+    if(wzUser && wzUser.length && wzUser[1]) return wzUser[1];
+    return false;
+  }
+
+  getUserFromAuthContext(authContext){
+    if(this.PLATFORM === 'xpack')
+      return authContext.username;
+    if(this.PLATFORM === 'opendistro')
+      return authContext.user_name;
+  }
+
+  async getToken(req, reply) {
+    try {
+      const { force } = req.payload;
+      const { idHost } = req.payload;
+      const authContext = await this.securityObj.getCurrentUser(req);
+      const username = this.getUserFromAuthContext(authContext);
+      if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie) && idHost === this.getApiIdFromCookie(req.headers.cookie)){
+        const wzToken = this.getTokenFromCookie(req.headers.cookie);
+        if(wzToken){
+          try{ // if the current token is not a valid jwt token we ask for a new one
+            const decodedToken =  jwtDecode(wzToken);
+            const expirationTime = (decodedToken.exp  - (Date.now() / 1000));
+            if(wzToken && expirationTime > 0) {
+              return {token: wzToken}
+            }
+          }catch(error){
+            log('wazuh-api:getToken', error.message || error);
+          }
+        }
+      }  
+      const isWazuhWui = await this.checkWazuhWui(idHost);
+      let token;
+      if(isWazuhWui){
+        token = await this.apiInterceptor.authenticateApi(idHost, authContext)
+      }else{
+        token = await this.apiInterceptor.authenticateApi(idHost)
+      }
+      const response = reply.response({token});
+      response.state('wz-token', token, {isSecure: false, path: '/'});
+      response.state('wz-user', username, {isSecure: false, path: '/'});
+      response.state('wz-api', idHost, {isSecure: false, path: '/'});
+
+      return { token };
+    } catch (error){
+      const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
+      log('wazuh-api:getToken', errorMessage);
+      return ErrorResponse(
+        `Error getting authorization token: ${errorMessage}`,
+        3000,
+        500,
+        reply
+      );
+    }
   }
 
   /**
@@ -64,121 +161,144 @@ export class WazuhApiCtrl {
 
       log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');
 
-      // Build credentials object for making a Wazuh API request
-      const credInfo = ApiHelper.buildOptionsObject(api);
-
       // Fetch needed information about the cluster and the manager itself
-      const response = await needle(
+      const responseManagerInfo = await this.apiInterceptor.request(
         'get',
         `${api.url}:${api.port}/manager/info`,
         {},
-        credInfo
+        { idHost: id, forceRefresh: true }
       );
 
       // Look for socket-related errors
-      if (this.checkResponseIsDown(response)) {
+      if (this.checkResponseIsDown(responseManagerInfo)) {
         return ErrorResponse(
-          `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${responseManagerInfo.data.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           reply
         );
       }
 
-      // Store error and data fields from the Wazuh API into different variables
-      const { body } = response;
-      const { error, data, message } = body;
-
-      // Check if the response has no errors (error code is zero and there is data)
-      const validResponse = parseInt(error) === 0 && data;
-
       // If we have a valid response from the Wazuh API
-      if (validResponse) {
-        const { name, cluster } = data;
+      if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const clusterEnabled = cluster.enabled === 'yes';
-        api.cluster_info = {
-          status: clusterEnabled ? 'enabled' : 'disabled',
-          manager: name,
-          node: cluster.node_name,
-          cluster: clusterEnabled ? cluster.name : 'Disabled'
-        };
+        const responseAgents = await this.apiInterceptor.request(
+          'get',
+          `${api.url}:${api.port}/agents`,
+          { params: { agents_list: '000' } },
+          { idHost: id}          
+        );
 
-        // Update cluster information in the wazuh-registry.json
-        await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
+        if (responseAgents.status === 200) {
+          const managerName = responseAgents.data.data.affected_items[0].manager;
 
-        // Hide Wazuh API password
-        const copied = { ...api };
-        copied.secret = '****';
-        copied.password = '****';
+          const responseClusterStatus = await this.apiInterceptor.request(
+            'get',
+            `${api.url}:${api.port}/cluster/status`,
+            {},
+            { idHost: id }      
+          );
+          if (responseClusterStatus.status === 200) {
+            if (responseClusterStatus.data.data.enabled === 'yes') {
+              const responseClusterLocalInfo = await this.apiInterceptor.request(
+                'get',
+                `${api.url}:${api.port}/cluster/local/info`,
+                {},
+                { idHost: id }
+              );
+              if (responseClusterLocalInfo.status === 200) {
+                const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
+                api.cluster_info = {
+                  status: clusterEnabled ? 'enabled' : 'disabled',
+                  manager: managerName,
+                  node: responseClusterLocalInfo.data.data.affected_items[0].node,
+                  cluster: clusterEnabled
+                    ? responseClusterLocalInfo.data.data.affected_items[0].cluster
+                    : 'Disabled',
+                };
+              }
+            } else {
+              // Cluster mode is not active
+              api.cluster_info = {
+                status: 'disabled',
+                manager: managerName,
+                cluster: 'Disabled',
+              };
+            }
+          } else {
+            // Cluster mode is not active
+            api.cluster_info = {
+              status: 'disabled',
+              manager: managerName,
+              cluster: 'Disabled',
+            };
+          }
 
-        return {
-          statusCode: 200,
-          data: copied,
-          idChanged: req.idChanged || req.payload.idChanged || null
-        };
+          if (api.cluster_info) {
+            // Update cluster information in the wazuh-registry.json
+            await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
+
+            // Hide Wazuh API secret, username, password
+            const copied = { ...api };
+            copied.secret = '****';
+            copied.password = '****';
+
+            return {
+              statusCode: 200,
+              data: copied,
+              idChanged: req.idChanged || null,
+            };
+          }
+        }
       }
 
       // If we have an invalid response from the Wazuh API
-      throw new Error(message || `${api.url}:${api.port} is unreachable`);
+      throw new Error(responseManagerInfo.data.detail || `${api.url}:${api.port} is unreachable`);
     } catch (error) {
       log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {
         return {
           statusCode: 200,
-          data: { password: '****', apiIsDown: true }
+          data: { password: '****', apiIsDown: true },
         };
       } else if (error.code === 'ECONNREFUSED') {
         return {
           statusCode: 200,
-          data: { password: '****', apiIsDown: true }
+          data: { password: '****', apiIsDown: true },
         };
       } else {
-        // Check if we can connect to a different API
-        if (
-          error &&
-          error.body &&
-          typeof error.body.found !== 'undefined' &&
-          !error.body.found
-        ) {
-          try {
-            const apis = await this.manageHosts.getHosts();
-            for (const api of apis) {
-              try {
-                const id = Object.keys(api)[0];
-                const host = api[id];
-                const options = ApiHelper.buildOptionsObject(host);
-                const response = await needle(
-                  'get',
-                  `${host.url}:${host.port}/version`,
-                  {},
-                  options
+        try {
+          const apis = await this.manageHosts.getHosts();
+          for (const api of apis) {
+            try {
+              const id = Object.keys(api)[0];
+              const host = api[id];
+
+              const response = await this.apiInterceptor(
+                'get',
+                `${host.url}:${host.port}/manager/info`,
+                {},
+                { idHost: id }
+              );
+
+              if (this.checkResponseIsDown(response)) {
+                return ErrorResponse(
+                  `ERROR3099 - ${response.data.detail || 'Wazuh not ready yet'}`,
+                  3099,
+                  500,
+                  reply
                 );
-
-                if (this.checkResponseIsDown(response)) {
-                  return ErrorResponse(
-                    `ERROR3099 - ${response.body.message ||
-                      'Wazuh not ready yet'}`,
-                    3099,
-                    500,
-                    reply
-                  );
-                }
-
-                if (
-                  ((response || {}).body || {}).error === 0 &&
-                  ((response || {}).body || {}).data
-                ) {
-                  req.payload = id;
-                  req.idChanged = id;
-                  return this.checkStoredAPI(req, reply, false);
-                }
-              } catch (error) {} // eslint-disable-line
-            }
-          } catch (error) {
-            return ErrorResponse(error.message || error, 3020, 500, reply);
+              }
+              if (response.status === 200) {
+                req.payload = id;
+                req.idChanged = id;
+                return this.checkStoredAPI(req, reply, false);
+              }
+            } catch (error) { } // eslint-disable-line
           }
+        } catch (error) {
+          return ErrorResponse(error.message || error, 3020, 500, reply);
         }
         return ErrorResponse(error.message || error, 3002, 500, reply);
       }
@@ -190,8 +310,8 @@ export class WazuhApiCtrl {
    * @param {Object} payload API params
    */
   validateCheckApiParams(payload) {
-    if (!('user' in payload)) {
-      return 'Missing param: API USER';
+    if (!('username' in payload)) {
+      return 'Missing param: API USERNAME';
     }
 
     if (!('password' in payload) && !('id' in payload)) {
@@ -232,33 +352,29 @@ export class WazuhApiCtrl {
           apiAvailable = data;
         } else {
           log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
-          return ErrorResponse(
-            `The API ${req.payload.id} was not found`,
-            3029,
-            500,
-            reply
-          );
+          return ErrorResponse(`The API ${req.payload.id} was not found`, 3029, 500, reply);
         }
-
         // Check if a password is given
       } else if (req.payload && req.payload.password) {
         apiAvailable = req.payload;
-        apiAvailable.password = Buffer.from(
-          req.payload.password,
-          'base64'
-        ).toString('ascii');
+        apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
       }
-      let response = await needle(
-        'get',
+      const options = { idHost: req.payload.id };
+      if(req.payload.forceRefresh){
+        options["forceRefresh"] = req.payload.forceRefresh;
+      }
+
+      let responseManagerInfo = await this.apiInterceptor.request(
+        'GET',
         `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
         {},
-        ApiHelper.buildOptionsObject(apiAvailable)
+        options
       );
+      const responseIsDown = this.checkResponseIsDown(responseManagerInfo);
 
-      const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
         return ErrorResponse(
-          `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${responseManagerInfo.data.detail || 'Wazuh not ready yet'}`,
           3099,
           500,
           reply
@@ -266,54 +382,46 @@ export class WazuhApiCtrl {
       }
 
       // Check wrong credentials
-      if (parseInt(response.statusCode) === 401) {
+      if (parseInt(responseManagerInfo.status) === 401) {
         log('wazuh-api:checkAPI', `Wrong Wazuh API credentials used`);
         return ErrorResponse('Wrong credentials', 3004, 500, reply);
       }
-      log(
-        'wazuh-api:checkAPI',
-        `${req.payload.id} credentials are valid`,
-        'debug'
-      );
-      if (parseInt(response.body.error) === 0 && response.body.data) {
-        response = await needle(
-          'get',
-          `${apiAvailable.url}:${apiAvailable.port}/agents/000`,
-          {},
-          ApiHelper.buildOptionsObject(apiAvailable)
+      log('wazuh-api:checkAPI', `${req.payload.id} credentials are valid`, 'debug');
+      if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
+        let responseAgents = await this.apiInterceptor.request(
+          'GET',
+          `${apiAvailable.url}:${apiAvailable.port}/agents`,
+          { params: { agents_list: '000' } },
+          { idHost: req.payload.id }
         );
 
-        if (!response.body.error) {
-          const managerName = response.body.data.name;
+        if (responseAgents.status === 200) {
+          const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          response = await needle(
-            'get',
+          let responseCluster = await this.apiInterceptor.request(
+            'GET',
             `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
             {},
-            ApiHelper.buildOptionsObject(apiAvailable)
+            { idHost: req.payload.id }
           );
 
-          if (!response.body.error) {
-            log(
-              'wazuh-api:checkStoredAPI',
-              `Wazuh API response is valid`,
-              'debug'
-            );
-            if (response.body.data.enabled === 'yes') {
+          if (responseCluster.status === 200) {
+            log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
+            if (responseCluster.data.data.enabled === 'yes') {
               // If cluster mode is active
-              response = await needle(
-                'get',
-                `${apiAvailable.url}:${apiAvailable.port}/cluster/node`,
+              let responseClusterLocal = await this.apiInterceptor.request(
+                'GET',
+                `${apiAvailable.url}:${apiAvailable.port}/cluster/local/info`,
                 {},
-                ApiHelper.buildOptionsObject(apiAvailable)
+                { idHost: req.payload.id }
               );
 
-              if (!response.body.error) {
+              if (responseClusterLocal.status === 200) {
                 return {
                   manager: managerName,
-                  node: response.body.data.node,
-                  cluster: response.body.data.cluster,
-                  status: 'enabled'
+                  node: responseClusterLocal.data.data.affected_items[0].node,
+                  cluster: responseClusterLocal.data.data.affected_items[0].cluster,
+                  status: 'enabled',
                 };
               }
             } else {
@@ -321,20 +429,35 @@ export class WazuhApiCtrl {
               return {
                 manager: managerName,
                 cluster: 'Disabled',
-                status: 'disabled'
+                status: 'disabled',
               };
             }
           }
         }
       }
 
-      const tmpMsg =
-        ((response || {}).body || {}).message ||
-        'Unexpected error checking the Wazuh API';
+      const tmpMsg = responseManagerInfo.data.detail || 'Unexpected error checking the Wazuh API';
 
       throw new Error(tmpMsg);
     } catch (error) {
       log('wazuh-api:checkAPI', error.message || error);
+
+      if(error && error.response && error.response.status === 401){
+        return ErrorResponse(
+          'Unathorized. Please check API credentials.',
+          401,
+          401,
+          reply
+        );
+      }
+      if(error && error.response && error.response.data && error.response.data.detail){
+        return ErrorResponse(
+          error.response.data.detail,
+          error.response.status || 500,
+          error.response.status || 500,
+          reply
+        );
+      }
       if (error.code === 'EPROTO') {
         return ErrorResponse(
           'Wrong protocol being used to connect to the Wazuh API',
@@ -366,29 +489,21 @@ export class WazuhApiCtrl {
         const api = await this.manageHosts.getHostById(apiId);
 
         if (!Object.keys(api).length) {
-          log(
-            'wazuh-api:getPciRequirement',
-            `Cannot get the credentials for the host ${apiId}`
-          );
+          log('wazuh-api:getPciRequirement', `Cannot get the credentials for the host ${apiId}`);
           // Can not get credentials from wazuh-hosts
-          return ErrorResponse(
-            'Unexpected error getting host credentials',
-            3007,
-            400,
-            reply
-          );
+          return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/pci`,
+          `${api.url}:${api.port}/rules/requirement/pci`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let PCIobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof pciRequirementsFile[item] !== 'undefined')
               PCIobject[item] = pciRequirementsFile[item];
           }
@@ -406,17 +521,15 @@ export class WazuhApiCtrl {
           );
         }
       } else {
-        if (
-          typeof pciRequirementsFile[req.params.requirement] !== 'undefined'
-        ) {
+        if (typeof pciRequirementsFile[req.params.requirement] !== 'undefined') {
           pci_description = pciRequirementsFile[req.params.requirement];
         }
 
         return {
           pci: {
             requirement: req.params.requirement,
-            description: pci_description
-          }
+            description: pci_description,
+          },
         };
       }
     } catch (error) {
@@ -444,56 +557,36 @@ export class WazuhApiCtrl {
         const api = await this.manageHosts.getHostById(apiId);
 
         // Checking for GDPR
-        const version = await needle(
+        const version = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/version`,
+          `${api.url}:${api.port}//`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
+        const number = version.data.api_version;
 
-        const number = version.body.data;
+        const [major, minor, patch] = number.split('.');
 
-        const major = number.split('v')[1].split('.')[0];
-        const minor = number
-          .split('v')[1]
-          .split('.')[1]
-          .split('.')[0];
-        const patch = number
-          .split('v')[1]
-          .split('.')[1]
-          .split('.')[1];
-
-        if (
-          (major >= 3 && minor < 2) ||
-          (major >= 3 && minor >= 2 && patch < 3)
-        ) {
+        if ((major >= 3 && minor < 2) || (major >= 3 && minor >= 2 && patch < 3)) {
           return {};
         }
 
         if (!Object.keys(api).length) {
-          log(
-            'wazuh-api:getGdprRequirement',
-            'Unexpected error getting host credentials'
-          );
+          log('wazuh-api:getGdprRequirement', 'Unexpected error getting host credentials');
           // Can not get credentials from wazuh-hosts
-          return ErrorResponse(
-            'Unexpected error getting host credentials',
-            3024,
-            400,
-            reply
-          );
+          return ErrorResponse('Unexpected error getting host credentials', 3024, 400, reply);
         }
 
-        const response = await needle(
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/gdpr`,
+          `${api.url}:${api.port}/rules/requirement/gdpr`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let GDPRobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof gdprRequirementsFile[item] !== 'undefined')
               GDPRobject[item] = gdprRequirementsFile[item];
           }
@@ -511,17 +604,15 @@ export class WazuhApiCtrl {
           );
         }
       } else {
-        if (
-          typeof gdprRequirementsFile[req.params.requirement] !== 'undefined'
-        ) {
+        if (typeof gdprRequirementsFile[req.params.requirement] !== 'undefined') {
           gdpr_description = gdprRequirementsFile[req.params.requirement];
         }
 
         return {
           gdpr: {
             requirement: req.params.requirement,
-            description: gdpr_description
-          }
+            description: gdpr_description,
+          },
         };
       }
     } catch (error) {
@@ -531,21 +622,17 @@ export class WazuhApiCtrl {
   }
 
   checkResponseIsDown(response) {
-    const responseBody = (response || {}).body || {};
-    const responseError = responseBody.error || false;
+    if (response.status !== 200) {
+      // Avoid "Error communicating with socket" like errors
+      const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
+      const status = (response.data || {}).status || 1
+      const isDown = socketErrorCodes.includes(status);
 
-    // Avoid "Error communicating with socket" like errors
-    const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
+      isDown && log('wazuh-api:makeRequest', 'Wazuh API is online but Wazuh is not ready yet');
 
-    const isDown = socketErrorCodes.includes(responseError || 1);
-
-    isDown &&
-      log(
-        'wazuh-api:makeRequest',
-        'Wazuh API is online but Wazuh is not ready yet'
-      );
-
-    return isDown;
+      return isDown;
+    }
+    return false;
   }
 
   /**
@@ -567,29 +654,21 @@ export class WazuhApiCtrl {
         const api = await this.manageHosts.getHostById(apiId);
 
         if (!Object.keys(api).length) {
-          log(
-            'wazuh-api:getHipaaRequirement',
-            'Unexpected error getting host credentials'
-          );
+          log('wazuh-api:getHipaaRequirement', 'Unexpected error getting host credentials');
           // Can not get credentials from wazuh-hosts
-          return ErrorResponse(
-            'Unexpected error getting host credentials',
-            3007,
-            400,
-            reply
-          );
+          return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/hipaa`,
+          `${api.url}:${api.port}/rules/requirement/hipaa`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
 
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let HIPAAobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof hipaaRequirementsFile[item] !== 'undefined')
               HIPAAobject[item] = hipaaRequirementsFile[item];
           }
@@ -607,17 +686,15 @@ export class WazuhApiCtrl {
           );
         }
       } else {
-        if (
-          typeof hipaaRequirementsFile[req.params.requirement] !== 'undefined'
-        ) {
+        if (typeof hipaaRequirementsFile[req.params.requirement] !== 'undefined') {
           hipaa_description = hipaaRequirementsFile[req.params.requirement];
         }
 
         return {
           hipaa: {
             requirement: req.params.requirement,
-            description: hipaa_description
-          }
+            description: hipaa_description,
+          },
         };
       }
     } catch (error) {
@@ -645,29 +722,20 @@ export class WazuhApiCtrl {
         const api = await this.manageHosts.getHostById(apiId);
 
         if (!Object.keys(api).length) {
-          log(
-            'wazuh-api:getNistRequirement',
-            'Unexpected error getting host credentials'
-          );
+          log('wazuh-api:getNistRequirement', 'Unexpected error getting host credentials');
           // Can not get credentials from wazuh-hosts
-          return ErrorResponse(
-            'Unexpected error getting host credentials',
-            3007,
-            400,
-            reply
-          );
+          return ErrorResponse('Unexpected error getting host credentials', 3007, 400, reply);
         }
 
-        const response = await needle(
+        const response = await this.apiInterceptor.request(
           'get',
-          `${api.url}:${api.port}/rules/nist-800-53`,
+          `${api.url}:${api.port}/rules/requirement/nist-800-53`,
           {},
-          ApiHelper.buildOptionsObject(api)
+          { idHost: apiId }
         );
-
-        if ((((response || {}).body || {}).data || {}).items) {
+        if ((((response || {}).data || {}).data || {}).affected_items) {
           let NISTobject = {};
-          for (const item of response.body.data.items) {
+          for (const item of response.data.data.affected_items) {
             if (typeof nistRequirementsFile[item] !== 'undefined')
               NISTobject[item] = nistRequirementsFile[item];
           }
@@ -685,17 +753,15 @@ export class WazuhApiCtrl {
           );
         }
       } else {
-        if (
-          typeof nistRequirementsFile[req.params.requirement] !== 'undefined'
-        ) {
+        if (typeof nistRequirementsFile[req.params.requirement] !== 'undefined') {
           nist_description = nistRequirementsFile[req.params.requirement];
         }
 
         return {
           nist: {
             requirement: req.params.requirement,
-            description: nist_description
-          }
+            description: nist_description,
+          },
         };
       }
     } catch (error) {
@@ -789,14 +855,14 @@ export class WazuhApiCtrl {
    */
   async checkDaemons(api, path) {
     try {
-      const response = await needle(
+      const response = await this.apiInterceptor.request(
         'GET',
         getPath(api) + '/manager/status',
         {},
-        ApiHelper.buildOptionsObject(api)
+        { idHost: api.id }
       );
 
-      const daemons = ((response || {}).body || {}).data || {};
+      const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
 
       const isCluster =
         ((api || {}).cluster_info || {}).status === 'enabled' &&
@@ -806,9 +872,7 @@ export class WazuhApiCtrl {
       const execd = daemons['ossec-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-      const clusterd = isCluster
-        ? daemons['wazuh-clusterd'] === 'running'
-        : true;
+      const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
@@ -846,10 +910,8 @@ export class WazuhApiCtrl {
   shouldKeepArrayAsIt(method, path) {
     // Methods that we must respect a do not transform them
     const isAgentsRestart = method === 'POST' && path === '/agents/restart';
-    const isActiveResponse =
-      method === 'PUT' && path.startsWith('/active-response/');
-    const isAddingAgentsToGroup =
-      method === 'POST' && path.startsWith('/agents/group/');
+    const isActiveResponse = method === 'PUT' && path.startsWith('/active-response/');
+    const isAddingAgentsToGroup = method === 'POST' && path.startsWith('/agents/group/');
 
     // Returns true only if one of the above conditions is true
     return isAgentsRestart || isActiveResponse || isAddingAgentsToGroup;
@@ -864,11 +926,10 @@ export class WazuhApiCtrl {
    * @param {Object} reply
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(method, path, data, id, reply) {
+  async makeRequest(method, path, data, id, reply, token) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
-
       if (devTools) {
         delete data.devTools;
       }
@@ -876,43 +937,30 @@ export class WazuhApiCtrl {
       if (!Object.keys(api).length) {
         log('wazuh-api:makeRequest', 'Could not get host credentials');
         //Can not get credentials from wazuh-hosts
-        return ErrorResponse(
-          'Could not get host credentials',
-          3011,
-          404,
-          reply
-        );
+        return ErrorResponse('Could not get host credentials', 3011, 404, reply);
       }
-
+      let body = {}
       if (!data) {
         data = {};
       }
 
-      const options = ApiHelper.buildOptionsObject(api);
+      const options = {};
+      options['idHost'] = id;
 
       // Set content type application/xml if needed
-      if (
-        typeof (data || {}).content === 'string' &&
-        (data || {}).origin === 'xmleditor'
-      ) {
+      if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
         options.content_type = 'application/xml';
-        data = data.content;
+        delete data.origin;
       }
 
-      if (
-        typeof (data || {}).content === 'string' &&
-        (data || {}).origin === 'json'
-      ) {
+      if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
         options.content_type = 'application/json';
-        data = data.content.replace(new RegExp('\\n', 'g'), '');
+        delete data.origin;
       }
 
-      if (
-        typeof (data || {}).content === 'string' &&
-        (data || {}).origin === 'raw'
-      ) {
+      if (typeof (data || {}).body === 'string' && (data || {}).origin === 'raw') {
         options.content_type = 'application/octet-stream';
-        data = data.content;
+        delete data.origin;
       }
       const delay = (data || {}).delay || 0;
       let fullUrl = getPath(api) + path;
@@ -924,7 +972,7 @@ export class WazuhApiCtrl {
           method,
           fullUrl,
           data,
-          options
+          options,
         });
         return { error: 0, message: 'Success' };
       }
@@ -936,10 +984,7 @@ export class WazuhApiCtrl {
         } catch (error) {
           const isDown = (error || {}).code === 'ECONNREFUSED';
           if (!isDown) {
-            log(
-              'wazuh-api:makeRequest',
-              'Wazuh API is online but Wazuh is not ready yet'
-            );
+            log('wazuh-api:makeRequest', 'Wazuh API is online but Wazuh is not ready yet');
             return ErrorResponse(
               `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
               3099,
@@ -966,17 +1011,7 @@ export class WazuhApiCtrl {
         }
       }
 
-      // DELETE and PUT must use URL query but we accept objects in Dev Tools
-      if ((method === 'DELETE' || method === 'PUT') && dataProperties.length) {
-        (Object.keys(data) || []).forEach(key => {
-          fullUrl += `${fullUrl.includes('?') ? '&' : '?'}${key}${
-            data[key] !== '' ? '=' : ''
-          }${data[key]}`;
-        });
-        data = {};
-      }
-
-      const response = await needle(method, fullUrl, data, options);
+      const response = await this.apiInterceptor.requestToken(method, fullUrl, data, options, token);
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
@@ -987,42 +1022,46 @@ export class WazuhApiCtrl {
           reply
         );
       }
-
-      const responseBody = (response || {}).body || {};
-      let responseData = responseBody.data;
-      if (!responseData) {
-        responseData =
-          typeof responseData === 'string' &&
-          path.includes('/files') &&
-          method === 'GET'
+      let responseBody = (response || {}).data || {};
+      if (!responseBody) {
+        responseBody =
+          typeof responseBody === 'string' && path.includes('/files') && method === 'GET'
             ? ' '
             : false;
-        response.body.data = responseData;
+        response.data = responseBody;
       }
-      const responseError = responseBody.error || false;
+      const responseError = response.status !== 200 ? response.status : false;
 
-      if (!responseError && responseData) {
-        cleanKeys(response);
-        return response.body;
+      if (!responseError && responseBody) {
+        //cleanKeys(response);
+        return response.data;
       }
 
       if (responseError && devTools) {
-        return response.body;
+        return response.data;
       }
-
-      throw responseError && responseBody.message
-        ? { message: responseBody.message, code: responseError }
+      throw responseError && responseBody.detail
+        ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      log('wazuh-api:makeRequest', error.message || error);
+      if(error && error.response && error.response.status === 401){        
+        return ErrorResponse(
+          error.message || error,
+          error.code ? `Wazuh API error: ${error.code}` : 3013,
+          401,
+          reply
+        );
+      }
+      const errorMsg = (error.response || {}).data || error.message
+      log('wazuh-api:makeRequest', errorMsg || error);
       if (devTools) {
-        return { error: '3013', message: error.message || error };
+        return { error: '3013', message: errorMsg || error };
       } else {
         if ((error || {}).code && ApiErrorEquivalence[error.code]) {
           error.message = ApiErrorEquivalence[error.code];
         }
         return ErrorResponse(
-          error.message || error,
+          errorMsg.detail || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
           500,
           reply
@@ -1062,26 +1101,23 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const options = ApiHelper.buildOptionsObject(api);
-
       const fullUrl = getPath(api) + path;
 
       log('wazuh-api:makeGenericRequest', `${method} ${fullUrl}`, 'debug');
-      const response = await needle(method, fullUrl, data, options);
 
-      if (
-        response &&
-        response.body &&
-        !response.body.error &&
-        response.body.data
-      ) {
+      const response = await this.apiInterceptor.request(
+        'GET',
+        fullUrl,
+        data,
+        { idHost: id }
+      );
+
+      if (response && response.data && !response.data.error && response.data.data) {
         cleanKeys(response);
-        return response.body;
+        return response.data;
       }
-
-      throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
-        ? { message: response.body.message, code: response.body.error }
+      throw ((response || {}).data || {}).error && ((response || {}).data || {}).message
+        ? { message: response.data.message, code: response.data.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       log('wazuh-api:makeGenericRequest', error.message || error);
@@ -1096,13 +1132,16 @@ export class WazuhApiCtrl {
    * @returns {Object} api response or ErrorResponse
    */
   requestApi(req, reply) {
-    const configuration = getConfiguration();
-    const adminMode = !(
-      configuration &&
-      typeof configuration.admin !== 'undefined' &&
-      !configuration.admin
-    );
-
+    const token = this.getTokenFromCookie(req.headers.cookie);
+    const idApi = this. getApiIdFromCookie(req.headers.cookie);
+    if(idApi !== req.payload.id){ // if the current token belongs to a different API id, we relogin to obtain a new token
+      return ErrorResponse(
+        'status code 401',
+        401,
+        401,
+        reply
+      );
+    }
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
     } else if (!req.payload.method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
@@ -1116,40 +1155,13 @@ export class WazuhApiCtrl {
       //Path doesn't start with '/'
       return ErrorResponse('Request path is not valid.', 3015, 400, reply);
     } else {
-      if (req.payload.method !== 'GET' && !adminMode) {
-        log('wazuh-api:requestApi', 'Forbidden action, allowed methods: GET');
-        return ErrorResponse(
-          req.payload.body && req.payload.body.devTools
-            ? 'Allowed method: [GET]'
-            : `Forbidden (${req.payload.method} ${req.payload.path}`,
-          3029,
-          400,
-          reply
-        );
-      }
-      if (req.payload.body.devTools) {
-        //delete req.payload.body.devTools;
-        const keyRegex = new RegExp(/.*agents\/\d*\/key.*/);
-        if (
-          typeof req.payload.path === 'string' &&
-          keyRegex.test(req.payload.path) &&
-          !adminMode
-        ) {
-          log('wazuh-api:makeRequest', 'Forbidden route /agents/:id/key');
-          return ErrorResponse(
-            'Forbidden route /agents/:id/key',
-            3028,
-            400,
-            reply
-          );
-        }
-      }
       return this.makeRequest(
         req.payload.method,
         req.payload.path,
         req.payload.body,
         req.payload.id,
-        reply
+        reply,
+        token
       );
     }
   }
@@ -1167,7 +1179,7 @@ export class WazuhApiCtrl {
         statusCode: 200,
         error: '0',
         data: '',
-        output
+        output,
       };
     } catch (error) {
       log('wazuh-api:fetchAgents', error.message || error);
@@ -1183,13 +1195,10 @@ export class WazuhApiCtrl {
    */
   async csv(req, reply) {
     try {
-      if (!req.payload || !req.payload.path)
-        throw new Error('Field path is required');
+      if (!req.payload || !req.payload.path) throw new Error('Field path is required');
       if (!req.payload.id) throw new Error('Field id is required');
 
-      const filters = Array.isArray(((req || {}).payload || {}).filters)
-        ? req.payload.filters
-        : [];
+      const filters = Array.isArray(((req || {}).payload || {}).filters) ? req.payload.filters : [];
 
       const config = await this.manageHosts.getHostById(req.payload.id);
 
@@ -1212,50 +1221,42 @@ export class WazuhApiCtrl {
         }
       }
 
-      const cred = ApiHelper.buildOptionsObject(config);
-
       let itemsArray = [];
-      const output = await needle(
-        'get',
-        `${config.url}:${config.port}/${tmpPath}${
-          tmpPath.includes('?') ? '&' : '?'
-        }wait_for_complete`,
-        params,
-        cred
+
+      const output = await this.apiInterceptor.request(
+        'GET',
+        `${config.url}:${config.port}/${tmpPath}`,
+        { params: params },
+        { idHost: req.payload.id }
       );
 
-      const isList =
-        req.payload.path.includes('/lists') &&
-        req.payload.filters &&
-        req.payload.filters.length &&
-        req.payload.filters.find(filter => filter._isCDBList);
-
-      const totalItems = (((output || {}).body || {}).data || {}).totalItems;
+      const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
+         
+      const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
 
       if (totalItems && !isList) {
         params.offset = 0;
-        itemsArray.push(...output.body.data.items);
+        itemsArray.push(...output.data.data.affected_items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
-          const tmpData = await needle(
-            'get',
-            `${config.url}:${config.port}/${tmpPath}${
-              tmpPath.includes('?') ? '&' : '?'
-            }wait_for_complete`,
-            params,
-            cred
+          const tmpData = await this.apiInterceptor.request(
+            'GET',
+            `${config.url}:${config.port}/${tmpPath}`,
+            { params: params },
+            { idHost: req.payload.id }
           );
-          itemsArray.push(...tmpData.body.data.items);
+          itemsArray.push(...tmpData.data.data.affected_items);
         }
       }
 
       if (totalItems) {
         const { path, filters } = req.payload;
-        const isArrayOfLists = path.includes('/lists') && !isList;
+        const isArrayOfLists =
+          path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
         const isFiles = path.endsWith('/files');
-        let fields = Object.keys(output.body.data.items[0]);
+        let fields = Object.keys(output.data.data.affected_items[0]);
 
         if (isAgents || isAgentsOfGroup) {
           if (isFiles) {
@@ -1280,7 +1281,7 @@ export class WazuhApiCtrl {
               'os.name',
               'os.platform',
               'os.uname',
-              'os.version'
+              'os.version',
             ];
           }
         }
@@ -1288,25 +1289,22 @@ export class WazuhApiCtrl {
         if (isArrayOfLists) {
           const flatLists = [];
           for (const list of itemsArray) {
-            const { path, items } = list;
-            flatLists.push(
-              ...items.map(item => ({ path, key: item.key, value: item.value }))
-            );
+            const { relative_dirname, items } = list;
+            flatLists.push(...items.map(item => ({ relative_dirname, key: item.key, value: item.value })));
           }
-          fields = ['path', 'key', 'value'];
+          fields = ['relative_dirname', 'key', 'value'];
           itemsArray = [...flatLists];
         }
 
         if (isList) {
           fields = ['key', 'value'];
-          itemsArray = output.body.data.items[0];
+          itemsArray = output.data.data.affected_items[0].items;
         }
         fields = fields.map(item => ({ value: item, default: '-' }));
 
         const json2csvParser = new Parser({ fields });
 
         let csv = json2csvParser.parse(itemsArray);
-
         for (const field of fields) {
           const { value } = field;
           if (csv.includes(value)) {
@@ -1315,12 +1313,7 @@ export class WazuhApiCtrl {
         }
 
         return reply.response(csv).type('text/csv');
-      } else if (
-        output &&
-        output.body &&
-        output.body.data &&
-        !output.body.data.totalItems
-      ) {
+      } else if (output && output.data && output.data.data && !output.data.data.total_affected_items) {
         throw new Error('No results');
       } else {
         throw new Error(`An error occurred fetching data from the Wazuh API${output && output.body && output.body.message ? `: ${output.body.message}` : ''}`);
@@ -1339,17 +1332,19 @@ export class WazuhApiCtrl {
    */
   async getAgentsFieldsUniqueCount(req, reply) {
     try {
-      if (!req.params || !req.params.api)
-        throw new Error('Field api is required');
+      if (!req.params || !req.params.api) throw new Error('Field api is required');
 
       const config = await this.manageHosts.getHostById(req.params.api);
 
-      const headers = ApiHelper.buildOptionsObject(config);
+      const distinctUrl = `${config.url}:${config.port}/overview​/agents`;
 
-      const distinctUrl = `${config.url}:${config.port}/summary/agents`;
-
-      const data = await needle('get', distinctUrl, {}, headers);
-      const response = ((data || {}).body || {}).data || {};
+      const data = await this.apiInterceptor.request(
+        'get',
+        distinctUrl,
+        {},
+        { idHost: req.payload.id }
+      );
+      const response = (data || {}).data || {};
 
       const nodes = response.nodes;
       const groups = response.groups;
@@ -1369,8 +1364,8 @@ export class WazuhApiCtrl {
           agentsCountDisconnected: 0,
           agentsCountNeverConnected: 0,
           agentsCountTotal: 0,
-          agentsCoverity: 0
-        }
+          agentsCoverity: 0,
+        },
       };
 
       if (nodes && nodes.items) {
@@ -1385,17 +1380,12 @@ export class WazuhApiCtrl {
 
       if (osPlatforms && osPlatforms.items) {
         result.osPlatforms = osPlatforms.items
-          .filter(
-            item =>
-              !!item.os && item.os.platform && item.os.name && item.os.version
-          )
+          .filter(item => !!item.os && item.os.platform && item.os.name && item.os.version)
           .map(item => item.os);
       }
 
       if (versions && versions.items) {
-        result.versions = versions.items
-          .filter(item => !!item.version)
-          .map(item => item.version);
+        result.versions = versions.items.filter(item => !!item.version).map(item => item.version);
       }
 
       if (summary) {
@@ -1405,9 +1395,7 @@ export class WazuhApiCtrl {
           agentsCountNeverConnected: summary['Never connected'],
           agentsCountTotal: summary.Total - 1,
           agentsCoverity:
-            summary.Total - 1
-              ? ((summary.Active - 1) / (summary.Total - 1)) * 100
-              : 0
+            summary.Total - 1 ? ((summary.Active - 1) / (summary.Total - 1)) * 100 : 0,
         });
       }
 
@@ -1436,9 +1424,7 @@ export class WazuhApiCtrl {
    */
   getTimeStamp(req, reply) {
     try {
-      const source = JSON.parse(
-        fs.readFileSync(this.updateRegistry.file, 'utf8')
-      );
+      const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
@@ -1447,7 +1433,7 @@ export class WazuhApiCtrl {
         );
         return {
           installationDate: source.installationDate,
-          lastRestart: source.lastRestart
+          lastRestart: source.lastRestart,
         };
       } else {
         throw new Error('Could not fetch wazuh-version registry');
@@ -1522,17 +1508,14 @@ export class WazuhApiCtrl {
    */
   async getSetupInfo(req, reply) {
     try {
-      const source = JSON.parse(
-        fs.readFileSync(this.updateRegistry.file, 'utf8')
-      );
+      const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       return !Object.values(source).length
         ? { statusCode: 200, data: '' }
         : { statusCode: 200, data: source };
     } catch (error) {
       log('wazuh-api:getSetupInfo', error.message || error);
       return ErrorResponse(
-        `Could not get data from wazuh-version registry due to ${error.message ||
-          error}`,
+        `Could not get data from wazuh-version registry due to ${error.message || error}`,
         4005,
         500,
         reply
@@ -1557,37 +1540,24 @@ export class WazuhApiCtrl {
 
       const config = await this.manageHosts.getHostById(api);
 
-      const headers = ApiHelper.buildOptionsObject(config);
-
       const data = await Promise.all([
-        needle(
-          'get',
-          `${config.url}:${config.port}/syscollector/${agent}/hardware`,
-          {},
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/syscollector/${agent}/os`,
-          {},
-          headers
-        )
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, { idHost: api }),
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, { idHost: api })
       ]);
 
-      const result = data.map(item => (item.body || {}).data || false);
+      const result = data.map(item => (item.data || {}).data || []);
       const [hardwareResponse, osResponse] = result;
 
       // Fill syscollector object
       const syscollector = {
         hardware:
-          typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
-            ? { ...hardwareResponse }
+          typeof hardwareResponse === 'object' && Object.keys(hardwareResponse).length
+            ? { ...hardwareResponse.affected_items[0] }
             : false,
         os:
           typeof osResponse === 'object' && Object.keys(osResponse).length
-            ? { ...osResponse }
-            : false
+            ? { ...osResponse.affected_items[0] }
+            : false,
       };
 
       return syscollector;

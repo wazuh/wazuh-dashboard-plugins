@@ -65,7 +65,7 @@ export class ApiCheck {
    * Check the status of an API entry
    * @param {String} apiObject
    */
-  static async checkApi(apiEntry) {
+  static async checkApi(apiEntry, forceRefresh=false) {
     try {
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
@@ -75,7 +75,7 @@ export class ApiCheck {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
         url: url,
-        data: apiEntry,
+        data: {...apiEntry, forceRefresh},
         timeout: timeout || 20000
       };
 

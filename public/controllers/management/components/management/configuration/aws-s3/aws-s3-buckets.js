@@ -13,9 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import {} from '@elastic/eui';
-
-import WzNoConfig from '../util-components/no-config';
+import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
@@ -49,7 +47,7 @@ class WzConfigurationAmazonS3Buckets extends Component {
     return (
       <Fragment>
         {currentConfig &&
-        !wodleConfig['aws-s3'] /*&& !currentConfig['aws-s3'].buckets*/ && (
+        (!wodleConfig['aws-s3'] || (wodleConfig['aws-s3'] && !wodleConfig['aws-s3'].buckets)) && (
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && (
@@ -60,7 +58,7 @@ class WzConfigurationAmazonS3Buckets extends Component {
           wodleConfig['aws-s3'].buckets && (
             <WzConfigurationSettingsTabSelector
               title="Main settings"
-              description="Common settings applied to all Amazon S3 buckets"
+              description="Amazon buckets from where logs are read"
               currentConfig={wodleConfig}
               minusHeight={320}
               helpLinks={helpLinks}

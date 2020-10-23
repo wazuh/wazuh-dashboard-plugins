@@ -13,12 +13,13 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { ModulesHelper } from '../../components/common/modules/modules-helper';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
 
 export function ClusterController(
   $scope,
@@ -42,6 +43,7 @@ export function ClusterController(
     AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
   $scope.isClusterEnabled = clusterEnabled;
   $scope.isClusterRunning = true;
+  $scope.authorized = true;
   $location.search('tabView', 'cluster-monitoring');
   $location.search('tab', 'monitoring');
   $location.search('_a', null);
@@ -99,6 +101,7 @@ export function ClusterController(
       monitoring: 1
     });
     assignFilters();
+    $scope.nodeProps = { goBack: () => $scope.goBack() }
     $rootScope.$broadcast('updateVis');
   };
 
@@ -121,12 +124,12 @@ export function ClusterController(
         monitoring: 1
       });
       $scope.currentNode = parameters.node;
-      const data = await ApiRequest.request('GET', '/cluster/healthcheck', {
+      const data = await WzRequest.apiReq('GET', '/cluster/healthcheck', {
         node: $scope.currentNode.name
       });
 
       $scope.currentNode.healthCheck =
-        data.data.data.nodes[$scope.currentNode.name];
+        data.data.data.affected_items[0];
 
       if (
         $scope.currentNode.healthCheck &&
@@ -225,6 +228,17 @@ export function ClusterController(
     }
   };
 
+  const clusterStatus = async () => {
+    try {
+      const status = await WzRequest.apiReq('GET', '/cluster/status', {});
+      $scope.authorized = true;
+      return status;
+    } catch (error) {
+      if(error === '3013 - Permission denied: Resource type: *:*')
+        $scope.authorized = false
+    }
+  }
+
   /**
    * This set some required settings at init
    */
@@ -235,8 +249,13 @@ export function ClusterController(
       discoverPendingUpdates.removeAll();
       rawVisualizations.removeAll();
       loadedVisualizations.removeAll();
-
-      const status = await ApiRequest.request('GET', '/cluster/status', {});
+      const status = await clusterStatus();
+      if (!status) {
+        $scope.permissions = [{action: 'cluster:status', resource: "*:*:*"}];
+        $scope.loading = false;
+        $scope.$applyAsync()
+        return;
+      }
       $scope.status = status.data.data.running;
       if ($scope.status === 'no') {
         $scope.isClusterRunning = false;
@@ -245,28 +264,23 @@ export function ClusterController(
       }
 
       const data = await Promise.all([
-        ApiRequest.request('GET', '/cluster/nodes', {}),
-        ApiRequest.request('GET', '/cluster/config', {}),
-        ApiRequest.request('GET', '/version', {}),
-        ApiRequest.request('GET', '/agents', { limit: 1 }),
-        ApiRequest.request('GET', '/cluster/healthcheck', {})
+        WzRequest.apiReq('GET', '/cluster/nodes', {}),
+        WzRequest.apiReq('GET', '/cluster/local/config', {}),
+        WzRequest.apiReq('GET', '//', {}),
+        WzRequest.apiReq('GET', '/agents', { limit: 1 }),
+        WzRequest.apiReq('GET', '/cluster/healthcheck', {})
       ]);
 
-      const result = data.map(item => ((item || {}).data || {}).data || false);
+      const nodeList = (((data[0] || {}).data || {}).data || {}) || false;
+      const clusterConfig = ((((data[1] || {}).data || {}).data || {}) || false);
+      const version = (((data[2] || {}).data || {}).data || {}).api_version || false;
+      const agents = ((((data[3] || {}).data || {}).data || {}) || false);
 
-      const [
-        nodeList,
-        clusterConfig,
-        version,
-        agents,
-        clusterHealthCheck
-      ] = result;
 
-      $scope.nodesCount = nodeList.totalItems;
-      $scope.configuration = clusterConfig;
+      $scope.nodesCount = nodeList.total_affected_items;
+      $scope.configuration = clusterConfig.affected_items[0];
       $scope.version = version;
-      $scope.agentsCount = agents.totalItems - 1;
-      $scope.healthCheck = clusterHealthCheck;
+      $scope.agentsCount = agents.total_affected_items - 1;
 
       nodeList.name = $scope.configuration.name;
       nodeList.master_node = $scope.configuration.node_name;

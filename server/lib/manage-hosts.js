@@ -16,12 +16,12 @@ import { log } from '../logger';
 import { UpdateRegistry } from './update-registry';
 import { initialWazuhConfig } from './initial-wazuh-config';
 
-const BASE_LOGS_PATH = '../../../../optimize/wazuh';
+const OPTIMIZE_WAZUH_PATH = '../../../../optimize/wazuh';
 
 export class ManageHosts {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, `${BASE_LOGS_PATH}/config/wazuh.yml`);
+    this.file = path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config/wazuh.yml`);
     this.updateRegistry = new UpdateRegistry();
     this.initialConfig = initialWazuhConfig;
   }
@@ -37,7 +37,7 @@ export class ManageHosts {
       return `  - ${!id ? new Date().getTime() : id}:
       url: ${host.url}
       port: ${host.port}
-      user: ${host.username || host.user}
+      username: ${host.username || host.user}
       password: ${host.password}`;
     } catch (error) {
       log('manage-hosts:composeHost', error.message || error);
@@ -52,7 +52,7 @@ export class ManageHosts {
   composeRegex(host) {
     try {
       const hostId = Object.keys(host)[0];
-      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*user\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`;
+      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*username\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`;
       log('manage-hosts:composeRegex', 'Composing regex', 'debug');
       return new RegExp(`${reg}`, 'gm');
     } catch (error) {
@@ -68,18 +68,18 @@ export class ManageHosts {
     try {
       this.checkBusy();
       this.busy = true;
-      if (!fs.existsSync(path.join(__dirname, BASE_LOGS_PATH))) {
-        fs.mkdirSync(path.join(__dirname, BASE_LOGS_PATH));
+      if (!fs.existsSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH))) {
+        fs.mkdirSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH));
       }
-      if (!fs.existsSync(path.join(__dirname, `${BASE_LOGS_PATH}/config`))) {
-        fs.mkdirSync(path.join(__dirname, `${BASE_LOGS_PATH}/config`));
+      if (!fs.existsSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`))) {
+        fs.mkdirSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`));
       }
       if (
         !fs.existsSync(
           path.join(__dirname, '../../../../optimize/wazuh/config/wazuh.yml')
         )
       ) {
-        await fs.writeFileSync(this.file, this.initialConfig, 'utf8');
+        await fs.writeFileSync(this.file, this.initialConfig, { encoding: 'utf8', mode: 0o600 });
       }
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
@@ -140,6 +140,9 @@ export class ManageHosts {
       const host = hosts.filter(h => {
         return Object.keys(h)[0] == id;
       });
+      if(host && !host.length){
+        throw new Error('Selected API is no longer available in wazuh.yml');
+      }
       const key = Object.keys(host[0])[0];
       const result = Object.assign(host[0][key], { id: key }) || {};
       return result;
@@ -171,7 +174,7 @@ export class ManageHosts {
           id: id,
           url: host.url,
           port: host.api_port,
-          user: host.api_user,
+          username: host.api_username,
           password: this.decodeApiPassword(host.api_password),
           cluster_info: host.cluster_info,
           extensions: host.extensions

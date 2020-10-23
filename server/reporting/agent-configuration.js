@@ -55,7 +55,7 @@ export const AgentConfiguration = {
           config: [{ component: 'agent', configuration: 'buffer' }],
           labels: [
             {
-              disabled: 'Buffer enabled',
+              disabled: 'Buffer disabled',
               queue_size: 'Queue size',
               events_per_second: 'Events per second'
             }
@@ -83,7 +83,7 @@ export const AgentConfiguration = {
           wodle: [{ name: 'sca' }],
           labels: [
             {
-              disabled: 'Policy monitoring service enabled',
+              disabled: 'Policy monitoring service disabled',
               base_directory: 'Base directory',
               rootkit_files: 'Rootkit files database path',
               rootkit_trojans: 'Rootkit trojans database path',
@@ -117,7 +117,7 @@ export const AgentConfiguration = {
           labels: [
             {
               content: 'Evaluations',
-              disabled: 'OpenSCAP integration enabled',
+              disabled: 'OpenSCAP integration disabled',
               'scan-on-start': 'Scan on start',
               interval: 'Interval between scan executions',
               timeout: 'Timeout (in seconds) for scan executions'
@@ -132,7 +132,7 @@ export const AgentConfiguration = {
           wodle: [{ name: 'cis-cat' }],
           labels: [
             {
-              disabled: 'CIS-CAT integration enabled',
+              disabled: 'CIS-CAT integration disabled',
               'scan-on-start': 'Scan on start',
               interval: 'Interval between scan executions',
               java_path: 'Path to Java executable directory',
@@ -156,7 +156,7 @@ export const AgentConfiguration = {
           wodle: [{ name: 'osquery' }],
           labels: [
             {
-              disabled: 'Osquery integration enabled',
+              disabled: 'Osquery integration disabled',
               run_daemon: 'Auto-run the Osquery daemon',
               add_labels: 'Use defined labels as decorators',
               log_path: 'Path to the Osquery results log file',
@@ -173,7 +173,7 @@ export const AgentConfiguration = {
           wodle: [{ name: 'syscollector' }],
           labels: [
             {
-              disabled: 'Syscollector integration enabled',
+              disabled: 'Syscollector integration disabled',
               'scan-on-start': 'Scan on start',
               interval: 'Interval between system scans',
               network: 'Scan network interfaces',
@@ -194,7 +194,7 @@ export const AgentConfiguration = {
           config: [{ component: 'com', configuration: 'active-response' }],
           labels: [
             {
-              disabled: 'Active response enabled',
+              disabled: 'Active response disabled',
               ca_store: 'Use the following list of root CA certificates',
               ca_verification: 'Validate WPKs using root CA certificate'
             }
@@ -208,7 +208,7 @@ export const AgentConfiguration = {
           wodle: [{ name: 'command' }],
           labels: [
             {
-              disabled: 'Command enabled',
+              disabled: 'Command disabled',
               run_on_start: 'Run on start',
               ignore_output: 'Ignore command output',
               skip_verification: 'Ignore checksum verification',
@@ -230,7 +230,7 @@ export const AgentConfiguration = {
           wodle: [{ name: 'docker-listener' }],
           labels: [
             {
-              disabled: 'Docker listener enabled',
+              disabled: 'Docker listener disabled',
               run_on_start:
                 'Run the listener immediately when service is started',
               interval: 'Waiting time to rerun the listener in case it fails',
@@ -288,7 +288,7 @@ export const AgentConfiguration = {
           tabs: ['General', 'Who data'],
           labels: [
             {
-              disabled: 'Integrity monitoring enabled',
+              disabled: 'Integrity monitoring disabled',
               frequency: 'Interval (in seconds) to run the integrity scan',
               skip_nfs: 'Skip scan on CIFS/NFS mounts',
               scan_on_start: 'Scan on start',

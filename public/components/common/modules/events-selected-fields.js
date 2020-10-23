@@ -11,6 +11,7 @@
  */
 export const EventsSelectedFiles = {
   fim: [
+    'agent.name',
     'syscheck.path',
     'syscheck.event',
     'rule.description',
@@ -18,6 +19,7 @@ export const EventsSelectedFiles = {
     'rule.id'
   ],
   mitre: [
+    'agent.name',
     'rule.mitre.id',
     'rule.mitre.tactic',
     'rule.description',
@@ -31,7 +33,7 @@ export const EventsSelectedFiles = {
     'data.sca.policy',
   ],
   general: [
-    'agent.id',
+    'agent.name',
     'rule.description',
     'rule.level',
     'rule.id',
@@ -43,6 +45,7 @@ export const EventsSelectedFiles = {
     'rule.id',
   ],
   gcp: [
+    'agent.name',
     'data.gcp.jsonPayload.vmInstanceName',
     'data.gcp.resource.labels.location',
     'data.gcp.resource.labels.project_id',
@@ -50,12 +53,14 @@ export const EventsSelectedFiles = {
     'data.gcp.severity',
   ],
   pm: [
+    'agent.name',
     'data.title',
     'rule.description',
     'rule.level',
     'rule.id',
   ],
   audit: [
+    'agent.name',
     'data.audit.command',
     'data.audit.pid',
     'rule.description',
@@ -63,20 +68,14 @@ export const EventsSelectedFiles = {
     'rule.id',
   ],
   oscap: [
+    'agent.name',
     'data.oscap.check.title',
     'data.oscap.check.description',
     'data.oscap.check.result',
     'data.oscap.check.severity',
   ],
   ciscat: [
-    'data.cis.benchmark',
-    'data.cis.group',
-    'data.cis.pass',
-    'data.cis.fail',
-    'data.cis.unknown',
-    'data.cis.result',
-  ],
-  ciscat: [
+    'agent.name',
     'data.cis.benchmark',
     'data.cis.group',
     'data.cis.pass',
@@ -91,6 +90,7 @@ export const EventsSelectedFiles = {
     'data.vulnerability.severity'
   ],
   virustotal: [
+    'agent.name',
     'data.virustotal.source.file',
     'data.virustotal.permalink',
     'data.virustotal.malicious',
@@ -98,12 +98,14 @@ export const EventsSelectedFiles = {
     'data.virustotal.total',
   ],
   osquery: [
+    'agent.name',
     'data.osquery.name',
     'data.osquery.pack',
     'data.osquery.action',
     'data.osquery.subquery',
   ],
   docker: [
+    'agent.name',
     'data.docker.from',
     'data.docker.Type',
     'data.docker.Action',
@@ -111,30 +113,35 @@ export const EventsSelectedFiles = {
     'rule.level',
   ],
   pci: [
+    'agent.name',
     'rule.pci_dss',
     'rule.description',
     'rule.level',
     'rule.id'
   ],
   gdpr: [
+    'agent.name',
     'rule.gdpr',
     'rule.description',
     'rule.level',
     'rule.id'
   ],
   hipaa: [
+    'agent.name',
     'rule.hipaa',
     'rule.description',
     'rule.level',
     'rule.id'
   ],
   nist: [
+    'agent.name',
     'rule.nist_800_53',
     'rule.description',
     'rule.level',
     'rule.id'
   ],
   tsc: [
+    'agent.name',
     'rule.tsc',
     'rule.description',
     'rule.level',

@@ -1,21 +1,3 @@
-<div ng-if="showNodes && !currentNode" class="wz-margin-top-10">
-    <!-- Back button -->
-    <div layout="row">
-        <md-button class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info" aria-label="Back"
-            tooltip="Go back" tooltip-placement="bottom" ng-click="goBack()"><i class="fa fa-fw fa-arrow-left"
-                aria-hidden="true"></i></md-button>
-        <input placeholder="Filter nodes..." ng-model="custom_search" type="text"
-            class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
-            wz-enter="search(custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
-            ng-click="search(custom_search)">
-            <span class="fa fa-search" aria-hidden="true"></span>
-        </button>
-    </div>
-    <div style="padding-top:16px">
-        <div class="euiPanel euiPanel--paddingLarge">
-            <wz-table flex path="'/cluster/nodes'" keys="['name','version','ip','type']" allow-click="true">
-            </wz-table>
-        </div>
-    </div>
+<div ng-if="showNodes && !currentNode">
+    <react-component name="NodeList" props="nodeProps"></react-component>
 </div>

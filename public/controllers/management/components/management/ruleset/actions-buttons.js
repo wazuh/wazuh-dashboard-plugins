@@ -31,6 +31,7 @@ import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
 import RulesetHandler from './utils/ruleset-handler';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzRulesetActionButtons extends Component {
   constructor(props) {
@@ -91,7 +92,7 @@ class WzRulesetActionButtons extends Component {
       } else if (path === 'etc/decoders') {
         upload = this.rulesetHandler.sendDecoderConfiguration;
       } else {
-        upload = this.rulesetHandler.uploadCdbList;
+        upload = this.rulesetHandler.updateCdbList;
       }
       for (let idx in files) {
         const { file, content } = files[idx];
@@ -162,7 +163,6 @@ class WzRulesetActionButtons extends Component {
 
   render() {
     const { section, showingFiles } = this.props.state;
-    const { adminMode } = this.props;
 
     // Export button
     const exportButton = (
@@ -177,7 +177,9 @@ class WzRulesetActionButtons extends Component {
 
     // Add new rule button
     const addNewRuleButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
+        buttonType='empty'
         iconType="plusInCircle"
         onClick={() =>
           this.props.updteAddingRulesetFile({
@@ -188,12 +190,14 @@ class WzRulesetActionButtons extends Component {
         }
       >
         {`Add new ${section} file`}
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     //Add new CDB list button
     const addNewCdbListButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists/files'}]}
         iconType="plusInCircle"
         onClick={() =>
           this.props.updateListContent({
@@ -204,17 +208,19 @@ class WzRulesetActionButtons extends Component {
         }
       >
         {`Add new ${section} file`}
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Manage files
     const manageFiles = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >
         {showingFiles ? `Manage ${section}` : `Manage ${section} files`}
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Refresh
@@ -234,16 +240,16 @@ class WzRulesetActionButtons extends Component {
 
     return (
       <Fragment>
-        {section !== 'lists' && adminMode && (
+        {section !== 'lists' && (
           <EuiFlexItem grow={false}>{manageFiles}</EuiFlexItem>
         )}
-        {adminMode && section !== 'lists' && (
+        {section !== 'lists' && (
           <EuiFlexItem grow={false}>{addNewRuleButton}</EuiFlexItem>
         )}
-        {adminMode && section === 'lists' && (
+        {section === 'lists' && (
           <EuiFlexItem grow={false}>{addNewCdbListButton}</EuiFlexItem>
         )}
-        {(section === 'lists' || showingFiles) && adminMode && (
+        {(section === 'lists' || showingFiles) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
               msg={section}
@@ -261,8 +267,7 @@ class WzRulesetActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.rulesetReducers
   };
 };
 

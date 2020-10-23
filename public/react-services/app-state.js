@@ -19,6 +19,10 @@ import {
 } from '../redux/actions/appStateActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { WazuhConfig } from './wazuh-config';
+import { CSVRequest } from '../services/csv-request';
+import { toastNotifications } from 'ui/notify';
+import * as FileSaver from '../services/file-saver';
+import { WzAuthentication } from './wz-authentication';
 
 export class AppState {
 
@@ -211,6 +215,7 @@ export class AppState {
         try {
           const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
           store.dispatch(updateApiMenu);
+          WzAuthentication.refresh();
         } catch (err) {}
       }
     } catch (err) {
@@ -373,5 +378,31 @@ export class AppState {
   static setWzMenu(isVisible = true) {
     const showMenu = updateShowMenu(isVisible);
     store.dispatch(showMenu);
+  }
+
+
+  static async downloadCsv(path, fileName, filters = []) {
+    try {
+      const csvReq = new CSVRequest();
+      toastNotifications.add({
+        color: 'success',
+        title: 'CSV',
+        text: 'Your download should begin automatically...',
+        toastLifeTimeMs: 4000,
+      });
+      const currentApi = JSON.parse(this.getCurrentAPI()).id;
+      const output = await csvReq.fetch(path, currentApi, filters);
+      const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
+
+      FileSaver.saveAs(blob, fileName);
+    } catch (error) {
+      toastNotifications.add({
+        color: 'success',
+        title: 'CSV',
+        text: 'Error generating CSV',
+        toastLifeTimeMs: 4000,
+      }); 
+    }
+    return;
   }
 }

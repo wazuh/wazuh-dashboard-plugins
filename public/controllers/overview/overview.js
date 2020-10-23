@@ -16,14 +16,14 @@ import { TabDescription } from '../../../server/reporting/tab-description';
 import { timefilter } from 'ui/timefilter';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
-import { updateCurrentTab, updateCurrentAgentData} from '../../redux/actions/appStateActions';
+import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
-import { WzRequest } from '../../react-services/wz-request';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
+import { WAZUH_ALERTS_PATTERN } from '../../../util/constants';
 
 export class OverviewController {
   /**
@@ -51,7 +51,6 @@ export class OverviewController {
     this.$location = $location;
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
-    this.apiReq = ApiRequest;
     this.tabVisualizations = new TabVisualizations();
     this.commonData = commonData;
     this.reportingService = reportingService;
@@ -96,7 +95,7 @@ export class OverviewController {
 
     this.$scope.getMainProps = (resultState) => {
       return {
-        section: this.tab, 
+        section: this.tab,
         disabledReport: resultState !== 'ready',
         agentsSelectionProps: this.agentsSelectionProps,
         switchSubTab: (subtab) => this.switchSubtab(subtab)
@@ -139,20 +138,22 @@ export class OverviewController {
       this.visFactoryService.clearAll();
     });
 
-    this.$scope.getVisualizeProps = (resultState) =>{
-      return {...this.visualizeProps, resultState};
+    this.$scope.getVisualizeProps = (resultState) => {
+      return { ...this.visualizeProps, resultState };
     }
 
     //check if we need to load an agent filter
     const agent = this.$location.search().agentId;
-    if(agent && store.getState().appStateReducers.currentAgentData.id !== agent){
-        const data = await this.wzReq('GET', '/agents', {"q" : "id="+agent } );
-        const formattedData = data.data.data.items[0];
-        this.visualizeProps["isAgent"] = agent;
-        store.dispatch(updateCurrentAgentData(formattedData));
-        this.$location.search('agentId', String(agent));
+    if (agent && store.getState().appStateReducers.currentAgentData.id !== agent) {
+      const params = { "q": `id=${agent}` }
+      const data = await this.wzReq('GET', '/agents', { params });
+      const agentList = data.data.data.affected_items;
+      const formattedData = agentList[0];
+      this.visualizeProps["isAgent"] = agent;
+      store.dispatch(updateCurrentAgentData(formattedData));
+      this.$location.search('agentId', String(agent));
+      this.updateSelectedAgents(agentList);
     }
-    
   }
 
   /**
@@ -164,34 +165,34 @@ export class OverviewController {
     return item && Array.isArray(array) && array.includes(item);
   }
 
-  async updateSelectedAgents(agentList){
-    if(this.initialFilter){
-      this.initialFilter= false;
+  async updateSelectedAgents(agentList) {
+    if (this.initialFilter) {
+      this.initialFilter = false;
       this.agentsSelectionProps.initialFilter = false;
     }
     this.isAgent = agentList ? agentList[0] : false;
     this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
-    if(agentList && agentList.length ){
+    if (agentList && agentList.length) {
       await this.visFactoryService.buildAgentsVisualizations(
         this.filterHandler,
         this.tab,
         this.tabView,
         false,
         (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
-        ); 
+      );
       this.oldFilteredTab = this.tab;
-    }else if(!agentList && this.tab !== 'welcome'){ 
-      if(!store.getState().appStateReducers.currentAgentData.id){
+    } else if (!agentList && this.tab !== 'welcome') {
+      if (!store.getState().appStateReducers.currentAgentData.id) {
         await this.visFactoryService.buildOverviewVisualizations(
           this.filterHandler,
           this.tab,
-          this.tabView, 
+          this.tabView,
           (this.tabView === 'discover' || this.oldFilteredTab === this.tab)
         );
         this.oldFilteredTab = this.tab;
       }
     }
-    setTimeout(() => {  this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null) }, 1);
+    setTimeout(() => { this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id) : null) }, 1);
 
     this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
     this.$rootScope.$applyAsync();
@@ -201,7 +202,7 @@ export class OverviewController {
   // Switch subtab
   async switchSubtab(subtab) {
     try {
-      this.oldFilteredTab="";
+      this.oldFilteredTab = "";
       this.tabVisualizations.clearDeadVis();
       this.$location.search('tabView', subtab);
       const previousTab = this.currentOverviewSectionProps.currentTab;
@@ -213,20 +214,10 @@ export class OverviewController {
       };
 
       this.tabView = this.commonData.checkTabViewLocation();
-      if ( this.tab !== 'welcome') {
-        if(!store.getState().appStateReducers.currentAgentData.id || subtab === 'inventory')
-          await this.visFactoryService.buildOverviewVisualizations(
-            this.filterHandler,
-            this.tab,
-            subtab,
-            false
-          );
-         this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
+      if (this.tab !== 'welcome') {
+        this.$rootScope.$emit('changeTabView', { tabView: subtab, tab: this.tab });
       } else {
-        this.$scope.$emit('changeTabView', {
-          tabView: subtab,
-          tab: this.tab
-        });
+        this.$scope.$emit('changeTabView', { tabView: subtab, tab: this.tab });
       }
       this.tabView = subtab;
     } catch (error) {
@@ -268,7 +259,7 @@ export class OverviewController {
         await this.getSummary();
       }
 
-      
+
 
       if (this.tab === newTab && !force) return;
 
@@ -276,11 +267,11 @@ export class OverviewController {
       if (force === 'nav') force = false;
       this.$location.search('tab', newTab);
       this.tab = newTab;
-      if(!this.initialFilter) this.updateSelectedAgents(false);
+      if (!this.initialFilter) this.updateSelectedAgents(false);
       const tabView = this.$location.search().tabView;
-      if(tabView){
+      if (tabView) {
         await this.switchSubtab(tabView, true);
-      }else{
+      } else {
         await this.switchSubtab('panels', true);
       }
       this.overviewModuleReady = true;
@@ -303,16 +294,16 @@ export class OverviewController {
    */
   async getSummary() {
     try {
-      const data = await this.apiReq.request('GET', '/agents/summary', {});
+      const data = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
       const result = ((data || {}).data || {}).data || false;
 
       if (result) {
-        const active = result.Active - 1;
-        const total = result.Total - 1;
+        const active = result.active - 1;
+        const total = result.total - 1;
         this.agentsCountActive = active;
-        this.agentsCountDisconnected = result.Disconnected;
-        this.agentsCountNeverConnected = result['Never connected'];
+        this.agentsCountDisconnected = result.disconnected;
+        this.agentsCountNeverConnected = result['never_connected'];
         this.agentsCountTotal = total;
         this.agentsCoverity = total ? (active / total) * 100 : 0;
       } else {
@@ -345,7 +336,7 @@ export class OverviewController {
    * @param {*} id
    */
   addMitrefilter(id) {
-    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    const filter = `{"meta":{ "index": ${AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }
 

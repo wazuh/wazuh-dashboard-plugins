@@ -6,23 +6,19 @@ import {
   EuiPanel,
   EuiPage,
   EuiText,
-  EuiTitle
+  EuiTitle,
+  EuiLoadingSpinner
 } from '@elastic/eui';
-import {
-  updateAdminMode
-} from '../../../../../redux/actions/appStateActions';
 
 import { connect } from 'react-redux';
-import checkAdminMode from './utils/check-admin-mode';
 
 // Wazuh components
 import WzRulesetTable from './ruleset-table';
 import WzRulesetSearchBar from './ruleset-search-bar';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../../../redux/store';
-import { WzRulesetTotalItems } from './ruleset-total-items';
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import { compose } from 'redux';
 
 class WzRulesetOverview extends Component {
   sectionNames = {
@@ -38,33 +34,6 @@ class WzRulesetOverview extends Component {
     }
   }
 
-  componentDidMount() {
-    this.setAdminMode();
-  }
-
-  async setAdminMode() {
-    //Set the admin mode
-    const admin = await checkAdminMode();
-    this.props.updateAdminMode(admin);
-  }
-
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: this.sectionNames[this.props.state.section] }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
-  componentDidUpdate() {
-    this.setGlobalBreadcrumb();
-  }
-
-  clickActionFilterBar(obj) {
-    console.log('clicking ', obj);
-  }
-
   render() {
     const { section } = this.props.state;
     const { totalItems } = this.state;
@@ -75,7 +44,7 @@ class WzRulesetOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiTitle>
-                <h2>{this.sectionNames[section]} <WzRulesetTotalItems section={section} totalItems={totalItems} /></h2>
+                <h2>{this.sectionNames[section]} {totalItems === false ? <EuiLoadingSpinner /> : <span>({totalItems})</span>}</h2>
               </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem></EuiFlexItem>
@@ -106,13 +75,27 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updateAdminMode: status => dispatch(updateAdminMode(status)),
-  };
-};
+const SectionResourceType = {
+  rules: 'file',
+  decoders: 'file',
+  lists: 'path'
+}
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(WzRulesetOverview);
+export default compose(
+  connect(
+    mapStateToProps
+  ),
+  withGlobalBreadcrumb(props => {
+    const sectionNames = {
+      rules: 'Rules',
+      decoders: 'Decoders',
+      lists: 'CDB lists'
+    }
+    return [
+      { text: '' },
+      { text: 'Management', href: '/app/wazuh#/manager' },
+      { text: sectionNames[props.state.section] }
+    ];
+  }),
+  withUserAuthorizationPrompt((props) => [{action: `${props.state.section}:read`, resource: `${props.state.section.slice(0,-1)}:${SectionResourceType[props.state.section]}:*`}])
+)(WzRulesetOverview);

@@ -97,6 +97,7 @@ export class OverviewWelcome extends Component {
                         this.buildTabCard('oscap', 'codeApp')}
                       {this.props.extensions.ciscat &&
                         this.buildTabCard('ciscat', 'auditbeatApp')}
+                      {this.buildTabCard('sca', 'securityAnalyticsApp')}
                     </EuiFlexGrid>
                   </EuiPanel>
                 </EuiFlexItem>
@@ -115,7 +116,7 @@ export class OverviewWelcome extends Component {
                         this.buildTabCard('osquery', 'searchProfilerApp')}
                       {this.props.extensions.docker &&
                         this.buildTabCard('docker', 'logoDocker')}
-                      {this.buildTabCard('mitre', 'spacesApp')}{' '}
+                      {this.buildTabCard('mitre', 'spacesApp')}
                       {/* TODO- Change "spacesApp" icon*/}
                     </EuiFlexGrid>
                   </EuiPanel>

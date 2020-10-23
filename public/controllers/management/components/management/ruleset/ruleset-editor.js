@@ -40,6 +40,7 @@ import { toastNotifications } from 'ui/notify';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
 import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzRulesetEditor extends Component {
   _isMounted = false;
@@ -107,7 +108,7 @@ class WzRulesetEditor extends Component {
         });
         this.setState({ isSaving: false });
         this.goToEdit(name);
-        this.showToast('warning', warning.savedMessage, warning.details, 3000);
+        this.showToast('warning', warning.savedMessage, error, 3000);
         return;
       }
       this.setState({ isSaving: false });
@@ -160,12 +161,11 @@ class WzRulesetEditor extends Component {
       addingRulesetFile,
       fileContent
     } = this.props.state;
-    const { adminMode } = this.props;
     const { wazuhNotReadyYet } = this.props;
     const { name, content, path, showWarningRestart } = this.state;
     const isEditable = addingRulesetFile
       ? true
-      : path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode;
+      : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
     nameForSaving = nameForSaving.endsWith('.xml')
       ? nameForSaving
@@ -174,7 +174,8 @@ class WzRulesetEditor extends Component {
 
     const xmlError = validateXML(content);
     const saveButton = (
-      <EuiButton
+      <WzButtonPermissions
+        permissions={[{action: 'manager:upload_file', resource: `file:path:etc/${section}/${nameForSaving}`}]}
         fill
         iconType={(isEditable && xmlError) ? "alert" : "save"}
         isLoading={this.state.isSaving}
@@ -182,7 +183,7 @@ class WzRulesetEditor extends Component {
         onClick={() => this.save(nameForSaving, overwrite)}
       >
         {(isEditable && xmlError) ? 'XML format error' : 'Save'}
-      </EuiButton>
+      </WzButtonPermissions>
     );
 
     return (
@@ -251,7 +252,7 @@ class WzRulesetEditor extends Component {
                   <WzRestartClusterManagerCallout
                     onRestart={() => this.setState({showWarningRestart: true})}
                     onRestarted={() => this.setState({showWarningRestart: false})}
-                    onRestartedError={() => this.setState({showWarningRestart: false})}
+                    onRestartedError={() => this.setState({showWarningRestart: true})}
                   />
                   <EuiSpacer size='s'/>
                 </Fragment>
@@ -295,8 +296,7 @@ class WzRulesetEditor extends Component {
 const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
-    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
-    adminMode: state.appStateReducers.adminMode
+    wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
   };
 };
 

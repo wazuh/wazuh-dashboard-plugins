@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
@@ -30,51 +30,64 @@ import {
   EuiConfirmModal,
   EuiLoadingSpinner
 } from '@elastic/eui';
-import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar';
 import { CheckUpgrade } from './checkUpgrade';
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { AgentGroupTruncate } from '../../../components/common/util';
+import { GroupTruncate } from '../../../components/common/util';
+import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
+import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
+import { WzButtonPermissions } from '../../../components/common/permissions/button';
 
 export class AgentsTable extends Component {
   _isMount = false;
   constructor(props) {
     super(props);
-    const selectedOptions = JSON.parse(
-      sessionStorage.getItem('agents_preview_selected_options')
-    );
     this.state = {
       agents: [],
       isLoading: false,
-      isProcessing: true,
       pageIndex: 0,
       pageSize: 15,
-      q: '',
-      search: '',
-      selectedOptions: selectedOptions || [],
       sortDirection: 'asc',
       sortField: 'id',
       totalItems: 0,
       selectedItems: [],
       allSelected: false,
-      purgeModal: false
+      purgeModal: false,
+      filters: sessionStorage.getItem('agents_preview_selected_options') ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options')) : []
     };
+    this.suggestions = [
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
+      { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'group', description: 'Filter by agent group', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'node_name', description: 'Filter by node name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'manager', description: 'Filter by manager', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'version', description: 'Filter by agent version', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'configSum', description: 'Filter by agent config sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'mergedSum', description: 'Filter by agent merged sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000' }) },
+      { type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }) },
+    ];
     this.downloadCsv.bind(this);
   }
 
   async UNSAFE_componentWillMount() {
-    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+    const managerVersion = await WzRequest.apiReq('GET', '//', {});
     const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
     const agentActive = await WzRequest.apiReq('GET', '/agents', {
-      q: 'status=active'
+      params: {
+        q: 'status=active'
+      }
     });
 
     this.setState({
-      managerVersion: managerVersion.data.data,
+      managerVersion: managerVersion.data.data.api_version,
       agentActive: agentActive.data.data.totalItems,
-      avaibleAgents: totalAgent.data.data.items
+      avaibleAgents: totalAgent.data.data.affected_items
     });
   }
 
@@ -85,98 +98,71 @@ export class AgentsTable extends Component {
       pageIndex,
       pageSize,
       sortField,
-      sortDirection,
-      isProcessing: true,
-      isLoading: true
-    });
-  };
-
-  onQueryChange = ({ q = {}, search = {}, selectedOptions = {} }) => {
-    sessionStorage.setItem(
-      'agents_preview_selected_options',
-      JSON.stringify(selectedOptions)
-    );
-    this._isMount && this.setState({
-      q,
-      search,
-      selectedOptions,
-      isProcessing: true,
-      isLoading: true
+      sortDirection
     });
   };
 
   async componentDidMount() {
     this._isMount = true;
     await this.getItems();
-    const filterStatus = this.filterBarModelStatus();
-    const filterGroups = await this.filterBarModelGroups();
-    const filterOs = await this.filterBarModelOs();
-    const filterVersion = await this.filterBarModelWazuhVersion();
-    const filterOsPlatform = await this.filterBarModelOsPlatform();
-    const filterNodes = await this.filterBarModelNodes();
-    this._isMount && this.setState({
-      filterStatus,
-      filterGroups,
-      filterOs,
-      filterVersion,
-      filterOsPlatform,
-      filterNodes
-    });
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     this._isMount = false;
+    if(sessionStorage.getItem('agents_preview_selected_options')){
+      sessionStorage.removeItem('agents_preview_selected_options');
+    }
   }
-  
+
   async reloadAgents() {
-    const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
-    this._isMount && this.setState({
-      isProcessing: true,
-      isLoading: true,
-      avaibleAgents: totalAgent.data.data.items
-    });
+    // const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
+    // this._isMount && this.setState({
+    //   isLoading: true,
+    //   avaibleAgents: totalAgent.data.data.items
+    // });
+    await this.getItems();
     await this.props.reload();
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if(this.props.filters && this.props.filters.length){
-      this._isMount && this.setState({selectedOptions: this.props.filters, 
-        q:`${this.props.filters[0].group}=${ this.props.filters[0].label_}`,
-        isProcessing: true,
-        isLoading: false});
-      this.props.removeFilters()
-    }
-    if (this.state.isProcessing) {
-      const { q, search } = this.state;
-      const { q: prevQ, search: prevSearch } = prevState;
-      if (prevQ !== q || prevSearch !== search) {
-        this._isMount && this.setState({ pageIndex: 0 });
-      }
+    if (!(_.isEqual(prevState.filters, this.state.filters))
+      || prevState.pageIndex !== this.state.pageIndex
+      || prevState.pageSize !== this.state.pageSize
+      || prevState.sortField !== this.state.sortField
+      || prevState.sortDirection !== this.state.sortDirection) {
       await this.getItems();
+    } else if (!(_.isEqual(prevProps.filters, this.props.filters)) && this.props.filters && this.props.filters.length) {
+      this.setState({ filters: this.props.filters, pageIndex: 0 });
+      this.props.removeFilters();
     }
-    if (prevState.allSelected === false && this.state.allSelected === true) {
-      this._isMount && this.setState({ loadingAllItem: true });
-      this.getAllItems();
-    }
+    // if (prevState.allSelected === false && this.state.allSelected === true) {
+    //   this._isMount && this.setState({ loadingAllItem: true });
+    //   this.getAllItems();
+    // }
   }
 
   async getItems() {
-    const rawAgents = await this.props.wzReq(
-      'GET',
-      '/agents',
-      this.buildFilter()
-    );
+    try {
+      this._isMount && this.setState({ isLoading: true });
+      const rawAgents = await this.props.wzReq(
+        'GET',
+        '/agents',
+        { params: this.buildFilter() }
+      );
 
-    const formatedAgents = (
-      ((rawAgents || {}).data || {}).data || {}
-    ).items.map(this.formatAgent.bind(this));
-    this._isMount &&
-      this.setState({
-        agents: formatedAgents,
-        totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
-        isProcessing: false,
-        isLoading: false
-      });
+      const formatedAgents = (
+        ((rawAgents || {}).data || {}).data || {}
+      ).affected_items.map(this.formatAgent.bind(this));
+
+      this._isMount &&
+        this.setState({
+          agents: formatedAgents,
+          totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
+          isLoading: false
+        });
+    } catch (error) {
+      this.setState({ isLoading: false });
+    }
   }
 
   async getAllItems() {
@@ -209,24 +195,21 @@ export class AgentsTable extends Component {
         agents: formatedAgents,
         avaibleAgents: agentsFiltered.data.data.items,
         totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
-        isProcessing: false,
         isLoading: false
       });
   }
 
   buildFilter() {
-    const { pageIndex, pageSize, search } = this.state;
+    const { pageIndex, pageSize, filters } = this.state;
 
     const filter = {
+      ...filtersToObject(filters),
       offset: (pageIndex * pageSize) || 0,
       limit: pageSize,
-      q: this.buildQFilter(),
       sort: this.buildSortFilter()
     };
+    filter.q = !filter.q ? `id!=000` : `id!=000;${filter.q}`;
 
-    if (search !== '') {
-      filter.search = search;
-    }
     return filter;
   }
 
@@ -287,7 +270,7 @@ export class AgentsTable extends Component {
           />
         </EuiToolTip>
         &nbsp;
-        {agent.status !== 'Never connected' && 
+        {agent.status !== 'never_connected' &&
           <EuiToolTip content="Open configuration for this agent" position="left">
             <EuiButtonIcon
               onClick={ev => {
@@ -334,23 +317,23 @@ export class AgentsTable extends Component {
     );
   }
 
+
   addHealthStatusRender(status) {
     const color = status => {
       if (status.toLowerCase() === 'active') {
         return 'success';
       } else if (status.toLowerCase() === 'disconnected') {
         return 'danger';
-      } else if (status.toLowerCase() === 'never connected') {
+      } else if (status.toLowerCase() === 'never_connected') {
         return 'subdued';
       }
     };
 
-    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status}</span></EuiHealth>;
+    return <EuiHealth color={color(status)}><span className={'hide-agent-status'}>{status === 'never_connected' ? 'never connected' : status}</span></EuiHealth>;
   }
 
   reloadAgent = () => {
     this._isMount && this.setState({
-      isProcessing: true,
       isLoading: true
     });
     this.props.reload();
@@ -369,10 +352,11 @@ export class AgentsTable extends Component {
   }
 
   downloadCsv = () => {
-    const { q, search = {} } = this.buildFilter();
-    const filterQ = { name: 'q', value: q };
-    const filterSearch = { name: 'search', value: search };
-    this.props.downloadCsv([filterQ, filterSearch]);
+    const filters = this.buildFilter();
+    const formatedFilters = Object.keys(filters)
+      .filter(field => !['limit', 'offset', 'sort'].includes(field))
+      .map(field => ({name: field, value: filters[field]}))
+    this.props.downloadCsv(formatedFilters);
   };
   formattedButton() {
     return (
@@ -424,7 +408,7 @@ export class AgentsTable extends Component {
       (selectedItems.length > 0 &&
         selectedItems.filter(item => item.status === 'Active').length === 0 &&
         selectedItems.filter(item => item.status === 'Disconnected').length >
-          0) ||
+        0) ||
       selectedItems.filter(item => item.outdated && item.status === 'Active')
         .length === 0
     ) {
@@ -665,17 +649,17 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-              'success',
-              `Selected agents were successfully deleted`,
-              '',
-              5000
-            )
+            'success',
+            `Selected agents were successfully deleted`,
+            '',
+            5000
+          )
           : this.showToast(
-              'warning',
-              `Failed to delete selected agents`,
-              '',
-              5000
-            );
+            'warning',
+            `Failed to delete selected agents`,
+            '',
+            5000
+          );
       })
       .catch(error => {
         this.showToast(
@@ -708,11 +692,11 @@ export class AgentsTable extends Component {
       .then(value => {
         value.status === 200
           ? this.showToast(
-              'success',
-              `All agents have been successfully deleted`,
-              '',
-              5000
-            )
+            'success',
+            `All agents have been successfully deleted`,
+            '',
+            5000
+          )
           : this.showToast('warning', `Failed to delete all agents`, '', 5000);
       })
       .catch(error => {
@@ -821,12 +805,14 @@ export class AgentsTable extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
+            <WzButtonPermissions
+              buttonType='empty'
+              permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
               iconType="plusInCircle"
               onClick={() => this.props.addingNewAgent()}
             >
               Deploy new agent
-            </EuiButtonEmpty>
+            </WzButtonPermissions>
           </EuiFlexItem>
           {formattedButton}
         </EuiFlexGroup>
@@ -835,179 +821,16 @@ export class AgentsTable extends Component {
     );
   }
 
-  filterBarModelStatus() {
-    return {
-      label: 'Status',
-      options: [
-        {
-          label: 'Active',
-          group: 'status'
-        },
-        {
-          label: 'Disconnected',
-          group: 'status'
-        },
-        {
-          label: 'Never connected',
-          group: 'status'
-        }
-      ]
-    };
-  }
-
-  async filterBarModelGroups() {
-    const rawGroups = await this.props.wzReq('GET', '/agents/groups', {});
-    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
-    const groups = itemsGroups
-      .filter(item => {
-        return item.count > 0;
-      })
-      .map(item => {
-        return { label: item.name, group: 'group' };
-      });
-    return {
-      label: 'Groups',
-      options: groups
-    };
-  }
-
-  async filterBarModelOs() {
-    const rawOs = await this.props.wzReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'os.name,os.version',
-        q: 'id!=000'
-      }
-    );
-    const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
-    const os = itemsOs
-      .filter(item => {
-        return Object.keys(item).includes('os');
-      })
-      .map(item => {
-        const { name, version } = item.os;
-        return {
-          label: `${name}-${version}`,
-          group: 'osname',
-          query: `os.name=${name};os.version=${version}`
-        };
-      });
-    return {
-      label: 'OS Name',
-      options: os
-    };
-  }
-
-  async filterBarModelOsPlatform() {
-    const rawOsPlatform = await this.props.wzReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'os.platform',
-        q: 'id!=000'
-      }
-    );
-    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {})
-      .items;
-    const osPlatform = itemsOsPlatform
-      .filter(item => {
-        return Object.keys(item).includes('os');
-      })
-      .map(item => {
-        const { platform } = item.os;
-        return {
-          label: platform,
-          group: 'osplatform',
-          query: `os.platform=${platform}`
-        };
-      });
-    return {
-      label: 'OS Platform',
-      options: osPlatform
-    };
-  }
-
-  async filterBarModelNodes() {
-    const rawNodes = await this.props.wzReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'node_name',
-        q: 'id!=000;node_name!=unknown'
-      }
-    );
-    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
-    const nodes = itemsNodes
-      .filter(item => {
-        return Object.keys(item).includes('node_name');
-      })
-      .map(item => {
-        const { node_name } = item;
-        return {
-          label: node_name,
-          group: 'nodename',
-          query: `node_name=${node_name}`
-        };
-      });
-    return {
-      label: 'Nodes',
-      options: nodes
-    };
-  }
-
-  async filterBarModelWazuhVersion() {
-    const rawVersions = await this.props.wzReq(
-      'GET',
-      '/agents/stats/distinct?pretty',
-      {
-        fields: 'version',
-        q: 'id!=000'
-      }
-    );
-    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
-    const versions = itemsVersions
-      .filter(item => {
-        return Object.keys(item).includes('version');
-      })
-      .map(item => {
-        return {
-          label: item.version,
-          group: 'version'
-        };
-      });
-    return {
-      label: 'Version',
-      options: versions
-    };
-  }
-
   filterBarRender() {
-    const {
-      filterStatus,
-      filterGroups,
-      filterOs,
-      filterVersion,
-      filterOsPlatform,
-      filterNodes
-    } = this.state;
-    const model = [
-      filterStatus || { label: 'Status', options: [] },
-      filterGroups || { label: 'Groups', options: [] },
-      filterOs || { label: 'OS Name', options: [] },
-      filterOsPlatform || { label: 'OS Platform', options: [] },
-      filterVersion || { label: 'Version', options: [] },
-      filterNodes || { label: 'Nodes', options: [] }
-    ];
-    const { selectedOptions } = this.state;
-
     return (
       <EuiFlexGroup>
         <EuiFlexItem style={{ marginRight: 0 }}>
-          <WzFilterBar
-            model={model}
-            clickAction={this.onQueryChange}
-            selectedOptions={selectedOptions}
+          <WzSearchBar
+            noDeleteFiltersOnUpdateSuggests
+            filters={this.state.filters}
+            suggestions={this.suggestions}
+            onFiltersChange={filters => this.setState({ filters, pageIndex: 0 })}
+            placeholder="Filter or search agent"
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
@@ -1029,14 +852,15 @@ export class AgentsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => {}
+        onClick: () => { }
       };
     };
 
     const getCellProps = item => {
       return {
         onMouseDown: (ev) => {
-          AppNavigate.navigateToModule(ev, 'agents', {"tab": "welcome", "agent": item.id, } ); ev.stopPropagation()}
+          AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": item.id, }); ev.stopPropagation()
+        }
       }
     };
 
@@ -1046,17 +870,18 @@ export class AgentsTable extends Component {
       totalItems,
       agents,
       sortField,
-      sortDirection
+      sortDirection,
+      isLoading
     } = this.state;
     const columns = this.columns();
     const pagination =
       totalItems > 15
         ? {
-            pageIndex: pageIndex,
-            pageSize: pageSize,
-            totalItemCount: totalItems,
-            pageSizeOptions: [15, 25, 50, 100]
-          }
+          pageIndex: pageIndex,
+          pageSize: pageSize,
+          totalItemCount: totalItems,
+          pageSizeOptions: [15, 25, 50, 100]
+        }
         : false;
     const sorting = {
       sort: {
@@ -1064,7 +889,6 @@ export class AgentsTable extends Component {
         direction: sortDirection
       }
     };
-    const isLoading = this.state.isLoading;
 
     const selection = {
       selectable: agent => agent.id,
@@ -1083,8 +907,8 @@ export class AgentsTable extends Component {
             loading={isLoading}
             rowProps={getRowProps}
             cellProps={getCellProps}
-/*             isSelectable={false}
-            selection={selection} */
+            /*             isSelectable={false}
+                        selection={selection} */
             noItemsMessage="No agents found"
             {...(pagination && { pagination })}
           />
@@ -1093,9 +917,24 @@ export class AgentsTable extends Component {
     );
   }
 
+  filterGroupBadge = (group) => {
+    const { filters } = this.state;
+    let auxFilters = filters.map(filter => filter.value.match(/group=(.*S?)/)[1]);
+    if (filters.length > 0) {
+      !auxFilters.includes(group) ?
+        this.setState({
+          filters: [...filters, { field: "q", value: `group=${group}` }],
+        }) : false;
+    } else {
+      this.setState({
+        filters: [...filters, { field: "q", value: `group=${group}` }],
+      })
+    }
+  }
+
   renderGroups(groups) {
-    return(
-      <AgentGroupTruncate groups={groups} length={25} label={'more'}/> 
+    return (
+      <GroupTruncate groups={groups} length={25} label={'more'} action={'filter'} filterAction={this.filterGroupBadge} {...this.props} />
     )
   }
 

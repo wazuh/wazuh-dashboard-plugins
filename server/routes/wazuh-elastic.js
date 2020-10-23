@@ -14,7 +14,7 @@ import { WazuhElasticCtrl } from '../controllers';
 export function WazuhElasticRouter(server) {
   const ctrl = new WazuhElasticCtrl(server);
 
-  // Get index patterns list
+  // Get current space
   server.route({
     method: 'GET',
     path: '/elastic/current-space',
@@ -22,6 +22,33 @@ export function WazuhElasticRouter(server) {
       return ctrl.getCurrentSpace(req, res);
     }
   });
+
+  // Get current user
+  server.route({
+    method: 'GET',
+    path: '/elastic/security/current-user',
+    handler(req, res) {
+      return ctrl.getCurrentUser(req, res);
+    }
+  });  
+
+  // Get roles of an user
+  server.route({
+    method: 'GET',
+    path: '/elastic/security/roles/{user}',
+    handler(req, res) {
+      return ctrl.getRoles(req, res);
+    }
+  });
+    
+  // Get current security platform
+  server.route({
+    method: 'GET',
+    path: '/elastic/security/current-platform',
+    handler(req, res) {
+      return ctrl.getCurrentPlatform(req, res);
+    }
+  });  
 
   // Get index patterns list
   server.route({
@@ -130,6 +157,14 @@ export function WazuhElasticRouter(server) {
     path: '/elastic/esAlerts',
     handler(req, res) {
       return ctrl.esAlerts(req, res);
+    }
+  });
+  // Check if there are indices for Statistics
+  server.route({
+    method: 'GET',
+    path: '/elastic/statistics',
+    handler(req, res) {
+      return ctrl.existStatisticsIndices(req, res);
     }
   });
 }

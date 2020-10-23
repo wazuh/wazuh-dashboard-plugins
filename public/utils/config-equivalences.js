@@ -9,6 +9,8 @@ export const configEquivalences = {
     'Enable or disable the setup health check when opening the app.',
   'checks.fields':
     'Enable or disable the known fields health check when opening the app.',
+    'checks.metaFields': 
+      'Change the default value of the Kibana metaField configuration',
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
   'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
@@ -33,24 +35,159 @@ export const configEquivalences = {
     'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':
     'Disable certain index pattern names from being available in index pattern selector from the Wazuh app.',
-  'xpack.rbac.enabled':
-    'Enable or disable X-Pack RBAC security capabilities when using the app.',
   'wazuh.monitoring.enabled':
     'Enable or disable the wazuh-monitoring index creation and/or visualization.',
   'wazuh.monitoring.frequency':
     'Define in seconds the frequency the app generates a new document on the wazuh-monitoring index.',
   'wazuh.monitoring.shards':
-    'Define the number of shards to use for the wazuh-monitoring-3.x-* indices.',
+    'Define the number of shards to use for the wazuh-monitoring-* indices.',
   'wazuh.monitoring.replicas':
-    'Define the number of replicas to use for the wazuh-monitoring-3.x-* indices.',
+    'Define the number of replicas to use for the wazuh-monitoring-* indices.',
   'wazuh.monitoring.creation':
     'Define the interval in which the wazuh-monitoring index will be created.',
   'wazuh.monitoring.pattern':
     'Default index pattern to use on the app for Wazuh monitoring.',
-  admin:
-    'Enable or disable administrator requests to the Wazuh API when using the app.',
   hideManagerAlerts:
-    'Hide the alerts of the manager in all dashboards and discover',
+    'Hide the alerts of the manager in all dashboards.',
   'logs.level':
-    'Set the app logging level, allowed values are info and debug. Default is info.'
+    'Set the app logging level, allowed values are info and debug. Default is info.',
+  'enrollment.dns':
+    'Set the Wazuh server address in the agent deployment.',
+  'cron.prefix':
+    'Define the index prefix of predefined jobs.',
+  'cron.statistics.status':
+    'Enable or disable the statistics tasks.',
+  'cron.statistics.apis':
+    'Enter the ID of the APIs you want to save data from, leave this empty to run the task on all configured APIs.',
+  'cron.statistics.interval': 'Define the frequency of task execution using cron schedule expressions.',
+  'cron.statistics.index.name': 'Define the name of the index in which the documents are to be saved.',
+  'cron.statistics.index.creation': 'Define the interval in which the index will be created.',
 };
+
+export const nameEquivalence = {
+  pattern: 'Index pattern',
+  'checks.pattern': 'Index pattern',
+  'checks.template': 'Index template',
+  'checks.api': 'API connection',
+  'checks.setup': 'API version',
+  'checks.fields': 'Know fields',
+  'checks.metaFields': 'Remove meta fields',
+  timeout: 'Request timeout',
+  'api.selector': 'API selector',
+  'ip.selector': 'IP selector',
+  'ip.ignore': 'IP ignore',
+  'xpack.rbac.enabled': 'X-Pack RBAC',
+  'wazuh.monitoring.enabled': 'Status',
+  'wazuh.monitoring.frequency': 'Frecuency',
+  'wazuh.monitoring.shards': 'Index shards',
+  'wazuh.monitoring.replicas': 'Index replicas',
+  'wazuh.monitoring.creation': 'Interval creation',
+  'wazuh.monitoring.pattern': 'Index pattern',
+  hideManagerAlerts: 'Hide manager alerts',
+  'logs.level': 'Log level',
+  'enrollment.dns': 'Enrollment DNS',
+  'cron.prefix': 'Cron prefix',
+  'cron.statistics.status': 'Status',
+  'cron.statistics.apis': 'Includes apis',
+  'cron.statistics.interval': 'Interval',
+  'cron.statistics.index.name': 'Index name',
+  'cron.statistics.index.creation': 'Index creation',
+}
+
+const HEALTH_CHECK = 'Health Check';
+const GENERAL = 'General';
+const SECURITY = 'Security';
+const MONITORING = 'Monitoring'
+const STATISTICS = 'Statistics'
+export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS,];
+
+export const categoriesEquivalence = {
+  pattern: GENERAL,
+  'checks.pattern': HEALTH_CHECK,
+  'checks.template': HEALTH_CHECK,
+  'checks.api': HEALTH_CHECK,
+  'checks.setup': HEALTH_CHECK,
+  'checks.fields': HEALTH_CHECK,
+  'checks.metaFields': HEALTH_CHECK,
+  timeout: GENERAL,
+  'api.selector': GENERAL,
+  'ip.selector': GENERAL,
+  'ip.ignore': GENERAL,
+  'wazuh.monitoring.enabled': MONITORING,
+  'wazuh.monitoring.frequency': MONITORING,
+  'wazuh.monitoring.shards': MONITORING,
+  'wazuh.monitoring.replicas': MONITORING,
+  'wazuh.monitoring.creation': MONITORING,
+  'wazuh.monitoring.pattern': MONITORING,
+  hideManagerAlerts: GENERAL,
+  'logs.level': GENERAL,
+  'enrollment.dns': GENERAL,
+  'cron.prefix': GENERAL,
+  'cron.statistics.status': STATISTICS,
+  'cron.statistics.apis': STATISTICS,
+  'cron.statistics.interval': STATISTICS,
+  'cron.statistics.index.name': STATISTICS,
+  'cron.statistics.index.creation': STATISTICS,
+}
+
+const TEXT = 'text';
+const NUMBER = 'number';
+const LIST = 'list';
+const BOOLEAN = 'boolean';
+const ARRAY = 'array';
+const INTERVAL = 'interval'
+
+export const formEquivalence = {
+  pattern: { type: TEXT },
+  'checks.pattern': { type: BOOLEAN },
+  'checks.template': { type: BOOLEAN },
+  'checks.api': { type: BOOLEAN },
+  'checks.setup': { type: BOOLEAN },
+  'checks.fields': { type: BOOLEAN },
+  'checks.metaFields': { type: BOOLEAN },
+  timeout: { type: NUMBER },
+  'api.selector': { type: BOOLEAN },
+  'ip.selector': { type: BOOLEAN },
+  'ip.ignore': { type: ARRAY },
+  'xpack.rbac.enabled': { type: BOOLEAN },
+  'wazuh.monitoring.enabled': { type: BOOLEAN },
+  'wazuh.monitoring.frequency': { type: NUMBER },
+  'wazuh.monitoring.shards': { type: NUMBER },
+  'wazuh.monitoring.replicas': { type: NUMBER },
+  'wazuh.monitoring.creation': {
+    type: LIST, params: {
+      options: [
+        { text: 'Hourly', value: 'h' },
+        { text: 'Daily', value: 'd' },
+        { text: 'Weekly', value: 'w' },
+        { text: 'Monthly', value: 'm' },
+      ]
+    }
+  },
+  'wazuh.monitoring.pattern': { type: TEXT },
+  hideManagerAlerts: { type: BOOLEAN },
+  'logs.level': {
+    type: LIST, params: {
+      options: [
+        { text: 'Info', value: 'info' },
+        { text: 'Debug', value: 'debug' },
+      ]
+    }
+  },
+  'enrollment.dns': { type: TEXT },
+  'cron.prefix': { type: TEXT },
+  'cron.statistics.status': { type: BOOLEAN },
+  'cron.statistics.apis': { type: ARRAY },
+  'cron.statistics.interval': { type: INTERVAL },
+  'cron.statistics.index.name': { type: TEXT },
+  'cron.statistics.index.creation': {
+    type: LIST, params: {
+      options: [
+        { text: 'Hourly', value: 'h' },
+        { text: 'Daily', value: 'd' },
+        { text: 'Weekly', value: 'w' },
+        { text: 'Monthly', value: 'm' },
+      ]
+    }
+  },
+}

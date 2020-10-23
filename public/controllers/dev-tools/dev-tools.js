@@ -21,7 +21,7 @@ import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { ApiRequest } from '../../react-services/api-request';
+import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 
 export class DevToolsController {
@@ -33,7 +33,7 @@ export class DevToolsController {
    * @param {*} $document
    */
   constructor($scope, $window, errorHandler, $document) {
-    this.apiReq = ApiRequest;
+    this.wzRequest = WzRequest;
     this.genericReq = GenericRequest;
     this.$window = $window;
     this.errorHandler = errorHandler;
@@ -367,8 +367,8 @@ export class DevToolsController {
     const currentState = AppState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
-        JSON.stringify({ limit: 5 }, null, 2);
+        'GET /agents?status=active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh&limit=1\n\nPOST /agents\n' +
+        JSON.stringify({ name: "NewAgent" }, null, 2);
 
       AppState.setCurrentDevTools(demoStr);
       this.apiInputBox.getDoc().setValue(demoStr);
@@ -378,43 +378,152 @@ export class DevToolsController {
     this.groups = this.analyzeGroups();
     const currentGroup = this.calculateWhichGroup();
     this.highlightGroup(currentGroup);
-
+    const self = this;
     // Register our custom Codemirror hint plugin.
     CodeMirror.registerHelper('hint', 'dictionaryHint', function(editor) {
       const model = editor.model;
       function getDictionary(line, word) {
         let hints = [];
         const exp = line.split(/\s+/g);
-        if (exp[0] && exp[0].match(/^(?:GET|PUT|POST|DELETE).*$/)) {
-          let method = model.find(function(item) {
-            return item.method === exp[0];
-          });
-          const forbidChars = /^[^?{]+$/;
-          if (method && !exp[2] && forbidChars.test(word)) {
-            method.endpoints.forEach(function(endpoint) {
-              endpoint.path = endpoint.name;
-              if (endpoint.args && endpoint.args.length > 0) {
-                let argSubs = [];
-                endpoint.args.forEach(function(arg) {
-                  const pathSplitted = endpoint.name.split('/');
-                  const arrayIdx = pathSplitted.indexOf(arg.name);
-                  const wordSplitted = word.split('/');
-                  if (wordSplitted[arrayIdx] && wordSplitted[arrayIdx] != '') {
-                    argSubs.push({
-                      id: arg.name,
-                      value: wordSplitted[arrayIdx]
-                    });
-                  }
-                });
-                let auxPath = endpoint.name;
-                argSubs.forEach(function(arg) {
-                  auxPath = auxPath.replace(arg.id, arg.value);
-                });
-                endpoint.path = auxPath;
-              }
-            });
-            hints = method.endpoints.map(a => a.path);
+        const currentGroup = self.calculateWhichGroup();
+        const editorCursor = editor.getCursor();
+        // Get http method, path, query params from API request
+        const [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] = (currentGroup && currentGroup.requestText && currentGroup.requestText.match(/^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/)) || [];
+        // Split the input request path as array and lowercase
+        const inputEndpoint = inputPath && inputPath.split('/').filter(item => item).map(item => item.toLowerCase()) || [];
+        // Get all API endpoints with http method in the request
+        const inputHttpMethodEndpoints = (model.find(item => item.method === inputHttpMethod) || {}).endpoints || [];
+        // Find the API endpoint in the request
+        const apiEndpoint = inputHttpMethodEndpoints
+            .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
+            .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
+            .find(endpoint => endpoint.splitURL.reduce((accum,str,index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]),true));
+        // Get API endpoint path hints
+        if(exp[0] && currentGroup && currentGroup.start === editorCursor.line && !word.includes('{')){
+          // Get hints for requests as: http_method api_path?query_params
+          if(inputHttpMethod && inputPath && inputQueryParamsStart){
+            // Split the query params as {key, value}[] where key=value in query param
+            const inputQuery = inputQueryParams && inputQueryParams.split('&').filter(item => item).map(item => {
+              const [key, value] = item.split('=');
+              return { key, value };
+            }) || [];
+            // It is defining query param value query_param=
+            const definingQueryParamValue = inputQueryParams && inputQueryParams.includes('&') ? inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('&') : (inputRequest.lastIndexOf('=') > inputRequest.lastIndexOf('?'));
+            
+            if(!definingQueryParamValue && apiEndpoint && apiEndpoint.query){
+              const inputQueryPreviousEntriesKeys = inputQuery.filter(query => query.key && query.value).map(query => query.key);
+              hints = apiEndpoint.query
+                .filter(query => !inputQueryPreviousEntriesKeys.includes(query.name))
+                .map(item => `${inputPath}${inputQuery
+                  .filter(query => query.key && query.value)
+                  .reduce((accum, query, index) => `${accum}${index > 0 ? '&' : ''}${query.key}=${query.value}`, '?')}${inputQuery.filter(query => query.key && query.value).length > 0 ? '&' : ''}${item.name}=`)
+            };
+          }else if(inputHttpMethod){
+            // Get hints for all http method endpoint
+            if(!inputPath){
+              hints = inputHttpMethodEndpoints
+                .map(endpoint => endpoint.name);
+            }else{
+              // Get hints for requests as: http_method api_path
+              hints = inputHttpMethodEndpoints
+                .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
+                .filter(endpoint => endpoint.splitURL.reduce((accum, splitPath, index) => {
+                    if(!accum){ return accum };
+                    if(splitPath.startsWith(':') || !inputEndpoint[index] || (inputEndpoint[index] && splitPath.startsWith(inputEndpoint[index]))){
+                      return true;
+                    };
+                  }, true)
+                ).map(endpoint => endpoint.splitURL.reduce((accum, splitPath, index) => 
+                    `${accum}/${splitPath.startsWith(':') && inputEndpoint[index] || splitPath}`
+                  , '')
+                );
+            }
           }
+        // Get API endpoint body params hints
+        } else if(currentGroup && currentGroup.requestText && currentGroup.requestTextJson && currentGroup.start < editorCursor.line && currentGroup.end > editorCursor.line){
+          const reLineStart = /^(\s*)(?:"|')(\S*)(?::)?$/; // Line starts with 
+          const spaceLineStart = (line.match(reLineStart) || [])[1] || '';
+          const inputKeyBodyParam = (line.match(reLineStart) || [])[2] || '';
+
+          const renderBodyParam = (parameter, spaceLineStart) => {
+            let valueBodyParam = '';
+            if(parameter.type === 'string'){
+              valueBodyParam = '""'
+            }else if(parameter.type === 'array'){
+              valueBodyParam = '[]'
+            }else if (parameter.type === 'object'){
+              const paramPropertiesKeys = Object.keys(parameter.properties).sort();
+              const lastIndex = paramPropertiesKeys.length - 1;
+              valueBodyParam = `{\n${paramPropertiesKeys.map((keyProperty, index) => `${spaceLineStart}\t${renderBodyParam({name: keyProperty,...parameter.properties[keyProperty]},spaceLineStart + '\t')}${lastIndex !== index ? ',' : ''}`).join('\n')}\n${spaceLineStart}}`
+            }
+            return `"${parameter.name}": ${valueBodyParam}`;
+          };
+
+          const getInnerKeysBodyRequest = () => {
+            let jsonBodyKeyCurrent = [];
+            let jsonBodyKeyCurrentPosition = {
+              start : {line: currentGroup.start, ch: 0},
+              end: {line: currentGroup.start, ch: 0}
+            };
+            return ([...Array(currentGroup.end + 1 - currentGroup.start).keys()])
+              .reduce((jsonBodyKeyCursor, lineNumberRange) => {
+                const editorLineNumber = currentGroup.start + lineNumberRange;
+                const editorLineContent = editor.getLine(editorLineNumber);
+                const openBracket = editorLineContent.indexOf('{');
+                const closeBracket = editorLineContent.indexOf('}');
+                const keyOpenBracket = (editorLineContent.match(/\s*"(\S+)"\s*:\s*\{/) || [])[1];
+                keyOpenBracket && jsonBodyKeyCurrent.push(keyOpenBracket) && (jsonBodyKeyCurrentPosition.start = {line: editorLineNumber, ch: openBracket});
+
+                closeBracket !== -1 && (jsonBodyKeyCurrentPosition.end = {line: editorLineNumber, ch: closeBracket});
+                if(!jsonBodyKeyCursor && editorCursor.line > jsonBodyKeyCurrentPosition.start.line
+                  && editorCursor.line < jsonBodyKeyCurrentPosition.end.line){
+                    jsonBodyKeyCursor = [...jsonBodyKeyCurrent];
+                };
+                closeBracket !== -1 && jsonBodyKeyCurrent.pop();
+                return jsonBodyKeyCursor
+              }, false);
+          }
+          const getInnerPropertyBodyParamObject = (object, keys) => {
+            if(!keys || !keys.length){
+              return object;
+            }
+            const key = keys.shift();
+            if(!object.properties || !object.properties[key] || object.properties[key].type !== 'object'){
+              return [];
+            }
+            return getInnerPropertyBodyParamObject(object.properties[key], keys);
+          };
+
+          if(apiEndpoint && apiEndpoint.body && reLineStart.test(line)){
+            let inputBodyPreviousKeys;
+            let paramsBody = apiEndpoint.body;
+            let requestBodyCursorKeys;
+            if(apiEndpoint.body[0].type === 'object'){
+              requestBodyCursorKeys = getInnerKeysBodyRequest();
+              const paramInnerBody = getInnerPropertyBodyParamObject(apiEndpoint.body[0], [...requestBodyCursorKeys]);
+              paramsBody = Object.keys(paramInnerBody.properties).sort().map(keyBodyParam => ({name:keyBodyParam, ...paramInnerBody.properties[keyBodyParam]}));
+            };
+            try{
+              const bodySanitizedBodyParam = currentGroup.requestTextJson.replace(/(,\s*"\S*\s*)\}/g, '}');
+              inputBodyPreviousKeys = Object.keys((requestBodyCursorKeys || []).reduce((acumm, key) => acumm[key],JSON.parse(bodySanitizedBodyParam)));
+            }catch(error){
+              inputBodyPreviousKeys = [];
+            };
+            
+            hints = paramsBody
+              .filter(bodyParam => !inputBodyPreviousKeys.includes(bodyParam.name) && bodyParam.name && ( inputKeyBodyParam ? bodyParam.name.includes(inputKeyBodyParam) : true))
+              .map(bodyParam => ({
+                text: renderBodyParam(bodyParam, spaceLineStart),
+                _moveCursor: ['string', 'array'].includes(bodyParam.type),
+                displayText: bodyParam.name,
+                bodyParam,
+                hint: (cm, self, data) => {
+                  editor.replaceRange(line.replace(/\S+/,'')+data.text, { line: editorCursor.line, ch: editorCursor.ch }, { line: editorCursor.line, ch: 0 });
+                  const textReplacedLine = editor.getLine(editorCursor.line);
+                  editor.setCursor({line: editorCursor.line, ch: data._moveCursor ? textReplacedLine.length - 1 : textReplacedLine.length});
+                }
+              }));
+          };
         } else {
           hints = model.map(a => a.method);
         }
@@ -434,7 +543,8 @@ export class DevToolsController {
         list: (!curWord
           ? []
           : getDictionary(curLine, curWord).filter(function(item) {
-              return item.toUpperCase().includes(curWord.toUpperCase());
+              const text = item.text || item;
+              return text.toUpperCase().includes(curWord.toUpperCase());
             })
         ).sort(),
         from: CodeMirror.Pos(cur.line, start),
@@ -498,15 +608,37 @@ export class DevToolsController {
         ch: 0
       });
       if (!$('#play_button').is(':visible')) $('#play_button').show();
+      if (!$('#wazuh_dev_tools_documentation').is(':visible')) $('#wazuh_dev_tools_documentation').show();
       const currentPlayButton = $('#play_button').offset();
       $('#play_button').offset({
         top: cords.top + 2,
         left: currentPlayButton.left
       });
+      $('#wazuh_dev_tools_documentation').offset({
+        top: cords.top + 2
+      });
       if (firstTime) this.highlightGroup(desiredGroup[0]);
+      if (desiredGroup[0]) {
+        const [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] = (desiredGroup[0] && desiredGroup[0].requestText && desiredGroup[0].requestText.match(/^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/)) || [];
+        // Split the input request path as array and lowercase
+        const inputEndpoint = inputPath && inputPath.split('/').filter(item => item).map(item => item.toLowerCase()) || [];
+        // Get all API endpoints with http method in the request
+        const inputHttpMethodEndpoints = (this.apiInputBox.model.find(item => item.method === inputHttpMethod) || {}).endpoints || [];
+        // Find the API endpoint in the request
+        const apiEndpoint = inputHttpMethodEndpoints
+            .map(endpoint => ({...endpoint, splitURL: endpoint.name.split('/').filter(item => item)}))
+            .filter(endpoint => endpoint.splitURL.length === inputEndpoint.length)
+            .find(endpoint => endpoint.splitURL.reduce((accum,str,index) => accum && (str.startsWith(':') ? true : str.toLowerCase() === inputEndpoint[index]),true));
+        if(apiEndpoint && apiEndpoint.documentation){
+          $('#wazuh_dev_tools_documentation').attr('href', apiEndpoint.documentation).show();
+        }else{
+          $('#wazuh_dev_tools_documentation').attr('href', '').hide();
+        }
+      }
       return desiredGroup[0];
     } catch (error) {
       $('#play_button').hide();
+      $('#wazuh_dev_tools_documentation').hide();
       return null;
     }
   }
@@ -587,12 +719,12 @@ export class DevToolsController {
         if (typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
 
         // Assign inline parameters
-        for (const key in extra) JSONraw[key] = extra[key];
-        const path = req.includes('?') ? req.split('?')[0] : req;
+        //for (const key in extra) JSONraw[key] = extra[key];
+        const path = req;
 
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
-          const output = await this.apiReq.request(method, path, JSONraw);
+          const output = await this.wzRequest.apiReq(method, path, JSONraw);
           if(typeof output === 'string' && output.includes('3029')) {
             this.apiOutputBox.setValue('This method is not allowed without admin mode');
           }

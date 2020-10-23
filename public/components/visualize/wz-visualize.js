@@ -28,25 +28,29 @@ import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
 import { CommonData } from '../../services/common-data';
-import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
-import { Metrics } from '../overview/metrics/metrics'
+import { Metrics } from '../overview/metrics/metrics';
+import { PatternHandler } from '../../react-services/pattern-handler';
+import { toastNotifications } from 'ui/notify';
+import { SecurityAlerts } from './components';
+import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 
 const visHandler = new VisHandlers();
 
 export class WzVisualize extends Component {
+  _isMount = false;
   constructor(props) {
     super(props);
-    this.visualizations = this.props.isAgent
-      ? agentVisualizations
-      : visualizations;
     this.state = {
-      selectedTab: this.props.selectedTab,
+      visualizations: !!props.isAgent ? agentVisualizations : visualizations,
       expandedVis: false,
       thereAreSampleAlerts: false,
-      adminMode: false,
+      hasRefreshedKnownFields: false,
+      refreshingKnownFields: [],
+      refreshingIndex: true
     };
+    this.KibanaServices =  getServices();
     this.metricValues = false;
     this.rawVisualizations = new RawVisualizations();
     this.wzReq = WzRequest;
@@ -58,75 +62,94 @@ export class WzVisualize extends Component {
     ];
   }
 
+
+  showToast(color, title = '', text = '', time = 3000) {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
   async componentDidMount() {
+    this._isMount = true;
+    // visHandler.removeAll();
     this.agentsStatus = false;
     if (!this.monitoringEnabled) {
-      const data = await this.wzReq.apiReq('GET', '/agents/summary', {});
+      const data = await this.wzReq.apiReq('GET', '/agents/summary/status', {});
       const result = ((data || {}).data || {}).data || false;
       if (result) {
         this.agentsStatus = [
           {
             title: 'Total',
-            description: result.Total - 1
+            description: result.total - 1,
           },
           {
             title: 'Active',
-            description: result.Active - 1
+            description: result.active - 1,
           },
           {
             title: 'Disconnected',
-            description: result.Disconnected
+            description: result.disconnected,
           },
           {
             title: 'Never Connected',
-            description: result['Never connected']
+            description: result['never_connected'],
           },
           {
             title: 'Agents coverage',
-            description:
-              (result.Total - 1
-                ? ((result.Active - 1) / (result.Total - 1)) * 100
-                : 0) + '%'
-          }
+            description: ((result.total - 1) ? ((result.active - 1) / (result.total - 1)) * 100 : 0) + '%',
+          },
         ];
       }
     }
 
     // Check if there is sample alerts installed
     try {
-      this.setState({
-        thereAreSampleAlerts: (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled
-      });
-    } catch (error) { }
-
-    // Check adminMode
-    try {
-      const adminMode = await checkAdminMode();
-      this.setState({ adminMode });
+      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled;
+      this._isMount && this.setState({ thereAreSampleAlerts });
     } catch (error) { }
   }
 
   async componentDidUpdate(prevProps) {
-    this.visualizations = this.props.isAgent && this.props.isAgent.length ? agentVisualizations : visualizations;
-    const { selectedTab } = this.props;
-    if (selectedTab !== this.state.selectedTab) {
-      this.setState({
-        selectedTab: selectedTab
-      });
-    }
-    // when it changes no selected agent to selected or inverse, remove previous visualizations VisHanderls
-    if ((!prevProps.isAgent && this.props.isAgent) || (prevProps.isAgent && !this.props.isAgent)) {
+    if (prevProps.isAgent !== this.props.isAgent) {
+      this._isMount &&
+        this.setState({ visualizations: !!this.props.isAgent ? agentVisualizations : visualizations });
       visHandler.removeAll();
     }
+  }
+
+  componentWillUnmount() {
+    this._isMount = false;
   }
 
   expand = id => {
     this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
   };
 
+  refreshKnownFields = async () => {
+    if (!this.state.hasRefreshedKnownFields) { // Known fields are refreshed only once per dashboard loading
+      try {
+        this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
+        await PatternHandler.refreshIndexPattern();
+        this.setState({ isRefreshing: false });
+        this.showToast('success', 'The index pattern was refreshed successfully.');
+
+      } catch (err) {
+        this.setState({ isRefreshing: false });
+        this.showToast('danger', 'The index pattern could not be refreshed');
+
+      }
+    } else if (this.state.isRefreshing) {
+      await new Promise(r => setTimeout(r, 150));
+      await this.refreshKnownFields();
+    }
+  }
+
   render() {
-    this.visualizations = this.rawVisualizations.getType() !== 'general' ? agentVisualizations : visualizations;
-    const { selectedTab } = this.state;
+    const { visualizations } = this.state;
+    const { selectedTab } = this.props;
     const renderVisualizations = vis => {
       return (
         <EuiFlexItem
@@ -162,6 +185,7 @@ export class WzVisualize extends Component {
                     this.monitoringEnabled)) && (
                     <WzReduxProvider>
                       <KibanaVis
+                        refreshKnownFields={this.refreshKnownFields}
                         visID={vis.id}
                         tab={selectedTab}
                         {...this.props}
@@ -216,11 +240,8 @@ export class WzVisualize extends Component {
         {/* Sample alerts Callout */}
         {this.state.thereAreSampleAlerts && this.props.resultState === 'ready' && (
           <EuiCallOut title='This dashboard contains sample data' color='warning' iconType='alert' style={{ margin: '0 8px 16px 8px' }}>
-            <p>The data displayed may contain sample alerts. {this.state.adminMode && (
-              <Fragment>
-                Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
-              </Fragment>
-            )}</p>
+            <p>The data displayed may contain sample alerts. Go <EuiLink href='#/settings?tab=sample_data' aria-label='go to configure sample data'>here</EuiLink> to configure the sample data.
+            </p>
           </EuiCallOut>
         )}
 
@@ -232,12 +253,12 @@ export class WzVisualize extends Component {
         )}
         <EuiFlexItem className={this.props.resultState === 'none' && 'no-opacity' || ''}>
 
-        <Metrics section={selectedTab} resultState={this.props.resultState} /> 
+          <Metrics section={selectedTab} resultState={this.props.resultState} />
 
           {selectedTab &&
             selectedTab !== 'welcome' &&
-            this.visualizations[selectedTab] &&
-            this.visualizations[selectedTab].rows.map((row, i) => {
+            visualizations[selectedTab] &&
+            visualizations[selectedTab].rows.map((row, i) => {
               return (
                 <EuiFlexGroup
                   key={i}
@@ -257,6 +278,39 @@ export class WzVisualize extends Component {
               );
             })}
         </EuiFlexItem>
+        <EuiFlexGroup style={{margin: 0}}>
+          <EuiFlexItem>
+            {this.props.selectedTab === "general" && this.props.resultState !== "none" && 
+
+          <EuiPanel
+          paddingSize="none"
+          className={
+            this.state.expandedVis === 'security-alerts' ? 'fullscreen h-100 wz-overflow-y-auto wz-overflow-x-hidden' : 'h-100'
+          }
+        >
+          <EuiFlexItem className="h-100" style={{marginBottom: 12}}>
+            <EuiFlexGroup
+              style={{ padding: '12px 12px 0px' }}
+              className="embPanel__header"
+            >
+              <h2 className="embPanel__title wz-headline-title">
+                Security Alerts
+              </h2>
+              <EuiButtonIcon
+                color="text"
+                style={{ padding: '0px 6px', height: 30 }}
+                onClick={() => this.expand('security-alerts')}
+                iconType="expand"
+                aria-label="Expand"
+              />
+            </EuiFlexGroup>
+            <SecurityAlerts />
+
+          </EuiFlexItem>
+        </EuiPanel>
+            }
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </Fragment>
     );
   }
