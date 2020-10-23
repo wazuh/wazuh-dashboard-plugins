@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { checkPluginVersion } from "./utils";
+checkPluginVersion();
+
 import 'ui/autoload/all';
 import 'uiExports/visTypes';
 import 'uiExports/visResponseHandlers';
