@@ -102,7 +102,6 @@ export function Initialize(server) {
           'Wazuh configuration registry inserted',
           'debug'
         );
-        // Check 
       } catch (error) {
         log('initialize:saveConfiguration', error.message || error);
         server.log(
@@ -229,13 +228,13 @@ export function Initialize(server) {
         const source = JSON.parse(fs.readFileSync(wazuhRegistry, 'utf8'));
 
         // Check if the stored revision differs from the package.json revision
-        const isNewApp = packageJSON.revision !== source.revision;
+        const isUpgradedApp = packageJSON.revision !== source.revision || packageJSON.version !== source['app-version'];
 
-        // Rebuild the registry file if revision fields are differents
-        if (isNewApp) { 
+        // Rebuild the registry file if revision or version fields are differents
+        if (isUpgradedApp) { 
           log(
             'initialize[checkwazuhRegistry]',
-            'Wazuh app revision changed, regenerating wazuh registry',
+            'Wazuh app revision or version changed, regenerating wazuh-version registry',
             'info'
           );
           // Rebuild registry file in blank
