@@ -15,8 +15,23 @@ import { UsersTable } from './users-table';
 import { WazuhSecurity } from '../../../factories/wazuh-security'
 import { EditUser } from './edit-user';
 import { WzRequest } from '../../../react-services/wz-request';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { withGuard } from '../../common/hocs';
+import { PromptNoSecurityPluginUsers } from './prompt-no-security-plugin';
 
-export const Users = () => {
+
+const mapStateToProps = state => ({currentPlatform: state.appStateReducers.currentPlatform});
+
+export const Users = compose(
+  connect(mapStateToProps),
+  withGuard(
+    (props) => {
+      return props.currentPlatform === 'elastic';
+    },
+    PromptNoSecurityPluginUsers
+  )
+)(() => {
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(false);
   const [users, setUsers] = useState([]);
@@ -24,6 +39,7 @@ export const Users = () => {
   const [relationUserRole, setRelationUserRole] = useState({});
   const [roles, setRoles] = useState({});
   const [securityError, setSecurityError] = useState(false);
+
   const getUsers = async () => {
     const loadRoles = async (users) => {
       const rolesData = await WzRequest.apiReq(
@@ -119,4 +135,4 @@ export const Users = () => {
       {editFlyout}
     </EuiPageContent>
   );
-};
+});
