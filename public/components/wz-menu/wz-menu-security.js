@@ -53,7 +53,7 @@ class WzMenuSecurity extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      isSelected: this.props.state.section === item.id,
+      isSelected: this.props.state.selected_security_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
@@ -84,7 +84,7 @@ class WzMenuSecurity extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.securityReducers
   };
 };
 
