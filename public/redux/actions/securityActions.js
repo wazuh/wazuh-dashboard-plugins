@@ -11,7 +11,6 @@
  */
 
 export const updateSecuritySection = section => {
-  console.log(section)
   return {
     type: 'UPDATE_SECURITY_SECTION',
     section

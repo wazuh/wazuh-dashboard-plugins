@@ -14,7 +14,6 @@ const initialState = { selected_security_section: '' };
 
 const securityReducers = (state = initialState, action) => {
   if (action.type === 'UPDATE_SECURITY_SECTION') {
-    console.log("reducer", state.section, action.section)
     return {
       ...state,
       selected_security_section: action.section
