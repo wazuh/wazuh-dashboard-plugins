@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 // @ts-ignore
-import chrome from 'ui/chrome';
 import React, { Component, Fragment } from 'react';
 import {
   EuiAccordion,
@@ -22,8 +21,8 @@ import {
   EuiIcon,
   EuiSpacer,
   EuiStat,
-  EuiLink,
-  EuiToolTip
+  EuiToolTip,
+  EuiBadge
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover'
 // @ts-ignore
@@ -33,10 +32,8 @@ import { ICustomBadges } from '../../../wz-search-bar/components';
 import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../overview/mitre/lib';
 import moment from 'moment-timezone';
-import store from '../../../../redux/store';
-import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-import rison from 'rison-node';
 import { AppNavigate } from '../../../../react-services/app-navigate';
+import { TruncateHorizontalComponents } from '../../../common/util';
 
 export class FileDetails extends Component {
 
@@ -111,12 +108,53 @@ export class FileDetails extends Component {
         name: 'Permissions',
         icon: 'lock',
         link: false,
+        transformValue: (value, {agent}) => {
+          if(((agent || {}).os || {}).platform === 'windows' && value && value !== '-'){
+            value = value + ', ' + value;
+            value = value + ', ' + value;
+            const components = value.split(', ').map(userNameAndPermissionsFullString => {
+              const [_, username, userPermissionsString] = userNameAndPermissionsFullString.match(/(\S+) \(allowed\): (\S+)/);
+              const permissions = userPermissionsString.split('|').sort();
+              return { username, permissions};
+            }).sort((a,b) => {
+              if(a.username > b.username){
+                return 1;
+              }else if (a.username < b.username){
+                return -1;
+              }else{
+                return 0;
+              };
+            }).map(({username, permissions}) => {
+              return (
+                  <EuiToolTip
+                    key={`permissions-windows-user-${username}`}
+                    content={permissions.join(', ')}
+                    title={`${username} permissions`}
+                  >
+                    <EuiBadge color='hollow' title={null} style={{margin: '2px 2px'}}>{username}</EuiBadge>
+                  </EuiToolTip>
+              )
+            });
+            return <TruncateHorizontalComponents
+              components={components}
+              labelButtonHideComponents={(count) => `+${count} users`}
+              buttonProps={{size: 'xs'}}
+              componentsWidthPercentage={0.85}
+            />
+          };
+          return value;
+        }
       },
       {
         field: 'size',
         name: 'Size',
         icon: 'nested',
         link: true,
+        transformValue: (value) => {
+          if(isNaN(value)){return 0};
+          const b = 2;
+          if (0 === value) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(value) / Math.log(1024)); return parseFloat((value / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+        }
       },
       {
         field: 'inode',
@@ -214,8 +252,6 @@ export class FileDetails extends Component {
     }
   }
 
-  formatBytes(a, b = 2) { if (0 === a) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024)); return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d] }
-
   addFilter(field, value) {
     const {filters, onFiltersChange} = this.props;
     const newBadge:ICustomBadges = {field: 'q', value: ''}
@@ -235,9 +271,9 @@ export class FileDetails extends Component {
     const columns = this.props.type === 'file' ? this.details() : this.registryDetails();
     const generalDetails = columns.map((item, idx) => {
       var value = this.props.currentFile[item.field] || '-';
-      if (item.field === 'size') {
-        value = !isNaN(value) ? this.formatBytes(value) : 0;
-      }
+      if(item.transformValue){
+        value = item.transformValue(value, this.props);
+      };
       var link = (item.link && !['events', 'extern'].includes(view)) || false;
       const agentPlatform = ((this.props.agent || {}).os || {}).platform;
       if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
