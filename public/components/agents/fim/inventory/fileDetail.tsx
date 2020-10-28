@@ -110,8 +110,6 @@ export class FileDetails extends Component {
         link: false,
         transformValue: (value, {agent}) => {
           if(((agent || {}).os || {}).platform === 'windows' && value && value !== '-'){
-            value = value + ', ' + value;
-            value = value + ', ' + value;
             const components = value.split(', ').map(userNameAndPermissionsFullString => {
               const [_, username, userPermissionsString] = userNameAndPermissionsFullString.match(/(\S+) \(allowed\): (\S+)/);
               const permissions = userPermissionsString.split('|').sort();
