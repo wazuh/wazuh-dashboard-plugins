@@ -53,7 +53,7 @@ class WzMenuSecurity extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      isSelected: this.props.state.selected_security_section === item.id,
+      isSelected: window.location.href.includes('/security') && this.props.state.selected_security_section === item.id,
       onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
