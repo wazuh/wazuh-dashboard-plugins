@@ -34,9 +34,13 @@ const wazuhCookies: cookie[] = [
 ]
 
 export const checkPluginVersion = async () => {
-  const response: AxiosResponse<TAppInfoResponse> = await GenericRequest.request('GET', '/api/setup');
-  const { revision, "app-version": appRevision } = response.data.data;
-  return checkLocalstorageVersion({ revision, "app-version": appRevision });
+  try {
+    const response: AxiosResponse<TAppInfoResponse> = await GenericRequest.request('GET', '/api/setup');
+    const { revision, "app-version": appRevision } = response.data.data;
+    return checkLocalstorageVersion({ revision, "app-version": appRevision });
+  } catch (error) {
+    console.error(`Error when getting the plugin version: ${error}`)
+  }
 }
 
 const checkLocalstorageVersion = (appInfo: TAppInfo) => {
