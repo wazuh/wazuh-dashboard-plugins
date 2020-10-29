@@ -55,7 +55,7 @@ const deleteWazuhCookies = ([name, path]: cookie) => {
 }
 
 function clearBrowserInfo(appInfo: TAppInfo) {
-  wazuhCookies.map(deleteWazuhCookies);
+  wazuhCookies.forEach(deleteWazuhCookies);
   updateAppInfo(appInfo);
   location.reload(true);
 }
