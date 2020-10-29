@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { checkPluginVersion } from "./utils";
-checkPluginVersion();
-
 import 'ui/autoload/all';
 import 'uiExports/visTypes';
 import 'uiExports/visResponseHandlers';
@@ -120,6 +118,6 @@ app.run([
     }).catch(() => {})
 
     // Init the process of refreshing the user's token when app start.
-    WzAuthentication.refresh();
+    checkPluginVersion().finally(WzAuthentication.refresh);
   }
 ]);
