@@ -45,6 +45,17 @@ import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
 import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
 
+const sections = {
+  'overview': 'overview',
+  'manager': 'manager',
+  'agents-preview': 'agents-preview',
+  'agents': 'agents-preview',
+  'settings': 'settings',
+  'wazuh-dev': 'wazuh-dev',
+  'health-check': 'health-check',
+  'security': 'security'
+};
+
 class WzMenu extends Component {
   constructor(props) {
     super(props);
@@ -104,28 +115,14 @@ class WzMenu extends Component {
 
   getCurrentTab() {
     const currentWindowLocation = window.location.hash;
-    if (currentWindowLocation.match(/#\/overview/)) {
-      return 'overview';
-    }
-    if (currentWindowLocation.match(/#\/manager/)) {
-      return 'manager';
-    }
-    if (
-      currentWindowLocation.match(/#\/agents-preview/) ||
-      currentWindowLocation.match(/#\/agents/)
-    ) {
-      return 'agents-preview';
-    }
-    if (currentWindowLocation.match(/#\/settings/)) {
-      return 'settings';
-    }
-    if (currentWindowLocation.match(/#\/wazuh-dev/)) {
-      return 'wazuh-dev';
-    }
-    if (currentWindowLocation.match(/#\/health-check/)) {
-      return 'health-check';
-    }
-    return '';
+    let currentTab = '';
+    Object.keys(sections).some((section) => {
+      if (currentWindowLocation.match(`#/${section}`)) {
+        currentTab = sections[section];
+        return true;
+      }
+    });
+    return currentTab;
   }
 
   loadApiList = async () => {
