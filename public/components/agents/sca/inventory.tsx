@@ -301,8 +301,10 @@ export class Inventory extends Component {
   }
 
   getItems = () => !!this.checks && this.checks.filter(check =>
-      this.state.filters.every(filter =>
-        typeof check[filter.field] === 'string' && (filter.value === '' ? check[filter.field] === filter.value
+      this.state.filters.every(filter => 
+        filter.field === 'search'
+        ? Object.keys(check).some(key =>  ['string', 'number'].includes(typeof check[key]) && String(check[key]).toLowerCase().includes(filter.value.toLowerCase()))
+        : typeof check[filter.field] === 'string' && (filter.value === '' ? check[filter.field] === filter.value
           : check[filter.field].toLowerCase().includes(filter.value.toLowerCase())
         )
       )
