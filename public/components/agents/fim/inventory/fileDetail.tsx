@@ -108,51 +108,14 @@ export class FileDetails extends Component {
         name: 'Permissions',
         icon: 'lock',
         link: false,
-        transformValue: (value, {agent}) => {
-          if(((agent || {}).os || {}).platform === 'windows' && value && value !== '-'){
-            const components = value.split(', ').map(userNameAndPermissionsFullString => {
-              const [_, username, userPermissionsString] = userNameAndPermissionsFullString.match(/(\S+) \(allowed\): (\S+)/);
-              const permissions = userPermissionsString.split('|').sort();
-              return { username, permissions};
-            }).sort((a,b) => {
-              if(a.username > b.username){
-                return 1;
-              }else if (a.username < b.username){
-                return -1;
-              }else{
-                return 0;
-              };
-            }).map(({username, permissions}) => {
-              return (
-                  <EuiToolTip
-                    key={`permissions-windows-user-${username}`}
-                    content={permissions.join(', ')}
-                    title={`${username} permissions`}
-                  >
-                    <EuiBadge color='hollow' title={null} style={{margin: '2px 2px'}}>{username}</EuiBadge>
-                  </EuiToolTip>
-              )
-            });
-            return <TruncateHorizontalComponents
-              components={components}
-              labelButtonHideComponents={(count) => `+${count} users`}
-              buttonProps={{size: 'xs'}}
-              componentsWidthPercentage={0.85}
-            />
-          };
-          return value;
-        }
+        transformValue: (value) => this.renderFileDetailsPermissions(value)
       },
       {
         field: 'size',
         name: 'Size',
         icon: 'nested',
         link: true,
-        transformValue: (value) => {
-          if(isNaN(value)){return 0};
-          const b = 2;
-          if (0 === value) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(value) / Math.log(1024)); return parseFloat((value / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
-        }
+        transformValue: (value) => this.renderFileDetailsSize(value)
       },
       {
         field: 'inode',
@@ -336,6 +299,47 @@ export class FileDetails extends Component {
   updateTotalHits = (total) => {
     this.setState({totalHits : total});
   }
+
+  renderFileDetailsPermissions(value){
+    if(((this.props.agent || {}).os || {}).platform === 'windows' && value && value !== '-'){
+      const components = value.split(', ').map(userNameAndPermissionsFullString => {
+        const [_, username, userPermissionsString] = userNameAndPermissionsFullString.match(/(\S+) \(allowed\): (\S+)/);
+        const permissions = userPermissionsString.split('|').sort();
+        return { username, permissions};
+      }).sort((a,b) => {
+        if(a.username > b.username){
+          return 1;
+        }else if (a.username < b.username){
+          return -1;
+        }else{
+          return 0;
+        };
+      }).map(({username, permissions}) => {
+        return (
+            <EuiToolTip
+              key={`permissions-windows-user-${username}`}
+              content={permissions.join(', ')}
+              title={`${username} permissions`}
+            >
+              <EuiBadge color='hollow' title={null} style={{margin: '2px 2px'}}>{username}</EuiBadge>
+            </EuiToolTip>
+        )
+      });
+      return <TruncateHorizontalComponents
+        components={components}
+        labelButtonHideComponents={(count) => `+${count} users`}
+        buttonProps={{size: 'xs'}}
+        componentsWidthPercentage={0.85}
+      />
+    };
+    return value;
+  }
+
+  renderFileDetailsSize(value){
+    if(isNaN(value)){return 0};
+    const b = 2;
+    if (0 === value) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(value) / Math.log(1024)); return parseFloat((value / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+  };
 
   render() {
     const { fileName, type, implicitFilters, view } = this.props;
