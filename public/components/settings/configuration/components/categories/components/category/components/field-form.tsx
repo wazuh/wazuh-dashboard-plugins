@@ -114,6 +114,7 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
       mode='javascript'
       // theme='github'
       height='50px'
+      width='100%'
       value={list}
       onChange={setList}
       onBlur={checkErrors} />
