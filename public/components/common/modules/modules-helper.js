@@ -53,7 +53,7 @@ export class ModulesHelper {
     }
     const filters = $(`.globalFilterItem .euiBadge__childButton`);
     for (let i = 0; i < filters.length; i++) {
-      let found = false;
+      let found = false;    
       (implicitFilters || []).forEach(x => {
         const objKey = x.query && x.query.match ? Object.keys(x.query.match)[0] : x.meta.key;
         const key = `filter-key-${objKey}`;
@@ -66,13 +66,11 @@ export class ModulesHelper {
         }
       });
       if (!found) {
-        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
-        $(closeButton).removeClass('hide-close-button');
+        $(filters[i]).siblings('.euiBadge__iconButton').removeClass('hide-close-button');       
+        $(filters[i]).off('click'); 
       } else {
-        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
-        $(closeButton).addClass('hide-close-button');
-        const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
-        $(optionsButton).on('click', ev => {
+        $(filters[i]).siblings('.euiBadge__iconButton').addClass('hide-close-button');
+        $(filters[i]).on('click', ev => {
           ev.stopPropagation();
         });
       }
