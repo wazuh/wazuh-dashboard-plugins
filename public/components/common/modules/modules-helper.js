@@ -53,7 +53,7 @@ export class ModulesHelper {
     }
     const filters = $(`.globalFilterItem .euiBadge__childButton`);
     for (let i = 0; i < filters.length; i++) {
-      let found = false;    
+      let found = false;
       (implicitFilters || []).forEach(x => {
         const objKey = x.query && x.query.match ? Object.keys(x.query.match)[0] : x.meta.key;
         const key = `filter-key-${objKey}`;
