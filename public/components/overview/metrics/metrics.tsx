@@ -109,7 +109,6 @@ export class Metrics extends Component {
     this.indexPattern = await getIndexPattern();
     this.scope = await this.modulesHelper.getDiscoverScope();
     this._isMount = true;
-    this.buildMetric();
   }
 
   async getResults(filterParams, aggs = {}){
@@ -257,11 +256,11 @@ export class Metrics extends Component {
 
   componentDidUpdate(){
     if(!this.state.buildingMetrics && this.props.resultState === 'ready' && this.state.resultState === 'loading'){
-      this.setState({ buildingMetrics: true, resultState: this.props.resultState}, () => {
+    this.setState({ buildingMetrics: true, resultState: this.props.resultState}, () => {
         this.stats = this.buildMetric();
       }); 
     }else if(this.props.resultState !== this.state.resultState){
-      const isLoading = this.props.resultState === 'loading' ? {loading:true} : {};
+    const isLoading = this.props.resultState === 'loading' ? {loading:true} : {};
       this.setState({resultState: this.props.resultState, ...isLoading});
     }
   }
