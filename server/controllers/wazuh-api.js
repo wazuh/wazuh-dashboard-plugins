@@ -35,7 +35,7 @@ import { ApiInterceptor } from '../lib/api-interceptor';
 import { SecurityObj } from '../lib/security-factory';
 import jwtDecode from 'jwt-decode';
 import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
-
+import { CacheInMemoryAPIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -51,10 +51,28 @@ export class WazuhApiCtrl {
     this.apiInterceptor = new ApiInterceptor();
   }
 
-  async checkWazuhWui(apiId){
-    const host = await this.manageHosts.getHostById(apiId);
-    if(host && host.username === 'wazuh-wui') return true;
-    return false;
+  async checkAPIUserAllowRunAs(apiId){
+    try{
+      const api = await this.manageHosts.getHostById(apiId);
+      log('wazuh-api:checkAPIUserAllowRunAs', `Check if API user ${api.username} (${apiId}) has run_as`, 'debug');
+      // Check if the API user is cached and returns
+      if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
+        return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
+      };
+      const response = await this.apiInterceptor.request(
+        'get',
+        `${api.url}:${api.port}/security/users/me`,
+        {},
+        { idHost: apiId }
+      );
+      const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as;
+      // Cache the run_as for the API user
+      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, APIUserAllowRunAs);
+      return APIUserAllowRunAs;
+    }catch(error){
+      log('wazuh-api:checkAPIUserAllowRunAs', error.message || error);
+      return false;
+    }
   }
 
   getCurrentPlatform(server) {
@@ -118,9 +136,8 @@ export class WazuhApiCtrl {
           }
         }
       }  
-      const isWazuhWui = await this.checkWazuhWui(idHost);
       let token;
-      if(isWazuhWui){
+      if(await this.checkAPIUserAllowRunAs(idHost)){
         token = await this.apiInterceptor.authenticateApi(idHost, authContext)
       }else{
         token = await this.apiInterceptor.authenticateApi(idHost)
@@ -406,6 +423,19 @@ export class WazuhApiCtrl {
             { idHost: req.payload.id }
           );
 
+          // Check the run_as for the API user and update it
+          const responseApiUserAllowRunAs = await this.apiInterceptor.request(
+            'GET',
+            `${apiAvailable.url}:${apiAvailable.port}/security/users/me`,
+            {},
+            { idHost: req.payload.id }
+          );
+          let apiUserAllowRunAs = false;
+          if(responseApiUserAllowRunAs.status === 200) {
+            apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as;
+            CacheInMemoryAPIUserAllowRunAs.set(req.payload.id, apiAvailable.username, apiUserAllowRunAs);
+          }
+
           if (responseCluster.status === 200) {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
             if (responseCluster.data.data.enabled === 'yes') {
@@ -423,6 +453,7 @@ export class WazuhApiCtrl {
                   node: responseClusterLocal.data.data.affected_items[0].node,
                   cluster: responseClusterLocal.data.data.affected_items[0].cluster,
                   status: 'enabled',
+                  allow_run_as: apiUserAllowRunAs
                 };
               }
             } else {
@@ -431,6 +462,7 @@ export class WazuhApiCtrl {
                 manager: managerName,
                 cluster: 'Disabled',
                 status: 'disabled',
+                allow_run_as: apiUserAllowRunAs
               };
             }
           }

@@ -12,13 +12,16 @@
 
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
+import { ApiInterceptor } from '../lib/api-interceptor';
 import { log } from '../../server/logger';
 import { ErrorResponse } from './error-response';
+import { CacheInMemoryAPIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
 
 export class WazuhHostsCtrl {
   constructor() {
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
+    this.apiInterceptor = new ApiInterceptor();
   }
 
   /**
@@ -31,7 +34,7 @@ export class WazuhHostsCtrl {
     try {
       const hosts = await this.manageHosts.getHosts(removePassword);
       const registry = await this.updateRegistry.getHosts();
-      const result = this.joinHostRegistry(hosts, registry, removePassword);
+      const result = await this.joinHostRegistry(hosts, registry, removePassword);
       return result;
     } catch (error) {
       log('wazuh-hosts:getHostsEntries', error.message || error);
@@ -47,21 +50,26 @@ export class WazuhHostsCtrl {
    * @param {Object} hosts
    * @param {Object} registry
    */
-  joinHostRegistry(hosts, registry, removePassword = true) {
+  async joinHostRegistry(hosts, registry, removePassword = true) {
     try {
       if (!Array.isArray(hosts)) {
         throw new Error('Hosts configuration error in wazuh.yml');
       }
 
-      const joined = [];
-      hosts.forEach(h => {
+      return await Promise.all(hosts.map(async h => {
         const id = Object.keys(h)[0];
         const api = Object.assign(h[id], { id: id });
         const host = Object.assign(api, registry[id]);
-        if (removePassword) delete host.password;
-        joined.push(host);
-      });
-      return joined;
+        // Add to run_as from API user. Use the cached value or get it doing a request
+        host.allow_run_as = CacheInMemoryAPIUserAllowRunAs.has(id, api.username)
+          ? CacheInMemoryAPIUserAllowRunAs.get(id, api.username)
+          : await this.checkAPIUserAllowRunAs(id);
+        if (removePassword) {
+          delete host.password;
+          delete host.token;
+        };
+        return host;
+      }));
     } catch (error) {
       throw new Error(error);
     }
@@ -115,6 +123,30 @@ export class WazuhHostsCtrl {
         500,
         reply
       );
+    }
+  }
+
+  async checkAPIUserAllowRunAs(apiId){
+    try{
+      const api = await this.manageHosts.getHostById(apiId);
+      log('wazuh-hosts:checkAPIUserAllowRunAs', `Check if API user ${api.username} (${apiId}) has run_as`, 'debug');
+      // Check if the API user is cached and returns
+      if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
+        return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
+      };
+      const response = await this.apiInterceptor.request(
+        'get',
+        `${api.url}:${api.port}/security/users/me`,
+        {},
+        { idHost: apiId, /*forceRefresh: true*/ }
+      );
+      const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as;
+      // Cache the run_as for the API user
+      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, APIUserAllowRunAs);
+      return APIUserAllowRunAs;
+    }catch(error){
+      log('wazuh-hosts:checkAPIUserAllowRunAs', error.message || error);
+      return false;
     }
   }
 }

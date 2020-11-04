@@ -24,7 +24,8 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiText,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiIcon
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
@@ -214,6 +215,26 @@ export class ApiTable extends Component {
               </span>
             );
           }
+        }
+      },
+      {
+        name: 'Run as',
+        field: 'allow_run_as',
+        align: 'center',
+        sortable: true,
+        width: '80px',
+        render: (value) => {
+          return value ? (
+            <EuiToolTip
+              position='top'
+              content='The configurated API user uses the authentication context'
+            >
+              <EuiIcon
+                type='check'
+              />
+            </EuiToolTip>
+          
+          ) : '';
         }
       },
       {
