@@ -1,0 +1,16 @@
+{
+    "id": "wazuh",
+    "version": "4.0.0",
+    "kibanaVersion": "kibana",
+    "configPath": [
+        "wazuh"
+    ],
+    "requiredPlugins": [
+        "navigation",
+        "discover",
+        "kibanaLegacy",
+        "visualizations"
+    ],
+    "server": true,
+    "ui": false
+}

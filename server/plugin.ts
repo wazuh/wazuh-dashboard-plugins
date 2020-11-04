@@ -20,21 +20,34 @@
 import {
   CoreSetup,
   CoreStart,
+  Logger,
   Plugin,
-} from '../../../src/core/server';
+  PluginInitializerContext,
+} from 'kibana/server';
 
 import { WazuhPluginSetup, WazuhPluginStart } from './types';
-
-import { initApp } from '../init';
-
+import { setupRoutes } from './routes';
 interface LegacySetup {
   server: any
 }
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
-  public setup(core: CoreSetup, plugins: WazuhPluginSetup, __LEGACY: LegacySetup) {
-    // Add server routes and initialize the plugin here
-    initApp(__LEGACY.server);
+  private readonly logger: Logger;
+
+  constructor(private readonly initializerContext: PluginInitializerContext) {
+    this.logger = initializerContext.logger.get();
+  }
+  
+  public setup(core: CoreSetup, plugins: WazuhPluginSetup) {
+    this.logger.debug('Wazuh-wui: Setup');
+
+    // TODO: implement router
+    const router = core.http.createRouter();
+    setupRoutes(router);
+    // TODO: implement Wazuh monitoring
+
+    // TODO: implement Scheduler handler 
+    
     return {};
   }
 
