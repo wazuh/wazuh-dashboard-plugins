@@ -25,6 +25,7 @@ import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
 import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzGroupsActionButtonsFiles extends Component {
   _isMounted = false;
@@ -146,7 +147,7 @@ class WzGroupsActionButtonsFiles extends Component {
   async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
     const result = await this.groupsHandler.getFileContent(
-      `/agents/groups/${itemDetail.name}/files/agent.conf`
+      `/groups/${itemDetail.name}/files/agent.conf/xml`
     );
 
     const data = this.autoFormat(result);
@@ -235,11 +236,7 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(
-        `/agents/groups/${this.props.state.itemDetail.name}/files`,
-        filters,
-        'Groups'
-      );
+      await this.exportCsv(`/groups/${this.props.state.itemDetail.name}/files`, filters, 'Groups');
       this.showToast(
         'success',
         'Success',
@@ -267,17 +264,17 @@ class WzGroupsActionButtonsFiles extends Component {
   };
 
   render() {
-    const { adminMode } = this.props;
-
     // Add new group button
     const groupConfigurationButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[{action: 'group:read', resource: `group:id:${this.props.state.itemDetail.name}`}]}
         iconSide="left"
         iconType="documentEdit"
         onClick={() => this.showGroupConfiguration()}
       >
         Edit group configuration
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Export PDF button
@@ -315,9 +312,7 @@ class WzGroupsActionButtonsFiles extends Component {
 
     return (
       <Fragment>
-        {adminMode && (
-          <EuiFlexItem grow={false}>{groupConfigurationButton}</EuiFlexItem>
-        )}
+        <EuiFlexItem grow={false}>{groupConfigurationButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{exportPDFButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{exportCSVButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
@@ -328,8 +323,7 @@ class WzGroupsActionButtonsFiles extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 

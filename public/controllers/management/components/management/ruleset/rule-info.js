@@ -14,10 +14,12 @@ import {
   EuiLink,
   EuiAccordion,
   EuiFlexGrid,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 import RulesetHandler from './utils/ruleset-handler';
 
@@ -41,9 +43,17 @@ class WzRuleInfo extends Component {
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53',
       tsc: 'TSC',
+      'mitreTactics': 'MITRE Tactics',
+      'mitreTechniques': 'MITRE Techniques',
       'mitre': 'MITRE'
     };
-
+    this.state = {
+      mitreTactics: [],
+      mitreLoading: false,
+      mitreTechniques: [],
+      mitreRuleId: "",
+      mitreIds: []
+    };
     this.rulesetHandler = RulesetHandler;
     this.columns = [
       {
@@ -60,20 +70,20 @@ class WzRuleInfo extends Component {
         sortable: true,
         width: '30%',
         render: (value, item) => {
-          if(value === undefined) return '';
+          if (value === undefined) return '';
           const regex = /\$(.*?)\)/g;
           let result = value.match(regex);
-          if(result !== null) {
+          if (result !== null) {
             for (const oldValue of result) {
-              let newValue = oldValue.replace('$(',`<strong style="color:#006BB4">`);
+              let newValue = oldValue.replace('$(', `<strong style="color:#006BB4">`);
               newValue = newValue.replace(')', ' </strong>');
               value = value.replace(oldValue, newValue);
             }
           }
           return (
-          <div>
-            <span dangerouslySetInnerHTML={{ __html: value}} />
-          </div>
+            <div>
+              <span dangerouslySetInnerHTML={{ __html: value }} />
+            </div>
           );
         }
       },
@@ -96,7 +106,7 @@ class WzRuleInfo extends Component {
         width: '5%'
       },
       {
-        field: 'file',
+        field: 'filename',
         name: 'File',
         align: 'left',
         sortable: true,
@@ -107,7 +117,7 @@ class WzRuleInfo extends Component {
               <EuiLink
                 onClick={async event => {
                   event.stopPropagation();
-                  const noLocal = item.path.startsWith('ruleset/');
+                  const noLocal = item.relative_dirname.startsWith('ruleset/');
                   const result = await this.rulesetHandler.getRuleContent(
                     value,
                     noLocal
@@ -115,7 +125,7 @@ class WzRuleInfo extends Component {
                   const file = {
                     name: value,
                     content: result,
-                    path: item.path
+                    path: item.relative_dirname
                   };
                   this.props.updateFileContent(file);
                 }}
@@ -158,7 +168,7 @@ class WzRuleInfo extends Component {
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc', 'mitre'];
+    const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
     const buildBadge = field => {
       const idGenerator = () => {
         return (
@@ -218,38 +228,53 @@ class WzRuleInfo extends Component {
   renderInfo(id, level, file, path, groups) {
     return (
       <EuiFlexGrid columns={4}>
-        <EuiFlexItem key="id" grow={1}>
-          <b style={{ paddingBottom: 6 }}>ID</b>{id}
-        </EuiFlexItem>
-        <EuiFlexItem key="level" grow={1}>
-          <b style={{ paddingBottom: 6 }}>Level</b>
-          <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
+      <EuiFlexItem key="rule_ids" grow={1}>
+        <b style={{ paddingBottom: 6 }}>ID</b>
+        <span>
+          <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'level', value: level}])}
+              onClick={async () => this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])}
             >
-              {level}
+              {id}
             </EuiLink>
           </EuiToolTip>
+        </span>
+      </EuiFlexItem>
+        <EuiFlexItem key="level" grow={1}>
+          <b style={{ paddingBottom: 6 }}>Level</b>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
+              <EuiLink
+                onClick={async () => this.setNewFiltersAndBack([{ field: 'level', value: level }])}
+              >
+                {level}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="file" grow={1}>
           <b style={{ paddingBottom: 6 }}>File</b>
-          <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'file', value: file}])}
-            >
-              {file}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+              <EuiLink
+                onClick={async () => this.setNewFiltersAndBack([{ field: 'filename', value: file }])}
+              >
+                {file}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="path" grow={1}>
           <b style={{ paddingBottom: 6 }}>Path</b>
-          <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field:'path', value: path}])}
-            >
-              {path}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+              <EuiLink
+                onClick={async () => this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])}
+              >
+                {path}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="Groups" grow={1}><b style={{ paddingBottom: 6 }}>Groups</b>
           {this.renderGroups(groups)}
@@ -259,20 +284,39 @@ class WzRuleInfo extends Component {
     );
   }
 
-  getFormattedDetails(value){
+  getFormattedDetails(value) {
 
-    if(Array.isArray(value) && value[0].type){
+    if (Array.isArray(value) && value[0].type) {
       let link = "";
       let name = "";
 
       value.forEach(item => {
-        if(item.type === 'cve')
+        if (item.type === 'cve')
           name = item.name;
-        if(item.type === 'link')
+        if (item.type === 'link')
           link = <a href={item.name} target="_blank">{item.name}</a>
       })
       return <span>{name}: {link}</span>
-    }else{
+    } else if (value && typeof value === 'object' && value.constructor === Object) {
+      let list = [];
+      Object.keys(value).forEach((key, idx) => {
+        list.push(
+          <span key={key}>
+            {key}:&nbsp;
+            {value[key]}
+            {idx < Object.keys(value).length - 1 && ', '}
+            <br />
+          </span>
+        );
+      });
+      return (
+        <ul>
+          <li>
+            {list}
+          </li>
+        </ul>
+      );
+    } else {
       return (
         <WzTextWithTooltipTruncated position='top'>
           {value}
@@ -309,7 +353,7 @@ class WzRuleInfo extends Component {
       listGroups.push(
         <span key={group}>
           <EuiLink
-            onClick={async () => this.setNewFiltersAndBack([{field: 'group', value: group}])}
+            onClick={async () => this.setNewFiltersAndBack([{ field: 'group', value: group }])}
           >
             <EuiToolTip
               position="top"
@@ -331,21 +375,56 @@ class WzRuleInfo extends Component {
     );
   }
 
+
+  async addMitreInformation(compliance, currentRuleId){
+    try{
+      this.setState({mitreLoading: true, mitreRuleId: currentRuleId })
+      const mitreName = [];
+      const mitreIds = [];
+      const mitreTactics = await Promise.all(compliance.map(async (i) => {
+        const data = await WzRequest.apiReq('GET', '/mitre', { 
+          params: {
+            q: `id=${i}`
+          }
+        });
+        const formattedData = (((((data || {}).data).data || {}).affected_items || [])[0] || {});
+        const techniques = formattedData.phase_name || [];
+        mitreName.push(formattedData.json.name);
+        mitreIds.push(i);
+        return techniques;
+      }));
+      if(mitreTactics.length){
+        let removeDuplicates = (arr) => arr.filter((v,i) => arr.indexOf(v) === i)
+        const uniqueTactics = removeDuplicates(mitreTactics.flat());
+        this.setState({mitreLoading: false, mitreRuleId: currentRuleId, mitreIds, mitreTactics: uniqueTactics, mitreTechniques:mitreName })
+      }
+    }catch(error){
+      this.setState({mitreLoading: false})
+    }
+  }
+
   /**
    * Render the compliance(HIPAA, NIST...)
    * @param {Array} compliance
    */
   renderCompliance(compliance) {
+    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : this.props.state.ruleInfo.current;
+    if(compliance.mitre && compliance.mitre.length && currentRuleId !== this.state.mitreRuleId){
+      this.addMitreInformation(compliance.mitre, currentRuleId);
+    }else if(currentRuleId !== this.state.mitreRuleId){
+      this.setState({mitreLoading: false, mitreRuleId: currentRuleId, mitreIds: [], mitreTactics: [], mitreTechniques: [] });
+    }
     const listCompliance = [];
+    if(compliance.mitre) delete compliance.mitre;
     const keys = Object.keys(compliance);
     for (let i in Object.keys(keys)) {
       const key = keys[i];
 
       const values = compliance[key].map((element, index) => {
         return (
-          <span key={element}>
+          <span key={index}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field: key, value: element}])}
+              onClick={async () => this.setNewFiltersAndBack([{ field: key, value: element }])}
             >
               <EuiToolTip position="top" content="Filter by this compliance">
                 <span>{element}</span>
@@ -364,6 +443,39 @@ class WzRuleInfo extends Component {
         </EuiFlexItem>
       );
     }
+
+    if(this.state.mitreTechniques && this.state.mitreTechniques.length){
+      
+      const values = this.state.mitreTechniques.map((element, index) => {
+        return (
+          <span key={index}>
+            <EuiLink
+              onClick={async () => this.setNewFiltersAndBack([{ field: 'mitre', value: this.state.mitreIds[index] }])}
+            >
+              <EuiToolTip position="top" content="Filter by this compliance">
+                <span>{element}</span>
+              </EuiToolTip>
+            </EuiLink>
+            {index < this.state.mitreTechniques.length - 1 && ', '}
+          </span>
+        );
+      });
+      listCompliance.push(<EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+        <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTechniques']}</b>
+        {this.state.mitreLoading && <EuiLoadingSpinner size="m" /> || <p>{values}</p>}
+        <EuiSpacer size="s" />
+      </EuiFlexItem>)
+    }
+
+    if(this.state.mitreTactics && this.state.mitreTactics.length){
+      
+      listCompliance.push(<EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+        <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTactics']}</b>
+        <p>{this.state.mitreTactics.toString()}</p>
+        <EuiSpacer size="s" />
+      </EuiFlexItem>)
+    }
+
     return <EuiFlexGrid columns={4}>{listCompliance}</EuiFlexGrid>;
   }
 
@@ -372,6 +484,7 @@ class WzRuleInfo extends Component {
    * @param {Number} ruleId
    */
   changeBetweenRules(ruleId) {
+    window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), `redirectRule=${ruleId}`);
     this.setState({ currentRuleId: ruleId });
   }
 
@@ -380,12 +493,12 @@ class WzRuleInfo extends Component {
    * @param {string} value 
    */
   updateStyleTitle(value) {
-    if(value === undefined) return '';
+    if (value === undefined) return '';
     const regex = /\$(.*?)\)/g;
     let result = value.match(regex);
-    if(result !== null) {
+    if (result !== null) {
       for (const oldValue of result) {
-        let newValue = oldValue.replace('$(',`<span style="color:#006BB4">`);
+        let newValue = oldValue.replace('$(', `<span style="color:#006BB4">`);
         newValue = newValue.replace(')', ' </span>');
         value = value.replace(oldValue, newValue);
       }
@@ -395,24 +508,11 @@ class WzRuleInfo extends Component {
 
   render() {
     const { ruleInfo, isLoading } = this.props.state;
-    const currentRuleId =
-      this.state && this.state.currentRuleId
-        ? this.state.currentRuleId
-        : ruleInfo.current;
-    const rules = ruleInfo.items;
-    const currentRuleArr = rules.filter(r => {
-      return r.id === currentRuleId;
-    });
+    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : ruleInfo.current;
+    const rules = ruleInfo.affected_items;
+    const currentRuleArr = rules.filter(r => { return r.id === currentRuleId });
     const currentRuleInfo = currentRuleArr[0];
-    const {
-      description,
-      details,
-      file,
-      path,
-      level,
-      id,
-      groups
-    } = currentRuleInfo;
+    const { description, details, filename, relative_dirname, level, id, groups } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
@@ -445,7 +545,7 @@ class WzRuleInfo extends Component {
                         }}
                       />
                     </EuiToolTip>
-                    {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description)}} />}
+                    {<span dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description) }} />}
                   </span>
                 </EuiTitle>
               </EuiFlexItem>
@@ -474,7 +574,7 @@ class WzRuleInfo extends Component {
                     paddingSize="none"
                     initialIsOpen={true}>
                     <div className='flyout-row details-row'>
-                      {this.renderInfo(id, level, file, path, groups)}
+                      {this.renderInfo(id, level, filename, relative_dirname, groups)}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>

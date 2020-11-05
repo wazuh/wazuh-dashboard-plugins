@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiToolTip, EuiButtonIcon, EuiLink, EuiBadge } from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
 import exportCsv from '../../../../../../react-services/wz-csv';
+import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 export default class RulesetColumns {
   constructor(tableProps) {
@@ -70,38 +71,31 @@ export default class RulesetColumns {
             width: '5%'
           },
           {
-            field: 'file',
+            field: 'filename',
             name: 'File',
             align: 'left',
             sortable: true,
             width: '15%',
             render: (value, item) => {
               return (
-                <EuiToolTip position="top" content={`Show ${value} content`}>
-                  <EuiLink
-                    onClick={async ev => {
-                      ev.stopPropagation();
-                      const noLocal = item.path.startsWith('ruleset/');
-                      const result = await this.rulesetHandler.getRuleContent(
-                        value,
-                        noLocal
-                      );
-                      const file = {
-                        name: value,
-                        content: result,
-                        path: item.path
-                      };
-                      this.tableProps.updateFileContent(file);
-                    }}
-                  >
-                    {value}
-                  </EuiLink>
-                </EuiToolTip>
+                <WzButtonPermissions 
+                  buttonType='link'
+                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'rules:read', resource: `rule:file:${item.filename}`}]]}
+                  tooltip={{position:'top', content: `Show ${value} content`}}
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    const noLocal = item.relative_dirname.startsWith('ruleset/');
+                    const result = await this.rulesetHandler.getRuleContent(value, noLocal);
+                    const file = { name: value, content: result, path: item.relative_dirname };
+                    this.tableProps.updateFileContent(file);
+                  }}>
+                  {value}
+                </WzButtonPermissions>
               );
             }
           },
           {
-            field: 'path',
+            field: 'relative_dirname',
             name: 'Path',
             align: 'left',
             sortable: true,
@@ -128,37 +122,30 @@ export default class RulesetColumns {
             sortable: false
           },
           {
-            field: 'file',
+            field: 'filename',
             name: 'File',
             align: 'left',
             sortable: true,
             render: (value, item) => {
               return (
-                <EuiToolTip position="top" content={`Show ${value} content`}>
-                  <EuiLink
-                    onClick={async ev => {
-                      ev.stopPropagation();
-                      const noLocal = item.path.startsWith('ruleset/');
-                      const result = await this.rulesetHandler.getDecoderContent(
-                        value,
-                        noLocal
-                      );
-                      const file = {
-                        name: value,
-                        content: result,
-                        path: item.path
-                      };
-                      this.tableProps.updateFileContent(file);
-                    }}
-                  >
+                <WzButtonPermissions
+                  buttonType='link'
+                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'decoders:read', resource: `decoder:file:${item.filename}`}]]}
+                  tooltip={{position:'top', content: `Show ${value} content`}}
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    const noLocal = item.relative_dirname.startsWith('ruleset/');
+                    const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
+                    const file = { name: value, content: result, path: item.relative_dirname };
+                    this.tableProps.updateFileContent(file);
+                  }}>
                     {value}
-                  </EuiLink>
-                </EuiToolTip>
+                </WzButtonPermissions>
               );
             }
           },
           {
-            field: 'path',
+            field: 'relative_dirname',
             name: 'Path',
             align: 'left',
             sortable: true
@@ -166,13 +153,13 @@ export default class RulesetColumns {
         ],
         lists: [
           {
-            field: 'name',
+            field: 'filename',
             name: 'Name',
             align: 'left',
             sortable: true
           },
           {
-            field: 'path',
+            field: 'relative_dirname',
             name: 'Path',
             align: 'left',
             sortable: true
@@ -180,24 +167,14 @@ export default class RulesetColumns {
           {
             name: 'Actions',
             align: 'left',
-            render: item => (
-              <EuiToolTip position="top" content={`Export ${item.name}`}>
+            render: (item) => (
+              <EuiToolTip position="top" content={`Export ${item.filename}`}>
                 <EuiButtonIcon
                   aria-label="Export list"
                   iconType="exportAction"
                   onClick={async ev => {
                     ev.stopPropagation();
-                    await exportCsv(
-                      `/lists?path=${item.path}/${item.name}`,
-                      [
-                        {
-                          _isCDBList: true,
-                          name: 'path',
-                          value: `${item.path}/${item.name}`
-                        }
-                      ],
-                      item.name
-                    );
+                    await exportCsv(`/lists?path=${item.relative_dirname}/${item.filename}`, [{_isCDBList: true, name: 'path', value: `${item.relative_dirname}/${item.filename}`}], item.filename)
                   }}
                   color="primary"
                 />
@@ -207,7 +184,7 @@ export default class RulesetColumns {
         ],
         files: [
           {
-            field: 'file',
+            field: 'filename',
             name: 'File',
             align: 'left',
             sortable: true
@@ -216,71 +193,53 @@ export default class RulesetColumns {
             name: 'Actions',
             align: 'left',
             render: item => {
-              if (item.path.startsWith('ruleset/')) {
+              if (item.relative_dirname.startsWith('ruleset/')) {
                 return (
-                  <EuiToolTip
-                    position="top"
-                    content={`Show ${item.file} content`}
-                  >
-                    <EuiButtonIcon
-                      aria-label="Show content"
-                      iconType="eye"
-                      onClick={async ev => {
-                        ev.stopPropagation();
-                        const result = await this.rulesetHandler.getFileContent(
-                          `${item.path}/${item.file}`
-                        );
-                        const file = {
-                          name: item.file,
-                          content: result,
-                          path: item.path
-                        };
-                        this.tableProps.updateFileContent(file);
-                      }}
-                      color="primary"
-                    />
-                  </EuiToolTip>
+                  <WzButtonPermissions
+                    buttonType='icon'
+                    permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                    aria-label="Show content"
+                    iconType="eye"
+                    tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
+                    onClick={async ev => {
+                      ev.stopPropagation();
+                      const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);
+                      const file = { name: item.filename, content: result, path: item.relative_dirname };
+                      this.tableProps.updateFileContent(file);
+                    }}
+                    color="primary"
+                  />
                 );
               } else {
                 return (
                   <div>
-                    <EuiToolTip
-                      position="top"
-                      content={`Edit ${item.file} content`}
-                    >
-                      <EuiButtonIcon
-                        aria-label="Edit content"
-                        iconType="pencil"
-                        onClick={async ev => {
-                          ev.stopPropagation();
-                          const result = await this.rulesetHandler.getFileContent(
-                            `${item.path}/${item.file}`
-                          );
-                          const file = {
-                            name: item.file,
-                            content: result,
-                            path: item.path
-                          };
-                          this.tableProps.updateFileContent(file);
-                        }}
-                        color="primary"
-                      />
-                    </EuiToolTip>
-                    <EuiToolTip
-                      position="top"
-                      content={`Remove ${item.file} file`}
-                    >
-                      <EuiButtonIcon
-                        aria-label="Delete content"
-                        iconType="trash"
-                        onClick={ev => {
-                          ev.stopPropagation();
-                          this.tableProps.updateListItemsForRemove([item]);
-                          this.tableProps.updateShowModal(true);
-                        }}
-                        color="danger"
-                      />
-                    </EuiToolTip>
+                    <WzButtonPermissions
+                      buttonType='icon'
+                      permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                      aria-label="Edit content"
+                      iconType="pencil"
+                      tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
+                      onClick={async ev => {
+                        ev.stopPropagation();
+                        const result = await this.rulesetHandler.getFileContent(`${item.relative_dirname}/${item.filename}`);
+                        const file = { name: item.filename, content: result, path: item.relative_dirname };
+                        this.tableProps.updateFileContent(file);
+                      }}
+                      color="primary"
+                    />
+                    <WzButtonPermissions
+                      buttonType='icon'
+                      permissions={[{action: 'manager:delete_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                      aria-label="Delete content"
+                      iconType="trash"
+                      tooltip={{position: 'top', content:`Remove ${item.filename} file`}}
+                      onClick={ev => {
+                        ev.stopPropagation();
+                        this.tableProps.updateListItemsForRemove([item]);
+                        this.tableProps.updateShowModal(true);
+                      }}
+                      color="danger"
+                    />
                   </div>
                 );
               }
@@ -288,93 +247,67 @@ export default class RulesetColumns {
           }
         ]
       };
-      // If the admin mode is enabled the action column in CDB lists is shown
-      if (this.tableProps.adminMode) {
-        this.columns.lists[2] = {
+
+      this.columns.lists[2] =
+        {
           name: 'Actions',
           align: 'left',
           render: item => {
             const defaultItems = this.tableProps.state.defaultItems;
             return (
               <div>
-                <EuiToolTip
-                  position="top"
-                  content={`Edit ${item.name} content`}
-                >
-                  <EuiButtonIcon
-                    aria-label="Edit content"
-                    iconType="pencil"
-                    onClick={async ev => {
-                      ev.stopPropagation();
-                      const result = await this.rulesetHandler.getCdbList(
-                        `${item.path}/${item.name}`
-                      );
-                      const file = {
-                        name: item.name,
-                        content: result,
-                        path: item.path
-                      };
-                      this.tableProps.updateListContent(file);
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
-                <EuiToolTip
-                  position="top"
-                  content={
-                    defaultItems.indexOf(`${item.path}/${item.name}`) === -1
-                      ? `Delete ${item.name}`
-                      : `The ${item.name} list cannot be deleted`
-                  }
-                >
-                  <EuiButtonIcon
-                    aria-label="Show content"
-                    iconType="trash"
-                    onClick={async ev => {
-                      ev.stopPropagation();
-                      this.tableProps.updateListItemsForRemove([item]);
-                      this.tableProps.updateShowModal(true);
-                    }}
-                    color="danger"
-                    disabled={
-                      defaultItems.indexOf(`${item.path}/${item.name}`) !== -1
-                    }
-                  />
-                </EuiToolTip>
-                <EuiToolTip position="top" content={`Export ${item.name}`}>
+                <WzButtonPermissions
+                  buttonType='icon'
+                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                  aria-label="Edit content"
+                  iconType="pencil"
+                  tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.filename}`);
+                    const file = { name: item.filename, content: result, path: item.relative_dirname };
+                    this.tableProps.updateListContent(file);
+                  }}
+                  color="primary"
+                />
+                <WzButtonPermissions
+                  buttonType='icon'
+                  permissions={[{action: 'manager:delete_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                  aria-label="Show content"
+                  iconType="trash"
+                  tooltip={{position: 'top', content:(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted`}}
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    this.tableProps.updateListItemsForRemove([item]);
+                    this.tableProps.updateShowModal(true);
+                  }}
+                  color="danger"
+                  isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
+                />
+                <EuiToolTip position="top" content={`Export ${item.filename}`}>
                   <EuiButtonIcon
                     aria-label="Export list"
                     iconType="exportAction"
-                    onClick={async ev => {
+                    onClick={async (ev) => {
                       ev.stopPropagation();
-                      await exportCsv(
-                        `/lists?path=${item.path}/${item.name}`,
-                        [
-                          {
-                            _isCDBList: true,
-                            name: 'path',
-                            value: `${item.path}/${item.name}`
-                          }
-                        ],
-                        item.name
-                      );
+                      await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
                     }}
                     color="primary"
                   />
                 </EuiToolTip>
               </div>
-            );
+            )
           }
-        };
-      }
-    };
+        }
+      };
+      
 
     this.buildColumns();
   }
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci', 'gpg13', 'hipaa', 'gdpr', 'nist-800-53', 'tsc', 'mitre'];
+    const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
     const buildBadge = field => {
       const idGenerator = () => {
         return (

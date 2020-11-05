@@ -13,6 +13,7 @@
 import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server/';
+import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from '../../util/constants';
 
 export class ElasticWrapper {
   constructor(server) {
@@ -75,7 +76,7 @@ export class ElasticWrapper {
 
   /**
    * This function creates a new index pattern.
-   * @param {*} title Eg: 'wazuh-alerts-3.x-*'
+   * @param {*} title Eg: 'wazuh-alerts-
    * @param {*} id Optional.
    */
   async createIndexPattern(title, id) {
@@ -84,6 +85,7 @@ export class ElasticWrapper {
         return Promise.reject(
           new Error('No valid title for create index pattern')
         );
+      return ; // Index pattern is now created when accessing the WUI
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: this.WZ_KIBANA_INDEX,
@@ -180,6 +182,21 @@ export class ElasticWrapper {
     }
   }
 
+  addFormatMap(fields){
+    const tmpFields = JSON.parse(fields);
+    if(!tmpFields["data.virustotal.permalink"]){
+      tmpFields["data.virustotal.permalink"] = {"id":"url"};
+    }
+    if(!tmpFields["data.vulnerability.reference"]){
+      tmpFields["data.vulnerability.reference"] = {"id":"url"};
+    }
+    if(!tmpFields["data.url"]){
+      tmpFields["data.url"] = {"id":"url"};
+    }
+    return tmpFields;
+  }
+
+
   /**
    * Updates index-pattern known fields
    * @param {*} id 'index-pattern:' + id
@@ -201,9 +218,10 @@ export class ElasticWrapper {
       } catch (error) {} // eslint-disable-line
 
       let currentFields = [];
-
       // If true, it's an existing index pattern, we need to review its known fields
-      const { fields } = ((pattern || {})._source || {})['index-pattern'] || {};
+      const { fields, fieldFormatMap } = ((pattern || {})._source || {})['index-pattern'] || {};
+      if( !fields || !fieldFormatMap ) throw {message: " No index pattern found, open the interface to generate"}
+      const currentFieldsFormatMap = this.addFormatMap(fieldFormatMap);
       if (fields) {
         currentFields = JSON.parse(fields);
 
@@ -264,11 +282,7 @@ export class ElasticWrapper {
             'index-pattern': {
               timeFieldName: 'timestamp',
               fields: currentFieldsString,
-              fieldFormatMap: `{
-                  "data.virustotal.permalink":{"id":"url"},
-                  "data.vulnerability.reference":{"id":"url"},
-                  "data.url":{"id":"url"}
-                }`,
+              fieldFormatMap: JSON.stringify(currentFieldsFormatMap) ,
               sourceFilters: '[{"value":"@timestamp"}]'
             }
           }
@@ -381,7 +395,7 @@ export class ElasticWrapper {
         false;
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
-        index: title || 'wazuh-alerts-3.x-*',
+        index: title || WAZUH_ALERTS_PATTERN,
         type: '_doc',
         body: payload
       });
@@ -518,13 +532,13 @@ export class ElasticWrapper {
    * Check if an index exists
    * @param {*} index
    */
-  async checkIfIndexExists(index) {
+  async checkIfIndexExists(index, params = {}) {
     try {
       if (!index) return Promise.reject(new Error('No valid index given'));
 
       const data = await this.elasticRequest.callWithInternalUser(
         'indices.exists',
-        { index: index }
+        { index: index, ...params }
       );
 
       return data;
@@ -619,7 +633,7 @@ export class ElasticWrapper {
       const data = await this.elasticRequest.callWithInternalUser('delete', {
         index: this.WZ_KIBANA_INDEX,
         type: '_doc',
-        id: 'index-pattern:wazuh-monitoring-*'
+        id: `index-pattern:${WAZUH_MONITORING_PATTERN}`
       });
 
       return data;
@@ -780,5 +794,21 @@ export class ElasticWrapper {
         }
       }
     }
+  }
+
+  /**
+   * Get user roles
+   */
+  async getRoles(req, user) {
+    const params = {
+      path: `_security/user/${user}`,
+      method: 'GET',
+    };
+    const result = await this.elasticRequest.callWithRequest(
+      req,
+      'transport.request',
+      params
+    );
+    return ((result || {})[user] || {}).roles || []
   }
 }

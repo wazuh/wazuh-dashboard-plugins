@@ -33,7 +33,7 @@ import {
 } from '@elastic/eui';
 import './discover.less';
 import { EuiFlexItem } from '@elastic/eui';
-import { ApiRequest } from '../../../../react-services/api-request';
+import { WzRequest } from '../../../../react-services/wz-request';
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
@@ -107,7 +107,8 @@ export class RowDetails extends Component {
 
   async componentDidMount() {
     this._isMount = true;
-    const rulesDataResponse = await ApiRequest.request('GET', `/rules`, { q: `id=${this.props.item.rule.id}` });
+    const params = { q: `id=${this.props.item.rule.id}` }
+    const rulesDataResponse = await WzRequest.apiReq('GET', `/rules`, { params });
     const ruleData = (rulesDataResponse.data || {}).data || {};
     if (this._isMount) {
       this.setState({ ruleData })
@@ -145,15 +146,16 @@ export class RowDetails extends Component {
 
 
   renderRows() {
-    const fieldsToShow = ['agent', 'cluster', 'manager', 'rule', 'decoder', 'syscheck'];
+    const fieldsToShow = ['agent', 'cluster', 'manager', 'rule', 'decoder', 'syscheck', 'full_log', 'location'];
     var rows: any[] = [];
-
+    const isString = val => typeof val === 'string';
     for (var i = 0; i < fieldsToShow.length; i++) {
-      if (this.props.item[fieldsToShow[i]]) {
-        const itemPaths = this.propertiesToArray(this.props.item[fieldsToShow[i]]);
-        const tmpRows = itemPaths.map((item, idx) => {
-          const key = fieldsToShow[i] + "." + item; // = agent + . + id = agent.id
-          const value = this.getChildFromPath(this.props.item[fieldsToShow[i]], item);
+      const field = this.props.item[fieldsToShow[i]];
+      if (field) {
+        const itemPaths = isString(field) ? [fieldsToShow[i]] : this.propertiesToArray(field);
+        const tmpRows = itemPaths.map((item) => {
+          const key = isString(field) ? item : fieldsToShow[i] + "." + item; // = agent + . + id = agent.id
+          const value = isString(field) ? field : this.getChildFromPath(this.props.item[fieldsToShow[i]], item);
           const filter = {};
           filter[key] = value;
           const cells: any[] = [];
@@ -366,20 +368,20 @@ export class RowDetails extends Component {
     );
   }
 
-  getFormattedDetails(value){
+  getFormattedDetails(value) {
 
-    if(Array.isArray(value) && value[0].type){
+    if (Array.isArray(value) && value[0].type) {
       let link = "";
       let name = "";
 
       value.forEach(item => {
-        if(item.type === 'cve')
+        if (item.type === 'cve')
           name = item.name;
-        if(item.type === 'link')
+        if (item.type === 'link')
           link = <a href={item.name} target="_blank">{item.name}</a>
       })
       return <span>{name}: {link}</span>
-    }else{
+    } else {
       return (
         <WzTextWithTooltipTruncated position='top'>
           {value}
@@ -394,7 +396,7 @@ export class RowDetails extends Component {
     // Exclude group key of details
     Object.keys(details).filter(key => key !== 'group').forEach((key) => {
       detailsToRender.push(
-        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)', maxHeight: 41}}>
+        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)', maxHeight: 41 }}>
           <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>{details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
         </EuiFlexItem>
       );
@@ -420,7 +422,7 @@ export class RowDetails extends Component {
                     [this.getComplianceKey(complianceCategory)]: comp
                   };
                   return (
-                    <EuiToolTip 
+                    <EuiToolTip
                       key={`rule-compliance-tooltip-${complianceCategory}-${(Math.random() * (index - 0)) + index}`}
                       position="top"
                       content={`Filter by this compliance`}>
@@ -444,7 +446,7 @@ export class RowDetails extends Component {
   }
 
   getRule() {
-    const item = this.state.ruleData.items[0];
+    const item = this.state.ruleData.affected_items[0];
     const { id, level, file, path, groups, details } = item;
     const compliance = this.buildCompliance(item);
     return (
@@ -494,21 +496,21 @@ export class RowDetails extends Component {
         <EuiSpacer size='m' />
         <EuiFlexGroup>
           <EuiFlexItem style={{ marginTop: 8 }}>
-              <EuiAccordion
-                id="Compliance"
-                buttonContent={
-                  <EuiTitle size="s">
-                    <h3>Compliance</h3>
-                  </EuiTitle>
-                }
-                paddingSize="none"
-                initialIsOpen={true}>          
-                <div className='flyout-row details-row'>
-                  {this.renderCompliance(compliance)}
-                </div>
-              </EuiAccordion>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+            <EuiAccordion
+              id="Compliance"
+              buttonContent={
+                <EuiTitle size="s">
+                  <h3>Compliance</h3>
+                </EuiTitle>
+              }
+              paddingSize="none"
+              initialIsOpen={true}>
+              <div className='flyout-row details-row'>
+                {this.renderCompliance(compliance)}
+              </div>
+            </EuiAccordion>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiSpacer size='s' />
       </div>
     )
@@ -565,7 +567,7 @@ export class RowDetails extends Component {
             {this.state.selectedTabId === 'json' && (
               this.getJSON()
             )}
-            {this.state.selectedTabId === 'rule' && this.state.ruleData.totalItems === 1 && (
+            {this.state.selectedTabId === 'rule' && this.state.ruleData.total_affected_items === 1 && (
               this.getRule()
             ) || this.state.selectedTabId === 'rule' &&
               (

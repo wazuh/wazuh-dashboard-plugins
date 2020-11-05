@@ -13,15 +13,12 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import {} from '@elastic/eui';
-
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 
 import {
   renderValueNoThenEnabled,
-  renderValueOrYes,
   isString
 } from '../utils/utils';
 
@@ -37,8 +34,7 @@ const mainSettings = [
   { field: 'run_on_start', label: 'Run on start' },
   {
     field: 'remove_from_bucket',
-    label: 'Remove bucket logs after being read',
-    render: renderValueOrYes
+    label: 'Remove bucket logs after being read'
   },
   { field: 'skip_on_error', label: "Skip logs that can't be processed" }
 ];

@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import cron from 'node-cron';
-import needle from 'needle';
 import { getPath } from '../util/get-path';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
@@ -21,6 +20,8 @@ import { indexDate } from './lib/index-date';
 import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 import { WazuhHostsCtrl } from '../server/controllers/wazuh-hosts';
+import { ApiInterceptor } from './lib/api-interceptor';
+import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PREFIX, WAZUH_MONITORING_PATTERN } from '../util/constants';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -36,12 +37,13 @@ export class Monitoring {
     this.FREQUENCY = 900;
     this.CRON_FREQ = '0 1 * * * *';
     this.CREATION = 'd';
-    this.index_pattern = 'wazuh-monitoring-3.x-*';
-    this.index_prefix = 'wazuh-monitoring-3.x-';
+    this.index_pattern = WAZUH_MONITORING_PATTERN;
+    this.index_prefix = WAZUH_MONITORING_PREFIX;
     this.wzWrapper = new ElasticWrapper(server);
     this.wazuhHosts = new WazuhHostsCtrl();
     this.agentsArray = [];
     this.quiet = quiet;
+    this.apiInterceptor = new ApiInterceptor();
     this.initVariables();
   }
 
@@ -171,42 +173,43 @@ export class Monitoring {
         `Prepare OptionsObject for API: ${api.url}:${api.port}`,
         'debug'
       );
-      const options = ApiHelper.buildOptionsObject(api);
-
-      const response = await needle(
-        'get',
-        `${getPath(api)}/agents`,
-        payload,
-        options
+      const response = await this.apiInterceptor.request(
+        'GET',
+        getPath(api) + '/agents',
+        {params: payload},
+        { idHost: api.id}
       );
 
-      const isCluster = await needle(
-        'get',
-        `${getPath(api)}/cluster/status`,
+      const isCluster = await this.apiInterceptor.request(
+        'GET',
+        getPath(api) + '/cluster/status',
         {},
-        options
+        { idHost: api.id}
       );
 
       const clusterName =
-        (((isCluster || {}).body || {}).data || {}).enabled === 'yes'
-          ? await needle('get', `${getPath(api)}/cluster/node`, {}, options)
-          : false;
-
-      api.clusterName =
-        (((clusterName || {}).body || {}).data || {}).cluster || false;
-
-      if (!response.error && ((response.body || {}).data || {}).totalItems) {
+      (((isCluster || {}).data || {}).data || {}).enabled === 'yes'
+      ? await this.apiInterceptor.request('GET', `${getPath(api)}/cluster/local/info`, {},  { idHost: api.id})
+      : false;
+      
+      if( (((clusterName || {}).data   || {}).data || {}).affected_items) {
+        api.clusterName =  (((clusterName || {}).data   || {}).data || {}).affected_items[0].cluster || false;
+      } else {
+        api.clusterName = false;
+      }
+      
+      if (response.status === 200 && ((response.data || {}).data || {}).affected_items) {
         log(
           'monitoring:checkAndSaveStatus',
           `Calling checkStatus for API: ${api.url}:${api.port}`,
           'debug'
         );
-        await this.checkStatus(api, response.body.data.totalItems);
-      } else if ((response || {}).error) {
-        const msg = ((response || {}).body || {}).message || false;
+        await this.checkStatus(api, response.data.data.total_affected_items);
+      } else if (response.status !== 200) {
+        const msg = ((response || {}).data || {}).message || false;
         const extraLog =
           msg ||
-          'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
+          `Agent monitoring cannot be started because Wazuh's API credentials were not found or are incorrect. Open the Wazuh-wui in your browser to see more details.`;
 
         !this.quiet && log('monitoring:checkAndSaveStatus', extraLog);
         !this.quiet && this.server.log(monitoringErrorLogColors, extraLog);
@@ -250,7 +253,8 @@ export class Monitoring {
           user: element.user,
           password: element.password,
           url: element.url,
-          port: element.port
+          port: element.port,
+          id: element.id
         };
         log(
           'monitoring:loadCredentials',
@@ -343,7 +347,7 @@ export class Monitoring {
 
   /**
    * Creating wazuh-monitoring index
-   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
   async createIndex(datedIndex, clusterName) {
@@ -399,7 +403,7 @@ export class Monitoring {
 
   /**
    * Inserting one document per agent into Elastic. Bulk.
-   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
   async insertDocument(datedIndex, clusterName) {
@@ -546,7 +550,7 @@ export class Monitoring {
           currentTemplate['wazuh-agent'].index_patterns;
       } catch (error) {
         // Init with the default index pattern
-        monitoringTemplate.index_patterns = ['wazuh-monitoring-3.x-*'];
+        monitoringTemplate.index_patterns = [WAZUH_MONITORING_PATTERN];
       }
 
       // Check if the user is using a custom pattern
@@ -599,7 +603,7 @@ export class Monitoring {
         !this.quiet &&
           log(
             'monitoring:init',
-            'Checking if wazuh-monitoring-3.x-* index pattern exists...',
+            'Checking if wazuh-monitoring-* index pattern exists...',
             'debug'
           );
 
@@ -614,7 +618,7 @@ export class Monitoring {
         await this.wzWrapper.updateMonitoringIndexPatternKnownFields(patternId);
       } catch (error) {
         const didNotFindMsg =
-          "Didn't find wazuh-monitoring-3.x-* index pattern for Kibana. Proceeding to create it...";
+          "Didn't find wazuh-monitoring- index pattern for Kibana. Proceeding to create it...";
         !this.quiet && log('monitoring:init', didNotFindMsg, 'info');
         !this.quiet && this.server.log(monitoringErrorLogColors, didNotFindMsg);
         return this.createWazuhMonitoring();

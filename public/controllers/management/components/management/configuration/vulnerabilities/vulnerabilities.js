@@ -11,16 +11,13 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import withWzConfig from '../util-hocs/wz-config';
-import WzNoConfig from '../util-components/no-config';
 import WzTabSelector, {
   WzTabSelectorTab
 } from '../util-components/tab-selector';
 import WzConfigurationVulnerabilitiesGeneral from './vulnerabilities-general';
 import WzConfigurationVulnerabilitiesProviders from './vulnerabilities-providers';
-import { isString } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 
 class WzConfigurationVulnerabilities extends Component {

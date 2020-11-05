@@ -11,9 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-
-import { EuiSpacer } from '@elastic/eui';
 
 import WzConfigurationSettingsHeader from './configuration-settings-header';
 import WzViewSelector, { WzViewSelectorSwitch } from './view-selector';
@@ -43,11 +40,13 @@ class WzConfigurationSettingsTabSelector extends Component {
     }
     return result;
   }
+
   render() {
     const { view } = this.state;
     const { currentConfig, helpLinks, children, minusHeight } = this.props;
     const { title, description } = this.getTitleDescription(view);
     const codeViewerMinusHeight = minusHeight !== undefined ? minusHeight : 280;
+    
     return (
       <Fragment>
         <WzConfigurationSettingsHeader

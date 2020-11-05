@@ -1,11 +1,10 @@
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
-import { ApiRequest } from '../react-services/api-request';
+import { WzRequest } from '../react-services/wz-request';
 
 export class CheckDaemonsStatus {
   constructor($rootScope, $timeout) {
     this.$rootScope = $rootScope;
-    this.apiReq = ApiRequest;
     this.tries = 10;
     this.$timeout = $timeout;
     this.busy = false;
@@ -20,7 +19,7 @@ export class CheckDaemonsStatus {
       let isValid = false;
       while (this.tries--) {
         await this.$timeout(1200);
-        const result = await this.apiReq.request('GET', '/ping', {});
+        const result = await WzRequest.apiReq('GET', '/ping', {});
         isValid = ((result || {}).data || {}).isValid;
         if (isValid) {
           const updateNotReadyYet = updateWazuhNotReadyYet(false);

@@ -19,6 +19,7 @@ import { Mitre } from '../../components/overview'
 import { AgentsPreview } from './components/agents-preview';
 import { AgentsTable } from './components/agents-table';
 import { MainModule } from '../../components/common/modules/main';
+import { MainSyscollector } from '../../components/agents/syscollector/main';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -31,4 +32,5 @@ app
   .value('AgentsPreview', AgentsPreview)
   .value('Mitre', Mitre)
   .value('AgentsTable', AgentsTable)
+  .value('MainSyscollector', MainSyscollector)
   .value('MainModule', MainModule);

@@ -40,6 +40,7 @@ import {
 } from '../integration-files/visualizations';
 
 import { log } from '../logger';
+import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 
 const BASE_OPTIMIZE_PATH = '../../../../optimize';
 const REPORTING_PATH = `${BASE_OPTIMIZE_PATH}/wazuh/downloads/reports`;
@@ -534,16 +535,16 @@ export class WazuhReportingCtrl {
       if (isAgents && typeof isAgents === 'string') {
         const agent = await this.apiRequest.makeGenericRequest(
           'GET',
-          `/agents/${isAgents}`,
-          {},
+          `/agents`,
+          { params: { agents_list: isAgents }},
           apiId
         );
         if (
-          typeof ((agent || {}).data || {}).status === 'string' &&
-          ((agent || {}).data || {}).status !== 'Active'
+          typeof ((((agent || {}).data || {}).affected_items || [])[0] || {}).status === 'string' &&
+          ((((agent || {}).data || {}).affected_items || [])[0] || {}).status !== 'active'
         ) {
           this.dd.content.push({
-            text: `Warning. Agent is ${agent.data.status.toLowerCase()}`,
+            text: `Warning. Agent is ${agent.data.affected_items[0].status.toLowerCase()}`,
             style: 'standard'
           });
           this.dd.content.push('\n');
@@ -701,11 +702,12 @@ export class WazuhReportingCtrl {
       if (multi) {
         const agents = await this.apiRequest.makeGenericRequest(
           'GET',
-          `/agents/groups/${multi}`,
+          `/groups/${multi}/agents`,
           {},
           apiId
         );
-        for (let item of ((agents || {}).data || {}).items || []) {
+
+        for (let item of ((agents || {}).data || {}).affected_items || []) {
           const str = Array(6).fill('-');
           if ((item || {}).id) str[0] = item.id;
           if ((item || {}).name) str[1] = item.name;
@@ -727,13 +729,13 @@ export class WazuhReportingCtrl {
           try {
             const agent = await this.apiRequest.makeGenericRequest(
               'GET',
-              `/agents/${item}`,
-              {},
+              `/agents`,
+              {params: {q:`id=${item}`}},
               apiId
-            );
-            if (agent && agent.data) {
+              );
+            if (agent && agent.data.affected_items[0]) {
               data = {};
-              Object.assign(data, agent.data);
+              Object.assign(data, agent.data.affected_items[0]);
             }
           } catch (error) {
             log(
@@ -803,7 +805,7 @@ export class WazuhReportingCtrl {
     from,
     to,
     filters,
-    pattern = 'wazuh-alerts-3.x-*',
+    pattern = WAZUH_ALERTS_PATTERN,
     agent = null
   ) {
     try {
@@ -821,10 +823,10 @@ export class WazuhReportingCtrl {
       const agents = await this.apiRequest.makeGenericRequest(
         'GET',
         '/agents',
-        { limit: 1 },
+        { params: {limit: 1 }},
         apiId
       );
-      const totalAgents = agents.data.totalItems;
+      const totalAgents = agents.data.total_affected_items;
 
       if (section === 'overview' && tab === 'vuls') {
         log(
@@ -1355,131 +1357,7 @@ export class WazuhReportingCtrl {
         }
       }
 
-      if (section === 'agents' && tab === 'pm') {
-        log(
-          'reporting:extendedInformation',
-          `Fetching rootcheck database for agent ${agent}`,
-          'debug'
-        );
-        const database = await this.apiRequest.makeGenericRequest(
-          'GET',
-          `/rootcheck/${agent}`,
-          { limit: 15 },
-          apiId
-        );
-        //const cis = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/cis`, {}, apiId);
-        const pci = await this.apiRequest.makeGenericRequest(
-          'GET',
-          `/rootcheck/${agent}/pci`,
-          {},
-          apiId
-        );
-        const lastScan = await this.apiRequest.makeGenericRequest(
-          'GET',
-          `/rootcheck/${agent}/last_scan`,
-          {},
-          apiId
-        );
 
-        if (lastScan && lastScan.data) {
-          if (lastScan.data.start && lastScan.data.end) {
-            this.dd.content.push({
-              text: `Last policy monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`,
-              style: 'standard'
-            });
-          } else if (lastScan.data.start) {
-            this.dd.content.push({
-              text: `Policy monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`,
-              style: 'standard'
-            });
-          } else {
-            this.dd.content.push({
-              text: `Policy monitoring scan is currently in progress for this agent.`,
-              style: 'standard'
-            });
-          }
-          this.dd.content.push('\n');
-        }
-
-        if (((database || {}).data || {}).items) {
-          PdfTable(
-            this.dd,
-            database.data.items,
-            ['Date', 'Status', 'Event'],
-            ['readDay', 'status', 'event'],
-            'Last entries from policy monitoring scan'
-          );
-          this.dd.content.push('\n');
-        }
-
-        if (((pci || {}).data || {}).items) {
-          this.dd.content.push({
-            text: 'Fired rules due to PCI requirements',
-            style: 'h2',
-            pageBreak: 'before'
-          });
-          this.dd.content.push('\n');
-          for (const item of pci.data.items) {
-            const rules = await this.pciRequest.getRulesByRequirement(
-              from,
-              to,
-              filters,
-              item,
-              pattern
-            );
-            this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
-            this.dd.content.push('\n');
-
-            if (PCI[item]) {
-              const content =
-                typeof PCI[item] === 'string'
-                  ? { text: PCI[item], style: 'standard' }
-                  : PCI[item];
-              this.dd.content.push(content);
-              this.dd.content.push('\n');
-            }
-
-            PdfTable(
-              this.dd,
-              rules,
-              ['Rule ID', 'Description'],
-              ['ruleId', 'ruleDescription']
-            );
-            this.dd.content.push('\n');
-          }
-        }
-        log(
-          'reporting:extendedInformation',
-          `Fetching top 5 detected rootkits`,
-          'debug'
-        );
-        const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(
-          from,
-          to,
-          filters,
-          pattern,
-          10
-        );
-        if (top5RootkitsRank && top5RootkitsRank.length) {
-          this.dd.content.push({ text: 'Rootkits files found', style: 'h2' });
-          this.dd.content.push('\n');
-          this.dd.content.push({
-            text:
-              'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',
-            style: 'standard'
-          });
-          this.dd.content.push('\n');
-          PdfTable(
-            this.dd,
-            top5RootkitsRank.map(item => {
-              return { top: top5RootkitsRank.indexOf(item) + 1, name: item };
-            }),
-            ['Top', 'Rootkit'],
-            ['top', 'name']
-          );
-          this.dd.content.push('\n');
-        }
-      }
 
       if (section === 'agents' && tab === 'audit') {
         log(
@@ -1519,13 +1397,13 @@ export class WazuhReportingCtrl {
         );
 
         if (lastScan && lastScan.data) {
-          if (lastScan.data.start && lastScan.data.end) {
+          if (lastScan.data.affected_items[0].start && lastScan.data.affected_items[0].end) {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`
             });
-          } else if (lastScan.data.start) {
+          } else if (lastScan.data.affected_items[0].start) {
             this.dd.content.push({
-              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`
+              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.affected_items[0].start}).`
             });
           } else {
             this.dd.content.push({
@@ -1597,14 +1475,14 @@ export class WazuhReportingCtrl {
           this.dd.content.push({ text: 'Hardware information', style: 'h2' });
           this.dd.content.push('\n');
           const ulcustom = [];
-          if (hardware.data.cpu && hardware.data.cpu.cores)
-            ulcustom.push(hardware.data.cpu.cores + ' cores ');
-          if (hardware.data.cpu && hardware.data.cpu.name)
-            ulcustom.push(hardware.data.cpu.name);
-          if (hardware.data.ram && hardware.data.ram.total)
+          if (hardware.data.affected_items[0].cpu && hardware.data.affected_items[0].cpu.cores)
+            ulcustom.push(hardware.data.affected_items[0].cpu.cores + ' cores ');
+          if (hardware.data.affected_items[0].cpu && hardware.data.affected_items[0].cpu.name)
+            ulcustom.push(hardware.data.affected_items[0].cpu.name);
+          if (hardware.data.affected_items[0].ram && hardware.data.affected_items[0].ram.total)
             ulcustom.push(
-              Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-                'GB RAM'
+              Number(hardware.data.affected_items[0].ram.total / 1024 / 1024).toFixed(2) +
+              'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1627,15 +1505,16 @@ export class WazuhReportingCtrl {
         );
 
         if (os && os.data) {
+          const osData = os.data.affected_items[0];
           this.dd.content.push({ text: 'OS information', style: 'h2' });
           this.dd.content.push('\n');
           const ulcustom = [];
-          if (os.data.sysname) ulcustom.push(os.data.sysname);
-          if (os.data.version) ulcustom.push(os.data.version);
-          if (os.data.architecture) ulcustom.push(os.data.architecture);
-          if (os.data.release) ulcustom.push(os.data.release);
-          if (os.data.os && os.data.os.name && os.data.os.version)
-            ulcustom.push(os.data.os.name + ' ' + os.data.os.version);
+          if (osData.sysname) ulcustom.push(osData.sysname);
+          if (osData.version) ulcustom.push(osData.version);
+          if (osData.architecture) ulcustom.push(osData.architecture);
+          if (osData.release) ulcustom.push(osData.release);
+          if (osData.os && osData.os.name && osData.os.version)
+            ulcustom.push(osData.os.name + ' ' + osData.os.version);
           ulcustom &&
             ulcustom.length &&
             this.dd.content.push({
@@ -1952,14 +1831,14 @@ export class WazuhReportingCtrl {
             try {
               configuration = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}/configuration`,
+                `/groups/${g_id}/configuration`, 
                 {},
                 apiId
               );
             } catch (error) {
               log('reporting:report', error.message || error, 'debug');
             }
-            if (Object.keys(configuration.data.items[0].config).length) {
+            if (Object.keys(configuration.data.affected_items[0].config).length) {
               this.dd.content.push({
                 text: 'Configurations',
                 style: { fontSize: 14, color: '#000' },
@@ -1969,7 +1848,7 @@ export class WazuhReportingCtrl {
                 labels: [],
                 isGroupConfig: true
               };
-              for (let config of configuration.data.items) {
+              for (let config of configuration.data.affected_items) {
                 let filterTitle = '';
                 let index = 0;
                 for (let filter of Object.keys(config.filters)) {
@@ -2150,7 +2029,7 @@ export class WazuhReportingCtrl {
             try {
               agentsInGroup = await this.apiRequest.makeGenericRequest(
                 'GET',
-                `/agents/groups/${g_id}`,
+                `/groups/${g_id}/agents`,
                 {},
                 apiId
               );
@@ -2160,7 +2039,7 @@ export class WazuhReportingCtrl {
             await this.renderHeader(
               tab,
               g_id,
-              (((agentsInGroup || []).data || []).items || []).map(x => x.id),
+              (((agentsInGroup || []).data || []).affected_items || []).map(x => x.id),
               apiId
             );
           }
@@ -2414,33 +2293,21 @@ export class WazuhReportingCtrl {
         const isSycollector = tab === 'syscollector';
         if (isSycollector) {
           log('reporting:report', `Syscollector report`, 'debug');
-          let agentId = '';
+          const agentId = ((((req || {}).payload || {}).filters[1] || {}).meta || {}).value;
           let agentOs = '';
           try {
-            if (
-              !req.payload.filters ||
-              !req.payload.filters[1] ||
-              !req.payload.filters[1].meta ||
-              !req.payload.filters[1].meta.value
-            ) {
+            if ( !agentId ) {
               throw new Error(
                 'Syscollector reporting needs a valid agent in order to work properly'
               );
             }
             const agent = await this.apiRequest.makeGenericRequest(
               'GET',
-              `/agents/${req.payload.filters[1].meta.value}`,
-              {},
+              '/agents',
+              {params: {q: `id=${agentId}`}},
               apiId
             );
-            agentId =
-              agent && agent.data && agent.data.id
-                ? agent.data.id
-                : req.payload.filters[1].meta.value;
-            agentOs =
-              agent && agent.data && agent.data.os && agent.data.os.platform
-                ? agent.data.os.platform
-                : '';
+            agentOs = ((((agent || {}).data || {}).affected_items[0] || {}).os || {}).platform || '';
           } catch (error) {
             log('reporting:report', error.message || error, 'debug');
           }
@@ -2456,7 +2323,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (packages && packages.data && packages.data.items) {
+            if (packages && packages.data && packages.data.affected_items) {
               tables.push({
                 title: 'Packages',
                 columns:
@@ -2469,7 +2336,7 @@ export class WazuhReportingCtrl {
                         'Vendor',
                         'Description'
                       ],
-                rows: packages.data.items.map(x => {
+                rows: packages.data.affected_items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
@@ -2497,14 +2364,14 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (processes && processes.data && processes.data.items) {
+            if (processes && processes.data && processes.data.affected_items) {
               tables.push({
                 title: 'Processes',
                 columns:
                   agentOs === 'windows'
                     ? ['Name', 'CMD', 'Priority', 'NLWP']
                     : ['Name', 'Effective user', 'Priority', 'State'],
-                rows: processes.data.items.map(x => {
+                rows: processes.data.affected_items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
@@ -2532,14 +2399,14 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (ports && ports.data && ports.data.items) {
+            if (ports && ports.data && ports.data.affected_items) {
               tables.push({
                 title: 'Network ports',
                 columns:
                   agentOs === 'windows'
                     ? ['Local IP', 'Local port', 'Process', 'State', 'Protocol']
                     : ['Local IP', 'Local port', 'State', 'Protocol'],
-                rows: ports.data.items.map(x => {
+                rows: ports.data.affected_items.map(x => {
                   return agentOs === 'windows'
                     ? [
                         x['local']['ip'],
@@ -2573,11 +2440,11 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (netiface && netiface.data && netiface.data.items) {
+            if (netiface && netiface.data && netiface.data.affected_items) {
               tables.push({
                 title: 'Network interfaces',
                 columns: ['Name', 'Mac', 'State', 'MTU', 'Type'],
-                rows: netiface.data.items.map(x => {
+                rows: netiface.data.affected_items.map(x => {
                   return [x['name'], x['mac'], x['state'], x['mtu'], x['type']];
                 })
               });
@@ -2597,7 +2464,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (netaddr && netaddr.data && netaddr.data.items) {
+            if (netaddr && netaddr.data && netaddr.data.affected_items) {
               tables.push({
                 title: 'Network settings',
                 columns: [
@@ -2607,7 +2474,7 @@ export class WazuhReportingCtrl {
                   'Protocol',
                   'Broadcast'
                 ],
-                rows: netaddr.data.items.map(x => {
+                rows: netaddr.data.affected_items.map(x => {
                   return [
                     x['iface'],
                     x['address'],
@@ -2634,11 +2501,11 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            if (hotfixes && hotfixes.data && hotfixes.data.items) {
+            if (hotfixes && hotfixes.data && hotfixes.data.affected_items) {
               tables.push({
                 title: 'Windows updates',
                 columns: ['Update code'],
-                rows: hotfixes.data.items.map(x => {
+                rows: hotfixes.data.affected_items.map(x => {
                   return [x['hotfix']];
                 })
               });

@@ -18,7 +18,7 @@ export class RawVisualizations {
       return RawVisualizations.instance;
     }
     this.list = [];
-    this.type="";
+    this.type = "";
 
     RawVisualizations.instance = this;
     return this;

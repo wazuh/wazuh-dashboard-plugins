@@ -79,10 +79,10 @@ class WzMenuOverview extends Component {
 
   clickMenuItem = (ev, section) => {
     this.props.closePopover();
-    const params = { tab : section};
-    if(store.getState().appStateReducers.currentAgentData.id)
+    const params = { tab: section };
+    if (store.getState().appStateReducers.currentAgentData.id)
       params["agentId"] = store.getState().appStateReducers.currentAgentData.id;
-    if(section === "sca"){ // SCA initial tab is inventory
+    if (section === "sca") { // SCA initial tab is inventory
       params["tabView"] = "inventory"
     }
     const currentTab = (((store || {}).getState() || {}).appStateReducers || {})
@@ -90,11 +90,11 @@ class WzMenuOverview extends Component {
     if (currentTab !== section) {
       // do not redirect if we already are in that tab
       if (!this.props.isAgent) {
-        AppNavigate.navigateToModule(ev, 'overview', params )
+        AppNavigate.navigateToModule(ev, 'overview', params)
       } else {
         if (!this.props.switchTab) {
-          store.dispatch(updateCurrentAgentData(this.props.isAgent)); 
-          AppNavigate.navigateToModule(ev, 'overview', params )
+          store.dispatch(updateCurrentAgentData(this.props.isAgent));
+          AppNavigate.navigateToModule(ev, 'overview', params)
         } else {
           this.props.switchTab(section);
         }
@@ -123,7 +123,7 @@ class WzMenuOverview extends Component {
       id: item.id,
       name: item.text,
       isSelected: currentTab === item.id,
-      onClick:() => {},
+      onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
@@ -135,8 +135,8 @@ class WzMenuOverview extends Component {
     else if (status.toLowerCase() === 'never connected') { return hex ? '#98A2B3' : 'subdued'; }
   }
 
-  removeSelectedAgent(){
-    store.dispatch(updateCurrentAgentData({})); 
+  removeSelectedAgent() {
+    store.dispatch(updateCurrentAgentData({}));
     this.router.reload();
   }
 
@@ -166,43 +166,51 @@ class WzMenuOverview extends Component {
       platform = ((agent.os || {}).uname || '').includes('Linux') ? 'linux' : ((agent.os || {}).platform || false);
     }
 
-    if( !platform || !UnsupportedComponents[platform].includes('audit')) {
+    if (!platform || !UnsupportedComponents[platform].includes('audit')) {
       auditingItems.splice(1, 0, this.overviewSections.audit);
       auditingItems.splice(2, 0, this.overviewSections.oscap);
     }
-    if(!platform || !UnsupportedComponents[platform].includes('docker')) {
+    if (!platform || !UnsupportedComponents[platform].includes('docker')) {
       threatDetectionItems.splice(2, 0, this.overviewSections.docker);
     }
-    if(!platform || !UnsupportedComponents[platform].includes('vuls')) {
+    if (!platform || !UnsupportedComponents[platform].includes('vuls')) {
       threatDetectionItems.unshift(this.overviewSections.vuls);
     }
-    
+
     const securityInformation = [
-      this.createItem(this.overviewSections.securityInformation, {
+      {
+        name: this.overviewSections.securityInformation.text,
+        id: this.overviewSections.securityInformation.id,
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: this.createItems(securityInformationItems)
-      })
+      }
     ];
 
     const auditing = [
-      this.createItem(this.overviewSections.auditing, {
+      {
+        name: this.overviewSections.auditing.text,
+        id: this.overviewSections.auditing.id,
         disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: this.createItems(auditingItems)
-      })
+      }
     ];
 
     const threatDetection = [
-      this.createItem(this.overviewSections.threatDetection, {
+      {
+        name: this.overviewSections.threatDetection.text,
+        id: this.overviewSections.threatDetection.id,
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: this.createItems(threatDetectionItems)
-      })
+      }
     ];
 
     const regulatoryCompliance = [
-      this.createItem(this.overviewSections.regulatoryCompliance, {
+      {
+        name: this.overviewSections.regulatoryCompliance.text,
+        id: this.overviewSections.regulatoryCompliance.id,
         disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: this.createItems([
@@ -212,22 +220,8 @@ class WzMenuOverview extends Component {
           this.overviewSections.nist,
           this.overviewSections.tsc
         ])
-      })
+      }
     ];
-    
-    const addHealthRender = (agent) => {
-      // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
-      return (
-        <span className="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow" style={{ paddingTop: 3, fontSize: '12px'}}>
-          <span className="euiFlexItem euiFlexItem--flexGrowZero">
-            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className={`euiIcon euiIcon--medium euiIcon--${this.color(agent.status)}`} focusable="false" role="img" aria-hidden="true">
-              <circle cx="8" cy="8" r="4"></circle>
-            </svg>
-          </span>
-          <span className="euiFlexItem euiFlexItem--flexGrowZero">{agent.status}</span>
-        </span>
-      )
-    }
 
     const agentData = store.getState().appStateReducers.currentAgentData
 

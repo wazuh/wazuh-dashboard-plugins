@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';

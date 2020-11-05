@@ -21,6 +21,8 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
+import { WzStat } from '../../wz-stat';
+import { GroupTruncate } from '../util/agent-group-truncate'
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -30,10 +32,10 @@ export class AgentInfo extends Component {
   }
 
   async componentDidMount() {
-    const managerVersion = await WzRequest.apiReq('GET', '/version', {});
+    const managerVersion = await WzRequest.apiReq('GET', '//', {});
 
     this.setState({
-      managerVersion: ((managerVersion || {}).data || {}).data || {}
+      managerVersion: (((managerVersion || {}).data || {}).data || {}).api_version || {}
     });
   }
 
@@ -123,19 +125,26 @@ export class AgentInfo extends Component {
     const stats = items.map(item => {
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
-          <EuiStat
+          <WzStat
             title={
               item.description === 'Groups' ? (
-                this.addGroupsRender(this.props.agent)
+                <GroupTruncate
+                  agent={this.props.agent}
+                  groups={this.props.agent.group}
+                  length={40}
+                  label={'more'}
+                  action={'redirect'}
+                  agent={this.props.agent}
+                  {...this.props}/>
               ) : item.description === 'Operating system' ? (
                 this.addTextPlatformRender(this.props.agent)
               ) : item.description === 'Status' ? (
                 this.addHealthRender(this.props.agent)
               ) : (
-                      <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
-                        {checkField(item.title)}
-                      </WzTextWithTooltipIfTruncated>
-                    )
+                <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "250px", fontSize: 12 }}>
+                  {checkField(item.title)}
+                </WzTextWithTooltipIfTruncated>
+              )
             }
             description={item.description}
             titleSize="xs"

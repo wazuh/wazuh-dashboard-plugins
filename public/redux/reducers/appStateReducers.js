@@ -16,10 +16,14 @@ const initialState = {
   wazuhNotReadyYet: '',
   currentTab: '',
   extensions: {},
-  adminMode: false,
+  selected_settings_section: '',
+  currentPlatform: false,
   currentAgentData: {},
   showExploreAgentModal: false,
-  showExploreAgentModalGlobal: false
+  showExploreAgentModalGlobal: false,
+  userPermissions: {},
+  userRoles: [],
+  toastNotification: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -58,10 +62,10 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-  if (action.type === 'UPDATE_ADMIN_MODE') {
+  if (action.type === 'UPDATE_CURRENT_PLATFORM') {
     return {
       ...state,
-      adminMode: action.adminMode
+      currentPlatform: action.currentPlatform
     };
   }
 
@@ -88,7 +92,33 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
+  if (action.type === 'UPDATE_USER_ROLES') {
+    return {
+      ...state,
+      userRoles: action.userRoles
+    };
+  }
 
+  if (action.type === 'UPDATE_USER_PERMISSIONS') {
+    return {
+      ...state,
+      userPermissions: action.userPermissions
+    };
+  }
+
+  if (action.type === 'UPDATE_SELECTED_SETTINGS_SECTION') {
+    return {
+      ...state,
+      selected_settings_section: action.selected_settings_section
+    };
+  }
+
+  if (action.type === 'UPDATE_TOAST_NOTIFICATIONS_MODAL') {
+    return {
+      ...state,
+      toastNotification: action.toastNotification
+    };
+  }
 
   return state;
 };

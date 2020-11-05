@@ -14,7 +14,8 @@ import {
   EuiBasicTable,
   EuiCallOut,
   EuiOverlayMask,
-  EuiConfirmModal
+  EuiConfirmModal,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -47,7 +48,7 @@ class WzGroupAgentsTable extends Component {
       filters: [],
     };
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, {q: `group=${this.props.state.itemDetail.name}`})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value,  {q: `group=${this.props.state.itemDetail.name}`})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value,  {q: `group=${this.props.state.itemDetail.name}`})},
@@ -89,14 +90,14 @@ class WzGroupAgentsTable extends Component {
     try {
       const rawItems = await this.groupsHandler.agentsGroup(
         this.props.state.itemDetail.name,
-        this.buildFilter()
+        { params: this.buildFilter() }
       );
-      const { items, totalItems } = ((rawItems || {}).data || {}).data;
+      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
       this.setState({
-        items,
-        totalItems,
-        isProcessing: false
+        items: affected_items,
+        totalItems : total_affected_items,
+        isProcessing: false,
       });
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
@@ -169,7 +170,9 @@ class WzGroupAgentsTable extends Component {
             filters={filters}
             suggestions={this.suggestions}
             onFiltersChange={filters => this.setState({filters})}
+            placeholder='Filter or search agent'
           />
+          <EuiSpacer size='s'/>
           <EuiBasicTable
             itemId="id"
             items={items}
@@ -184,16 +187,16 @@ class WzGroupAgentsTable extends Component {
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title={`Delete ${
+                title={`Remove ${
                   itemList[0].file ? itemList[0].file : itemList[0].name
-                } agent?`}
+                } agent from this group?`}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
                   this.props.updateShowModal(false);
                 }}
                 cancelButtonText="Cancel"
-                confirmButtonText="Delete"
+                confirmButtonText="Remove"
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
               ></EuiConfirmModal>
@@ -240,8 +243,7 @@ class WzGroupAgentsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 

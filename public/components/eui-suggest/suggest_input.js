@@ -91,6 +91,7 @@ export class EuiSuggestInput extends Component {
       <EuiFieldText
         value={this.state.value}
         fullWidth
+        onFocus={onPopoverFocus}
         append={appendArray}
         isLoading={status === 'loading' ? true : false}
         onChange={this.onFieldChange}
@@ -103,7 +104,6 @@ export class EuiSuggestInput extends Component {
         <EuiInputPopover
           id="popover"
           input={customInput}
-          onFocus={onPopoverFocus}
           isOpen={isPopoverOpen}
           panelPaddingSize="none"
           fullWidth

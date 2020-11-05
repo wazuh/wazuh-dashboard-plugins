@@ -20,10 +20,6 @@
   display: none;
 }
 
-.kbnQueryBar__wrap {
-  z-index: 1!important;
-}
-
 .error-notify {
   font-size: 20px;
   color: black;
@@ -497,6 +493,10 @@ md-sidenav {
 
 .wz-question-dev-color {
   color: #b4bcc2;
+}
+
+.conApp .euiProgress{
+  z-index: 2000;
 }
 
 .wz-dev-column-separator {
@@ -1018,6 +1018,9 @@ wz-xml-file-editor {
 
 .health-check{
   padding-top: 5%;
+  width: 500px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 @keyframes rotation {
@@ -1036,14 +1039,16 @@ wz-xml-file-editor {
 }
 
 .health-check-logo{
-    width: 60px;
-    height: 60px;
-    float: left;
-    margin: 0 auto;
-    margin-top: -90px;
-    margin-bottom: 50px;
-    z-index: 1;
-    filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  z-index: 1;
+  filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
+  margin-left: -100px;
+}
+
+.health-check .euiDescriptionList__description{
+  text-align: left!important;
 }
 
 .CodeMirror-gutters {
@@ -1582,6 +1587,87 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   }
 }
 
+.no-focus:focus {
+  background-color: transparent !important;
+}
+
+
+.ace_scrollbar-v {
+  margin-top: -10px!important;
+}
+.ace_autocomplete {
+  width: 390px!important;
+}
+
+.wz-devtools {
+  border: 1px solid red;
+  margin: 16px;
+}
+.wz-devtools-tab .euiButtonEmpty__text {
+  height:24px;
+  text-decoration: none !important;
+}
+
+
+.history-list {
+  background-color: white;
+  border:  1px solid #80808061;
+  max-height: 25vh;
+  overflow: auto;
+  border-radius: 5px;
+}
+
+.history-list-item {
+  padding: 10px;
+  font-size: 14px;
+  border-bottom: 1px solid #80808061 ;
+}
+
+.history-list-item:hover {
+  background-color:#a4a0e11a;
+}
+
+.history-list-item-active {
+  background-color:#a09dd326 !important;
+}
+
+.history-list-item:last-child {
+  padding: 10px;
+  border:none;
+}
+
+iframe.width-changed {
+  width: 100%;
+  display: block;
+  border: 0;
+  height: 0;
+  margin: 0;
+}
+
+.selectDevTools {
+  display: none;
+}
+
+.marginAddTab {
+  padding-bottom: 5px;
+}
+
+@media only screen and (max-width: 1200px) { 
+ .wideElementsDevTools {
+    display: none;
+  }
+  /* .selectDevTools {
+    display: inline;
+  } */
+} 
 .module-table .euiFacetButton__text {
   max-height: 40px;
+}
+
+.code-block-log-viewer-container {
+  max-width: calc(~"100vw - 41*2px");
+}
+
+.dscFieldDetails__barContainer {
+  min-width: 0;
 }

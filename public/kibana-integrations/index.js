@@ -11,7 +11,6 @@
  */
 
 import { npStart } from 'ui/new_platform';
-import './kibana-visualization';
 import './kibana-discover';
 import './saved_visualizations';
 import { loadWzTopNavDirectives } from './wz-top-nav';

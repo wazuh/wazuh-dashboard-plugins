@@ -18,6 +18,7 @@
  */
 
 import { ErrorHandler } from '../react-services/error-handler';
+import { WzRequest } from '../react-services/wz-request';
 
 export async function queryConfig(
   agentId,
@@ -56,7 +57,7 @@ export async function queryConfig(
           ? `/manager/config/${component}/${configuration}`
           : `/agents/${agentId}/config/${component}/${configuration}`;
 
-        const partialResult = await apiReq.request('GET', url, {});
+        const partialResult = await WzRequest.apiReq('GET', url, {});
         result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
         result[`${component}-${configuration}`] = ErrorHandler.handle(

@@ -10,5 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import monitoring from './monitoring';
+import statistics from './statistics';
 
-export { monitoring };
+export { monitoring};
+export { statistics }

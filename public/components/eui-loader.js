@@ -28,10 +28,11 @@ import {
   EuiLoadingChart
 } from '@elastic/eui';
 
-import { BasicTable } from '../directives/wz-table-eui/components/table';
-import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
-import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
-import { WzEuiPrompt } from '../directives/wz-eui-prompt/components/wz-eui-prompt';
+import { Tabs } from './common/tabs/tabs';
+import { MultipleAgentSelector } from './management/groups/multiple-agent-selector';
+import { NodeList } from './management/cluster/node-list';
+import { HealthCheck } from './health-check/health-check';
+import { WzEmptyPromptNoPermissions } from './common/permissions/prompt';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -47,11 +48,12 @@ app
   .value('EuiBasicTable', EuiBasicTable)
   .value('EuiHealth', EuiHealth)
   .value('EuiCallOut', EuiCallOut)
-  .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
-  .value('WzEuiPrompt', WzEuiPrompt)
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer', EuiSpacer)
-  .value('SyscheckTable', SyscheckTable)
   .value('EuiSpacer', EuiSpacer)
   .value('EuiLoadingChart', EuiLoadingChart)
+  .value('MultipleAgentSelector', MultipleAgentSelector)
+  .value('NodeList', NodeList)
+  .value('HealthCheck', HealthCheck)
+  .value('WzEmptyPromptNoPermissions', WzEmptyPromptNoPermissions)

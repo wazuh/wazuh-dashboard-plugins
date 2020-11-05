@@ -19,9 +19,14 @@ import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from './lib/manage-hosts';
 import { UpdateRegistry } from './lib/update-registry';
+import { WAZUH_ALERTS_PATTERN } from '../util/constants';
+import path from 'path';
 
 const manageHosts = new ManageHosts();
-const wazuhRegistry = new UpdateRegistry().file;
+const registry = new UpdateRegistry()
+const wazuhRegistry = registry.file;
+
+const OPTIMIZE_WAZUH_PATH = '../../../optimize/wazuh';
 
 export function Initialize(server) {
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
@@ -40,10 +45,10 @@ export function Initialize(server) {
     pattern =
       configurationFile && typeof configurationFile.pattern !== 'undefined'
         ? configurationFile.pattern
-        : 'wazuh-alerts-3.x-*';
+        : WAZUH_ALERTS_PATTERN;
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -65,10 +70,10 @@ export function Initialize(server) {
     );
   }
 
-  const defaultIndexPattern = pattern || 'wazuh-alerts-3.x-*';
+  const defaultIndexPattern = pattern || WAZUH_ALERTS_PATTERN;
 
   // Save Wazuh App setup
-  const saveConfiguration = () => {
+  const saveConfiguration = async () => {
     try {
       const commonDate = new Date().toISOString();
 
@@ -80,9 +85,14 @@ export function Initialize(server) {
         lastRestart: commonDate,
         hosts: {}
       };
-
       try {
-        fs.writeFileSync(wazuhRegistry, JSON.stringify(configuration), err => {
+        if (!fs.existsSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH))) {
+          fs.mkdirSync(path.join(__dirname, OPTIMIZE_WAZUH_PATH));
+        }
+        if (!fs.existsSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`))) {
+          fs.mkdirSync(path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config`));
+        }
+        await fs.writeFileSync(wazuhRegistry, JSON.stringify(configuration), 'utf8', err => {
           if (err) {
             throw new Error(err);
           }
@@ -214,26 +224,22 @@ export function Initialize(server) {
         // Create the app registry file for the very first time
         saveConfiguration();
       } else {
-        // App registry file exists, just update it
-        const currentDate = new Date().toISOString();
-
         // If this function fails, it throws an exception
         const source = JSON.parse(fs.readFileSync(wazuhRegistry, 'utf8'));
 
         // Check if the stored revision differs from the package.json revision
-        const isNewApp = packageJSON.revision !== source.revision;
+        const isUpgradedApp = packageJSON.revision !== source.revision || packageJSON.version !== source['app-version'];
 
-        // If it's an app with a different revision, it's a new installation
-        source['installationDate'] = isNewApp
-          ? currentDate
-          : source['installationDate'];
-
-        source['app-version'] = packageJSON.version;
-        source.revision = packageJSON.revision;
-        source.lastRestart = currentDate;
-
-        // If this function fails, it throws an exception
-        fs.writeFileSync(wazuhRegistry, JSON.stringify(source), 'utf-8');
+        // Rebuild the registry file if revision or version fields are differents
+        if (isUpgradedApp) { 
+          log(
+            'initialize[checkwazuhRegistry]',
+            'Wazuh app revision or version changed, regenerating wazuh-version registry',
+            'info'
+          );
+          // Rebuild registry file in blank
+          saveConfiguration();
+        }
       }
     } catch (error) {
       return Promise.reject(error);
@@ -289,7 +295,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -310,7 +316,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );

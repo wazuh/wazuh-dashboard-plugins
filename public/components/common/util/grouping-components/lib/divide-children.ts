@@ -14,8 +14,10 @@
 export const divideChildren = (children, ref, parentWidth, width):{
   show: [], hide: [], width: number
 } => {
+  if(!parentWidth) return {show: children, hide: [], width: 0};
   return children.reduce((acc, child, key) => {
-    const currentChild = ((ref || {}).current || {}).childNodes[key]
+    const childs = ((ref || {}).current || {}).childNodes
+    const currentChild = !!childs && childs[0];
     const isPopOver = !!currentChild && !!currentChild.classList && currentChild.classList.contains('euiPopover');
     const currentWidth = acc.width + ((isPopOver) ? 5000 : (currentChild || {}).offsetWidth || 100) ;
     const newAcc = {

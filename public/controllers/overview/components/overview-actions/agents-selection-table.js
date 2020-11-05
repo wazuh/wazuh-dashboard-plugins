@@ -35,7 +35,7 @@ import { LEFT_ALIGNMENT, RIGHT_ALIGNMENT, SortableProperties } from '@elastic/eu
 import {  updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import  store  from '../../../../redux/store';
 import chrome from 'ui/chrome';
-import { AgentGroupTruncate } from '../../../../components/common/util/agent-group-truncate/agent_group_truncate'
+import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/'
 import { WzSearchBar, filtersToObject } from '../../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
 import _ from 'lodash';
@@ -94,7 +94,7 @@ export class AgentSelectionTable extends Component {
           show: false,
         },
         isSortable: true,
-        render: this.renderGroups
+        render: groups => this.renderGroups(groups)
       },
       {
         id: 'version',
@@ -129,7 +129,7 @@ export class AgentSelectionTable extends Component {
       },
     ];
     this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['Active', 'Disconnected', 'Never connected'] },
+      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: ['active', 'disconnected', 'never_connected'] },
       { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
       { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
@@ -191,9 +191,9 @@ export class AgentSelectionTable extends Component {
   async getItems() {
     try{
       this._isMounted && this.setState({isLoading: true});
-      const rawData = await WzRequest.apiReq('GET', '/agents', this.buildFilter());
-      const data = (((rawData || {}).data || {}).data || {}).items;
-      const totalItems = (((rawData || {}).data || {}).data || {}).totalItems;
+      const rawData = await WzRequest.apiReq('GET', '/agents', { params: this.buildFilter() });
+      const data = (((rawData || {}).data || {}).data || {}).affected_items;
+      const totalItems = (((rawData || {}).data || {}).data || {}).total_affected_items;
       const formattedData = data.map((item, id) => {
         return {
           id: item.id,
@@ -215,25 +215,15 @@ export class AgentSelectionTable extends Component {
       return 'success';
     } else if (status.toLowerCase() === 'disconnected') {
       return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
+    } else if (status.toLowerCase() === 'never_connected') {
       return 'subdued';
-    }
-  }
-
-  agentStatusBadgeColor(status){
-    if (status.toLowerCase() === 'active') {
-      return 'secondary';
-    } else if (status.toLowerCase() === 'disconnected') {
-      return 'danger';
-    } else if (status.toLowerCase() === 'never connected') {
-      return 'default';
     }
   }
 
   addHealthStatusRender(status) {
     return (
       <EuiHealth color={this.agentStatusColor(status)} style={{ whiteSpace: 'no-wrap' }}>
-        {status}
+        {status === 'never_connected' ? 'never connected' : status}
       </EuiHealth>
     );
   }
@@ -548,22 +538,10 @@ export class AgentSelectionTable extends Component {
     return this.getSelectedItems().length;
   }
 
-  async newSearch(){
-    if(this.areAnyRowsSelected()){
-      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+this.getSelectedItems()[0]  } );
-      const formattedData = data.data.data.items[0] //TODO: do it correctly
-      store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.updateAgentSearch(this.getSelectedItems());
-    }else{
-      store.dispatch(updateCurrentAgentData({}));
-      this.props.removeAgentsFilter(true);      
-    }
-  }
-
   async selectAgentAndApply(agentID){
     try{
-      const data = await WzRequest.apiReq('GET', '/agents', {"q" : "id="+agentID } );
-      const formattedData = data.data.data.items[0] //TODO: do it correctly
+      const data = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=' + agentID}});
+      const formattedData = data.data.data.affected_items[0] //TODO: do it correctly
       store.dispatch(updateCurrentAgentData(formattedData));
       this.props.updateAgentSearch([agentID]);
     }catch(error){
@@ -602,9 +580,30 @@ export class AgentSelectionTable extends Component {
     );
   }
 
+  filterGroupBadge = (group) => {
+    const { filters } = this.state;
+    let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
+    if (filters.length > 0) {
+      !auxFilters.includes(group) ? 
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      }) : false;
+    } else {
+      this.setState({
+        filters: [...filters, {field: "q", value: `group=${group}`}],
+      })
+    }
+  }
+
   renderGroups(groups){
     return Array.isArray(groups) ? (
-      <AgentGroupTruncate groups={groups} length={25} label={'more'}/>
+      <GroupTruncate
+        groups={groups}
+        length={20}
+        label={'more'}
+        action={'filter'}
+        filterAction={this.filterGroupBadge}
+        {...this.props} /> 
     ) : groups
   }
 

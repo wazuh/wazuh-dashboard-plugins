@@ -13,8 +13,6 @@ import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
-import { checkAdminMode } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
-import { updateAdminMode } from '../../redux/actions/appStateActions';
 import { AppNavigate } from '../../react-services/app-navigate';
 import chrome from 'ui/chrome';
 
@@ -35,53 +33,36 @@ class WzMenuSettings extends Component {
     }
   }
 
-  async componentDidMount() {
-    try{
-      const adminMode = await checkAdminMode();
-      if(this.props.adminMode !== adminMode){
-        this.props.updateAdminMode(adminMode);
-      };
-    }catch(error){}
-  }
-
-  avaibleSettings() {
-    const {adminMode} = this.props;
+  availableSettings() {
     let auxSettings = {
       settings: { id: 'settings', text: 'Settings' },
       api: { id: 'api', text: 'API configuration' },
       modules: { id: 'modules', text: 'Modules' },
-      sample_data: { id: 'sample_data', text: 'Sample Data' },
+      sample_data: { id: 'sample_data', text: 'Sample data' },
       configuration: { id: 'configuration', text: 'Configuration' },
       logs: { id: 'logs', text: 'Logs' },
       about: { id: 'about', text: 'About' },
     };
-    if (!adminMode) {
-      delete auxSettings.modules;
-      delete auxSettings.sample_data;
-    }
-    return(auxSettings);
+    return (auxSettings);
   }
 
   avaibleRenderSettings() {
-    const {adminMode} = this.props;
-    const avaibleSettings = this.avaibleSettings()
+    const availableSettings = this.availableSettings()
     let auxItems = [
-      this.createItem(avaibleSettings.api),
-      this.createItem(avaibleSettings.configuration),
-      this.createItem(avaibleSettings.logs),
-      this.createItem(avaibleSettings.about),
+      this.createItem(availableSettings.api),
+      this.createItem(availableSettings.modules),
+      this.createItem(availableSettings.sample_data),
+      this.createItem(availableSettings.configuration),
+      this.createItem(availableSettings.logs),
+      this.createItem(availableSettings.about),
     ]
-    if (adminMode) {
-      auxItems.splice(1, 0, this.createItem(avaibleSettings.sample_data));
-      auxItems.splice(1, 0, this.createItem(avaibleSettings.modules));
-    }
-    return(auxItems);
+    return (auxItems);
   }
 
-  clickMenuItem = async(ev,section) => {
+  clickMenuItem = async (ev, section) => {
     this.props.closePopover();
-    AppNavigate.navigateToModule(ev, 'settings', {tab: section} );
-    if(this.props.currentMenuTab === 'settings'){
+    AppNavigate.navigateToModule(ev, 'settings', { tab: section });
+    if (this.props.currentMenuTab === 'settings') {
       const $injector = await chrome.dangerouslyGetActiveInjector();
       const router = $injector.get('$route');
       router.reload();
@@ -94,26 +75,28 @@ class WzMenuSettings extends Component {
       ...data,
       id: item.id,
       name: item.text,
-      isSelected: this.props.state.section === item.id,
-      onClick: () => {},
+      isSelected: window.location.href.includes('/settings') && this.props.state.selected_settings_section === item.id,
+      onClick: () => { },
       onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
     };
   };
 
   render() {
-    const avaibleSettings = this.avaibleSettings()
+    const availableSettings = this.availableSettings()
     const renderSettings = this.avaibleRenderSettings()
     const sideNavAdmin = [
-      this.createItem(avaibleSettings.settings, {
+      {
+        name: availableSettings.settings.text,
+        id: availableSettings.settings.id,
         disabled: true,
         icon: <EuiIcon type="gear" color="primary" />,
         items: renderSettings
-      })
+      }
     ];
 
 
     return (
-      <div className="WzManagementSideMenu" style={{ width: 200}}>
+      <div className="WzManagementSideMenu" style={{ width: 200 }}>
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />
@@ -126,18 +109,10 @@ class WzMenuSettings extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
-    adminMode: state.appStateReducers.adminMode
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    updateAdminMode: adminMode => dispatch(updateAdminMode(adminMode))
+    state: state.appStateReducers,
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
 )(WzMenuSettings);

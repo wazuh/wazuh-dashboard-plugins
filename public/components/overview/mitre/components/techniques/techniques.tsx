@@ -34,12 +34,12 @@ import { ITactic } from '../../';
 import { getServices } from '../../../../../../../../src/plugins/discover/public/kibana_services';
 import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import {WAZUH_ALERTS_PATTERN} from '../../../../../../util/constants';
 import { AppState } from '../../../../../react-services/app-state';
+import { WzFieldSearchDelay } from '../../../../common/search'
 
 export const Techniques = withWindowSize(class Techniques extends Component {
   _isMount = false;
-  timerDelaySearch: ReturnType<typeof setTimeout> | undefined;
-  delaySearchTime: number = 400; // delay time in search bar techniques to do the request. This prevents you from making a request with every change in the search term and wait this time instead after last change
 
   props!: {
     tacticsObject: ITactic
@@ -50,7 +50,6 @@ export const Techniques = withWindowSize(class Techniques extends Component {
 
   state: {
     techniquesCount: {key: string, doc_count: number}[]
-    searchValue: any,
     isFlyoutVisible: Boolean,
     currentTechniqueData: {},
     currentTechnique: string,
@@ -64,7 +63,6 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     super(props);
     
     this.state = {
-      searchValue: "",
       isFlyoutVisible: false,
       currentTechniqueData: {},
       techniquesCount: [],
@@ -102,9 +100,6 @@ export const Techniques = withWindowSize(class Techniques extends Component {
 
   componentWillUnmount() {
     this._isMount = false;
-    if(this.timerDelaySearch){
-      clearTimeout(this.timerDelaySearch);
-    };
   }
 
   async getTechniquesCount() {
@@ -232,7 +227,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
                   </EuiToolTip>
 
                   {this.state.hover === item.id &&
-                    <span style={{float: "right"}}>
+                    <span style={{float: "right", position: 'fixed'}}>
                       <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
                           <EuiIcon onClick={(e) => {this.openDashboard(e,item.id);e.stopPropagation()}} color="primary" type="visualizeApp"></EuiIcon>
                       </EuiToolTip> &nbsp;
@@ -301,7 +296,7 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"
+        "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }
@@ -309,40 +304,32 @@ export const Techniques = withWindowSize(class Techniques extends Component {
     filterManager.addFilters([newFilter]);
   }
 
-  onSearchValueChange = async e => {
-    const searchValue = e.target.value;
-    
-    if(this.timerDelaySearch){
-      clearTimeout(this.timerDelaySearch);
-    };
-    
-    if(searchValue){
-      this.setState({searchValue});
-    }else{
-      this._isMount && this.setState({ searchValue, filteredTechniques: false, isSearching: false });
-      return;
+  onChange = searchValue => {
+    if(!searchValue){
+      this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
     }
+  }
 
-    this.timerDelaySearch = setTimeout(async () => {
-      try{
-        if(searchValue){
-          this._isMount && this.setState({isSearching: true});
-          const response = await WzRequest.apiReq('GET', '/mitre', {
+  onSearch = async searchValue => {
+    try{
+      if(searchValue){
+        this._isMount && this.setState({isSearching: true});
+        const response = await WzRequest.apiReq('GET', '/mitre', {
+          params: {
             select: "id",
             search: searchValue,
             limit: 500
-          });
-          const filteredTechniques = ((((response || {}).data || {}).data).items || []).map(item => item.id);
-          this._isMount && this.setState({ filteredTechniques, isSearching: false });
-        }else{
-          this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
-        }
-      }catch(error){
+          }
+        });
+        const filteredTechniques = ((((response || {}).data || {}).data).affected_items || []).map(item => item.id);
+        this._isMount && this.setState({ filteredTechniques, isSearching: false });
+      }else{
         this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
       }
-    }, this.delaySearchTime); // delay time in search bar techniques to do the request. This prevents you from making a request with every change in the search term and wait this time instead after last change
+    }catch(error){
+      this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+    }
   }
-
   async closeActionsMenu() {
     this.setState({actionsOpen: false});
   }
@@ -395,13 +382,12 @@ export const Techniques = withWindowSize(class Techniques extends Component {
         </EuiFlexGroup>
         <EuiSpacer size="xs" />
 
-        <EuiFieldSearch
+        <WzFieldSearchDelay
           fullWidth={true}
           placeholder="Filter techniques of selected tactic/s"
-          value={this.state.searchValue}
-          onChange={e => this.onSearchValueChange(e)}
+          onChange={this.onChange}
+          onSearch={this.onSearch}
           isClearable={true}
-          isLoading={this.state.isSearching}
           aria-label="Use aria labels when no actual label is in use"
         />
         <EuiSpacer size="s" />

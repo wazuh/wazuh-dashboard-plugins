@@ -14,7 +14,6 @@ import { useState, useEffect} from 'react';
 import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 
 export const useFilterManager = () => {
-    const [filterManager, setFilterManager] = useState();
-    useEffect(() => setFilterManager(getServices().filterManager), [])
+    const [filterManager, setFilterManager] = useState(getServices().filterManager);
     return filterManager;
 }

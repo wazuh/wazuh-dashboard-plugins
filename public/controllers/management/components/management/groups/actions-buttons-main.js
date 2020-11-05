@@ -23,6 +23,7 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button'
 
 import {
   updateLoadingStatus,
@@ -172,7 +173,7 @@ class WzGroupsActionButtons extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv('/agents/groups', filters, 'Groups');
+      await this.exportCsv('/groups', filters, 'Groups');
       this.showToast(
         'success',
         'Success',
@@ -204,17 +205,17 @@ class WzGroupsActionButtons extends Component {
   }
 
   render() {
-    const { adminMode } = this.props;
-
     // Add new group button
     const newGroupButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
         iconSide="left"
         iconType="plusInCircle"
+        permissions={[{action: 'group:create', resource: '*:*:*'}]}
         onClick={() => this.togglePopover()}
       >
         Add new group
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Export button
@@ -240,14 +241,15 @@ class WzGroupsActionButtons extends Component {
 
     return (
       <Fragment>
-        {adminMode && (
-          <EuiFlexItem grow={false}>
-            <EuiPopover
-              id="popover"
-              button={newGroupButton}
-              isOpen={this.state.isPopoverOpen}
-              closePopover={() => this.closePopover()}
-            >
+        <EuiFlexItem grow={false}>
+          <EuiPopover
+            id="popover"
+            button={newGroupButton}
+            isOpen={this.state.isPopoverOpen}
+            closePopover={() => this.closePopover()}
+          >
+          <EuiFlexGroup direction={'column'}>
+            <EuiFlexItem>
               <EuiFormRow label="Introduce the group name" id="">
                 <EuiFieldText
                   className="groupNameInput"
@@ -256,24 +258,23 @@ class WzGroupsActionButtons extends Component {
                   aria-label=""
                 />
               </EuiFormRow>
-              <EuiSpacer size="xs" />
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiButton
-                    iconType="save"
-                    isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
-                    fill
-                    onClick={async () => {
-                      await this.createGroup();
-                    }}
-                  >
-                    Save new group
-                  </EuiButton>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPopover>
-          </EuiFlexItem>
-        )}
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <WzButtonPermissions
+                permissions={[{action: 'group:create', resource: '*:*:*'}]}
+                iconType="save"
+                isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
+                fill
+                onClick={async () => {
+                  await this.createGroup();
+                }}
+              >
+                Save new group
+              </WzButtonPermissions>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          </EuiPopover>
+        </EuiFlexItem>
         <EuiFlexItem grow={false}>{exportButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
       </Fragment>
@@ -283,8 +284,7 @@ class WzGroupsActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 

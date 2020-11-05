@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { checkPluginVersion } from "./utils";
 import 'ui/autoload/all';
 import 'uiExports/visTypes';
 import 'uiExports/visResponseHandlers';
@@ -67,12 +68,12 @@ import './kibana-integrations';
 import './services';
 import './controllers';
 import './factories';
-import './directives';
 
-// Imports to update adminMode when app starts
-import { checkAdminMode } from './controllers/management/components/management/configuration/utils/wz-fetch';
+// Imports to update currentPlatform when app starts
+import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
-import { updateAdminMode } from './redux/actions/appStateActions';
+import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import { WzAuthentication } from './react-services/wz-authentication'
 
 import { getAngularModule } from '../../../src/plugins/discover/public/kibana_services';
 const app = getAngularModule('app/wazuh');
@@ -103,6 +104,7 @@ app.run([
         <div ng-view class="mainView"></div>
         <react-component name="WzMenuWrapper" props=""></react-component>
         <react-component name="WzAgentSelectorWrapper" props=""></react-component>
+        <react-component name="ToastNotificationsModal" props=""></react-component>
        </div>
         `
       )
@@ -110,12 +112,12 @@ app.run([
     changeWazuhNavLogo();
     app.$injector = _$injector;
 
-    // Set adminMode in Redux when app starts.
-    // It prevents the first rendering, which depends on adminMode, from blinking due to a request to the app backend
-    checkAdminMode()
-      .then(adminMode => {
-        store.dispatch(updateAdminMode(adminMode))
-      })
-      .catch(() => {/* Do nothing if it fails */ })
+    // Set currentSecurity platform in Redux when app starts.
+    checkCurrentSecurityPlatform().then((item) => {
+      store.dispatch(updateCurrentPlatform(item))
+    }).catch(() => {})
+
+    // Init the process of refreshing the user's token when app start.
+    checkPluginVersion().finally(WzAuthentication.refresh);
   }
 ]);

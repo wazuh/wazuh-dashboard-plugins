@@ -31,7 +31,8 @@ export class WzStatusNodeInfo extends Component {
   }
 
   render() {
-    const { nodeInfo, selectedNode } = this.props.state;
+    const { stats, nodeInfo, selectedNode, clusterEnabled } = this.props.state;
+    const agentsNodeCount = clusterEnabled ? (stats.agentsCount.find(node => node.node_name === selectedNode) || {}).count || 0 : stats.agentsCountTotal;
     const title = selectedNode
       ? selectedNode + ' information'
       : 'Manager information';
@@ -70,6 +71,10 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>Installation type</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.type}</EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>Agents</EuiFlexItem>
+          <EuiFlexItem style={greyStyle}>{agentsNodeCount}</EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
     );

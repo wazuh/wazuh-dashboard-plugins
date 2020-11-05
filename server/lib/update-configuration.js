@@ -47,9 +47,10 @@ export class UpdateConfigurationFile {
     try {
       const data = fs.readFileSync(this.file, { encoding: 'utf-8' });
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
+      const formatedValue = this.formatValue(value);
       const result = exists
-        ? data.replace(re, `${key}: ${value}`)
-        : `${data}\n${key}: ${value}`;
+        ? data.replace(re, `${key}: ${formatedValue}`)
+        : `${data}\n${key}: ${formatedValue}`;
       fs.writeFileSync(this.file, result, 'utf8');
       log('update-configuration:updateLine', 'Updating line', 'debug');
       return true;
@@ -59,6 +60,15 @@ export class UpdateConfigurationFile {
     }
   }
 
+  formatValue = (value) => typeof value === 'string'
+    ? isNaN(Number(value)) ? `'${value}'` : value
+    : typeof value === 'object' 
+      ? JSON.stringify(value)
+      : value
+
+  formatValueCachedConfiguration = (value) => typeof value === 'string'
+    ? isNaN(Number(value)) ? value : Number(value)
+    : value;
   /**
    * Updates wazuh.yml file. If it fails, it throws the error to the next function.
    * @param {Object} input
@@ -69,23 +79,23 @@ export class UpdateConfigurationFile {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
+      
       const configuration = getConfiguration(true) || {};
-      const adminUndefined = !Object.keys(configuration).includes('admin');
-      const adminIsTrue = configuration.admin;
 
-      if (!adminUndefined && !adminIsTrue) {
-        throw new Error('You are not authorized to update the configuration');
-      }
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
+      
+      // Update the app configuration server-cached setting in memory with the new value
+      configuration[key] = this.formatValueCachedConfiguration(value);
+      
       this.busy = false;
       log(
         'update-configuration:updateConfiguration',
         'Updating configuration',
         'debug'
       );
-      return { 
-        needRestart: needRestartFields.includes(key), 
+      return {
+        needRestart: needRestartFields.includes(key),
         needReload: newReloadFields.includes(key)
       };
     } catch (error) {

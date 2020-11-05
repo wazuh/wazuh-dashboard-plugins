@@ -13,9 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import {} from '@elastic/eui';
-
-import WzNoConfig from '../util-components/no-config';
+import WzNoConfig from "../util-components/no-config";
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
@@ -45,7 +43,7 @@ class WzConfigurationAmazonS3Services extends Component {
     return (
       <Fragment>
         {currentConfig &&
-        !wodleConfig['aws-s3'] /*&& !currentConfig['aws-s3'].services*/ && (
+        (!wodleConfig['aws-s3'] || (wodleConfig['aws-s3'] && !wodleConfig['aws-s3'].services)) && (
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && (

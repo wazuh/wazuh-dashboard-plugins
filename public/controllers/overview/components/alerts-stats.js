@@ -20,6 +20,7 @@ import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plug
 import { esFilters } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
 import '../../../../public/less/loader';
+import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
 import { AppState } from '../../../react-services/app-state';
 
 
@@ -91,7 +92,7 @@ class AlertsStats extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"
+        "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }

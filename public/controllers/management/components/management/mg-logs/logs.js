@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Component what renders Management/Logs
+ * Copyright (C) 2015-2020 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGroup,
@@ -5,8 +16,6 @@ import {
   EuiSelect,
   EuiSwitch,
   EuiSpacer,
-  EuiFieldSearch,
-  EuiButton,
   EuiPage,
   EuiPageBody,
   EuiCodeBlock,
@@ -15,19 +24,29 @@ import {
   EuiTextColor,
   EuiProgress,
   EuiCallOut,
-  EuiIcon,
-  EuiLoadingSpinner
+  EuiButtonEmpty
 } from '@elastic/eui';
-import 'brace/mode/less';
-import 'brace/theme/github';
-import { ApiRequest } from '../../../../../react-services/api-request';
-import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../../../redux/store';
+import 'brace/mode/less';	
+import 'brace/theme/github';	
+import exportCsv from '../../../../../react-services/wz-csv';
+import { toastNotifications } from 'ui/notify';
+import { WzRequest } from '../../../../../react-services/wz-request';
+import { withUserAuthorizationPrompt, withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import { compose } from 'redux';
+import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';
 
-export default class WzLogs extends Component {
+export default compose(
+  withGlobalBreadcrumb([
+    { text: '' },
+    { text: 'Management', href: '/app/wazuh#/manager' },
+    { text: 'Logs' }
+  ]),
+  withUserAuthorizationPrompt([{action: 'cluster:status', resource: '*:*:*'}, {action: 'cluster:read', resource: 'node:id:*'}])
+)
+(class WzLogs extends Component {
   constructor(props) {
     super(props);
-    this.offset = 325;
+    this.offset = 350;
     this.state = {
       isCluster: false,
       selectedDaemon: '',
@@ -54,17 +73,7 @@ export default class WzLogs extends Component {
     this.forceUpdate();
   };
 
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '/app/wazuh#/manager' },
-      { text: 'Logs' }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
   async componentDidMount() {
-    this.setGlobalBreadcrumb();
     this.height = window.innerHeight - this.offset;
     window.addEventListener('resize', this.updateHeight);
     this.setState({ isLoading: true });
@@ -83,13 +92,14 @@ export default class WzLogs extends Component {
       logsPath,
       loadingLogs: false,
       nodeList
+    }, async () => {
+      await this.setFullLogs();
+      this.setState({
+        isLoading: false
+      });
     });
 
-    await this.setFullLogs();
 
-    this.setState({
-      isLoading: false
-    });
   }
 
   componentWillUnmount() {
@@ -100,12 +110,15 @@ export default class WzLogs extends Component {
   async initDaemonsList(logsPath) {
     try {
       const path = logsPath + '/summary';
-      const data = await ApiRequest.request('GET', path, {});
-      const formattedData = ((data || {}).data || {}).data || {};
-      const daemonsList = [...['all'], ...Object.keys(formattedData)];
+      const data = await WzRequest.apiReq('GET', path, {});
+      const formattedData = (((data || {}).data || {}).data || {}).affected_items;
+      const daemonsList = [...['all']];
+      for (const daemon of formattedData) {
+        daemonsList.push(Object.keys(daemon)[0]);
+      }
       this.setState({ daemonsList });
     } catch (err) {
-      throw new Error('Error obtaining daemons list.');
+      return Promise.reject('Error obtaining daemons list.');
     } // eslint-disable-line
   }
 
@@ -131,9 +144,9 @@ export default class WzLogs extends Component {
       result['offset'] = customOffset;
     }
     if (this.state.logLevelSelect !== 'all')
-      result['type_log'] = this.state.logLevelSelect;
+      result['level'] = this.state.logLevelSelect;
     if (this.state.selectedDaemon !== 'all')
-      result['category'] = this.state.selectedDaemon;
+      result['tag'] = this.state.selectedDaemon;
     if (this.state.appliedSearch) result['search'] = this.state.appliedSearch;
     if (this.state.descendingSort) result['sort'] = '+timestamp';
     else result['sort'] = '-timestamp';
@@ -147,31 +160,31 @@ export default class WzLogs extends Component {
     let totalItems = 0;
     if (this.state.selectedNode) {
       try {
-        const tmpResult = await ApiRequest.request(
+        const tmpResult = await WzRequest.apiReq(
           'GET',
           logsPath,
-          this.buildFilters(customOffset)
+          { params: this.buildFilters(customOffset) }
         );
-        const resultItems = ((tmpResult || {}).data.data || {}).items;
-        totalItems = ((tmpResult || {}).data.data || {}).totalItems;
+        const resultItems = ((tmpResult || {}).data.data || {}).affected_items;
+        totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (err) {
         result = '';
-        throw new Error('Error obtaining logs.');
+        return Promise.reject('Error obtaining logs.');
       }
     } else {
       try {
-        const tmpResult = await ApiRequest.request(
+        const tmpResult = await WzRequest.apiReq(
           'GET',
           logsPath,
-          this.buildFilters(customOffset)
+          { params: this.buildFilters(customOffset) }
         );
-        const resultItems = ((tmpResult || {}).data.data || {}).items;
-        totalItems = ((tmpResult || {}).data.data || {}).totalItems;
+        const resultItems = ((tmpResult || {}).data.data || {}).affected_items;
+        totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (err) {
         result = '';
-        throw new Error('Error obtaining logs');
+        return Promise.reject('Error obtaining logs');
       }
     }
     this.setState({ totalItems });
@@ -179,8 +192,12 @@ export default class WzLogs extends Component {
   }
 
   async setFullLogs() {
-    const result = await this.getFullLogs();
-    this.setState({ logsList: result, offset: 0 });
+    try{
+      const result = await this.getFullLogs();
+      this.setState({ logsList: result, offset: 0 });
+    }catch(error){
+      
+    }
   }
 
   /**
@@ -188,7 +205,7 @@ export default class WzLogs extends Component {
    */
   async getLogsPath() {
     try {
-      const clusterStatus = await ApiRequest.request(
+      const clusterStatus = await WzRequest.apiReq(
         'GET',
         '/cluster/status',
         {}
@@ -200,16 +217,16 @@ export default class WzLogs extends Component {
       if (clusterEnabled) {
         let nodeList = '';
         let selectedNode = '';
-        const nodeListTmp = await ApiRequest.request(
+        const nodeListTmp = await WzRequest.apiReq(
           'GET',
           '/cluster/nodes',
           {}
         );
         if (
-          Array.isArray((((nodeListTmp || {}).data || {}).data || {}).items)
+          Array.isArray((((nodeListTmp || {}).data || {}).data || {}).affected_items)
         ) {
-          nodeList = nodeListTmp.data.data.items;
-          selectedNode = nodeListTmp.data.data.items.filter(
+          nodeList = nodeListTmp.data.data.affected_items;
+          selectedNode = nodeListTmp.data.data.affected_items.filter(
             item => item.type === 'master'
           )[0].name;
         }
@@ -220,7 +237,7 @@ export default class WzLogs extends Component {
         };
       }
     } catch (error) {
-      throw new Error('Error obtaining logs path.');
+      return Promise.reject('Error obtaining logs path.');
     }
 
     return { nodeList: '', logsPath: '/manager/logs', selectedNode: '' };
@@ -240,11 +257,12 @@ export default class WzLogs extends Component {
   getLogLevelOptions() {
     return [
       { value: 'all', text: 'All log levels' },
-      { value: 'INFO', text: 'Info' },
-      { value: 'ERROR', text: 'Error' },
-      { value: 'WARNING', text: 'Warning' },
-      { value: 'CRITICAL', text: 'Critical' },
-      { value: 'DEBUG', text: 'Debug' }
+      { value: 'info', text: 'Info' },
+      { value: 'error', text: 'Error' },
+      { value: 'warning', text: 'Warning' },
+      { value: 'critical', text: 'Critical' },
+      { value: 'debug', text: 'Debug' },
+      { value: 'debug2', text: 'Debug2'}
     ];
   }
 
@@ -259,7 +277,7 @@ export default class WzLogs extends Component {
         return false;
       }
     } catch (err) {
-      throw new Error('Error obtaining list of nodes.');
+      return Promise.reject('Error obtaining list of nodes.');
     }
   }
 
@@ -302,7 +320,7 @@ export default class WzLogs extends Component {
 
   onSearchBarChange = e => {
     this.setState({
-      searchBarValue: e.target.value
+      searchBarValue: e
     });
   };
 
@@ -332,6 +350,29 @@ export default class WzLogs extends Component {
     this.setState({ realTime: !this.state.realTime }, this.setRealTimeInterval);
   }
 
+  showToast = (color, title, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      toastLifeTimeMs: time,
+    });
+  }
+
+  exportFormatted = async () => {
+    try {
+      this.showToast('success', 'Your download should begin automatically...', 3000);
+      const filters = this.buildFilters();
+      await exportCsv(
+        this.state.selectedNode ? `/cluster/${this.state.selectedNode}/logs` : '/manager/logs',
+        Object.keys(filters).map(filter => ({name: filter, value: filters[filter]})),
+        `wazuh-${this.state.selectedNode ? `${this.state.selectedNode}-` : ''}ossec-log`
+        );
+        return;
+    } catch (error) {
+      this.showToast('danger', error, 3000);
+    }
+  }
+
   header() {
     const daemonsOptions = this.getDaemonsOptions();
     const logLevelOptions = this.getLogLevelOptions();
@@ -345,6 +386,15 @@ export default class WzLogs extends Component {
               <h2>Logs</h2>
             </EuiTitle>
           </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty iconType="importAction" onClick={this.exportFormatted}>
+                  Export formatted
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
@@ -354,72 +404,65 @@ export default class WzLogs extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <EuiSelect
-              id="filterDaemon"
-              options={daemonsOptions}
-              value={this.state.selectedDaemon}
-              onChange={this.onDaemonChange}
-              aria-label="Filter by daemon"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiSelect
-              id="filterLogLevel"
-              options={logLevelOptions}
-              value={this.state.logLevelSelect}
-              onChange={this.onLogLevelChange}
-              aria-label="Filter by log level"
-            />
-          </EuiFlexItem>
-          {this.state.selectedNode && (
-            <EuiFlexItem grow={false}>
-              <EuiSelect
-                id="selectNode"
-                options={nodeList}
-                value={this.state.selectedNode}
-                onChange={this.onSelectNode}
-                aria-label="Select node"
-              />
-            </EuiFlexItem>
-          )}
-          <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
-            <EuiSwitch
-              label="Descending sort"
-              checked={this.state.descendingSort}
-              onChange={this.onSortSwitchChange}
-            />
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiSelect
+                  id="filterDaemon"
+                  options={daemonsOptions}
+                  value={this.state.selectedDaemon}
+                  onChange={this.onDaemonChange}
+                  aria-label="Filter by daemon"
+                />
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiSelect
+                  id="filterLogLevel"
+                  options={logLevelOptions}
+                  value={this.state.logLevelSelect}
+                  onChange={this.onLogLevelChange}
+                  aria-label="Filter by log level"
+                />
+              </EuiFlexItem>
+              {this.state.selectedNode && (
+                <EuiFlexItem grow={false}>
+                  <EuiSelect
+                    id="selectNode"
+                    options={nodeList}
+                    value={this.state.selectedNode}
+                    onChange={this.onSelectNode}
+                    aria-label="Select node"
+                  />
+                </EuiFlexItem>
+              )}
+              <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
+                <EuiSwitch
+                  label="Descending sort"
+                  checked={this.state.descendingSort}
+                  onChange={this.onSortSwitchChange}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
+                <EuiSwitch
+                  label="Realtime"
+                  checked={this.state.realTime}
+                  onChange={() => this.switchRealTime()}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size={'s'}></EuiSpacer>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiFieldSearch
-              fullWidth={true}
-              placeholder="Filter logs..."
-              value={this.state.searchBarValue}
+            <WzFieldSearch
+              searchDelay={500}
               onChange={this.onSearchBarChange}
               onSearch={this.onSearchBarSearch}
-              aria-label="Filter logs..."
+              placeholder="Filter logs"
+              aria-label="Filter logs"
+              fullWidth
             />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton onClick={() => this.makeSearch()}>Search</EuiButton>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            {(!this.state.realTime && (
-              <EuiButton onClick={() => this.switchRealTime()} iconType="play">
-                Play realtime
-              </EuiButton>
-            )) || (
-              <EuiButton
-                onClick={() => this.switchRealTime()}
-                color="danger"
-                iconType="stop"
-              >
-                Stop realtime
-              </EuiButton>
-            )}
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
@@ -442,33 +485,31 @@ export default class WzLogs extends Component {
       <div>
         {(this.state.logsList && (
           <Fragment>
-            <EuiCodeBlock
-              fontSize="s"
-              paddingSize="m"
-              color="dark"
-              overflowHeight={this.height}
-            >
-              {this.state.logsList}
-            </EuiCodeBlock>
+            <div className='code-block-log-viewer-container'>
+              <EuiCodeBlock
+                fontSize="s"
+                paddingSize="m"
+                color="dark"
+                overflowHeight={this.height}
+              >
+                {this.state.logsList}
+              </EuiCodeBlock>
+            </div>
             <EuiSpacer size="m" />
-            {(this.state.offset + 100 < this.state.totalItems &&
-              !this.state.loadingLogs && (
-                <p
-                  className="wz-load-extra"
-                  onClick={() => this.loadExtraLogs()}
-                >
-                  {' '}
-                  <EuiIcon type="refresh" />
-                  &nbsp; Click here to load more logs.
-                </p>
-              )) ||
-              (this.state.loadingLogs && (
-                <p className="wz-load-extra">
-                  {' '}
-                  <EuiLoadingSpinner size="m" />
-                  &nbsp; Loading...
-                </p>
-              ))}
+            {(this.state.offset + 100 < this.state.totalItems && (
+              <EuiFlexGroup justifyContent='center'>
+                <EuiFlexItem grow={false} style={{marginTop: 0, marginBottom: 0}}>
+                  <EuiButtonEmpty
+                    iconType='refresh'
+                    isLoading={this.state.loadingLogs}
+                    isDisabled={this.state.loadingLogs}
+                    onClick={!this.state.loadingLogs ? () => this.loadExtraLogs() : undefined}
+                  >
+                    Load more logs
+                  </EuiButtonEmpty>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            ))}
           </Fragment>
         )) || (
           <EuiCallOut
@@ -485,7 +526,7 @@ export default class WzLogs extends Component {
     return (
       <EuiPage>
         <EuiPageBody>
-          <EuiPanel>
+          <EuiPanel paddingSize="l">
             {this.header()}
             <EuiSpacer size={'m'}></EuiSpacer>
             {(!this.state.isLoading && this.logsTable()) || (
@@ -501,4 +542,4 @@ export default class WzLogs extends Component {
       </EuiPage>
     );
   }
-}
+})

@@ -13,8 +13,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import {} from '@elastic/eui';
-
 import WzConfigurationSettingsHeader from './configuration-settings-header';
 import WzCodeEditor from './code-editor';
 import { getJSON, getXML } from '../utils/utils';

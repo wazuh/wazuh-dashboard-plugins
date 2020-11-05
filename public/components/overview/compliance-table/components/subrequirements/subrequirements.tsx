@@ -31,6 +31,7 @@ import { getServices } from '../../../../../../../../src/plugins/discover/public
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout'
+import { WAZUH_ALERTS_PATTERN } from '../../../../../../util/constants';
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -71,7 +72,7 @@ export class ComplianceSubrequirements extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"
+        "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }
@@ -177,7 +178,7 @@ export class ComplianceSubrequirements extends Component {
                 </EuiToolTip>
 
                 {this.state.hover === item.id &&
-                  <span style={{ float: "right" }}>
+                  <span style={{ float: "right", position: 'fixed' }}>
                     <EuiToolTip position="top" content={"Show " + item.id + " in Dashboard"} >
                       <EuiIcon onMouseDown={(e) => { this.openDashboard(e, item.id); e.stopPropagation() }} color="primary" type="visualizeApp"></EuiIcon>
                     </EuiToolTip> &nbsp;

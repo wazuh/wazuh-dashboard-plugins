@@ -66,7 +66,7 @@ export class ApiIsDown extends Component {
       for (let idx in entries) {
         const entry = entries[idx];
         try {
-          const data = await this.props.testApi(entry);
+          const data = await this.props.testApi(entry, true); // token refresh is forced
           const clusterInfo = data.data || {};
           const id = entries[idx].id;
           entries[idx].status = 'online';
@@ -110,8 +110,8 @@ hosts:
     - production:
         url: http://172.16.1.2
         port: 55000
-        user: foo
-        password: bar
+        username: wazuh
+        password: wazuh
 `;
 
     const checkConnectionChildren = (
@@ -210,11 +210,11 @@ hosts:
           <div>
             <EuiText>For Systemd</EuiText>
             <EuiSpacer />
-            <EuiCode>$ sudo systemctl status wazuh-api</EuiCode>
+            <EuiCode>$ sudo systemctl status wazuh-manager</EuiCode>
             <EuiSpacer />
             <EuiText>For SysV Init</EuiText>
             <EuiSpacer />
-            <EuiCode>$ sudo service wazuh-api status</EuiCode>
+            <EuiCode>$ sudo service wazuh-manager status</EuiCode>
           </div>
         )
       },

@@ -14,14 +14,18 @@ import {
   EuiBasicTable,
   EuiCallOut,
   EuiOverlayMask,
-  EuiConfirmModal
+  EuiConfirmModal,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
 import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
+import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 
 import {
   updateLoadingStatus,
@@ -40,20 +44,7 @@ import GroupsColums from './utils/columns-main';
 class WzGroupsTable extends Component {
   _isMounted = false;
 
-  suggestions = [
-    {
-      type: 'q', label: 'name', description: 'Filter by group name', operators: ['=', '!=', '~'], values: async (value) => {
-        const result = await WzRequest.apiReq('GET', `/agents/groups`,
-          {
-            limit: 30,
-            ...(value ? { search: value } : {}),
-          })
-        return (((result || {}).data || {}).data || {}).items.map((item) => { return item['name'] });
-      },
-    },
-    { type: 'q', label: 'count', description: 'Filter by number of agents', operators: ['=', '!=', '<', '>'], values: [] },
-
-  ]
+  suggestions = []; //TODO: Fix suggestions without q search for API 4.0
 
   constructor(props) {
     super(props);
@@ -105,12 +96,12 @@ class WzGroupsTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
-      const { items, totalItems } = ((rawItems || {}).data || {}).data;
+      const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
+      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
 
-      this._isMounted && this.setState({
-        items,
-        totalItems,
+      this.setState({
+        items : affected_items,
+        totalItems : total_affected_items
       });
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
@@ -182,7 +173,7 @@ class WzGroupsTable extends Component {
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
-        onClick: () => this.props.updateGroupDetail(item)
+        onClick: !WzUserPermissions.checkMissingUserPermissions([{action: 'group:read', resource: `group:id:${item.name}`}],this.props.userPermissions) ? () => this.props.updateGroupDetail(item) : undefined
       };
     };
 
@@ -195,7 +186,10 @@ class WzGroupsTable extends Component {
         <WzSearchBar
           filters={filters}
           suggestions={this.suggestions}
-          onFiltersChange={(filters) => this._isMounted && this.setState({ filters })} />
+          onFiltersChange={(filters) => this._isMounted && this.setState({ filters })}
+          placeholder='Search group'
+        />
+        <EuiSpacer size='s' />
         <EuiBasicTable
           itemId="id"
           items={items}
@@ -262,8 +256,7 @@ class WzGroupsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 
@@ -284,7 +277,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+export default compose(
+  connect(mapStateToProps,mapDispatchToProps),
+  withUserPermissions
 )(WzGroupsTable);

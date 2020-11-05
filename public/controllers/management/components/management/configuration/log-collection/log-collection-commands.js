@@ -11,7 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -36,9 +35,11 @@ const mainSettings = [
   {
     field: 'target',
     label: 'Redirect output to this socket',
-    render: renderValueOrDefault('agent')
+    render: renderTargetField
   }
 ];
+
+const renderTargetField = item => item ? item.join(', ') : 'agent';
 
 class WzConfigurationLogCollectionCommands extends Component {
   constructor(props) {
@@ -54,11 +55,8 @@ class WzConfigurationLogCollectionCommands extends Component {
             [
               'file',
               'alias',
-              'command',
-              item =>
-                `${item.logformat}${
-                  item.targetStr ? ` - ${item.targetStr}` : ''
-                }`
+              'commnad', 
+              (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`
             ]
           )
         : [];

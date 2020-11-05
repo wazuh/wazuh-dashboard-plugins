@@ -74,6 +74,7 @@ import { ModulesHelper } from '../components/common/modules/modules-helper';
 ///////////
 import { validateTimeRange } from '../../../../src/plugins/discover/public/application/helpers/validate_time_range';
 import {
+  fieldFormats,
   esFilters,
   indexPatterns as indexPatternsUtils,
   connectToQueryState,
@@ -83,6 +84,7 @@ import {
   UI_SETTINGS,
 } from '../../../../src/plugins/data/public';
 import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
+import { WAZUH_ALERTS_PATTERN } from '../../util/constants';
 import {
   DEFAULT_COLUMNS_SETTING,
   SAMPLE_SIZE_SETTING,
@@ -503,7 +505,7 @@ function discoverController(
                         negate: true,
                         params: { query: '000' },
                         type: 'phrase',
-                        index: AppState.getCurrentPattern() || "wazuh-alerts-3.x-*"
+                        index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
                       },
                       query: { match_phrase: { 'agent.id': '000' } },
                       $state: { store: 'appState' }
@@ -1040,13 +1042,9 @@ function discoverController(
 
   $scope.$watch('fetchStatus', () => {
     if ($scope.fetchStatus !== fetchStatuses.UNINITIALIZED) {
-      if ($scope.fetchStatus === fetchStatuses.LOADING) {
-        setTimeout(() => {
-          modulesHelper.hideCloseButtons();
-        }, $scope.tabView === 'inventory' ? 500 : 100);
-      } else {
-        modulesHelper.activeNoImplicitsFilters();
-      }
+      setTimeout(() => {
+        modulesHelper.hideCloseButtons();
+      },  100);
     }
   });
 

@@ -13,10 +13,12 @@ import fs from 'fs';
 import path from 'path';
 import { log } from '../logger';
 
+const OPTIMIZE_WAZUH_PATH = '../../../../optimize/wazuh';
+
 export class UpdateRegistry {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../server/wazuh-registry.json');
+    this.file = path.join(__dirname, `${OPTIMIZE_WAZUH_PATH}/config/wazuh-registry.json`);
   }
 
   /**
@@ -24,11 +26,7 @@ export class UpdateRegistry {
    */
   async readContent() {
     try {
-      log(
-        'update-registry:readContent',
-        'Reading wazuh-registry.json content',
-        'debug'
-      );
+      log('update-registry:readContent', 'Reading wazuh-registry.json content', 'debug');
       const content = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       return JSON.parse(content);
     } catch (error) {
@@ -72,11 +70,7 @@ export class UpdateRegistry {
    */
   async writeContent(content) {
     try {
-      log(
-        'update-registry:writeContent',
-        'Writting wazuh-registry.json content',
-        'debug'
-      );
+      log('update-registry:writeContent', 'Writting wazuh-registry.json content', 'debug');
       if (this.busy) {
         throw new Error('Another process is updating the registry file');
       }
@@ -112,16 +106,11 @@ export class UpdateRegistry {
   async migrateToRegistry(id, clusterInfo, clusterExtensions) {
     try {
       const content = await this.readContent();
-      if (!Object.keys(content).includes('hosts'))
-        Object.assign(content, { hosts: {} });
+      if (!Object.keys(content).includes('hosts')) Object.assign(content, { hosts: {} });
       const info = { cluster_info: clusterInfo, extensions: clusterExtensions };
       content.hosts[id] = info;
       await this.writeContent(content);
-      log(
-        'update-registry:migrateToRegistry',
-        `API ${id} was properly migrated`,
-        'debug'
-      );
+      log('update-registry:migrateToRegistry', `API ${id} was properly migrated`, 'debug');
       return info;
     } catch (error) {
       log('update-registry:migrateToRegistry', error.message || error);
@@ -192,16 +181,12 @@ export class UpdateRegistry {
   }
 
   /**
-   * Compare the hosts from wazuh.yml and the host in the wazuh-registry.file in order to remove the orphan registry register
+   * Compare the hosts from wazuh.yml and the host in the wazuh-registry.json file in order to remove the orphan registry register
    * @param {Array} hosts
    */
   async removeOrphanEntries(hosts) {
     try {
-      log(
-        'update-registry:removeOrphanEntries',
-        'Checking orphan registry entries',
-        'debug'
-      );
+      log('update-registry:removeOrphanEntries', 'Checking orphan registry entries', 'debug');
       const entries = await this.getHosts();
       const hostsKeys = hosts.map(h => {
         return h.id;
@@ -213,6 +198,41 @@ export class UpdateRegistry {
       await this.removeHostEntries(diff);
     } catch (error) {
       log('update-registry:removeOrphanEntries', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Returns the token information associated to an API id
+   * @param {String} id
+   */
+  async getTokenById(id) {
+    try {
+      if (!id) throw new Error('API id is missing');
+      const hosts = await this.getHosts();
+      return hosts[id] ? hosts[id].token || null : null;
+    } catch (error) {
+      log('update-registry:getTokenById', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Updates the token in the registry
+   * @param {String} id
+   * @param {String} token
+   */
+  async updateTokenByHost(id, token) {
+    try {
+      const content = await this.readContent();
+      // Checks if not exists in order to create
+      if (!content.hosts[id]) content.hosts[id] = {};
+      content.hosts[id].token = token;
+      await this.writeContent(content);
+      log('update-registry:updateToken', `API ${id} information was properly updated`, 'debug');
+      return id;
+    } catch (error) {
+      log('update-registry:updateToken', error.message || error);
       return Promise.reject(error);
     }
   }

@@ -13,8 +13,13 @@ import {
 } from '@elastic/eui';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 import { AppState } from '../../../react-services/app-state';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import store from '../../../redux/store';
+import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
+import { withUserAuthorizationPrompt } from '../../common/hocs/withUserAuthorization';
+import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../util/constants';
 
-export default class EnableModules extends Component {
+export class EnableModulesWrapper extends Component {
   constructor(props) {
     super(props);
     this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
@@ -65,6 +70,7 @@ export default class EnableModules extends Component {
   }
 
   async componentDidMount() {
+    store.dispatch(updateSelectedSettingsSection('modules'));
     const extensions = await AppState.getExtensions(this.currentApi);
     this.setState({ extensions });
   }
@@ -157,4 +163,13 @@ export default class EnableModules extends Component {
       );
     });
   }
+}
+
+const WzEnableModulesWithAdministrator = withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])(EnableModulesWrapper);
+export function EnableModules() {
+  return(
+    <WzReduxProvider>
+      <WzEnableModulesWithAdministrator />
+    </WzReduxProvider>
+  );
 }

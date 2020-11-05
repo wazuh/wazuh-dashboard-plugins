@@ -30,6 +30,7 @@ import {
 
 import StatusHandler from './utils/status-handler';
 import { toastNotifications } from 'ui/notify';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzStatusActionButtons extends Component {
   _isMounted = false;
@@ -106,11 +107,11 @@ class WzStatusActionButtons extends Component {
       this.props.updateSelectedNode(node);
 
       const daemons = await this.statusHandler.clusterNodeStatus(node);
-      const listDaemons = this.objToArr(daemons.data.data);
+      const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
       this.props.updateListDaemons(listDaemons);
 
       const nodeInfo = await this.statusHandler.clusterNodeInfo(node);
-      this.props.updateNodeInfo(nodeInfo.data.data);
+      this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
 
       this.props.updateLoadingStatus(false);
     } catch (error) {
@@ -164,7 +165,6 @@ class WzStatusActionButtons extends Component {
       clusterEnabled,
       isRestarting
     } = this.props.state;
-    const { adminMode } = this.props;
 
     let options = this.transforToOptions(listNodes);
 
@@ -182,7 +182,9 @@ class WzStatusActionButtons extends Component {
 
     // Restart button
     const restartButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[clusterEnabled ? {action: 'cluster:restart', resource: 'node:id:*'} : {action: 'manager:restart', resource: '*:*:*'}]}
         iconType="refresh"
         onClick={async () => this.setState({ isModalVisible: true })}
         isDisabled={isLoading}
@@ -190,7 +192,7 @@ class WzStatusActionButtons extends Component {
       >
         {clusterEnabled && 'Restart cluster'}
         {!clusterEnabled && 'Restart manager'}
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     let modal;
@@ -223,7 +225,7 @@ class WzStatusActionButtons extends Component {
 
     return (
       <Fragment>
-        {adminMode && selectedNode !== null && (
+        {selectedNode !== null && (
           <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>
         )}
         {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
@@ -235,8 +237,7 @@ class WzStatusActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.statusReducers
   };
 };
 

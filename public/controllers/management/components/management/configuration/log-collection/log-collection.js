@@ -11,9 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-
-import {} from '@elastic/eui';
 
 import WzTabSelector, {
   WzTabSelectorTab
@@ -39,10 +36,10 @@ class WzConfigurationLogCollection extends Component {
               ...currentConfig['logcollector-localfile'],
               'localfile-logs': currentConfig[
                 'logcollector-localfile'
-              ].localfile.filter(item => item.file),
+              ].localfile.filter(item => typeof item.file !== 'undefined'), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
               'localfile-commands': currentConfig[
                 'logcollector-localfile'
-              ].localfile.filter(item => item.command)
+              ].localfile.filter(item => typeof item.file === 'undefined')
             }
           }
         : currentConfig;

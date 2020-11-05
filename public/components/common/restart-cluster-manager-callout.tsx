@@ -70,6 +70,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
       this.showToast('success', `${data.restarted === 'cluster' ? 'Restarting cluster, it will take up to 30 seconds.': 'Manager was restarted'}`)
     }catch(error){
       this.setState({ warningRestarting: false });
+      this.props.updateWazuhNotReadyYet(false);
       this.props.onRestartedError();
       this.showToast('danger', 'Error', error.message || error );
     }

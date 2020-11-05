@@ -54,36 +54,26 @@ class WzDecoderInfo extends Component {
         sortable: true
       },
       {
-        field: 'file',
+        field: 'filename',
         name: 'File',
         align: 'left',
         sortable: true,
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink
-                onClick={async () => {
-                  const noLocal = item.path.startsWith('ruleset/');
-                  const result = await this.rulesetHandler.getDecoderContent(
-                    value,
-                    noLocal
-                  );
-                  const file = {
-                    name: value,
-                    content: result,
-                    path: item.path
-                  };
-                  this.props.updateFileContent(file);
-                }}
-              >
-                {value}
-              </EuiLink>
+              <EuiLink onClick={async () => {
+                const noLocal = item.relative_dirname.startsWith('ruleset/');
+                const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
+                const file = { name: value, content: result, path: item.relative_dirname };
+                this.props.updateFileContent(file);
+              }
+              }>{value}</EuiLink>
             </EuiToolTip>
           );
         }
       },
       {
-        field: 'path',
+        field: 'relative_dirname',
         name: 'Path',
         align: 'left',
         sortable: true
@@ -114,23 +104,23 @@ class WzDecoderInfo extends Component {
         </EuiFlexItem>
         <EuiFlexItem key="file">
           <b style={{ paddingBottom: 6 }}>File</b>
-          <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
-            <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field: 'file', value: file}])}
-            >
-              {file}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+              <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'filename', value: file}])}>
+                &nbsp;{file}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiFlexItem key="path">
           <b style={{ paddingBottom: 6 }}>Path</b>
-          <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
-            <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{field: 'path', value: path}])}
-            >
-              {path}
-            </EuiLink>
-          </EuiToolTip>
+          <span>
+            <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+              <EuiLink onClick={async () => this.setNewFiltersAndBack([{field:'relative_dirname', value: path}])}>
+                &nbsp;{path}
+              </EuiLink>
+            </EuiToolTip>
+          </span>
         </EuiFlexItem>
         <EuiSpacer size="s" />
       </EuiFlexGrid>
@@ -223,16 +213,11 @@ class WzDecoderInfo extends Component {
 
   render() {
     const { decoderInfo, isLoading } = this.props.state;
-    const currentDecoder =
-      this.state && this.state.currentDecoder
-        ? this.state.currentDecoder
-        : decoderInfo.current;
-    const decoders = decoderInfo.items;
-    const currentDecoderArr = decoders.filter(r => {
-      return r.name === currentDecoder;
-    });
+    const currentDecoder = (this.state && this.state.currentDecoder) ? this.state.currentDecoder : decoderInfo.current;
+    const decoders = decoderInfo.affected_items;
+    const currentDecoderArr = decoders.filter(r => { return r.name === currentDecoder });
     const currentDecoderInfo = currentDecoderArr[0];
-    const { position, details, file, name, path } = currentDecoderInfo;
+    const { position, details, filename, name, relative_dirname } = currentDecoderInfo;
     const columns = this.columns;
 
     const onClickRow = item => {
@@ -281,7 +266,7 @@ class WzDecoderInfo extends Component {
                     paddingSize="none"
                     initialIsOpen={true}>
                     <div className='flyout-row details-row'>
-                      {this.renderInfo(position, file, path)}
+                      {this.renderInfo(position, filename, relative_dirname)}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>

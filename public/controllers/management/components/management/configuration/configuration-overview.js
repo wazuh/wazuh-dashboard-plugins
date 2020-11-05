@@ -30,6 +30,7 @@ import configurationSettingsGroup from './configuration-settings';
 
 import { connect } from 'react-redux';
 import { isString, isFunction } from './utils/utils';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 const columns = [
   {
@@ -114,27 +115,26 @@ class WzConfigurationOverview extends Component {
                   <WzRefreshClusterInfoButton />
                 </EuiFlexItem>
               )}
-              {this.props.agent.id === '000' && this.props.adminMode && (
+              {this.props.agent.id === '000' && (
                 <EuiFlexItem>
-                  <EuiButtonEmpty
+                  <WzButtonPermissions
+                    buttonType='empty'
+                    permissions={[this.props.clusterNodeSelected ? {action: 'cluster:read_file', resource: `node:id:${this.props.clusterNodeSelected}`}: {action: 'manager:read_file', resource: 'file:path:/etc/ossec.conf'}]}
                     iconSide="left"
                     iconType="pencil"
                     onClick={() =>
                       this.updateConfigurationSection(
                         'edit-configuration',
-                        `${
-                          this.props.clusterNodeSelected ? 'Cluster' : 'Manager'
-                        } configuration`,
+                        `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`,
                         '',
                         'Edit configuration'
-                      )
-                    }
+                      )}
                   >
                     Edit configuration
-                  </EuiButtonEmpty>
+                  </WzButtonPermissions>
                 </EuiFlexItem>
               )}
-              {this.props.agent.id !== '000' && this.props.agent.status === 'Active' && (
+              {this.props.agent.id !== '000' && this.props.agent.status === 'active' && (
                 <EuiFlexItem>
                   <ExportConfiguration
                     agent={this.props.agent}
@@ -178,8 +178,7 @@ class WzConfigurationOverview extends Component {
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  adminMode: state.appStateReducers.adminMode
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);

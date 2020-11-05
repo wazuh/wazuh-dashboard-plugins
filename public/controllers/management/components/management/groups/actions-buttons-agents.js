@@ -166,11 +166,7 @@ class WzGroupsActionButtonsAgents extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(
-        `/agents/groups/${this.props.state.itemDetail.name}`,
-        filters,
-        'Groups'
-      );
+      await this.exportCsv(`/groups/${this.props.state.itemDetail.name}/agents`, filters, 'Groups');
       this.showToast(
         'success',
         'Success',
@@ -198,7 +194,6 @@ class WzGroupsActionButtonsAgents extends Component {
   };
 
   render() {
-    const { adminMode } = this.props;
 
     // Add new group button
     const manageAgentsButton = (
@@ -246,9 +241,7 @@ class WzGroupsActionButtonsAgents extends Component {
 
     return (
       <Fragment>
-        {adminMode && (
-          <EuiFlexItem grow={false}>{manageAgentsButton}</EuiFlexItem>
-        )}
+        <EuiFlexItem grow={false}>{manageAgentsButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{exportPDFButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{exportCSVButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
@@ -259,8 +252,7 @@ class WzGroupsActionButtonsAgents extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers,
-    adminMode: state.appStateReducers.adminMode
+    state: state.groupsReducers
   };
 };
 

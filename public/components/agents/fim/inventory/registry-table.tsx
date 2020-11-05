@@ -70,7 +70,7 @@ export class RegistryTable extends Component {
     await this.getSyscheck();
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
-    this.setState({totalItems: this.props.totalItems});
+    this.setState({ totalItems: this.props.totalItems });
     if (match && match[0]) {
       const file = match[0].split('=')[1];
       this.showFlyout(decodeURIComponent(file), true);
@@ -96,13 +96,17 @@ export class RegistryTable extends Component {
         return item.file === file;
       })
     } else {
-      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, { 'file': file });
-      fileData = ((response.data || {}).data || {}).items || [];
+      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
+        params: {
+          'file': file
+        }
+      });
+      fileData = ((response.data || {}).data || {}).affected_items || [];
     }
     if (!redirect)
       window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
-    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item}));
+    this.setState({ isFlyoutVisible: false }, () => this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item }));
   }
 
   async getSyscheck() {
@@ -111,17 +115,17 @@ export class RegistryTable extends Component {
       const syscheck = await WzRequest.apiReq(
         'GET',
         `/syscheck/${agentID}`,
-        this.buildFilter()
+        { params: this.buildFilter() }
       );
 
       this.setState({
-        syscheck: (((syscheck || {}).data || {}).data || {}).items || {},
-        totalItems: (((syscheck || {}).data || {}).data || {}).totalItems - 1,
+        syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},
+        totalItems: (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
         isLoading: false,
         error: undefined,
       });
     } catch (error) {
-      this.setState({error, isLoading: false})
+      this.setState({ error, isLoading: false })
     }
   }
 
@@ -234,13 +238,13 @@ export class RegistryTable extends Component {
             onClick={() => this.closeFlyout()}
           >
             <FlyoutDetail
-            fileName={this.state.currentFile.file}
-            agentId={this.props.agent.id}
-            item={this.state.syscheckItem}
-            closeFlyout={() => this.closeFlyout()}
-            type='registry'
-            view='inventory'
-            {...this.props} />
+              fileName={this.state.currentFile.file}
+              agentId={this.props.agent.id}
+              item={this.state.syscheckItem}
+              closeFlyout={() => this.closeFlyout()}
+              type='registry'
+              view='inventory'
+              {...this.props} />
           </EuiOverlayMask>
         )}
       </div>

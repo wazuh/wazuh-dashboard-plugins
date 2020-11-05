@@ -10,12 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { useWindowSize } from './useWindowSize';
+export { useFilterManager } from './use-filter-manager';
 
 export { useIndexPattern } from './use-index-pattern';
 
-export { useFilterManager } from './use-filter-manager';
+export { useKbnLoadingIndicator } from './use-kbn-loading-indicator';
+
+export { useQuery } from './use-query';
 
 export { useTimeFilter } from './use-time-filter';
 
-export { useQuery } from './use-query';
+export { useWindowSize } from './useWindowSize';
+
+export { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsPrivate } from './useUserPermissions';
+
+export { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from './useUserRoles';

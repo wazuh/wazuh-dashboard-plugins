@@ -254,7 +254,7 @@ export class MitreTopTactics extends Component {
             implicitFilters={[ {"agent.id": this.props.agentId} ] }
             agentId={this.props.agentId}
             onChangeFlyout={this.onChangeFlyout}
-            currentTechnique={selectedTechnique}/>
+            currentTechnique={selectedTechnique} />
         </EuiOverlayMask>}
       </Fragment>
     )
