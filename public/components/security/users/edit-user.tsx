@@ -18,8 +18,8 @@ import { useApiRequest } from '../../common/hooks/useApiRequest';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzRequest } from '../../../react-services/wz-request';
 
-export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) => {
-    const userRolesFormatted = userRoles && userRoles.length ? userRoles.map(item => { return { label: rolesObject[item], id:item } }) : [];
+export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
+    const userRolesFormatted = currentUser.roles && currentUser.roles.length ? currentUser.roles.map(item => { return { label: rolesObject[item], id:item } }) : [];
     const [selectedRoles, setSelectedRole] = useState(userRolesFormatted);
     const [rolesParams, setRoleParams] = useState({});
     const [rolesLoading, roles, rolesError] = useApiRequest('GET', '/security/roles', rolesParams);
@@ -52,8 +52,8 @@ export const EditUser = ({ currentUser, closeFlyout, userRoles, rolesObject }) =
         }
         const ruleId = (userRules[0] || {}).id || false;
         if(ruleId){
-            const toAdd = formattedRoles.filter(value => !userRoles.includes(value));
-            const toRemove = userRoles.filter(value => !formattedRoles.includes(value));
+            const toAdd = formattedRoles.filter(value => !currentUser.roles.includes(value));
+            const toRemove = currentUser.roles.filter(value => !formattedRoles.includes(value));
             await Promise.all(toAdd.map(async (role) => {  
                 const data = await WzRequest.apiReq(
                     'POST',

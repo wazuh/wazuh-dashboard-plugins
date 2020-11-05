@@ -1,15 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
     EuiInMemoryTable,
     EuiBadge,
     EuiFlexGroup,
     EuiLoadingSpinner,
-    EuiFlexItem
+    EuiFlexItem,
+    EuiBasicTableColumn,
+    SortDirection
 } from '@elastic/eui';
 
-export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, relationUserRole}) => {
-    
+export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles}) => {
     const getRowProps = item => {
         const { id } = item;
         return {
@@ -18,39 +19,32 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, relati
         };
       };
     
-    const columns = [
+    const columns: EuiBasicTableColumn<any>[] = [
         {
-            field: 'user',
+            field: 'username',
             name: 'User',
             sortable: true,
             truncateText: true,
         },
         {
-            field: 'full_name',
-            name: 'Full name',
+            field: 'allow_run_as',
+            name: 'Allow run as ',
             sortable: true,
             truncateText: true,
         },
         {
-            field: 'email',
-            name: 'Email',
-            sortable: true,
-            truncateText: true,
-        },
-        {
-            field: 'user',
+            field: 'roles',
             name: 'Roles',
             dataType: 'boolean',
-            render: (user) => {
+            render: (userRoles) => {
                 if(rolesLoading){
                     return <EuiLoadingSpinner size="m" />
                 }
-                const userRoles = relationUserRole[user];
                 if(!userRoles || !userRoles.length) return <></>;
-                const tmpRoles = userRoles.map(role => {
-                    return <EuiFlexItem grow={false}><EuiBadge color="secondary">{roles[role]}</EuiBadge></EuiFlexItem>;
+                const tmpRoles = userRoles.map((userRole, idx) => {
+                    return <EuiFlexItem grow={false} key={idx}><EuiBadge color="secondary">{roles[userRole]}</EuiBadge></EuiFlexItem>;
                 });
-                return <EuiFlexGroup
+                return <EuiFlexGroup                    
                     wrap
                     responsive={false}
                     gutterSize="xs">
@@ -64,7 +58,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, relati
     const sorting = {
         sort: {
             field: 'roles',
-            direction: 'desc',
+            direction: SortDirection.DESC,
         },
     };
 
