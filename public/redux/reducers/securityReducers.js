@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React Components to some utilities.
- *
+ * Wazuh app - Security Reducers
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,6 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
- export { AgentGroupTruncate, GroupTruncate} from './agent-group-truncate';
- export { TruncateHorizontalComponents } from './truncate-horizontal-components/truncate-horizontal-components';
- export { GroupingComponents } from './grouping-components';
+const initialState = { selected_security_section: '' };
+
+const securityReducers = (state = initialState, action) => {
+  if (action.type === 'UPDATE_SECURITY_SECTION') {
+    return {
+      ...state,
+      selected_security_section: action.section
+    };
+  }
+
+  return state;
+};
+
+export default securityReducers;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   EuiPage,
   EuiFlexGroup,
@@ -16,6 +17,7 @@ import { RolesMapping } from './roles-mapping/roles-mapping';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../common/hocs';
 import { compose } from 'redux';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
+import { updateSecuritySection } from '../../redux/actions/securityActions';
 
 const tabs = [
   {
@@ -45,6 +47,8 @@ export const WzSecurity = compose(
   withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
   withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(() => {
+  const dispatch = useDispatch();
+
   // Get the initial tab when the component is initiated
   const securityTabRegExp = new RegExp(`tab=(${tabs.map(tab => tab.id).join('|')})`);
   const tab = window.location.href.match(securityTabRegExp);
@@ -61,9 +65,13 @@ export const WzSecurity = compose(
     return () => window.removeEventListener('popstate', listenerLocationChanged);
   });
 
+  useEffect(() => {
+    dispatch(updateSecuritySection(selectedTabId));
+  })
+
   const onSelectedTabChanged = id => {
     window.location.href = window.location.href.replace(`tab=${selectedTabId}`, `tab=${id}`);
-    setSelectedTabId(id);
+    setSelectedTabId(id);    
   };
 
   const renderTabs = () => {

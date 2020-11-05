@@ -224,26 +224,22 @@ export function Initialize(server) {
         // Create the app registry file for the very first time
         saveConfiguration();
       } else {
-        // App registry file exists, just update it
-        const currentDate = new Date().toISOString();
-
         // If this function fails, it throws an exception
         const source = JSON.parse(fs.readFileSync(wazuhRegistry, 'utf8'));
 
         // Check if the stored revision differs from the package.json revision
-        const isNewApp = packageJSON.revision !== source.revision;
+        const isUpgradedApp = packageJSON.revision !== source.revision || packageJSON.version !== source['app-version'];
 
-        // If it's an app with a different revision, it's a new installation
-        source['installationDate'] = isNewApp
-          ? currentDate
-          : source['installationDate'];
-
-        source['app-version'] = packageJSON.version;
-        source.revision = packageJSON.revision;
-        source.lastRestart = currentDate;
-
-        // If this function fails, it throws an exception
-        fs.writeFileSync(wazuhRegistry, JSON.stringify(source), 'utf-8');
+        // Rebuild the registry file if revision or version fields are differents
+        if (isUpgradedApp) { 
+          log(
+            'initialize[checkwazuhRegistry]',
+            'Wazuh app revision or version changed, regenerating wazuh-version registry',
+            'info'
+          );
+          // Rebuild registry file in blank
+          saveConfiguration();
+        }
       }
     } catch (error) {
       return Promise.reject(error);

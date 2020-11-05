@@ -173,6 +173,6 @@ hosts:
   - default:
      url: https://localhost
      port: 55000
-     username: wazuh-wui
-     password: wazuh-wui
+     username: wazuh
+     password: wazuh
 `
