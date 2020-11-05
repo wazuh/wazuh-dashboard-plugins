@@ -32,12 +32,14 @@ if (IS_DARK_THEME) {
 
   newSS = document.createElement('link');
   newSS.rel = 'stylesheet';
-  newSS.href = '../plugins/wazuh/less/7.9.0/index.dark.css';
+  newSS.type = 'text/css';
+  newSS.src = '../plugins/wazuh/less/7.9.0/index.dark.min.css';
   document.getElementsByTagName('head')[0].appendChild(newSS);
 }else{
   let newSS = document.createElement('link');
   newSS.rel = 'stylesheet';
-  newSS.href = '../plugins/wazuh/less/7.9.0/index.light.css';
+  newSS.type = 'text/css';
+  newSS.src = '../plugins/wazuh/less/7.9.0/index.light.min.css';
   document.getElementsByTagName('head')[0].appendChild(newSS);
 }
 /* eslint-enable no-undef */

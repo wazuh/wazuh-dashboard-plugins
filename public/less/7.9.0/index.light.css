@@ -1088,12 +1088,6 @@ table th i.fa-sort-up {
 .truncate-by-height {
   overflow: hidden; }
 
-/*!
- * ui-select
- * http://github.com/angular-ui/ui-select
- * Version: 0.19.5 - 2016-10-24T23:13:59.551Z
- * License: MIT
- */
 /* Style when highlighting a search. */
 .ui-select-highlight {
   font-weight: bold; }
