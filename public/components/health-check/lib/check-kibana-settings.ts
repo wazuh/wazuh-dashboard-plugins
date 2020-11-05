@@ -31,6 +31,6 @@ async function updateMetaFieldsSetting(isModified:boolean) {
   return !isModified && await GenericRequest.request(
     'POST',
     '/api/kibana/settings',
-    {"changes":{"metaFields":["_source"]}}
+    {"changes":{"metaFields":[]}}
   );
 }
