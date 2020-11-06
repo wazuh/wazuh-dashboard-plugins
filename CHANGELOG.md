@@ -2,6 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4007
+
+### Fixed
+
+- updated macOS package URL [#2596](https://github.com/wazuh/wazuh-kibana-app/pull/2596)
+- Revert "[4.0-7.9] [BUGFIX] Removed unnecessary function call" [#2597](https://github.com/wazuh/wazuh-kibana-app/pull/2597)
+
 ## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4006
 
 ### Fixed
