@@ -109,6 +109,7 @@ export class Metrics extends Component {
     this.indexPattern = await getIndexPattern();
     this.scope = await this.modulesHelper.getDiscoverScope();
     this._isMount = true;
+    this.buildMetric();
   }
 
   async getResults(filterParams, aggs = {}){
