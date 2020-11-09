@@ -1,4 +1,3 @@
-
 /*
  * Wazuh app - Update User Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -11,16 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { IUpdateUser, IUser } from '../interfaces/user.interface';
+import { UpdateUser, User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const UpdateUserService = async (userId: number, user: IUpdateUser): Promise<IUser> => {
+const UpdateUserService = async (userId: number, user: UpdateUser): Promise<User> => {
   const response = await WzRequest.apiReq(
-    'POST',
+    'PUT',
     `/security/users/${userId}`,
     user
-  ) as IApiResponse<IUser>;
+  ) as IApiResponse<User>;
   const users = response.data?.data?.affected_items || [{}];
   return users[0];
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   EuiPageContent,
@@ -12,7 +11,7 @@ import {
 } from '@elastic/eui';
 import { UsersTable } from './users-table';
 
-import { WazuhSecurity } from '../../../factories/wazuh-security'
+import { CreateUser } from './create-user';
 import { EditUser } from './edit-user';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -20,8 +19,9 @@ import { withGuard } from '../../common/hocs';
 import { PromptNoSecurityPluginUsers } from './prompt-no-security-plugin';
 import UsersServices from './services';
 import RolesServices from '../roles/services';
-import RulesServices from '../rules/services';
-import { IUser } from './interfaces/user.interface';
+import { User } from './types/user.type';
+import { useApiService } from '../../common/hooks/useApiService';
+import { Role } from '../roles/types/role.type';
 
 const mapStateToProps = state => ({ currentPlatform: state.appStateReducers.currentPlatform });
 
@@ -37,32 +37,34 @@ export const Users = compose(
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
   const [isCreateFlyoutVisible, setIsCreateFlyoutVisible] = useState(false);
   const [editingUser, setEditingUser] = useState({});
-  const [users, setUsers] = useState(Array<any>());
-  const [rolesLoading, setRolesLoading] = useState(true);
-  const [roles, setRoles] = useState({});
+  const [users, setUsers] = useState([] as User[]);
+  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
   const [securityError, setSecurityError] = useState(false);
-
-  const loadRoles = async () => {
-    const roles = await RolesServices.GetRoles();
-    const rolesObject = roles.reduce((rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }), {});
-    setRoles(rolesObject);
-    setRolesLoading(false);
-  }
+  const [rolesObject, setRolesObject] = useState({})
 
   const getUsers = async () => {
-    try {
-      const users = await UsersServices.GetUsers();
-      setUsers(users);
-      loadRoles();
-    } catch (error) {
+    const _users = await UsersServices.GetUsers()
+    .catch(error => {
+      setUsers([]);
       setSecurityError(true);
-    }
+    });
+
+    setUsers(_users as User[]);
   }
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    if (!rolesLoading && roles?.length) {
+      const _rolesObject = roles.reduce((rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }), {});
+      setRolesObject(_rolesObject);
+    }
+    if (rolesError) {
+      setSecurityError(true);
+    }
+  }, [rolesLoading]);
 
+  useEffect(() => {
+    getUsers();
+  }, [])
 
   let editFlyout, createFlyout;
   const closeEditFlyout = async () => {
@@ -89,17 +91,17 @@ export const Users = compose(
       <EuiOverlayMask
         headerZindexLocation="below"
         onClick={() => { setIsEditFlyoutVisible(false) }}>
-        <EditUser currentUser={editingUser} closeFlyout={closeEditFlyout} rolesObject={roles} />
+        <EditUser currentUser={editingUser} closeFlyout={closeEditFlyout} rolesObject={rolesObject} />
       </EuiOverlayMask >
     );
   }
 
   if (isCreateFlyoutVisible) {
-    editFlyout = (
+    createFlyout = (
       <EuiOverlayMask
         headerZindexLocation="below"
         onClick={() => { setIsCreateFlyoutVisible(false) }}>
-        <EditUser currentUser={editingUser} closeFlyout={closeCreateFlyout} rolesObject={roles} />
+        <CreateUser closeFlyout={closeCreateFlyout} />
       </EuiOverlayMask >
     );
   }
@@ -128,7 +130,7 @@ export const Users = compose(
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
-        <UsersTable users={users} editUserFlyover={showEditFlyover} rolesLoading={rolesLoading} roles={roles}></UsersTable>
+        <UsersTable users={users} editUserFlyover={showEditFlyover} rolesLoading={rolesLoading} roles={rolesObject}></UsersTable>
       </EuiPageContentBody>
       {editFlyout}
     </EuiPageContent>

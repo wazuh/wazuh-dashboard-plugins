@@ -1,4 +1,3 @@
-
 /*
  * Wazuh app - Delete Users Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -11,11 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { IUser } from '../interfaces/user.interface';
+import { User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const DeleteUsersService = async (userIds: Array<number>): Promise<Array<IUser>> => {
+const DeleteUsersService = async (userIds: number[]): Promise<User[]> => {
 
   const response = await WzRequest.apiReq(
     'DELETE',
@@ -23,7 +22,7 @@ const DeleteUsersService = async (userIds: Array<number>): Promise<Array<IUser>>
     {
       users_ids: userIds.join(',')
     }
-  ) as IApiResponse<IUser>;
+  ) as IApiResponse<User>;
   const users = response.data?.data?.affected_items || [];
   return users;
 };

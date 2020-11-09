@@ -13,14 +13,14 @@ import IApiResponse from '../../../../react-services/interfaces/api-response.int
  */
 
 import { WzRequest } from '../../../../react-services/wz-request';
-import { IRule } from '../interfaces/rule.interface';
+import { Rule } from '../types/rule.type';
 
-const GetRulesService = async (): Promise<Array<IRule>> => {
+const GetRulesService = async (): Promise<Rule[]> => {
   const response = await WzRequest.apiReq(
     'GET',
     '/security/rules',
     {}
-  ) as IApiResponse<IRule>;
+  ) as IApiResponse<Rule>;
   const rules =  response.data?.data?.affected_items || [];
   return rules;
 };

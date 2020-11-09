@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Create User Service
+ * Wazuh app - Delete User Roles Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { CreateUser, User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
+import { User } from '../types/user.type';
 
-const CreateUserService = async (user: CreateUser): Promise<User> => {
+const DeleteUserRolesService = async (userId: number, roles: number[], removeAll: boolean): Promise<User> => {
   const response = await WzRequest.apiReq(
-    'POST',
-    '/security/users',
-    user
+    'DELETE',
+    `/security/users/${userId}/roles?role_ids=${removeAll ? 'all' : roles.join(',')}`,
+    {}
   ) as IApiResponse<User>;
   const users = response.data?.data?.affected_items || [{}];
   return users[0];
 };
 
-export default CreateUserService;
+export default DeleteUserRolesService;

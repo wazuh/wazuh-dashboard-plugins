@@ -1,5 +1,3 @@
-
-import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 /*
  * Wazuh app - Get Users Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -12,16 +10,17 @@ import IApiResponse from '../../../../react-services/interfaces/api-response.int
  * Find more information about this on the LICENSE file.
  */
 
-import { IUser } from '../interfaces/user.interface';
+import { User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
+import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const GetUsersService = async (): Promise<Array<IUser>> => {
+const GetUsersService = async (): Promise<User[]> => {
   const response = await WzRequest.apiReq(
     'GET',
     '/security/users',
     {}
-  ) as IApiResponse<IUser>;
-  const users =  response.data?.data?.affected_items || [];
+  ) as IApiResponse<User>;
+  const users = response.data?.data?.affected_items || [];
   return users;
 };
 

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     EuiButton,
     EuiTitle,
@@ -10,33 +10,42 @@ import {
     EuiFlexItem,
     EuiFormRow,
     EuiSpacer,
-    EuiBadge,
     EuiComboBox,
     EuiSwitch,
     EuiFieldPassword,
+    EuiText,
+    EuiFieldText,
 } from '@elastic/eui';
 
 import { useApiService } from '../../../components/common/hooks/useApiService';
 import { Role } from '../roles/types/role.type';
-import { UpdateUser } from './types/user.type';
+import { CreateUser as TCreateUser } from './types/user.type';
 import UsersServices from './services';
 import RolesServices from '../roles/services';
 import { ErrorHandler } from '../../../react-services/error-handler';
 
 
-export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
-    const userRolesFormatted = currentUser.roles && currentUser.roles.length ? currentUser.roles.map(item => ({ label: rolesObject[item], id: item })) : [];
-    const [selectedRoles, setSelectedRole] = useState(userRolesFormatted);
+export const CreateUser = ({ closeFlyout }) => {
+    const [selectedRoles, setSelectedRole] = useState<any>([]);
     const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
     const rolesOptions = roles ? roles.map(item => { return { label: item.name, id: item.id } }) : [];
 
     const [isLoading, setIsLoading] = useState(false);
-    const [updatePassword, setUpdatePassword] = useState(false);
+    const [userName, setUserName] = useState('');
+    const [userNameError, setUserNameError] = useState<null | string>(null);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState<null | string>(null);
     const [confirmPassword, setConfirmPassword] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState<null | string>(null);
-    const [allowRunAs, setAllowRunAs] = useState<boolean>(currentUser.allow_run_as);
+    const [allowRunAs, setAllowRunAs] = useState<boolean>(false);
+
+    useEffect(() => {
+        let error: null | string = null;
+        if (userName.length > 0 && !userName.match(/^.{4,20}$/)) {
+            error = 'The user name must contain a length between 4 and 20 characters.';
+        }
+        setUserNameError(error);
+    }, [userName]);
 
     useEffect(() => {
         let error: null | string = null;
@@ -54,23 +63,18 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
         setConfirmPasswordError(error);
     }, [confirmPassword, password]);
 
-    const updateRoles = async () => {
+    const addRoles = async (userId) => {
         const formattedRoles = selectedRoles.map(item => {
             return item.id;
         });
-
-        if (formattedRoles.sort((a, b) => a > b).join(',') === userRolesFormatted.map(role => role.id).sort((a, b) => a > b).join(','))
-            return;
-
-        await UsersServices.DeleteUserRoles(currentUser.id, [], true);
         if (formattedRoles.length > 0)
-            await UsersServices.AddUserRoles(currentUser.id, formattedRoles);
+            await UsersServices.AddUserRoles(userId, formattedRoles);
     };
 
     const isValidForm = () => {
         let error = false;
-        error = (updatePassword && (password === '' || confirmPassword === ''));
-        error = error || !!(passwordError || confirmPasswordError);
+        error = !!(userName === '')
+        error = error || (password === '' || confirmPassword === '');
         return !error;
     };
 
@@ -82,20 +86,17 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
         setIsLoading(true);
 
-        const userData: UpdateUser = {
+        const userData: TCreateUser = {
+            username: userName,
+            password: password,
             allow_run_as: allowRunAs
         };
 
-        if (updatePassword) {
-            userData.password = password;
-        }
         try {
-            await Promise.all([
-                UsersServices.UpdateUser(currentUser.id, userData),
-                updateRoles()
-            ])
+            const user = await UsersServices.CreateUser(userData)
+            await addRoles(user.id);
 
-            ErrorHandler.info('User was successfully updated');
+            ErrorHandler.info('User was successfully created');
             closeFlyout(false)
         } catch (error) {
             ErrorHandler.handle(error, "There was an error");
@@ -106,6 +107,10 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     const onChangeRoles = selectedRoles => {
         setSelectedRole(selectedRoles);
     };
+
+    const onChangeUserName = e => {
+        setUserName(e.target.value);
+    }
 
     const onChangePassword = e => {
         setPassword(e.target.value);
@@ -119,29 +124,56 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
         setAllowRunAs(e.target.checked);
     }
 
-    const onChangeUpdatePassword = e => {
-        const checked = e.target.checked;
-        if (!checked) {
-            setPassword('');
-            setConfirmPassword('');
-        }
-        setUpdatePassword(checked);
-    }
-
     return (
 
         <EuiFlyout
             onClose={() => closeFlyout()}>
             <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">
-                    <h2>Edit {currentUser.user} user &nbsp; &nbsp;
-                    {currentUser.user === 'elastic' || currentUser.user === 'admin' &&
-                            <EuiBadge color='primary'>Reserved</EuiBadge>
-                        }</h2>
+                    <h2>Create new user</h2>
                 </EuiTitle>
             </EuiFlyoutHeader>
             <EuiFlyoutBody>
                 <EuiForm component="form" style={{ padding: 24 }}>
+                    <EuiFormRow label="User name"
+                        isInvalid={!!userNameError}
+                        error={userNameError}
+                        helpText="Introduce a the user name for the user.">
+                        <EuiFieldText
+                            placeholder="User name"
+                            value={userName}
+                            onChange={e => onChangeUserName(e)}
+                            aria-label=""
+                            isInvalid={!!userNameError}
+                            required
+                        />
+                    </EuiFormRow>
+                    <EuiFormRow label="Password"
+                        isInvalid={!!passwordError}
+                        error={passwordError}
+                        helpText="Introduce a new password for the user.">
+                        <EuiFieldPassword
+                            placeholder="Password"
+                            value={password}
+                            onChange={e => onChangePassword(e)}
+                            aria-label=""
+                            isInvalid={!!passwordError}
+                            required
+                        />
+                    </EuiFormRow>
+                    <EuiFormRow label="Confirm Password"
+                        isInvalid={!!confirmPasswordError}
+                        error={confirmPasswordError}
+                        helpText="Confirm the new password.">
+                        <EuiFieldPassword
+                            placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={e => onChangeConfirmPassword(e)}
+                            aria-label=""
+                            isInvalid={!!confirmPasswordError}
+                            required
+                        />
+                    </EuiFormRow>
                     <EuiFormRow label="Allow run as"
                         helpText="Set if the user is able to use run as">
                         <EuiSwitch
@@ -154,7 +186,6 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                     </EuiFormRow>
                     <EuiFormRow label="Roles"
                         helpText="Assign roles to the selected user">
-
                         <EuiComboBox
                             placeholder="Select roles"
                             options={rolesOptions}
@@ -166,45 +197,9 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                         />
                     </EuiFormRow>
                     <EuiSpacer />
-                    <EuiSwitch
-                        label="Update user password"
-                        onChange={e => onChangeUpdatePassword(e)}
-                        checked={updatePassword}
-                        aria-label="">
-                    </EuiSwitch>
-                    {updatePassword && <Fragment>
-                        <EuiSpacer />
-                        <EuiFormRow label="Password"
-                            isInvalid={!!passwordError}
-                            error={passwordError}
-                            helpText="Introduce a new password for the user.">
-                            <EuiFieldPassword
-                                placeholder="Password"
-                                value={password}
-                                onChange={e => onChangePassword(e)}
-                                aria-label=""
-                                isInvalid={!!passwordError}
-                                required={updatePassword}
-                            />
-                        </EuiFormRow>
-                        <EuiFormRow label="Confirm Password"
-                            isInvalid={!!confirmPasswordError}
-                            error={confirmPasswordError}
-                            helpText="Confirm the new password.">
-                            <EuiFieldPassword
-                                placeholder="Confirm Password"
-                                value={confirmPassword}
-                                onChange={e => onChangeConfirmPassword(e)}
-                                aria-label=""
-                                isInvalid={!!confirmPasswordError}
-                                required={updatePassword}
-                            />
-                        </EuiFormRow>
-                    </Fragment>}
-                    <EuiSpacer />
                     <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                            <EuiButton fill isLoading={isLoading} isDisabled={currentUser.user === 'elastic' || currentUser.user === 'admin'} onClick={editUser}>
+                            <EuiButton fill isLoading={isLoading} onClick={editUser}>
                                 Apply
                             </EuiButton>
                         </EuiFlexItem>
