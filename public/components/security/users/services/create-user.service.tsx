@@ -20,7 +20,7 @@ const CreateUserService = async (user: CreateUser): Promise<User> => {
     '/security/users',
     user
   ) as IApiResponse<User>;
-  const users = response.data?.data?.affected_items || [{}];
+  const users = ((response.data || {}).data || {}).affected_items || [{}];
   return users[0];
 };
 

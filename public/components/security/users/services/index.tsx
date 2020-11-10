@@ -3,7 +3,7 @@ import CreateUser from './create-user.service';
 import UpdateUser from './update-user.service';
 import DeleteUsers from './delete-users.service';
 import AddUserRoles from './add-user-roles.service';
-import DeleteUserRoles from './delete-user-roles.service';
+import RemoveUserRoles from './remove-user-roles.service';
 
 export default {
     GetUsers,
@@ -11,5 +11,5 @@ export default {
     UpdateUser,
     DeleteUsers,
     AddUserRoles,
-    DeleteUserRoles,
+    RemoveUserRoles,
 };

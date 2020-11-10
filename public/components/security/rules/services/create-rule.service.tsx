@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Get Users Service
+ * Wazuh app - Create Rule Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { User } from '../types/user.type';
+import { CreateRule, Rule } from '../types/rule.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const GetUsersService = async (): Promise<User[]> => {
+const CreateRuleService = async (rule: CreateRule): Promise<Rule> => {
   const response = await WzRequest.apiReq(
-    'GET',
-    '/security/users',
-    {}
-  ) as IApiResponse<User>;
-  const users = ((response.data || {}).data || {}).affected_items || [];
-  return users;
+    'POST',
+    '/security/rules',
+    rule
+  ) as IApiResponse<Rule>;
+  const rules = ((response.data || {}).data || {}).affected_items || [{}];
+  return rules[0];
 };
 
-export default GetUsersService;
+export default CreateRuleService;

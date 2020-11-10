@@ -20,7 +20,7 @@ const AddUserRolesService = async (userId: number, roles: number[]): Promise<Use
     `/security/users/${userId}/roles?role_ids=${roles.join(',')}`,
     {}
   ) as IApiResponse<User>;
-  const users = response.data?.data?.affected_items || [{}];
+  const users = ((response.data || {}).data || {}).affected_items || [{}];
   return users[0];
 };
 

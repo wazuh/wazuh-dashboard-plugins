@@ -21,7 +21,7 @@ const GetRolesService = async (): Promise<Role[]> => {
     '/security/roles',
     {}
   ) as IApiResponse<Role>;
-  const roles =  response.data?.data?.affected_items || [];
+  const roles =  ((response.data || {}).data || {}).affected_items || [];
   return roles;
 };
 

@@ -4,3 +4,10 @@ export type Rule = {
   rule: any;
   roles: number[];
 }
+
+export type UpdateRule = {
+  name: string;
+  rule: any;  
+}
+
+export type CreateRule = UpdateRule;

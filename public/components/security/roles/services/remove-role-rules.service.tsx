@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Get Users Service
+ * Wazuh app - Remove Role Rules Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
+import { Role } from '../types/role.type';
 
-const GetUsersService = async (): Promise<User[]> => {
+const RemoveRoleRulesService = async (roleId: number, rulesIds: number[], removeAll: boolean = false): Promise<Role> => {
   const response = await WzRequest.apiReq(
-    'GET',
-    '/security/users',
+    'DELETE',
+    `/security/roles/${roleId}/rules?rule_ids=${removeAll ? 'all' : rulesIds.join(',')}`,
     {}
-  ) as IApiResponse<User>;
-  const users = ((response.data || {}).data || {}).affected_items || [];
-  return users;
+  ) as IApiResponse<Role>;
+  const roles = ((response.data || {}).data || {}).affected_items || [{}];
+  return roles[0];
 };
 
-export default GetUsersService;
+export default RemoveRoleRulesService;

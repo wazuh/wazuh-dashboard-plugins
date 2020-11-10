@@ -14,16 +14,14 @@ import { User } from '../types/user.type';
 import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const DeleteUsersService = async (userIds: number[]): Promise<User[]> => {
+const DeleteUsersService = async (userIds: number[], deleteAll: boolean = false): Promise<User[]> => {
 
   const response = await WzRequest.apiReq(
     'DELETE',
-    `/security/users/`,
-    {
-      users_ids: userIds.join(',')
-    }
+    `/security/users?user_ids=${deleteAll ? 'all' : userIds.join(',')}`,
+    {}
   ) as IApiResponse<User>;
-  const users = response.data?.data?.affected_items || [];
+  const users = ((response.data || {}).data || {}).affected_items || [];
   return users;
 };
 

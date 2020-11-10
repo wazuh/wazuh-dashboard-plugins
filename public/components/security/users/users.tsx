@@ -9,14 +9,14 @@ import {
   EuiOverlayMask,
   EuiEmptyPrompt
 } from '@elastic/eui';
-import { UsersTable } from './users-table';
+import { UsersTable } from './components/users-table';
 
-import { CreateUser } from './create-user';
-import { EditUser } from './edit-user';
+import { CreateUser } from './components/create-user';
+import { EditUser } from './components/edit-user';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuard } from '../../common/hocs';
-import { PromptNoSecurityPluginUsers } from './prompt-no-security-plugin';
+import { PromptNoSecurityPluginUsers } from './components/prompt-no-security-plugin';
 import UsersServices from './services';
 import RolesServices from '../roles/services';
 import { User } from './types/user.type';
@@ -53,8 +53,8 @@ export const Users = compose(
   }
 
   useEffect(() => {
-    if (!rolesLoading && roles?.length) {
-      const _rolesObject = roles.reduce((rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }), {});
+    if (!rolesLoading && (roles || []).length) {
+      const _rolesObject = (roles || []).reduce((rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }), {});
       setRolesObject(_rolesObject);
     }
     if (rolesError) {
@@ -91,7 +91,7 @@ export const Users = compose(
       <EuiOverlayMask
         headerZindexLocation="below"
         onClick={() => { setIsEditFlyoutVisible(false) }}>
-        <EditUser currentUser={editingUser} closeFlyout={closeEditFlyout} rolesObject={rolesObject} />
+        <EditUser currentUser={editingUser} closeFlyout={closeEditFlyout} rolesObject={rolesObject}/>
       </EuiOverlayMask >
     );
   }
@@ -130,7 +130,7 @@ export const Users = compose(
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
-        <UsersTable users={users} editUserFlyover={showEditFlyover} rolesLoading={rolesLoading} roles={rolesObject}></UsersTable>
+        <UsersTable users={users} editUserFlyover={showEditFlyover} rolesLoading={rolesLoading} roles={rolesObject} onSave={async () => await getUsers()}></UsersTable>
       </EuiPageContentBody>
       {editFlyout}
     </EuiPageContent>

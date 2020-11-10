@@ -2,14 +2,14 @@ import React from 'react';
 import {
   EuiInMemoryTable,
   EuiBadge,
-  EuiToolTip,
-  EuiButtonIcon,
   EuiFlexItem,
-  EuiFlexGroup
+  EuiFlexGroup,
+  EuiBasicTableColumn,
+  SortDirection
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
-import { ErrorHandler } from '../../../react-services/error-handler';
-import { WzButtonModalConfirm } from '../../common/buttons';
+import { ErrorHandler } from '../../../../react-services/error-handler';
+import { WzButtonModalConfirm } from '../../../common/buttons';
+import RulesServices from '../../rules/services';
 
 export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule, updateRules }) => {
   const getRowProps = item => {
@@ -20,11 +20,11 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
     };
   };
 
-  const columns = [
+  const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'id',
       name: 'ID',
-      width: 75,
+      width: '75',
       sortable: true,
       truncateText: true,
     },
@@ -39,8 +39,8 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       name: 'Roles',
       sortable: true,
       render: (item) => {
-        const tmpRoles = item.map(role => {
-          return <EuiFlexItem grow={false}><EuiBadge color="secondary">{rolesEquivalences[role]}</EuiBadge></EuiFlexItem>;
+        const tmpRoles = item.map((role, idx) => {
+          return <EuiFlexItem key={`role_${idx}`} grow={false}><EuiBadge color="secondary">{rolesEquivalences[role]}</EuiBadge></EuiFlexItem>;
         });
         return <EuiFlexGroup
           wrap
@@ -57,7 +57,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       render: (item) => {
         return item < 3 && <EuiBadge color="primary" >Reserved</EuiBadge>
       },
-      width: 150,
+      width: '150',
       sortable: false,
     },
     {
@@ -68,44 +68,34 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonModalConfirm
             buttonType='icon'
-            tooltip={{content: item.id < 3 ? "Reserved role mapping can't be deleted" : 'Delete role mapping', position: 'left'}}
+            tooltip={{ content: item.id < 3 ? "Reserved role mapping can't be deleted" : 'Delete role mapping', position: 'left' }}
             isDisabled={item.id < 3}
             modalTitle={`Do you want to delete the ${item.name} role mapping?`}
             onConfirm={async () => {
               try {
-                const response = await WzRequest.apiReq(
-                  'DELETE',
-                  `/security/rules/`,
-                  {
-                    params: {
-                      rule_ids: item.id
-                    }
-                  }
-                );
-                const data = (response.data || {}).data;
-                if (data.failed_items && data.failed_items.length) {
-                  return;
-                }
+                await RulesServices.DeleteRules([item.id]);
                 ErrorHandler.info('Role mapping was successfully deleted');
                 updateRules();
               } catch (err) {
                 ErrorHandler.error(err);
-              }  
+              }
             }}
-            modalProps={{buttonColor: 'danger'}}
+            modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
             aria-label='Delete role mapping'
-      />
+            modalCancelText = 'Cancel'
+            modalConfirmText = 'Confirm'
+          />
         </div>
-        )
+      )
     }
   ];
 
   const sorting = {
     sort: {
       field: 'id',
-      direction: 'asc',
+      direction: SortDirection.ASC,
     },
   };
 
@@ -118,7 +108,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
 
   return (
     <EuiInMemoryTable
-      items={rules}
+      items={rules || []}
       columns={columns}
       search={search}
       rowProps={getRowProps}

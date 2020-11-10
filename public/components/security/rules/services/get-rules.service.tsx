@@ -1,5 +1,3 @@
-
-import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 /*
  * Wazuh app - Get Rules Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
@@ -14,6 +12,7 @@ import IApiResponse from '../../../../react-services/interfaces/api-response.int
 
 import { WzRequest } from '../../../../react-services/wz-request';
 import { Rule } from '../types/rule.type';
+import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const GetRulesService = async (): Promise<Rule[]> => {
   const response = await WzRequest.apiReq(
@@ -21,7 +20,7 @@ const GetRulesService = async (): Promise<Rule[]> => {
     '/security/rules',
     {}
   ) as IApiResponse<Rule>;
-  const rules =  response.data?.data?.affected_items || [];
+  const rules =  ((response.data || {}).data || {}).affected_items || [];
   return rules;
 };
 

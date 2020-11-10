@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import {
   EuiToolTip,
   EuiButtonIcon,
@@ -17,17 +17,24 @@ import {
   EuiSelect,
   EuiFieldText,
   EuiCodeEditor,
-  EuiHorizontalRule
+  EuiHorizontalRule,
+  EuiComboBox,
+  EuiComboBoxOptionOption,
+  EuiSpacer
 } from '@elastic/eui';
+import { getJsonFromRule, decodeJsonRule, getSelectedUserFromRole } from '../helpers/rule-editor.helper';
 
-export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
-  const [logicalOperator, setLogicalOperator] = useState("AND")
+export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalUsers }) => {
+  const [logicalOperator, setLogicalOperator] = useState("OR")
   const [isLogicalPopoverOpen, setIsLogicalPopoverOpen] = useState(false);
   const [isJsonEditor, setIsJsonEditor] = useState(false);
   const [ruleJson, setRuleJson] = useState("{\n\t\n}");
   const [hasWrongFormat, setHasWrongFormat] = useState(false);
   const default_rule = { user_field: "username", searchOperation: "FIND", value: "wazuh" }
-  const [rules, setRules] = useState([{ ...default_rule }]);
+  const [rules, setRules] = useState<any[]>([]);
+  const [internalUserRules, setInternalUserRules] = useState<any[]>([]);
+  const [internalUsersOptions, setInternalUsersOptions] = useState<EuiComboBoxOptionOption<any>[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<EuiComboBoxOptionOption<any>[]>([]);
   const searchOperationOptions = [
     { value: 'FIND', text: 'FIND' },
     { value: 'FIND$', text: 'FIND$' },
@@ -37,13 +44,30 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
 
   useEffect(() => {
     if (initialRule) {
-      const ruleTmp = getRuleFromJson(JSON.stringify(initialRule));
-      if (!hasWrongFormat) {
-        setRules(ruleTmp);
-      }
+      setStateFromRule(JSON.stringify(initialRule));
     }
   }, []);
 
+  useEffect(() => {
+    if (internalUsers.length) {
+      const users = internalUsers.map(user => ({ label: user.user, id: user.user }));
+      setInternalUsersOptions(users);
+    }
+  }, [internalUsers]);
+
+  const setStateFromRule = (jsonRule) => {
+    const rulesResult = getRulesFromJson(jsonRule);    
+    if (!rulesResult.wrongFormat) {
+      setRules(rulesResult.customeRules);
+      setInternalUserRules(rulesResult.internalUsersRules);
+      const _selectedUsers = getSelectedUserFromRole(rulesResult.internalUsersRules)
+      setSelectedUsers(_selectedUsers);
+      setIsJsonEditor(false);
+    } else {
+      setRuleJson(JSON.stringify(JSON.parse(jsonRule), undefined, 2));
+      setIsJsonEditor(true);
+    }
+  }
   const onButtonClick = () =>
     setIsLogicalPopoverOpen(isLogicalPopoverOpen => !isLogicalPopoverOpen);
   const closeLogicalPopover = () => setIsLogicalPopoverOpen(false);
@@ -77,10 +101,17 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
     setRules(rulesTmp);
   }
 
+  const getRulesFromJson = (jsonRule) => {
+    const {customeRules, internalUsersRules, wrongFormat, logicalOperator } = decodeJsonRule(jsonRule, internalUsers);
+    setLogicalOperator(logicalOperator);
+    setHasWrongFormat(wrongFormat);
+    return { customeRules, internalUsersRules, wrongFormat, logicalOperator };
+  }
+
   const printRules = () => {
     const rulesList = rules.map((item, idx) => {
       return (
-        <>
+        <Fragment key={`rule_${idx}`}>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiFormRow label="User field">
@@ -131,7 +162,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
               <EuiHorizontalRule margin="xs" />
             </EuiFlexItem>
           </EuiFlexGroup>
-        </>
+        </Fragment>
       )
     });
 
@@ -146,76 +177,19 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
     setRules(rulesTmp);
   }
 
-  const getJsonFromRule = () => {
-    const ruleObject = {};
-    const rulesArray = rules.map(item => {
-      const tmpRule = {};
-      tmpRule[item.searchOperation] = {};
-      tmpRule[item.searchOperation][item.user_field] = item.value
-      return tmpRule;
-    })
-    ruleObject[logicalOperator] = rulesArray;
-    return ruleObject;
-  }
-
   const openJsonEditor = () => {
-    const ruleObject = {};
-    const rulesArray = rules.map(item => {
-      const tmpRule = {};
-      tmpRule[item.searchOperation] = {};
-      tmpRule[item.searchOperation][item.user_field] = item.value
-      return tmpRule;
-    })
-    ruleObject[logicalOperator] = rulesArray;
+    const ruleObject = getJsonFromRule(internalUserRules, rules, logicalOperator);
     setRuleJson(JSON.stringify(ruleObject, undefined, 2));
     setIsJsonEditor(true);
   }
 
-  const getRuleFromJson = (jsonRule) => {
-    try {
-      var wrongFormat = false;
-      const ruleObject = JSON.parse(jsonRule);
-      if (Object.keys(ruleObject).length !== 1) {
-        wrongFormat = true;
-      }
-      var logicalOperator = Object.keys(ruleObject)[0];
-      var rulesArray;
-      if (logicalOperator === 'AND' || logicalOperator === 'OR') {
-        rulesArray = ruleObject[logicalOperator];
-      } else {
-        rulesArray = [ruleObject];
-        logicalOperator = "AND";
-      }
-      setLogicalOperator(logicalOperator);
-      const tmpRules = rulesArray.map((item, idx) => {
-        if (Object.keys(item).length !== 1) {
-          wrongFormat = true;
-        }
-        const searchOperationTmp = Object.keys(item)[0];
-        if (Object.keys(item[searchOperationTmp]).length !== 1) {
-          wrongFormat = true;
-        }
-        const userFieldTmp = Object.keys(item[searchOperationTmp])[0];
-        const valueTmp = item[searchOperationTmp][userFieldTmp];
-
-        return { user_field: userFieldTmp, searchOperation: searchOperationTmp, value: valueTmp }
-      });
-      setHasWrongFormat(wrongFormat);
-      return tmpRules;
-    } catch (error) {
-      setHasWrongFormat(true);
-    }
-  }
-
   const openVisualEditor = () => {
-    const tmpRules = getRuleFromJson(ruleJson);
-    setRules(tmpRules);
-    setIsJsonEditor(false);
+    setStateFromRule(ruleJson);
   }
 
   const onChangeRuleJson = (e) => {
     setRuleJson(e);
-    getRuleFromJson(e); // we test format to disable button if it's incorrect
+    getRulesFromJson(e); // we test format to disable button if it's incorrect
   }
 
   const getSwitchVisualButton = () => {
@@ -243,8 +217,16 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
     if (isJsonEditor) {
       save(JSON.parse(ruleJson));
     } else {
-      save(getJsonFromRule());
+      save(getJsonFromRule(internalUserRules, rules, logicalOperator));
     }
+  }
+
+  const onChangeSelectedUsers = (selectedUsers) => {
+    setSelectedUsers(selectedUsers);
+    const tmpInternalUsersRules = selectedUsers.map(user => {
+      return { user_field: "username", searchOperation: "FIND", value: user.id };
+    });
+    setInternalUserRules(tmpInternalUsersRules);
   }
 
   return (
@@ -254,9 +236,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText>
-              <span>Assign roles to users who match these rules. </span> 
+              <span>Assign roles to users who match these rules. </span>
               <EuiLink href="https://documentation.wazuh.com/current/user-manual/api/rbac/auth_context.html" external target="_blank">
-                  Learn more
+                Learn more
               </EuiLink>
             </EuiText>
           </EuiFlexItem>
@@ -265,21 +247,35 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
           <EuiFlexItem>
             <EuiPanel>
               {isJsonEditor &&
-                <div >
-                  <EuiCodeEditor
-                    // theme="textmate"
-                    readOnly={isLoading || isReserved}
-                    width="100%"
-                    height="250px"
-                    value={ruleJson}
-                    mode="json"
-                    onChange={onChangeRuleJson}
-                    wrapEnabled
-                    aria-label="Code Editor"
-                  />
-                </div>
+                <EuiCodeEditor
+                  // theme="textmate"
+                  readOnly={isLoading || isReserved}
+                  width="100%"
+                  height="250px"
+                  value={ruleJson}
+                  mode="json"
+                  onChange={onChangeRuleJson}
+                  wrapEnabled
+                  aria-label="Code Editor"
+                />
                 ||
-                <>
+                <Fragment>
+
+                  <EuiTitle size="s"><h2>Map internal users</h2></EuiTitle>
+                  <EuiFormRow label="Internal users"
+                    helpText="Assign internal users to the selected role mapping">
+                    <EuiComboBox
+                      placeholder="Select internal users"
+                      options={internalUsersOptions}
+                      selectedOptions={selectedUsers}
+                      isLoading={isLoading}
+                      onChange={onChangeSelectedUsers}
+                      isClearable={true}
+                      data-test-subj="demoComboBox"
+                    />
+                  </EuiFormRow>
+                  <EuiSpacer />
+                  <EuiTitle size="s"><h2>Custome rules</h2></EuiTitle>
                   <EuiPopover
                     ownFocus
                     button={
@@ -326,7 +322,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved }) => {
                     onClick={() => addNewRule()}>
                     Add new rule
                                 </EuiButtonEmpty>
-                </>
+                </Fragment>
               }
             </EuiPanel>
           </EuiFlexItem>

@@ -9,8 +9,11 @@ import {
     EuiBasicTableColumn,
     SortDirection
 } from '@elastic/eui';
+import { WzButtonModalConfirm } from '../../../../components/common/buttons';
+import UsersServices from '../services';
+import { ErrorHandler } from '../../../../react-services/error-handler';
 
-export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles}) => {
+export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave}) => {
     const getRowProps = item => {
         const { id } = item;
         return {
@@ -53,6 +56,36 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles}) => {
             },
             sortable: true,
         },
+        {
+            align: 'right',
+            width: '5%',
+            name: 'Actions',
+            render: item => (
+              <div onClick={ev => ev.stopPropagation()}>
+                <WzButtonModalConfirm
+                  buttonType='icon'
+                  tooltip={{ content: item.id < 3 ? "Reserved users mapping can't be deleted" : 'Delete user', position: 'left' }}
+                  isDisabled={item.id < 3}
+                  modalTitle={`Do you want to delete ${item.name} user?`}
+                  onConfirm={async () => {
+                    try {
+                      await UsersServices.DeleteUsers([item.id]);
+                      ErrorHandler.info('User was successfully deleted');
+                      onSave();
+                    } catch (err) {
+                      ErrorHandler.error(err);
+                    }
+                  }}
+                  modalProps={{ buttonColor: 'danger' }}
+                  iconType='trash'
+                  color='danger'
+                  aria-label='Delete user'
+                  modalCancelText = 'Cancel'
+                  modalConfirmText = 'Confirm'
+                />
+              </div>
+            )
+          }
     ];
 
     const sorting = {

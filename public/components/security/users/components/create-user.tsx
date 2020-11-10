@@ -15,14 +15,15 @@ import {
     EuiFieldPassword,
     EuiText,
     EuiFieldText,
+    EuiPanel,
 } from '@elastic/eui';
 
-import { useApiService } from '../../../components/common/hooks/useApiService';
-import { Role } from '../roles/types/role.type';
-import { CreateUser as TCreateUser } from './types/user.type';
-import UsersServices from './services';
-import RolesServices from '../roles/services';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import { useApiService } from '../../../../components/common/hooks/useApiService';
+import { Role } from '../../roles/types/role.type';
+import { CreateUser as TCreateUser } from '../types/user.type';
+import UsersServices from '../services';
+import RolesServices from '../../roles/services';
+import { ErrorHandler } from '../../../../react-services/error-handler';
 
 
 export const CreateUser = ({ closeFlyout }) => {
@@ -135,67 +136,72 @@ export const CreateUser = ({ closeFlyout }) => {
             </EuiFlyoutHeader>
             <EuiFlyoutBody>
                 <EuiForm component="form" style={{ padding: 24 }}>
-                    <EuiFormRow label="User name"
-                        isInvalid={!!userNameError}
-                        error={userNameError}
-                        helpText="Introduce a the user name for the user.">
-                        <EuiFieldText
-                            placeholder="User name"
-                            value={userName}
-                            onChange={e => onChangeUserName(e)}
-                            aria-label=""
+                    <EuiPanel>
+                        <EuiTitle size="s"><h2>User data</h2></EuiTitle>
+                        <EuiSpacer/>
+                        <EuiFormRow label="User name"
                             isInvalid={!!userNameError}
-                            required
-                        />
-                    </EuiFormRow>
-                    <EuiFormRow label="Password"
-                        isInvalid={!!passwordError}
-                        error={passwordError}
-                        helpText="Introduce a new password for the user.">
-                        <EuiFieldPassword
-                            placeholder="Password"
-                            value={password}
-                            onChange={e => onChangePassword(e)}
-                            aria-label=""
+                            error={userNameError}
+                            helpText="Introduce a the user name for the user.">
+                            <EuiFieldText
+                                placeholder="User name"
+                                value={userName}
+                                onChange={e => onChangeUserName(e)}
+                                aria-label=""
+                                isInvalid={!!userNameError}
+                            />
+                        </EuiFormRow>
+                        <EuiFormRow label="Password"
                             isInvalid={!!passwordError}
-                            required
-                        />
-                    </EuiFormRow>
-                    <EuiFormRow label="Confirm Password"
-                        isInvalid={!!confirmPasswordError}
-                        error={confirmPasswordError}
-                        helpText="Confirm the new password.">
-                        <EuiFieldPassword
-                            placeholder="Confirm Password"
-                            value={confirmPassword}
-                            onChange={e => onChangeConfirmPassword(e)}
-                            aria-label=""
+                            error={passwordError}
+                            helpText="Introduce a new password for the user.">
+                            <EuiFieldPassword
+                                placeholder="Password"
+                                value={password}
+                                onChange={e => onChangePassword(e)}
+                                aria-label=""
+                                isInvalid={!!passwordError}
+                            />
+                        </EuiFormRow>
+                        <EuiFormRow label="Confirm Password"
                             isInvalid={!!confirmPasswordError}
-                            required
-                        />
-                    </EuiFormRow>
-                    <EuiFormRow label="Allow run as"
-                        helpText="Set if the user is able to use run as">
-                        <EuiSwitch
-                            label="Allow run as"
-                            showLabel={false}
-                            checked={allowRunAs}
-                            onChange={e => onChangeAllowRunAs(e)}
-                            aria-label=""
-                        />
-                    </EuiFormRow>
-                    <EuiFormRow label="Roles"
-                        helpText="Assign roles to the selected user">
-                        <EuiComboBox
-                            placeholder="Select roles"
-                            options={rolesOptions}
-                            selectedOptions={selectedRoles}
-                            isLoading={rolesLoading || isLoading}
-                            onChange={onChangeRoles}
-                            isClearable={true}
-                            data-test-subj="demoComboBox"
-                        />
-                    </EuiFormRow>
+                            error={confirmPasswordError}
+                            helpText="Confirm the new password.">
+                            <EuiFieldPassword
+                                placeholder="Confirm Password"
+                                value={confirmPassword}
+                                onChange={e => onChangeConfirmPassword(e)}
+                                aria-label=""
+                                isInvalid={!!confirmPasswordError}
+                            />
+                        </EuiFormRow>
+                        <EuiFormRow label="Allow run as"
+                            helpText="Set if the user is able to use run as">
+                            <EuiSwitch
+                                label="Allow run as"
+                                showLabel={false}
+                                checked={allowRunAs}
+                                onChange={e => onChangeAllowRunAs(e)}
+                                aria-label=""
+                            />
+                        </EuiFormRow>
+                    </EuiPanel>
+                    <EuiSpacer />
+                    <EuiPanel>
+                        <EuiTitle size="s"><h2>User roles</h2></EuiTitle>
+                        <EuiFormRow label=""
+                            helpText="Assign roles to the selected user">
+                            <EuiComboBox
+                                placeholder="Select roles"
+                                options={rolesOptions}
+                                selectedOptions={selectedRoles}
+                                isLoading={rolesLoading || isLoading}
+                                onChange={onChangeRoles}
+                                isClearable={true}
+                                data-test-subj="demoComboBox"
+                            />
+                        </EuiFormRow>
+                    </EuiPanel>
                     <EuiSpacer />
                     <EuiFlexGroup>
                         <EuiFlexItem grow={false}>

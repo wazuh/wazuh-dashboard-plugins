@@ -20,7 +20,7 @@ const UpdateUserService = async (userId: number, user: UpdateUser): Promise<User
     `/security/users/${userId}`,
     user
   ) as IApiResponse<User>;
-  const users = response.data?.data?.affected_items || [{}];
+  const users = ((response.data || {}).data || {}).affected_items || [{}];
   return users[0];
 };
 

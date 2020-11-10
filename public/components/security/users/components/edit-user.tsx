@@ -14,14 +14,16 @@ import {
     EuiComboBox,
     EuiSwitch,
     EuiFieldPassword,
+    EuiComboBoxOptionOption,
+    EuiPanel,
 } from '@elastic/eui';
 
-import { useApiService } from '../../../components/common/hooks/useApiService';
-import { Role } from '../roles/types/role.type';
-import { UpdateUser } from './types/user.type';
-import UsersServices from './services';
-import RolesServices from '../roles/services';
-import { ErrorHandler } from '../../../react-services/error-handler';
+import { useApiService } from '../../../common/hooks/useApiService';
+import { Role } from '../../roles/types/role.type';
+import { UpdateUser } from '../types/user.type';
+import UsersServices from '../services';
+import RolesServices from '../../roles/services';
+import { ErrorHandler } from '../../../../react-services/error-handler';
 
 
 export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
@@ -31,7 +33,6 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     const rolesOptions = roles ? roles.map(item => { return { label: item.name, id: item.id } }) : [];
 
     const [isLoading, setIsLoading] = useState(false);
-    const [updatePassword, setUpdatePassword] = useState(false);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState<null | string>(null);
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -55,22 +56,21 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     }, [confirmPassword, password]);
 
     const updateRoles = async () => {
-        const formattedRoles = selectedRoles.map(item => {
-            return item.id;
-        });
+        const formattedRoles = selectedRoles.map(item => item.id);
+        const _userRolesFormatted = userRolesFormatted.map(role => role.id)
 
-        if (formattedRoles.sort((a, b) => a > b).join(',') === userRolesFormatted.map(role => role.id).sort((a, b) => a > b).join(','))
-            return;
+        const toAdd = formattedRoles.filter(value => !_userRolesFormatted.includes(value));
+        if (toAdd.length)
+            await RolesServices.AddRoleRules(currentUser.id, toAdd);
 
-        await UsersServices.DeleteUserRoles(currentUser.id, [], true);
-        if (formattedRoles.length > 0)
-            await UsersServices.AddUserRoles(currentUser.id, formattedRoles);
+        const toRemove = _userRolesFormatted.filter(value => !formattedRoles.includes(value));
+        if (toRemove)
+            await RolesServices.RemoveRoleRules(currentUser.id, toRemove);
     };
 
     const isValidForm = () => {
         let error = false;
-        error = (updatePassword && (password === '' || confirmPassword === ''));
-        error = error || !!(passwordError || confirmPasswordError);
+        error = !!(passwordError || confirmPasswordError);
         return !error;
     };
 
@@ -86,7 +86,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             allow_run_as: allowRunAs
         };
 
-        if (updatePassword) {
+        if (password) {
             userData.password = password;
         }
         try {
@@ -119,15 +119,6 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
         setAllowRunAs(e.target.checked);
     }
 
-    const onChangeUpdatePassword = e => {
-        const checked = e.target.checked;
-        if (!checked) {
-            setPassword('');
-            setConfirmPassword('');
-        }
-        setUpdatePassword(checked);
-    }
-
     return (
 
         <EuiFlyout
@@ -135,46 +126,31 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">
                     <h2>Edit {currentUser.user} user &nbsp; &nbsp;
-                    {currentUser.user === 'elastic' || currentUser.user === 'admin' &&
+                    {currentUser.id < 3 &&
                             <EuiBadge color='primary'>Reserved</EuiBadge>
                         }</h2>
                 </EuiTitle>
             </EuiFlyoutHeader>
             <EuiFlyoutBody>
                 <EuiForm component="form" style={{ padding: 24 }}>
-                    <EuiFormRow label="Allow run as"
-                        helpText="Set if the user is able to use run as">
-                        <EuiSwitch
-                            label="Allow run as"
-                            showLabel={false}
-                            checked={allowRunAs}
-                            onChange={e => onChangeAllowRunAs(e)}
-                            aria-label=""
-                        />
-                    </EuiFormRow>
-                    <EuiFormRow label="Roles"
-                        helpText="Assign roles to the selected user">
-
-                        <EuiComboBox
-                            placeholder="Select roles"
-                            options={rolesOptions}
-                            selectedOptions={selectedRoles}
-                            isLoading={rolesLoading || isLoading}
-                            onChange={onChangeRoles}
-                            isClearable={true}
-                            data-test-subj="demoComboBox"
-                        />
-                    </EuiFormRow>
+                    <EuiPanel>
+                        <EuiTitle size="s"><h2>Run as</h2></EuiTitle>
+                        <EuiFormRow label=""
+                            helpText="Set if the user is able to use run as">
+                            <EuiSwitch
+                                label="Allow"
+                                showLabel={true}
+                                checked={allowRunAs}
+                                onChange={e => onChangeAllowRunAs(e)}
+                                aria-label=""
+                                disabled={currentUser.id < 3}
+                            />
+                        </EuiFormRow>
+                    </EuiPanel>
                     <EuiSpacer />
-                    <EuiSwitch
-                        label="Update user password"
-                        onChange={e => onChangeUpdatePassword(e)}
-                        checked={updatePassword}
-                        aria-label="">
-                    </EuiSwitch>
-                    {updatePassword && <Fragment>
-                        <EuiSpacer />
-                        <EuiFormRow label="Password"
+                    <EuiPanel>
+                        <EuiTitle size="s"><h2>Password</h2></EuiTitle>
+                        <EuiFormRow label=""
                             isInvalid={!!passwordError}
                             error={passwordError}
                             helpText="Introduce a new password for the user.">
@@ -184,10 +160,10 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                                 onChange={e => onChangePassword(e)}
                                 aria-label=""
                                 isInvalid={!!passwordError}
-                                required={updatePassword}
+                                disabled={currentUser.id < 3}
                             />
                         </EuiFormRow>
-                        <EuiFormRow label="Confirm Password"
+                        <EuiFormRow label=""
                             isInvalid={!!confirmPasswordError}
                             error={confirmPasswordError}
                             helpText="Confirm the new password.">
@@ -197,14 +173,33 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                                 onChange={e => onChangeConfirmPassword(e)}
                                 aria-label=""
                                 isInvalid={!!confirmPasswordError}
-                                required={updatePassword}
+                                disabled={currentUser.id < 3}
                             />
                         </EuiFormRow>
-                    </Fragment>}
+                    </EuiPanel>
+                    <EuiSpacer />
+                    <EuiPanel>
+                        <EuiTitle size="s"><h2>Roles</h2></EuiTitle>
+                        <EuiFormRow label=""
+                            helpText="Assign roles to the selected user">
+
+                            <EuiComboBox
+                                placeholder="Select roles"
+                                options={rolesOptions}
+                                selectedOptions={selectedRoles}
+                                isLoading={rolesLoading || isLoading}
+                                onChange={onChangeRoles}
+                                isClearable={true}
+                                data-test-subj="demoComboBox"
+                                disabled={currentUser.id < 3}
+                            />
+                        </EuiFormRow>
+                    </EuiPanel>
+
                     <EuiSpacer />
                     <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                            <EuiButton fill isLoading={isLoading} isDisabled={currentUser.user === 'elastic' || currentUser.user === 'admin'} onClick={editUser}>
+                            <EuiButton fill isLoading={isLoading} isDisabled={currentUser.id < 3} onClick={editUser}>
                                 Apply
                             </EuiButton>
                         </EuiFlexItem>

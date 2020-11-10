@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Delete User Roles Service
+ * Wazuh app - Delete Rules Service
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,17 +11,17 @@
  */
 
 import { WzRequest } from '../../../../react-services/wz-request';
+import { Rule } from '../types/rule.type';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
-import { User } from '../types/user.type';
 
-const DeleteUserRolesService = async (userId: number, roles: number[], removeAll: boolean): Promise<User> => {
+const GetRulesService = async (ruleIds: number[], deleteAll: boolean = false): Promise<Rule[]> => {
   const response = await WzRequest.apiReq(
     'DELETE',
-    `/security/users/${userId}/roles?role_ids=${removeAll ? 'all' : roles.join(',')}`,
+    `/security/rules?rule_ids=${deleteAll ? 'all' : ruleIds.join(',')}`,
     {}
-  ) as IApiResponse<User>;
-  const users = response.data?.data?.affected_items || [{}];
-  return users[0];
+  ) as IApiResponse<Rule>;
+  const rules =  ((response.data || {}).data || {}).affected_items || [];
+  return rules;
 };
 
-export default DeleteUserRolesService;
+export default GetRulesService;

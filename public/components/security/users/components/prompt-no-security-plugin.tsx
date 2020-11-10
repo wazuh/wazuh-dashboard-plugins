@@ -12,7 +12,7 @@
 
 import React from 'react';
 import { EuiEmptyPrompt, EuiSpacer } from '@elastic/eui';
-import { WAZUH_SECURITY_PLUGINS } from '../../../../util/constants';
+import { WAZUH_SECURITY_PLUGINS } from '../../../../../util/constants';
 
 export const PromptNoSecurityPluginUsers = () => {
   return (
