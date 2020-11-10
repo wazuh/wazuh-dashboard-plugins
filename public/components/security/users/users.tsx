@@ -44,10 +44,10 @@ export const Users = compose(
 
   const getUsers = async () => {
     const _users = await UsersServices.GetUsers()
-    .catch(error => {
-      setUsers([]);
-      setSecurityError(true);
-    });
+      .catch(error => {
+        setUsers([]);
+        setSecurityError(true);
+      });
 
     setUsers(_users as User[]);
   }
@@ -130,7 +130,12 @@ export const Users = compose(
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
-        <UsersTable users={users} editUserFlyover={showEditFlyover} rolesLoading={rolesLoading} roles={rolesObject}></UsersTable>
+        <UsersTable
+          users={users}
+          editUserFlyover={showEditFlyover}
+          rolesLoading={rolesLoading}
+          roles={rolesObject}
+          updateUsers={getUsers} />
       </EuiPageContentBody>
       {editFlyout}
     </EuiPageContent>
