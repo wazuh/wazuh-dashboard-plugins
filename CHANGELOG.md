@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Icons not align to the right in Modules > Events [#2607](https://github.com/wazuh/wazuh-kibana-app/pull/2607)
 - Statistics visualizations do not show data [#2602](https://github.com/wazuh/wazuh-kibana-app/pull/2602)
 - Error on loading css files [#2599](https://github.com/wazuh/wazuh-kibana-app/pull/2599)
 - Fixed search filter in search bar in Module/SCA wasn't working [#2601](https://github.com/wazuh/wazuh-kibana-app/pull/2601)
