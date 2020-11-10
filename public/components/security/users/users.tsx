@@ -44,10 +44,10 @@ export const Users = compose(
 
   const getUsers = async () => {
     const _users = await UsersServices.GetUsers()
-    .catch(error => {
-      setUsers([]);
-      setSecurityError(true);
-    });
+      .catch(error => {
+        setUsers([]);
+        setSecurityError(true);
+      });
 
     setUsers(_users as User[]);
   }
