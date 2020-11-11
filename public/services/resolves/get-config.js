@@ -49,7 +49,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'cron.prefix': 'wazuh',
     'cron.statistics.status': true,
     'cron.statistics.apis': [],
-    'cron.statistics.interval': '0 0 * * * *',
+    'cron.statistics.interval': '0 */5 * * * *',
     'cron.statistics.index.name': 'statistics',
     'cron.statistics.index.creation': 'w',
     hideManagerAlerts: false,

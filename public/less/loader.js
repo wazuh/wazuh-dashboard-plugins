@@ -25,19 +25,9 @@ import chrome from 'ui/chrome';
 const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
 /* eslint-disable no-undef */
 if (IS_DARK_THEME) {
-  let newSS = document.createElement('link');
-  newSS.rel = 'stylesheet';
-  newSS.href = '../plugins/wazuh/less/dark_theme/wz_theme_dark.css';
-  document.getElementsByTagName('head')[0].appendChild(newSS);
-
-  newSS = document.createElement('link');
-  newSS.rel = 'stylesheet';
-  newSS.href = '../plugins/wazuh/less/7.9.0/index.dark.css';
-  document.getElementsByTagName('head')[0].appendChild(newSS);
+  import('./dark_theme/wz_theme_dark.css').then();
+  import('./7.9.0/index.dark.css').then();
 }else{
-  let newSS = document.createElement('link');
-  newSS.rel = 'stylesheet';
-  newSS.href = '../plugins/wazuh/less/7.9.0/index.light.css';
-  document.getElementsByTagName('head')[0].appendChild(newSS);
+  import('./7.9.0/index.light.css').then();
 }
 /* eslint-enable no-undef */
