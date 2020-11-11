@@ -24,7 +24,7 @@ import {
 import {
   getJsonFromRule,
   decodeJsonRule,
-  getSelectedUserFromRole,
+  getSelectedUsersFromRules,
 } from '../helpers/rule-editor.helper';
 
 export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalUsers }) => {
@@ -65,7 +65,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     if (!rulesResult.wrongFormat) {
       setRules(rulesResult.customeRules);
       setInternalUserRules(rulesResult.internalUsersRules);
-      const _selectedUsers = getSelectedUserFromRole(rulesResult.internalUsersRules);
+      const _selectedUsers = getSelectedUsersFromRules(rulesResult.internalUsersRules);
       setSelectedUsers(_selectedUsers);
       setIsJsonEditor(false);
     } else {

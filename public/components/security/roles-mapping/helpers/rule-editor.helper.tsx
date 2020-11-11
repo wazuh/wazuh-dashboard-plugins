@@ -139,6 +139,6 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
   }
 };
 
-export const getSelectedUserFromRole = roles => {
-  return roles.map(role => ({ label: role.value, id: role.value }));
+export const getSelectedUsersFromRules = rules => {
+  return rules.map(rule => ({ label: rule.value, id: rule.value }));
 };
