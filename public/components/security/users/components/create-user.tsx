@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     EuiButton,
     EuiTitle,
@@ -18,65 +18,78 @@ import {
     EuiPanel,
 } from '@elastic/eui';
 
-import { useApiService } from '../../../../components/common/hooks/useApiService';
+import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
 import { CreateUser as TCreateUser } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
+import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 
 
 export const CreateUser = ({ closeFlyout }) => {
     const [selectedRoles, setSelectedRole] = useState<any>([]);
     const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
-    const rolesOptions = roles ? roles.map(item => { return { label: item.name, id: item.id } }) : [];
+    const rolesOptions: any = roles ? roles.map(item => { return { label: item.name, id: item.id } }) : [];
 
     const [isLoading, setIsLoading] = useState(false);
     const [userName, setUserName] = useState('');
-    const [userNameError, setUserNameError] = useState<null | string>(null);
     const [password, setPassword] = useState('');
-    const [passwordError, setPasswordError] = useState<null | string>(null);
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [confirmPasswordError, setConfirmPasswordError] = useState<null | string>(null);
     const [allowRunAs, setAllowRunAs] = useState<boolean>(false);
+    const [formErrors, setFormErrors] = useState<any>({
+        userName: '',
+        password: '',
+        confirmPassword: ''
+    });
 
-    useEffect(() => {
-        let error: null | string = null;
-        if (userName.length > 0 && !userName.match(/^.{4,20}$/)) {
-            error = 'The user name must contain a length between 4 and 20 characters.';
-        }
-        setUserNameError(error);
-    }, [userName]);
+    const userNameRef = useRef(false);
+    useDebouncedEffect(() => {
+        if(userNameRef.current) validateField('userName');
+        else userNameRef.current = true;
+    }, 1000, [userName]);
 
-    useEffect(() => {
-        let error: null | string = null;
-        if (password.length > 0 && !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/)) {
-            error = 'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.';
-        }
-        setPasswordError(error);
-    }, [password]);
+    const passwordRef = useRef(false);
+    useDebouncedEffect(() => {
+        if(passwordRef.current) validateField('password');
+        else passwordRef.current = true;
+    }, 1000, [password]);
 
-    useEffect(() => {
-        let error: null | string = null;
-        if ((password.length > 0 || confirmPassword.length > 0) && password !== confirmPassword) {
-            error = `Passwords don't match.`
-        }
-        setConfirmPasswordError(error);
-    }, [confirmPassword, password]);
+    const confirmPasswordRef = useRef(false);
+    useDebouncedEffect(() => {
+        if(confirmPasswordRef.current) validateField('confirmPassword');
+        else confirmPasswordRef.current = true;
+    }, 1000, [confirmPassword]);
 
-    const addRoles = async (userId) => {
-        const formattedRoles = selectedRoles.map(item => {
-            return item.id;
-        });
-        if (formattedRoles.length > 0)
-            await UsersServices.AddUserRoles(userId, formattedRoles);
+    const validations = {
+        userName: [
+            { fn: () => userName.trim() === '' ? 'The user name is required' : '' },
+            { fn: () => !userName.match(/^.{4,20}$/) ? 'The user name must contain a length between 4 and 20 characters.' : '' }
+        ],
+        password: [
+            { fn: () => password === '' ? 'The password is required' : '' },
+            { fn: () => !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/) ? 'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.' : '' },
+        ],
+        confirmPassword: [
+            { fn: () => confirmPassword === '' ? 'The confirm password is required' : '' },
+            { fn: () => confirmPassword !== password ? `Passwords don't match.` : '' }
+        ]
+    };
+
+    const validateField = (field) => {
+        const error = validations[field].reduce((result, validation) => {            
+            return !!result ? result : validation.fn();
+        }, '');
+        setFormErrors({ ...formErrors, [field]: error });
+        return !!error;
     };
 
     const isValidForm = () => {
-        let error = false;
-        error = !!(userName === '')
-        error = error || (password === '' || confirmPassword === '');
-        return !error;
+        let errors = false;
+        Object.keys(validations).forEach(field => {
+            errors = errors || validateField(field);
+        });
+        return !errors;
     };
 
     const editUser = async () => {
@@ -103,6 +116,14 @@ export const CreateUser = ({ closeFlyout }) => {
             ErrorHandler.handle(error, "There was an error");
             setIsLoading(false);
         }
+    };
+
+    const addRoles = async (userId) => {
+        const formattedRoles = selectedRoles.map(item => {
+            return item.id;
+        });
+        if (formattedRoles.length > 0)
+            await UsersServices.AddUserRoles(userId, formattedRoles);
     };
 
     const onChangeRoles = selectedRoles => {
@@ -138,41 +159,41 @@ export const CreateUser = ({ closeFlyout }) => {
                 <EuiForm component="form" style={{ padding: 24 }}>
                     <EuiPanel>
                         <EuiTitle size="s"><h2>User data</h2></EuiTitle>
-                        <EuiSpacer/>
+                        <EuiSpacer />
                         <EuiFormRow label="User name"
-                            isInvalid={!!userNameError}
-                            error={userNameError}
+                            isInvalid={!!formErrors.userName}
+                            error={formErrors.userName}
                             helpText="Introduce a the user name for the user.">
                             <EuiFieldText
                                 placeholder="User name"
                                 value={userName}
                                 onChange={e => onChangeUserName(e)}
                                 aria-label=""
-                                isInvalid={!!userNameError}
+                                isInvalid={!!formErrors.userName}
                             />
                         </EuiFormRow>
                         <EuiFormRow label="Password"
-                            isInvalid={!!passwordError}
-                            error={passwordError}
+                            isInvalid={!!formErrors.password}
+                            error={formErrors.password}
                             helpText="Introduce a new password for the user.">
                             <EuiFieldPassword
                                 placeholder="Password"
                                 value={password}
                                 onChange={e => onChangePassword(e)}
                                 aria-label=""
-                                isInvalid={!!passwordError}
+                                isInvalid={!!formErrors.password}
                             />
                         </EuiFormRow>
                         <EuiFormRow label="Confirm Password"
-                            isInvalid={!!confirmPasswordError}
-                            error={confirmPasswordError}
+                            isInvalid={!!formErrors.confirmPassword}
+                            error={formErrors.confirmPassword}
                             helpText="Confirm the new password.">
                             <EuiFieldPassword
                                 placeholder="Confirm Password"
                                 value={confirmPassword}
                                 onChange={e => onChangeConfirmPassword(e)}
                                 aria-label=""
-                                isInvalid={!!confirmPasswordError}
+                                isInvalid={!!formErrors.confirmPassword}
                             />
                         </EuiFormRow>
                         <EuiFormRow label="Allow run as"

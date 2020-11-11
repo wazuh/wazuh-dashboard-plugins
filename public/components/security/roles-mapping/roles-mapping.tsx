@@ -13,7 +13,7 @@ import { RolesMappingEdit } from './components/roles-mapping-edit';
 import { RolesMappingCreate } from './components/roles-mapping-create';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WazuhSecurity } from '../../../factories/wazuh-security'
-import { useApiService } from '../../../components/common/hooks/useApiService';
+import { useApiService } from '../../common/hooks/useApiService';
 import { Rule } from '../rules/types/rule.type';
 import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';

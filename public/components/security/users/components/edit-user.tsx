@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
     EuiButton,
     EuiTitle,
@@ -13,8 +13,7 @@ import {
     EuiBadge,
     EuiComboBox,
     EuiSwitch,
-    EuiFieldPassword,
-    EuiComboBoxOptionOption,
+    EuiFieldPassword,    
     EuiPanel,
 } from '@elastic/eui';
 
@@ -24,54 +23,59 @@ import { UpdateUser } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
+import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 
 
 export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     const userRolesFormatted = currentUser.roles && currentUser.roles.length ? currentUser.roles.map(item => ({ label: rolesObject[item], id: item })) : [];
     const [selectedRoles, setSelectedRole] = useState(userRolesFormatted);
     const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
-    const rolesOptions = roles ? roles.map(item => { return { label: item.name, id: item.id } }) : [];
+    const rolesOptions: any = roles ? roles.map(item => { return { label: item.name, id: item.id } }) : [];
 
     const [isLoading, setIsLoading] = useState(false);
     const [password, setPassword] = useState('');
-    const [passwordError, setPasswordError] = useState<null | string>(null);
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [confirmPasswordError, setConfirmPasswordError] = useState<null | string>(null);
     const [allowRunAs, setAllowRunAs] = useState<boolean>(currentUser.allow_run_as);
+    const [formErrors, setFormErrors] = useState<any>({
+        password: '',
+        confirmPassword: ''
+    });
 
-    useEffect(() => {
-        let error: null | string = null;
-        if (password.length > 0 && !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/)) {
-            error = 'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.';
-        }
-        setPasswordError(error);
-    }, [password]);
+    const passwordRef = useRef(false);
+    useDebouncedEffect(() => {
+        if(passwordRef.current) validateField('password');
+        else passwordRef.current = true;
+    }, 1000, [password]);
 
-    useEffect(() => {
-        let error: null | string = null;
-        if ((password.length > 0 || confirmPassword.length > 0) && password !== confirmPassword) {
-            error = `Passwords don't match.`
-        }
-        setConfirmPasswordError(error);
-    }, [confirmPassword, password]);
+    const confirmPasswordRef = useRef(false);
+    useDebouncedEffect(() => {
+        if(confirmPasswordRef.current) validateField('confirmPassword');
+        else confirmPasswordRef.current = true;
+    }, 1000, [confirmPassword]);
 
-    const updateRoles = async () => {
-        const formattedRoles = selectedRoles.map(item => item.id);
-        const _userRolesFormatted = userRolesFormatted.map(role => role.id)
+    const validations = {
+        password: [
+            { fn: () => password !== '' && !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/) ? 'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.' : '' },
+        ],
+        confirmPassword: [
+            { fn: () => confirmPassword !== password ? `Passwords don't match.` : '' }
+        ]
+    };
 
-        const toAdd = formattedRoles.filter(value => !_userRolesFormatted.includes(value));
-        if (toAdd.length)
-            await RolesServices.AddRoleRules(currentUser.id, toAdd);
-
-        const toRemove = _userRolesFormatted.filter(value => !formattedRoles.includes(value));
-        if (toRemove)
-            await RolesServices.RemoveRoleRules(currentUser.id, toRemove);
+    const validateField = (field) => {
+        const error = validations[field].reduce((result, validation) => {            
+            return !!result ? result : validation.fn();
+        }, '');
+        setFormErrors({ ...formErrors, [field]: error });
+        return !!error;
     };
 
     const isValidForm = () => {
-        let error = false;
-        error = !!(passwordError || confirmPasswordError);
-        return !error;
+        let errors = false;
+        Object.keys(validations).forEach(field => {
+            errors = errors || validateField(field);
+        });
+        return !errors;
     };
 
     const editUser = async () => {
@@ -103,6 +107,20 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
         }
     };
 
+    const updateRoles = async () => {
+        const formattedRoles = selectedRoles.map(item => item.id);
+        const _userRolesFormatted = userRolesFormatted.map(role => role.id)
+
+        const toAdd = formattedRoles.filter(value => !_userRolesFormatted.includes(value));
+        if (toAdd.length)
+            await RolesServices.AddRoleRules(currentUser.id, toAdd);
+
+        const toRemove = _userRolesFormatted.filter(value => !formattedRoles.includes(value));
+        if (toRemove)
+            await RolesServices.RemoveRoleRules(currentUser.id, toRemove);
+    };
+
+
     const onChangeRoles = selectedRoles => {
         setSelectedRole(selectedRoles);
     };
@@ -125,7 +143,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             onClose={() => closeFlyout()}>
             <EuiFlyoutHeader hasBorder={false}>
                 <EuiTitle size="m">
-                    <h2>Edit {currentUser.user} user &nbsp; &nbsp;
+                    <h2>Edit {currentUser.username} user &nbsp; &nbsp;
                     {currentUser.id < 3 &&
                             <EuiBadge color='primary'>Reserved</EuiBadge>
                         }</h2>
@@ -151,28 +169,28 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                     <EuiPanel>
                         <EuiTitle size="s"><h2>Password</h2></EuiTitle>
                         <EuiFormRow label=""
-                            isInvalid={!!passwordError}
-                            error={passwordError}
+                            isInvalid={!!formErrors.password}
+                            error={formErrors.password}
                             helpText="Introduce a new password for the user.">
                             <EuiFieldPassword
                                 placeholder="Password"
                                 value={password}
                                 onChange={e => onChangePassword(e)}
                                 aria-label=""
-                                isInvalid={!!passwordError}
+                                isInvalid={!!formErrors.password}
                                 disabled={currentUser.id < 3}
                             />
                         </EuiFormRow>
                         <EuiFormRow label=""
-                            isInvalid={!!confirmPasswordError}
-                            error={confirmPasswordError}
+                            isInvalid={!!formErrors.confirmPassword}
+                            error={formErrors.confirmPassword}
                             helpText="Confirm the new password.">
                             <EuiFieldPassword
                                 placeholder="Confirm Password"
                                 value={confirmPassword}
                                 onChange={e => onChangeConfirmPassword(e)}
                                 aria-label=""
-                                isInvalid={!!confirmPasswordError}
+                                isInvalid={!!formErrors.confirmPassword}
                                 disabled={currentUser.id < 3}
                             />
                         </EuiFormRow>
@@ -191,7 +209,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                                 onChange={onChangeRoles}
                                 isClearable={true}
                                 data-test-subj="demoComboBox"
-                                disabled={currentUser.id < 3}
+                                isDisabled={currentUser.id < 3}
                             />
                         </EuiFormRow>
                     </EuiPanel>

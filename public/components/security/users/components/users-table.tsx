@@ -9,7 +9,7 @@ import {
   EuiBasicTableColumn,
   SortDirection
 } from '@elastic/eui';
-import { WzButtonModalConfirm } from '../../../../components/common/buttons';
+import { WzButtonModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 
