@@ -220,7 +220,7 @@ export class RegisterAgent extends Component {
           ? " WAZUH_PROTOCOL='UDP'"
           : ''
         } dpkg -i ./wazuh-agent.deb`,
-      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/osx/wazuh-agent-${
+      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
         this.state.wazuhVersion
         }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
         this.state.serverAddress

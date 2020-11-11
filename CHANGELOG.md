@@ -2,6 +2,22 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4008
+
+### Fixed
+
+- Icons not align to the right in Modules > Events [#2607](https://github.com/wazuh/wazuh-kibana-app/pull/2607)
+- Statistics visualizations do not show data [#2602](https://github.com/wazuh/wazuh-kibana-app/pull/2602)
+- Error on loading css files [#2599](https://github.com/wazuh/wazuh-kibana-app/pull/2599)
+- Fixed search filter in search bar in Module/SCA wasn't working [#2601](https://github.com/wazuh/wazuh-kibana-app/pull/2601)
+
+## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4007
+
+### Fixed
+
+- updated macOS package URL [#2596](https://github.com/wazuh/wazuh-kibana-app/pull/2596)
+- Revert "[4.0-7.9] [BUGFIX] Removed unnecessary function call" [#2597](https://github.com/wazuh/wazuh-kibana-app/pull/2597)
+
 ## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4006
 
 ### Fixed
