@@ -7,7 +7,7 @@ import {
   EuiButton,
   EuiTitle,
   EuiOverlayMask,
-  EuiEmptyPrompt
+  EuiEmptyPrompt,
 } from '@elastic/eui';
 import { UsersTable } from './components/users-table';
 
@@ -27,12 +27,9 @@ const mapStateToProps = state => ({ currentPlatform: state.appStateReducers.curr
 
 export const Users = compose(
   connect(mapStateToProps),
-  withGuard(
-    (props) => {
-      return props.currentPlatform === 'elastic';
-    },
-    PromptNoSecurityPluginUsers
-  )
+  withGuard(props => {
+    return props.currentPlatform === 'elastic';
+  }, PromptNoSecurityPluginUsers)
 )(() => {
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
   const [isCreateFlyoutVisible, setIsCreateFlyoutVisible] = useState(false);
@@ -40,21 +37,23 @@ export const Users = compose(
   const [users, setUsers] = useState([] as User[]);
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
   const [securityError, setSecurityError] = useState(false);
-  const [rolesObject, setRolesObject] = useState({})
+  const [rolesObject, setRolesObject] = useState({});
 
   const getUsers = async () => {
-    const _users = await UsersServices.GetUsers()
-      .catch(error => {
-        setUsers([]);
-        setSecurityError(true);
-      });
+    const _users = await UsersServices.GetUsers().catch(error => {
+      setUsers([]);
+      setSecurityError(true);
+    });
 
     setUsers(_users as User[]);
-  }
+  };
 
   useEffect(() => {
     if (!rolesLoading && (roles || []).length) {
-      const _rolesObject = (roles || []).reduce((rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }), {});
+      const _rolesObject = (roles || []).reduce(
+        (rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }),
+        {}
+      );
       setRolesObject(_rolesObject);
     }
     if (rolesError) {
@@ -64,35 +63,42 @@ export const Users = compose(
 
   useEffect(() => {
     getUsers();
-  }, [])
+  }, []);
 
   let editFlyout, createFlyout;
   const closeEditFlyout = async () => {
     await getUsers();
     setIsEditFlyoutVisible(false);
-  }
+  };
 
   const closeCreateFlyout = async () => {
     await getUsers();
     setIsCreateFlyoutVisible(false);
-  }
+  };
 
   if (securityError) {
-    return <EuiEmptyPrompt
-      iconType="securityApp"
-      title={<h2>You need permission to manage users</h2>}
-      body={
-        <p>Contact your system administrator.</p>
-      }
-    />
+    return (
+      <EuiEmptyPrompt
+        iconType="securityApp"
+        title={<h2>You need permission to manage users</h2>}
+        body={<p>Contact your system administrator.</p>}
+      />
+    );
   }
   if (isEditFlyoutVisible) {
     editFlyout = (
       <EuiOverlayMask
         headerZindexLocation="below"
-        onClick={() => { setIsEditFlyoutVisible(false) }}>
-        <EditUser currentUser={editingUser} closeFlyout={closeEditFlyout} rolesObject={rolesObject}/>
-      </EuiOverlayMask >
+        onClick={() => {
+          setIsEditFlyoutVisible(false);
+        }}
+      >
+        <EditUser
+          currentUser={editingUser}
+          closeFlyout={closeEditFlyout}
+          rolesObject={rolesObject}
+        />
+      </EuiOverlayMask>
     );
   }
 
@@ -100,16 +106,19 @@ export const Users = compose(
     createFlyout = (
       <EuiOverlayMask
         headerZindexLocation="below"
-        onClick={() => { setIsCreateFlyoutVisible(false) }}>
+        onClick={() => {
+          setIsCreateFlyoutVisible(false);
+        }}
+      >
         <CreateUser closeFlyout={closeCreateFlyout} />
-      </EuiOverlayMask >
+      </EuiOverlayMask>
     );
   }
 
-  const showEditFlyover = (item) => {
+  const showEditFlyover = item => {
     setEditingUser(item);
     setIsEditFlyoutVisible(true);
-  }
+  };
 
   return (
     <EuiPageContent>
@@ -121,16 +130,19 @@ export const Users = compose(
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           <div>
-            <EuiButton
-              onClick={() => setIsCreateFlyoutVisible(true)}>
-              Create user
-            </EuiButton>
+            <EuiButton onClick={() => setIsCreateFlyoutVisible(true)}>Create user</EuiButton>
             {createFlyout}
           </div>
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
-        <UsersTable users={users} editUserFlyover={showEditFlyover} rolesLoading={rolesLoading} roles={rolesObject} onSave={async () => await getUsers()}></UsersTable>
+        <UsersTable
+          users={users}
+          editUserFlyover={showEditFlyover}
+          rolesLoading={rolesLoading}
+          roles={rolesObject}
+          onSave={async () => await getUsers()}
+        ></UsersTable>
       </EuiPageContentBody>
       {editFlyout}
     </EuiPageContent>

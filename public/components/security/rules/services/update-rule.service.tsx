@@ -15,11 +15,11 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const UpdateRuleService = async (ruleId: number, rule: UpdateRule): Promise<Rule> => {
-  const response = await WzRequest.apiReq(
+  const response = (await WzRequest.apiReq(
     'PUT',
     `/security/rules/${ruleId}`,
     rule
-  ) as IApiResponse<Rule>;
+  )) as IApiResponse<Rule>;
   const rules = ((response.data || {}).data || {}).affected_items || [{}];
   return rules[0];
 };

@@ -15,11 +15,11 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const UpdateUserService = async (userId: number, user: UpdateUser): Promise<User> => {
-  const response = await WzRequest.apiReq(
+  const response = (await WzRequest.apiReq(
     'PUT',
     `/security/users/${userId}`,
     user
-  ) as IApiResponse<User>;
+  )) as IApiResponse<User>;
   const users = ((response.data || {}).data || {}).affected_items || [{}];
   return users[0];
 };

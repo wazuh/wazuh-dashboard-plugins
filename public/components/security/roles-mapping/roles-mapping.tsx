@@ -12,13 +12,12 @@ import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
 import { RolesMappingCreate } from './components/roles-mapping-create';
 import { ErrorHandler } from '../../../react-services/error-handler';
-import { WazuhSecurity } from '../../../factories/wazuh-security'
+import { WazuhSecurity } from '../../../factories/wazuh-security';
 import { useApiService } from '../../common/hooks/useApiService';
 import { Rule } from '../rules/types/rule.type';
 import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
-
 
 export const RolesMapping = () => {
   const [isEditingRule, setIsEditingRule] = useState(false);
@@ -36,7 +35,10 @@ export const RolesMapping = () => {
 
   useEffect(() => {
     if (!rolesLoading && (roles || [])) {
-      const _rolesObject = (roles || []).reduce((rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }), {});
+      const _rolesObject = (roles || []).reduce(
+        (rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }),
+        {}
+      );
       setRolesEquivalences(_rolesObject);
     }
     if (rolesError) {
@@ -49,7 +51,13 @@ export const RolesMapping = () => {
       const wazuhSecurity = new WazuhSecurity();
       const users = await wazuhSecurity.security.getUsers();
       const _users = users.map((item, idx) => {
-        return { id: idx, user: item.username, roles: [], full_name: item.full_name, email: item.email }
+        return {
+          id: idx,
+          user: item.username,
+          roles: [],
+          full_name: item.full_name,
+          email: item.email,
+        };
       });
       setInternalUsers(_users);
     } catch (error) {
@@ -59,7 +67,7 @@ export const RolesMapping = () => {
 
   const getRules = async () => {
     try {
-      const _rules = await RulesServices.GetRules();      
+      const _rules = await RulesServices.GetRules();
       setRules(_rules);
     } catch (error) {
       ErrorHandler.error('There was an error loading rules');
@@ -79,23 +87,48 @@ export const RolesMapping = () => {
 
   let editFlyout;
   if (isEditingRule) {
-    editFlyout = (<EuiOverlayMask
-      headerZindexLocation="below"
-      onClick={() => {
-        setIsEditingRule(false)
-      }}>
-      <RolesMappingEdit rule={selectedRule} closeFlyout={(isVisible) => { setIsEditingRule(isVisible); initData() }} rolesEquivalences={rolesEquivalences} roles={roles} internalUsers={internalUsers} onSave={async () => await updateRoles()} />
-    </EuiOverlayMask>)
+    editFlyout = (
+      <EuiOverlayMask
+        headerZindexLocation="below"
+        onClick={() => {
+          setIsEditingRule(false);
+        }}
+      >
+        <RolesMappingEdit
+          rule={selectedRule}
+          closeFlyout={isVisible => {
+            setIsEditingRule(isVisible);
+            initData();
+          }}
+          rolesEquivalences={rolesEquivalences}
+          roles={roles}
+          internalUsers={internalUsers}
+          onSave={async () => await updateRoles()}
+        />
+      </EuiOverlayMask>
+    );
   }
   let createFlyout;
   if (isCreatingRule) {
-    editFlyout = (<EuiOverlayMask
-      headerZindexLocation="below"
-      onClick={() => {
-        setIsCreatingRule(false)
-      }}>
-      <RolesMappingCreate closeFlyout={(isVisible) => { setIsCreatingRule(isVisible); initData() }} rolesEquivalences={rolesEquivalences} roles={roles} internalUsers={internalUsers} onSave={async () => await updateRoles()} />
-    </EuiOverlayMask>)
+    editFlyout = (
+      <EuiOverlayMask
+        headerZindexLocation="below"
+        onClick={() => {
+          setIsCreatingRule(false);
+        }}
+      >
+        <RolesMappingCreate
+          closeFlyout={isVisible => {
+            setIsCreatingRule(isVisible);
+            initData();
+          }}
+          rolesEquivalences={rolesEquivalences}
+          roles={roles}
+          internalUsers={internalUsers}
+          onSave={async () => await updateRoles()}
+        />
+      </EuiOverlayMask>
+    );
   }
 
   return (
@@ -108,17 +141,23 @@ export const RolesMapping = () => {
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           <div>
-            <EuiButton
-              onClick={() => setIsCreatingRule(true)}>
-              Create Role mapping
-            </EuiButton>
+            <EuiButton onClick={() => setIsCreatingRule(true)}>Create Role mapping</EuiButton>
             {createFlyout}
             {editFlyout}
           </div>
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
-        <RolesMappingTable rolesEquivalences={rolesEquivalences} loading={loadingTable || rolesLoading} rules={rules} editRule={(item) => { setSelectedRule(item); setIsEditingRule(true); }} updateRules={async () => await updateRoles()}></RolesMappingTable>
+        <RolesMappingTable
+          rolesEquivalences={rolesEquivalences}
+          loading={loadingTable || rolesLoading}
+          rules={rules}
+          editRule={item => {
+            setSelectedRule(item);
+            setIsEditingRule(true);
+          }}
+          updateRules={async () => await updateRoles()}
+        ></RolesMappingTable>
       </EuiPageContentBody>
     </EuiPageContent>
   );

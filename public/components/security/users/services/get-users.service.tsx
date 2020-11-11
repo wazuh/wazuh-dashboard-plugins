@@ -15,11 +15,7 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const GetUsersService = async (): Promise<User[]> => {
-  const response = await WzRequest.apiReq(
-    'GET',
-    '/security/users',
-    {}
-  ) as IApiResponse<User>;
+  const response = (await WzRequest.apiReq('GET', '/security/users', {})) as IApiResponse<User>;
   const users = ((response.data || {}).data || {}).affected_items || [];
   return users;
 };

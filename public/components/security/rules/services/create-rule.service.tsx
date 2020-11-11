@@ -15,11 +15,7 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const CreateRuleService = async (rule: CreateRule): Promise<Rule> => {
-  const response = await WzRequest.apiReq(
-    'POST',
-    '/security/rules',
-    rule
-  ) as IApiResponse<Rule>;
+  const response = (await WzRequest.apiReq('POST', '/security/rules', rule)) as IApiResponse<Rule>;
   const rules = ((response.data || {}).data || {}).affected_items || [{}];
   return rules[0];
 };

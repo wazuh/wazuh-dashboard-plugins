@@ -3,27 +3,27 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
   const usersRulesArray = internalUserRules.map(item => {
     const tmpRule = {};
     tmpRule[item.searchOperation] = {};
-    tmpRule[item.searchOperation][item.user_field] = item.value
+    tmpRule[item.searchOperation][item.user_field] = item.value;
     return tmpRule;
   });
   const rulesArray = rules.map(item => {
     const tmpRule = {};
     tmpRule[item.searchOperation] = {};
-    tmpRule[item.searchOperation][item.user_field] = item.value
+    tmpRule[item.searchOperation][item.user_field] = item.value;
     return tmpRule;
   });
   if (usersRulesArray.length && rulesArray.length) {
-    ruleObject["OR"] = [
+    ruleObject['OR'] = [
       {
-        "OR": usersRulesArray
+        OR: usersRulesArray,
       },
       {
-        [logicalOperator]: rulesArray
-      }
+        [logicalOperator]: rulesArray,
+      },
     ];
   } else {
     if (usersRulesArray.length) {
-      ruleObject["OR"] = usersRulesArray;
+      ruleObject['OR'] = usersRulesArray;
     }
     if (rulesArray.length) {
       ruleObject[logicalOperator] = rulesArray;
@@ -32,7 +32,7 @@ export const getJsonFromRule = (internalUserRules, rules, logicalOperator) => {
   return ruleObject;
 };
 
-const formatRules = (rulesArray) => {
+const formatRules = rulesArray => {
   let wrongFormat = false;
   const tmpRules = rulesArray.map((item, idx) => {
     if (Object.keys(item).length !== 1 || Array.isArray(item[Object.keys(item)[0]])) {
@@ -45,7 +45,7 @@ const formatRules = (rulesArray) => {
     const userFieldTmp = Object.keys(item[searchOperationTmp])[0];
     const valueTmp = item[searchOperationTmp][userFieldTmp];
 
-    return { user_field: userFieldTmp, searchOperation: searchOperationTmp, value: valueTmp }
+    return { user_field: userFieldTmp, searchOperation: searchOperationTmp, value: valueTmp };
   });
 
   return { tmpRules, wrongFormat };
@@ -64,9 +64,10 @@ const getFormatedRules = (rulesArray, internalUsers) => {
   let formatedRules;
   let logicalOperator;
 
-  const operatorsCount = rulesArray.filter(rule => Array.isArray(rule[Object.keys(rule)[0]])).length;  
+  const operatorsCount = rulesArray.filter(rule => Array.isArray(rule[Object.keys(rule)[0]]))
+    .length;
   switch (operatorsCount) {
-    case 0: // only custome rules or internal users 
+    case 0: // only custome rules or internal users
       formatedRules = formatRules(rulesArray);
       wrongFormat = formatedRules.wrongFormat;
       if (!wrongFormat && hasInternalUsers(formatedRules.tmpRules, internalUsers)) {
@@ -92,12 +93,12 @@ const getFormatedRules = (rulesArray, internalUsers) => {
         break;
       }
 
-      //get custome rules 
+      //get custome rules
       operator = Object.keys(rulesArray[1])[0];
       formatedRules = formatRules(rulesArray[1][operator]);
       customeRules = formatedRules.tmpRules;
       wrongFormat = formatedRules.wrongFormat;
-      logicalOperator = (operator || "AND");
+      logicalOperator = operator || 'AND';
 
       break;
     default:
@@ -123,11 +124,11 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
       rulesArray = ruleObject[logicalOperator];
     } else {
       rulesArray = [ruleObject];
-      logicalOperator = "AND";
-    }    
+      logicalOperator = 'AND';
+    }
     const formatedRules = getFormatedRules(rulesArray, internalUsers);
 
-    return { 
+    return {
       customeRules: formatedRules.customeRules,
       internalUsersRules: formatedRules.internalUsersRules,
       wrongFormat: wrongFormat || formatedRules.wrongFormat,
@@ -138,6 +139,6 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
   }
 };
 
-export const getSelectedUserFromRole = (roles) => {
-  return roles.map(role => ({label: role.value, id: role.value}))
-}
+export const getSelectedUserFromRole = roles => {
+  return roles.map(role => ({ label: role.value, id: role.value }));
+};

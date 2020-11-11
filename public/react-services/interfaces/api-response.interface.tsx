@@ -1,4 +1,3 @@
-
 interface IData<T> {
   affected_items: Array<T>;
   failed_items: Array<any>;

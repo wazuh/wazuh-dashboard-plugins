@@ -5,7 +5,7 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiBasicTableColumn,
-  SortDirection
+  SortDirection,
 } from '@elastic/eui';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonModalConfirm } from '../../../common/buttons';
@@ -38,24 +38,27 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       field: 'roles',
       name: 'Roles',
       sortable: true,
-      render: (item) => {
+      render: item => {
         const tmpRoles = item.map((role, idx) => {
-          return <EuiFlexItem key={`role_${idx}`} grow={false}><EuiBadge color="secondary">{rolesEquivalences[role]}</EuiBadge></EuiFlexItem>;
+          return (
+            <EuiFlexItem key={`role_${idx}`} grow={false}>
+              <EuiBadge color="secondary">{rolesEquivalences[role]}</EuiBadge>
+            </EuiFlexItem>
+          );
         });
-        return <EuiFlexGroup
-          wrap
-          responsive={false}
-          gutterSize="xs">
-          {tmpRoles}
-        </EuiFlexGroup>
+        return (
+          <EuiFlexGroup wrap responsive={false} gutterSize="xs">
+            {tmpRoles}
+          </EuiFlexGroup>
+        );
       },
       truncateText: true,
     },
     {
       field: 'id',
       name: 'Status',
-      render: (item) => {
-        return item < 3 && <EuiBadge color="primary" >Reserved</EuiBadge>
+      render: item => {
+        return item < 3 && <EuiBadge color="primary">Reserved</EuiBadge>;
       },
       width: '150',
       sortable: false,
@@ -67,8 +70,12 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonModalConfirm
-            buttonType='icon'
-            tooltip={{ content: item.id < 3 ? "Reserved role mapping can't be deleted" : 'Delete role mapping', position: 'left' }}
+            buttonType="icon"
+            tooltip={{
+              content:
+                item.id < 3 ? "Reserved role mapping can't be deleted" : 'Delete role mapping',
+              position: 'left',
+            }}
             isDisabled={item.id < 3}
             modalTitle={`Do you want to delete the ${item.name} role mapping?`}
             onConfirm={async () => {
@@ -81,15 +88,15 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
               }
             }}
             modalProps={{ buttonColor: 'danger' }}
-            iconType='trash'
-            color='danger'
-            aria-label='Delete role mapping'
-            modalCancelText = 'Cancel'
-            modalConfirmText = 'Confirm'
+            iconType="trash"
+            color="danger"
+            aria-label="Delete role mapping"
+            modalCancelText="Cancel"
+            modalConfirmText="Confirm"
           />
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const sorting = {

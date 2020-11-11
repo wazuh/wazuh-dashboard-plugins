@@ -1,4 +1,3 @@
-
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 /*
  * Wazuh app - Get Roles Service
@@ -16,12 +15,8 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { Role } from '../types/role.type';
 
 const GetRolesService = async (): Promise<Role[]> => {
-  const response = await WzRequest.apiReq(
-    'GET',
-    '/security/roles',
-    {}
-  ) as IApiResponse<Role>;
-  const roles =  ((response.data || {}).data || {}).affected_items || [];
+  const response = (await WzRequest.apiReq('GET', '/security/roles', {})) as IApiResponse<Role>;
+  const roles = ((response.data || {}).data || {}).affected_items || [];
   return roles;
 };
 

@@ -20,14 +20,20 @@ import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
 export class WzRequest {
   static wazuhConfig: any;
-  
+
   /**
    * Permorn a generic request
    * @param {String} method
    * @param {String} path
    * @param {Object} payload
    */
-  static async genericReq(method, path, payload:any = null, customTimeout = false, shouldRetry = true) {
+  static async genericReq(
+    method,
+    path,
+    payload: any = null,
+    customTimeout = false,
+    shouldRetry = true
+  ) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -42,7 +48,7 @@ export class WzRequest {
         headers: { 'Content-Type': 'application/json', 'kbn-xsrf': 'kibana' },
         url: url,
         data: payload,
-        timeout: customTimeout || timeout
+        timeout: customTimeout || timeout,
       };
       const data = await axios(options);
       if (data['error']) {
@@ -66,15 +72,21 @@ export class WzRequest {
           return;
         }
       }
-      const errorMessage = (error && error.response && error.response.data && error.response.data.message) || (error || {}).message;
-      if(typeof errorMessage === 'string' && errorMessage.includes("status code 401") && shouldRetry){
-        try{
+      const errorMessage =
+        (error && error.response && error.response.data && error.response.data.message) ||
+        (error || {}).message;
+      if (
+        typeof errorMessage === 'string' &&
+        errorMessage.includes('status code 401') &&
+        shouldRetry
+      ) {
+        try {
           await WzAuthentication.refresh(true);
           return this.genericReq(method, path, payload, customTimeout, false);
-        }catch(error){
+        } catch (error) {
           return ((error || {}).data || {}).message || false
-          ? Promise.reject(error.data.message)
-          : Promise.reject(error.message || error)
+            ? Promise.reject(error.data.message)
+            : Promise.reject(error.message || error);
         }
       }
       return errorMessage
@@ -89,7 +101,7 @@ export class WzRequest {
    * @param {String} path API route
    * @param {Object} body Request body
    */
-  static async apiReq(method, path, body, shouldRetry=true): Promise<IApiResponse<any>> {
+  static async apiReq(method, path, body, shouldRetry = true): Promise<IApiResponse<any>> {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
@@ -98,11 +110,17 @@ export class WzRequest {
       const requestData = { method, path, body, id };
       const response = await this.genericReq('POST', '/api/request', requestData);
       const hasFailed = (((response || {}).data || {}).data || {}).total_failed_items || 0;
-      if(hasFailed){
-        const error = ((((response.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
-        const failed_ids = ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
-        const message = ((response.data || {}).message || "Unexpected error");
-        return Promise.reject(`${message} (${error.code}) - ${error.message} ${failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ""}`)
+      if (hasFailed) {
+        const error =
+          ((((response.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
+        const failed_ids =
+          ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
+        const message = (response.data || {}).message || 'Unexpected error';
+        return Promise.reject(
+          `${message} (${error.code}) - ${error.message} ${
+            failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''
+          }`
+        );
       }
       return Promise.resolve(response);
     } catch (error) {

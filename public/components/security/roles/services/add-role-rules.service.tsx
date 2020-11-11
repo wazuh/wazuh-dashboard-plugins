@@ -15,11 +15,11 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const AddRoleRulesService = async (roleId: number, rules: number[]): Promise<Role> => {
-  const response = await WzRequest.apiReq(
+  const response = (await WzRequest.apiReq(
     'POST',
     `/security/roles/${roleId}/rules?rule_ids=${rules.join(',')}`,
     {}
-  ) as IApiResponse<Role>;
+  )) as IApiResponse<Role>;
   const roles = ((response.data || {}).data || {}).affected_items || [{}];
   return roles[0];
 };

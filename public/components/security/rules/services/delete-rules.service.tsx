@@ -15,12 +15,12 @@ import { Rule } from '../types/rule.type';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
 const GetRulesService = async (ruleIds: number[], deleteAll: boolean = false): Promise<Rule[]> => {
-  const response = await WzRequest.apiReq(
+  const response = (await WzRequest.apiReq(
     'DELETE',
     `/security/rules?rule_ids=${deleteAll ? 'all' : ruleIds.join(',')}`,
     {}
-  ) as IApiResponse<Rule>;
-  const rules =  ((response.data || {}).data || {}).affected_items || [];
+  )) as IApiResponse<Rule>;
+  const rules = ((response.data || {}).data || {}).affected_items || [];
   return rules;
 };
 

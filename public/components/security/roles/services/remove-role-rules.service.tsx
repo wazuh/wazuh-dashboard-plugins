@@ -14,12 +14,16 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 import { Role } from '../types/role.type';
 
-const RemoveRoleRulesService = async (roleId: number, rulesIds: number[], removeAll: boolean = false): Promise<Role> => {
-  const response = await WzRequest.apiReq(
+const RemoveRoleRulesService = async (
+  roleId: number,
+  rulesIds: number[],
+  removeAll: boolean = false
+): Promise<Role> => {
+  const response = (await WzRequest.apiReq(
     'DELETE',
     `/security/roles/${roleId}/rules?rule_ids=${removeAll ? 'all' : rulesIds.join(',')}`,
     {}
-  ) as IApiResponse<Role>;
+  )) as IApiResponse<Role>;
   const roles = ((response.data || {}).data || {}).affected_items || [{}];
   return roles[0];
 };

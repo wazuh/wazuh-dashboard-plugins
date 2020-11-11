@@ -8,4 +8,4 @@ export default {
   CreateRule,
   DeleteRules,
   UpdateRule,
-}
+};

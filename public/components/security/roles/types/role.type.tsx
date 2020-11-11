@@ -1,7 +1,7 @@
 export interface Role {
-  id: number,
+  id: number;
   name: string;
-  polices: number[];  
+  polices: number[];
   users: number[];
   rules: number[];
 }

@@ -6,10 +6,10 @@ import AddUserRoles from './add-user-roles.service';
 import RemoveUserRoles from './remove-user-roles.service';
 
 export default {
-    GetUsers,
-    CreateUser,
-    UpdateUser,
-    DeleteUsers,
-    AddUserRoles,
-    RemoveUserRoles,
+  GetUsers,
+  CreateUser,
+  UpdateUser,
+  DeleteUsers,
+  AddUserRoles,
+  RemoveUserRoles,
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   EuiInMemoryTable,
@@ -7,7 +6,7 @@ import {
   EuiLoadingSpinner,
   EuiFlexItem,
   EuiBasicTableColumn,
-  SortDirection
+  SortDirection,
 } from '@elastic/eui';
 import { WzButtonModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
@@ -39,20 +38,23 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
       field: 'roles',
       name: 'Roles',
       dataType: 'boolean',
-      render: (userRoles) => {
+      render: userRoles => {
         if (rolesLoading) {
-          return <EuiLoadingSpinner size="m" />
+          return <EuiLoadingSpinner size="m" />;
         }
         if (!userRoles || !userRoles.length) return <></>;
         const tmpRoles = userRoles.map((userRole, idx) => {
-          return <EuiFlexItem grow={false} key={idx}><EuiBadge color="secondary">{roles[userRole]}</EuiBadge></EuiFlexItem>;
+          return (
+            <EuiFlexItem grow={false} key={idx}>
+              <EuiBadge color="secondary">{roles[userRole]}</EuiBadge>
+            </EuiFlexItem>
+          );
         });
-        return <EuiFlexGroup
-          wrap
-          responsive={false}
-          gutterSize="xs">
-          {tmpRoles}
-        </EuiFlexGroup>
+        return (
+          <EuiFlexGroup wrap responsive={false} gutterSize="xs">
+            {tmpRoles}
+          </EuiFlexGroup>
+        );
       },
       sortable: true,
     },
@@ -63,8 +65,11 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonModalConfirm
-            buttonType='icon'
-            tooltip={{ content: item.id < 3 ? "Reserved users mapping can't be deleted" : 'Delete user', position: 'left' }}
+            buttonType="icon"
+            tooltip={{
+              content: item.id < 3 ? "Reserved users mapping can't be deleted" : 'Delete user',
+              position: 'left',
+            }}
             isDisabled={item.id < 3}
             modalTitle={`Do you want to delete ${item.name} user?`}
             onConfirm={async () => {
@@ -77,15 +82,15 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
               }
             }}
             modalProps={{ buttonColor: 'danger' }}
-            iconType='trash'
-            color='danger'
-            aria-label='Delete user'
-            modalCancelText='Cancel'
-            modalConfirmText='Confirm'
+            iconType="trash"
+            color="danger"
+            aria-label="Delete user"
+            modalCancelText="Cancel"
+            modalConfirmText="Confirm"
           />
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const sorting = {
