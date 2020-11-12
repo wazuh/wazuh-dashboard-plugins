@@ -134,7 +134,8 @@ export const windowsInvalidLoginPassword = {
 }
 
 export const userLoginFailed = {
-  rule: {
+  rule: {    
+    id: "5556",
     level: 5,
     description: "PAM: User login failed.",
     mail: false,
