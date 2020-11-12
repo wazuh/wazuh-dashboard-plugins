@@ -5,15 +5,18 @@ type userValue<T> = {userValue: T}
 
 type kbnSettings = {
   buildNum: userValue<number>
-  metaFields?: userValue<string[]>,
+  timeFilter?: userValue<string[]>,
 };
-
 type responseKbnSettings = {settings: kbnSettings};
 
-export function checkKibanaSettings (removeMetaFields: boolean) {
+const timeFilterSetting = [
+    { from: "nowtime-24h" },
+    { to: 'now'}];
+
+export function checkKibanaSettingsTimeFilter (removeMetaFields: boolean) {
   removeMetaFields && getKibanaSettings()
-  .then(checkMetafieldSetting)
-  .then(updateMetaFieldsSetting)
+  .then(checktimeFilter)
+  .then(updateTimeFilterSetting)
   .catch(error => error !== 'Unable to update config' && console.log(error));
 }
 
@@ -22,16 +25,18 @@ async function getKibanaSettings(): Promise<responseKbnSettings> {
   return kibanaSettings.data;
 }
 
-async function checkMetafieldSetting({settings}: responseKbnSettings) {
-  const { metaFields } = settings;
-  return !!metaFields && !!metaFields.userValue.length;
+async function checktimeFilter({settings}: responseKbnSettings) {
+  const { timeFilter } = settings;
+  return !!timeFilter && !!timeFilter.userValue.length;
 }
 
 
-async function updateMetaFieldsSetting(isModified:boolean) {
+async function updateTimeFilterSetting(isModified:boolean) {
   return !isModified && await GenericRequest.request(
     'POST',
     '/api/kibana/settings',
-    {"changes":{"metaFields":[]}}
+    {"changes":{"timepicker:timeDefaults":[{
+        timeFilterSetting
+      }]}}
   );
 }
