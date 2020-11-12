@@ -1,15 +1,14 @@
 import { ISecurityFactory } from '../'
+import { SecurityPluginSetup } from 'x-pack/plugins/security/server';
+import { KibanaRequest, RequestHandlerContext } from 'src/core/server';
 
 export class XpackFactory implements ISecurityFactory {
-  server;
 
-  constructor(server) {
-    this.server = server;
-  }
+  constructor(private security: SecurityPluginSetup) {}
 
-  async getCurrentUser(req) {
+  async getCurrentUser(request: KibanaRequest) {
     try {
-      const authInfo = await this.server.newPlatform.setup.plugins.security.authc.getCurrentUser(req);
+      const authInfo = await this.security.authc.getCurrentUser(request);
       if(!authInfo) return { username: 'elastic'};
       return authInfo;
     } catch (error) {

@@ -16,8 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { SecurityPluginSetup } from 'x-pack/plugins/security/server';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhPluginSetup {}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface WazuhPluginStart {}
+
+export type PluginSetup = {
+    security?: SecurityPluginSetup,
+    opendistroSecurity?: {}
+  }

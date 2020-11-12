@@ -1,24 +1,19 @@
 import { ISecurityFactory } from '../'
+import { KibanaRequest, RequestHandlerContext } from 'src/core/server';
 
 export class OpendistroFactory implements ISecurityFactory {
-  server;
 
-  constructor(server) {
-    this.server = server;
+  constructor(private opendistroSecurity: any) {
   }
 
-  async getCurrentUser(req) {
+  async getCurrentUser(request: KibanaRequest, context:RequestHandlerContext) {
     try {
-      const elasticRequest = this.server.plugins.elasticsearch.getCluster('data');
       const params = {
         path: `_opendistro/_security/api/account`,
         method: 'GET',
       };
-      
-      const data = await elasticRequest.callWithRequest(
-        req,
-        'transport.request',
-        params);
+
+      const data = await context.core.elasticsearch.client.asCurrentUser.transport.request(params);
       return data;
     } catch (error) {
       throw error; 

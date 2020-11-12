@@ -5,11 +5,9 @@
     "configPath": [
         "wazuh"
     ],
-    "requiredPlugins": [
-        "navigation",
-        "discover",
-        "kibanaLegacy",
-        "visualizations"
+    "optionalPlugins": [
+        "security",
+        "opendistroSecurity"
     ],
     "server": true,
     "ui": false

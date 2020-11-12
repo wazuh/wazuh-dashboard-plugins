@@ -25,11 +25,9 @@ import {
   PluginInitializerContext,
 } from 'kibana/server';
 
-import { WazuhPluginSetup, WazuhPluginStart } from './types';
+import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
+import { SecurityObj } from './lib/security-factory';
 import { setupRoutes } from './routes';
-interface LegacySetup {
-  server: any
-}
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   private readonly logger: Logger;
@@ -37,24 +35,20 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
   }
-  
-  public setup(core: CoreSetup, plugins: WazuhPluginSetup) {
+
+  public setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
-    // Add to context parameter in route handler an interface called wazuh with some services
-    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
-      return {
-        logger: this.logger
-      };
-    });
+    const securityObj = SecurityObj(plugins);
     // TODO: implement router
     const router = core.http.createRouter();
-    setupRoutes(router);
+    setupRoutes(router, securityObj);
     // TODO: implement Wazuh monitoring
 
     // TODO: implement Scheduler handler 
-    
-    return {};
+
+    return {
+    };
   }
 
   public start(core: CoreStart) {

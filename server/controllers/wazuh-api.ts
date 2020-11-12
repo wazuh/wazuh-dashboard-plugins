@@ -32,40 +32,25 @@ import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
 import { UpdateRegistry } from '../lib/update-registry';
 import { ApiInterceptor } from '../lib/api-interceptor';
-import { SecurityObj } from '../lib/security-factory';
+import { ISecurityFactory } from '../lib/security-factory';
 import jwtDecode from 'jwt-decode';
 import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
+import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
 
 export class WazuhApiCtrl {
-  /**
-   * Constructor
-   * @param {*} router
-   */
-  constructor(router) {
-    // this.PLATFORM = this.getCurrentPlatform(server);
+
+  constructor(private securityObj: ISecurityFactory) {
     this.queue = Queue;
     // this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
-    // this.securityObj = SecurityObj(this.PLATFORM, server);
     this.apiInterceptor = new ApiInterceptor();
-
   }
 
-  async checkWazuhWui(apiId){
+  async checkWazuhWui(apiId: string){
     const host = await this.manageHosts.getHostById(apiId);
     if(host && host.username === 'wazuh-wui') return true;
     return false;
-  }
-
-  getCurrentPlatform(server) {
-    if (server.plugins.security) {
-      return WAZUH_SECURITY_PLUGIN_XPACK_SECURITY;
-    }
-    if (server.newPlatform.setup.plugins.opendistroSecurity) {
-      return WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH;
-    }
-    return undefined;
   }
 
   getApiIdFromCookie(cookie){
@@ -92,17 +77,17 @@ export class WazuhApiCtrl {
     return false;
   }
 
-  getUserFromAuthContext(authContext){
+  getUserFromAuthContext(authContext){ // TODO: change method of check platform type
     if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_XPACK_SECURITY)
       return authContext.username;
     if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH)
       return authContext.user_name;
   }
 
-  async getToken(context, request, response) {
+  async getToken(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { force, idHost } = request.body;
-      const authContext = await this.securityObj.getCurrentUser(req);
+      const authContext = await this.securityObj.getCurrentUser(request, context);
       const username = this.getUserFromAuthContext(authContext);
       if(!force && request.headers.cookie && username === this.getUserFromCookie(request.headers.cookie) && idHost === this.getApiIdFromCookie(request.headers.cookie)){
         const wzToken = this.getTokenFromCookie(request.headers.cookie);
@@ -127,10 +112,6 @@ export class WazuhApiCtrl {
       }else{
         token = await this.apiInterceptor.authenticateApi(idHost)
       }
-      const response = res.response({token}); //TODO 
-      response.state('wz-token', token, {isSecure: false, path: '/'});
-      response.state('wz-user', username, {isSecure: false, path: '/'});
-      response.state('wz-api', idHost, {isSecure: false, path: '/'});
       
       return response.ok({
         headers: {
@@ -375,7 +356,7 @@ export class WazuhApiCtrl {
           return ErrorResponse(`The API ${request.body.id} was not found`, 3029, 500, response);
         }
         // Check if a password is given
-      } else if (request.body && request.body.password) {
+      } else if (request.body && request.body.password) { // TODO: Check if this is in use
         apiAvailable = request.body;
         apiAvailable.password = Buffer.from(request.body.password, 'base64').toString('ascii');
       }
