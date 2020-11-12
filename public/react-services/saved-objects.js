@@ -210,7 +210,13 @@ export class SavedObject {
         {
           attributes: {
             title: pattern,
-            timeFieldName: 'timestamp'
+            timeFieldName: 'timestamp',
+            fieldFormatMap: `{
+              "data.virustotal.permalink":{"id":"url"},
+              "data.vulnerability.reference":{"id":"url"},
+              "data.url":{"id":"url"}
+            }`,
+            sourceFilters: '[{"value":"@timestamp"}]'
           }
         },
         fields

@@ -66,13 +66,11 @@ export class ModulesHelper {
         }
       });
       if (!found) {
-        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
-        $(closeButton).removeClass('hide-close-button');
+        $(filters[i]).siblings('.euiBadge__iconButton').removeClass('hide-close-button');       
+        $(filters[i]).off('click'); 
       } else {
-        const closeButton = $(`.globalFilterItem .euiBadge__iconButton`)[i];
-        $(closeButton).addClass('hide-close-button');
-        const optionsButton = $(`.globalFilterItem .euiBadge__childButton`)[i];
-        $(optionsButton).on('click', ev => {
+        $(filters[i]).siblings('.euiBadge__iconButton').addClass('hide-close-button');
+        $(filters[i]).on('click', ev => {
           ev.stopPropagation();
         });
       }

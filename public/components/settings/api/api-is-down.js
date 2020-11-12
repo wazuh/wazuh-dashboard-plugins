@@ -110,8 +110,8 @@ hosts:
     - production:
         url: https://172.16.1.2
         port: 55000
-        username: wazuh-wui
-        password: wazuh-wui
+        username: wazuh
+        password: wazuh
         run_as: false
 `;
 

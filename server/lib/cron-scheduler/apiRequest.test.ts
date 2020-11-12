@@ -5,8 +5,8 @@ jest.mock('axios');
 describe('ApiRequest', () => {
   const apiExample1: IApi = {
     id: 'default',
-    user: 'wazuh-wui',
-    password: 'wazuh-wui',
+    user: 'wazuh',
+    password: 'wazuh',
     url: 'http://localhost',
     port: 55000,
     cluster_info: {
@@ -58,34 +58,6 @@ describe('ApiRequest', () => {
       await apiRequest.getData();
     } catch (error) {
       expect(error).toEqual({error: 404, message: "Nothing matches the given URI"});
-    }
-  })
-
-  test('should throw an error when the api user are unauthorized', async () => {
-    const mockResponse = {
-      response: {
-        response: {
-          data: {
-            "type": "about:blank",
-            "title": "Unauthorized",
-            "detail": "The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password),or your browser doesn't understand how to supply the credentials required.",
-            "status": 401
-          },
-          status: 404,
-          statusText: 'Not Found',
-          headers: {},
-          config: {},
-        },
-        "status": 401
-      }
-    };
-    axios.mockRejectedValue(mockResponse);
-
-    const apiRequest = new ApiRequest('/cluster/status', apiExample1);
-    try {
-      await apiRequest.getData();
-    } catch (error) {
-      expect(error).toEqual({error: 401, message: 'Wrong Wazuh API credentials used'});
     }
   })
 

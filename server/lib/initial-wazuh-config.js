@@ -136,7 +136,7 @@ export const initialWazuhConfig = `---
 #cron.statistics.apis: []
 #
 # Define the frequency of task execution using cron schedule expressions
-#cron.statistics.interval: 0 0 * * * *
+#cron.statistics.interval: 0 */5 * * * *
 #
 # Define the name of the index in which the documents are to be saved.
 #cron.statistics.index.name: statistics
