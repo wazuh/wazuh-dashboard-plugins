@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Hide empty columns of the processes table of the MacOS agents [#2570](https://github.com/wazuh/wazuh-kibana-app/pull/2570)
 
+### Fixed
+
+- Inconsistent data in sample data alerts [#2618](https://github.com/wazuh/wazuh-kibana-app/pull/2618)
+
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4008
 
 ### Fixed
