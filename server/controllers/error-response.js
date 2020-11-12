@@ -29,7 +29,7 @@ export function ErrorResponse(
   message = null,
   code = null,
   statusCode = null,
-  h
+  response
 ) {
   message.includes('password: ') ? message = message.split('password: ')[0] + ' password: ***' : false;
   let filteredMessage = '';
@@ -69,15 +69,18 @@ export function ErrorResponse(
     }
   }
 
-  return h
-    .response({
+  const statusCodeResponse = statusCode || 500;
+  return response.custom({
+    statusCode: statusCodeResponse,
+    body: {
       message: filteredMessage
         ? `${code || 1000} - ${filteredMessage}`
         : typeof message === 'string'
         ? `${code || 1000} - ${message}`
         : `${code || 1000} - Unexpected error`,
       code: code || 1000,
-      statusCode: statusCode || 500
-    })
-    .code(statusCode || 500);
+      statusCode: statusCodeResponse
+    }
+  })
 }
+

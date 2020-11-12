@@ -41,6 +41,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   public setup(core: CoreSetup, plugins: WazuhPluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
+    // Add to context parameter in route handler an interface called wazuh with some services
+    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
+      return {
+        logger: this.logger
+      };
+    });
     // TODO: implement router
     const router = core.http.createRouter();
     setupRoutes(router);
