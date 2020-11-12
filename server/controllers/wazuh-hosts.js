@@ -60,6 +60,10 @@ export class WazuhHostsCtrl {
         const id = Object.keys(h)[0];
         const api = Object.assign(h[id], { id: id });
         const host = Object.assign(api, registry[id]);
+        // Check if api.run_as is false or undefined, then it set to false in cache
+        if(!api.run_as){
+          CacheInMemoryAPIUserAllowRunAs.set(id, api.username, false);
+        };
         // Add to run_as from API user. Use the cached value or get it doing a request
         host.allow_run_as = CacheInMemoryAPIUserAllowRunAs.has(id, api.username)
           ? CacheInMemoryAPIUserAllowRunAs.get(id, api.username)
@@ -130,6 +134,10 @@ export class WazuhHostsCtrl {
     try{
       const api = await this.manageHosts.getHostById(apiId);
       log('wazuh-hosts:checkAPIUserAllowRunAs', `Check if API user ${api.username} (${apiId}) has run_as`, 'debug');
+      // Check if api.run_as is false or undefined, then it set to false in cache
+      if(!api.run_as){
+        CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, false);
+      };
       // Check if the API user is cached and returns
       if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
         return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
@@ -138,7 +146,7 @@ export class WazuhHostsCtrl {
         'get',
         `${api.url}:${api.port}/security/users/me`,
         {},
-        { idHost: apiId, /*forceRefresh: true*/ }
+        { idHost: apiId }
       );
       const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as;
       // Cache the run_as for the API user

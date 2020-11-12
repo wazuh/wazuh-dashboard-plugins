@@ -55,7 +55,11 @@ export class WazuhApiCtrl {
     try{
       const api = await this.manageHosts.getHostById(apiId);
       log('wazuh-api:checkAPIUserAllowRunAs', `Check if API user ${api.username} (${apiId}) has run_as`, 'debug');
-      // Check if the API user is cached and returns
+      // Check if api.run_as is false or undefined, then it set to false in cache
+      if(!api.run_as){
+        CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, false);
+      };
+      // Check if the API user is cached and returns it
       if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
         return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
       };
@@ -424,17 +428,19 @@ export class WazuhApiCtrl {
           );
 
           // Check the run_as for the API user and update it
-          const responseApiUserAllowRunAs = await this.apiInterceptor.request(
-            'GET',
-            `${apiAvailable.url}:${apiAvailable.port}/security/users/me`,
-            {},
-            { idHost: req.payload.id }
-          );
           let apiUserAllowRunAs = false;
-          if(responseApiUserAllowRunAs.status === 200) {
-            apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as;
-            CacheInMemoryAPIUserAllowRunAs.set(req.payload.id, apiAvailable.username, apiUserAllowRunAs);
+          if(apiAvailable.run_as){
+            const responseApiUserAllowRunAs = await this.apiInterceptor.request(
+              'GET',
+              `${apiAvailable.url}:${apiAvailable.port}/security/users/me`,
+              {},
+              { idHost: req.payload.id }
+            );
+            if(responseApiUserAllowRunAs.status === 200) {
+              apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as;
+            }
           }
+          CacheInMemoryAPIUserAllowRunAs.set(req.payload.id, apiAvailable.username, apiUserAllowRunAs);
 
           if (responseCluster.status === 200) {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');

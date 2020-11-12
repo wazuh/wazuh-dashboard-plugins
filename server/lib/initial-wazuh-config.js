@@ -168,11 +168,19 @@ export const initialWazuhConfig = `---
 #     port: <port>
 #     username: <username>
 #     password: <password>
+#     run_as: <true|false>
+#
+#     run_as: Define how the app user gets his/her app permissions.
+#         Values:
+#           - true: use his/her authentication context. Require Wazuh API user allows run_as.
+#           - false or not defined: get same permissions of Wazuh API user.
+ 
 
 hosts:
   - default:
      url: https://localhost
      port: 55000
-     username: wazuh-wui
-     password: wazuh-wui
+     username: wazuh
+     password: wazuh
+     run_as: false
 `
