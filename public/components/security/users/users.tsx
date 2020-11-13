@@ -66,13 +66,13 @@ export const Users = compose(
   }, []);
 
   let editFlyout, createFlyout;
-  const closeEditFlyout = async () => {
-    await getUsers();
+  const closeEditFlyout = async refresh => {
+    if (refresh) await getUsers();
     setIsEditFlyoutVisible(false);
   };
 
-  const closeCreateFlyout = async () => {
-    await getUsers();
+  const closeCreateFlyout = async (refresh) => {
+    if (refresh) await getUsers();
     setIsCreateFlyoutVisible(false);
   };
 

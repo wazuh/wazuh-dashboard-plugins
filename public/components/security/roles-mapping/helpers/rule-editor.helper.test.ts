@@ -27,13 +27,13 @@ const internalUsersRulesJsonObject = {
   ],
 };
 
-const customeRules = [
+const customRules = [
   { user_field: 'user_name', searchOperation: 'FIND', value: 'admin' },
   { user_field: 'user_email', searchOperation: 'FIND', value: 'admin@admin' },
   { user_field: 'user_id', searchOperation: 'FIND', value: '10' },
 ];
 
-const customeRulesJsonObject = {
+const customRulesJsonObject = {
   AND: [
     {
       FIND: {
@@ -54,7 +54,7 @@ const customeRulesJsonObject = {
 };
 
 const bothRulesJsonObject = {
-  OR: [{ ...internalUsersRulesJsonObject }, { ...customeRulesJsonObject }],
+  OR: [{ ...internalUsersRulesJsonObject }, { ...customRulesJsonObject }],
 };
 
 describe('Rule Editor Helper', () => {
@@ -64,7 +64,7 @@ describe('Rule Editor Helper', () => {
         const json = JSON.stringify(internalUsersRulesJsonObject);
         const result = decodeJsonRule(json, internalUsers);
         expect(result).toEqual({
-          customeRules: [],
+          customRules: [],
           internalUsersRules,
           wrongFormat: false,
           logicalOperator: 'OR',
@@ -72,12 +72,12 @@ describe('Rule Editor Helper', () => {
       });
     });
 
-    describe('Given a Json with only custome rules', () => {
-      it('Should return all the custome rules', () => {
-        const json = JSON.stringify(customeRulesJsonObject);
+    describe('Given a Json with only custom rules', () => {
+      it('Should return all the custom rules', () => {
+        const json = JSON.stringify(customRulesJsonObject);
         const result = decodeJsonRule(json, internalUsers);
         expect(result).toEqual({
-          customeRules,
+          customRules,
           internalUsersRules: [],
           wrongFormat: false,
           logicalOperator: 'AND',
@@ -85,12 +85,12 @@ describe('Rule Editor Helper', () => {
       });
     });
 
-    describe('Given a Json with internal users rules and custome rules', () => {
+    describe('Given a Json with internal users rules and custom rules', () => {
       it('Should return all the rules', () => {
         const json = JSON.stringify(bothRulesJsonObject);
         const result = decodeJsonRule(json, internalUsers);
         expect(result).toEqual({
-          customeRules,
+          customRules,
           internalUsersRules,
           wrongFormat: false,
           logicalOperator: 'AND',
@@ -100,10 +100,10 @@ describe('Rule Editor Helper', () => {
 
     describe('Given a Json  without initial operator', () => {
       it('Should return wrong format', () => {
-        const json = JSON.stringify(customeRulesJsonObject.AND);
+        const json = JSON.stringify(customRulesJsonObject.AND);
         const result = decodeJsonRule(json, internalUsers);
         expect(result).toEqual({
-          customeRules: [],
+          customRules: [],
           internalUsersRules: [],
           wrongFormat: true,
           logicalOperator: 'AND',
@@ -162,17 +162,17 @@ describe('Rule Editor Helper', () => {
       });
     });
 
-    describe('Given only an array of custome rules', () => {
+    describe('Given only an array of custom rules', () => {
       it('Should retuns the correct Json object', () => {
-        const JsonObject = getJsonFromRule([], customeRules, 'AND');
+        const JsonObject = getJsonFromRule([], customRules, 'AND');
 
-        expect(JsonObject).toEqual(customeRulesJsonObject);
+        expect(JsonObject).toEqual(customRulesJsonObject);
       });
     });
 
-    describe('Given an array of custome rules and an array of internal users rules', () => {
+    describe('Given an array of custom rules and an array of internal users rules', () => {
       it('Should retuns the correct Json object', () => {
-        const JsonObject = getJsonFromRule(internalUsersRules, customeRules, 'AND');
+        const JsonObject = getJsonFromRule(internalUsersRules, customRules, 'AND');
 
         expect(JsonObject).toEqual(bothRulesJsonObject);
       });

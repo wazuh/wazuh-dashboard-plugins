@@ -45,11 +45,12 @@ export const CreateUser = ({ closeFlyout }) => {
     password: '',
     confirmPassword: '',
   });
+  const [showApply, setShowApply] = useState(false);
 
   const userNameRef = useRef(false);
   useDebouncedEffect(
     () => {
-      if (userNameRef.current) validateField('userName');
+      if (userNameRef.current) validateFields(['userName']);
       else userNameRef.current = true;
     },
     300,
@@ -59,7 +60,7 @@ export const CreateUser = ({ closeFlyout }) => {
   const passwordRef = useRef(false);
   useDebouncedEffect(
     () => {
-      if (passwordRef.current) validateField('password');
+      if (passwordRef.current) validateFields(['password', 'confirmPassword']);
       else passwordRef.current = true;
     },
     300,
@@ -69,11 +70,19 @@ export const CreateUser = ({ closeFlyout }) => {
   const confirmPasswordRef = useRef(false);
   useDebouncedEffect(
     () => {
-      if (confirmPasswordRef.current) validateField('confirmPassword');
+      if (confirmPasswordRef.current) validateFields(['confirmPassword']);
       else confirmPasswordRef.current = true;
     },
     300,
     [confirmPassword]
+  );
+
+  useDebouncedEffect(
+    () => {
+      setShowApply(isValidForm(false));
+    },
+    300,
+    [userName, password, confirmPassword]
   );
 
   const validations = {
@@ -101,20 +110,22 @@ export const CreateUser = ({ closeFlyout }) => {
     ],
   };
 
-  const validateField = field => {
-    const error = validations[field].reduce((result, validation) => {
-      return !!result ? result : validation.fn();
-    }, '');
-    setFormErrors({ ...formErrors, [field]: error });
-    return !!error;
+  const validateFields = (fields, showErrors = true) => {
+    const _formErrors = { ...formErrors };
+    let isValid = true;
+    fields.forEach(field => {
+      const error = validations[field].reduce((currentError, validation) => {
+        return !!currentError ? currentError : validation.fn();
+      }, '');
+      _formErrors[field] = error;
+      isValid = isValid && !!!error;
+    });
+    if (showErrors) setFormErrors(_formErrors);
+    return isValid;
   };
 
-  const isValidForm = () => {
-    let errors = false;
-    Object.keys(validations).forEach(field => {
-      errors = errors || validateField(field);
-    });
-    return !errors;
+  const isValidForm = (showErrors = true) => {
+    return validateFields(Object.keys(validations), showErrors);
   };
 
   const editUser = async () => {
@@ -136,7 +147,7 @@ export const CreateUser = ({ closeFlyout }) => {
       await addRoles(user.id);
 
       ErrorHandler.info('User was successfully created');
-      closeFlyout(false);
+      closeFlyout(true);
     } catch (error) {
       ErrorHandler.handle(error, 'There was an error');
       setIsLoading(false);
@@ -188,7 +199,7 @@ export const CreateUser = ({ closeFlyout }) => {
               label="User name"
               isInvalid={!!formErrors.userName}
               error={formErrors.userName}
-              helpText="Introduce a the user name for the user."
+              helpText="Introduce the user name for the user."
             >
               <EuiFieldText
                 placeholder="User name"
@@ -256,7 +267,7 @@ export const CreateUser = ({ closeFlyout }) => {
           <EuiSpacer />
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <EuiButton fill isLoading={isLoading} onClick={editUser}>
+              <EuiButton fill isLoading={isLoading} onClick={editUser} isDisabled={!showApply}>
                 Apply
               </EuiButton>
             </EuiFlexItem>

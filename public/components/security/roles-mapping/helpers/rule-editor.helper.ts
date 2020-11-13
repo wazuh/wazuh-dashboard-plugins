@@ -58,7 +58,7 @@ const hasInternalUsers = (rules, internalUsers) => {
 };
 
 const getFormatedRules = (rulesArray, internalUsers) => {
-  let customeRules = [];
+  let customRules = [];
   let internalUsersRules = [];
   let wrongFormat = false;
   let formatedRules;
@@ -67,16 +67,16 @@ const getFormatedRules = (rulesArray, internalUsers) => {
   const operatorsCount = rulesArray.filter(rule => Array.isArray(rule[Object.keys(rule)[0]]))
     .length;
   switch (operatorsCount) {
-    case 0: // only custome rules or internal users
+    case 0: // only custom rules or internal users
       formatedRules = formatRules(rulesArray);
       wrongFormat = formatedRules.wrongFormat;
       if (!wrongFormat && hasInternalUsers(formatedRules.tmpRules, internalUsers)) {
         internalUsersRules = formatedRules.tmpRules;
       } else if (!wrongFormat) {
-        customeRules = formatedRules.tmpRules;
+        customRules = formatedRules.tmpRules;
       }
       break;
-    case 2: // internal users and custome rules
+    case 2: // internal users and custom rules
       let operator;
       // get internal users rules
       operator = Object.keys(rulesArray[0])[0];
@@ -84,31 +84,31 @@ const getFormatedRules = (rulesArray, internalUsers) => {
       wrongFormat = formatedRules.wrongFormat;
       if (!wrongFormat && hasInternalUsers(formatedRules.tmpRules, internalUsers)) {
         internalUsersRules = formatedRules.tmpRules;
-        customeRules = formatedRules.tmpRules;
+        customRules = formatedRules.tmpRules;
       } else {
-        // set all rules as custome rules
+        // set all rules as custom rules
         formatedRules = formatRules(rulesArray);
-        customeRules = formatedRules.tmpRules;
+        customRules = formatedRules.tmpRules;
         wrongFormat = true;
         break;
       }
 
-      //get custome rules
+      //get custom rules
       operator = Object.keys(rulesArray[1])[0];
       formatedRules = formatRules(rulesArray[1][operator]);
-      customeRules = formatedRules.tmpRules;
+      customRules = formatedRules.tmpRules;
       wrongFormat = formatedRules.wrongFormat;
       logicalOperator = operator || 'AND';
 
       break;
     default:
-      // set all rules as custome rules
+      // set all rules as custom rules
       formatedRules = formatRules(rulesArray);
-      customeRules = formatedRules.tmpRules;
+      customRules = formatedRules.tmpRules;
       wrongFormat = true;
   }
 
-  return { customeRules, internalUsersRules, wrongFormat, logicalOperator };
+  return { customRules, internalUsersRules, wrongFormat, logicalOperator };
 };
 
 export const decodeJsonRule = (jsonRule, internalUsers) => {
@@ -129,13 +129,13 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
     const formatedRules = getFormatedRules(rulesArray, internalUsers);
 
     return {
-      customeRules: formatedRules.customeRules,
+      customRules: formatedRules.customRules,
       internalUsersRules: formatedRules.internalUsersRules,
       wrongFormat: wrongFormat || formatedRules.wrongFormat,
       logicalOperator: formatedRules.logicalOperator || logicalOperator,
     };
   } catch (error) {
-    return { customeRules: [], internalUsersRules: [], wrongFormat: true };
+    return { customRules: [], internalUsersRules: [], wrongFormat: true };
   }
 };
 

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   EuiButton,
   EuiTitle,
@@ -46,11 +46,12 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     password: '',
     confirmPassword: '',
   });
+  const [showApply, setShowApply] = useState(false);
 
   const passwordRef = useRef(false);
   useDebouncedEffect(
     () => {
-      if (passwordRef.current) validateField('password');
+      if (passwordRef.current) validateFields(['password', 'confirmPassword']);
       else passwordRef.current = true;
     },
     300,
@@ -60,11 +61,24 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   const confirmPasswordRef = useRef(false);
   useDebouncedEffect(
     () => {
-      if (confirmPasswordRef.current) validateField('confirmPassword');
+      if (confirmPasswordRef.current) validateFields(['confirmPassword']);
       else confirmPasswordRef.current = true;
     },
     300,
     [confirmPassword]
+  );
+
+  useDebouncedEffect(
+    () => {
+      let _showApply =
+        isValidForm(false) &&
+        (allowRunAs !== currentUser.allow_run_as ||
+          Object.values(getRolesDiff()).some(i => i.length));
+
+      setShowApply(_showApply);
+    },
+    300,
+    [password, confirmPassword, allowRunAs, selectedRoles]
   );
 
   const validations = {
@@ -80,20 +94,22 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     confirmPassword: [{ fn: () => (confirmPassword !== password ? `Passwords don't match.` : '') }],
   };
 
-  const validateField = field => {
-    const error = validations[field].reduce((result, validation) => {
-      return !!result ? result : validation.fn();
-    }, '');
-    setFormErrors({ ...formErrors, [field]: error });
-    return !!error;
+  const validateFields = (fields, showErrors = true) => {
+    const _formErrors = { ...formErrors };
+    let isValid = true;
+    fields.forEach(field => {
+      const error = validations[field].reduce((currentError, validation) => {
+        return !!currentError ? currentError : validation.fn();
+      }, '');
+      _formErrors[field] = error;
+      isValid = isValid && !!!error;
+    });
+    if (showErrors) setFormErrors(_formErrors);
+    return isValid;
   };
 
-  const isValidForm = () => {
-    let errors = false;
-    Object.keys(validations).forEach(field => {
-      errors = errors || validateField(field);
-    });
-    return !errors;
+  const isValidForm = (showErrors = true) => {
+    return validateFields(Object.keys(validations), showErrors);
   };
 
   const editUser = async () => {
@@ -115,20 +131,24 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
       await Promise.all([UsersServices.UpdateUser(currentUser.id, userData), updateRoles()]);
 
       ErrorHandler.info('User was successfully updated');
-      closeFlyout(false);
+      closeFlyout(true);
     } catch (error) {
       ErrorHandler.handle(error, 'There was an error');
       setIsLoading(false);
     }
   };
 
-  const updateRoles = async () => {
+  const getRolesDiff = () => {
     const formattedRoles = selectedRoles.map(item => item.id);
     const _userRolesFormatted = userRolesFormatted.map(role => role.id);
-    const toAdd = formattedRoles.filter(value => !_userRolesFormatted.includes(value));    
-    if (toAdd.length) await UsersServices.AddUserRoles(currentUser.id, toAdd);
-
+    const toAdd = formattedRoles.filter(value => !_userRolesFormatted.includes(value));
     const toRemove = _userRolesFormatted.filter(value => !formattedRoles.includes(value));
+    return { toAdd, toRemove };
+  };
+
+  const updateRoles = async () => {
+    const { toAdd, toRemove } = getRolesDiff();
+    if (toAdd.length) await UsersServices.AddUserRoles(currentUser.id, toAdd);
     if (toRemove.length) await UsersServices.RemoveUserRoles(currentUser.id, toRemove);
   };
 
@@ -236,7 +256,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
               <EuiButton
                 fill
                 isLoading={isLoading}
-                isDisabled={currentUser.id < 3}
+                isDisabled={currentUser.id < 3 || !showApply}
                 onClick={editUser}
               >
                 Apply

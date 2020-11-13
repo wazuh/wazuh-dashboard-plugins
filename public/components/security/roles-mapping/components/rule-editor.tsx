@@ -63,7 +63,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   const setStateFromRule = jsonRule => {
     const rulesResult = getRulesFromJson(jsonRule);
     if (!rulesResult.wrongFormat) {
-      setRules(rulesResult.customeRules);
+      setRules(rulesResult.customRules);
       setInternalUserRules(rulesResult.internalUsersRules);
       const _selectedUsers = getSelectedUsersFromRules(rulesResult.internalUsersRules);
       setSelectedUsers(_selectedUsers);
@@ -107,13 +107,13 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   };
 
   const getRulesFromJson = jsonRule => {
-    const { customeRules, internalUsersRules, wrongFormat, logicalOperator } = decodeJsonRule(
+    const { customRules, internalUsersRules, wrongFormat, logicalOperator } = decodeJsonRule(
       jsonRule,
       internalUsers
     );
     setLogicalOperator(logicalOperator);
     setHasWrongFormat(wrongFormat);
-    return { customeRules, internalUsersRules, wrongFormat, logicalOperator };
+    return { customRules, internalUsersRules, wrongFormat, logicalOperator };
   };
 
   const printRules = () => {
@@ -292,7 +292,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                   </EuiFormRow>
                   <EuiSpacer />
                   <EuiTitle size="s">
-                    <h2>Custome rules</h2>
+                    <h2>Custom rules</h2>
                   </EuiTitle>
                   <EuiPopover
                     ownFocus
