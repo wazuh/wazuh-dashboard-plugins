@@ -27,7 +27,6 @@ async function checkMetafieldSetting({settings}: responseKbnSettings) {
   return !!metaFields && !!metaFields.userValue.length;
 }
 
-
 async function updateMetaFieldsSetting(isModified:boolean) {
   return !isModified && await GenericRequest.request(
     'POST',
