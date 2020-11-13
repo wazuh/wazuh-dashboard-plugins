@@ -77,19 +77,11 @@ export class WazuhApiCtrl {
     return false;
   }
 
-  getUserFromAuthContext(authContext){ // TODO: change method of check platform type
-    if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_XPACK_SECURITY)
-      return authContext.username;
-    if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH)
-      return authContext.user_name;
-  }
-
   async getToken(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { force, idHost } = request.body;
-      const authContext = await this.securityObj.getCurrentUser(request, context);
-      const username = this.getUserFromAuthContext(authContext);
-      if(!force && request.headers.cookie && username === this.getUserFromCookie(request.headers.cookie) && idHost === this.getApiIdFromCookie(request.headers.cookie)){
+      const {userName, authContext} = await this.securityObj.getCurrentUser(request, context);
+      if(!force && request.headers.cookie && userName === this.getUserFromCookie(request.headers.cookie) && idHost === this.getApiIdFromCookie(request.headers.cookie)){
         const wzToken = this.getTokenFromCookie(request.headers.cookie);
         if(wzToken){
           try{ // if the current token is not a valid jwt token we ask for a new one
@@ -117,7 +109,7 @@ export class WazuhApiCtrl {
         headers: {
           'set-cookie': [
             `wz-token=${token};Path=/;HttpOnly`,
-            `wz-user=${username};Path=/;HttpOnly`,
+            `wz-user=${userName};Path=/;HttpOnly`,
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },
@@ -1608,7 +1600,6 @@ export class WazuhApiCtrl {
    */
   async getSyscollector(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      console.log('dsadsa', request)
       const idApi = this. getApiIdFromCookie(request.headers.cookie);
       if (!request.params || !idApi || !request.params.agent) {
         throw new Error('Agent ID and API ID are required');
