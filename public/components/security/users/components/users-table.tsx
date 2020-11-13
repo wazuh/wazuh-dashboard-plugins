@@ -95,8 +95,8 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
 
   const sorting = {
     sort: {
-      field: 'roles',
-      direction: SortDirection.DESC,
+      field: 'username',
+      direction: SortDirection.ASC,
     },
   };
 

@@ -15,7 +15,7 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { Role } from '../types/role.type';
 
 const GetRolesService = async (): Promise<Role[]> => {
-  const response = (await WzRequest.apiReq('GET', '/security/roles', {})) as IApiResponse<Role>;
+  const response = (await WzRequest.apiReq('GET', '/security/roles?sort=name', {})) as IApiResponse<Role>;
   const roles = ((response.data || {}).data || {}).affected_items || [];
   return roles;
 };

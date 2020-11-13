@@ -58,7 +58,7 @@ export const RolesMapping = () => {
           full_name: item.full_name,
           email: item.email,
         };
-      });
+      }).sort((a, b) => (a.user > b.user) ? 1 : (a.user < b.user) ? -1 : 0);      
       setInternalUsers(_users);
     } catch (error) {
       ErrorHandler.error('There was an error loading internal users');
