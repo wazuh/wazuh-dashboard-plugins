@@ -14,7 +14,7 @@ type responseKbnSettings = { settings: kbnSettings };
 
 export function checkKibanaSettingsTimeFilter(changeTimeDefaults: boolean) {
   changeTimeDefaults && getKibanaSettings()
-    .then(checktimeFilter)
+    .then(checkTimeFilter)
     .then(updateTimeFilterSetting)
     .catch(error => error !== 'Unable to update config' && console.log(error));
 }
@@ -24,7 +24,7 @@ async function getKibanaSettings(): Promise<responseKbnSettings> {
   return kibanaSettings.data;
 }
 
-async function checktimeFilter({ settings }: responseKbnSettings) {
+async function checkTimeFilter({ settings }: responseKbnSettings) {
   if (!settings["timepicker:timeDefaults"]) {
     return false;
   }
