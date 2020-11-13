@@ -121,7 +121,7 @@ export class WazuhApiCtrl {
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },
-        body: { token }
+        body: {}
       });
     } catch (error){
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
@@ -142,7 +142,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async checkStoredAPI(context, request, response) {
+  async checkStoredAPI(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       // Get config from wazuh.yml
       const id = request.body.id || request.body;
@@ -340,7 +340,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async checkAPI(context, request, response) {
+  async checkAPI(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       let apiAvailable = null;
       const notValid = this.validateCheckApiParams(request.body);
@@ -482,7 +482,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Array<Object>} requirements or ErrorResponse
    */
-  async getPciRequirement(context, request, response) {
+  async getPciRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       let pci_description = '';
 
@@ -557,7 +557,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Array<Object>} requirements or ErrorResponse
    */
-  async getGdprRequirement(context, request, response) {
+  async getGdprRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       let gdpr_description = '';
 
@@ -661,7 +661,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Array<Object>} requirements or ErrorResponse
    */
-  async getHipaaRequirement(context, request, response) {
+  async getHipaaRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       let hipaa_description = '';
 
@@ -736,10 +736,10 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Array<Object>} requirements or ErrorResponse
    */
-  async getNistRequirement(context, request, response) {
-    try {
+  async getNistRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    try { // TODO: Fix this method
       let nist_description = '';
-
+      
       if (request.params.requirement === 'all') {
         if (!request.headers.id) {
           return response.ok({
@@ -749,7 +749,6 @@ export class WazuhApiCtrl {
 
         const apiId = request.headers.id;
         const api = await this.manageHosts.getHostById(apiId);
-
         if (!Object.keys(api).length) {
           log('wazuh-api:getNistRequirement', 'Unexpected error getting host credentials');
           // Can not get credentials from wazuh-hosts
@@ -810,7 +809,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Array<Object>} requirements or ErrorResponse
    */
-  async getTSCRequirement(context, request, response) {
+  async getTSCRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       let tsc_description = '';
 
@@ -979,20 +978,21 @@ export class WazuhApiCtrl {
         //Can not get credentials from wazuh-hosts
         return ErrorResponse('Could not get host credentials', 3011, 404, response);
       }
+      
       let body = {}
       if (!data) {
         data = {};
       }
-
+      
       const options = {};
       options['idHost'] = id;
-
+      
       // Set content type application/xml if needed
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
         options.content_type = 'application/xml';
         delete data.origin;
       }
-
+      
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
         options.content_type = 'application/json';
         delete data.origin;
@@ -1073,14 +1073,14 @@ export class WazuhApiCtrl {
         response.data = responseBody;
       }
       const responseError = response.status !== 200 ? response.status : false;
-
+      
       if (!responseError && responseBody) {
         //cleanKeys(response);
         return response.ok({
-          body: response.data
+          body: responseToken.data
         });
       }
-
+      
       if (responseError && devTools) {
         return response.ok({
           body: response.data
@@ -1180,8 +1180,10 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} api response or ErrorResponse
    */
-  requestApi(context, request, response) {
+  requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    
     const token = this.getTokenFromCookie(request.headers.cookie);
+    console.log({token})
     const idApi = this. getApiIdFromCookie(request.headers.cookie);
     if(idApi !== request.body.id){ // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
@@ -1222,7 +1224,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponseerror.message || error
    */
-  async fetchAgents(context, request, response) {
+  async fetchAgents(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const output = await this.monitoringInstance.fetchAgentsExternal();
       return response.ok({
@@ -1246,7 +1248,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} csv or ErrorResponse
    */
-  async csv(context, request, response) {
+  async csv(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       if (!request.body || !request.body.path) throw new Error('Field path is required');
       if (!request.body.id) throw new Error('Field id is required');
@@ -1387,7 +1389,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Array<Object>} unique fileds or ErrorResponse
    */
-  async getAgentsFieldsUniqueCount(context, request, response) {
+  async getAgentsFieldsUniqueCount(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       console.log(request)
       if (!request.params || !request.params.api) throw new Error('Field api is required');
@@ -1471,7 +1473,7 @@ export class WazuhApiCtrl {
   }
 
   // Get de list of available requests in the API
-  getRequestList(context, request, response) {
+  getRequestList(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     //Read a static JSON until the api call has implemented
     return response.ok({
       body: apiRequestList
@@ -1485,7 +1487,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} timestamp field or ErrorResponse
    */
-  getTimeStamp(context, request, response) {
+  getTimeStamp(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       if (source.installationDate && source.lastRestart) {
@@ -1521,7 +1523,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} extensions object or ErrorResponse
    */
-  async setExtensions(context, request, response) {
+  async setExtensions(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { id, extensions } = request.body;
       // Update cluster information in the wazuh-registry.json
@@ -1549,7 +1551,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} extensions object or ErrorResponse
    */
-  getExtensions(context, request, response) {
+  getExtensions(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const source = JSON.parse(
         fs.readFileSync(this.updateRegistry.file, 'utf8')
@@ -1577,7 +1579,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} setup info or ErrorResponse
    */
-  async getSetupInfo(context, request, response) {
+  async getSetupInfo(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       return response.ok({
@@ -1604,21 +1606,21 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} Basic syscollector information
    */
-  async getSyscollector(context, request, response) {
+  async getSyscollector(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       console.log('dsadsa', request)
-      if (!request.params || !request.headers.id || !request.params.agent) {
+      const idApi = this. getApiIdFromCookie(request.headers.cookie);
+      if (!request.params || !idApi || !request.params.agent) {
         throw new Error('Agent ID and API ID are required');
       }
 
       const { agent } = request.params;
-      const api = request.headers.id;
 
-      const config = await this.manageHosts.getHostById(api);
+      const config = await this.manageHosts.getHostById(idApi);
 
       const data = await Promise.all([
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, { idHost: api }),
-        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, { idHost: api })
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/hardware`, {}, { idHost: idApi }),
+        this.apiInterceptor.request('GET', `${config.url}:${config.port}/syscollector/${agent}/os`, {}, { idHost: idApi })
       ]);
 
       const result = data.map(item => (item.data || {}).data || []);

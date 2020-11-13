@@ -59,7 +59,7 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
     validate: {
       body: schema.object({
         idHost: schema.string(),
-        force: schema.boolean({defaultValue: false})
+        force: schema.boolean({defaultValue: false}),
       })
     }
   },
@@ -70,100 +70,28 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
   router.post({
     path: '/api/request',
     validate: {
-      body: schema.any()
+      body: schema.object({
+        id: schema.string(),
+        method: schema.string(),
+        path: schema.string(),
+        body: schema.object({}),
+      })
     }
   },
     async (context, request, response) => ctrl.requestApi(context, request, response)
-  );
-
-  // Return a PCI requirement description
-  router.get({
-    path: '/api/pci/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getPciRequirement(context, request, response)
-  );
-
-  // Return a GDPR requirement description
-  router.get({
-    path: '/api/gdpr/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getGdprRequirement(context, request, response)
-  );
-
-  // Return a NIST 800-53 requirement description
-  router.get({
-    path: '/api/nist/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getNistRequirement(context, request, response)
-  );
-
-  // Return a TSC requirement description
-  router.get({
-    path: '/api/tsc/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getTSCRequirement(context, request, response)
-  );
-
-  // Return a HIPAA requirement description
-  router.get({
-    path: '/api/hipaa/{requirement}',
-    validate: {
-      params: schema.object({
-        requirement: schema.string()
-      })
-    }
-  },
-    async (context, request, response) => ctrl.getHipaaRequirement(context, request, response)
-  );
-
-  // Force fetch data to be inserted on wazuh-monitoring indices
-  router.get({
-    path: '/api/monitoring',
-    validate: false,
-  },
-    async (context, request, response) => ctrl.fetchAgents(context, request, response)
   );
 
   // Returns data from the Wazuh API on CSV readable format
   router.post({
     path: '/api/csv',
     validate: {
-      body: schema.any()
-    }
-  },
-    async (context, request, response) => ctrl.csv(context, request, response)
-  );
-
-  // Returns unique fields from the agents such OS, agent version ...
-  router.get({
-    path: '/api/agents-unique/{api}',
-    validate: {
-      params: schema.object({
-        api: schema.string()
+      body: schema.object({
+        id: schema.string(),
+        path: schema.string(),
       })
     }
   },
-    async (context, request, response) => ctrl.getAgentsFieldsUniqueCount(context, request, response)
+    async (context, request, response) => ctrl.csv(context, request, response)
   );
 
   // Returns a route list used by the Dev Tools
@@ -220,4 +148,87 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
   },
     async (context, request, response) => ctrl.getSyscollector(context, request, response)
   );
+
+  //#region TODO: Remove these end point if not used 
+  // Return a PCI requirement description
+  router.get({
+    path: '/api/pci/{requirement}',
+    validate: {
+      params: schema.object({
+        requirement: schema.string(),
+      })
+    }
+  },
+    async (context, request, response) => ctrl.getPciRequirement(context, request, response)
+  );
+
+  // Return a GDPR requirement description
+  router.get({
+    path: '/api/gdpr/{requirement}',
+    validate: {
+      params: schema.object({
+        requirement: schema.string()
+      })
+    }
+  },
+    async (context, request, response) => ctrl.getGdprRequirement(context, request, response)
+  );
+
+  // Return a NIST 800-53 requirement description
+  router.get({
+    path: '/api/nist/{requirement}',
+    validate: {
+      params: schema.object({
+        requirement: schema.string()
+      })
+    }
+  },
+    async (context, request, response) => ctrl.getNistRequirement(context, request, response)
+  );
+
+  // Return a TSC requirement description
+  router.get({
+    path: '/api/tsc/{requirement}',
+    validate: {
+      params: schema.object({
+        requirement: schema.string()
+      })
+    }
+  },
+    async (context, request, response) => ctrl.getTSCRequirement(context, request, response)
+  );
+
+  // Return a HIPAA requirement description
+  router.get({
+    path: '/api/hipaa/{requirement}',
+    validate: {
+      params: schema.object({
+        requirement: schema.string()
+      })
+    }
+  },
+    async (context, request, response) => ctrl.getHipaaRequirement(context, request, response)
+  );
+
+  // Force fetch data to be inserted on wazuh-monitoring indices
+  router.get({ // FIXME: Fix this endpoint if is used
+    path: '/api/monitoring',
+    validate: false,
+  },
+    async (context, request, response) => ctrl.fetchAgents(context, request, response)
+  );
+
+  // Returns unique fields from the agents such OS, agent version ...
+  router.get({ // TODO: Remove this endpoint if not used
+    path: '/api/agents-unique/{api}',
+    validate: {
+      params: schema.object({
+        api: schema.string()
+      })
+    }
+  },
+    async (context, request, response) => ctrl.getAgentsFieldsUniqueCount(context, request, response)
+  );
+
+  //#endregion 
 }
