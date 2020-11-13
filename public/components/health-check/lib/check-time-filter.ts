@@ -1,5 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { GenericRequest } from '../../../react-services';
+import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
+import { WAZUH_TIME_FILTER_DEFAULT } from '../../../../util/constants'
 
 type userValue<T> = { userValue: T }
 type kbnSettings = {
@@ -7,11 +9,8 @@ type kbnSettings = {
   timeFilter?: userValue<string[]>,
 };
 
+
 type responseKbnSettings = { settings: kbnSettings };
-const timeFilterSetting = JSON.stringify({
-  from: "now-24h",
-  to: 'now'
-});
 
 export function checkKibanaSettingsTimeFilter(changeTimeDefaults: boolean) {
   changeTimeDefaults && getKibanaSettings()
@@ -26,14 +25,19 @@ async function getKibanaSettings(): Promise<responseKbnSettings> {
 }
 
 async function checktimeFilter({ settings }: responseKbnSettings) {
-  const { timeFilter } = settings;
-  return !!timeFilter && !!timeFilter.userValue.length;
+  if (!settings["timepicker:timeDefaults"]) {
+    return false;
+  }
+
+  const timeFilter = settings["timepicker:timeDefaults"].userValue;
+  const timeFilterObject = JSON.parse(timeFilter);
+  return WAZUH_TIME_FILTER_DEFAULT.from == timeFilterObject.from && WAZUH_TIME_FILTER_DEFAULT.to == timeFilterObject.to;
 }
 
 async function updateTimeFilterSetting(isModified: boolean) {
   return !isModified && await GenericRequest.request(
     'POST',
     '/api/kibana/settings',
-    { "changes": { "timepicker:timeDefaults": timeFilterSetting } }
-  );
+    { "changes": { "timepicker:timeDefaults": JSON.stringify(WAZUH_TIME_FILTER_DEFAULT) } }
+  ) && getServices().timefilter.setTime(WAZUH_TIME_FILTER_DEFAULT);
 }

@@ -254,7 +254,7 @@ export class HealthCheck extends Component {
             const wazuhConfig = new WazuhConfig();
             const configuration = wazuhConfig.getConfig();
             checkKibanaSettings(configuration['checks.metaFields']);
-            checkKibanaSettingsTimeFilter(configuration['checks.TimeFilter']);
+            checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);
             AppState.setPatternSelector(configuration['ip.selector']);
             let checks = {};
             checks.pattern = configuration['checks.pattern'];
