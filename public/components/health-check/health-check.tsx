@@ -12,8 +12,7 @@ import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';
 import { WAZUH_MONITORING_PATTERN } from '../../../util/constants';
-import { checkKibanaSettings } from './lib';
-import { checkKibanaSettingsTimeFilter } from './lib';
+import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
 
 export class HealthCheck extends Component {
     constructor(props) {
