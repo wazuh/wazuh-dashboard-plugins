@@ -71,7 +71,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
               position: 'left',
             }}
             isDisabled={item.id < 3}
-            modalTitle={`Do you want to delete ${item.name} user?`}
+            modalTitle={`Do you want to delete ${item.username} user?`}
             onConfirm={async () => {
               try {
                 await UsersServices.DeleteUsers([item.id]);
