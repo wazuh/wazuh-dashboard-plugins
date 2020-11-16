@@ -29,7 +29,8 @@ import {
   EuiPageBody,
   EuiCallOut,
   EuiSpacer,
-  EuiProgress
+  EuiProgress,
+  EuiCode
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 
@@ -45,6 +46,10 @@ export class RegisterAgent extends Component {
       wazuhPassword: '',
       udpProtocol: false
     };
+    this.restartAgentCommand = {
+      rpm: 'sudo systemctl start wazuh-agent',
+      deb: 'sudo service wazuh-agent start'
+    }
   }
 
   async componentDidMount() {
@@ -179,11 +184,16 @@ export class RegisterAgent extends Component {
     );
 
     const ipInput = (
-      <EuiFieldText
-        placeholder="Server address..."
-        value={this.state.serverAddress}
-        onChange={event => this.setServerAddress(event)}
-      />
+      <EuiText>
+        <p>
+          You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode> Wazuh app setting.
+        </p>
+        <EuiFieldText
+          placeholder="Server address..."
+          value={this.state.serverAddress}
+          onChange={event => this.setServerAddress(event)}
+        />
+      </EuiText>
     );
 
     const passwordInput = (
@@ -260,6 +270,7 @@ export class RegisterAgent extends Component {
         <EuiSpacer></EuiSpacer>
       </>
     );
+    const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
 
     const guide = (
       <div>
@@ -311,7 +322,30 @@ export class RegisterAgent extends Component {
             </Fragment>
           </div>
         )
-      }
+      },
+      ...(this.state.selectedOS && restartAgentCommand ? [
+        {
+          title: 'Start the agent',
+          children: (
+            <EuiText>
+              <EuiCodeBlock style={codeBlock} language={language}>
+                {restartAgentCommand}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={restartAgentCommand}>
+                {copy => (
+                  <EuiButton
+                    fill
+                    iconType="copy"
+                    onClick={copy}>
+                    Copy command
+                  </EuiButton>
+                )}
+              </EuiCopy>
+            </EuiText>
+          )
+        }
+      ] : [])
+      
     ];
 
     return (
