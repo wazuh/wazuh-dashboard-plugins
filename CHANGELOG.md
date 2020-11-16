@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Hide empty columns of the processes table of the MacOS agents [#2570](https://github.com/wazuh/wazuh-kibana-app/pull/2570)
 - Missing step in "Deploy a new agent" view [#2623](https://github.com/wazuh/wazuh-kibana-app/issues/2623)
+- Implement wazuh users' CRUD [#2598](https://github.com/wazuh/wazuh-kibana-app/pull/2598)
 
 ### Fixed
 
