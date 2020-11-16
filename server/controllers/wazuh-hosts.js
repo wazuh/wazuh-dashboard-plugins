@@ -15,7 +15,7 @@ import { UpdateRegistry } from '../lib/update-registry';
 import { ApiInterceptor } from '../lib/api-interceptor';
 import { log } from '../../server/logger';
 import { ErrorResponse } from './error-response';
-import { CacheInMemoryAPIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
+import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
 
 export class WazuhHostsCtrl {
   constructor() {
@@ -60,14 +60,8 @@ export class WazuhHostsCtrl {
         const id = Object.keys(h)[0];
         const api = Object.assign(h[id], { id: id });
         const host = Object.assign(api, registry[id]);
-        // Check if api.run_as is false or undefined, then it set to false in cache
-        if(!api.run_as){
-          CacheInMemoryAPIUserAllowRunAs.set(id, api.username, false);
-        };
         // Add to run_as from API user. Use the cached value or get it doing a request
-        host.allow_run_as = CacheInMemoryAPIUserAllowRunAs.has(id, api.username)
-          ? CacheInMemoryAPIUserAllowRunAs.get(id, api.username)
-          : await this.checkAPIUserAllowRunAs(id);
+        host.allow_run_as = await APIUserAllowRunAs.check(id);
         if (removePassword) {
           delete host.password;
           delete host.token;
@@ -127,34 +121,6 @@ export class WazuhHostsCtrl {
         500,
         reply
       );
-    }
-  }
-
-  async checkAPIUserAllowRunAs(apiId){
-    try{
-      const api = await this.manageHosts.getHostById(apiId);
-      log('wazuh-hosts:checkAPIUserAllowRunAs', `Check if API user ${api.username} (${apiId}) has run_as`, 'debug');
-      // Check if api.run_as is false or undefined, then it set to false in cache
-      if(!api.run_as){
-        CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, false);
-      };
-      // Check if the API user is cached and returns
-      if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
-        return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
-      };
-      const response = await this.apiInterceptor.request(
-        'get',
-        `${api.url}:${api.port}/security/users/me`,
-        {},
-        { idHost: apiId }
-      );
-      const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as;
-      // Cache the run_as for the API user
-      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, APIUserAllowRunAs);
-      return APIUserAllowRunAs;
-    }catch(error){
-      log('wazuh-hosts:checkAPIUserAllowRunAs', error.message || error);
-      return false;
     }
   }
 }

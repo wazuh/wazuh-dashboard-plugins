@@ -35,7 +35,7 @@ import { ApiInterceptor } from '../lib/api-interceptor';
 import { SecurityObj } from '../lib/security-factory';
 import jwtDecode from 'jwt-decode';
 import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
-import { CacheInMemoryAPIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
+import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs } from '../lib/cache-api-user-has-run-as'
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -49,34 +49,6 @@ export class WazuhApiCtrl {
     this.updateRegistry = new UpdateRegistry();
     this.securityObj = SecurityObj(this.PLATFORM, server);
     this.apiInterceptor = new ApiInterceptor();
-  }
-
-  async checkAPIUserAllowRunAs(apiId){
-    try{
-      const api = await this.manageHosts.getHostById(apiId);
-      log('wazuh-api:checkAPIUserAllowRunAs', `Check if API user ${api.username} (${apiId}) has run_as`, 'debug');
-      // Check if api.run_as is false or undefined, then it set to false in cache
-      if(!api.run_as){
-        CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, false);
-      };
-      // Check if the API user is cached and returns it
-      if(CacheInMemoryAPIUserAllowRunAs.has(apiId, api.username)){
-        return CacheInMemoryAPIUserAllowRunAs.get(apiId, api.username);
-      };
-      const response = await this.apiInterceptor.request(
-        'get',
-        `${api.url}:${api.port}/security/users/me`,
-        {},
-        { idHost: apiId }
-      );
-      const APIUserAllowRunAs = response.data.data.affected_items[0].allow_run_as;
-      // Cache the run_as for the API user
-      CacheInMemoryAPIUserAllowRunAs.set(apiId, api.username, APIUserAllowRunAs);
-      return APIUserAllowRunAs;
-    }catch(error){
-      log('wazuh-api:checkAPIUserAllowRunAs', error.message || error);
-      return false;
-    }
   }
 
   getCurrentPlatform(server) {
@@ -141,11 +113,11 @@ export class WazuhApiCtrl {
         }
       }  
       let token;
-      if(await this.checkAPIUserAllowRunAs(idHost)){
+      if(await APIUserAllowRunAs.check(idHost)){
         token = await this.apiInterceptor.authenticateApi(idHost, authContext)
       }else{
         token = await this.apiInterceptor.authenticateApi(idHost)
-      }
+      };
       const response = reply.response({token});
       response.state('wz-token', token, {isSecure: false, path: '/'});
       response.state('wz-user', username, {isSecure: false, path: '/'});
