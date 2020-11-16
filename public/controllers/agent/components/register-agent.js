@@ -47,8 +47,8 @@ export class RegisterAgent extends Component {
       udpProtocol: false
     };
     this.restartAgentCommand = {
-      rpm: 'systemctl start wazuh-agent',
-      deb: 'service wazuh-agent start'
+      rpm: 'sudo systemctl start wazuh-agent',
+      deb: 'sudo service wazuh-agent start'
     }
   }
 
