@@ -61,34 +61,6 @@ describe('ApiRequest', () => {
     }
   })
 
-  test('should throw an error when the api user are unauthorized', async () => {
-    const mockResponse = {
-      response: {
-        response: {
-          data: {
-            "type": "about:blank",
-            "title": "Unauthorized",
-            "detail": "The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password),or your browser doesn't understand how to supply the credentials required.",
-            "status": 401
-          },
-          status: 404,
-          statusText: 'Not Found',
-          headers: {},
-          config: {},
-        },
-        "status": 401
-      }
-    };
-    axios.mockRejectedValue(mockResponse);
-
-    const apiRequest = new ApiRequest('/cluster/status', apiExample1);
-    try {
-      await apiRequest.getData();
-    } catch (error) {
-      expect(error).toEqual({error: 401, message: 'Wrong Wazuh API credentials used'});
-    }
-  })
-
   test('should throw an error when the port or url api are invalid', async () => {
     const mockResponse = {response: { data: { detail: 'ECONNREFUSED' }, status: 500} }
     axios.mockRejectedValue(mockResponse);

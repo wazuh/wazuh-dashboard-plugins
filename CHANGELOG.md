@@ -2,6 +2,42 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4009
+
+### Changed
+
+- Hide empty columns of the processes table of the MacOS agents [#2570](https://github.com/wazuh/wazuh-kibana-app/pull/2570)
+
+### Fixed
+
+- Inconsistent data in sample data alerts [#2618](https://github.com/wazuh/wazuh-kibana-app/pull/2618)
+
+## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4008
+
+### Fixed
+
+- Icons not align to the right in Modules > Events [#2607](https://github.com/wazuh/wazuh-kibana-app/pull/2607)
+- Statistics visualizations do not show data [#2602](https://github.com/wazuh/wazuh-kibana-app/pull/2602)
+- Error on loading css files [#2599](https://github.com/wazuh/wazuh-kibana-app/pull/2599)
+- Fixed search filter in search bar in Module/SCA wasn't working [#2601](https://github.com/wazuh/wazuh-kibana-app/pull/2601)
+
+## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4007
+
+### Fixed
+
+- updated macOS package URL [#2596](https://github.com/wazuh/wazuh-kibana-app/pull/2596)
+- Revert "[4.0-7.9] [BUGFIX] Removed unnecessary function call" [#2597](https://github.com/wazuh/wazuh-kibana-app/pull/2597)
+
+## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4006
+
+### Fixed
+
+- Undefined field in event view [#2588](https://github.com/wazuh/wazuh-kibana-app/issues/2588)
+- Several calls to the same stats request (esAlerts) [#2586](https://github.com/wazuh/wazuh-kibana-app/issues/2586)
+- The filter options popup doesn't open on click once the filter is pinned [#2581](https://github.com/wazuh/wazuh-kibana-app/issues/2581)
+- The formatedFields are missing from the index-pattern of wazuh-alerts-* [#2574](https://github.com/wazuh/wazuh-kibana-app/issues/2574)
+
+
 ## Wazuh v4.0.0 - Kibana v7.9.3 - Revision 4005
 
 ### Added

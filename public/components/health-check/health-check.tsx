@@ -12,7 +12,7 @@ import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { toastNotifications } from 'ui/notify';
 import { WAZUH_MONITORING_PATTERN } from '../../../util/constants';
-import { checkKibanaSettings } from './lib';
+import { checkKibanaSettings, checkKibanaSettingsTimeFilter } from './lib';
 
 export class HealthCheck extends Component {
     constructor(props) {
@@ -254,6 +254,7 @@ export class HealthCheck extends Component {
             const wazuhConfig = new WazuhConfig();
             const configuration = wazuhConfig.getConfig();
             checkKibanaSettings(configuration['checks.metaFields']);
+            checkKibanaSettingsTimeFilter(configuration['checks.timeFilter']);
             AppState.setPatternSelector(configuration['ip.selector']);
             let checks = {};
             checks.pattern = configuration['checks.pattern'];
