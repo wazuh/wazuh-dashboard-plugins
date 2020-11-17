@@ -46,7 +46,7 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
         url: schema.string(),
         port: schema.number(),
         username: schema.string(),
-        forceRefresh: schema.boolean(),
+        forceRefresh: schema.boolean({defaultValue:false}),
         cluster_info: schema.object({}),
       })
     }

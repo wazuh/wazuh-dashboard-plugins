@@ -76,7 +76,7 @@ const attributesExternalLink = {
 };
 
 // Define button styles
-const buttonStyles = {...attributesExternalLink, style: styleObjectToString({'min-width': '75px', display: 'block'}) };
+const buttonStyles = attributesExternalLink;
 
 export const EventsEnhanceDiscoverCell = {
   'rule.id': createElementFieldURLRedirection({...buttonStyles, href: (content) => `#/manager/rules?tab=rules&redirectRule=${content}`}),

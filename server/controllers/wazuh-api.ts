@@ -17,10 +17,8 @@ import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
 import { nistRequirementsFile } from '../integration-files/nist-requirements';
 import { tscRequirementsFile } from '../integration-files/tsc-requirements';
 import { getPath } from '../../util/get-path';
-import { Monitoring } from '../monitoring';
 import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
-import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
@@ -34,8 +32,8 @@ import { UpdateRegistry } from '../lib/update-registry';
 import { ApiInterceptor } from '../lib/api-interceptor';
 import { ISecurityFactory } from '../lib/security-factory';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
 import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src/core/server';
+import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as';
 
 export class WazuhApiCtrl {
 
@@ -47,64 +45,57 @@ export class WazuhApiCtrl {
     this.apiInterceptor = new ApiInterceptor();
   }
 
-  async checkWazuhWui(apiId: string){
-    const host = await this.manageHosts.getHostById(apiId);
-    if(host && host.username === 'wazuh-wui') return true;
-    return false;
-  }
-
-  getApiIdFromCookie(cookie){
-    if(!cookie) return false;
+  getApiIdFromCookie(cookie) {
+    if (!cookie) return false;
     const getWzApi = /.*wz-api=([^;]+)/;
     const wzApi = cookie.match(getWzApi)
-    if(wzApi && wzApi.length && wzApi[1]) return wzApi[1];
+    if (wzApi && wzApi.length && wzApi[1]) return wzApi[1];
     return false;
   }
 
-  getTokenFromCookie(cookie){
-    if(!cookie) return false;
+  getTokenFromCookie(cookie) {
+    if (!cookie) return false;
     const getWzToken = /.*wz-token=([^;]+)/;
     const wzToken = cookie.match(getWzToken)
-    if(wzToken && wzToken.length && wzToken[1]) return wzToken[1];
+    if (wzToken && wzToken.length && wzToken[1]) return wzToken[1];
     return false;
   }
 
-  getUserFromCookie(cookie){
-    if(!cookie) return false;
+  getUserFromCookie(cookie) {
+    if (!cookie) return false;
     const getWzUser = /.*wz-user=([^;]+)/;
     const wzUser = cookie.match(getWzUser)
-    if(wzUser && wzUser.length && wzUser[1]) return wzUser[1];
+    if (wzUser && wzUser.length && wzUser[1]) return wzUser[1];
     return false;
   }
 
   async getToken(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { force, idHost } = request.body;
-      const {userName, authContext} = await this.securityObj.getCurrentUser(request, context);
-      if(!force && request.headers.cookie && userName === this.getUserFromCookie(request.headers.cookie) && idHost === this.getApiIdFromCookie(request.headers.cookie)){
+      const { userName, authContext } = await this.securityObj.getCurrentUser(request, context);
+      if (!force && request.headers.cookie && userName === this.getUserFromCookie(request.headers.cookie) && idHost === this.getApiIdFromCookie(request.headers.cookie)) {
         const wzToken = this.getTokenFromCookie(request.headers.cookie);
-        if(wzToken){
-          try{ // if the current token is not a valid jwt token we ask for a new one
-            const decodedToken =  jwtDecode(wzToken);
-            const expirationTime = (decodedToken.exp  - (Date.now() / 1000));
-            if(wzToken && expirationTime > 0) {
+        if (wzToken) {
+          try { // if the current token is not a valid jwt token we ask for a new one
+            const decodedToken = jwtDecode(wzToken);
+            const expirationTime = (decodedToken.exp - (Date.now() / 1000));
+            if (wzToken && expirationTime > 0) {
               return response.ok({
-                body: {token: wzToken}
+                body: { token: wzToken }
               });
             }
-          }catch(error){
+          } catch (error) {
             log('wazuh-api:getToken', error.message || error);
           }
         }
-      }  
-      const isWazuhWui = await this.checkWazuhWui(idHost);
-      let token;
-      if(isWazuhWui){
-        token = await this.apiInterceptor.authenticateApi(idHost, authContext)
-      }else{
-        token = await this.apiInterceptor.authenticateApi(idHost)
       }
-      
+      let token;
+      if (await APIUserAllowRunAs.canUse(idHost)) {
+        token = await this.apiInterceptor.authenticateApi(idHost, authContext)
+      } else {
+        token = await this.apiInterceptor.authenticateApi(idHost)
+      };
+
       return response.ok({
         headers: {
           'set-cookie': [
@@ -115,11 +106,11 @@ export class WazuhApiCtrl {
         },
         body: {}
       });
-    } catch (error){
+    } catch (error) {
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
       log('wazuh-api:getToken', errorMessage);
       return ErrorResponse(
-        `Error getting authorization token: ${errorMessage}`,
+        `Error getting the authorization token: ${errorMessage}`,
         3000,
         500,
         response
@@ -173,7 +164,7 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/agents`,
           { params: { agents_list: '000' } },
-          { idHost: id}          
+          { idHost: id }
         );
 
         if (responseAgents.status === 200) {
@@ -183,7 +174,7 @@ export class WazuhApiCtrl {
             'get',
             `${api.url}:${api.port}/cluster/status`,
             {},
-            { idHost: id }      
+            { idHost: id }
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
@@ -250,7 +241,7 @@ export class WazuhApiCtrl {
           body: {
             statusCode: 200,
             data: { password: '****', apiIsDown: true },
-          } 
+          }
         });
       } else if (error.code === 'ECONNREFUSED') {
         return response.ok({
@@ -353,7 +344,7 @@ export class WazuhApiCtrl {
         apiAvailable.password = Buffer.from(request.body.password, 'base64').toString('ascii');
       }
       const options = { idHost: request.body.id };
-      if(request.body.forceRefresh){
+      if (request.body.forceRefresh) {
         options["forceRefresh"] = request.body.forceRefresh;
       }
 
@@ -398,6 +389,21 @@ export class WazuhApiCtrl {
             { idHost: request.body.id }
           );
 
+          // Check the run_as for the API user and update it
+          let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.DISABLED;
+          if (apiAvailable.run_as) {
+            const responseApiUserAllowRunAs = await this.apiInterceptor.request(
+              'GET',
+              `${apiAvailable.url}:${apiAvailable.port}/security/users/me`,
+              {},
+              { idHost: request.body.id }
+            );
+            if (responseApiUserAllowRunAs.status === 200) {
+              apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
+            }
+          }
+          CacheInMemoryAPIUserAllowRunAs.set(request.body.id, apiAvailable.username, apiUserAllowRunAs);
+
           if (responseCluster.status === 200) {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
             if (responseCluster.data.data.enabled === 'yes') {
@@ -416,6 +422,7 @@ export class WazuhApiCtrl {
                     node: responseClusterLocal.data.data.affected_items[0].node,
                     cluster: responseClusterLocal.data.data.affected_items[0].cluster,
                     status: 'enabled',
+                    allow_run_as: apiUserAllowRunAs,
                   }
                 });
               }
@@ -426,6 +433,7 @@ export class WazuhApiCtrl {
                   manager: managerName,
                   cluster: 'Disabled',
                   status: 'disabled',
+                  allow_run_as: apiUserAllowRunAs,
                 }
               });
             }
@@ -439,15 +447,15 @@ export class WazuhApiCtrl {
     } catch (error) {
       log('wazuh-api:checkAPI', error.message || error);
 
-      if(error && error.response && error.response.status === 401){
+      if (error && error.response && error.response.status === 401) {
         return ErrorResponse(
-          'Unathorized. Please check API credentials.',
+          `Unathorized. Please check API credentials. ${error.response.data.message}`,
           401,
           401,
           response
         );
       }
-      if(error && error.response && error.response.data && error.response.data.detail){
+      if (error && error.response && error.response.data && error.response.data.detail) {
         return ErrorResponse(
           error.response.data.detail,
           error.response.status || 500,
@@ -731,7 +739,7 @@ export class WazuhApiCtrl {
   async getNistRequirement(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try { // TODO: Fix this method
       let nist_description = '';
-      
+
       if (request.params.requirement === 'all') {
         if (!request.headers.id) {
           return response.ok({
@@ -970,21 +978,21 @@ export class WazuhApiCtrl {
         //Can not get credentials from wazuh-hosts
         return ErrorResponse('Could not get host credentials', 3011, 404, response);
       }
-      
+
       let body = {}
       if (!data) {
         data = {};
       }
-      
+
       const options = {};
       options['idHost'] = id;
-      
+
       // Set content type application/xml if needed
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'xmleditor') {
         options.content_type = 'application/xml';
         delete data.origin;
       }
-      
+
       if (typeof (data || {}).body === 'string' && (data || {}).origin === 'json') {
         options.content_type = 'application/json';
         delete data.origin;
@@ -1065,14 +1073,14 @@ export class WazuhApiCtrl {
         response.data = responseBody;
       }
       const responseError = response.status !== 200 ? response.status : false;
-      
+
       if (!responseError && responseBody) {
         //cleanKeys(response);
         return response.ok({
           body: responseToken.data
         });
       }
-      
+
       if (responseError && devTools) {
         return response.ok({
           body: response.data
@@ -1082,7 +1090,7 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      if(error && error.response && error.response.status === 401){        
+      if (error && error.response && error.response.status === 401) {
         return ErrorResponse(
           error.message || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
@@ -1173,11 +1181,11 @@ export class WazuhApiCtrl {
    * @returns {Object} api response or ErrorResponse
    */
   requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    
+
     const token = this.getTokenFromCookie(request.headers.cookie);
-    console.log({token})
-    const idApi = this. getApiIdFromCookie(request.headers.cookie);
-    if(idApi !== request.body.id){ // if the current token belongs to a different API id, we relogin to obtain a new token
+    console.log({ token })
+    const idApi = this.getApiIdFromCookie(request.headers.cookie);
+    if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
         'status code 401',
         401,
@@ -1278,7 +1286,7 @@ export class WazuhApiCtrl {
       );
 
       const isList = request.body.path.includes('/lists') && request.body.filters && request.body.filters.length && request.body.filters.find(filter => filter._isCDBList);
-         
+
       const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
 
       if (totalItems && !isList) {
@@ -1360,7 +1368,7 @@ export class WazuhApiCtrl {
         }
 
         return response.ok({
-          headers: {'Content-Type': 'text/csv'},
+          headers: { 'Content-Type': 'text/csv' },
           body: csv
         });
       } else if (output && output.data && output.data.data && !output.data.data.total_affected_items) {
@@ -1600,7 +1608,7 @@ export class WazuhApiCtrl {
    */
   async getSyscollector(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      const idApi = this. getApiIdFromCookie(request.headers.cookie);
+      const idApi = this.getApiIdFromCookie(request.headers.cookie);
       if (!request.params || !idApi || !request.params.agent) {
         throw new Error('Agent ID and API ID are required');
       }

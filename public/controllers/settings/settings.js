@@ -335,6 +335,7 @@ export class SettingsController {
       this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
       this.apiEntries[index].status = 'online';
+      this.apiEntries[index].allow_run_as = data.data.allow_run_as;
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && ErrorHandler.info('Connection success', 'Settings');
