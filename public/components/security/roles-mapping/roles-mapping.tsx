@@ -18,8 +18,19 @@ import { Rule } from '../rules/types/rule.type';
 import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { withGuard } from '../../common/hocs';
+import { PromptNoSecurityPluginUsers } from '../users/components/prompt-no-security-plugin';
 
-export const RolesMapping = () => {
+const mapStateToProps = state => ({ currentPlatform: state.appStateReducers.currentPlatform });
+
+export const RolesMapping = compose(
+  connect(mapStateToProps),
+  withGuard(props => {
+    return props.currentPlatform === 'elastic';
+  }, PromptNoSecurityPluginUsers)
+)(() => {
   const [isEditingRule, setIsEditingRule] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
   const [rules, setRules] = useState<Rule[]>([]);
@@ -161,4 +172,4 @@ export const RolesMapping = () => {
       </EuiPageContentBody>
     </EuiPageContent>
   );
-};
+});
