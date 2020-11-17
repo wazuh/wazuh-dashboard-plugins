@@ -12,23 +12,27 @@
 
 import React from 'react';
 import { EuiEmptyPrompt, EuiSpacer } from '@elastic/eui';
-import { WAZUH_SECURITY_PLUGINS } from '../../../../util/constants';
+import { WAZUH_SECURITY_PLUGINS } from '../../../../../util/constants';
 
 export const PromptNoSecurityPluginUsers = () => {
   return (
     <EuiEmptyPrompt
-      iconType='securityApp'
+      iconType="securityApp"
       title={<h2>No security plugin installed</h2>}
       body={
         <>
           <p>A supported security plugin is required to see and manage the users.</p>
           <div>Supported plugins:</div>
-          <EuiSpacer size='s'/>
-          <ul style={{listStyleType: 'none', margin: 0, padding: 0}}>
-            {WAZUH_SECURITY_PLUGINS.map(securityPlugin => <li key={`security-plugin-${securityPlugin}`}><strong>{securityPlugin}</strong></li>)}
+          <EuiSpacer size="s" />
+          <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
+            {WAZUH_SECURITY_PLUGINS.map(securityPlugin => (
+              <li key={`security-plugin-${securityPlugin}`}>
+                <strong>{securityPlugin}</strong>
+              </li>
+            ))}
           </ul>
         </>
       }
     />
-  )
-}
+  );
+};
