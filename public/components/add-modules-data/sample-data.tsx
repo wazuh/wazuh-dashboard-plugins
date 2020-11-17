@@ -80,7 +80,7 @@ export default class WzSampleData extends Component {
       const indexPattern = await getIndexPattern();
       this.setState({indexPattern});
       const results = await PromiseAllRecursiveObject(this.categories.reduce((accum, cur) => {
-        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/${indexPattern}/samplealerts/${cur.categorySampleAlertsIndex}`)
+        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${indexPattern}/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
   
@@ -123,7 +123,7 @@ export default class WzSampleData extends Component {
         ...this.state[category.categorySampleAlertsIndex],
         addDataLoading: true
       } });
-      await WzRequest.genericReq('POST', `/elastic/${this.state.indexPattern}/samplealerts/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
+      await WzRequest.genericReq('POST', `/elastic/samplealerts/${this.state.indexPattern}/${category.categorySampleAlertsIndex}`, { params: this.generateAlertsParams });
       this.showToast('success', `${category.title} alerts installed`, 'Date range for sample data is now-7 days ago', 5000);
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
@@ -144,7 +144,7 @@ export default class WzSampleData extends Component {
         ...this.state[category.categorySampleAlertsIndex],
         removeDataLoading: true
       } });
-      await WzRequest.genericReq('DELETE', `/elastic/${this.state.indexPattern}/samplealerts/${category.categorySampleAlertsIndex}` );
+      await WzRequest.genericReq('DELETE', `/elastic/samplealerts/${this.state.indexPattern}/${category.categorySampleAlertsIndex}` );
       this.setState({ [category.categorySampleAlertsIndex]: {
         ...this.state[category.categorySampleAlertsIndex],
         exists: false,

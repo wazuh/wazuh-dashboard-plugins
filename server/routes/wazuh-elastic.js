@@ -122,7 +122,7 @@ export function WazuhElasticRouter(server) {
   // Check if there is some sample alerts index
   server.route({
     method: 'GET',
-    path: '/elastic/{index_pattern}/samplealerts',
+    path: '/elastic/samplealerts/{index_pattern}',
     handler(req, res) {
       return ctrl.haveSampleAlerts(req, res);
     }
@@ -130,7 +130,7 @@ export function WazuhElasticRouter(server) {
   // Check if there is sample alerts index created of category
   server.route({
     method: 'GET',
-    path: '/elastic/{index_pattern}/samplealerts/{category}',
+    path: '/elastic/samplealerts/{index_pattern}/{category}',
     handler(req, res) {
       return ctrl.haveSampleAlertsOfCategory(req, res);
     }
@@ -138,7 +138,7 @@ export function WazuhElasticRouter(server) {
   // Create sample alert index
   server.route({
     method: 'POST',
-    path: '/elastic/{index_pattern}/samplealerts/{category}',
+    path: '/elastic/samplealerts/{index_pattern}/{category}',
     handler(req, res) {
       return ctrl.createSampleAlerts(req, res);
     }
@@ -146,7 +146,7 @@ export function WazuhElasticRouter(server) {
   // Delete sample alert index by category
   server.route({
     method: 'DELETE',
-    path: '/elastic/{index_pattern}/samplealerts/{category}',
+    path: '/elastic/samplealerts/{index_pattern}/{category}',
     handler(req, res) {
       return ctrl.deleteSampleAlerts(req, res);
     }

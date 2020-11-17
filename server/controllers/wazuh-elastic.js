@@ -860,7 +860,7 @@ export class WazuhElasticCtrl {
   /**
    * This checks if there is sample alerts
    * @param {*} req
-   * GET /elastic/{index_pattern}/samplealerts
+   * GET /elastic/samplealerts/{index_pattern}
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -879,7 +879,7 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * GET /elastic/{index_pattern}/samplealerts/{category}
+   * GET /elastic/samplealerts/{index_pattern}/{category}
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -907,7 +907,7 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * POST /elastic/{index_pattern}/samplealerts/{category}
+   * POST /elastic/samplealerts/{index_pattern}/{category}
    * {
    *   "manager": {
    *      "name": "manager_name"
