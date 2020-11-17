@@ -18,14 +18,9 @@ import { Rule } from '../rules/types/rule.type';
 import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-const mapStateToProps = state => ({ currentPlatform: state.appStateReducers.currentPlatform });
-
-export const RolesMapping = compose(
-  connect(mapStateToProps)
-)((props: any) => {
+export const RolesMapping = () => {
   const [isEditingRule, setIsEditingRule] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
   const [rules, setRules] = useState<Rule[]>([]);
@@ -34,6 +29,7 @@ export const RolesMapping = compose(
   const [rolesEquivalences, setRolesEquivalences] = useState({});
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
   const [internalUsers, setInternalUsers] = useState([]);
+  const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
 
   useEffect(() => {
     initData();
@@ -110,7 +106,7 @@ export const RolesMapping = compose(
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
-          currentPlatform={props.currentPlatform}
+          currentPlatform={currentPlatform}
         />
       </EuiOverlayMask>
     );
@@ -133,7 +129,7 @@ export const RolesMapping = compose(
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
-          currentPlatform={props.currentPlatform}
+          currentPlatform={currentPlatform}
         />
       </EuiOverlayMask>
     );
@@ -169,4 +165,4 @@ export const RolesMapping = compose(
       </EuiPageContentBody>
     </EuiPageContent>
   );
-});
+};
