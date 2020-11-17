@@ -25,8 +25,8 @@ interface WzButtonModalConfirmProps{
   onConfirm: (ev) => void
   onCancel?: (ev) => void
   modalTitle: string
-  modalConfirmText: string
-  modalCancelText: string
+  modalConfirmText?: string
+  modalCancelText?: string
   modalProps: any
   [key: string]: any
 };

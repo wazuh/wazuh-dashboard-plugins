@@ -24,13 +24,15 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiText,
-  EuiLoadingSpinner
+  EuiLoadingSpinner,
+  EuiIcon
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { AppState } from '../../../react-services/app-state';
+import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
 
 export class ApiTable extends Component {
   constructor(props) {
@@ -217,6 +219,36 @@ export class ApiTable extends Component {
         }
       },
       {
+        name: 'Run as',
+        field: 'allow_run_as',
+        align: 'center',
+        sortable: true,
+        width: '80px',
+        render: (value) => {
+          return value === API_USER_STATUS_RUN_AS.ENABLED ? (
+            <EuiToolTip
+              position='top'
+              content='The configurated API user uses the authentication context.'
+            >
+              <EuiIcon
+                type='check'
+              />
+            </EuiToolTip>
+          
+          ) : value === API_USER_STATUS_RUN_AS.NOT_ALLOWED ? (
+            <EuiToolTip
+              position='top'
+              content='The configurated API user is not allowed to use run_as. Give it permissions or set run_as with false value in host the configuration.'
+            >
+              <EuiIcon
+                color='danger'
+                type='alert'
+              />
+            </EuiToolTip>
+          ): '';
+        }
+      },
+      {
         name: 'Actions',
         render: item => (
           <EuiFlexGroup>
@@ -240,7 +272,7 @@ export class ApiTable extends Component {
               />
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiToolTip position="bottom" content={<p>Check connection</p>}>
+              <EuiToolTip position="top" content={<p>Check connection</p>}>
                 <EuiButtonIcon
                   aria-label="Check connection"
                   iconType="refresh"

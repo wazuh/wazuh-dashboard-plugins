@@ -44,6 +44,7 @@ export const initialWazuhConfig = `---
 #checks.api     : true
 #checks.setup   : true
 #checks.metaFields: true
+#checks.timeFilter: true
 #
 # --------------------------------- Extensions ---------------------------------
 #
@@ -136,7 +137,7 @@ export const initialWazuhConfig = `---
 #cron.statistics.apis: []
 #
 # Define the frequency of task execution using cron schedule expressions
-#cron.statistics.interval: 0 0 * * * *
+#cron.statistics.interval: 0 */5 * * * *
 #
 # Define the name of the index in which the documents are to be saved.
 #cron.statistics.index.name: statistics
@@ -164,10 +165,30 @@ export const initialWazuhConfig = `---
 #
 #hosts:
 #  - <id>:
-#     url: http(s)://<url>
-#     port: <port>
-#     username: <username>
-#     password: <password>
+      # URL
+      # API url
+      # url: http(s)://<url>
+
+      # Port
+      # API port
+      # port: <port>
+
+      # Username
+      # API user's username
+      # username: <username>
+      
+      # Password
+      # API user's password
+      # password: <password>
+      
+      # Run as
+      # Define how the app user gets his/her app permissions.
+      # Values:
+      #   - true: use his/her authentication context. Require Wazuh API user allows run_as.
+      #   - false or not defined: get same permissions of Wazuh API user.
+      # run_as: <true|false>
+ 
+ 
 
 hosts:
   - default:
@@ -175,4 +196,5 @@ hosts:
      port: 55000
      username: wazuh
      password: wazuh
+     run_as: false
 `
