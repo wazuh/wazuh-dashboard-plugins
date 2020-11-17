@@ -80,7 +80,7 @@ export default class WzSampleData extends Component {
       const indexPattern = await getIndexPattern();
       this.setState({indexPattern});
       const results = await PromiseAllRecursiveObject(this.categories.reduce((accum, cur) => {
-        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic${indexPattern}/samplealerts/${cur.categorySampleAlertsIndex}`)
+        accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/${indexPattern}/samplealerts/${cur.categorySampleAlertsIndex}`)
         return accum
       },{}));
   
