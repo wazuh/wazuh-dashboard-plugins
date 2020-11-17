@@ -35,6 +35,7 @@ import { PatternHandler } from '../../react-services/pattern-handler';
 import { toastNotifications } from 'ui/notify';
 import { SecurityAlerts } from './components';
 import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
+import { getIndexPattern } from '../overview/mitre/lib';
 
 const visHandler = new VisHandlers();
 
@@ -107,7 +108,8 @@ export class WzVisualize extends Component {
 
     // Check if there is sample alerts installed
     try {
-      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', '/elastic/samplealerts', {})).data.sampleAlertsInstalled;
+      const indexPattern = await getIndexPattern();
+      const thereAreSampleAlerts = (await WzRequest.genericReq('GET', `/elastic/${indexPattern}/samplealerts`, {})).data.sampleAlertsInstalled;
       this._isMount && this.setState({ thereAreSampleAlerts });
     } catch (error) { }
   }

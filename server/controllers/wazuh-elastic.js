@@ -22,7 +22,7 @@ import {
 import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
-import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
+import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
 import { ApiInterceptor } from '../lib/api-interceptor';
@@ -41,8 +41,7 @@ export class WazuhElasticCtrl {
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
-    this.wzSampleAlertsIndexPrefix = WAZUH_SAMPLE_ALERT_PREFIX;
-    this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-sample-security, wazuh-alerts-sample-auditing-policy-monitoring, wazuh-alerts-threat-detection
+    this.buildSampleIndexByCategory = (indexPattern, category) => `${indexPattern}sample-${category}` // wazuh-alerts-sample-security, wazuh-alerts-sample-auditing-policy-monitoring, wazuh-alerts-threat-detection
     this.defaultNumSampleAlerts = 3000;
     this.manageHosts = new ManageHosts();
     this.apiInterceptor = new ApiInterceptor();
@@ -861,7 +860,7 @@ export class WazuhElasticCtrl {
   /**
    * This checks if there is sample alerts
    * @param {*} req
-   * GET /elastic/samplealerts
+   * GET /elastic/{index_pattern}/samplealerts
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -870,7 +869,7 @@ export class WazuhElasticCtrl {
     try {
       // Check if wazuh sample alerts index exists
       const results = await Promise.all(Object.keys(this.wzSampleAlertsCaterories)
-        .map((category) => this.wzWrapper.checkIfIndexExists(this.buildSampleIndexByCategory(category))));
+        .map((category) => this.wzWrapper.checkIfIndexExists(this.buildSampleIndexByCategory(req.params.index_pattern, category))));
 
       return { sampleAlertsInstalled: results.some(result => result) }
     } catch (error) {
@@ -880,7 +879,7 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * GET /elastic/samplealerts/{category}
+   * GET /elastic/{index_pattern}/samplealerts/{category}
    *
    * @param {*} reply
    * {alerts: [...]} or ErrorResponse
@@ -893,7 +892,7 @@ export class WazuhElasticCtrl {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     try {
-      const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
+      const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.index_pattern, req.params.category);
       // Check if wazuh sample alerts index exists
       const existsSampleIndex = await this.wzWrapper.checkIfIndexExists(sampleAlertsIndex);
       return { index: sampleAlertsIndex, exists: existsSampleIndex }
@@ -908,7 +907,7 @@ export class WazuhElasticCtrl {
   /**
    * This creates sample alerts in wazuh-sample-alerts
    * @param {*} req
-   * POST /elastic/samplealerts/{category}
+   * POST /elastic/{index_pattern}/samplealerts/{category}
    * {
    *   "manager": {
    *      "name": "manager_name"
@@ -930,7 +929,7 @@ export class WazuhElasticCtrl {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
-    const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
+    const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.index_pattern, req.params.category);
 
     try {
       // Check if user has administrator role in token
@@ -1018,7 +1017,7 @@ export class WazuhElasticCtrl {
       return ErrorResponse('Sample Alerts category not valid', 1000, 400, reply);
     };
     
-    const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.category);
+    const sampleAlertsIndex = this.buildSampleIndexByCategory(req.params.index_pattern, req.params.category);
 
     try {
       // Check if user has administrator role in token
