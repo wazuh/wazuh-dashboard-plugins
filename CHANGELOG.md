@@ -6,7 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- [4.0-7.9] Run as with no wazuh-wui API user(https://github.com/wazuh/wazuh-kibana-app/issues/2576)
+- [4.0-7.9] Run as with no wazuh-wui API user [#2576](https://github.com/wazuh/wazuh-kibana-app/issues/2576)
 
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4009
 
