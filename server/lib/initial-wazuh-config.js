@@ -44,6 +44,7 @@ export const initialWazuhConfig = `---
 #checks.api     : true
 #checks.setup   : true
 #checks.metaFields: true
+#checks.timeFilter: true
 #
 # --------------------------------- Extensions ---------------------------------
 #

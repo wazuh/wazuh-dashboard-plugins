@@ -2,12 +2,23 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4010
+
+### Changed
+
+- [4.0-7.9] Run as with no wazuh-wui API user(https://github.com/wazuh/wazuh-kibana-app/issues/2576)
+
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4009
 
 ### Changed
 
 - Hide empty columns of the processes table of the MacOS agents [#2570](https://github.com/wazuh/wazuh-kibana-app/pull/2570)
-- feat(frontend): added API user allow_run_as [#2590](https://github.com/wazuh/wazuh-kibana-app/pull/2590)
+- Missing step in "Deploy a new agent" view [#2623](https://github.com/wazuh/wazuh-kibana-app/issues/2623)
+- Implement wazuh users' CRUD [#2598](https://github.com/wazuh/wazuh-kibana-app/pull/2598)
+
+### Fixed
+
+- Inconsistent data in sample data alerts [#2618](https://github.com/wazuh/wazuh-kibana-app/pull/2618)
 
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4008
 
