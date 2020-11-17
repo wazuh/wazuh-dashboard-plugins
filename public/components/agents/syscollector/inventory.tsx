@@ -2,6 +2,8 @@ import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiFlexGroup, EuiFlexItem, EuiIcon, EuiCallOut } from '@elastic/eui';
 import {InventoryMetrics} from './components/syscollector-metrics';
 import {SyscollectorTable} from './components/syscollector-table';
+import { processColumns, portsColumns,packagesColumns } from './columns'
+
 
 export function SyscollectorInventory({agent}){
 
@@ -26,18 +28,24 @@ export function SyscollectorInventory({agent}){
       </EuiButton>
       }
     /> );
-  }               
+  }
 
-  const portsColumns = agent && agent.os && agent.os.platform === 'windows' ? [{id: "process"},{id: "local.ip", sortable: false}, {id: "local.port", sortable: false}, {id: "state"}, {id: "protocol"}]
-    : [{id: "local.ip", sortable: false}, {id: "local.port", sortable:false}, {id: "state"}, {id: "protocol"}]
+  let soPlatform;
+
+  if (((agent.os || {}).uname || '').includes('Linux')) {
+    soPlatform = 'linux';
+  } else if ((agent.os || {}).platform === 'windows') {
+    soPlatform = 'windows';
+  } else if ((agent.os || {}).platform === 'darwin') {
+    soPlatform = 'apple';
+  }
+             
+  
+  console.log('Probando',soPlatform);
+  
   const netifaceColumns =  [{id: "name"}, {id: "mac"}, {id: "state", value:"State"}, {id:"mtu", value:"MTU"}, {id: "type", value:"Type"}];
-  const processesColumns = agent && agent.os && agent.os.platform === 'windows' ? [{id: 'name', width: '10%'}, {id: 'pid'}, {id: 'ppid'}, {id: 'vm_size'}, {id: 'priority'}, {id: 'nlwp'}, {id: 'cmd', width: '30%'}]
-    : [{id: 'name', width: '10%'}, {id: 'euser'}, {id: 'egroup'} ,{id: 'pid'}, {id: 'ppid'}, {id: 'cmd', width: '15%'}, {id:'argvs', width: "15%"}, {id: 'vm_size'}, {id: 'size'}, {id: 'session'}, {id: 'nice'}, {id: 'state', width: "15%"}]
   const netaddrColumns = [{id:'iface'},{id:'address'},{id:'netmask'},{id:'proto'},{id:'broadcast'}];
-  const packagesColumns = agent && agent.os && agent.os.platform === 'windows' ? [{id:'name'},{id:'architecture', width: "10%"},{id:'version'},{id:'vendor', width: '30%'}] 
-    : agent && agent.os && agent.os.platform === 'darwin' ?  [{id:'name'},{id:'version'},{id:'format'},{id:'location', width: "30%"},{id:'description', width: '20%'}]
-      :  [{id:'name'},{id:'architecture',width:'10%'},{id:'version'},{id:'vendor', width: "30%"},{id:'description', width: '30%'}]
-
+  
 
   return (
     <div style={{overflow: 'hidden'}}>
@@ -59,7 +67,7 @@ export function SyscollectorInventory({agent}){
           <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/netiface`, title: "Network interfaces", columns: netifaceColumns ,icon: "indexMapping",  searchBar: false, exportFormatted: false }} />
         </EuiFlexItem>
         <EuiFlexItem grow={2} style={{marginLeft: 4, marginTop: 0}}>
-          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/ports`, title: "Network ports", columns: portsColumns, icon: "inputOutput",  searchBar: false, exportFormatted: false }} />
+          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/ports`, title: "Network ports", columns: portsColumns[soPlatform], icon: "inputOutput",  searchBar: false, exportFormatted: false }} />
         </EuiFlexItem>
       </EuiFlexGroup>
 
@@ -76,13 +84,13 @@ export function SyscollectorInventory({agent}){
 
       <EuiFlexGroup gutterSize="s">
         <EuiFlexItem >
-          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/packages`, hasTotal: true, title: "Packages", columns: packagesColumns, icon: "apps",  searchBar: true, exportFormatted: 'packages.csv' }} />
+          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/packages`, hasTotal: true, title: "Packages", columns: packagesColumns[soPlatform], icon: "apps",  searchBar: true, exportFormatted: 'packages.csv' }} />
         </EuiFlexItem>
       </EuiFlexGroup>
 
       <EuiFlexGroup gutterSize="s">
         <EuiFlexItem >
-          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/processes`, hasTotal: true, title: "Processes", columns: processesColumns, icon: "console",  searchBar: true, exportFormatted: 'processes.csv' }} />
+          <SyscollectorTable tableParams={ {path: `/syscollector/${agent.id}/processes`, hasTotal: true, title: "Processes", columns: processColumns[soPlatform], icon: "console",  searchBar: true, exportFormatted: 'processes.csv' }} />
         </EuiFlexItem>
       </EuiFlexGroup>
 
