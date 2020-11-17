@@ -20,17 +20,12 @@ import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withGuard } from '../../common/hocs';
-import { PromptNoSecurityPluginUsers } from '../users/components/prompt-no-security-plugin';
 
 const mapStateToProps = state => ({ currentPlatform: state.appStateReducers.currentPlatform });
 
 export const RolesMapping = compose(
-  connect(mapStateToProps),
-  withGuard(props => {
-    return props.currentPlatform === 'elastic';
-  }, PromptNoSecurityPluginUsers)
-)(() => {
+  connect(mapStateToProps)
+)((props: any) => {
   const [isEditingRule, setIsEditingRule] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
   const [rules, setRules] = useState<Rule[]>([]);
@@ -115,6 +110,7 @@ export const RolesMapping = compose(
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
+          currentPlatform={props.currentPlatform}
         />
       </EuiOverlayMask>
     );
@@ -137,6 +133,7 @@ export const RolesMapping = compose(
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
+          currentPlatform={props.currentPlatform}
         />
       </EuiOverlayMask>
     );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   EuiTitle,
   EuiFlyout,
@@ -25,6 +25,7 @@ export const RolesMappingEdit = ({
   roles,
   internalUsers,
   onSave,
+  currentPlatform,
 }) => {
   const getEquivalences = roles => {
     const list = roles.map(item => {
@@ -133,6 +134,7 @@ export const RolesMappingEdit = ({
               isLoading={isLoading}
               isReserved={rule.id < 3}
               internalUsers={internalUsers}
+              currentPlatform={currentPlatform}
             ></RuleEditor>
           </EuiFlexItem>
         </EuiFlexGroup>
