@@ -41,7 +41,7 @@ export class WazuhElasticCtrl {
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
-    this.buildSampleIndexByCategory = (indexPattern, category) => `${indexPattern.replace(/\*/g, '' )}-sample-${category}` // ie for wazuh-alerts-* -> wazuh-alerts.x-sample-security
+    this.buildSampleIndexByCategory = (indexPattern, category) => `${indexPattern.replace(/\*/g, '' )}-sample-${category}`; // ie for wazuh-alerts-* -> wazuh-alerts--sample-security
     this.defaultNumSampleAlerts = 3000;
     this.manageHosts = new ManageHosts();
     this.apiInterceptor = new ApiInterceptor();
