@@ -200,7 +200,8 @@ export default class RulesetHandler {
    */
   static async getFileContent(path) {
     try {
-      const result = await WzRequest.apiReq('GET', `/manager/files`, {
+      const pathFiles = await RulesetHandler.pathSendFilesManager();
+      const result = await WzRequest.apiReq('GET', pathFiles, {
         params: {
           path: path
         }
@@ -219,9 +220,10 @@ export default class RulesetHandler {
    */
   static async sendRuleConfiguration(rule, content, overwrite) {
     try {
+      const pathFiles = await RulesetHandler.pathSendFilesManager();
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/files`, {
+        pathFiles, {
           params: {
             path: `etc/rules/${rule.file || rule}`,
             overwrite: overwrite
@@ -244,9 +246,10 @@ export default class RulesetHandler {
    */
   static async sendDecoderConfiguration(decoder, content, overwrite) {
     try {
+      const pathFiles = await RulesetHandler.pathSendFilesManager();
       const result = await WzRequest.apiReq(
         'PUT',
-        '/manager/files?', {
+        pathFiles, {
           params: {
             path: `etc/decoders/${decoder.file || decoder}`,
             overwrite: overwrite
@@ -270,9 +273,10 @@ export default class RulesetHandler {
    */
   static async sendCdbList(list, path, content, overwrite, addingNew = false) {
     try {
+      const pathFiles = await RulesetHandler.pathSendFilesManager();
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/files`, {
+        pathFiles, {
           params: {
             path: `${path}/${list}`,
             overwrite: overwrite
@@ -290,9 +294,10 @@ export default class RulesetHandler {
 
   static async updateCdbList(list, content, overwrite) {
     try {
+      const pathFiles = await RulesetHandler.pathSendFilesManager();
       const result = await WzRequest.apiReq(
         'PUT',
-        `/manager/files`, {
+        pathFiles, {
           params: {
             path: `etc/lists/${list}`,
             overwrite: !overwrite
@@ -314,8 +319,9 @@ export default class RulesetHandler {
    */
   static async deleteFile(file, path) {
     let fullPath = `${path}/${file}`;
+    const pathFiles = await RulesetHandler.pathSendFilesManager();
     try {
-      const result = await WzRequest.apiReq('DELETE', '/manager/files', {
+      const result = await WzRequest.apiReq('DELETE', pathFiles, {
         params: {
           path: fullPath
         }
@@ -323,6 +329,36 @@ export default class RulesetHandler {
       return result;
     } catch (error) {
       return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Check if the cluster mode is enabled or not
+   * @returns {bolean}
+   */
+  static async checkClusterModeEnabled(){
+    try{
+      const {running, enabled} = (await WzRequest.apiReq('GET', '/cluster/status', {})).data.data;
+      return Boolean(running === 'yes' && enabled === 'yes');
+    }catch(error){
+      return false;
+    }
+  }
+
+  /**
+   * Get the cluster or manager mode and returns the path to do the request to send the files
+   * @returns {string}
+   */
+  static async pathSendFilesManager(){
+    try{
+      const isClusterMode = await RulesetHandler.checkClusterModeEnabled();
+      if(isClusterMode){
+        const managerNodeName = (await WzRequest.apiReq('GET', '/cluster/nodes', {params: {type: 'master'}})).data.data.affected_items[0].name;
+        return `/cluster/${managerNodeName}/files`;
+      }
+      return '/manager/files';
+    }catch(error){
+      throw error;
     }
   }
 }
