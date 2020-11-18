@@ -403,7 +403,7 @@ export class ElasticWrapper {
       console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload:search]', data);
       return data;
     } catch (error) {
-      console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload:error]', error);
+      console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload:error]', JSON.stringify(error));
       return Promise.reject(error);
     }
   }
