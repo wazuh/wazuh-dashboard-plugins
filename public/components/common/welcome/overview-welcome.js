@@ -80,7 +80,6 @@ export class OverviewWelcome extends Component {
   }
 
   render() {
-    console.log("erwe", this.props)
     return (
       <Fragment>
         <EuiPage className="wz-welcome-page">
