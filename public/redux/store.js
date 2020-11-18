@@ -10,7 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { createStore } from 'redux';
+import { createStore, applyMiddleware  } from 'redux';
+import thunk from 'redux-thunk';
 import rootReducers from './reducers/rootReducers';
 
-export default createStore(rootReducers);
+export default createStore(rootReducers, applyMiddleware(thunk));
+

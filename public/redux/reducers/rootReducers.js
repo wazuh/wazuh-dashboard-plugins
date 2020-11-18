@@ -21,8 +21,10 @@ import appStateReducers from './appStateReducers';
 import visualizationsReducers from './visualizationsReducers';
 import globalBreadcrumbReducers from './globalBreadcrumbReducers';
 import securityReducers from './securityReducers';
+import nidsReducers from './nidsReducers';
 
 export default combineReducers({
+  nidsReducers,
   rulesetReducers,
   groupsReducers,
   statusReducers,

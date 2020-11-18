@@ -19,6 +19,7 @@ import { WazuhHostsRoutes } from './server/routes/wazuh-hosts';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
 import { SchedulerHandler } from './server/lib/cron-scheduler'
+import { WazuhNidsRoutes } from './server/routes/wazuh-nids';
 import { log } from './server/logger';
 import { Queue } from './server/jobs/queue';
 
@@ -43,6 +44,7 @@ export function initApp(server) {
       WazuhHostsRoutes(server);
       WazuhReportingRoutes(server);
       WazuhUtilsRoutes(server);
+      WazuhNidsRoutes(server);
     })
     .catch(error => {
       log('init:initApp', error.message || error);

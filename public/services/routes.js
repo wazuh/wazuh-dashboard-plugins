@@ -33,6 +33,8 @@ import settingsTemplate from '../templates/settings/settings.pug';
 import securityTemplate from '../templates/security/security.html';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import toolsTemplate from '../templates/tools/tools.pug';
+import nidsTemplate from '../templates/nids/nids.pug';
+import nodeTemplate from '../templates/node/node.pug';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
@@ -174,6 +176,14 @@ routes
   .when('/context/:pattern?/:type?/:id?', {
     redirectTo: function () { },
     resolve: { wzKibana }
+  })
+  .when('/nids/', {
+    template: nidsTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
+  .when('/node/', {
+    template: nodeTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {
     redirectTo: function () { },

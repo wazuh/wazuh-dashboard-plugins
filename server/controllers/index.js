@@ -13,5 +13,6 @@ import { WazuhElasticCtrl } from './wazuh-elastic';
 import { WazuhApiCtrl } from './wazuh-api';
 import { WazuhReportingCtrl } from './wazuh-reporting';
 import { WazuhUtilsCtrl } from './wazuh-utils';
+import { WazuhNidsCtrl } from './wazuh-nids';
 
-export { WazuhElasticCtrl, WazuhApiCtrl, WazuhReportingCtrl, WazuhUtilsCtrl };
+export { WazuhElasticCtrl, WazuhApiCtrl, WazuhReportingCtrl, WazuhUtilsCtrl, WazuhNidsCtrl };
