@@ -10,6 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
 import React, { Component, Fragment } from 'react';
 import { StringsTools } from '../../../utils/strings-tools';
 import {
@@ -22,7 +23,8 @@ import {
   EuiFlexGrid,
   EuiCallOut,
   EuiPage,
-  EuiButton
+  EuiButton,
+  EuiButtonEmpty
 } from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
@@ -39,7 +41,6 @@ export class OverviewWelcome extends Component {
       extensions: this.props.extensions
     };
   }
-
   setGlobalBreadcrumb() {
     const breadcrumb = [{ text: '' }, { text: 'Modules' }];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
@@ -66,12 +67,26 @@ export class OverviewWelcome extends Component {
     );
   }
 
+  addAgent() {
+    return (
+      <EuiFlexGroup >
+        <EuiFlexItem >
+          <EuiCallOut   title="No agents were added to this manager. " color="warning" iconType="alert">
+            <EuiButtonEmpty style={{margin: "-58px 286px"}} alignItems='right' color="warning" href='#/agents-preview?'>Add agent</EuiButtonEmpty>
+          </EuiCallOut>
+        </EuiFlexItem >
+      </EuiFlexGroup>
+    );
+  }
+
   render() {
+    console.log("erwe", this.props)
     return (
       <Fragment>
         <EuiPage className="wz-welcome-page">
           <EuiFlexGroup>
             <EuiFlexItem>
+              {this.props.agentsCountTotal == 0 && this.addAgent()}
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiPanel betaBadgeLabel="Security Information Management">
