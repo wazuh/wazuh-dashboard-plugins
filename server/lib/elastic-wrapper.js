@@ -385,23 +385,25 @@ export class ElasticWrapper {
       if (!payload) return Promise.reject(new Error('No valid payload given'));
       const pattern = payload.pattern;
       delete payload.pattern;
+      console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload]', payload, namespace)
       const fullPattern = await this.getIndexPatternUsingGet(
         pattern,
         namespace
       );
-
+      console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload:fullPattern]', fullPattern);
       const title =
         (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
         false;
-
+      console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload:title]', title, title || WAZUH_ALERTS_PATTERN);
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: title || WAZUH_ALERTS_PATTERN,
         type: '_doc',
         body: payload
       });
-
+      console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload:search]', data);
       return data;
     } catch (error) {
+      console.log('[CLOUD_DEBUG:searchWazuhAlertsWithPayload:error]', error);
       return Promise.reject(error);
     }
   }
@@ -648,17 +650,21 @@ export class ElasticWrapper {
    */
   async getIndexPatternUsingGet(id, namespace) {
     try {
+      console.log('[CLOUD_DEBUG:getIndexPatternUsingGet:id/namespace]', id, namespace)
       if (!id) return Promise.reject(new Error('No valid id given'));
       let idQuery = id.includes('index-pattern:') ? id : 'index-pattern:' + id;
       if (namespace && namespace !== 'default') {
         idQuery = `${namespace}:${idQuery}`;
       }
+      console.log('[CLOUD_DEBUG:getIndexPatternUsingGet:idQuery]', idQuery)
+      console.log('[CLOUD_DEBUG:getIndexPatternUsingGet:WZ_KIBANA_INDEX]', this.WZ_KIBANA_INDEX)
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: this.WZ_KIBANA_INDEX,
         type: '_doc',
         id: idQuery
       });
-
+      
+      console.log('[CLOUD_DEBUG:getIndexPatternUsingGet:data]', this.data)
       return data;
     } catch (error) {
       return Promise.reject(error);

@@ -816,6 +816,7 @@ export class WazuhElasticCtrl {
    */
   async alerts(req, reply) {
     try {
+      console.log('[CLOUD_DEBUG:alerts:received payload]', req.payload);
       const pattern = req.payload.pattern || WAZUH_ALERTS_PATTERN;
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
@@ -849,12 +850,16 @@ export class WazuhElasticCtrl {
       payload.size = size;
       payload.track_total_hits = true;
       payload.from = req.payload.offset || 0;
+      console.log('[CLOUD_DEBUG:alerts:payload]', payload);
       const spaces = this._server.plugins.spaces;
       const namespace = spaces && spaces.getSpaceId(req);
+      console.log('[CLOUD_DEBUG:alerts:namespace]', namespace);
       const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload, namespace);
+      console.log('[CLOUD_DEBUG:alerts:data]', data);
       return { alerts: data.hits.hits, hits: data.hits.total.value };
     } catch (error) {
       log('wazuh-elastic:alerts', error.message || error);
+      console.log('[CLOUD_DEBUG:alerts:error]', error);
       return ErrorResponse(error.message || error, 4010, 500, reply);
     }
   }
