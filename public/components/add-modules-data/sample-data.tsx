@@ -10,27 +10,21 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
 import {
     EuiFlexItem,
     EuiCard,
-    EuiSpacer,
     EuiFlexGrid,
     EuiFlexGroup,
-    EuiButton,
-    EuiButtonEmpty,
-    EuiTitle,
-    EuiToolTip,
-    EuiButtonIcon
 } from '@elastic/eui';
 
 import { toastNotifications } from 'ui/notify';
 import { WzRequest } from '../../react-services/wz-request';
 import { AppState } from '../../react-services/app-state';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../util/constants';
-import { getIndexPattern } from '../overview/mitre/lib';
+import { PatternHandler } from '../../react-services/pattern-handler';
 
 export default class WzSampleData extends Component {
   categories: {title: string, description: string, image: string, categorySampleAlertsIndex: string}[]
@@ -74,11 +68,18 @@ export default class WzSampleData extends Component {
       }
     });
   }
+
+  async getIndexPattern() {
+    const indexPatterns = await PatternHandler.getPatternList('api');
+    const currentIndexPatternId = await AppState.getCurrentPattern();
+    const indexPattern = (indexPatterns.find(item => item.id == currentIndexPatternId)).title;
+    return indexPattern;
+  }
+
   async componentDidMount(){
     // Check if sample data for each category was added
     try{
-      const indexPattern = await getIndexPattern();
-      this.setState({indexPattern});
+      const indexPattern = await this.getIndexPattern();
       const results = await PromiseAllRecursiveObject(this.categories.reduce((accum, cur) => {
         accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq('GET', `/elastic/samplealerts/${indexPattern}/${cur.categorySampleAlertsIndex}`)
         return accum
@@ -90,7 +91,7 @@ export default class WzSampleData extends Component {
           exists: results[cur].data.exists
         }
         return accum
-      },{...this.state}));
+      },{...this.state, indexPattern}));
     }catch(error){}
 
     // Get information about cluster/manager

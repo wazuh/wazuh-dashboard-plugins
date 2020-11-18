@@ -41,7 +41,7 @@ export class WazuhElasticCtrl {
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
-    this.buildSampleIndexByCategory = (indexPattern, category) => `${indexPattern}sample-${category}` // wazuh-alerts-sample-security, wazuh-alerts-sample-auditing-policy-monitoring, wazuh-alerts-threat-detection
+    this.buildSampleIndexByCategory = (indexPattern, category) => `${indexPattern.replace(/(-\*)$|\*/g, '' )}.x-sample-${category}` // ie for wazuh-alerts-* -> wazuh-alerts.x-sample-security
     this.defaultNumSampleAlerts = 3000;
     this.manageHosts = new ManageHosts();
     this.apiInterceptor = new ApiInterceptor();
@@ -1002,10 +1002,12 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 1000, 500, reply);
     }
   }
+  
   /**
    * This deletes sample alerts
    * @param {*} req
    * @param {*} reply
+   * DELETE /elastic/samplealerts/{index_pattern}/{category}
    * {result: "deleted", index: string} or ErrorResponse
    */
   async deleteSampleAlerts(req, reply) {

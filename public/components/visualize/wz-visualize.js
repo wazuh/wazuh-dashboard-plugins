@@ -35,7 +35,7 @@ import { PatternHandler } from '../../react-services/pattern-handler';
 import { toastNotifications } from 'ui/notify';
 import { SecurityAlerts } from './components';
 import { getServices } from '../../../../../src/plugins/discover/public/kibana_services';
-import { getIndexPattern } from '../overview/mitre/lib';
+import { AppState } from '../../react-services/app-state';
 
 const visHandler = new VisHandlers();
 
@@ -72,6 +72,13 @@ export class WzVisualize extends Component {
       toastLifeTimeMs: time,
     });
   };
+
+  async getIndexPattern() {
+    const indexPatterns = await PatternHandler.getPatternList('api');
+    const currentIndexPatternId = await AppState.getCurrentPattern();
+    const indexPattern = (indexPatterns.find(item => item.id == currentIndexPatternId)).title;
+    return indexPattern;
+  }
 
   async componentDidMount() {
     this._isMount = true;
