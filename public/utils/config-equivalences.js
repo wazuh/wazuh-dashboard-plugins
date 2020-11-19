@@ -64,6 +64,8 @@ export const configEquivalences = {
   'cron.statistics.interval': 'Define the frequency of task execution using cron schedule expressions.',
   'cron.statistics.index.name': 'Define the name of the index in which the documents are to be saved.',
   'cron.statistics.index.creation': 'Define the interval in which the index will be created.',
+  'cron.statistics.index.shards': 'Define the number of shards to use for the statistics indices.',
+  'cron.statistics.index.replicas': 'Define the number of replicas to use for the statistics indices.',
 };
 
 export const nameEquivalence = {
@@ -95,6 +97,8 @@ export const nameEquivalence = {
   'cron.statistics.interval': 'Interval',
   'cron.statistics.index.name': 'Index name',
   'cron.statistics.index.creation': 'Index creation',
+  'cron.statistics.index.shards': 'Index shards',
+  'cron.statistics.index.replicas': 'Index replicas',
 }
 
 const HEALTH_CHECK = 'Health Check';
@@ -132,6 +136,8 @@ export const categoriesEquivalence = {
   'cron.statistics.interval': STATISTICS,
   'cron.statistics.index.name': STATISTICS,
   'cron.statistics.index.creation': STATISTICS,
+  'cron.statistics.index.shards': STATISTICS,
+  'cron.statistics.index.replicas': STATISTICS,
 }
 
 const TEXT = 'text';
@@ -195,4 +201,6 @@ export const formEquivalence = {
       ]
     }
   },
+  'cron.statistics.index.shards': { type: NUMBER },
+  'cron.statistics.index.replicas': { type: NUMBER },
 }

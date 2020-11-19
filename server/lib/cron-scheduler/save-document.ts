@@ -2,11 +2,14 @@ import { BulkIndexDocumentsParams } from 'elasticsearch';
 import { getConfiguration } from '../get-configuration';
 import { log } from '../../logger.js';
 import { indexDate } from '../index-date.js';
+import { WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../../../util/constants'
 
 export interface IIndexConfiguration {
   name: string
   creation: 'h' | 'd' | 'w' | 'm'
   mapping?: string
+  shards: number
+  replicas: number
 }
 
 export class SaveDocument {
@@ -22,11 +25,11 @@ export class SaveDocument {
   }
 
   async save(doc: object[], indexConfig: IIndexConfiguration) {
-    const { name, creation, mapping } = indexConfig;
+    const { name, creation, mapping, shards, replicas } = indexConfig;
     const index = this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
     try {
-      await this.checkIndexAndCreateIfNotExists(indexCreation);
+      await this.checkIndexAndCreateIfNotExists(indexCreation ,shards, replicas);
       const createDocumentObject = this.createDocument(doc, indexCreation, mapping);
       const response = await this.callWithInternalUser('bulk', createDocumentObject);
       log(this.logPath, `Response of create new document ${JSON.stringify(response)}`, 'debug');
@@ -40,7 +43,7 @@ export class SaveDocument {
     }
   }
 
-  private async checkIndexAndCreateIfNotExists(index) {
+  private async checkIndexAndCreateIfNotExists(index, shards, replicas) {
     try {
       const exists = await this.callWithInternalUser('indices.exists', { index });
       log(this.logPath, `Index '${index}' exists? ${exists}`, 'debug');
@@ -51,8 +54,8 @@ export class SaveDocument {
           body: {
             settings: {
               index: {
-                number_of_shards: 2,
-                number_of_replicas: 0
+                number_of_shards: shards || WAZUH_INDEX_SHARDS,
+                number_of_replicas: replicas || WAZUH_INDEX_REPLICAS
               }
             }
           }

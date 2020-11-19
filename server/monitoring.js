@@ -21,7 +21,7 @@ import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 import { WazuhHostsCtrl } from '../server/controllers/wazuh-hosts';
 import { ApiInterceptor } from './lib/api-interceptor';
-import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PREFIX, WAZUH_MONITORING_PATTERN } from '../util/constants';
+import { WAZUH_MONITORING_PREFIX, WAZUH_MONITORING_PATTERN, WAZUH_INDEX_SHARDS, WAZUH_INDEX_REPLICAS } from '../util/constants';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -358,12 +358,12 @@ export class Monitoring {
       const shards =
         typeof (configFile || {})['wazuh.monitoring.shards'] !== 'undefined'
           ? configFile['wazuh.monitoring.shards']
-          : 2;
+          : WAZUH_INDEX_SHARDS;
 
       const replicas =
         typeof (configFile || {})['wazuh.monitoring.replicas'] !== 'undefined'
           ? configFile['wazuh.monitoring.replicas']
-          : 0;
+          : WAZUH_INDEX_REPLICAS;
 
       const configuration = {
         settings: {

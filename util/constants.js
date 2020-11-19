@@ -38,3 +38,6 @@ export const WAZUH_TIME_FILTER_DEFAULT = {
   from: "now-24h",
   to: 'now'
 };
+
+export const WAZUH_INDEX_SHARDS = 2;
+export const WAZUH_INDEX_REPLICAS = 0;
