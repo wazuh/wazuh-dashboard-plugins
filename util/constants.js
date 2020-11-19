@@ -44,3 +44,10 @@ export const WAZUH_INDEX_SHARDS = 2;
 export const WAZUH_INDEX_REPLICAS = 0;
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
+<<<<<<< HEAD
+=======
+
+// Default value of shards and replicas for indices
+export const WAZUH_INDEX_SHARDS = 2;
+export const WAZUH_INDEX_REPLICAS = 0;
+>>>>>>> 35b3f0627 (Added configs for statistics shards and replicas index)
