@@ -1,6 +1,13 @@
 # Change Log
 
 All notable changes to the Wazuh app project will be documented in this file.
+## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4010
+
+### Changed
+
+- Show callout when there aren´t agents available [#2635](https://github.com/wazuh/wazuh-kibana-app/pull/2635)
+
+### Fixed
 
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4010
 
