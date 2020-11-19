@@ -105,7 +105,7 @@ export class OverviewController {
     this.welcomeCardsProps = {
       api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
-      extensions: this.extensions
+      extensions: this.extensions,
     };
 
     this.currentOverviewSectionProps = {
@@ -305,6 +305,7 @@ export class OverviewController {
         this.agentsCountDisconnected = result.disconnected;
         this.agentsCountNeverConnected = result['never_connected'];
         this.agentsCountTotal = total;
+        this.welcomeCardsProps.agentsCountTotal = total;
         this.agentsCoverity = total ? (active / total) * 100 : 0;
       } else {
         throw new Error('Error fetching /agents/summary from Wazuh API');
