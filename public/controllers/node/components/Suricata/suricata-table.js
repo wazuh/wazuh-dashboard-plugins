@@ -213,9 +213,7 @@ export const SuricataTable = withReduxProvider(() => {
 
         <EuiToolTip content="Delete Suricata" position="left">
           <EuiButtonIcon
-            onClick={ev => {            
-              console.log(data.service)                 
-              console.log(nodeDetail.uuid)                 
+            onClick={ev => {                         
               dispatch(deleteService({uuid: nodeDetail.uuid, service:data.service}))              
             }}
             iconType="trash"

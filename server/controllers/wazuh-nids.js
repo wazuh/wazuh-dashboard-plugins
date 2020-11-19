@@ -173,6 +173,46 @@ export class WazuhNidsCtrl {
     }
   }
 
+  async getTags(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.getTags(req.payload);   
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async getGroups(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.getGroups(req.payload);   
+      console.log(data);
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async getOrgs(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.getOrgs(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
   async addService(req, reply) {
     try {
       const data = await this.manageNidsHosts.addService(req.payload);      

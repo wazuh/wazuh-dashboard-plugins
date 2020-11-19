@@ -5,18 +5,60 @@ const initialState = {
     nodeTabSelected: "suricata",
     nodeToEdit: "",
     nodeDetail: {},
+    tags: {},
+    orgs: {},
+    groups: {},
     nodePlugins: {},
     editPlugin: {},
     addNodeForm: false,
     toggleSuricata: false,
     nodes: [],
+    savedOrgs: [],
+    savedTags: [],
+    savedGroups: [],
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'SAVE_GROUPS') {
+        return {
+          ...state,
+          savedGroups: action.payload
+        };
+      }  
+      if (action.type === 'SAVE_ORGS') {
+        return {
+          ...state,
+          savedOrgs: action.payload
+        };
+      }  
+      if (action.type === 'SAVE_TAGS') {
+        return {
+          ...state,
+          savedTags: action.payload
+        };
+      }  
       if (action.type === 'RULESETS') {
         return {
           ...state,
           rulesets: action.payload
+        };
+      }  
+      if (action.type === 'GROUPS') {
+        return {
+          ...state,
+          groups: action.payload
+        };
+      }  
+      if (action.type === 'TAGS') {
+        return {
+          ...state,
+          tags: action.payload
+        };
+      }  
+      if (action.type === 'ORGS') {
+        return {
+          ...state,
+          orgs: action.payload
         };
       }  
       if (action.type === 'TAB') {

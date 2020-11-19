@@ -13,6 +13,45 @@ function accGetAllNodes(nodes){
   }
 };
 
+export function getAllTags() {
+  return async (dispatch) => {
+    const tags = await NidsRequest.genericReq('GET', '/nids/tags', {});
+    dispatch(accGetAllTags(tags.data.data))
+  }
+}
+function accGetAllTags(tags){
+  return {
+    type: 'TAGS', 
+    payload: tags
+  }
+};
+
+export function getAllOrgs() {
+  return async (dispatch) => {
+    const orgs = await NidsRequest.genericReq('GET', '/nids/orgs', {});
+    dispatch(accGetAllOrgs(orgs.data.data))
+  }
+}
+function accGetAllOrgs(orgs){
+  return {
+    type: 'ORGS', 
+    payload: orgs
+  }
+};
+
+export function getAllGroups() {
+  return async (dispatch) => {
+    const groups = await NidsRequest.genericReq('GET', '/nids/groups', {});
+    dispatch(accGetAllGroups(groups.data.data))
+  }
+}
+function accGetAllGroups(groups){
+  return {
+    type: 'GROUPS', 
+    payload: groups
+  }
+};
+
 export function LoadInterfaces() {
   return async (dispatch) => {
     const ifaces = await NidsRequest.genericReq('GET', '/nids/interfaces', {});
@@ -235,12 +274,45 @@ export const toggleAddSuricata = value => {
 };
   
 /**
- * Add suricata toggle
+ * Save plugin to edit
  * @param {String} 
  */
 export const savePluginToEdit = value => {
   return {
     type: 'EDIT_PLUGIN',
+    payload: value
+  };
+};
+  
+/**
+ * Save Orgs uuids
+ * @param {String} 
+ */
+export const saveSelectedOrgs = value => {
+  return {
+    type: 'SAVE_ORGS',
+    payload: value
+  };
+};
+  
+/**
+ * Save Tags uuids
+ * @param {String} 
+ */
+export const saveSelectedTags = value => {
+  return {
+    type: 'SAVE_TAGS',
+    payload: value
+  };
+};
+  
+/**
+ * Save groups uuids
+ * @param {String} 
+ */
+export const saveSelectedGroups = value => {
+  return {
+    type: 'SAVE_GROUPS',
     payload: value
   };
 };

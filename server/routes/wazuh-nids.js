@@ -41,12 +41,21 @@ export async function WazuhNidsRoutes(server) {
     }
   });
 
-  // Get node plugins
+  // Get nids tags
   await server.route({    
-    method: 'PUT',
-    path: '/nids/node/PingPluginsNode',
+    method: 'GET',
+    path: '/nids/tags',
     handler(req, reply) {
-      return ctrl.getNodePlugins(req, reply);
+      return ctrl.getTags(req, reply);
+    }
+  });
+
+  // Get node orgs
+  await server.route({    
+    method: 'GET',
+    path: '/nids/orgs',
+    handler(req, reply) {
+      return ctrl.getOrgs(req, reply);
     }
   });
 
@@ -56,6 +65,15 @@ export async function WazuhNidsRoutes(server) {
     path: '/nids/node/delete',
     handler(req, reply) {      
       return ctrl.deleteNode(req, reply);
+    }
+  });
+
+  // Delete specific node
+  server.route({
+    method: 'GET',
+    path: '/nids/groups',
+    handler(req, reply) {      
+      return ctrl.getGroups(req, reply);
     }
   });
 

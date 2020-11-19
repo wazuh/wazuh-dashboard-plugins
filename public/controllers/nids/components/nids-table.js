@@ -51,6 +51,7 @@ import { log } from '../../../../server/logger';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { toggleAddNodeMenu, SaveNodeToDetails, getAllNodes, deleteNode, nodeForEdit } from '../../../redux/actions/nidsActions';
+import { getAllTags, getAllOrgs, getAllGroups } from '../../../redux/actions/nidsActions';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 
@@ -64,6 +65,9 @@ export const NidsTable = withReduxProvider(() => {
 
   useEffect(() => { 
     loadNodes() 
+    dispatch(getAllTags())
+    dispatch(getAllOrgs())
+    dispatch(getAllGroups())
   }, []);
 
   useEffect(() => { 

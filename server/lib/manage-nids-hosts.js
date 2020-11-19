@@ -134,7 +134,7 @@ export class ManageNidsHosts {
     return response.data
   }
 
-  //getNodes
+  //getInterfaces
   async getInterfaces() {
     //check credentials
     if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
@@ -154,6 +154,80 @@ export class ManageNidsHosts {
       url: `${url}/master/interface`,
     };
     const response = await axios(options);
+
+    return response.data
+  }
+
+  //getNodes
+  async getTags() {
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}/node/getAllTags`,
+    };
+    const response = await axios(options);
+
+    return response.data
+  }
+
+  //getNodes
+  async getOrgs() {
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}/node/getAllOrganizations`,
+    };
+    const response = await axios(options);
+
+    return response.data
+  }
+
+  //getNodes
+  async getGroups() {    
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}/group`,
+    };
+    const response = await axios(options);
+
+    console.log(response.data);
 
     return response.data
   }
