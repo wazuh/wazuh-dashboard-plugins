@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Alerts summary table for PDF reports on all modules [#2632](https://github.com/wazuh/wazuh-kibana-app/issues/2632)
 - [4.0-7.9] Run as with no wazuh-wui API user [#2576](https://github.com/wazuh/wazuh-kibana-app/issues/2576)
 - Deploy a new agent interface as default interface [#2564](https://github.com/wazuh/wazuh-kibana-app/issues/2564)
+- Problem in the visualization of new reserved resources of the Wazuh API [#2643](https://github.com/wazuh/wazuh-kibana-app/issues/2643)
 
 ### Fixed
 
