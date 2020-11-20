@@ -313,7 +313,9 @@ export const restartCluster = async () => {
       throw new Error(str);
     }
     // this.performClusterRestart(); // TODO: convert AngularJS to React
-    await WzRequest.apiReq('PUT', `/cluster/restart`, {});
+    await WzRequest.apiReq('PUT', `/cluster/restart`, {
+      delay: 15000
+    });
     // this.$rootScope.$broadcast('removeRestarting', {}); TODO: isRestarting: false?
     return {
       data: {
@@ -506,7 +508,7 @@ export const checkCurrentSecurityPlatform = async () => {
       '/elastic/security/current-platform',
       {}
     );
-    const platform = (result.data || {}).platform || 'elastic';
+    const platform = (result.data || {}).platform || 'elastic'; 
 
     return platform;
   } catch (error) {
@@ -522,7 +524,7 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-
+    
     isCluster ? await restartCluster() : await restartManager();
     // Dispatch a Redux action
     updateWazuhNotReadyYet(
