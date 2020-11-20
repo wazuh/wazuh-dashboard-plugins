@@ -13,24 +13,13 @@ import { UsersTable } from './components/users-table';
 
 import { CreateUser } from './components/create-user';
 import { EditUser } from './components/edit-user';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { withGuard } from '../../common/hocs';
-import { PromptNoSecurityPluginUsers } from './components/prompt-no-security-plugin';
 import UsersServices from './services';
 import RolesServices from '../roles/services';
 import { User } from './types/user.type';
 import { useApiService } from '../../common/hooks/useApiService';
 import { Role } from '../roles/types/role.type';
 
-const mapStateToProps = state => ({ currentPlatform: state.appStateReducers.currentPlatform });
-
-export const Users = compose(
-  connect(mapStateToProps),
-  withGuard(props => {
-    return props.currentPlatform === 'elastic';
-  }, PromptNoSecurityPluginUsers)
-)(() => {
+export const Users = () => {
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
   const [isCreateFlyoutVisible, setIsCreateFlyoutVisible] = useState(false);
   const [editingUser, setEditingUser] = useState({});
@@ -147,4 +136,4 @@ export const Users = compose(
       {editFlyout}
     </EuiPageContent>
   );
-});
+};

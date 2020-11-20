@@ -111,6 +111,15 @@ export const agentVisualizations = {
             id: 'Wazuh-App-Agents-AWS-geo'
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-AWS-Alerts-summary'
+          }
+        ]
       }
     ]
   },
@@ -217,6 +226,15 @@ export const agentVisualizations = {
             id: 'Wazuh-App-Agents-GCP-Top-ResourceType-By-Project-Id',
             width: 60
           },
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-GCP-Alerts-summary'
+          }
         ]
       }
     ]
@@ -543,6 +561,15 @@ export const agentVisualizations = {
             id: 'Wazuh-App-Agents-Virustotal-Files-Table'
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-Virustotal-Alerts-summary'
+          }
+        ]
       }
     ]
   },
@@ -623,6 +650,15 @@ export const agentVisualizations = {
             title: 'Rule level by tactic',
             id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
             width: 34
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-MITRE-Alerts-summary'
           }
         ]
       }

@@ -116,7 +116,7 @@ export class WzVisualize extends Component {
     if (prevProps.isAgent !== this.props.isAgent) {
       this._isMount &&
         this.setState({ visualizations: !!this.props.isAgent ? agentVisualizations : visualizations });
-      visHandler.removeAll();
+      typeof prevProps.isAgent !== 'undefined' && visHandler.removeAll();
     }
   }
 
