@@ -38,8 +38,9 @@ import {
 } from '@elastic/eui';
 import { NodeMenu } from './node-menu';
 import { SuricataTable } from './Suricata/suricata-table';
+import { ZeekTable } from './Zeek/zeek-table';
 import { AddSuricata } from './Suricata/add-suricata';
-import { PingPluginsNode, LoadInterfaces, loadRuleset } from '../../../redux/actions/nidsActions';
+import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -53,8 +54,9 @@ export const NodeDetails = withReduxProvider(() => {
     dispatch(PingPluginsNode(nodeDetail.uuid))
     dispatch(LoadInterfaces())
     dispatch(loadRuleset())
+    dispatch(PingZeek(nodeDetail.uuid))
   }, []);
-
+  
   return (
     <Fragment>
       <NodeMenu></NodeMenu>    
@@ -63,7 +65,7 @@ export const NodeDetails = withReduxProvider(() => {
       <br />
         <EuiPage>
             {nodeTab === "suricata" ? <SuricataTable></SuricataTable> : null}
-            {nodeTab === "zeek" ? <p>Zeek</p> : null}
+            {nodeTab === "zeek" ? <ZeekTable></ZeekTable> : null}
             {nodeTab === "stap" ? <p>Traffic Management - STAP</p> : null}
             {nodeTab === "analyzer" ? <p>Analyzer</p> : null} 
             {nodeTab === "monitor" ? <p>Monitor</p> : null} 

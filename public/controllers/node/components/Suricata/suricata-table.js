@@ -156,7 +156,6 @@ export const SuricataTable = withReduxProvider(() => {
     ];
   }
   
-  
   function actionButtonsRender(data) {
     return (      
       <div className={'icon-box-action'}>
@@ -165,8 +164,23 @@ export const SuricataTable = withReduxProvider(() => {
           ?
           <EuiToolTip content="Stop Suricata" position="left">
             <EuiButtonIcon
-              onClick={ev => {                
-                dispatch(changeServiceStatus(data))
+              onClick={ev => {  
+                console.log({
+                  uuid:nodeDetail.uuid,
+                  status:data.status,
+                  param:"status",
+                  service:data.service,
+                  type:data.type,
+                  interface:data.interface
+                })              
+                dispatch(changeServiceStatus({
+                  uuid:nodeDetail.uuid,
+                  status:"disabled",
+                  param:"status",
+                  service:data.service,
+                  type:data.type,
+                  interface:data.interface
+                }))
               }}
               iconType="stop"
               color={'primary'}
@@ -177,7 +191,22 @@ export const SuricataTable = withReduxProvider(() => {
           <EuiToolTip content="Launch Suricata" position="left">
             <EuiButtonIcon
               onClick={ev => {
-                dispatch(changeServiceStatus(data))
+                console.log({
+                  uuid:nodeDetail.uuid,
+                  status:data.status,
+                  param:"status",
+                  service:data.service,
+                  type:data.type,
+                  interface:data.interface
+                })              
+                dispatch(changeServiceStatus({
+                  uuid:nodeDetail.uuid,
+                  status:"enabled",
+                  param:"status",
+                  service:data.service,
+                  type:data.type,
+                  interface:data.interface
+                }))
               }}
               iconType="play"
               color={'primary'}

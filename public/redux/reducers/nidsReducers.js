@@ -16,9 +16,16 @@ const initialState = {
     savedOrgs: [],
     savedTags: [],
     savedGroups: [],
+    zeekData: {},
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'ZEEK') {
+        return {
+          ...state,
+          zeekData: action.payload
+        };
+      }  
       if (action.type === 'SAVE_GROUPS') {
         return {
           ...state,

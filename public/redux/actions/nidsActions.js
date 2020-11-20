@@ -3,6 +3,7 @@ import { NidsRequest } from '../../react-services/nids-request';
 export function getAllNodes() {
   return async (dispatch) => {
     const nodes = await NidsRequest.genericReq('GET', '/nids/nodes', {});
+    console.log(nodes.data.data);
     dispatch(accGetAllNodes(nodes.data.data))
   }
 }
@@ -10,6 +11,23 @@ function accGetAllNodes(nodes){
   return {
     type: 'NODES', 
     payload: nodes
+  }
+};
+
+export function PingZeek(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "GET",
+      path: `/node/zeek/${uuid}`
+    }     
+    const zeek = await NidsRequest.genericReq('PUT', '/nids/zeek', params);
+    dispatch(accPingZeek(zeek.data.data))
+  }
+}
+function accPingZeek(zeek){
+  return {
+    type: 'ZEEK', 
+    payload: zeek
   }
 };
 
@@ -98,6 +116,18 @@ export function addNode(nodeData) {
   return async (dispatch) => {
     const data = await NidsRequest.genericReq('POST', '/nids/node/enroll', params)        
     dispatch(getAllNodes())
+  }
+}
+
+export function LaunchZeekMainConf(values) {
+  var params = {
+    method: "PUT",
+    path: '/node/LaunchZeekMainConf',
+    data: values
+  }  
+  return async (dispatch) => {
+    const data = await NidsRequest.genericReq('PUT', '/nids/node/LaunchZeekMainConf', params)        
+    dispatch(PingPluginsNode(values.uuid))
   }
 }
 

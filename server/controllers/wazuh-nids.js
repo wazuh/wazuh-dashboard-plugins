@@ -186,10 +186,35 @@ export class WazuhNidsCtrl {
     }
   }
 
+  async LaunchZeekMainConf(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.LaunchZeekMainConf(req.payload);   
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async pingZeek(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.pingZeek(req.payload);   
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
   async getGroups(req, reply) {
     try {
       const data = await this.manageNidsHosts.getGroups(req.payload);   
-      console.log(data);
       return {
         statusCode: 200,
         error: 0,

@@ -91,7 +91,16 @@ export async function WazuhNidsRoutes(server) {
     method: 'PUT',
     path: '/nids/node/updateService',
     handler(req, reply) {      
-      return ctrl.editPlugin(req, reply);
+      return ctrl.updateService(req, reply);
+    }
+  });
+
+  // Edit specific node
+  server.route({
+    method: 'PUT',
+    path: '/nids/node/LaunchZeekMainConf',
+    handler(req, reply) {      
+      return ctrl.LaunchZeekMainConf(req, reply);
     }
   });
 
@@ -101,6 +110,24 @@ export async function WazuhNidsRoutes(server) {
     path: '/nids/node/changeServiceStatus',
     handler(req, reply) {      
       return ctrl.changeServiceStatus(req, reply);
+    }
+  });
+
+  // Edit specific node
+  server.route({
+    method: 'PUT',
+    path: '/nids/zeek',
+    handler(req, reply) {      
+      return ctrl.pingZeek(req, reply);
+    }
+  });
+
+  // Edit specific node
+  server.route({
+    method: 'PUT',
+    path: '/nids/node/PingPluginsNode',
+    handler(req, reply) {      
+      return ctrl.getNodePlugins(req, reply);
     }
   });
 

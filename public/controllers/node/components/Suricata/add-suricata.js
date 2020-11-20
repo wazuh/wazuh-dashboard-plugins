@@ -115,7 +115,6 @@ export const AddSuricata = () => {
 				newSuricata.rulesetName = id[1].name
 			}
 		})
-		console.log(newSuricata);
 		dispatch(toggleAddSuricata(false));
 		dispatch(updateService(newSuricata));
 	}
