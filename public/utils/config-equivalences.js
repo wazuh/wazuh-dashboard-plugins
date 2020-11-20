@@ -64,7 +64,7 @@ export const configEquivalences = {
   'cron.statistics.interval': 'Define the frequency of task execution using cron schedule expressions.',
   'cron.statistics.index.name': 'Define the name of the index in which the documents are to be saved.',
   'cron.statistics.index.creation': 'Define the interval in which the index will be created.',
-  'alerts.sample.prefix': 'Define the index prefix of sample alerts.\nIt must match with the template used by the index pattern to avoid unknown fields in dashboards.'
+  'alerts.sample.prefix': 'Define the index name prefix of sample alerts. It must match with the template used by the index pattern to avoid unknown fields in dashboards.'
 };
 
 export const nameEquivalence = {

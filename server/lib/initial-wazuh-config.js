@@ -129,7 +129,7 @@ export const initialWazuhConfig = `---
 #
 # --------------------------------- wazuh-sample-alerts -------------------------
 #
-# Customize the index prefix of sample alerts
+# Customize the index name prefix of sample alerts
 # This change is not retroactive, if you change it new indexes will be created
 # It should match with a valid index template to avoid unknown fields on 
 # dashboards
