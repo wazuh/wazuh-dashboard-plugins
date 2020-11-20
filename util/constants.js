@@ -34,7 +34,11 @@ export const WAZUH_SECURITY_PLUGINS = [
   WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH
 ];
 
+// Default time filter set by the app
 export const WAZUH_TIME_FILTER_DEFAULT = {
   from: "now-24h",
   to: 'now'
 };
+
+// Reserved ids for Users/Role mapping
+export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;

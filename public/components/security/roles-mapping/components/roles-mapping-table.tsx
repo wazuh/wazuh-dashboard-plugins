@@ -9,6 +9,7 @@ import {
 } from '@elastic/eui';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonModalConfirm } from '../../../common/buttons';
+import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import RulesServices from '../../rules/services';
 
 export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule, updateRules }) => {
@@ -58,7 +59,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
       field: 'id',
       name: 'Status',
       render: item => {
-        return item < 3 && <EuiBadge color="primary">Reserved</EuiBadge>;
+        return WzAPIUtils.isReservedID(item) && <EuiBadge color="primary">Reserved</EuiBadge>;
       },
       width: '150',
       sortable: false,
@@ -73,10 +74,10 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
             buttonType="icon"
             tooltip={{
               content:
-                item.id < 3 ? "Reserved role mapping can't be deleted" : 'Delete role mapping',
+                WzAPIUtils.isReservedID(item.id) ? "Reserved role mapping can't be deleted" : 'Delete role mapping',
               position: 'left',
             }}
-            isDisabled={item.id < 3}
+            isDisabled={WzAPIUtils.isReservedID(item.id)}
             modalTitle={`Do you want to delete the ${item.name} role mapping?`}
             onConfirm={async () => {
               try {
