@@ -36,9 +36,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Manager restart in rule editor does not work with Wazuh cluster enabled [#2640](https://github.com/wazuh/wazuh-kibana-app/issues/2640)
 - Restore the tables in the agents' reports [#2628](https://github.com/wazuh/wazuh-kibana-app/issues/2628)
 - Changes done via a worker's API are overwritten [#2626](https://github.com/wazuh/wazuh-kibana-app/issues/2626)
+
+### Fixed
+
 - [BUGFIX] Default user field for current platform [#2633](https://github.com/wazuh/wazuh-kibana-app/pull/2633)
 
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4009
