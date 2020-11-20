@@ -299,8 +299,8 @@ export class OverviewController {
       const result = ((data || {}).data || {}).data || false;
 
       if (result) {
-        const active = result.active;
-        const total = result.total;
+        const active = result.active - 1;
+        const total = result.total - 1;
         this.agentsCountActive = active;
         this.agentsCountDisconnected = result.disconnected;
         this.agentsCountNeverConnected = result['never_connected'];

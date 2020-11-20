@@ -86,7 +86,7 @@ export class AgentsPreviewController {
     }
     const summaryData = await WzRequest.apiReq('GET', '/agents/summary/status', {});
     this.summary = summaryData.data.data;
-    if (this.summary.total === 0) {
+    if (this.summary.total - 1 === 0) {
       if (this.addingNewAgent === undefined) {
         this.addNewAgent(true);
       }
