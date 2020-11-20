@@ -23,6 +23,7 @@ import { UpdateUser } from '../types/user.type';
 import UsersServices from '../services';
 import RolesServices from '../../roles/services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
+import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import { useDebouncedEffect } from '../../../common/hooks/useDebouncedEffect';
 
 export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
@@ -174,7 +175,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
         <EuiTitle size="m">
           <h2>
             Edit {currentUser.username} user &nbsp; &nbsp;
-            {currentUser.id < 3 && <EuiBadge color="primary">Reserved</EuiBadge>}
+            {WzAPIUtils.isReservedID(currentUser.id) && <EuiBadge color="primary">Reserved</EuiBadge>}
           </h2>
         </EuiTitle>
       </EuiFlyoutHeader>
@@ -191,7 +192,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 checked={allowRunAs}
                 onChange={e => onChangeAllowRunAs(e)}
                 aria-label=""
-                disabled={currentUser.id < 3}
+                disabled={WzAPIUtils.isReservedID(currentUser.id)}
               />
             </EuiFormRow>
           </EuiPanel>
@@ -212,7 +213,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 onChange={e => onChangePassword(e)}
                 aria-label=""
                 isInvalid={!!formErrors.password}
-                disabled={currentUser.id < 3}
+                disabled={WzAPIUtils.isReservedID(currentUser.id)}
               />
             </EuiFormRow>
             <EuiFormRow
@@ -227,7 +228,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 onChange={e => onChangeConfirmPassword(e)}
                 aria-label=""
                 isInvalid={!!formErrors.confirmPassword}
-                disabled={currentUser.id < 3}
+                disabled={WzAPIUtils.isReservedID(currentUser.id)}
               />
             </EuiFormRow>
           </EuiPanel>
@@ -245,7 +246,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 onChange={onChangeRoles}
                 isClearable={true}
                 data-test-subj="demoComboBox"
-                isDisabled={currentUser.id < 3}
+                isDisabled={WzAPIUtils.isReservedID(currentUser.id)}
               />
             </EuiFormRow>
           </EuiPanel>
@@ -256,7 +257,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
               <EuiButton
                 fill
                 isLoading={isLoading}
-                isDisabled={currentUser.id < 3 || !showApply}
+                isDisabled={WzAPIUtils.isReservedID(currentUser.id) || !showApply}
                 onClick={editUser}
               >
                 Apply
