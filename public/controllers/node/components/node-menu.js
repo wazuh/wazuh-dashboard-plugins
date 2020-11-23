@@ -55,6 +55,11 @@ export const NodeMenu = withReduxProvider(() => {
 
     function updateMenuNodes() {
         const defaultMenuNodes = {
+            mntr: {
+                id: 'overview',
+                text: 'Overview',
+                isPin: true,
+            },
             srct: {
                 id: 'suricata',
                 text: 'Suricata',
@@ -74,12 +79,7 @@ export const NodeMenu = withReduxProvider(() => {
                 id: 'analyzer',
                 text: 'Analyzer',
                 isPin: true,
-            },
-            mntr: {
-                id: 'monitor',
-                text: 'Monitor',
-                isPin: true,
-            },
+            }
         }
   
         let menuNodesDetails = JSON.parse(window.localStorage.getItem('nodes'));

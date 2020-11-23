@@ -28,7 +28,7 @@ import {
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
-import { LaunchZeekMainConf, PingZeek } from '../../../../redux/actions/nidsActions';
+import { LaunchZeekMainConf, PingZeek, IsLoadingData, ZeekDiag } from '../../../../redux/actions/nidsActions';
 import { log } from '../../../../../server/logger';
 
 export const ZeekCurrentStatusTable = () => {
@@ -36,8 +36,8 @@ export const ZeekCurrentStatusTable = () => {
 	const nodeDetail = useSelector(state => state.nidsReducers.nodeDetail);
 	const nodePlugins = useSelector(state => state.nidsReducers.nodePlugins);
 	const zeekData = useSelector(state => state.nidsReducers.zeekData);
+	const loadingData = useSelector(state => state.nidsReducers.loadingData);
 
-	const [isLoading, setIsLoading] = useState(false)
 	const [plugins, setPlugins] = useState([])
 	
 	const title = headRender();
@@ -69,27 +69,27 @@ export const ZeekCurrentStatusTable = () => {
 
 
 					<EuiFlexItem grow={false}>
-						<EuiButtonEmpty iconType="stop" onClick={() => { dispatch(LaunchZeekMainConf({uuid: nodeDetail.uuid, param: "stop"})) }}>
+						<EuiButtonEmpty iconType="stop" onClick={() => { dispatch(IsLoadingData(true)); dispatch(LaunchZeekMainConf({uuid: nodeDetail.uuid, param: "stop"})) }}>
 							Stop
 						</EuiButtonEmpty>
 					</EuiFlexItem>
 					<EuiFlexItem grow={false}>
-						<EuiButtonEmpty iconType="play" onClick={() => { dispatch(LaunchZeekMainConf({uuid: nodeDetail.uuid, param: "start"})) }}>
+						<EuiButtonEmpty iconType="play" onClick={() => { dispatch(IsLoadingData(true)); dispatch(LaunchZeekMainConf({uuid: nodeDetail.uuid, param: "start"})) }}>
 							Start
 						</EuiButtonEmpty>
 					</EuiFlexItem>
 					<EuiFlexItem grow={false}>
-						<EuiButtonEmpty iconType="importAction" onClick={() => { dispatch(LaunchZeekMainConf({uuid: nodeDetail.uuid, param: "deploy"})) }}>
+						<EuiButtonEmpty iconType="importAction" onClick={() => { dispatch(IsLoadingData(true)); dispatch(LaunchZeekMainConf({uuid: nodeDetail.uuid, param: "deploy"})) }}>
 							Deploy
 						</EuiButtonEmpty>
 					</EuiFlexItem>
 					<EuiFlexItem grow={false}>
-						<EuiButtonEmpty iconType="refresh" onClick={() => { dispatch(PingZeek(nodeDetail.uuid)) }}>
+						<EuiButtonEmpty iconType="refresh" onClick={() => { dispatch(IsLoadingData(true)); dispatch(PingZeek(nodeDetail.uuid)) }}>
 							Refresh status
 						</EuiButtonEmpty>
 					</EuiFlexItem>
 					<EuiFlexItem grow={false}>
-						<EuiButtonEmpty iconType="stats" onClick={() => { }}>
+						<EuiButtonEmpty iconType="stats" onClick={() => { dispatch(IsLoadingData(true)); dispatch(ZeekDiag(nodeDetail.uuid))}}>
 							Diagnostics
 						</EuiButtonEmpty>
 					</EuiFlexItem>
@@ -129,8 +129,8 @@ export const ZeekCurrentStatusTable = () => {
 						<EuiBasicTable
 							items={plugins}
 							itemId="uuid"
-							 columns={columns()}
-							loading={isLoading}
+							columns={columns()}
+							loading={loadingData}
 						/>
 					</EuiFlexItem>
 				</EuiFlexGroup>

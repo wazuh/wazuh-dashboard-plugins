@@ -107,6 +107,24 @@ export async function WazuhNidsRoutes(server) {
   // Edit specific node
   server.route({
     method: 'PUT',
+    path: '/nids/getFileContent',
+    handler(req, reply) {      
+      return ctrl.getFileContent(req, reply);
+    }
+  });
+
+  // Edit specific node
+  server.route({
+    method: 'PUT',
+    path: '/nids/zeek/diag',
+    handler(req, reply) {      
+      return ctrl.ZeekDiag(req, reply);
+    }
+  });
+
+  // Edit specific node
+  server.route({
+    method: 'PUT',
     path: '/nids/node/changeServiceStatus',
     handler(req, reply) {      
       return ctrl.changeServiceStatus(req, reply);

@@ -35,6 +35,7 @@ import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import toolsTemplate from '../templates/tools/tools.pug';
 import nidsTemplate from '../templates/nids/nids.pug';
 import nodeTemplate from '../templates/node/node.pug';
+import nodeFilesTemplate from '../templates/nids-files/nids-files.pug';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
@@ -183,6 +184,10 @@ routes
   })
   .when('/node/', {
     template: nodeTemplate,
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  })
+  .when('/nids-files/', {
+    template: nodeFilesTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {

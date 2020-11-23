@@ -14,6 +14,25 @@ function accGetAllNodes(nodes){
   }
 };
 
+export function getFile(file) {
+  return async (dispatch) => {
+    var params = {
+      method: "GET",
+      path: `/node/loadfile/${file.uuid}/${file.file}`
+    }     
+    const values = await NidsRequest.genericReq('PUT', '/nids/getFileContent', {params});
+    console.log("values.data.data");
+    console.log(values.data.data);
+    dispatch(accGetFile(nodes.data.data))
+  }
+}
+function accGetFile(data){
+  return {
+    type: 'FILE_CONTENT', 
+    payload: data
+  }
+};
+
 export function PingZeek(uuid) {
   return async (dispatch) => {
     var params = {
@@ -21,6 +40,7 @@ export function PingZeek(uuid) {
       path: `/node/zeek/${uuid}`
     }     
     const zeek = await NidsRequest.genericReq('PUT', '/nids/zeek', params);
+    dispatch(IsLoadingData(false))
     dispatch(accPingZeek(zeek.data.data))
   }
 }
@@ -126,8 +146,8 @@ export function LaunchZeekMainConf(values) {
     data: values
   }  
   return async (dispatch) => {
-    const data = await NidsRequest.genericReq('PUT', '/nids/node/LaunchZeekMainConf', params)        
-    dispatch(PingPluginsNode(values.uuid))
+    const data = await NidsRequest.genericReq('PUT', '/nids/node/LaunchZeekMainConf', params)      
+    dispatch(PingZeek(values.uuid))
   }
 }
 
@@ -215,6 +235,29 @@ export function PingPluginsNode(uuid) {
   }
 }
 
+export function ZeekDiag(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",
+      path: '/node/zeek/' + uuid + '/diag'
+    }  
+    const values = await NidsRequest.genericReq('PUT', '/nids/zeek/diag', params)    
+    dispatch(IsLoadingData(false))
+    dispatch(saveZeekDiag(values.data.data))
+  }
+}
+
+/**
+ * Toggle the tab selected for NIDS
+ * @param {Boolean} tab
+ */
+export const saveZeekDiag = value => {
+  return {
+    type: 'SAVE_ZEEK_DIAG',
+    payload: value
+  };
+};
+
 /**
  * Toggle the tab selected for NIDS
  * @param {Boolean} tab
@@ -233,6 +276,13 @@ export const savePlugins = value => {
 export const changeTabSelected = value => {
   return {
     type: 'TAB',
+    payload: value
+  };
+};
+  
+export const NidsShowFile = value => {
+  return {
+    type: 'FILE',
     payload: value
   };
 };
@@ -343,6 +393,17 @@ export const saveSelectedTags = value => {
 export const saveSelectedGroups = value => {
   return {
     type: 'SAVE_GROUPS',
+    payload: value
+  };
+};
+  
+/**
+ * change loading data
+ * @param {String} 
+ */
+export const IsLoadingData = value => {
+  return {
+    type: 'IS_LOADING_DATA',
     payload: value
   };
 };

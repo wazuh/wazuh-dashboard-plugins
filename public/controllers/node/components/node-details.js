@@ -64,11 +64,11 @@ export const NodeDetails = withReduxProvider(() => {
       {toggleSuricata ? <AddSuricata></AddSuricata> : null}      
       <br />
         <EuiPage>
+            {nodeTab === "overview" ? <p>Overview</p> : null} 
             {nodeTab === "suricata" ? <SuricataTable></SuricataTable> : null}
             {nodeTab === "zeek" ? <ZeekTable></ZeekTable> : null}
             {nodeTab === "stap" ? <p>Traffic Management - STAP</p> : null}
             {nodeTab === "analyzer" ? <p>Analyzer</p> : null} 
-            {nodeTab === "monitor" ? <p>Monitor</p> : null} 
         </EuiPage>
     </Fragment>
     // <Fragment>

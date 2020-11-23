@@ -2,8 +2,9 @@ const initialState = {
     interfaces: {},
     rulesets: {},
     tabSelected: "nodes",
-    nodeTabSelected: "suricata",
+    nodeTabSelected: "overview",
     nodeToEdit: "",
+    file: "",
     nodeDetail: {},
     tags: {},
     orgs: {},
@@ -12,14 +13,41 @@ const initialState = {
     editPlugin: {},
     addNodeForm: false,
     toggleSuricata: false,
+    loadingData: false,
     nodes: [],
     savedOrgs: [],
     savedTags: [],
     savedGroups: [],
     zeekData: {},
+    zeekDiag: {},
+    fileContent: {},
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'FILE_CONTENT') {
+        return {
+          ...state,
+          fileContent: action.payload
+        };
+      }  
+      if (action.type === 'FILE') {
+        return {
+          ...state,
+          file: action.payload
+        };
+      }  
+      if (action.type === 'SAVE_ZEEK_DIAG') {
+        return {
+          ...state,
+          zeekDiag: action.payload
+        };
+      }  
+      if (action.type === 'IS_LOADING_DATA') {
+        return {
+          ...state,
+          loadingData: action.payload
+        };
+      }  
       if (action.type === 'ZEEK') {
         return {
           ...state,

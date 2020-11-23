@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Load all the controllers.
+ * Wazuh app - Load the Agent controllers and React components.
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import './overview';
-import './management';
-import './agent';
-import './settings';
-import './security';
-import './dev-tools';
-import './misc';
-import './nids';
-import './node';
-import './nids-utils';
+
+import { uiModules } from 'ui/modules';
+import { NidsUtilsController } from './nids-utils';
+import { NidsFiles } from './components/nids-files';
+
+const app = uiModules.get('app/wazuh', []);
+
+app
+  .controller('NidsUtilsController', NidsUtilsController)
+  .value('NidsFiles', NidsFiles);

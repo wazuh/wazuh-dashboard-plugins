@@ -27,8 +27,9 @@ import {
 	EuiPageBody
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
+import { AppNavigate } from '../../../../react-services/app-navigate';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
-import { toggleAddSuricata, savePluginToEdit, deleteService, syncRuleset, changeServiceStatus } from '../../../../redux/actions/nidsActions';
+import { NidsShowFile } from '../../../../redux/actions/nidsActions';
 
 export const ZeekStatusDetailsTable = () => {
     const dispatch = useDispatch();
@@ -44,13 +45,20 @@ export const ZeekStatusDetailsTable = () => {
     useEffect(() => { 
 		formatZeek(zeekData)
 	}, []);
+    useEffect(() => { 
+		formatZeek(zeekData)
+	}, [zeekData]);
 	
 	function formatZeek(zeekData) {
+		// console.log("LOADING...>");
+		// setIsLoading(true);
         var data = [];
-        [...Object.keys(zeekData.nodes).map((item) => { 
-            data.push({...zeekData.nodes[item], nameHost: zeekData.nodes[item].name+"("+zeekData.nodes[item].host+")"})
+        [...Object.keys(zeekData.nodes || {}).map((item) => { 
+			data.push({...zeekData.nodes[item], nameHost: zeekData.nodes[item].name+"("+zeekData.nodes[item].host+")"})
         })];          
 		setPlugins(data)
+		// setIsLoading(false);
+		// console.log("Out...>");
     }
     
     
@@ -67,6 +75,33 @@ export const ZeekStatusDetailsTable = () => {
 								</EuiTitle>
 							</EuiFlexItem>
 						</EuiFlexGroup>
+					</EuiFlexItem> 
+						
+					<EuiFlexItem grow={false}>
+						<EuiButtonEmpty iconType="document" onClick={ev => { 
+							dispatch(NidsShowFile("node.cfg"))
+							AppNavigate.navigateToModule(ev, 'nids-files', { tab: { id: 'ZeekFiles', text: 'Zeek Files' } })
+						 }}>
+							Node.cfg
+						</EuiButtonEmpty>
+					</EuiFlexItem>
+					
+					<EuiFlexItem grow={false}>
+						<EuiButtonEmpty iconType="document" onClick={ev => { 
+							dispatch(NidsShowFile("network.cfg"))
+							AppNavigate.navigateToModule(ev, 'nids-files', { tab: { id: 'ZeekFiles', text: 'Zeek Files' } })
+						}}>
+							Network.cfg
+						</EuiButtonEmpty>
+					</EuiFlexItem>
+					
+					<EuiFlexItem grow={false}>
+						<EuiButtonEmpty iconType="document" onClick={ev => { 
+							dispatch(NidsShowFile("zeekctl.cfg"))
+							AppNavigate.navigateToModule(ev, 'nids-files', { tab: { id: 'ZeekFiles', text: 'Zeek Files' } })
+						}}>
+							Zeekctl.cfg
+						</EuiButtonEmpty>
 					</EuiFlexItem>
 				</EuiFlexGroup>
 				<EuiSpacer size="xs" />
@@ -124,7 +159,7 @@ export const ZeekStatusDetailsTable = () => {
 						<EuiBasicTable
 							items={plugins}
 							itemId="uuid"
-							 columns={columns()}
+							columns={columns()}
 							loading={isLoading}
 						/>
 					</EuiFlexItem>
