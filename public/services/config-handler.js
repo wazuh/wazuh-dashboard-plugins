@@ -55,7 +55,7 @@ export class ConfigHandler {
 
   async performClusterRestart() {
     try {
-      await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
+      await WzRequest.apiReq('PUT', `/cluster/restart`, {});
       this.$rootScope.$broadcast('removeRestarting', {});
     } catch (error) {
       this.$rootScope.$broadcast('removeRestarting', {});

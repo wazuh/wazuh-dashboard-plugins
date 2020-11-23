@@ -108,10 +108,11 @@ export class ApiIsDown extends Component {
     const apiExample = `# Example Wazuh API configuration
 hosts:
     - production:
-        url: http://172.16.1.2
+        url: https://172.16.1.2
         port: 55000
         username: wazuh
         password: wazuh
+        run_as: false
 `;
 
     const checkConnectionChildren = (

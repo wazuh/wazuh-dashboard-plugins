@@ -23,6 +23,7 @@ export const RolesMappingCreate = ({
   roles,
   internalUsers,
   onSave,
+  currentPlatform,
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
   const [ruleName, setRuleName] = useState('');
@@ -105,6 +106,7 @@ export const RolesMappingCreate = ({
               isReserved={false}
               isLoading={isLoading}
               internalUsers={internalUsers}
+              currentPlatform={currentPlatform}
             ></RuleEditor>
           </EuiFlexItem>
         </EuiFlexGroup>
