@@ -11,6 +11,7 @@ import {
 import { WzButtonModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
+import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 
 export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave }) => {
   const getRowProps = item => {
@@ -67,10 +68,10 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
           <WzButtonModalConfirm
             buttonType="icon"
             tooltip={{
-              content: item.id < 3 ? "Reserved users mapping can't be deleted" : 'Delete user',
+              content: WzAPIUtils.isReservedID(item.id) ? "Reserved users mapping can't be deleted" : 'Delete user',
               position: 'left',
             }}
-            isDisabled={item.id < 3}
+            isDisabled={WzAPIUtils.isReservedID(item.id)}
             modalTitle={`Do you want to delete ${item.username} user?`}
             onConfirm={async () => {
               try {
