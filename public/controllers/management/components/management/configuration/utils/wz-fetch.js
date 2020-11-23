@@ -345,7 +345,7 @@ export const restartNode = async node => {
     }
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/restart`, {}
+      `/cluster/restart`, {delay: 15000}
     );
 
     return result;
