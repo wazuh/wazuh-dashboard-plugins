@@ -72,7 +72,7 @@ export class OverviewWelcome extends Component {
       <EuiFlexGroup >
         <EuiFlexItem >
           <EuiCallOut  style={{height:"65%"}} title="No agents were added to this manager. " color="warning" iconType="alert">
-            <EuiButtonEmpty style={{margin: "-58px 286px"}} alignItems='right' color="warning" href='#/agents-preview?'>Add agent</EuiButtonEmpty>
+            <EuiButtonEmpty style={{margin: "-58px 286px"}}  href='#/agents-preview?'>Add agent</EuiButtonEmpty>
           </EuiCallOut>
         </EuiFlexItem >
       </EuiFlexGroup>
