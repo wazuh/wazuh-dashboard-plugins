@@ -48,7 +48,9 @@ export class RegisterAgent extends Component {
     };
     this.restartAgentCommand = {
       rpm: 'sudo systemctl start wazuh-agent',
-      deb: 'sudo service wazuh-agent start'
+      deb: 'sudo service wazuh-agent start',
+      macos: 'sudo /Library/Ossec/bin/ossec-control start'
+
     }
   }
 
