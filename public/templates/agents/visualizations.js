@@ -428,6 +428,15 @@ export const visualizations = {
             id: 'Wazuh-App-Agents-Virustotal-Files-Table'
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-Virustotal-Alerts-summary'
+          }
+        ]
       }
     ]
   },

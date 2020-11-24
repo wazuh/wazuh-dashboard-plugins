@@ -83,11 +83,11 @@ export class WzVisualize extends Component {
         this.agentsStatus = [
           {
             title: 'Total',
-            description: result.total - 1,
+            description: result.total,
           },
           {
             title: 'Active',
-            description: result.active - 1,
+            description: result.active,
           },
           {
             title: 'Disconnected',
@@ -99,7 +99,7 @@ export class WzVisualize extends Component {
           },
           {
             title: 'Agents coverage',
-            description: ((result.total - 1) ? ((result.active - 1) / (result.total - 1)) * 100 : 0) + '%',
+            description: ((result.total) ? ((result.active) / (result.total)) * 100 : 0) + '%',
           },
         ];
       }
@@ -116,7 +116,7 @@ export class WzVisualize extends Component {
     if (prevProps.isAgent !== this.props.isAgent) {
       this._isMount &&
         this.setState({ visualizations: !!this.props.isAgent ? agentVisualizations : visualizations });
-      visHandler.removeAll();
+      typeof prevProps.isAgent !== 'undefined' && visHandler.removeAll();
     }
   }
 

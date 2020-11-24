@@ -43,6 +43,21 @@ export const agentVisualizations = {
             width: 34
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-General-Alerts-summary',
+            width: 60
+          },
+          {
+            title: 'Groups summary',
+            id: 'Wazuh-App-Agents-General-Groups-summary',
+            width: 40
+          }
+        ]
       }
     ]
   },
@@ -96,6 +111,15 @@ export const agentVisualizations = {
             id: 'Wazuh-App-Agents-AWS-geo'
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-AWS-Alerts-summary'
+          }
+        ]
       }
     ]
   },
@@ -138,6 +162,15 @@ export const agentVisualizations = {
             title: 'Files deleted',
             id: 'Wazuh-App-Agents-FIM-Files-deleted',
             width: 34
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-FIM-Alerts-summary'
           }
         ]
       }
@@ -195,6 +228,15 @@ export const agentVisualizations = {
           },
         ]
       },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-GCP-Alerts-summary'
+          }
+        ]
+      }
     ]
   },
   pci: {
@@ -231,6 +273,15 @@ export const agentVisualizations = {
             title: 'Rule level distribution',
             id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
             width: 25
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-PCI-Last-alerts'
           }
         ]
       }
@@ -272,6 +323,15 @@ export const agentVisualizations = {
             width: 25
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-GDPR-Last-alerts'
+          }
+        ]
       }
     ]
   },
@@ -303,6 +363,15 @@ export const agentVisualizations = {
           {
             title: 'Requirements over time',
             id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime'
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-NIST-Last-alerts'
           }
         ]
       }
@@ -344,6 +413,15 @@ export const agentVisualizations = {
             width: 25
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-TSC-Alerts-summary'
+          }
+        ]
       }
     ]
   },
@@ -381,6 +459,15 @@ export const agentVisualizations = {
             title: 'Most common alerts',
             id: 'Wazuh-App-Agents-HIPAA-Most-Common',
             width: 25
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-HIPAA-Last-alerts'
           }
         ]
       }
@@ -437,6 +524,15 @@ export const agentVisualizations = {
             width: 75
           },
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-vuls-Alerts-summary'
+          }
+        ]
       }
     ]
   },
@@ -463,6 +559,15 @@ export const agentVisualizations = {
           {
             title: 'Last files',
             id: 'Wazuh-App-Agents-Virustotal-Files-Table'
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-Virustotal-Alerts-summary'
           }
         ]
       }
@@ -497,6 +602,15 @@ export const agentVisualizations = {
             title: 'Most common rules',
             id: 'Wazuh-App-Agents-Osquery-monst-common-rules-being-fired',
             width: 75
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Overview-Osquery-Alerts-summary'
           }
         ]
       }
@@ -539,6 +653,15 @@ export const agentVisualizations = {
           }
         ]
       },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-MITRE-Alerts-summary'
+          }
+        ]
+      }
     ]
   },
   docker: {
@@ -569,6 +692,15 @@ export const agentVisualizations = {
           {
             title: 'Events occurred evolution',
             id: 'Wazuh-App-Agents-Docker-Actions-over-time'
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-Docker-Events-summary'
           }
         ]
       }
@@ -624,6 +756,15 @@ export const agentVisualizations = {
             width: 50
           }
         ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-OSCAP-Last-alerts'
+          }
+        ]
       }
     ]
   },
@@ -641,6 +782,15 @@ export const agentVisualizations = {
             title: 'Scan result evolution',
             id: 'Wazuh-app-Agents-CISCAT-scan-result-evolution',
             width: 40
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-app-Agents-CISCAT-alerts-summary'
           }
         ]
       }
@@ -669,6 +819,15 @@ export const agentVisualizations = {
           {
             title: 'Events per control type evolution',
             id: 'Wazuh-App-Agents-PM-Events-per-agent-evolution'
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-PM-Alerts-summary'
           }
         ]
       }
@@ -702,6 +861,15 @@ export const agentVisualizations = {
           {
             title: 'Alerts over time',
             id: 'Wazuh-App-Agents-Audit-Alerts-over-time'
+          }
+        ]
+      },
+      {
+        hide: true,
+        vis: [
+          {
+            title: 'Alerts summary',
+            id: 'Wazuh-App-Agents-Audit-Last-alerts'
           }
         ]
       }

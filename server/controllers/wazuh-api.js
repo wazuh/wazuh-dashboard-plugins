@@ -35,7 +35,7 @@ import { ApiInterceptor } from '../lib/api-interceptor';
 import { SecurityObj } from '../lib/security-factory';
 import jwtDecode from 'jwt-decode';
 import { WAZUH_SECURITY_PLUGIN_XPACK_SECURITY, WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH } from '../../util/constants';
-
+import { APIUserAllowRunAs, CacheInMemoryAPIUserAllowRunAs, API_USER_STATUS_RUN_AS } from '../lib/cache-api-user-has-run-as'
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -49,12 +49,6 @@ export class WazuhApiCtrl {
     this.updateRegistry = new UpdateRegistry();
     this.securityObj = SecurityObj(this.PLATFORM, server);
     this.apiInterceptor = new ApiInterceptor();
-  }
-
-  async checkWazuhWui(apiId){
-    const host = await this.manageHosts.getHostById(apiId);
-    if(host && host.username === 'wazuh-wui') return true;
-    return false;
   }
 
   getCurrentPlatform(server) {
@@ -118,13 +112,12 @@ export class WazuhApiCtrl {
           }
         }
       }  
-      const isWazuhWui = await this.checkWazuhWui(idHost);
       let token;
-      if(isWazuhWui){
+      if(await APIUserAllowRunAs.canUse(idHost)){
         token = await this.apiInterceptor.authenticateApi(idHost, authContext)
       }else{
         token = await this.apiInterceptor.authenticateApi(idHost)
-      }
+      };
       const response = reply.response({token});
       response.state('wz-token', token, {isSecure: false, path: '/'});
       response.state('wz-user', username, {isSecure: false, path: '/'});
@@ -135,7 +128,7 @@ export class WazuhApiCtrl {
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
       log('wazuh-api:getToken', errorMessage);
       return ErrorResponse(
-        `Error getting authorization token: ${errorMessage}`,
+        `Error getting the authorization token: ${errorMessage}`,
         3000,
         500,
         reply
@@ -406,6 +399,21 @@ export class WazuhApiCtrl {
             { idHost: req.payload.id }
           );
 
+          // Check the run_as for the API user and update it
+          let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.DISABLED;
+          if(apiAvailable.run_as){
+            const responseApiUserAllowRunAs = await this.apiInterceptor.request(
+              'GET',
+              `${apiAvailable.url}:${apiAvailable.port}/security/users/me`,
+              {},
+              { idHost: req.payload.id }
+            );
+            if(responseApiUserAllowRunAs.status === 200) {
+              apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
+            }
+          }
+          CacheInMemoryAPIUserAllowRunAs.set(req.payload.id, apiAvailable.username, apiUserAllowRunAs);
+
           if (responseCluster.status === 200) {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
             if (responseCluster.data.data.enabled === 'yes') {
@@ -423,6 +431,7 @@ export class WazuhApiCtrl {
                   node: responseClusterLocal.data.data.affected_items[0].node,
                   cluster: responseClusterLocal.data.data.affected_items[0].cluster,
                   status: 'enabled',
+                  allow_run_as: apiUserAllowRunAs
                 };
               }
             } else {
@@ -431,6 +440,7 @@ export class WazuhApiCtrl {
                 manager: managerName,
                 cluster: 'Disabled',
                 status: 'disabled',
+                allow_run_as: apiUserAllowRunAs
               };
             }
           }
@@ -445,7 +455,7 @@ export class WazuhApiCtrl {
 
       if(error && error.response && error.response.status === 401){
         return ErrorResponse(
-          'Unathorized. Please check API credentials.',
+          `Unathorized. Please check API credentials. ${error.response.data.message}`,
           401,
           401,
           reply
@@ -1391,12 +1401,12 @@ export class WazuhApiCtrl {
 
       if (summary) {
         Object.assign(result.summary, {
-          agentsCountActive: summary.Active - 1,
+          agentsCountActive: summary.Active,
           agentsCountDisconnected: summary.Disconnected,
           agentsCountNeverConnected: summary['Never connected'],
-          agentsCountTotal: summary.Total - 1,
+          agentsCountTotal: summary.Total,
           agentsCoverity:
-            summary.Total - 1 ? ((summary.Active - 1) / (summary.Total - 1)) * 100 : 0,
+            summary.Total ? ((summary.Active) / (summary.Total)) * 100 : 0,
         });
       }
 

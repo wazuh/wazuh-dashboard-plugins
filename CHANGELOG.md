@@ -2,6 +2,33 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4011
+
+### Fixed
+
+- The index pattern title is overwritten with its id after refreshing its fields [#2577](https://github.com/wazuh/wazuh-kibana-app/issues/2577)
+- [RBAC] Issues detected when using RBAC [#2579](https://github.com/wazuh/wazuh-kibana-app/issues/2579)
+
+## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4010
+
+### Added
+
+- Support for Wazuh v4.0.2.
+
+### Changed
+
+- Alerts summary table for PDF reports on all modules [#2632](https://github.com/wazuh/wazuh-kibana-app/issues/2632)
+- [4.0-7.9] Run as with no wazuh-wui API user [#2576](https://github.com/wazuh/wazuh-kibana-app/issues/2576)
+- Deploy a new agent interface as default interface [#2564](https://github.com/wazuh/wazuh-kibana-app/issues/2564)
+- Problem in the visualization of new reserved resources of the Wazuh API [#2643](https://github.com/wazuh/wazuh-kibana-app/issues/2643)
+
+### Fixed
+
+- Manager restart in rule editor does not work with Wazuh cluster enabled [#2640](https://github.com/wazuh/wazuh-kibana-app/issues/2640)
+- Restore the tables in the agents' reports [#2628](https://github.com/wazuh/wazuh-kibana-app/issues/2628)
+- Changes done via a worker's API are overwritten [#2626](https://github.com/wazuh/wazuh-kibana-app/issues/2626)
+- [BUGFIX] Default user field for current platform [#2633](https://github.com/wazuh/wazuh-kibana-app/pull/2633)
+
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4009
 
 ### Changed
