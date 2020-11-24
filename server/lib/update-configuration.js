@@ -23,6 +23,8 @@ const needRestartFields = [
   'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern',
   'alerts.sample.prefix',
+  'cron.statistics.index.shards',
+  'cron.statistics.index.replicas',
   'logs.level',
 ];
 
