@@ -153,6 +153,10 @@ export const initialWazuhConfig = `---
 # Define the interval in which the index will be created
 #cron.statistics.index.creation: w
 #
+# Configure statistics indices shards and replicas.
+#cron.statistics.shards: 2
+#cron.statistics.replicas: 0
+#
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
 #hideManagerAlerts: false
