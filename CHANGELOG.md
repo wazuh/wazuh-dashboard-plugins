@@ -13,6 +13,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Statistics settings do not allow to configure primary shards and replicas [#2627](https://github.com/wazuh/wazuh-kibana-app/issues/2627)
+### Fixed
+- fix(fronted): fixed the check of API and APP version in health check [#2655](https://github.com/wazuh/wazuh-kibana-app/pull/2655)
 
 ## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4011
 
