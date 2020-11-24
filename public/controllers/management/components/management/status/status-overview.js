@@ -67,7 +67,7 @@ export class WzStatusOverview extends Component {
     this.fetchData();
   }
 
-  componentDidUpdate() {}
+  componentDidUpdate() { }
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -84,29 +84,29 @@ export class WzStatusOverview extends Component {
    * Fetchs all required data
    */
   async fetchData() {
-    try{
+    try {
       this.props.updateLoadingStatus(true);
-  
+
       const agSumm = await this.statusHandler.agentsSummary();
       const clusStat = await this.statusHandler.clusterStatus();
       const manInfo = await this.statusHandler.managerInfo();
       const agentsCountResponse = await this.statusHandler.clusterAgentsCount();
-  
+
       const data = [];
       data.push(agSumm);
       data.push(clusStat);
       data.push(manInfo);
       data.push(agentsCountResponse);
-  
+
       const parsedData = data.map(
         item => ((item || {}).data || {}).data || false
       );
       const [stats, clusterStatus, managerInfo, agentsCount] = parsedData;
-  
+
       // Once Wazuh core fixes agent 000 issues, this should be adjusted
-      const active = stats.active - 1;
-      const total = stats.total - 1;
-  
+      const active = stats.active;
+      const total = stats.total;
+
       this.props.updateStats({
         agentsCount: agentsCount.nodes,
         agentsCountActive: active,
@@ -115,11 +115,11 @@ export class WzStatusOverview extends Component {
         agentsCountTotal: total,
         agentsCoverity: total ? (active / total) * 100 : 0
       });
-  
+
       this.props.updateClusterEnabled(
         clusterStatus && clusterStatus.enabled === 'yes'
       );
-  
+
       if (
         clusterStatus &&
         clusterStatus.enabled === 'yes' &&
@@ -156,9 +156,9 @@ export class WzStatusOverview extends Component {
       }
       const lastAgentRaw = await this.statusHandler.lastAgentRaw();
       const [lastAgent] = lastAgentRaw.data.data.affected_items;
-  
+
       this.props.updateAgentInfo(lastAgent);
-    }catch(error){
+    } catch (error) {
       ToastNotifications.error('management:status:overview.fetchData', error);
     }
     this.props.updateLoadingStatus(false);
@@ -253,9 +253,9 @@ export default compose(
     { text: 'Management', href: '/app/wazuh#/manager' },
     { text: 'Status' }
   ]),
-  withUserAuthorizationPrompt([{action: 'agent:read', resource: 'agent:id:*'}, {action: 'manager:read', resource: '*:*:*'}, {action: 'cluster:read', resource: 'node:id:*'}]),
+  withUserAuthorizationPrompt([{ action: 'agent:read', resource: 'agent:id:*' }, { action: 'manager:read', resource: '*:*:*' }, { action: 'cluster:read', resource: 'node:id:*' }]),
   connect(
     mapStateToProps,
     mapDispatchToProps
-  ) 
+  )
 )(WzStatusOverview);
