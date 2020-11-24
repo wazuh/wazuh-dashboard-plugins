@@ -6,14 +6,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Sample data indices name should take index pattern in use [#2593](https://github.com/wazuh/wazuh-kibana-app/issues/2593) 
 - Added start option to macos Agents [#2653](https://github.com/wazuh/wazuh-kibana-app/pull/2653)
 
 ## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4011
 
-
 ### Added
 
 - Support for Wazuh v4.0.2.
+
 ### Fixed
 
 - The index pattern title is overwritten with its id after refreshing its fields [#2577](https://github.com/wazuh/wazuh-kibana-app/issues/2577)
