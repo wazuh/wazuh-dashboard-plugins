@@ -51,7 +51,7 @@ import { log } from '../../../../server/logger';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { toggleAddNodeMenu, SaveNodeToDetails, getAllNodes, deleteNode, nodeForEdit } from '../../../redux/actions/nidsActions';
-import { getAllTags, getAllOrgs, getAllGroups } from '../../../redux/actions/nidsActions';
+import { getAllTags, getAllOrgs, getAllGroups, IsLoadingData } from '../../../redux/actions/nidsActions';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 
@@ -59,11 +59,12 @@ export const NidsTable = withReduxProvider(() => {
   const dispatch = useDispatch();
   const addNodeForm = useSelector(state => state.nidsReducers.addNodeForm);
   const nodes = useSelector(state => state.nidsReducers.nodes);
+  const loadingData = useSelector(state => state.nidsReducers.loadingData);
 
   const [newNodesList, setNewNodesList] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => { 
+    dispatch(IsLoadingData(true));
     loadNodes() 
     dispatch(getAllTags())
     dispatch(getAllOrgs())
@@ -76,8 +77,8 @@ export const NidsTable = withReduxProvider(() => {
       nids.push(formatNode(node))
     });      
     //save nodes formated into array
-    setNewNodesList(nids)    
-    setIsLoading(false)
+    setNewNodesList(nids)   
+    dispatch(IsLoadingData(false)); 
   }, [nodes]);
 
   //load header for table
@@ -113,8 +114,7 @@ export const NidsTable = withReduxProvider(() => {
         <EuiToolTip content="Delete node" position="left">
           <EuiButtonIcon
             onClick={ev => {                             
-              dispatch(deleteNode(node.uuid))
-              
+              dispatch(deleteNode(node.uuid))              
             }}
             iconType="trash"
             color={'danger'}
@@ -129,7 +129,7 @@ export const NidsTable = withReduxProvider(() => {
     try{
       dispatch(getAllNodes())
     }catch(error){
-      setIsLoading(false)
+      dispatch(IsLoadingData(false));
     }
   }
 
@@ -263,7 +263,7 @@ export const NidsTable = withReduxProvider(() => {
               items={newNodesList}
               itemId="uuid"
               columns={columns()}
-              loading={isLoading}
+              loading={loadingData}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

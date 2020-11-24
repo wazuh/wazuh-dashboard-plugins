@@ -116,6 +116,15 @@ export async function WazuhNidsRoutes(server) {
   // Edit specific node
   server.route({
     method: 'PUT',
+    path: '/nids/saveNidsFile',
+    handler(req, reply) {      
+      return ctrl.saveNidsFile(req, reply);
+    }
+  });
+
+  // Edit specific node
+  server.route({
+    method: 'PUT',
     path: '/nids/zeek/diag',
     handler(req, reply) {      
       return ctrl.ZeekDiag(req, reply);

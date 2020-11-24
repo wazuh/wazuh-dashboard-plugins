@@ -23,26 +23,40 @@ import {
 	WzButtonPermissions,
 	EuiToolTip,
 	EuiCodeEditor,
+	EuiFormRow,
 	EuiButtonIcon,
 	EuiEmptyPrompt,
 	EuiPageBody
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
-import { toggleAddSuricata, savePluginToEdit, deleteService, syncRuleset, changeServiceStatus } from '../../../../redux/actions/nidsActions';
+import { saveZeekDiag } from '../../../../redux/actions/nidsActions';
 
 export const ZeekDiagnostic = () => {
 	const zeekDiag = useSelector(state => state.nidsReducers.zeekDiag);
-    
+	const dispatch = useDispatch();
+	
     return (
-		<EuiCodeEditor
-			mode="less"
-			theme="github"
-			width="100%"
-			value={zeekDiag.raw}
-			setOptions={{ fontSize: '14px' }}
-			isReadOnly
-			aria-label="Zeek Diagnostics"
-		/>
+		<div>
+			<EuiCodeEditor
+				mode="less"
+				theme="github"
+				width="100%"
+				value={zeekDiag.raw}
+				setOptions={{ fontSize: '14px' }}
+				isReadOnly
+				aria-label="Zeek Diagnostics"
+			/>
+			
+			<EuiSpacer size="m" />
+
+			<EuiFlexGroup>
+				<EuiFlexItem>
+					<EuiFormRow>
+						<EuiButton onClick={() => { dispatch(saveZeekDiag({})) }}>Close</EuiButton>
+					</EuiFormRow>
+				</EuiFlexItem>
+			</EuiFlexGroup>
+		</div>
     )
 }

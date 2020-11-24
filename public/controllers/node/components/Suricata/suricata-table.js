@@ -28,19 +28,22 @@ import {
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
-import { toggleAddSuricata, savePluginToEdit, deleteService, syncRuleset, changeServiceStatus } from '../../../../redux/actions/nidsActions';
+import { toggleAddSuricata, savePluginToEdit, deleteService, syncRuleset, IsLoadingData, changeServiceStatus, NidsShowFile } from '../../../../redux/actions/nidsActions';
 import { log } from '../../../../../server/logger';
-
+import { AppNavigate } from '../../../../react-services/app-navigate';
+import { AddSuricata } from './add-suricata';
 
 export const SuricataTable = withReduxProvider(() => {
     const dispatch = useDispatch();
     const nodeDetail = useSelector(state => state.nidsReducers.nodeDetail);
     const nodePlugins = useSelector(state => state.nidsReducers.nodePlugins);
-  
-    const [isLoading, setIsLoading] = useState(false)
+    const loadingData = useSelector(state => state.nidsReducers.loadingData);
+    const toggleSuricata = useSelector(state => state.nidsReducers.toggleSuricata);
+
     const [plugins, setPlugins] = useState([])
 
     useEffect(() => { 
+      dispatch(IsLoadingData(true));
       getPlugin()
     }, [nodePlugins]);
 
@@ -61,6 +64,8 @@ export const SuricataTable = withReduxProvider(() => {
       });  
       
       setPlugins(plug)
+      console.log(plug);
+      dispatch(IsLoadingData(false));
     }
     
     function formatNode(plugin) {
@@ -84,17 +89,16 @@ export const SuricataTable = withReduxProvider(() => {
                   </EuiFlexItem>                  
                 </EuiFlexGroup>
               </EuiFlexItem>
-
                   
-                <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty
-                    // permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
-                    iconType="plusInCircle"
-                    onClick={() => {dispatch(toggleAddSuricata(true))}}
-                  >
-                    Add Suricata
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  // permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
+                  iconType="plusInCircle"
+                  onClick={() => {dispatch(toggleAddSuricata(true))}}
+                >
+                  Add Suricata
+                </EuiButtonEmpty>
+              </EuiFlexItem>
            
             </EuiFlexGroup>
             <EuiSpacer size="xs" />
@@ -164,15 +168,8 @@ export const SuricataTable = withReduxProvider(() => {
           ?
           <EuiToolTip content="Stop Suricata" position="left">
             <EuiButtonIcon
-              onClick={ev => {  
-                console.log({
-                  uuid:nodeDetail.uuid,
-                  status:data.status,
-                  param:"status",
-                  service:data.service,
-                  type:data.type,
-                  interface:data.interface
-                })              
+              onClick={ev => {   
+                dispatch(IsLoadingData(true));
                 dispatch(changeServiceStatus({
                   uuid:nodeDetail.uuid,
                   status:"disabled",
@@ -190,15 +187,8 @@ export const SuricataTable = withReduxProvider(() => {
           :
           <EuiToolTip content="Launch Suricata" position="left">
             <EuiButtonIcon
-              onClick={ev => {
-                console.log({
-                  uuid:nodeDetail.uuid,
-                  status:data.status,
-                  param:"status",
-                  service:data.service,
-                  type:data.type,
-                  interface:data.interface
-                })              
+              onClick={ev => {           
+                dispatch(IsLoadingData(true));  
                 dispatch(changeServiceStatus({
                   uuid:nodeDetail.uuid,
                   status:"enabled",
@@ -219,8 +209,7 @@ export const SuricataTable = withReduxProvider(() => {
         <EuiToolTip content="Sync ruleset" position="left">
           <EuiButtonIcon
             onClick={ev => {
-              dispatch(syncRuleset({uuid: nodeDetail.uuid, service: data.service, ruleset: data.ruleset, type: "node"}))
-            //   AppNavigate.navigateToModule(ev, 'node', { tab: { id: 'nodeDetails', text: 'Node details' } })
+              dispatch(syncRuleset({uuid: nodeDetail.uuid, service: data.service, ruleset: data.ruleset, type: "node"}))            
             }}
             iconType="refresh"
             color={'primary'}
@@ -240,6 +229,18 @@ export const SuricataTable = withReduxProvider(() => {
           />
         </EuiToolTip>
 
+        <EuiToolTip content="Edit Suricata file" position="left">
+          <EuiButtonIcon
+            onClick={ev => {               
+              dispatch(NidsShowFile("suricata_config"))
+							AppNavigate.navigateToModule(ev, 'nids-files', { })
+            }}
+            iconType="documentEdit"
+            color={'primary'}
+            aria-label="Edit Suricata file"
+          />
+        </EuiToolTip>
+
         <EuiToolTip content="Delete Suricata" position="left">
           <EuiButtonIcon
             onClick={ev => {                         
@@ -255,21 +256,24 @@ export const SuricataTable = withReduxProvider(() => {
     }
 
     return (
-        <div>
-            <EuiSpacer size="m" />
-            <EuiPanel paddingSize="m">
-            {title}
-            <EuiFlexGroup>
-                <EuiFlexItem>
-                <EuiBasicTable
-                     items={plugins}
-                     itemId="uuid"
-                     columns={columns()}
-                     loading={isLoading}
-                />
-                </EuiFlexItem>
-            </EuiFlexGroup>
-            </EuiPanel>
-       </div>
+      <div>
+        <br />
+        {toggleSuricata ? <AddSuricata></AddSuricata> : null}      
+        <br />
+        <EuiSpacer size="m" />
+        <EuiPanel paddingSize="m">
+          {title}
+          <EuiFlexGroup>
+              <EuiFlexItem>
+              <EuiBasicTable
+                  items={plugins}
+                  itemId="uuid"
+                  columns={columns()}
+                  loading={loadingData}
+              />
+              </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPanel>
+      </div>
     )
 });

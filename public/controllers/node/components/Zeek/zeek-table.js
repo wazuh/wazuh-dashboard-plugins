@@ -36,14 +36,13 @@ import {ZeekDiagnostic} from './zeek-diag'
 
 export const ZeekTable = () => {
     const zeekDiagData = useSelector(state => state.nidsReducers.zeekDiag);
-    useEffect(() => { 
-        console.log(zeekDiagData != null);
-	}, []);
+
     return (
         <div>
             <ZeekCurrentStatusTable></ZeekCurrentStatusTable>
             <br></br>
             <ZeekStatusDetailsTable></ZeekStatusDetailsTable>
+            <br></br>
             <br></br>
             {Object.entries(zeekDiagData).length !== 0 ? <ZeekDiagnostic></ZeekDiagnostic> : null}
         </div>

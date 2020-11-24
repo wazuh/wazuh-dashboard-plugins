@@ -29,7 +29,7 @@ import {
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
-import { toggleAddSuricata, savePluginToEdit, updateService, addService } from '../../../../redux/actions/nidsActions';
+import { toggleAddSuricata, savePluginToEdit, updateService, addService, IsLoadingData } from '../../../../redux/actions/nidsActions';
 
 // export const AddSuricata = withReduxProvider(() => {
 export const AddSuricata = () => {
@@ -120,13 +120,14 @@ export const AddSuricata = () => {
 	}
 
 	return (
+		
 		<div>
 			<EuiPanel paddingSize="m">
 				{/* Header */}
 				<EuiFlexGroup>
 					<EuiFlexItem>
-						<EuiFlexGroup>
-							<EuiFlexItem>
+						{/* <EuiFlexGroup> */}
+							{/* <EuiFlexItem> */}
 								<EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
 									{
 										Object.entries(editPlugin).length !== 0 ?
@@ -134,8 +135,8 @@ export const AddSuricata = () => {
 										<h2>Add Suricata</h2>
 									}
 								</EuiTitle>
-							</EuiFlexItem>
-						</EuiFlexGroup>
+							{/* </EuiFlexItem> */}
+						{/* </EuiFlexGroup> */}
 					</EuiFlexItem>
 					<EuiFlexItem grow={false}>
 						<EuiButtonEmpty
@@ -146,7 +147,7 @@ export const AddSuricata = () => {
 							}}
 						>
 							Close
-                        </EuiButtonEmpty>
+						</EuiButtonEmpty>
 					</EuiFlexItem>
 				</EuiFlexGroup>
 				<EuiSpacer size="xs" />
@@ -209,14 +210,15 @@ export const AddSuricata = () => {
 						<EuiFormRow>
 							{
 								Object.entries(editPlugin).length !== 0 ?
-								<EuiButton onClick={() => { handleEditRequest() }}>Edit</EuiButton> :
-								<EuiButton onClick={() => { handleAddRequest() }}>Add</EuiButton>
+								<EuiButton onClick={() => { dispatch(IsLoadingData(true)); dispatch(toggleAddSuricata(false)); handleEditRequest() }}>Edit</EuiButton> :
+								<EuiButton onClick={() => { dispatch(IsLoadingData(true)); dispatch(toggleAddSuricata(false)); handleAddRequest() }}>Add</EuiButton>
 							}
 						</EuiFormRow>
 					</EuiFlexItem>
 				</EuiFlexGroup>
 
 			</EuiPanel>
+			
 		</div>
 	)
 }

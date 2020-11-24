@@ -42,7 +42,7 @@ import { AddNodeGroups } from './add-node-groups';
 // import axios from 'axios';
 // import { log } from '../../../../server/logger';
 // import { connect } from 'react-redux';
-import { toggleAddNodeMenu, addNode, editNode, nodeForEdit } from '../../../redux/actions/nidsActions';
+import { toggleAddNodeMenu, addNode, editNode, nodeForEdit, IsLoadingData } from '../../../redux/actions/nidsActions';
 // import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { useSelector, useDispatch } from 'react-redux';
 // import { compose } from 'redux';
@@ -238,8 +238,8 @@ const NidsAddNode = () => {
             <EuiFormRow>
               {
                 nodeToEdit != "" ? 
-                <EuiButton onClick={() => {handleRequest()}}>Edit</EuiButton>:
-                <EuiButton onClick={() => {handleRequest()}}>Add</EuiButton>                
+                <EuiButton onClick={() => {dispatch(toggleAddNodeMenu(false)); dispatch(IsLoadingData(true)); handleRequest()}}>Edit</EuiButton>:
+                <EuiButton onClick={() => {dispatch(toggleAddNodeMenu(false)); dispatch(IsLoadingData(true)); handleRequest()}}>Add</EuiButton>                
               }
             </EuiFormRow>
           </EuiFlexItem>

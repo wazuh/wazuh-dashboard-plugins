@@ -76,7 +76,7 @@ export const NidsPreview = withReduxProvider(() => {
 
   return (
     <div>
-       <Fragment>
+       {/* <Fragment> */}
         <NidsMenu></NidsMenu>
         <EuiPage>
           {tab === "nodes" ? <NidsTable></NidsTable> : null}
@@ -85,7 +85,7 @@ export const NidsPreview = withReduxProvider(() => {
           {tab === "master" ? <p>master</p> : null}
           {tab === "config" ? <p>config</p> : null}
         </EuiPage>
-      </Fragment>
+      {/* </Fragment> */}
     </div>
   )
 }

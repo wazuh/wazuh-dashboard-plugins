@@ -88,7 +88,7 @@ export const ZeekStatusDetailsTable = () => {
 					
 					<EuiFlexItem grow={false}>
 						<EuiButtonEmpty iconType="document" onClick={ev => { 
-							dispatch(NidsShowFile("network.cfg"))
+							dispatch(NidsShowFile("networks.cfg"))
 							AppNavigate.navigateToModule(ev, 'nids-files', { tab: { id: 'ZeekFiles', text: 'Zeek Files' } })
 						}}>
 							Network.cfg

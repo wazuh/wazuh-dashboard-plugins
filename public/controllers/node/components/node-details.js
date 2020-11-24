@@ -39,7 +39,7 @@ import {
 import { NodeMenu } from './node-menu';
 import { SuricataTable } from './Suricata/suricata-table';
 import { ZeekTable } from './Zeek/zeek-table';
-import { AddSuricata } from './Suricata/add-suricata';
+// import { AddSuricata } from './Suricata/add-suricata';
 import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { useSelector, useDispatch } from 'react-redux';
@@ -48,7 +48,7 @@ export const NodeDetails = withReduxProvider(() => {
   const dispatch = useDispatch();
   const nodeTab = useSelector(state => state.nidsReducers.nodeTabSelected);
   const nodeDetail = useSelector(state => state.nidsReducers.nodeDetail);
-  const toggleSuricata = useSelector(state => state.nidsReducers.toggleSuricata);
+  // const toggleSuricata = useSelector(state => state.nidsReducers.toggleSuricata);
 
   useEffect(() => { 
     dispatch(PingPluginsNode(nodeDetail.uuid))
@@ -60,9 +60,6 @@ export const NodeDetails = withReduxProvider(() => {
   return (
     <Fragment>
       <NodeMenu></NodeMenu>    
-      <br />
-      {toggleSuricata ? <AddSuricata></AddSuricata> : null}      
-      <br />
         <EuiPage>
             {nodeTab === "overview" ? <p>Overview</p> : null} 
             {nodeTab === "suricata" ? <SuricataTable></SuricataTable> : null}
@@ -71,9 +68,6 @@ export const NodeDetails = withReduxProvider(() => {
             {nodeTab === "analyzer" ? <p>Analyzer</p> : null} 
         </EuiPage>
     </Fragment>
-    // <Fragment>
-    //     <NodeMenu></NodeMenu>
-    // </Fragment>
   )
 });
 // export default NodeDetails

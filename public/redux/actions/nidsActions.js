@@ -18,12 +18,10 @@ export function getFile(file) {
   return async (dispatch) => {
     var params = {
       method: "GET",
-      path: `/node/loadfile/${file.uuid}/${file.file}`
+      path: '/node/loadfile/'+file.uuid+'/'+file.file
     }     
     const values = await NidsRequest.genericReq('PUT', '/nids/getFileContent', {params});
-    console.log("values.data.data");
-    console.log(values.data.data);
-    dispatch(accGetFile(nodes.data.data))
+    dispatch(accGetFile(values.data.data))
   }
 }
 function accGetFile(data){
@@ -32,6 +30,17 @@ function accGetFile(data){
     payload: data
   }
 };
+
+export function NidsSaveFile(fileData) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",
+      path: '/node/savefile',
+      data: fileData
+    }     
+    const values = await NidsRequest.genericReq('PUT', '/nids/saveNidsFile', {params});    
+  }
+}
 
 export function PingZeek(uuid) {
   return async (dispatch) => {

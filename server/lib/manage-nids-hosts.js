@@ -107,8 +107,6 @@ export class ManageNidsHosts {
     };
     const response = await axios(options);
 
-    console.log(response.data);
-
     return response.data.Nodes
   }
 
@@ -350,7 +348,6 @@ export class ManageNidsHosts {
         data: JSON.stringify(req.data)
       };
       const response = await axios(options);
-      console.log(response.data);
       return response.data
 
     } catch (error) {
@@ -613,14 +610,42 @@ export class ManageNidsHosts {
     const url = this.getActiveMasterURL()
 
     const options = {
-      method: req.method,
+      method: req.params.method,
       headers: {
         'content-type': 'application/json',
         'token': NIDStoken,
         'user': NIDSuser
       },
-      url: `${url}${req.path}`,
+      url: `${url}${req.params.path}`,
       // data: JSON.stringify(req.data)
+    };
+
+    const response = await axios(options);
+
+    return response.data
+  }
+
+  async saveNidsFile(req) {
+    console.log(req.params.path);
+    console.log(req.params.method);
+    console.log(req.params.data);
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: req.params.method,
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}${req.params.path}`,
+      data: JSON.stringify(req.params.data)
     };
 
     const response = await axios(options);

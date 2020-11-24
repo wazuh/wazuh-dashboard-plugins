@@ -186,6 +186,19 @@ export class WazuhNidsCtrl {
     }
   }
 
+  async saveNidsFile(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.saveNidsFile(req.payload);   
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
   async getFileContent(req, reply) {
     try {
       const data = await this.manageNidsHosts.getFileContent(req.payload);   

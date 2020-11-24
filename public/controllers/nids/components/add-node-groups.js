@@ -31,7 +31,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 export const AddNodeGroups = () => {
 	const dispatch = useDispatch();
-	const groups = useSelector(state => state.nidsReducers.groups);
+	const groups = useSelector(state => state.nidsReducers.groups);	
 	const [allGroups, setGroups] = useState([]); //set default org list
 	const [selectedOptions, setSelected] = useState([]);
 
