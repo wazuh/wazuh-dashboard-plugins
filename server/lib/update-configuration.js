@@ -22,6 +22,7 @@ const needRestartFields = [
   'wazuh.monitoring.replicas',
   'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern',
+  'alerts.sample.prefix',
   'logs.level',
 ];
 
@@ -62,7 +63,7 @@ export class UpdateConfigurationFile {
 
   formatValue = (value) => typeof value === 'string'
     ? isNaN(Number(value)) ? `'${value}'` : value
-    : typeof value === 'object' 
+    : typeof value === 'object'
       ? JSON.stringify(value)
       : value
 
@@ -79,15 +80,15 @@ export class UpdateConfigurationFile {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
-      
+
       const configuration = getConfiguration(true) || {};
 
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
-      
+
       // Update the app configuration server-cached setting in memory with the new value
       configuration[key] = this.formatValueCachedConfiguration(value);
-      
+
       this.busy = false;
       log(
         'update-configuration:updateConfiguration',

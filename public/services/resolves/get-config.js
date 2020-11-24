@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from "../../../util/constants";
+import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX } from "../../../util/constants";
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
   // Remember to keep this values equal to default wazuh.yml values
@@ -53,6 +53,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'cron.statistics.interval': '0 */5 * * * *',
     'cron.statistics.index.name': 'statistics',
     'cron.statistics.index.creation': 'w',
+    'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
     hideManagerAlerts: false,
     'logs.level': 'info',
     'enrollment.dns': ''
