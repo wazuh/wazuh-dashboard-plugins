@@ -10,7 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WAZUH_ALERTS_PATTERN, WAZUH_INDEX_REPLICAS, WAZUH_INDEX_SHARDS, WAZUH_MONITORING_PATTERN } from "../../../util/constants";
+import {
+  WAZUH_ALERTS_PATTERN,
+  WAZUH_INDEX_REPLICAS,
+  WAZUH_INDEX_SHARDS,
+  WAZUH_MONITORING_PATTERN,
+  WAZUH_SAMPLE_ALERT_PREFIX
+} from "../../../util/constants";
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
   // Remember to keep this values equal to default wazuh.yml values
