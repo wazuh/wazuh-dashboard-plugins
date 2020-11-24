@@ -18,6 +18,7 @@ import { Rule } from '../rules/types/rule.type';
 import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
+import { useSelector } from 'react-redux';
 
 export const RolesMapping = () => {
   const [isEditingRule, setIsEditingRule] = useState(false);
@@ -28,6 +29,7 @@ export const RolesMapping = () => {
   const [rolesEquivalences, setRolesEquivalences] = useState({});
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
   const [internalUsers, setInternalUsers] = useState([]);
+  const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
 
   useEffect(() => {
     initData();
@@ -104,6 +106,7 @@ export const RolesMapping = () => {
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
+          currentPlatform={currentPlatform}
         />
       </EuiOverlayMask>
     );
@@ -126,6 +129,7 @@ export const RolesMapping = () => {
           roles={roles}
           internalUsers={internalUsers}
           onSave={async () => await updateRoles()}
+          currentPlatform={currentPlatform}
         />
       </EuiOverlayMask>
     );

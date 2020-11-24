@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   EuiTitle,
   EuiFlyout,
@@ -17,6 +17,7 @@ import { ErrorHandler } from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
 import RolesServices from '../../roles/services';
+import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 
 export const RolesMappingEdit = ({
   rule,
@@ -25,6 +26,7 @@ export const RolesMappingEdit = ({
   roles,
   internalUsers,
   onSave,
+  currentPlatform,
 }) => {
   const getEquivalences = roles => {
     const list = roles.map(item => {
@@ -85,7 +87,7 @@ export const RolesMappingEdit = ({
         <EuiTitle size="m">
           <h2>
             Edit <strong>{rule.name}&nbsp;&nbsp;</strong>
-            {rule.id < 3 && <EuiBadge color="primary">Reserved</EuiBadge>}
+            {WzAPIUtils.isReservedID(rule.id) && <EuiBadge color="primary">Reserved</EuiBadge>}
           </h2>
         </EuiTitle>
       </EuiFlyoutHeader>
@@ -99,7 +101,7 @@ export const RolesMappingEdit = ({
           >
             <EuiFieldText
               placeholder=""
-              disabled={rule.id < 3}
+              disabled={WzAPIUtils.isReservedID(rule.id)}
               value={ruleName}
               onChange={e => setRuleName(e.target.value)}
               aria-label=""
@@ -114,7 +116,7 @@ export const RolesMappingEdit = ({
             <EuiComboBox
               placeholder="Select roles"
               options={getRolesList(roles)}
-              isDisabled={rule.id < 3}
+              isDisabled={WzAPIUtils.isReservedID(rule.id)}
               selectedOptions={selectedRoles}
               onChange={roles => {
                 setSelectedRoles(roles);
@@ -131,8 +133,9 @@ export const RolesMappingEdit = ({
               save={rule => editRule(rule)}
               initialRule={rule.rule}
               isLoading={isLoading}
-              isReserved={rule.id < 3}
+              isReserved={WzAPIUtils.isReservedID(rule.id)}
               internalUsers={internalUsers}
+              currentPlatform={currentPlatform}
             ></RuleEditor>
           </EuiFlexItem>
         </EuiFlexGroup>

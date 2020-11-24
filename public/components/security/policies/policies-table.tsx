@@ -8,6 +8,7 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
+import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { WzButtonModalConfirm } from '../../common/buttons';
 
 export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) => {
@@ -60,7 +61,7 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
             field: 'id',
             name: 'Status',
             render: (item) => {
-                return item < 100 && <EuiBadge color="primary" >Reserved</EuiBadge>
+                return WzAPIUtils.isReservedID(item) && <EuiBadge color="primary" >Reserved</EuiBadge>
             },
             width: 150,
             sortable: false,
@@ -73,8 +74,8 @@ export const PoliciesTable = ({policies, loading, editPolicy, updatePolicies}) =
             <div onClick={ev => ev.stopPropagation()}>
                 <WzButtonModalConfirm
                 buttonType='icon'
-                tooltip={{content: item.id < 100 ? "Reserved policies can't be deleted" : 'Delete policy', position: 'left'}}
-                isDisabled={item.id < 100}
+                tooltip={{content: WzAPIUtils.isReservedID(item.id) ? "Reserved policies can't be deleted" : 'Delete policy', position: 'left'}}
+                isDisabled={WzAPIUtils.isReservedID(item.id)}
                 modalTitle={`Do you want to delete the ${item.name} policy?`}
                 onConfirm={async () => {
                     try{

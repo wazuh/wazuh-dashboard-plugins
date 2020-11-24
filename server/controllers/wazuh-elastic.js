@@ -41,11 +41,27 @@ export class WazuhElasticCtrl {
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
       'threat-detection': [{ vulnerabilities: true }, { virustotal: true }, { osquery: true }, { docker: true }, { mitre: true }]
     };
-    this.wzSampleAlertsIndexPrefix = WAZUH_SAMPLE_ALERT_PREFIX;
-    this.buildSampleIndexByCategory = (category) => `${this.wzSampleAlertsIndexPrefix}sample-${category}` // wazuh-alerts-sample-security, wazuh-alerts-sample-auditing-policy-monitoring, wazuh-alerts-threat-detection
+    this.wzSampleAlertsIndexPrefix = this.getSampleAlertPrefix();
     this.defaultNumSampleAlerts = 3000;
     this.manageHosts = new ManageHosts();
     this.apiInterceptor = new ApiInterceptor();
+  }
+
+  /**
+   * This returns the index according the category
+   * @param {string} category 
+   */
+  buildSampleIndexByCategory (category) {
+    return `${this.wzSampleAlertsIndexPrefix}sample-${category}`;
+  }
+
+  /**
+   * This returns the defined config for sample alerts prefix or the default value.
+   * @param {string} category 
+   */
+  getSampleAlertPrefix() {
+    const config = getConfiguration();    
+    return  config['alerts.sample.prefix'] || WAZUH_SAMPLE_ALERT_PREFIX;
   }
 
   /**
