@@ -11,7 +11,7 @@ import {
 import { WzButtonModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
-import { WzAPIUtils } from '../../../../react-services/wz-api-utilsq';
+import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 
 export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave }) => {
   const getRowProps = item => {

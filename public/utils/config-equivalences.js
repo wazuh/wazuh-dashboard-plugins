@@ -9,9 +9,9 @@ export const configEquivalences = {
     'Enable or disable the setup health check when opening the app.',
   'checks.fields':
     'Enable or disable the known fields health check when opening the app.',
-    'checks.metaFields': 
+    'checks.metaFields':
       'Change the default value of the Kibana metaField configuration',
-    'checks.timeFilter': 
+    'checks.timeFilter':
       'Change the default value of the Kibana timeFilter configuration',
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
@@ -66,6 +66,7 @@ export const configEquivalences = {
   'cron.statistics.index.creation': 'Define the interval in which the index will be created.',
   'cron.statistics.index.shards': 'Define the number of shards to use for the statistics indices.',
   'cron.statistics.index.replicas': 'Define the number of replicas to use for the statistics indices.',
+  'alerts.sample.prefix': 'Define the index name prefix of sample alerts. It must match with the template used by the index pattern to avoid unknown fields in dashboards.',
 };
 
 export const nameEquivalence = {
@@ -99,6 +100,7 @@ export const nameEquivalence = {
   'cron.statistics.index.creation': 'Index creation',
   'cron.statistics.index.shards': 'Index shards',
   'cron.statistics.index.replicas': 'Index replicas',
+  'alerts.sample.prefix': 'Sample alerts prefix',
 }
 
 const HEALTH_CHECK = 'Health Check';
@@ -138,6 +140,7 @@ export const categoriesEquivalence = {
   'cron.statistics.index.creation': STATISTICS,
   'cron.statistics.index.shards': STATISTICS,
   'cron.statistics.index.replicas': STATISTICS,
+  'alerts.sample.prefix': GENERAL,
 }
 
 const TEXT = 'text';
@@ -203,4 +206,5 @@ export const formEquivalence = {
   },
   'cron.statistics.index.shards': { type: NUMBER },
   'cron.statistics.index.replicas': { type: NUMBER },
+  'alerts.sample.prefix': { type: TEXT },
 }

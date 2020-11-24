@@ -19,10 +19,11 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
+import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 
 
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
-    const isReserved = policy.id < 100;
+    const isReserved = WzAPIUtils.isReservedID(policy.id);
     const [actionValue, setActionValue] = useState('');
     const [addedActions, setAddedActions] = useState([]);
     const [availableResources, setAvailableResources] = useState([]);

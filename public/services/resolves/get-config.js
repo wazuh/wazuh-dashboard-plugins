@@ -55,6 +55,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'cron.statistics.index.creation': 'w',
     'cron.statistics.index.shards': WAZUH_INDEX_SHARDS,
     'cron.statistics.index.replicas': WAZUH_INDEX_REPLICAS,
+    'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
     hideManagerAlerts: false,
     'logs.level': 'info',
     'enrollment.dns': ''

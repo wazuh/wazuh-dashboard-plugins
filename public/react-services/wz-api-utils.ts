@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WAZUH_API_RESERVED_ID_LOWER_THAN } from '../../util/contants';
+import { WAZUH_API_RESERVED_ID_LOWER_THAN } from '../../util/constants';
 
 export class WzAPIUtils{
   static isReservedID(id: number): boolean{
