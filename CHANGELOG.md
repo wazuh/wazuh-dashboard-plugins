@@ -2,7 +2,22 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4012
+
+### Added
+
+- Sample data indices name should take index pattern in use [#2593](https://github.com/wazuh/wazuh-kibana-app/issues/2593) 
+- Added start option to macos Agents [#2653](https://github.com/wazuh/wazuh-kibana-app/pull/2653)
+
+### Changed
+
+- Statistics settings do not allow to configure primary shards and replicas [#2627](https://github.com/wazuh/wazuh-kibana-app/issues/2627)
+
 ## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4011
+
+### Added
+
+- Support for Wazuh v4.0.2.
 
 ### Fixed
 
@@ -10,10 +25,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - [RBAC] Issues detected when using RBAC [#2579](https://github.com/wazuh/wazuh-kibana-app/issues/2579)
 
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4010
-
-### Added
-
-- Support for Wazuh v4.0.2.
 
 ### Changed
 
