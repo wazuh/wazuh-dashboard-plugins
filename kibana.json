@@ -5,10 +5,11 @@
     "configPath": [
         "wazuh"
     ],
+    "requiredPlugins": ["navigation"],
     "optionalPlugins": [
         "security",
         "opendistroSecurity"
     ],
     "server": true,
-    "ui": false
+    "ui": true
 }
