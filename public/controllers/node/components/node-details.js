@@ -39,6 +39,7 @@ import {
 import { NodeMenu } from './node-menu';
 import { SuricataTable } from './Suricata/suricata-table';
 import { ZeekTable } from './Zeek/zeek-table';
+import { StapTables } from './Stap/stap-tables';
 // import { AddSuricata } from './Suricata/add-suricata';
 import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
@@ -64,7 +65,8 @@ export const NodeDetails = withReduxProvider(() => {
             {nodeTab === "overview" ? <p>Overview</p> : null} 
             {nodeTab === "suricata" ? <SuricataTable></SuricataTable> : null}
             {nodeTab === "zeek" ? <ZeekTable></ZeekTable> : null}
-            {nodeTab === "stap" ? <p>Traffic Management - STAP</p> : null}
+            {nodeTab === "stap" ? <StapTables></StapTables> : null}
+            {/* {nodeTab === "stap" ? <p>stap</p> : null} */}
             {nodeTab === "analyzer" ? <p>Analyzer</p> : null} 
         </EuiPage>
     </Fragment>
