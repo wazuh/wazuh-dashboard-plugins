@@ -13,6 +13,7 @@
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { delay } from './utils';
 import { replaceIllegalXML } from './xml';
+import { toastNotifications } from 'ui/notify';
 
 /**
  * Get configuration for an agent/manager of request sections
@@ -181,7 +182,7 @@ export const checkDaemons = async () => {
  * @param {number} [tries=10] Tries
  * @return {Promise}
  */
-export const makePing = async (updateWazuhNotReadyYet, tries = 15) => {
+export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
   try {
     let isValid = false;
     while (tries--) {
@@ -524,12 +525,17 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
     const isCluster =
       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    
+      toastNotifications.add({
+        color:'success',
+        title:isCluster ?'Restarting cluster, it will take up to 30 seconds.': 'Manager was restarted',
+        toastLifeTimeMs: 3000
+      });
     isCluster ? await restartCluster() : await restartManager();
     // Dispatch a Redux action
     updateWazuhNotReadyYet(
       `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`
     );
+    await delay(15000);
     await makePing(updateWazuhNotReadyYet);
     return { restarted: isCluster ? 'cluster' : 'manager'}
   }catch (error){
