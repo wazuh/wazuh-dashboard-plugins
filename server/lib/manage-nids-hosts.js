@@ -626,9 +626,6 @@ export class ManageNidsHosts {
   }
 
   async saveNidsFile(req) {
-    console.log(req.params.path);
-    console.log(req.params.method);
-    console.log(req.params.data);
     //check credentials
     if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
       await this.getNidsCredentials()
@@ -646,6 +643,84 @@ export class ManageNidsHosts {
       },
       url: `${url}${req.params.path}`,
       data: JSON.stringify(req.params.data)
+    };
+
+    const response = await axios(options);
+
+    return response.data
+  }
+
+  async deployStapService(req) {
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: req.params.method,
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}${req.params.path}`,
+      data: JSON.stringify(req.params.data)
+    };
+
+    const response = await axios(options);
+
+    return response.data
+  }
+
+  async stopStapService(req) {
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: req.params.method,
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}${req.params.path}`,
+      data: JSON.stringify(req.params.data)
+    };
+
+    const response = await axios(options);
+
+    return response.data
+  }
+
+  async addStap(req) {
+    console.log(req.method);
+    console.log(req.data);
+
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: req.method,
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}${req.path}`,
+      data: JSON.stringify(req.data)
     };
 
     const response = await axios(options);

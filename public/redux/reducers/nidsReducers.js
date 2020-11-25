@@ -14,6 +14,9 @@ const initialState = {
     addNodeForm: false,
     toggleSuricata: false,
     loadingData: false,
+    showSocNet: '',
+    showSocPcap: '',
+    showNetSock: '',
     nodes: [],
     savedOrgs: [],
     savedTags: [],
@@ -24,6 +27,24 @@ const initialState = {
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'TOGGLE_NET_SOC') {
+        return {
+          ...state,
+          showNetSock: action.payload
+        };
+      }  
+      if (action.type === 'TOGGLE_SOC_PCAP') {
+        return {
+          ...state,
+          showSocPcap: action.payload
+        };
+      }  
+      if (action.type === 'TOGGLE_SOC_NET') {
+        return {
+          ...state,
+          showSocNet: action.payload
+        };
+      }  
       if (action.type === 'FILE_CONTENT') {
         return {
           ...state,

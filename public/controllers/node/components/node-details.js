@@ -38,9 +38,8 @@ import {
 } from '@elastic/eui';
 import { NodeMenu } from './node-menu';
 import { SuricataTable } from './Suricata/suricata-table';
+import { StapTables } from './SoftwareTAP/stap-tables';
 import { ZeekTable } from './Zeek/zeek-table';
-import { StapTables } from './Stap/stap-tables';
-// import { AddSuricata } from './Suricata/add-suricata';
 import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { useSelector, useDispatch } from 'react-redux';
@@ -49,7 +48,6 @@ export const NodeDetails = withReduxProvider(() => {
   const dispatch = useDispatch();
   const nodeTab = useSelector(state => state.nidsReducers.nodeTabSelected);
   const nodeDetail = useSelector(state => state.nidsReducers.nodeDetail);
-  // const toggleSuricata = useSelector(state => state.nidsReducers.toggleSuricata);
 
   useEffect(() => { 
     dispatch(PingPluginsNode(nodeDetail.uuid))
@@ -66,7 +64,6 @@ export const NodeDetails = withReduxProvider(() => {
             {nodeTab === "suricata" ? <SuricataTable></SuricataTable> : null}
             {nodeTab === "zeek" ? <ZeekTable></ZeekTable> : null}
             {nodeTab === "stap" ? <StapTables></StapTables> : null}
-            {/* {nodeTab === "stap" ? <p>stap</p> : null} */}
             {nodeTab === "analyzer" ? <p>Analyzer</p> : null} 
         </EuiPage>
     </Fragment>

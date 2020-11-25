@@ -176,7 +176,14 @@ export async function WazuhNidsRoutes(server) {
     }
   });
 
-  // Delete specific service
+  server.route({
+    method: 'POST',
+    path: '/nids/node/addStap',
+    handler(req, reply) {      
+      return ctrl.addStap(req, reply);
+    }
+  });
+
   server.route({
     method: 'DELETE',
     path: '/nids/node/deleteService',
@@ -185,12 +192,27 @@ export async function WazuhNidsRoutes(server) {
     }
   });
 
-  // Delete specific service
   server.route({
     method: 'PUT',
     path: '/nids/node/syncRuleset',
     handler(req, reply) {      
       return ctrl.syncRuleset(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/nids/deployStapService',
+    handler(req, reply) {      
+      return ctrl.deployStapService(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/nids/stopStapService',
+    handler(req, reply) {      
+      return ctrl.stopStapService(req, reply);
     }
   });
 

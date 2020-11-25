@@ -329,4 +329,43 @@ export class WazuhNidsCtrl {
     }
   }
 
+  async deployStapService(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.deployStapService(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: []
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async stopStapService(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.stopStapService(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: []
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async addStap(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.addStap(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
 }
