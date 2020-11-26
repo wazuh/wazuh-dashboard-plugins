@@ -29,7 +29,7 @@ import {
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
-import { toggleSocketPcap, updateService, addStap, IsLoadingData } from '../../../../redux/actions/nidsActions';
+import { toggleSocketPcap, updateService, addStap, IsLoadingData, savePluginToEdit } from '../../../../redux/actions/nidsActions';
 
 export const AddSocketToPcap = () => {
 
@@ -53,8 +53,13 @@ export const AddSocketToPcap = () => {
 	})
 
 	useEffect(() => {
+    console.log("BEFORE");
     console.log(editPlugin);
   },[])
+	useEffect(() => {
+    console.log("AFTER");
+    console.log(stapData);
+  },[stapData])
 
 	useEffect(() => {
 		//create interface array
@@ -72,9 +77,9 @@ export const AddSocketToPcap = () => {
 				name: editPlugin.name,
 				cert: editPlugin.cert,
 				port: editPlugin.port,
-        bpf: editPlugin.bpt,
-        "pcap-path": editPlugin.pcapPath,
-        "pcap-prefix": editPlugin.pcapPrefix,
+        bpf: editPlugin.bpf,
+        "pcap-path": editPlugin["pcap-path"],
+        "pcap-prefix": editPlugin["pcap-prefix"],
 			})
 		}
 
@@ -142,6 +147,7 @@ export const AddSocketToPcap = () => {
           <EuiButtonEmpty
             iconType="cross"
             onClick={() => {
+              dispatch(savePluginToEdit({}))
               dispatch(toggleSocketPcap(''))
             }}
           >
@@ -169,12 +175,12 @@ export const AddSocketToPcap = () => {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiFormRow label="PCAP-Path">
-            <EuiFieldText value={stapData["pcap-path"]} name="pcap-path" aria-label="PCAP-Path" onChange={handleChangeEdit} />
+            <EuiFieldText value={(stapData["pcap-path"] || '')} name="pcap-path" aria-label="PCAP-Path" onChange={handleChangeEdit} />
           </EuiFormRow>
         </EuiFlexItem>
         <EuiFlexItem>
           <EuiFormRow label="PCAP-prefix">
-            <EuiFieldText value={stapData["pcap-prefix"]} name="pcap-prefix" aria-label="PCAP-prefix" onChange={handleChangeEdit} />
+            <EuiFieldText value={(stapData["pcap-prefix"] || '')} name="pcap-prefix" aria-label="PCAP-prefix" onChange={handleChangeEdit} />
           </EuiFormRow>
         </EuiFlexItem>
       </EuiFlexGroup>

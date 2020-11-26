@@ -33,6 +33,7 @@ import { log } from '../../../../../server/logger';
 import { AppNavigate } from '../../../../react-services/app-navigate';
 
 import { SocketToNewtwork } from './socket-to-network';
+// import { NetworkToPcap } from './socket-to-network';
 import { SocketToPcap } from './socket-to-pcap';
 import { NetworkToSocket } from './network-to-socket';
 import { AddNetworkToSocket } from './add-network-to-socket';
@@ -43,7 +44,7 @@ export const StapTables = () => {
 	const nodeDetail = useSelector(state => state.nidsReducers.nodeDetail);
 	const showSocNet = useSelector(state => state.nidsReducers.showSocNet);
 	const showSocPcap = useSelector(state => state.nidsReducers.showSocPcap);
-	const showNetSock = useSelector(state => state.nidsReducers.showNetSock);
+	const showNetSoc = useSelector(state => state.nidsReducers.showNetSoc);
 
 	return (
 		<div>
@@ -55,10 +56,11 @@ export const StapTables = () => {
 			<br />
 			<SocketToPcap></SocketToPcap>
 			<br />
-			{showNetSock != '' ? <AddNetworkToSocket></AddNetworkToSocket> : null}
+			{showNetSoc != '' ? <AddNetworkToSocket></AddNetworkToSocket> : null}
 			<br />
 			<NetworkToSocket></NetworkToSocket>
 			<br />
+			{/* <NetworkToPcap></NetworkToPcap> */}
 		</div>
 	)
 }

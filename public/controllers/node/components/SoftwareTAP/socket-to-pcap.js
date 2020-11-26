@@ -55,8 +55,8 @@ export const SocketToPcap = () => {
       [...Object.keys(nodePlugins).map((item) => {         
         if(nodePlugins[item]["type"] == "socket-pcap"){          
           nodePlugins[item]["service"] = item
-          {nodePlugins[item]["pid"] != "none" ? nodePlugins[item]["pid"] = "on" : nodePlugins[item]["pid"] = "off"}
-          {"running" in nodePlugins[item] ? nodePlugins[item]["running"] = "running" : nodePlugins[item]["running"] = "stopped"}
+          // {nodePlugins[item]["pid"] != "none" ? nodePlugins[item]["pid"] = "on" : nodePlugins[item]["pid"] = "off"}
+          // {"running" in nodePlugins[item] ? nodePlugins[item]["running"] = "running" : nodePlugins[item]["running"] = "stopped"}
           allSTAP.push(nodePlugins[item])
         }
       })];
@@ -175,7 +175,7 @@ export const SocketToPcap = () => {
     return (
       <div className={'icon-box-action'}>
         {
-          data["running"] == "running" 
+          data["running"] == "true" 
           ?
           <EuiToolTip content="Stop" position="left">
             <EuiButtonIcon

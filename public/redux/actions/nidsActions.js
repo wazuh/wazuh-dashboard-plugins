@@ -136,6 +136,49 @@ function accSaveInterfaces(ifaces) {
   }
 };
 
+export function ChangeAnalyzerStatus(values) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",      
+      path: '/node/analyzer',
+      data: values
+    }   
+    const data = await NidsRequest.genericReq('PUT', '/nids/ChangeAnalyzerStatus', params);
+    dispatch(IsLoadingData(false)); 
+    dispatch(PingAnalyzer(values.uuid)); 
+  }
+}
+
+export function ReloadFilesData(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "GET",      
+      path: `/node/reloadFilesData/${uuid}`
+    }   
+    const data = await NidsRequest.genericReq('PUT', '/nids/ReloadFilesData', params);
+    dispatch(IsLoadingData(false)); 
+    dispatch(PingAnalyzer(uuid)); 
+  }
+}
+
+export function PingAnalyzer(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "GET",      
+      path: `/node/PingAnalyzer/${uuid}`
+    }
+   
+    const data = await NidsRequest.genericReq('PUT', '/nids/pingAnalyzer', params);
+    dispatch(accAnalyzer(data.data.data))
+  }
+}
+function accAnalyzer(data) {
+  return {
+    type: 'ANALYZER',
+    payload: data
+  }
+};
+
 export function loadRuleset() {
   return async (dispatch) => {
     const rsets = await NidsRequest.genericReq('GET', '/nids/rulesets', {});

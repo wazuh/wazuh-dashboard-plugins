@@ -72,6 +72,25 @@ export class WazuhNidsCtrl {
   }
 
   /**
+   * Returns nodes from master
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+  async pingAnalyzer(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.pingAnalyzer(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  /**
    * Returns interfaces from master
    * @param {Object} req
    * @param {Object} reply
@@ -358,6 +377,32 @@ export class WazuhNidsCtrl {
   async addStap(req, reply) {
     try {
       const data = await this.manageNidsHosts.addStap(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async ChangeAnalyzerStatus(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.ChangeAnalyzerStatus(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async ReloadFilesData(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.ReloadFilesData(req.payload);      
       return {
         statusCode: 200,
         error: 0,

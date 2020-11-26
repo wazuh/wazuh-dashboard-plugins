@@ -40,7 +40,8 @@ import { NodeMenu } from './node-menu';
 import { SuricataTable } from './Suricata/suricata-table';
 import { StapTables } from './SoftwareTAP/stap-tables';
 import { ZeekTable } from './Zeek/zeek-table';
-import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek } from '../../../redux/actions/nidsActions';
+import { AnalyzerTable } from './Analyzer/analyzer-table';
+import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek, PingAnalyzer } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -54,6 +55,7 @@ export const NodeDetails = withReduxProvider(() => {
     dispatch(LoadInterfaces())
     dispatch(loadRuleset())
     dispatch(PingZeek(nodeDetail.uuid))
+    dispatch(PingAnalyzer(nodeDetail.uuid))
   }, []);
   
   return (
@@ -64,7 +66,7 @@ export const NodeDetails = withReduxProvider(() => {
             {nodeTab === "suricata" ? <SuricataTable></SuricataTable> : null}
             {nodeTab === "zeek" ? <ZeekTable></ZeekTable> : null}
             {nodeTab === "stap" ? <StapTables></StapTables> : null}
-            {nodeTab === "analyzer" ? <p>Analyzer</p> : null} 
+            {nodeTab === "analyzer" ? <AnalyzerTable></AnalyzerTable> : null} 
         </EuiPage>
     </Fragment>
   )

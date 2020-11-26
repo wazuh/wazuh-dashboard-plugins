@@ -15,7 +15,7 @@ export async function WazuhNidsRoutes(server) {
   const ctrl = new WazuhNidsCtrl(server);
 
   // Get rulesets nodes
-  await server.route({    
+  await server.route({
     method: 'GET',
     path: '/nids/rulesets',
     handler(req, reply) {
@@ -24,7 +24,7 @@ export async function WazuhNidsRoutes(server) {
   });
 
   // Get nids nodes
-  await server.route({    
+  await server.route({
     method: 'GET',
     path: '/nids/nodes',
     handler(req, reply) {
@@ -33,7 +33,7 @@ export async function WazuhNidsRoutes(server) {
   });
 
   // Get nids nodes
-  await server.route({    
+  await server.route({
     method: 'GET',
     path: '/nids/interfaces',
     handler(req, reply) {
@@ -42,7 +42,7 @@ export async function WazuhNidsRoutes(server) {
   });
 
   // Get nids tags
-  await server.route({    
+  await server.route({
     method: 'GET',
     path: '/nids/tags',
     handler(req, reply) {
@@ -51,7 +51,7 @@ export async function WazuhNidsRoutes(server) {
   });
 
   // Get node orgs
-  await server.route({    
+  await server.route({
     method: 'GET',
     path: '/nids/orgs',
     handler(req, reply) {
@@ -63,7 +63,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/node/delete',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.deleteNode(req, reply);
     }
   });
@@ -72,7 +72,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'GET',
     path: '/nids/groups',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.getGroups(req, reply);
     }
   });
@@ -81,7 +81,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/node/editNode',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.editNode(req, reply);
     }
   });
@@ -90,7 +90,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/node/updateService',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.updateService(req, reply);
     }
   });
@@ -99,7 +99,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/node/LaunchZeekMainConf',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.LaunchZeekMainConf(req, reply);
     }
   });
@@ -108,7 +108,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/getFileContent',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.getFileContent(req, reply);
     }
   });
@@ -117,7 +117,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/saveNidsFile',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.saveNidsFile(req, reply);
     }
   });
@@ -126,7 +126,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/zeek/diag',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.ZeekDiag(req, reply);
     }
   });
@@ -135,7 +135,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/node/changeServiceStatus',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.changeServiceStatus(req, reply);
     }
   });
@@ -144,7 +144,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/zeek',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.pingZeek(req, reply);
     }
   });
@@ -153,7 +153,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/node/PingPluginsNode',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.getNodePlugins(req, reply);
     }
   });
@@ -162,7 +162,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'POST',
     path: '/nids/node/addService',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.addService(req, reply);
     }
   });
@@ -171,7 +171,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'POST',
     path: '/nids/node/enroll',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.enrollNode(req, reply);
     }
   });
@@ -179,7 +179,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'POST',
     path: '/nids/node/addStap',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.addStap(req, reply);
     }
   });
@@ -187,7 +187,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'DELETE',
     path: '/nids/node/deleteService',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.deleteService(req, reply);
     }
   });
@@ -195,7 +195,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/node/syncRuleset',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.syncRuleset(req, reply);
     }
   });
@@ -203,7 +203,7 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/deployStapService',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.deployStapService(req, reply);
     }
   });
@@ -211,8 +211,32 @@ export async function WazuhNidsRoutes(server) {
   server.route({
     method: 'PUT',
     path: '/nids/stopStapService',
-    handler(req, reply) {      
+    handler(req, reply) {
       return ctrl.stopStapService(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/nids/pingAnalyzer',
+    handler(req, reply) {
+      return ctrl.pingAnalyzer(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/nids/ChangeAnalyzerStatus',
+    handler(req, reply) {
+      return ctrl.ChangeAnalyzerStatus(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/nids/ReloadFilesData',
+    handler(req, reply) {
+      return ctrl.ReloadFilesData(req, reply);
     }
   });
 

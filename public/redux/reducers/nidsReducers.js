@@ -16,7 +16,7 @@ const initialState = {
     loadingData: false,
     showSocNet: '',
     showSocPcap: '',
-    showNetSock: '',
+    showNetSoc: '',
     nodes: [],
     savedOrgs: [],
     savedTags: [],
@@ -24,13 +24,20 @@ const initialState = {
     zeekData: {},
     zeekDiag: {},
     fileContent: {},
+    analyzer: {},
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'ANALYZER') {
+        return {
+          ...state,
+          analyzer: action.payload
+        };
+      }  
       if (action.type === 'TOGGLE_NET_SOC') {
         return {
           ...state,
-          showNetSock: action.payload
+          showNetSoc: action.payload
         };
       }  
       if (action.type === 'TOGGLE_SOC_PCAP') {

@@ -29,7 +29,7 @@ import {
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
-import { toggleSocketNetwork, updateService, addStap, IsLoadingData } from '../../../../redux/actions/nidsActions';
+import { toggleSocketNetwork, updateService, addStap, IsLoadingData, savePluginToEdit } from '../../../../redux/actions/nidsActions';
 
 export const AddSocketToNewtwork = () => {
 	const dispatch = useDispatch();
@@ -140,6 +140,7 @@ export const AddSocketToNewtwork = () => {
 						<EuiButtonEmpty
 							iconType="cross"
 							onClick={() => {
+								dispatch(savePluginToEdit({}))
 								dispatch(toggleSocketNetwork(''))
 							}}
 						>
