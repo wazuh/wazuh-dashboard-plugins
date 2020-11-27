@@ -18,7 +18,7 @@ export function useRefreshAngularDiscover(): number {
     let subscription;
     ModulesHelper.getDiscoverScope()
       .then(scope => {
-        subscription = scope.$watchCollection('fetchStatus',
+        subscription = scope.$watch('fetchStatus',
           (fetchStatus) => {
             (fetchStatus === 'loading') && (refresh !== Date.now()) && setRefresh(Date.now())
           });

@@ -29,6 +29,7 @@ import { FlyoutTechnique } from '../../../../components/overview/mitre/component
 import { withReduxProvider } from '../../../common/hocs';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import _ from 'lodash';
 
 import {
   EuiBasicTable,
@@ -189,15 +190,15 @@ export const Discover = compose(
       this.setState({ columns: this.getColumns() }); // Updates the columns to be rendered if you change the selected agent to none or vice versa
       return;
     }
-    if(JSON.stringify(this.props.query) !== JSON.stringify(prevProps.query)){
+    if(!_.isEqual(this.props.query,prevProps.query)){
       this.setState({ query: {...this.props.query}});
       return;
     };
-    if((JSON.stringify(this.props.shareFilterManager) !== JSON.stringify(prevProps.shareFilterManager))
+    if((!_.isEqual(this.props.shareFilterManager, prevProps.shareFilterManager))
       || (this.props.currentAgentData.id !== prevProps.currentAgentData.id)
-      || (JSON.stringify(this.state.query) !== JSON.stringify(prevState.query))
-      || (JSON.stringify(this.state.searchBarFilters) !== JSON.stringify(prevState.searchBarFilters))
-      || (JSON.stringify(this.state.dateRange) !== JSON.stringify(prevState.dateRange))
+      || (!_.isEqual(this.state.query, prevState.query))
+      || (!_.isEqual(this.state.searchBarFilters, prevState.searchBarFilters))
+      || (!_.isEqual(this.state.dateRange, prevState.dateRange))
       || (this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover)
     ){
       this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
