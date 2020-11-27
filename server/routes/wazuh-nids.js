@@ -240,4 +240,12 @@ export async function WazuhNidsRoutes(server) {
     }
   });
 
+  server.route({
+    method: 'PUT',
+    path: '/nids/wazuh/loadLines',
+    handler(req, reply) {
+      return ctrl.loadLines(req, reply);
+    }
+  });
+
 }

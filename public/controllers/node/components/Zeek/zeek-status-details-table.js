@@ -79,7 +79,7 @@ export const ZeekStatusDetailsTable = () => {
 						
 					<EuiFlexItem grow={false}>
 						<EuiButtonEmpty iconType="document" onClick={ev => { 
-							dispatch(NidsShowFile("node.cfg"))
+							dispatch(NidsShowFile({type: "node.cfg"}))
 							AppNavigate.navigateToModule(ev, 'nids-files', { tab: { id: 'ZeekFiles', text: 'Zeek Files' } })
 						 }}>
 							Node.cfg
@@ -88,7 +88,7 @@ export const ZeekStatusDetailsTable = () => {
 					
 					<EuiFlexItem grow={false}>
 						<EuiButtonEmpty iconType="document" onClick={ev => { 
-							dispatch(NidsShowFile("networks.cfg"))
+							dispatch(NidsShowFile({type: "networks.cfg"}))
 							AppNavigate.navigateToModule(ev, 'nids-files', { tab: { id: 'ZeekFiles', text: 'Zeek Files' } })
 						}}>
 							Network.cfg
@@ -97,7 +97,7 @@ export const ZeekStatusDetailsTable = () => {
 					
 					<EuiFlexItem grow={false}>
 						<EuiButtonEmpty iconType="document" onClick={ev => { 
-							dispatch(NidsShowFile("zeekctl.cfg"))
+							dispatch(NidsShowFile({type: "zeekctl.cfg"}))
 							AppNavigate.navigateToModule(ev, 'nids-files', { tab: { id: 'ZeekFiles', text: 'Zeek Files' } })
 						}}>
 							Zeekctl.cfg

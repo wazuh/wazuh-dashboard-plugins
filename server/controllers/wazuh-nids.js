@@ -413,4 +413,17 @@ export class WazuhNidsCtrl {
     }
   }
 
+  async loadLines(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.loadLines(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
 }

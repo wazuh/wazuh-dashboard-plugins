@@ -40,25 +40,33 @@ export const AnalyzerTable = () => {
   const [plugin, setPlugin] = useState([])
 
   useEffect(() => {
+    console.log("init");
+    console.log(analyzer);
+
     if (analyzer.status == "Enabled") { analyzer.currentStatus = "ON" }
     if (analyzer.status == "Disabled") { analyzer.currentStatus = "OFF" }
 
-    if (analyzer.size < 1024 && analyzer.size > 0) { analyzer.size = (analyzer.size).toFixed(2) + " Bytes" }
-    if (analyzer.size >= 1024 && analyzer.size < 1048576) { analyzer.size = (analyzer.size / 1024).toFixed(2) + " KB" }
-    if (analyzer.size >= 1048576 && analyzer.size < 1073741824) { analyzer.size = (analyzer.size / 1048576).toFixed(2) + " MB" }
-    if (analyzer.size >= 1073741824) { analyzer.size = (analyzer.size / 1073741824).toFixed(2) + " GB" }
+    if(analyzer.size <= 0){analyzer.size = "0 Bytes"}
+    else if (analyzer.size > 0 && analyzer.size < 1024) { analyzer.size = parseFloat(analyzer.size).toFixed(2) + " Bytes" }
+    else if (analyzer.size >= 1024 && analyzer.size < 1048576) { analyzer.size = parseFloat(analyzer.size / 1024).toFixed(2) + " KB" }
+    else if (analyzer.size >= 1048576 && analyzer.size < 1073741824) { analyzer.size = parseFloat(analyzer.size / 1048576).toFixed(2) + " MB" }
+    else if (analyzer.size >= 1073741824) { analyzer.size = parseFloat(analyzer.size / 1073741824).toFixed(2) + " GB" }
 
     setPlugin(analyzer)
   }, []);
 
   useEffect(() => {
+    console.log("init");
+    console.log(analyzer);
+
     if (analyzer.status == "Enabled") { analyzer.currentStatus = "ON" }
     if (analyzer.status == "Disabled") { analyzer.currentStatus = "OFF" }
 
-    if (analyzer.size < 1024 && analyzer.size > 0) { analyzer.size = (analyzer.size).toFixed(2) + " Bytes" }
-    if (analyzer.size >= 1024 && analyzer.size < 1048576) { analyzer.size = (analyzer.size / 1024).toFixed(2) + " KB" }
-    if (analyzer.size >= 1048576 && analyzer.size < 1073741824) { analyzer.size = (analyzer.size / 1048576).toFixed(2) + " MB" }
-    if (analyzer.size >= 1073741824) { analyzer.size = (analyzer.size / 1073741824).toFixed(2) + " GB" }
+    if(analyzer.size <= 0){analyzer.size = "0 Bytes"}
+    else if (analyzer.size > 0 && analyzer.size < 1024) { analyzer.size = parseFloat(analyzer.size).toFixed(2) + " Bytes" }
+    else if (analyzer.size >= 1024 && analyzer.size < 1048576) { analyzer.size = parseFloat(analyzer.size / 1024).toFixed(2) + " KB" }
+    else if (analyzer.size >= 1048576 && analyzer.size < 1073741824) { analyzer.size = parseFloat(analyzer.size / 1048576).toFixed(2) + " MB" }
+    else if (analyzer.size >= 1073741824) { analyzer.size = parseFloat(analyzer.size / 1073741824).toFixed(2) + " GB" }
 
     setPlugin(analyzer)
   }, [analyzer]);
@@ -112,8 +120,8 @@ export const AnalyzerTable = () => {
             <EuiButtonEmpty
               iconType="documentEdit"
               onClick={ev => {
-                dispatch(NidsShowFile("analyzer"))
-							  AppNavigate.navigateToModule(ev, 'nids-files', { })
+                dispatch(NidsShowFile({type: "analyzer"}))
+                AppNavigate.navigateToModule(ev, 'nids-files', {})
               }}
             >
               Edit analyzer
@@ -153,7 +161,7 @@ export const AnalyzerTable = () => {
       {
         field: '',
         name: 'Actions',
-        width: '15%',
+        width: '20%',
         render: data => actionButtonsRender(data)
       }
     ];
@@ -163,30 +171,46 @@ export const AnalyzerTable = () => {
   function actionButtonsRender(data) {
     return (
       <div className={'icon-box-action'}>
+        <EuiFlexGroup gutterSize="s" alignItems="center">
+          <EuiToolTip content="Reload analyzer information" position="left">
+            <EuiButtonIcon
+              onClick={ev => {
+                dispatch(ReloadFilesData(nodeDetail.uuid))
+              }}
+              iconType="refresh"
+              color={'primary'}
+              aria-label="Reload analyzer information"
+            />
+          </EuiToolTip>
 
-        <EuiToolTip content="Reload analyzer information" position="left">
-          <EuiButtonIcon
-            onClick={ev => {
-              dispatch(ReloadFilesData(nodeDetail.uuid))
-            }}
-            iconType="refresh"
-            color={'primary'}
-            aria-label="Reload analyzer information"
-          />
-        </EuiToolTip>
+          <EuiToolTip content="View alerts file" position="left">
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={ev => { 
+                dispatch(NidsShowFile({type: "alerts.json", path: analyzer.path, lines:"10"}))
+                AppNavigate.navigateToModule(ev, 'nids-files', {})
+              }}>10</EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiToolTip>
 
-        <EuiToolTip content="View analyzer file" position="left">
-          <EuiButtonIcon
-            onClick={ev => {
-              console.log(analyzer.path)
-            }}
-            iconType="eye"
-            color={'primary'}
-            aria-label="View analyzer file"
-          />
-        </EuiToolTip>
+          <EuiToolTip content="View alerts file" position="left">
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={ev => { 
+                dispatch(NidsShowFile({type: "alerts.json", path: analyzer.path, lines:"50"}))
+                AppNavigate.navigateToModule(ev, 'nids-files', {})
+              }}>50</EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiToolTip>
 
+          <EuiToolTip content="View alerts file" position="left">
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={ev => { 
+                dispatch(NidsShowFile({type: "alerts.json", path: analyzer.path, lines:"100"}))
+                AppNavigate.navigateToModule(ev, 'nids-files', {})
+              }}>100</EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiToolTip>
 
+        </EuiFlexGroup>
       </div>
     );
   }

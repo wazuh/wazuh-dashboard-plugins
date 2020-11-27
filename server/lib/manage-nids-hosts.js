@@ -799,4 +799,31 @@ export class ManageNidsHosts {
     return response.data
   }
 
+  async loadLines(req) {
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: req.method,
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}${req.path}`,
+      data: JSON.stringify(req.data)
+    };
+
+    const response = await axios(options);
+
+    console.log(response.data); 
+
+    return response.data
+  }
+
 }

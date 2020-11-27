@@ -20,6 +20,7 @@ export function getFile(file) {
       path: '/node/loadfile/' + file.uuid + '/' + file.file
     }
     const values = await NidsRequest.genericReq('PUT', '/nids/getFileContent', { params });
+    console.log(values.data.data);
     dispatch(accGetFile(values.data.data))
   }
 }
@@ -334,6 +335,21 @@ export function ZeekDiag(uuid) {
     const values = await NidsRequest.genericReq('PUT', '/nids/zeek/diag', params)
     dispatch(IsLoadingData(false))
     dispatch(saveZeekDiag(values.data.data))
+  }
+}
+
+
+export function LoadFileLastLines(data) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",
+      path: '/node/wazuh/loadLines',
+      data:data
+    }
+    const values = await NidsRequest.genericReq('PUT', '/nids/wazuh/loadLines', params)
+    console.log(values.data.data);
+    dispatch(IsLoadingData(false))
+    dispatch(accGetFile({fileContent: values.data.data.result}))
   }
 }
 
