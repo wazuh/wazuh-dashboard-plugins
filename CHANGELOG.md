@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - fix(fronted): fixed the check of API and APP version in health check [#2655](https://github.com/wazuh/wazuh-kibana-app/pull/2655)
+- Replace user by username key in the monitoring logic [#2654](https://github.com/wazuh/wazuh-kibana-app/pull/2654)
 
 ## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4012
 
