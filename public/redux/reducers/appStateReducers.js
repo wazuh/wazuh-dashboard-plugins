@@ -120,6 +120,13 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
+  if (action.type === 'UPDATE_CLUSTER_STATUS') {
+    return {
+      ...state,
+      clusterStatus: action.clusterStatus,
+    };
+  }
+
   return state;
 };
 
