@@ -66,7 +66,7 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
       this.setState({ warningRestarting: true, warningRestartModalVisible: false});
       const data = await restartClusterOrManager(this.props.updateWazuhNotReadyYet);
       this.props.onRestarted();
-      this.showToast('success', `${data.restarted === 'cluster' ? 'Cluster was restarted': 'Manager was restarted'}`)
+      this.showToast('success', `${data.restarted} was restarted`);
     }catch(error){
       this.setState({ warningRestarting: false });
       this.props.updateWazuhNotReadyYet(false);

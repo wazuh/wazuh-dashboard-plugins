@@ -537,7 +537,7 @@ export const restartClusterOrManager = async (updateWazuhNotReadyYet) => {
     );
     await delay(15000);
     await makePing(updateWazuhNotReadyYet);
-    return { restarted: isCluster ? 'cluster' : 'manager'}
+    return { restarted: isCluster ? 'Cluster' : 'Manager'}
   }catch (error){
     return Promise.reject(error);
   };
