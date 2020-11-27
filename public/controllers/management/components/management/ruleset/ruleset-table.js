@@ -38,6 +38,8 @@ import { filtersToObject } from '../../../../../components/wz-search-bar';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
+import { clusterReq } from '../configuration/utils/wz-fetch';
+import { updateClusterStatus } from '../../../../../redux/actions/appStateActions';
 
 class WzRulesetTable extends Component {
   _isMounted = false;
@@ -74,7 +76,7 @@ class WzRulesetTable extends Component {
       if (match && match[0]) {
         this._isMounted && this.setState({ isRedirect: true });
         const id = match[0].split('=')[1];
-        const result = await WzRequest.apiReq('GET', `/rules`, 
+        const result = await WzRequest.apiReq('GET', `/rules`,
         {
           params: {
             rule_ids: id
@@ -91,11 +93,12 @@ class WzRulesetTable extends Component {
         this._isMounted && this.setState({ isRedirect: false });
       }
     }
+    await this.isClusterOrManager();
   }
 
   async componentDidUpdate(prevProps) {
     const { isProcessing, section, showingFiles, filters, } = this.props.state;
-    
+
     const processingChange = prevProps.state.isProcessing !== isProcessing ||
     (prevProps.state.isProcessing && isProcessing);
     const sectionChanged = prevProps.state.section !== section;
@@ -122,6 +125,33 @@ class WzRulesetTable extends Component {
     this._isMounted = false;
   }
 
+  isClusterOrManager = async () => {
+    await clusterReq()
+      .then((clusterStatus) => {
+        if (
+          clusterStatus.data.data.enabled === 'yes' &&
+          clusterStatus.data.data.running === 'yes'
+        ) {
+          this.props.updateClusterStatus({
+            status: true,
+            contextConfigServer: 'cluster',
+          });
+        } else {
+          this.props.updateClusterStatus({
+            status: false,
+            contextConfigServer: 'manager',
+          });
+        }
+      })
+      .catch((error) => {
+        console.warn(`Error when try to get cluster status`, error);
+        this.props.updateClusterStatus({
+          status: false,
+          contextConfigServer: 'manager',
+        });
+      });
+  };
+
   async getItems() {
     const { section, showingFiles } = this.props.state;
 
@@ -129,7 +159,7 @@ class WzRulesetTable extends Component {
       items: []
     });
     this.props.updateTotalItems(false);
-    
+
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
@@ -235,12 +265,35 @@ class WzRulesetTable extends Component {
 
       const getRowProps = item => {
         const { id, name } = item;
-        
+
         const extraSectionPermissions = this.extraSectionPrefixResource[this.props.state.section];
         return {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
-          onClick: !WzUserPermissions.checkMissingUserPermissions([[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${this.props.state.section}:read`, resource: `${extraSectionPermissions}:${item.filename}`}]], this.props.userPermissions) ? async () => {
+          onClick: !WzUserPermissions.checkMissingUserPermissions(
+            [
+              [
+                {
+                  action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read_file`,
+                  resource: `file:path:${item.relative_dirname}/${item.filename}`,
+                },
+                {
+                  action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read`,
+                  resource: `file:path:${item.relative_dirname}/${item.filename}`,
+                },
+                {
+                  action: `cluster:status`,
+                  resource: `*:*:*`,
+                },
+                {
+                  action: `${this.props.state.section}:read`,
+                  resource: `${extraSectionPermissions}:${item.filename}`,
+                },
+              ],
+            ],
+            this.props.userPermissions
+          )
+            ? async () => {
             if(this.isLoading) return;
             this.setState({isLoading: true});
             const { section } = this.props.state;
@@ -333,32 +386,27 @@ class WzRulesetTable extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
+    clusterStatus: state.appStateReducers.clusterStatus,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateDefaultItems: defaultItems =>
-      dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
-    updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing)),
-    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
-    updateFileContent: fileContent => dispatch(updateFileContent(fileContent)),
-    updateListContent: listInfo => dispatch(updateListContent(listInfo)),
-    updateListItemsForRemove: itemList =>
-      dispatch(updateListItemsForRemove(itemList)),
-    updateRuleInfo: rule => dispatch(updateRuleInfo(rule)),
-    updateDecoderInfo: rule => dispatch(updateDecoderInfo(rule))
+    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
+    updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
+    updateFileContent: (fileContent) => dispatch(updateFileContent(fileContent)),
+    updateListContent: (listInfo) => dispatch(updateListContent(listInfo)),
+    updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
+    updateRuleInfo: (rule) => dispatch(updateRuleInfo(rule)),
+    updateDecoderInfo: (rule) => dispatch(updateDecoderInfo(rule)),
+    updateClusterStatus: (clusterStatus) => dispatch(updateClusterStatus(clusterStatus)),
   };
 };
 
 export default compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   withUserPermissions
 )(WzRulesetTable);
