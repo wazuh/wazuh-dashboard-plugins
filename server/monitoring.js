@@ -237,7 +237,7 @@ export class Monitoring {
           index ===
           self.findIndex(
             t =>
-              t.user === element.user &&
+              t.username === element.username &&
               t.password === element.password &&
               t.url === element.url &&
               t.port === element.port
@@ -250,7 +250,7 @@ export class Monitoring {
       );
       for (const element of filteredApis) {
         const apiEntry = {
-          user: element.user,
+          username: element.username,
           password: element.password,
           url: element.url,
           port: element.port,
