@@ -219,7 +219,7 @@ export class HealthCheck extends Component {
 
                         const i = this.state.results.map(item => item.id).indexOf(1);
                         if (api.groups.version !== appSplit[0] || api.groups.minor !== appSplit[1]) {
-                            this.errors.push(
+                            errors.push(
                                 'API version mismatch. Expected v' +
                                 setupData.data.data['app-version']
                             );
