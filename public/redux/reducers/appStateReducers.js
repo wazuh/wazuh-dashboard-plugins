@@ -23,7 +23,11 @@ const initialState = {
   showExploreAgentModalGlobal: false,
   userPermissions: {},
   userRoles: [],
-  toastNotification: false
+  toastNotification: false,
+  clusterStatus: {
+    status: false,
+    contextConfigServer: 'manager',
+  },
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -33,7 +37,7 @@ const appStateReducers = (state = initialState, action) => {
       currentAPI: action.currentAPI
     };
   }
-  
+
   if (action.type === 'SHOW_MENU') {
     return {
       ...state,
