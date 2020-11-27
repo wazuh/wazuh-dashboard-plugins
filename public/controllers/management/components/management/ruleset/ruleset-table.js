@@ -274,11 +274,11 @@ class WzRulesetTable extends Component {
             [
               [
                 {
-                  action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read_file`,
+                  action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read_file`,
                   resource: `file:path:${item.relative_dirname}/${item.filename}`,
                 },
                 {
-                  action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read`,
+                  action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`,
                   resource: `file:path:${item.relative_dirname}/${item.filename}`,
                 },
                 {
