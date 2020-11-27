@@ -42,7 +42,7 @@ export default class RulesetColumns {
               }
               return (
               <div>
-                {haveTooltip === false ? 
+                {haveTooltip === false ?
                 <span dangerouslySetInnerHTML={{ __html: value}} /> :
                 <EuiToolTip position="bottom" content={toolTipDescription}>
                   <span dangerouslySetInnerHTML={{ __html: value}} />
@@ -78,9 +78,9 @@ export default class RulesetColumns {
             width: '15%',
             render: (value, item) => {
               return (
-                <WzButtonPermissions 
+                <WzButtonPermissions
                   buttonType='link'
-                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'rules:read', resource: `rule:file:${item.filename}`}]]}
+                  permissions={[[{action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read_file`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'rules:read', resource: `rule:file:${item.filename}`}]]}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
@@ -130,7 +130,7 @@ export default class RulesetColumns {
               return (
                 <WzButtonPermissions
                   buttonType='link'
-                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'decoders:read', resource: `decoder:file:${item.filename}`}]]}
+                  permissions={[[{action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read_file`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'decoders:read', resource: `decoder:file:${item.filename}`}]]}
                   tooltip={{position:'top', content: `Show ${value} content`}}
                   onClick={async (ev) => {
                     ev.stopPropagation();
@@ -197,7 +197,7 @@ export default class RulesetColumns {
                 return (
                   <WzButtonPermissions
                     buttonType='icon'
-                    permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                    permissions={[[{action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read_file`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
                     aria-label="Show content"
                     iconType="eye"
                     tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
@@ -215,7 +215,7 @@ export default class RulesetColumns {
                   <div>
                     <WzButtonPermissions
                       buttonType='icon'
-                      permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                      permissions={[[{action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read_file`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read`, resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
                       aria-label="Edit content"
                       iconType="pencil"
                       tooltip={{position: 'top', content:`Edit ${item.filename} content`}}
@@ -229,7 +229,7 @@ export default class RulesetColumns {
                     />
                     <WzButtonPermissions
                       buttonType='icon'
-                      permissions={[{action: 'manager:delete_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                      permissions={[{action: `${this.tableProps?.clusterStatus?.contextConfigServer}:delete_file`, resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
                       aria-label="Delete content"
                       iconType="trash"
                       tooltip={{position: 'top', content:`Remove ${item.filename} file`}}
@@ -248,6 +248,24 @@ export default class RulesetColumns {
         ]
       };
 
+      const getEditButtonPermissions = (item) => {
+        return [
+          {
+            action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read_file`,
+            resource: `file:path:${item.relative_dirname}/${item.filename}`,
+          },
+          {
+            action: `${this.tableProps?.clusterStatus?.contextConfigServer}:read`,
+            resource: `node:id:*`,
+          },
+          { action: 'lists:read', resource: `list:path:${item.filename}` },
+          {
+            action: `cluster:status`,
+            resource: `*:*:*`,
+          },
+        ];
+      };
+
       this.columns.lists[2] =
         {
           name: 'Actions',
@@ -258,7 +276,7 @@ export default class RulesetColumns {
               <div>
                 <WzButtonPermissions
                   buttonType='icon'
-                  permissions={[[{action: 'manager:read_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}, {action: 'manager:read', resource: `file:path:${item.relative_dirname}/${item.filename}`}, { action: 'lists:read', resource: `list:path:${item.filename}`}]]}
+                  permissions={getEditButtonPermissions(item)}
                   aria-label="Edit content"
                   iconType="pencil"
                   tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
@@ -272,7 +290,7 @@ export default class RulesetColumns {
                 />
                 <WzButtonPermissions
                   buttonType='icon'
-                  permissions={[{action: 'manager:delete_file', resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
+                  permissions={[{action: `${this.tableProps?.clusterStatus?.contextConfigServer}:delete_file`, resource: `file:path:${item.relative_dirname}/${item.filename}`}]}
                   aria-label="Show content"
                   iconType="trash"
                   tooltip={{position: 'top', content:(defaultItems.indexOf(`${item.relative_dirname}`) === -1) ? `Delete ${item.filename}` : `The ${item.filename} list cannot be deleted`}}
@@ -300,7 +318,7 @@ export default class RulesetColumns {
           }
         }
       };
-      
+
 
     this.buildColumns();
   }
