@@ -395,6 +395,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    updateDefaultItems: (defaultItems) => dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
     updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
     updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
     updateFileContent: (fileContent) => dispatch(updateFileContent(fileContent)),
