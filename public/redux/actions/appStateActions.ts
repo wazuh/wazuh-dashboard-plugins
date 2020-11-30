@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ResolverAction } from '../types';
+
 /**
  * Updates CurrentAPI in the appState store
  * @param currentAPI
@@ -156,5 +158,16 @@ export const updateToastNotificationsModal = toastNotification => {
   return {
     type: 'UPDATE_TOAST_NOTIFICATIONS_MODAL',
     toastNotification
+  };
+ };
+
+/**
+* Updates blankScreenError in the appState store
+* @param toastNotification
+*/
+export const updateBlankScreenError = (error: string): ResolverAction => {
+  return {
+    type: 'UPDATE_BLANK_SCREEN_ERROR',
+    payload: error
   };
  };

@@ -18,9 +18,8 @@ import {
   updateExtensions
 } from '../redux/actions/appStateActions';
 import { GenericRequest } from '../react-services/generic-request';
-import { WazuhConfig } from './wazuh-config';
 import { CSVRequest } from '../services/csv-request';
-import { toastNotifications } from 'ui/notify';
+import { LegacyServices } from './legacy-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
 
@@ -52,23 +51,22 @@ export class AppState {
           AppState.setExtensions(id, extensions);
           return extensions;
         } else {
-          const wazuhConfig = new WazuhConfig();
-          const config = wazuhConfig.getConfig();
-          if(!Object.keys(config).length) return;
+          const config = ((store.getState() || {}).appConfigReducer || {});
+          if(!config.isReady) return;
           const extensions = {
-            audit: config['extensions.audit'],
-            pci: config['extensions.pci'],
-            gdpr: config['extensions.gdpr'],
-            hipaa: config['extensions.hipaa'],
-            nist: config['extensions.nist'],
-            tsc: config['extensions.tsc'],
-            oscap: config['extensions.oscap'],
-            ciscat: config['extensions.ciscat'],
-            aws: config['extensions.aws'],
-            gcp: config['extensions.gcp'],
-            virustotal: config['extensions.virustotal'],
-            osquery: config['extensions.osquery'],
-            docker: config['extensions.docker']
+            audit: config.data['extensions.audit'],
+            pci: config.data['extensions.pci'],
+            gdpr: config.data['extensions.gdpr'],
+            hipaa: config.data['extensions.hipaa'],
+            nist: config.data['extensions.nist'],
+            tsc: config.data['extensions.tsc'],
+            oscap: config.data['extensions.oscap'],
+            ciscat: config.data['extensions.ciscat'],
+            aws: config.data['extensions.aws'],
+            gcp: config.data['extensions.gcp'],
+            virustotal: config.data['extensions.virustotal'],
+            osquery: config.data['extensions.osquery'],
+            docker: config.data['extensions.docker']
           };
           AppState.setExtensions(id, extensions);
           return extensions;
@@ -396,7 +394,7 @@ export class AppState {
 
       FileSaver.saveAs(blob, fileName);
     } catch (error) {
-      toastNotifications.add({
+      LegacyServices.getToastNotifications().add({
         color: 'success',
         title: 'CSV',
         text: 'Error generating CSV',

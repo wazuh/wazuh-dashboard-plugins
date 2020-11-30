@@ -9,13 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { toastNotifications } from 'ui/notify';
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
-import { WzMisc } from '../factories/misc';
 import { CheckDaemonsStatus } from './check-daemons-status';
+import { useToasts } from '../components/common/hooks/use-toasts';
 
-const wzMisc = new WzMisc();
 let history = [];
 const filterHistoryTimeInMs = 2000;
 const filterRecentHistory = date => history.filter(item => date - item.date <= filterHistoryTimeInMs);
@@ -78,7 +76,7 @@ export class ErrorHandler {
    * @param {string} message The message to be shown
    * @param {string} location Usually means the file where this method was called
    */
-  static info(message, location) {
+  static info(message, location) {    
     if (typeof message === 'string') {
       // Current date in milliseconds
       const date = new Date().getTime();
@@ -92,7 +90,7 @@ export class ErrorHandler {
       if (!recentlyShown) {
         message = location ? `${location}. ${message}` : message;
         history.push({ text: message, date });
-        toastNotifications.addSuccess(message);
+        useToasts().addSuccess(message);
       }
     }
   }
@@ -116,7 +114,7 @@ export class ErrorHandler {
       if (!recentlyShown) {
         message = location ? `${location}. ${message}` : message;
         history.push({ text: message, date });
-        toastNotifications.addWarning(message);
+        useToasts().addWarning(message);
       }
     }
   }
@@ -130,6 +128,7 @@ export class ErrorHandler {
    * @param {boolean} [params.silent=false] If true, no message is shown
    */
   static handle(error, location, params = {warning: false, silent: false}) {
+    const toasts = useToasts();
     const message = ErrorHandler.extractMessage(error);
     const messageIsString = typeof message === 'string';
     if (messageIsString && message.includes('ERROR3099')) {
@@ -142,7 +141,7 @@ export class ErrorHandler {
     const origin = ((error || {}).config || {}).url || '';
     const originIsString = typeof origin === 'string' && origin.length;
 
-    if (wzMisc.getBlankScr()){
+    if (store.getState().appStateReducers.blankScreenError){
       params.silent = true
     };
 
@@ -176,9 +175,9 @@ export class ErrorHandler {
           typeof text === 'string' &&
           text.toLowerCase().includes('no results'))
       ) {
-        toastNotifications.addWarning(text);
+        toasts.addWarning(text);
       } else {
-        toastNotifications.addDanger(text);
+        toasts.addDanger(text);
       }
     }
     return text;
