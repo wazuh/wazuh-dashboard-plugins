@@ -156,7 +156,7 @@ export default class StatusHandler {
         const str = data.details.join();
         throw new Error(str);
       }
-      await WzRequest.apiReq('PUT', `/cluster/restart`, { });
+      await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
       return { data: { data: 'Restarting cluster' } };
     } catch (error) {
       return Promise.reject(error);
