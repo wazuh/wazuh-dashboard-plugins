@@ -38,8 +38,6 @@ import { filtersToObject } from '../../../../../components/wz-search-bar';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
-import { clusterReq } from '../configuration/utils/wz-fetch';
-import { updateClusterStatus } from '../../../../../redux/actions/appStateActions';
 
 class WzRulesetTable extends Component {
   _isMounted = false;
@@ -93,7 +91,6 @@ class WzRulesetTable extends Component {
         this._isMounted && this.setState({ isRedirect: false });
       }
     }
-    await this.isClusterOrManager();
   }
 
   async componentDidUpdate(prevProps) {
@@ -124,33 +121,6 @@ class WzRulesetTable extends Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-
-  isClusterOrManager = async () => {
-    await clusterReq()
-      .then((clusterStatus) => {
-        if (
-          clusterStatus.data.data.enabled === 'yes' &&
-          clusterStatus.data.data.running === 'yes'
-        ) {
-          this.props.updateClusterStatus({
-            status: true,
-            contextConfigServer: 'cluster',
-          });
-        } else {
-          this.props.updateClusterStatus({
-            status: false,
-            contextConfigServer: 'manager',
-          });
-        }
-      })
-      .catch((error) => {
-        console.warn(`Error when try to get cluster status`, error);
-        this.props.updateClusterStatus({
-          status: false,
-          contextConfigServer: 'manager',
-        });
-      });
-  };
 
   async getItems() {
     const { section, showingFiles } = this.props.state;
@@ -274,11 +244,11 @@ class WzRulesetTable extends Component {
             [
               [
                 {
-                  action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+                  action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
                   resource: `file:path:${item.relative_dirname}/${item.filename}`,
                 },
                 {
-                  action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`,
+                  action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
                   resource: `file:path:${item.relative_dirname}/${item.filename}`,
                 },
                 {
@@ -389,7 +359,6 @@ class WzRulesetTable extends Component {
 const mapStateToProps = (state) => {
   return {
     state: state.rulesetReducers,
-    clusterStatus: state.appStateReducers.clusterStatus,
   };
 };
 
@@ -403,7 +372,6 @@ const mapDispatchToProps = (dispatch) => {
     updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
     updateRuleInfo: (rule) => dispatch(updateRuleInfo(rule)),
     updateDecoderInfo: (rule) => dispatch(updateDecoderInfo(rule)),
-    updateClusterStatus: (clusterStatus) => dispatch(updateClusterStatus(clusterStatus)),
   };
 };
 

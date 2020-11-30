@@ -178,7 +178,12 @@ class WzRulesetActionButtons extends Component {
     // Add new rule button
     const addNewRuleButton = (
       <WzButtonPermissions
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
+        permissions={[
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
+            resource: `file:path:/etc/${section}`,
+          },
+        ]}
         buttonType='empty'
         iconType="plusInCircle"
         onClick={() =>
@@ -197,7 +202,12 @@ class WzRulesetActionButtons extends Component {
     const addNewCdbListButton = (
       <WzButtonPermissions
         buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: 'file:path:/etc/lists/files'}]}
+        permissions={[
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
+            resource: 'file:path:/etc/lists/files',
+          },
+        ]}
         iconType="plusInCircle"
         onClick={() =>
           this.props.updateListContent({
@@ -215,7 +225,12 @@ class WzRulesetActionButtons extends Component {
     const manageFiles = (
       <WzButtonPermissions
         buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${section}`}]}
+        permissions={[
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}::upload_file`,
+            resource: `file:path:/etc/${section}`,
+          },
+        ]}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >
@@ -252,6 +267,7 @@ class WzRulesetActionButtons extends Component {
         {(section === 'lists' || showingFiles) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
+              clusterStatus={this.props.clusterStatus}
               msg={section}
               path={`etc/${section}`}
               upload={uploadFile}

@@ -251,7 +251,12 @@ export class UploadFiles extends Component {
     const button = (
       <WzButtonPermissions
         buttonType='empty'
-        permissions={[{action: 'manager:upload_file', resource: `file:path:/etc/${this.props.msg}`}]}
+        permissions={[
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+        ]}
         iconType="importAction"
         iconSide="left"
         onClick={() => this.onButtonClick()}
