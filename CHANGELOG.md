@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.3 - Revision 4014
 
+### Added
+
+- Improved management of index-pattern fields [#2630] (https://github.com/wazuh/wazuh-kibana-app/issues/2630)
+
 ### Fixed
 
 - fix(fronted): fixed the check of API and APP version in health check [#2655](https://github.com/wazuh/wazuh-kibana-app/pull/2655)
