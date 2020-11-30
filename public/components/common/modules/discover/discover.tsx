@@ -29,6 +29,7 @@ import { FlyoutTechnique } from '../../../../components/overview/mitre/component
 import { withReduxProvider } from '../../../common/hocs';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import _ from 'lodash';
 
 import {
   EuiBasicTable,
@@ -106,6 +107,7 @@ export const Discover = compose(
     includeFilters?: string,
     initialColumns: string[],
     shareFilterManager: object[],
+    refreshAngularDiscover?: number
   }
   constructor(props) {
     super(props);
@@ -172,7 +174,7 @@ export const Discover = compose(
     try {
       this.setState({columns: this.getColumns(), searchBarFilters: this.props.shareFilterManager || []}) //initial columns
       await this.getIndexPattern(); 
-      this.getAlerts();
+      await this.getAlerts();
     } catch (err) {
       console.log(err);
     }
@@ -186,12 +188,30 @@ export const Discover = compose(
     if (!this._isMount) { return; }
     if((!prevProps.currentAgentData.id && this.props.currentAgentData.id) || (prevProps.currentAgentData.id && !this.props.currentAgentData.id)){
       this.setState({ columns: this.getColumns() }); // Updates the columns to be rendered if you change the selected agent to none or vice versa
+      return;
     }
-    try {
-      await this.getAlerts();
-    } catch (err) {
-      console.log(err);
-    }
+    if(!_.isEqual(this.props.query,prevProps.query)){
+      this.setState({ query: {...this.props.query}});
+      return;
+    };
+    if((!_.isEqual(this.props.shareFilterManager, prevProps.shareFilterManager))
+      || (this.props.currentAgentData.id !== prevProps.currentAgentData.id)
+      || (!_.isEqual(this.state.query, prevState.query))
+      || (!_.isEqual(this.state.searchBarFilters, prevState.searchBarFilters))
+      || (!_.isEqual(this.state.dateRange, prevState.dateRange))
+      || (this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover)
+    ){
+      this.setState({ pageIndex: 0 , tsUpdated: Date.now()});
+      return;
+    };
+
+    if(['pageIndex', 'pageSize', 'sortField', 'sortDirection'].some(field => this.state[field] !== prevState[field]) || (this.state.tsUpdated !== prevState.tsUpdated)){
+      try {
+        await this.getAlerts();
+      } catch (err) {
+        console.log(err);
+      };
+    };
   }
 
   getColumns () {
@@ -265,7 +285,7 @@ export const Discover = compose(
   buildFilter() {
     const dateParse = ds => /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
     const { searchBarFilters } = this.state;
-    const { query = this.state.query } = this.props;
+    const { query } = this.state;
     const { hideManagerAlerts } = this.wazuhConfig.getConfig();
     const extraFilters = [];
     if (hideManagerAlerts) extraFilters.push({
@@ -290,14 +310,36 @@ export const Discover = compose(
         [...searchBarFilters, ...extraFilters, ...shareFilterManager],
         getEsQueryConfig(npSetup.core.uiSettings)
       );
-    const pattern = AppState.getCurrentPattern();
-    const { filters, sortField, sortDirection } = this.state;
-    const { from: oldFrom, to: oldTo } = this.timefilter.getTime();
-    const sort = { ...(sortField && { [sortField]: { "order": sortDirection } }) };
-    const offset = Math.floor((this.state.pageIndex * this.state.pageSize) / this.state.requestSize) * this.state.requestSize;
-    const from = dateParse(oldFrom);
-    const to = dateParse(oldTo);
-    return { filters, sort, from, to, offset, pattern, elasticQuery };
+
+    const { sortField, sortDirection } = this.state;
+
+    const range = {
+      range: {
+        timestamp: {
+          gte: dateParse(this.timefilter.getTime().from),
+          lte: dateParse(this.timefilter.getTime().to),
+          format: 'epoch_millis'
+        }
+      }
+    }
+    elasticQuery.bool.must.push(range);
+
+    if(this.props.implicitFilters){
+      this.props.implicitFilters.map(impicitFilter => elasticQuery.bool.must.push({
+        match: impicitFilter
+      }));
+    };
+    if(this.props.currentAgentData.id){
+      elasticQuery.bool.must.push({
+        match: {"agent.id": this.props.currentAgentData.id}
+      });
+    };
+    return {
+      query: elasticQuery,
+      size: this.state.pageSize,
+      from: this.state.pageIndex*this.state.pageSize,
+      ...(sortField ? {sort: { [sortField]: { "order": sortDirection } }}: {})
+    };
   }
 
   async getAlerts() {
@@ -305,30 +347,21 @@ export const Discover = compose(
     //compare filters so we only make a request into Elasticsearch if needed
     const newFilters = this.buildFilter();
     try {
-      if (JSON.stringify(newFilters) !== JSON.stringify(this.state.requestFilters)) {
-        if (newFilters.offset === this.state.requestFilters.offset) // we only reset pageIndex to 0 if the requestFilters has changed but the offset is the same
-          this.setState({ isLoading: true, pageIndex: 0 });
-        else
-          this.setState({ isLoading: true});
-          let filtersReq = [...newFilters['filters'], ...this.props.implicitFilters];
-        if(this.props.currentAgentData.id){
-          filtersReq.push({"agent.id": this.props.currentAgentData.id})
-        } 
+        this.setState({ isLoading: true});
 
         const alerts = await GenericRequest.request(
           'POST',
-          `/elastic/alerts`,
+          `/elastic/esAlerts`,
           {
-            ...newFilters,
-            filters: filtersReq
+            index: AppState.getCurrentPattern(),
+            body: newFilters
           }
         );
-        if (this._isMount) {
-          this.setState({ alerts: alerts.data.alerts, total: alerts.data.hits, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
-          this.props.updateTotalHits(alerts.data.hits);
 
+        if (this._isMount) {
+          this.setState({ alerts: alerts.data.hits.hits, total: alerts.data.hits.total.value, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
+          this.props.updateTotalHits(alerts.data.hits.total.value);
         }
-      }
     } catch (err) {
       if (this._isMount) {
         this.setState({ alerts: [], total: 0, isLoading: false, requestFilters: newFilters, filters: newFilters.filters });
@@ -477,23 +510,8 @@ export const Discover = compose(
       pageSize,
       sortField,
       sortDirection,
-    }, async () => this.getAlerts())
+    });
   };
-
-
-  getpageIndexItems() {
-    let items: {}[] = [];
-
-    const start = (this.state.pageIndex * this.state.pageSize) % this.state.requestSize;
-    const end = start + this.state.pageSize
-    for (let i = start; i < end && (this.state.pageIndex * this.state.pageSize) < this.state.total; i++) {
-      if (this.state.alerts[i] && this.state.alerts[i]._source) {
-        items.push({ ...this.state.alerts[i]._source, _id: this.state.alerts[i]._id })
-      }
-    }
-    return items;
-
-  }
 
   getFiltersAsObject(filters) {
     var result = {};
@@ -545,7 +563,7 @@ export const Discover = compose(
   }
 
   onQuerySubmit = (payload: { dateRange: TimeRange, query: Query | undefined }) => {
-    this.setState(payload);
+    this.setState({...payload, tsUpdated: Date.now()});
   }
 
   onFiltersUpdated = (filters: Filter[]) => {
@@ -582,7 +600,6 @@ export const Discover = compose(
       };
     };
 
-    const pageIndexItems = this.getpageIndexItems();
     const columns = this.columns();
 
     const sorting: EuiTableSortingType<{}> = {
@@ -622,9 +639,9 @@ export const Discover = compose(
         {total
           ? <EuiFlexGroup>
             <EuiFlexItem>
-              {pageIndexItems.length && (
+              {this.state.alerts.length && (
                 <EuiBasicTable
-                  items={pageIndexItems}
+                  items={this.state.alerts.map(alert => ({...alert._source, _id: alert._id}))}
                   className="module-discover-table"
                   itemId="_id"
                   itemIdToExpandedRowMap={itemIdToExpandedRowMap}

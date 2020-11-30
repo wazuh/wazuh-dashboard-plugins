@@ -11,12 +11,13 @@
  */
 
 import React from 'react';
-import { useFilterManager, useQuery } from '../../common/hooks';
+import { useFilterManager, useQuery, useRefreshAngularDiscover } from '../../common/hooks';
 import { Discover } from '../../common/modules/discover';
 
 export const SecurityAlerts = () => {
   const [query] = useQuery();
   const filterManager = useFilterManager();
+  const refreshAngularDiscover = useRefreshAngularDiscover();
 
   return (
     <Discover
@@ -25,6 +26,8 @@ export const SecurityAlerts = () => {
       initialColumns={["icon", "timestamp", 'rule.mitre.id', 'rule.mitre.tactic', 'rule.description', 'rule.level', 'rule.id']}
       implicitFilters={[]}
       initialFilters={[]}
-      updateTotalHits={(total) => { }} />
+      updateTotalHits={(total) => { }}
+      refreshAngularDiscover={refreshAngularDiscover}
+      />
   )
 }
