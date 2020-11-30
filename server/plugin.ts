@@ -29,6 +29,14 @@ import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { SecurityObj } from './lib/security-factory';
 import { setupRoutes } from './routes';
 
+declare module 'kibana/server' {
+  interface RequestHandlerContext {
+    wazuh: {
+      logger: Logger,
+      plugins: PluginSetup
+    };
+  }
+}
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   private readonly logger: Logger;
 
@@ -39,13 +47,20 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   public setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
+    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
+      return {
+        logger: this.logger,
+        plugins,
+      };
+    });
+
     const securityObj = SecurityObj(plugins);
     // TODO: implement router
     const router = core.http.createRouter();
     setupRoutes(router, securityObj);
     // TODO: implement Wazuh monitoring
 
-    // TODO: implement Scheduler handler 
+    // TODO: implement Scheduler handler
 
     return {
     };

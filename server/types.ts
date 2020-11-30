@@ -17,6 +17,7 @@
  * under the License.
  */
 import { SecurityPluginSetup } from 'x-pack/plugins/security/server';
+import { SpacesPluginSetup } from 'x-pack/plugins/spaces/server';
 
 export interface WazuhPluginSetup {}
 
@@ -24,5 +25,6 @@ export interface WazuhPluginStart {}
 
 export type PluginSetup = {
     security?: SecurityPluginSetup,
-    opendistroSecurity?: {}
-  }
+    opendistroSecurity?: {}, // TODO: Add ODFE interface
+    spaces?: SpacesPluginSetup,
+}
