@@ -980,8 +980,13 @@ export class WazuhApiCtrl {
         const del = data.delay;
         delete data.delay;
         setTimeout(() => {
-          this.makeRequest(method, path, data, id, reply, token).then(console.log).catch(console.log);
-        }, del)
+          this.makeRequest(method, path, data, id, reply, token).then()
+            .catch(error =>
+              console.error(
+                `Error restarting the cluster due to:\n${error.message || error}`
+              )
+            );
+          }, del)
         return { error: 0, message: 'Success' };
       }
 
