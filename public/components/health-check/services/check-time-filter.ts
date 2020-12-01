@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { GenericRequest } from '../../../react-services';
-import { getServices } from '../../../../../../src/plugins/discover/public/kibana_services';
 import { WAZUH_TIME_FILTER_DEFAULT } from '../../../../util/constants'
+import { getDataPlugin } from '../../../kibana-services';
 
 type userValue<T> = { userValue: T }
 type kbnSettings = {
@@ -39,5 +39,5 @@ async function updateTimeFilterSetting(isModified: boolean) {
     'POST',
     '/api/kibana/settings',
     { "changes": { "timepicker:timeDefaults": JSON.stringify(WAZUH_TIME_FILTER_DEFAULT) } }
-  ) && getServices().timefilter.setTime(WAZUH_TIME_FILTER_DEFAULT);
+  ) && getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_TIME_FILTER_DEFAULT);
 }

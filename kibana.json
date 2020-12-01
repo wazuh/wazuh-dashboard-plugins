@@ -5,11 +5,15 @@
     "configPath": [
         "wazuh"
     ],
-    "requiredPlugins": ["navigation"],
+    "requiredPlugins": ["navigation", "data"],
     "optionalPlugins": [
         "security",
         "opendistroSecurity"
     ],
+    "requiredBundles": [
+        "kibanaReact",
+        "kibanaUtils"
+      ],
     "server": true,
     "ui": true
 }

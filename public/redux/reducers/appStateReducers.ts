@@ -24,7 +24,8 @@ const initialState = {
   userPermissions: {},
   userRoles: [],
   toastNotification: false,
-  blankScreenError: null
+  blankScreenError: null,
+  apiIsDown: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -125,6 +126,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       blankScreenError: action.payload
+    };
+  }
+
+  if (action.type === 'UPDATE_API_IS_DOWN') {
+    return {
+      ...state,
+      apiIsDown: action.payload
     };
   }
 

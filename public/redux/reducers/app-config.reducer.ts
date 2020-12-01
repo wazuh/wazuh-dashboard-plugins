@@ -46,7 +46,7 @@ const appConfigReducer: Reducer<AppConfigState, ResolverAction> = (
         isLoading: false,
         isReady: true,
         hasError: true,
-        data: action.payload,
+        data: {...state.data, ...action.payload},
       };
     default:
       return state;

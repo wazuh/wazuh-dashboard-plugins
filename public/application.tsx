@@ -2,26 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { AppMountParameters, CoreStart } from 'kibana/public';
-import { KibanaContextProvider } from '../../../src/plugins/kibana_react/public';
 import { AppPluginStartDependencies } from './types';
 import { I18nProvider } from '@kbn/i18n/react';
 import store from './redux/store';
 import { AppRouter } from './app-router';
+import { KibanaContextProvider } from '../../../src/plugins/kibana_react/public';
 
 export function renderApp(
   core: CoreStart,
-  navigation: AppPluginStartDependencies,
+  plugins: AppPluginStartDependencies,
   params: AppMountParameters
 ) {
-  const deps = { core, navigation, params };
-
-  //TODO load app confing into store
-
+  const deps = { core, plugins, params };
+  
   ReactDOM.render(
     <Provider store={store}>
-      <KibanaContextProvider {...deps}>
+      <KibanaContextProvider services={deps}>
         <I18nProvider>
-          <AppRouter />
+          <AppRouter {...deps}/>
         </I18nProvider>
       </KibanaContextProvider>
     </Provider>,

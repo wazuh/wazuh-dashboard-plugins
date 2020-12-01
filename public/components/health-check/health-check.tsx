@@ -22,7 +22,7 @@ import {
 import { ErrorHandler } from '../../react-services/error-handler';
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { useAppConfig } from '../common/hooks/use-app-config';
+import { useAppConfig } from '../../hooks/use-app-config';
 import {
   checkPatternService,
   checkTemplateService,
@@ -33,9 +33,9 @@ import {
   checkKibanaSettingsTimeFilter,
 } from './services';
 import { CheckResult } from './components/check-result';
-import { AppState } from '../../react-services/app-state';
-import { useAppDeps } from '../common/hooks/use-app-deps';
-import { useToasts } from '../common/hooks/use-toasts';
+import AppState from '../../react-services/app-state';
+import { useAppDeps } from '../../hooks/use-app-deps';
+import { useToasts } from '../../hooks/use-toasts';
 
 
 const checks = {

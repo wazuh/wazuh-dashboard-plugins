@@ -14,17 +14,18 @@
 
 import { EuiPage, EuiPageBody } from '@elastic/eui';
 import React from 'react';
-import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
 //import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 //import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 //import { ToastNotificationsModal } from './components/notifications/modal';
 import { HealthCheck } from './components/health-check/health-check';
+import { AppDependencies } from './types';
 
 const LANDING_PAGE_URL = '/overview';
 
-export function AppRouter(props) {
+export function AppRouter(props: AppDependencies) {
   return (
-    <Router basename={props.params.appBasePath}>
+    <Router history={props.params.history}>
       <EuiPage>
         <EuiPageBody>
           <Switch>
