@@ -256,6 +256,10 @@ export class UploadFiles extends Component {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
             resource: `file:path:/etc/${this.props.msg}`,
           },
+          {
+            action: `cluster:status`,
+            resource: `*:*:*`,
+          },
         ]}
         iconType="importAction"
         iconSide="left"

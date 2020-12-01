@@ -11,7 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import { EuiFlexItem, EuiButtonEmpty, EuiGlobalToastList } from '@elastic/eui';
+import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 import { toastNotifications } from 'ui/notify';
 
 import { connect } from 'react-redux';
@@ -22,11 +22,10 @@ import {
   updteAddingRulesetFile,
   updateListContent,
   updateIsProcessing,
-  updatePageIndex
+  updatePageIndex,
 } from '../../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../../react-services/wz-request';
-import { ErrorHandler } from '../../../../../react-services/error-handler';
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
@@ -166,13 +165,28 @@ class WzRulesetActionButtons extends Component {
 
     // Export button
     const exportButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType="empty"
+        permissions={[
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `cluster:status`,
+            resource: `*:*:*`,
+          },
+        ]}
         iconType="exportAction"
+        iconSide="left"
         onClick={async () => await this.generateCsv()}
-        isLoading={this.state.generatingCsv}
       >
         Export formatted
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Add new rule button
@@ -182,6 +196,18 @@ class WzRulesetActionButtons extends Component {
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
             resource: `file:path:/etc/${section}`,
+          },
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `cluster:status`,
+            resource: `*:*:*`,
           },
         ]}
         buttonType='empty'
@@ -207,6 +233,18 @@ class WzRulesetActionButtons extends Component {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
             resource: 'file:path:/etc/lists/files',
           },
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `cluster:status`,
+            resource: `*:*:*`,
+          },
         ]}
         iconType="plusInCircle"
         onClick={() =>
@@ -229,6 +267,18 @@ class WzRulesetActionButtons extends Component {
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}::upload_file`,
             resource: `file:path:/etc/${section}`,
+          },
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+            resource: `file:path:/etc/${this.props.msg}`,
+          },
+          {
+            action: `cluster:status`,
+            resource: `*:*:*`,
           },
         ]}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}

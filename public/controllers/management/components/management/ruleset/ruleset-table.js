@@ -233,7 +233,7 @@ class WzRulesetTable extends Component {
     if (!error) {
       const itemList = this.props.state.itemList;
 
-      const getRowProps = item => {
+      const getRowProps = (item) => {
         const { id, name } = item;
 
         const extraSectionPermissions = this.extraSectionPrefixResource[this.props.state.section];
@@ -242,48 +242,56 @@ class WzRulesetTable extends Component {
           className: 'customRowClass',
           onClick: !WzUserPermissions.checkMissingUserPermissions(
             [
-              [
-                {
-                  action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-                  resource: `file:path:${item.relative_dirname}/${item.filename}`,
-                },
-                {
-                  action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-                  resource: `file:path:${item.relative_dirname}/${item.filename}`,
-                },
-                {
-                  action: `cluster:status`,
-                  resource: `*:*:*`,
-                },
-                {
-                  action: `${this.props.state.section}:read`,
-                  resource: `${extraSectionPermissions}:${item.filename}`,
-                },
-              ],
+              {
+                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+                resource: `file:path:${item.relative_dirname}/${item.filename}`,
+              },
+              {
+                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+                resource: `file:path:${item.relative_dirname}/${item.filename}`,
+              },
+              {
+                action: `cluster:status`,
+                resource: `*:*:*`,
+              },
+              {
+                action: `${this.props.state.section}:read`,
+                resource: `${extraSectionPermissions}:${item.filename}`,
+              },
             ],
             this.props.userPermissions
           )
             ? async () => {
-            if(this.isLoading) return;
-            this.setState({isLoading: true});
-            const { section } = this.props.state;
-            window.location.href = `${window.location.href}&redirectRule=${id}`;
-            if (section === 'rules') {
-              const result = await this.rulesetHandler.getRuleInformation(
-                item.filename,
-                id
-              );
-              this.props.updateRuleInfo(result);
-            } else if (section === 'decoders') {
-              const result = await this.rulesetHandler.getDecoderInformation(item.filename, name);
-              this.props.updateDecoderInfo(result);
-            } else {
-              const result = await this.rulesetHandler.getCdbList(`${item.relative_dirname}/${item.filename}`);
-              const file = { name: item.filename, content: result, path: item.relative_dirname };
-              this.props.updateListContent(file);
-            }
-            this.setState({isLoading: false});
-          } : undefined
+                if (this.isLoading) return;
+                this.setState({ isLoading: true });
+                const { section } = this.props.state;
+                window.location.href = `${window.location.href}&redirectRule=${id}`;
+                if (section === 'rules') {
+                  const result = await this.rulesetHandler.getRuleInformation(
+                    item.filename,
+                    id
+                  );
+                  this.props.updateRuleInfo(result);
+                } else if (section === 'decoders') {
+                  const result = await this.rulesetHandler.getDecoderInformation(
+                    item.filename,
+                    name
+                  );
+                  this.props.updateDecoderInfo(result);
+                } else {
+                  const result = await this.rulesetHandler.getCdbList(
+                    `${item.relative_dirname}/${item.filename}`
+                  );
+                  const file = {
+                    name: item.filename,
+                    content: result,
+                    path: item.relative_dirname,
+                  };
+                  this.props.updateListContent(file);
+                }
+                this.setState({ isLoading: false });
+              }
+            : undefined,
         };
       };
 

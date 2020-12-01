@@ -302,17 +302,18 @@ export default class RulesetColumns {
                   color="danger"
                   isDisabled={defaultItems.indexOf(`${item.relative_dirname}`) !== -1}
                 />
-                <EuiToolTip position="top" content={`Export ${item.filename}`}>
-                  <EuiButtonIcon
-                    aria-label="Export list"
-                    iconType="exportAction"
-                    onClick={async (ev) => {
-                      ev.stopPropagation();
-                      await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
+                <WzButtonPermissions
+                  buttonType='icon'
+                  permissions={getEditButtonPermissions(item)}
+                  aria-label="Export list"
+                  iconType="exportAction"
+                  tooltip={{position: 'top', content: `Edit ${item.filename} content`}}
+                  onClick={async (ev) => {
+                    ev.stopPropagation();
+                    await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
+                  }}
+                  color="primary"
+                />
               </div>
             )
           }
