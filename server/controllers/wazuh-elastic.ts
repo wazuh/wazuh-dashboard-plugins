@@ -20,7 +20,6 @@ import {
 } from '../integration-files/visualizations';
 
 import { Base } from '../reporting/base-query';
-import { checkKnownFields } from '../lib/refresh-known-fields';
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import { WAZUH_MONITORING_PATTERN, WAZUH_ALERTS_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../util/constants';
 import jwtDecode from 'jwt-decode';
@@ -728,34 +727,6 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log('wazuh-elastic:createClusterVis', error.message || error);
       return ErrorResponse(error.message || error, 4009, 500, reply);
-    }
-  }
-
-  /**
-   * Reload elastic index
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {Object} status obj or ErrorResponse
-   */
-  async refreshIndex(req, reply) {
-    try {
-      if (!req.params.pattern) throw new Error('Missing parameters');
-      log(
-        'wazuh-elastic:refreshIndex',
-        `Index pattern: ${req.params.pattern}`,
-        'debug'
-      );
-      const output =
-        ((req || {}).params || {}).pattern === 'all'
-          ? await checkKnownFields(this.wzWrapper, false, false, false, true)
-          : await this.wzWrapper.updateIndexPatternKnownFields(
-            req.params.pattern
-          );
-
-      return { acknowledge: true, output: output };
-    } catch (error) {
-      log('wazuh-elastic:refreshIndex', error.message || error);
-      return ErrorResponse(error.message || error, 4008, 500, reply);
     }
   }
 

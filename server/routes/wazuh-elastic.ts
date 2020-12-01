@@ -34,18 +34,6 @@ export function WazuhElasticRouter(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/known-fields/{pattern}',
-      validate: {
-        params: schema.object({
-          pattern: schema.string(),
-        })
-      }
-    },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
-  );
-
-  router.get(
-    {
       path: '/elastic/visualizations/{tab}/{pattern}',
       validate: {
         params: schema.object({

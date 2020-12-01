@@ -113,11 +113,20 @@ export class PatternHandler {
   static async changePattern(selectedPattern) {
     try {
       AppState.setCurrentPattern(selectedPattern);
-      await GenericRequest.request(
-        'GET',
-        `/elastic/known-fields/${selectedPattern}`,
+      // TODO: Review this, it needs modify the selector and add an param to receive the index pattern's title to works
+      // await GenericRequest.request( // This is the old endpoint and needs to be removed
+      //   'GET',
+      //   `/elastic/known-fields/${selectedPattern}`,
+      //   {}
+      // );
+
+      // TODO: Adapt to selected index pattern with id and title params
+      const fields = await GenericRequest.request(
+        'POST',
+        `/api/saved_objects/index-pattern/${selectedPattern}`,
         {}
       );
+      await SavedObject.refreshFieldsOfIndexPattern(selectedPattern, title, fields);
       return AppState.getCurrentPattern();
     } catch (error) {
       throw new Error('Error Pattern Handler (changePattern)');
