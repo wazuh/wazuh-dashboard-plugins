@@ -8,6 +8,7 @@
     "optionalPlugins": [
         "security",
         "opendistroSecurity",
+        "searchguard",
         "spaces"
     ],
     "server": true,

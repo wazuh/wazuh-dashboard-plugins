@@ -31,10 +31,11 @@ import { KibanaRequest, RequestHandlerContext, KibanaResponseFactory } from 'src
 import { ApiResponse, TransportRequestPromise } from '@elastic/elasticsearch/lib/Transport';
 
 export class WazuhElasticCtrl {
+  wzWrapper: ElasticWrapper;
 
   constructor() {
     this._server;
-    // this.wzWrapper = new ElasticWrapper(server);
+    this.wzWrapper = new ElasticWrapper();
     this.wzSampleAlertsCaterories = {
       'security': [{ syscheck: true }, { aws: true }, { gcp: true }, { authentication: true }, { ssh: true }, { apache: true, alerts: 2000 }, { web: true }, { windows: { service_control_manager: true }, alerts: 1000 }],
       'auditing-policy-monitoring': [{ rootcheck: true }, { audit: true }, { openscap: true }, { ciscat: true }],
@@ -319,7 +320,7 @@ export class WazuhElasticCtrl {
     for (const index of indexPatternList) {
       let valid, parsed;
       try {
-        parsed = JSON.parse(index._source['index-pattern'].fields);
+        parsed = JSON.parse(index.attributes.fields);
       } catch (error) {
         continue;
       }
@@ -327,94 +328,12 @@ export class WazuhElasticCtrl {
       valid = parsed.filter(item => minimum.includes(item.name));
       if (valid.length === 4) {
         list.push({
-          id: index._id.split('index-pattern:')[1],
-          title: index._source['index-pattern'].title
+          id: index.id,
+          title: index.attributes.title
         });
       }
     }
     return list;
-  }
-
-  /**
-   * This get the current space
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {String} current namespace
-   */
-  async getCurrentSpace(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      // const spaces = this._server.plugins.spaces;
-      if(!context.wazuh.plugins.spaces) throw "The spaces plugin is not active"
-      const spaces = context.wazuh.plugins.spaces.spacesService;
-      const namespace = spaces && spaces.getSpaceId(request);
-      return response.ok({
-        body: { namespace },
-      });
-    } catch (error) {
-      log('wazuh-elastic:getCurrentSpace', error.message || error);
-      return ErrorResponse(error.message || error, 4011, 500, reply);
-    }
-  }
-
-  /**
-   * Get current logged in user
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {String} current user
-   */
-  async getCurrentUser(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
-    try {
-      if(context.wazuh.plugins.security) {
-        const user = await context.wazuh.plugins.security.authc.getCurrentUser(request);
-        return response.ok({
-          body: { user: (user || {}).username || '' }
-        });
-      } else {
-        return response.ok({
-          body: { user: '' }
-        });
-      }
-    } catch (error) {
-      log('wazuh-elastic:getCurrentUser', error.message || error);
-      return ErrorResponse(error.message || error, 4011, 500, reply);
-    }
-  }
-
-
-
-  /**
-   * Check if current user can manage security
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {String}
-   */
-  async getRoles(context: RequestHandlerContext, request: KibanaRequest<{user: string}>, response: KibanaResponseFactory) {
-    try {
-      if(!request.params || !request.params.user)
-        throw new Error('Missing parameters');
-      const user = request.params.user;
-      const { security } = context.wazuh.plugins;
-      if(security) { // XPACK
-        const users:ApiResponse<{[user:string]:{roles:[]}}> = await context.core.elasticsearch.client.asCurrentUser.transport.request({
-          method: 'GET',
-          path: `_security/user/${user}`
-        })
-
-        return response.ok({
-          body: {roles: ((users.body || {})[user] || {}).roles || [] }
-        })
-      }
-      return response.ok({
-        body: { roles: [] }
-      });
-    } catch (error) {
-      log('wazuh-elastic:getRoles', error.message || error);
-      const { reason } = (((error || {}).meta || {}).body || {}).error || {};
-      if (!!reason) {
-        return response.internalError({body: reason})
-      }
-      return response.internalError({body: 'Unexpected error'})
-    }
   }
 
   /**
@@ -444,14 +363,17 @@ export class WazuhElasticCtrl {
    * @param {Object} reply
    * @returns {Array<Object>} list of index-patterns or ErrorResponse
    */
-  async getlist(req, reply) {
+  async getlist(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    // FIXME:
     try {
-      const spaces = this._server.plugins.spaces;
-      const namespace = spaces && spaces.getSpaceId(req);
+      const elasticClient = context.core.elasticsearch.client;
+      const spaces = context.wazuh.plugins.spaces?.spacesService;
+      const { opendistroSecurity, searchguard } = context.wazuh.plugins;
+      const namespace = spaces && spaces.getSpaceId(request);
 
       const config = getConfiguration();
 
-      const usingCredentials = await this.wzWrapper.usingCredentials();
+      const usingCredentials = !!opendistroSecurity || !!searchguard || await this.wzWrapper.usingCredentials(elasticClient);
 
       const isXpackEnabled =
         typeof XPACK_RBAC_ENABLED !== 'undefined' &&
@@ -460,29 +382,28 @@ export class WazuhElasticCtrl {
 
       const isSuperUser =
         isXpackEnabled &&
-        req.auth &&
-        req.auth.credentials &&
-        req.auth.credentials.roles &&
-        req.auth.credentials.roles.includes('superuser');
+        request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.roles &&
+        request.auth.credentials.roles.includes('superuser');
 
-      const data = await this.wzWrapper.getAllIndexPatterns();
-
+      // const data = await this.wzWrapper.getAllIndexPatterns(elasticClient);
+      const data = await context.core.savedObjects.client.find({type: 'index-pattern'})
       // Default namespace index patterns have no prefix.
       // If it's a custom namespace, then filter by its name.
       if (namespace) {
-        data.hits.hits = data.hits.hits.filter(item =>
-          namespace !== 'default'
-            ? (item._id || '').includes(namespace)
-            : (item._id || '').startsWith('index-pattern:')
+        data.saved_objects = data.saved_objects.filter(item =>
+            namespace !== 'default'
+            ? (item.namespaces || []).includes(namespace)
+            : true
         );
       }
 
-      if ((((data || {}).hits || {}).hits || []).length === 0) {
+      if (((data || {}).saved_objects || {}).length === 0) {
         throw new Error('There are no index patterns');
       }
-
-      if (((data || {}).hits || {}).hits) {
-        let list = this.validateIndexPattern(data.hits.hits);
+      if (data.saved_objects) {
+        let list = this.validateIndexPattern(data.saved_objects);
         if (
           config &&
           config['ip.ignore'] &&
@@ -495,20 +416,23 @@ export class WazuhElasticCtrl {
           );
         }
 
-        return {
-          data:
+        return response.ok({
+          body: {
+            data:
             isXpackEnabled && !isSuperUser
-              ? await this.filterAllowedIndexPatternList(list, req)
-              : list
-        };
+            ? await this.filterAllowedIndexPatternList(list, request)
+            : list
+          }
+        })
       }
 
       throw new Error(
         "The Elasticsearch request didn't fetch the expected data"
       );
     } catch (error) {
+      console.log("wazuh-elastic",error)
       log('wazuh-elastic:getList', error.message || error);
-      return ErrorResponse(error.message || error, 4006, 500, reply);
+      return ErrorResponse(error.message || error, 4006, 500, response);
     }
   }
 

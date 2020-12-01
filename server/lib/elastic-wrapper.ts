@@ -14,6 +14,7 @@ import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server/';
 import { WAZUH_ALERTS_PATTERN, WAZUH_MONITORING_PATTERN } from '../../util/constants';
+import { IScopedClusterClient } from 'src/core/server';
 
 export class ElasticWrapper {
   constructor() {
@@ -160,9 +161,9 @@ export class ElasticWrapper {
   /**
    * Get all the index patterns
    */
-  async getAllIndexPatterns() {
+  async getAllIndexPatterns(elasticClient: IScopedClusterClient) {
     try {
-      const data = await this.elasticRequest.callWithInternalUser('search', {
+      const data = await elasticClient.asInternalUser.search({
         index: this.WZ_KIBANA_INDEX,
         type: '_doc',
         body: {
@@ -468,18 +469,12 @@ export class ElasticWrapper {
     }
   }
 
-  async usingCredentials() {
+  async usingCredentials(elasticClient: IScopedClusterClient) {
     try {
-      const data = await this.elasticRequest.callWithInternalUser(
-        'cluster.getSettings',
-        { includeDefaults: true }
+      const data = await elasticClient.asInternalUser.cluster.getSettings(
+        {include_defaults: true}
       );
-
-      return (
-        this.usingSearchGuard ||
-        ((((data || {}).defaults || {}).xpack || {}).security || {}).user !=
-          null
-      );
+      return (((((data || {}).body || {}).defaults || {}).xpack || {}).security || {}).user != null;
     } catch (error) {
       return Promise.reject(error);
     }

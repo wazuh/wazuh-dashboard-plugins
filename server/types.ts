@@ -27,4 +27,5 @@ export type PluginSetup = {
     security?: SecurityPluginSetup,
     opendistroSecurity?: {}, // TODO: Add ODFE interface
     spaces?: SpacesPluginSetup,
+    searchguard?: {}, // TODO: Add searchguard interface
 }

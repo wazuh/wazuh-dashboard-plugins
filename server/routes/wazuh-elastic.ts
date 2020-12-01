@@ -18,35 +18,6 @@ export function WazuhElasticRouter(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/current-space',
-      validate: false,
-    },
-    async (context, request, response) => ctrl.getCurrentSpace(context, request, response)
-  );
-
-  router.get(
-    {
-      path: '/elastic/security/current-user',
-      validate: false,
-    },
-    async (context, request, response) => ctrl.getCurrentUser(context, request, response)
-  );
-
-  // TODO: Delete
-  router.get(
-    {
-      path: '/elastic/security/roles/{user}',
-      validate: {
-        params: schema.object({
-          user: schema.string()
-        })
-      },
-    },
-    async (context, request, response) => ctrl.getRoles(context, request, response)
-  );
-
-  router.get(
-    {
       path: '/elastic/security/current-platform',
       validate: false,
     },
