@@ -76,7 +76,7 @@ export class SavedObject {
         : error.message || error;
     }
   }
-  
+
   static async existsOrCreateIndexPattern(patternID) {
     try {
       await GenericRequest.request(
@@ -135,7 +135,7 @@ export class SavedObject {
       );
 
       if (type === 'index-pattern')
-        await this.refreshFieldsOfIndexPattern(id, fields);
+        await this.refreshFieldsOfIndexPattern(id, params.attributes.title, fields);
 
       return result;
     } catch (error) {
@@ -145,11 +145,10 @@ export class SavedObject {
     }
   }
 
-  static async refreshFieldsOfIndexPattern(id, fields) {
+  static async refreshFieldsOfIndexPattern(id, title, fields) {
     try {
       // same logic as Kibana when a new index is created, you need to refresh it to see its fields
       // we force the refresh of the index by requesting its fields and the assign these fields
-
       await GenericRequest.request(
         'PUT',
         `/api/saved_objects/index-pattern/${id}`,
@@ -157,7 +156,7 @@ export class SavedObject {
           attributes: {
             fields: JSON.stringify(fields.data.fields),
             timeFieldName: 'timestamp',
-            title: id
+            title: title
           }
         }
       );
@@ -178,14 +177,15 @@ export class SavedObject {
       const fields = await GenericRequest.request(
         //we check if indices exist before creating the index pattern
         'GET',
-        `/api/index_patterns/_fields_for_wildcard?pattern=${patternTitle}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+        `/api/index_patterns/_fields_for_wildcard?pattern=${patternTitle}`,
         {}
       );
 
-      await this.refreshFieldsOfIndexPattern(pattern, fields);
+      await this.refreshFieldsOfIndexPattern(pattern, patternTitle, fields);
 
       return;
     } catch (error) {
+      console.log(error)
       return ((error || {}).data || {}).message || false
         ? error.data.message
         : error.message || error;

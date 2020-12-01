@@ -127,6 +127,14 @@ export const initialWazuhConfig = `---
 # This change is not retroactive, if you change it new indexes will be created
 # cron.prefix: test
 #
+# --------------------------------- wazuh-sample-alerts -------------------------
+#
+# Customize the index name prefix of sample alerts
+# This change is not retroactive, if you change it new indexes will be created
+# It should match with a valid index template to avoid unknown fields on 
+# dashboards
+#alerts.sample.prefix: wazuh-alerts-4.x-
+#
 # ------------------------------ wazuh-statistics -------------------------------
 #
 # Custom setting to enable/disable statistics tasks.
@@ -144,6 +152,10 @@ export const initialWazuhConfig = `---
 #
 # Define the interval in which the index will be created
 #cron.statistics.index.creation: w
+#
+# Configure statistics indices shards and replicas.
+#cron.statistics.shards: 2
+#cron.statistics.replicas: 0
 #
 # ---------------------------- Hide manager alerts ------------------------------
 # Hide the alerts of the manager in all dashboards and discover
