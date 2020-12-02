@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Replace user by username key in the monitoring logic [#2654](https://github.com/wazuh/wazuh-kibana-app/pull/2654)
 - Security alerts and reporting issues when using private tenants [#2639](https://github.com/wazuh/wazuh-kibana-app/issues/2639)
 - Manager restart in rule editor does not work with Wazuh cluster enabled [#2640](https://github.com/wazuh/wazuh-kibana-app/issues/2640)
+- Create index pattern even if there aren´t available indices [#2620](https://github.com/wazuh/wazuh-kibana-app/issues/2620)
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.3 - Revision 4013
 
