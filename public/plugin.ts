@@ -1,15 +1,16 @@
 import { AppMountParameters, CoreSetup, CoreStart, Plugin } from 'kibana/public';
-import { AppPluginStartDependencies } from './types';
-
-export type WazuhSetupDeps = {}
-export type WazuhStartDeps = {}
-
-export type WazuhSetup = {}
-export type WazuhStart = {}
+import { setDataPlugin, setHttp, setToasts } from './kibana-services';
+import { loadAppConfig } from './react-services/load-app-config.service';
+import {
+  AppPluginStartDependencies,
+  WazuhSetup,
+  WazuhSetupDeps,
+  WazuhStart,
+  WazuhStartDeps,
+} from './types';
 
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDeps, WazuhStartDeps> {
-
-  public setup(core: CoreSetup, plugins: WazuhStartDeps): WazuhSetup {
+  public setup(core: CoreSetup, plugins: WazuhSetupDeps): WazuhSetup {
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
@@ -18,14 +19,21 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
         const { renderApp } = await import('./application');
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
+
         // Render the application
         return renderApp(coreStart, depsStart as AppPluginStartDependencies, params);
-      }
-    })
+      },
+    });
     return {};
   }
 
-  public start(core: CoreStart, plugins: WazuhStartDeps): WazuhStart {
+  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
+    setHttp(core.http);
+    setToasts(core.notifications.toasts);
+    setDataPlugin(plugins.data);
+
+    loadAppConfig();
+
     return {};
   }
 }

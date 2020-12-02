@@ -23,7 +23,9 @@ const initialState = {
   showExploreAgentModalGlobal: false,
   userPermissions: {},
   userRoles: [],
-  toastNotification: false
+  toastNotification: false,
+  blankScreenError: null,
+  apiIsDown: false
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -117,6 +119,20 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       toastNotification: action.toastNotification
+    };
+  }
+
+  if (action.type === 'UPDATE_BLANK_SCREEN_ERROR') {
+    return {
+      ...state,
+      blankScreenError: action.payload
+    };
+  }
+
+  if (action.type === 'UPDATE_API_IS_DOWN') {
+    return {
+      ...state,
+      apiIsDown: action.payload
     };
   }
 
