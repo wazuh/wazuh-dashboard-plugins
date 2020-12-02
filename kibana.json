@@ -8,7 +8,9 @@
     "requiredPlugins": ["navigation", "data"],
     "optionalPlugins": [
         "security",
-        "opendistroSecurity"
+        "opendistroSecurity",
+        "searchguard",
+        "spaces"
     ],
     "requiredBundles": [
         "kibanaReact",

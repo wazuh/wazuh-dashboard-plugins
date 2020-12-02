@@ -14,7 +14,6 @@ import { ElasticWrapper } from './lib/elastic-wrapper';
 import packageJSON from '../package.json';
 import { kibanaTemplate } from './integration-files/kibana-template';
 import { getConfiguration } from './lib/get-configuration';
-import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 import fs from 'fs';
 import { ManageHosts } from './lib/manage-hosts';
@@ -251,8 +250,7 @@ export function Initialize(server) {
     try {
       await Promise.all([
         checkWazuhIndex(),
-        checkWazuhRegistry(),
-        checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
+        checkWazuhRegistry()
       ]);
     } catch (error) {
       log('initialize:init', error.message || error);
