@@ -85,7 +85,7 @@ export class UpdateConfigurationFile {
 
       const configuration = getConfiguration(true) || {};
 
-      const { key, value } = (input || {}).payload || {};
+      const { key, value } = (input || {}).body || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
 
       // Update the app configuration server-cached setting in memory with the new value

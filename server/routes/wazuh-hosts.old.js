@@ -11,8 +11,8 @@
  */
 import { WazuhHostsCtrl } from '../controllers/wazuh-hosts';
 
-export function WazuhHostsRoutes(server) {
-  const ctrl = new WazuhHostsCtrl(server);
+export function WazuhHostsRoutes(router: IRouter) {
+  const ctrl = new WazuhHostsCtrl();
 
   // Get Wazuh-API entries list (Multimanager) from elasticsearch index
   server.route({

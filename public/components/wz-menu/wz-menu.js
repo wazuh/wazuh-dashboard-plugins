@@ -212,7 +212,7 @@ class WzMenu extends Component {
   changePattern = event => {
     try {
       if (!AppState.getPatternSelector()) return;
-      PatternHandler.changePattern(event.target.value);
+      PatternHandler.changePattern(event.target.value); // TODO: This needs of index pattern's title as second parameter. We should modify it.
       this.setState({ currentSelectedPattern: event.target.value });
       if (this.state.currentMenuTab !== 'wazuh-dev') {
         this.router.reload();
