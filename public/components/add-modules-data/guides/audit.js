@@ -60,7 +60,7 @@ export default {
           type: 'input-number',
           values: { min: 1 },
           default_value: '',
-          placeholder: 'Frecuency',
+          placeholder: 'Frequency',
           validate_error_message: 'Any positive number of seconds'
         },
         {

@@ -61,34 +61,34 @@ export class WazuhApiCtrl {
     return undefined;
   }
 
-  getApiIdFromCookie(cookie){
-    if(!cookie) return false;
+  getApiIdFromCookie(cookie) {
+    if (!cookie) return false;
     const getWzApi = /.*wz-api=([^;]+)/;
     const wzApi = cookie.match(getWzApi)
-    if(wzApi && wzApi.length && wzApi[1]) return wzApi[1];
+    if (wzApi && wzApi.length && wzApi[1]) return wzApi[1];
     return false;
   }
 
-  getTokenFromCookie(cookie){
-    if(!cookie) return false;
+  getTokenFromCookie(cookie) {
+    if (!cookie) return false;
     const getWzToken = /.*wz-token=([^;]+)/;
     const wzToken = cookie.match(getWzToken)
-    if(wzToken && wzToken.length && wzToken[1]) return wzToken[1];
+    if (wzToken && wzToken.length && wzToken[1]) return wzToken[1];
     return false;
   }
 
-  getUserFromCookie(cookie){
-    if(!cookie) return false;
+  getUserFromCookie(cookie) {
+    if (!cookie) return false;
     const getWzUser = /.*wz-user=([^;]+)/;
     const wzUser = cookie.match(getWzUser)
-    if(wzUser && wzUser.length && wzUser[1]) return wzUser[1];
+    if (wzUser && wzUser.length && wzUser[1]) return wzUser[1];
     return false;
   }
 
-  getUserFromAuthContext(authContext){
-    if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_XPACK_SECURITY)
+  getUserFromAuthContext(authContext) {
+    if (this.PLATFORM === WAZUH_SECURITY_PLUGIN_XPACK_SECURITY)
       return authContext.username;
-    if(this.PLATFORM === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH)
+    if (this.PLATFORM === WAZUH_SECURITY_PLUGIN_OPEN_DISTRO_FOR_ELASTICSEARCH)
       return authContext.user_name;
   }
 
@@ -98,33 +98,33 @@ export class WazuhApiCtrl {
       const { idHost } = req.payload;
       const authContext = await this.securityObj.getCurrentUser(req);
       const username = this.getUserFromAuthContext(authContext);
-      if(!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie) && idHost === this.getApiIdFromCookie(req.headers.cookie)){
+      if (!force && req.headers.cookie && username === this.getUserFromCookie(req.headers.cookie) && idHost === this.getApiIdFromCookie(req.headers.cookie)) {
         const wzToken = this.getTokenFromCookie(req.headers.cookie);
-        if(wzToken){
-          try{ // if the current token is not a valid jwt token we ask for a new one
-            const decodedToken =  jwtDecode(wzToken);
-            const expirationTime = (decodedToken.exp  - (Date.now() / 1000));
-            if(wzToken && expirationTime > 0) {
-              return {token: wzToken}
+        if (wzToken) {
+          try { // if the current token is not a valid jwt token we ask for a new one
+            const decodedToken = jwtDecode(wzToken);
+            const expirationTime = (decodedToken.exp - (Date.now() / 1000));
+            if (wzToken && expirationTime > 0) {
+              return { token: wzToken }
             }
-          }catch(error){
+          } catch (error) {
             log('wazuh-api:getToken', error.message || error);
           }
         }
-      }  
+      }
       let token;
-      if(await APIUserAllowRunAs.canUse(idHost)){
+      if (await APIUserAllowRunAs.canUse(idHost)) {
         token = await this.apiInterceptor.authenticateApi(idHost, authContext)
-      }else{
+      } else {
         token = await this.apiInterceptor.authenticateApi(idHost)
       };
-      const response = reply.response({token});
-      response.state('wz-token', token, {isSecure: false, path: '/'});
-      response.state('wz-user', username, {isSecure: false, path: '/'});
-      response.state('wz-api', idHost, {isSecure: false, path: '/'});
+      const response = reply.response({ token });
+      response.state('wz-token', token, { isSecure: false, path: '/' });
+      response.state('wz-user', username, { isSecure: false, path: '/' });
+      response.state('wz-api', idHost, { isSecure: false, path: '/' });
 
       return { token };
-    } catch (error){
+    } catch (error) {
       const errorMessage = ((error.response || {}).data || {}).detail || error.message || error;
       log('wazuh-api:getToken', errorMessage);
       return ErrorResponse(
@@ -181,7 +181,7 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/agents`,
           { params: { agents_list: '000' } },
-          { idHost: id}          
+          { idHost: id }
         );
 
         if (responseAgents.status === 200) {
@@ -191,7 +191,7 @@ export class WazuhApiCtrl {
             'get',
             `${api.url}:${api.port}/cluster/status`,
             {},
-            { idHost: id }      
+            { idHost: id }
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
@@ -354,7 +354,7 @@ export class WazuhApiCtrl {
         apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
       }
       const options = { idHost: req.payload.id };
-      if(req.payload.forceRefresh){
+      if (req.payload.forceRefresh) {
         options["forceRefresh"] = req.payload.forceRefresh;
       }
 
@@ -401,14 +401,14 @@ export class WazuhApiCtrl {
 
           // Check the run_as for the API user and update it
           let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.DISABLED;
-          if(apiAvailable.run_as){
+          if (apiAvailable.run_as) {
             const responseApiUserAllowRunAs = await this.apiInterceptor.request(
               'GET',
               `${apiAvailable.url}:${apiAvailable.port}/security/users/me`,
               {},
               { idHost: req.payload.id }
             );
-            if(responseApiUserAllowRunAs.status === 200) {
+            if (responseApiUserAllowRunAs.status === 200) {
               apiUserAllowRunAs = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as ? API_USER_STATUS_RUN_AS.ENABLED : API_USER_STATUS_RUN_AS.NOT_ALLOWED;
             }
           }
@@ -453,7 +453,7 @@ export class WazuhApiCtrl {
     } catch (error) {
       log('wazuh-api:checkAPI', error.message || error);
 
-      if(error && error.response && error.response.status === 401){
+      if (error && error.response && error.response.status === 401) {
         return ErrorResponse(
           `Unathorized. Please check API credentials. ${error.response.data.message}`,
           401,
@@ -461,7 +461,7 @@ export class WazuhApiCtrl {
           reply
         );
       }
-      if(error && error.response && error.response.data && error.response.data.detail){
+      if (error && error.response && error.response.data && error.response.data.detail) {
         return ErrorResponse(
           error.response.data.detail,
           error.response.status || 500,
@@ -975,16 +975,18 @@ export class WazuhApiCtrl {
       }
       const delay = (data || {}).delay || 0;
       let fullUrl = getPath(api) + path;
+
       if (delay) {
-        const current = new Date();
-        this.queue.addJob({
-          startAt: new Date(current.getTime() + delay),
-          type: 'request',
-          method,
-          fullUrl,
-          data,
-          options,
-        });
+        const del = data.delay;
+        delete data.delay;
+        setTimeout(() => {
+          this.makeRequest(method, path, data, id, reply, token).then()
+            .catch(error =>
+              console.error(
+                `Error restarting the cluster due to:\n${error.message || error}`
+              )
+            );
+          }, del)
         return { error: 0, message: 'Success' };
       }
 
@@ -1055,7 +1057,7 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      if(error && error.response && error.response.status === 401){        
+      if (error && error.response && error.response.status === 401) {
         return ErrorResponse(
           error.message || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
@@ -1144,8 +1146,8 @@ export class WazuhApiCtrl {
    */
   requestApi(req, reply) {
     const token = this.getTokenFromCookie(req.headers.cookie);
-    const idApi = this. getApiIdFromCookie(req.headers.cookie);
-    if(idApi !== req.payload.id){ // if the current token belongs to a different API id, we relogin to obtain a new token
+    const idApi = this.getApiIdFromCookie(req.headers.cookie);
+    if (idApi !== req.payload.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
         'status code 401',
         401,
@@ -1242,7 +1244,7 @@ export class WazuhApiCtrl {
       );
 
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
-         
+
       const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
 
       if (totalItems && !isList) {
