@@ -12,7 +12,7 @@
  *
  */
 
-import { PatternHandler } from '../../../react-services/pattern-handler';
+import PatternHandler from '../../../react-services/pattern-handler';
 
 export const checkFieldsService = async (): Promise<{ errors: string[] }> => {
   let errors: string[] = [];

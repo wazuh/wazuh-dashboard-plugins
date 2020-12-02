@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import store from '../redux/store';
-import axios, { Method, AxiosError } from 'axios';
+import axios, { Method } from 'axios';
 import AppState from './app-state';
 import { updateApiIsDown } from '../redux/actions/appStateActions';
 import { AppConfigState } from '../redux/types';
@@ -37,10 +37,7 @@ const checkStored = async (data, idChanged = false) => {
       AppState.setAPISelector(configuration['api.selector']);
     }
 
-    const response = await axios(options).catch((error: AxiosError) => {
-      throw error.message;
-    });
-    return response;
+    return await axios(options);
   } catch (err) {
     if (err.response) {
       store.dispatch(updateApiIsDown(true));
@@ -71,9 +68,7 @@ const checkApi = async (apiEntry, forceRefresh = false) => {
       timeout: timeout || 20000,
     };
 
-    await axios(options).catch((error: AxiosError) => {
-      throw error.message;
-    });
+    return await axios(options);
   } catch (err) {
     if (err.response) {
       const response = (err.response.data || {}).message || err.message;

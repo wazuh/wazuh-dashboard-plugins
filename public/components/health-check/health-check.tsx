@@ -37,7 +37,6 @@ import AppState from '../../react-services/app-state';
 import { useAppDeps } from '../../hooks/use-app-deps';
 import { useToasts } from '../../hooks/use-toasts';
 
-
 const checks = {
   api: {
     title: 'Check Wazuh API connection',
@@ -68,7 +67,6 @@ export function HealthCheck(props) {
   const toasts = useToasts();
   const appConfig = useAppConfig();
 
-
   useEffect(() => {
     if (!appConfig.isReady) {
       setCheckResults(
@@ -79,7 +77,6 @@ export function HealthCheck(props) {
               check={appConfig.data[`checks.${check}`]}
               validationService={checks[check].validator}
               handleError={handleError}
-              showToast={showToast}
             />
           );
         })
@@ -98,15 +95,6 @@ export function HealthCheck(props) {
         : errors)
     );
     setCheckErrors(_errors);
-  };
-
-  const showToast = (color, title, text, time) => {
-    toasts.add({
-      color: color,
-      title: title,
-      text: text,
-      toastLifeTimeMs: time,
-    });
   };
 
   const logo_url = core.http.basePath.prepend('/plugins/wazuh/img/icon_blue.svg');
