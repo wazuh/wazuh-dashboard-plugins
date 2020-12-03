@@ -15,7 +15,7 @@ import store from '../redux/store';
 import {
   setAppConfigIsLoading,
   setAppConfigHasError,
-  setAppConfig,
+  updateAppConfig,
 } from '../redux/actions/app-config.actions';
 
 
@@ -32,7 +32,7 @@ export const loadAppConfig = async () => {
     }
 
     const ymlContent = config.data.data;
-    store.dispatch(setAppConfig(ymlContent))
+    store.dispatch(updateAppConfig(ymlContent))
   } catch (error) {
     store.dispatch(setAppConfigHasError());
     console.error('Error parsing wazuh.yml, using default values.'); // eslint-disable-line

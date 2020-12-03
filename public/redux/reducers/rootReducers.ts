@@ -34,5 +34,5 @@ export default combineReducers({
   visualizationsReducers,
   globalBreadcrumbReducers,
   securityReducers,
-  appConfigReducer,
+  appConfig: appConfigReducer,
 });

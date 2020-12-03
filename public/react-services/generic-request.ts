@@ -28,7 +28,7 @@ const request = async (
     if (!method || !path) {
       throw new Error('Missing parameters');
     }
-    const { timeout } = (store.getState().appConfigReducer as AppConfigState).data;
+    const { timeout } = (store.getState().appConfig as AppConfigState).data;
     const requestHeaders: any = {
       'Content-Type': 'application/json',
       'kbn-xsrf': 'kibana',

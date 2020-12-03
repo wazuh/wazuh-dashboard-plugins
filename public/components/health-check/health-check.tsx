@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
- * This program is free software; you can redistribute it and/or modify
+* This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
@@ -19,7 +19,7 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
-import { ErrorHandler } from '../../react-services/error-handler';
+import ErrorHandler from '../../react-services/error-handler';
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useAppConfig } from '../../hooks/use-app-config';
@@ -35,7 +35,6 @@ import {
 import { CheckResult } from './components/check-result';
 import AppState from '../../react-services/app-state';
 import { useAppDeps } from '../../hooks/use-app-deps';
-import { useToasts } from '../../hooks/use-toasts';
 
 const checks = {
   api: {
@@ -64,30 +63,17 @@ export function HealthCheck(props) {
   const [checkResults, setCheckResults] = useState<any[]>([]);
   const [checkErrors, setCheckErrors] = useState<any[]>([]);
   const { core } = useAppDeps();
-  const toasts = useToasts();
   const appConfig = useAppConfig();
 
   useEffect(() => {
-    if (!appConfig.isReady) {
-      setCheckResults(
-        Object.keys(checks).map((check) => {
-          return (
-            <CheckResult
-              title={checks[check].title}
-              check={appConfig.data[`checks.${check}`]}
-              validationService={checks[check].validator}
-              handleError={handleError}
-            />
-          );
-        })
-      );
+    if (appConfig.isReady) {
       checkKibanaSettings(appConfig.data['checks.metaFields']);
       checkKibanaSettingsTimeFilter(appConfig.data['checks.timeFilter']);
       AppState.setPatternSelector(appConfig.data['ip.selector']);
     }
   }, [appConfig]);
 
-  const handleError = (errors, parsed) => {
+  const handleErrors = (errors, parsed) => {
     let _errors = checkErrors;
     _errors.push(
       ...(parsed
@@ -96,21 +82,37 @@ export function HealthCheck(props) {
     );
     setCheckErrors(_errors);
   };
+  
+  const renderChecks = () => {
+    return Object.keys(checks).map((check, index) => {
+      return (
+        <CheckResult
+          key={index}
+          title={checks[check].title}
+          check={appConfig.data[`checks.${check}`]}
+          validationService={checks[check].validator}
+          handleErrors={handleErrors}
+          isLoading={appConfig.isLoading}
+        />
+      );
+    })
+  };
 
-  const logo_url = core.http.basePath.prepend('/plugins/wazuh/img/icon_blue.svg');
+  const logo_url = core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
   return (
     <div className="health-check">
       <EuiLoadingSpinner className="health-check-loader" />
       <img src={logo_url} className="health-check-logo" alt=""></img>
       <div className="margin-top-30">
         <EuiDescriptionList textStyle="reverse" align="center" type="column">
-          {checkResults}
+          {renderChecks()}
         </EuiDescriptionList>
       </div>
       <EuiSpacer size="xxl" />
-      {(checkErrors || []).map((error) => (
+      {(checkErrors || []).map((error, index) => (
         <>
           <EuiCallOut
+            key= {index}
             title={error}
             color="danger"
             iconType="alert"

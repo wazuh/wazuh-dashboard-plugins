@@ -17,7 +17,7 @@ import { AppConfigState } from '../redux/types';
 import { getHttp } from '../kibana-services';
 
 const checkStored = async (data, idChanged = false) => {
-  const configuration = (store.getState().appConfigReducer as AppConfigState).data;
+  const configuration = (store.getState().appConfig as AppConfigState).data;
   const payload: any = { id: data };
   if (idChanged) {
     payload.idChanged = data;
@@ -57,7 +57,7 @@ const checkStored = async (data, idChanged = false) => {
  */
 const checkApi = async (apiEntry, forceRefresh = false) => {
   try {
-    const { timeout } = (store.getState().appConfigReducer as AppConfigState).data;
+    const { timeout } = (store.getState().appConfig as AppConfigState).data;
     const url = getHttp().basePath.prepend('/api/check-api');
 
     const options = {

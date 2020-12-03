@@ -26,9 +26,9 @@ export const setAppConfigHasError = (): ResolverAction => {
   };
 }
 
-export const setAppConfig = (data: object): ResolverAction => {
+export const updateAppConfig = (data: object): ResolverAction => {
   return {
-    type: 'APP_CONFIG_SET_IS_LOADING',
+    type: 'UPDATE_APP_CONFIG',
     payload: data
   };
 }

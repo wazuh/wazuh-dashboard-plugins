@@ -13,5 +13,5 @@ export type AppConfigState = {
 };
 
 export type AppRootState = DefaultRootState & {
-  appConfigState: AppConfigState;
+  appConfig: AppConfigState,
 };

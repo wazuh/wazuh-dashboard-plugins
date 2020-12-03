@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { Reducer } from 'react';
+import { Reducer } from 'redux';
 import { WAZUH_DEFAULT_APP_CONFIG } from '../../../util/constants';
 import { AppConfigState, ResolverAction } from '../types';
 
@@ -45,7 +45,7 @@ const appConfigReducer: Reducer<AppConfigState, ResolverAction> = (
         ...state,
         isLoading: false,
         isReady: true,
-        hasError: true,
+        hasError: false,
         data: {...state.data, ...action.payload},
       };
     default:

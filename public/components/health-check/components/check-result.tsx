@@ -25,24 +25,24 @@ export function CheckResult(props) {
   const [result, setResult] = useState<Result>('loading');
 
   useEffect(() => {
-    if (props.check) {
+    if (props.check && !props.isLoading) {
       initCheck();
     } else if (props.check === false) {
       setResult('disabled');
     }
-  }, [props.checkPatterns]);
+  }, [props]);
 
   const initCheck = async () => {
     try {
       const { errors } = await props.validationService();
       if (errors.length) {
-        props.handleError(errors);
+        props.handleErrors(errors);
         setResult('error');
       } else {
         setResult('ready');
       }
     } catch (error) {
-      props.handleError(error, true);
+      props.handleErrors([error], true);
       setResult('error');
     }
   };

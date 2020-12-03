@@ -49,7 +49,7 @@ const getExtensions = async (id) => {
         setExtensions(id, extensions);
         return extensions;
       } else {
-        const config = store.getState().appConfigReducer as AppConfigState;
+        const config = store.getState().appConfig as AppConfigState;
         if (!config.isReady) return;
         const extensions = {
           audit: config.data['extensions.audit'],
