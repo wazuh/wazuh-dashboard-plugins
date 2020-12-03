@@ -175,13 +175,7 @@ export class SavedObject {
   static async refreshIndexPattern(pattern) {
     try {
       const { title: patternTitle } = await getServices().indexPatterns.get(pattern);
-      const fields = await GenericRequest.request(
-        //we check if indices exist before creating the index pattern
-        'GET',
-        `/api/index_patterns/_fields_for_wildcard?pattern=${patternTitle}`,
-        {}
-      );
-
+      const fields = await SavedObject.getIndicesFields(pattern);
       await this.refreshFieldsOfIndexPattern(pattern, patternTitle, fields);
 
       return;
