@@ -8,6 +8,8 @@ import store from './redux/store';
 import { AppRouter } from './app-router';
 import { KibanaContextProvider } from '../../../src/plugins/kibana_react/public';
 
+import './styles';
+
 export function renderApp(
   core: CoreStart,
   plugins: AppPluginStartDependencies,

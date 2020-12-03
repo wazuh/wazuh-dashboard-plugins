@@ -230,7 +230,7 @@ html{
 }
 
 .wz-mitre-width { 
-  width: calc(~'100% - 35px');
+  width: calc('100% - 35px');
 }
 
 .wz-width-auto {
@@ -419,14 +419,14 @@ md-dialog.modalTheme .md-button {
 }
 
 .chrHeaderWrapper--navIsLocked ~ .app-wrapper .fullscreen {
-  width: calc(~'100vw - 400px')!important;
+  width: calc('100vw - 400px')!important;
   left: 321px!important;
 }
 
 .fullscreen {
   z-index: 1000;
-  height: calc(~'100vh - 119px');
-  width: calc(~'100vw - 80px');
+  height: calc('100vh - 119px');
+  width: calc('100vw - 80px');
   position: fixed;
   top: 49px;
   left: 0px;

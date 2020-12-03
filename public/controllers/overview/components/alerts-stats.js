@@ -19,7 +19,6 @@ import { getServices } from '../../../../../../src/plugins/discover/public/kiban
 import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
 import { esFilters } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
-import '../../../../public/less/loader';
 import { WAZUH_ALERTS_PATTERN } from '../../../../util/constants';
 import { AppState } from '../../../react-services/app-state';
 

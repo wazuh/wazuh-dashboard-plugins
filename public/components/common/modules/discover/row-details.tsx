@@ -31,7 +31,7 @@ import {
   EuiBadge,
   EuiAccordion,
 } from '@elastic/eui';
-import './discover.less';
+import './discover.scss';
 import { EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';

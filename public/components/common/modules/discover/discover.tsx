@@ -11,7 +11,7 @@
  */
 
 import React, { Component, } from 'react';
-import './discover.less';
+import './discover.scss';
 import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/'
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
@@ -54,7 +54,7 @@ import {
   buildEsQuery,
   IFieldType
 } from '../../../../../../../src/plugins/data/common';
-import '../../../../components/agents/fim/inventory/inventory.less';
+import '../../../../components/agents/fim/inventory/inventory.scss';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData

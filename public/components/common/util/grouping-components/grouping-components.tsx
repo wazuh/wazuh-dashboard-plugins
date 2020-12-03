@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 import { EuiPopover, EuiButtonEmpty, EuiFlexGroup } from '@elastic/eui';
 import { useParentWidth } from './hooks';
 import { divideChildren } from './lib'
-import './grouping-components.less'
+import './grouping-components.scss'
 
 
 interface IGroupingComponents {

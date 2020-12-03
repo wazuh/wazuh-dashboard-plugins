@@ -1,5 +1,5 @@
 import { AppMountParameters, CoreSetup, CoreStart, Plugin } from 'kibana/public';
-import { setDataPlugin, setHttp, setToasts } from './kibana-services';
+import { setDataPlugin, setHttp, setToasts, setUiSettings } from './kibana-services';
 import { loadAppConfig } from './react-services/load-app-config.service';
 import {
   AppPluginStartDependencies,
@@ -34,6 +34,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
   public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
     setToasts(core.notifications.toasts);
     setDataPlugin(plugins.data);
+    setUiSettings(core.uiSettings);
     return {};
   }
 }

@@ -14,7 +14,7 @@
 import React, { Component } from 'react';
 import WzMenu from './wz-menu';
 import WzReduxProvider from '../../redux/wz-redux-provider';
-import './wz-menu.less';
+import './wz-menu.scss';
 
 export class WzMenuWrapper extends Component {
   constructor(props) {
