@@ -84,7 +84,7 @@ export const nameEquivalence = {
   'ip.ignore': 'IP ignore',
   'xpack.rbac.enabled': 'X-Pack RBAC',
   'wazuh.monitoring.enabled': 'Status',
-  'wazuh.monitoring.frequency': 'Frecuency',
+  'wazuh.monitoring.frequency': 'Frequency',
   'wazuh.monitoring.shards': 'Index shards',
   'wazuh.monitoring.replicas': 'Index replicas',
   'wazuh.monitoring.creation': 'Interval creation',
