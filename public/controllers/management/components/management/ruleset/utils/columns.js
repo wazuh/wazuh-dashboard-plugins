@@ -249,14 +249,12 @@ export default class RulesetColumns {
       };
 
       const getEditButtonPermissions = (item) => {
-        return [
+        let permissions = [
           {
-            action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+            action: `${
+              ((this.tableProps || {}).clusterStatus || {}).contextConfigServer
+            }:read_file`,
             resource: `file:path:${item.relative_dirname}/${item.filename}`,
-          },
-          {
-            action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`,
-            resource: `node:id:*`,
           },
           { action: 'lists:read', resource: `list:path:${item.filename}` },
           {
@@ -264,6 +262,26 @@ export default class RulesetColumns {
             resource: `*:*:*`,
           },
         ];
+
+        if (((this.tableProps || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
+          permissions.push(
+            {
+              action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`,
+              resource: `node:id:*`,
+            },
+            {
+              action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`,
+              resource: `node:id:*&file:path:*`,
+            }
+          );
+        } else {
+          permissions.push({
+            action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`,
+            resource: `*:*:*`,
+          });
+        }
+
+        return permissions;
       };
 
       this.columns.lists[2] =

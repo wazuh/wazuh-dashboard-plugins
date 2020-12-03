@@ -170,11 +170,11 @@ class WzRulesetActionButtons extends Component {
         permissions={[
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-            resource: `file:path:/etc/${this.props.msg}`,
+            resource: `file:path:/etc/${section}`,
           },
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-            resource: `file:path:/etc/${this.props.msg}`,
+            resource: `file:path:/etc/${section}`,
           },
           {
             action: `cluster:status`,
@@ -199,24 +199,24 @@ class WzRulesetActionButtons extends Component {
           },
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-            resource: `file:path:/etc/${this.props.msg}`,
+            resource: `file:path:*`,
           },
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-            resource: `file:path:/etc/${this.props.msg}`,
+            resource: `file:path:*`,
           },
           {
             action: `cluster:status`,
             resource: `*:*:*`,
           },
         ]}
-        buttonType='empty'
+        buttonType="empty"
         iconType="plusInCircle"
         onClick={() =>
           this.props.updteAddingRulesetFile({
             name: '',
             content: '<!-- Modify it at your will. -->',
-            path: `etc/${section}`
+            path: `etc/${section}`,
           })
         }
       >
@@ -224,34 +224,54 @@ class WzRulesetActionButtons extends Component {
       </WzButtonPermissions>
     );
 
-    //Add new CDB list button
-    const addNewCdbListButton = (
-      <WzButtonPermissions
-        buttonType='empty'
-        permissions={[
+    const getPermissionsNewFile = () => {
+      let permissions = [
+        {
+          action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
+          resource: `file:path:/etc/${section}`,
+        },
+        {
+          action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+          resource: `file:path:/etc/${section}`,
+        },
+        {
+          action: `cluster:status`,
+          resource: `*:*:*`,
+        },
+      ];
+
+      if (((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
+        permissions.push(
           {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
-            resource: 'file:path:/etc/lists/files',
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+            resource: `node:id:*`,
           },
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-            resource: `file:path:/etc/${this.props.msg}`,
-          },
-          {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-            resource: `file:path:/etc/${this.props.msg}`,
-          },
-          {
-            action: `cluster:status`,
-            resource: `*:*:*`,
-          },
-        ]}
+            resource: `node:id:*&file:path:*`,
+          }
+        );
+      } else {
+        permissions.push({
+          action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+          resource: `*:*:*`,
+        });
+      }
+
+      return permissions;
+    };
+
+    //Add new CDB list button
+    const addNewCdbListButton = (
+      <WzButtonPermissions
+        buttonType="empty"
+        permissions={getPermissionsNewFile()}
         iconType="plusInCircle"
         onClick={() =>
           this.props.updateListContent({
             name: false,
             content: '',
-            path: 'etc/lists'
+            path: 'etc/lists',
           })
         }
       >
@@ -262,7 +282,7 @@ class WzRulesetActionButtons extends Component {
     // Manage files
     const manageFiles = (
       <WzButtonPermissions
-        buttonType='empty'
+        buttonType="empty"
         permissions={[
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}::upload_file`,

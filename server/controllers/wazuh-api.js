@@ -111,7 +111,7 @@ export class WazuhApiCtrl {
             log('wazuh-api:getToken', error.message || error);
           }
         }
-      }  
+      }
       let token;
       if(await APIUserAllowRunAs.canUse(idHost)){
         token = await this.apiInterceptor.authenticateApi(idHost, authContext)
@@ -181,7 +181,7 @@ export class WazuhApiCtrl {
           'get',
           `${api.url}:${api.port}/agents`,
           { params: { agents_list: '000' } },
-          { idHost: id}          
+          { idHost: id}
         );
 
         if (responseAgents.status === 200) {
@@ -191,7 +191,7 @@ export class WazuhApiCtrl {
             'get',
             `${api.url}:${api.port}/cluster/status`,
             {},
-            { idHost: id }      
+            { idHost: id }
           );
           if (responseClusterStatus.status === 200) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
@@ -1055,7 +1055,7 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      if(error && error.response && error.response.status === 401){        
+      if(error && error.response && error.response.status === 401){
         return ErrorResponse(
           error.message || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
@@ -1242,7 +1242,7 @@ export class WazuhApiCtrl {
       );
 
       const isList = req.payload.path.includes('/lists') && req.payload.filters && req.payload.filters.length && req.payload.filters.find(filter => filter._isCDBList);
-         
+
       const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
 
       if (totalItems && !isList) {
@@ -1327,7 +1327,7 @@ export class WazuhApiCtrl {
       } else if (output && output.data && output.data.data && !output.data.data.total_affected_items) {
         throw new Error('No results');
       } else {
-        throw new Error(`An error occurred fetching data from the Wazuh API${output && output.body && output.body.message ? `: ${output.body.message}` : ''}`);
+        throw new Error(`An error occurred fetching data from the Wazuh API ${output && output.data && output.data.detail ? `: ${output.data.detail}` : ''}`);
       }
     } catch (error) {
       log('wazuh-api:csv', error.message || error);

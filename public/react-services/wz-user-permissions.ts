@@ -265,7 +265,8 @@ const wazuhPermissions = {
   "cluster:read": {
     "description": "Read Wazuh's cluster configuration",
     "resources": [
-      "node:id"
+      "node:id",
+      "node:id:*&file:path:*"
     ],
     "example": {
       "actions": [
@@ -950,8 +951,32 @@ export class WzUserPermissions{
       }
       const actionName = typeof permission === 'string' ? permission : permission.action;
       let actionResource = (typeof permission === 'string' && wazuhPermissions[actionName].resources.length === 1) ? (wazuhPermissions[actionName].resources[0] + ':*') : permission.resource;
-      const actionResourceAll = actionResource.split(':').map((str, index) => index === 2 ? '*': str).join(':');
-      const userPartialResources = userPermissions[actionName] ? Object.keys(userPermissions[actionName]).filter(resource => !([actionResource,actionResourceAll].includes(resource)) && (resource.match(actionResource.replace('*','\\*')) || resource.match(actionResourceAll.replace('*','\\*'))) ) : undefined;
+      const actionResourceAll = actionResource
+        .split('&')
+        .map(function (str) {
+          return str
+            .split(':')
+            .map(function (str, index) {
+              return index === 2 ? '*' : str;
+            })
+            .join(':');
+        })
+        .join('&');
+
+      let userPartialResources: string[] | undefined = userPermissions[actionName]
+        ? Object.keys(userPermissions[actionName]).filter((resource) =>
+            resource.match('&')
+              ? ![actionResource, actionResourceAll].includes(resource) &&
+                (resource.match(`/${actionResource}/`) || resource.match(`/${actionResourceAll}/`))
+              : ![actionResource, actionResourceAll].includes(resource) &&
+                (resource.match(actionResource.replace('*', '\\*')) ||
+                  resource.match(actionResourceAll.replace('*', '\\*')))
+          )
+        : undefined;
+
+      userPartialResources =
+        (userPartialResources || []).length > 0 ? userPartialResources : undefined;
+
       if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
         // API RBAC mode = 'black'
         if(!userPermissions[actionName]){ return false };
@@ -970,13 +995,13 @@ export class WzUserPermissions{
           : true
       }
     });
-  
+
     return filtered.length ? filtered : false;
   }
   // Check the missing roles of the required ones that the user does not have
   static checkMissingUserRoles(requiredRoles, userRoles) {
     const rolesUserNotOwn = requiredRoles.filter(requiredRole => !userRoles.includes(requiredRole));
-    return rolesUserNotOwn.length ? rolesUserNotOwn : false; 
+    return rolesUserNotOwn.length ? rolesUserNotOwn : false;
   }
 }
 

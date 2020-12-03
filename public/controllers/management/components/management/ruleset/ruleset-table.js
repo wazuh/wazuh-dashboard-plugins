@@ -236,29 +236,45 @@ class WzRulesetTable extends Component {
       const getRowProps = (item) => {
         const { id, name } = item;
 
-        const extraSectionPermissions = this.extraSectionPrefixResource[this.props.state.section];
+        const getRequiredPermissions = (item) => {
+          let permissions = [
+            {
+              action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
+              resource: `file:path:${item.relative_dirname}/${item.filename}`,
+            },
+            { action: 'lists:read', resource: `list:path:${item.filename}` },
+            {
+              action: `cluster:status`,
+              resource: `*:*:*`,
+            },
+          ];
+
+          if (((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
+            permissions.push(
+              {
+                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+                resource: `node:id:*`,
+              },
+              {
+                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+                resource: `node:id:*&file:path:*`,
+              }
+            );
+          } else {
+            permissions.push({
+              action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+              resource: `*:*:*`,
+            });
+          }
+
+          return permissions;
+        };
+
         return {
           'data-test-subj': `row-${id || name}`,
           className: 'customRowClass',
           onClick: !WzUserPermissions.checkMissingUserPermissions(
-            [
-              {
-                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-                resource: `file:path:${item.relative_dirname}/${item.filename}`,
-              },
-              {
-                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-                resource: `file:path:${item.relative_dirname}/${item.filename}`,
-              },
-              {
-                action: `cluster:status`,
-                resource: `*:*:*`,
-              },
-              {
-                action: `${this.props.state.section}:read`,
-                resource: `${extraSectionPermissions}:${item.filename}`,
-              },
-            ],
+            getRequiredPermissions(item),
             this.props.userPermissions
           )
             ? async () => {
