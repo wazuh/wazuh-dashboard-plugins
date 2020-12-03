@@ -237,7 +237,7 @@ class WzRulesetTable extends Component {
         const { id, name } = item;
 
         const getRequiredPermissions = (item) => {
-          let permissions = [
+          const permissions = [
             {
               action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
               resource: `file:path:${item.relative_dirname}/${item.filename}`,

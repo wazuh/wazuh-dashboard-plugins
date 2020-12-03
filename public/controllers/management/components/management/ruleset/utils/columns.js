@@ -249,7 +249,7 @@ export default class RulesetColumns {
       };
 
       const getEditButtonPermissions = (item) => {
-        let permissions = [
+        const permissions = [
           {
             action: `${
               ((this.tableProps || {}).clusterStatus || {}).contextConfigServer

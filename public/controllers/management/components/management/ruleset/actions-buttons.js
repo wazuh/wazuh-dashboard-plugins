@@ -225,7 +225,7 @@ class WzRulesetActionButtons extends Component {
     );
 
     const getPermissionsNewFile = () => {
-      let permissions = [
+      const permissions = [
         {
           action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
           resource: `file:path:/etc/${section}`,
