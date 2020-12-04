@@ -12,10 +12,17 @@
 import { WazuhElasticCtrl } from '../controllers';
 import { IRouter, RequestHandlerContext } from 'kibana/server';
 import { schema } from '@kbn/config-schema';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY, WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING, WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../util/constants';
 
 export function WazuhElasticRouter(router: IRouter) {
   const ctrl = new WazuhElasticCtrl();
+  const schemaSampleAlertsCategories = schema.oneOf([
+    WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+    WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+    WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION
+  ].map(category => schema.literal(category)));
 
+  // Endpoints
   router.get(
     {
       path: '/elastic/security/current-platform',
@@ -42,7 +49,21 @@ export function WazuhElasticRouter(router: IRouter) {
         }),
       }
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.createVis(context, request, response)
+  );
+
+  router.post(
+    {
+      path: '/elastic/visualizations/{tab}/{pattern}',
+      validate: {
+        params: schema.object({
+          tab: schema.string(),
+          pattern: schema.string(),
+        }),
+        body: schema.any()
+      }
+    },
+    async (context, request, response) => ctrl.createClusterVis(context, request, response)
   );
 
   router.get(
@@ -54,7 +75,7 @@ export function WazuhElasticRouter(router: IRouter) {
         })
       }
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.getTemplate(context, request, response)
   );
 
   router.get(
@@ -66,7 +87,7 @@ export function WazuhElasticRouter(router: IRouter) {
         })
       }
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.checkPattern(context, request, response)
   );
 
   router.get(
@@ -81,15 +102,7 @@ export function WazuhElasticRouter(router: IRouter) {
         })
       }
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
-  );
-
-  router.post(
-    {
-      path: '/elastic/alerts',
-      validate: false,
-    },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.getFieldTop(context, request, response)
   );
 
   router.get(
@@ -97,7 +110,7 @@ export function WazuhElasticRouter(router: IRouter) {
       path: '/elastic/samplealerts',
       validate: false,
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.haveSampleAlerts(context, request, response)
   );
 
   router.get(
@@ -105,11 +118,11 @@ export function WazuhElasticRouter(router: IRouter) {
       path: '/elastic/samplealerts/{category}',
       validate: {
         params: schema.object({
-          category: schema.string(),
+          category: schemaSampleAlertsCategories,
         })
       },
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.haveSampleAlertsOfCategory(context, request, response)
   );
 
   router.post(
@@ -117,11 +130,11 @@ export function WazuhElasticRouter(router: IRouter) {
       path: '/elastic/samplealerts/{category}',
       validate: {
         params: schema.object({
-          category: schema.string(),
+          category: schemaSampleAlertsCategories,
         })
       },
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.createSampleAlerts(context, request, response)
   );
 
   router.delete(
@@ -129,21 +142,21 @@ export function WazuhElasticRouter(router: IRouter) {
       path: '/elastic/samplealerts/{category}',
       validate: {
         params: schema.object({
-          category: schema.string(),
+          category: schemaSampleAlertsCategories,
         })
       },
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.deleteSampleAlerts(context, request, response)
   );
 
   router.post(
     {
       path: '/elastic/esAlerts',
       validate: {
-        query: schema.object({}),
+        body: schema.any(),
       }
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.esAlerts(context, request, response)
   );
 
   router.get(
@@ -151,6 +164,6 @@ export function WazuhElasticRouter(router: IRouter) {
       path: '/elastic/statistics',
       validate: false
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.existStatisticsIndices(context, request, response)
   );
 }
