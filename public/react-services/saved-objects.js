@@ -12,6 +12,7 @@
 
 import { GenericRequest } from './generic-request';
 import { getServices } from '../../../../src/plugins/discover/public/kibana_services';
+import { KnownFields } from '../utils/known-fields'
 
 export class SavedObject {
   /**
@@ -154,7 +155,7 @@ export class SavedObject {
         `/api/saved_objects/index-pattern/${id}`,
         {
           attributes: {
-            fields: JSON.stringify(fields.data.fields),
+            fields: JSON.stringify(fields),
             timeFieldName: 'timestamp',
             title: title
           }
@@ -173,14 +174,8 @@ export class SavedObject {
    */
   static async refreshIndexPattern(pattern) {
     try {
-      const {title : patternTitle} = await getServices().indexPatterns.get(pattern);
-      const fields = await GenericRequest.request(
-        //we check if indices exist before creating the index pattern
-        'GET',
-        `/api/index_patterns/_fields_for_wildcard?pattern=${patternTitle}`,
-        {}
-      );
-
+      const { title: patternTitle } = await getServices().indexPatterns.get(pattern);
+      const fields = await SavedObject.getIndicesFields(pattern);
       await this.refreshFieldsOfIndexPattern(pattern, patternTitle, fields);
 
       return;
@@ -197,13 +192,7 @@ export class SavedObject {
    */
   static async createWazuhIndexPattern(pattern) {
     try {
-      const fields = await GenericRequest.request(
-        //we check if indices exist before creating the index pattern
-        'GET',
-        `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
-        {}
-      );
-
+      const fields = await SavedObject.getIndicesFields(pattern);
       await this.createSavedObject(
         'index-pattern',
         pattern,
@@ -228,4 +217,11 @@ export class SavedObject {
         : error.message || error;
     }
   }
+
+  static getIndicesFields = async (pattern) => GenericRequest.request(
+    //we check if indices exist before creating the index pattern
+    'GET',
+    `/api/index_patterns/_fields_for_wildcard?pattern=${pattern}`,
+    {}
+  ).then(response => response.data.fields).catch(() => KnownFields)
 }
