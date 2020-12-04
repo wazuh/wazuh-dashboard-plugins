@@ -975,38 +975,27 @@ export class WzUserPermissions{
           )
         : undefined;
 
-      if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
-        // API RBAC mode = 'black'
-        if(!userPermissions[actionName]){ return false };
-        return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
-        : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
-        : userPartialResources ? userPartialResources.some(resource => !isAllow(userPermissions[actionName][resource]))
-        : wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
-        : false
-      } else {
-        // API RBAC mode = 'white'
-        if (!userPermissions[actionName]) {
-          return true;
-        }
-
-        return userPermissions[actionName][actionResource]
-          ? !isAllow(userPermissions[actionName][actionResource])
-          : Object.keys(userPermissions[actionName]).some((resource) => {
-              return resource.match(actionResourceAll.replace('*', '\\*')) !== null;
-            })
-          ? Object.keys(userPermissions[actionName]).some((resource) => {
-              if (resource.match(actionResourceAll.replace('*', '\\*'))) {
-                return !isAllow(userPermissions[actionName][resource]);
-              }
-            })
-          : userPartialResources?.length
-          ? userPartialResources.some((resource) => !isAllow(userPermissions[actionName][resource]))
-          : wazuhPermissions[actionName].resources.find(
-              (resource) => resource === RESOURCE_ANY_SHORT
-            ) && userPermissions[actionName][RESOURCE_ANY]
-          ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
-          : true;
+      if (!userPermissions[actionName]) {
+        return userPermissions.rbac_mode === RBAC_MODE_WHITE;
       }
+
+      return userPermissions[actionName][actionResource]
+        ? !isAllow(userPermissions[actionName][actionResource])
+        : Object.keys(userPermissions[actionName]).some((resource) => {
+            return resource.match(actionResourceAll.replace('*', '\\*')) !== null;
+          })
+        ? Object.keys(userPermissions[actionName]).some((resource) => {
+            if (resource.match(actionResourceAll.replace('*', '\\*'))) {
+              return !isAllow(userPermissions[actionName][resource]);
+            }
+          })
+        : userPartialResources?.length
+        ? userPartialResources.some((resource) => !isAllow(userPermissions[actionName][resource]))
+        : wazuhPermissions[actionName].resources.find(
+            (resource) => resource === RESOURCE_ANY_SHORT
+          ) && userPermissions[actionName][RESOURCE_ANY]
+        ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
+        : userPermissions.rbac_mode === RBAC_MODE_WHITE;
     });
 
     return filtered.length ? filtered : false;
