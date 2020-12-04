@@ -2,11 +2,18 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4015
+
+### Fixed
+
+- Create index pattern even if there aren´t available indices [#2620](https://github.com/wazuh/wazuh-kibana-app/issues/2620)
+- Top bar overlayed over expanded visualizations [#2667](https://github.com/wazuh/wazuh-kibana-app/issues/2667)
+
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
 ### Added
 
-- Improved management of index-pattern fields [#2630] (https://github.com/wazuh/wazuh-kibana-app/issues/2630)
+- Improved management of index-pattern fields [#2630](https://github.com/wazuh/wazuh-kibana-app/issues/2630)
 
 ### Fixed
 
