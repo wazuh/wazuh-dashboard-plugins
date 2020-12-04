@@ -10,14 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ResolverAction } from '../types';
+
 /**
  * Updates CurrentAPI in the appState store
  * @param currentAPI
  */
-export const updateCurrentApi = currentAPI => {
+export const updateCurrentApi = (currentAPI) => {
   return {
     type: 'UPDATE_CURRENT_API',
-    currentAPI: currentAPI
+    currentAPI: currentAPI,
   };
 };
 
@@ -25,10 +27,10 @@ export const updateCurrentApi = currentAPI => {
  * Updates ShowMenu in the appState store
  * @param showMenu
  */
-export const updateShowMenu = showMenu => {
+export const updateShowMenu = (showMenu) => {
   return {
     type: 'SHOW_MENU',
-    showMenu: showMenu
+    showMenu: showMenu,
   };
 };
 
@@ -36,10 +38,10 @@ export const updateShowMenu = showMenu => {
  * Updates WazuhNotReadyYet in the appState store
  * @param wazuhNotReadyYet
  */
-export const updateWazuhNotReadyYet = wazuhNotReadyYet => {
+export const updateWazuhNotReadyYet = (wazuhNotReadyYet) => {
   return {
     type: 'UPDATE_WAZUH_NOT_READY_YET',
-    wazuhNotReadyYet: wazuhNotReadyYet
+    wazuhNotReadyYet: wazuhNotReadyYet,
   };
 };
 
@@ -47,13 +49,12 @@ export const updateWazuhNotReadyYet = wazuhNotReadyYet => {
  * Updates currentTab in the appState store
  * @param currentTab
  */
-export const updateCurrentTab = currentTab => {
+export const updateCurrentTab = (currentTab) => {
   return {
     type: 'UPDATE_WAZUH_CURRENT_TAB',
-    currentTab: currentTab
+    currentTab: currentTab,
   };
 };
-
 
 /**
  * Updates extensions in the appState store
@@ -64,7 +65,7 @@ export const updateExtensions = (id, extensions) => {
   tmpExtensions[id] = extensions;
   return {
     type: 'UPDATE_EXTENSIONS',
-    extensions: tmpExtensions
+    extensions: tmpExtensions,
   };
 };
 
@@ -72,13 +73,12 @@ export const updateExtensions = (id, extensions) => {
  * Updates currentPlatform in the appState store
  * @param extensions
  */
-export const updateCurrentPlatform = currentPlatform => {
+export const updateCurrentPlatform = (currentPlatform) => {
   return {
     type: 'UPDATE_CURRENT_PLATFORM',
-    currentPlatform
+    currentPlatform,
   };
 };
-
 
 /**
  * Updates currentAgentData in the appState store
@@ -87,10 +87,9 @@ export const updateCurrentPlatform = currentPlatform => {
 export const updateCurrentAgentData = (data) => {
   return {
     type: 'UPDATE_SELECTED_AGENT_DATA',
-    currentAgentData: data
+    currentAgentData: data,
   };
 };
-
 
 /**
  * Updates showExploreAgentModal in the appState store
@@ -99,10 +98,9 @@ export const updateCurrentAgentData = (data) => {
 export const showExploreAgentModal = (shouldShow) => {
   return {
     type: 'SHOW_EXPLORE_AGENT_MODAL',
-    showExploreAgentModal: shouldShow
+    showExploreAgentModal: shouldShow,
   };
 };
-
 
 /**
  * Updates showExploreAgentModalGlobal in the appState store
@@ -111,7 +109,7 @@ export const showExploreAgentModal = (shouldShow) => {
 export const showExploreAgentModalGlobal = (shouldShow) => {
   return {
     type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
-    showExploreAgentModalGlobal: shouldShow
+    showExploreAgentModalGlobal: shouldShow,
   };
 };
 
@@ -119,10 +117,10 @@ export const showExploreAgentModalGlobal = (shouldShow) => {
  * Updates userRoles in the appState store
  * @param extensions
  */
-export const updateUserRoles = userRoles => {
+export const updateUserRoles = (userRoles) => {
   return {
     type: 'UPDATE_USER_ROLES',
-    userRoles
+    userRoles,
   };
 };
 
@@ -130,31 +128,53 @@ export const updateUserRoles = userRoles => {
  * Updates userPermissions in the appState store
  * @param extensions
  */
-export const updateUserPermissions = userPermissions => {
+export const updateUserPermissions = (userPermissions) => {
   return {
     type: 'UPDATE_USER_PERMISSIONS',
-    userPermissions
+    userPermissions,
   };
 };
 
 /**
-* Updates selectedSettingsSection in the appState store
-* @param selected_settings_section
-*/
-export const updateSelectedSettingsSection = selected_settings_section => {
- return {
-   type: 'UPDATE_SELECTED_SETTINGS_SECTION',
-   selected_settings_section
- };
+ * Updates selectedSettingsSection in the appState store
+ * @param selected_settings_section
+ */
+export const updateSelectedSettingsSection = (selected_settings_section) => {
+  return {
+    type: 'UPDATE_SELECTED_SETTINGS_SECTION',
+    selected_settings_section,
+  };
 };
 
 /**
-* Updates toastNotification in the appState store
-* @param toastNotification
-*/
-export const updateToastNotificationsModal = toastNotification => {
+ * Updates toastNotification in the appState store
+ * @param toastNotification
+ */
+export const updateToastNotificationsModal = (toastNotification) => {
   return {
     type: 'UPDATE_TOAST_NOTIFICATIONS_MODAL',
-    toastNotification
+    toastNotification,
   };
- };
+};
+
+/**
+ * Updates blankScreenError in the appState store
+ * @param {string} error
+ */
+export const updateBlankScreenError = (error: string): ResolverAction => {
+  return {
+    type: 'UPDATE_BLANK_SCREEN_ERROR',
+    payload: error,
+  };
+};
+
+/**
+ * Updates blankScreenError in the appState store
+ * @param {boolean} isDown
+ */
+export const updateApiIsDown = (isDown: boolean): ResolverAction => {
+  return {
+    type: 'UPDATE_BLANK_SCREEN_ERROR',
+    payload: isDown,
+  };
+};

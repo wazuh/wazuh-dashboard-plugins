@@ -10,6 +10,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+  // TODO:MIGRATION REMOVE ALL USAGES
 export class WzMisc {
   /**
    * Class constructor

@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "alwaysStrict": false,
     "noImplicitUseStrict": false,
+    "noImplicitAny": false,
   },
   "include": [
     "server/**/*",
