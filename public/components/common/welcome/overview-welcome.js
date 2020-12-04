@@ -29,7 +29,7 @@ import {
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
-import './welcome.less';
+import './welcome.scss';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 
 export class OverviewWelcome extends Component {

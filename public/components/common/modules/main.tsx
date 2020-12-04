@@ -19,7 +19,7 @@ import {
   EuiButton,
   EuiButtonEmpty
 } from '@elastic/eui';
-import '../../common/modules/module.less';
+import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { ModulesDefaults } from './modules-defaults';

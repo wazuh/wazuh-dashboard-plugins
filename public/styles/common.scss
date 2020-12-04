@@ -14,6 +14,15 @@
 /* ------------------------ Wazuh commons stylesheet ------------------------ */
 /* -------------------------------------------------------------------------- */
 
+/* Customize the App icon style */
+
+/* .euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiIcon {  
+  height: 24px;
+  width: 24px;
+  filter: brightness(0) saturate(100%) invert(24%) sepia(97%) saturate(1757%) hue-rotate(186deg) brightness(94%) contrast(101%);
+  margin: 0px 8px 0px 0px
+} */
+
 /* Custom healthcheck and blank screen styles */
 
 .kbnGlobalBannerList{
@@ -525,16 +534,16 @@ md-sidenav {
 }
 
 #wz-dev-left-column {
-  width: calc(~'30% - 7px');
-  min-width: calc(~'20% - 7px');
-  max-width: calc(~'80% - 7px');
+  width: calc('30% - 7px');
+  min-width: calc('20% - 7px');
+  max-width: calc('80% - 7px');
   float: left;
 }
 
 #wz-dev-right-column {
-  width: calc(~'70% - 7px');
-  min-width: calc(~'20% - 7px');
-  max-width: calc(~'80% - 7px');
+  width: calc('70% - 7px');
+  min-width: calc('20% - 7px');
+  max-width: calc('80% - 7px');
   float: left;
 }
 
@@ -604,7 +613,7 @@ md-switch.md-checked .md-thumb {
 
 @media (min-width: 1200px) {
   .wz-logo {
-    background-image: url('../img/new_logo_white.svg');
+    background-image: url('../assets/new_logo_white.svg');
     width: 150px;
     max-width: 150px;
   }
@@ -613,7 +622,7 @@ md-switch.md-checked .md-thumb {
   .wz-logo {
     min-width: 28px !important;
     margin-right: 15px !important;
-    background-image: url('../img/new_logo_white_wolf.svg');
+    background-image: url('../assets/new_logo_white_wolf.svg');
   }
 }
 
@@ -1000,7 +1009,7 @@ wz-xml-file-editor {
 }
 
 .registerAgent{
-  min-height: calc(~'100vh - 100px');
+  min-height: calc('100vh - 100px');
   background: #fafbfd;
 }
 
@@ -1217,7 +1226,7 @@ wz-xml-file-editor {
 }
 
 .logtest-side{
-  height: calc(~'100vh - 95px');
+  height: calc('100vh - 95px');
   border-left: 1px solid #e1e2e3;
   box-shadow: -2px 0px 2px -1px rgba(152, 162, 179, 0.3);
   margin-top: -50px;
@@ -1225,7 +1234,7 @@ wz-xml-file-editor {
   z-index: 10;
   position : fixed;
   right: 0;
-  width: calc(~'30% - 16px');
+  width: calc('30% - 16px');
 }
 
 .logtest .euiFlyoutFooter, .logtest-side .euiFlyoutFooter{
@@ -1665,7 +1674,7 @@ iframe.width-changed {
 }
 
 .code-block-log-viewer-container {
-  max-width: calc(~"100vw - 41*2px");
+  max-width: calc("100vw - 41*2px");
 }
 
 .dscFieldDetails__barContainer {

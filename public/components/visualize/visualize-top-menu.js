@@ -22,7 +22,7 @@ import {
   EuiModalHeaderTitle,
   EuiModalBody
 } from '@elastic/eui';
-import './visualize-top-menu.less';
+import './visualize-top-menu.scss';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 
 export class VisualizeTopMenu extends Component {

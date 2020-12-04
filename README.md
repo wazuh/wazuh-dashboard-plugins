@@ -54,31 +54,31 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 **Modules overview**
 
-![Overview](/public/img/app.png)
+![Overview](/public/assets/app.png)
 
 **Security events**
 
-![Overview](/public/img/app2.png)
+![Overview](/public/assets/app2.png)
 
 **Integrity monitoring**
 
-![Overview](/public/img/app3.png)
+![Overview](/public/assets/app3.png)
 
 **Vulnerability detection**
 
-![Overview](/public/img/app4.png)
+![Overview](/public/assets/app4.png)
 
 **Regulatory compliance**
 
-![Overview](/public/img/app5.png)
+![Overview](/public/assets/app5.png)
 
 **Agents overview**
 
-![Overview](/public/img/app6.png)
+![Overview](/public/assets/app6.png)
 
 **Agent summary**
 
-![Overview](/public/img/app7.png)
+![Overview](/public/asstes/app7.png)
 
 ## Branches
 

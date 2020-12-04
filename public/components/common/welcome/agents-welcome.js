@@ -43,7 +43,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import { ActionAgents } from '../../../react-services/action-agents';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
-import './welcome.less';
+import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';

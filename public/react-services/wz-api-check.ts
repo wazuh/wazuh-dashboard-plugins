@@ -10,14 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 import store from '../redux/store';
-import axios, { Method, AxiosError } from 'axios';
+import axios, { Method } from 'axios';
 import AppState from './app-state';
 import { updateApiIsDown } from '../redux/actions/appStateActions';
 import { AppConfigState } from '../redux/types';
 import { getHttp } from '../kibana-services';
 
 const checkStored = async (data, idChanged = false) => {
-  const configuration = (store.getState().appConfigReducer as AppConfigState).data;
+  const configuration = (store.getState().appConfig as AppConfigState).data;
   const payload: any = { id: data };
   if (idChanged) {
     payload.idChanged = data;
@@ -37,10 +37,7 @@ const checkStored = async (data, idChanged = false) => {
       AppState.setAPISelector(configuration['api.selector']);
     }
 
-    const response = await axios(options).catch((error: AxiosError) => {
-      throw error.message;
-    });
-    return response;
+    return await axios(options);
   } catch (err) {
     if (err.response) {
       store.dispatch(updateApiIsDown(true));
@@ -60,7 +57,7 @@ const checkStored = async (data, idChanged = false) => {
  */
 const checkApi = async (apiEntry, forceRefresh = false) => {
   try {
-    const { timeout } = (store.getState().appConfigReducer as AppConfigState).data;
+    const { timeout } = (store.getState().appConfig as AppConfigState).data;
     const url = getHttp().basePath.prepend('/api/check-api');
 
     const options = {
@@ -71,9 +68,7 @@ const checkApi = async (apiEntry, forceRefresh = false) => {
       timeout: timeout || 20000,
     };
 
-    await axios(options).catch((error: AxiosError) => {
-      throw error.message;
-    });
+    return await axios(options);
   } catch (err) {
     if (err.response) {
       const response = (err.response.data || {}).message || err.message;

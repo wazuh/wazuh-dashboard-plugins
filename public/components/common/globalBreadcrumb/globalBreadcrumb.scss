@@ -26,7 +26,7 @@
     }
 }
 
-@-moz-document url-prefix() {
+$-moz-document url-prefix() {
     .wz-global-breadcrumb #breadcrumbNoTitle {
         height: auto!important;
     }

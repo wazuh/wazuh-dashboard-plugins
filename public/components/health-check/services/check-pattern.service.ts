@@ -11,9 +11,9 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import { SavedObject } from '../../../react-services/saved-objects';
-import { AppState } from '../../../react-services/app-state';
-import { PatternHandler } from '../../../react-services/pattern-handler';
+import SavedObject from '../../../react-services/saved-objects';
+import AppState from '../../../react-services/app-state';
+import PatternHandler from '../../../react-services/pattern-handler';
 import { WAZUH_MONITORING_PATTERN } from '../../../../util/constants';
 
 const validateDefaultPattern = async () => {
@@ -24,7 +24,7 @@ const validateDefaultPattern = async () => {
            as every index pattern is stored in its current tenant .kibana-tenant-XX index. 
            */
   try {
-    await SavedObject.existsMonitoringIndexPattern(WAZUH_MONITORING_PATTERN); //this checks if it exists, if not it automatically creates the index pattern
+    await SavedObject.existsOrCreateIndexPattern(WAZUH_MONITORING_PATTERN); //this checks if it exists, if not it automatically creates the index pattern
   } catch (err) {}
 };
 

@@ -127,7 +127,7 @@ export class WazuhReportingCtrl {
         margin: [40, 20, 0, 0],
         columns: [
           {
-            image: path.join(__dirname, '../../public/img/logo.png'),
+            image: path.join(__dirname, '../../public/assets/logo.png'),
             width: 190
           },
           {

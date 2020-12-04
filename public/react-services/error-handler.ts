@@ -14,7 +14,7 @@ import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { CheckDaemonsStatus } from './check-daemons-status';
 import { getToasts } from '../kibana-services';
 
-let history = [];
+let history: Array<{date: number, text: string}> = [];
 const filterHistoryTimeInMs = 2000;
 const filterRecentHistory = (date) =>
   history.filter((item) => date - item.date <= filterHistoryTimeInMs);
@@ -129,7 +129,7 @@ const warning = (message, location) => {
  */
 const handle = (error, location, params = { warning: false, silent: false }) => {
   const toasts = getToasts();
-  const message = ErrorHandler.extractMessage(error);
+  const message = extractMessage(error);
   const messageIsString = typeof message === 'string';
   if (messageIsString && message.includes('ERROR3099')) {
     const updateNotReadyYet = updateWazuhNotReadyYet('Wazuh not ready yet.');

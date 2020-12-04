@@ -17,7 +17,7 @@ import chrome from 'ui/chrome';
 import React from "react";
 import { EuiIcon } from "@elastic/eui";
 import { EuiListGroup } from "@elastic/eui";
-import './requirements_leggend.less';
+import './requirements_leggend.scss';
 import rison from 'rison-node';
 import { buildPhraseFilter } from '../../../../../../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../../../../../overview/mitre/lib';

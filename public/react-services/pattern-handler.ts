@@ -46,7 +46,7 @@ const getPatternList = async (where) => {
     if (!patternList.length) {
       // if no valid index patterns are found we try to create the wazuh-alerts-*
       try {
-        const { pattern } = (store.getState().appConfigReducer as AppConfigState).data;
+        const { pattern } = (store.getState().appConfig as AppConfigState).data;
         if (!pattern) return;
 
         toasts.add({

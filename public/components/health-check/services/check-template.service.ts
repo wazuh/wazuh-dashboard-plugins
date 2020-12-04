@@ -12,9 +12,9 @@
  *
  */
 
-import { SavedObject } from '../../../react-services/saved-objects';
-import { AppState } from '../../../react-services/app-state';
-import { GenericRequest } from '../../../react-services/generic-request';
+import SavedObject from '../../../react-services/saved-objects';
+import AppState from '../../../react-services/app-state';
+import GenericRequest from '../../../react-services/generic-request';
 
 export const checkTemplateService = async (): Promise<{ errors: string[] }> => {
   let errors: string[] = [];

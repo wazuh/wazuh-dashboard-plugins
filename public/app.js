@@ -29,7 +29,7 @@ import 'uiExports/interpreter';
 import 'angular-sanitize';
 
 // Require CSS
-import './less/loader';
+import './scss/loader';
 // Require lib to dashboards PDFs
 require('./utils/dom-to-image.js');
 
@@ -43,7 +43,7 @@ import 'angular-chart.js';
 import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 
 // Font Awesome, Kibana UI framework and others
-import './utils/fontawesome/css/font-awesome.min.css';
+import './utils/fontawesome/css/font-awesome.min.scss';
 
 // Dev tools
 import './utils/codemirror';
@@ -51,7 +51,7 @@ import './utils/codemirror';
 import './utils/jquery-ui';
 
 // Material
-import 'angular-material/angular-material.css';
+import 'angular-material/angular-material.scss';
 import 'angular-aria/angular-aria';
 import 'angular-animate/angular-animate';
 import 'angular-material/angular-material';

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { EuiBreadcrumbs, EuiToolTip } from '@elastic/eui';
 import { connect } from 'react-redux';
-import './globalBreadcrumb.less';
+import './globalBreadcrumb.scss';
 import chrome from 'ui/chrome';
 import { AppNavigate } from '../../../react-services/app-navigate';
 

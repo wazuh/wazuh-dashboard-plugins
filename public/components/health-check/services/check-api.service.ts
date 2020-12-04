@@ -12,9 +12,10 @@
  *
  */
 
-import { AppState } from '../../../react-services/app-state';
-import { GenericRequest } from '../../../react-services/generic-request';
-import { ApiCheck } from '../../../react-services/wz-api-check';
+import { getToasts } from '../../../kibana-services';
+import AppState from '../../../react-services/app-state';
+import GenericRequest from '../../../react-services/generic-request';
+import ApiCheck from '../../../react-services/wz-api-check';
 
 const trySetDefault = async () => {
   try {
@@ -44,7 +45,7 @@ const trySetDefault = async () => {
   }
 };
 
-export const checkApiService = async (showToast): Promise<{ errors: string[] }> => {
+export const checkApiService = async (): Promise<{ errors: string[] }> => {
   let errors: string[] = [];
   let apiChanged = false;
   try {
@@ -62,7 +63,12 @@ export const checkApiService = async (showToast): Promise<{ errors: string[] }> 
     });
 
     if (apiChanged) {
-      showToast('warning', 'Selected Wazuh API has been updated', '', 3000);
+      getToasts().add({
+        color: 'warning',
+        title: 'Selected Wazuh API has been updated',
+        text: '',
+        toastLifeTimeMs: 3000,
+      });
       const api = ((data || {}).data || {}).data || {};
       const name = (api.cluster_info || {}).manager || false;
       AppState.setCurrentAPI(JSON.stringify({ name: name, id: api.id }));

@@ -12,9 +12,9 @@
  *
  */
 
-import { AppState } from '../../../react-services/app-state';
-import { GenericRequest } from '../../../react-services/generic-request';
-import { WzRequest } from '../../../react-services/wz-request';
+import AppState from '../../../react-services/app-state';
+import GenericRequest from '../../../react-services/generic-request';
+import WzRequest from '../../../react-services/wz-request';
 
 export const checkSetupService = async (): Promise<{ errors: string[] }> => {
   let errors: string[] = [];

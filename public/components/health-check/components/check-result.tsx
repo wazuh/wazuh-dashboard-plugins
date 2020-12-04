@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiDescriptionListDescription,
   EuiDescriptionListTitle,
@@ -19,58 +19,63 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 
+type Result = 'loading' | 'ready' | 'error' | 'disabled';
+
 export function CheckResult(props) {
-  const [result, setResult] = useState<any>('');
-  const [isLoading, setIsloading] = useState(false);
+  const [result, setResult] = useState<Result>('loading');
 
   useEffect(() => {
-    if (props.check) {
-      setIsloading(true);
+    if (props.check && !props.isLoading) {
       initCheck();
     } else if (props.check === false) {
-      setResult('Disabled');
+      setResult('disabled');
     }
-  }, [props.checkPatterns]);
-
+  }, [props]);
 
   const initCheck = async () => {
     try {
-      const { errors } = await props.validationService(props.showToast);
+      const { errors } = await props.validationService();
       if (errors.length) {
-        props.handleError(errors);
-        setResult(
+        props.handleErrors(errors);
+        setResult('error');
+      } else {
+        setResult('ready');
+      }
+    } catch (error) {
+      props.handleErrors([error], true);
+      setResult('error');
+    }
+  };
+
+  const renderResult = () => {
+    switch (result) {
+      case 'loading':
+        return (
           <span>
-            <EuiIcon type="alert" color="danger"></EuiIcon> Error
+            <EuiLoadingSpinner size="m" /> Checking...
           </span>
         );
-      } else {
-        setResult(
+      case 'disabled':
+        return <span>Disabled</span>;
+      case 'ready':
+        return (
           <span>
             <EuiIcon type="check" color="secondary"></EuiIcon> Ready
           </span>
         );
-      }
-    } catch (error) {
-      props.handleError(error);
-      setResult(
-        <span>
-          <EuiIcon type="alert" color="danger"></EuiIcon> Error
-        </span>
-      );
+      case 'error':
+        return (
+          <span>
+            <EuiIcon type="alert" color="danger"></EuiIcon> Error
+          </span>
+        );
     }
   };
 
   return (
-    <Fragment>
+    <>
       <EuiDescriptionListTitle>{props.title}</EuiDescriptionListTitle>
-      <EuiDescriptionListDescription>
-        {isLoading && (
-          <span>
-            <EuiLoadingSpinner size="m" /> Checking...
-          </span>
-        )}
-        {!isLoading && <span>{result}</span>}
-      </EuiDescriptionListDescription>
-    </Fragment>
+      <EuiDescriptionListDescription>{renderResult()}</EuiDescriptionListDescription>
+    </>
   );
 }

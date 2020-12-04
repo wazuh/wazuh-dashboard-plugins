@@ -37,7 +37,7 @@ const genericReq = async (
     if (!method || !path) {
       throw new Error('Missing parameters');
     }
-    const configuration = (store.getState().appConfigReducer as AppConfigState).data;
+    const configuration = (store.getState().appConfig as AppConfigState).data;
     const timeout = configuration ? configuration.timeout : 20000;
     const url = getHttp().basePath.prepend(path);
     const options = {
