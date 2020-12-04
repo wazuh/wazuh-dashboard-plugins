@@ -304,7 +304,7 @@ class WzRulesetActionButtons extends Component {
         buttonType="empty"
         permissions={[
           {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}::upload_file`,
+            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
             resource: `file:path:/etc/${section}`,
           },
           {
