@@ -18,6 +18,9 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiButtonToggle,
+  EuiButtonGroup,
+  EuiFormRow,
+  EuiComboBox,
   EuiFieldText,
   EuiText,
   EuiCodeBlock,
@@ -34,6 +37,42 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 
+
+const architectureBottons = [
+  {
+    id: 'x86',
+    label: 'x86'
+  },
+  {
+    id: 'x64',
+    label: 'x64'
+  },
+  {
+    id: 'arm',
+    label: 'arm'
+  }
+];
+const architectureCentos5 = [
+  {
+    id: 'x86',
+    label: 'x86'
+  },
+  {
+    id: 'x64',
+    label: 'x64'
+  }
+];
+
+const versionBottonsCentos = [
+  {
+    id: 'centos5',
+    label: 'CentOS5'
+  },
+  {
+    id: 'centos6',
+    label: 'CentOS6 o superior'
+  }
+];
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
@@ -42,8 +81,13 @@ export class RegisterAgent extends Component {
     this.state = {
       status: 'incomplete',
       selectedOS: '',
+      selectedArchitecture: '',
+      selectedVersion: '',
+      version: '',
       serverAddress: '',
       wazuhPassword: '',
+      groups: [],
+      selectedGroup: [],
       udpProtocol: false
     };
     this.restartAgentCommand = {
@@ -72,14 +116,21 @@ export class RegisterAgent extends Component {
           hidePasswordInput = true;
         }
       }
+
+
       const udpProtocol = await this.getRemoteInfo();
+      const groups = await this.getGroups();
       this.setState({
         serverAddress,
         needsPassword,
         hidePasswordInput,
+        versionBottonsCentos,
+        architectureBottons,
+        architectureCentos5,
         wazuhPassword,
         udpProtocol,
         wazuhVersion,
+        groups,
         loading: false
       });
     } catch (error) {
@@ -125,18 +176,21 @@ export class RegisterAgent extends Component {
     this.setState({ serverAddress: event.target.value });
   }
 
-  setWazuhPassword(event) {
-    this.setState({ wazuhPassword: event.target.value });
+  setGroupName(selectedGroup) {
+    this.setState({ selectedGroup });
   }
 
-  /**
-   * Checks if the password is not needed, in that case remove the input password step
-   * @param {Array} steps
-   */
-  cleanSteps(steps) {
-    if (!this.state.needsPassword || this.state.hidePasswordInput)
-      steps.splice(2, 1);
-    return steps;
+  setArchitecture(selectedArchitecture) {
+    this.setState({ selectedArchitecture });
+  }
+
+  setVersion(selectedVersion) {
+    console.log("VERSION", selectedVersion)
+    this.setState({ selectedVersion });
+  }
+
+  setWazuhPassword(event) {
+    this.setState({ wazuhPassword: event.target.value });
   }
 
   obfuscatePassword(text) {
@@ -149,6 +203,63 @@ export class RegisterAgent extends Component {
       text = text.replace(password, obfuscate);
     }
     return text;
+  }
+
+  async getGroups() {
+    try {
+      const result = await WzRequest.apiReq(
+        'GET',
+        '/groups',
+        {}
+      );
+      return result.data.data.affected_items.map(item =>
+        ({ label: item.name, id: item.name })
+      )
+    } catch (error) {
+      return [];
+    }
+  }
+
+  optionalDeploymentVariables() {
+    let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
+      ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
+      : ''
+      }${this.state.udpProtocol
+        ? " WAZUH_PROTOCOL='UDP'"
+        : ''
+      }${this.state.selectedGroup.length ? `WAZUH_AGENT_GROUP='${this.state.selectedGroup.map(item => item.label).join(',')}' ` : ''}`
+    return deployment;
+  }
+
+  optionalPackets() {
+
+    let ret = `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+    if ((this.state.selectedVersion == 'centos5' && this.state.selectedArchitecture == 'x86')) {
+      ret = `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`
+      return ret;
+    } else if (this.state.selectedVersion == 'centos5' && this.state.selectedArchitecture == 'x64') {
+      ret = `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`
+      return ret;
+    } else if (this.state.selectedVersion == 'centos6' && this.state.selectedArchitecture == 'x86') {
+      ret = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`
+      return ret;
+    } else if (this.state.selectedVersion == 'centos6' && this.state.selectedArchitecture == 'x64') {
+      ret = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`
+      return ret;
+    } else if (this.state.selectedVersion == 'centos6' && this.state.selectedArchitecture == 'arm') {
+      ret = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7h.rpm`
+      return ret;
+    } else if (this.state.selectedOS == 'deb' && this.state.selectedArchitecture == 'x86') {
+      ret = `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_i386.deb`
+      return ret;
+    } else if (this.state.selectedOS == 'deb' && this.state.selectedArchitecture == 'x64') {
+      ret = `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_arm64.deb`
+      return ret;
+    } else if (this.state.selectedOS == 'deb' && this.state.selectedArchitecture == 'arm') {
+      ret = `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`
+      return ret;
+    }
+    return ret;
   }
 
   render() {
@@ -197,6 +308,24 @@ export class RegisterAgent extends Component {
       </EuiText>
     );
 
+    const groupInput = (
+      <EuiText>
+        <p>
+          You can predefine the group where you want to enroll the agent.
+        </p>
+        <EuiComboBox
+          placeholder="Select agent group"
+          options={this.state.groups}
+          selectedOptions={this.state.selectedGroup}
+          onChange={group => {
+            this.setGroupName(group);
+          }}
+          isClearable={true}
+          data-test-subj="demoComboBox"
+        />
+      </EuiText>
+    );
+
     const passwordInput = (
       <EuiFieldText
         placeholder="Wazuh password..."
@@ -209,54 +338,12 @@ export class RegisterAgent extends Component {
       zIndex: '100'
     };
     const customTexts = {
-      rpmText: `sudo WAZUH_MANAGER='${this.state.serverAddress}'${
-        this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
-          : ''
-        }${
-        this.state.udpProtocol
-          ? " WAZUH_PROTOCOL='UDP'"
-          : ''
-        } yum install https://packages.wazuh.com/4.x/yum/wazuh-agent-${
-        this.state.wazuhVersion
-        }-1.x86_64.rpm`,
-      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${
-        this.state.wazuhVersion
-        }-1_amd64.deb && sudo WAZUH_MANAGER='${this.state.serverAddress}'${
-        this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
-          : ''
-        }${
-        this.state.udpProtocol
-          ? " WAZUH_PROTOCOL='UDP'"
-          : ''
-        } dpkg -i ./wazuh-agent.deb`,
-      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
-        this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv WAZUH_MANAGER '${
-        this.state.serverAddress
-        }'${
-        this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD '${this.state.wazuhPassword}'`
-          : ''
-        }${
-        this.state.udpProtocol
-          ? " WAZUH_PROTOCOL 'UDP'"
-          : ''
-        } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
-      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
-        this.state.wazuhVersion
-        }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q WAZUH_MANAGER='${
-        this.state.serverAddress
-        }' WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}'${
-        this.state.needsPassword
-          ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
-          : ''
-        }${
-        this.state.udpProtocol
-          ? " WAZUH_PROTOCOL='UDP'"
-          : ''
-        }`
+      rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackets()}`,
+      debText: `curl -so wazuh-agent.deb ${this.optionalPackets()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent.deb`,
+      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
+        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()} sudo installer -pkg ./wazuh-agent.pkg -target /`,
+      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
+        }-1.msi -OutFile wazuh-agent.msi; ./wazuh-agent.msi /q ${this.optionalDeploymentVariables()}`
     };
 
     const field = `${this.state.selectedOS}Text`;
@@ -296,7 +383,7 @@ export class RegisterAgent extends Component {
         )}
       </div>
     );
-
+    console.log("VERSIONAFADF", this.state.selectedVersion)
     const steps = [
       {
         title: 'Choose OS',
@@ -306,13 +393,44 @@ export class RegisterAgent extends Component {
           </Fragment>
         )
       },
+      ...((this.state.selectedOS == 'rpm') ? [{
+        title: 'Choose your CentOS version',
+        children: <Fragment><EuiButtonGroup
+          color='primary'
+          options={versionBottonsCentos}
+          idSelected={this.state.selectedVersion}
+          onChange={version => this.setVersion(version)}
+        /></Fragment>
+      }] : []),
+      ...((this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5') ? [{
+        title: 'Choose your architecture',
+        children: <Fragment><EuiButtonGroup
+          color='primary'
+          options={this.state.architectureCentos5}
+          idSelected={this.state.selectedArchitecture}
+          onChange={architecture => this.setArchitecture(architecture)}
+        /></Fragment>
+      }] : []),
+      ...((this.state.selectedOS == 'deb' || (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')) ? [{
+        title: 'Choose your architecture',
+        children: <Fragment><EuiButtonGroup
+          color='primary'
+          options={this.state.architectureBottons}
+          idSelected={this.state.selectedArchitecture}
+          onChange={architecture => this.setArchitecture(architecture)}
+        /></Fragment>
+      }] : []),
       {
         title: 'Wazuh server address',
         children: <Fragment>{ipInput}</Fragment>
       },
-      {
+      ...(!(!this.state.needsPassword || this.state.hidePasswordInput) ? [{
         title: 'Wazuh password',
         children: <Fragment>{passwordInput}</Fragment>
+      }] : []),
+      {
+        title: 'Assign the agent to a group',
+        children: <Fragment>{groupInput}</Fragment>
       },
       {
         title: 'Install and enroll the agent',
@@ -393,7 +511,7 @@ export class RegisterAgent extends Component {
                   )}
                   {!this.state.loading && (
                     <EuiFlexItem>
-                      <EuiSteps steps={this.cleanSteps(steps)} />
+                      <EuiSteps steps={steps} />
                     </EuiFlexItem>
                   )}
                 </EuiPanel>
