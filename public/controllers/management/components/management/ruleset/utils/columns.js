@@ -270,7 +270,7 @@ export default class RulesetColumns {
               resource: `node:id:*`,
             },
             {
-              action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read`,
+              action: `${((this.tableProps || {}).clusterStatus || {}).contextConfigServer}:read_file`,
               resource: `node:id:*&file:path:*`,
             }
           );

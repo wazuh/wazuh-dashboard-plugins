@@ -266,7 +266,6 @@ const wazuhPermissions = {
     "description": "Read Wazuh's cluster configuration",
     "resources": [
       "node:id",
-      "node:id:*&file:path:*"
     ],
     "example": {
       "actions": [
@@ -383,7 +382,8 @@ const wazuhPermissions = {
     "description": "Read Wazuh's cluster files",
     "resources": [
       "node:id",
-      "file:path"
+      "file:path",
+      "node:id:*&file:path:*",
     ],
     "example": {
       "actions": [
@@ -403,7 +403,8 @@ const wazuhPermissions = {
     "description": "Delete Wazuh's cluster files",
     "resources": [
       "node:id",
-      "file:path"
+      "file:path",
+      "node:id:*&file:path:*",
     ],
     "example": {
       "actions": [
@@ -974,9 +975,6 @@ export class WzUserPermissions{
           )
         : undefined;
 
-      userPartialResources =
-        (userPartialResources || []).length > 0 ? userPartialResources : undefined;
-
       if(userPermissions.rbac_mode === RBAC_MODE_BLACK){
         // API RBAC mode = 'black'
         if(!userPermissions[actionName]){ return false };
@@ -985,14 +983,29 @@ export class WzUserPermissions{
         : userPartialResources ? userPartialResources.some(resource => !isAllow(userPermissions[actionName][resource]))
         : wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
         : false
-      }else{
+      } else {
         // API RBAC mode = 'white'
-        if(!userPermissions[actionName]){ return true };
-        return userPermissions[actionName][actionResource] ? !isAllow(userPermissions[actionName][actionResource])
-          : userPermissions[actionName][actionResourceAll] ? !isAllow(userPermissions[actionName][actionResourceAll])
-          : userPartialResources ? userPartialResources.some(resource => !isAllow(userPermissions[actionName][resource]))
-          : wazuhPermissions[actionName].resources.find(resource => resource === RESOURCE_ANY_SHORT) && userPermissions[actionName][RESOURCE_ANY] ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
-          : true
+        if (!userPermissions[actionName]) {
+          return true;
+        }
+
+        return userPermissions[actionName][actionResource]
+          ? !isAllow(userPermissions[actionName][actionResource])
+          : Object.keys(userPermissions[actionName]).some((resource) => {
+              return resource.match(actionResourceAll.replace('*', '\\*')) !== null;
+            })
+          ? Object.keys(userPermissions[actionName]).some((resource) => {
+              if (resource.match(actionResourceAll.replace('*', '\\*'))) {
+                return !isAllow(userPermissions[actionName][resource]);
+              }
+            })
+          : userPartialResources?.length
+          ? userPartialResources.some((resource) => !isAllow(userPermissions[actionName][resource]))
+          : wazuhPermissions[actionName].resources.find(
+              (resource) => resource === RESOURCE_ANY_SHORT
+            ) && userPermissions[actionName][RESOURCE_ANY]
+          ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
+          : true;
       }
     });
 

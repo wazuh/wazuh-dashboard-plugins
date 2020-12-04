@@ -256,7 +256,7 @@ class WzRulesetTable extends Component {
                 resource: `node:id:*`,
               },
               {
-                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
+                action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
                 resource: `node:id:*&file:path:*`,
               }
             );

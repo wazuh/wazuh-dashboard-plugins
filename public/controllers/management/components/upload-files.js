@@ -248,19 +248,33 @@ export class UploadFiles extends Component {
     });
   }
   render() {
+    const getPermissionsImportFiles = () => {
+      const permissions = [
+        {
+          action: 'cluster:status',
+          resource: `*:*:*`,
+        },
+      ];
+
+      if (((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster') {
+        permissions.push({
+          action: 'cluster:upload_file',
+          resource: `node:id:*`,
+        });
+      } else {
+        permissions.push({
+          action: 'manager:upload_file',
+          resource: `file:path:/etc/${this.props.msg}`,
+        });
+      }
+
+      return permissions;
+    };
+
     const button = (
       <WzButtonPermissions
-        buttonType='empty'
-        permissions={[
-          {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
-            resource: `file:path:/etc/${this.props.msg}`,
-          },
-          {
-            action: `cluster:status`,
-            resource: `*:*:*`,
-          },
-        ]}
+        buttonType="empty"
+        permissions={getPermissionsImportFiles()}
         iconType="importAction"
         iconSide="left"
         onClick={() => this.onButtonClick()}
