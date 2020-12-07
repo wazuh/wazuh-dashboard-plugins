@@ -40,8 +40,10 @@ import { NodeMenu } from './node-menu';
 import { SuricataTable } from './Suricata/suricata-table';
 import { StapTables } from './SoftwareTAP/stap-tables';
 import { ZeekTable } from './Zeek/zeek-table';
+// import { WazuhTable } from './Wazuh/wazuh-table';
+import { WazuhTable } from './Wazuh/wazuh-table';
 import { AnalyzerTable } from './Analyzer/analyzer-table';
-import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek, PingAnalyzer } from '../../../redux/actions/nidsActions';
+import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek, PingAnalyzer, PingWazuhFiles } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -56,6 +58,7 @@ export const NodeDetails = withReduxProvider(() => {
     dispatch(loadRuleset())
     dispatch(PingZeek(nodeDetail.uuid))
     dispatch(PingAnalyzer(nodeDetail.uuid))
+    dispatch(PingWazuhFiles(nodeDetail.uuid))
   }, []);
   
   return (
@@ -65,6 +68,7 @@ export const NodeDetails = withReduxProvider(() => {
             {nodeTab === "overview" ? <p>Overview</p> : null} 
             {nodeTab === "suricata" ? <SuricataTable></SuricataTable> : null}
             {nodeTab === "zeek" ? <ZeekTable></ZeekTable> : null}
+            {nodeTab === "output" ? <WazuhTable></WazuhTable> : null}
             {nodeTab === "stap" ? <StapTables></StapTables> : null}
             {nodeTab === "analyzer" ? <AnalyzerTable></AnalyzerTable> : null} 
         </EuiPage>

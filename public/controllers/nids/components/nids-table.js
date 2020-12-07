@@ -250,13 +250,13 @@ export const NidsTable = withReduxProvider(() => {
   
   return (
     <div>
-      {searchNodes()}
       
       { addNodeForm==true ? <NidsAddNode /> : null }    
 
       <EuiSpacer size="m" />
       <EuiPanel paddingSize="m">
         {title}
+        {searchNodes()}
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiBasicTable

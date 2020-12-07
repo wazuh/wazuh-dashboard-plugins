@@ -413,6 +413,34 @@ export class WazuhNidsCtrl {
     }
   }
 
+  async PingWazuhFiles(req, reply) {
+
+    try {
+      const data = await this.manageNidsHosts.PingWazuhFiles(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async deleteWazuhFile(req, reply) {
+
+    try {
+      const data = await this.manageNidsHosts.deleteWazuhFile(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
   async loadLines(req, reply) {
     try {
       const data = await this.manageNidsHosts.loadLines(req.payload);      

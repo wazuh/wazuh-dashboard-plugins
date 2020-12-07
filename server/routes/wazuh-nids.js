@@ -68,12 +68,29 @@ export async function WazuhNidsRoutes(server) {
     }
   });
 
-  // Delete specific node
+  
   server.route({
     method: 'GET',
     path: '/nids/groups',
     handler(req, reply) {
       return ctrl.getGroups(req, reply);
+    }
+  });
+
+  
+  server.route({
+    method: 'DELETE',
+    path: '/nids/deleteWazuhFile',
+    handler(req, reply) {
+      return ctrl.deleteWazuhFile(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/nids/pingWazuhFiles',
+    handler(req, reply) {
+      return ctrl.PingWazuhFiles(req, reply);
     }
   });
 

@@ -7,6 +7,8 @@ export function getAllNodes() {
   }
 }
 function accGetAllNodes(nodes) {
+  console.log("accGetAllNodes");
+  console.log(nodes);
   return {
     type: 'NODES',
     payload: nodes
@@ -347,11 +349,44 @@ export function LoadFileLastLines(data) {
       data:data
     }
     const values = await NidsRequest.genericReq('PUT', '/nids/wazuh/loadLines', params)
-    console.log(values.data.data);
+    
     dispatch(IsLoadingData(false))
     dispatch(accGetFile({fileContent: values.data.data.result}))
   }
 }
+
+export function deleteWazuhFile(data) {
+  return async (dispatch) => {
+    var params = {
+      method: "DELETE",
+      path: '/node/deleteWazuhFile',
+      data:data
+    }
+    const values = await NidsRequest.genericReq('DELETE', '/nids/deleteWazuhFile', params)
+    
+    dispatch(IsLoadingData(false))
+    dispatch(PingWazuhFiles(data.uuid))
+    
+  }
+}
+
+export function PingWazuhFiles(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "GET",      
+      path: `/node/pingWazuhFiles/${uuid}`
+    }
+   
+    const data = await NidsRequest.genericReq('PUT', '/nids/pingWazuhFiles', params);
+    dispatch(accWazuhFiles(data.data.data))
+  }
+}
+function accWazuhFiles(data) {
+  return {
+    type: 'WAZUH_FILES',
+    payload: data
+  }
+};
 
 export const saveZeekDiag = value => {
   return {

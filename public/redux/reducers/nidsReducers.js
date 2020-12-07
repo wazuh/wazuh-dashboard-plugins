@@ -25,9 +25,18 @@ const initialState = {
     zeekDiag: {},
     fileContent: {},
     analyzer: {},
+    wazuhFiles: {},
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'WAZUH_FILES') {
+        console.log("WAZUH_FILES");
+        console.log(action.payload);
+        return {
+          ...state,
+          wazuhFiles: action.payload
+        };
+      }  
       if (action.type === 'ANALYZER') {
         return {
           ...state,

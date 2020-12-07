@@ -821,7 +821,57 @@ export class ManageNidsHosts {
 
     const response = await axios(options);
 
-    console.log(response.data); 
+    return response.data
+  }
+
+  async deleteWazuhFile(req) {
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: req.method,
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}${req.path}`,
+      data: JSON.stringify(req.data)
+    };
+
+    const response = await axios(options);
+
+    return response.data
+  }
+
+  async PingWazuhFiles(req) {
+    console.log(req);
+    //check credentials
+    if((NIDStoken == "" || NIDStoken == null) || (NIDSuser == "" || NIDSuser == null)){
+      await this.getNidsCredentials()
+    }
+
+    //get active master and basic url
+    const url = this.getActiveMasterURL()
+
+    const options = {
+      method: req.method,
+      headers: {
+        'content-type': 'application/json',
+        'token': NIDStoken,
+        'user': NIDSuser
+      },
+      url: `${url}${req.path}`,
+    };
+
+    const response = await axios(options);
+
+    console.log(response.data);
 
     return response.data
   }

@@ -70,6 +70,11 @@ export const NodeMenu = withReduxProvider(() => {
 				text: 'Zeek',
 				isPin: true,
 			},
+			ovw: {
+				id: 'output',
+				text: 'Output',
+				isPin: true,
+			},
 			st: {
 				id: 'stap',
 				text: 'Traffic Management - STAP',
