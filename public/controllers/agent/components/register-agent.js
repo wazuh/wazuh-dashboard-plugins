@@ -58,12 +58,12 @@ const architectureBottons = [
 ];
 const architectureCentos5 = [
   {
-    id: 'x86_64',
-    label: 'x86_64'
-  },
-  {
     id: 'i386',
     label: 'i386'
+  },
+  {
+    id: 'x86_64',
+    label: 'x86_64'
   }
 ];
 
@@ -224,7 +224,7 @@ export class RegisterAgent extends Component {
   }
 
   optionalDeploymentVariables() {
-    let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
+    const deployment = `WAZUH_MANAGER='${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
       ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
       : ''
       }${this.state.udpProtocol
@@ -234,41 +234,45 @@ export class RegisterAgent extends Component {
     return deployment;
   }
 
-  optionalPackets() {
-    let ret = `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;;
-
-    if (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5' && this.state.selectedArchitecture == 'i386') {
-      ret = `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`
-      return ret;
-    } else if (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5' && this.state.selectedArchitecture == 'x86_64') {
-      ret = `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`
-      return ret;
-    } else if (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' && this.state.selectedArchitecture == 'i386') {
-      ret = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`
-      return ret;
-    } else if (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' && this.state.selectedArchitecture == 'aarch64') {
-      ret = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`
-      return ret;
-    } else if (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' && this.state.selectedArchitecture == 'x86_64') {
-      ret = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
-      return ret;
-    } else if (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' && this.state.selectedArchitecture == 'armhf') {
-      ret = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7h.rpm`
-      return ret;
-    } else if (this.state.selectedOS == 'deb' && this.state.selectedArchitecture == 'i386') {
-      ret = `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_i386.deb`
-      return ret;
-    } else if (this.state.selectedOS == 'deb' && this.state.selectedArchitecture == 'aarch64') {
-      ret = `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_arm64.deb`
-      return ret;
-    } else if (this.state.selectedOS == 'deb' && this.state.selectedArchitecture == 'armhf') {
-      ret = `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`
-      return ret;
-    } else if (this.state.selectedOS == 'deb' && this.state.selectedArchitecture == 'x86_64') {
-      ret = `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`
-      return ret;
+  resolveRPMPackage() {
+    switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      case 'centos5-i386':
+        return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`
+      case 'centos5-x86_64':
+        return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`
+      case 'centos6-i386':
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`
+      case 'centos6-aarch64':
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`
+      case 'centos6-x86_64':
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
+      case 'centos6-armhf':
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7h.rpm`
     }
-    return ret;
+  }
+
+  resolveDEBPackage() {
+    switch (`${this.state.selectedArchitecture}`) {
+      case 'i386':
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_i386.deb`
+      case 'aarch64':
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_arm64.deb`
+      case 'armhf':
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`
+      case 'x86_64':
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`
+    }
+  }
+
+  optionalPackages() {
+    switch (this.state.selectedOS) {
+      case 'rpm':
+        return this.resolveRPMPackage();
+      case 'deb':
+        return this.resolveDEBPackage();
+      default:
+        return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+    }
   }
 
   render() {
@@ -347,8 +351,8 @@ export class RegisterAgent extends Component {
       zIndex: '100'
     };
     const customTexts = {
-      rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackets()}`,
-      debText: `curl -so wazuh-agent.deb ${this.optionalPackets()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent.deb`,
+      rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
+      debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
         }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
