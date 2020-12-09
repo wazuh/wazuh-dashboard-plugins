@@ -81,6 +81,13 @@ export function SyscollectorTable({ tableParams }) {
       return `(${data.total_affected_items})`;
   }
 
+  const downloadCsv = async () => {
+    await AppState.downloadCsv(
+      tableParams.path,
+      tableParams.exportFormatted,
+      !!params.search ? [{ name: 'search', value: params.search }] : []
+    )
+  }
 
   return (
     <EuiPanel paddingSize="m" style={{ margin: '12px 16px 12px 16px' }}>
@@ -121,13 +128,7 @@ export function SyscollectorTable({ tableParams }) {
           <EuiFlexItem grow={true} />
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-              onClick={async () =>
-                await AppState.downloadCsv(
-                  tableParams.path,
-                  tableParams.exportFormatted,
-                  !!params.search ? [{ name: 'search', value: params.search }] : []
-                )
-              }
+              onClick={downloadCsv}
               iconType="importAction"
             >
               Download CSV
