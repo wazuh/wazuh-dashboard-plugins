@@ -1,5 +1,52 @@
 export const KnownFields = [
   {
+    "name": "_id",
+    "type": "string",
+    "esTypes": [
+      "_id"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_index",
+    "type": "string",
+    "esTypes": [
+      "_index"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_score",
+    "type": "number",
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_source",
+    "type": "_source",
+    "esTypes": [
+      "_source"
+    ],
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_type",
+    "type": "string",
+    "esTypes": [
+    "_type"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
     "name": "@timestamp",
     "type": "date",
     "esTypes": [
