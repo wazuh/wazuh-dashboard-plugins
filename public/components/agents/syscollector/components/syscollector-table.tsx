@@ -36,7 +36,7 @@ export function SyscollectorTable({ tableParams }) {
   };
 
   const buildColumns = () => {
-    const columns = (tableParams.columns || []).map(item => {
+    return (tableParams.columns || []).map(item => {
       return {
         field: item.id,
         name: KeyEquivalence[item.id] || item.id,
@@ -44,7 +44,6 @@ export function SyscollectorTable({ tableParams }) {
         width: item.width || undefined,
       };
     });
-    return columns ? columns : [];
   };
 
   const columns = buildColumns();
