@@ -1,8 +1,8 @@
 import React, {  useState } from "react";
 import {EuiPanel, EuiFlexGroup, EuiFlexItem, EuiText, EuiLoadingSpinner, EuiIcon} from "@elastic/eui";
+import mapValues from 'lodash';
 import {useGenericRequest} from '../../../common/hooks/useGenericRequest';
 import { TimeService } from '../../../../react-services/time-service';
-
 
 export function InventoryMetrics({agent}) {
     const [params, setParams] = useState({});
@@ -14,13 +14,18 @@ export function InventoryMetrics({agent}) {
         }
       }
     const syscollector = useGenericRequest('GET', `/api/syscollector/${agent.id}`, params, (result) => {return (result || {}).data || {};});
-    
-    if(!syscollector.isLoading && (!syscollector.data.hardware || !syscollector.data.os)){
-        return <EuiPanel paddingSize="s" style={{margin: 16, textAlign: "center"}}>
-           <EuiIcon type="iInCircle" /> Not enough hardware or operating system information
-        </EuiPanel>
-    }
-    
+
+  if (
+    !syscollector.isLoading &&
+    (mapValues.isEmpty(syscollector.data.hardware) || mapValues.isEmpty(syscollector.data.os))
+  ) {
+    return (
+      <EuiPanel paddingSize="s" style={{ margin: 16, textAlign: 'center' }}>
+        <EuiIcon type="iInCircle" /> Not enough hardware or operating system information
+      </EuiPanel>
+    );
+  }
+
     return (
         <EuiPanel paddingSize="s" style={{margin: 16}}>
             <EuiFlexGroup>
@@ -45,6 +50,6 @@ export function InventoryMetrics({agent}) {
             </EuiFlexGroup>
         </EuiPanel>
         );
-    
-    
+
+
 }

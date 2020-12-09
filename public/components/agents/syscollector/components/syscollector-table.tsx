@@ -36,16 +36,16 @@ export function SyscollectorTable({ tableParams }) {
   };
 
   const buildColumns = () => {
-    const columns = tableParams.columns.map(item => {
+    const columns = (tableParams.columns || []).map(item => {
       return {
         field: item.id,
         name: KeyEquivalence[item.id] || item.id,
         sortable: typeof item.sortable !== 'undefined' ? item.sortable : true,
         width: item.width || undefined,
-      }
+      };
     });
-    return columns;
-  }
+    return columns ? columns : [];
+  };
 
   const columns = buildColumns();
 
@@ -117,19 +117,25 @@ export function SyscollectorTable({ tableParams }) {
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      {tableParams.exportFormatted &&
-        <EuiFlexGroup >
-          <EuiFlexItem grow={true} > </EuiFlexItem>
-          <EuiFlexItem grow={false} >
+      {tableParams.exportFormatted && tableParams.columns && (
+        <EuiFlexGroup>
+          <EuiFlexItem grow={true} />
+          <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-              onClick={async () => await AppState.downloadCsv(tableParams.path, tableParams.exportFormatted, !!params.search ? [{ name: 'search', value: params.search }] : [])}
-              iconType="importAction">
+              onClick={async () =>
+                await AppState.downloadCsv(
+                  tableParams.path,
+                  tableParams.exportFormatted,
+                  !!params.search ? [{ name: 'search', value: params.search }] : []
+                )
+              }
+              iconType="importAction"
+            >
               Download CSV
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
-      }
-
+      )}
     </EuiPanel>
   );
 }
