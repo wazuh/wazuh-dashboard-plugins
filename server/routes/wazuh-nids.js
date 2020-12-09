@@ -77,6 +77,45 @@ export async function WazuhNidsRoutes(server) {
     }
   });
 
+  server.route({
+    method: 'put',
+    path: '/nids/SaveCurrentContent',
+    handler(req, reply) {
+      return ctrl.SaveCurrentContent(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'put',
+    path: '/nids/PingWazuh',
+    handler(req, reply) {
+      return ctrl.PingWazuh(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'put',
+    path: '/nids/RunWazuh',
+    handler(req, reply) {
+      return ctrl.RunWazuh(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'put',
+    path: '/nids/StopWazuh',
+    handler(req, reply) {
+      return ctrl.StopWazuh(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'put',
+    path: '/nids/addWazuhFile',
+    handler(req, reply) {
+      return ctrl.addWazuhFile(req, reply);
+    }
+  });
   
   server.route({
     method: 'DELETE',

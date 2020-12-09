@@ -13,6 +13,7 @@ const initialState = {
     editPlugin: {},
     addNodeForm: false,
     toggleSuricata: false,
+    toggleAddWazuhFile: false,
     loadingData: false,
     showSocNet: '',
     showSocPcap: '',
@@ -26,12 +27,23 @@ const initialState = {
     fileContent: {},
     analyzer: {},
     wazuhFiles: {},
+    wazuhData: {},
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'PING_WAZUH') {
+        return {
+          ...state,
+          wazuhData: action.payload
+        };
+      }  
+      if (action.type === 'ADD_WAZUH_FILE') {
+        return {
+          ...state,
+          toggleAddWazuhFile: action.payload
+        };
+      }  
       if (action.type === 'WAZUH_FILES') {
-        console.log("WAZUH_FILES");
-        console.log(action.payload);
         return {
           ...state,
           wazuhFiles: action.payload

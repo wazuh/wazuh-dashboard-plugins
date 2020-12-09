@@ -29,7 +29,7 @@ import {
 } from '@elastic/eui';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { IsLoadingData, getFile, NidsSaveFile, LoadFileLastLines } from '../../../redux/actions/nidsActions';
+import { IsLoadingData, getFile, NidsSaveFile, LoadFileLastLines, SaveCurrentContent } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { arrayAuthAnswer } from '../../../../server/lib/generate-alerts/sample-data/gcp';
@@ -45,7 +45,7 @@ export const NidsFiles = withReduxProvider(() => {
 	const title = headRender();
 
 	useEffect(() => {		
-		if(file.type=="alerts.json"){
+		if(file.type=="alerts.json" || file.type=="ossec.conf" || file.type.includes("Wazuh file")){
 			dispatch(IsLoadingData(true))
 			dispatch(LoadFileLastLines({ uuid:nodeDetail.uuid, number:file.lines, path:file.path }))
 		}else{
@@ -76,16 +76,29 @@ export const NidsFiles = withReduxProvider(() => {
 
 
 					{
-						file.type != "alerts.json"
+						file.type != "alerts.json" || file.type != "ossec.conf"
 						?
-						<EuiFlexItem grow={false}>
-							<EuiButtonEmpty iconType="save" onClick={ev => {
-								dispatch(NidsSaveFile({ uuid: nodeDetail.uuid, file: file.type, content: newFileContent }))
-								AppNavigate.navigateToModule(ev, 'node', {})
-							}}>
-								Save
-							</EuiButtonEmpty>
-						</EuiFlexItem>
+						(
+							file.type === "ossec.conf"
+							?
+							<EuiFlexItem grow={false}>
+								<EuiButtonEmpty iconType="save" onClick={ev => {
+									dispatch(SaveCurrentContent({ uuid: nodeDetail.uuid, path: file.path, content: newFileContent }))
+									AppNavigate.navigateToModule(ev, 'node', {})
+								}}>
+									Save
+								</EuiButtonEmpty>
+							</EuiFlexItem>
+							:
+							<EuiFlexItem grow={false}>
+								<EuiButtonEmpty iconType="save" onClick={ev => {
+									dispatch(NidsSaveFile({ uuid: nodeDetail.uuid, file: file.type, content: newFileContent }))
+									AppNavigate.navigateToModule(ev, 'node', {})
+								}}>
+									Save
+								</EuiButtonEmpty>
+							</EuiFlexItem>
+						)
 						:
 						null
 					}

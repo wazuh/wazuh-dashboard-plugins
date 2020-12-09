@@ -57,6 +57,16 @@ export function stopStapService(stap) {
   }
 }
 
+export function SaveCurrentContent(fileData) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",
+      path: '/node/wazuh/saveFileContentWazuh',
+      data: fileData
+    }
+    const values = await NidsRequest.genericReq('PUT', '/nids/SaveCurrentContent', params);
+  }
+}
 
 export function NidsSaveFile(fileData) {
   return async (dispatch) => {
@@ -68,6 +78,19 @@ export function NidsSaveFile(fileData) {
     const values = await NidsRequest.genericReq('PUT', '/nids/saveNidsFile', { params });
   }
 }
+
+// export function ReloadFilesData(uuid) {
+//   return async (dispatch) => {
+//     var params = {
+//       method: "GET",
+//       path: `/node/reloadFilesData/${uuid}`
+//     }
+//     const zeek = await NidsRequest.genericReq('PUT', '/nids/zeek', params);
+//     dispatch(IsLoadingData(false))
+//     dispatch(IsLoadingData(false))
+
+//   }
+// }
 
 export function PingZeek(uuid) {
   return async (dispatch) => {
@@ -172,6 +195,8 @@ export function PingAnalyzer(uuid) {
     }
    
     const data = await NidsRequest.genericReq('PUT', '/nids/pingAnalyzer', params);
+    console.log("data.data.data");
+    console.log(data.data.data);
     dispatch(accAnalyzer(data.data.data))
   }
 }
@@ -328,6 +353,23 @@ export function PingPluginsNode(uuid) {
   }
 }
 
+export function PingWazuh(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "GET",
+      path: '/node/wazuh/' + uuid,
+    }
+    const values = await NidsRequest.genericReq('PUT', '/nids/PingWazuh', params)
+    dispatch(accPingWwazuh(values.data.data))
+  }
+}
+export const accPingWwazuh = value => {
+  return {
+    type: 'PING_WAZUH',
+    payload: value
+  };
+};
+
 export function ZeekDiag(uuid) {
   return async (dispatch) => {
     var params = {
@@ -340,6 +382,43 @@ export function ZeekDiag(uuid) {
   }
 }
 
+export function RunWazuh(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",
+      path: '/node/RunWazuh/' + uuid
+    }
+    const values = await NidsRequest.genericReq('PUT', '/nids/RunWazuh', params)
+    dispatch(IsLoadingData(false))
+    dispatch(PingWazuh(uuid))
+  }
+}
+
+export function StopWazuh(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",
+      path: '/node/StopWazuh/' + uuid
+    }
+    const values = await NidsRequest.genericReq('PUT', '/nids/StopWazuh', params)
+    dispatch(IsLoadingData(false))
+    dispatch(PingWazuh(uuid))
+  }
+}
+
+export function addWazuhFile(data) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",
+      path: '/node/addWazuhFile',
+      data:data
+    }
+    const values = await NidsRequest.genericReq('PUT', '/nids/addWazuhFile', params)
+    
+    dispatch(IsLoadingData(false))
+    dispatch(PingWazuhFiles(data.uuid))
+  }
+}
 
 export function LoadFileLastLines(data) {
   return async (dispatch) => {
@@ -419,6 +498,13 @@ export const NidsShowFile = value => {
 export const toggleAddNodeMenu = value => {
   return {
     type: 'ADD_NODE',
+    payload: value
+  };
+};
+
+export const toggleWazuhFile = value => {
+  return {
+    type: 'ADD_WAZUH_FILE',
     payload: value
   };
 };

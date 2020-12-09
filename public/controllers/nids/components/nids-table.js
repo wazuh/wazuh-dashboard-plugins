@@ -74,6 +74,9 @@ export const NidsTable = withReduxProvider(() => {
   useEffect(() => { 
     var nids = []
     const formatedNodes = (nodes || []).map(node => {
+      // if(node.status == "online"){
+      //   <EuiHealth color='success'><h5>OFF</h5></EuiHealth>
+      // }
       nids.push(formatNode(node))
     });      
     //save nodes formated into array

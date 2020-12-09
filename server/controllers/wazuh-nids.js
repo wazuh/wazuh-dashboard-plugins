@@ -414,7 +414,6 @@ export class WazuhNidsCtrl {
   }
 
   async PingWazuhFiles(req, reply) {
-
     try {
       const data = await this.manageNidsHosts.PingWazuhFiles(req.payload);      
       return {
@@ -427,8 +426,72 @@ export class WazuhNidsCtrl {
     }
   }
 
-  async deleteWazuhFile(req, reply) {
+  async StopWazuh(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.StopWazuh(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
 
+  async RunWazuh(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.RunWazuh(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async PingWazuh(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.PingWazuh(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async addWazuhFile(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.addWazuhFile(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async SaveCurrentContent(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.SaveCurrentContent(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async deleteWazuhFile(req, reply) {
     try {
       const data = await this.manageNidsHosts.deleteWazuhFile(req.payload);      
       return {

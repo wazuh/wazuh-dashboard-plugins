@@ -39,10 +39,7 @@ export const AnalyzerTable = () => {
 
   const [plugin, setPlugin] = useState([])
 
-  useEffect(() => {
-    console.log("init");
-    console.log(analyzer);
-
+  useEffect(() => {    
     if (analyzer.status == "Enabled") { analyzer.currentStatus = "ON" }
     if (analyzer.status == "Disabled") { analyzer.currentStatus = "OFF" }
 
@@ -56,9 +53,6 @@ export const AnalyzerTable = () => {
   }, []);
 
   useEffect(() => {
-    console.log("init");
-    console.log(analyzer);
-
     if (analyzer.status == "Enabled") { analyzer.currentStatus = "ON" }
     if (analyzer.status == "Disabled") { analyzer.currentStatus = "OFF" }
 
