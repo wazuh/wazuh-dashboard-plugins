@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React hook for get Kibana plugin dependecies
+ * Wazuh app - React hook for app configs
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { AppDependencies } from '../types';
-import { useKibana } from '../../../../src/plugins/kibana_react/public';
+import { AppRootState } from '../../../redux/types';
+import { useSelector } from 'react-redux';
 
-export const useAppDeps = () => useKibana().services as AppDependencies;
+export const useAppConfig = () => {
+  const appConfig = useSelector((state: AppRootState) => state.appConfig);
+  return appConfig;
+}

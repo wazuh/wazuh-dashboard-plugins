@@ -1,0 +1,44 @@
+.wz-welcome-page .euiCard .euiTitle, .wz-module-body .euiCard .euiTitle {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.wz-welcome-page .euiCard .euiText, .wz-module-body .euiCard .euiText {
+    font-size: 12px;
+    font-family: sans-serif;
+}
+
+.wz-module-header-agent:not(.wz-module-header-agent-main){
+   background: white;
+   border-bottom: 1px solid #D3DAE6;
+}
+
+.wz-welcome-page-agent-info.wz-welcome-page-agent-info-gray{
+    border-top: 1px solid #d3dae6;
+    background: #fafbfd!important;
+    border-bottom: 1px solid #d3dae6;
+}
+
+.wz-welcome-page-agent-tabs{
+    padding: 12px 16px 1px 10px;
+    min-height: 54px;
+    border-bottom: 1px solid #D3DAE6;
+    background-color: white;
+}
+
+.wz-welcome-page-agent-info-actions{
+    padding: 6px 0px 6px 0px;
+}
+
+.wz-welcome-page-agent-info .euiStat .euiText{
+    font-size: 12px;
+    font-family: sans-serif;
+}
+
+.statWithLink:hover .euiTitle {
+    text-decoration: underline;
+}
+
+span.statWithLink:hover  {
+    text-decoration: underline;
+}

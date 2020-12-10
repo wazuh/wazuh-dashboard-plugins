@@ -10,8 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export class StringsTools {
-  constructor() {}
+export default {
   /**
    * Set the first letter to upper case
    *
@@ -19,9 +18,9 @@ export class StringsTools {
    * @returns capitalized str
    * @memberof StringsTools
    */
-  capitalize(str) {
+  capitalize: (str) => {
     return str[0].toUpperCase() + str.slice(1);
-  }
+  },
 
   /**
    * Remove all white spaces from str
@@ -30,12 +29,12 @@ export class StringsTools {
    * @returns striped str
    * @memberof StringsTools
    */
-  strip(str) {
+  strip: (str) => {
     return str.replace(/\s+/g, '');
-  }
+  },
 
-  toUpperCamelCase(str) {
-    const capitalizeStrs = str.split(' ').map(s => this.capitalize(s));
+  toUpperCamelCase: (str) => {
+    const capitalizeStrs = str.split(' ').map((s) => this.capitalize(s));
     return capitalizeStrs.join('');
-  }
-}
+  },
+};

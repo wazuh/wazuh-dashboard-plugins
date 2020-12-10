@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { AppDependencies } from '../types';
-import { useKibana } from '../../../../src/plugins/kibana_react/public';
+import { AppDependencies } from '../../../types';
+import { useKibana } from '../../../../../../src/plugins/kibana_react/public';
 import { ToastsStart } from 'kibana/public';
 
 export const useToasts = (): ToastsStart => {

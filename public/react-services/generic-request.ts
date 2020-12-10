@@ -96,9 +96,9 @@ const request = async (
         store.dispatch(updateApiIsDown(true));
 
         // TODO:MIGRATION check possible loop.
-        if (!window.location.hash.includes('#/settings')) {
+        /* if (!window.location.hash.includes('#/settings')) {
           window.location.href = '/app/wazuh#/health-check';
-        }
+        } */
       }
     }
     return (((err || {}).response || {}).data || {}).message || false

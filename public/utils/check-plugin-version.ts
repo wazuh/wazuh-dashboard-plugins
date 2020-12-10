@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { GenericRequest } from "../react-services/generic-request";
+import GenericRequest from "../react-services/generic-request";
 import { AxiosResponse } from 'axios';
 import _ from "lodash";
 

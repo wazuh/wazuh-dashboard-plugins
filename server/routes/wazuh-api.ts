@@ -112,9 +112,14 @@ export function WazuhApiRoutes(router: IRouter, securityObj: ISecurityFactory) {
 
   router.post({
     path: '/api/extensions',
-    validate: false,
+    validate: {
+      body: schema.object({
+        id: schema.string(),
+        extensions: schema.any({})
+      })
+    }
   },
-    async (context, request, response) => ctrl.setExtensions(context, request, response)
+    async (context, request, response) =>  ctrl.setExtensions(context, request, response)
   );
 
 

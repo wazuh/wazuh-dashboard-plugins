@@ -79,12 +79,12 @@ const getPatternList = async (where) => {
         return;
       }
       // retry again with the newly created index pattern
-      if (
+      /* if (
         !window.location.hash.includes('#/settings') &&
         !window.location.hash.includes('#/health-check')
       ) {
         window.location.href = '/app/wazuh#/health-check/';
-      }
+      } */
       patternList = await SavedObject.getListOfWazuhValidIndexPatterns();
     }
     if (AppState.getCurrentPattern() && patternList.length) {

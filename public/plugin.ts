@@ -1,6 +1,10 @@
 import { AppMountParameters, CoreSetup, CoreStart, Plugin } from 'kibana/public';
-import { setDataPlugin, setHttp, setToasts, setUiSettings } from './kibana-services';
+import { setDataPlugin, setHttp, setToasts, setUiSettings, setChrome } from './kibana-services';
 import { loadAppConfig } from './react-services/load-app-config.service';
+import { checkCurrentSecurityPlatform } from './react-services/security-utils';
+import WzAuthentication from './react-services/wz-authentication';
+import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import store from './redux/store';
 import {
   AppPluginStartDependencies,
   WazuhSetup,
@@ -8,6 +12,7 @@ import {
   WazuhStart,
   WazuhStartDeps,
 } from './types';
+import { checkPluginVersion, changeWazuhNavLogo } from './utils';
 
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDeps, WazuhStartDeps> {
   public setup(core: CoreSetup, plugins: WazuhSetupDeps): WazuhSetup {
@@ -20,7 +25,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
         const { renderApp } = await import('./application');
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
-        
+
         setHttp(core.http);
         loadAppConfig();
 
@@ -35,6 +40,17 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
     setToasts(core.notifications.toasts);
     setDataPlugin(plugins.data);
     setUiSettings(core.uiSettings);
+    setChrome(core.chrome);
+
+    changeWazuhNavLogo();
+
+    // Set currentSecurity platform in Redux when app starts.
+    checkCurrentSecurityPlatform().then((item) => {
+      store.dispatch(updateCurrentPlatform(item))
+    }).catch(() => {})
+    
+    // Init the process of refreshing the user's token when app start.
+    checkPluginVersion().finally(WzAuthentication.refresh);
     return {};
   }
 }

@@ -15,11 +15,13 @@
 import { EuiPage, EuiPageBody } from '@elastic/eui';
 import React from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
+import { AppDependencies } from './types';
 //import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 //import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 //import { ToastNotificationsModal } from './components/notifications/modal';
-import { HealthCheck } from './components/health-check/health-check';
-import { AppDependencies } from './types';
+import { HealthCheck } from './components/health-check';
+import { MainOverview } from './components/main-overview';
+
 
 const LANDING_PAGE_URL = '/overview';
 
@@ -29,8 +31,8 @@ export function AppRouter(props: AppDependencies) {
       <EuiPage>
         <EuiPageBody>
           <Switch>
-            <Route path={LANDING_PAGE_URL} render={() => <div>Hello World!</div>} />
-            <Route path="/health-check" render={() => <HealthCheck {...props} />} />
+            <Route path={LANDING_PAGE_URL} render={() => <MainOverview />} />
+            <Route path="/health-check" render={() => <HealthCheck />} />
             <Redirect exact from="/" to={LANDING_PAGE_URL} />
           </Switch>
         </EuiPageBody>

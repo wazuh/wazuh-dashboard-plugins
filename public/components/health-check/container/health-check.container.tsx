@@ -19,10 +19,10 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
-import ErrorHandler from '../../react-services/error-handler';
+import ErrorHandler from '../../../react-services/error-handler';
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { useAppConfig } from '../../hooks/use-app-config';
+import { useAppConfig } from '../../../components/common/hooks/use-app-config';
 import {
   checkPatternService,
   checkTemplateService,
@@ -31,10 +31,10 @@ import {
   checkFieldsService,
   checkKibanaSettings,
   checkKibanaSettingsTimeFilter,
-} from './services';
-import { CheckResult } from './components/check-result';
-import AppState from '../../react-services/app-state';
-import { useAppDeps } from '../../hooks/use-app-deps';
+} from '../services';
+import { CheckResult } from '../components/check-result';
+import AppState from '../../../react-services/app-state';
+import { useAppDeps } from '../../../components/common/hooks/use-app-deps';
 
 const checks = {
   api: {
@@ -59,7 +59,7 @@ const checks = {
   },
 };
 
-export function HealthCheck(props) {
+export function HealthCheck() {
   const [checkResults, setCheckResults] = useState<any[]>([]);
   const [checkErrors, setCheckErrors] = useState<any[]>([]);
   const { core } = useAppDeps();
@@ -77,7 +77,7 @@ export function HealthCheck(props) {
     let _errors = checkErrors;
     _errors.push(
       ...(parsed
-        ? errors.map((error) => ErrorHandler.handle(error, 'Health Check', { silent: true }))
+        ? errors.map((error) => ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true }))
         : errors)
     );
     setCheckErrors(_errors);

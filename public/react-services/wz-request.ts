@@ -62,10 +62,10 @@ const genericReq = async (
       } catch (error) {
         store.dispatch(updateApiIsDown(true));
 
-        // TODO: MIGRATION check for llop
-        if (!window.location.hash.includes('#/settings')) {
+        // TODO: MIGRATION check for loop
+       /*  if (!window.location.hash.includes('#/settings')) {
           window.location.href = '/app/wazuh#/health-check';
-        }
+        } */
         return;
       }
     }
