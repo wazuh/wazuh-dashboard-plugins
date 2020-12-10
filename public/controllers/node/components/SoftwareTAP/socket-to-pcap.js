@@ -12,6 +12,7 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiHealth,
+  EuiDescriptionList, 
   EuiHorizontalRule,
   EuiPage,
   EuiButton,
@@ -26,6 +27,7 @@ import {
   EuiEmptyPrompt,
   EuiPageBody
 } from '@elastic/eui';
+import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { useSelector, useDispatch } from 'react-redux';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../../components/common/hocs';
 import { IsLoadingData, toggleSocketPcap, savePluginToEdit, stopStapService, deployStapService, deleteService } from '../../../../redux/actions/nidsActions';
@@ -37,7 +39,7 @@ export const SocketToPcap = () => {
   const loadingData = useSelector(state => state.nidsReducers.loadingData);
 
   const [plugins, setPlugins] = useState([])
-
+  const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState({});
   
   useEffect(() => {    
     dispatch(IsLoadingData(true));
@@ -55,8 +57,6 @@ export const SocketToPcap = () => {
       [...Object.keys(nodePlugins).map((item) => {         
         if(nodePlugins[item]["type"] == "socket-pcap"){          
           nodePlugins[item]["service"] = item
-          // {nodePlugins[item]["pid"] != "none" ? nodePlugins[item]["pid"] = "on" : nodePlugins[item]["pid"] = "off"}
-          // {"running" in nodePlugins[item] ? nodePlugins[item]["running"] = "running" : nodePlugins[item]["running"] = "stopped"}
           allSTAP.push(nodePlugins[item])
         }
       })];
@@ -70,6 +70,93 @@ export const SocketToPcap = () => {
       dispatch(IsLoadingData(false));
   }
 
+  function ConnColumns() {
+    return [
+      {
+        field: 'proto',
+        name: 'Proto',
+      },
+      {
+        field: 'recvQ',
+        name: 'Recv-Q',
+      },
+      {
+        field: 'sendQ',
+        name: 'Send-Q',
+      },
+      {
+        field: 'localAddr',
+        name: 'Local Addr',
+      },
+      {
+        field: 'clientAddr',
+        name: 'Client Addr',
+      },
+      {
+        field: 'state',
+        name: 'State',
+      },
+      {
+        field: 'pid',
+        name: 'PID/name',
+      },
+      
+    ];
+  }
+
+  const toggleDetails = (item) => {
+    // item.connections = "tcp        0      1 192.168.1.101:59660     192.168.1.100:50010     SYN_SENT    5126/socat          \ntcp        0      1 192.168.1.101:59664     192.168.1.100:50010     SYN_SENT    5128/socat          \ntcp        0      1 192.168.1.101:59662     192.168.1.100:50010     SYN_SENT    5127/socat          \n"
+    // item.connectionsCount = "3"
+    const itemIdToExpandedRowMapValues = { ...itemIdToExpandedRowMap };
+    if (itemIdToExpandedRowMapValues[item.service]) {
+      delete itemIdToExpandedRowMapValues[item.service];
+    } else {
+      var connectionContent;
+      var connItems = [];
+
+      //split and filter connection data
+      var conns = item.connections.split("\n");
+      var result = conns.filter(con => con != "");          
+      result.forEach(function (item, index) {
+        var splittedData = item.split(' ');
+        var dataFiltered = splittedData.filter(word => word != '');
+        connItems.push({
+          proto:dataFiltered[0],
+          recvQ:dataFiltered[1],
+          sendQ:dataFiltered[2],
+          localAddr:dataFiltered[3],
+          clientAddr:dataFiltered[4],
+          state:dataFiltered[5],
+          pid:dataFiltered[6],
+        })                                         
+    });
+
+      //check for connections number
+      {
+        item.connections=="" || item.connectionsCount == "0"
+        ?
+        connectionContent='No connections available'
+        :
+        connectionContent=<EuiBasicTable
+                            items={connItems}
+                            itemId="service"
+                            columns={ConnColumns()}
+                            loading={false}
+                          />
+      }          
+
+      const listItems = [
+        {
+          title: 'Connections',
+          description: connectionContent
+        },
+      ];
+      itemIdToExpandedRowMapValues[item.service] = (
+        <EuiDescriptionList listItems={listItems} />
+      );
+    }
+    setItemIdToExpandedRowMap(itemIdToExpandedRowMapValues);
+  };
 
   const title = headRender();
 
@@ -167,7 +254,19 @@ export const SocketToPcap = () => {
         name: 'Actions',
         width: '15%',
         render: data => actionButtonsRender(data)
-      }
+      },
+      {
+        align: RIGHT_ALIGNMENT,
+        width: '40px',
+        isExpander: true,
+        render: (item) => (
+          <EuiButtonIcon
+            onClick={() => toggleDetails(item)}
+            aria-label={itemIdToExpandedRowMap[item.service] ? 'Collapse' : 'Expand'}
+            iconType={itemIdToExpandedRowMap[item.service] ? 'arrowUp' : 'arrowDown'}
+          />
+        ),
+      },
     ];
   }
 
@@ -250,9 +349,12 @@ export const SocketToPcap = () => {
           <EuiFlexItem>
             <EuiBasicTable
               items={plugins}
-              itemId="uuid"
+              itemId="service"
               columns={columns()}
               loading={loadingData}
+              itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+              isExpandable={true}
+              hasActions={true}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

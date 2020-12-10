@@ -195,8 +195,6 @@ export function PingAnalyzer(uuid) {
     }
    
     const data = await NidsRequest.genericReq('PUT', '/nids/pingAnalyzer', params);
-    console.log("data.data.data");
-    console.log(data.data.data);
     dispatch(accAnalyzer(data.data.data))
   }
 }
