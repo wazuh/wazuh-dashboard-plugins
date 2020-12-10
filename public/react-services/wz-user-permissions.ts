@@ -383,7 +383,7 @@ const wazuhPermissions = {
     "resources": [
       "node:id",
       "file:path",
-      "node:id:*&file:path:*",
+      "node:id&file:path",
     ],
     "example": {
       "actions": [
@@ -404,7 +404,7 @@ const wazuhPermissions = {
     "resources": [
       "node:id",
       "file:path",
-      "node:id:*&file:path:*",
+      "node:id&file:path",
     ],
     "example": {
       "actions": [
@@ -964,7 +964,7 @@ export class WzUserPermissions{
         })
         .join('&');
 
-      let userPartialResources: string[] | undefined = userPermissions[actionName]
+      const userPartialResources: string[] | undefined = userPermissions[actionName]
         ? Object.keys(userPermissions[actionName]).filter((resource) =>
             resource.match('&')
               ? ![actionResource, actionResourceAll].includes(resource) &&
@@ -979,14 +979,44 @@ export class WzUserPermissions{
         return userPermissions.rbac_mode === RBAC_MODE_WHITE;
       }
 
+      const existInWazuhPermissions = (userResource) => {
+        return !!wazuhPermissions[actionName].resources.find(function (resource) {
+          return (
+            resource ===
+            userResource
+              .split('&')
+              .map((str) => {
+                return str
+                  .split(':')
+                  .map(function (str, index) {
+                    return index === 2 ? '*' : str;
+                  })
+                  .join(':');
+              })
+              .join('&')
+              .replaceAll(':*', '')
+          );
+        });
+      };
+
+      const notAllowInWazuhPermissions = (userResource) => {
+        if (userResource !== RESOURCE_ANY) {
+          return existInWazuhPermissions(userResource)
+            ? !isAllow(userPermissions[actionName][userResource])
+            : true;
+        } else {
+          !isAllow(userPermissions[actionName][userResource]);
+        }
+      };
+
       return userPermissions[actionName][actionResource]
-        ? !isAllow(userPermissions[actionName][actionResource])
+        ? notAllowInWazuhPermissions(actionResource)
         : Object.keys(userPermissions[actionName]).some((resource) => {
             return resource.match(actionResourceAll.replace('*', '\\*')) !== null;
           })
         ? Object.keys(userPermissions[actionName]).some((resource) => {
             if (resource.match(actionResourceAll.replace('*', '\\*'))) {
-              return !isAllow(userPermissions[actionName][resource]);
+              return notAllowInWazuhPermissions(resource);
             }
           })
         : userPartialResources?.length

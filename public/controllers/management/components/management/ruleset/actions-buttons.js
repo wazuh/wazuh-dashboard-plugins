@@ -302,24 +302,7 @@ class WzRulesetActionButtons extends Component {
     const manageFiles = (
       <WzButtonPermissions
         buttonType="empty"
-        permissions={[
-          {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
-            resource: `file:path:/etc/${section}`,
-          },
-          {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read`,
-            resource: `file:path:/etc/${this.props.msg}`,
-          },
-          {
-            action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:read_file`,
-            resource: `file:path:/etc/${this.props.msg}`,
-          },
-          {
-            action: `cluster:status`,
-            resource: `*:*:*`,
-          },
-        ]}
+        permissions={getPermissionsFiles()}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >

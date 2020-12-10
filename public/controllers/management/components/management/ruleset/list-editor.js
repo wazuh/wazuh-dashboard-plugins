@@ -320,7 +320,10 @@ class WzListEditor extends Component {
         permissions={[
           {
             action: `${((this.props || {}).clusterStatus || {}).contextConfigServer}:upload_file`,
-            resource: `file:path:${path}/${name}`,
+            resource:
+              ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
+                ? 'node:id:*'
+                : `file:path:${path}/${name}`,
           },
         ]}
         fill
@@ -343,7 +346,10 @@ class WzListEditor extends Component {
                   action: `${
                     ((this.props || {}).clusterStatus || {}).contextConfigServer
                   }:upload_file`,
-                  resource: `file:path:${path}/${name}`,
+                  resource:
+                    ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
+                      ? 'node:id:*'
+                      : `file:path:${path}/${name}`,
                 },
               ]}
               iconType="plusInCircle"
@@ -513,7 +519,10 @@ class WzListEditor extends Component {
                       action: `${
                         ((this.props || {}).clusterStatus || {}).contextConfigServer
                       }:upload_file`,
-                      resource: `file:path:${path}/${fileName}`,
+                      resource:
+                        ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
+                          ? 'node:id:*'
+                          : `file:path:${path}/${fileName}`,
                     },
                   ]}
                   tooltip={{position: 'top', content: `Edit ${item.key}`}}
@@ -534,7 +543,10 @@ class WzListEditor extends Component {
                       action: `${
                         ((this.props || {}).clusterStatus || {}).contextConfigServer
                       }:upload_file`,
-                      resource: `file:path:${path}/${fileName}`,
+                      resource:
+                        ((this.props || {}).clusterStatus || {}).contextConfigServer === 'cluster'
+                          ? 'node:id:*'
+                          : `file:path:${path}/${fileName}`,
                     },
                   ]}
                   tooltip={{position: 'top', content: `Remove ${item.key}`}}
