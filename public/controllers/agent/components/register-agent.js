@@ -38,7 +38,7 @@ import {
 import { WzRequest } from '../../../react-services/wz-request';
 
 
-const architectureBottons = [
+const architectureButtons = [
   {
     id: 'i386',
     label: 'i386'
@@ -67,7 +67,7 @@ const architectureCentos5 = [
   }
 ];
 
-const versionBottonsCentos = [
+const versionButtonsCentos = [
   {
     id: 'centos5',
     label: 'CentOS5'
@@ -128,8 +128,8 @@ export class RegisterAgent extends Component {
         serverAddress,
         needsPassword,
         hidePasswordInput,
-        versionBottonsCentos,
-        architectureBottons,
+        versionButtonsCentos,
+        architectureButtons,
         architectureCentos5,
         wazuhPassword,
         udpProtocol,
@@ -189,7 +189,7 @@ export class RegisterAgent extends Component {
   }
 
   setVersion(selectedVersion) {
-    this.setState({ selectedVersion });
+    this.setState({ selectedVersion, selectedArchitecture: '' });
   }
 
   setWazuhPassword(event) {
@@ -225,7 +225,7 @@ export class RegisterAgent extends Component {
 
   optionalDeploymentVariables() {
     const deployment = `WAZUH_MANAGER='${this.state.serverAddress}' ${this.state.selectedOS == 'win' ? `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' ` : ''}${this.state.needsPassword
-      ? ` WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}'`
+      ? `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `
       : ''
       }${this.state.udpProtocol
         ? " WAZUH_PROTOCOL='UDP'"
@@ -413,7 +413,7 @@ export class RegisterAgent extends Component {
         title: 'Choose your CentOS version',
         children: <Fragment><EuiButtonGroup
           color='primary'
-          options={versionBottonsCentos}
+          options={versionButtonsCentos}
           idSelected={this.state.selectedVersion}
           onChange={version => this.setVersion(version)}
         /></Fragment>
@@ -431,7 +431,7 @@ export class RegisterAgent extends Component {
         title: 'Choose your architecture',
         children: <Fragment><EuiButtonGroup
           color='primary'
-          options={this.state.architectureBottons}
+          options={this.state.architectureButtons}
           idSelected={this.state.selectedArchitecture}
           onChange={architecture => this.setArchitecture(architecture)}
         /></Fragment>
@@ -448,7 +448,7 @@ export class RegisterAgent extends Component {
         title: 'Assign the agent to a group',
         children: <Fragment>{groupInput}</Fragment>
       },
-      {
+      ...((this.state.selectedArchitecture || this.state.selectedOS == 'win' || this.state.selectedOS == 'macos') ? [{
         title: 'Install and enroll the agent',
         children: (
           <div>
@@ -457,7 +457,7 @@ export class RegisterAgent extends Component {
             </Fragment>
           </div>
         )
-      },
+      }] : []),
       ...(this.state.selectedOS && restartAgentCommand ? [
         {
           title: 'Start the agent',
