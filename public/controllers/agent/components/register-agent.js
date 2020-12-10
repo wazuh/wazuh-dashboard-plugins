@@ -74,7 +74,7 @@ const versionBottonsCentos = [
   },
   {
     id: 'centos6',
-    label: 'CentOS6 o superior'
+    label: 'CentOS6 or higher'
   }
 ];
 export class RegisterAgent extends Component {
@@ -248,6 +248,8 @@ export class RegisterAgent extends Component {
         return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
       case 'centos6-armhf':
         return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7h.rpm`
+      default:
+        return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`
     }
   }
 
@@ -260,6 +262,8 @@ export class RegisterAgent extends Component {
       case 'armhf':
         return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`
       case 'x86_64':
+        return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`
+      default:
         return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`
     }
   }
