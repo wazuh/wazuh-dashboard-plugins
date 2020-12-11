@@ -151,8 +151,7 @@ class WzListEditor extends Component {
       }
       await this.rulesetHandler.sendCdbList(name, path, raw, overwrite, addingNew);
       if (!addingNew) {
-        const result = await this.rulesetHandler.getCdbList(`${path}/${name}`);
-        const file = { name: name, content: result, path: path };
+        const file = { name: name, content: raw, path: path };
         this.props.updateListContent(file);
         this.setState({ showWarningRestart: true });
         this.showToast(
