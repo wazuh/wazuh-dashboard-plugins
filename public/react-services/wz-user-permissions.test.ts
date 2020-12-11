@@ -18,7 +18,6 @@
  */
 
 import { WzUserPermissions } from './wz-user-permissions';
-//import { checkMissingUserPermissions } from './wz-user-permissions1';
 
 const requiredPermissionsCluster = [
   {
