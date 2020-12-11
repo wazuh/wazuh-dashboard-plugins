@@ -43,7 +43,7 @@ import { ZeekTable } from './Zeek/zeek-table';
 // import { WazuhTable } from './Wazuh/wazuh-table';
 import { WazuhTable } from './Wazuh/wazuh-table';
 import { AnalyzerTable } from './Analyzer/analyzer-table';
-import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek, PingAnalyzer, PingWazuhFiles, PingWazuh } from '../../../redux/actions/nidsActions';
+import { PingPluginsNode, LoadInterfaces, loadRuleset, PingZeek, PingAnalyzer, PingWazuhFiles, PingWazuh, GetMainconfData } from '../../../redux/actions/nidsActions';
 import { withReduxProvider, withGlobalBreadcrumb, withUserAuthorizationPrompt } from '../../../components/common/hocs';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -60,6 +60,7 @@ export const NodeDetails = withReduxProvider(() => {
     dispatch(PingAnalyzer(nodeDetail.uuid))
     dispatch(PingWazuhFiles(nodeDetail.uuid))
     dispatch(PingWazuh(nodeDetail.uuid))
+    dispatch(GetMainconfData(nodeDetail.uuid))
   }, []);
   
   return (

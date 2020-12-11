@@ -28,9 +28,23 @@ const initialState = {
     analyzer: {},
     wazuhFiles: {},
     wazuhData: {},
+    mainConfData: {},
+    mainServiceStatus: {},
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'MAIN_CONF_DATA') {
+        return {
+          ...state,
+          mainConfData: action.payload
+        };
+      }  
+      if (action.type === 'CHANGE_MAIN_SERVICE_STATUS') {
+        return {
+          ...state,
+          mainServiceStatus: action.payload
+        };
+      }  
       if (action.type === 'PING_WAZUH') {
         return {
           ...state,

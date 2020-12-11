@@ -95,9 +95,24 @@ export async function WazuhNidsRoutes(server) {
 
   server.route({
     method: 'put',
+    path: '/nids/ChangeMainServiceStatus',
+    handler(req, reply) {
+      return ctrl.ChangeMainServiceStatus(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'put',
     path: '/nids/RunWazuh',
     handler(req, reply) {
       return ctrl.RunWazuh(req, reply);
+    }
+  });
+  server.route({
+    method: 'put',
+    path: '/nids/getMainconfData',
+    handler(req, reply) {
+      return ctrl.getMainconfData(req, reply);
     }
   });
 

@@ -205,6 +205,26 @@ function accAnalyzer(data) {
   }
 };
 
+export function ChangeMainServiceStatus(values) {
+  return async (dispatch) => {
+    var params = {
+      method: "PUT",      
+      path: `/node/mainconfStatus`,
+      data: values
+    }
+   
+    const data = await NidsRequest.genericReq('PUT', '/nids/ChangeMainServiceStatus', params);
+    dispatch(IsLoadingData(false))
+    dispatch(accChangeMain(data.data.data))
+  }
+}
+function accChangeMain(data) {
+  return {
+    type: 'CHANGE_MAIN_SERVICE_STATUS',
+    payload: data
+  }
+};
+
 export function loadRuleset() {
   return async (dispatch) => {
     const rsets = await NidsRequest.genericReq('GET', '/nids/rulesets', {});
@@ -461,6 +481,24 @@ export function PingWazuhFiles(uuid) {
 function accWazuhFiles(data) {
   return {
     type: 'WAZUH_FILES',
+    payload: data
+  }
+};
+
+export function GetMainconfData(uuid) {
+  return async (dispatch) => {
+    var params = {
+      method: "GET",      
+      path: `/node/getMainconfData/${uuid}`
+    }
+   
+    const data = await NidsRequest.genericReq('PUT', '/nids/getMainconfData', params);
+    dispatch(accGetMainconfData(data.data.data))
+  }
+}
+function accGetMainconfData(data) {
+  return {
+    type: 'MAIN_CONF_DATA',
     payload: data
   }
 };

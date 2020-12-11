@@ -39,11 +39,11 @@ export const AnalyzerTable = () => {
 
   const [plugin, setPlugin] = useState([])
 
-  useEffect(() => {    
+  useEffect(() => {
     if (analyzer.status == "Enabled") { analyzer.currentStatus = "ON" }
     if (analyzer.status == "Disabled") { analyzer.currentStatus = "OFF" }
 
-    if(analyzer.size <= 0){analyzer.size = "0 Bytes"}
+    if (analyzer.size <= 0) { analyzer.size = "0 Bytes" }
     else if (analyzer.size > 0 && analyzer.size < 1024) { analyzer.size = parseFloat(analyzer.size).toFixed(2) + " Bytes" }
     else if (analyzer.size >= 1024 && analyzer.size < 1048576) { analyzer.size = parseFloat(analyzer.size / 1024).toFixed(2) + " KB" }
     else if (analyzer.size >= 1048576 && analyzer.size < 1073741824) { analyzer.size = parseFloat(analyzer.size / 1048576).toFixed(2) + " MB" }
@@ -56,7 +56,7 @@ export const AnalyzerTable = () => {
     if (analyzer.status == "Enabled") { analyzer.currentStatus = "ON" }
     if (analyzer.status == "Disabled") { analyzer.currentStatus = "OFF" }
 
-    if(analyzer.size <= 0){analyzer.size = "0 Bytes"}
+    if (analyzer.size <= 0) { analyzer.size = "0 Bytes" }
     else if (analyzer.size > 0 && analyzer.size < 1024) { analyzer.size = parseFloat(analyzer.size).toFixed(2) + " Bytes" }
     else if (analyzer.size >= 1024 && analyzer.size < 1048576) { analyzer.size = parseFloat(analyzer.size / 1024).toFixed(2) + " KB" }
     else if (analyzer.size >= 1048576 && analyzer.size < 1073741824) { analyzer.size = parseFloat(analyzer.size / 1048576).toFixed(2) + " MB" }
@@ -114,7 +114,7 @@ export const AnalyzerTable = () => {
             <EuiButtonEmpty
               iconType="documentEdit"
               onClick={ev => {
-                dispatch(NidsShowFile({type: "analyzer"}))
+                dispatch(NidsShowFile({ type: "analyzer" }))
                 AppNavigate.navigateToModule(ev, 'nids-files', {})
               }}
             >
@@ -150,7 +150,14 @@ export const AnalyzerTable = () => {
         name: 'Status',
         // width: '15%',
         // truncateText: true,
-        sortable: true
+        sortable: true,
+        render: item => {
+          if (item == "OFF") {
+            return <EuiHealth color="danger">OFF</EuiHealth>
+          } else {
+            return <EuiHealth color="success">ON</EuiHealth>
+          }
+        }
       },
       {
         field: '',
@@ -179,8 +186,8 @@ export const AnalyzerTable = () => {
 
           <EuiToolTip content="View alerts file" position="left">
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={ev => { 
-                dispatch(NidsShowFile({type: "alerts.json", path: analyzer.path, lines:"10"}))
+              <EuiButtonEmpty onClick={ev => {
+                dispatch(NidsShowFile({ type: "alerts.json", path: analyzer.path, lines: "10" }))
                 AppNavigate.navigateToModule(ev, 'nids-files', {})
               }}>10</EuiButtonEmpty>
             </EuiFlexItem>
@@ -188,8 +195,8 @@ export const AnalyzerTable = () => {
 
           <EuiToolTip content="View alerts file" position="left">
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={ev => { 
-                dispatch(NidsShowFile({type: "alerts.json", path: analyzer.path, lines:"50"}))
+              <EuiButtonEmpty onClick={ev => {
+                dispatch(NidsShowFile({ type: "alerts.json", path: analyzer.path, lines: "50" }))
                 AppNavigate.navigateToModule(ev, 'nids-files', {})
               }}>50</EuiButtonEmpty>
             </EuiFlexItem>
@@ -197,8 +204,8 @@ export const AnalyzerTable = () => {
 
           <EuiToolTip content="View alerts file" position="left">
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty onClick={ev => { 
-                dispatch(NidsShowFile({type: "alerts.json", path: analyzer.path, lines:"100"}))
+              <EuiButtonEmpty onClick={ev => {
+                dispatch(NidsShowFile({ type: "alerts.json", path: analyzer.path, lines: "100" }))
                 AppNavigate.navigateToModule(ev, 'nids-files', {})
               }}>100</EuiButtonEmpty>
             </EuiFlexItem>

@@ -111,56 +111,54 @@ export const NetworkToSocket = () => {
         field: 'name',
         name: 'Description',
         sortable: true,
-        // width: '20%',
-        // truncateText: true
       },
       {
         field: 'pid',
         name: 'Status',
         sortable: true,
-        // width: '20%',
-        // truncateText: true
+        render: item => {
+          if (item == "none") {
+            return <EuiHealth color="danger">Stopped</EuiHealth>
+          } else {
+            return <EuiHealth color="success">Running</EuiHealth>
+          }
+        }
       },
       {
         field: 'running',
         name: 'Running',
         sortable: true,
-        // width: '20%',
-        // truncateText: true
+        render: item => {
+          if (item == "true") {
+            return <EuiHealth color="success">ON</EuiHealth>
+          } else {
+            return <EuiHealth color="danger">OFF</EuiHealth>
+          }
+        }
       },
       {
         field: 'port',
         name: 'Port',
-        // width: '15%',
-        // truncateText: true,
         sortable: true
       },
       {
         field: 'cert',
         name: 'Certificate',
-        // width: '15%',
-        // truncateText: true,
         sortable: true
       },
       {
         field: 'interface',
         name: 'Interface',
-        // width: '15%',
-        // truncateText: true,
         sortable: true
       },
       {
         field: 'collector',
         name: 'Collector',
-        // width: '15%',
-        // truncateText: true,
         sortable: true
       },
       {
         field: 'bpf',
         name: 'BPF',
-        // width: '15%',
-        // truncateText: true,
         sortable: true
       },
       {

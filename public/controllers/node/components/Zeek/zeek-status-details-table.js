@@ -123,7 +123,16 @@ export const ZeekStatusDetailsTable = () => {
 				name: 'Status',
 				// width: '15%',
 				// truncateText: true,
-				sortable: true
+				sortable: true,				
+				render: item => {
+          if (item == "stopped") {
+            return <EuiHealth color="danger">Stopped</EuiHealth>
+          } else if (item == "running") {
+            return <EuiHealth color="success">Running</EuiHealth>
+          } else{
+            return <EuiHealth color="danger">Crashed</EuiHealth>
+					}
+        }
 			},
 			{
 				field: 'type',

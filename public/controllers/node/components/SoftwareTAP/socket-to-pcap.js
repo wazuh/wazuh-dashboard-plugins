@@ -204,6 +204,13 @@ export const SocketToPcap = () => {
         field: 'pid',
         name: 'Status',
         sortable: true,
+        render: item => {
+          if (item == "none") {
+            return <EuiHealth color="danger">Stopped</EuiHealth>
+          } else {
+            return <EuiHealth color="success">Running</EuiHealth>
+          }
+        }
         // width: '20%',
         // truncateText: true
       },
@@ -211,6 +218,13 @@ export const SocketToPcap = () => {
         field: 'running',
         name: 'Running',
         sortable: true,
+        render: item => {
+          if (item == "true") {
+            return <EuiHealth color="success">ON</EuiHealth>
+          } else {
+            return <EuiHealth color="danger">OFF</EuiHealth>
+          }
+        }
         // width: '20%',
         // truncateText: true
       },

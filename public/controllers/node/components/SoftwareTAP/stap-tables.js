@@ -45,9 +45,57 @@ export const StapTables = () => {
 	const showSocNet = useSelector(state => state.nidsReducers.showSocNet);
 	const showSocPcap = useSelector(state => state.nidsReducers.showSocPcap);
 	const showNetSoc = useSelector(state => state.nidsReducers.showNetSoc);
+	const nodePlugins = useSelector(state => state.nidsReducers.nodePlugins);
+
+	function IsInstalled() {
+		if (nodePlugins["installed"]["checkSocat"] == "false" || nodePlugins["installed"]["checkTcpdump"] == "false" || nodePlugins["installed"]["checkTcpreplay"] == false) {
+			return <div>
+				<EuiSpacer size="m" />
+				<EuiPanel paddingSize="m">
+					<EuiFlexGroup>
+
+						<EuiFlexGroup>
+							<EuiFlexItem>
+								{
+									nodePlugins["installed"]["checkSocat"] == "true"
+										?
+										<EuiHealth color='success'><h3>Socat: <b>Installed</b></h3></EuiHealth>
+										:
+										<EuiHealth color='danger'><h3>Socat: <b>Not Installed</b></h3></EuiHealth>
+								}
+							</EuiFlexItem>
+						</EuiFlexGroup>
+						<EuiFlexGroup>
+							<EuiFlexItem>
+								{
+									nodePlugins["installed"]["checkTcpdump"] == "true"
+										?
+										<EuiHealth color='success'><h3>Tcpdump: <b>Installed</b></h3></EuiHealth>
+										:
+										<EuiHealth color='danger'><h3>Tcpdump: <b>Not Installed</b></h3></EuiHealth>
+								}
+							</EuiFlexItem>
+						</EuiFlexGroup>
+						<EuiFlexGroup>
+							<EuiFlexItem>
+								{
+									nodePlugins["installed"]["checkTcpreplay"] == "true"
+										?
+										<EuiHealth color='success'><h3>Tcpreplay: <b>Installed</b></h3></EuiHealth>
+										:
+										<EuiHealth color='danger'><h3>Tcpreplay: <b>Not Installed</b></h3></EuiHealth>
+								}
+							</EuiFlexItem>
+						</EuiFlexGroup>
+					</EuiFlexGroup>
+				</EuiPanel>
+			</div>
+		}
+	}
 
 	return (
 		<div>
+			{IsInstalled()}
 			{showSocNet != '' ? <AddSocketToNewtwork></AddSocketToNewtwork> : null}
 			<br />
 			<SocketToNewtwork></SocketToNewtwork>

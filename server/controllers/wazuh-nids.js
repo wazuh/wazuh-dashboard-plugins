@@ -452,6 +452,32 @@ export class WazuhNidsCtrl {
     }
   }
 
+  async getMainconfData(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.getMainconfData(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  async ChangeMainServiceStatus(req, reply) {
+    try {
+      const data = await this.manageNidsHosts.ChangeMainServiceStatus(req.payload);      
+      return {
+        statusCode: 200,
+        error: 0,
+        data: (data || [])
+      };
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
   async PingWazuh(req, reply) {
     try {
       const data = await this.manageNidsHosts.PingWazuh(req.payload);      
