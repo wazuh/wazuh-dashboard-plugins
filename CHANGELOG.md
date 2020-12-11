@@ -2,15 +2,28 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.3 - Revision 4014
+## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4015
+
+### Fixed
+
+- Create index pattern even if there aren´t available indices [#2620](https://github.com/wazuh/wazuh-kibana-app/issues/2620)
+- Top bar overlayed over expanded visualizations [#2667](https://github.com/wazuh/wazuh-kibana-app/issues/2667)
+
+## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
+
+### Added
+
+- Improved management of index-pattern fields [#2630](https://github.com/wazuh/wazuh-kibana-app/issues/2630)
 
 ### Fixed
 
 - fix(fronted): fixed the check of API and APP version in health check [#2655](https://github.com/wazuh/wazuh-kibana-app/pull/2655)
 - Replace user by username key in the monitoring logic [#2654](https://github.com/wazuh/wazuh-kibana-app/pull/2654)
+- Security alerts and reporting issues when using private tenants [#2639](https://github.com/wazuh/wazuh-kibana-app/issues/2639)
+- Manager restart in rule editor does not work with Wazuh cluster enabled [#2640](https://github.com/wazuh/wazuh-kibana-app/issues/2640)
 - fix(frontend): Empty inventory data in Solaris agents [#2680](https://github.com/wazuh/wazuh-kibana-app/pull/2680)
 
-## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.3 - Revision 4013
+## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4013
 
 ### Added
 
@@ -49,9 +62,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Manager restart in rule editor does not work with Wazuh cluster enabled [#2640](https://github.com/wazuh/wazuh-kibana-app/issues/2640)
 - Restore the tables in the agents' reports [#2628](https://github.com/wazuh/wazuh-kibana-app/issues/2628)
 - Changes done via a worker's API are overwritten [#2626](https://github.com/wazuh/wazuh-kibana-app/issues/2626)
+
+### Fixed
+
 - [BUGFIX] Default user field for current platform [#2633](https://github.com/wazuh/wazuh-kibana-app/pull/2633)
 
 ## Wazuh v4.0.1 - Kibana v7.9.1, v7.9.3 - Revision 4009
