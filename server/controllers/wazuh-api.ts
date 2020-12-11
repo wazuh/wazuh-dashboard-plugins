@@ -1182,8 +1182,6 @@ export class WazuhApiCtrl {
   requestApi(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
 
     const token = this.getTokenFromCookie(request.headers.cookie);
-    console.log(token)
-    console.log({ token })
     const idApi = this.getApiIdFromCookie(request.headers.cookie);
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
@@ -1391,7 +1389,6 @@ export class WazuhApiCtrl {
    */
   async getAgentsFieldsUniqueCount(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      console.log(request)
       if (!request.params || !request.params.api) throw new Error('Field api is required');
 
       const config = await this.manageHosts.getHostById(request.params.api);

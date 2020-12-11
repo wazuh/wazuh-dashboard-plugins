@@ -1,5 +1,6 @@
 import { AppMountParameters, CoreSetup, CoreStart, Plugin } from 'kibana/public';
 import { setDataPlugin, setHttp, setToasts, setUiSettings, setChrome } from './kibana-services';
+import { resolveApis } from './react-services/api-resolver.service';
 import { loadAppConfig } from './react-services/load-app-config.service';
 import { checkCurrentSecurityPlatform } from './react-services/security-utils';
 import WzAuthentication from './react-services/wz-authentication';
@@ -36,13 +37,17 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupDep
     return {};
   }
 
-  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
+  public async start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
+    setHttp(core.http);
     setToasts(core.notifications.toasts);
     setDataPlugin(plugins.data);
     setUiSettings(core.uiSettings);
     setChrome(core.chrome);
 
     changeWazuhNavLogo();
+
+    // Set default api
+    await resolveApis();
 
     // Set currentSecurity platform in Redux when app starts.
     checkCurrentSecurityPlatform().then((item) => {

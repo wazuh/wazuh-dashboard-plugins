@@ -6,11 +6,11 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ 
  * Find more information about this on the LICENSE file.
  */
 
-import Cookies from '../utils/js-cookie';
+import { Cookies } from 'react-cookie';
 import store from '../redux/store';
 import {
   updateCurrentApi,
@@ -101,8 +101,9 @@ const setExtensions = async (id, extensions) => {
  * Cluster setters and getters
  **/
 const getClusterInfo = () => {
+  const cookies = new Cookies();
   try {
-    const clusterInfo = Cookies.get('clusterInfo') ? decodeURI(Cookies.get('clusterInfo')) : false;
+    const clusterInfo = cookies.get('clusterInfo') ? decodeURI(cookies.get('clusterInfo')) : false;
     return clusterInfo ? JSON.parse(clusterInfo) : {};
   } catch (err) {
     console.log('Error get cluster info');
@@ -116,12 +117,13 @@ const getClusterInfo = () => {
  * @param {*} cluster_info
  */
 const setClusterInfo = (cluster_info) => {
+  const cookies = new Cookies();
   try {
     const encodedClusterInfo = encodeURI(JSON.stringify(cluster_info));
     const exp = new Date();
     exp.setDate(exp.getDate() + 365);
     if (cluster_info) {
-      Cookies.set('clusterInfo', encodedClusterInfo, {
+      cookies.set('clusterInfo', encodedClusterInfo, {
         expires: exp,
         path: window.location.pathname,
       });
@@ -138,11 +140,12 @@ const setClusterInfo = (cluster_info) => {
  * @param {*} date
  */
 const setCreatedAt = (date) => {
+  const cookies = new Cookies();
   try {
     const createdAt = encodeURI(date);
     const exp = new Date();
     exp.setDate(exp.getDate() + 365);
-    Cookies.set('createdAt', createdAt, {
+    cookies.set('createdAt', createdAt, {
       expires: exp,
       path: window.location.pathname,
     });
@@ -157,8 +160,9 @@ const setCreatedAt = (date) => {
  * Get 'createdAt' value
  */
 const getCreatedAt = () => {
+  const cookies = new Cookies();
   try {
-    const createdAt = Cookies.get('createdAt') ? decodeURI(Cookies.get('createdAt')) : false;
+    const createdAt = cookies.get('createdAt') ? decodeURI(cookies.get('createdAt')) : false;
     return createdAt ? createdAt : false;
   } catch (err) {
     console.log('Error get createdAt date');
@@ -171,8 +175,9 @@ const getCreatedAt = () => {
  * Get 'API' value
  */
 const getCurrentAPI = () => {
+  const cookies = new Cookies();
   try {
-    const currentAPI = Cookies.get('currentApi');
+    const currentAPI = cookies.get('currentApi');
     return currentAPI ? decodeURI(currentAPI) : false;
   } catch (err) {
     console.log('Error get current Api');
@@ -185,9 +190,10 @@ const getCurrentAPI = () => {
  * Remove 'API' cookie
  */
 const removeCurrentAPI = () => {
+  const cookies = new Cookies();
   const updateApiMenu = updateCurrentApi(false);
   store.dispatch(updateApiMenu);
-  return Cookies.remove('currentApi', { path: window.location.pathname });
+  return cookies.remove('currentApi', { path: window.location.pathname });
 };
 
 /**
@@ -195,12 +201,13 @@ const removeCurrentAPI = () => {
  * @param {*} date
  */
 const setCurrentAPI = (API) => {
+  const cookies = new Cookies();
   try {
     const encodedApi = encodeURI(API);
     const exp = new Date();
     exp.setDate(exp.getDate() + 365);
     if (API) {
-      Cookies.set('currentApi', encodedApi, {
+      cookies.set('currentApi', encodedApi, {
         expires: exp,
         path: window.location.pathname,
       });
@@ -221,7 +228,8 @@ const setCurrentAPI = (API) => {
  * Get 'APISelector' value
  */
 const getAPISelector = () => {
-  return Cookies.get('APISelector') ? decodeURI(Cookies.get('APISelector')) == 'true' : false;
+  const cookies = new Cookies();
+  return cookies.get('APISelector') ? decodeURI(cookies.get('APISelector')) == 'true' : false;
 };
 
 /**
@@ -229,8 +237,9 @@ const getAPISelector = () => {
  * @param {*} value
  */
 const setAPISelector = (value) => {
+  const cookies = new Cookies();
   const encodedPattern = encodeURI(value);
-  Cookies.set('APISelector', encodedPattern, {
+  cookies.set('APISelector', encodedPattern, {
     path: window.location.pathname,
   });
 };
@@ -239,8 +248,9 @@ const setAPISelector = (value) => {
  * Get 'patternSelector' value
  */
 const getPatternSelector = () => {
-  return Cookies.get('patternSelector')
-    ? decodeURI(Cookies.get('patternSelector')) == 'true'
+  const cookies = new Cookies();
+  return cookies.get('patternSelector')
+    ? decodeURI(cookies.get('patternSelector')) == 'true'
     : false;
 };
 
@@ -249,8 +259,9 @@ const getPatternSelector = () => {
  * @param {*} value
  */
 const setPatternSelector = (value) => {
+  const cookies = new Cookies();
   const encodedPattern = encodeURI(value);
-  Cookies.set('patternSelector', encodedPattern, {
+  cookies.set('patternSelector', encodedPattern, {
     path: window.location.pathname,
   });
 };
@@ -260,11 +271,12 @@ const setPatternSelector = (value) => {
  * @param {*} newPattern
  */
 const setCurrentPattern = (newPattern) => {
+  const cookies = new Cookies();
   const encodedPattern = encodeURI(newPattern);
   const exp = new Date();
   exp.setDate(exp.getDate() + 365);
   if (newPattern) {
-    Cookies.set('currentPattern', encodedPattern, {
+    cookies.set('currentPattern', encodedPattern, {
       expires: exp,
       path: window.location.pathname,
     });
@@ -275,8 +287,9 @@ const setCurrentPattern = (newPattern) => {
  * Get 'currentPattern' value
  */
 const getCurrentPattern = () => {
-  const currentPattern = Cookies.get('currentPattern')
-    ? decodeURI(Cookies.get('currentPattern'))
+  const cookies = new Cookies();
+  const currentPattern = cookies.get('currentPattern')
+    ? decodeURI(cookies.get('currentPattern'))
     : '';
   // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
   if (
@@ -287,14 +300,15 @@ const getCurrentPattern = () => {
     const newPattern = currentPattern.substring(1, currentPattern.length - 1);
     setCurrentPattern(newPattern);
   }
-  return Cookies.get('currentPattern') ? decodeURI(Cookies.get('currentPattern')) : '';
+  return cookies.get('currentPattern') ? decodeURI(cookies.get('currentPattern')) : '';
 };
 
 /**
  * Remove 'currentPattern' value
  */
 const removeCurrentPattern = () => {
-  return Cookies.remove('currentPattern', { path: window.location.pathname });
+  const cookies = new Cookies();
+  return cookies.remove('currentPattern', { path: window.location.pathname });
 };
 
 /**
@@ -338,25 +352,28 @@ const removeSessionStorageItem = (key) => {
 };
 
 const setNavigation = (params) => {
-  const decodedNavigation = Cookies.get('navigate') ? decodeURI(Cookies.get('navigate')) : false;
+  const cookies = new Cookies();
+  const decodedNavigation = cookies.get('navigate') ? decodeURI(cookies.get('navigate')) : false;
   var navigate = decodedNavigation ? JSON.parse(decodedNavigation) : {};
   for (var key in params) {
     navigate[key] = params[key];
   }
   if (navigate) {
     const encodedURI = encodeURI(JSON.stringify(navigate));
-    Cookies.set('navigate', encodedURI, { path: window.location.pathname });
+    cookies.set('navigate', encodedURI, { path: window.location.pathname });
   }
 };
 
 const getNavigation = () => {
-  const decodedNavigation = Cookies.get('navigate') ? decodeURI(Cookies.get('navigate')) : false;
+  const cookies = new Cookies();
+  const decodedNavigation = cookies.get('navigate') ? decodeURI(cookies.get('navigate')) : false;
   const navigation = decodedNavigation ? JSON.parse(decodedNavigation) : {};
   return navigation;
 };
 
 const removeNavigation = () => {
-  return Cookies.remove('navigate', { path: window.location.pathname });
+  const cookies = new Cookies();
+  return cookies.remove('navigate', { path: window.location.pathname });
 };
 
 const setWzMenu = (isVisible = true) => {

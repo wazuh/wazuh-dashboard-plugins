@@ -429,7 +429,6 @@ export class WazuhElasticCtrl {
         "The Elasticsearch request didn't fetch the expected data"
       );
     } catch (error) {
-      console.log("wazuh-elastic",error)
       log('wazuh-elastic:getList', error.message || error);
       return ErrorResponse(error.message || error, 4006, 500, response);
     }

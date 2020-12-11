@@ -30,7 +30,7 @@ export function CheckResult(props) {
     } else if (props.check === false) {
       setResult('disabled');
     }
-  }, [props]);
+  }, [props.check, props.isLoading]);
 
   const initCheck = async () => {
     try {

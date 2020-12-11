@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
-* This program is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
@@ -35,6 +35,7 @@ import {
 import { CheckResult } from '../components/check-result';
 import AppState from '../../../react-services/app-state';
 import { useAppDeps } from '../../../components/common/hooks/use-app-deps';
+import { Fragment } from 'react';
 
 const checks = {
   api: {
@@ -60,7 +61,6 @@ const checks = {
 };
 
 export function HealthCheck() {
-  const [checkResults, setCheckResults] = useState<any[]>([]);
   const [checkErrors, setCheckErrors] = useState<any[]>([]);
   const { core } = useAppDeps();
   const appConfig = useAppConfig();
@@ -74,15 +74,14 @@ export function HealthCheck() {
   }, [appConfig]);
 
   const handleErrors = (errors, parsed) => {
-    let _errors = checkErrors;
-    _errors.push(
-      ...(parsed
-        ? errors.map((error) => ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true }))
-        : errors)
-    );
-    setCheckErrors(_errors);
+    const newErrors = parsed
+      ? errors.map((error) =>
+          ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true })
+        )
+      : errors;
+    setCheckErrors((prev) => [...prev, ...newErrors]);
   };
-  
+
   const renderChecks = () => {
     return Object.keys(checks).map((check, index) => {
       return (
@@ -95,7 +94,23 @@ export function HealthCheck() {
           isLoading={appConfig.isLoading}
         />
       );
-    })
+    });
+  };
+
+  const renderErrors = () => {
+    return checkErrors.map((error, index) => {
+      return (
+        <Fragment key={index}>
+          <EuiCallOut
+            title={error}
+            color="danger"
+            iconType="alert"
+            style={{ textAlign: 'left' }}
+          ></EuiCallOut>
+          <EuiSpacer size="xs" />
+        </Fragment>
+      );
+    });
   };
 
   const logo_url = core.http.basePath.prepend('/plugins/wazuh/assets/icon_blue.svg');
@@ -109,18 +124,7 @@ export function HealthCheck() {
         </EuiDescriptionList>
       </div>
       <EuiSpacer size="xxl" />
-      {(checkErrors || []).map((error, index) => (
-        <>
-          <EuiCallOut
-            key= {index}
-            title={error}
-            color="danger"
-            iconType="alert"
-            style={{ textAlign: 'left' }}
-          ></EuiCallOut>
-          <EuiSpacer size="xs" />
-        </>
-      ))}
+      {renderErrors()}
       <EuiSpacer size="xxl" />
       {!!checkErrors.length && (
         <EuiButton fill href="/settings">
