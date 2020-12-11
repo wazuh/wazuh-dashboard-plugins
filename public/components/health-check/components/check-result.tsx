@@ -18,32 +18,51 @@ import {
   EuiIcon,
   EuiLoadingSpinner,
 } from '@elastic/eui';
+import { useStartTyping } from 'react-use';
 
 type Result = 'loading' | 'ready' | 'error' | 'disabled';
 
 export function CheckResult(props) {
   const [result, setResult] = useState<Result>('loading');
+  const [isCheckStarted, setIsCheckStarted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (props.check && !props.isLoading) {
+    if (props.check && !props.isLoading && awaitForIsReady()) {
       initCheck();
     } else if (props.check === false) {
       setResult('disabled');
+      setAsReady();
     }
-  }, [props.check, props.isLoading]);
+  }, [props.check, props.isLoading, props.checksReady]);
+
+  const setAsReady = () => {
+    props.handleCheckReady(props.name, true)
+  }
+
+  /**
+   * validate if the current check is not started and if the dependentes checks are ready
+   */
+  const awaitForIsReady = () => {
+    return !isCheckStarted && (props.awaitFor.lenght === 0 || props.awaitFor.every((check) => {
+      return props.checksReady[check];
+    }))
+  }
 
   const initCheck = async () => {
+    setIsCheckStarted(true);
     try {
       const { errors } = await props.validationService();
       if (errors.length) {
         props.handleErrors(errors);
         setResult('error');
       } else {
-        setResult('ready');
-      }
+        setResult('ready');        
+      }      
     } catch (error) {
       props.handleErrors([error], true);
       setResult('error');
+    } finally {      
+      setAsReady();
     }
   };
 

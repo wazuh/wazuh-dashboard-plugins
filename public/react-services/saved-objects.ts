@@ -155,15 +155,14 @@ const refreshFieldsOfIndexPattern = async (id, title, fields) => {
  */
 const refreshIndexPattern = async (pattern) => {
   try {
-    const { title: patternTitle } = await getDataPlugin().indexPatterns.get(pattern);
     const fields = await GenericRequest.request(
       //we check if indices exist before creating the index pattern
       'GET',
-      `/api/index_patterns/_fields_for_wildcard?pattern=${patternTitle}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
+      `/api/index_patterns/_fields_for_wildcard?pattern=${pattern.title}&meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score`,
       {}
     );
 
-    await refreshFieldsOfIndexPattern(pattern, patternTitle, fields);
+    await refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
 
     return;
   } catch (error) {

@@ -456,14 +456,10 @@ export class ElasticWrapper {
   /**
    * Same as curling the templates from Elasticsearch
    */
-  async getTemplates() {
+  async getTemplates(elasticClient: IScopedClusterClient) {
     try {
-      const data = await this.elasticRequest.callWithInternalUser(
-        'cat.templates',
-        {}
-      );
-
-      return data;
+      const data = await elasticClient.asInternalUser.cat.templates();      
+      return data.body;
     } catch (error) {
       return Promise.reject(error);
     }

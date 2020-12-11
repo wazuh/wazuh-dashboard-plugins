@@ -38,30 +38,36 @@ import { useAppDeps } from '../../../components/common/hooks/use-app-deps';
 import { Fragment } from 'react';
 
 const checks = {
-  api: {
+  api: {    
     title: 'Check Wazuh API connection',
     validator: checkApiService,
+    awaitFor: []
   },
   setup: {
     title: 'Check for Wazuh API version',
     validator: checkSetupService,
+    awaitFor: ["api"],
   },
   pattern: {
     title: 'Check Elasticsearch index pattern',
     validator: checkPatternService,
+    awaitFor: []
   },
   template: {
     title: 'Check Elasticsearch template',
     validator: checkTemplateService,
+    awaitFor: ["pattern"],
   },
   fields: {
     title: 'Check index pattern fields',
     validator: checkFieldsService,
+    awaitFor: ["pattern"],
   },
 };
 
 export function HealthCheck() {
   const [checkErrors, setCheckErrors] = useState<any[]>([]);
+  const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
   const { core } = useAppDeps();
   const appConfig = useAppConfig();
 
@@ -82,16 +88,24 @@ export function HealthCheck() {
     setCheckErrors((prev) => [...prev, ...newErrors]);
   };
 
+  const handleCheckReady = (checkId, isReady) => {    
+    setChecksReady(prev =>  ({...prev, [checkId]: isReady}));
+  }
+
   const renderChecks = () => {
     return Object.keys(checks).map((check, index) => {
       return (
         <CheckResult
-          key={index}
+          key={index}          
+          name={check}
           title={checks[check].title}
+          awaitFor={checks[check].awaitFor}
           check={appConfig.data[`checks.${check}`]}
           validationService={checks[check].validator}
           handleErrors={handleErrors}
           isLoading={appConfig.isLoading}
+          handleCheckReady= {handleCheckReady}
+          checksReady={checksReady}
         />
       );
     });

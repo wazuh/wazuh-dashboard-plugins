@@ -54,7 +54,7 @@ export function WazuhElasticRouter(router: IRouter) {
         })
       }
     },
-    async (context, request, response) => response.ok({ body: 'Hi!' })
+    async (context, request, response) => ctrl.getTemplate(context, request, response)
   );
 
   router.get(

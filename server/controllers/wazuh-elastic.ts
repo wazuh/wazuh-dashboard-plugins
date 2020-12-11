@@ -65,19 +65,22 @@ export class WazuhElasticCtrl {
 
   /**
    * This retrieve a template from Elasticsearch
-   * @param {Object} req
-   * @param {Object} reply
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
    * @returns {Object} template or ErrorResponse
    */
-  async getTemplate(req, reply) {
+  async getTemplate(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      if (!req.params || !req.params.pattern) {
+      const params = request.params as {pattern: string};
+      if (!params || !params.pattern) {
         throw new Error(
           'An index pattern is needed for checking the Elasticsearch template existance'
         );
       }
+      const elasticClient = context.core.elasticsearch.client;
 
-      const data = await this.wzWrapper.getTemplates();
+      const data = await this.wzWrapper.getTemplates(elasticClient);
 
       if (!data || typeof data !== 'string') {
         throw new Error(
@@ -85,11 +88,11 @@ export class WazuhElasticCtrl {
         );
       }
 
-      const lastChar = req.params.pattern[req.params.pattern.length - 1];
+      const lastChar = params.pattern[params.pattern.length - 1];
 
       // Split into separate patterns
-      const tmpdata = data.match(/\[.*\]/g);
-      const tmparray = [];
+      const tmpdata = data.match(/\[.*\]/g) || [];
+      const tmparray: string[] = [];
       for (let item of tmpdata) {
         // A template might use more than one pattern
         if (item.includes(',')) {
@@ -109,7 +112,7 @@ export class WazuhElasticCtrl {
       );
 
       const pattern =
-        lastChar === '*' ? req.params.pattern.slice(0, -1) : req.params.pattern;
+        lastChar === '*' ? params.pattern.slice(0, -1) : params.pattern;
       const isIncluded = array.filter(item => {
         item = item.slice(1, -1);
         const lastChar = item[item.length - 1];
@@ -125,17 +128,20 @@ export class WazuhElasticCtrl {
         }`,
         'debug'
       );
-      return isIncluded && Array.isArray(isIncluded) && isIncluded.length
+      return response.ok({
+        body: 
+          isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? {
           statusCode: 200,
           status: true,
-          data: `Template found for ${req.params.pattern}`
+          data: `Template found for ${params.pattern}`
         }
         : {
           statusCode: 200,
           status: false,
-          data: `No template found for ${req.params.pattern}`
-        };
+          data: `No template found for ${params.pattern}`
+        }
+      });
     } catch (error) {
       log('wazuh-elastic:getTemplate', error.message || error);
       return ErrorResponse(
@@ -143,7 +149,7 @@ export class WazuhElasticCtrl {
         error}`,
         4002,
         500,
-        reply
+        response
       );
     }
   }

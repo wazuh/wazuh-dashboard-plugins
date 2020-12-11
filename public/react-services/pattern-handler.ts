@@ -122,10 +122,8 @@ const changePattern = async (selectedPattern) => {
 const refreshIndexPattern = async () => {
   try {
     const currentPattern = AppState.getCurrentPattern();
-    const courierData = await getDataPlugin().indexPatterns.get(currentPattern);
-    await SavedObject.refreshIndexPattern(currentPattern);
-    const fields = await courierData.fieldsFetcher.fetch({});
-    await courierData.initFields(fields);
+    const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
+    await SavedObject.refreshIndexPattern(pattern);
   } catch (error) {
     throw new Error(error);
   }
