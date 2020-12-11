@@ -25,6 +25,10 @@ const requiredPermissionsCluster = [
     action: 'cluster:delete_file',
     resource: 'file:path:etc/lists/security-eventchannel',
   },
+  {
+    action: `cluster:read_file`,
+    resource: `node:id:*&file:path:*`,
+  },
 ];
 
 const requiredPermissionsManager = [
@@ -103,6 +107,10 @@ const missingPermissionsForClusterUser = [
     action: 'cluster:delete_file',
     resource: 'file:path:etc/lists/security-eventchannel',
   },
+  {
+    action: 'cluster:read_file',
+    resource: 'node:id:*&file:path:*',
+  },
 ];
 
 const missingPermissionsForManagerUser = [
@@ -171,19 +179,19 @@ describe('Wazuh User Permissions', () => {
         expect(result).toEqual(false); // false === all permissions OK
       });
 
-      // it('Should return a simple missing permissions for cluster user', () => {
-      //   const simplePermission = [
-      //     {
-      //       action: 'cluster:read',
-      //       resource: 'node:id:*',
-      //     },
-      //   ];
-      //   const result = WzUserPermissions.checkMissingUserPermissions(
-      //     simplePermission,
-      //     userClusterTest
-      //   );
-      //   expect(result).toEqual(false);
-      // });
+      it('Should return a simple missing permissions for cluster user', () => {
+        const simplePermission = [
+          {
+            action: 'cluster:status',
+            resource: '*:*:*',
+          },
+        ];
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          simplePermission,
+          userClusterTest
+        );
+        expect(result).toEqual(false);
+      });
     });
 
     describe('Should return all the required permissions to show on view', () => {
@@ -196,7 +204,10 @@ describe('Wazuh User Permissions', () => {
       });
 
       it('Should return missing permissions for cluster user', () => {
-        const result = WzUserPermissions.checkMissingUserPermissions(requiredPermissionsCluster, userClusterTest);
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          requiredPermissionsCluster,
+          userClusterTest
+        );
         expect(result).toEqual(missingPermissionsForClusterUser);
       });
     });
