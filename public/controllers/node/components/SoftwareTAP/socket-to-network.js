@@ -22,6 +22,8 @@ import {
   EuiLoadingChart,
   EuiBasicTable,
   WzButtonPermissions,
+  EuiBadge,
+  EuiTextColor,
   EuiToolTip,
   EuiButtonIcon,
   EuiEmptyPrompt,
@@ -42,33 +44,36 @@ export const SocketToNewtwork = () => {
 
   const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState({});
 
-  useEffect(() => {    
+  useEffect(() => {
+    console.log("nodePlugins");
+    console.log(nodePlugins);
     dispatch(IsLoadingData(true));
     formatPlugin()
   }, []);
-  
-  useEffect(() => {        
+
+  useEffect(() => {
     dispatch(IsLoadingData(true));
     formatPlugin()
   }, [nodePlugins]);
 
-  function formatPlugin(){
+  function formatPlugin() {
     var allSTAP = [];
 
-      [...Object.keys(nodePlugins).map((item) => { 
-        if(nodePlugins[item]["type"] == "socket-network"){
-          nodePlugins[item]["service"] = item
-          allSTAP.push(nodePlugins[item])
-        }
-      })];
-      
-      var plug = []
-      const formatedNodes = (allSTAP || []).map(plugin => {
-        plug.push( {...plugin, actions: plugin} )
-      });  
-      
-      setPlugins(plug)      
-      dispatch(IsLoadingData(false));
+    [...Object.keys(nodePlugins).map((item) => {
+      if (nodePlugins[item]["type"] == "socket-network") {
+        nodePlugins[item]["service"] = item
+        nodePlugins[item]["connectionName"] = nodePlugins[item]["name"] + ' -/- ' + nodePlugins[item]["connectionsCount"]
+        allSTAP.push(nodePlugins[item])
+      }
+    })];
+
+    var plug = []
+    const formatedNodes = (allSTAP || []).map(plugin => {
+      plug.push({ ...plugin, actions: plugin })
+    });
+
+    setPlugins(plug)
+    dispatch(IsLoadingData(false));
   }
 
 
@@ -92,7 +97,7 @@ export const SocketToNewtwork = () => {
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
               iconType="plusInCircle"
-              onClick={() => { dispatch(toggleSocketNetwork("add"))}}
+              onClick={() => { dispatch(toggleSocketNetwork("add")) }}
             >
               Add Socket->Network
               </EuiButtonEmpty>
@@ -104,13 +109,21 @@ export const SocketToNewtwork = () => {
     );
   }
 
-
   function columns() {
     return [
       {
-        field: 'name',
+        field: 'connectionName',
         name: 'Description',
         sortable: true,
+        render: item => {
+          var dataArray = item.split(' -/- ');
+          return (
+            <>
+              <EuiTextColor color="default">{dataArray[0]}  </EuiTextColor>
+              <EuiBadge color='default'>{dataArray[1]}</EuiBadge>
+            </>
+          );
+        },
       },
       {
         field: 'pid',
@@ -201,7 +214,7 @@ export const SocketToNewtwork = () => {
         field: 'pid',
         name: 'PID/name',
       },
-      
+
     ];
   }
 
@@ -217,34 +230,34 @@ export const SocketToNewtwork = () => {
 
       //split and filter connection data
       var conns = item.connections.split("\n");
-      var result = conns.filter(con => con != "");          
+      var result = conns.filter(con => con != "");
       result.forEach(function (item, index) {
         var splittedData = item.split(' ');
         var dataFiltered = splittedData.filter(word => word != '');
         connItems.push({
-          proto:dataFiltered[0],
-          recvQ:dataFiltered[1],
-          sendQ:dataFiltered[2],
-          localAddr:dataFiltered[3],
-          clientAddr:dataFiltered[4],
-          state:dataFiltered[5],
-          pid:dataFiltered[6],
-        })                                         
-    });
+          proto: dataFiltered[0],
+          recvQ: dataFiltered[1],
+          sendQ: dataFiltered[2],
+          localAddr: dataFiltered[3],
+          clientAddr: dataFiltered[4],
+          state: dataFiltered[5],
+          pid: dataFiltered[6],
+        })
+      });
 
       //check for connections number
       {
-        item.connections=="" || item.connectionsCount == "0"
-        ?
-        connectionContent='No connections available'
-        :
-        connectionContent=<EuiBasicTable
-                            items={connItems}
-                            itemId="service"
-                            columns={ConnColumns()}
-                            loading={false}
-                          />
-      }          
+        item.connections == "" || item.connectionsCount == "0"
+          ?
+          connectionContent = 'No connections available'
+          :
+          connectionContent = <EuiBasicTable
+            items={connItems}
+            itemId="service"
+            columns={ConnColumns()}
+            loading={false}
+          />
+      }
 
       const listItems = [
         {
@@ -264,50 +277,50 @@ export const SocketToNewtwork = () => {
     return (
       <div className={'icon-box-action'}>
         {
-          data["running"] == "true" 
-          ?
-          <EuiToolTip content="Stop" position="left">
-            <EuiButtonIcon
-              onClick={ev => { 
-                dispatch(IsLoadingData(true));
-                dispatch(stopStapService(
-                  {
-                    uuid: nodeDetail.uuid,
-                    service: data.service,
-                    type: data.type,
-                  }
-                )) 
-              }}
-              iconType="stop"
-              color={'primary'}
-              aria-label="Stop"
-            />
-          </EuiToolTip>
-          :
-          <EuiToolTip content="Play" position="left">
-            <EuiButtonIcon
-              onClick={ev => { 
-                dispatch(IsLoadingData(true));
-                dispatch(deployStapService(
-                  {
-                    uuid: nodeDetail.uuid,
-                    service: data.service,
-                    type: data.type,
-                  }
-                )) 
-              }}
-              iconType="play"
-              color={'primary'}
-              aria-label="Play"
-            />
-          </EuiToolTip>
+          data["running"] == "true"
+            ?
+            <EuiToolTip content="Stop" position="left">
+              <EuiButtonIcon
+                onClick={ev => {
+                  dispatch(IsLoadingData(true));
+                  dispatch(stopStapService(
+                    {
+                      uuid: nodeDetail.uuid,
+                      service: data.service,
+                      type: data.type,
+                    }
+                  ))
+                }}
+                iconType="stop"
+                color={'primary'}
+                aria-label="Stop"
+              />
+            </EuiToolTip>
+            :
+            <EuiToolTip content="Play" position="left">
+              <EuiButtonIcon
+                onClick={ev => {
+                  dispatch(IsLoadingData(true));
+                  dispatch(deployStapService(
+                    {
+                      uuid: nodeDetail.uuid,
+                      service: data.service,
+                      type: data.type,
+                    }
+                  ))
+                }}
+                iconType="play"
+                color={'primary'}
+                aria-label="Play"
+              />
+            </EuiToolTip>
         }
 
         <EuiToolTip content="Edit" position="left">
           <EuiButtonIcon
-            onClick={ev => { 
+            onClick={ev => {
               dispatch(savePluginToEdit(data))
-              dispatch(toggleSocketNetwork("edit")) 
+              dispatch(toggleSocketNetwork("edit"))
             }}
             iconType="documentEdit"
             color={'primary'}
@@ -317,7 +330,7 @@ export const SocketToNewtwork = () => {
 
         <EuiToolTip content="Delete" position="left">
           <EuiButtonIcon
-            onClick={ev => { dispatch(IsLoadingData(true)); dispatch(deleteService({uuid: nodeDetail.uuid, service:data.service})) }}
+            onClick={ev => { dispatch(IsLoadingData(true)); dispatch(deleteService({ uuid: nodeDetail.uuid, service: data.service })) }}
             iconType="trash"
             color={'primary'}
             aria-label="Delete"

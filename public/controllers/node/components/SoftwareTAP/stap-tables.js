@@ -46,7 +46,7 @@ export const StapTables = () => {
 	const showSocPcap = useSelector(state => state.nidsReducers.showSocPcap);
 	const showNetSoc = useSelector(state => state.nidsReducers.showNetSoc);
 	const nodePlugins = useSelector(state => state.nidsReducers.nodePlugins);
-
+	
 	function IsInstalled() {
 		if (nodePlugins["installed"]["checkSocat"] == "false" || nodePlugins["installed"]["checkTcpdump"] == "false" || nodePlugins["installed"]["checkTcpreplay"] == false) {
 			return <div>
@@ -95,7 +95,7 @@ export const StapTables = () => {
 
 	return (
 		<div>
-			{IsInstalled()}
+			{nodePlugins!=undefined ? IsInstalled() : null}
 			{showSocNet != '' ? <AddSocketToNewtwork></AddSocketToNewtwork> : null}
 			<br />
 			<SocketToNewtwork></SocketToNewtwork>

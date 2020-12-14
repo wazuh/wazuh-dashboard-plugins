@@ -47,7 +47,7 @@ export const AddNetworkToSocket = () => {
 		connectionsCount: "",
 		interface: "",
 		name: "",
-		cert: "",
+		cert: "/usr/local/owlh/src/owlhnode/conf/certs/ca.pem",
 		bpf: "",
 		collector: "",
 		pid: "",
@@ -58,8 +58,6 @@ export const AddNetworkToSocket = () => {
 	})
 
 	useEffect(() => {
-		console.log(editPlugin);
-
 		//create interface array
 		var ifaces = []
 		Object.entries(interfaces || {}).map((id) => {
@@ -114,8 +112,6 @@ export const AddNetworkToSocket = () => {
 	}
 
 	const handleEditRequest = () => {
-    console.log("EDIT");
-    console.log(stapData);
 		dispatch(IsLoadingData(true));
 		dispatch(toggleNetworkSocket(''));
 		dispatch(updateService(

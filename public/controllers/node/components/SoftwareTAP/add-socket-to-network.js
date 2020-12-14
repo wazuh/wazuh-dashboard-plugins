@@ -48,16 +48,14 @@ export const AddSocketToNewtwork = () => {
 		interfaz: "",
 		name: "",
 		pid: "",
-		cert: "",
+		cert: "/usr/local/owlh/src/owlhnode/conf/certs/ca.pem",
 		port: "",
 		running: "",
 		type: "",
 	})
 
 	useEffect(() => {
-		console.log(editPlugin);
-
-		//create interface array
+  	//create interface array
 		var ifaces = []
 		Object.entries(interfaces || {}).map((id) => {
 			ifaces.push({ value: id[0], text: id[0] })

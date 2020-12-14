@@ -145,14 +145,10 @@ export const SuricataTable = withReduxProvider(() => {
         field: 'name',
         name: 'Description',
         sortable: true,
-        // width: '20%',
-        // truncateText: true
       },
       {
         field: 'status',
         name: 'Status',
-        // width: '15%',
-        // truncateText: true,
         sortable: true,
         render: item => {
           if (item == "disabled") {
@@ -165,10 +161,9 @@ export const SuricataTable = withReduxProvider(() => {
       {
         field: 'running',
         name: 'Running',
-        // width: '15%',
-        // truncateText: true,
         sortable: true, 
         render: item => {
+          console.log(item);
           if (item == "false") {
             return <EuiHealth color="danger">Stopped</EuiHealth>
           } else {
@@ -179,22 +174,16 @@ export const SuricataTable = withReduxProvider(() => {
       {
         field: 'bpf',
         name: 'BPF',
-        // width: '10%',
-        // truncateText: true,
         sortable: true
       },
       {
         field: 'localRulesetName',
         name: 'Ruleset',
-        // width: '10%',
-        // truncateText: true,
         sortable: true
       },
       {
         field: 'interface',
         name: 'Interface',
-        // width: '15%',
-        // truncateText: true,
         sortable: true
       },
       {
@@ -278,7 +267,7 @@ export const SuricataTable = withReduxProvider(() => {
         <EuiToolTip content="Edit Suricata file" position="left">
           <EuiButtonIcon
             onClick={ev => {
-              dispatch(NidsShowFile("suricata_config"))
+              dispatch(NidsShowFile({ type: "Suricata config file", path: data.configFile, lines: "none" }))
               AppNavigate.navigateToModule(ev, 'nids-files', {})
             }}
             iconType="documentEdit"

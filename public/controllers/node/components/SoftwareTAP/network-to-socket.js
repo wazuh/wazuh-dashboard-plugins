@@ -6,7 +6,7 @@ import {
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiDescriptionList ,
+  EuiDescriptionList,
   EuiSpacer,
   EuiText,
   EuiFlexGrid,
@@ -19,6 +19,8 @@ import {
   EuiPopover,
   WzTextWithTooltipIfTruncated,
   EuiSelect,
+  EuiTextColor,
+  EuiBadge,
   EuiLoadingChart,
   EuiBasicTable,
   WzButtonPermissions,
@@ -57,8 +59,7 @@ export const NetworkToSocket = () => {
     [...Object.keys(nodePlugins).map((item) => {
       if (nodePlugins[item]["type"] == "network-socket") {
         nodePlugins[item]["service"] = item
-        // {nodePlugins[item]["pid"] != "none" ? nodePlugins[item]["pid"] = "on" : nodePlugins[item]["pid"] = "off"}
-        // {"running" in nodePlugins[item] ? nodePlugins[item]["running"] = "running" : nodePlugins[item]["running"] = "stopped"}
+        nodePlugins[item]["connectionName"] = nodePlugins[item]["name"] + ' -/- ' + nodePlugins[item]["connectionsCount"]
         allSTAP.push(nodePlugins[item])
       }
     })];
@@ -108,9 +109,18 @@ export const NetworkToSocket = () => {
   function columns() {
     return [
       {
-        field: 'name',
+        field: 'connectionName',
         name: 'Description',
         sortable: true,
+        render: item => {
+          var dataArray = item.split(' -/- ');
+          return (
+            <>
+              <EuiTextColor color="default">{dataArray[0]}  </EuiTextColor>
+              <EuiBadge color='default'>{dataArray[1]}</EuiBadge>
+            </>
+          );
+        },
       },
       {
         field: 'pid',
@@ -212,7 +222,7 @@ export const NetworkToSocket = () => {
         field: 'pid',
         name: 'PID/name',
       },
-      
+
     ];
   }
 
@@ -228,34 +238,34 @@ export const NetworkToSocket = () => {
 
       //split and filter connection data
       var conns = item.connections.split("\n");
-      var result = conns.filter(con => con != "");          
+      var result = conns.filter(con => con != "");
       result.forEach(function (item, index) {
         var splittedData = item.split(' ');
         var dataFiltered = splittedData.filter(word => word != '');
         connItems.push({
-          proto:dataFiltered[0],
-          recvQ:dataFiltered[1],
-          sendQ:dataFiltered[2],
-          localAddr:dataFiltered[3],
-          clientAddr:dataFiltered[4],
-          state:dataFiltered[5],
-          pid:dataFiltered[6],
-        })                                         
-    });
+          proto: dataFiltered[0],
+          recvQ: dataFiltered[1],
+          sendQ: dataFiltered[2],
+          localAddr: dataFiltered[3],
+          clientAddr: dataFiltered[4],
+          state: dataFiltered[5],
+          pid: dataFiltered[6],
+        })
+      });
 
       //check for connections number
       {
-        item.connections=="" || item.connectionsCount == "0"
-        ?
-        connectionContent='No connections available'
-        :
-        connectionContent=<EuiBasicTable
-                            items={connItems}
-                            itemId="service"
-                            columns={ConnColumns()}
-                            loading={false}
-                          />
-      }          
+        item.connections == "" || item.connectionsCount == "0"
+          ?
+          connectionContent = 'No connections available'
+          :
+          connectionContent = <EuiBasicTable
+            items={connItems}
+            itemId="service"
+            columns={ConnColumns()}
+            loading={false}
+          />
+      }
 
       const listItems = [
         {

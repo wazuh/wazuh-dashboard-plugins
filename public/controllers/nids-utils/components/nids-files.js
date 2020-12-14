@@ -45,7 +45,8 @@ export const NidsFiles = withReduxProvider(() => {
 	const title = headRender();
 
 	useEffect(() => {		
-		if(file.type=="alerts.json" || file.type=="ossec.conf" || file.type.includes("Wazuh file")){
+		console.log(file);
+		if(file.type=="alerts.json" || file.type=="Suricata config file" || file.type=="ossec.conf" || file.type.includes("Wazuh file")){
 			dispatch(IsLoadingData(true))
 			dispatch(LoadFileLastLines({ uuid:nodeDetail.uuid, number:file.lines, path:file.path }))
 		}else{
@@ -76,10 +77,10 @@ export const NidsFiles = withReduxProvider(() => {
 
 
 					{
-						file.type != "alerts.json" || file.type != "ossec.conf"
+						file.type != "alerts.json" || file.type != "ossec.conf" || file.type=="Suricata config file"
 						?
 						(
-							file.type === "ossec.conf"
+							file.type === "ossec.conf" || file.type=="Suricata config file"
 							?
 							<EuiFlexItem grow={false}>
 								<EuiButtonEmpty iconType="save" onClick={ev => {

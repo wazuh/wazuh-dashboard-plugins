@@ -46,20 +46,11 @@ export const AddSocketToPcap = () => {
 		type: "",
 		name: "",
 		port: "",
-		cert: "",
+		cert: "/usr/local/owlh/src/owlhnode/conf/certs/ca.pem",
 		bpf: "",
 		"pcap-path": "",
 		"pcap-prefix": "",
 	})
-
-	useEffect(() => {
-    console.log("BEFORE");
-    console.log(editPlugin);
-  },[])
-	useEffect(() => {
-    console.log("AFTER");
-    console.log(stapData);
-  },[stapData])
 
 	useEffect(() => {
 		//create interface array
