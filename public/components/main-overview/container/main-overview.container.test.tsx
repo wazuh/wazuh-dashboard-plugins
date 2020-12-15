@@ -11,10 +11,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { shallow } from 'enzyme';
 import { MainOverview } from './main-overview.container';
-import { EuiFlyout } from '@elastic/eui';
 
 jest.mock('../../../react-services/app-state', () => ({
   getCurrentAPI: () => {
@@ -47,12 +46,14 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('../components/overview-welcome', () => ({
-  OverviewWelcome: () => () => <div />,
+  OverviewWelcome: () => () => <></>,
 }));
+
 jest.mock('../components/overview-stats', () => ({
-  OverviewStats: () => () => <div />,
+  OverviewStats: () => () => <></>,
 }));
-describe('Main overview', () => {
+
+describe('Main overview container', () => {
   test('should render a Main overview screen', () => {
     const component = shallow(<MainOverview />);
 

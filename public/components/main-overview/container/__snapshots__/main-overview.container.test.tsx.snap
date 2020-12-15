@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Main overview should render a Main overview screen 1`] = `
+exports[`Main overview container should render a Main overview screen 1`] = `
 <EuiFlexGroup
   direction="column"
 >

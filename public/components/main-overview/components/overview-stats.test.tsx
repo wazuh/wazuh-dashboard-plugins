@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for main overview - Test
+ * Wazuh app - React component for showing stats about agents - Test
  *
  * Copyright (C) 2015-2020 Wazuh, Inc.
  *
@@ -17,7 +17,7 @@ import { OverviewStats } from './overview-stats';
 import { AgentsSummary } from '../../common/hooks/types';
 import { findTestSubject } from '@elastic/eui/lib/test';
 
-describe('Overview stats', () => {
+describe('Overview stats component', () => {
   test('should render a Overview stats screen', () => {
     const summaryMock: AgentsSummary = {
       total: 0,

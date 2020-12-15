@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Overview stats should render a Overview stats screen 1`] = `
+exports[`Overview stats component should render a Overview stats screen 1`] = `
 <EuiPage>
   <EuiFlexGroup>
     <EuiFlexItem />
