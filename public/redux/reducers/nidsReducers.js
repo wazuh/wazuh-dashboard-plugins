@@ -30,9 +30,16 @@ const initialState = {
     wazuhData: {},
     mainConfData: {},
     mainServiceStatus: {},
+    serviceStatus: {},
   };
   
   const nidsReducers = (state = initialState, action) => {
+      if (action.type === 'SERVICE_STATUS') {
+        return {
+          ...state,
+          serviceStatus: action.payload
+        };
+      }  
       if (action.type === 'MAIN_CONF_DATA') {
         return {
           ...state,

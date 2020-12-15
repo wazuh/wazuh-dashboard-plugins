@@ -306,6 +306,7 @@ export function changeServiceStatus(pluginData) {
   }
   return async (dispatch) => {
     const data = await NidsRequest.genericReq('PUT', '/nids/node/changeServiceStatus', params)
+    dispatch(changeServiceStatusData(data.data.data))
     dispatch(PingPluginsNode(pluginData.uuid))
   }
 }
@@ -501,6 +502,13 @@ function accGetMainconfData(data) {
     type: 'MAIN_CONF_DATA',
     payload: data
   }
+};
+
+export const changeServiceStatusData = value => {
+  return {
+    type: 'SERVICE_STATUS',
+    payload: value
+  };
 };
 
 export const saveZeekDiag = value => {

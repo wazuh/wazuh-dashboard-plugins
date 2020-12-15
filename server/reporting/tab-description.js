@@ -15,6 +15,11 @@ export const TabDescription = {
     description:
       'Browse through your security alerts, identifying issues and threats in your environment.'
   },
+  nids: {
+    title: 'Network threat detection',
+    description:
+      'Network Security Monitor.'
+  },
   fim: {
     title: 'Integrity monitoring',
     description:

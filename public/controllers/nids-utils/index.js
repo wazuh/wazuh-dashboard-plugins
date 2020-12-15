@@ -14,9 +14,11 @@
 import { uiModules } from 'ui/modules';
 import { NidsUtilsController } from './nids-utils';
 import { NidsFiles } from './components/nids-files';
+import { ServiceCommands } from './components/service-commands';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('NidsUtilsController', NidsUtilsController)
-  .value('NidsFiles', NidsFiles);
+  .value('NidsFiles', NidsFiles)
+  .value('ServiceCommands', ServiceCommands)

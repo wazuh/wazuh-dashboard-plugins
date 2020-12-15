@@ -140,7 +140,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -159,7 +159,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -172,7 +172,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -185,7 +185,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -302,7 +302,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -315,7 +315,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -328,7 +328,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -341,7 +341,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -354,7 +354,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
@@ -367,7 +367,7 @@ export class WazuhNidsCtrl {
       return {
         statusCode: 200,
         error: 0,
-        data: []
+        data: (data || [])
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);

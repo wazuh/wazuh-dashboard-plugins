@@ -182,6 +182,10 @@ routes
     template: nidsTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
+  // .when('/service-commands/', {
+  //   template: NidsCommandController,
+  //   resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
+  // })
   .when('/node/', {
     template: nodeTemplate,
     resolve: { enableWzMenu, nestedResolve, ip, savedSearch }

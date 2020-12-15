@@ -415,8 +415,12 @@ export class ManageNidsHosts {
         data: JSON.stringify(req.data)
       };
       const response = await axios(options);
-             
-      return null
+
+      if(response.data.ack == "false"){
+        return response.data
+      }else{
+        return null
+      }
 
     } catch (error) {
       throw error;

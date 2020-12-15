@@ -12,6 +12,7 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiHealth,
+  EuiBadge,
   EuiHorizontalRule,
   EuiPage,
   EuiSwitch,
@@ -21,6 +22,7 @@ import {
   EuiSelect,
   EuiLoadingChart,
   EuiBasicTable,
+  EuiTextColor,
   WzButtonPermissions,
   EuiToolTip,
   EuiButtonIcon,
@@ -42,6 +44,7 @@ export const SuricataTable = withReduxProvider(() => {
   const toggleSuricata = useSelector(state => state.nidsReducers.toggleSuricata);
   const mainServiceStatus = useSelector(state => state.nidsReducers.mainServiceStatus);
   const mainConfData = useSelector(state => state.nidsReducers.mainConfData);
+  const serviceStatus = useSelector(state => state.nidsReducers.serviceStatus);
 
   const [plugins, setPlugins] = useState([])
 
@@ -145,6 +148,22 @@ export const SuricataTable = withReduxProvider(() => {
         field: 'name',
         name: 'Description',
         sortable: true,
+        render: item => {
+          if (serviceStatus.ack == "false") {
+            return (
+              <>
+                <EuiTextColor color="default">{item}</EuiTextColor>
+                <EuiBadge 
+                  onClick={ev => AppNavigate.navigateToModule(ev, 'service-commands', {})}
+                  color='warning'>
+                    Error - View log
+                </EuiBadge>
+              </>
+            );
+          } else {
+            return <EuiTextColor color="default">{item}</EuiTextColor>
+          }
+        }
       },
       {
         field: 'status',
@@ -163,7 +182,6 @@ export const SuricataTable = withReduxProvider(() => {
         name: 'Running',
         sortable: true, 
         render: item => {
-          console.log(item);
           if (item == "false") {
             return <EuiHealth color="danger">Stopped</EuiHealth>
           } else {

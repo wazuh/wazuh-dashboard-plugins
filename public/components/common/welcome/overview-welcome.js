@@ -28,6 +28,7 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import './welcome.less';
+import { AppNavigate } from '../../../react-services/app-navigate';
 import { TabDescription } from '../../../../server/reporting/tab-description';
 
 export class OverviewWelcome extends Component {
@@ -58,7 +59,14 @@ export class OverviewWelcome extends Component {
           icon={<EuiIcon size="xl" type={icon} color="primary" />}
           className="homSynopsis__card"
           title={TabDescription[tab].title}
-          onClick={() => store.dispatch(updateCurrentTab(tab))}
+          onClick={ev => {
+              tab=='nids'
+              ?
+              AppNavigate.navigateToModule(ev, 'nids', {})
+              :
+              store.dispatch(updateCurrentTab(tab))
+            }
+          }
           data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
           description={TabDescription[tab].description}
         />
@@ -79,6 +87,7 @@ export class OverviewWelcome extends Component {
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('general', 'dashboardApp')}
                       {this.buildTabCard('fim', 'filebeatApp')}
+                      {this.buildTabCard('nids', 'filebeatApp')}
                       {this.props.extensions.aws &&
                         this.buildTabCard('aws', 'logoAWSMono')}
                       {this.props.extensions.gcp &&
