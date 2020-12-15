@@ -31,14 +31,6 @@ export const OverviewStats = (props: IOverviewStastsProps) => {
     window.location.href = '#/agents-preview';
   };
 
-  const renderTitle = (total) => {
-    return (
-      <EuiToolTip position="top" content={`Go to all agents`}>
-        <span>{total}</span>
-      </EuiToolTip>
-    );
-  };
-
   return (
     <EuiPage>
       <EuiFlexGroup>
@@ -50,7 +42,8 @@ export const OverviewStats = (props: IOverviewStastsProps) => {
                 <span
                   className={'statWithLink'}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => goToAgents(null)}
+                  onClick={() => goToAgents(null)}                  
+                  data-test-subj='spanTotalAgents'
                 >
                   {props.summary.total || '-'}
                 </span>
@@ -69,6 +62,7 @@ export const OverviewStats = (props: IOverviewStastsProps) => {
                   onClick={() => goToAgents('active')}
                   className={'statWithLink'}
                   style={{ cursor: 'pointer' }}
+                  data-test-subj='spanActiveAgents'
                 >
                   {props.summary.active || '-'}
                 </span>
@@ -87,6 +81,7 @@ export const OverviewStats = (props: IOverviewStastsProps) => {
                   onClick={() => goToAgents('disconnected')}
                   className={'statWithLink'}
                   style={{ cursor: 'pointer' }}
+                  data-test-subj='spanDisconnectedAgents'
                 >
                   {props.summary.disconnected || '-'}
                 </span>
@@ -105,6 +100,7 @@ export const OverviewStats = (props: IOverviewStastsProps) => {
                   onClick={() => goToAgents('never_connected')}
                   className={'statWithLink'}
                   style={{ cursor: 'pointer' }}
+                  data-test-subj='spanNeverConnectedAgents'
                 >
                   {props.summary.never_connected || '-'}
                 </span>
